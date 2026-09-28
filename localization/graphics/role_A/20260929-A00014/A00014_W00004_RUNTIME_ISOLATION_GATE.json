@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00014",
+  "wave_id": "W00004",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T00:24:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "refreshed_head_before_write": "f5291bde9346f3f70f0d125536d3bf5a4ac61eb0",
+  "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "shard_rule": "odd numeric index only; no work stealing while lane B may be active",
+  "queue_recompute": {
+    "total_rows": 137,
+    "odd_rows": 69,
+    "odd_rework": 4,
+    "odd_pending_artwork": 34,
+    "odd_zoom_review_hold": 21
+  },
+  "reviewed_rework": [
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "status": "REWORK_REQUIRED",
+      "reason": "C85 visual/source-style gate rejects the shrink result despite containment. No new source/candidate DDS change exists since W00003; source-faithful rerender remains required."
+    },
+    {
+      "index": 53,
+      "asset": "568D3696",
+      "status": "REWORK_REQUIRED",
+      "reason": "DXT5/BC3 exact decoded-pixel-safe recompression and mip validation remains unresolved. No new DDS evidence exists in GitHub."
+    },
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "status": "REWORK_REQUIRED",
+      "reason": "Six overlap/artwork-sensitive regions remain after prior partial safe rework. No new source/candidate DDS evidence enables non-speculative reconstruction."
+    },
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "status": "REWORK_REQUIRED",
+      "reason": "Exact-bbox/collateral failures still require source-faithful per-element raster reconstruction. No new DDS evidence exists in GitHub."
+    }
+  ],
+  "latest_runtime_context": {
+    "source_commit": "f5291bde9346f3f70f0d125536d3bf5a4ac61eb0",
+    "observed": "User diagnostic run no longer crashed, but combined 16-DDS graphics test still has runtime visual failures involving dimensions/scaling, alpha/transparency, or sprite position.",
+    "lane_decision": "Do not guess which DDS is responsible and do not overwrite candidates from aggregate package evidence. Per-DDS isolation remains required before promotion or runtime-sensitive rework.",
+    "task_runtime_validation": "UNTESTED"
+  },
+  "anti_duplication": {
+    "previous_lane_terminal": "a05a5cb36f7b1f325e564c2cc4e03b4ff2890286",
+    "changes_since_previous_lane_terminal": "No HD source/candidate DDS path changed; subsequent changes are B/C records, shared state, crash diagnostic workflow/docs, and runtime feedback worklog.",
+    "repeated_completed_work": false
+  },
+  "self_qa": {
+    "zero_pixel_containment": "NO_NEW_ASSET_WRITE_CURRENT_C85_C86_EVIDENCE_REVIEWED",
+    "dds_format_compression_mips_alpha_orientation": "NO_NEW_ASSET_WRITE",
+    "runtime_dimension_scaling_alpha_position_gate": "BLOCKED_PENDING_PER_DDS_ISOLATION",
+    "parity_shard": "PASS_ODD_ONLY",
+    "shared_state_isolation": "PASS",
+    "speculative_rerender_avoided": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/progress/progress.json",
+    "localization/resume_state.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00013.json",
+    "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json",
+    "localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md",
+    "localization/WORKLOG.md"
+  ],
+  "note": "Durable W00004 lane-A blocker/no-action result. Aggregate user runtime feedback is not per-DDS approval evidence, and this task performed no in-game test."
+}
