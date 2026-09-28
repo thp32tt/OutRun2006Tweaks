@@ -1039,3 +1039,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - GitHub-only index 57 39229D64 exact-bbox rework; no N100/GPT Library/VR/FFB/build.
 - Automated containment 15/15 PASS, outside/collateral 0; candidate e98278b4dd1fea91cc23802f9ae0c64185edad96dc57177fe1f67b71f30fc8fa.
 - RUNTIME_VALIDATION=UNTESTED; independent C + DDS_ONLY in-game pending.
+
+
+## 2026-09-28T16:07:15+09:00 - A AUTO 00001 FF2462BB
+- GitHub-only index 51 FF2462BB rework; no N100/GPT Library/VR/FFB/build.
+- Repaired 21 exact-bbox failures without B91-style broad shrink: translate/trim without resampling where possible; only minimum-fit rows resampled.
+- Automated containment 21/21 PASS, outside/collateral 0; candidate f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb.
+- Independent C visual/source-style QA and isolated DDS_ONLY in-game pending; RUNTIME_VALIDATION=UNTESTED.

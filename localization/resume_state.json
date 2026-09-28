@@ -1,5 +1,5 @@
 {
-  "schema_version": 58,
+  "schema_version": 59,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
     "A AUTO 00001: 39229D64 self-QA PASS; pending independent C and DDS_ONLY in-game.",
     "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
     "C86: 62BEBF33 and E3FD08BE independently revalidated from current GitHub DDS; exact bbox containment PASS but top edge-touch high-risk. Keep unapproved until isolated DDS_ONLY in-game validation.",
@@ -646,9 +647,9 @@
       "status": "B94_SELF_QA_PASS_PENDING_C_INGAME"
     },
     "a_auto_00001_ff2462bb": {
-      "timestamp_kst": "2026-09-28T16:04:19+09:00",
+      "timestamp_kst": "2026-09-28T16:07:15+09:00",
       "report": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
-      "candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+      "candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
       "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"
     },
     "a_auto_00001_39229d64": {

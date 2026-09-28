@@ -3,12 +3,12 @@
   "role": "A",
   "run": "A_AUTO_00001_FF2462BB",
   "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
-  "timestamp_kst": "2026-09-28T16:04:19+09:00",
-  "base_head": "3a4fa5e2af7d2aea2d7d2afeff286e9923e6365e",
+  "timestamp_kst": "2026-09-28T16:07:15+09:00",
+  "base_head": "34d9594f4392544e650d28017fa47c475fb7f9c6",
   "asset": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
   "index": 51,
-  "previous_candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
-  "candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+  "previous_candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+  "candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
   "structure": {
     "dimensions": [
       4096,
@@ -35,9 +35,9 @@
         301
       ],
       "localized_bbox": [
-        9,
+        12,
         261,
-        81,
+        82,
         300
       ],
       "method": "translate_no_resample",
@@ -63,7 +63,7 @@
         6,
         321,
         260,
-        360
+        359
       ],
       "method": "translate_no_resample",
       "scale_x": 1.0,
@@ -113,7 +113,7 @@
         1138,
         388,
         1475,
-        428
+        427
       ],
       "method": "translate_no_resample",
       "scale_x": 1.0,
@@ -238,7 +238,7 @@
         3254,
         137,
         3519,
-        180
+        179
       ],
       "method": "translate_no_resample",
       "scale_x": 1.0,
@@ -336,9 +336,9 @@
       ],
       "localized_bbox": [
         906,
-        456,
+        457,
         1486,
-        520
+        521
       ],
       "method": "translate_no_resample",
       "scale_x": 1.0,
@@ -386,9 +386,9 @@
       ],
       "localized_bbox": [
         2594,
-        1333,
+        1337,
         2792,
-        1373
+        1374
       ],
       "method": "translate_no_resample",
       "scale_x": 1.0,
@@ -410,9 +410,9 @@
         779
       ],
       "localized_bbox": [
-        1345,
-        737,
-        1424,
+        1346,
+        746,
+        1421,
         785
       ],
       "method": "minimal_lanczos_fit",
@@ -460,9 +460,9 @@
         779
       ],
       "localized_bbox": [
-        2123,
-        737,
-        2202,
+        2124,
+        746,
+        2199,
         785
       ],
       "method": "minimal_lanczos_fit",
@@ -510,9 +510,9 @@
         779
       ],
       "localized_bbox": [
-        2903,
-        737,
-        2982,
+        2904,
+        746,
+        2979,
         785
       ],
       "method": "minimal_lanczos_fit",
