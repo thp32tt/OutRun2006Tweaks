@@ -18,6 +18,7 @@
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
 #include "vr/core/d3d9_draw_state.hpp"
+#include "vr/d3d11/runtime_census.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -1300,10 +1301,58 @@ namespace OutRunVRStereo
 			FrameHadDuplicatedDraw=true;++DuplicatedDraws;if(draw.worldStereo){if(FrameStereoPoseSequence==0){FrameStereoPoseSequence=draw.poseSequence;FrameStereoMetadata=draw.stereoFrame;}else if(FrameStereoPoseSequence!=draw.poseSequence){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);if(!FramePoseMismatchLogged){FramePoseMismatchLogged=true;++PoseSequenceMismatchFrames;spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");}}FrameHadWorldStereo=true;++WorldStereoDraws;if(!FirstWorldStereoLogged){FirstWorldStereoLogged=true;spdlog::info("VR stereo: TRUE GEOMETRY STEREO active; per-eye c64 + OpenXR asymmetric FOV confirmed");}}else ++NonWorldDuplicatedDraws;if(FAILED(rightHr)){FrameRightDrawFailed=true;InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(rightFailure);}if(!restoreOk){InvalidateRightDepthStencilIfLeftMayWrite(device);NoteRestoreFailure("right-eye draw");}return leftHr;
 		}
 
-		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minVertexIndex,UINT numVertices,UINT startIndex,UINT primitiveCount){auto call=[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device,type,baseVertexIndex,minVertexIndex,numVertices,startIndex,primitiveCount);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT primitiveCount,const void*data,UINT stride){if(InternalStereoPass)return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);auto call=[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT minVertexIndex,UINT numVertices,UINT primitiveCount,const void*indexData,D3DFORMAT indexFormat,const void*vertexData,UINT stride){auto call=[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device,type,minVertexIndex,numVertices,primitiveCount,indexData,indexFormat,vertexData,stride);};return ExecuteStereoDraw(device,call);}
+		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+		{
+			outrun::vr::dx11::observe_source_draw(device, type);
+			auto call = [&]() {
+				return DrawPrimitiveHook.stdcall<HRESULT>(
+					device, type, startVertex, primitiveCount);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
+
+		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, INT baseVertexIndex, UINT minVertexIndex,
+			UINT numVertices, UINT startIndex, UINT primitiveCount)
+		{
+			outrun::vr::dx11::observe_source_draw(device, type);
+			auto call = [&]() {
+				return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+					device, type, baseVertexIndex, minVertexIndex, numVertices,
+					startIndex, primitiveCount);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
+
+		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
+			UINT stride)
+		{
+			if (InternalStereoPass)
+				return DrawPrimitiveUPHook.stdcall<HRESULT>(
+					device, type, primitiveCount, data, stride);
+			outrun::vr::dx11::observe_source_draw(device, type);
+			auto call = [&]() {
+				return DrawPrimitiveUPHook.stdcall<HRESULT>(
+					device, type, primitiveCount, data, stride);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
+
+		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9* device,
+			D3DPRIMITIVETYPE type, UINT minVertexIndex, UINT numVertices,
+			UINT primitiveCount, const void* indexData, D3DFORMAT indexFormat,
+			const void* vertexData, UINT stride)
+		{
+			outrun::vr::dx11::observe_source_draw(device, type);
+			auto call = [&]() {
+				return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+					device, type, minVertexIndex, numVertices, primitiveCount,
+					indexData, indexFormat, vertexData, stride);
+			};
+			return ExecuteStereoDraw(device, call);
+		}
 
 		HRESULT __stdcall ClearDest(IDirect3DDevice9*device,DWORD count,const D3DRECT*rects,DWORD flags,D3DCOLOR color,float z,DWORD stencil)
 		{
