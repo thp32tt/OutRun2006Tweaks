@@ -11,6 +11,7 @@ $parseFiles = @(
     'Test-OutRunVROneClickPreflight.ps1',
     'Select-OutRunVRBackend.ps1',
     'Test-BackendSelectorTransaction.ps1',
+    'Test-RunOutRunVRFailureDiagnostics.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
     'Build-OutRunPCFast.ps1',
@@ -36,6 +37,9 @@ foreach ($name in $parseFiles) {
 
 $selectorTransactionTest = Join-Path $toolsRoot 'Test-BackendSelectorTransaction.ps1'
 & $selectorTransactionTest
+
+$runnerFailureTest = Join-Path $toolsRoot 'Test-RunOutRunVRFailureDiagnostics.ps1'
+& $runnerFailureTest
 
 $pythonFiles = @(
     'analyze_dxvk_session.py',
@@ -163,6 +167,26 @@ if ($collector -notmatch [regex]::Escape("VisualGateChecklist='ONE_RUN_VISUAL_CH
 }
 if ($collector -notmatch [regex]::Escape('VR_ONE_CLICK_PREFLIGHT.json')) {
     throw 'Collector does not preserve one-click preflight report.'
+}
+foreach ($requiredText in @(
+    '[switch]$Emergency',
+    'emergency-snapshot-running-process',
+    'Source logs/captures and CURRENT_VR_SESSION.json were preserved'
+)) {
+    if ($collector -notmatch [regex]::Escape($requiredText)) {
+        throw "Emergency collector contract missing: $requiredText"
+    }
+}
+$runnerText = Get-Content (Join-Path $toolsRoot 'Run-OutRunVRTest.ps1') -Raw
+foreach ($requiredText in @(
+    'GAME_LAUNCH_OR_WAIT',
+    'HOST_TEARDOWN',
+    '& $collector -Emergency',
+    'RUNNER_FAILURE.json'
+)) {
+    if ($runnerText -notmatch [regex]::Escape($requiredText)) {
+        throw "Runner failure diagnostic survivability contract missing: $requiredText"
+    }
 }
 foreach ($requiredText in @(
     'VR_ONE_CLICK_TARGET.json',
