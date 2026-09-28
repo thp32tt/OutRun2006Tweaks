@@ -1,0 +1,9 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
+  "lane": "LOCALIZATION_A",
+  "index": 51,
+  "asset": "FF2462BB",
+  "strategy": "integer_translation_only_no_resampling",
+  "runtime_validation": "UNTESTED",
+  "dispatched_from": "f06eb4f36170db51e46583d7e45d5daae4fdc051"
+}
