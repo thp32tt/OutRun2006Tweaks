@@ -152,50 +152,55 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
 
 
 async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, active: dict, q: dict) -> bool:
-    """Serialize Retry handling with adaptive backoff. Returns True when Retry owns this cycle."""
+    """Serialize Retry handling while distinguishing real rate pressure from generic transient Retry."""
     retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
     if retry is None:
         return False
 
     now = datetime.now(TZ)
-    if rate_limit_active(reg, now):
-        write_runtime(
-            status="rate_limited_backoff",
-            last_action=f"Retry visible for {active['task_id']}; waiting {rate_limit_seconds_remaining(reg, now)}s before any retry",
-            rate_limit_attempts=reg.rate_limit_attempts,
-            rate_limit_until=reg.rate_limit_until,
-        )
-        return True
+    retry_text = await retry_surface_text(page)
+    is_rate = any(re.search(p, retry_text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
 
-    last_backoff = _parse_iso(active.get("last_retry_backoff_at"))
-    last_click = _parse_iso(active.get("last_retry_click_at"))
+    if is_rate:
+        if rate_limit_active(reg, now):
+            write_runtime(
+                status="rate_limited_backoff",
+                last_action=f"Too many requests on {active['task_id']}; waiting {rate_limit_seconds_remaining(reg, now)}s",
+                rate_limit_attempts=reg.rate_limit_attempts,
+                rate_limit_until=reg.rate_limit_until,
+            )
+            return True
 
-    # First Retry after a send (or Retry returned after our last click): assume
-    # request pressure until proven otherwise. This prevents rapid Retry storms.
-    if last_backoff is None or (last_click is not None and (last_backoff is None or last_click > last_backoff)):
-        context = await retry_surface_text(page)
-        source = f"queue-retry:{active['task_id']}"
-        if await retry_looks_rate_limited(page):
-            source += ":too-many-requests"
-        else:
-            source += ":conservative"
-        mark_rate_limit(reg, now, source)
-        active["last_retry_backoff_at"] = now.isoformat()
-        active["last_retry_context"] = context[:500]
-        slot.last_result = "queue_retry_backoff"
-        slot.last_watchdog_at = now.isoformat()
-        save_registry(reg)
-        save_queue_state(q)
-        return True
+        last_backoff = _parse_iso(active.get("last_retry_backoff_at"))
+        last_click = _parse_iso(active.get("last_retry_click_at"))
+        if last_backoff is None or (last_click is not None and last_click > last_backoff):
+            mark_rate_limit(reg, now, f"queue-retry:{active['task_id']}:too-many-requests")
+            active["last_retry_backoff_at"] = now.isoformat()
+            active["last_retry_context"] = retry_text[:500]
+            slot.last_result = "queue_rate_limit_backoff"
+            save_registry(reg)
+            save_queue_state(q)
+            return True
 
-    # Backoff has expired and no retry has been clicked since that backoff.
-    guard = send_guard_reason(reg, slot, now)
-    if guard:
-        write_runtime(
-            status="retry_wait",
-            last_action=f"Retry for {active['task_id']} waiting for {guard}",
-        )
-        return True
+        guard = send_guard_reason(reg, slot, now)
+        if guard:
+            write_runtime(status="retry_wait", last_action=f"Rate-limit Retry for {active['task_id']} waiting for {guard}")
+            return True
+    else:
+        # Generic Retry is usually a transient generation/UI failure. Keep it fast.
+        last_click = _parse_iso(active.get("last_retry_click_at"))
+        if last_click:
+            age = (now - last_click).total_seconds()
+            if age < RETRY_BUTTON_COOLDOWN_SECONDS:
+                write_runtime(
+                    status="retry_wait",
+                    last_action=f"Generic Retry for {active['task_id']} cooling down {max(1, int(RETRY_BUTTON_COOLDOWN_SECONDS-age))}s",
+                )
+                return True
+        guard = send_guard_reason(reg, slot, now)
+        if guard and not guard.startswith("slot_dedup:"):
+            write_runtime(status="retry_wait", last_action=f"Generic Retry for {active['task_id']} waiting for {guard}")
+            return True
 
     if await click_retry_generation(page):
         request_now = datetime.now(TZ)
@@ -207,20 +212,17 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
         slot.last_sent_at = request_now.isoformat()
         slot.last_assistant_hash = None
         slot.last_assistant_change_at = request_now.isoformat()
-        slot.last_result = "queue_retry_clicked_after_backoff"
+        slot.last_result = "queue_retry_clicked"
         save_registry(reg)
         save_queue_state(q)
         write_runtime(
             status="queue_retry_clicked",
-            last_action=f"Clicked one controlled Retry for {active['task_id']} after adaptive backoff",
+            last_action=f"Clicked one controlled {'rate-limit' if is_rate else 'generic'} Retry for {active['task_id']}",
             queue=active,
         )
         return True
 
-    write_runtime(
-        status="retry_wait",
-        last_action=f"Retry visible for {active['task_id']} but controlled click was not available",
-    )
+    write_runtime(status="retry_wait", last_action=f"Retry visible for {active['task_id']} but controlled click unavailable")
     return True
 
 
