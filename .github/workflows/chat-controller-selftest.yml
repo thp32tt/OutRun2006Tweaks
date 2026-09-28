@@ -19,6 +19,16 @@ jobs:
           cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
           python -m py_compile /tmp/controller.py
 
+      - name: Check undefined Python names
+        run: |
+          python -m pip install --disable-pip-version-check --quiet pyflakes
+          pyflakes /tmp/controller.py | tee /tmp/pyflakes.txt || true
+          if grep -q "undefined name" /tmp/pyflakes.txt; then
+            echo "Undefined Python names detected:"
+            grep "undefined name" /tmp/pyflakes.txt
+            exit 1
+          fi
+
       - name: Validate Portainer compose files
         run: |
           docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-vr.yml config >/tmp/vr-compose.txt
