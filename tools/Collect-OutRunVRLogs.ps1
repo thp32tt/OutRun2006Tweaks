@@ -136,6 +136,38 @@ if(Test-Path $captureRoot){
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
 
+$oneClickTargetPath=Join-Path $root 'VR_ONE_CLICK_TARGET.json'
+$oneClickTarget=$null
+$developmentBranch='unknown'
+$rendererTarget='unknown'
+$developmentStage='unknown'
+$nativeDrawPathActive=$false
+$dxvkVersion=''
+if(Test-Path $oneClickTargetPath){
+    try{
+        $oneClickTarget=Get-Content $oneClickTargetPath -Raw|ConvertFrom-Json
+        if($oneClickTarget.DevelopmentBranch){$developmentBranch=[string]$oneClickTarget.DevelopmentBranch}
+        if($oneClickTarget.RendererTarget){$rendererTarget=[string]$oneClickTarget.RendererTarget}
+        if($oneClickTarget.Stage){$developmentStage=[string]$oneClickTarget.Stage}
+        if($null -ne $oneClickTarget.NativeDrawPathActive){$nativeDrawPathActive=[bool]$oneClickTarget.NativeDrawPathActive}
+        if($oneClickTarget.DxvkVersion){$dxvkVersion=[string]$oneClickTarget.DxvkVersion}
+        Copy-Item $oneClickTargetPath $dest -Force
+        $copied+='VR_ONE_CLICK_TARGET.json'
+    }catch{
+        Write-Warning "Could not parse VR_ONE_CLICK_TARGET.json: $($_.Exception.Message)"
+    }
+}
+
+if($backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'){
+    foreach($name in @('DXVK_VERSION.txt','DXVK_D3D9_SHA256.txt')){
+        $providerMeta=Join-Path $root ("backends/dxvk/" + $name)
+        if(Test-Path $providerMeta){
+            Copy-Item $providerMeta $dest -Force
+            $copied+=$name
+        }
+    }
+}
+
 $matchesUpstream=$false
 $exeSemanticIdentity='MISSING'
 $gameExe=Join-Path $root 'OR2006C2C.EXE'
@@ -253,7 +285,7 @@ if(Test-Path $hudCsv){
 
 $sha=if($state.SourceSha){[string]$state.SourceSha}else{$activeSourceSha}
 if($sha -eq 'unknown'){
-    $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
+    $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe' -or $backend -eq 'dx11'){'d3d9'}else{$backend}
     $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
     if(Test-Path $source){$sha=(Get-Content $source -Raw).Trim()}
 }
@@ -280,7 +312,11 @@ $analysisRequest=[ordered]@{
     AutoAnalyzeOnUpload=$true
     RequiresUserDescription=$false
     Project='OutRun2006Tweaks VR'
-    IntegrationBranch='vr-d3d9ex-focus'
+    IntegrationBranch=$developmentBranch
+    RendererTarget=$rendererTarget
+    DevelopmentStage=$developmentStage
+    NativeDrawPathActive=$nativeDrawPathActive
+    DxvkVersion=$dxvkVersion
     BuildMatrixId=$matrix
     VariantId=$variant
     Backend=$backend
@@ -306,6 +342,9 @@ $analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_
     "backend=$backend"
     "profile=$profile"
     "sourceSha=$sha"
+    "developmentBranch=$developmentBranch"
+    "rendererTarget=$rendererTarget"
+    "developmentStage=$developmentStage"
 )|Set-Content (Join-Path $dest 'UPLOAD_THIS_ZIP.txt') -Encoding UTF8
 $copied+='ANALYSIS_REQUEST.json'
 $copied+='UPLOAD_THIS_ZIP.txt'
@@ -338,6 +377,11 @@ if($assetSemanticsPresent){
     "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
     "BUILD_MATRIX=$matrix"
     "SOURCE_SHA=$sha"
+    "DEVELOPMENT_BRANCH=$developmentBranch"
+    "RENDERER_TARGET=$rendererTarget"
+    "DEVELOPMENT_STAGE=$developmentStage"
+    "NATIVE_DRAW_PATH_ACTIVE=$nativeDrawPathActive"
+    "DXVK_VERSION=$dxvkVersion"
     "CONFIG_SHA256=$configHash"
     "EXE_SEMANTIC_IDENTITY=$exeSemanticIdentity"
     "EXE_SEMANTIC_BASELINE_VALID=$matchesUpstream"
@@ -361,6 +405,11 @@ if($assetSemanticsPresent){
     SessionStartedUtc=$startedUtc.ToString('o')
     BuildMatrixId=$matrix
     GitSha=$sha
+    DevelopmentBranch=$developmentBranch
+    RendererTarget=$rendererTarget
+    DevelopmentStage=$developmentStage
+    NativeDrawPathActive=$nativeDrawPathActive
+    DxvkVersion=$dxvkVersion
     ConfigSha256=$configHash
     ExeSemanticIdentity=$exeSemanticIdentity
     ExeSemanticBaselineValid=$matchesUpstream
