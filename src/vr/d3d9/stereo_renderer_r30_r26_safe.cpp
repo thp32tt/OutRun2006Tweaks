@@ -1350,7 +1350,10 @@ namespace OutRunVRStereo
             R68StageHoldRemaining = 0;
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
-            return R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr =
+                R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            outrun::vr::dx11::observe_device_reset_generation(hr);
+            return hr;
         }
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
