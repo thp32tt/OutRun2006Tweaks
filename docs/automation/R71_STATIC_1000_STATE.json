@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 9,
+  "completedCycles": 10,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "6b3544520713e067dc77b69c43257a31c6881d79",
+  "currentHead": "fa735613decd14685c4ac4b2bd14a76c47d675b5",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -271,18 +271,58 @@
       "automationValidation": "PASS: Build 36463037708; OpenXR architecture 36463038710 (host-x64 109066117776); HUD Inspector 36463038533",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 10: add a bounded, testable release-before-watermark enumerator/adapter that stages only current-run DirectGPU frames proven never sampled; integrate with immediate skip/transition paths only after LEVEL0 coverage proves sampled/deferred identities cannot enter the queue."
+    },
+    {
+      "cycle": 10,
+      "lenses": [
+        "architecture/control-flow: latest-frame skip ownership",
+        "lifetime/reset/sync: stage-before-ACK durability",
+        "stereo/HUD/visual correctness: no rendering classification changes",
+        "hot path/frame pacing/copies/waits: retry only metadata ACK, no GPU wait/copy added",
+        "adversarial/falsification: deferred EVENT exclusion and same-slot conflict"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "Wired the cycle-8 durable queue only into the existing latest-frame-wins older-frame skip path after R23DeferredSlotBlocked excludes sampled/deferred ownership.",
+        "Ownership is staged before PublishCompletedFrame, so transient ACK publication failure survives later selection-watermark advancement and is retried on subsequent gameplay ticks.",
+        "A different frame in the same live producer slot while retry ownership is pending faults the transport generation rather than replacing the unresolved identity.",
+        "STOPPING/reference-space/presentation transition release-before-watermark enumeration remains deferred; current history classification is not yet bounded enough to prove every transition candidate never sampled."
+      ],
+      "evidence": [
+        "960b63acd0a3c51be622cb15e950ef758d646b39 runtime adapter",
+        "26b56df6d8f35f45eacb927e85d97fae37424c7f LEVEL0 watermark regression",
+        "fa735613decd14685c4ac4b2bd14a76c47d675b5 structural ownership verifier",
+        "Issue #14 comment 5880071326"
+      ],
+      "changedFiles": [
+        "vrhost/src/main_r23.cpp",
+        "vrhost/tests/r41_skipped_release_smoke.cpp",
+        "tools/verify_vr_r32_review.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "960b63acd0a3c51be622cb15e950ef758d646b39",
+        "26b56df6d8f35f45eacb927e85d97fae37424c7f",
+        "fa735613decd14685c4ac4b2bd14a76c47d675b5"
+      ],
+      "automationValidation": "EXACT_HEAD_PR80_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 11: consume exact-head PR #80 CI. If green, design a bounded transition-history adapter that excludes deferred/sampled identities before advancing STOPPING/reference-space/presentation watermarks."
     }
   ],
   "nextCycle": {
-    "cycle": 10,
+    "cycle": 11,
     "priority": [
-      "design/test release-before-watermark enumeration using full producer identity",
-      "prove sampled/deferred EVENT identities are excluded",
-      "wire immediate-skip retry only if LEVEL0 adapter tests pass",
-      "then cover STOPPING/LOCAL reference-space/presentation transitions",
-      "do not alter waits/copies/HUD/visual tuning without runtime evidence"
+      "consume exact-head PR #80 Build/OpenXR/HUD Inspector",
+      "repair deterministic compile/verifier failures only",
+      "design bounded transition-history release adapter",
+      "prove deferred/sampled identities excluded at transitions",
+      "do not change waits/copies/HUD/visual tuning without runtime evidence"
     ],
-    "guard": "Never stage a frame in the skipped-release queue if D3D11 sampled it or R23 deferred EVENT ownership exists. Keep frozen 34eef500 user-test package immutable."
+    "guard": "Keep frozen 34eef500 user-test package immutable; never queue sampled/deferred identities."
   },
-  "updatedKst": "2026-09-29T07:45:00+09:00"
+  "updatedKst": "2026-09-29T07:58:00+09:00"
 }
