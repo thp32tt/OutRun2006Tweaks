@@ -1,0 +1,46 @@
+{
+  "task_id": "CONVERSION-DXVK-00008",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "d76c5ba4895fbdcc865795f11a2404d1e18aaf17",
+  "result_sha": "27bd1e89bdac1d547bd9994eb5ea51901d08d81a",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-CLEAN-PERFORMANCE-PROFILE",
+  "summary": "Selected the highest-priority runnable DXVK item after CONVERSION-DXVK-00006: clean performance-profile isolation. The runner now allows only dxvk-safe + PERFORMANCE to consume the canonical PERFORMANCE profile cadence policy, explicitly forces HudInspector=false for that path, disables OUTRUN_VR_SHADER_FINGERPRINT for that path, and records clean-performance/instrumentation state in RUN_OVERRIDES.txt. DXVK CORRECTNESS, DXVK multiview, D3D9 reference behavior and renderer/provider ownership are unchanged. The one-click contract now parses the profile library, validates the PERFORMANCE cadence arguments and verifies the DXVK SAFE clean-performance branch/instrumentation guards.",
+  "changed_paths": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "source_commits": [
+    "b218211169bcdbde314c0bad9ac263b6eac7e2f6",
+    "375e75fbbfa3acc41552b1aeb1c25cf5177f5fc5",
+    "27bd1e89bdac1d547bd9994eb5ea51901d08d81a"
+  ],
+  "review": {
+    "architecture": "Scoped to runner/profile selection only; no renderer, provider, selector payload or vr-d3d9ex-focus mutation.",
+    "lifetime_sync": "No resource lifetime, fence, ACK, Reset or OpenXR ownership changes.",
+    "stereo_correctness": "CORRECTNESS stays on the pre-existing conservative non-D3D9 path; no visual ownership or stereo classification changes.",
+    "performance": "DXVK SAFE PERFORMANCE now uses profile-equivalent cadence and removes forced HUD inspector/shader fingerprint runtime instrumentation while retaining DXVK provider/version logging.",
+    "adversarial": "DXVK multiview is deliberately excluded from the clean-performance condition; no runtime-performance claim is made without Quest 3/VDXR evidence."
+  },
+  "regression_revalidation": [
+    "VR-STARTUP-WHITE-001: launch/profile configuration trigger; automatic checks required and HMD status remains UNTESTED.",
+    "VR-R50-FRAME-STABILITY-PRESERVE-001: cadence/pacing trigger; clean profile is methodology infrastructure only, not a performance verdict."
+  ],
+  "evidence": [
+    "C0 read current branch HEAD, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, VR durable state, Set 08/10 review evidence, prior CONVERSION-DXVK-00006 state, regression knowledge/history and production ledger.",
+    "Set 08 F27/F28/F29 and S08-R10 identify non-equivalent DXVK cadence plus forced HUD inspector/shader fingerprint as blockers to benchmark-grade evidence.",
+    "Prior task state leaves exactly two DXVK items: exact-build Quest 3/VDXR visual parity and DXVK-CLEAN-PERFORMANCE-PROFILE. The former is runtime-blocked, so the latter is the highest-priority runnable software item.",
+    "Run-OutRunVRTest.ps1 limits profile-equivalent launch to backend=dxvk-safe and TestProfile=PERFORMANCE. Other non-D3D9 paths retain the conservative policy.",
+    "PERFORMANCE clean mode explicitly appends -HudInspector=false, clears OUTRUN_VR_SHADER_FINGERPRINT, and records cleanDxvkPerformance/hudInspectorEnabled/shaderFingerprintEnabled.",
+    "Test-VROneClickContract.ps1 checks PERFORMANCE cadence arguments, rejects conservative cadence arguments and statically requires the DXVK SAFE-only clean-performance guards.",
+    "A post-commit self-review found interpolation-prone test literals under StrictMode; commit 27bd1e89bdac1d547bd9994eb5ea51901d08d81a corrects them before canonical CI validation."
+  ],
+  "open_work_items": [
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY"
+  ],
+  "next_action": "Require exact-SHA GitHub Actions validation for 27bd1e89bdac1d547bd9994eb5ea51901d08d81a. If automatic checks pass, mark DXVK clean-performance profile infrastructure complete while keeping RUNTIME_VALIDATION=UNTESTED; use a later exact-build Quest 3/VDXR PERFORMANCE run for any actual pacing/performance conclusion.",
+  "recorded_at": "2026-09-28T20:09:00+09:00"
+}
