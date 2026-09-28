@@ -15,6 +15,11 @@ PROBE_RE = re.compile(
     r"stockHr=0x(?P<stockHr>[0-9A-Fa-f]+) exHr=0x(?P<exHr>[0-9A-Fa-f]+)"
     r"(?: source=(?P<source>[A-Za-z0-9_.-]+) "
     r"attestation=(?P<attestation>\d+))?"
+    r"(?: vkHandles=(?P<vkHandles>[01]) vkQueue=(?P<vkQueue>[01]) "
+    r"extMemoryWin32=(?P<extMemoryWin32>[01]) "
+    r"extSemaphoreWin32=(?P<extSemaphoreWin32>[01]) "
+    r"nativeTransportCandidate=(?P<nativeTransportCandidate>[01]) "
+    r"queueFamily=(?P<queueFamily>\d+) queueIndex=(?P<queueIndex>\d+))?"
 )
 
 DXVK_VERSION_RE = re.compile(r"DXVK:\s*v?(?P<version>\d+\.\d+(?:\.\d+)?)", re.I)
@@ -58,6 +63,41 @@ def main() -> int:
                         "attestation": (
                             int(data["attestation"])
                             if data.get("attestation")
+                            else None
+                        ),
+                        "stock_vk_handles": (
+                            bool(int(data["vkHandles"]))
+                            if data.get("vkHandles") is not None
+                            else None
+                        ),
+                        "stock_vk_submission_queue": (
+                            bool(int(data["vkQueue"]))
+                            if data.get("vkQueue") is not None
+                            else None
+                        ),
+                        "external_memory_win32": (
+                            bool(int(data["extMemoryWin32"]))
+                            if data.get("extMemoryWin32") is not None
+                            else None
+                        ),
+                        "external_semaphore_win32": (
+                            bool(int(data["extSemaphoreWin32"]))
+                            if data.get("extSemaphoreWin32") is not None
+                            else None
+                        ),
+                        "native_transport_candidate": (
+                            bool(int(data["nativeTransportCandidate"]))
+                            if data.get("nativeTransportCandidate") is not None
+                            else None
+                        ),
+                        "queue_family_index": (
+                            int(data["queueFamily"])
+                            if data.get("queueFamily") is not None
+                            else None
+                        ),
+                        "queue_index": (
+                            int(data["queueIndex"])
+                            if data.get("queueIndex") is not None
                             else None
                         ),
                     }
@@ -154,6 +194,14 @@ def main() -> int:
         "PreflightProviderSha256": expected_hash,
         "DetectedDxvkVersions": unique_versions,
         "RuntimeVersionMatchesPreflight": version_match,
+        "NativeTransportPrerequisitesObserved": (
+            latest.get("native_transport_candidate") if latest else None
+        ),
+        "NativeTransportPrerequisiteNote": (
+            "Passive capability evidence only. A true cross-process DXVK transport "
+            "still requires explicit external-memory allocation/export/import plus "
+            "generation/fence/consumer-ACK synchronization before runtime use."
+        ),
         "DxvkLogFiles": sorted(set(dxvk_log_files)),
         "DeviceEvidence": device_lines,
     }

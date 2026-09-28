@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 struct IDirect3DDevice9;
 
 namespace OutRunVR::Dxvk
@@ -11,6 +13,13 @@ namespace OutRunVR::Dxvk
         bool gameLocalProvider{};
         bool stockDxvkInterop{};
         bool d3d9ExAvailable{};
+        bool stockDxvkVulkanHandles{};
+        bool stockDxvkSubmissionQueue{};
+        bool externalMemoryWin32{};
+        bool externalSemaphoreWin32{};
+        bool nativeTransportCandidate{};
+        std::uint32_t stockQueueIndex{0xffffffffu};
+        std::uint32_t stockQueueFamilyIndex{0xffffffffu};
         long stockDxvkInteropHr{};
         long d3d9ExHr{};
     };

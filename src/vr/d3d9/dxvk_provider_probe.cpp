@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <cstring>
 #include <cwchar>
 #include <filesystem>
 #include <string>
@@ -12,20 +13,13 @@
 #include <spdlog/spdlog.h>
 
 #include "vr/d3d9/dxvk_provider_probe.hpp"
+#include "vr/d3d9/dxvk_stock_interop.hpp"
 #include "vr/game/disasm_render_contract.hpp"
 
 namespace OutRunVR::Dxvk
 {
     namespace
     {
-        // Stock DXVK D3D9 Vulkan interop IID. Verified against official DXVK
-        // v3.1 and current master d3d9_interfaces.h on 2026-09-28. Detection
-        // only: no custom fork API is armed.
-        const GUID DxvkVkInteropDeviceIid{
-            0x2eaa4b89u, 0x0107u, 0x4bdbu,
-            { 0x87u, 0xf7u, 0x0fu, 0x54u, 0x1cu, 0x49u, 0x3cu, 0xe0u }
-        };
-
         bool ModulePath(HMODULE module, std::wstring& out) noexcept
         {
             if (!module)
@@ -62,6 +56,68 @@ namespace OutRunVR::Dxvk
         }
 
         std::atomic<std::uint64_t> ProviderAttestationSequence{0};
+
+        void ProbeStockNativeTransportPrerequisites(
+            ID3D9VkInteropDeviceR71* interop,
+            ProviderSnapshot& snapshot) noexcept
+        {
+            if (!interop)
+                return;
+
+            void* instance = nullptr;
+            void* physicalDevice = nullptr;
+            void* vkDevice = nullptr;
+            void* submissionQueue = nullptr;
+            std::uint32_t queueIndex = 0xffffffffu;
+            std::uint32_t queueFamilyIndex = 0xffffffffu;
+
+            interop->GetVulkanHandles(
+                &instance, &physicalDevice, &vkDevice);
+            interop->GetSubmissionQueue(
+                &submissionQueue, &queueIndex, &queueFamilyIndex);
+
+            snapshot.stockDxvkVulkanHandles =
+                instance != nullptr &&
+                physicalDevice != nullptr &&
+                vkDevice != nullptr;
+            snapshot.stockDxvkSubmissionQueue =
+                submissionQueue != nullptr &&
+                queueIndex != 0xffffffffu &&
+                queueFamilyIndex != 0xffffffffu;
+            snapshot.stockQueueIndex = queueIndex;
+            snapshot.stockQueueFamilyIndex = queueFamilyIndex;
+
+            // DXVK v3.1.1 enables VK_KHR_external_memory_win32 and
+            // VK_KHR_external_semaphore_win32 when the physical device supports
+            // them. Querying the corresponding device entry points proves the
+            // running stock device actually enabled those capabilities. This is
+            // passive: no image, memory, semaphore, queue submission or layout
+            // transition is created or performed.
+            HMODULE vulkan = GetModuleHandleW(L"vulkan-1.dll");
+            if (vulkan && vkDevice)
+            {
+                const auto getDeviceProcAddr =
+                    reinterpret_cast<DxvkStock::GetDeviceProcAddrFn>(
+                        GetProcAddress(vulkan, "vkGetDeviceProcAddr"));
+                if (getDeviceProcAddr)
+                {
+                    snapshot.externalMemoryWin32 =
+                        getDeviceProcAddr(
+                            vkDevice,
+                            DxvkStock::GetMemoryWin32HandleFunction) != nullptr;
+                    snapshot.externalSemaphoreWin32 =
+                        getDeviceProcAddr(
+                            vkDevice,
+                            DxvkStock::GetSemaphoreWin32HandleFunction) != nullptr;
+                }
+            }
+
+            snapshot.nativeTransportCandidate =
+                snapshot.stockDxvkVulkanHandles &&
+                snapshot.stockDxvkSubmissionQueue &&
+                snapshot.externalMemoryWin32 &&
+                snapshot.externalSemaphoreWin32;
+        }
 
         bool IsGameLocalD3D9Provider(HMODULE module) noexcept
         {
@@ -123,15 +179,18 @@ namespace OutRunVR::Dxvk
         if (!device)
             return snapshot;
 
-        IUnknown* stockInterop = nullptr;
+        ID3D9VkInteropDeviceR71* stockInterop = nullptr;
         const HRESULT stockHr = device->QueryInterface(
-            DxvkVkInteropDeviceIid,
+            __uuidof(ID3D9VkInteropDeviceR71),
             reinterpret_cast<void**>(&stockInterop));
         snapshot.stockDxvkInteropHr = static_cast<long>(stockHr);
         snapshot.stockDxvkInterop =
             SUCCEEDED(stockHr) && stockInterop != nullptr;
         if (stockInterop)
+        {
+            ProbeStockNativeTransportPrerequisites(stockInterop, snapshot);
             stockInterop->Release();
+        }
 
         IDirect3DDevice9Ex* deviceEx = nullptr;
         const HRESULT exHr = device->QueryInterface(
@@ -154,7 +213,7 @@ namespace OutRunVR::Dxvk
         const auto attestation =
             ProviderAttestationSequence.fetch_add(1, std::memory_order_relaxed) + 1;
         spdlog::info(
-            "VR DXVK R71 census: providerLoaded={} nonSystem={} gameLocal={} stockInterop={} D3D9Ex={} stockHr=0x{:08X} exHr=0x{:08X} source={} attestation={}",
+            "VR DXVK R71 census: providerLoaded={} nonSystem={} gameLocal={} stockInterop={} D3D9Ex={} stockHr=0x{:08X} exHr=0x{:08X} source={} attestation={} vkHandles={} vkQueue={} extMemoryWin32={} extSemaphoreWin32={} nativeTransportCandidate={} queueFamily={} queueIndex={}",
             snapshot.d3d9ProviderLoaded ? 1 : 0,
             snapshot.nonSystemProvider ? 1 : 0,
             snapshot.gameLocalProvider ? 1 : 0,
@@ -163,6 +222,13 @@ namespace OutRunVR::Dxvk
             static_cast<unsigned>(snapshot.stockDxvkInteropHr),
             static_cast<unsigned>(snapshot.d3d9ExHr),
             source ? source : "unknown",
-            attestation);
+            attestation,
+            snapshot.stockDxvkVulkanHandles ? 1 : 0,
+            snapshot.stockDxvkSubmissionQueue ? 1 : 0,
+            snapshot.externalMemoryWin32 ? 1 : 0,
+            snapshot.externalSemaphoreWin32 ? 1 : 0,
+            snapshot.nativeTransportCandidate ? 1 : 0,
+            snapshot.stockQueueFamilyIndex,
+            snapshot.stockQueueIndex);
     }
 }

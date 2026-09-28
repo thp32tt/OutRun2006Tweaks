@@ -337,6 +337,24 @@ switch ([string]$target.RendererTarget) {
         if (!(Test-Path (Join-Path $repoRoot 'src/vr/d3d9/dxvk_provider_probe.cpp'))) {
             throw 'DXVK passive provider probe is missing.'
         }
+        $stockInteropHeaderPath = Join-Path $repoRoot 'src/vr/d3d9/dxvk_stock_interop.hpp'
+        if (!(Test-Path $stockInteropHeaderPath)) {
+            throw 'DXVK stock interop ABI declaration is missing.'
+        }
+        $stockInteropHeader = Get-Content $stockInteropHeaderPath -Raw
+        foreach ($requiredText in @(
+            'ID3D9VkInteropDeviceR71',
+            'GetVulkanHandles',
+            'GetSubmissionQueue',
+            'VK_KHR_external_memory_win32',
+            'VK_KHR_external_semaphore_win32',
+            'vkGetMemoryWin32HandleKHR',
+            'vkGetSemaphoreWin32HandleKHR'
+        )) {
+            if ($stockInteropHeader -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK stock native-transport ABI gate missing: $requiredText"
+            }
+        }
         $deviceProbe = Get-Content (Join-Path $repoRoot 'src/vr/d3d9/device_probe.cpp') -Raw
         if ($deviceProbe -notmatch [regex]::Escape('OutRunVR::Dxvk::LogProviderCensus')) {
             throw 'DXVK provider census is not connected to the startup device lifecycle.'
@@ -347,7 +365,10 @@ switch ([string]$target.RendererTarget) {
         }
         foreach ($requiredText in @(
             'LogProviderCensus',
-            'source={} attestation={}'
+            'source={} attestation={}',
+            'ProbeStockNativeTransportPrerequisites',
+            'nativeTransportCandidate',
+            'vkGetDeviceProcAddr'
         )) {
             if ($providerProbe -notmatch [regex]::Escape($requiredText)) {
                 throw "DXVK provider re-attestation logger missing: $requiredText"
@@ -369,7 +390,9 @@ switch ([string]$target.RendererTarget) {
         foreach ($requiredText in @(
             'DXVK_DEVICE_CREATION_REATTESTATION_MISSING',
             'DXVK_DEVICE_CREATION_REATTESTATION_FAILED',
-            'DeviceCreationReattestationPassed'
+            'DeviceCreationReattestationPassed',
+            'NativeTransportPrerequisitesObserved',
+            'nativeTransportCandidate'
         )) {
             if ($dxvkAnalyzer -notmatch [regex]::Escape($requiredText)) {
                 throw "DXVK session analyzer recreation gate missing: $requiredText"

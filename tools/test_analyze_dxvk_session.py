@@ -16,8 +16,17 @@ PROBE_BASE = (
     "VR DXVK R71 census: providerLoaded=1 nonSystem=1 gameLocal=1 "
     "stockInterop=1 D3D9Ex=1 stockHr=0x00000000 exHr=0x00000000"
 )
-PROBE_CREATE_EX = PROBE_BASE + " source=create-device-ex attestation=1"
-PROBE_STARTUP = PROBE_BASE + " source=startup-observer attestation=2"
+PROBE_NATIVE = (
+    " vkHandles=1 vkQueue=1 extMemoryWin32=1 extSemaphoreWin32=1 "
+    "nativeTransportCandidate=1 queueFamily=0 queueIndex=0"
+)
+PROBE_CREATE_EX = (
+    PROBE_BASE + " source=create-device-ex attestation=1" + PROBE_NATIVE
+)
+PROBE_STARTUP = (
+    PROBE_BASE + " source=startup-observer attestation=2" + PROBE_NATIVE
+)
+PROBE_CREATE_EX_LEGACY = PROBE_BASE + " source=create-device-ex attestation=1"
 
 
 def run_case(
@@ -30,6 +39,7 @@ def run_case(
     probe_lines: list[str] | None = None,
     expected_create_count: int = 1,
     expected_reattest_passed: bool = True,
+    expected_native_transport: bool | None = True,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix=f"dxvk-analyzer-{name}-") as temp:
         session = Path(temp)
@@ -65,18 +75,24 @@ def run_case(
         actual_match = report.get("RuntimeVersionMatchesPreflight")
         actual_count = report.get("DeviceCreationReattestationCount")
         actual_passed = report.get("DeviceCreationReattestationPassed")
+        actual_native_transport = report.get(
+            "NativeTransportPrerequisitesObserved"
+        )
         if (
             actual_status != expected_status
             or actual_match is not expected_match
             or actual_count != expected_create_count
             or actual_passed is not expected_reattest_passed
+            or actual_native_transport is not expected_native_transport
         ):
             raise AssertionError(
                 f"{name}: status={actual_status!r} match={actual_match!r} "
-                f"create_count={actual_count!r} reattest={actual_passed!r}; "
+                f"create_count={actual_count!r} reattest={actual_passed!r} "
+                f"native_transport={actual_native_transport!r}; "
                 f"expected status={expected_status!r} match={expected_match!r} "
                 f"create_count={expected_create_count!r} "
-                f"reattest={expected_reattest_passed!r}"
+                f"reattest={expected_reattest_passed!r} "
+                f"native_transport={expected_native_transport!r}"
             )
 
 
@@ -140,6 +156,16 @@ def main() -> int:
         probe_lines=[PROBE_CREATE_EX, PROBE_STARTUP, failed_recreation],
         expected_create_count=2,
         expected_reattest_passed=False,
+        expected_native_transport=None,
+    )
+    run_case(
+        "legacy-log-without-native-transport-gate",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="STOCK_DXVK_PROVIDER_VERIFIED",
+        expected_match=True,
+        probe_lines=[PROBE_CREATE_EX_LEGACY],
+        expected_native_transport=None,
     )
     print("DXVK session analyzer regression tests: OK")
     return 0
