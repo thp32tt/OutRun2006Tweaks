@@ -193,8 +193,10 @@ namespace OutRunVRStereo
         // false negatives are impossible because registration sets the bit.
         std::atomic<std::uint64_t> R30TrackedVertexBloom{ 0 };
         std::atomic<std::uint64_t> R30TrackedIndexBloom{ 0 };
-        std::atomic<std::uint32_t> R30VertexRegistrationsInFlight{ 0 };
-        std::atomic<std::uint32_t> R30IndexRegistrationsInFlight{ 0 };
+        std::array<std::atomic<std::uint32_t>, 64>
+            R30VertexRegistrationsInFlight{};
+        std::array<std::atomic<std::uint32_t>, 64>
+            R30IndexRegistrationsInFlight{};
 
         struct R30RegistrationFlightGuard
         {
@@ -212,13 +214,19 @@ namespace OutRunVRStereo
         };
 
         template <typename T>
-        std::uint64_t R30ShadowBloomBit(T* buffer) noexcept
+        std::size_t R30ShadowBucket(T* buffer) noexcept
         {
             const auto value =
                 reinterpret_cast<std::uintptr_t>(buffer);
             const auto mixed =
                 (value >> 4) ^ (value >> 13) ^ (value >> 23);
-            return 1ull << (mixed & 63u);
+            return static_cast<std::size_t>(mixed & 63u);
+        }
+
+        template <typename T>
+        std::uint64_t R30ShadowBloomBit(T* buffer) noexcept
+        {
+            return 1ull << R30ShadowBucket(buffer);
         }
 
         bool R30MaybeTrackedVertex(
@@ -244,18 +252,12 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return false;
-            if (R30MaybeTrackedVertex(buffer))
-            {
-                while (R30VertexRegistrationsInFlight.load(
-                           std::memory_order_acquire) != 0)
-                    SwitchToThread();
-                return R30MaybeTrackedVertex(buffer);
-            }
-            if (R30VertexRegistrationsInFlight.load(
-                    std::memory_order_acquire) == 0)
+            const auto bucket = R30ShadowBucket(buffer);
+            auto& inFlight = R30VertexRegistrationsInFlight[bucket];
+            if (!R30MaybeTrackedVertex(buffer) &&
+                inFlight.load(std::memory_order_acquire) == 0)
                 return false;
-            while (R30VertexRegistrationsInFlight.load(
-                       std::memory_order_acquire) != 0)
+            while (inFlight.load(std::memory_order_acquire) != 0)
                 SwitchToThread();
             return R30MaybeTrackedVertex(buffer);
         }
@@ -265,18 +267,12 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return false;
-            if (R30MaybeTrackedIndex(buffer))
-            {
-                while (R30IndexRegistrationsInFlight.load(
-                           std::memory_order_acquire) != 0)
-                    SwitchToThread();
-                return R30MaybeTrackedIndex(buffer);
-            }
-            if (R30IndexRegistrationsInFlight.load(
-                    std::memory_order_acquire) == 0)
+            const auto bucket = R30ShadowBucket(buffer);
+            auto& inFlight = R30IndexRegistrationsInFlight[bucket];
+            if (!R30MaybeTrackedIndex(buffer) &&
+                inFlight.load(std::memory_order_acquire) == 0)
                 return false;
-            while (R30IndexRegistrationsInFlight.load(
-                       std::memory_order_acquire) != 0)
+            while (inFlight.load(std::memory_order_acquire) != 0)
                 SwitchToThread();
             return R30MaybeTrackedIndex(buffer);
         }
@@ -447,29 +443,27 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return nullptr;
-            if (auto existing = R30FindVertexShadow(buffer))
-                return existing;
-            D3DVERTEXBUFFER_DESC desc{};
-            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
-                desc.Size > R30MaxShadowBytes)
-                return nullptr;
-            auto entry = std::make_shared<R30BufferShadow>();
-            entry->size = desc.Size;
-            entry->usage = desc.Usage;
-            entry->pool = desc.Pool;
-            R30RegistrationFlightGuard registration(
-                R30VertexRegistrationsInFlight);
-            R30TrackedVertexBloom.fetch_or(
-                R30ShadowBloomBit(buffer), std::memory_order_release);
             try
             {
+                if (auto existing = R30FindVertexShadow(buffer))
+                    return existing;
+                D3DVERTEXBUFFER_DESC desc{};
+                if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
+                    desc.Size > R30MaxShadowBytes)
+                    return nullptr;
+                auto entry = std::make_shared<R30BufferShadow>();
+                entry->size = desc.Size;
+                entry->usage = desc.Usage;
+                entry->pool = desc.Pool;
+                auto& inFlight =
+                    R30VertexRegistrationsInFlight[
+                        R30ShadowBucket(buffer)];
+                R30RegistrationFlightGuard registration(inFlight);
+                R30TrackedVertexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer), std::memory_order_release);
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 auto [it, inserted] =
                     R30VertexShadows.emplace(buffer, entry);
-                // A concurrent release can rebuild the Bloom while this
-                // registration is waiting for the registry mutex. Republish
-                // the definitive bit while holding the mutex so the inserted
-                // entry cannot become invisible to subsequent Lock hooks.
                 R30TrackedVertexBloom.fetch_or(
                     R30ShadowBloomBit(buffer),
                     std::memory_order_release);
@@ -488,25 +482,27 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return nullptr;
-            if (auto existing = R30FindIndexShadow(buffer))
-                return existing;
-            D3DINDEXBUFFER_DESC desc{};
-            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
-                desc.Size > R30MaxShadowBytes ||
-                (desc.Format != D3DFMT_INDEX16 &&
-                 desc.Format != D3DFMT_INDEX32))
-                return nullptr;
-            auto entry = std::make_shared<R30BufferShadow>();
-            entry->size = desc.Size;
-            entry->usage = desc.Usage;
-            entry->pool = desc.Pool;
-            entry->indexFormat = desc.Format;
-            R30RegistrationFlightGuard registration(
-                R30IndexRegistrationsInFlight);
-            R30TrackedIndexBloom.fetch_or(
-                R30ShadowBloomBit(buffer), std::memory_order_release);
             try
             {
+                if (auto existing = R30FindIndexShadow(buffer))
+                    return existing;
+                D3DINDEXBUFFER_DESC desc{};
+                if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
+                    desc.Size > R30MaxShadowBytes ||
+                    (desc.Format != D3DFMT_INDEX16 &&
+                     desc.Format != D3DFMT_INDEX32))
+                    return nullptr;
+                auto entry = std::make_shared<R30BufferShadow>();
+                entry->size = desc.Size;
+                entry->usage = desc.Usage;
+                entry->pool = desc.Pool;
+                entry->indexFormat = desc.Format;
+                auto& inFlight =
+                    R30IndexRegistrationsInFlight[
+                        R30ShadowBucket(buffer)];
+                R30RegistrationFlightGuard registration(inFlight);
+                R30TrackedIndexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer), std::memory_order_release);
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 auto [it, inserted] =
                     R30IndexShadows.emplace(buffer, entry);
@@ -693,13 +689,20 @@ namespace OutRunVRStereo
         ULONG __stdcall R30VertexBufferReleaseDest(
             IDirect3DVertexBuffer9* buffer)
         {
+            const auto expected =
+                R30WaitForVertexRegistration(buffer)
+                    ? R30FindVertexShadow(buffer)
+                    : R30ShadowPtr{};
             const ULONG refs =
                 R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0 && R30WaitForVertexRegistration(buffer))
+            if (refs == 0 && expected)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                if (R30VertexShadows.erase(buffer) != 0)
+                const auto it = R30VertexShadows.find(buffer);
+                if (it != R30VertexShadows.end() &&
+                    it->second == expected)
                 {
+                    R30VertexShadows.erase(it);
                     R30RebuildTrackedBloomsLocked();
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
@@ -745,13 +748,20 @@ namespace OutRunVRStereo
         ULONG __stdcall R30IndexBufferReleaseDest(
             IDirect3DIndexBuffer9* buffer)
         {
+            const auto expected =
+                R30WaitForIndexRegistration(buffer)
+                    ? R30FindIndexShadow(buffer)
+                    : R30ShadowPtr{};
             const ULONG refs =
                 R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0 && R30WaitForIndexRegistration(buffer))
+            if (refs == 0 && expected)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                if (R30IndexShadows.erase(buffer) != 0)
+                const auto it = R30IndexShadows.find(buffer);
+                if (it != R30IndexShadows.end() &&
+                    it->second == expected)
                 {
+                    R30IndexShadows.erase(it);
                     R30RebuildTrackedBloomsLocked();
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
@@ -810,6 +820,19 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30CreateVertexBufferHook.stdcall<HRESULT>(
                 device, length, usage, fvf, pool, out, shared);
+            if (SUCCEEDED(hr) && out && *out)
+            {
+                {
+                    std::lock_guard<std::mutex> lock(
+                        R30ShadowRegistryMutex);
+                    if (R30VertexShadows.erase(*out) != 0)
+                    {
+                        R30RebuildTrackedBloomsLocked();
+                        R30ShadowRegistryGeneration.fetch_add(
+                            1, std::memory_order_release);
+                    }
+                }
+            }
             if (SUCCEEDED(hr) && out && *out &&
                 (fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZRHW)
             {
@@ -829,6 +852,17 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30CreateIndexBufferHook.stdcall<HRESULT>(
                 device, length, usage, format, pool, out, shared);
+            if (SUCCEEDED(hr) && out && *out)
+            {
+                std::lock_guard<std::mutex> lock(
+                    R30ShadowRegistryMutex);
+                if (R30IndexShadows.erase(*out) != 0)
+                {
+                    R30RebuildTrackedBloomsLocked();
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                }
+            }
             // Buffer shadow ownership is draw-proven, not creation-wide.
             return hr;
         }
