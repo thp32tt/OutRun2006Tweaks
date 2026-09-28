@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r29.cpp"
+#include "vr/d3d11/runtime_census.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -372,8 +373,12 @@ namespace OutRunVRStereo
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && data && *data)
+            {
+                outrun::vr::dx11::observe_vertex_buffer_lock(
+                    buffer, offset, size, flags);
                 R30BeginObservedLock(
                     R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -387,6 +392,7 @@ namespace OutRunVRStereo
                 R30FinishObservedLock(entry, true);
             const HRESULT hr =
                 R30VertexBufferUnlockHook.stdcall<HRESULT>(buffer);
+            outrun::vr::dx11::observe_vertex_buffer_unlock(buffer, hr);
             if (FAILED(hr) && entry)
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
@@ -402,6 +408,7 @@ namespace OutRunVRStereo
                 R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
             if (refs == 0)
             {
+                outrun::vr::dx11::forget_vertex_buffer_mutation(buffer);
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 R30VertexShadows.erase(buffer);
             }
@@ -415,8 +422,12 @@ namespace OutRunVRStereo
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && data && *data)
+            {
+                outrun::vr::dx11::observe_index_buffer_lock(
+                    buffer, offset, size, flags);
                 R30BeginObservedLock(
                     R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -428,6 +439,7 @@ namespace OutRunVRStereo
                 R30FinishObservedLock(entry, true);
             const HRESULT hr =
                 R30IndexBufferUnlockHook.stdcall<HRESULT>(buffer);
+            outrun::vr::dx11::observe_index_buffer_unlock(buffer, hr);
             if (FAILED(hr) && entry)
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
@@ -443,6 +455,7 @@ namespace OutRunVRStereo
                 R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
             if (refs == 0)
             {
+                outrun::vr::dx11::forget_index_buffer_mutation(buffer);
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 R30IndexShadows.erase(buffer);
             }

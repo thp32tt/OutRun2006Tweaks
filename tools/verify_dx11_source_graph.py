@@ -96,6 +96,70 @@ def main() -> None:
             "DX11 R73 census resource gate drift: " + ", ".join(missing_r73)
         )
 
+    census_header = (DX11 / "runtime_census.hpp").read_text(encoding="utf-8")
+    mutation_api_contract = {
+        "observe_vertex_buffer_lock": "VB successful Lock observation API",
+        "observe_vertex_buffer_unlock": "VB successful Unlock observation API",
+        "forget_vertex_buffer_mutation": "VB release cleanup API",
+        "observe_index_buffer_lock": "IB successful Lock observation API",
+        "observe_index_buffer_unlock": "IB successful Unlock observation API",
+        "forget_index_buffer_mutation": "IB release cleanup API",
+    }
+    missing_mutation_api = [
+        meaning
+        for token, meaning in mutation_api_contract.items()
+        if token not in census_header or token not in census
+    ]
+    if missing_mutation_api:
+        raise SystemExit(
+            "DX11 R74 mutation observation API drift: "
+            + ", ".join(missing_mutation_api)
+        )
+
+    mutation_counter_contract = {
+        "ResourceMutationWriteUnlocks": "successful write Lock/Unlock counter",
+        "ResourceMutationReadOnlyUnlocks": "successful READONLY Lock/Unlock counter",
+        "ResourceMutationDiscardWriteUnlocks": "successful DISCARD write counter",
+        "ResourceMutationNoOverwriteWriteUnlocks": "successful NOOVERWRITE write counter",
+    }
+    missing_mutation_counters = [
+        meaning
+        for token, meaning in mutation_counter_contract.items()
+        if token not in census
+    ]
+    if missing_mutation_counters:
+        raise SystemExit(
+            "DX11 R74 mutation counters drift: "
+            + ", ".join(missing_mutation_counters)
+        )
+
+    for renderer_name in (
+        "stereo_renderer_r30.cpp",
+        "stereo_renderer_r30_r26_safe.cpp",
+    ):
+        renderer = (ROOT / "src" / "vr" / "d3d9" / renderer_name).read_text(
+            encoding="utf-8"
+        )
+        bridge_contract = {
+            'vr/d3d11/runtime_census.hpp': "DX11 census observer include",
+            "observe_vertex_buffer_lock": "VB Lock bridge",
+            "observe_vertex_buffer_unlock": "VB Unlock bridge",
+            "forget_vertex_buffer_mutation": "VB release cleanup bridge",
+            "observe_index_buffer_lock": "IB Lock bridge",
+            "observe_index_buffer_unlock": "IB Unlock bridge",
+            "forget_index_buffer_mutation": "IB release cleanup bridge",
+        }
+        missing_bridge = [
+            meaning
+            for token, meaning in bridge_contract.items()
+            if token not in renderer
+        ]
+        if missing_bridge:
+            raise SystemExit(
+                f"DX11 R74 mutation bridge drift in {renderer_name}: "
+                + ", ".join(missing_bridge)
+            )
+
     analyzer = (ROOT / "tools" / "analyze_dx11_census.py").read_text(
         encoding="utf-8"
     )
@@ -106,7 +170,11 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R7[23] census": "R72/R73 summary compatibility",
+        "R7[234] census": "R72/R73/R74 summary compatibility",
+        "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
+        "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
+        "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
+        "mutationNoOverwriteWriteUnlocks": "R74 NOOVERWRITE evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer

@@ -9,6 +9,7 @@
 #include <atomic>
 #include <cstdint>
 #include <mutex>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -38,6 +39,10 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceIntrospectionFailureSamples{0};
         std::atomic<std::uint64_t> ResourceBehaviorUnsupportedSamples{0};
         std::atomic<std::uint64_t> ResourceMutationTelemetryRequiredSamples{0};
+        std::atomic<std::uint64_t> ResourceMutationWriteUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationReadOnlyUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationDiscardWriteUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationNoOverwriteWriteUnlocks{0};
         std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
@@ -48,6 +53,20 @@ namespace outrun::vr::dx11
         std::atomic<ULONGLONG> LastLogMs{0};
         std::mutex SignatureMutex;
         std::unordered_set<std::uint64_t> SignatureHashes;
+
+        struct BufferMutationEvidence
+        {
+            bool lockPending{};
+            UINT offset{};
+            UINT size{};
+            DWORD flags{};
+        };
+
+        using BufferMutationRegistry =
+            std::unordered_map<const void*, BufferMutationEvidence>;
+        std::mutex MutationEvidenceMutex;
+        BufferMutationRegistry VertexMutationEvidence;
+        BufferMutationRegistry IndexMutationEvidence;
 
         struct FixedFunctionStageSignature
         {
@@ -173,6 +192,73 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.textured ? 1u : 0u);
             hash = hash_mix(hash, sig.fixedFunction ? 1u : 0u);
             return hash;
+        }
+
+        void begin_observed_buffer_lock(
+            BufferMutationRegistry& registry,
+            const void* resource,
+            UINT offset,
+            UINT size,
+            DWORD flags) noexcept
+        {
+            if (!resource)
+                return;
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            auto& evidence = registry[resource];
+            evidence.lockPending = true;
+            evidence.offset = offset;
+            evidence.size = size;
+            evidence.flags = flags;
+        }
+
+        void finish_observed_buffer_unlock(
+            BufferMutationRegistry& registry,
+            const void* resource,
+            HRESULT result) noexcept
+        {
+            if (!resource)
+                return;
+
+            DWORD flags = 0;
+            bool pending = false;
+            {
+                std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+                const auto it = registry.find(resource);
+                if (it == registry.end())
+                    return;
+                pending = it->second.lockPending;
+                flags = it->second.flags;
+                it->second.lockPending = false;
+            }
+
+            if (!pending || FAILED(result))
+                return;
+
+            if ((flags & D3DLOCK_READONLY) != 0)
+            {
+                ResourceMutationReadOnlyUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                return;
+            }
+
+            ResourceMutationWriteUnlocks.fetch_add(
+                1, std::memory_order_relaxed);
+            if ((flags & D3DLOCK_DISCARD) != 0)
+                ResourceMutationDiscardWriteUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+            if ((flags & D3DLOCK_NOOVERWRITE) != 0)
+                ResourceMutationNoOverwriteWriteUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+        }
+
+        void forget_observed_buffer(
+            BufferMutationRegistry& registry,
+            const void* resource) noexcept
+        {
+            if (!resource)
+                return;
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            registry.erase(resource);
         }
 
         bool inspect_texture(
@@ -455,7 +541,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R73 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R74 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -561,7 +647,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R73 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates; native draw routing remains disabled",
+                    "VR DX11 R74 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates and live VB/IB Lock/Unlock telemetry; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -583,7 +669,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R73 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R74 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -601,6 +687,10 @@ namespace outrun::vr::dx11
                 UnsupportedTextureFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedColorFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedDepthFormatSamples.load(std::memory_order_relaxed),
+                ResourceMutationWriteUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationReadOnlyUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationDiscardWriteUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationNoOverwriteWriteUnlocks.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -615,6 +705,62 @@ namespace outrun::vr::dx11
                         1, std::memory_order_relaxed);
             }
         }
+    }
+
+    void observe_vertex_buffer_lock(
+        IDirect3DVertexBuffer9* buffer,
+        UINT offset,
+        UINT size,
+        DWORD flags) noexcept
+    {
+        if (!buffer || !census_enabled())
+            return;
+        begin_observed_buffer_lock(
+            VertexMutationEvidence, buffer, offset, size, flags);
+    }
+
+    void observe_vertex_buffer_unlock(
+        IDirect3DVertexBuffer9* buffer,
+        HRESULT result) noexcept
+    {
+        if (!buffer || !census_enabled())
+            return;
+        finish_observed_buffer_unlock(
+            VertexMutationEvidence, buffer, result);
+    }
+
+    void forget_vertex_buffer_mutation(
+        IDirect3DVertexBuffer9* buffer) noexcept
+    {
+        forget_observed_buffer(VertexMutationEvidence, buffer);
+    }
+
+    void observe_index_buffer_lock(
+        IDirect3DIndexBuffer9* buffer,
+        UINT offset,
+        UINT size,
+        DWORD flags) noexcept
+    {
+        if (!buffer || !census_enabled())
+            return;
+        begin_observed_buffer_lock(
+            IndexMutationEvidence, buffer, offset, size, flags);
+    }
+
+    void observe_index_buffer_unlock(
+        IDirect3DIndexBuffer9* buffer,
+        HRESULT result) noexcept
+    {
+        if (!buffer || !census_enabled())
+            return;
+        finish_observed_buffer_unlock(
+            IndexMutationEvidence, buffer, result);
+    }
+
+    void forget_index_buffer_mutation(
+        IDirect3DIndexBuffer9* buffer) noexcept
+    {
+        forget_observed_buffer(IndexMutationEvidence, buffer);
     }
 
     void observe_source_draw(
