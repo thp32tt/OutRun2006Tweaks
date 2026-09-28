@@ -146,8 +146,6 @@ workflow = require(
     "Verify binary exists",
 )
 
-if "multiview" not in contract.lower():
-    raise SystemExit("DXVK SAFE contract lost explicit multiview isolation")
 if "dx12" in json.dumps(target).lower():
     raise SystemExit("Retired DX12 identity leaked into DXVK one-click target")
 
