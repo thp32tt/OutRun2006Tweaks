@@ -299,6 +299,29 @@ if($sha -eq 'unknown'){
     $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
     if(Test-Path $source){$sha=(Get-Content $source -Raw).Trim()}
 }
+$dx11CensusAnalyzer=Join-Path $root 'analyze_dx11_census.py'
+if($rendererTarget -eq 'dx11-native' -and (Test-Path $dx11CensusAnalyzer)){
+    $python=Get-Command python -ErrorAction SilentlyContinue
+    if($python){
+        try{
+            $dx11CensusOut=Join-Path $dest 'DX11_CENSUS_SUMMARY.json'
+            & $python.Source $dx11CensusAnalyzer --session-dir $dest --output $dx11CensusOut
+            if($LASTEXITCODE -ne 0){
+                throw "DX11 census analyzer exited with code $LASTEXITCODE"
+            }
+            if(Test-Path $dx11CensusOut){$copied+='DX11_CENSUS_SUMMARY.json'}
+        }catch{
+            @(
+                'DX11_CENSUS_ANALYSIS_STATUS=ERROR'
+                "message=$($_.Exception.Message)"
+            )|Set-Content (Join-Path $dest 'DX11_CENSUS_ANALYSIS_ERROR.txt') -Encoding UTF8
+            $copied+='DX11_CENSUS_ANALYSIS_ERROR.txt'
+        }
+    }else{
+        Write-Warning 'python not found; DX11 census JSON extraction skipped.'
+    }
+}
+
 $analyzer=Join-Path $root 'Analyze-OutRunVRSession.ps1'
 if(Test-Path $analyzer){
     try {
