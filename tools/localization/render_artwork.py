@@ -83,13 +83,17 @@ def render(spec, font_path, output_dir):
 
 def main():
     ap = argparse.ArgumentParser(
-        description="Render deterministic Korean UI proof overlays from JSONL specs."
+        description="Render deterministic Korean UI proof overlays from JSONL specs. PROOF ONLY; never use these transparent overlays as final localized DDS artwork."
     )
     ap.add_argument("spec_jsonl")
+    ap.add_argument("--proof-only-ack", action="store_true", help="Required acknowledgement: output is transparent proof lettering only, not a final localized texture")
     ap.add_argument("--font", required=True, help="Path to a Hangul-capable TTF/TTC owned by the user")
     ap.add_argument("--output-dir", default="localization_work/rendered")
     ap.add_argument("--id", type=int, help="Render only one spec id")
     args = ap.parse_args()
+
+    if not args.proof_only_ack:
+        raise SystemExit("BLOCKED: render_artwork.py creates transparent lettering overlays only. It must not be used as final DDS artwork. Re-run with --proof-only-ack only for QA/proof rendering.")
 
     output_dir = Path(args.output_dir)
     count = 0
