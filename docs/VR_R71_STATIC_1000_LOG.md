@@ -369,3 +369,14 @@ Five lenses: architecture, lifetime/reset/sync, stereo correctness, performance,
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: inspect DirectGPU descriptor/cache generation identity.
+
+
+## Cycle 0015 — DirectGPU cache identity
+
+Five lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD correctness; hot-path/frame pacing/copies/waits; adversarial falsification.
+
+Finding/evidence: R23/R32 cache hits require generation, handles, dimensions and format; no stale-SRV omission found. Evidence: R23DirectDescCache and R32SharedSlotCache predicates. No production behavior changed.
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect R32 inactive-eye fallback ordering.
