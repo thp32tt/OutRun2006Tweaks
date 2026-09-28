@@ -1,4 +1,4 @@
-param([switch]$All)
+param([switch]$All,[switch]$Emergency)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -86,7 +86,13 @@ function Prepare-NextSession([string]$backend,[string]$variant,[string]$profile,
 $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
     $_.ProcessName -ieq 'OR2006C2C' -or $_.ProcessName -ieq 'outrun-vr-host'
 }
-if($running){throw 'Close OutRun and outrun-vr-host.exe before collecting logs so the session can be sealed safely.'}
+if($running -and -not $Emergency){
+    throw 'Close OutRun and outrun-vr-host.exe before collecting logs so the session can be sealed safely.'
+}
+if($running -and $Emergency){
+    Write-Warning 'Emergency diagnostic snapshot: a game/host process is still running. Logs are copied without deleting source evidence or preparing the next session.'
+}
+$logBoundary=if($Emergency){'emergency-snapshot-running-process'}else{'clean-session-root'}
 
 $active=Join-Path $root 'ACTIVE_VR_BACKEND.txt'
 if(!(Test-Path $active)){throw 'ACTIVE_VR_BACKEND.txt not found; select a backend first.'}
@@ -439,7 +445,8 @@ if($assetSemanticsPresent){
     "ASSET_SEMANTICS_TRUNCATED=$assetSemanticsTruncated"
     "FILES=$($copied -join ',')"
     "CAPTURES=$((@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})) -join ',')"
-    'LOG_BOUNDARY=clean-session-root'
+    "LOG_BOUNDARY=$logBoundary"
+    "EMERGENCY_SNAPSHOT=$([bool]$Emergency)"
 )|Set-Content (Join-Path $dest 'MANIFEST.txt') -Encoding UTF8
 
 @{
@@ -470,7 +477,8 @@ if($assetSemanticsPresent){
     CollectedAtUtc=(Get-Date).ToUniversalTime().ToString('o')
     CollectedFiles=$copied
     CollectedCaptures=@($capturedDirs | ForEach-Object {[IO.Path]::GetFileName($_)})
-    LogBoundary='clean-session-root'
+    LogBoundary=$logBoundary
+    EmergencySnapshot=[bool]$Emergency
 }|ConvertTo-Json -Depth 4|Set-Content (Join-Path $dest 'variant_manifest.json') -Encoding UTF8
 
 $resultFile=Join-Path $dest 'TEST_RESULT.txt'
@@ -490,17 +498,23 @@ if($All){
     Compress-Archive -Path "$dest/*" -DestinationPath $zip
 }
 
-foreach($file in $sourceFiles){
-    if($copied -contains $file.Name -and (Test-Path $file.FullName)){
-        Remove-Item $file.FullName -Force
+if(-not $Emergency){
+    foreach($file in $sourceFiles){
+        if($copied -contains $file.Name -and (Test-Path $file.FullName)){
+            Remove-Item $file.FullName -Force
+        }
+    }
+    foreach($captureDir in $capturedDirs){
+        if(Test-Path $captureDir){Remove-Item $captureDir -Recurse -Force}
     }
 }
-foreach($captureDir in $capturedDirs){
-    if(Test-Path $captureDir){Remove-Item $captureDir -Recurse -Force}
-}
 
-$nextSession=Prepare-NextSession $backend $variant $profile $matrix $sha
 Write-Host "Diagnostic archive: $zip"
-Write-Host "Next test session prepared automatically: $nextSession"
-Write-Host 'You do NOT need to run the collector before the next test.'
+if($Emergency){
+    Write-Host 'Emergency snapshot complete. Source logs/captures and CURRENT_VR_SESSION.json were preserved; no next session was prepared.'
+}else{
+    $nextSession=Prepare-NextSession $backend $variant $profile $matrix $sha
+    Write-Host "Next test session prepared automatically: $nextSession"
+    Write-Host 'You do NOT need to run the collector before the next test.'
+}
 Write-Host 'Upload this ZIP to the OutRun VR project chat. The ZIP itself is the analysis request; no description is required.'
