@@ -340,3 +340,86 @@ Tool enforcement:
 - `tools/localization/render_artwork.py` is PROOF-ONLY and requires explicit acknowledgement; its transparent lettering output is forbidden as final DDS artwork.
 - `tools/localization/validate_clean_plate.py` provides a fail-closed source/candidate edit-mask gate and rejects changed pixels outside the permitted edit mask, protected-mask changes and alpha changes outside the permitted mask.
 
+## Broad-source automated-development safeguards
+
+Effective 2026-09-29 after additional review of open-source scene-text translation, inpainting, visual-regression and DDS texture workflows.
+
+### Detection geometry is not an edit mask
+
+- OCR/text detector rectangles are localization hints only. They must never be used directly as erase/fill rectangles.
+- Derive a pixel-level glyph/effect mask inside the detected region.
+- Track detection confidence separately from mask confidence. Low confidence in either blocks automatic promotion.
+- When text is rotated/mirrored in raw DDS, perform mask derivation in a normalized temporary view but map the exact mask back to the original raw transform before editing.
+
+### Bounded mask dilation
+
+- Expand glyph masks only enough to include source antialias, outline, shadow and glow residue.
+- Dilation radius must be recorded per element and clipped by protected masks/cell boundaries.
+- If residue requires dilation that would touch protected artwork, automatic removal stops; do not sacrifice artwork to erase text.
+
+### Exact-resolution reconstruction
+
+- Detection may use temporary scaled views, but reconstruction and final compositing occur at exact source DDS resolution.
+- Neural/upscaled/inpainted intermediate images are never accepted as final pixels merely because they look clean at preview scale.
+- Any reconstruction method must be constrained to the approved mask and validated at native resolution.
+
+### Source-style measurement before lettering
+
+Record before Korean rendering:
+- source text/effect bbox;
+- baseline/center/alignment;
+- approximate cap/text height;
+- foreground/effect colors sampled from source;
+- outline/shadow direction and extent;
+- line spacing and inter-line alignment;
+- raw orientation.
+
+Do not apply generic renderer defaults when source measurements are available.
+
+### Compression round-trip QA
+
+For BC/DXT/compressed candidates:
+1. construct and validate the uncompressed working image;
+2. encode to the exact required DDS compression/mipmap policy;
+3. decode the produced DDS again;
+4. run containment, protected-mask, alpha, residue and visual checks on the **decoded final DDS**, not only on the pre-compression PNG;
+5. compare DDS metadata against the exact source.
+
+Compression artifacts that create visible residue, alpha damage, edge contamination or protected-region changes are `REWORK_REQUIRED`.
+
+### Multi-scale visual regression
+
+Human QA evidence must include:
+- full atlas at native aspect;
+- native-resolution translated-region crop;
+- nearest-neighbor enlarged crop for pixel-edge inspection;
+- source/candidate/diff view;
+- alpha-channel comparison when alpha is used.
+
+Smooth/bilinear preview scaling must not be used as the sole evidence for 1-pixel decisions.
+
+### Candidate determinism and provenance
+
+Each automatic candidate records:
+- generator/tool version or commit;
+- generation rule version;
+- exact source SHA-256;
+- translation/spec identifier;
+- mask/protected-mask hashes when retained;
+- font identifier (not redistributed font bytes);
+- deterministic parameters affecting layout/reconstruction;
+- candidate SHA-256.
+
+Regenerating with identical inputs should produce identical pre-compression pixels where the method is deterministic. Nondeterministic reconstruction must record its method/seed or be treated as manual-review evidence.
+
+### Fail-closed CI semantics
+
+A changed DDS is not accepted merely because a QA JSON exists. Automation must parse machine-readable QA and require:
+- a PASS-class status;
+- zero changed pixels outside permitted source/edit region;
+- zero changed pixels in protected masks;
+- zero introduced/changed alpha outside the permitted region;
+- post-compression decoded-final validation for compressed DDS where applicable.
+
+A missing metric is not assumed to be zero; missing mandatory post-reset evidence blocks promotion.
+
