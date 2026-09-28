@@ -112,8 +112,9 @@
   ],
   "production_change_ledger": {
     "issue": 14,
-    "status": "PENDING_AT_RECORD_COMMIT",
-    "note": "Append the CHAT_DIRECT event after this durable record commit so the event can reference both code_result_sha and record commit SHA."
+    "status": "WRITTEN",
+    "comment_id": 5865535111,
+    "record_commit_before_ledger_seal": "d8a549ba54cd502d88314d87c9f8da390e307d42"
   },
   "next_action": "Keep NativeDrawPathActivationAllowed=false. Continue one bounded DX11 activation prerequisite at a time. Next, address F18 resource behavior/lifetime evidence and R73 explicit VB/IB/texture/render-target/depth mirror lifetime tables; then F19/F21 input-layout and shader/fixed-function translation readiness. Do not promote native draw ownership before exact-build Quest 3/OpenXR runtime parity."
 }
