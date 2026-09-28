@@ -55,7 +55,7 @@ if dds:
     records=qa_pass_records()
     if not records:
         raise SystemExit("DDS changed but no machine-readable PASS record exists in changed QA JSON")
-    required_post_reset=("source_sha256","candidate_dds_sha256","runtime_validation")
+    required_post_reset=("source_sha256","candidate_dds_sha256","runtime_validation","prompt_contract","prompt_sha256","prompt_json_sha256")
     zero_keys=("changed_pixels_outside_edit_mask","changed_pixels_outside_source_region",
                "changed_pixels_in_protected_mask","introduced_alpha_outside_source_region",
                "alpha_changed_outside_edit_mask")
@@ -65,7 +65,7 @@ if dds:
     for rel,d in records:
         if all(k in d for k in required_post_reset):
             seen_post_reset=True
-            rv=str(d.get("runtime_validation","")).upper()
+            if d.get("prompt_contract")!="outrun-first-pass-edit-v1":\n                bad.append(f"{rel}:invalid_prompt_contract")\n            if len(str(d.get("prompt_sha256","")))!=64 or len(str(d.get("prompt_json_sha256","")))!=64:\n                bad.append(f"{rel}:invalid_prompt_hash")\n            rv=str(d.get("runtime_validation","")).upper()
             if rv not in {"UNTESTED","PASS"}:
                 bad.append(f"{rel}:runtime_validation={rv}")
         for k in zero_keys:
