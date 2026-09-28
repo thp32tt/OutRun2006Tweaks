@@ -192,12 +192,14 @@ namespace OutRunVRStereo
             IDirect3DVertexBuffer9* key = nullptr;
             std::uint64_t generation = 0;
             std::weak_ptr<R30BufferShadow> value;
+            bool knownMiss = false;
         };
         struct R30IndexShadowLookupCache
         {
             IDirect3DIndexBuffer9* key = nullptr;
             std::uint64_t generation = 0;
             std::weak_ptr<R30BufferShadow> value;
+            bool knownMiss = false;
         };
         thread_local R30VertexShadowLookupCache R30VertexShadowLookup{};
         thread_local R30IndexShadowLookupCache R30IndexShadowLookup{};
@@ -282,6 +284,8 @@ namespace OutRunVRStereo
             if (R30VertexShadowLookup.key == buffer &&
                 R30VertexShadowLookup.generation == generation)
             {
+                if (R30VertexShadowLookup.knownMiss)
+                    return nullptr;
                 if (auto cached = R30VertexShadowLookup.value.lock())
                     return cached;
             }
@@ -294,6 +298,7 @@ namespace OutRunVRStereo
             R30VertexShadowLookup.generation =
                 R30ShadowRegistryGeneration.load(std::memory_order_relaxed);
             R30VertexShadowLookup.value = result;
+            R30VertexShadowLookup.knownMiss = !result;
             return result;
         }
 
@@ -304,6 +309,8 @@ namespace OutRunVRStereo
             if (R30IndexShadowLookup.key == buffer &&
                 R30IndexShadowLookup.generation == generation)
             {
+                if (R30IndexShadowLookup.knownMiss)
+                    return nullptr;
                 if (auto cached = R30IndexShadowLookup.value.lock())
                     return cached;
             }
@@ -316,6 +323,7 @@ namespace OutRunVRStereo
             R30IndexShadowLookup.generation =
                 R30ShadowRegistryGeneration.load(std::memory_order_relaxed);
             R30IndexShadowLookup.value = result;
+            R30IndexShadowLookup.knownMiss = !result;
             return result;
         }
 
@@ -502,8 +510,15 @@ namespace OutRunVRStereo
             if (R30BufferShadowCaptureArmed.load(
                     std::memory_order_acquire) &&
                 SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            {
+                // Only buffers already proven relevant by an XYZRHW draw are
+                // shadowed. The hooks are vtable-global, so auto-registering
+                // every buffer here would make unrelated dynamic world VBs pay
+                // the memcpy cost after the first XYZRHW draw.
+                if (auto entry = R30FindVertexShadow(buffer))
+                    R30BeginObservedLock(
+                        entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -549,8 +564,11 @@ namespace OutRunVRStereo
             if (R30BufferShadowCaptureArmed.load(
                     std::memory_order_acquire) &&
                 SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            {
+                if (auto entry = R30FindIndexShadow(buffer))
+                    R30BeginObservedLock(
+                        entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
@@ -635,13 +653,8 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30CreateVertexBufferHook.stdcall<HRESULT>(
                 device, length, usage, fvf, pool, out, shared);
-            if (SUCCEEDED(hr) && out && *out)
-            {
-                R30EnsureVertexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureVertexShadow(*out);
-            }
+            // Buffer shadow ownership is draw-proven, not creation-wide.
+            // Do not auto-register arbitrary world buffers here.
             return hr;
         }
 
@@ -652,13 +665,7 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30CreateIndexBufferHook.stdcall<HRESULT>(
                 device, length, usage, format, pool, out, shared);
-            if (SUCCEEDED(hr) && out && *out)
-            {
-                R30EnsureIndexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureIndexShadow(*out);
-            }
+            // Buffer shadow ownership is draw-proven, not creation-wide.
             return hr;
         }
 
@@ -3277,7 +3284,7 @@ namespace OutRunVRStereo
             {
                 R30FirstShadowArmLogged = true;
                 spdlog::info(
-                    "VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW VB draw; ordinary world buffers no longer pay per-Lock shadow memcpy cost");
+                    "VR R30 BUFFER SHADOW V3: draw-proven selective capture armed after real XYZRHW VB draw; untracked world buffers bypass shadow memcpy");
             }
 
             D3DVERTEXBUFFER_DESC desc{};
@@ -3387,7 +3394,7 @@ namespace OutRunVRStereo
             {
                 R30FirstShadowArmLogged = true;
                 spdlog::info(
-                    "VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW VB/IB draw; ordinary world buffers no longer pay per-Lock shadow memcpy cost");
+                    "VR R30 BUFFER SHADOW V3: draw-proven selective capture armed after real XYZRHW VB/IB draw; untracked world buffers bypass shadow memcpy");
             }
 
             D3DINDEXBUFFER_DESC ibDesc{};
@@ -4568,9 +4575,9 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
-                    R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
-
+                // Do not hook CreateVertexBuffer/CreateIndexBuffer globally.
+                // The first actual XYZRHW VB/IB draw installs the common
+                // buffer Lock/Unlock/Release vtable hooks lazily.
                 const auto r29 = R26InstallState.load(
                     std::memory_order_acquire);
                 if (r29 == State::Failed)
