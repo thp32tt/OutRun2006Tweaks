@@ -11,7 +11,7 @@ function Invoke-AnalyzerCase {
         [Parameter(Mandatory=$true)][string]$Name,
         [Parameter(Mandatory=$true)][string]$GameLog,
         [Parameter(Mandatory=$true)][string]$DxvkLog,
-        [Parameter(Mandatory=$true)][string]$HostLog,
+        [Parameter(Mandatory=$true)][AllowEmptyString()][string]$HostLog,
         [Parameter(Mandatory=$true)][bool]$ExpectedSharedFailure,
         [string[]]$ExpectedReasons=@(),
         [Parameter(Mandatory=$true)][int64]$ExpectedDirectFrames,
