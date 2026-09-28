@@ -60,6 +60,15 @@ if ($startHere -notmatch 'Invoke-OutRunVROneClick\.ps1') {
 }
 
 $launcherText = Get-Content (Join-Path $toolsRoot 'Invoke-OutRunVROneClick.ps1') -Raw
+foreach ($required in @(
+    '[switch]$AllowTargetOverride',
+    'One-click backend override blocked',
+    'One-click variant override blocked'
+)) {
+    if ($launcherText -notmatch [regex]::Escape($required)) {
+        throw "One-click branch target override lock missing: $required"
+    }
+}
 foreach ($required in @('Test-OutRunVROneClickPreflight.ps1','& $preflight -Backend $resolvedBackend')) {
     if ($launcherText -notmatch [regex]::Escape($required)) {
         throw "One-click launcher does not invoke runtime preflight: $required"
