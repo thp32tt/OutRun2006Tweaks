@@ -1,1 +1,1 @@
-OutRun 2006 한글화 C(:40) 최종 QA+승인+Git 동기화를 진행해줘. GitHub thp32tt/OutRun2006Tweaks의 korean-localization-clean 최신 상태에서 시작해 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md를 먼저 읽고 그 계약과 지정 기준 문서를 모두 적용해. A/B 결과와 기존 승인후보를 최종 전수검증하고 픽셀 containment PASS만 승인해. 상태/WORKLOG/report를 갱신하고 변경을 같은 브랜치에 commit/push하여 SHA까지 확인해. GPT Library, VR/FFB, 빌드는 사용하지 마.
+OutRun 한글화 C 실행
