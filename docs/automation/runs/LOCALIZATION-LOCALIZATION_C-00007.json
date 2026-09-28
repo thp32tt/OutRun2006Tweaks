@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00007",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-09-28T22:18:00+09:00",
+  "role": "A+B synchronization barrier + cross-lane final QA + shared-state merge",
+  "source_of_truth": "GitHub thp32tt/OutRun2006Tweaks korean-localization-clean only",
+  "reconstructed_from": {
+    "localization/progress/progress.json_blob": "3d24f012fad2538d3552916e299abe4b87a27765",
+    "localization/resume_state.json_blob": "read_current_branch",
+    "localization/progress/STATUS.md_blob": "962aea4893542b3408f46c6afede1bf03f28c0a1",
+    "localization/graphics/ORIENTATION_POLICY.md_blob": "ebd5f41b0044c46dfd6494b91a3fa5a3c19950ce"
+  },
+  "barrier": {
+    "required_predecessors": [
+      "LOCALIZATION-LOCALIZATION_A-00006",
+      "LOCALIZATION-LOCALIZATION_B-00005"
+    ],
+    "github_commit_search": {
+      "LOCALIZATION-LOCALIZATION_A-00006": "NOT_FOUND",
+      "LOCALIZATION-LOCALIZATION_B-00005": "NOT_FOUND"
+    },
+    "github_run_record_search": {
+      "LOCALIZATION-LOCALIZATION_A-00006": "NOT_FOUND",
+      "LOCALIZATION-LOCALIZATION_B-00005": "NOT_FOUND"
+    },
+    "status": "BLOCKED_WAITING_FOR_PREDECESSOR_GITHUB_RESULTS"
+  },
+  "current_verified_state": {
+    "latest_c_strict_qa": "C86 after C85 zero-tolerance audit",
+    "approved_lock_count": 0,
+    "runtime_incident": "RETEST_REQUIRED",
+    "mandatory_runtime_order": "TEXT_ONLY first, then DDS_ONLY exactly one candidate at a time, combined only after isolated passes",
+    "pixel_visual_pass_pending_ingame": [
+      "C4A2937B",
+      "9F060EC1",
+      "D6DC1380",
+      "48DEBE77"
+    ],
+    "high_risk_containment_pass_pending_ingame": [
+      "62BEBF33",
+      "E3FD08BE"
+    ],
+    "known_rework_or_pending_revalidation": [
+      "FF2462BB",
+      "568D3696",
+      "39229D64",
+      "A064FDFC",
+      "2DA43E41",
+      "411827E",
+      "571E78F3",
+      "C075FB49",
+      "FD90AA9",
+      "FA7BBB13"
+    ]
+  },
+  "action": "No candidate DDS or shared progress state merged because required A/B wave outputs are not yet present in GitHub. Do not repeat completed C85/C86 QA. Resume this task when both predecessor results are durable on the target branch, then cross-lane QA only their new/current SHAs.",
+  "automation_validation": "PASS_BARRIER_STATE_RECONSTRUCTED_AND_DURABLY_RECORDED",
+  "runtime_validation": "UNTESTED"
+}
