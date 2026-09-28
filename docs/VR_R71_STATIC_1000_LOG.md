@@ -1,0 +1,61 @@
+# R71 Static 1000 Review / Fix Log
+
+Series: `R71-STATIC-1000-20260929`  
+Branch: `vr-d3d9ex-candidate/R71-STATIC-1000-20260929`  
+Frozen user-test source: `34eef500b2f79e7e68477d7ffe675f803e809e01`  
+Rule: user HMD package stays immutable; this branch is static/build work only until runtime evidence is returned.
+
+## Cycle 0001 — validation contract / backend isolation
+
+- Recovered durable repository rules and the exact R71 lineage.
+- Rechecked PR #78 validation. DX9Ex Active Validation run `36455508333` failed before game build at the DXVK selector contract test.
+- Root cause: the synthetic selector sandbox copied `Select-OutRunVRBackend.ps1` but not its required `OutRunVR-BackendContract.ps1`.
+- Added a contract-aware synthetic test and wired it into the R71 candidate validation workflow.
+- Commits:
+  - `59a6f0513a0b550985a35d1f487492e6de3bc926`
+  - `8eea529972b92285d32525bab4af822c79080c89`
+- AUTOMATION_VALIDATION: `PENDING_FINAL_HEAD_CI`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: require selector+contract sandbox PASS on the exact branch head.
+
+## Cycle 0002 — DirectGPU copy attribution / frame pacing
+
+- Reviewed D3D9Ex producer ring reuse, two-eye `StretchRect`, EVENT fence and 2 ms producer wait.
+- Existing R71 telemetry exposed fence/backpressure but not the cost of submitting the two full-eye copies.
+- Ported the previously build-verified telemetry-only pattern from the backend-hardening lineage:
+  - copy-pair count;
+  - average / maximum CPU enqueue microseconds;
+  - two-eye copied pixel count;
+  - width / height / format.
+- Synchronization, copy order, EVENT semantics and fallback behavior were not changed.
+- Commit: `9e77c2b3027c654dfcc7ab0d1e6a7a694ef73067`
+- Finding key reused: `VR-PERF-DIRECT-COPY-TELEMETRY-001`
+- AUTOMATION_VALIDATION: `FINAL_HEAD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: use real PERFORMANCE logs before changing producer wait/copy behavior.
+
+## Cycle 0003 — OutRun HUD exact-evidence hardening
+
+- Re-read the canonical EXE HUD Inspector artifact from R71 validation.
+- Confirmed exact direct calls:
+  - `0x975EE / 0x97727 / 0x977FB -> Sumo_Printf`
+  - `0x97BB7 / 0x97DA7 -> put_clip_sprite`
+  - `0xBB6F0 -> Calc3D2D`
+  - `0xBB796 -> sprani_play_ae_auth_alpha`
+- Extended the analyzer with those exact anchors plus `0xBA9D0 HudTextProducer`.
+- Deliberately did **not** encode the broad runtime `0x097300..0x097F00` BA9D0 range as analyzer truth. The next inspector output must enumerate real BA9D0 callers so the runtime classifier can be narrowed instead of widened.
+- Commit: `199ca005ef21b40fe5d605c87743380d88ff4e68`
+- AUTOMATION_VALIDATION: `HUD_INSPECTOR_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: consume exact BA9D0 callers and shrink broad ownership where evidence permits.
+
+## Cycle 0004 — queued
+
+Priority:
+1. consume exact-head CI and repair only deterministic failures;
+2. consume canonical BA9D0 caller list;
+3. review host DirectGPU ACK/session lifetime divergence without blind branch replacement;
+4. review R14 managed-shadow lifetime/budget;
+5. defer SkyGlow intensity tuning until the frozen R71 HMD result.
+
+No direct merge to `vr-d3d9ex-focus`. No self-hosted PC runner.
