@@ -150,8 +150,8 @@ require_all("src/game_addrs.hpp", [
     'GameState::STATE_START',
     '*Game::game_start_progress_code == 65',
 ], "P8_START_GATE")
-require("src/vr/d3d9/stereo_renderer_r7.inc",
-        'return Game::is_vr_gameplay_presentation();',
+require("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        'if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())',
         "P8_STEREO_SHARED_PREDICATE")
 require("src/vr/game/outrun_renderer.cpp",
         'Game::is_vr_gameplay_presentation()',
