@@ -64,7 +64,7 @@
         3437,
         1507
       ],
-      "scale": 1.0
+      "scale": 1
     },
     {
       "key": "target_top",
@@ -130,7 +130,7 @@
         1568,
         938
       ],
-      "scale": 1.0
+      "scale": 1
     },
     {
       "key": "easy",
@@ -181,7 +181,17 @@
           665,
           245
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          165,
+          120,
+          665,
+          245
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "dumped_white",
@@ -205,7 +215,17 @@
           3605,
           390
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          3169,
+          270,
+          3605,
+          390
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "dumped_big",
@@ -229,7 +249,17 @@
           3569,
           1514
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          2525,
+          1302,
+          3569,
+          1514
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "knockout_white",
@@ -253,7 +283,17 @@
           1270,
           250
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          833,
+          120,
+          1270,
+          250
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "knockout_in",
@@ -277,7 +317,17 @@
           2270,
           250
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          1260,
+          120,
+          2270,
+          250
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "target_top",
@@ -301,7 +351,17 @@
           3133,
           223
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          2910,
+          145,
+          3133,
+          223
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "target_bottom",
@@ -325,7 +385,17 @@
           3559,
           1884
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          3260,
+          1780,
+          3559,
+          1884
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "ranking",
@@ -349,7 +419,17 @@
           455,
           349
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          120,
+          245,
+          455,
+          349
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "stage",
@@ -373,7 +453,17 @@
           690,
           349
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          455,
+          245,
+          690,
+          349
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "rank",
@@ -397,7 +487,17 @@
           875,
           349
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          690,
+          245,
+          875,
+          349
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "outrun_miles_white",
@@ -421,7 +521,17 @@
           1929,
           384
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          1090,
+          245,
+          1929,
+          384
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "outrun_miles",
@@ -445,7 +555,17 @@
           2860,
           370
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          2081,
+          250,
+          2860,
+          370
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "best_time",
@@ -469,7 +589,17 @@
           3062,
           539
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          2179,
+          365,
+          3062,
+          539
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "stage_clear",
@@ -493,7 +623,17 @@
           3956,
           462
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          3444,
+          362,
+          3956,
+          462
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "pass",
@@ -517,7 +657,17 @@
           4053,
           621
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          3620,
+          490,
+          4053,
+          621
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "continue",
@@ -541,7 +691,17 @@
           1089,
           780
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          19,
+          570,
+          1089,
+          780
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "try_again",
@@ -565,7 +725,17 @@
           1320,
           999
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          25,
+          760,
+          1320,
+          999
+        ],
+        "delta_left": 0,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "rank_table",
@@ -589,7 +759,17 @@
           1634,
           939
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          1320,
+          836,
+          1634,
+          939
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "retry",
@@ -613,7 +793,17 @@
           1899,
           780
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          1270,
+          570,
+          1899,
+          780
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 0
       },
       {
         "key": "please_wait",
@@ -637,7 +827,17 @@
           3539,
           777
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          2320,
+          565,
+          3539,
+          777
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 1
       },
       {
         "key": "easy",
@@ -661,13 +861,25 @@
           3623,
           962
         ],
-        "containment": "PASS"
+        "containment": "PASS",
+        "localized_bbox": [
+          3180,
+          825,
+          3623,
+          962
+        ],
+        "delta_left": 0,
+        "delta_right": 1,
+        "delta_top": 0,
+        "delta_bottom": 0
       }
     ],
     "changed_pixels_outside_reworked_cells": 0,
     "changed_pixels_outside_all_declared_cells": 0,
     "introduced_alpha_outside_all_declared_cells": 0,
-    "containment": "PASS"
+    "containment": "PASS",
+    "bbox_basis": "conservative_source_vs_localized_rgba_diff",
+    "bbox_basis_note": "The diff bbox includes all RGBA changes versus the canonical HD source (localized raster plus source-text removal). Therefore containment PASS is conservative: any localized/change pixel outside the original permitted bbox would fail."
   },
   "result": "B94_SELF_QA_PASS_PENDING_C_AND_DDS_ONLY_INGAME",
   "runtime_validation": "UNTESTED",
