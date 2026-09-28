@@ -15,7 +15,8 @@ SUMMARY_RE = re.compile(
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
     r"signatures=(?P<signatures>\d+) declSamples=(?P<declSamples>\d+) "
     r"indexedSamples=(?P<indexedSamples>\d+) texturedSamples=(?P<texturedSamples>\d+) "
-    r"resourceExact\[indexUnsupported=(?P<indexUnsupported>\d+),"
+    r"resourceExact\[(?:introspectionFailure=(?P<introspectionFailure>\d+),)?"
+    r"indexUnsupported=(?P<indexUnsupported>\d+),"
     r"textureUnsupported=(?P<textureUnsupported>\d+),"
     r"colorUnsupported=(?P<colorUnsupported>\d+),"
     r"depthUnsupported=(?P<depthUnsupported>\d+)\] "
@@ -60,7 +61,10 @@ FFP_RE = re.compile(
 
 
 def int_fields(match: re.Match[str]) -> dict[str, int]:
-    return {key: int(value) for key, value in match.groupdict().items()}
+    return {
+        key: int(value) if value is not None else 0
+        for key, value in match.groupdict().items()
+    }
 
 
 def main() -> int:
@@ -161,6 +165,7 @@ def main() -> int:
     if latest:
         unsupported_keys = [
             "topologyUnsupported",
+            "introspectionFailure",
             "indexUnsupported",
             "textureUnsupported",
             "colorUnsupported",
