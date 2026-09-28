@@ -1,0 +1,47 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00006",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": 1,
+  "wave_id": "W00001",
+  "base_sha": "128c11cbc82825fc8b8b170b6f6e6adb1b76ef82",
+  "result": "BLOCKED_NO_ACTION",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "shard": "ODD_INDEX_PRIMARY_ONLY",
+  "selected_blockers": [
+    {
+      "index": 53,
+      "asset": "568D3696",
+      "status": "REWORK_REQUIRED",
+      "reason": "DXT5 4096x4096 mip13; exact decoded-pixel-safe geometry/recompression evidence is required. GitHub-only connector access in this run cannot safely perform and independently verify the required BC3 pixel rework without risking compression/artifact or mip regressions."
+    },
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "status": "PARTIAL_REWORK_6_REMAIN",
+      "reason": "Previous A run safely reworked 3 isolated regions; remaining keep_passing/drift/maximum_speed/tuned_setting/normal_setting/random are overlap/artwork-sensitive. No speculative resampling or badge/background alteration performed."
+    }
+  ],
+  "preserved_peer_lane": true,
+  "shared_state_modified": false,
+  "touched_assets": [],
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
+    "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json"
+  ],
+  "qa": {
+    "zero_pixel_containment": "NOT_RUN_NO_TOUCHED_ASSET",
+    "dds_alpha_orientation": "NOT_RUN_NO_TOUCHED_ASSET",
+    "self_qa": "PASS_BLOCKER_CLASSIFICATION_ONLY"
+  },
+  "build_performed": false,
+  "vr_ffb_dx_changes": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "note": "Durable no-action/blocker record required by automation contract. No real-game test performed; static blocker classification does not imply asset approval."
+}
