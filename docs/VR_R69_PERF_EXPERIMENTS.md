@@ -63,3 +63,10 @@ For every run keep the same route, HMD refresh, Virtual Desktop quality/codec an
 - Ten-pass static review status: PASS for HMD test.
 - Includes QPC 2 ms fence timing, FVF/cull/scissor SkyGlow restore hardening, reset-generation invalidation, and failed-projection deferred DirectGPU ACK protection.
 - Test EXP_ALL_V2 before the older EXP_ALL candidate.
+
+
+## EXP_ALL_V3
+- Source checkpoint: `f19745bf88bbab6dc765f326148cb557f3984631`.
+- Adds draw-proven selective XYZRHW shadow ownership, lock-free Bloom fast rejection for untracked VB/IB Lock/Unlock/Release, long-session Bloom rebuild, relaxed atomic diagnostics, explicit deferred-query cleanup, and deterministic smoke-test execution for every experiment matrix candidate.
+- Additional orthogonal review: `docs/VR_R69_PERF_REVIEW_V3.md`.
+- Test EXP_ALL_V3 before V2/older combined candidates.
