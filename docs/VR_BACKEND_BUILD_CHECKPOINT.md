@@ -13,3 +13,5 @@ Required behavior:
 
 Checkpoint refresh: stock DXVK 3.1.1 SAFE + game-local provider census + runtime preflight + session-local DXVK logs.
 
+Final one-run packaging checkpoint: machine-readable DXVK provider/session summary wired into the diagnostic ZIP.
+
