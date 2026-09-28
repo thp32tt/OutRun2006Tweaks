@@ -338,6 +338,8 @@ namespace
     {
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.borrowedSlot = OutRunVR::RenderFrameRingSize;
+        R23DirectHold.borrowed = false;
         R23DirectHold.valid = false;
     }
 
