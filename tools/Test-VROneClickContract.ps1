@@ -133,7 +133,7 @@ foreach ($requiredText in @(
     'VR_ONE_CLICK_TARGET.json',
     'IntegrationBranch=$developmentBranch',
     'RendererTarget=$rendererTarget',
-    "dxvk-safe' -or $backend -eq 'dx11"
+    "dxvk-safe' -or `$backend -eq 'dx11"
 )) {
     if ($collector -notmatch [regex]::Escape($requiredText)) {
         throw "Collector is not branch-aware for one-click runs: $requiredText"

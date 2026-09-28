@@ -704,3 +704,1232 @@ namespace OutRunVRRenderer
 				const std::uint32_t seqAfter = SharedState->sequence;
 				if (seqBefore == seqAfter && !(seqAfter & 1u))
 				{
+					stable = true;
+					pose.sequence = seqAfter;
+					break;
+				}
+			}
+
+			if (!stable || snapshot.magic != SharedMagic ||
+				snapshot.protocolVersion != SharedProtocolVersion ||
+				snapshot.structSize != sizeof(SharedPoseState))
+				return false;
+			if ((snapshot.flags & HostAlive) == 0 ||
+				(snapshot.flags & OrientationValid) == 0 ||
+				(snapshot.flags & SessionVisible) == 0 ||
+				(snapshot.flags & HostShouldRender) == 0 || snapshot.hostPid == 0)
+				return false;
+
+			LARGE_INTEGER now{};
+			QueryPerformanceCounter(&now);
+			if (QpcFrequency.QuadPart <= 0 || snapshot.sampleQpc <= 0)
+				return false;
+			const LONGLONG ageTicks = now.QuadPart - snapshot.sampleQpc;
+			const LONGLONG maxAgeTicks = (QpcFrequency.QuadPart * HostPoseStaleMs) / 1000;
+			if (ageTicks < 0 || ageTicks > maxAgeTicks)
+				return false;
+
+			const Quat rawOrientation{
+				snapshot.orientation[0], snapshot.orientation[1],
+				snapshot.orientation[2], snapshot.orientation[3]
+			};
+			if (!QuaternionIsSane(rawOrientation))
+				return false;
+
+			pose.orientation = Normalize(rawOrientation);
+			pose.position = { snapshot.position[0], snapshot.position[1], snapshot.position[2] };
+			pose.positionValid = (snapshot.flags & PositionValid) != 0 && VectorIsFinite(pose.position);
+			pose.hostPid = snapshot.hostPid;
+			pose.referenceSpaceGeneration = snapshot.reserved[HostReferenceSpaceGenerationIndex];
+
+			pose.stereoValid = (snapshot.flags & StereoViewsValid) != 0 &&
+				(snapshot.flags & StereoEyeOrientationValid) != 0 &&
+				FovValid(snapshot.eyeFov[0]) && FovValid(snapshot.eyeFov[1]);
+			if (pose.stereoValid)
+			{
+				pose.eyeFov[0] = snapshot.eyeFov[0];
+				pose.eyeFov[1] = snapshot.eyeFov[1];
+				Quat eyeOrientation[2]{};
+				if (!DecodePackedEyeOrientations(snapshot, eyeOrientation))
+					pose.stereoValid = false;
+				const std::uint32_t indexes[2][3] = {
+					{ HostEyeOffsetLeftXIndex, HostEyeOffsetLeftYIndex, HostEyeOffsetLeftZIndex },
+					{ HostEyeOffsetRightXIndex, HostEyeOffsetRightYIndex, HostEyeOffsetRightZIndex }
+				};
+				for (int eye = 0; eye < 2 && pose.stereoValid; ++eye)
+				{
+					for (int axis = 0; axis < 3; ++axis)
+					{
+						const float value = FloatFromBits(snapshot.reserved[indexes[eye][axis]]);
+						if (!std::isfinite(value) || std::fabs(value) > 0.25f)
+						{
+							pose.stereoValid = false;
+							break;
+						}
+						pose.eyeOffset[eye][axis] = value;
+					}
+					pose.eyeOrientation[eye] = eyeOrientation[eye];
+				}
+			}
+			return true;
+		}
+
+		bool RendererRecenterActionDown()
+		{
+			if (Settings::UseNewInput)
+				return InputManager_ModActionHeld(ModAction::VRRecenter);
+			return (GetAsyncKeyState(VK_F12) & 0x8000) != 0;
+		}
+
+		bool RendererRecenterPressed()
+		{
+			const bool isDown = RendererRecenterActionDown();
+			const bool pressed = isDown && !RecenterWasDown;
+			RecenterWasDown = isDown;
+			return pressed;
+		}
+
+		void ServiceRendererRecenterInput()
+		{
+			if (!RendererRecenterPressed())
+				return;
+
+			// Keep a game-side center request pending until gameplay has a valid
+			// pose again, but publish to the host immediately. This makes the same
+			// bound action recenter the LOCAL-fixed theater/menu as well as the
+			// later gameplay projection.
+			PendingRendererRecenter = true;
+			LastPublishedRecenterRequest =
+				OutRunVR::RecenterIpc::SharedChannel().Publish();
+			if (LastPublishedRecenterRequest != 0)
+			{
+				spdlog::info(
+					"VR recenter: published host requestId={} from configured VR Recenter action",
+					LastPublishedRecenterRequest);
+			}
+			else
+			{
+				spdlog::warn(
+					"VR recenter: failed to publish host request; renderer-local recenter remains pending");
+			}
+		}
+
+		bool GameRendererIsActive()
+		{
+			return CurrentPresentationMode() == PresentationGameplay;
+		}
+
+
+        bool CadenceHostHeaderValid(const OutRunVR::CadenceV1::HostState& state) noexcept
+        {
+            return state.magic == OutRunVR::CadenceV1::HostMagic &&
+                state.version == OutRunVR::CadenceV1::ProtocolVersion &&
+                state.structSize == sizeof(OutRunVR::CadenceV1::HostState);
+        }
+
+        bool EnsureCadenceChannel() noexcept
+        {
+            if (!CadenceHostState)
+            {
+                CadenceHostMapping = OpenFileMappingW(
+                    FILE_MAP_READ, FALSE, OutRunVR::CadenceV1::HostStateName);
+                if (!CadenceHostMapping)
+                    return false;
+                CadenceHostState =
+                    static_cast<const OutRunVR::CadenceV1::HostState*>(
+                        MapViewOfFile(CadenceHostMapping, FILE_MAP_READ, 0, 0,
+                            sizeof(OutRunVR::CadenceV1::HostState)));
+                if (!CadenceHostState)
+                {
+                    CloseHandle(CadenceHostMapping);
+                    CadenceHostMapping = nullptr;
+                    return false;
+                }
+            }
+
+            if (!CadenceClientState)
+            {
+                CadenceClientMapping = CreateFileMappingW(
+                    INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
+                    static_cast<DWORD>(sizeof(OutRunVR::CadenceV1::ClientState)),
+                    OutRunVR::CadenceV1::ClientStateName);
+                if (!CadenceClientMapping)
+                    return false;
+                CadenceClientState =
+                    static_cast<OutRunVR::CadenceV1::ClientState*>(
+                        MapViewOfFile(CadenceClientMapping, FILE_MAP_ALL_ACCESS, 0, 0,
+                            sizeof(OutRunVR::CadenceV1::ClientState)));
+                if (!CadenceClientState)
+                {
+                    CloseHandle(CadenceClientMapping);
+                    CadenceClientMapping = nullptr;
+                    return false;
+                }
+                std::memset(CadenceClientState, 0, sizeof(*CadenceClientState));
+                CadenceClientState->version = OutRunVR::CadenceV1::ProtocolVersion;
+                CadenceClientState->structSize = sizeof(*CadenceClientState);
+                CadenceClientState->clientPid = GetCurrentProcessId();
+                MemoryBarrier();
+                CadenceClientState->magic = OutRunVR::CadenceV1::ClientMagic;
+            }
+
+            if (!CadenceRequestEvent)
+                CadenceRequestEvent = CreateEventW(
+                    nullptr, FALSE, FALSE, OutRunVR::CadenceV1::RequestEventName);
+            if (!CadencePresentedEvent)
+                CadencePresentedEvent = CreateEventW(
+                    nullptr, FALSE, FALSE, OutRunVR::CadenceV1::PresentedEventName);
+
+            return CadenceHostState && CadenceClientState &&
+                CadenceRequestEvent && CadencePresentedEvent;
+        }
+
+        bool ReadCadenceHost(OutRunVR::CadenceV1::HostState& out) noexcept
+        {
+            if (!EnsureCadenceChannel())
+                return false;
+            for (int attempt = 0; attempt < 4; ++attempt)
+            {
+                const std::uint32_t before = CadenceHostState->sequence;
+                if (before & 1u)
+                    continue;
+                MemoryBarrier();
+                std::memcpy(&out, CadenceHostState, sizeof(out));
+                MemoryBarrier();
+                const std::uint32_t after = CadenceHostState->sequence;
+                if (before == after && !(after & 1u) &&
+                    CadenceHostHeaderValid(out))
+                    return true;
+            }
+            return false;
+        }
+
+        void PublishCadenceClient(std::uint32_t flags) noexcept
+        {
+            if (!CadenceClientState)
+                return;
+            LONG seq = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+            if ((seq & 1) == 0)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+            MemoryBarrier();
+            CadenceClientState->magic = OutRunVR::CadenceV1::ClientMagic;
+            CadenceClientState->version = OutRunVR::CadenceV1::ProtocolVersion;
+            CadenceClientState->structSize = sizeof(*CadenceClientState);
+            CadenceClientState->clientPid = GetCurrentProcessId();
+            CadenceClientState->flags = flags;
+            CadenceClientState->acceptedRequestId = CadenceAcceptedRequestId;
+            CadenceClientState->presentedRequestId = CadencePresentedRequestId;
+            CadenceClientState->timeoutCount = CadenceTimeoutCount;
+            CadenceClientState->lastWaitUs = CadenceLastWaitUs;
+            CadenceClientState->acceptedQpc = CadenceAcceptedQpc;
+            CadenceClientState->presentedQpc = CadencePresentedQpc;
+            MemoryBarrier();
+            seq = InterlockedIncrement(
+                reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+            if (seq & 1)
+                InterlockedIncrement(
+                    reinterpret_cast<volatile LONG*>(&CadenceClientState->sequence));
+        }
+
+        void AcceptCadenceRequest(std::uint32_t requestId,
+            std::uint32_t waitUs) noexcept
+        {
+            LARGE_INTEGER now{};
+            QueryPerformanceCounter(&now);
+            ActiveCadenceRequestId.store(requestId, std::memory_order_release);
+            CadenceAcceptedRequestId = requestId;
+            CadenceAcceptedQpc = now.QuadPart;
+            CadenceLastWaitUs = waitUs;
+            PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
+            if (!FirstCadenceAcceptedLogged)
+            {
+                FirstCadenceAcceptedLogged = true;
+                if (Settings::VRFrameCadenceMode >= 2)
+                    spdlog::info(
+                        "VR R35 CADENCE: SerializedProbe active; request={} bounded game/host synchronization enabled",
+                        requestId);
+                else
+                    spdlog::info(
+                        "VR R40 CADENCE: runtime-gated PhaseLock active; request={} game Present waits for the next xrWaitFrame token while the host never waits for game Present",
+                        requestId);
+            }
+        }
+
+        void MarkCadencePresented() noexcept
+        {
+            if (Settings::VRFrameCadenceMode <= 0 || !EnsureCadenceChannel())
+                return;
+            const std::uint32_t active =
+                ActiveCadenceRequestId.load(std::memory_order_acquire);
+            if (!active || active == CadencePresentedRequestId)
+                return;
+            LARGE_INTEGER now{};
+            QueryPerformanceCounter(&now);
+            CadencePresentedRequestId = active;
+            CadencePresentedQpc = now.QuadPart;
+            PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
+            SetEvent(CadencePresentedEvent);
+        }
+
+        void WaitForNextCadenceRequest() noexcept
+        {
+            if (Settings::VRFrameCadenceMode <= 0 || !GameRendererIsActive())
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                return;
+            }
+
+            OutRunVR::CadenceV1::HostState host{};
+            if (!ReadCadenceHost(host))
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                return;
+            }
+            const std::uint32_t required =
+                OutRunVR::CadenceV1::HostEnabled |
+                OutRunVR::CadenceV1::HostRunning;
+            if ((host.flags & required) != required || !host.hostPid)
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                return;
+            }
+
+            HANDLE hostProcess = OpenProcess(SYNCHRONIZE, FALSE, host.hostPid);
+            const bool hostAlive = hostProcess &&
+                WaitForSingleObject(hostProcess, 0) == WAIT_TIMEOUT;
+            if (hostProcess) CloseHandle(hostProcess);
+
+            LARGE_INTEGER cadenceNow{}, cadenceFreq{};
+            QueryPerformanceCounter(&cadenceNow);
+            QueryPerformanceFrequency(&cadenceFreq);
+            const double requestAgeMs =
+                host.requestQpc > 0 && cadenceFreq.QuadPart > 0 &&
+                cadenceNow.QuadPart >= host.requestQpc
+                ? static_cast<double>(cadenceNow.QuadPart - host.requestQpc) *
+                    1000.0 / static_cast<double>(cadenceFreq.QuadPart)
+                : 0.0;
+            const double staleLimitMs = std::max(
+                100.0, static_cast<double>(std::clamp(
+                    Settings::VRFrameCadenceTimeoutMs.get(),
+                    5.0f, 100.0f)) * 4.0);
+            if (!hostAlive ||
+                (host.requestQpc > 0 && requestAgeMs > staleLimitMs))
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                ActiveCadenceRequestId.store(0, std::memory_order_release);
+                return;
+            }
+            CadencePacingActive.store(true, std::memory_order_release);
+
+            const std::uint32_t current =
+                ActiveCadenceRequestId.load(std::memory_order_acquire);
+            if (CadenceTimedOutRequestId != 0 &&
+                host.requestId == CadenceTimedOutRequestId)
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                return;
+            }
+            LARGE_INTEGER start{}, end{}, frequency{};
+            QueryPerformanceCounter(&start);
+            QueryPerformanceFrequency(&frequency);
+
+            if (host.requestId && host.requestId != current)
+            {
+                CadenceTimedOutRequestId = 0;
+                AcceptCadenceRequest(host.requestId, 0);
+                return;
+            }
+
+            // R40: PhaseLock is host-clock pacing, not merely telemetry.
+            // The game Present thread waits for the NEXT request token, which
+            // is published immediately after the host's xrBeginFrame. Crucially
+            // mode 1 never makes the host wait for game Present, so there is no
+            // circular wait: xrWaitFrame -> publish token -> game renders once.
+            // This prevents the old mode-1 failure where the Tweaks limiter was
+            // disabled while the game still ran uncapped at 100-126 FPS against
+            // a 90 Hz runtime. SerializedProbe (mode 2) keeps the same game-side
+            // gate and additionally enables its bounded host-side diagnostic ACK.
+            PublishCadenceClient(
+                OutRunVR::CadenceV1::ClientEnabled |
+                OutRunVR::CadenceV1::ClientWaiting);
+            const double runtimePeriodMs =
+                host.predictedDisplayPeriod > 0
+                ? static_cast<double>(host.predictedDisplayPeriod) / 1000000.0
+                : 0.0;
+            const double configuredTimeoutMs =
+                static_cast<double>(std::clamp(
+                    Settings::VRFrameCadenceTimeoutMs.get(),
+                    5.0f, 100.0f));
+            // Mode 1 must survive a temporarily late compositor long enough to
+            // remove GPU pressure and recover. Four runtime periods covers the
+            // observed ~39 ms VDXR interval at 90 Hz while still failing open.
+            const double waitBudgetMs =
+                Settings::VRFrameCadenceMode < 2
+                ? std::max(configuredTimeoutMs,
+                    runtimePeriodMs > 0.0 ? runtimePeriodMs * 4.0
+                                          : configuredTimeoutMs)
+                : (runtimePeriodMs > 0.0
+                    ? runtimePeriodMs * 1.25
+                    : configuredTimeoutMs);
+            const DWORD timeoutMs = static_cast<DWORD>(std::clamp(
+                waitBudgetMs, 5.0, 100.0));
+            const DWORD wait = WaitForSingleObject(CadenceRequestEvent, timeoutMs);
+            QueryPerformanceCounter(&end);
+            const std::uint32_t waitUs =
+                frequency.QuadPart > 0 && end.QuadPart >= start.QuadPart
+                ? static_cast<std::uint32_t>(std::min<LONGLONG>(
+                    0xFFFFFFFFll,
+                    ((end.QuadPart - start.QuadPart) * 1000000ll) /
+                        frequency.QuadPart))
+                : 0u;
+
+            OutRunVR::CadenceV1::HostState after{};
+            if (ReadCadenceHost(after) && after.requestId &&
+                after.requestId != current &&
+                (after.flags & required) == required)
+            {
+                CadenceTimedOutRequestId = 0;
+                AcceptCadenceRequest(after.requestId, waitUs);
+                return;
+            }
+
+            CadenceLastWaitUs = waitUs;
+            if (wait == WAIT_TIMEOUT)
+            {
+                ++CadenceTimeoutCount;
+                CadenceTimedOutRequestId =
+                    current ? current : host.requestId;
+                CadencePacingActive.store(false, std::memory_order_release);
+                PublishCadenceClient(
+                    OutRunVR::CadenceV1::ClientEnabled |
+                    OutRunVR::CadenceV1::ClientLastWaitTimedOut);
+                if (!FirstCadenceTimeoutLogged)
+                {
+                    FirstCadenceTimeoutLogged = true;
+                    spdlog::warn(
+                        "VR R35 CADENCE: host request timeout after {} ms; failing open so OutRun cannot hang",
+                        timeoutMs);
+                }
+            }
+            else
+            {
+                PublishCadenceClient(OutRunVR::CadenceV1::ClientEnabled);
+            }
+        }
+
+		void ResetFrameState()
+		{
+			LatchedHeadInverseValid = false;
+			LatchedStereo = {};
+			LastVerifiedWvpValid = false;
+			LastVerifiedWvpPoseSequence = 0;
+			LastVerifiedShaderIdentity = 0;
+			LastVerifiedShaderSerial = 0;
+			FrameTelemetryFlags = ClientHookAlive;
+			LatchedRelativeAngleDeg = 0.0f;
+			LatchedPoseSequence = 0;
+		}
+
+		void ResetCenter()
+		{
+			CenterValid = false;
+			CenterPositionValid = false;
+			CenterHostPid = 0;
+			CenterReferenceSpaceGeneration = 0;
+		}
+
+		void RestoreCullingCamera()
+		{
+			if (CullingCameraOverridden && CullingCameraObject)
+			{
+				CullingCameraObject->cam_pos_F8 = CullingCameraSavedPos;
+				CullingCameraObject->look_pos_104 = CullingCameraSavedLook;
+			}
+			CullingCameraObject = nullptr;
+			CullingCameraOverridden = false;
+			if (CullingProjectionOverridden && RendererProjection)
+			{
+				auto* projection = const_cast<D3DMATRIX*>(RendererProjection);
+				if (IsWritableRange(projection, sizeof(D3DMATRIX))) std::memcpy(projection, &CullingProjectionSaved, sizeof(D3DMATRIX));
+			}
+			CullingProjectionOverridden = false;
+		}
+
+		void ApplyCullingCameraSync()
+		{
+			if (!Settings::VRCullingCameraSync || !LatchedHeadInverseValid ||
+				Settings::VRMatrixOrder != 0 || !ValidateRendererGlobals())
+				return;
+
+			EvWorkCamera* cam = Game::camera();
+			if (!cam || !RendererView)
+				return;
+
+			D3DMATRIX baseView{};
+			std::memcpy(&baseView, RendererView, sizeof(baseView));
+			if (!MatrixFinite(baseView))
+				return;
+
+			const D3DMATRIX correctedView = MultiplyMatrix(baseView, LatchedHeadInverse);
+			if (!MatrixFinite(correctedView))
+				return;
+			const D3DMATRIX cameraWorld = InverseRigid(correctedView);
+
+			const float dx = cam->look_pos_104.x - cam->cam_pos_F8.x;
+			const float dy = cam->look_pos_104.y - cam->cam_pos_F8.y;
+			const float dz = cam->look_pos_104.z - cam->cam_pos_F8.z;
+			float lookDistance = std::sqrt(dx * dx + dy * dy + dz * dz);
+			if (!std::isfinite(lookDistance) || lookDistance < 0.01f)
+				lookDistance = 1.0f;
+
+			Vec3 forward{ -cameraWorld._31, -cameraWorld._32, -cameraWorld._33 };
+			const float forwardLength = std::sqrt(
+				forward.x * forward.x + forward.y * forward.y + forward.z * forward.z);
+			if (!std::isfinite(forwardLength) || forwardLength < 1.0e-5f)
+				return;
+			forward.x /= forwardLength;
+			forward.y /= forwardLength;
+			forward.z /= forwardLength;
+
+			RestoreCullingCamera();
+			CullingCameraObject = cam;
+			CullingCameraSavedPos = cam->cam_pos_F8;
+			CullingCameraSavedLook = cam->look_pos_104;
+			cam->cam_pos_F8 = { cameraWorld._41, cameraWorld._42, cameraWorld._43 };
+			cam->look_pos_104 = {
+				cameraWorld._41 + forward.x * lookDistance,
+				cameraWorld._42 + forward.y * lookDistance,
+				cameraWorld._43 + forward.z * lookDistance
+			};
+			CullingCameraOverridden = true;
+			if (Settings::VRCullingUnionFov && !CullingUnionFovDeferredLogged)
+			{
+				CullingUnionFovDeferredLogged = true;
+				spdlog::warn(
+					"VR renderer: CullingUnionFov disabled in active rendering after visual-regression evidence; live projection remains untouched until a culling-only frustum boundary is proven");
+			}
+			FrameTelemetryFlags |= ClientCullingCameraSynced;
+		}
+
+		void LatchFramePose()
+		{
+			ResetFrameState();
+			RestoreCullingCamera();
+
+			// Recenter is an application action, not a gameplay-only render action.
+			// Service it before the presentation gate so the LOCAL-fixed menu
+			// theater can move immediately through the host IPC channel.
+			ServiceRendererRecenterInput();
+
+			if (!GameRendererIsActive())
+				return;
+
+			PoseSample sample{};
+			if (!ReadHostPose(sample))
+			{
+				// A torn seqlock read or one stale sample must not redefine forward.
+				// Keep the existing center and simply render this scene without a VR
+				// transform. Centers change only on F10, host replacement, or an
+				// OpenXR reference-space generation change.
+				return;
+			}
+
+			FrameTelemetryFlags |= ClientHostPoseValid;
+			const bool autoEnabled = Settings::VRAutoEnableWhenHostPresent;
+			const bool trackingEnabled = Settings::VRHeadTracking || autoEnabled;
+			const bool enabled = (Settings::VREnabled || autoEnabled) && trackingEnabled;
+			if (autoEnabled && (!Settings::VREnabled || !Settings::VRHeadTracking))
+			{
+				FrameTelemetryFlags |= ClientAutoEnabled;
+				if (!AutoEnableLogged)
+				{
+					spdlog::info("VR renderer: live host pose auto-enabled renderer-side head tracking");
+					AutoEnableLogged = true;
+				}
+			}
+
+			if (!enabled)
+				return;
+
+			const bool recenter = PendingRendererRecenter;
+			if (recenter)
+				PendingRendererRecenter = false;
+			const bool hostChanged = !CenterValid || CenterHostPid != sample.hostPid;
+			const bool referenceSpaceChanged = CenterValid &&
+				CenterReferenceSpaceGeneration != sample.referenceSpaceGeneration;
+			if (hostChanged || referenceSpaceChanged || recenter)
+			{
+				// Recenter yaw only. Pitch and roll continue to describe the actual
+				// headset attitude, avoiding a tilted artificial horizon after F10.
+				CenterOrientation = YawOnly(sample.orientation);
+				CenterPosition = sample.positionValid ? sample.position : Vec3{ 0.0f, 0.0f, 0.0f };
+				CenterPositionValid = sample.positionValid;
+				CenterHostPid = sample.hostPid;
+				CenterReferenceSpaceGeneration = sample.referenceSpaceGeneration;
+				CenterValid = true;
+				if (recenter)
+					spdlog::info("VR renderer: yaw recentered gameplay pose after configured VR Recenter action; host requestId={}; pitch/roll preserved", LastPublishedRecenterRequest);
+				else if (referenceSpaceChanged)
+					spdlog::info("VR renderer: OpenXR reference space changed; tracking origin refreshed");
+			}
+
+			const Quat invCenter = Conjugate(Normalize(CenterOrientation));
+			Quat relativeOrientation = Multiply(invCenter, sample.orientation);
+			Vec3 relativePosition{ 0.0f, 0.0f, 0.0f };
+			if (Settings::VRPositionalTracking && sample.positionValid)
+			{
+				if (!CenterPositionValid)
+				{
+					CenterPosition = sample.position;
+					CenterPositionValid = true;
+				}
+				else
+				{
+					const Vec3 delta{
+						sample.position.x - CenterPosition.x,
+						sample.position.y - CenterPosition.y,
+						sample.position.z - CenterPosition.z
+					};
+					relativePosition = RotateVector(invCenter, delta);
+					relativePosition.x *= Settings::VRWorldScale;
+					relativePosition.y *= Settings::VRWorldScale;
+					relativePosition.z *= Settings::VRWorldScale;
+				}
+			}
+
+			if (!CenterPositionValid && sample.positionValid)
+			{
+				CenterPosition = sample.position;
+				CenterPositionValid = true;
+			}
+
+			relativeOrientation = ScaleRotation(relativeOrientation, Settings::VRRotationScale);
+			LatchedHeadInverse = InverseRigid(MatrixFromPose(relativeOrientation, relativePosition));
+			LatchedHeadInverseValid = MatrixFinite(LatchedHeadInverse);
+			LatchedPoseSequence = sample.sequence;
+
+			if (LatchedHeadInverseValid && sample.stereoValid)
+			{
+				LatchedStereo.valid = true;
+				LatchedStereo.poseSequence = sample.sequence;
+				LatchedStereo.eyeFov[0] = sample.eyeFov[0]; LatchedStereo.eyeFov[1] = sample.eyeFov[1];
+				std::memcpy(LatchedStereo.eyeOffset, sample.eyeOffset, sizeof(LatchedStereo.eyeOffset));
+				const Quat effectiveHeadOrientation = Normalize(
+					Multiply(Normalize(CenterOrientation), relativeOrientation));
+				// Frame.v2 positions are OpenXR LOCAL-space metres. WorldScale is
+				// only the metres->game-units conversion used by LatchedHeadInverse.
+				Vec3 effectiveHeadPosition = CenterPositionValid ? CenterPosition : sample.position;
+				if (Settings::VRPositionalTracking && sample.positionValid)
+					effectiveHeadPosition = sample.position;
+				for (int eye = 0; eye < 2; ++eye)
+				{
+					const Quat eyeOrientation = sample.eyeOrientation[eye];
+					LatchedStereo.eyeOrientation[eye][0] = eyeOrientation.x;
+					LatchedStereo.eyeOrientation[eye][1] = eyeOrientation.y;
+					LatchedStereo.eyeOrientation[eye][2] = eyeOrientation.z;
+					LatchedStereo.eyeOrientation[eye][3] = eyeOrientation.w;
+
+					const Quat effectiveEyeOrientation = Normalize(
+						Multiply(effectiveHeadOrientation, eyeOrientation));
+					LatchedStereo.effectiveEyeOrientation[eye][0] = effectiveEyeOrientation.x;
+					LatchedStereo.effectiveEyeOrientation[eye][1] = effectiveEyeOrientation.y;
+					LatchedStereo.effectiveEyeOrientation[eye][2] = effectiveEyeOrientation.z;
+					LatchedStereo.effectiveEyeOrientation[eye][3] = effectiveEyeOrientation.w;
+
+					// eyeOffset is already head-local metres; keep the projection-layer
+					// pose in OpenXR units even though D3D9 multiplies IPD by WorldScale.
+					const Vec3 localEye{
+						sample.eyeOffset[eye][0],
+						sample.eyeOffset[eye][1],
+						sample.eyeOffset[eye][2]
+					};
+					const Vec3 worldEye = RotateVector(effectiveHeadOrientation, localEye);
+					LatchedStereo.effectiveEyePosition[eye][0] = effectiveHeadPosition.x + worldEye.x;
+					LatchedStereo.effectiveEyePosition[eye][1] = effectiveHeadPosition.y + worldEye.y;
+					LatchedStereo.effectiveEyePosition[eye][2] = effectiveHeadPosition.z + worldEye.z;
+				}
+			}
+
+			const float w = std::clamp(std::fabs(relativeOrientation.w), 0.0f, 1.0f);
+			LatchedRelativeAngleDeg = 2.0f * std::acos(w) * (180.0f / Pi);
+
+			// R41: the live OutRun camera may only follow the HMD during real
+			// gameplay. Menu/car-select scenes do not receive stereo c64 injection;
+			// moving only cam_pos/look there corrupts the preview model transform.
+			if (LatchedHeadInverseValid && GameRendererIsActive())
+				ApplyCullingCameraSync();
+			else
+				RestoreCullingCamera();
+		}
+
+		void InvalidateVerifiedWvp();
+
+		void ReusePresentPoseForScene()
+		{
+			// Additional BeginScene calls before the same Present reuse the exact
+			// pose chosen by the first scene. Only scene-local WVP classification
+			// state is reset. This prevents mixed-pose geometry in one desktop frame.
+			++ReusedPoseSceneCalls;
+			InvalidateVerifiedWvp();
+			RestoreCullingCamera();
+			FrameTelemetryFlags = ClientHookAlive;
+			if (LatchedPoseSequence != 0) FrameTelemetryFlags |= ClientHostPoseValid;
+			if (Settings::VRAutoEnableWhenHostPresent) FrameTelemetryFlags |= ClientAutoEnabled;
+			if (LatchedHeadInverseValid && GameRendererIsActive())
+				ApplyCullingCameraSync();
+			else
+				RestoreCullingCamera();
+		}
+
+		bool UploadContainsOutRunWvp(UINT startRegister, UINT vector4fCount)
+		{
+			if (vector4fCount == 0 || vector4fCount > 256 || startRegister > OutRunWvpRegister)
+				return false;
+			const UINT offset = OutRunWvpRegister - startRegister;
+			return vector4fCount >= offset + OutRunWvpRegisterCount;
+		}
+
+		bool UploadTouchesOutRunWvp(UINT startRegister, UINT vector4fCount)
+		{
+			if (vector4fCount == 0 || vector4fCount > 256) return false;
+			const std::uint64_t first = startRegister;
+			const std::uint64_t lastExclusive = first + vector4fCount;
+			return first < OutRunWvpRegister + OutRunWvpRegisterCount &&
+				lastExclusive > OutRunWvpRegister;
+		}
+
+		bool TryPrepareOutRunWvp(
+			UINT startRegister, const float* constantData, UINT vector4fCount,
+			float* patchedData)
+		{
+			if (!RendererInjectionAllowed.load(std::memory_order_acquire) ||
+				!LatchedHeadInverseValid || !GameRendererIsActive())
+				return false;
+			if (!constantData || !patchedData || !UploadContainsOutRunWvp(startRegister, vector4fCount))
+				return false;
+
+			++WvpCandidateCalls;
+
+			D3DMATRIX view{};
+			D3DMATRIX projection{};
+			D3DMATRIX worldView{};
+			if (!ReadRendererMatrices(view, projection, worldView))
+			{
+				++UnsafeAddressRejects;
+				if (!FirstUnsafeAddressLogged)
+				{
+					FirstUnsafeAddressLogged = true;
+					spdlog::warn("VR renderer inject: OutRun renderer globals are not safely readable; injection disabled for this draw");
+				}
+				return false;
+			}
+
+			const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
+			const float* uploadedWvp = constantData + wvpOffsetRegisters * 4;
+			const D3DMATRIX expectedWvp = MultiplyMatrix(worldView, projection);
+			if (!MatrixNear(uploadedWvp, expectedWvp, true, WvpVerifyAbsoluteEpsilon))
+			{
+				++WvpRejectedCalls;
+				if (!FirstRejectedLogged)
+				{
+					FirstRejectedLogged = true;
+					spdlog::info("VR renderer inject: first c64 upload did not match Transpose(WorldView*Proj); unmatched draws stay untouched");
+				}
+				return false;
+			}
+
+			++WvpVerifiedCalls;
+			FrameTelemetryFlags |= ClientRendererWvpVerified;
+			if (!FirstVerifiedLogged)
+			{
+				FirstVerifiedLogged = true;
+				spdlog::info("VR renderer inject: verified OutRun c64 = Transpose(WorldView*Proj)");
+			}
+
+			D3DMATRIX correctedWvp{};
+			if (Settings::VRMatrixOrder == 0)
+			{
+				correctedWvp = MultiplyMatrix(MultiplyMatrix(worldView, LatchedHeadInverse), projection);
+			}
+			else
+			{
+				// WorldView = World * View -> World = WorldView * inverse(View).
+				const D3DMATRIX world = MultiplyMatrix(worldView, InverseRigid(view));
+				correctedWvp = MultiplyMatrix(
+					MultiplyMatrix(MultiplyMatrix(world, LatchedHeadInverse), view), projection);
+			}
+			if (!MatrixFinite(correctedWvp))
+				return false;
+
+			std::memcpy(patchedData, constantData, sizeof(float) * vector4fCount * 4);
+			const D3DMATRIX transposed = TransposeMatrix(correctedWvp);
+			std::memcpy(patchedData + wvpOffsetRegisters * 4, &transposed, sizeof(transposed));
+
+			++WvpPreparedCalls;
+			FrameTelemetryFlags |= ClientRendererMatrixPrepared;
+			return true;
+		}
+
+		void InvalidateVerifiedWvp()
+		{
+			LastVerifiedWvpValid = false;
+			LastVerifiedWvpPoseSequence = 0;
+			LastVerifiedShaderIdentity = 0;
+			LastVerifiedShaderSerial = 0;
+		}
+
+		void InvalidateGameWvpWrite() noexcept
+		{
+			LastGameWvpWriteValid = false;
+			LastGameWvpTopLevelDrawSerial = 0;
+			LastGameWvpShaderIdentity = 0;
+			LastGameWvpShaderSerial = 0;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
+			LastGameWvpQueueNodeEpoch = 0;
+			LastGameWvpQueueNode = nullptr;
+		}
+
+		void RecordGameWvpWrite(const float* constants,
+			const float* rawConstants) noexcept
+		{
+			if (!constants || !rawConstants)
+			{
+				InvalidateGameWvpWrite();
+				return;
+			}
+			std::uintptr_t shaderIdentity = 0;
+			std::uint64_t shaderSerial = 0;
+			if (!OutRunVRStereo::GetCurrentShaderEpoch(shaderIdentity, shaderSerial) ||
+				shaderIdentity == 0 || shaderSerial == 0)
+			{
+				InvalidateGameWvpWrite();
+				return;
+			}
+			std::memcpy(LastGameWvpWrite, constants, sizeof(LastGameWvpWrite));
+			std::memcpy(LastRawGameWvpWrite, rawConstants,
+				sizeof(LastRawGameWvpWrite));
+			if (++LastGameWvpWriteSerial == 0)
+				++LastGameWvpWriteSerial;
+			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
+			LastGameWvpShaderIdentity = shaderIdentity;
+			LastGameWvpShaderSerial = shaderSerial;
+			LastGameWvpSemanticScope = OutRunVR::GameSemantic::CurrentScope;
+			LastGameWvpQueueNodeEpoch =
+				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+			LastGameWvpQueueNode =
+				OutRunVR::GameSemantic::CurrentQueueNode();
+			LastGameWvpWriteValid = true;
+		}
+
+		void RecordVerifiedWvp(const float* constants)
+		{
+			if (!constants || LatchedPoseSequence == 0)
+				return;
+			std::uintptr_t shaderIdentity = 0;
+			std::uint64_t shaderSerial = 0;
+			if (!OutRunVRStereo::GetCurrentShaderEpoch(shaderIdentity, shaderSerial))
+				return;
+			std::memcpy(LastVerifiedWvp, constants, sizeof(LastVerifiedWvp));
+			if (++LastVerifiedWvpGeneration == 0)
+				++LastVerifiedWvpGeneration;
+			LastVerifiedWvpPoseSequence = LatchedPoseSequence;
+			LastVerifiedShaderIdentity = shaderIdentity;
+			LastVerifiedShaderSerial = shaderSerial;
+			LastVerifiedWvpValid = true;
+		}
+
+		void MaybeLogSummary()
+		{
+			if (!Settings::VRTelemetry)
+				return;
+			const ULONGLONG now = GetTickCount64();
+			if (now - LastSummaryMs < 5000)
+				return;
+			LastSummaryMs = now;
+			spdlog::info(
+				"VR renderer: beginScene={} poseReuse={} c64Candidate={} verified={} prepared={} uploadOk={} uploadFail={} rejected={} semanticOverlayBypass={} unsafe={} latchedSeq={} poseSource={} v3Reads={} v2Fallbacks={} wvpGen={} presentPoseLocked={}",
+				BeginSceneCalls, ReusedPoseSceneCalls, WvpCandidateCalls, WvpVerifiedCalls, WvpPreparedCalls,
+				WvpUploadSucceededCalls, WvpUploadFailedCalls, WvpRejectedCalls,
+				SemanticOverlayBypassCalls,
+				UnsafeAddressRejects, LatchedPoseSequence, LastPoseSourceV3 ? "v3" : "v2",
+				V3PoseReads, V2PoseFallbacks, LastVerifiedWvpGeneration, PresentPoseLocked ? 1 : 0);
+		}
+
+		HRESULT __stdcall BeginSceneDest(IDirect3DDevice9* device)
+		{
+			const HRESULT result = BeginSceneHook.stdcall<HRESULT>(device);
+			if (!IsGameDevice(device) || OutRunVRStereo::IsInternalStereoPassActive())
+				return result;
+			if (SUCCEEDED(result))
+			{
+				++BeginSceneCalls;
+				if (!PresentPoseLocked)
+				{
+					LatchFramePose();
+					PresentPoseLocked = GameRendererIsActive();
+				}
+				else
+					ReusePresentPoseForScene();
+			}
+			else
+			{
+				PresentPoseLocked = false;
+				ResetFrameState();
+			}
+			return result;
+		}
+
+		HRESULT __stdcall EndSceneDest(IDirect3DDevice9* device)
+		{
+			if (!IsGameDevice(device) || OutRunVRStereo::IsInternalStereoPassActive())
+				return EndSceneHook.stdcall<HRESULT>(device);
+
+			// Camera live-state sync is only for render-time culling/effects. Restore
+			// it before returning control to post-scene game code.
+			RestoreCullingCamera();
+			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
+
+			std::uint32_t publishedFlags = FrameTelemetryFlags;
+			if (SUCCEEDED(result))
+			{
+				publishedFlags |= OutRunVR::ClientFrameCompleted;
+				if (publishedFlags & ClientRendererPoseInjected)
+					publishedFlags |= ClientPoseApplied;
+			}
+			else
+			{
+				publishedFlags &= ~ClientPoseApplied;
+			}
+
+			PublishClientTelemetry(publishedFlags,
+				(publishedFlags & ClientPoseApplied) ? LatchedRelativeAngleDeg : 0.0f);
+			MaybeLogSummary();
+			return result;
+		}
+
+		HRESULT __stdcall SetVertexShaderConstantFDest(
+			IDirect3DDevice9* device, UINT startRegister, const float* constantData, UINT vector4fCount)
+		{
+			if (!IsGameDevice(device) || !constantData || OutRunVRStereo::IsInternalStereoPassActive())
+			{
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+			}
+			if (!UploadTouchesOutRunWvp(startRegister, vector4fCount))
+			{
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+			}
+
+			// Any GAME write touching c64..c67 supersedes the previous marker, even
+			// if it updates only one register. Stereo's own per-register writes are
+			// protected by InternalStereoPass above and must not disarm the marker.
+			InvalidateVerifiedWvp();
+			InvalidateGameWvpWrite();
+			if (!UploadContainsOutRunWvp(startRegister, vector4fCount))
+			{
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+			}
+
+			// R51 ownership split: the canonical EXE sprite queue and exact
+			// original-mod world-marker tags identify overlays before this c64
+			// upload. Leave SCREEN_OVERLAY_2D / SCREEN_HUD / WORLD_BILLBOARD
+			// game WVP completely raw here. R30 is then the single owner that
+			// places queue HUD on the finite world-fixed plane or keeps rival
+			// markers in world space. Without this split,
+			// renderer head injection can happen first and R30 applies a second
+			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
+			const auto semanticScope =
+				OutRunVR::GameSemantic::EffectiveScope();
+			const bool semanticOverlay =
+				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
+					semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope) ||
+				OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+					semanticScope);
+			if (semanticOverlay)
+			{
+				const HRESULT result =
+					SetVertexShaderConstantFHook.stdcall<HRESULT>(
+						device, startRegister, constantData, vector4fCount);
+				if (SUCCEEDED(result))
+				{
+					const UINT wvpOffsetRegisters =
+						OutRunWvpRegister - startRegister;
+					RecordGameWvpWrite(
+						constantData + wvpOffsetRegisters * 4,
+						constantData + wvpOffsetRegisters * 4);
+					++SemanticOverlayBypassCalls;
+					if (!FirstSemanticOverlayBypassLogged)
+					{
+						FirstSemanticOverlayBypassLogged = true;
+						spdlog::info(
+							"VR R51 HUD OWNER: queue overlay c64 kept raw; renderer head injection bypassed so R30 owns exactly one HUD/world-billboard transform");
+					}
+				}
+				return result;
+			}
+
+			float patchedData[256 * 4];
+			const bool prepared = TryPrepareOutRunWvp(
+				startRegister, constantData, vector4fCount, patchedData);
+			const float* uploadedData = prepared ? patchedData : constantData;
+			const HRESULT result = SetVertexShaderConstantFHook.stdcall<HRESULT>(
+				device, startRegister, uploadedData, vector4fCount);
+
+			if (SUCCEEDED(result))
+			{
+				const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
+				RecordGameWvpWrite(
+					uploadedData + wvpOffsetRegisters * 4,
+					constantData + wvpOffsetRegisters * 4);
+			}
+
+			if (prepared)
+			{
+				if (SUCCEEDED(result))
+				{
+					++WvpUploadSucceededCalls;
+					FrameTelemetryFlags |= ClientRendererPoseInjected;
+					const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
+					RecordVerifiedWvp(patchedData + wvpOffsetRegisters * 4);
+					if (!FirstInjectedLogged)
+					{
+						FirstInjectedLogged = true;
+						spdlog::info("VR renderer inject: HEAD TRACKING ACTIVE after successful VS c64 upload");
+					}
+				}
+				else
+				{
+					++WvpUploadFailedCalls;
+					FrameTelemetryFlags |= ClientRendererUploadFailed;
+					if (!FirstUploadFailedLogged)
+					{
+						FirstUploadFailedLogged = true;
+						spdlog::warn("VR renderer inject: patched c64 matrix prepared but D3D9 upload failed (HRESULT=0x{:08X})",
+							static_cast<unsigned int>(result));
+					}
+				}
+			}
+			return result;
+		}
+
+		bool InstallD3D9Hooks(IDirect3DDevice9* device)
+		{
+			if (!device)
+				return false;
+			void** vtable = *reinterpret_cast<void***>(device);
+			if (!vtable)
+				return false;
+
+			if (!ValidateRendererGlobals() && !FirstUnsafeAddressLogged)
+			{
+				FirstUnsafeAddressLogged = true;
+				spdlog::warn("VR renderer: OutRun renderer globals failed executable/readability validation; c64 injection will fail closed");
+			}
+
+			RendererInstallState.store(RendererInstallPending, std::memory_order_release);
+			RendererInjectionAllowed.store(true, std::memory_order_release);
+			BeginSceneHook = safetyhook::create_inline(vtable[BeginSceneVtableIndex], BeginSceneDest);
+			EndSceneHook = safetyhook::create_inline(vtable[EndSceneVtableIndex], EndSceneDest);
+			SetVertexShaderConstantFHook = safetyhook::create_inline(
+				vtable[SetVertexShaderConstantFVtableIndex], SetVertexShaderConstantFDest);
+
+			if (!BeginSceneHook || !EndSceneHook || !SetVertexShaderConstantFHook)
+			{
+				BeginSceneHook = {};
+				EndSceneHook = {};
+				SetVertexShaderConstantFHook = {};
+				RendererInjectionAllowed.store(false, std::memory_order_release);
+				RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
+				spdlog::error("VR renderer: failed to hook D3D9 renderer boundary; transactional rollback completed");
+				return false;
+			}
+
+			EnsureSharedState();
+			RendererInstallState.store(RendererInstallReady, std::memory_order_release);
+			spdlog::info("VR renderer: D3D9 hooks installed; atomic renderer install state=READY; v3-primary/v2-fallback frame-latched c64 WVP injection armed (vtbl 41/42/94)");
+			return true;
+		}
+
+		DWORD WINAPI RendererInstallThread(void*)
+		{
+			for (int attempt = 0; attempt < 1200; ++attempt)
+			{
+				if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
+				{
+					if (!InstallD3D9Hooks(*Game::D3DDevice_ptr))
+						spdlog::error("VR renderer: renderer hook installation failed");
+					return 0;
+				}
+				Sleep(100);
+			}
+			RendererInjectionAllowed.store(false, std::memory_order_release);
+			RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
+			spdlog::warn("VR renderer: D3D9 device did not appear; renderer hook not installed");
+			return 0;
+		}
+	}
+
+	std::uint32_t GetActiveCadenceRequestId() noexcept
+	{
+		return ActiveCadenceRequestId.load(std::memory_order_acquire);
+	}
+
+	bool IsCadencePacingActive() noexcept
+	{
+		return CadencePacingActive.load(std::memory_order_acquire);
+	}
+
+	bool GetLatchedStereoFrame(LatchedStereoFrame& out)
+	{
+		out = LatchedStereo;
+		return out.valid && out.poseSequence != 0;
+	}
+
+	bool GetLatchedHeadInverse(float outMatrix[16],
+		std::uint32_t& poseSequence) noexcept
+	{
+		if (!outMatrix || !LatchedHeadInverseValid ||
+			LatchedPoseSequence == 0)
+			return false;
+		std::memcpy(outMatrix, &LatchedHeadInverse,
+			sizeof(LatchedHeadInverse));
+		poseSequence = LatchedPoseSequence;
+		return true;
+	}
+
+	std::uint64_t GetBeginSceneCallCount()
+	{
+		return BeginSceneCalls;
+	}
+
+	void NotifyGamePresent()
+	{
+		MarkCadencePresented();
+		PresentPoseLocked = false;
+		InvalidateVerifiedWvp();
+		InvalidateGameWvpWrite();
+		RestoreCullingCamera();
+		WaitForNextCadenceRequest();
+	}
+
+	void NotifyGameReset()
+	{
+		ActiveCadenceRequestId.store(0, std::memory_order_release);
+		CadencePacingActive.store(false, std::memory_order_release);
+		CadenceAcceptedRequestId = 0;
+		CadencePresentedRequestId = 0;
+		CadenceTimedOutRequestId = 0;
+		PresentPoseLocked = false;
+		InvalidateGameWvpWrite();
+		RestoreCullingCamera();
+		ResetFrameState();
+	}
+
+	bool GetRendererBaseProjection(float outMatrix[16])
+	{
+		if (!outMatrix || !ValidateRendererGlobals() || !RendererProjection)
+			return false;
+		D3DMATRIX projection{};
+		if (CullingProjectionOverridden)
+			projection = CullingProjectionSaved;
+		else
+			std::memcpy(&projection, RendererProjection, sizeof(projection));
+		if (!MatrixFinite(projection))
+			return false;
+		std::memcpy(outMatrix, &projection, sizeof(projection));
+		return true;
+	}
+
+	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
+		std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
+		std::uint64_t& shaderSerial)
+	{
+		if (!outConstants || !LastVerifiedWvpValid || LastVerifiedWvpGeneration == 0 ||
+			LastVerifiedWvpPoseSequence == 0 || LastVerifiedShaderIdentity == 0 ||
+			LastVerifiedShaderSerial == 0)
+			return false;
+		std::memcpy(outConstants, LastVerifiedWvp, sizeof(LastVerifiedWvp));
+		generation = LastVerifiedWvpGeneration;
+		poseSequence = LastVerifiedWvpPoseSequence;
+		shaderIdentity = LastVerifiedShaderIdentity;
+		shaderSerial = LastVerifiedShaderSerial;
+		return true;
+	}
+
+	bool GetLastGameWvpWrite(float outConstants[16], std::uint64_t& writeSerial,
+		std::uint64_t& topLevelDrawSerial, std::uintptr_t& shaderIdentity,
+		std::uint64_t& shaderSerial) noexcept
+	{
+		if (!outConstants || !LastGameWvpWriteValid ||
+			LastGameWvpWriteSerial == 0 || LastGameWvpShaderIdentity == 0 ||
+			LastGameWvpShaderSerial == 0)
+			return false;
+		std::memcpy(outConstants, LastGameWvpWrite, sizeof(LastGameWvpWrite));
+		writeSerial = LastGameWvpWriteSerial;
+		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
+		shaderIdentity = LastGameWvpShaderIdentity;
+		shaderSerial = LastGameWvpShaderSerial;
+		return true;
+	}
+
+	bool GetLastGameWvpSemanticProvenance(
+		OutRunVR::GameSemantic::RenderScope& semanticScope,
+		std::uint64_t& queueNodeEpoch,
+		const void*& queueNode) noexcept
+	{
+		if (!LastGameWvpWriteValid || LastGameWvpWriteSerial == 0)
+			return false;
+		semanticScope = LastGameWvpSemanticScope;
+		queueNodeEpoch = LastGameWvpQueueNodeEpoch;
+		queueNode = LastGameWvpQueueNode;
+		return true;
+	}
+
+	bool GetLastRawGameWvpWrite(float outConstants[16],
+		std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+		std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept
+	{
+		if (!outConstants || !LastGameWvpWriteValid ||
+			LastGameWvpWriteSerial == 0 || LastGameWvpShaderIdentity == 0 ||
+			LastGameWvpShaderSerial == 0)
+			return false;
+		std::memcpy(outConstants, LastRawGameWvpWrite,
+			sizeof(LastRawGameWvpWrite));
+		writeSerial = LastGameWvpWriteSerial;
+		topLevelDrawSerial = LastGameWvpTopLevelDrawSerial;
+		shaderIdentity = LastGameWvpShaderIdentity;
+		shaderSerial = LastGameWvpShaderSerial;
+		return true;
+	}
+
+	class VRRendererHook : public Hook
+	{
+	public:
+		std::string_view description() override { return "OpenXRVRRenderer"; }
+		bool validate() override { return true; }
+
+		bool apply() override
+		{
+			HANDLE thread = CreateThread(nullptr, 0, RendererInstallThread, nullptr, 0, nullptr);
+			if (!thread)
+			{
+				RendererInjectionAllowed.store(false, std::memory_order_release);
+				RendererInstallState.store(RendererInstallFailed, std::memory_order_release);
+				spdlog::error("VR renderer: failed to create installer thread: {}", GetLastError());
+				return false;
+			}
+			CloseHandle(thread);
+			return true;
+		}
+
+		static VRRendererHook instance;
+	};
+
+	VRRendererHook VRRendererHook::instance;
+}
