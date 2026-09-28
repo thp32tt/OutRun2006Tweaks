@@ -48,9 +48,10 @@ namespace outrun::vr::dx11
         out.width = desc.Width;
         out.height = desc.Height;
         out.source_format = desc.Format;
-        out.native_format = translate_backbuffer_format(desc.Format);
+        const auto format = translate_resource_format(desc.Format, ResourceRole::Color);
+        out.native_format = format.format;
         out.multisample = desc.MultiSampleType;
-        out.format_supported = out.native_format != DXGI_FORMAT_UNKNOWN;
+        out.format_supported = format.exact;
         out.single_sample = desc.MultiSampleType == D3DMULTISAMPLE_NONE;
         out.native_bootstrap_compatible =
             out.width != 0 && out.height != 0 &&
