@@ -105,6 +105,10 @@ class UIScaling : public Hook
 
 	inline static thread_local
 		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
+	// R71 runtime evidence: the gameplay rival indicator has its own
+	// Calc3D2D projection at 0xBB6F0 and sprani draw at 0xBB796.
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RivalMarkerProjectedInfo{};
 
 	static OutRunVR::GameSemantic::RenderScope
 	R57RankProducerScope(bool) noexcept
@@ -139,6 +143,14 @@ class UIScaling : public Hook
 	static constexpr int R70ExactScreenHudClipSpriteCalls[] = {
 		0x460F1, 0x463D6, 0x46410,
 		0x97BB7, 0x97DA7
+	};
+	static constexpr int R71RivalMarkerSpraniCall = 0xBB796;
+
+	// Canonical EXE static map: these three direct Sumo_Printf calls live in
+	// the OutRun stage/checkpoint/result UI cluster. Bracket only the call
+	// duration so their generated glyph SpriteNodes inherit SCREEN_HUD.
+	static constexpr int R71OutRunStagePrintfCalls[] = {
+		0x975EE, 0x97727, 0x977FB
 	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
@@ -308,6 +320,12 @@ class UIScaling : public Hook
 		if (returnAddress == Module::exe_ptr(0xBAEE7))
 		{
 			recoverViewPoint(RankMarkerProjectedInfo);
+		}
+		else if (returnAddress == Module::exe_ptr(0xBB6F5))
+		{
+			// R71: preserve the rival-car projected view anchor separately
+			// from the ordinal 1st/2nd/3rd marker path.
+			recoverViewPoint(RivalMarkerProjectedInfo);
 		}
 		else if (returnAddress == Module::exe_ptr(0xCF53))
 		{
@@ -610,6 +628,64 @@ class UIScaling : public Hook
 			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
 		return result;
+	}
+
+	// R71: exact runtime-observed gameplay rival indicator. It already has a
+	// real vehicle-relative Calc3D2D anchor; preserve that depth and let the
+	// existing projected-marker renderer reproject it independently per eye.
+	static int __cdecl R71RivalMarker_sprani(
+		std::uint32_t spriteId, float x, float y,
+		int a4, int a5, float alpha)
+	{
+		const auto* marker = RivalMarkerProjectedInfo.valid
+			? &RivalMarkerProjectedInfo : nullptr;
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			marker
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::None,
+			marker);
+		return Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+	}
+
+	// R71: exact OutRun stage/checkpoint/result text uses Sumo_Printf instead
+	// of the BA9D0 producer restored by R70. Keep SCREEN_HUD ownership active
+	// only across the three statically proven direct calls.
+	inline static thread_local unsigned R71OutRunPrintDepth = 0;
+	inline static thread_local OutRunVR::GameSemantic::RenderScope
+		R71OutRunPrintPreviousScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo
+			R71OutRunPrintPreviousMarker{};
+	static inline SafetyHookMid R71OutRunPrintEnter1{};
+	static inline SafetyHookMid R71OutRunPrintLeave1{};
+	static inline SafetyHookMid R71OutRunPrintEnter2{};
+	static inline SafetyHookMid R71OutRunPrintLeave2{};
+	static inline SafetyHookMid R71OutRunPrintEnter3{};
+	static inline SafetyHookMid R71OutRunPrintLeave3{};
+
+	static void R71OutRunPrintEnter(safetyhook::Context&)
+	{
+		if (R71OutRunPrintDepth++ != 0)
+			return;
+		R71OutRunPrintPreviousScope =
+			OutRunVR::GameSemantic::CurrentProducerScope;
+		R71OutRunPrintPreviousMarker =
+			OutRunVR::GameSemantic::CurrentProducerMarker;
+		OutRunVR::GameSemantic::CurrentProducerScope =
+			OutRunVR::GameSemantic::RenderScope::ScreenHud;
+		OutRunVR::GameSemantic::CurrentProducerMarker = {};
+	}
+
+	static void R71OutRunPrintLeave(safetyhook::Context&)
+	{
+		if (R71OutRunPrintDepth == 0 || --R71OutRunPrintDepth != 0)
+			return;
+		OutRunVR::GameSemantic::CurrentProducerScope =
+			R71OutRunPrintPreviousScope;
+		OutRunVR::GameSemantic::CurrentProducerMarker =
+			R71OutRunPrintPreviousMarker;
 	}
 
 	using DispRankSpraniFn =
@@ -1270,6 +1346,24 @@ public:
 		for (int addr : R70ExactScreenHudClipSpriteCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr),
 				R70ExactScreenHud_putClipSprite, Memory::HookType::Call);
+
+		// R71 exact OutRun stage/checkpoint result text brackets.
+		R71OutRunPrintEnter1 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[0]), R71OutRunPrintEnter);
+		R71OutRunPrintLeave1 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[0] + 5), R71OutRunPrintLeave);
+		R71OutRunPrintEnter2 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[1]), R71OutRunPrintEnter);
+		R71OutRunPrintLeave2 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[1] + 5), R71OutRunPrintLeave);
+		R71OutRunPrintEnter3 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[2]), R71OutRunPrintEnter);
+		R71OutRunPrintLeave3 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[2] + 5), R71OutRunPrintLeave);
+
+		// R71 gameplay rival indicator: exact world projection + exact sprani.
+		Memory::VP::InjectHook(Module::exe_ptr(R71RivalMarkerSpraniCall),
+			R71RivalMarker_sprani, Memory::HookType::Call);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarker_SpraniCalls)
