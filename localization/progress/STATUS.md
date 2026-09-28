@@ -820,3 +820,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Report: `localization/graphics/role_C/20260929-0722-C100/C100_W00015_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C101 W00016 synchronization barrier — 2026-09-29T07:46:09+09:00
+- A00050/B00051 durable terminal + exact-SHA Automation Gate / Localization State / Domain Isolation Guard: PASS.
+- Index 215 `C05E67EF`: exact-HD 512x256 RGBA32 partial candidate; `15con. -> 15코스` touched segment static PASS. DDS header identical; 2,423 alpha-only changed pixels; zero changes outside reported replacement bbox; zero introduced alpha outside source region. GOAL A-E remain pending, so no full-asset completion.
+- B indices 86/100/106/128: upstream identities **12/12 PASS**, canonical translations **42/42 PASS**, no Korean DDS candidates; strict raster gates remain HOLD.
+- Combined canonical semantic validation **48/48**. Queue **137 = 95 localize_text / 31 zoom_review / 9 font / 1 Hangul name-entry / 1 preserve-only**; pending production localize_text **78**.
+- New full-asset static passes **0**; partial static segment passes **1**; runtime approvals **0**; approved DDS **0**. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-0746-C101/C101_W00016_SYNC_FINAL_QA.json`.

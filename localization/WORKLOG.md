@@ -1281,3 +1281,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Report: `localization/graphics/role_C/20260929-0722-C100/C100_W00015_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C101 W00016 synchronization barrier — 2026-09-29T07:46:09+09:00
+- Barrier gate: PASS. A00050 `7ae49bb870d5335d74b78e90f50cfed45f629ec9` and B00051 `76120d704630fe9aa9c07ab7be40ea36a76e40ae` are durable terminal commits in current HEAD ancestry; Localization Automation Gate, Localization State, and Domain Isolation Guard completed successfully on both exact SHAs.
+- A index 215 `C05E67EF` cross-lane byte QA: exact HD source and candidate are both 512x256 RGBA32, pitch 2048, mip1, with byte-identical 128-byte DDS headers. C measured 2,423 changed pixels, all alpha-only and confined to readable bbox [318,43,427,79]; changed pixels outside the reported replaced bbox = 0 and introduced alpha outside the source element = 0. The touched `15con. -> 15코스` segment receives a static PASS; five GOAL A-E cells remain source-identical and pending, so the asset is not full-static-complete.
+- Canonical meaning/context/term QA: A index 215 matches 6/6 canonical source-key translations; B indices 86/100/106/128 match 42/42 canonical transcription/artwork-plan segments. Combined semantic match: 48/48.
+- B source identity QA: all 12/12 pinned HD DDS / decoded original PNG / 4x atlas blobs match `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`. No B Korean DDS candidate bytes exist, so containment, Korean glyph, candidate DDS/alpha/orientation, and English-source-vs-Korean raster gates remain HOLD_STRICT_RECHECK for those four assets.
+- Queue remains **137 = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only**; unresolved zoom-review **0**; preserve-resolved zoom-review **31**; pending production localize_text **78**. New full-asset static passes **0**; new partial static segment passes **1**; runtime approvals **0**; approved/locked DDS **0**.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written byte-for-byte identically.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Report: `localization/graphics/role_C/20260929-0746-C101/C101_W00016_SYNC_FINAL_QA.json`.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`

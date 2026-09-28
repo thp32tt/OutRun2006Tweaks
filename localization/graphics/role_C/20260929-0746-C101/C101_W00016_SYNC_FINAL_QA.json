@@ -1,0 +1,193 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00052",
+  "wave_id": "W00016",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_RECONCILIATION",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T07:46:09+09:00",
+  "base_head_sha": "7ae49bb870d5335d74b78e90f50cfed45f629ec9",
+  "barrier_gate": "PASS_A_B_DURABLE_TERMINAL_AND_REMOTE_CI_SUCCESS",
+  "lane_a": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00050",
+    "commit_sha": "7ae49bb870d5335d74b78e90f50cfed45f629ec9",
+    "result": "PASS_PARTIAL_HD_RGBA32_CANDIDATE_1_OF_6_SEGMENTS_SELF_QA_PENDING_C_RUNTIME",
+    "remote_checks": {
+      "verify": "success",
+      "validate": "success",
+      "guard": "success"
+    },
+    "indices": [
+      215
+    ],
+    "candidate_git_blob_sha": "d25457980a5b6c69602751e010e7585b29f2d8ca",
+    "candidate_sha256": "fe0d8eb827bbe7ee170f87b5b8498f02f1fb103c8aede7bdd230d41dd3d963e9"
+  },
+  "lane_b": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00051",
+    "commit_sha": "76120d704630fe9aa9c07ab7be40ea36a76e40ae",
+    "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_RECONSTRUCTION_MANIFESTS_GITHUB_ONLY",
+    "remote_checks": {
+      "verify": "success",
+      "validate": "success",
+      "guard": "success"
+    },
+    "indices": [
+      86,
+      100,
+      106,
+      128
+    ]
+  },
+  "source_identity_validation": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "lane_b_expected_blobs": 12,
+    "lane_b_matched_blobs": 12,
+    "lane_a_exact_hd_source_blob_sha": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+    "lane_a_candidate_blob_sha": "d25457980a5b6c69602751e010e7585b29f2d8ca",
+    "result": "PASS_B_12_OF_12_PLUS_A_EXACT_HD_SOURCE_AND_CANDIDATE"
+  },
+  "semantic_validation": {
+    "canonical_files": [
+      "localization/graphics/transcriptions.jsonl",
+      "localization/graphics/artwork_plan.jsonl"
+    ],
+    "lane_a_index_215_segments": 6,
+    "lane_a_source_key_matches": 6,
+    "lane_b_segments": 42,
+    "lane_b_exact_matches": 42,
+    "total_segments": 48,
+    "total_matches": 48,
+    "result": "PASS_48_OF_48",
+    "context_term_note": "Canonical game-context translations are retained unchanged. Index 215 touched translation is 15con. -> 15코스; GOAL A-E remain 골 A-E and are not yet rendered."
+  },
+  "asset_results": [
+    {
+      "index": 215,
+      "asset": "C05E67EF",
+      "state": "PARTIAL_STATIC_PASS_1_OF_6_REMAINING_5_PENDING_ARTWORK",
+      "touched_segment": {
+        "source": "15con.",
+        "korean": "15코스"
+      },
+      "remaining_segments": [
+        "GOAL A",
+        "GOAL B",
+        "GOAL C",
+        "GOAL D",
+        "GOAL E"
+      ],
+      "dds": {
+        "width": 512,
+        "height": 256,
+        "pitch": 2048,
+        "mip_count": 1,
+        "format": "RGBA32_MASKS",
+        "header_128_byte_identical": true,
+        "rgb_component_changes": 0,
+        "alpha_changed_pixels": 2423
+      },
+      "containment": {
+        "source_element_bbox": [
+          244,
+          30,
+          427,
+          79
+        ],
+        "localized_element_bbox": [
+          244,
+          30,
+          419,
+          79
+        ],
+        "changed_readable_bbox": [
+          318,
+          43,
+          427,
+          79
+        ],
+        "changed_pixels_outside_reported_replaced_bbox": 0,
+        "introduced_alpha_outside_source_region": 0,
+        "result": "PASS_TOUCHED_SEGMENT_ZERO_PIXEL_OVERFLOW"
+      },
+      "orientation": "flip-Y",
+      "proof": "PASS_TOUCHED_CELL_VISUAL_REVIEW_AND_WHOLE_ATLAS_BYTE_CONFINEMENT",
+      "background_and_wrong_replacement": "PASS_RGB_BYTES_IDENTICAL_AND_FIVE_UNTOUCHED_CELLS_SOURCE_IDENTICAL",
+      "full_asset_static_completion": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 86,
+      "asset": "C598919A",
+      "state": "EXACT_HD_RECONSTRUCTION_MANIFEST_RETAINED_HOLD_NO_KOREAN_DDS",
+      "semantic_segments": 24,
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 100,
+      "asset": "53CE39D5",
+      "state": "EXACT_HD_RECONSTRUCTION_MANIFEST_RETAINED_HOLD_NO_KOREAN_DDS",
+      "semantic_segments": 7,
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 106,
+      "asset": "788CE557",
+      "state": "EXACT_HD_RECONSTRUCTION_MANIFEST_RETAINED_HOLD_NO_KOREAN_DDS",
+      "semantic_segments": 4,
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 128,
+      "asset": "12519155",
+      "state": "EXACT_HD_RECONSTRUCTION_MANIFEST_RETAINED_HOLD_NO_KOREAN_DDS",
+      "semantic_segments": 7,
+      "containment": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "candidate_dds_modified_by_wave": true,
+  "candidate_dds_modified_by_c": false,
+  "cross_lane_final_qa": {
+    "hangul_glyph_integrity": "PASS_TOUCHED_15코스_STATIC_PROOF_ONLY",
+    "clipping": "PASS_TOUCHED_SEGMENT_NONE_VISIBLE",
+    "zero_pixel_containment": "PASS_TOUCHED_SEGMENT__B_ASSETS_HOLD_NO_CANDIDATE",
+    "resolution": "PASS_A_EXACT_HD_512X256__B_SOURCE_ONLY",
+    "dds_format_mipmap_alpha_transparency": "PASS_A_HEADER_FORMAT_MIP_ALPHA_BEHAVIOR__B_HOLD_NO_CANDIDATE",
+    "background_wrong_replacement": "PASS_A_TOUCHED_REGION_AND_UNTOUCHED_CELLS__B_NO_CANDIDATE_WRITE",
+    "mandatory_english_source_comparison": "PASS_A_TOUCHED_CELL_PLUS_FULL_ATLAS_BYTE_CONFINEMENT__B_HOLD_NO_CANDIDATE",
+    "new_full_asset_static_passes": 0,
+    "new_partial_static_segment_passes": 1,
+    "new_runtime_approvals": 0,
+    "approved_locked_dds_count": 0
+  },
+  "queue_after": {
+    "rows": 137,
+    "localize_text": 95,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1,
+    "unresolved_zoom_review": 0,
+    "resolved_preserve_original_zoom_review": 31,
+    "pending_production_localize_text": 78
+  },
+  "shared_state_updates": [
+    "localization/resume_state.json",
+    "localization/WORKLOG.md",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/progress/STATUS.md",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_W00016_SYNC_FINAL_QA_1_PARTIAL_HD_SEGMENT_STATIC_PASS_4_RECONSTRUCTION_INPUTS_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
