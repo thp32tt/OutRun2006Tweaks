@@ -618,7 +618,7 @@ class UIScaling : public Hook
 				1, std::memory_order_relaxed) + 1;
 			if ((hit & (hit - 1)) == 0)
 				spdlog::info(
-					"VR V7 OPTION ARROW: exact node pinned sprite=0x{:X} prio={} kind={} hits={}",
+					"VR R66 OPTION ARROW: exact node pinned V7 sprite=0x{:X} prio={} kind={} hits={}",
 					xstnum, prio, node->kind_C, hit);
 		}
 		return result;
