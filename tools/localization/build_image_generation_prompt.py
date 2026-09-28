@@ -29,12 +29,12 @@ def main():
         req(s,k)
     els=[]
     for e in s["elements"]:
-        for k in ("source_text","korean","source_bbox","permitted_region","alignment","text_height_px","line_count","colors","effects","source_text_transform","baseline_vector","style_traits"):
+        for k in ("source_text","korean","source_bbox","permitted_region","alignment","text_height_px","line_count","colors","effects","source_text_transform","baseline_vector","style_traits","slant_dx_per_dy","slant_angle_deg","slant_direction","display_transform"):
             req(e,k)
         els.append({
           "source_text":e["source_text"],"approved_korean":e["korean"],"source_bbox":e["source_bbox"],
           "permitted_region":e["permitted_region"],"alignment":e["alignment"],"text_height_px":e["text_height_px"],
-          "line_count":e["line_count"],"colors":e["colors"],"effects":e["effects"],\n          "source_text_transform":e["source_text_transform"],"baseline_vector":e["baseline_vector"],\n          "style_traits":e["style_traits"]})
+          "line_count":e["line_count"],"colors":e["colors"],"effects":e["effects"],\n          "source_text_transform":e["source_text_transform"],"baseline_vector":e["baseline_vector"],\n          "style_traits":e["style_traits"],"slant_dx_per_dy":e["slant_dx_per_dy"],\n          "slant_angle_deg":e["slant_angle_deg"],"slant_direction":e["slant_direction"],"display_transform":e["display_transform"]})
     prompt={
       "contract":"outrun-first-pass-edit-v1",
       "priority":[
@@ -59,7 +59,7 @@ def main():
        "no cover box, patch, seam or invented panel",
        "protected artwork unchanged",
        "Korean fully inside permitted region and unclipped",
-       "canvas, raw orientation and transparency unchanged",\n       "Korean baseline/direction exactly follows source_text_transform",\n       "slant/width/weight/corners/outline/shadow materially match source style"
+       "canvas, raw orientation and transparency unchanged",\n       "Korean baseline/direction exactly follows source_text_transform",\n       "displayed Korean slant sign matches source slant_direction and measured signed angle",\n       "slant/width/weight/corners/outline/shadow materially match source style"
       ],
       "failure_behavior":"Do not produce a production candidate; flag MANUAL_RECONSTRUCTION_REQUIRED."
     }
