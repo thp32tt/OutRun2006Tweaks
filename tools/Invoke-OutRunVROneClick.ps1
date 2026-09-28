@@ -11,6 +11,7 @@ $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $selector = Join-Path $scriptRoot 'Select-OutRunVRBackend.ps1'
 $runner = Join-Path $scriptRoot 'Run-OutRunVRTest.ps1'
 $targetFile = Join-Path $scriptRoot 'VR_ONE_CLICK_TARGET.json'
+$visualChecklist = Join-Path $scriptRoot 'ONE_RUN_VISUAL_CHECKLIST.txt'
 $preflight = Join-Path $scriptRoot 'Test-OutRunVROneClickPreflight.ps1'
 
 if (!(Test-Path $selector)) { throw "Select-OutRunVRBackend.ps1 not found: $selector" }
@@ -54,6 +55,9 @@ if ($target) {
 Write-Host ("Launch backend  : {0}" -f $resolvedBackend)
 Write-Host ("Test profile    : {0}" -f $TestProfile)
 Write-Host ("Variant         : {0}" -f $resolvedVariant)
+if (Test-Path $visualChecklist) {
+    Write-Host ("One-run QA       : {0}" -f $visualChecklist)
+}
 Write-Host ''
 
 # Fail before mutating the game directory when the packaged renderer/host/provider
