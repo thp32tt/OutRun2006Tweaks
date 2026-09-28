@@ -699,6 +699,11 @@ namespace OutRunVRStereo
                     R30ShadowRegistryMutex);
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
+                // Invalidate every thread-local weak lookup immediately. This
+                // also covers reset-time COM address reuse while an old
+                // shared_ptr is still draining on another thread.
+                R30ShadowRegistryGeneration.fetch_add(
+                    1, std::memory_order_release);
             }
         }
 
@@ -963,6 +968,7 @@ namespace OutRunVRStereo
             D3DVIEWPORT9 viewport{};
             UINT streamOffset = 0;
             UINT streamStride = 0;
+            DWORD fvf = 0;
             DWORD samplerMin = 0;
             DWORD samplerMag = 0;
             DWORD samplerMip = 0;
@@ -977,6 +983,8 @@ namespace OutRunVRStereo
             DWORD destBlend = 0;
             DWORD blendOp = 0;
             DWORD colorWrite = 0;
+            DWORD cullMode = D3DCULL_CCW;
+            DWORD scissorEnable = FALSE;
             float psConstant0[4]{};
 
             ~R30SkyGlowSavedState()
@@ -1007,6 +1015,7 @@ namespace OutRunVRStereo
                 FAILED(device->GetStreamSource(
                     0, &state.stream0,
                     &state.streamOffset, &state.streamStride)) ||
+                FAILED(device->GetFVF(&state.fvf)) ||
                 FAILED(device->GetSamplerState(
                     0, D3DSAMP_MINFILTER, &state.samplerMin)) ||
                 FAILED(device->GetSamplerState(
@@ -1035,6 +1044,10 @@ namespace OutRunVRStereo
                     D3DRS_BLENDOP, &state.blendOp)) ||
                 FAILED(device->GetRenderState(
                     D3DRS_COLORWRITEENABLE, &state.colorWrite)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_CULLMODE, &state.cullMode)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_SCISSORTESTENABLE, &state.scissorEnable)) ||
                 FAILED(device->GetPixelShaderConstantF(
                     0, state.psConstant0, 1)))
                 return false;
@@ -1060,8 +1073,14 @@ namespace OutRunVRStereo
             keep(device->SetRenderTarget(0, state.renderTarget));
             keep(device->SetDepthStencilSurface(state.depthStencil));
             keep(device->SetViewport(&state.viewport));
+            // SetFVF replaces the vertex declaration. Restore exactly the
+            // original declaration mode before restoring the vertex shader.
+            if (state.fvf != 0)
+                keep(device->SetFVF(state.fvf));
+            else
+                keep(device->SetVertexDeclaration(
+                    state.vertexDeclaration));
             keep(device->SetVertexShader(state.vertexShader));
-            keep(device->SetVertexDeclaration(state.vertexDeclaration));
             keep(device->SetPixelShader(state.pixelShader));
             keep(device->SetTexture(0, state.texture0));
             keep(device->SetStreamSource(
@@ -1095,6 +1114,10 @@ namespace OutRunVRStereo
                 D3DRS_BLENDOP, state.blendOp));
             keep(device->SetRenderState(
                 D3DRS_COLORWRITEENABLE, state.colorWrite));
+            keep(device->SetRenderState(
+                D3DRS_CULLMODE, state.cullMode));
+            keep(device->SetRenderState(
+                D3DRS_SCISSORTESTENABLE, state.scissorEnable));
             keep(device->SetPixelShaderConstantF(
                 0, state.psConstant0, 1));
             return ok;
@@ -1129,7 +1152,11 @@ namespace OutRunVRStereo
                 SUCCEEDED(device->SetRenderState(
                     D3DRS_STENCILENABLE, FALSE)) &&
                 SUCCEEDED(device->SetRenderState(
-                    D3DRS_ALPHATESTENABLE, FALSE));
+                    D3DRS_ALPHATESTENABLE, FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_CULLMODE, D3DCULL_NONE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_SCISSORTESTENABLE, FALSE));
         }
 
         bool R30DrawSkyGlowPass(IDirect3DDevice9* device,
@@ -1327,7 +1354,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW EXP STATEBLOCK: explicit touched-state restore ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
+                        "VR SKY GLOW EXP STATEBLOCK V2: explicit touched-state restore + FVF/cull/scissor hardening ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
