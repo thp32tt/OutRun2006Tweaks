@@ -10,6 +10,12 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $targetPath = Join-Path $root 'VR_ONE_CLICK_TARGET.json'
 $reportPath = Join-Path $root 'VR_ONE_CLICK_PREFLIGHT.json'
 
+# Never leave a previous successful preflight report behind when this run fails.
+# Pre-session failure diagnostics are written by the one-click launcher.
+if (Test-Path $reportPath -PathType Leaf) {
+    Remove-Item $reportPath -Force
+}
+
 function Get-PeMachine([string]$Path) {
     $bytes = [System.IO.File]::ReadAllBytes($Path)
     if ($bytes.Length -lt 256) { throw "PE file is too small: $Path" }
