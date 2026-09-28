@@ -42,6 +42,12 @@ services:
       RATE_LIMIT_BACKOFF_SECONDS: "120,300,600,1200"
       MIN_SEND_GAP_SECONDS: "60"
       SLOT_DEDUP_SECONDS: "180"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8787/status >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
     ports:
       - "6080:6080"
       - "8787:8787"
