@@ -1,11 +1,68 @@
 #include "native_backend.hpp"
 
 #include <array>
+#include <dxgi1_2.h>
 
 namespace outrun::vr::dx11 {
 namespace {
 
+bool same_luid(const LUID& a, const LUID& b) noexcept {
+    return a.LowPart == b.LowPart && a.HighPart == b.HighPart;
+}
+
+bool find_adapter(
+    const LUID& wanted,
+    Microsoft::WRL::ComPtr<IDXGIAdapter1>& adapter) noexcept {
+
+    Microsoft::WRL::ComPtr<IDXGIFactory1> factory;
+    if (FAILED(CreateDXGIFactory1(
+            __uuidof(IDXGIFactory1),
+            reinterpret_cast<void**>(factory.ReleaseAndGetAddressOf()))))
+        return false;
+
+    for (UINT index = 0;; ++index) {
+        Microsoft::WRL::ComPtr<IDXGIAdapter1> candidate;
+        const HRESULT hr = factory->EnumAdapters1(
+            index, candidate.ReleaseAndGetAddressOf());
+        if (hr == DXGI_ERROR_NOT_FOUND) break;
+        if (FAILED(hr)) return false;
+
+        DXGI_ADAPTER_DESC1 desc{};
+        if (SUCCEEDED(candidate->GetDesc1(&desc)) &&
+            same_luid(desc.AdapterLuid, wanted)) {
+            adapter = std::move(candidate);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool read_device_luid(
+    ID3D11Device* device,
+    LUID& luid) noexcept {
+
+    if (!device) return false;
+    Microsoft::WRL::ComPtr<IDXGIDevice> dxgiDevice;
+    if (FAILED(device->QueryInterface(
+            __uuidof(IDXGIDevice),
+            reinterpret_cast<void**>(dxgiDevice.ReleaseAndGetAddressOf()))))
+        return false;
+
+    Microsoft::WRL::ComPtr<IDXGIAdapter> adapter;
+    if (FAILED(dxgiDevice->GetAdapter(adapter.ReleaseAndGetAddressOf())) ||
+        !adapter)
+        return false;
+
+    DXGI_ADAPTER_DESC desc{};
+    if (FAILED(adapter->GetDesc(&desc)))
+        return false;
+
+    luid = desc.AdapterLuid;
+    return true;
+}
+
 HRESULT create_device(
+    IDXGIAdapter* adapter,
     UINT flags,
     Microsoft::WRL::ComPtr<ID3D11Device>& device,
     Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context,
@@ -18,8 +75,11 @@ HRESULT create_device(
         D3D_FEATURE_LEVEL_10_0,
     };
 
+    const D3D_DRIVER_TYPE driverType =
+        adapter ? D3D_DRIVER_TYPE_UNKNOWN : D3D_DRIVER_TYPE_HARDWARE;
+
     HRESULT hr = D3D11CreateDevice(
-        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags,
+        adapter, driverType, nullptr, flags,
         kFeatureLevels.data(), static_cast<UINT>(kFeatureLevels.size()),
         D3D11_SDK_VERSION, device.ReleaseAndGetAddressOf(),
         &feature_level, context.ReleaseAndGetAddressOf());
@@ -31,7 +91,7 @@ HRESULT create_device(
             D3D_FEATURE_LEVEL_10_0,
         };
         hr = D3D11CreateDevice(
-            nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags,
+            adapter, driverType, nullptr, flags,
             kFallbackLevels.data(), static_cast<UINT>(kFallbackLevels.size()),
             D3D11_SDK_VERSION, device.ReleaseAndGetAddressOf(),
             &feature_level, context.ReleaseAndGetAddressOf());
@@ -46,17 +106,38 @@ bool NativeBackend::initialize(const NativeBackendConfig& config) noexcept {
     shutdown();
     if (config.width == 0 || config.height == 0) return false;
 
+    if (config.require_adapter_luid && !config.adapter_luid_valid)
+        return false;
+
+    Microsoft::WRL::ComPtr<IDXGIAdapter1> requestedAdapter;
+    if (config.adapter_luid_valid &&
+        !find_adapter(config.adapter_luid, requestedAdapter) &&
+        config.require_adapter_luid)
+        return false;
+
     UINT flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
     if (config.request_debug_layer) flags |= D3D11_CREATE_DEVICE_DEBUG;
 
-    HRESULT hr = create_device(flags, device_, context_, feature_level_);
+    HRESULT hr = create_device(
+        requestedAdapter.Get(), flags, device_, context_, feature_level_);
     if (FAILED(hr) && (flags & D3D11_CREATE_DEVICE_DEBUG) != 0) {
         device_.Reset();
         context_.Reset();
         flags &= ~D3D11_CREATE_DEVICE_DEBUG;
-        hr = create_device(flags, device_, context_, feature_level_);
+        hr = create_device(
+            requestedAdapter.Get(), flags, device_, context_, feature_level_);
     }
     if (FAILED(hr)) {
+        shutdown();
+        return false;
+    }
+
+    selected_adapter_luid_valid_ =
+        read_device_luid(device_.Get(), selected_adapter_luid_);
+    if (config.adapter_luid_valid &&
+        config.require_adapter_luid &&
+        (!selected_adapter_luid_valid_ ||
+         !same_luid(selected_adapter_luid_, config.adapter_luid))) {
         shutdown();
         return false;
     }
@@ -105,6 +186,8 @@ void NativeBackend::shutdown() noexcept {
     device_.Reset();
     config_ = {};
     feature_level_ = D3D_FEATURE_LEVEL_9_1;
+    selected_adapter_luid_ = {};
+    selected_adapter_luid_valid_ = false;
 }
 
 bool NativeBackend::create_color_target(
