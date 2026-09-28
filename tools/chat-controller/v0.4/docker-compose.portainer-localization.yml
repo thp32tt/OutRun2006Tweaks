@@ -15,6 +15,8 @@ services:
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "${AUTO_SEND:-false}"
       QUEUE_MODE: "true"
+      LOCALIZATION_PARALLEL: "true"
+      PARALLEL_LANE_STAGGER_SECONDS: "60"
       QUEUE_CHECK_SECONDS: "15"
       QUEUE_STABLE_SECONDS: "30"
       QUEUE_RESULT_GRACE_SECONDS: "1800"
