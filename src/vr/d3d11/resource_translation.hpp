@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <limits>
 #include <d3d9.h>
 #include <d3d11.h>
 
@@ -76,7 +75,7 @@ namespace outrun::vr::dx11
     note_managed_shadow_write(ManagedMirrorLifetimeState state) noexcept
     {
         state.cpuShadowVersion =
-            state.cpuShadowVersion == std::numeric_limits<std::uint64_t>::max()
+            state.cpuShadowVersion == ~std::uint64_t{0}
                 ? 1
                 : state.cpuShadowVersion + 1;
         state.cpuShadowValid = true;
@@ -99,7 +98,7 @@ namespace outrun::vr::dx11
     advance_managed_device_generation(ManagedMirrorLifetimeState state) noexcept
     {
         state.deviceGeneration =
-            state.deviceGeneration == std::numeric_limits<std::uint64_t>::max()
+            state.deviceGeneration == ~std::uint64_t{0}
                 ? 1
                 : state.deviceGeneration + 1;
         state.mirrorValid = false;
