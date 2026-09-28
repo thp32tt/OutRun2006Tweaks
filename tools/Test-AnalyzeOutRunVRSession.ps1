@@ -27,7 +27,13 @@ function Invoke-AnalyzerCase {
         [Nullable[bool]]$ExpectedBuildIdentityVerified=$true,
         [bool]$ExpectedBuildIdentityMismatch=$false,
         [bool]$ExpectedDirectEvidenceTrusted=$false,
-        [string[]]$ExpectedDirectEvidenceBlockers=@()
+        [string[]]$ExpectedDirectEvidenceBlockers=@(),
+        [int]$ExpectedHostPipelineWindows=0,
+        [int]$ExpectedProducerPerfWindows=0,
+        [int64]$ExpectedProducerFenceOk=0,
+        [int64]$ExpectedProducerBudgetFallback=0,
+        [Nullable[double]]$ExpectedCaptureMaxMs=$null,
+        [Nullable[double]]$ExpectedEndFrameP95MaxMs=$null
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -116,6 +122,28 @@ function Invoke-AnalyzerCase {
     }
     if([bool]$summary.DxvkDirectEvidenceTrusted -ne $ExpectedDirectEvidenceTrusted){
         throw "${Name}: DxvkDirectEvidenceTrusted=$($summary.DxvkDirectEvidenceTrusted), expected $ExpectedDirectEvidenceTrusted"
+    }
+    if([int]$summary.FrameBudget.HostPipelineWindowCount -ne $ExpectedHostPipelineWindows){
+        throw "${Name}: HostPipelineWindowCount=$($summary.FrameBudget.HostPipelineWindowCount), expected $ExpectedHostPipelineWindows"
+    }
+    if([int]$summary.FrameBudget.GameProducer.WindowCount -ne $ExpectedProducerPerfWindows){
+        throw "${Name}: Producer WindowCount=$($summary.FrameBudget.GameProducer.WindowCount), expected $ExpectedProducerPerfWindows"
+    }
+    if([int64]$summary.FrameBudget.GameProducer.ProducerFenceOk -ne $ExpectedProducerFenceOk){
+        throw "${Name}: ProducerFenceOk=$($summary.FrameBudget.GameProducer.ProducerFenceOk), expected $ExpectedProducerFenceOk"
+    }
+    if([int64]$summary.FrameBudget.GameProducer.ProducerBudgetFallback -ne $ExpectedProducerBudgetFallback){
+        throw "${Name}: ProducerBudgetFallback=$($summary.FrameBudget.GameProducer.ProducerBudgetFallback), expected $ExpectedProducerBudgetFallback"
+    }
+    if($null -ne $ExpectedCaptureMaxMs){
+        if([math]::Abs([double]$summary.FrameBudget.CaptureMs.MaxObserved-[double]$ExpectedCaptureMaxMs) -gt 0.0001){
+            throw "${Name}: Capture MaxObserved=$($summary.FrameBudget.CaptureMs.MaxObserved), expected $ExpectedCaptureMaxMs"
+        }
+    }
+    if($null -ne $ExpectedEndFrameP95MaxMs){
+        if([math]::Abs([double]$summary.FrameBudget.XrEndFrameMs.MaxP95Observed-[double]$ExpectedEndFrameP95MaxMs) -gt 0.0001){
+            throw "${Name}: XrEndFrame P95 max=$($summary.FrameBudget.XrEndFrameMs.MaxP95Observed), expected $ExpectedEndFrameP95MaxMs"
+        }
     }
     $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
     foreach($blocker in $ExpectedDirectEvidenceBlockers){
@@ -282,6 +310,19 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedStatus 'DIRECT_GPU_UNAVAILABLE' `
         -IdentityMode 'INCOMPLETE' -ExpectedBuildIdentityVerified $false `
         -ExpectedBuildIdentityMismatch $false
+
+    # Existing game/host telemetry is promoted into a structured common
+    # frame-budget summary without changing runtime instrumentation.
+    Invoke-AnalyzerCase -Name 'dxvk-frame-budget-aggregation' `
+        -GameLog "direct[frames=0,fallbacks=2,fenceTimeout=0]`nVR R32 PERF 5s: liveWvpCheck=1 liveReject=0 stateBlock[record=0,apply=0] batchWvp[ok=4,fail=0] safety[stateReadFail=0,forcedZero=0] direct[probeCacheHit=5,producerFenceOk=7,producerBudgetFallback=1,backpressure=2,pendingDrain=3,pendingBlock=4,pendingError=0] reset[rearm=0,fail=0]`nVR R32 PERF 5s: liveWvpCheck=2 liveReject=0 stateBlock[record=0,apply=0] batchWvp[ok=5,fail=0] safety[stateReadFail=0,forcedZero=0] direct[probeCacheHit=6,producerFenceOk=11,producerBudgetFallback=2,backpressure=5,pendingDrain=7,pendingBlock=8,pendingError=1] reset[rearm=0,fail=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "[R23 pipeline] captureMs=1 commitCopyMs=0.5 renderMs=2 xrWaitFrameMs=3 xrFrameIntervalMs=11.1 cadenceSerialWaitMs=0.2 gamePresentToConsumeMs=4 xrEndFrameMs=5 captureAvgMaxP95=1.0/3.0/2.0 commitAvgMaxP95=0.5/1.5/1.0 renderAvgMaxP95=2.0/4.0/3.0 endAvgMaxP95=5.0/8.0/7.0`n[R23 pipeline] captureMs=2 commitCopyMs=0.7 renderMs=3 xrWaitFrameMs=5 xrFrameIntervalMs=22.2 cadenceSerialWaitMs=0.4 gamePresentToConsumeMs=6 xrEndFrameMs=7 captureAvgMaxP95=2.0/5.0/4.0 commitAvgMaxP95=0.7/2.0/1.4 renderAvgMaxP95=3.0/6.0/5.0 endAvgMaxP95=7.0/10.0/9.0" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 0 -ExpectedFallbacks 2 `
+        -ExpectedStatus 'DIRECT_GPU_UNAVAILABLE' `
+        -ExpectedHostPipelineWindows 2 -ExpectedProducerPerfWindows 2 `
+        -ExpectedProducerFenceOk 18 -ExpectedProducerBudgetFallback 3 `
+        -ExpectedCaptureMaxMs 5.0 -ExpectedEndFrameP95MaxMs 9.0
 
     Write-Host 'OutRun VR session analyzer shared-probe regression tests: PASS'
 } finally {

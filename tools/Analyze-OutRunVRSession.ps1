@@ -24,6 +24,46 @@ function Read-OptionalJson([string]$name){
     try{return Get-Content $path -Raw|ConvertFrom-Json}catch{return $null}
 }
 
+function Convert-InvariantDouble([string]$value){
+    return [double]::Parse($value,[Globalization.CultureInfo]::InvariantCulture)
+}
+
+function Get-HostTripletSummary([string]$text,[string]$name){
+    $matches=[regex]::Matches($text,([regex]::Escape($name)+'=([0-9]+(?:\.[0-9]+)?)/([0-9]+(?:\.[0-9]+)?)/([0-9]+(?:\.[0-9]+)?)'))
+    if($matches.Count -eq 0){
+        return [pscustomobject]@{WindowCount=0;AverageOfWindowAverages=$null;MaxObserved=$null;MaxP95Observed=$null}
+    }
+    $averages=@()
+    $maxima=@()
+    $p95s=@()
+    foreach($match in $matches){
+        $averages+=Convert-InvariantDouble $match.Groups[1].Value
+        $maxima+=Convert-InvariantDouble $match.Groups[2].Value
+        $p95s+=Convert-InvariantDouble $match.Groups[3].Value
+    }
+    return [pscustomobject]@{
+        WindowCount=$matches.Count
+        AverageOfWindowAverages=($averages|Measure-Object -Average).Average
+        MaxObserved=($maxima|Measure-Object -Maximum).Maximum
+        MaxP95Observed=($p95s|Measure-Object -Maximum).Maximum
+    }
+}
+
+function Get-HostScalarSummary([string]$text,[string]$name){
+    $values=@()
+    foreach($match in [regex]::Matches($text,([regex]::Escape($name)+'=([0-9]+(?:\.[0-9]+)?)'))){
+        $values+=Convert-InvariantDouble $match.Groups[1].Value
+    }
+    if($values.Count -eq 0){
+        return [pscustomobject]@{SampleCount=0;Average=$null;Maximum=$null}
+    }
+    return [pscustomobject]@{
+        SampleCount=$values.Count
+        Average=($values|Measure-Object -Average).Average
+        Maximum=($values|Measure-Object -Maximum).Maximum
+    }
+}
+
 $session=@{}
 $manifestPath=Join-Path $SessionDir 'session_manifest.json'
 if(Test-Path $manifestPath){
@@ -116,6 +156,40 @@ if($frameIntervals.Count -gt 0){
     $avgFrameMs=($frameIntervals|Measure-Object -Average).Average
     if($avgFrameMs -gt 0){$approxHz=1000.0/$avgFrameMs}
 }
+
+$hostCaptureBudget=Get-HostTripletSummary $hostLog 'captureAvgMaxP95'
+$hostCommitBudget=Get-HostTripletSummary $hostLog 'commitAvgMaxP95'
+$hostRenderBudget=Get-HostTripletSummary $hostLog 'renderAvgMaxP95'
+$hostEndFrameBudget=Get-HostTripletSummary $hostLog 'endAvgMaxP95'
+$hostXrWaitBudget=Get-HostScalarSummary $hostLog 'xrWaitFrameMs'
+$hostXrIntervalBudget=Get-HostScalarSummary $hostLog 'xrFrameIntervalMs'
+$hostCadenceWaitBudget=Get-HostScalarSummary $hostLog 'cadenceSerialWaitMs'
+$hostPresentToConsumeBudget=Get-HostScalarSummary $hostLog 'gamePresentToConsumeMs'
+
+$r32PerfWindows=0
+$r32ProducerFenceOk=0L
+$r32ProducerBudgetFallback=0L
+$r32Backpressure=0L
+$r32PendingDrain=0L
+$r32PendingBlock=0L
+$r32PendingError=0L
+$r32Pattern='VR R32 PERF 5s:.*?direct\[probeCacheHit=\d+,producerFenceOk=(\d+),producerBudgetFallback=(\d+),backpressure=(\d+),pendingDrain=(\d+),pendingBlock=(\d+),pendingError=(\d+)\]'
+foreach($r32 in [regex]::Matches($gameLog,$r32Pattern,[Text.RegularExpressions.RegexOptions]::IgnoreCase)){
+    $r32PerfWindows++
+    $r32ProducerFenceOk+=[int64]$r32.Groups[1].Value
+    $r32ProducerBudgetFallback+=[int64]$r32.Groups[2].Value
+    $r32Backpressure+=[int64]$r32.Groups[3].Value
+    $r32PendingDrain+=[int64]$r32.Groups[4].Value
+    $r32PendingBlock+=[int64]$r32.Groups[5].Value
+    $r32PendingError+=[int64]$r32.Groups[6].Value
+}
+$hostPipelineWindowCount=@(
+    $hostCaptureBudget.WindowCount,
+    $hostCommitBudget.WindowCount,
+    $hostRenderBudget.WindowCount,
+    $hostEndFrameBudget.WindowCount
+)|Measure-Object -Maximum|Select-Object -ExpandProperty Maximum
+$frameBudgetEvidenceAvailable=($hostPipelineWindowCount -gt 0 -or $r32PerfWindows -gt 0)
 
 $variant=if($session.VariantId){[string]$session.VariantId}else{'UNKNOWN'}
 $backend=if($session.Backend){[string]$session.Backend}else{'UNKNOWN'}
@@ -269,6 +343,27 @@ $result=[ordered]@{
     RecenterHostApplied=$recenterHostApplied
     ApproxAverageXrFrameMs=$avgFrameMs
     ApproxAverageXrHz=$approxHz
+    FrameBudgetEvidenceAvailable=$frameBudgetEvidenceAvailable
+    FrameBudget=[ordered]@{
+        HostPipelineWindowCount=[int]$hostPipelineWindowCount
+        CaptureMs=$hostCaptureBudget
+        CommitCopyMs=$hostCommitBudget
+        RenderMs=$hostRenderBudget
+        XrEndFrameMs=$hostEndFrameBudget
+        XrWaitFrameMs=$hostXrWaitBudget
+        XrFrameIntervalMs=$hostXrIntervalBudget
+        CadenceSerialWaitMs=$hostCadenceWaitBudget
+        GamePresentToConsumeMs=$hostPresentToConsumeBudget
+        GameProducer=[ordered]@{
+            WindowCount=$r32PerfWindows
+            ProducerFenceOk=$r32ProducerFenceOk
+            ProducerBudgetFallback=$r32ProducerBudgetFallback
+            Backpressure=$r32Backpressure
+            PendingDrain=$r32PendingDrain
+            PendingBlock=$r32PendingBlock
+            PendingError=$r32PendingError
+        }
+    }
     Flags=$flags
 }
 $result|ConvertTo-Json -Depth 4|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.json') -Encoding UTF8
@@ -324,6 +419,19 @@ $lines=@(
     "recenterHostApplied=$recenterHostApplied"
     ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
     ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
+    "frameBudgetEvidenceAvailable=$frameBudgetEvidenceAvailable"
+    "hostPipelineWindowCount=$hostPipelineWindowCount"
+    ("hostCaptureAvgMs="+$(if($null -ne $hostCaptureBudget.AverageOfWindowAverages){'{0:F3}' -f $hostCaptureBudget.AverageOfWindowAverages}else{'n/a'}))
+    ("hostCaptureMaxMs="+$(if($null -ne $hostCaptureBudget.MaxObserved){'{0:F3}' -f $hostCaptureBudget.MaxObserved}else{'n/a'}))
+    ("hostCommitCopyAvgMs="+$(if($null -ne $hostCommitBudget.AverageOfWindowAverages){'{0:F3}' -f $hostCommitBudget.AverageOfWindowAverages}else{'n/a'}))
+    ("hostRenderAvgMs="+$(if($null -ne $hostRenderBudget.AverageOfWindowAverages){'{0:F3}' -f $hostRenderBudget.AverageOfWindowAverages}else{'n/a'}))
+    ("hostXrEndFrameAvgMs="+$(if($null -ne $hostEndFrameBudget.AverageOfWindowAverages){'{0:F3}' -f $hostEndFrameBudget.AverageOfWindowAverages}else{'n/a'}))
+    "producerPerfWindows=$r32PerfWindows"
+    "producerFenceOk=$r32ProducerFenceOk"
+    "producerBudgetFallback=$r32ProducerBudgetFallback"
+    "producerBackpressure=$r32Backpressure"
+    "producerPendingBlock=$r32PendingBlock"
+    "producerPendingError=$r32PendingError"
     "flags=$($flags -join ',')"
 )
 if($status -eq 'DXVK_BUILD_IDENTITY_MISMATCH'){

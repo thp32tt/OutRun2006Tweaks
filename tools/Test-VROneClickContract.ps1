@@ -247,7 +247,12 @@ foreach ($requiredText in @(
     'DxvkDirectEvidenceBlockers',
     'DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED',
     'DXVK_HOST_GENERATION_MISMATCH',
-    'PACKAGE_INTEGRITY_EVIDENCE_MISSING'
+    'PACKAGE_INTEGRITY_EVIDENCE_MISSING',
+    'FrameBudgetEvidenceAvailable',
+    'HostPipelineWindowCount',
+    'ProducerBudgetFallback',
+    'captureAvgMaxP95',
+    'endAvgMaxP95'
 )) {
     if ($runtimeAnalyzer -notmatch [regex]::Escape($requiredText)) {
         throw "Runtime analyzer exact-build identity gate missing: $requiredText"
