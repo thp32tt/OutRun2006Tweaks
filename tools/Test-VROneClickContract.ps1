@@ -157,6 +157,10 @@ switch ([string]$target.RendererTarget) {
         if ($deviceProbe -notmatch [regex]::Escape('OutRunVR::Dxvk::ProbeProvider(device)')) {
             throw 'DXVK provider census is not connected to the game-device lifecycle.'
         }
+        $providerProbe = Get-Content (Join-Path $repoRoot 'src/vr/d3d9/dxvk_provider_probe.cpp') -Raw
+        if ($providerProbe -notmatch [regex]::Escape('gameLocalProvider')) {
+            throw 'DXVK provider census does not verify game-local provider identity.'
+        }
     }
 
     default {
