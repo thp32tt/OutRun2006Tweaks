@@ -77,6 +77,17 @@ for r in fails:
     nx0,ny0,nx1,ny1=a["new_localized_bbox"]; tw=nx1-nx0+1; th=ny1-ny0+1
     if patch.size!=(tw,th): patch=patch.resize((tw,th),Image.Resampling.LANCZOS)
     after.alpha_composite(patch,(nx0,ny0))
+    # Strictly restore every pixel in this sprite cell that lies outside the original permitted bbox.
+    cx0,cy0,cx1,cy1=r["sprite_cell"]; ox0,oy0,ox1,oy1=orig
+    strips=[
+      (cx0,cy0,cx1,min(cy1,oy0-1)),
+      (cx0,max(cy0,oy1+1),cx1,cy1),
+      (cx0,max(cy0,oy0),min(cx1,ox0-1),min(cy1,oy1)),
+      (max(cx0,ox1+1),max(cy0,oy0),cx1,min(cy1,oy1)),
+    ]
+    for sx0,sy0,sx1,sy1 in strips:
+        if sx0<=sx1 and sy0<=sy1:
+            after.paste(src.crop((sx0,sy0,sx1+1,sy1+1)),(sx0,sy0))
     records.append({"key":r["key"],"old_localized_bbox":old,"original_bbox":orig,"target_bbox":a["new_localized_bbox"],"scale":a.get("scale",1)})
 
 qa=[]; failed=[]
