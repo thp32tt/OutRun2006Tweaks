@@ -94,7 +94,7 @@ $kv=@{}
 Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1]]=$matches[2]}}
 $backend=$kv.backend
 if(!$backend){throw 'backend identity missing'}
-$variant=if($kv.variant){$kv.variant}else{switch($backend){'d3d9'{'A_CONTROL'};'dxvk-safe'{'E_DXVK_SAFE'};'dxvk'{'E_DXVK_MULTIVIEW'};'dx12'{'F_DX12_STRICT'};'2d'{'CONTROL_2D'};default{'UNKNOWN'}}}
+$variant=if($kv.variant){$kv.variant}else{switch($backend){'d3d9'{'A_CONTROL'};'dxvk-safe'{'E_DXVK_SAFE'};'dxvk'{'E_DXVK_MULTIVIEW'};'2d'{'CONTROL_2D'};default{'UNKNOWN'}}}
 $profile=if($kv.profile){$kv.profile}else{'CORRECTNESS'}
 $matrix=if($kv.matrix){$kv.matrix}else{'UNIFIED'}
 $activeSourceSha=if($kv.sourceSha){[string]$kv.sourceSha}else{'unknown'}
