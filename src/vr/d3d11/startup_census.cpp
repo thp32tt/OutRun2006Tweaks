@@ -1,22 +1,8 @@
 #include "startup_census.hpp"
+#include "resource_translation.hpp"
 
 namespace outrun::vr::dx11
 {
-    namespace
-    {
-        DXGI_FORMAT translate_backbuffer_format(D3DFORMAT format) noexcept
-        {
-            switch (format)
-            {
-            case D3DFMT_A8R8G8B8:
-            case D3DFMT_X8R8G8B8:
-                return DXGI_FORMAT_B8G8R8A8_UNORM;
-            default:
-                return DXGI_FORMAT_UNKNOWN;
-            }
-        }
-    }
-
     StartupCensus inspect_source_device(IDirect3DDevice9* device) noexcept
     {
         StartupCensus out{};
