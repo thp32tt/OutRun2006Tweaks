@@ -1,0 +1,788 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B95",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
+  "timestamp_kst": "2026-09-28T16:06:49+09:00",
+  "base_head": "f331352434b9428c332ac237b9052a55f8b2490d",
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "index": 54,
+  "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+  "previous_candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+  "candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "bytes": 33554560,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "reworked_elements": [
+    {
+      "key": "match_total",
+      "source": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "old_localized_bbox": [
+        135,
+        27,
+        637,
+        123
+      ],
+      "target_bbox": [
+        162,
+        36,
+        611,
+        122
+      ],
+      "original_bbox": [
+        119,
+        35,
+        637,
+        123
+      ],
+      "scale": 0.895833
+    },
+    {
+      "key": "hit_boost",
+      "source": "Hit the boost!",
+      "korean": "부스트를 밟으세요!",
+      "old_localized_bbox": [
+        885,
+        29,
+        1401,
+        123
+      ],
+      "target_bbox": [
+        915,
+        36,
+        1362,
+        117
+      ],
+      "original_bbox": [
+        914,
+        35,
+        1363,
+        123
+      ],
+      "scale": 0.866279
+    },
+    {
+      "key": "keep_control",
+      "source": "Keep control!",
+      "korean": "차량을 제어하세요!",
+      "old_localized_bbox": [
+        885,
+        119,
+        1401,
+        200
+      ],
+      "target_bbox": [
+        916,
+        124,
+        1362,
+        194
+      ],
+      "original_bbox": [
+        915,
+        110,
+        1363,
+        210
+      ],
+      "scale": 0.864341
+    },
+    {
+      "key": "hold_line",
+      "source": "Hold the line!",
+      "korean": "라인을 유지하세요!",
+      "old_localized_bbox": [
+        1646,
+        28,
+        2181,
+        123
+      ],
+      "target_bbox": [
+        1692,
+        36,
+        2136,
+        115
+      ],
+      "original_bbox": [
+        1678,
+        35,
+        2181,
+        116
+      ],
+      "scale": 0.831579
+    },
+    {
+      "key": "guess_sound",
+      "source": "Guess the sound!",
+      "korean": "소리를 맞혀 보세요!",
+      "old_localized_bbox": [
+        3429,
+        119,
+        4012,
+        205
+      ],
+      "target_bbox": [
+        3462,
+        128,
+        3977,
+        204
+      ],
+      "original_bbox": [
+        3398,
+        127,
+        3978,
+        205
+      ],
+      "scale": 0.883721
+    },
+    {
+      "key": "count_green",
+      "source": "Count Green Cars!",
+      "korean": "초록색 차를 세세요!",
+      "old_localized_bbox": [
+        39,
+        222,
+        671,
+        311
+      ],
+      "target_bbox": [
+        89,
+        231,
+        621,
+        306
+      ],
+      "original_bbox": [
+        51,
+        230,
+        661,
+        307
+      ],
+      "scale": 0.842697
+    },
+    {
+      "key": "count_blue",
+      "source": "Count Blue Cars!",
+      "korean": "파란색 차를 세세요!",
+      "old_localized_bbox": [
+        770,
+        222,
+        1393,
+        310
+      ],
+      "target_bbox": [
+        804,
+        223,
+        1360,
+        301
+      ],
+      "original_bbox": [
+        803,
+        210,
+        1361,
+        302
+      ],
+      "scale": 0.892456
+    },
+    {
+      "key": "count_sheep",
+      "source": "Count the sheep!",
+      "korean": "양을 세세요!",
+      "old_localized_bbox": [
+        2845,
+        222,
+        3247,
+        310
+      ],
+      "target_bbox": [
+        2845,
+        224,
+        3247,
+        312
+      ],
+      "original_bbox": [
+        2745,
+        223,
+        3314,
+        316
+      ],
+      "scale": 1.0
+    },
+    {
+      "key": "count_red",
+      "source": "Count Red Cars!",
+      "korean": "빨간색 차를 세세요!",
+      "old_localized_bbox": [
+        2794,
+        368,
+        3376,
+        453
+      ],
+      "target_bbox": [
+        2828,
+        374,
+        3341,
+        449
+      ],
+      "original_bbox": [
+        2802,
+        373,
+        3345,
+        450
+      ],
+      "scale": 0.882353
+    },
+    {
+      "key": "run_green",
+      "source": "Run through green!",
+      "korean": "초록색을 통과하세요!",
+      "old_localized_bbox": [
+        2949,
+        467,
+        3622,
+        556
+      ],
+      "target_bbox": [
+        2957,
+        471,
+        3614,
+        558
+      ],
+      "original_bbox": [
+        2924,
+        470,
+        3648,
+        559
+      ],
+      "scale": 0.977528
+    }
+  ],
+  "qa": {
+    "elements": 17,
+    "failed_elements": 0,
+    "rows": [
+      {
+        "key": "match_total",
+        "source": "Match the total!",
+        "korean": "합계를 맞히세요!",
+        "sprite_cell": [
+          92,
+          18,
+          681,
+          123
+        ],
+        "original_bbox": [
+          119,
+          35,
+          637,
+          123
+        ],
+        "localized_bbox": [
+          162,
+          36,
+          611,
+          122
+        ],
+        "delta_left": 43,
+        "delta_right": 26,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "count_gifts",
+        "source": "Count the gifts!",
+        "korean": "선물을 세세요!",
+        "sprite_cell": [
+          92,
+          110,
+          681,
+          210
+        ],
+        "original_bbox": [
+          120,
+          110,
+          635,
+          208
+        ],
+        "localized_bbox": [
+          173,
+          110,
+          593,
+          198
+        ],
+        "delta_left": 53,
+        "delta_right": 42,
+        "delta_top": 0,
+        "delta_bottom": 10,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "hit_boost",
+        "source": "Hit the boost!",
+        "korean": "부스트를 밟으세요!",
+        "sprite_cell": [
+          883,
+          18,
+          1403,
+          123
+        ],
+        "original_bbox": [
+          914,
+          35,
+          1363,
+          123
+        ],
+        "localized_bbox": [
+          915,
+          36,
+          1362,
+          117
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 1,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "keep_control",
+        "source": "Keep control!",
+        "korean": "차량을 제어하세요!",
+        "sprite_cell": [
+          883,
+          110,
+          1403,
+          210
+        ],
+        "original_bbox": [
+          915,
+          110,
+          1363,
+          210
+        ],
+        "localized_bbox": [
+          916,
+          111,
+          1362,
+          194
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 1,
+        "delta_bottom": 16,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "hold_line",
+        "source": "Hold the line!",
+        "korean": "라인을 유지하세요!",
+        "sprite_cell": [
+          1644,
+          18,
+          2181,
+          123
+        ],
+        "original_bbox": [
+          1678,
+          35,
+          2181,
+          116
+        ],
+        "localized_bbox": [
+          1692,
+          36,
+          2136,
+          115
+        ],
+        "delta_left": 14,
+        "delta_right": 45,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "honk_horn",
+        "source": "Honk the horn!",
+        "korean": "경적을 울리세요!",
+        "sprite_cell": [
+          1882,
+          110,
+          2470,
+          210
+        ],
+        "original_bbox": [
+          1882,
+          110,
+          2470,
+          210
+        ],
+        "localized_bbox": [
+          1937,
+          110,
+          2470,
+          210
+        ],
+        "delta_left": 55,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 0,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "do_math",
+        "source": "Do the math!",
+        "korean": "계산하세요!",
+        "sprite_cell": [
+          2683,
+          110,
+          3200,
+          215
+        ],
+        "original_bbox": [
+          2683,
+          110,
+          3143,
+          205
+        ],
+        "localized_bbox": [
+          2764,
+          120,
+          3117,
+          204
+        ],
+        "delta_left": 81,
+        "delta_right": 26,
+        "delta_top": 10,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "guess_sound",
+        "source": "Guess the sound!",
+        "korean": "소리를 맞혀 보세요!",
+        "sprite_cell": [
+          3366,
+          110,
+          4076,
+          215
+        ],
+        "original_bbox": [
+          3398,
+          127,
+          3978,
+          205
+        ],
+        "localized_bbox": [
+          3462,
+          128,
+          3977,
+          204
+        ],
+        "delta_left": 64,
+        "delta_right": 1,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "count_green",
+        "source": "Count Green Cars!",
+        "korean": "초록색 차를 세세요!",
+        "sprite_cell": [
+          20,
+          210,
+          691,
+          323
+        ],
+        "original_bbox": [
+          51,
+          230,
+          661,
+          307
+        ],
+        "localized_bbox": [
+          89,
+          231,
+          621,
+          306
+        ],
+        "delta_left": 38,
+        "delta_right": 40,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "count_blue",
+        "source": "Count Blue Cars!",
+        "korean": "파란색 차를 세세요!",
+        "sprite_cell": [
+          768,
+          210,
+          1395,
+          323
+        ],
+        "original_bbox": [
+          803,
+          210,
+          1361,
+          302
+        ],
+        "localized_bbox": [
+          804,
+          223,
+          1360,
+          301
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 13,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "count_sheep",
+        "source": "Count the sheep!",
+        "korean": "양을 세세요!",
+        "sprite_cell": [
+          2701,
+          210,
+          3392,
+          323
+        ],
+        "original_bbox": [
+          2745,
+          223,
+          3314,
+          316
+        ],
+        "localized_bbox": [
+          2845,
+          224,
+          3246,
+          311
+        ],
+        "delta_left": 100,
+        "delta_right": 68,
+        "delta_top": 1,
+        "delta_bottom": 5,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "count_red",
+        "source": "Count Red Cars!",
+        "korean": "빨간색 차를 세세요!",
+        "sprite_cell": [
+          2765,
+          358,
+          3405,
+          463
+        ],
+        "original_bbox": [
+          2802,
+          373,
+          3345,
+          450
+        ],
+        "localized_bbox": [
+          2828,
+          374,
+          3341,
+          449
+        ],
+        "delta_left": 26,
+        "delta_right": 4,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "memorize_sequence",
+        "source": "Memorize the sequence!",
+        "korean": "순서를 기억하세요!",
+        "sprite_cell": [
+          0,
+          456,
+          786,
+          568
+        ],
+        "original_bbox": [
+          0,
+          456,
+          786,
+          559
+        ],
+        "localized_bbox": [
+          91,
+          468,
+          694,
+          555
+        ],
+        "delta_left": 91,
+        "delta_right": 92,
+        "delta_top": 12,
+        "delta_bottom": 4,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "drive_above_speed",
+        "source": "Drive above the speed!",
+        "korean": "지정 속도 이상으로 달리세요!",
+        "sprite_cell": [
+          786,
+          456,
+          1562,
+          568
+        ],
+        "original_bbox": [
+          786,
+          456,
+          1562,
+          559
+        ],
+        "localized_bbox": [
+          788,
+          468,
+          1559,
+          555
+        ],
+        "delta_left": 2,
+        "delta_right": 3,
+        "delta_top": 12,
+        "delta_bottom": 4,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "spot_odd",
+        "source": "Spot the odd one out!",
+        "korean": "다른 하나를 찾으세요!",
+        "sprite_cell": [
+          1562,
+          456,
+          2324,
+          568
+        ],
+        "original_bbox": [
+          1562,
+          456,
+          2324,
+          559
+        ],
+        "localized_bbox": [
+          1598,
+          466,
+          2287,
+          556
+        ],
+        "delta_left": 36,
+        "delta_right": 37,
+        "delta_top": 10,
+        "delta_bottom": 3,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "slipstream_cars",
+        "source": "Slipstream the cars!",
+        "korean": "차량 뒤에서 슬립스트림하세요!",
+        "sprite_cell": [
+          2324,
+          456,
+          2924,
+          568
+        ],
+        "original_bbox": [
+          2324,
+          456,
+          2924,
+          559
+        ],
+        "localized_bbox": [
+          2326,
+          475,
+          2921,
+          548
+        ],
+        "delta_left": 2,
+        "delta_right": 3,
+        "delta_top": 19,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "run_green",
+        "source": "Run through green!",
+        "korean": "초록색을 통과하세요!",
+        "sprite_cell": [
+          2924,
+          456,
+          3648,
+          568
+        ],
+        "original_bbox": [
+          2924,
+          470,
+          3648,
+          559
+        ],
+        "localized_bbox": [
+          2957,
+          471,
+          3648,
+          558
+        ],
+        "delta_left": 33,
+        "delta_right": 0,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      }
+    ],
+    "changed_pixels_outside_old_or_new_rework_rects": 0,
+    "preexisting_source_diff_pixels_outside_union_original_bboxes": 156983,
+    "new_source_diff_pixels_outside_union_original_bboxes": 142,
+    "introduced_alpha_outside_union_original_bboxes": 0,
+    "changes_in_preexisting_pass_cells_outside_rework_overlap": {
+      "count_gifts": 0,
+      "honk_horn": 0,
+      "do_math": 0,
+      "memorize_sequence": 0,
+      "drive_above_speed": 0,
+      "spot_odd": 0,
+      "slipstream_cars": 0
+    },
+    "bbox_containment": "PASS",
+    "artifact_risk_checks": "PASS_AUTOMATED_PENDING_C_VISUAL",
+    "translation_review": "17/17 reviewed Korean strings retained"
+  },
+  "result": "B95_SELF_QA_PASS_PENDING_C_AND_DDS_ONLY_INGAME",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "final_approval": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false,
+  "n100_used": false,
+  "qa_image": "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_BEFORE_AFTER_QA.png"
+}
