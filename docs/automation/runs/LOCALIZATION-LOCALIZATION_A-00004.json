@@ -14,7 +14,7 @@
   "deferred_asset": {
     "index": 53,
     "asset": "568D3696",
-    "reason": "DXT5/mip13; six failures include height/width shrink beyond B92 one-pixel index-remap method; do not risk broad recompression without specialized decoded-pixel proof"
+    "reason": "DXT5 4096x4096 mip13; six C85 failures include geometry shrink beyond the proven endpoint-preserving one-pixel remap used by B92. Broad recompression was not attempted without decoded-pixel-safe evidence."
   },
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
@@ -27,10 +27,40 @@
     "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_QA.png"
   ],
   "result_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088",
-  "note": "GitHub-only. 568D3696 index 53 deferred for specialized DXT5-safe shrink handling. No N100/GPT Library/VR/FFB/DX9Ex/DX11/DXVK/build. Runtime validation not performed.",
-  "summary": "A00004 produced 411827E full self-QA PASS (7/7) and C075FB49 partial safe rework (3 independent text failures fixed; 6 failures remain). 568D3696 DXT5 specialized rework deferred. C visual/final QA and isolated DDS_ONLY in-game validation remain required.",
+  "note": "GitHub-only. No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK/build used. No real-game test performed; RUNTIME_VALIDATION=UNTESTED. Static A self-QA does not imply final approval.",
+  "summary": "A00004 GitHub-only production completed two odd-index REWORK batches: 411827E index 97 full A self-QA PASS (7/7 foreground containment; badge artwork not resampled) and C075FB49 index 111 partial safe rework PASS for 3 isolated text regions with 6 overlap/artwork-sensitive failures intentionally remaining REWORK_REQUIRED. 568D3696 index 53 remains deferred for a specialized DXT5/mip13 decoded-pixel-safe shrink path. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain required.",
   "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
   "production_commit_sha": "bd28cb592c6c3180eef7d88497f7fa0ceb311657",
   "c075_candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
-  "latest_production_commit_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088"
+  "latest_production_commit_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088",
+  "production_commits": {
+    "411827E": "bd28cb592c6c3180eef7d88497f7fa0ceb311657",
+    "C075FB49_partial": "ade45761f638a34281d20a2d0d60c8bb672fe088"
+  },
+  "produced_assets": {
+    "411827E": {
+      "index": 97,
+      "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+      "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME",
+      "report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json"
+    },
+    "C075FB49": {
+      "index": 111,
+      "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+      "status": "PARTIAL_REWORK_PASS_3_SAFE_6_REMAIN",
+      "remaining_rework_elements": [
+        "keep_passing",
+        "drift",
+        "maximum_speed",
+        "tuned_setting",
+        "normal_setting",
+        "random"
+      ],
+      "report": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json"
+    }
+  },
+  "internal_attempts": [
+    "411827E first production attempt failed safely before candidate write because whole-cell source-diff included erased-English/background differences; QA was corrected to the C85 foreground-bbox contract.",
+    "C075FB49 first two partial attempts failed safely before candidate write on overly strict alpha-envelope preconditions; final successful attempt transformed only actual alpha tight-crops and passed pixel/alpha guards."
+  ]
 }
