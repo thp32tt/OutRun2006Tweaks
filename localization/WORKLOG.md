@@ -1255,3 +1255,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Report: `localization/graphics/role_C/20260929-0619-C98/C98_W00013_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C99 W00014 synchronization barrier — 2026-09-29T06:51:53+09:00
+- Barrier gate: PASS. A00044 `b6a436ff2ad2d33562aa6d2c6e44fc628cc8e058` and B00045 terminal `072307a244ae0c16b4d75a472165245ca8aee117` are durable in current HEAD ancestry; Localization Automation Gate / Localization State / Domain Isolation Guard succeeded on both exact terminal commits.
+- A index 195 `9CE4E175` cross-lane final QA: exact HD source and Korean candidate are both 1024x128 BGRA32, pitch 4096, mip1, with byte-identical 128-byte DDS headers. C independently measured source bbox [95,7,489,46], Korean bbox [215,8,369,45], 8,776 changed pixels confined to the source text region, 0 alpha changes/outside pixels, raw-to-readable flip-Y, and visually confirmed `NOT AVAILABLE -> 이용 불가` with no clipping, English residue, artwork intrusion or erasure residue. **STATIC PASS only**; runtime UNTESTED.
+- B indices 46/48/50/62: 12/12 pinned upstream PNG/atlas/HD DDS blob identities match the immutable upstream commit and all 42 canonical semantic translations match current transcription/artwork-plan data. 38 mappings are pinned; index 50 keeps four explicit pixel-detection HOLDs rather than guessing. No B candidate DDS bytes were produced, so raster containment/DDS/alpha/orientation remain HOLD for these four.
+- Shared queue remains 137 rows = **95 localize_text / 31 zoom_review / 9 font / 1 Hangul name-entry / 1 preserve-only**; unresolved zoom-review **0**, resolved preserve-original zoom-review **31**. Transcription/artwork plan remain **95 assets / 750 segments**. Pending production localize_text becomes **78** after the new index-195 candidate.
+- New static passes: **1 (9CE4E175)**. Approved/locked DDS count remains **0**; no in-game/runtime approval is inferred.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Canonical shared-state commit: `3097d59693e206b3523b2e33be9b3532c93bfd64`.
+- Report: `localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json`.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`

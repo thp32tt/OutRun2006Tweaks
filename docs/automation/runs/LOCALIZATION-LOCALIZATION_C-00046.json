@@ -1,0 +1,59 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00046",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00014",
+  "recorded_at_kst": "2026-09-29T06:51:53+09:00",
+  "base_head_sha": "b6a436ff2ad2d33562aa6d2c6e44fc628cc8e058",
+  "canonical_state_commit": "3097d59693e206b3523b2e33be9b3532c93bfd64",
+  "result": "PASS_W00014_SYNC_FINAL_QA_1_NEW_HD_STATIC_PASS_4_RECONSTRUCTION_INPUTS_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "barrier_gate": "PASS_A_B_DURABLE_TERMINAL_AND_REMOTE_CI_SUCCESS",
+  "lane_a_commit": "b6a436ff2ad2d33562aa6d2c6e44fc628cc8e058",
+  "lane_b_commit": "072307a244ae0c16b4d75a472165245ca8aee117",
+  "source_identity_validation": "PASS_B_12_OF_12_PLUS_A_SOURCE_AND_CANDIDATE_BLOBS",
+  "material_deliverable": {
+    "type": "C_SHARED_STATE_RECONCILIATION_AND_CROSS_LANE_FINAL_QA",
+    "static_pass_indices": [
+      195
+    ],
+    "retained_reconstruction_inputs": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "candidate_dds_modified_by_c": false,
+    "wave_candidate_dds_modified": true,
+    "new_static_passes": 1,
+    "new_runtime_approvals": 0
+  },
+  "queue_after": {
+    "rows": 137,
+    "localize_text": 95,
+    "zoom_review": 31,
+    "unresolved_zoom_review": 0,
+    "resolved_preserve_original_zoom_review": 31,
+    "pending_production_localize_text": 78
+  },
+  "transcription_after": {
+    "assets": 95,
+    "segments": 750
+  },
+  "artwork_plan_after": {
+    "assets": 95,
+    "segments": 750
+  },
+  "report": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json",
+  "shared_state_modified": true,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "C99 reconciles W00014 A/B durable results. Index 195 (9CE4E175) independently passes exact-HD static QA with zero-pixel containment and preserved DDS/header/alpha/orientation; indices 46/48/50/62 retain reconstruction evidence without raster promotion. Runtime remains UNTESTED."
+}

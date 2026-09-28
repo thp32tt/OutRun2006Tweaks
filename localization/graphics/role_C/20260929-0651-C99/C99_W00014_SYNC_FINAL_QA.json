@@ -1,0 +1,214 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00046",
+  "wave_id": "W00014",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_MERGE",
+  "recorded_at_kst": "2026-09-29T06:51:53+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "b6a436ff2ad2d33562aa6d2c6e44fc628cc8e058",
+  "canonical_state_commit": "3097d59693e206b3523b2e33be9b3532c93bfd64",
+  "barrier": {
+    "result": "PASS",
+    "lane_a": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00044",
+      "commit": "b6a436ff2ad2d33562aa6d2c6e44fc628cc8e058",
+      "durable_terminal_result": "PASS_1_ODD_HD_BGRA32_CANDIDATE_SELF_QA_PENDING_C_RUNTIME",
+      "remote_ci": {
+        "localization_automation_gate": "success",
+        "localization_state": "success",
+        "domain_isolation_guard": "success"
+      }
+    },
+    "lane_b": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00045",
+      "commit": "072307a244ae0c16b4d75a472165245ca8aee117",
+      "durable_terminal_result": "PASS_MATERIAL_FALLBACK_4_EVEN_HD_ATLAS_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+      "remote_ci": {
+        "localization_automation_gate": "success",
+        "localization_state": "success",
+        "domain_isolation_guard": "success"
+      }
+    }
+  },
+  "source_identity_qa": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "lane_b_expected_blob_checks": 12,
+    "lane_b_matched_blob_checks": 12,
+    "lane_a_source_blob": {
+      "expected": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+      "actual": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+      "result": "PASS"
+    },
+    "lane_a_candidate_blob": {
+      "expected": "e40af638fe836185d25f2b500531f15729d663f2",
+      "actual": "e40af638fe836185d25f2b500531f15729d663f2",
+      "result": "PASS"
+    },
+    "result": "PASS"
+  },
+  "semantic_context_qa": {
+    "result": "PASS",
+    "canonical_segments_rechecked": 43,
+    "lane_a": {
+      "index": 195,
+      "asset": "9CE4E175",
+      "source": "NOT AVAILABLE",
+      "korean": "이용 불가",
+      "result": "PASS_CANONICAL_NATURAL_STATUS_LABEL"
+    },
+    "lane_b": [
+      {
+        "index": 46,
+        "asset": "AA04D779",
+        "segments": 21,
+        "mapped": 21,
+        "result": "PASS_CANONICAL_SEGMENTS_AND_MAPPING_EVIDENCE_RETAINED"
+      },
+      {
+        "index": 48,
+        "asset": "B1696633",
+        "segments": 9,
+        "mapped": 9,
+        "result": "PASS_CANONICAL_SEGMENTS_AND_MAPPING_EVIDENCE_RETAINED"
+      },
+      {
+        "index": 50,
+        "asset": "CBF8ECBF",
+        "segments": 7,
+        "mapped": 3,
+        "explicit_hold": [
+          "PLEASE WAIT",
+          "PLAYERS",
+          "YOUR FRIENDS",
+          "FRIEND REQUEST"
+        ],
+        "result": "PASS_PARTIAL_MAPPING_WITHOUT_GUESSING"
+      },
+      {
+        "index": 62,
+        "asset": "33491F83",
+        "segments": 5,
+        "physical_occurrences": 7,
+        "result": "PASS_CANONICAL_SEGMENTS_AND_MAPPING_EVIDENCE_RETAINED"
+      }
+    ]
+  },
+  "raster_final_qa": {
+    "index": 195,
+    "asset": "9CE4E175",
+    "source_path": "Release/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "source_git_blob_sha": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+    "candidate_git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+    "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+    "source_candidate_bytes": [
+      524416,
+      524416
+    ],
+    "dimensions": [
+      1024,
+      128
+    ],
+    "format": "BGRA32_ARGB_MASKS",
+    "pitch": 4096,
+    "mip_count": 1,
+    "dds_header_128_byte_identical": true,
+    "raw_to_readable_orientation": "flip-Y",
+    "original_bbox": [
+      95,
+      7,
+      489,
+      46
+    ],
+    "localized_bbox": [
+      215,
+      8,
+      369,
+      45
+    ],
+    "delta_left": 120,
+    "delta_right": -120,
+    "delta_top": 1,
+    "delta_bottom": -1,
+    "changed_pixels": 8776,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_pixels": 0,
+    "edge_touch": false,
+    "one_pixel_containment": "PASS",
+    "clipping": "PASS_STATIC_VISUAL",
+    "hangul_glyph_integrity": "PASS_STATIC_VISUAL",
+    "untranslated_english_residue": "PASS_NONE_VISIBLE_IN_TRANSLATED_REGION",
+    "background_artwork_preservation": "PASS",
+    "wrong_replacement": "PASS_ASSET_IDENTITY",
+    "mandatory_english_source_comparison": "PASS_C_INDEPENDENT_READABLE_ORIENTATION_RENDER_AND_LANE_PROOF",
+    "result": "STATIC_QA_PASS_RUNTIME_UNTESTED"
+  },
+  "lane_b_raster_hold": {
+    "candidate_dds_modified": false,
+    "indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "result": "HOLD_NO_CANDIDATE_BYTES",
+    "note": "Pinned source/atlas/HD identities and semantic mappings are valid reconstruction inputs, but exact decoded text/effect bboxes and Korean candidate bytes do not yet exist; containment/DDS/alpha/orientation raster PASS is not inferred."
+  },
+  "shared_state_merge": {
+    "queue": {
+      "rows": 137,
+      "actions": {
+        "localize_text": 95,
+        "zoom_review": 31,
+        "font_pipeline": 9,
+        "hangul_name_entry": 1,
+        "preserve_brand_song_credit": 1
+      },
+      "zoom_review_unresolved": 0,
+      "zoom_review_resolved_preserve_original": 31,
+      "static_pass_updated": [
+        195
+      ],
+      "reconstruction_notes_refreshed": [
+        46,
+        48,
+        50,
+        62
+      ]
+    },
+    "transcription": {
+      "assets": 95,
+      "segments": 750,
+      "changed": false
+    },
+    "artwork_plan": {
+      "assets": 95,
+      "segments": 750,
+      "updated_indices": [
+        46,
+        48,
+        50,
+        62,
+        195
+      ]
+    },
+    "canonical_progress_mirror": "localization/progress/progress.json and localization/progress.json use the same Git blob f18f8da728f6843c249db9dcb82bf3208dc38636 in canonical state commit 3097d59693e206b3523b2e33be9b3532c93bfd64",
+    "worklog_updated": true,
+    "status_updated": true,
+    "resume_updated": true,
+    "visual_review_updated": true
+  },
+  "approved_dds_count": 0,
+  "result": "PASS_W00014_SYNC_FINAL_QA_1_NEW_HD_STATIC_PASS_4_RECONSTRUCTION_INPUTS_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false
+}

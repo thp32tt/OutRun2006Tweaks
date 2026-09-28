@@ -798,3 +798,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Report: `localization/graphics/role_C/20260929-0619-C98/C98_W00013_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C99 W00014 synchronization barrier — 2026-09-29T06:51:53+09:00
+- A/B barrier: PASS; A00044 and B00045 terminal commits are in current ancestry and all three remote localization/domain gates succeeded for both terminal SHAs.
+- **9CE4E175:** C independent exact-HD static QA PASS. 1024x128 BGRA32 / mip1 / pitch4096; 128-byte header identical to English HD source; source bbox [95,7,489,46] contains Korean bbox [215,8,369,45]; 8,776 changed pixels, 0 outside-region pixels, 0 alpha changes; flip-Y readable orientation; `이용 불가` has no visible clipping/residue/intrusion. Runtime remains UNTESTED.
+- **46/48/50/62:** B reconstruction inputs cross-checked 12/12 upstream blobs and 42/42 canonical semantic translations. 46/48/62 are mapping-ready but exact text/effect bbox render-HOLD; 50 remains 3/7 mapped with four explicit detection HOLDs. No raster PASS is inferred without candidates.
+- Queue: **137 = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only**; zoom unresolved **0**; preserve-resolved zoom **31**; transcription/artwork plan **95 / 750**; pending production localize_text **78**.
+- New static passes **1**, runtime approvals **0**, approved/locked DDS **0**. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json`.
