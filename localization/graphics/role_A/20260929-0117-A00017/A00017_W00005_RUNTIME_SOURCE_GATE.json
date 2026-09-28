@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00017",
+  "wave_id": "W00005",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T01:17:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "d494c1b1a44af94e67d3040ed11b8ce51c273a31",
+  "refreshed_head_before_write": "d494c1b1a44af94e67d3040ed11b8ce51c273a31",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "queue_recompute": {
+    "total_rows": 137,
+    "odd_rows": 69,
+    "odd_rework": 4,
+    "odd_pending_artwork": 34,
+    "odd_zoom_review_hold": 21
+  },
+  "reviewed_rework": [
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "status": "REWORK_REQUIRED",
+      "decision": "NO_SPECULATIVE_REWRITE",
+      "reason": "C85/source-style evidence still requires a source-faithful rerender and artifact-safe reconstruction. C89 records no newer DDS bytes or per-DDS runtime attribution."
+    },
+    {
+      "index": 53,
+      "asset": "568D3696",
+      "status": "REWORK_REQUIRED",
+      "decision": "NO_SPECULATIVE_REWRITE",
+      "reason": "DXT5/BC3 decoded-pixel-safe recompression and mip validation remains unresolved. No newer GitHub DDS evidence exists after C89."
+    },
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "status": "REWORK_REQUIRED",
+      "decision": "NO_SPECULATIVE_REWRITE",
+      "reason": "Six overlap/artwork-sensitive failures remain. Current GitHub state provides no new source-faithful evidence enabling a safe reconstruction without risking collateral artwork changes."
+    },
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "status": "REWORK_REQUIRED",
+      "decision": "NO_SPECULATIVE_REWRITE",
+      "reason": "Exact-bbox/collateral failures still require source-faithful per-element reconstruction; no newer safe GitHub production input exists."
+    }
+  ],
+  "source_delta_gate": {
+    "base_barrier_commit": "d494c1b1a44af94e67d3040ed11b8ce51c273a31",
+    "branch_head_at_selection": "d494c1b1a44af94e67d3040ed11b8ce51c273a31",
+    "commits_since_c89": 0,
+    "hd_source_dds_changed": false,
+    "hd_candidate_dds_changed": false,
+    "new_safe_production_input": false
+  },
+  "runtime_gate": {
+    "source": "localization/resume_state.json + C89 barrier",
+    "observed": "The aggregate 16-DDS diagnostic run no longer crashed under the diagnostic configuration, but graphics still show unisolated size/scaling, alpha/transparency, or sprite-position failures.",
+    "decision": "Do not overwrite any odd-shard candidate based on aggregate evidence. Isolated DDS_ONLY in-game attribution is required before runtime-sensitive rework or approval.",
+    "task_runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY",
+    "anti_duplication": "PASS",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_NEW_DDS_WRITE; current C85/C86 evidence reviewed",
+    "dds_format_compression_mips_alpha_orientation": "NOT_APPLICABLE_NO_NEW_DDS_WRITE",
+    "runtime_dimension_scaling_alpha_position_gate": "BLOCKED_PENDING_PER_DDS_ISOLATION",
+    "speculative_rerender_avoided": true
+  },
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/progress/progress.json",
+    "localization/resume_state.json",
+    "localization/graphics/README.md",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00016.json",
+    "localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json",
+    "localization/graphics/role_A/20260929-A00014/A00014_W00004_RUNTIME_ISOLATION_GATE.json"
+  ],
+  "conclusion": "W00005 lane A has no new safe GitHub-resident production input after the C89 barrier. Odd REWORK rows 51/53/111/121 remain blocked by source-faithful/decoded-pixel/overlap reconstruction requirements and aggregate runtime failures remain unisolated. Durable no-action blocker recorded without changing DDS or shared state."
+}
