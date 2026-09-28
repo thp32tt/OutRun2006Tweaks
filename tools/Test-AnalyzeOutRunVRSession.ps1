@@ -15,7 +15,13 @@ function Invoke-AnalyzerCase {
         [Parameter(Mandatory=$true)][bool]$ExpectedSharedFailure,
         [string[]]$ExpectedReasons=@(),
         [Parameter(Mandatory=$true)][int64]$ExpectedDirectFrames,
-        [Parameter(Mandatory=$true)][int64]$ExpectedFallbacks
+        [Parameter(Mandatory=$true)][int64]$ExpectedFallbacks,
+        [string]$ExpectedStatus='',
+        [bool]$ExpectedBridgeReady=$false,
+        [bool]$ExpectedImportReady=$false,
+        [bool]$ExpectedImportFailed=$false,
+        [bool]$ExpectedDirectPathActive=$false,
+        [Nullable[bool]]$ExpectedGenerationMatches=$null
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -49,6 +55,26 @@ function Invoke-AnalyzerCase {
     }
     if([int64]$summary.DirectFallbacks -ne $ExpectedFallbacks){
         throw "${Name}: DirectFallbacks=$($summary.DirectFallbacks), expected $ExpectedFallbacks"
+    }
+    if($ExpectedStatus -and [string]$summary.Status -ne $ExpectedStatus){
+        throw "${Name}: Status=$($summary.Status), expected $ExpectedStatus"
+    }
+    if([bool]$summary.DxvkHostBridgeReady -ne $ExpectedBridgeReady){
+        throw "${Name}: DxvkHostBridgeReady=$($summary.DxvkHostBridgeReady), expected $ExpectedBridgeReady"
+    }
+    if([bool]$summary.DxvkHostImportReady -ne $ExpectedImportReady){
+        throw "${Name}: DxvkHostImportReady=$($summary.DxvkHostImportReady), expected $ExpectedImportReady"
+    }
+    if([bool]$summary.DxvkHostImportFailed -ne $ExpectedImportFailed){
+        throw "${Name}: DxvkHostImportFailed=$($summary.DxvkHostImportFailed), expected $ExpectedImportFailed"
+    }
+    if([bool]$summary.DxvkHostDirectPathActive -ne $ExpectedDirectPathActive){
+        throw "${Name}: DxvkHostDirectPathActive=$($summary.DxvkHostDirectPathActive), expected $ExpectedDirectPathActive"
+    }
+    if($null -ne $ExpectedGenerationMatches){
+        if($null -eq $summary.DxvkHostGenerationMatches -or [bool]$summary.DxvkHostGenerationMatches -ne [bool]$ExpectedGenerationMatches){
+            throw "${Name}: DxvkHostGenerationMatches=$($summary.DxvkHostGenerationMatches), expected $ExpectedGenerationMatches"
+        }
     }
 
     $actualReasons=@($summary.SharedD3D9ExProbeFailureReasons)
@@ -100,6 +126,34 @@ D3D9: Failed to write shared resource info for a texture
         -DxvkLog "DXVK: v3.1.1" -HostLog "directReady=1" `
         -ExpectedSharedFailure $false -ExpectedReasons @() `
         -ExpectedDirectFrames 240 -ExpectedFallbacks 1
+
+    Invoke-AnalyzerCase -Name 'host-bridge-import-not-established' `
+        -GameLog "keeping SBS/Desktop Duplication fallback`ndirect[frames=0,fallbacks=12,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345; Desktop Duplication remains menu/fail-open only." `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 0 -ExpectedFallbacks 12 `
+        -ExpectedStatus 'DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED' `
+        -ExpectedBridgeReady $true
+
+    Invoke-AnalyzerCase -Name 'host-bridge-import-failed' `
+        -GameLog "VR DXVK native transport: host-owned KMT eye import failed generation=12345 slot=2 leftHr=0x8876086C rightHr=0x80004005; SBS fallback remains available`ndirect[frames=0,fallbacks=12,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345; Desktop Duplication remains menu/fail-open only." `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 0 -ExpectedFallbacks 12 `
+        -ExpectedStatus 'DXVK_HOST_OWNED_IMPORT_FAILED' `
+        -ExpectedBridgeReady $true -ExpectedImportFailed $true
+
+    Invoke-AnalyzerCase -Name 'host-bridge-direct-active' `
+        -GameLog "VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring 2124x2284 generation=12345; Desktop Duplication is no longer required for gameplay frames`nVR stereo: 4-slot direct GPU transport uses bounded post-Present completion; path=DXVK host-owned D3D11 KMT import sourceEye=3440x1440`ndirect[frames=240,fallbacks=1,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345; Desktop Duplication remains menu/fail-open only." `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
+        -ExpectedStatus 'DXVK_HOST_OWNED_DIRECTGPU_ACTIVE' `
+        -ExpectedBridgeReady $true -ExpectedImportReady $true `
+        -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true
 
     Write-Host 'OutRun VR session analyzer shared-probe regression tests: PASS'
 } finally {

@@ -50,6 +50,22 @@ foreach($entry in $sharedProbeFailurePatterns.GetEnumerator()){
     }
 }
 $sharedProbeFailed=($sharedProbeFailureReasons.Count -gt 0)
+
+$dxvkHostBridgeReadyMatch=Get-LastRegexMatch $hostLog 'DXVK host-owned shared-eye bridge ready:\s*(\d+)x(\d+)\s*x2,\s*slots=(\d+),\s*generation=(\d+)'
+$dxvkHostBridgeAllocationFailed=($hostLog -match 'DXVK host-owned shared-eye bridge allocation failed')
+$dxvkHostImportReadyMatch=Get-LastRegexMatch $gameLog 'VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring\s+(\d+)x(\d+)\s+generation=(\d+)'
+$dxvkHostImportFailed=($gameLog -match 'VR DXVK native transport: host-owned KMT eye import failed')
+$dxvkHostPathActive=($gameLog -match 'path=DXVK host-owned D3D11 KMT import')
+$dxvkHostBridgeReady=($null -ne $dxvkHostBridgeReadyMatch)
+$dxvkHostImportReady=($null -ne $dxvkHostImportReadyMatch)
+$dxvkHostBridgeWidth=if($dxvkHostBridgeReady){[int]$dxvkHostBridgeReadyMatch.Groups[1].Value}else{0}
+$dxvkHostBridgeHeight=if($dxvkHostBridgeReady){[int]$dxvkHostBridgeReadyMatch.Groups[2].Value}else{0}
+$dxvkHostBridgeSlots=if($dxvkHostBridgeReady){[int]$dxvkHostBridgeReadyMatch.Groups[3].Value}else{0}
+$dxvkHostBridgeGeneration=if($dxvkHostBridgeReady){[uint32]$dxvkHostBridgeReadyMatch.Groups[4].Value}else{0}
+$dxvkHostImportWidth=if($dxvkHostImportReady){[int]$dxvkHostImportReadyMatch.Groups[1].Value}else{0}
+$dxvkHostImportHeight=if($dxvkHostImportReady){[int]$dxvkHostImportReadyMatch.Groups[2].Value}else{0}
+$dxvkHostImportGeneration=if($dxvkHostImportReady){[uint32]$dxvkHostImportReadyMatch.Groups[3].Value}else{0}
+$dxvkHostGenerationMatches=if($dxvkHostBridgeReady -and $dxvkHostImportReady){$dxvkHostBridgeGeneration -eq $dxvkHostImportGeneration}else{$null}
 $driverSeatCount=([regex]::Matches($gameLog,'VR DRIVER SEAT CAMERA:')).Count
 $crashEvidence=($combined -match '(?im)\b(crash|unhandled exception|access violation|fatal error)\b')
 $whiteScreenEvidence=($combined -match '(?im)white screen|white-screen|startup white')
@@ -97,6 +113,11 @@ $flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
 if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
+if($dxvkHostBridgeAllocationFailed){$flags+='DXVK_HOST_BRIDGE_ALLOCATION_FAILED'}
+if($dxvkHostBridgeReady){$flags+='DXVK_HOST_BRIDGE_READY'}
+if($dxvkHostImportFailed){$flags+='DXVK_HOST_BRIDGE_IMPORT_FAILED'}
+if($dxvkHostImportReady){$flags+='DXVK_HOST_BRIDGE_IMPORT_READY'}
+if($dxvkHostPathActive){$flags+='DXVK_HOST_DIRECT_PATH_ACTIVE'}
 if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
 if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
 if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
@@ -109,7 +130,11 @@ $profile=if($session.TestProfile){[string]$session.TestProfile}else{'UNKNOWN'}
 $sourceSha=if($session.SourceSha){[string]$session.SourceSha}else{'UNKNOWN'}
 
 $status='OK'
-if($sbsFallback -and $backend -match 'dxvk'){$status='DXVK_SBS_FALLBACK_CONFIRMED'}
+if($backend -match 'dxvk' -and $dxvkHostPathActive -and $directFrames -gt 0){$status='DXVK_HOST_OWNED_DIRECTGPU_ACTIVE'}
+elseif($backend -match 'dxvk' -and $dxvkHostImportFailed){$status='DXVK_HOST_OWNED_IMPORT_FAILED'}
+elseif($backend -match 'dxvk' -and $dxvkHostBridgeAllocationFailed){$status='DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED'}
+elseif($backend -match 'dxvk' -and $dxvkHostBridgeReady -and -not $dxvkHostImportReady -and $directFrames -eq 0 -and $directFallbacks -gt 0){$status='DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED'}
+elseif($sbsFallback -and $backend -match 'dxvk'){$status='DXVK_SBS_FALLBACK_CONFIRMED'}
 elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED_DRIVER_SEAT_CAMERA_ACTIVE'}
 elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
 
@@ -125,6 +150,19 @@ $result=[ordered]@{
     PlainD3D9Device=$plainD3D9
     SharedD3D9ExProbeFailed=$sharedProbeFailed
     SharedD3D9ExProbeFailureReasons=@($sharedProbeFailureReasons)
+    DxvkHostBridgeReady=$dxvkHostBridgeReady
+    DxvkHostBridgeAllocationFailed=$dxvkHostBridgeAllocationFailed
+    DxvkHostBridgeWidth=$dxvkHostBridgeWidth
+    DxvkHostBridgeHeight=$dxvkHostBridgeHeight
+    DxvkHostBridgeSlots=$dxvkHostBridgeSlots
+    DxvkHostBridgeGeneration=$dxvkHostBridgeGeneration
+    DxvkHostImportReady=$dxvkHostImportReady
+    DxvkHostImportFailed=$dxvkHostImportFailed
+    DxvkHostImportWidth=$dxvkHostImportWidth
+    DxvkHostImportHeight=$dxvkHostImportHeight
+    DxvkHostImportGeneration=$dxvkHostImportGeneration
+    DxvkHostGenerationMatches=$dxvkHostGenerationMatches
+    DxvkHostDirectPathActive=$dxvkHostPathActive
     DirectFrames=$directFrames
     DirectFallbacks=$directFallbacks
     FenceTimeouts=$fenceTimeout
@@ -154,6 +192,17 @@ $lines=@(
     "plainD3D9Device=$plainD3D9"
     "sharedD3D9ExProbeFailed=$sharedProbeFailed"
     "sharedD3D9ExProbeFailureReasons=$($sharedProbeFailureReasons -join ',')"
+    "dxvkHostBridgeReady=$dxvkHostBridgeReady"
+    "dxvkHostBridgeAllocationFailed=$dxvkHostBridgeAllocationFailed"
+    "dxvkHostBridgeSize=$($dxvkHostBridgeWidth)x$($dxvkHostBridgeHeight)"
+    "dxvkHostBridgeSlots=$dxvkHostBridgeSlots"
+    "dxvkHostBridgeGeneration=$dxvkHostBridgeGeneration"
+    "dxvkHostImportReady=$dxvkHostImportReady"
+    "dxvkHostImportFailed=$dxvkHostImportFailed"
+    "dxvkHostImportSize=$($dxvkHostImportWidth)x$($dxvkHostImportHeight)"
+    "dxvkHostImportGeneration=$dxvkHostImportGeneration"
+    "dxvkHostGenerationMatches=$dxvkHostGenerationMatches"
+    "dxvkHostDirectPathActive=$dxvkHostPathActive"
     "directFrames=$directFrames"
     "directFallbacks=$directFallbacks"
     "fenceTimeouts=$fenceTimeout"
@@ -169,7 +218,19 @@ $lines=@(
     ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
     "flags=$($flags -join ',')"
 )
-if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
+if($status -eq 'DXVK_HOST_OWNED_DIRECTGPU_ACTIVE'){
+    $lines+='interpretation=DXVK host-owned shared-eye bridge was created, imported by the game, selected as the direct path, and produced DirectGPU frames.'
+}
+elseif($status -eq 'DXVK_HOST_OWNED_IMPORT_FAILED'){
+    $lines+='interpretation=The OpenXR host reached the DXVK shared-eye bridge, but the game-side KMT eye import failed; inspect leftHr/rightHr and provider errors before pacing changes.'
+}
+elseif($status -eq 'DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED'){
+    $lines+='interpretation=The OpenXR host failed to allocate/publish the host-owned shared-eye bridge; game-side import cannot succeed until host allocation is fixed.'
+}
+elseif($status -eq 'DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED'){
+    $lines+='interpretation=The host published a ready shared-eye bridge, but no matching game import was observed while gameplay fell back; inspect mapping visibility, generation identity and import eligibility.'
+}
+elseif($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
     $lines+='interpretation=DXVK loaded, but DirectGPU shared-eye transport did not activate; runtime fell back to SBS/Desktop Duplication.'
 }
 if($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){
