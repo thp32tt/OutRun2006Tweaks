@@ -7,22 +7,32 @@ class StatusHandler(BaseHTTPRequestHandler):
             self.send_response(404); self.end_headers(); return
         now = datetime.now(TZ)
         reg = load_registry(now)
+        q = load_queue_state()
+        execution = (
+            f"QUEUE / event-driven (check every {QUEUE_CHECK_SECONDS}s; legacy schedule ignored)"
+            if QUEUE_MODE else
+            f"SCHEDULE / minute {SCHEDULE_MINUTES} KST"
+        )
+        legacy_schedule = "ignored while QUEUE_MODE=true" if QUEUE_MODE else f"active: minute {SCHEDULE_MINUTES} KST"
         body = f"""<!doctype html><html><head><meta charset='utf-8'><title>OutRun Chat Controller</title>
-<style>body{{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:0 20px}}pre{{background:#f5f5f5;padding:16px;overflow:auto}}</style></head><body>
+<style>body{{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:0 20px}}pre{{background:#f5f5f5;padding:16px;overflow:auto}}.ok{{font-weight:700}}</style></head><body>
 <h1>OutRun Chat Controller</h1>
+<p><b>Controller mode:</b> {html.escape(str(CONTROLLER_MODE))}</p>
 <p><b>AUTO_SEND:</b> {html.escape(str(AUTO_SEND))}</p>
+<p><b>Execution:</b> <span class='ok'>{html.escape(execution)}</span></p>
+<p><b>Legacy schedule:</b> {html.escape(legacy_schedule)}</p>
 <p><b>Status:</b> {html.escape(str(runtime.get('status')))}</p>
 <p><b>Last action:</b> {html.escape(str(runtime.get('last_action')))}</p>
-<p><b>Schedule:</b> minute {html.escape(str(SCHEDULE_MINUTES))} / KST</p>
-<p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
+<p><b>Queue:</b> poll {QUEUE_CHECK_SECONDS}s / response stable {QUEUE_STABLE_SECONDS}s / GitHub poll {GITHUB_POLL_SECONDS}s / max attempts {MAX_TASK_ATTEMPTS}</p>
+<p><b>Conversation rollover:</b> {html.escape(str(CONVERSATION_ROLLOVER_ENABLED))} / max {MAX_CHAT_ROLLOVERS_PER_TASK} per task / rollover does not increment attempt</p>
+<p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / recovery-only in queue mode / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
 <p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_SECONDS))}s / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
-<p><b>Chat mode:</b> fresh_each_run {html.escape(str(FRESH_CHAT_EACH_RUN))} / retry cooldown {RETRY_BUTTON_COOLDOWN_SECONDS}s</p>
 <p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
 <p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
 <p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
+<h2>Queue State</h2><pre>{html.escape(json.dumps(q, ensure_ascii=False, indent=2))}</pre>
 <h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "rate_limit_attempts": reg.rate_limit_attempts, "rate_limit_until": reg.rate_limit_until, "last_global_send_at": reg.last_global_send_at, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
 <h2>Runtime</h2><pre>{html.escape(json.dumps(runtime, ensure_ascii=False, indent=2))}</pre>
-<p>noVNC: <a href='http://192.168.0.48:6080/vnc.html'>192.168.0.48:6080/vnc.html</a></p>
 </body></html>""".encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -36,6 +46,109 @@ def start_status_server():
     t.start()
     log.info("status server listening on :%s", STATUS_PORT)
 
+
+
+def queue_rollover_prompt(active: dict) -> str:
+    rollover = int(active.get("chat_rollovers", 0)) + 1
+    return "\n".join([
+        "[대화 자동 롤오버 재개]",
+        f"TASK_ID={active['task_id']}",
+        f"LANE={active['lane']}",
+        f"TARGET_BRANCH={active['branch']}",
+        f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
+        f"CHAT_ROLLOVER={rollover}",
+        "",
+        "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
+        "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
+        "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
+        "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
+        "반드시 GitHub만 직접 사용하고 N100 로컬 clone/worktree로 우회하지 마.",
+        "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
+        "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
+    ])
+
+
+async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
+    """Move one active task to a fresh chat without consuming a repair attempt."""
+    if not CONVERSATION_ROLLOVER_ENABLED:
+        return False
+    count = int(active.get("chat_rollovers", 0))
+    if count >= MAX_CHAT_ROLLOVERS_PER_TASK:
+        active["failure_context"] = (
+            f"conversation rollover limit reached ({MAX_CHAT_ROLLOVERS_PER_TASK}) after: {reason}"
+        )
+        active["phase"] = "BLOCKED"
+        return False
+
+    now = datetime.now(TZ)
+    reg = load_registry(now)
+    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
+    if slot is None:
+        return False
+
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(
+            status="conversation_rollover_wait",
+            last_action=f"{active['task_id']} rollover waiting for {guard}",
+        )
+        return False
+
+    old_page = pages.get(slot.name)
+    old_url = slot.url or (old_page.url if old_page and not old_page.is_closed() else None)
+    previous = list(active.get("previous_chat_urls", []))
+    if old_url and old_url not in previous:
+        previous.append(old_url)
+    active["previous_chat_urls"] = previous[-20:]
+
+    page = await replace_with_fresh_slot_page(context, pages, slot)
+    if not await ensure_logged_in(page):
+        write_runtime(status="login_required", last_action=f"{active['task_id']}: login required after conversation rollover")
+        return False
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=5000) is None:
+        write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: fresh project composer unavailable")
+        return False
+
+    runtime["queue_task_id"] = active["task_id"]
+    runtime["queue_lane"] = active["lane"]
+    runtime["queue_branch"] = active["branch"]
+    runtime["queue_attempt"] = active["attempt"]
+    runtime["queue_failure_context"] = active.get("failure_context", "")
+
+    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+        write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
+        return False
+
+    result = await send_message(page, queue_rollover_prompt(active))
+    if result != "sent":
+        write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: rollover send failed: {result}")
+        return False
+
+    sent_at = datetime.now(TZ)
+    new_url = await wait_for_chat_url(page, timeout_sec=8)
+    if new_url:
+        slot.url = new_url
+        active["active_chat_url"] = new_url
+
+    active["chat_rollovers"] = count + 1
+    active["last_rollover_reason"] = reason
+    active["last_rollover_at"] = sent_at.isoformat()
+    active["sent_at"] = sent_at.isoformat()
+    active["last_hash"] = None
+    active["last_hash_changed_at"] = sent_at.isoformat()
+    active["phase"] = "WAIT_CHAT"
+    slot.last_sent_at = sent_at.isoformat()
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = sent_at.isoformat()
+    slot.last_result = "conversation_rollover_sent"
+    note_successful_request(reg, sent_at)
+    save_registry(reg)
+    write_runtime(
+        status="conversation_rollover_sent",
+        last_action=f"{active['task_id']} moved to fresh chat rollover={active['chat_rollovers']} without incrementing attempt",
+        queue=active,
+    )
+    return True
 
 
 async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
@@ -109,6 +222,9 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             "base_sha": base_sha,
             "result_sha": None,
             "attempt": 1,
+            "chat_rollovers": 0,
+            "previous_chat_urls": [],
+            "active_chat_url": slot.url,
             "phase": "WAIT_CHAT",
             "sent_at": datetime.now(TZ).isoformat(),
             "last_hash": None,
@@ -130,6 +246,14 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     page = await slot_page(context, pages, slot)
 
     if active["phase"] == "WAIT_CHAT":
+        if await detect_conversation_limit(page):
+            reason = "ChatGPT reported that the current conversation reached its length limit."
+            if await queue_rollover_chat(context, pages, active, reason):
+                save_queue_state(q)
+                return
+            if active.get("phase") == "BLOCKED":
+                save_queue_state(q)
+            return
         if await detect_busy(page):
             return
         text = await last_assistant_text(page)
