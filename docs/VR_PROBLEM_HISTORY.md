@@ -119,3 +119,12 @@ A concrete identity mismatch has higher precedence than apparent DirectGPU succe
 Initial gate `36465739251` exposed a new-test ordering error under PowerShell StrictMode; no runtime code failed. Final source `ffebc679e30c0f742953c02e7b961f79ead6ea37` corrected the calculation order and passed Backend Conversion Gate `36465995809`, Build `36466003756`, OpenXR architecture `36466003736`, and HUD Inspector `36466003758`.
 
 This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` remains OPEN; future Quest 3 / VDXR evidence must first have `BuildIdentityVerified=true`, then separately prove host-owned DirectGPU frames, fallback reduction, pacing recovery and visual/startup safety.
+
+
+## 2026-09-29 — DXVK DirectGPU evidence trust gate
+
+Task `CONVERSION-DXVK-00025` closed a remaining evidence-classification gap around the pending host-owned DXVK runtime gate. Prior work correlated exact-build identity and package integrity, but apparent `DirectFrames > 0` could still produce `DXVK_HOST_OWNED_DIRECTGPU_ACTIVE` when identity/package evidence was incomplete, and host/import generation disagreement did not have a fail-closed status.
+
+Exact source `4394b69096fa529cfef90eaa06001442da3272ba` now emits trusted DirectGPU evidence only when build identity is verified, package integrity is verified, host/import bridge generations agree, the host-owned direct path is active, and DirectFrames is positive. Incomplete or unverified evidence reports `DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED`; generation disagreement reports `DXVK_HOST_GENERATION_MISMATCH`; machine-readable blockers are exposed as `DxvkDirectEvidenceBlockers`.
+
+Backend Conversion Gate `36480684112`, Build `36480692985`, OpenXR architecture `36480693052`, and HUD Inspector `36480692977` all passed on the exact source SHA. This remains **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` stays OPEN until a Quest 3 / VDXR exact-build test has `DxvkDirectEvidenceTrusted=true` and separately demonstrates fallback reduction, pacing recovery, and no startup/stereo/HUD/menu/recenter regression.

@@ -507,6 +507,26 @@
         ],
         "rule": "Concrete session/build/preflight source or backend mismatch overrides apparent DXVK DirectGPU success as DXVK_BUILD_IDENTITY_MISMATCH. Missing optional evidence is incomplete, not mismatch.",
         "runtime_problem_status_unchanged": true
+      },
+      "directEvidenceTrustGate": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00025",
+        "result_sha": "4394b69096fa529cfef90eaa06001442da3272ba",
+        "validation_run_id": 36480684112,
+        "trusted_requirements": [
+          "BuildIdentityVerified=true",
+          "PackageIntegrityVerified=true",
+          "host/import bridge generations agree",
+          "DxvkHostDirectPathActive=true",
+          "DirectFrames>0"
+        ],
+        "fail_closed_statuses": [
+          "DXVK_BUILD_IDENTITY_MISMATCH",
+          "DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED",
+          "DXVK_HOST_GENERATION_MISMATCH"
+        ],
+        "blocker_field": "DxvkDirectEvidenceBlockers",
+        "runtime_problem_status_unchanged": true
       }
     }
   ],

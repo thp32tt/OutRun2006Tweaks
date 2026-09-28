@@ -139,5 +139,22 @@
     "success_evidence_precondition": "For future exact-build DXVK HMD evidence, BuildIdentityVerified must be true before DirectGPU/pacing results are attributed to a source SHA.",
     "fail_closed_status": "DXVK_BUILD_IDENTITY_MISMATCH",
     "incomplete_flag": "DXVK_BUILD_IDENTITY_INCOMPLETE"
+  },
+  "direct_evidence_trust_gate": {
+    "task_id": "CONVERSION-DXVK-00025",
+    "result_sha": "4394b69096fa529cfef90eaa06001442da3272ba",
+    "automation_validation": "PASS",
+    "validation_run_id": 36480684112,
+    "runtime_validation": "UNTESTED",
+    "trusted_field": "DxvkDirectEvidenceTrusted",
+    "blocker_field": "DxvkDirectEvidenceBlockers",
+    "required_for_future_promotion_evidence": [
+      "BuildIdentityVerified=true",
+      "PackageIntegrityVerified=true",
+      "no host/import generation mismatch",
+      "DxvkHostDirectPathActive=true",
+      "DirectFrames>0"
+    ],
+    "interpretation": "A trusted evidence verdict only establishes that the DirectGPU transport telemetry belongs to an integrity-verified exact build and coherent bridge generation. Quest3/VDXR still must prove fallback reduction, pacing recovery and visual/startup/recenter correctness."
   }
 }
