@@ -50,7 +50,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 - Same-provider D3D9/D3D9Ex behavior is strong.
 - Multiview isolation is correct.
 - Provider cache/upstream provenance needs stronger enforcement.
-- Runtime analyzer must require positive version evidence before claiming stock-version verification.
+- **F24 closed 2026-09-28:** runtime analyzer requires preflight version plus one exact observed DXVK runtime version before claiming stock-provider verification; missing, mismatched, or ambiguous version evidence fails closed (`4fc17768bb3cbb8242567f5c9ca9ce54526339dd`, gate `36390216273`).
 - Exact-build Quest 3 two-pass visual parity is still required.
 
 ### E. Performance evidence
@@ -70,7 +70,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 2. Unify semantic catalogs and runtime producer classification.
 3. Seal selector payload identity and transactional failure behavior.
 4. Tighten DX11 census/activation gates and transport parity.
-5. Tighten DXVK provenance/version evidence.
+5. **PARTIAL 2026-09-28:** DXVK runtime-version attestation F24 is closed at `4fc17768bb3cbb8242567f5c9ca9ce54526339dd` with exact-SHA gate `36390216273` PASS. Acquisition/cache provenance (F09) still needs pinned-release digest enforcement.
 6. Obtain stock DXVK SAFE and DX11 observation one-run Quest 3 evidence.
 7. Separate clean performance profiles from discovery instrumentation.
 8. Only after graphics/lifecycle gates close, consider DXVK multiview or native DX11 draw ownership promotion.
