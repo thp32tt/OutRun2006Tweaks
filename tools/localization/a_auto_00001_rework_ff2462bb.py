@@ -158,15 +158,9 @@ report={
 }
 REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n","utf-8")
 
-q=ROOT/"localization/graphics/asset_queue.csv"
-with q.open("r",encoding="utf-8",newline="") as f: qr=list(csv.DictReader(f)); fields=list(qr[0])
-for row in qr:
-    if int(row["index"])==INDEX:
-        row["artwork_status"]="a_auto_self_qa_pass_pending_c_visual"
-        row["notes"]=(row.get("notes","").rstrip("; ")+"; A AUTO FF2462BB containment PASS 21/21 with minimal/no-resample repair; independent C visual + DDS_ONLY in-game pending").strip("; ")
-with q.open("w",encoding="utf-8",newline="") as f:
-    wr=csv.DictWriter(f,fieldnames=fields,lineterminator="\n"); wr.writeheader(); wr.writerows(qr)
-
+# asset_queue.csv currently contains historical rows with extra unquoted fields that
+# parse as DictReader key None. Do not rewrite that shared ledger from this production
+# action; progress/resume/report carry the durable A result without risking CSV loss.
 pp=ROOT/"localization/progress/progress.json"; p=json.loads(pp.read_text("utf-8"))
 p["updated_at_kst"]=now
 p.setdefault("graphics",{})["latest_a_production"]={"run":"A_AUTO_00001_FF2462BB","task_id":TASK_ID,"report":str(REPORT.relative_to(ROOT)),"assets":{ASSET:{"candidate_sha256":newsha,"status":"A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"}}}
