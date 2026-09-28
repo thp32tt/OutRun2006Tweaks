@@ -1,0 +1,414 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00038",
+  "wave_id": "W00012",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T05:36:30+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ODD_LOCALIZE_TEXT_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+  "initial_head_sha": "162cc60882752eb519836d9ad67e7b541656135b",
+  "final_precommit_head_sha": "9cac14635213638f148b09f4ea0baf053423e4e6",
+  "preserved_intervening_peer_head": true,
+  "source_of_truth": {
+    "contract_path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "contract_git_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+    "queue_path": "localization/graphics/asset_queue.csv",
+    "queue_git_blob_sha": "5f0cf3cb0ecb8448a51ae5d72b96f0ea5a8a82ee",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "dependency_blocker_rule": "Unchanged REWORK dependency fingerprints; skipped without repeating identical review.",
+    "chosen_pending_localize_text_indices": [
+      35,
+      43,
+      47,
+      49
+    ],
+    "reason": "No unresolved odd zoom-review remains. Exact HD source DDS bytes for these pending assets are not materialized under localization/graphics/hd_source, so zero-pixel rules prohibit speculative DDS writes. This run pins exact upstream HD/source/atlas blobs and translations to make the next decoded-pixel rebuild executable.",
+    "candidate_dds_modified": false
+  },
+  "assets": [
+    {
+      "queue_index": 35,
+      "asset": "E989E3B7",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "translations": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrences_known": 2
+        }
+      ],
+      "original_stock_dds": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+        "git_blob_sha": "c326267c625b35acb2131e058051275f5fa88f7f",
+        "bytes": 1048704
+      },
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.png",
+        "git_blob_sha": "7377da8531185e7e0df1bd399c044a0f1e85bd9b"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024_atlas.json",
+        "git_blob_sha": "4072705bc70475aea27e1d961f98180ee71b12b8",
+        "width": 1024,
+        "height": 1024,
+        "regions": 8,
+        "rotations": false
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_HOLL_RANK_Exst/4x_E989E3B7_1024x1024_atlas.json",
+        "git_blob_sha": "fbe3495161865a3da65e6c26a6c32da84edba6ac",
+        "width": 4096,
+        "height": 4096,
+        "regions": 8,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+        "git_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+        "bytes": 67108992,
+        "expected_canvas_from_4x_atlas": [
+          4096,
+          4096
+        ]
+      },
+      "candidate_git_blob_sha": null,
+      "resolution": "RECONSTRUCTION_INPUT_READY_PENDING_EXACT_HD_DECODED_TEXT_BBOX",
+      "rebuild_spec": {
+        "source": "Fetch exact pinned HD release DDS blob eae5175b79369b02ea36ef084cc1e0820f765da2; reject any different source.",
+        "target": "Decode all 8 atlas cells and positively identify both Total Rank occurrences before edit; derive separate full-effect alpha bboxes including outline/shadow/fringe.",
+        "artwork": "Preserve character/rank/card artwork and all pixels outside the two exact English text footprints.",
+        "translation": "Total Rank -> 종합 랭크",
+        "orientation": "Determine raw DDS readable/game orientation from the decoded HD source; atlas rotations=false is not sufficient to infer text orientation.",
+        "containment": "Each Korean full-effect bbox must be a subset of its corresponding exact English-HD bbox and remain inside its atlas cell; changed or introduced-alpha pixels outside target bboxes must be zero.",
+        "proof": "Retain ENGLISH SOURCE vs KOREAN CANDIDATE side-by-side at identical crop/orientation/zoom/scale."
+      }
+    },
+    {
+      "queue_index": 43,
+      "asset": "455717B2",
+      "queue_path": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "translations": [
+        {
+          "source": "CONTINUE",
+          "korean": "계속하기"
+        },
+        {
+          "source": "PERFECT!",
+          "korean": "완벽!"
+        },
+        {
+          "source": "CONGRATULATIONS!",
+          "korean": "축하합니다!"
+        },
+        {
+          "source": "PASSED!",
+          "korean": "통과!"
+        }
+      ],
+      "original_stock_dds": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+        "git_blob_sha": "95cf5b669afdff12d12ebb8d1b1ab70ced87a6cc",
+        "bytes": 262272
+      },
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_congrats_cvt_Exst/455717B2_512x512.png",
+        "git_blob_sha": "b5a7e8724bbf6c7fb6f7f2281db7cdbb1d530f27"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_congrats_cvt_Exst/455717B2_512x512_atlas.json",
+        "git_blob_sha": "80f304ad008da4d3ebaa88b379de1641c82f86d3",
+        "width": 512,
+        "height": 512,
+        "regions": 8,
+        "rotations": false
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_congrats_cvt_Exst/4x_455717B2_512x512_atlas.json",
+        "git_blob_sha": "95e98515af9d7727919d8b6019ecdcb386590d46",
+        "width": 2048,
+        "height": 2048,
+        "regions": 8,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+        "git_blob_sha": "92a3cb717afb6ea10aa76df23941353fd0a04148",
+        "bytes": 16777344,
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          2048
+        ]
+      },
+      "candidate_git_blob_sha": null,
+      "resolution": "RECONSTRUCTION_INPUT_READY_PENDING_EXACT_HD_DECODED_TEXT_TO_CELL_MAPPING",
+      "rebuild_spec": {
+        "source": "Fetch exact pinned HD release DDS blob 92a3cb717afb6ea10aa76df23941353fd0a04148 only.",
+        "target": "Decode the 8 HD atlas cells; map CONTINUE/PERFECT!/CONGRATULATIONS!/PASSED! by source pixels rather than assumed ordering, then derive exact full-effect bboxes.",
+        "artwork": "Preserve icons/non-text sprites and all pixels outside matched English text footprints.",
+        "translations": [
+          "CONTINUE -> 계속하기",
+          "PERFECT! -> 완벽!",
+          "CONGRATULATIONS! -> 축하합니다!",
+          "PASSED! -> 통과!"
+        ],
+        "orientation": "Inspect exact raw HD element orientation before render.",
+        "containment": "Korean pixels including outline/shadow/alpha fringe must not exceed the matched English-HD bbox by even 1 pixel and must remain inside the source atlas cell.",
+        "proof": "Retain exact English-source side-by-side evidence for each translated cell and whole atlas."
+      }
+    },
+    {
+      "queue_index": 47,
+      "asset": "AD720950",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+      "translations": [
+        {
+          "source": "Symbols",
+          "korean": "기호"
+        },
+        {
+          "source": "Shift",
+          "korean": "Shift",
+          "preserve_latin": true
+        },
+        {
+          "source": "Caps Lock",
+          "korean": "대문자 고정"
+        },
+        {
+          "source": "Backspace",
+          "korean": "지우기"
+        },
+        {
+          "source": "Accents",
+          "korean": "악센트"
+        },
+        {
+          "source": "Done",
+          "korean": "완료"
+        },
+        {
+          "source": "Space",
+          "korean": "공백"
+        }
+      ],
+      "original_stock_dds": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+        "git_blob_sha": "244ea65a37e2895ec44a6fac60a0d5c353834c8e",
+        "bytes": 262272
+      },
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/AD720950_1024x256.png",
+        "git_blob_sha": "8e83be29bec8622f242a979a9b41a87d4a622157"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/AD720950_1024x256_atlas.json",
+        "git_blob_sha": "18b11a2caf1d1cb9aa62b5a0d1cecda5bde10e40",
+        "width": 1024,
+        "height": 256,
+        "regions": 7,
+        "rotations": false
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/4x_AD720950_1024x256_atlas.json",
+        "git_blob_sha": "975805b8f625ccf644c3436d40a16600a3e2fa0d",
+        "width": 4096,
+        "height": 1024,
+        "regions": 7,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+        "git_blob_sha": "98b120d89b690068e5e50edbb1e7dcd28b9ea928",
+        "bytes": 16777344,
+        "expected_canvas_from_4x_atlas": [
+          4096,
+          1024
+        ]
+      },
+      "candidate_git_blob_sha": null,
+      "resolution": "RECONSTRUCTION_INPUT_READY_PENDING_EXACT_HD_DECODED_TEXT_TO_CELL_MAPPING",
+      "rebuild_spec": {
+        "source": "Fetch exact pinned HD release DDS blob 98b120d89b690068e5e50edbb1e7dcd28b9ea928 only.",
+        "target": "Decode all 7 keyboard-label cells sprite_556..sprite_562; match each source label from pixels and derive its exact full-effect bbox.",
+        "artwork": "Do not redesign the keyboard/name-entry glyph pipeline. Modify only confirmed UI label text; preserve Shift as Latin per canonical transcription and preserve all non-label/glyph art.",
+        "translations": [
+          "Symbols -> 기호",
+          "Shift -> Shift",
+          "Caps Lock -> 대문자 고정",
+          "Backspace -> 지우기",
+          "Accents -> 악센트",
+          "Done -> 완료",
+          "Space -> 공백"
+        ],
+        "orientation": "Inspect exact raw HD cell orientation before edit; do not infer from atlas rotations flag alone.",
+        "containment": "Every localized label effect must remain within its exact English-HD bbox and atlas cell with zero changed/introduced-alpha pixels elsewhere.",
+        "proof": "Whole-atlas plus per-cell ENGLISH SOURCE vs KOREAN CANDIDATE comparison required."
+      }
+    },
+    {
+      "queue_index": 49,
+      "asset": "BF3EE5C6",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+      "translations": [
+        {
+          "source": "Rank for this stage",
+          "korean": "이 스테이지 랭크"
+        },
+        {
+          "source": "NORMAL",
+          "korean": "일반"
+        },
+        {
+          "source": "TUNED",
+          "korean": "튜닝"
+        },
+        {
+          "source": "TOP Ghost Car!!",
+          "korean": "최고 고스트 카!!"
+        },
+        {
+          "source": "Double!",
+          "korean": "더블!"
+        },
+        {
+          "source": "Strike!",
+          "korean": "스트라이크!"
+        },
+        {
+          "source": "GOAL!",
+          "korean": "골!"
+        },
+        {
+          "source": "Spare!",
+          "korean": "스페어!"
+        },
+        {
+          "source": "Shift up!!",
+          "korean": "시프트 업!!"
+        },
+        {
+          "source": "Rank",
+          "korean": "랭크"
+        },
+        {
+          "source": "Turkey!",
+          "korean": "터키!"
+        },
+        {
+          "source": "Go!",
+          "korean": "출발!"
+        }
+      ],
+      "original_stock_dds": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+        "git_blob_sha": "c274b085a99f96d4a177f66a4a95627006ff37ca",
+        "bytes": 262272
+      },
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.png",
+        "git_blob_sha": "0f4712e293cac5c90493264d9cb09a38c7c35c29"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512_atlas.json",
+        "git_blob_sha": "aadb817729492376b97faaf83f1a92d4c6f649da",
+        "width": 512,
+        "height": 512,
+        "regions": 61,
+        "rotations": false
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/4x_BF3EE5C6_512x512_atlas.json",
+        "git_blob_sha": "298417865257ed116ec795bd5f34eb83348e96fa",
+        "width": 2048,
+        "height": 2048,
+        "regions": 61,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+        "git_blob_sha": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+        "bytes": 16777344,
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          2048
+        ]
+      },
+      "candidate_git_blob_sha": null,
+      "resolution": "RECONSTRUCTION_INPUT_READY_PENDING_EXACT_HD_DECODED_TEXT_TO_CELL_MAPPING",
+      "rebuild_spec": {
+        "source": "Fetch exact pinned HD release DDS blob d6cde0c83a157e66e089867ccd616c289eb29c6e only.",
+        "target": "Decode the 61-cell atlas and positively map all 12 canonical text segments to exact source cells/physical occurrences before any edit; derive per-occurrence full-effect bboxes.",
+        "artwork": "Preserve all HUD icons, counters, particles, badges and neighboring sprites. Bowling loanwords remain canonical Korean transcription.",
+        "translations": [
+          "Rank for this stage -> 이 스테이지 랭크",
+          "NORMAL -> 일반",
+          "TUNED -> 튜닝",
+          "TOP Ghost Car!! -> 최고 고스트 카!!",
+          "Double! -> 더블!",
+          "Strike! -> 스트라이크!",
+          "GOAL! -> 골!",
+          "Spare! -> 스페어!",
+          "Shift up!! -> 시프트 업!!",
+          "Rank -> 랭크",
+          "Turkey! -> 터키!",
+          "Go! -> 출발!"
+        ],
+        "orientation": "Inspect exact raw HD orientation per matched cell before render.",
+        "containment": "No localized effect pixel may escape the original English-HD per-occurrence bbox or cross the matched atlas cell; preserve all untargeted pixels byte/pixel-faithfully where practical.",
+        "proof": "Retain whole-atlas and every touched-cell ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+      }
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_35_43_47_49",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_HEAD_9cac1463",
+    "unchanged_rework_blockers_skipped": "PASS_51_53_111_121",
+    "direct_github_source_identity": "PASS_PINNED_OR2006SPRITES_COMMIT",
+    "exact_hd_release_dds_blob_identity": "PASS_4_OF_4",
+    "original_png_blob_identity": "PASS_4_OF_4",
+    "stock_atlas_blob_identity": "PASS_4_OF_4",
+    "hd_4x_atlas_blob_identity": "PASS_4_OF_4",
+    "canonical_translation_segments": "PASS_24_SEMANTIC_SEGMENTS",
+    "deterministic_reconstruction_input": "PASS_4_ASSETS",
+    "mandatory_english_source_comparison_gate": "HOLD_UNTIL_FUTURE_CANDIDATE_NO_NEW_DDS",
+    "zero_pixel_containment": "HOLD_UNTIL_EXACT_HD_DECODED_TEXT_BBOX_NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "UNCHANGED_NO_DDS_WRITE; FUTURE_REBUILD_MUST_PARSE_AND_PRESERVE_EXACT_HD_HEADER_BEHAVIOR",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "E989E3B7",
+    "455717B2",
+    "AD720950",
+    "BF3EE5C6"
+  ],
+  "material_deliverable": "Exact immutable HD/source/atlas Git blob identities plus canonical translations and deterministic zero-pixel reconstruction specifications for four unfinished odd-shard localize_text assets.",
+  "c_reconciliation_required": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00012 lane A materially advances four pending odd localize_text assets by pinning exact GitHub HD/source/atlas inputs and executable source-faithful reconstruction constraints. No speculative DDS bytes were written because exact decoded text bboxes and raw orientation remain mandatory. Runtime remains UNTESTED."
+}
