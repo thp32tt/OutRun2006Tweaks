@@ -25,16 +25,16 @@ index,path,text_detected,action,review_status,notes
 23,textures/load/spr_font_xst/FDC6BAD7_512x128.dds,glyph_atlas,font_pipeline,visual_reviewed,
 24,textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds,glyph_atlas,hangul_name_entry,visual_reviewed,
 25,textures/load/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds,maybe,zoom_review,visual_reviewed,
-26,textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds,maybe,zoom_review,visual_reviewed,
+26,textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 27,textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds,maybe,zoom_review,visual_reviewed,
-28,textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds,maybe,zoom_review,visual_reviewed,
+28,textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 29,textures/load/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds,maybe,zoom_review,visual_reviewed,
-30,textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds,maybe,zoom_review,visual_reviewed,
+30,textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 31,textures/load/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds,maybe,zoom_review,visual_reviewed,
-32,textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds,maybe,zoom_review,visual_reviewed,
+32,textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 33,textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds,maybe,zoom_review,visual_reviewed,
 34,textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds,maybe,zoom_review,visual_reviewed,
-35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,maybe,zoom_review,visual_reviewed,
+35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 36,textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds,maybe,zoom_review,visual_reviewed,
 37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,maybe,zoom_review,visual_reviewed,
 38,textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds,maybe,zoom_review,visual_reviewed,
@@ -102,7 +102,7 @@ index,path,text_detected,action,review_status,notes
 100,textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds,yes,localize_text,visual_reviewed,
 101,textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds,yes,localize_text,visual_reviewed,
 102,textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds,yes,localize_text,visual_reviewed,
-103,textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds,maybe,zoom_review,visual_reviewed,
+103,textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds,yes,localize_text,visual_reviewed,W00009 A00029+C94: Normal balance confirmed localizable
 104,textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds,yes,localize_text,visual_reviewed,
 105,textures/load/spr_sprani_selector_cvt_Exst/710CF7E0_256x64.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 106,textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds,yes,localize_text,visual_reviewed,
@@ -150,11 +150,11 @@ index,path,text_detected,action,review_status,notes
 148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,maybe,zoom_review,visual_reviewed,
 149,textures/load/spr_sprani_sumo_fe_cvt_Exst/3FF19FF7_512x128.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 150,textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds,maybe,zoom_review,visual_reviewed,
-151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,maybe,zoom_review,visual_reviewed,
+151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,no,zoom_review,visual_reviewed,W00009 A00029+C94: resolved preserve-original; no localizable UI prose
 152,textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds,yes,localize_text,visual_reviewed,
-153,textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds,maybe,zoom_review,visual_reviewed,
+153,textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds,no,zoom_review,visual_reviewed,W00009 A00029+C94: resolved preserve-original; no localizable UI prose
 154,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds,yes,localize_text,visual_reviewed,
-155,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds,maybe,zoom_review,visual_reviewed,
+155,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds,no,zoom_review,visual_reviewed,W00009 A00029+C94: resolved preserve-original; no localizable UI prose
 156,textures/load/spr_sprani_sumo_fe_cvt_Exst/4DC09A74_1024x1024.dds,no,no_localization,visual_reviewed,
 157,textures/load/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.dds,maybe,zoom_review,visual_reviewed,
 158,textures/load/spr_sprani_sumo_fe_cvt_Exst/4EA333E1_256x128.dds,no,no_localization,visual_reviewed,
