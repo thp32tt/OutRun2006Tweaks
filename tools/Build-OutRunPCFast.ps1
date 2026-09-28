@@ -274,10 +274,15 @@ $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
 Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_${buildMode}_NOT_FINAL_CI" -Encoding ascii
 
+$oneClickTarget = Get-Content 'tools/VR_ONE_CLICK_TARGET.json' -Raw | ConvertFrom-Json
 $buildInputs = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
+    DevelopmentBranch = [string]$oneClickTarget.DevelopmentBranch
+    RendererTarget = [string]$oneClickTarget.RendererTarget
+    DevelopmentStage = [string]$oneClickTarget.Stage
+    LaunchBackend = [string]$oneClickTarget.LaunchBackend
     VariantId = 'ACTIVE_R26_HUD_R69'
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
