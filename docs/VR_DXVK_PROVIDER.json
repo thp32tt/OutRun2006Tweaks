@@ -18,5 +18,10 @@
     "multiviewPatcherIncluded": false,
     "promotionRequiresQuest3VdxrParity": true
   },
-  "provenanceNote": "Pinned official DXVK release asset. The package workflow verifies this archive digest before extracting the x86 d3d9.dll and records the extracted DLL SHA256."
+  "provenanceNote": "Pinned official DXVK release asset. The package workflow verifies this archive digest before extracting the x86 d3d9.dll and records the extracted DLL SHA256.",
+  "sourceCommit": "b1a1c99ab52b687cf950d62c88bc2fa316b41663",
+  "releaseTagObjectSha": "1e0f92318d6ec7b7286e050d9e24fd01a2d09c92",
+  "releaseTagSignatureVerified": true,
+  "licenseUrl": "https://raw.githubusercontent.com/doitsujin/dxvk/b1a1c99ab52b687cf950d62c88bc2fa316b41663/LICENSE",
+  "licenseGitBlobSha": "35d56c0baa980b10aa25e494a3c944a1e8dd04b7"
 }
