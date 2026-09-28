@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "evidence_id": "DXVK-RUNTIME-20260929-93B69470",
+  "backend": "DXVK",
+  "branch": "vr-dxvk-r71-disasm",
+  "tested_sha": "93b69470a3ca72ad2c14df9d72253c3bf3721458",
+  "tested_tree_relation": "PC fast trigger commit over the CONVERSION-DXVK-00010 native-capability-gate tree",
+  "observed_at_kst": "2026-09-29T01:16:29+09:00",
+  "hardware_runtime": {
+    "hmd": "Quest 3",
+    "openxr_runtime": "VDXR",
+    "test_profile": "CORRECTNESS"
+  },
+  "provider": {
+    "dxvk_version": "3.1.1",
+    "provider_sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+    "stock_vk_handles": true,
+    "stock_vk_submission_queue": true,
+    "external_memory_win32": true,
+    "external_semaphore_win32": true,
+    "nativeTransportCandidate": true,
+    "queue_family_index": 0,
+    "queue_index": 0
+  },
+  "legacy_directgpu": {
+    "result": "USER_RUNTIME_VERIFIED_FAIL",
+    "probe_ack": 0,
+    "direct_ready": 0,
+    "direct_frames": 0,
+    "fallbacks": 1504,
+    "fence_timeouts": 0,
+    "dxvk_errors": [
+      "DxvkMemoryAllocator::createImageResource: Failed to open shared D3DKMT handle",
+      "D3D9: Failed to write shared resource info for a texture"
+    ],
+    "interpretation": "The stock DXVK provider exposes the Vulkan/external-memory prerequisites, but the existing legacy D3D9Ex shared-handle -> D3D11 DirectGPU path is not usable in this runtime session. The renderer falls back to SBS/Desktop Duplication."
+  },
+  "frame_pacing": {
+    "menu_or_local_xr_interval_ms_approx": 11.1,
+    "menu_or_local_hz_approx": 90.1,
+    "gameplay_projection_exact_xr_interval_ms_approx": 33.44,
+    "gameplay_hz_approx": 29.9,
+    "gameplay_xr_end_frame_ms_approx": 25.3,
+    "interpretation": "The severe pacing collapse is concentrated in gameplay stereo/fallback processing rather than the base HMD/menu cadence."
+  },
+  "analyzer_defect": {
+    "observed": true,
+    "field": "SharedD3D9ExProbeFailed",
+    "reported_value": false,
+    "expected_value": true,
+    "reason": "Concrete DXVK D3DKMT shared-handle failures plus probeAck=0/directReady=0/directFrames=0 contradict the false classification.",
+    "followup": "Repair the analyzer classification separately; do not let the false summary override raw runtime evidence."
+  },
+  "visual_validation": {
+    "result": "UNSPECIFIED",
+    "reason": "TEST_RESULT.txt was blank; no HUD/menu/vehicle/sky/smoke visual parity claim is made."
+  },
+  "regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "current_head_after_test": {
+    "sha": "54be06b4bb8e6cc6d3b2995aa94369fdc9097b17",
+    "commit": "Implement DXVK host-owned shared-eye transport [AUTO:CONVERSION-DXVK-00010]",
+    "runtime_validation": "UNTESTED",
+    "note": "This implementation was committed after the tested SHA. Do not infer that the runtime failure is fixed from source/build state alone."
+  },
+  "automation_decision": {
+    "capability_gate": "PASS",
+    "legacy_directgpu": "FAIL",
+    "highest_priority_next_action": "Build and Quest3/VDXR-test the current host-owned shared-eye transport candidate. Require directReady/directFrames evidence and same-scene frame pacing before any promotion.",
+    "success_criteria": [
+      "native transport/bridge initializes without legacy D3DKMT shared-handle failure",
+      "directReady=1 and directFrames increases during gameplay",
+      "fallback count is eliminated or materially reduced for normal gameplay",
+      "gameplay XR frame interval recovers materially from the ~33.44 ms tested failure without regressing 90 Hz menu cadence",
+      "no startup/white-screen, stereo, HUD, menu, recenter or visual-parity regression"
+    ],
+    "constraints": [
+      "Preserve run generation and transport generation identity.",
+      "Preserve producer completion before publish.",
+      "Published slots/resources remain immutable until exact consumer ACK.",
+      "Fail closed to a known fallback; do not silently claim DirectGPU readiness.",
+      "Do not promote custom DXVK multiview until exact-build Quest3/VDXR parity and pacing are proven."
+    ]
+  },
+  "issue_13_comment_id": 5874110684,
+  "runtime_validation": "TESTED_CAPABILITY_PASS_LEGACY_DIRECTGPU_FAIL",
+  "current_head_runtime_validation": "UNTESTED"
+}

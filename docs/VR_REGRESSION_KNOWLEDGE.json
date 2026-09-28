@@ -370,6 +370,71 @@
         "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
         "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
       }
+    },
+    {
+      "key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+      "title": "DXVK stock provider legacy D3D9Ex shared-handle DirectGPU fails and gameplay falls to ~30 Hz fallback",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "runtime-performance-major",
+      "firstKnownWindowKst": "2026-09-29",
+      "lastObservedKst": "2026-09-29T01:16:29+09:00",
+      "sourceSha": "93b69470a3ca72ad2c14df9d72253c3bf3721458",
+      "symptomFingerprint": {
+        "primary": "Stock DXVK 3.1.1 exposes native Vulkan/external-memory prerequisites, but the legacy D3D9Ex shared-handle probe is not acknowledged; DirectGPU stays unavailable and gameplay falls back to SBS/Desktop Duplication.",
+        "secondary": [
+          "nativeTransportCandidate=1 with Vulkan handles, submission queue, VK_KHR_external_memory_win32 and VK_KHR_external_semaphore_win32 available",
+          "probeAck=0, directReady=0, directFrames=0, fallbacks=1504, fenceTimeouts=0",
+          "DXVK reports failed shared D3DKMT handle open / shared texture info write",
+          "menu/local XR cadence ~11.10 ms (~90.1 Hz), gameplay projection-exact cadence ~33.44 ms (~29.9 Hz), gameplay xrEndFrame ~25.3 ms"
+        ]
+      },
+      "hypothesis": "The stock-DXVK legacy D3D9Ex shared-resource compatibility path cannot provide the cross-process shared-eye transport expected by the current DirectGPU probe, forcing Desktop Duplication fallback. The gameplay-only ~30 Hz collapse is therefore most strongly associated with the stereo/fallback transport path, not the base HMD/menu cadence.",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
+      "constraints": [
+        "The capability-gate PASS does not mean the legacy shared-handle transport works.",
+        "Current post-test implementation SHA 54be06b4bb8e6cc6d3b2995aa94369fdc9097b17 is runtime-untested.",
+        "Preserve exact run generation, transport generation, producer completion, immutable published resource lifetime and consumer ACK rules.",
+        "Do not promote custom DXVK multiview before exact-build Quest3/VDXR parity and pacing evidence."
+      ],
+      "nextAction": "Build and Quest3/VDXR-test current DXVK host-owned shared-eye transport SHA 54be06b4bb8e6cc6d3b2995aa94369fdc9097b17 (or its exact descendant if only documentation/validation changes intervene). Require directReady=1/directFrames>0, materially reduced fallback use, and same-scene frame pacing recovery before considering the transport fix validated. If it fails, use the bridge/host telemetry to isolate export/import/open/copy/ACK failure; do not fall back to cadence micro-tuning first.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d9/dxvk_provider_probe.cpp",
+        "src/vr/ipc/dxvk_shared_eye_bridge.hpp",
+        "src/vr/ipc/protocol.hpp",
+        "vrhost/src/main.cpp",
+        "vrhost/CMakeLists.txt",
+        "tools/analyze_dxvk_session.py"
+      ],
+      "revalidationTriggers": [
+        "changes to DXVK shared-eye resource creation/export/import/open logic",
+        "changes to directReady/probeAck/DirectGPU eligibility or fallback routing",
+        "changes to producer/consumer generation, completion or ACK ordering",
+        "changes to host copy/OpenXR end-frame pacing or Desktop Duplication fallback"
+      ],
+      "verifier": {
+        "static": [
+          "verify provider capability discovery remains passive/fail-closed and nativeTransportCandidate cannot imply directReady by itself",
+          "verify shared-eye bridge preserves generation identity, publish-after-producer-completion, immutable-until-ACK resource lifetime and exact consumer ACK",
+          "verify analyzer marks concrete D3DKMT/shared-handle probe failures as failures even when the old summary regex would report false"
+        ],
+        "runtime": [
+          "Quest3/VDXR exact build: provider census remains nativeTransportCandidate=1",
+          "gameplay: directReady=1 and directFrames increases; normal gameplay does not remain at directFrames=0/fallback-only",
+          "same scene: gameplay XR interval improves materially from ~33.44 ms while menu/local cadence remains near the runtime refresh cadence",
+          "confirm no white-screen/startup, stereo-eye, HUD/menu, recenter or visual-parity regression"
+        ]
+      },
+      "latestFailedCandidate": {
+        "sha": "93b69470a3ca72ad2c14df9d72253c3bf3721458",
+        "profile": "CORRECTNESS",
+        "result": "native capability PASS; legacy DirectGPU FAIL; SBS/Desktop Duplication fallback active; gameplay ~29.9 Hz",
+        "telemetry": "nativeTransportCandidate=1; probeAck=0; directReady=0; directFrames=0; fallbacks=1504; gameplay interval≈33.44ms; menu interval≈11.10ms",
+        "evidencePath": "docs/automation/runtime/DXVK_RUNTIME_20260929_93b69470.json",
+        "issue13CommentId": 5874110684
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {

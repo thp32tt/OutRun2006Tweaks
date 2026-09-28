@@ -6,7 +6,7 @@
   "base_sha": "136af4da45d3cf2aadba908b9fd334b7e06b148f",
   "result_sha": "f7ebdb99e6db7695672729563bae51512705e9ab",
   "automation_validation": "PASS",
-  "runtime_validation": "UNTESTED",
+  "runtime_validation": "UNTESTED_CURRENT_HEAD_WITH_PREDECESSOR_RUNTIME_EVIDENCE",
   "selected_work_item": "DXVK-NATIVE-TRANSPORT-CAPABILITY-GATE",
   "summary": "Added a passive, fail-closed stock-DXVK native transport prerequisite gate without activating a new transport. The provider probe now uses the official DXVK 3.1.1 ID3D9VkInteropDevice ABI to observe Vulkan instance/physical-device/device handles and the graphics submission queue, then checks the running Vulkan device for Win32 external-memory and external-semaphore export entry points. The session analyzer records nativeTransportCandidate, while legacy logs remain accepted. No renderer, Present, D3D9Ex shared-eye routing, multiview, OpenXR submission or vr-d3d9ex-focus source was changed.",
   "changed_paths": [
@@ -40,7 +40,8 @@
     "Backend Conversion Gate 36446910184 PASS on exact source SHA f7ebdb99e6db7695672729563bae51512705e9ab, including queue/baseline/one-click/backend-semantic/analyzer/acquisition checks, Win32 configure/build, binary verification and artifact upload.",
     "Build 36446918291 PASS; OpenXR VR architecture 36446918082 PASS across host-x64 and all Win32 comparison jobs; OutRun EXE HUD Inspector CI 36446918088 PASS. VR PC Fast Test Build was skipped as required.",
     "Backend Conversion Gate artifact 10980394963 digest sha256:7b31ddf2bb216a5aee0280473783f33de0233b99b1a8b05692a457c5017b231d. OpenXR host artifact 10980554430 digest sha256:fc3d8f595470ae0257fc0af03068b78bc68bbbea46e9bd30f03630d2f53adc6e. HUD Inspector artifact 10981700161 digest sha256:7ad10c0c7e76881fedb4826118328f2158faf8a45400fdf690428aa58a75d025.",
-    "Production change ledger Issue #14 received IMPLEMENTATION event comment 5873662765 and VALIDATION event comment 5873744753. No Issue #13 runtime status was changed because no new HMD/game runtime test was performed."
+    "Production change ledger Issue #14 received IMPLEMENTATION event comment 5873662765 and VALIDATION event comment 5873744753. No Issue #13 runtime status was changed because no new HMD/game runtime test was performed.",
+    "User runtime evidence DXVK-RUNTIME-20260929-93B69470: nativeTransportCandidate=1 but legacy D3D9Ex shared-handle DirectGPU failed (probeAck=0, directReady=0, directFrames=0, fallbacks=1504); gameplay pacing was ~29.9 Hz versus ~90.1 Hz menu cadence. Durable machine-readable record: docs/automation/runtime/DXVK_RUNTIME_20260929_93b69470.json."
   ],
   "completed_work_items": [
     "DXVK-NATIVE-TRANSPORT-CAPABILITY-GATE"
@@ -50,7 +51,7 @@
     "DXVK-HOST-XREND-FRAME-PACING",
     "DXVK-EXACT-BUILD-QUEST3-VDXR-MAJOR-CHANGE-GATE"
   ],
-  "next_action": "Collect one exact stock-DXVK session with the new census. If nativeTransportCandidate=1, the next bounded DXVK task may implement external-memory allocation/export/import plus synchronization while preserving run/generation/fence/consumer-ACK lifetime rules. If nativeTransportCandidate=0, fail closed and investigate the missing prerequisite. Do not claim a runtime or performance improvement until a subsequent exact-build Quest 3/VDXR test passes.",
+  "next_action": "Runtime evidence DXVK-RUNTIME-20260929-93B69470 satisfied the native capability gate (nativeTransportCandidate=1) and proved the legacy D3D9Ex shared-handle DirectGPU path failed. Current branch SHA 54be06b4bb8e6cc6d3b2995aa94369fdc9097b17 adds a host-owned shared-eye transport after that test and is RUNTIME UNTESTED. The next DXVK runtime gate is an exact-build Quest 3/VDXR test of the current implementation: require directReady/directFrames evidence, reduced fallback use, same-scene frame pacing, and no startup/stereo/HUD/menu/recenter regression before promotion.",
   "recorded_at": "2026-09-29T01:00:23.169+09:00",
   "validation": {
     "backend_conversion_gate_run_id": 36446910184,
@@ -69,5 +70,22 @@
     "openxr_host_artifact_digest": "sha256:fc3d8f595470ae0257fc0af03068b78bc68bbbea46e9bd30f03630d2f53adc6e",
     "hud_artifact_id": 10981700161,
     "hud_artifact_digest": "sha256:7ad10c0c7e76881fedb4826118328f2158faf8a45400fdf690428aa58a75d025"
+  },
+  "runtime_evidence": {
+    "evidence_id": "DXVK-RUNTIME-20260929-93B69470",
+    "path": "docs/automation/runtime/DXVK_RUNTIME_20260929_93b69470.json",
+    "tested_sha": "93b69470a3ca72ad2c14df9d72253c3bf3721458",
+    "observed_at_kst": "2026-09-29T01:16:29+09:00",
+    "runtime_validation": "TESTED_CAPABILITY_PASS_LEGACY_DIRECTGPU_FAIL",
+    "nativeTransportCandidate": true,
+    "legacy_directgpu": "FAIL",
+    "direct_frames": 0,
+    "fallbacks": 1504,
+    "gameplay_hz_approx": 29.9,
+    "menu_hz_approx": 90.1,
+    "regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+    "issue_13_comment_id": 5874110684,
+    "current_head_after_test": "54be06b4bb8e6cc6d3b2995aa94369fdc9097b17",
+    "current_head_runtime_validation": "UNTESTED"
   }
 }

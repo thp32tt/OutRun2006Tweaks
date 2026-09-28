@@ -66,3 +66,18 @@ For the rank-marker case, exact callsite WORLD_BILLBOARD tags were also insuffic
 
 Protected R51 baseline remains unchanged. The failed candidate is evidence only and must not be integrated.
 
+
+
+## 2026-09-29 — VR-DXVK-D3D9EX-SHARED-HANDLE-001 — stock DXVK native capability passes, legacy DirectGPU fails
+
+Exact user runtime build `93b69470a3ca72ad2c14df9d72253c3bf3721458` on Quest 3 / VDXR proved that the new stock-DXVK capability census succeeds: `stock_vk_handles=1`, `stock_vk_submission_queue=1`, `external_memory_win32=1`, `external_semaphore_win32=1`, therefore `nativeTransportCandidate=1`.
+
+That capability result does **not** make the existing D3D9Ex shared-handle DirectGPU path valid. The same session recorded `probeAck=0`, `directReady=0`, `directFrames=0`, `fallbacks=1504`, with DXVK errors `Failed to open shared D3DKMT handle` and `Failed to write shared resource info for a texture`. The renderer therefore remained on SBS/Desktop Duplication fallback.
+
+Frame pacing localizes the severe stutter to gameplay/fallback work: menu/local OpenXR cadence was about 11.10 ms (~90.1 Hz), while gameplay projection-exact windows were about 33.44 ms (~29.9 Hz) and sampled gameplay `xrEndFrame` was about 25.3 ms. This is runtime evidence, not a claim that every 30 Hz frame is caused by one single function.
+
+The session analyzer also misclassified `SharedD3D9ExProbeFailed=false`; raw DXVK/host telemetry proves the probe failed. Treat the raw evidence as authoritative and repair that analyzer classification separately.
+
+After this test, branch SHA `54be06b4bb8e6cc6d3b2995aa94369fdc9097b17` added a host-owned shared-eye transport. That SHA is **RUNTIME UNTESTED** and must not be marked fixed from source/build evidence alone. The next runtime gate is an exact Quest 3 / VDXR test requiring `directReady=1`, increasing `directFrames`, materially reduced fallback use, and same-scene pacing recovery without startup/stereo/HUD/menu/recenter regressions.
+
+Machine-readable evidence: `docs/automation/runtime/DXVK_RUNTIME_20260929_93b69470.json`. Issue #13 runtime event: comment `5874110684`.
