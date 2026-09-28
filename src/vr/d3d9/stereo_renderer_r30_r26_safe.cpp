@@ -675,6 +675,9 @@ namespace OutRunVRStereo
         R30SkyGlowResources R30SkyGlow{};
         std::uint64_t R30SkyGlowFrames = 0;
         std::uint64_t R30SkyGlowFailures = 0;
+        std::uint64_t R30SkyGlowPerfSamples = 0;
+        std::uint64_t R30SkyGlowPerfTotalUs = 0;
+        std::uint64_t R30SkyGlowPerfMaxUs = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
@@ -1184,8 +1187,12 @@ namespace OutRunVRStereo
             if (now - R30LastTelemetryMs < 5000)
                 return;
             R30LastTelemetryMs = now;
+            const std::uint64_t skyGlowAvgUs =
+                R30SkyGlowPerfSamples
+                    ? R30SkyGlowPerfTotalUs / R30SkyGlowPerfSamples
+                    : 0;
             spdlog::info(
-                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{},samples={},avgUs={},maxUs={}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
@@ -1212,7 +1219,9 @@ namespace OutRunVRStereo
                 R44FlatOverlayClassifications,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
-                R30SkyGlow.glowHeight);
+                R30SkyGlow.glowHeight,
+                R30SkyGlowPerfSamples, skyGlowAvgUs,
+                R30SkyGlowPerfMaxUs);
         }
 
         HRESULT __stdcall PresentDestR30(
@@ -1227,8 +1236,32 @@ namespace OutRunVRStereo
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
             {
-                InternalPassScope guard;
-                R30ApplyStereoSkyGlow(device);
+                LARGE_INTEGER perfStart{}, perfEnd{}, perfFrequency{};
+                const bool measureSkyGlow =
+                    Settings::VRTelemetry &&
+                    QueryPerformanceFrequency(&perfFrequency) &&
+                    perfFrequency.QuadPart > 0 &&
+                    QueryPerformanceCounter(&perfStart);
+                {
+                    InternalPassScope guard;
+                    R30ApplyStereoSkyGlow(device);
+                }
+                if (measureSkyGlow &&
+                    QueryPerformanceCounter(&perfEnd) &&
+                    perfEnd.QuadPart >= perfStart.QuadPart)
+                {
+                    const auto elapsedUs =
+                        static_cast<std::uint64_t>(
+                            (static_cast<long double>(
+                                perfEnd.QuadPart - perfStart.QuadPart) *
+                                1000000.0L) /
+                            static_cast<long double>(
+                                perfFrequency.QuadPart));
+                    ++R30SkyGlowPerfSamples;
+                    R30SkyGlowPerfTotalUs += elapsedUs;
+                    R30SkyGlowPerfMaxUs =
+                        std::max(R30SkyGlowPerfMaxUs, elapsedUs);
+                }
             }
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
