@@ -2,6 +2,7 @@
 
 #include <array>
 #include <dxgi1_2.h>
+#include <utility>
 
 namespace outrun::vr::dx11 {
 namespace {
