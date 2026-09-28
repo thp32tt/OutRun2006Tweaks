@@ -7,9 +7,9 @@
   "wave_id": "W00008",
   "recorded_at_kst": "2026-09-29T03:05:00+09:00",
   "initial_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
-  "final_precommit_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
+  "final_precommit_head_sha": "050acd9feec61a535107104784a6b69586872464",
   "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
-  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "scope": "GitHub-only lane B even-index primary shard; positive zoom_review text classification plus deterministic source-faithful reconstruction input for indices 26/28/30/32; no shared-state mutation; no work stealing; no VR/FFB/build.",
   "report": "localization/graphics/role_B/20260929-0305-B102/B102_W00008_ZOOM_REVIEW_TEXT_RECONSTRUCTION_SPEC.json",
@@ -39,6 +39,28 @@
   "n100_used": false,
   "gpt_library_used": false,
   "vr_ffb_dx_changes": false,
-  "conclusion": "Material fallback is not a no-op: four unresolved even zoom-review assets are now positively classified and have immutable source/HD identities, exact HD sprite rectangles, canonical translation and a deterministic rebuild contract. DDS write is held rather than guessed because exact HD decoded pixels are required by the zero-pixel rule.",
-  "preserved_intervening_head": true
+  "conclusion": "W00008 lane B materially advanced four unresolved even-shard zoom_review assets (26/28/30/32) by confirming localizable Total Rank text and committing deterministic HD reconstruction inputs. Exact-HD decoded-pixel containment remains HOLD rather than guessed; C must reconcile shared state. Material-commit Localization State, Automation Gate and Domain Isolation Guard all passed. Runtime remains UNTESTED.",
+  "preserved_intervening_head": true,
+  "report_commit_sha": "5814a150ea14b1d5bea58ce00d3c9e3e58bde390",
+  "remote_ci": {
+    "material_commit_sha": "5814a150ea14b1d5bea58ce00d3c9e3e58bde390",
+    "localization_state": {
+      "run_id": 36463914545,
+      "conclusion": "success"
+    },
+    "localization_automation_gate": {
+      "run_id": 36463914410,
+      "conclusion": "success"
+    },
+    "domain_isolation_guard": {
+      "run_id": 36463914846,
+      "conclusion": "success"
+    }
+  },
+  "peer_lane": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00026",
+    "commit_sha": "050acd9feec61a535107104784a6b69586872464",
+    "terminal_record_present_at_final_precommit_refresh": false,
+    "action": "PRESERVED_INTERVENING_A_MATERIAL_COMMIT; no work stealing; terminal B record rebased on latest A head."
+  }
 }
