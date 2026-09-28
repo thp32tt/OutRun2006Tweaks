@@ -49,8 +49,8 @@ jobs:
             ref: 60d1c483d79eb2d883ab9fd4f3d65bcbb693695b
             note: reviewed V2 with QPC fence, explicit-state hardening, deferred failed-render ACK and shadow reset
           - id: EXP_ALL_V3
-            ref: 18b81a86a62f564f45175c260c8ff072c02b29bb
-            note: V2 plus selective draw-proven XYZRHW shadow capture, thread-safe shadow diagnostics and deferred-query cleanup
+            ref: f19745bf88bbab6dc765f326148cb557f3984631
+            note: V3 selective XYZRHW shadow gate + relaxed diagnostics + deferred-query cleanup + smoke-tested CI
     steps:
       - uses: actions/checkout@v4
         with:
