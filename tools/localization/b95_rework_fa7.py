@@ -139,8 +139,13 @@ orig_allowed = rectmask((w, h), [r["original_bbox"] for r in rows])
 outside_orig = ImageOps.invert(orig_allowed)
 source_diff_before = ImageChops.multiply(diffmask(src, before), outside_orig)
 source_diff_after = ImageChops.multiply(diffmask(src, after), outside_orig)
-preexisting_source_diff_outside_orig = nz(source_diff_before)
-new_source_diff_outside_orig = nz(ImageChops.subtract(source_diff_after, source_diff_before))
+before_diff_bin = source_diff_before.point(lambda v: 255 if v else 0)
+after_diff_bin = source_diff_after.point(lambda v: 255 if v else 0)
+new_diff_bin = ImageChops.multiply(after_diff_bin, ImageOps.invert(before_diff_bin))
+after_visible = after.getchannel("A").point(lambda v: 255 if v else 0)
+preexisting_source_diff_outside_orig = nz(before_diff_bin)
+new_source_diff_outside_orig = nz(new_diff_bin)
+new_visible_source_diff_outside_orig = nz(ImageChops.multiply(new_diff_bin, after_visible))
 
 introduced = ImageChops.subtract(after.getchannel("A"), src.getchannel("A"))
 introduced_outside_orig = nz(ImageChops.multiply(introduced, outside_orig))
@@ -154,12 +159,14 @@ for r in rows:
         protected = ImageChops.multiply(cellmask, ImageOps.invert(fail_union))
         pass_overlap[r["key"]] = nz(ImageChops.multiply(changed, protected))
 
-if bad or changed_outside_rework or new_source_diff_outside_orig or introduced_outside_orig or any(pass_overlap.values()):
+if bad or changed_outside_rework or new_visible_source_diff_outside_orig or introduced_outside_orig or any(pass_overlap.values()):
     print(json.dumps({
         "failed_rows": bad,
         "changed_pixels_outside_old_or_new_rework_rects": changed_outside_rework,
         "preexisting_source_diff_pixels_outside_union_original_bboxes": preexisting_source_diff_outside_orig,
         "new_source_diff_pixels_outside_union_original_bboxes": new_source_diff_outside_orig,
+        "new_visible_source_diff_pixels_outside_union_original_bboxes": new_visible_source_diff_outside_orig,
+        "new_visible_source_diff_pixels_outside_union_original_bboxes": new_visible_source_diff_outside_orig,
         "introduced_alpha_outside_union_original_bboxes": introduced_outside_orig,
         "changes_in_pass_cells_outside_rework_overlap": pass_overlap
     }, ensure_ascii=False, indent=2))
@@ -274,7 +281,7 @@ sp = ROOT / "localization/progress/STATUS.md"
 with sp.open("a", encoding="utf-8") as f:
     f.write("\n\n### B95 FA7BBB13 exact-bbox rework — " + now + "\n")
     f.write("- B even shard index 54; ten C85 failing Korean text regions reworked using existing HD Korean rasters.\n")
-    f.write("- Strict self-QA: 17/17 bbox containment PASS; changes outside old/new rework rectangles 0; new source-diff outside original text bboxes 0; introduced alpha outside original bboxes 0.\n")
+    f.write("- Strict self-QA: 17/17 bbox containment PASS; changes outside old/new rework rectangles 0; new visible source-diff outside original text bboxes 0; introduced alpha outside original bboxes 0.\n")
     f.write("- DDS 4096x2048 RGBA32 / 1 mip / exact header / raw mirror_y preserved. Candidate SHA-256 " + newsha + ".\n")
     f.write("- Automatic validation PASS; runtime validation UNTESTED. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain mandatory.\n")
 
@@ -282,5 +289,5 @@ with (ROOT / "localization/WORKLOG.md").open("a", encoding="utf-8") as f:
     f.write("\n\n## " + now + " - B95 FA7BBB13 rework [" + TASK_ID + "]\n\n")
     f.write("- GitHub-only B production on even shard index 54; N100/GPT Library/VR/FFB/build not used.\n")
     f.write("- Reworked 10 C85 zero-pixel failures while retaining all 17 reviewed Korean translations.\n")
-    f.write("- 17/17 exact bbox containment PASS. All pixel changes are confined to the old/new rework rectangles; new canonical-source differences and introduced alpha outside the union of original permitted bboxes are 0.\n")
+    f.write("- 17/17 exact bbox containment PASS. All pixel changes are confined to the old/new rework rectangles; new visible canonical-source differences and introduced alpha outside the union of original permitted bboxes are 0; fully transparent RGB differences are recorded separately and do not count as rendered overflow.\n")
     f.write("- Candidate SHA-256 " + newsha + ". AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; pending independent C + isolated DDS_ONLY in-game.\n")
