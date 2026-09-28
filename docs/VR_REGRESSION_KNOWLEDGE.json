@@ -442,6 +442,36 @@
         "validation_run_id": 36452657989,
         "behavior": "Concrete DXVK D3DKMT/shared-info failure signatures now force SharedD3D9ExProbeFailed=true with explicit reason codes.",
         "runtime_problem_status_unchanged": true
+      },
+      "hostOwnedBridgeTelemetry": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00015",
+        "result_sha": "b1057f02048048967b75e730c0952a4f8cad59ec",
+        "validation_run_id": 36458351684,
+        "fields": [
+          "DxvkHostBridgeReady",
+          "DxvkHostBridgeAllocationFailed",
+          "DxvkHostBridgeWidth",
+          "DxvkHostBridgeHeight",
+          "DxvkHostBridgeSlots",
+          "DxvkHostBridgeGeneration",
+          "DxvkHostImportReady",
+          "DxvkHostImportFailed",
+          "DxvkHostImportWidth",
+          "DxvkHostImportHeight",
+          "DxvkHostImportGeneration",
+          "DxvkHostGenerationMatches",
+          "DxvkHostDirectPathActive",
+          "DirectFrames",
+          "DirectFallbacks"
+        ],
+        "statuses": [
+          "DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED",
+          "DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED",
+          "DXVK_HOST_OWNED_IMPORT_FAILED",
+          "DXVK_HOST_OWNED_DIRECTGPU_ACTIVE"
+        ],
+        "runtime_problem_status_unchanged": true
       }
     }
   ],

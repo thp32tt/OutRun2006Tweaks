@@ -90,3 +90,12 @@ Task `CONVERSION-DXVK-00012` repaired only the automatic diagnostic classificati
 Result `9a815650fe05e7313c1922d2f8030d68d90840e0` recognizes those exact signatures and emits reason codes `DXVK_OPEN_D3DKMT` and `DXVK_WRITE_SHARED_INFO` while retaining the historical legacy marker. Backend Conversion Gate `36452657989` behavior-tested the exact failure fixture and a working direct-frames negative control, then completed the Win32 build successfully.
 
 This does **not** close the runtime regression. The host-owned shared-eye transport remains Quest 3 / VDXR runtime-untested; `VR-DXVK-D3D9EX-SHARED-HANDLE-001` stays OPEN until DirectGPU frames, fallback reduction and same-scene pacing recovery are observed.
+
+
+## 2026-09-29 — DXVK host-owned bridge runtime telemetry added
+
+Task `CONVERSION-DXVK-00015` added diagnostics-only classification for the current host-owned DXVK shared-eye transport. The analyzer now separates host bridge allocation/publication, game-side KMT import, host/game generation identity, actual host-owned direct-path selection, and DirectGPU frame production. Bridge-ready by itself is intentionally **not** a success verdict.
+
+Exact source `b1057f02048048967b75e730c0952a4f8cad59ec` passed Backend Conversion Gate `36458351684`, Build `36458357368`, OpenXR architecture `36458357496`, and HUD Inspector `36458357217`. No HMD/game test was performed by this task.
+
+The next Quest 3 / VDXR bundle can now distinguish `DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED`, `DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED`, `DXVK_HOST_OWNED_IMPORT_FAILED`, and `DXVK_HOST_OWNED_DIRECTGPU_ACTIVE`. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` remains OPEN until DirectFrames > 0, fallback reduction, same-scene pacing recovery, and visual/startup regression checks pass.
