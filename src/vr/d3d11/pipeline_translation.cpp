@@ -19,6 +19,73 @@ namespace outrun::vr::dx11
                 mask |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
             return mask;
         }
+
+        struct DeclTypeTranslation
+        {
+            DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+            UINT byteSize = 0;
+            bool exact = false;
+        };
+
+        DeclTypeTranslation translate_decl_type(BYTE type) noexcept
+        {
+            switch (static_cast<D3DDECLTYPE>(type))
+            {
+            case D3DDECLTYPE_FLOAT1:
+                return { DXGI_FORMAT_R32_FLOAT, 4, true };
+            case D3DDECLTYPE_FLOAT2:
+                return { DXGI_FORMAT_R32G32_FLOAT, 8, true };
+            case D3DDECLTYPE_FLOAT3:
+                return { DXGI_FORMAT_R32G32B32_FLOAT, 12, true };
+            case D3DDECLTYPE_FLOAT4:
+                return { DXGI_FORMAT_R32G32B32A32_FLOAT, 16, true };
+            case D3DDECLTYPE_D3DCOLOR:
+                return { DXGI_FORMAT_B8G8R8A8_UNORM, 4, true };
+            case D3DDECLTYPE_UBYTE4:
+                return { DXGI_FORMAT_R8G8B8A8_UINT, 4, true };
+            case D3DDECLTYPE_SHORT2:
+                return { DXGI_FORMAT_R16G16_SINT, 4, true };
+            case D3DDECLTYPE_SHORT4:
+                return { DXGI_FORMAT_R16G16B16A16_SINT, 8, true };
+            case D3DDECLTYPE_UBYTE4N:
+                return { DXGI_FORMAT_R8G8B8A8_UNORM, 4, true };
+            case D3DDECLTYPE_SHORT2N:
+                return { DXGI_FORMAT_R16G16_SNORM, 4, true };
+            case D3DDECLTYPE_SHORT4N:
+                return { DXGI_FORMAT_R16G16B16A16_SNORM, 8, true };
+            case D3DDECLTYPE_USHORT2N:
+                return { DXGI_FORMAT_R16G16_UNORM, 4, true };
+            case D3DDECLTYPE_USHORT4N:
+                return { DXGI_FORMAT_R16G16B16A16_UNORM, 8, true };
+            case D3DDECLTYPE_FLOAT16_2:
+                return { DXGI_FORMAT_R16G16_FLOAT, 4, true };
+            case D3DDECLTYPE_FLOAT16_4:
+                return { DXGI_FORMAT_R16G16B16A16_FLOAT, 8, true };
+            default:
+                return {};
+            }
+        }
+
+        const char* translate_decl_semantic(BYTE usage) noexcept
+        {
+            switch (static_cast<D3DDECLUSAGE>(usage))
+            {
+            case D3DDECLUSAGE_POSITION:     return "POSITION";
+            case D3DDECLUSAGE_BLENDWEIGHT:  return "BLENDWEIGHT";
+            case D3DDECLUSAGE_BLENDINDICES: return "BLENDINDICES";
+            case D3DDECLUSAGE_NORMAL:       return "NORMAL";
+            case D3DDECLUSAGE_PSIZE:        return "PSIZE";
+            case D3DDECLUSAGE_TEXCOORD:     return "TEXCOORD";
+            case D3DDECLUSAGE_TANGENT:      return "TANGENT";
+            case D3DDECLUSAGE_BINORMAL:     return "BINORMAL";
+            case D3DDECLUSAGE_POSITIONT:    return "POSITIONT";
+            case D3DDECLUSAGE_COLOR:        return "COLOR";
+            case D3DDECLUSAGE_FOG:          return "FOG";
+            case D3DDECLUSAGE_DEPTH:        return "DEPTH";
+            case D3DDECLUSAGE_SAMPLE:       return "SAMPLE";
+            default:                        return nullptr;
+            }
+        }
     }
 
     PipelineTranslation translate_pipeline(
@@ -117,6 +184,57 @@ namespace outrun::vr::dx11
         if (!source.complete)
             out.unsupported |= PipelineUnsupportedIncompleteSnapshot;
 
+        return out;
+    }
+
+    VertexInputLayoutTranslation translate_vertex_input_layout(
+        const D3DVERTEXELEMENT9* source,
+        UINT count,
+        DWORD fvf,
+        UINT stream0Stride) noexcept
+    {
+        VertexInputLayoutTranslation out{};
+        if (!source || count == 0)
+        {
+            out.fvfPending = fvf != 0;
+            return out;
+        }
+
+        out.declarationPath = true;
+        bool terminatorSeen = false;
+        for (UINT i = 0; i < count; ++i)
+        {
+            const auto& element = source[i];
+            if (element.Stream == 0xFF &&
+                element.Type == D3DDECLTYPE_UNUSED)
+            {
+                terminatorSeen = true;
+                break;
+            }
+
+            if (out.elementCount >= out.elements.size() ||
+                element.Stream != 0 ||
+                element.Method != D3DDECLMETHOD_DEFAULT)
+                return out;
+
+            const auto type = translate_decl_type(element.Type);
+            const char* semantic = translate_decl_semantic(element.Usage);
+            if (!type.exact || !semantic || stream0Stride == 0 ||
+                type.byteSize > stream0Stride ||
+                element.Offset > stream0Stride - type.byteSize)
+                return out;
+
+            auto& desc = out.elements[out.elementCount++];
+            desc.SemanticName = semantic;
+            desc.SemanticIndex = element.UsageIndex;
+            desc.Format = type.format;
+            desc.InputSlot = 0;
+            desc.AlignedByteOffset = element.Offset;
+            desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+            desc.InstanceDataStepRate = 0;
+        }
+
+        out.exact = terminatorSeen && out.elementCount > 0;
         return out;
     }
 }
