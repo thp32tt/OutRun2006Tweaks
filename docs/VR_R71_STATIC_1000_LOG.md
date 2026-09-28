@@ -360,3 +360,12 @@ Five lenses completed: architecture, lifetime, stereo correctness, performance, 
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: inspect retry service placement.
+
+
+## Cycle 0014 — retry service placement review
+
+Five lenses: architecture, lifetime/reset/sync, stereo correctness, performance, falsification. R41 retry drops stale producer identities before publish, but moving retry servicing across Theater/STOPPING needs a transition-specific ownership test. No scheduling or synchronization change was justified.
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect DirectGPU descriptor/cache generation identity.
