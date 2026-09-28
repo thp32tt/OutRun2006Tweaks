@@ -22,7 +22,7 @@
 
 namespace OutRunVrD3D9ExDirectPassthrough
 {
-    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-EXP-FENCE2-20260928";
+    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-EXP-FENCE2-QPC-V2-20260928";
     inline constexpr const char* LegacyBuildId = "D3D9Ex-direct-passthrough-20260915";
     inline constexpr ULONGLONG FallbackSourceMaxAgeMs = 250;
 
@@ -31,7 +31,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
     // copy fence to 2 ms instead of allowing an 8 ms CPU-side stall. A copy
     // that misses this budget fails closed to the existing fallback/cached
     // projection chain.
-    inline constexpr ULONGLONG CopyFenceTimeoutMs = 2;
+    inline constexpr LONGLONG CopyFenceTimeoutUs = 2000;
 
     inline std::uint64_t DirectPassFrames = 0;
     inline std::uint64_t FallbackFrames = 0;
@@ -441,14 +441,33 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         OutRunVrFinalTest::Context->End(CopyFence);
         OutRunVrFinalTest::Context->Flush();
-        const ULONGLONG start = GetTickCount64();
+
+        static const LARGE_INTEGER frequency = []() noexcept {
+            LARGE_INTEGER value{};
+            QueryPerformanceFrequency(&value);
+            return value;
+        }();
+        LARGE_INTEGER start{};
+        if (frequency.QuadPart <= 0 ||
+            !QueryPerformanceCounter(&start))
+            return false;
+
+        const LONGLONG budgetTicks =
+            (frequency.QuadPart * CopyFenceTimeoutUs) / 1000000LL;
         for (;;)
         {
             const HRESULT hr = OutRunVrFinalTest::Context->GetData(
                 CopyFence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
             if (hr == S_OK)
                 return true;
-            if (FAILED(hr) || GetTickCount64() - start >= CopyFenceTimeoutMs)
+
+            LARGE_INTEGER now{};
+            const bool haveNow = QueryPerformanceCounter(&now) != FALSE;
+            const bool timedOut =
+                !haveNow ||
+                now.QuadPart - start.QuadPart >=
+                    std::max<LONGLONG>(1, budgetTicks);
+            if (FAILED(hr) || timedOut)
             {
                 ++CopyFenceTimeout;
                 if (!FirstCopyFenceTimeoutLogged)
@@ -456,8 +475,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
                     FirstCopyFenceTimeoutLogged = true;
                     std::cerr
                         << "[D3D9Ex R23] direct copy fence exceeded "
-                        << CopyFenceTimeoutMs
-                        << "ms EXP-FENCE2 budget; dropping direct candidate to fallback/cached projection\n";
+                        << CopyFenceTimeoutUs
+                        << "us EXP-FENCE2-QPC budget; dropping direct candidate to fallback/cached projection\n";
                 }
                 return false;
             }
