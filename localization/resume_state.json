@@ -1,5 +1,5 @@
 {
-  "schema_version": 59,
+  "schema_version": 60,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B95: FA7BBB13 exact-bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game.",
+    "Refresh current GitHub queue before next B target; do not repeat B95 FA7BBB13.",
     "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
     "A AUTO 00001: 39229D64 self-QA PASS; pending independent C and DDS_ONLY in-game.",
     "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
@@ -657,6 +659,13 @@
       "report": "localization/graphics/role_A/20260928-AUTO-A00001/A_AUTO_00001_39229D64_REPORT.json",
       "candidate_sha256": "e98278b4dd1fea91cc23802f9ae0c64185edad96dc57177fe1f67b71f30fc8fa",
       "status": "A_SELF_QA_PASS_PENDING_C_INGAME"
+    },
+    "b95_fa7bbb13": {
+      "timestamp_kst": "2026-09-28T16:06:49+09:00",
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
+      "report": "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json",
+      "candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+      "status": "B95_SELF_QA_PASS_PENDING_C_INGAME"
     }
   },
   "runtime_packages": {
