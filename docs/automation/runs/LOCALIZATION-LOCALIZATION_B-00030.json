@@ -10,11 +10,12 @@
   "final_precommit_head_sha": "667230cab14693126e69501a5188631802d4e66d",
   "preserved_intervening_head": true,
   "preserved_head_message": "localization(A): record attempt3 C-state blocker [AUTO:LOCALIZATION-LOCALIZATION_A-00029] [skip ci]",
-  "result": "PASS_MATERIAL_FALLBACK_EXACT_HD_DECODED_PIXEL_PREFLIGHT_4_ASSETS_6_LABELS",
-  "automation_validation": "PASS_LANE_LOCAL_STATIC_PRECOMMIT",
+  "result": "PASS_MATERIAL_DELIVERABLE_COMMITTED_REMOTE_VALIDATION_BLOCKED_PREEXISTING_C_STATE",
+  "automation_validation": "FAIL_PREEXISTING_C_SHARED_STATE_INCONSISTENCY",
   "runtime_validation": "UNTESTED",
   "scope": "GitHub-only SSOT lane B even-index primary shard; exact immutable GitHub HD source identity verified for indices 26/28/30/32; decoded-pixel reconstruction inputs/tooling persisted; unsafe candidate trials rejected; no shared-state mutation; no work stealing; no VR/FFB/build.",
   "report": "localization/graphics/role_B/20260929-0400-B103/B103_W00009_HD_TOTAL_RANK_PREFLIGHT.json",
+  "material_commit_sha": "6d3180cbc772241b9be9426cb9a7ac0c2404d491",
   "material_deliverable": {
     "type": "EXACT_HD_DECODED_PIXEL_RECONSTRUCTION_INPUT_PLUS_ASSET_SPECIFIC_PREFLIGHT_TOOL",
     "indices": [26,28,30,32],
@@ -26,11 +27,25 @@
     "candidate_dds_modified": false,
     "candidate_trials": "REJECTED_NOT_PERSISTED_VISUAL_ARTIFACT_GATE"
   },
+  "remote_ci": {
+    "material_commit_sha": "6d3180cbc772241b9be9426cb9a7ac0c2404d491",
+    "domain_isolation_guard": {"run_id":36469777722,"conclusion":"success"},
+    "localization_state": {"run_id":36469777552,"conclusion":"failure"},
+    "localization_automation_gate": {"run_id":36469777692,"conclusion":"failure"},
+    "failure_stage": "verify_state.py before changed-payload/parallel-lane validation",
+    "failure_details": [
+      "artwork-plan indices do not match transcription indices",
+      "artwork-plan segment total 725 != transcription total 730",
+      "artwork-plan count 79 != localize_text target 84",
+      "graphics inventory action counts remain 79 localize_text / 47 zoom_review while authoritative queue is 84 / 42"
+    ]
+  },
   "known_preexisting_shared_state_blocker": {
     "source_task": "LOCALIZATION-LOCALIZATION_A-00029",
     "owner": "LOCALIZATION_C",
     "indices": [26,28,30,32,35],
-    "failure_root_cause": "PREEXISTING_C_SHARED_STATE_INCONSISTENCY_ARTWORK_PLAN_AND_VISUAL_REVIEW_NOT_RECONCILED_FOR_PROMOTED_W00008_ASSETS"
+    "failure_root_cause": "PREEXISTING_C_SHARED_STATE_INCONSISTENCY_ARTWORK_PLAN_AND_VISUAL_REVIEW_NOT_RECONCILED_FOR_PROMOTED_W00008_ASSETS",
+    "evidence": "The same C-owned verify_state failure was already recorded by A00029 before B's material commit; B did not modify any shared state."
   },
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
@@ -39,10 +54,10 @@
   "n100_used": false,
   "gpt_library_used": false,
   "vr_ffb_dx_changes": false,
-  "conclusion": "B materially advanced four even-shard promoted assets with exact decoded-HD source metrics and deterministic preflight tooling. Candidate DDS trials failed artifact cleanliness and were discarded rather than committed. Preexisting C-owned shared-state inconsistency remains untouched. Runtime remains UNTESTED.",
+  "conclusion": "B materially advanced four even-shard promoted assets with exact decoded-HD source metrics and deterministic preflight tooling. Candidate DDS trials failed artifact cleanliness and were discarded rather than committed. Domain isolation passed. Localization State and Automation Gate were blocked at the preexisting C-owned shared-state verify_state step before B payload/parallel-lane validation could run. Runtime remains UNTESTED.",
   "preserved_peer_lane": {
     "task_id": "LOCALIZATION-LOCALIZATION_A-00029",
     "head_sha": "667230cab14693126e69501a5188631802d4e66d",
-    "action": "PRESERVED; no work stealing; B commit must parent current A head."
+    "action": "PRESERVED; no work stealing; material commit is a direct child of the latest A head."
   }
 }
