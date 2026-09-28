@@ -43,6 +43,13 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceMutationReadOnlyUnlocks{0};
         std::atomic<std::uint64_t> ResourceMutationDiscardWriteUnlocks{0};
         std::atomic<std::uint64_t> ResourceMutationNoOverwriteWriteUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationPlanExactUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationPlanUnsupportedUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationManagedShadowUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationMapWriteUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationMapDiscardUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationMapNoOverwriteUnlocks{0};
+        std::atomic<std::uint64_t> ResourceMutationUpdateSubresourceUnlocks{0};
         std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
@@ -57,6 +64,10 @@ namespace outrun::vr::dx11
         struct BufferMutationEvidence
         {
             bool lockPending{};
+            bool descriptorObserved{};
+            ResourceRole role = ResourceRole::Vertex;
+            D3DPOOL pool = D3DPOOL_FORCE_DWORD;
+            DWORD usage{};
             UINT offset{};
             UINT size{};
             DWORD flags{};
@@ -197,6 +208,10 @@ namespace outrun::vr::dx11
         void begin_observed_buffer_lock(
             BufferMutationRegistry& registry,
             const void* resource,
+            ResourceRole role,
+            D3DPOOL pool,
+            DWORD usage,
+            bool descriptorObserved,
             UINT offset,
             UINT size,
             DWORD flags) noexcept
@@ -206,6 +221,10 @@ namespace outrun::vr::dx11
             std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
             auto& evidence = registry[resource];
             evidence.lockPending = true;
+            evidence.descriptorObserved = descriptorObserved;
+            evidence.role = role;
+            evidence.pool = pool;
+            evidence.usage = usage;
             evidence.offset = offset;
             evidence.size = size;
             evidence.flags = flags;
@@ -219,7 +238,7 @@ namespace outrun::vr::dx11
             if (!resource)
                 return;
 
-            DWORD flags = 0;
+            BufferMutationEvidence evidence{};
             bool pending = false;
             {
                 std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
@@ -227,28 +246,76 @@ namespace outrun::vr::dx11
                 if (it == registry.end())
                     return;
                 pending = it->second.lockPending;
-                flags = it->second.flags;
+                evidence = it->second;
                 it->second.lockPending = false;
             }
 
             if (!pending || FAILED(result))
                 return;
 
-            if ((flags & D3DLOCK_READONLY) != 0)
+            if ((evidence.flags & D3DLOCK_READONLY) != 0)
             {
                 ResourceMutationReadOnlyUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+            }
+            else
+            {
+                ResourceMutationWriteUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                if ((evidence.flags & D3DLOCK_DISCARD) != 0)
+                    ResourceMutationDiscardWriteUnlocks.fetch_add(
+                        1, std::memory_order_relaxed);
+                if ((evidence.flags & D3DLOCK_NOOVERWRITE) != 0)
+                    ResourceMutationNoOverwriteWriteUnlocks.fetch_add(
+                        1, std::memory_order_relaxed);
+            }
+
+            if (!evidence.descriptorObserved)
+            {
+                ResourceMutationPlanUnsupportedUnlocks.fetch_add(
                     1, std::memory_order_relaxed);
                 return;
             }
 
-            ResourceMutationWriteUnlocks.fetch_add(
-                1, std::memory_order_relaxed);
-            if ((flags & D3DLOCK_DISCARD) != 0)
-                ResourceMutationDiscardWriteUnlocks.fetch_add(
+            const auto plan = translate_buffer_mutation(
+                evidence.role, evidence.pool, evidence.usage, evidence.flags);
+            switch (plan.kind)
+            {
+            case BufferMutationUpdateKind::DynamicMapWrite:
+                ResourceMutationPlanExactUnlocks.fetch_add(
                     1, std::memory_order_relaxed);
-            if ((flags & D3DLOCK_NOOVERWRITE) != 0)
-                ResourceMutationNoOverwriteWriteUnlocks.fetch_add(
+                ResourceMutationMapWriteUnlocks.fetch_add(
                     1, std::memory_order_relaxed);
+                break;
+            case BufferMutationUpdateKind::DynamicMapWriteDiscard:
+                ResourceMutationPlanExactUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                ResourceMutationMapDiscardUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                break;
+            case BufferMutationUpdateKind::DynamicMapWriteNoOverwrite:
+                ResourceMutationPlanExactUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                ResourceMutationMapNoOverwriteUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                break;
+            case BufferMutationUpdateKind::DefaultUpdateSubresource:
+                ResourceMutationPlanExactUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                ResourceMutationUpdateSubresourceUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                break;
+            case BufferMutationUpdateKind::ManagedCpuShadowRead:
+            case BufferMutationUpdateKind::ManagedCpuShadowWrite:
+                ResourceMutationManagedShadowUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                break;
+            case BufferMutationUpdateKind::Unsupported:
+            default:
+                ResourceMutationPlanUnsupportedUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                break;
+            }
         }
 
         void forget_observed_buffer(
@@ -541,7 +608,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R74 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R75 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -647,7 +714,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R74 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates and live VB/IB Lock/Unlock telemetry; native draw routing remains disabled",
+                    "VR DX11 R75 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates and classified VB/IB D3D11 mirror update plans; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -669,7 +736,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R74 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R75 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -691,6 +758,13 @@ namespace outrun::vr::dx11
                 ResourceMutationReadOnlyUnlocks.load(std::memory_order_relaxed),
                 ResourceMutationDiscardWriteUnlocks.load(std::memory_order_relaxed),
                 ResourceMutationNoOverwriteWriteUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationPlanExactUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationPlanUnsupportedUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationManagedShadowUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationMapWriteUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationMapDiscardUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationMapNoOverwriteUnlocks.load(std::memory_order_relaxed),
+                ResourceMutationUpdateSubresourceUnlocks.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -715,8 +789,11 @@ namespace outrun::vr::dx11
     {
         if (!buffer || !census_enabled())
             return;
+        D3DVERTEXBUFFER_DESC desc{};
+        const bool descriptorObserved = SUCCEEDED(buffer->GetDesc(&desc));
         begin_observed_buffer_lock(
-            VertexMutationEvidence, buffer, offset, size, flags);
+            VertexMutationEvidence, buffer, ResourceRole::Vertex,
+            desc.Pool, desc.Usage, descriptorObserved, offset, size, flags);
     }
 
     void observe_vertex_buffer_unlock(
@@ -743,8 +820,11 @@ namespace outrun::vr::dx11
     {
         if (!buffer || !census_enabled())
             return;
+        D3DINDEXBUFFER_DESC desc{};
+        const bool descriptorObserved = SUCCEEDED(buffer->GetDesc(&desc));
         begin_observed_buffer_lock(
-            IndexMutationEvidence, buffer, offset, size, flags);
+            IndexMutationEvidence, buffer, ResourceRole::Index,
+            desc.Pool, desc.Usage, descriptorObserved, offset, size, flags);
     }
 
     void observe_index_buffer_unlock(
