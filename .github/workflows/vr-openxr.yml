@@ -37,6 +37,10 @@ on:
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
 
+concurrency:
+  group: openxr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   game-x86:
     runs-on: windows-2022
