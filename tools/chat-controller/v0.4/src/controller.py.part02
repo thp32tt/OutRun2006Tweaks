@@ -306,6 +306,15 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         if await detect_rate_limit(page):
             mark_rate_limit(reg, datetime.now(TZ), f"watchdog-precheck:{slot.name}")
             return
+        if QUEUE_MODE and await detect_conversation_limit(page):
+            slot.last_result = "watchdog_conversation_limit_deferred_to_queue"
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            write_runtime(
+                status="conversation_limit_detected",
+                last_action=f"Slot {slot.name} conversation limit detected; queue engine will roll over the active task",
+            )
+            continue
         if await detect_limit(page):
             write_runtime(status="limit_detected", last_action=f"Watchdog stopped: limit detected while checking slot {slot.name}")
             return
@@ -486,17 +495,32 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
             log.exception("slot-tab navigation failed slot=%s", slot.name)
             return
 
-        if await detect_busy(page):
-            slot.last_result = "busy_skipped"
-            reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
+        if CONVERSATION_ROLLOVER_ENABLED and await detect_conversation_limit(page):
+            old_url = slot.url
+            page = await replace_with_fresh_slot_page(context, pages, slot)
+            is_new = True
             save_registry(reg)
+            if not await ensure_logged_in(page):
+                write_runtime(status="login_required", last_action=f"Slot {slot.name}: login required after completed-chat rollover")
+                return
+            prompt = prompt_for_slot(slot, "bootstrap")
             write_runtime(
-                status="slot_busy",
-                last_action=f"Slot {slot.name} still generating in its own tab; advanced to next slot",
-                slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+                status="conversation_rollover_new_task",
+                last_action=f"Slot {slot.name} old chat reached length limit; opened a fresh project chat for the next task",
+                previous_chat_url=old_url,
             )
-            return
-        prompt = prompt_for_slot(slot, "continue")
+        else:
+            if await detect_busy(page):
+                slot.last_result = "busy_skipped"
+                reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
+                save_registry(reg)
+                write_runtime(
+                    status="slot_busy",
+                    last_action=f"Slot {slot.name} still generating in its own tab; advanced to next slot",
+                    slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+                )
+                return
+            prompt = prompt_for_slot(slot, "continue")
 
     # Scheduled self-healing: Retry/error pages can lose the composer entirely.
     # Refresh once, then replace only this slot tab; do not consume an extra prompt send.
