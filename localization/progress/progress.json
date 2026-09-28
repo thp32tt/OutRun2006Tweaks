@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T02:54:00+09:00",
+  "updated_at_kst": "2026-09-29T03:19:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -103,39 +103,49 @@
     "graphics_transcription": {
       "status": "done",
       "percent": 100,
-      "transcribed_assets": 79,
-      "localize_text_targets": 79,
-      "transcribed_segments": 725,
+      "transcribed_assets": 84,
+      "localize_text_targets": 84,
+      "transcribed_segments": 730,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
     "graphics_artwork": {
       "status": "zero_pixel_bbox_rework_required",
       "final_artwork_percent": 0,
-      "draft_percent": 100,
+      "draft_percent": 94.05,
       "completed": 0,
       "full_draft_candidates": 79,
-      "total": 79,
+      "total": 84,
       "source_faithful_reviewed": 32,
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
-      "percent": 8.9,
+      "percent": 8.33,
       "proof_specs": 7,
       "final_artwork_completed": 0,
-      "total": 79
+      "total": 84
     },
     "graphics_artwork_planning": {
-      "status": "done",
-      "percent": 100,
+      "status": "needs_extension_w00008_5_assets",
+      "percent": 94.05,
       "planned_assets": 79,
       "translated_segments": 725,
-      "plan_file": "localization/graphics/artwork_plan.jsonl"
+      "plan_file": "localization/graphics/artwork_plan.jsonl",
+      "localize_text_targets": 84,
+      "transcribed_segments": 730,
+      "pending_plan_assets": 5,
+      "pending_indices": [
+        26,
+        28,
+        30,
+        32,
+        35
+      ]
     }
   },
-  "next_checkpoint": "W00007 C92 reconciliation: zoom_review indices 25/27/29/31/150/174/180/194 are resolved as preserve-original/no-localizable-text. Unresolved zoom_review is 35 and resolved preserve-original zoom_review is 12. No DDS bytes changed and approved_dds remains 0. Continue pending localize_text/rework and remaining zoom_review production; keep runtime validation asset-local until real-game evidence.",
+  "next_checkpoint": "W00008 C93 reconciliation: zoom_review indices 26/28/30/32/35 are promoted to localize_text for Total Rank -> 종합 랭크, while 33/37/45 are resolved preserve-original. Queue is now 84 localize_text + 42 zoom_review; unresolved zoom_review is 27 and resolved preserve-original zoom_review is 15. No DDS bytes changed and approved_dds remains 0. Produce the five newly promoted assets only from exact HD English DDS with zero-pixel and side-by-side QA; runtime remains asset-local and UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -155,17 +165,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 79,
+    "localize_text": 84,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 47,
+    "zoom_review": 42,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 79,
-    "transcribed_segments": 725,
+    "transcribed_assets": 84,
+    "transcribed_segments": 730,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -531,23 +541,25 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C92",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00025",
-      "wave_id": "W00007",
-      "result": "PASS_W00007_SYNC_8_ZOOM_REVIEW_RESOLVED_PRESERVE_ORIGINAL_NO_NEW_APPROVALS",
+      "run": "C93",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00028",
+      "wave_id": "W00008",
+      "result": "PASS_W00008_SYNC_5_LOCALIZABLE_PROMOTED_3_PRESERVE_NO_NEW_DDS_APPROVALS",
       "approved_dds_count": 0,
-      "material_backlog_action": "8_ZOOM_REVIEW_RESOLUTIONS_PRESERVE_ORIGINAL",
-      "resolved_indices": [
-        25,
-        27,
-        29,
-        31,
-        150,
-        174,
-        180,
-        194
+      "material_backlog_action": "5_ZOOM_REVIEW_TO_LOCALIZE_TEXT_3_PRESERVE_ORIGINAL",
+      "promoted_indices": [
+        26,
+        28,
+        30,
+        32,
+        35
       ],
-      "report": "localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json",
+      "resolved_preserve_indices": [
+        33,
+        37,
+        45
+      ],
+      "report": "localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {
@@ -570,8 +582,8 @@
         "W00006_C00022_C4A2937B"
       ]
     },
-    "zoom_review_unresolved": 35,
-    "zoom_review_resolved_preserve_original": 12
+    "zoom_review_unresolved": 27,
+    "zoom_review_resolved_preserve_original": 15
   },
   "data_build": {
     "draft_bin_entries": 1356,
