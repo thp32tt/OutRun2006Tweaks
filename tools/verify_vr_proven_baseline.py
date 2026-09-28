@@ -53,6 +53,30 @@ require_all("cmake.toml", [
     'option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" ON)',
 ], "P1_CMKR_SOURCE_DEFAULT_R26_HUD")
 
+# The R26+HUD production wrapper must describe and hook the chain it actually
+# compiles. Stale R29 names previously made source review look like renderer R29
+# was inherited even though this production owner deliberately stops at R26/R23.
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    '#include "stereo_renderer_r26.cpp"',
+    'R30DrawPrimitiveR26Hook',
+    'R30PresentR26Hook',
+    'reinterpret_cast<void*>(&DrawPrimitiveDestR26)',
+    'reinterpret_cast<void*>(&PresentDestR27)',
+    'const auto r26 = R26InstallState.load(',
+], "P1_R26_HUD_ACTUAL_LOWER_OWNER")
+for stale in [
+    "R30DrawPrimitiveR29Hook",
+    "R30DrawIndexedPrimitiveR29Hook",
+    "R30DrawPrimitiveUPR29Hook",
+    "R30DrawIndexedPrimitiveUPR29Hook",
+    "R30PresentR29Hook",
+    "R30ResetR29Hook",
+    "R29 prerequisite failed",
+    "R29 remains active",
+]:
+    forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+           stale, f"P1_NO_STALE_R29_OWNER_{stale}")
+
 # PASS 2 — R69 CLEAN fixes projected-rank ownership to one production path.
 for rel in [
     "src/hooks_uiscaling.cpp",
