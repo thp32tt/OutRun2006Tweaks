@@ -50,3 +50,8 @@ This final set is derived from Sets 01-09 and is intentionally a convergence rev
 - Review method: every set chose its next ten directions from the preceding set's unresolved evidence rather than repeating the same checklist.
 - Production source changes during this campaign: **none**; only review evidence documents were committed.
 - Runtime merge gate: **still open** for both DX11 and DXVK.
+
+
+## Post-campaign DXVK closure — F34 package-wide integrity
+
+On 2026-09-29, `CONVERSION-DXVK-00021` closed Set 09 F34 for the DXVK one-click path. DXVK preflight now verifies the generated `SHA256SUMS.txt` before selector mutation, including launcher/analyzer/checklist/helper files rather than only critical binaries. Unsafe/malformed/duplicate manifest entries, missing files, and hash mismatches fail closed. Exact-SHA Backend Conversion Gate `36470762665` PASS on `1d46bf5a4ce1cba8752d481db297a44cf850a64c`, with Build `36470774288`, OpenXR architecture `36470773858`, and HUD Inspector `36470774360` also PASS. This is software integrity evidence only and does not change the still-open Quest 3 / VDXR runtime gate for DXVK SAFE.

@@ -1,0 +1,83 @@
+{
+  "task_id": "CONVERSION-DXVK-00021",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "455b08b75c74cf726e7c64314f11e359a39998ab",
+  "result_sha": "1d46bf5a4ce1cba8752d481db297a44cf850a64c",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-PACKAGE-WIDE-SHA256-PREFLIGHT-GATE",
+  "summary": "Closed Set 09 F34 for the DXVK one-click package path. Added a reusable package-integrity helper and behavior tests; dxvk-safe/dxvk preflight now requires SHA256SUMS.txt and verifies every listed package file before selector mutation. Unsafe manifest paths, malformed/self-referential/duplicate entries, missing files and hash mismatch fail closed. Preflight evidence records verified entry count and manifest SHA256.",
+  "changed_paths": [
+    "tools/OutRunVR-PackageIntegrity.ps1",
+    "tools/Test-OutRunVRPackageIntegrity.ps1",
+    "tools/Test-OutRunVROneClickPreflight.ps1",
+    "tools/Build-OutRunPCFast.ps1",
+    "tools/Test-VROneClickContract.ps1",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "review": {
+    "architecture": "The existing PC-fast build already generated SHA256SUMS.txt after all packaged runtime/support files were staged. The missing enforcement point was preflight before selector mutation.",
+    "lifetime_sync": "No DirectGPU resource lifetime, generation, producer fence, consumer ACK or OpenXR ownership source changed.",
+    "stereo_correctness": "No rendering, WVP, HUD/menu, SkyGlow or visual code changed.",
+    "performance": "No game/host hot-path work changed. Hash verification occurs once during preflight.",
+    "adversarial": "The behavior test explicitly rejects support-file tampering, missing listed files, '..' traversal entries and duplicate manifest paths; manifest self-reference/rooted paths are rejected by the helper."
+  },
+  "behavior_verified": [
+    "Valid two-file manifest verifies and returns Verified=true with exact entry count.",
+    "Tampered support file produces Package manifest hash mismatch.",
+    "Deleted listed file produces Package manifest file missing.",
+    "Path traversal entry '../...' is rejected as unsafe.",
+    "Duplicate manifest path is rejected.",
+    "DXVK preflight requires SHA256SUMS.txt and runs Test-OutRunVRPackageIntegrity before game/backend payload mutation.",
+    "Preflight report records PackageIntegrity.Verified, EntryCount and ManifestSha256.",
+    "PC-fast package includes OutRunVR-PackageIntegrity.ps1 so runtime verification is available in the extracted test payload."
+  ],
+  "regression_revalidation": [
+    "VR_BACKEND_100_REVIEW_SET_09:F34 is closed for the DXVK one-click path only; no cross-backend closure claim is made.",
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001 remains OPEN_USER_RUNTIME_VERIFIED_FAILURE because no HMD/game test occurred.",
+    "Transport/startup/stereo/frame-stability runtime invariants are unaffected because no renderer/host transport source changed."
+  ],
+  "evidence": [
+    "C0 recovered current GitHub HEAD, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, automation state and CONVERSION-DXVK-00019. N100/local clone was not used.",
+    "Set 09 F34 identified that SHA256SUMS.txt existed but runtime preflight did not enforce package-wide support-file integrity.",
+    "Backend Conversion Gate 36470762665 PASS on exact source SHA 1d46bf5a4ce1cba8752d481db297a44cf850a64c. New 'Test package-wide SHA256 integrity' behavior step PASS, one-click structure PASS, DXVK analyzer PASS, host-owned sync contract PASS, pinned provider acquisition PASS, Win32 build/binary verification PASS.",
+    "Build 36470774288 PASS on exact source SHA 1d46bf5a4ce1cba8752d481db297a44cf850a64c.",
+    "OpenXR VR architecture 36470773858 PASS on exact source SHA 1d46bf5a4ce1cba8752d481db297a44cf850a64c across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36470774360 PASS on exact source SHA 1d46bf5a4ce1cba8752d481db297a44cf850a64c.",
+    "PC Fast 36470762566 skipped as required for scheduled automation.",
+    "Backend artifact 10992400427 digest sha256:e6b8e1b23a254a92c04f26f24e35921ca6b06d8566c63b590aaf01a11c4e41e0.",
+    "OpenXR host artifact 10991545988 digest sha256:7393175fbdc00aaf56865d2e4704c928407457cd81fb1687f626787650b1899f.",
+    "HUD inspector artifact 10991144916 digest sha256:9cc8977f46d48856b707128792fa36ed76cc7d793e023ac43bf2d9644f5464d4.",
+    "Issue #14 implementation comment 5876749451 and validation comment 5876846461 record the production transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-PACKAGE-WIDE-SHA256-PREFLIGHT-GATE"
+  ],
+  "blocked_runtime_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "The highest-priority DXVK transport/visual verdict remains BLOCKED_RUNTIME. On the next exact-build Quest 3/VDXR run, require package preflight PackageIntegrity.Verified=true and analyzer BuildIdentityVerified=true before attributing DirectGPU/pacing results to the tested SHA; then evaluate host-owned path activation, DirectFrames, fallbacks, pacing and visual regressions.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36470762665,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36470774288,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36470773858,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36470774360,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36470762566,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10992400427,
+    "backend_gate_artifact_digest": "sha256:e6b8e1b23a254a92c04f26f24e35921ca6b06d8566c63b590aaf01a11c4e41e0",
+    "openxr_host_artifact_id": 10991545988,
+    "openxr_host_artifact_digest": "sha256:7393175fbdc00aaf56865d2e4704c928407457cd81fb1687f626787650b1899f",
+    "hud_inspector_artifact_id": 10991144916,
+    "hud_inspector_artifact_digest": "sha256:9cc8977f46d48856b707128792fa36ed76cc7d793e023ac43bf2d9644f5464d4"
+  },
+  "recorded_at_kst": "2026-09-29T04:20:00+09:00"
+}
