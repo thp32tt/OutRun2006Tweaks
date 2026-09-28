@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00017",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00005",
+  "recorded_at_kst": "2026-09-29T01:17:00+09:00",
+  "initial_head_sha": "d494c1b1a44af94e67d3040ed11b8ce51c273a31",
+  "report_commit_sha": "c5eb24a7291e3ed1121294d7e6e7f698212055b8",
+  "final_precommit_head_sha": "c5eb24a7291e3ed1121294d7e6e7f698212055b8",
+  "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+  "automation_validation": "PASS_PENDING_REMOTE_CI_CONFIRMATION",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; REWORK-first review; no work stealing; no shared-state mutation.",
+  "report": "localization/graphics/role_A/20260929-0117-A00017/A00017_W00005_RUNTIME_SOURCE_GATE.json",
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "branch_move_check": {
+    "head_after_report_commit": "c5eb24a7291e3ed1121294d7e6e7f698212055b8",
+    "peer_commit_detected_before_task_record": false,
+    "peer_changes_preserved": true
+  },
+  "conclusion": "No safe new A-shard DDS production is justified from current GitHub-only inputs. C89 requires per-DDS runtime isolation before runtime-sensitive rewrite/approval, while odd REWORK rows 51/53/111/121 still lack new source-faithful or decoded-pixel-safe evidence. Durable blocker recorded without modifying shared state or repeating completed work.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-0117-A00017/A00017_W00005_RUNTIME_SOURCE_GATE.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00016.json",
+    "localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json",
+    "localization/resume_state.json",
+    "localization/graphics/asset_queue.csv"
+  ]
+}
