@@ -1,5 +1,6 @@
 param(
-    [switch]$Clean
+    [switch]$Clean,
+    [string]$DxvkD3D9 = ''
 )
 
 Set-StrictMode -Version Latest
@@ -31,6 +32,18 @@ function Patch-DependencyProject {
     }
 }
 
+function Get-PeMachine {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -lt 256) { throw "PE file is too small: $Path" }
+    if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "Not an MZ image: $Path" }
+    $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+    if ($peOffset -lt 0 -or ($peOffset + 6) -gt $bytes.Length) {
+        throw "Invalid PE header: $Path"
+    }
+    return [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+}
+
 if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
     throw 'cmake.exe is not in PATH. Install CMake before starting the runner.'
 }
@@ -49,6 +62,8 @@ $root = Join-Path $repoRoot 'out/pc-fast'
 $gameBuild = Join-Path $root 'game'
 $hostBuild = Join-Path $root 'host'
 $packageDir = Join-Path $root 'package'
+$dxvkVersion = '3.1.1'
+$dxvkAcquireScript = Join-Path $repoRoot 'tools/Acquire-OutRunDXVK.ps1'
 
 # Canonical PC-fast contract for the HMD-proven R66 renderer lineage.
 # Keep this single source of truth in sync with the HMD-proven R66 R26+HUD build.
@@ -136,12 +151,33 @@ Invoke-Checked cmake '-S' 'vrhost' '-B' $hostBuild '-G' 'Visual Studio 17 2022' 
 Invoke-Checked cmake '--build' $hostBuild '--config' 'Release' '--target' 'outrun-vr-host' '--parallel' "$jobs"
 $hostWatch.Stop()
 
+# DXVK R71 package contract: always produce a self-contained stock-DXVK SAFE
+# payload. An explicit x86 provider may be supplied; otherwise acquire the
+# pinned official release once and reuse the verified cache on later builds.
+if ([string]::IsNullOrWhiteSpace($DxvkD3D9)) {
+    if (-not (Test-Path $dxvkAcquireScript)) {
+        throw "DXVK acquisition helper missing: $dxvkAcquireScript"
+    }
+    & $dxvkAcquireScript -Version $dxvkVersion | Out-Null
+    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+        throw "DXVK acquisition failed with exit code $LASTEXITCODE"
+    }
+    $DxvkD3D9 = Join-Path $repoRoot ("out/dxvk/{0}/x32/d3d9.dll" -f $dxvkVersion)
+}
+$dxvkProvider = (Resolve-Path $DxvkD3D9).Path
+if ((Get-PeMachine $dxvkProvider) -ne 0x014C) {
+    throw "DXVK package requires an x86 PE32 d3d9.dll: $dxvkProvider"
+}
+$dxvkProviderSha = (Get-FileHash $dxvkProvider -Algorithm SHA256).Hash.ToLowerInvariant()
+
 $packageWatch = [Diagnostics.Stopwatch]::StartNew()
 if (Test-Path $packageDir) {
     Remove-Item $packageDir -Recurse -Force
 }
 $backendDir = Join-Path $packageDir 'backends/d3d9'
+$dxvkBackendDir = Join-Path $packageDir 'backends/dxvk'
 New-Item -ItemType Directory -Force $backendDir | Out-Null
+New-Item -ItemType Directory -Force $dxvkBackendDir | Out-Null
 
 $dll = Get-ChildItem $gameBuild -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
 if (-not $dll) { throw 'dinput8.dll missing after incremental build.' }
@@ -179,6 +215,16 @@ Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69' -Encod
 Assert-R66ProvenBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
+
+# DXVK SAFE intentionally reuses the proven game DLL/host and changes only the
+# D3D9 provider. Multiview/custom patcher stays absent until visual parity.
+Copy-Item $dll.FullName (Join-Path $dxvkBackendDir 'dinput8.dll')
+Copy-Item $hostExe (Join-Path $dxvkBackendDir 'outrun-vr-host.exe')
+Copy-Item $dxvkProvider (Join-Path $dxvkBackendDir 'd3d9.dll')
+Set-Content (Join-Path $dxvkBackendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
+Set-Content (Join-Path $dxvkBackendDir 'DXVK_VERSION.txt') $dxvkVersion -Encoding ascii
+Set-Content (Join-Path $dxvkBackendDir 'DXVK_D3D9_SHA256.txt') $dxvkProviderSha -Encoding ascii
+Set-Content (Join-Path $dxvkBackendDir 'VARIANT_ID.txt') 'DXVK_SAFE_R71' -Encoding ascii
 
 Copy-Item 'OutRun2006Tweaks.ini' (Join-Path $packageDir 'OutRun2006Tweaks.ini')
 Copy-Item 'OutRun2006Tweaks.lods.ini' (Join-Path $packageDir 'OutRun2006Tweaks.lods.ini')
@@ -239,11 +285,23 @@ $buildInputs = [ordered]@{
     BuildMode = $buildMode
     BuildContract = $buildContractVersion
     CMakeFlags = $canonicalGameFlagString
+    DxvkVersion = $dxvkVersion
+    DxvkD3D9Sha256 = $dxvkProviderSha
 }
 $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $packageDir 'BUILD_INPUTS.json') -Encoding UTF8
 
-$bad = Get-ChildItem $packageDir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll', 'multiviewpatcher.dll', 'outrun-vr-host-dx12.exe') }
-if ($bad) { throw "Forbidden backend payload: $($bad.FullName -join ', ')" }
+$badRoot = Get-ChildItem $packageDir -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -in @('d3d9.dll', 'multiviewpatcher.dll', 'outrun-vr-host-dx12.exe') }
+$badExperimental = Get-ChildItem $packageDir -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -in @('multiviewpatcher.dll', 'outrun-vr-host-dx12.exe') }
+if ($badRoot -or $badExperimental) {
+    $bad = @($badRoot) + @($badExperimental)
+    throw "Forbidden backend payload: $($bad.FullName -join ', ')"
+}
+$packagedDxvk = Join-Path $packageDir 'backends/dxvk/d3d9.dll'
+if (-not (Test-Path $packagedDxvk) -or (Get-PeMachine $packagedDxvk) -ne 0x014C) {
+    throw 'DXVK SAFE package is missing the verified x86 provider.'
+}
 
 $packageRoot = (Resolve-Path $packageDir).Path
 Get-ChildItem $packageDir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
