@@ -308,6 +308,168 @@ namespace
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
         R37BootstrapSubmittedGeneration{};
 
+    struct R23DeferredReferenceAck
+    {
+        ID3D11Query* fence = nullptr;
+        bool armed = false;
+        bool poisoned = false;
+        OutRunVR::SharedRenderFrameState frame{};
+    };
+
+    std::array<R23DeferredReferenceAck, OutRunVR::RenderFrameRingSize>
+        R23DeferredReferenceAcks{};
+    std::uint64_t R23DeferredReferenceAckArmed = 0;
+    std::uint64_t R23DeferredReferenceAckCompleted = 0;
+    std::uint64_t R23DeferredReferenceAckPoisoned = 0;
+    bool R23FirstDeferredReferenceAckLogged = false;
+    bool R23FirstDeferredReferenceAckPoisonLogged = false;
+
+    bool R23SameDirectIdentity(
+        const OutRunVR::SharedRenderFrameState& a,
+        const OutRunVR::SharedRenderFrameState& b) noexcept
+    {
+        return a.frameId != 0 && a.frameId == b.frameId &&
+            a.clientPid == b.clientPid &&
+            a.reserved[OutRunVR::RenderFrameDirectSlotIndex] ==
+                b.reserved[OutRunVR::RenderFrameDirectSlotIndex] &&
+            a.reserved[OutRunVR::RenderFrameDirectGenerationIndex] ==
+                b.reserved[OutRunVR::RenderFrameDirectGenerationIndex] &&
+            a.reserved[OutRunVR::RenderFrameRunGenerationIndex] ==
+                b.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+    }
+
+    bool R23DeferredReferencePending(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        if (slot >= R23DeferredReferenceAcks.size())
+            return false;
+        const auto& pending = R23DeferredReferenceAcks[slot];
+        return pending.armed &&
+            R23SameDirectIdentity(pending.frame, frame);
+    }
+
+    void R23PollDeferredReferenceAcks(StereoCompositor& c) noexcept
+    {
+        if (!c.context_)
+            return;
+
+        for (std::uint32_t slot = 0;
+             slot < R23DeferredReferenceAcks.size(); ++slot)
+        {
+            auto& pending = R23DeferredReferenceAcks[slot];
+            if (!pending.armed || pending.poisoned || !pending.fence)
+                continue;
+
+            const HRESULT hr = c.context_->GetData(
+                pending.fence, nullptr, 0,
+                D3D11_ASYNC_GETDATA_DONOTFLUSH);
+            if (hr == S_FALSE)
+                continue;
+            if (FAILED(hr))
+            {
+                // Completion is unknowable. Keep the producer slot blocked
+                // rather than publishing an unsafe ACK that could allow D3D9
+                // to overwrite a resource still referenced by D3D11.
+                pending.poisoned = true;
+                ++R23DeferredReferenceAckPoisoned;
+                if (!R23FirstDeferredReferenceAckPoisonLogged)
+                {
+                    R23FirstDeferredReferenceAckPoisonLogged = true;
+                    std::cerr
+                        << "[R23 deferred-ack] EVENT query failed; exact producer slot remains fail-closed until transport reset.\n";
+                }
+                continue;
+            }
+
+            if (!OutRunVrD3D9ExDirectPassthrough::
+                    FrameRunIdentityCurrent(pending.frame))
+            {
+                // Producer run changed. No ACK may be written into the new
+                // run's mapping, but the old GPU work is complete and can be
+                // forgotten safely.
+                pending.armed = false;
+                pending.poisoned = false;
+                pending.frame = {};
+                ++R23DeferredReferenceAckCompleted;
+                continue;
+            }
+
+            if (!OutRunVrD3D9ExDirectPassthrough::
+                    PublishCompletedFrame(pending.frame))
+                continue;
+
+            R37BootstrapSubmittedFrame[slot] =
+                pending.frame.frameId;
+            R37BootstrapSubmittedGeneration[slot] =
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex];
+            pending.armed = false;
+            pending.poisoned = false;
+            pending.frame = {};
+            ++R23DeferredReferenceAckCompleted;
+        }
+    }
+
+    bool R23ArmDeferredReferenceAck(
+        StereoCompositor& c,
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (!c.context_ || !c.device_ ||
+            slot >= R23DeferredReferenceAcks.size() ||
+            !frame.frameId || !generation)
+            return false;
+
+        R23PollDeferredReferenceAcks(c);
+        auto& pending = R23DeferredReferenceAcks[slot];
+        if (pending.armed)
+        {
+            if (R23SameDirectIdentity(pending.frame, frame))
+                return true;
+            // A different frame in the same producer slot while an older GPU
+            // reference is unresolved violates the slot-lifetime contract.
+            pending.poisoned = true;
+            return false;
+        }
+
+        if (!pending.fence)
+        {
+            D3D11_QUERY_DESC desc{};
+            desc.Query = D3D11_QUERY_EVENT;
+            if (FAILED(c.device_->CreateQuery(
+                    &desc, &pending.fence)) ||
+                !pending.fence)
+            {
+                pending.frame = frame;
+                pending.armed = true;
+                pending.poisoned = true;
+                ++R23DeferredReferenceAckPoisoned;
+                return false;
+            }
+        }
+
+        // This EVENT is inserted after every command queued by the failed
+        // fresh-projection attempt. P5 DirectHold copies and V2 zero-copy
+        // partial sampling are therefore both protected before producer reuse.
+        c.context_->End(pending.fence);
+        pending.frame = frame;
+        pending.armed = true;
+        pending.poisoned = false;
+        ++R23DeferredReferenceAckArmed;
+        if (!R23FirstDeferredReferenceAckLogged)
+        {
+            R23FirstDeferredReferenceAckLogged = true;
+            std::cerr
+                << "[R23 deferred-ack] failed fresh projection now holds its producer slot until an asynchronous GPU EVENT completes.\n";
+        }
+        return true;
+    }
+
     bool R37FrameIdBefore(
         std::uint32_t candidate, std::uint32_t reference) noexcept
     {
@@ -2298,6 +2460,7 @@ int main(int argc, char** argv)
                     // R32's GPU EVENT completion ACK.
                     if (directTransportOnly)
                     {
+                        R23PollDeferredReferenceAcks(compositor);
                         std::array<OutRunVR::SharedRenderFrameState,
                             OutRunVR::RenderFrameRingSize> history{};
                         std::size_t historyCount = 0;
@@ -2380,8 +2543,12 @@ int main(int argc, char** argv)
                                         generation != currentGeneration)
                                         continue;
 
-                                    // No D3D11 draw/copy references this skipped
-                                    // frame, so producer reuse is safe immediately.
+                                    // Only frames never referenced by D3D11 may
+                                    // be ACKed immediately. A failed fresh
+                                    // projection has its own deferred EVENT and
+                                    // must remain immutable until that completes.
+                                    if (R23DeferredReferencePending(frame))
+                                        continue;
                                     if (OutRunVrD3D9ExDirectPassthrough::
                                             PublishCompletedFrame(frame))
                                     {
@@ -2652,8 +2819,24 @@ int main(int argc, char** argv)
                     const bool hadCachedProjection = cachedProjectionValid;
                     const bool projectionRefreshNeeded =
                         newStereoCommitted || !cachedProjectionValid;
-                    if (grace && projectionRefreshNeeded &&
-                        R23RenderProjection(compositor, matchedViews, pv))
+                    bool freshProjectionRendered = false;
+                    if (grace && projectionRefreshNeeded)
+                        freshProjectionRendered =
+                            R23RenderProjection(
+                                compositor, matchedViews, pv);
+
+                    if (!freshProjectionRendered &&
+                        pendingBundlePublish &&
+                        pendingBundleSource ==
+                            OutRunVrR23VerifiedBundle::SourceKind::DirectGpu)
+                    {
+                        R23ArmDeferredReferenceAck(
+                            compositor, pendingBundleFrame);
+                        candidateRejectReason =
+                            "render-failed-deferred-gpu-ack";
+                    }
+
+                    if (freshProjectionRendered)
                     {
                         ++R42ProjectionRefreshes;
                         projection.space = localSpace;
