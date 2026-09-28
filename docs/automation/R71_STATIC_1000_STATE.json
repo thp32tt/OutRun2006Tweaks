@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 8,
+  "completedCycles": 9,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "ed05f657272ec9f0ba32a758d2cb82dc9e700c33",
+  "currentHead": "1f08dfb521a065e781f19719f06aaae717564e26",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -234,18 +234,52 @@
       "automationValidation": "LEVEL0_STATE_MACHINE_AND_HOST_BUILD_CONTRACT_ADDED; PR80 exact-parent CI queued (Build/OpenXR/HUD Inspector); no pass claimed yet",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 9: consume PR #80 exact-head host/build results. If LEVEL0 is green, wire only never-sampled immediate-skip and transition-watermark release retry into main_r23.cpp; do not touch sampled EVENT ownership."
+    },
+    {
+      "cycle": 9,
+      "lenses": [
+        "architecture/control-flow: transition watermark ownership",
+        "lifetime/reset/sync: sampled EVENT vs never-sampled retry separation",
+        "stereo/HUD/visual correctness: preserve R71 projection/HUD paths unchanged",
+        "hot path/frame pacing/copies/waits: no behavior change without runtime telemetry",
+        "adversarial/falsification: prove transition enumeration is safe before wiring"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "PR #80 exact-parent hosted validation is green: Build 36463037708, OpenXR architecture 36463038710 including host-x64, and HUD Inspector 36463038533 all completed success.",
+        "The cycle-8 pure skipped-release queue is build/LEVEL0-gated successfully, but current transition sites only read a latest snapshot before advancing lastProcessedStereoFrame; they do not enumerate and classify every older current-generation frame as never-sampled.",
+        "Wiring the queue directly at STOPPING/reference-space/presentation transitions without a bounded release-before-watermark enumerator could overlap sampled/deferred EVENT ownership. Runtime wiring is therefore deferred rather than speculatively ACKing.",
+        "No production/runtime, HUD, synchronization, copy/wait, or validation-contract behavior changed in cycle 9."
+      ],
+      "evidence": [
+        "Build run 36463037708: success",
+        "OpenXR architecture run 36463038710: success; host-x64 job 109066117776 success",
+        "HUD Inspector run 36463038533: success",
+        "main_r23.cpp transition paths advance lastProcessedStereoFrame from a latest snapshot",
+        "R41 latest-frame skip excludes R23DeferredSlotBlocked identities, but failed immediate PublishCompletedFrame still has no runtime retry owner"
+      ],
+      "changedFiles": [
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [],
+      "automationValidation": "PASS: Build 36463037708; OpenXR architecture 36463038710 (host-x64 109066117776); HUD Inspector 36463038533",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 10: add a bounded, testable release-before-watermark enumerator/adapter that stages only current-run DirectGPU frames proven never sampled; integrate with immediate skip/transition paths only after LEVEL0 coverage proves sampled/deferred identities cannot enter the queue."
     }
   ],
   "nextCycle": {
-    "cycle": 9,
+    "cycle": 10,
     "priority": [
-      "consume PR #80 exact-head Build/OpenXR results",
-      "wire retry queue only after LEVEL0 PASS",
-      "release-before-watermark transition helper",
-      "same-live-slot conflict must quarantine/fail closed",
-      "keep sampled deferred EVENT ACK path unchanged"
+      "design/test release-before-watermark enumeration using full producer identity",
+      "prove sampled/deferred EVENT identities are excluded",
+      "wire immediate-skip retry only if LEVEL0 adapter tests pass",
+      "then cover STOPPING/LOCAL reference-space/presentation transitions",
+      "do not alter waits/copies/HUD/visual tuning without runtime evidence"
     ],
-    "guard": "Do not ACK or retry frames already sampled by D3D11 through the skipped-release queue. Runtime wiring is blocked until the new LEVEL0 smoke/build passes."
+    "guard": "Never stage a frame in the skipped-release queue if D3D11 sampled it or R23 deferred EVENT ownership exists. Keep frozen 34eef500 user-test package immutable."
   },
-  "updatedKst": "2026-09-29T03:07:20+09:00"
+  "updatedKst": "2026-09-29T07:45:00+09:00"
 }
