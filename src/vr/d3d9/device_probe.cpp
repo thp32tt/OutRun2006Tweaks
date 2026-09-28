@@ -9,6 +9,7 @@
 
 #include "hook_mgr.hpp"
 #include "game_addrs.hpp"
+#include "vr/d3d9/dxvk_provider_probe.hpp"
 
 namespace OutRunVRDeviceProbe
 {
@@ -53,6 +54,16 @@ namespace OutRunVRDeviceProbe
                 const HRESULT exHr = device->QueryInterface(
                     __uuidof(IDirect3DDevice9Ex), reinterpret_cast<void**>(&deviceEx));
                 const bool isEx = SUCCEEDED(exHr) && deviceEx;
+
+                const auto dxvk = OutRunVR::Dxvk::ProbeProvider(device);
+                spdlog::info(
+                    "VR DXVK R71 census: providerLoaded={} nonSystem={} stockInterop={} D3D9Ex={} stockHr=0x{:08X} exHr=0x{:08X}",
+                    dxvk.d3d9ProviderLoaded ? 1 : 0,
+                    dxvk.nonSystemProvider ? 1 : 0,
+                    dxvk.stockDxvkInterop ? 1 : 0,
+                    dxvk.d3d9ExAvailable ? 1 : 0,
+                    static_cast<unsigned>(dxvk.stockDxvkInteropHr),
+                    static_cast<unsigned>(dxvk.d3d9ExHr));
 
                 LUID adapterLuid{};
                 bool luidValid = false;
