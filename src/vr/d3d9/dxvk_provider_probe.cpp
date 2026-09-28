@@ -4,6 +4,7 @@
 #include <d3d9.h>
 
 #include <cwchar>
+#include <filesystem>
 #include <string>
 
 #include "vr/d3d9/dxvk_provider_probe.hpp"
@@ -55,6 +56,39 @@ namespace OutRunVR::Dxvk
             return modulePath.size() >= prefix.size() &&
                 _wcsnicmp(modulePath.c_str(), prefix.c_str(), prefix.size()) == 0;
         }
+
+        bool IsGameLocalD3D9Provider(HMODULE module) noexcept
+        {
+            try
+            {
+                std::wstring providerPath;
+                if (!ModulePath(module, providerPath))
+                    return false;
+
+                wchar_t exeBuffer[32768]{};
+                const DWORD exeCount = GetModuleFileNameW(
+                    nullptr, exeBuffer,
+                    static_cast<DWORD>(sizeof(exeBuffer) / sizeof(exeBuffer[0])));
+                if (exeCount == 0 ||
+                    exeCount >= (sizeof(exeBuffer) / sizeof(exeBuffer[0])))
+                    return false;
+
+                const auto provider =
+                    std::filesystem::path(providerPath).lexically_normal();
+                const auto exe =
+                    std::filesystem::path(std::wstring(exeBuffer, exeCount))
+                        .lexically_normal();
+
+                return _wcsicmp(
+                    provider.parent_path().c_str(),
+                    exe.parent_path().c_str()) == 0 &&
+                    _wcsicmp(provider.filename().c_str(), L"d3d9.dll") == 0;
+            }
+            catch (...)
+            {
+                return false;
+            }
+        }
     }
 
     static_assert(DisasmContract::WvpVsRegister == 64u);
@@ -77,6 +111,8 @@ namespace OutRunVR::Dxvk
         snapshot.d3d9ProviderLoaded = provider != nullptr;
         snapshot.nonSystemProvider =
             provider != nullptr && !IsSystemD3D9Provider(provider);
+        snapshot.gameLocalProvider =
+            provider != nullptr && IsGameLocalD3D9Provider(provider);
 
         if (!device)
             return snapshot;
