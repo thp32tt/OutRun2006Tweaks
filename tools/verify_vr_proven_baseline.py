@@ -186,9 +186,14 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'R69IsSelectorAtlasReserveCandidate',
     'desc.Width == 2048 && desc.Height == 2048',
     'R14GeneralShadowBytes',
+    'R14EmergencyShadowBytes',
+    'R14EmergencyShadowBudgetBytes',
     'std::uint64_t bytes, bool emergencyReserve',
-    'later general textures retain the 368 MiB class budget',
-    'total remains capped at 384 MiB',
+    'emergency > R14EmergencyShadowBudgetBytes - bytes',
+    'currentEmergency >',
+    'emergency class is cumulatively capped at 16 MiB',
+    'general stays capped at 368 MiB',
+    'total at 384 MiB',
 ], "P8_SELECTOR_ATLAS_RESERVE")
 require_all("src/hooks_uiscaling.cpp", [
     'Module::exe_ptr(0xBA9D0)',
