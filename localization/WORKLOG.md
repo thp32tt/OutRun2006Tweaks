@@ -999,3 +999,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Current canonical candidate state: PASS pending in-game `C4A2937B, 9F060EC1, D6DC1380, 48DEBE77`; REWORK `FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9`. 201 elements / 93 failing exact source-bbox checks.
 - Final `approved_dds` remains empty because isolated DDS_ONLY in-game validation is mandatory before final approval.
 - No build, VR/FFB, or GPT Library use. Report: `localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json`.
+
+## B92 DXT5 zero-pixel rework — 2026-09-28T12:31:00+09:00
+- Started from GitHub HEAD `11631c5f12037bcd01cda1af57ec9bc564af4bcf` and applied the current automation contract/C85 state.
+- Reworked even-shard REWORK assets `62BEBF33` and `E3FD08BE` by moving the existing HD Korean raster exactly 1 raw-DDS pixel upward.
+- `62BEBF33`: readable bbox `[565,52,1186,200]` inside original `[392,52,1357,201]`; SHA-256 `503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e`.
+- `E3FD08BE`: readable bbox `[632,54,1388,199]` inside original `[393,54,1628,200]`; SHA-256 `51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548`.
+- DXT5 endpoints, 128-byte headers, 2048x256 dimensions and mip count are preserved. Both candidates are zero-margin edge-touch high-risk and remain pending independent C revalidation + isolated DDS_ONLY in-game validation.
+- Binary commit: `abba1c70e744d6c26cc2f3a5da4d50bcbfd1d5b0`; report: `localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json`.
+- Remaining C85 production REWORK assets: 10. No build, VR/FFB, or GPT Library use.
