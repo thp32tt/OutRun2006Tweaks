@@ -1243,3 +1243,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Report: `localization/graphics/role_C/20260929-0540-C97/C97_W00012_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C98 W00013 synchronization barrier — 2026-09-29T06:19:30+09:00
+- Barrier gate: PASS. A00041 `c18a395cae55210221bc98332e18bdaa7b9aa614` and B00042 `785164ee077f4eb37f1a9760dcd1fcef067e8e81` are durable in current HEAD ancestry; Localization Automation Gate / Localization State / Domain Isolation Guard succeeded on both exact lane commits.
+- GitHub-only cross-lane source identity QA: **14/14** expected pinned upstream blobs match `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754` (A: 8/8 HD DDS/atlas, B: 6/6 source PNG/atlas/HD DDS).
+- A reconstruction inputs retained: 55 `2EA557B4`, 99 `4F68708E`, 119 `F6811E94`, 195 `9CE4E175`. B final zoom-review merge: 38 `6AB5CEE` promoted for Total Rank x3 -> 종합 랭크; 238 `132A1B1F` resolved preserve-original as logo/branding-only artwork.
+- Queue: 137 rows = **95 localize_text / 31 zoom_review / 9 font / 1 Hangul name-entry / 1 preserve-only**; unresolved zoom-review **0**, resolved preserve-original zoom-review **31**. Transcription/artwork plan: **95 assets / 750 semantic segments**.
+- Candidate DDS writes: **0**. New static approvals: **0**. With no new Korean candidate bytes, Hangul raster/clipping, zero-pixel containment, DDS format/mipmap/alpha/transparency, orientation, background/wrong-replacement and ENGLISH SOURCE vs KOREAN CANDIDATE gates are **not promoted to PASS**; reconstruction assets remain HOLD until exact candidate evidence exists.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone, GPT Library, VR/FFB/DX work, or game build was used.
+- Canonical shared-state commit: `1dd28a61a9c4c217d86a7d57ea1ad5ee0881678f`.
+- Report: `localization/graphics/role_C/20260929-0619-C98/C98_W00013_SYNC_FINAL_QA.json`.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`

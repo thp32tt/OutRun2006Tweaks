@@ -1,0 +1,159 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00043",
+  "wave_id": "W00013",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_MERGE",
+  "recorded_at_kst": "2026-09-29T06:19:30+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "c18a395cae55210221bc98332e18bdaa7b9aa614",
+  "canonical_state_commit": "1dd28a61a9c4c217d86a7d57ea1ad5ee0881678f",
+  "barrier": {
+    "result": "PASS",
+    "lane_a": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00041",
+      "commit": "c18a395cae55210221bc98332e18bdaa7b9aa614",
+      "durable_terminal_result": "PASS_MATERIAL_FALLBACK_4_ODD_HD_DECODED_PIXEL_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+      "remote_ci": {
+        "localization_automation_gate": "success",
+        "localization_state": "success",
+        "domain_isolation_guard": "success"
+      }
+    },
+    "lane_b": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00042",
+      "commit": "785164ee077f4eb37f1a9760dcd1fcef067e8e81",
+      "durable_terminal_result": "PASS_MATERIAL_FALLBACK_RESOLVED_LAST_2_EVEN_ZOOM_REVIEW_ROWS",
+      "remote_ci": {
+        "localization_automation_gate": "success",
+        "localization_state": "success",
+        "domain_isolation_guard": "success"
+      }
+    }
+  },
+  "source_identity_qa": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "upstream_tree": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "expected_blob_checks": 14,
+    "matched_blob_checks": 14,
+    "result": "PASS",
+    "lane_a": "8/8 expected HD release DDS / atlas identities matched for indices 55/99/119/195",
+    "lane_b": "6/6 expected original PNG / stock atlas / HD release DDS identities matched for indices 38/238"
+  },
+  "semantic_context_qa": {
+    "result": "PASS",
+    "retained_reconstruction_inputs": [
+      {
+        "index": 55,
+        "asset": "2EA557B4",
+        "summary": "NEXT ROUND -> 다음 라운드; mirror-Y/source bbox reconstruction still HOLD"
+      },
+      {
+        "index": 99,
+        "asset": "4F68708E",
+        "summary": "Ghost Car course-record prompt -> 고스트 카와 달리며 코스 기록에 도전하세요!; panel/text segmentation still HOLD"
+      },
+      {
+        "index": 119,
+        "asset": "F6811E94",
+        "summary": "Time Attack Mode -> 타임 어택 모드; source-faithful style/bbox reconstruction still HOLD"
+      },
+      {
+        "index": 195,
+        "asset": "9CE4E175",
+        "summary": "NOT AVAILABLE -> 이용 불가; mirror-X/atlas-origin and source-edge-risk reconstruction still HOLD"
+      }
+    ],
+    "promoted_localize_text": [
+      {
+        "index": 38,
+        "asset": "6AB5CEE",
+        "segments": [
+          {
+            "source": "Total Rank",
+            "korean": "종합 랭크",
+            "physical_occurrences": 3
+          }
+        ],
+        "context": "HD filename alias maps to the same canonical stock 06AB5CEE source/atlas already classified at index 36; canonical terminology retained."
+      }
+    ],
+    "preserve_original": [
+      {
+        "index": 238,
+        "asset": "132A1B1F",
+        "reason": "OutRun 2006 Coast 2 Coast logo/branding loading artwork only; current preserve-brand/logo policy excludes translation."
+      }
+    ]
+  },
+  "raster_final_qa": {
+    "candidate_dds_modified": false,
+    "new_candidate_bytes": 0,
+    "new_static_approvals": 0,
+    "approved_dds_count": 0,
+    "hangul_breakage": "NOT_APPLICABLE_NO_NEW_CANDIDATE_RASTER",
+    "clipping": "NOT_APPLICABLE_NO_NEW_CANDIDATE_RASTER",
+    "zero_pixel_containment": "HOLD_STRICT_RECHECK_FOR_FUTURE_CANDIDATES",
+    "resolution": "NO_NEW_CANDIDATE_BYTES",
+    "dds_format_mipmap_alpha_transparency": "NO_NEW_DDS_WRITE",
+    "orientation": "HOLD_EXACT_HD_DECODE_OR_RECONFIRMATION_REQUIRED_FOR_FUTURE_CANDIDATES",
+    "background_wrong_replacement": "NO_NEW_DDS_WRITE",
+    "mandatory_english_source_comparison": "HOLD_UNTIL_FUTURE_KOREAN_CANDIDATE_EXISTS",
+    "note": "W00013 lanes produced source/classification evidence but no Korean candidate DDS bytes. C therefore does not promote clipping, containment, format, alpha, mipmap, orientation, background, or source-vs-candidate raster gates to PASS."
+  },
+  "shared_state_merge": {
+    "queue": {
+      "rows": 137,
+      "actions": {
+        "localize_text": 95,
+        "zoom_review": 31,
+        "font_pipeline": 9,
+        "hangul_name_entry": 1,
+        "preserve_brand_song_credit": 1
+      },
+      "zoom_review_unresolved": 0,
+      "zoom_review_resolved_preserve_original": 31,
+      "promoted": [
+        38
+      ],
+      "preserve_resolved": [
+        238
+      ],
+      "reconstruction_notes_refreshed": [
+        55,
+        99,
+        119,
+        195
+      ]
+    },
+    "transcription": {
+      "assets": 95,
+      "segments": 750,
+      "added_indices": [
+        38
+      ]
+    },
+    "artwork_plan": {
+      "assets": 95,
+      "segments": 750,
+      "added_indices": [
+        38
+      ]
+    },
+    "canonical_progress_mirror": "localization/progress/progress.json and localization/progress.json are byte-for-byte identical in canonical state commit 1dd28a61a9c4c217d86a7d57ea1ad5ee0881678f",
+    "worklog_updated": true,
+    "status_updated": true,
+    "resume_updated": true,
+    "visual_review_updated": true
+  },
+  "result": "PASS_W00013_SYNC_FINAL_ZOOM_REVIEW_RESOLVED_5_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false
+}

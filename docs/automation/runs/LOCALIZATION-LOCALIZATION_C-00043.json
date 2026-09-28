@@ -1,0 +1,59 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00043",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00013",
+  "recorded_at_kst": "2026-09-29T06:19:30+09:00",
+  "base_head_sha": "c18a395cae55210221bc98332e18bdaa7b9aa614",
+  "canonical_state_commit": "1dd28a61a9c4c217d86a7d57ea1ad5ee0881678f",
+  "result": "PASS_W00013_SYNC_FINAL_ZOOM_REVIEW_RESOLVED_5_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "barrier_gate": "PASS_A_B_DURABLE_TERMINAL_AND_REMOTE_CI_SUCCESS",
+  "lane_a_commit": "c18a395cae55210221bc98332e18bdaa7b9aa614",
+  "lane_b_commit": "785164ee077f4eb37f1a9760dcd1fcef067e8e81",
+  "source_identity_validation": "PASS_14_OF_14_PINNED_GITHUB_BLOBS",
+  "material_deliverable": {
+    "type": "C_SHARED_STATE_RECONCILIATION_AND_CROSS_LANE_FINAL_QA",
+    "promoted_localize_text": [
+      38
+    ],
+    "resolved_preserve_original": [
+      238
+    ],
+    "retained_reconstruction_inputs": [
+      38,
+      55,
+      99,
+      119,
+      195
+    ],
+    "candidate_dds_modified": false
+  },
+  "queue_after": {
+    "rows": 137,
+    "localize_text": 95,
+    "zoom_review": 31,
+    "unresolved_zoom_review": 0,
+    "resolved_preserve_original_zoom_review": 31
+  },
+  "transcription_after": {
+    "assets": 95,
+    "segments": 750
+  },
+  "artwork_plan_after": {
+    "assets": 95,
+    "segments": 750
+  },
+  "report": "localization/graphics/role_C/20260929-0619-C98/C98_W00013_SYNC_FINAL_QA.json",
+  "shared_state_modified": true,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "C98 reconciles W00013 A/B durable results into canonical shared state without promoting any new DDS/raster approval. All unresolved zoom-review rows are classified; runtime validation remains UNTESTED."
+}
