@@ -58,6 +58,11 @@ namespace OutRunVRHudSemantics
             return { "MenuExactArrow", "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud };
         if (callRva == 0x097BB7 || callRva == 0x097DA7)
             return { "OutRunFinalResult", "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud };
+        // R71 canonical-EXE inspection + R70 HMD evidence: the bounded
+        // 0x4973xx-0x497Exx cluster owns OutRun checkpoint/stage/result text.
+        // Keep this narrow; it is not a blanket mode-16 HUD rule.
+        if (InRange(callRva, 0x097300, 0x097F00))
+            return { "OutRunStageResult", "HUD_OUTRUN_STAGE", OutRunVR::GameSemantic::RenderScope::ScreenHud };
 
         // HAM attached-heart draw; anchored by HeartDisp_PulseAngle=0x05B43A.
         if (InRange(callRva, 0x05B300, 0x05B700))
@@ -198,6 +203,7 @@ namespace OutRunVRHudSemantics
 
     static_assert(ClassifyCaller(0x0460F1).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x097BB7).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
+    static_assert(ClassifyCaller(0x0975EE).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x060D40).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0BBA89).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0B9F3A).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
