@@ -3,6 +3,14 @@ set -euo pipefail
 
 mkdir -p /data/browser-profile /data/state /logs /tmp/.X11-unix
 
+# Chrome may leave ProcessSingleton files behind after a container is replaced or
+# killed. They are safe to remove here because Chrome has not been started yet in
+# this container. Stale locks otherwise make Chrome exit immediately and can
+# cause an endless container restart loop.
+rm -f /data/browser-profile/SingletonLock \
+      /data/browser-profile/SingletonCookie \
+      /data/browser-profile/SingletonSocket
+
 VNC_PASSWORD="${VNC_PASSWORD:-change-me}"
 PASSFILE=/data/.vncpasswd
 x11vnc -storepasswd "$VNC_PASSWORD" "$PASSFILE" >/dev/null
@@ -49,4 +57,5 @@ for i in $(seq 1 60); do
   sleep 1
 done
 
+echo "$(date -Is) starting controller" >>/logs/controller-startup.log
 exec python -m app.controller
