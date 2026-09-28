@@ -613,3 +613,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Strict source-diff containment: 21/21 PASS; outside declared cells 0; collateral outside reworked cells 0.
 - DDS 4096x2048 RGBA32 mip1/header/raw mirror_y preserved. Candidate SHA-256 4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7.
 - Pending independent C and isolated DDS_ONLY in-game validation; runtime UNTESTED.
+
+## C86 B92 DXT5 final QA — 2026-09-28 13:20 KST
+- GitHub-only independent revalidation completed for B92 one-pixel reworks `62BEBF33` and `E3FD08BE`.
+- Both current candidates are **2048×256 DXT5 / 1 mip** with canonical 128-byte DDS headers unchanged.
+- Decoded-pixel QA: alpha changes outside each declared text cell = **0**; introduced alpha outside = **0**.
+- Exact source-bbox containment is PASS for both, but each touches the original top bbox edge with **0 px margin**. They are therefore high-risk HOLDs pending isolated `DDS_ONLY` in-game validation; no `approved_dds` promotion.
+- C86 report: `localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json`.
+- Current HD state from C85+C86: 4 pixel+visual PASS pending in-game, 2 containment PASS high-risk pending in-game, 10 REWORK_REQUIRED. Approved/locked count remains **0**.
+- Concurrent B93 work on `2DA43E41` was observed and left untouched. No build, VR/FFB, N100, or GPT Library use.
