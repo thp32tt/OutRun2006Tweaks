@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T02:14:53+09:00",
+  "updated_at_kst": "2026-09-29T02:54:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "W00006 C91 reconciliation: C4A2937B deterministic single-DDS isolation input is promoted and four zoom_review rows are resolved as preserve-original/no-localizable-text. Package/test D6DC1380 and C4A2937B only as separate DDS_ONLY cases before approval; keep RUNTIME_VALIDATION=UNTESTED until real-game tests occur. Continue unrelated pending localize_text and unresolved zoom_review production independently.",
+  "next_checkpoint": "W00007 C92 reconciliation: zoom_review indices 25/27/29/31/150/174/180/194 are resolved as preserve-original/no-localizable-text. Unresolved zoom_review is 35 and resolved preserve-original zoom_review is 12. No DDS bytes changed and approved_dds remains 0. Continue pending localize_text/rework and remaining zoom_review production; keep runtime validation asset-local until real-game evidence.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -531,13 +531,23 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C91",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00022",
-      "wave_id": "W00006",
-      "result": "PASS_W00006_SYNC_ZOOM_REVIEW_RESOLVED_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
+      "run": "C92",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00025",
+      "wave_id": "W00007",
+      "result": "PASS_W00007_SYNC_8_ZOOM_REVIEW_RESOLVED_PRESERVE_ORIGINAL_NO_NEW_APPROVALS",
       "approved_dds_count": 0,
-      "material_backlog_action": "C4A2937B_SINGLE_DDS_ISOLATION_READY_AND_4_ZOOM_REVIEWS_RESOLVED_PRESERVE_ORIGINAL",
-      "report": "localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json",
+      "material_backlog_action": "8_ZOOM_REVIEW_RESOLUTIONS_PRESERVE_ORIGINAL",
+      "resolved_indices": [
+        25,
+        27,
+        29,
+        31,
+        150,
+        174,
+        180,
+        194
+      ],
+      "report": "localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {
@@ -560,8 +570,8 @@
         "W00006_C00022_C4A2937B"
       ]
     },
-    "zoom_review_unresolved": 43,
-    "zoom_review_resolved_preserve_original": 4
+    "zoom_review_unresolved": 35,
+    "zoom_review_resolved_preserve_original": 12
   },
   "data_build": {
     "draft_bin_entries": 1356,

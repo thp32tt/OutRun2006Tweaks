@@ -1,0 +1,59 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00025",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00007",
+  "recorded_at_kst": "2026-09-29T02:54:00+09:00",
+  "initial_head_sha": "747c4bafac2afdd1d7b1355ecbfc712377dcc0a4",
+  "final_precommit_head_sha": "747c4bafac2afdd1d7b1355ecbfc712377dcc0a4",
+  "preserved_intervening_head": true,
+  "result": "PASS_W00007_SYNC_8_ZOOM_REVIEW_RESOLVED_PRESERVE_ORIGINAL_NO_NEW_APPROVALS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only C synchronization barrier + cross-lane final QA + shared-state merge for W00007; no VR/FFB/DX/build; no N100/GPT Library.",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00023",
+      "commit_sha": "747c4bafac2afdd1d7b1355ecbfc712377dcc0a4",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+      "remote_ci": "PASS"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00024",
+      "commit_sha": "12e0bb7f4b5cc8db7af9768e5cd70dc0717dfc87",
+      "material_commit_sha": "ef10cf5f43c23368eb0ecd7b3a62771f556358fd",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+      "remote_ci": "PASS"
+    }
+  },
+  "material_deliverables": [
+    {
+      "type": "ZOOM_REVIEW_RESOLUTION_MERGE",
+      "indices": [
+        25,
+        27,
+        29,
+        31,
+        150,
+        174,
+        180,
+        194
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL"
+    }
+  ],
+  "candidate_dds_modified": false,
+  "new_approvals": 0,
+  "approved_dds_count": 0,
+  "shared_state_modified": true,
+  "canonical_progress_mirror_identical": true,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "report": "localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json",
+  "conclusion": "W00007 C barrier passed. Eight zoom-review assets are reconciled as preserve-original/no-localizable-text. No DDS bytes changed and no approval is inferred without real-game validation."
+}

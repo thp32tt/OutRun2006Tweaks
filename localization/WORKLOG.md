@@ -1174,3 +1174,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Cross-lane final QA added 0 approvals because W00006 changed no DDS bytes and no isolated in-game validation was performed. approved/locked count remains 0; `RUNTIME_VALIDATION=UNTESTED`.
 - Canonical progress and legacy progress mirror are written from identical bytes. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
 - Machine report: `localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json`.
+
+## 2026-09-29 02:54 KST - W00007 C BARRIER + SHARED MERGE (AUTO C-00025)
+
+- Refreshed GitHub-only `korean-localization-clean` at `747c4bafac2afdd1d7b1355ecbfc712377dcc0a4` after W00007 A/B durable terminal results.
+- A00023 resolved odd zoom-review indices 25/27/29/31; B00024 resolved even indices 150/174/180/194. Both terminal commits have successful Automation Gate, Localization State, and Domain Isolation Guard runs.
+- C cross-lane QA revalidated the pinned Sonic-TV/OR2006Sprites source commit/tree and all 16 original-PNG/HD-release-DDS blob identities recorded by A/B. Preserve-vs-translate classification is consistent: only symbolic rank letters or protected OutRun2/OutRun2SP/logo artwork is present; no Korean candidate is required for these eight assets.
+- Shared queue update: eight rows move from `blocked_review/needs_zoom_review` to `preserve_original/not_required`. Queue remains 137 rows; unresolved zoom_review **43 -> 35**; resolved preserve-original zoom_review **4 -> 12**.
+- No candidate DDS bytes changed, no pixel/format/alpha/orientation result was newly inferred, and no DDS approval was added. Final approved/locked DDS count remains 0.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
+- No real-game test was performed by C; `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Machine report: `localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json`.

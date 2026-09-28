@@ -724,3 +724,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No new candidate DDS bytes and no new approvals. approved_dds remains **0**. Existing REWORK/HOLD states remain unchanged.
 - No real-game test was performed by C; `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
 - Machine report: `localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json`.
+
+## W00007 C synchronization barrier — 2026-09-29 02:54 KST
+- GitHub-only reconciliation base HEAD: `747c4bafac2afdd1d7b1355ecbfc712377dcc0a4`. A00023 and B00024 both have durable W00007 terminal records; their terminal commits passed Localization Automation Gate, Localization State, and Domain Isolation Guard.
+- Lane A resolved zoom-review indices 25/27/29/31; lane B resolved 150/174/180/194. C revalidated the exact Sonic-TV/OR2006Sprites pinned source tree and all recorded original-PNG / HD-release-DDS blob identities.
+- All eight contain only character/scenic/vehicle/card artwork plus symbolic rank letters or protected OutRun2/OutRun2SP/logo artwork; no localizable UI word text is introduced. They are merged as `preserve_original` / `not_required`.
+- Queue remains 137 rows. Unresolved zoom_review decreases from 43 to **35**; resolved zoom_review preserve-original increases to **12**. No candidate DDS bytes changed and approved/locked DDS count remains **0**.
+- Because W00007 introduced no Korean DDS bytes, zero-pixel containment, clipping, DDS format/mipmap/alpha/transparency/orientation and side-by-side English-vs-Korean raster gates are recorded as not applicable for new data; no prior PASS is promoted or inferred.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
+- Machine report: `localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json`.

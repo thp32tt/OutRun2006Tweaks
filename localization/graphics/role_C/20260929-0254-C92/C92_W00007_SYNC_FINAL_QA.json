@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C92",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00025",
+  "wave_id": "W00007",
+  "timestamp_kst": "2026-09-29T02:54:00+09:00",
+  "branch": "korean-localization-clean",
+  "reconciliation_base_head": "747c4bafac2afdd1d7b1355ecbfc712377dcc0a4",
+  "contract_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00023",
+      "commit_sha": "747c4bafac2afdd1d7b1355ecbfc712377dcc0a4",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+      "candidate_dds_modified": false,
+      "material_deliverable": "4_ZOOM_REVIEW_RESOLUTIONS_PRESERVE_ORIGINAL",
+      "runtime_validation": "UNTESTED",
+      "remote_ci": "PASS"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00024",
+      "terminal_record_commit_sha": "12e0bb7f4b5cc8db7af9768e5cd70dc0717dfc87",
+      "material_commit_sha": "ef10cf5f43c23368eb0ecd7b3a62771f556358fd",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+      "candidate_dds_modified": false,
+      "material_deliverable": "4_ZOOM_REVIEW_RESOLUTIONS_PRESERVE_ORIGINAL",
+      "runtime_validation": "UNTESTED",
+      "remote_ci": "PASS_ON_TERMINAL_RECORD_COMMIT"
+    }
+  },
+  "cross_lane_final_qa": {
+    "new_A_B_candidate_dds_bytes": 0,
+    "repeated_completed_pixel_qa": false,
+    "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "source_tree_sha": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "assets": [
+      {
+        "lane": "A",
+        "queue_index": 25,
+        "asset": "4AFC1BED",
+        "original_png_git_blob_sha": "fc1429d1ddb6d15d3893953a8945c25b042076b8",
+        "hd_release_git_blob_sha": "04e8ac7a2c4b8af34ae59e47865d7e15a7003a85",
+        "observed": "girlfriend portrait, heart/airplane icons, symbolic rank letters A/B/C/D/E only",
+        "protected_text": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "A",
+        "queue_index": 27,
+        "asset": "8B52FEEC",
+        "original_png_git_blob_sha": "5318009a9d7b3908e08c7d372dca490774393f82",
+        "hd_release_git_blob_sha": "57e693999d9364653c222575ffd54c9ccac7e35d",
+        "observed": "girlfriend character poses only",
+        "protected_text": [],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "A",
+        "queue_index": 29,
+        "asset": "F043316B",
+        "original_png_git_blob_sha": "c179a38cc90cf8514c7afe1af9a31bf3cd5b2146",
+        "hd_release_git_blob_sha": "6263af3257a4cd571c7b1fba0d71fc03993987e1",
+        "observed": "girlfriend character poses only",
+        "protected_text": [],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "A",
+        "queue_index": 31,
+        "asset": "A82266FC",
+        "original_png_git_blob_sha": "542e75b83da8b1a1f14aae691c7bd0c4f0c5e13b",
+        "hd_release_git_blob_sha": "6865c5afd2018a38cbc8ebccf4a638f09b415473",
+        "observed": "mechanic poses, symbolic rank A, embedded cap/shirt logo artwork",
+        "protected_text": [
+          "A",
+          "embedded logo artwork"
+        ],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "B",
+        "queue_index": 150,
+        "asset": "40A4D914",
+        "original_png_git_blob_sha": "1f37aee18ccfa9c5de615e42ac1ba1bdd44dac18",
+        "hd_release_git_blob_sha": "cb25645724694958d81cda2c64f45e8ae4fea457",
+        "observed": "scenic postcard/question-mark artwork plus OutRun2SP product logo",
+        "protected_text": [
+          "OutRun2SP logo"
+        ],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "B",
+        "queue_index": 174,
+        "asset": "73F852A4",
+        "original_png_git_blob_sha": "fa56d30c737753ce0a3794861e1c0f05cc78306f",
+        "hd_release_git_blob_sha": "cd547d09bc59b4f5918f156a920a8581a5be2544",
+        "observed": "scenic/course-card artwork plus OutRun2/OutRun2SP product logos",
+        "protected_text": [
+          "OutRun2 logo",
+          "OutRun2SP logo"
+        ],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "B",
+        "queue_index": 180,
+        "asset": "7ABD5110",
+        "original_png_git_blob_sha": "9b29ed0318460b1e25543ef7736221d6d7ffdada",
+        "hd_release_git_blob_sha": "33df59211a8422dd5cb2cb4d1b3c58dca9662209",
+        "observed": "vehicle/color-selector plus postcard artwork and OutRun2SP product logo",
+        "protected_text": [
+          "OutRun2SP logo"
+        ],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "B",
+        "queue_index": 194,
+        "asset": "9AC75730",
+        "original_png_git_blob_sha": "6b7657e3daaadb52de1cde71366ad4713b327720",
+        "hd_release_git_blob_sha": "5bc6b4b10bf9740eb1944000766d0d87d197df5e",
+        "observed": "scenic/course-card artwork plus OutRun2SP product logo",
+        "protected_text": [
+          "OutRun2SP logo"
+        ],
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      }
+    ],
+    "source_identity": "PASS_EXACT_UPSTREAM_COMMIT_TREE_PATH_AND_ALL_16_PNG_DDS_BLOB_IDENTITIES_REVALIDATED",
+    "visual_classification_basis": "A00023/B00024 durable direct-GitHub zoom review observations; C independently revalidated immutable original-PNG and HD-release-DDS provenance and preserve-vs-translate policy before shared merge.",
+    "semantic_context_terms": "PASS_NO_LOCALIZABLE_UI_WORD_TEXT; symbolic rank letters, product logos and embedded brand/logo artwork remain preserve-original.",
+    "omission_hangul_clipping_overflow": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_KOREAN_DDS_BYTES",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "dds_format_mipmap_alpha_transparency_orientation": "UNCHANGED_ORIGINAL_HD_BYTES_NO_CANDIDATE_WRITE",
+    "background_wrong_replacement_hd_gui": "PASS_PRESERVE_ORIGINAL_CLASSIFICATION; no replacement texture introduced",
+    "approvals_added": 0
+  },
+  "shared_state_merge": {
+    "queue_rows_changed": [
+      25,
+      27,
+      29,
+      31,
+      150,
+      174,
+      180,
+      194
+    ],
+    "zoom_review_unresolved_before": 43,
+    "zoom_review_unresolved_after": 35,
+    "zoom_review_resolved_preserve_original": 12,
+    "canonical_progress_and_legacy_mirror_identical": true
+  },
+  "queue_recompute": {
+    "rows": 137,
+    "actions": {
+      "localize_text": 79,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "zoom_review": 47,
+      "preserve_brand_song_credit": 1
+    },
+    "statuses": {
+      "c90_single_dds_isolation_ready_pending_ingame": 1,
+      "blocked_runtime_font": 9,
+      "blocked_runtime_name_entry": 1,
+      "preserve_original": 13,
+      "blocked_review": 35,
+      "pending_artwork": 63,
+      "rework_required_zero_pixel_or_artifact": 6,
+      "b95_self_qa_pass_pending_c": 1,
+      "a_auto_self_qa_pass_pending_c": 1,
+      "b94_self_qa_pass_pending_c": 1,
+      "c91_single_dds_isolation_ready_pending_ingame": 1,
+      "c85_pixel_visual_pass_pending_ingame": 2,
+      "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+      "c86_containment_pass_high_risk_pending_ingame": 2
+    },
+    "direct_image_scope": 126,
+    "zoom_review_unresolved": 35,
+    "zoom_review_resolved_preserve_original": 12
+  },
+  "approvals": {
+    "new_approvals": 0,
+    "approved_dds_count": 0
+  },
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_W00007_SYNC_8_ZOOM_REVIEW_RESOLVED_PRESERVE_ORIGINAL_NO_NEW_APPROVALS"
+}
