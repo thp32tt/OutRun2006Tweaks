@@ -455,7 +455,7 @@ namespace OutRunVRStereo
             if (entry->writeLock && (flags & D3DLOCK_DISCARD))
             {
                 entry->valid.clear();
-                ++R30ShadowDiscardInvalidations;
+                R30ShadowDiscardInvalidations.fetch_add(1, std::memory_order_relaxed);
             }
         }
 
@@ -477,7 +477,7 @@ namespace OutRunVRStereo
                         entry->lockPtr, entry->lockSize);
                     R30MergeValidRange(entry->valid, entry->lockOffset,
                         entry->lockOffset + entry->lockSize);
-                    ++R30ShadowWrites;
+                    R30ShadowWrites.fetch_add(1, std::memory_order_relaxed);
                 }
                 catch (...)
                 {
@@ -502,7 +502,7 @@ namespace OutRunVRStereo
             const auto entry = R30FindVertexShadow(buffer);
             if (!entry)
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -510,7 +510,7 @@ namespace OutRunVRStereo
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 if (!R30FirstShadowMissLogged.exchange(
                         true, std::memory_order_acq_rel))
                 {
@@ -528,7 +528,7 @@ namespace OutRunVRStereo
             {
                 return false;
             }
-            ++R30ShadowReadHits;
+            R30ShadowReadHits.fetch_add(1, std::memory_order_relaxed);
             return true;
         }
 
@@ -538,7 +538,7 @@ namespace OutRunVRStereo
             const auto entry = R30FindIndexShadow(buffer);
             if (!entry)
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -546,7 +546,7 @@ namespace OutRunVRStereo
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 return false;
             }
             try
@@ -558,7 +558,7 @@ namespace OutRunVRStereo
             {
                 return false;
             }
-            ++R30ShadowReadHits;
+            R30ShadowReadHits.fetch_add(1, std::memory_order_relaxed);
             return true;
         }
 
