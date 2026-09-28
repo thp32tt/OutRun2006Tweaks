@@ -1,9 +1,9 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "audit": "FULL_PIXEL_BOUNDARY_ZERO_TOLERANCE_EXACT_SOURCE_BBOX",
-  "timestamp_kst": "2026-09-28T10:09:21+09:00",
+  "timestamp_kst": "2026-09-28T13:20:00+09:00",
   "branch": "korean-localization-clean",
-  "base_head": "aa3abfa38cea3b2e05a34d210331b07248837c29",
+  "base_head": "e8362a08802f53fd4cfc778eabc4f07aaa5a11ec",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "rule": {
     "max_outside_pixels": 0,
@@ -23,7 +23,7 @@
     "historical_role_a_work_dds": 4,
     "historical_lowres_approved_dds": 3
   },
-  "detailed_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+  "detailed_report": "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
   "current_hd_candidates": [
     {
       "asset": "FF2462BB",
@@ -99,19 +99,19 @@
     },
     {
       "asset": "62BEBF33",
-      "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+      "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
       "text_elements": 1,
-      "failed_elements": 1,
-      "minimum_bbox_delta_px": -1,
-      "status": "REWORK_REQUIRED"
+      "failed_elements": 0,
+      "minimum_bbox_delta_px": 0,
+      "status": "CONTAINMENT_PASS_HIGH_RISK_PENDING_INGAME"
     },
     {
       "asset": "E3FD08BE",
-      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+      "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
       "text_elements": 1,
-      "failed_elements": 1,
-      "minimum_bbox_delta_px": -1,
-      "status": "REWORK_REQUIRED"
+      "failed_elements": 0,
+      "minimum_bbox_delta_px": 0,
+      "status": "CONTAINMENT_PASS_HIGH_RISK_PENDING_INGAME"
     },
     {
       "asset": "C075FB49",
@@ -196,16 +196,6 @@
       "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4"
     },
     {
-      "asset": "62BEBF33",
-      "failed_elements": 1,
-      "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d"
-    },
-    {
-      "asset": "E3FD08BE",
-      "failed_elements": 1,
-      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc"
-    },
-    {
       "asset": "C075FB49",
       "failed_elements": 9,
       "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9"
@@ -246,13 +236,28 @@
   },
   "summary": {
     "current_hd_pixel_visual_pass": 4,
-    "current_hd_rework_required": 12,
+    "current_hd_rework_required": 10,
     "elements_total": 201,
-    "elements_fail": 93,
+    "elements_fail": 91,
     "direct_queue_scope": 126,
     "pending_production_localize_text": 63,
     "hold_strict_recheck_zoom_review": 47,
     "approved_dds_count": 0,
-    "current_approved_lock_count": 0
-  }
+    "current_approved_lock_count": 0,
+    "current_hd_containment_pass_high_risk": 2
+  },
+  "high_risk_containment_pass_pending_ingame": [
+    {
+      "asset": "62BEBF33",
+      "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
+      "edge_touch": "top",
+      "independent_C_report": "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json"
+    },
+    {
+      "asset": "E3FD08BE",
+      "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
+      "edge_touch": "top",
+      "independent_C_report": "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json"
+    }
+  ]
 }
