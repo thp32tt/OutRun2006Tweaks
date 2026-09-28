@@ -285,6 +285,7 @@ if ($running) { throw "OutRun or outrun-vr-host.exe is still running. Close it b
 Seal-PendingSessionLogs
 
 $backendSwitchTransaction = Start-BackendSwitchTransaction
+$removeBackendSwitchTransactionBackup = $true
 try {
 Copy-Required "dinput8.dll"
 
@@ -439,11 +440,15 @@ if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
     try {
         Restore-BackendSwitchTransaction $backendSwitchTransaction
     } catch {
-        throw ("Backend selection failed: {0}; rollback failed: {1}" -f $selectionFailure.Message,$_.Exception.Message)
+        $removeBackendSwitchTransactionBackup = $false
+        throw ("Backend selection failed: {0}; rollback failed: {1}; backup preserved at {2}" -f
+            $selectionFailure.Message,$_.Exception.Message,$backendSwitchTransaction.BackupRoot)
     }
     throw $selectionFailure
 } finally {
-    Remove-BackendSwitchTransaction $backendSwitchTransaction
+    if ($removeBackendSwitchTransactionBackup) {
+        Remove-BackendSwitchTransaction $backendSwitchTransaction
+    }
 }
 
 Write-Host "OutRun renderer mode activated: $Backend"
