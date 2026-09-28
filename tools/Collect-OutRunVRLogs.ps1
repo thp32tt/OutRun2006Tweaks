@@ -299,6 +299,29 @@ if($sha -eq 'unknown'){
     $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
     if(Test-Path $source){$sha=(Get-Content $source -Raw).Trim()}
 }
+$dxvkAnalyzer=Join-Path $root 'analyze_dxvk_session.py'
+if($rendererTarget -eq 'dxvk' -and (Test-Path $dxvkAnalyzer)){
+    $python=Get-Command python -ErrorAction SilentlyContinue
+    if($python){
+        try{
+            $dxvkOut=Join-Path $dest 'DXVK_SESSION_SUMMARY.json'
+            & $python.Source $dxvkAnalyzer --session-dir $dest --output $dxvkOut
+            if($LASTEXITCODE -ne 0){
+                throw "DXVK session analyzer exited with code $LASTEXITCODE"
+            }
+            if(Test-Path $dxvkOut){$copied+='DXVK_SESSION_SUMMARY.json'}
+        }catch{
+            @(
+                'DXVK_SESSION_ANALYSIS_STATUS=ERROR'
+                "message=$($_.Exception.Message)"
+            )|Set-Content (Join-Path $dest 'DXVK_SESSION_ANALYSIS_ERROR.txt') -Encoding UTF8
+            $copied+='DXVK_SESSION_ANALYSIS_ERROR.txt'
+        }
+    }else{
+        Write-Warning 'python not found; DXVK session JSON extraction skipped.'
+    }
+}
+
 $analyzer=Join-Path $root 'Analyze-OutRunVRSession.ps1'
 if(Test-Path $analyzer){
     try {
