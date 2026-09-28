@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00026",
+  "wave_id": "W00008",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T03:15:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION",
+  "initial_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
+  "final_precommit_head_sha": "5814a150ea14b1d5bea58ce00d3c9e3e58bde390",
+  "preserved_intervening_peer_head": true,
+  "preserved_head_message": "localization: classify W00008 B Total Rank zoom assets [AUTO:LOCALIZATION-LOCALIZATION_B-00027]",
+  "contract": {
+    "path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "git_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7"
+  },
+  "queue": {
+    "path": "localization/graphics/asset_queue.csv",
+    "git_blob_sha": "0fa6d01a1407bc47a0a29374796b62366909b8cf",
+    "authoritative_queue_modified": false,
+    "c_reconciliation_required": true,
+    "unresolved_odd_zoom_review_before": 17,
+    "lane_local_classified_count": 4,
+    "expected_unresolved_odd_zoom_review_after_c_merge": 13,
+    "classified_indices": [
+      33,
+      35,
+      37,
+      45
+    ],
+    "preserve_original_indices": [
+      33,
+      37,
+      45
+    ],
+    "localizable_text_identified_indices": [
+      35
+    ]
+  },
+  "source_policy": {
+    "project_source_identity_record": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "semantic_visual_source_repo": "Sonic-TV/OR2006Sprites",
+    "semantic_visual_source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "relation_to_project": "Pinned canonical OR2-HD-GUI upstream recorded by current GitHub project state; original decoded PNG/SVG/atlas used only for zoom classification and preserve-vs-translate evidence.",
+    "production_rule": "No candidate DDS is emitted from zoom classification alone; any future Korean DDS must be rebuilt from the exact applicable HD English source and pass the mandatory side-by-side/containment gates."
+  },
+  "translation_cross_reference": {
+    "source": "Total Rank",
+    "korean": "종합 랭크",
+    "evidence_path": "localization/graphics/transcriptions.jsonl",
+    "evidence_git_blob_sha": "4387cff8159594067ec507c03cdbbf06790ea878",
+    "existing_reference_assets": [
+      "39229D64",
+      "FF2462BB"
+    ]
+  },
+  "assets": [
+    {
+      "queue_index": 33,
+      "asset": "FBCAB18D",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.png",
+        "git_blob_sha": "8fe5548942a4d41011dcc8de967ad7fc3fc07eba"
+      },
+      "observed": "Three mechanic character poses; only small embedded cap/shirt logo artwork is visible. No localizable UI word text.",
+      "protected_or_symbolic_text": [
+        "embedded cap/shirt logo artwork"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 35,
+      "asset": "E989E3B7",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.png",
+        "git_blob_sha": "7377da8531185e7e0df1bd399c044a0f1e85bd9b"
+      },
+      "observed": "Girlfriend character poses plus two speech-bubble/panel headers reading Total Rank.",
+      "localizable_text": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "occurrences_observed": 2
+        }
+      ],
+      "resolution": "LOCALIZABLE_TEXT_IDENTIFIED_PENDING_PRODUCTION",
+      "candidate_required": true,
+      "candidate_modified": false,
+      "next_action": "C should reconcile this zoom_review row into the production backlog; future A odd-shard production must use the exact HD English source, preserve panel artwork, and pass zero-pixel/alpha/orientation/source-side-by-side QA."
+    },
+    {
+      "queue_index": 37,
+      "asset": "515DCBB2",
+      "queue_path": "textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.png",
+        "git_blob_sha": "e3ff5510f7d08200964ab481642da9b08fa0b407"
+      },
+      "observed": "Six girlfriend character poses only; no visible user-facing word text.",
+      "protected_or_symbolic_text": [],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 45,
+      "asset": "1F77CB88",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.png",
+        "git_blob_sha": "f6e8aee6a2ae6008888a98eb17416403d1be7a48"
+      },
+      "observed": "Keyboard-control keycap atlas: F1, F2, Esc, Tab, Enter/return and directional-arrow legends. These identify physical input keys rather than translatable UI prose.",
+      "protected_or_symbolic_text": [
+        "F1",
+        "F2",
+        "Esc",
+        "Tab",
+        "Enter/return key legend",
+        "directional arrows"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    }
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "blocker_handling": "Unchanged dependency-blocked odd REWORK rows were skipped per current contract; no speculative rewrite or repeated blocker-only cycle.",
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_CURRENT_HEAD",
+    "direct_github_source_identity": "PASS",
+    "visual_zoom_review": "PASS_4_CLASSIFIED",
+    "preserve_vs_translate_classification": "PASS_3_PRESERVE_1_LOCALIZABLE",
+    "translation_cross_reference": "PASS_TOTAL_RANK_TO_종합_랭크",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "FBCAB18D",
+    "E989E3B7",
+    "515DCBB2",
+    "1F77CB88"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00008 lane A materially advances four odd-shard zoom-review assets. Three require no Korean raster candidate and are preserve-original; E989E3B7 contains two localizable Total Rank labels and is positively identified for future Korean production using the existing canonical translation 종합 랭크. No DDS bytes were changed, no runtime behavior is claimed, and RUNTIME_VALIDATION remains UNTESTED."
+}

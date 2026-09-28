@@ -1,0 +1,78 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00026",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00008",
+  "recorded_at_kst": "2026-09-29T03:15:00+09:00",
+  "initial_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
+  "final_precommit_head_sha": "5814a150ea14b1d5bea58ce00d3c9e3e58bde390",
+  "preserved_intervening_head": true,
+  "preserved_head_message": "localization: classify W00008 B Total Rank zoom assets [AUTO:LOCALIZATION-LOCALIZATION_B-00027]",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; unchanged REWORK blockers skipped; mandatory fallback ladder step 2; no work stealing; no shared-state mutation.",
+  "report": "localization/graphics/role_A/20260929-0315-A00026/A00026_W00008_ZOOM_REVIEW_RESOLUTION.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_CLASSIFICATION",
+    "classified_indices": [
+      33,
+      35,
+      37,
+      45
+    ],
+    "preserve_original_indices": [
+      33,
+      37,
+      45
+    ],
+    "localizable_text_identified_indices": [
+      35
+    ],
+    "localizable_asset": "E989E3B7",
+    "localizable_text": [
+      {
+        "source": "Total Rank",
+        "korean": "종합 랭크",
+        "occurrences_observed": 2
+      }
+    ],
+    "unresolved_odd_zoom_review_before": 17,
+    "expected_unresolved_odd_zoom_review_after_c_merge": 13,
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "FBCAB18D",
+    "E989E3B7",
+    "515DCBB2",
+    "1F77CB88"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00008 A satisfies the minimum-progress contract by classifying four unresolved odd-shard zoom-review items from direct GitHub source evidence: three preserve-original/no-localizable-text and E989E3B7 promoted to the localization production backlog for Total Rank x2 -> 종합 랭크. No DDS bytes changed; runtime remains UNTESTED.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "localization/graphics/transcriptions.jsonl",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "localization/graphics/role_A/20260929-0315-A00026/A00026_W00008_ZOOM_REVIEW_RESOLUTION.json"
+  ]
+}
