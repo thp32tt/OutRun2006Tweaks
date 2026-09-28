@@ -36,8 +36,8 @@ Each set contains ten distinct review passes and derives the next set's directio
 ### B. One-click payload identity
 - Preflight is strong before mutation.
 - **F01/F03 structurally sealed for the one-click target path 2026-09-28:** a target-named `slots/<VariantId>` payload is rejected unless its source SHA plus game DLL/host hashes match the canonical packaged backend, and the selector attests the exact root game DLL/host/provider bytes plus forbidden-file state before session handoff. The attestation is persisted as `ROOT_PAYLOAD_ATTESTATION.json` (`e4f0ca88479d131a743b30e4ece92a90433b5784`, gate `36394761652` PASS).
-- **F06 remains open:** selector mutation is still sequential and has no rollback if a filesystem/INI mutation fails midway.
-- F07 remains open: failures before normal session creation still need stronger durable diagnostics/behavioral coverage.
+- **F06 closed 2026-09-28:** backend selection now snapshots mutable root binaries/config/state before mutation, restores the prior state after injected mid-selection failure, removes a partially created session root, and preserves the backup directory if rollback itself fails. `Test-BackendSelectorTransaction.ps1` executes this behavior in the one-click gate.
+- **F07 closed for the pre-session boundary 2026-09-28:** selector failures before normal session creation persist structured diagnostics for source resolution, process guard, pending-log archival, transaction snapshot and mutation/session setup with root-sidecar fallback; one-click preflight failures also persist structured evidence and invalidate stale prior PASS reports. Exact-SHA gate `36396768691` passes on `8f8595d0c2cc6db80afd89f0108b02438dd4e10e`. Post-launch exception/stuck-host survivability remains separate S09 F31/F32 work.
 
 ### C. DX11 activation
 - Native draw remains correctly dormant.
@@ -60,15 +60,15 @@ Each set contains ten distinct review passes and derives the next set's directio
 
 ### F. Diagnostics / CI
 - Normal game failures are sealed before exit-code propagation.
-- Launch exceptions, stuck host teardown and pre-session selector failures can bypass automatic ZIP collection.
-- One-click CI is mostly structural/textual; behavior tests are still needed.
+- Pre-session selector/preflight failures now persist durable structured diagnostics even when no normal session exists; launch exceptions and stuck-host teardown can still bypass normal automatic ZIP collection (S09 F31/F32).
+- One-click CI now behavior-tests selector mid-mutation rollback plus pre-session selector diagnostics; broader launcher/preflight and post-launch failure injection coverage remains open.
 - The stale baseline/one-click verifier literals were reconciled (`243f5600dc2064cb795a283286e27ae399510b32`, `1090264633ee7dd30eba883721114ed7a5039620`). The exposed compile failure was traced to accidental truncation of `outrun_renderer.cpp` and `stereo_renderer_r7.inc` by earlier disassembly-contract centralization commits; full bodies were restored without reverting the intended shared-contract substitutions (`8cbf77086ce143c496e66f94d815c760df9c6c30`, `e46be02786f80aa9e554a24323714194b586d1f6`). Backend Conversion Gate run `36389674398` then passed through Win32 build, binary verification and artifact upload. Runtime/HMD validation remains UNTESTED.
 
 ## Evidence-driven implementation order
 
 1. **DONE 2026-09-28:** Reconcile stale gate verifiers and restore the accidentally truncated renderer bodies. Backend Conversion Gate run `36389674398` passes through Win32 build/binary verification/artifact upload on `e46be02786f80aa9e554a24323714194b586d1f6`; no runtime claim is made.
 2. **PARTIAL 2026-09-28:** F13/F14 producer-catalog drift/omissions are closed at `d2d02c774ee85046acd42a453f2cf1f392927a20` with exact-SHA gate `36391517935` PASS. F15 projected semantic expressiveness remains open.
-3. **PARTIAL 2026-09-28:** F01/F03 one-click payload identity is structurally sealed at `e4f0ca88479d131a743b30e4ece92a90433b5784` with gate `36394761652` PASS. F06 transactional rollback and F07 pre-session failure diagnostics remain open.
+3. **DONE 2026-09-28 for pre-session lifecycle:** F01/F03 payload identity is sealed, F06 transactional rollback is behavior-tested, and F07 pre-session selector/preflight diagnostics are durable. Exact-SHA Backend Conversion Gate `36396768691` PASS on `8f8595d0c2cc6db80afd89f0108b02438dd4e10e`, artifact `10958453229` (`sha256:eb0664bf837afe314b67f32d077626fdeee551988c8c1fccade8efcda5873f76`). Post-launch F31/F32 diagnostics remain separate.
 4. Tighten DX11 census/activation gates and transport parity.
 5. **PROVENANCE/VERSION/LIFECYCLE DONE 2026-09-28:** F24 runtime-version attestation, F08/F09 archive/cache/package-provider provenance, and F12 device-recreation provider/capability re-attestation are enforced and gate-tested. Hardware visual/runtime validation is still required.
 6. Obtain stock DXVK SAFE and DX11 observation one-run Quest 3 evidence.
