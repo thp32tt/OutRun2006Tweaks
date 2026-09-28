@@ -6,6 +6,7 @@ on:
     branches:
       - vr-d3d9ex-candidate/r69-perf-exp-all
       - vr-d3d9ex-candidate/r69-perf-exp-all-v2
+      - vr-d3d9ex-candidate/r69-perf-exp-all-v3
     paths:
       - 'src/vr/**'
       - 'vrhost/**'
@@ -47,6 +48,9 @@ jobs:
           - id: EXP_ALL_V2
             ref: 60d1c483d79eb2d883ab9fd4f3d65bcbb693695b
             note: reviewed V2 with QPC fence, explicit-state hardening, deferred failed-render ACK and shadow reset
+          - id: EXP_ALL_V3
+            ref: 18b81a86a62f564f45175c260c8ff072c02b29bb
+            note: V2 plus selective draw-proven XYZRHW shadow capture, thread-safe shadow diagnostics and deferred-query cleanup
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,11 +70,33 @@ jobs:
           (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
           cmake --build build-game --config Release --target outrun2006tweaks
 
-      - name: Build x64 D3D11 OpenXR host
+      - name: Build x64 D3D11 OpenXR host and deterministic smoke tests
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-host
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-shader-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-direct-ack-identity-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+
+      - name: Run deterministic no-HMD host smoke tests
+        shell: pwsh
+        run: |
+          $tests=@(
+            'outrun-vr-shader-smoke.exe',
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe',
+            'outrun-vr-r32-policy-smoke.exe',
+            'outrun-vr-direct-ack-identity-smoke.exe',
+            'outrun-vr-protocol-v3-smoke.exe',
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-host-state-v3-channel-smoke.exe',
+            'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
+            'outrun-vr-host-pose-v3-validation-smoke.exe'
+          )
+          foreach($test in $tests){
+            $testPath=Join-Path 'build-host/bin' $test
+            if(-not (Test-Path $testPath)){ throw "host smoke missing: $test" }
+            & $testPath
+            if($LASTEXITCODE -ne 0){ throw "host smoke failed ($LASTEXITCODE): $test" }
+          }
 
       - name: Assemble test candidate
         shell: pwsh
@@ -145,10 +171,10 @@ jobs:
             'OUTRUN R69 REMAINING PERFORMANCE EXPERIMENTS'
             ''
             'FAST TEST ORDER'
-            '1. EXP_ALL_V2 first.'
-            '2. If EXP_ALL_V2 is visually correct and the bad frame-drop section improves, stop.'
-            '3. If EXP_ALL_V2 shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
-            '4. If EXP_ALL_V2 shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
+            '1. EXP_ALL_V3 first.'
+            '2. If EXP_ALL_V3 is visually correct and the bad frame-drop section improves, stop.'
+            '3. If EXP_ALL_V3 shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
+            '4. If EXP_ALL_V3 shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
             '5. If only occasional hitch remains, test EXP_FENCE2.'
             '6. If HUD/particle-heavy CPU drops remain, test EXP_XYZCACHE.'
             '7. P5_BASE is only the before/after control.'
