@@ -9,6 +9,7 @@
 
 #include "hook_mgr.hpp"
 #include "game_addrs.hpp"
+#include "vr/d3d11/startup_census.hpp"
 
 namespace OutRunVRDeviceProbe
 {
@@ -53,6 +54,17 @@ namespace OutRunVRDeviceProbe
                 const HRESULT exHr = device->QueryInterface(
                     __uuidof(IDirect3DDevice9Ex), reinterpret_cast<void**>(&deviceEx));
                 const bool isEx = SUCCEEDED(exHr) && deviceEx;
+
+                const auto dx11 = outrun::vr::dx11::inspect_source_device(device);
+                spdlog::info(
+                    "VR DX11 R71 census: observed={} size={}x{} sourceFormat={} nativeFormat={} msaa={} bootstrapCompatible={}",
+                    dx11.observed ? 1 : 0,
+                    dx11.width,
+                    dx11.height,
+                    static_cast<int>(dx11.source_format),
+                    static_cast<int>(dx11.native_format),
+                    static_cast<int>(dx11.multisample),
+                    dx11.native_bootstrap_compatible ? 1 : 0);
 
                 LUID adapterLuid{};
                 bool luidValid = false;
