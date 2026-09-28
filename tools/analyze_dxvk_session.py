@@ -13,6 +13,8 @@ PROBE_RE = re.compile(
     r"nonSystem=(?P<nonSystem>[01]) gameLocal=(?P<gameLocal>[01]) "
     r"stockInterop=(?P<stockInterop>[01]) D3D9Ex=(?P<d3d9Ex>[01]) "
     r"stockHr=0x(?P<stockHr>[0-9A-Fa-f]+) exHr=0x(?P<exHr>[0-9A-Fa-f]+)"
+    r"(?: source=(?P<source>[A-Za-z0-9_.-]+) "
+    r"attestation=(?P<attestation>\d+))?"
 )
 
 DXVK_VERSION_RE = re.compile(r"DXVK:\s*v?(?P<version>\d+\.\d+(?:\.\d+)?)", re.I)
@@ -52,6 +54,12 @@ def main() -> int:
                         "d3d9_ex": bool(int(data["d3d9Ex"])),
                         "stock_interop_hr_hex": "0x" + data["stockHr"].upper(),
                         "d3d9_ex_hr_hex": "0x" + data["exHr"].upper(),
+                        "source": data.get("source") or "",
+                        "attestation": (
+                            int(data["attestation"])
+                            if data.get("attestation")
+                            else None
+                        ),
                     }
                 )
 
@@ -74,7 +82,19 @@ def main() -> int:
         except (OSError, json.JSONDecodeError):
             preflight = None
 
-    latest = probes[-1] if probes else None
+    creation_probes = [
+        probe
+        for probe in probes
+        if probe.get("source", "").startswith("create-device-")
+    ]
+    latest = creation_probes[-1] if creation_probes else (probes[-1] if probes else None)
+    creation_re_attestation_passed = bool(creation_probes) and all(
+        probe["provider_loaded"]
+        and probe["non_system"]
+        and probe["game_local"]
+        and probe["stock_interop"]
+        for probe in creation_probes
+    )
     expected_version = None
     expected_hash = None
     if isinstance(preflight, dict) and isinstance(preflight.get("Dxvk"), dict):
@@ -95,6 +115,10 @@ def main() -> int:
 
     if latest is None:
         status = "NO_DXVK_PROVIDER_CENSUS"
+    elif not creation_probes:
+        status = "DXVK_DEVICE_CREATION_REATTESTATION_MISSING"
+    elif not creation_re_attestation_passed:
+        status = "DXVK_DEVICE_CREATION_REATTESTATION_FAILED"
     elif not latest["provider_loaded"]:
         status = "D3D9_PROVIDER_NOT_LOADED"
     elif not latest["non_system"]:
@@ -113,7 +137,7 @@ def main() -> int:
         status = "STOCK_DXVK_PROVIDER_VERIFIED"
 
     report = {
-        "SchemaVersion": 1,
+        "SchemaVersion": 2,
         "Status": status,
         "MultiviewPromotionAllowed": False,
         "PromotionNote": (
@@ -123,6 +147,9 @@ def main() -> int:
         ),
         "ProviderProbe": latest,
         "AllProviderProbes": probes,
+        "DeviceCreationReattestations": creation_probes,
+        "DeviceCreationReattestationCount": len(creation_probes),
+        "DeviceCreationReattestationPassed": creation_re_attestation_passed,
         "PreflightDxvkVersion": expected_version,
         "PreflightProviderSha256": expected_hash,
         "DetectedDxvkVersions": unique_versions,
@@ -135,7 +162,8 @@ def main() -> int:
     output.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(
         f"DXVK session extraction: status={status} "
-        f"probes={len(probes)} logs={len(dxvk_log_files)}"
+        f"probes={len(probes)} createAttest={len(creation_probes)} "
+        f"logs={len(dxvk_log_files)}"
     )
     return 0
 
