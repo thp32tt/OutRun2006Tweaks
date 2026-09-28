@@ -64,6 +64,7 @@ SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES",
 CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
 ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
+NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
 WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
 WATCHDOG_STALL_MINUTES = int(os.getenv("WATCHDOG_STALL_MINUTES", "12"))
 WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20"))
@@ -223,6 +224,7 @@ runtime = {
     "expected_project_id": EXPECTED_PROJECT_ID or None,
     "project_id_match": PROJECT_ID_MATCH,
     "start_url": BASE_URL,
+    "novnc_public_url": NOVNC_PUBLIC_URL or None,
     "schedule_minutes": SCHEDULE_MINUTES,
     "status": "starting",
     "last_tick": None,
