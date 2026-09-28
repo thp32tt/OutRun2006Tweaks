@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: localization-automation-gate-${{ github.ref }}
-  cancel-in-progress: true
+  group: localization-automation-gate-${{ github.sha }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -31,6 +31,9 @@ jobs:
         env:
           GITHUB_EVENT_BEFORE: ${{ github.event.before }}
         run: python tools/localization/verify_automation_commit.py
+
+      - name: Verify parallel lane isolation
+        run: python tools/localization/verify_parallel_lane_commit.py
 
       - name: Mark candidate semantics
         run: |
