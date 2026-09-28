@@ -121,6 +121,51 @@ namespace OutRunVRHudInspector
             return Game::stg_stage_num ? static_cast<int>(*Game::stg_stage_num) : -1;
         }
 
+        std::string RawExeStackCandidates(
+            std::size_t maxWords = 192) noexcept
+        {
+            const auto* start = reinterpret_cast<const std::uintptr_t*>(
+                _AddressOfReturnAddress());
+            if (!start || !maxWords)
+                return {};
+
+            MEMORY_BASIC_INFORMATION mbi{};
+            if (!VirtualQuery(start, &mbi, sizeof(mbi)) ||
+                mbi.State != MEM_COMMIT ||
+                (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) != 0)
+                return {};
+
+            const auto regionEnd =
+                reinterpret_cast<std::uintptr_t>(mbi.BaseAddress) +
+                mbi.RegionSize;
+            std::string out;
+            std::uint32_t lastRva = 0;
+            std::size_t emitted = 0;
+            for (std::size_t i = 0; i < maxWords; ++i)
+            {
+                const auto addr =
+                    reinterpret_cast<std::uintptr_t>(start + i);
+                if (addr + sizeof(std::uintptr_t) > regionEnd)
+                    break;
+
+                const auto candidate =
+                    reinterpret_cast<const void*>(start[i]);
+                const std::uint32_t rva = ToExeRva(candidate);
+                if (!rva || rva == lastRva)
+                    continue;
+
+                char text[24]{};
+                std::snprintf(text, sizeof(text), "%s0x%08X",
+                    out.empty() ? "" : "/",
+                    static_cast<unsigned>(rva));
+                out += text;
+                lastRva = rva;
+                if (++emitted >= 32)
+                    break;
+            }
+            return out;
+        }
+
         void WriteEvent(EventKind kind, const char* eventName,
             const void* returnAddress,
             std::uint32_t arg0, std::uint32_t arg1,
@@ -184,20 +229,21 @@ namespace OutRunVRHudInspector
             if (!ShouldWrite(key, count))
                 return;
 
-            // R63: the exit confirmation HUD ("Are you sure?", YES/NO) is an
-            // existing unclassified menu path. Capture a small ASLR-safe stack
-            // sample only while the observed menu state is active so the next
-            // patch can use canonical EXE call-site ownership instead of a
-            // current_mode/stage heuristic.
+            // V7: x86/FPO builds often make RtlCaptureStackBackTrace stop
+            // at the common sprite helper. For unknown OutRun gameplay/GOAL
+            // overlays, also scan the committed stack memory for EXE return
+            // addresses. This is diagnostic only and never changes ownership.
             if (semantic.space ==
                     OutRunVR::GameSemantic::RenderScope::None &&
-                mode == 32 && stage == 60 && count <= 4)
+                (mode == STATE_GAME || mode == STATE_GOAL ||
+                 (mode == STATE_SUMO_FE && stage == 60)) &&
+                count <= 4)
             {
                 void* frames[16]{};
                 const USHORT frameCount = RtlCaptureStackBackTrace(
                     0, static_cast<DWORD>(std::size(frames)),
                     frames, nullptr);
-                std::string stack;
+                std::string unwind;
                 for (USHORT depth = 0; depth < frameCount; ++depth)
                 {
                     const auto rva = ToExeRva(frames[depth]);
@@ -206,13 +252,15 @@ namespace OutRunVRHudInspector
                     char text[24]{};
                     std::snprintf(
                         text, sizeof(text), "%s0x%08X",
-                        stack.empty() ? "" : "/",
+                        unwind.empty() ? "" : "/",
                         static_cast<unsigned>(rva));
-                    stack += text;
+                    unwind += text;
                 }
+                const std::string raw = RawExeStackCandidates();
                 spdlog::info(
-                    "VR R63 EXIT HUD STACK: event={} leaf=0x{:08X} a0={} a1={} stack={}",
-                    eventName, callRva, arg0, arg1, stack);
+                    "VR V7 OUTRUN HUD STACK: mode={} stage={} event={} leaf=0x{:08X} a0={} a1={} unwind={} raw={}",
+                    mode, stage, eventName, callRva, arg0, arg1,
+                    unwind, raw);
             }
 
             TraceFile
