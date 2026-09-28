@@ -64,6 +64,9 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
+        std::atomic<std::uint64_t> InputLayoutExactSamples{0};
+        std::atomic<std::uint64_t> InputLayoutUnsupportedSamples{0};
+        std::atomic<std::uint64_t> InputLayoutFvfPendingSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
         std::atomic<std::uint64_t> TexturedSamples{0};
         std::array<std::atomic<std::uint64_t>, UnsupportedBitCount>
@@ -154,6 +157,9 @@ namespace outrun::vr::dx11
             DWORD addressU = D3DTADDRESS_WRAP;
             DWORD addressV = D3DTADDRESS_WRAP;
             bool vertexDeclaration{};
+            bool inputLayoutExact{};
+            bool inputLayoutFvfPending{};
+            UINT inputLayoutElements{};
             bool vertexBufferPresent{};
             bool renderTargetPresent{};
             bool indexed{};
@@ -694,6 +700,15 @@ namespace outrun::vr::dx11
             device->GetSamplerState(0, D3DSAMP_MIPFILTER, &sig.mipFilter);
             device->GetSamplerState(0, D3DSAMP_ADDRESSU, &sig.addressU);
             device->GetSamplerState(0, D3DSAMP_ADDRESSV, &sig.addressV);
+
+            const auto inputLayout = translate_vertex_input_layout(
+                sig.vertexDeclaration ? sig.vertexDeclElementsData.data() : nullptr,
+                sig.vertexDeclaration ? sig.vertexDeclElements : 0,
+                sig.fvf,
+                sig.stride);
+            sig.inputLayoutExact = inputLayout.exact;
+            sig.inputLayoutFvfPending = inputLayout.fvfPending;
+            sig.inputLayoutElements = inputLayout.elementCount;
             return sig;
         }
 
@@ -715,6 +730,15 @@ namespace outrun::vr::dx11
             if (sig.vertexDeclaration)
                 VertexDeclarationSamples.fetch_add(
                     1, std::memory_order_relaxed);
+            if (sig.inputLayoutExact)
+                InputLayoutExactSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            else
+                InputLayoutUnsupportedSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            if (sig.inputLayoutFvfPending)
+                InputLayoutFvfPendingSamples.fetch_add(
+                    1, std::memory_order_relaxed);
             if (sig.indexed)
                 IndexedSamples.fetch_add(1, std::memory_order_relaxed);
             if (sig.textured)
@@ -723,7 +747,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R77 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R78 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfPending={}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -731,6 +755,9 @@ namespace outrun::vr::dx11
                     sig.vertexDeclaration ? 1 : 0,
                     sig.vertexDeclHash,
                     sig.vertexDeclElements,
+                    sig.inputLayoutExact ? 1 : 0,
+                    sig.inputLayoutElements,
+                    sig.inputLayoutFvfPending ? 1 : 0,
                     sig.streamOffset,
                     sig.stride,
                     sig.vertexBufferPresent ? 1 : 0,
@@ -829,7 +856,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R77 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, classified VB/IB update plans, texture mutation/update observation, and MANAGED reset-generation evidence; native draw routing remains disabled",
+                    "VR DX11 R78 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, MANAGED reset-generation evidence, and fail-closed declaration input-layout readiness; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -852,7 +879,7 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R77 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R78 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfPending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -897,6 +924,9 @@ namespace outrun::vr::dx11
                 managedLifetime.mirrorGeneration,
                 managedLifetime.mirrorShadowVersion,
                 managed_mirror_ready(managedLifetime) ? 1 : 0,
+                InputLayoutExactSamples.load(std::memory_order_relaxed),
+                InputLayoutUnsupportedSamples.load(std::memory_order_relaxed),
+                InputLayoutFvfPendingSamples.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -1093,6 +1123,7 @@ namespace outrun::vr::dx11
         const auto signature =
             inspect_source_signature(device, fixedFunction);
         note_signature(signature, primitive);
+        const bool inputLayoutExact = signature.inputLayoutExact;
 
         bool resourcesExact = signature.resourceIntrospectionComplete;
         if (!signature.resourceIntrospectionComplete)
@@ -1189,7 +1220,8 @@ namespace outrun::vr::dx11
             resourcesExact = false;
         }
 
-        if (unsupported == PipelineUnsupportedNone && topology.exact && resourcesExact)
+        if (unsupported == PipelineUnsupportedNone && topology.exact &&
+            resourcesExact && inputLayoutExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
         maybe_log();
