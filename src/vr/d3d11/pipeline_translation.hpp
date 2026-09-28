@@ -1,6 +1,8 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
+#include <d3d9.h>
 #include <d3d11.h>
 
 #include "vr/core/d3d9_draw_state.hpp"
@@ -39,4 +41,23 @@ namespace outrun::vr::dx11
 
     [[nodiscard]] PipelineTranslation translate_pipeline(
         const OutRunVR::DrawState::RenderStateSnapshot& source) noexcept;
+
+    // R78 translates an explicit D3D9 declaration into a canonical D3D11
+    // input-layout descriptor. FVF-only draws intentionally remain pending;
+    // programmable shader-signature compatibility remains an independent F21
+    // gate. exact therefore means descriptor-level translatability only.
+    struct VertexInputLayoutTranslation
+    {
+        std::array<D3D11_INPUT_ELEMENT_DESC, MAXD3DDECLLENGTH> elements{};
+        UINT elementCount = 0;
+        bool exact = false;
+        bool declarationPath = false;
+        bool fvfPending = false;
+    };
+
+    [[nodiscard]] VertexInputLayoutTranslation translate_vertex_input_layout(
+        const D3DVERTEXELEMENT9* source,
+        UINT count,
+        DWORD fvf,
+        UINT stream0Stride) noexcept;
 }
