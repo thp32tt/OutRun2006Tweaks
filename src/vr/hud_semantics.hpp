@@ -51,6 +51,14 @@ namespace OutRunVRHudSemantics
     // World-attached rival/heart markers remain true stereo billboards.
     constexpr SemanticInfo ClassifyCaller(std::uint32_t callRva) noexcept
     {
+        // R70 exact runtime-HMD evidence. These are five presentation-owned
+        // put_clip_sprite edges; nearby producers are not implicitly promoted.
+        if (callRva == 0x0460F1 || callRva == 0x0463D6 ||
+            callRva == 0x046410)
+            return { "MenuExactArrow", "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud };
+        if (callRva == 0x097BB7 || callRva == 0x097DA7)
+            return { "OutRunFinalResult", "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud };
+
         // HAM attached-heart draw; anchored by HeartDisp_PulseAngle=0x05B43A.
         if (InRange(callRva, 0x05B300, 0x05B700))
             return { "HeartDisp_car_heart", "WORLD_HEART", OutRunVR::GameSemantic::RenderScope::WorldBillboard };
@@ -118,7 +126,12 @@ namespace OutRunVRHudSemantics
     // Exact reverse-engineered anchor inventory from hooks_uiscaling.cpp.
     // This is a review/test source-of-truth, even where the anchor itself is
     // not a direct sprite call and therefore may not appear in hudtrace.csv.
-    inline constexpr std::array<SemanticAnchor, 55> Anchors{{
+    inline constexpr std::array<SemanticAnchor, 60> Anchors{{
+        {0x0460F1, "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact menu/list arrow #1"},
+        {0x0463D6, "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact menu/list arrow #2"},
+        {0x046410, "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact menu/list arrow #3"},
+        {0x097BB7, "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact OutRun result #1"},
+        {0x097DA7, "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact OutRun result #2"},
         {0x05B43A, "WORLD_HEART", OutRunVR::GameSemantic::RenderScope::WorldBillboard, "HeartDisp_car_heart pulse angle"},
         {0x060A21, "HUD_CTRL_ICON", OutRunVR::GameSemantic::RenderScope::ScreenHud, "set_icon_work girlfriend/control icon"},
         {0x060D40, "HUD_CTRL_ICON", OutRunVR::GameSemantic::RenderScope::ScreenHud, "ctrl_icon_work adjustment #1"},
@@ -183,6 +196,8 @@ namespace OutRunVRHudSemantics
         {0x0FCB20, "HUD_GF_SPEECH", OutRunVR::GameSemantic::RenderScope::ScreenHud, "speech initial position #4"},
     }};
 
+    static_assert(ClassifyCaller(0x0460F1).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
+    static_assert(ClassifyCaller(0x097BB7).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x060D40).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0BBA89).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0B9F3A).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
