@@ -86,6 +86,8 @@ namespace outrun::vr::dx11
             bool vertexDeclaration{};
             bool indexed{};
             bool textured{};
+            bool texture0Present{};
+            bool texture1Present{};
             bool depthPresent{};
             bool resourceIntrospectionComplete{true};
             bool fixedFunction{};
@@ -293,7 +295,7 @@ namespace outrun::vr::dx11
 
             IDirect3DSurface9* depth = nullptr;
             const HRESULT depthHr = device->GetDepthStencilSurface(&depth);
-            if (FAILED(depthHr))
+            if (FAILED(depthHr) && depthHr != D3DERR_NOTFOUND)
             {
                 sig.resourceIntrospectionComplete = false;
             }
@@ -325,15 +327,15 @@ namespace outrun::vr::dx11
                 ib->Release();
             }
 
-            bool texture0 = false;
-            bool texture1 = false;
             const bool texture0Observed = inspect_texture(
-                device, 0, sig.texture0Type, sig.texture0Format, texture0);
+                device, 0, sig.texture0Type, sig.texture0Format,
+                sig.texture0Present);
             const bool texture1Observed = inspect_texture(
-                device, 1, sig.texture1Type, sig.texture1Format, texture1);
+                device, 1, sig.texture1Type, sig.texture1Format,
+                sig.texture1Present);
             if (!texture0Observed || !texture1Observed)
                 sig.resourceIntrospectionComplete = false;
-            sig.textured = texture0 || texture1;
+            sig.textured = sig.texture0Present || sig.texture1Present;
 
             if (fixedFunction)
             {
@@ -590,25 +592,26 @@ namespace outrun::vr::dx11
             UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
             resourcesExact = false;
         }
-        if (signature.textured)
+        if (signature.texture0Present &&
+            !translate_resource_format(
+                signature.texture0Format, ResourceRole::Texture).exact)
         {
-            for (const D3DFORMAT format :
-                 { signature.texture0Format, signature.texture1Format })
-            {
-                if (format != D3DFMT_UNKNOWN &&
-                    !translate_resource_format(
-                        format, ResourceRole::Texture).exact)
-                {
-                    UnsupportedTextureFormatSamples.fetch_add(
-                        1, std::memory_order_relaxed);
-                    resourcesExact = false;
-                }
-            }
-
-            // A bound texture whose descriptor could not be observed leaves
-            // D3DFMT_UNKNOWN behind; resourceIntrospectionComplete above makes
-            // that sample fail closed rather than silently exact.
+            UnsupportedTextureFormatSamples.fetch_add(
+                1, std::memory_order_relaxed);
+            resourcesExact = false;
         }
+        if (signature.texture1Present &&
+            !translate_resource_format(
+                signature.texture1Format, ResourceRole::Texture).exact)
+        {
+            UnsupportedTextureFormatSamples.fetch_add(
+                1, std::memory_order_relaxed);
+            resourcesExact = false;
+        }
+
+        // A bound texture whose descriptor could not be observed leaves
+        // D3DFMT_UNKNOWN behind; both the introspection gate and the bound
+        // stage format checks above fail closed.
         if (!translate_resource_format(
                 signature.renderTargetFormat, ResourceRole::Color).exact)
         {
