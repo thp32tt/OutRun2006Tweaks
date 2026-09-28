@@ -6,7 +6,7 @@
   "base_sha": "cbe8e4a4974eb17ed5936574e0869fc383c290f3",
   "automation_validation": "RETRY_PENDING",
   "runtime_validation": "UNTESTED",
-  "summary": "A index 57 39229D64 retry queued with overlapping-sprite-cell QA disambiguation: per-element moved source-diff masks plus asset-wide zero-overflow enforcement.",
+  "summary": "A lane moved to next odd-index REWORK_REQUIRED target FF2462BB (index 51). GitHub Actions is queued with a new no-resample/minimal-fit reworker to avoid B91 ragged broad-shrink artifacts while enforcing zero-pixel containment.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
@@ -19,8 +19,12 @@
     "Strict post-QA on retry: collateral_pixels=0; outside_cells_changed_pixels=0; introduced_alpha_outside_cells=0.",
     "Next A-shard REWORK_REQUIRED candidate by queue priority/index age: FF2462BB index 51; C85 reason REWORK_REQUIRED_ARTIFACT (ragged stroke degradation after shrink).",
     "localization/progress.json absent; maintained file is localization/progress/progress.json",
-    "QA ownership fix commit f37fe7080bbf3ec7f77b25a4507885bbe905d208: overlapping sprite cells no longer use ambiguous whole-cell bbox attribution."
+    "QA ownership fix commit f37fe7080bbf3ec7f77b25a4507885bbe905d208: overlapping sprite cells no longer use ambiguous whole-cell bbox attribution.",
+    "A next target: FF2462BB index 51 from current asset_queue.csv.",
+    "C85: B91 staged FF2462BB decoded bbox/guard PASS but REWORK_REQUIRED_ARTIFACT due severe ragged resampling after broad shrink.",
+    "Reworker commit 71f348f618667c0919c6e9e56b96f9b39f3423ad.",
+    "Workflow retarget commit dc12c3d458d8d4dbf51b8bc55dc8b36e41dba159."
   ],
-  "result_sha": "PENDING_GITHUB_ACTIONS_RETRY",
+  "result_sha": "PENDING_GITHUB_ACTIONS_FF2462BB",
   "note": "No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed."
 }
