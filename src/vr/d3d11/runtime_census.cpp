@@ -45,6 +45,18 @@ namespace outrun::vr::dx11
         std::mutex SignatureMutex;
         std::unordered_set<std::uint64_t> SignatureHashes;
 
+        struct FixedFunctionStageSignature
+        {
+            DWORD colorOp = D3DTOP_DISABLE;
+            DWORD colorArg1 = D3DTA_TEXTURE;
+            DWORD colorArg2 = D3DTA_CURRENT;
+            DWORD alphaOp = D3DTOP_DISABLE;
+            DWORD alphaArg1 = D3DTA_TEXTURE;
+            DWORD alphaArg2 = D3DTA_CURRENT;
+            DWORD texCoordIndex = 0;
+            DWORD textureTransformFlags = D3DTTFF_DISABLE;
+        };
+
         struct SourceSignature
         {
             DWORD fvf{};
@@ -60,6 +72,7 @@ namespace outrun::vr::dx11
             D3DFORMAT texture0Format = D3DFMT_UNKNOWN;
             D3DRESOURCETYPE texture1Type = D3DRTYPE_FORCE_DWORD;
             D3DFORMAT texture1Format = D3DFMT_UNKNOWN;
+            std::array<FixedFunctionStageSignature, 4> fixedFunctionStages{};
             DWORD colorOp0 = D3DTOP_DISABLE;
             DWORD alphaOp0 = D3DTOP_DISABLE;
             DWORD colorOp1 = D3DTOP_DISABLE;
@@ -103,6 +116,17 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.alphaOp0);
             hash = hash_mix(hash, sig.colorOp1);
             hash = hash_mix(hash, sig.alphaOp1);
+            for (const auto& stage : sig.fixedFunctionStages)
+            {
+                hash = hash_mix(hash, stage.colorOp);
+                hash = hash_mix(hash, stage.colorArg1);
+                hash = hash_mix(hash, stage.colorArg2);
+                hash = hash_mix(hash, stage.alphaOp);
+                hash = hash_mix(hash, stage.alphaArg1);
+                hash = hash_mix(hash, stage.alphaArg2);
+                hash = hash_mix(hash, stage.texCoordIndex);
+                hash = hash_mix(hash, stage.textureTransformFlags);
+            }
             hash = hash_mix(hash, sig.minFilter);
             hash = hash_mix(hash, sig.magFilter);
             hash = hash_mix(hash, sig.mipFilter);
@@ -262,14 +286,26 @@ namespace outrun::vr::dx11
 
             if (fixedFunction)
             {
-                device->GetTextureStageState(
-                    0, D3DTSS_COLOROP, &sig.colorOp0);
-                device->GetTextureStageState(
-                    0, D3DTSS_ALPHAOP, &sig.alphaOp0);
-                device->GetTextureStageState(
-                    1, D3DTSS_COLOROP, &sig.colorOp1);
-                device->GetTextureStageState(
-                    1, D3DTSS_ALPHAOP, &sig.alphaOp1);
+                for (DWORD stage = 0;
+                     stage < static_cast<DWORD>(sig.fixedFunctionStages.size());
+                     ++stage)
+                {
+                    auto& out = sig.fixedFunctionStages[stage];
+                    device->GetTextureStageState(stage, D3DTSS_COLOROP, &out.colorOp);
+                    device->GetTextureStageState(stage, D3DTSS_COLORARG1, &out.colorArg1);
+                    device->GetTextureStageState(stage, D3DTSS_COLORARG2, &out.colorArg2);
+                    device->GetTextureStageState(stage, D3DTSS_ALPHAOP, &out.alphaOp);
+                    device->GetTextureStageState(stage, D3DTSS_ALPHAARG1, &out.alphaArg1);
+                    device->GetTextureStageState(stage, D3DTSS_ALPHAARG2, &out.alphaArg2);
+                    device->GetTextureStageState(stage, D3DTSS_TEXCOORDINDEX, &out.texCoordIndex);
+                    device->GetTextureStageState(
+                        stage, D3DTSS_TEXTURETRANSFORMFLAGS,
+                        &out.textureTransformFlags);
+                }
+                sig.colorOp0 = sig.fixedFunctionStages[0].colorOp;
+                sig.alphaOp0 = sig.fixedFunctionStages[0].alphaOp;
+                sig.colorOp1 = sig.fixedFunctionStages[1].colorOp;
+                sig.alphaOp1 = sig.fixedFunctionStages[1].alphaOp;
             }
 
             device->GetSamplerState(0, D3DSAMP_MINFILTER, &sig.minFilter);
@@ -332,6 +368,32 @@ namespace outrun::vr::dx11
                     sig.mipFilter,
                     sig.addressU,
                     sig.addressV);
+
+                if (sig.fixedFunction)
+                {
+                    for (std::size_t stageIndex = 0;
+                         stageIndex < sig.fixedFunctionStages.size();
+                         ++stageIndex)
+                    {
+                        const auto& stage = sig.fixedFunctionStages[stageIndex];
+                        if (stage.colorOp == D3DTOP_DISABLE &&
+                            stage.alphaOp == D3DTOP_DISABLE)
+                            continue;
+
+                        spdlog::info(
+                            "VR DX11 R72 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X}",
+                            unique,
+                            stageIndex,
+                            stage.colorOp,
+                            stage.colorArg1,
+                            stage.colorArg2,
+                            stage.alphaOp,
+                            stage.alphaArg1,
+                            stage.alphaArg2,
+                            stage.texCoordIndex,
+                            stage.textureTransformFlags);
+                    }
+                }
 
                 if (sig.vertexDeclaration && sig.vertexDeclElements > 0)
                 {
