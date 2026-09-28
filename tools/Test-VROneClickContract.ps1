@@ -234,8 +234,8 @@ switch ([string]$target.RendererTarget) {
             throw 'DXVK passive provider probe is missing.'
         }
         $deviceProbe = Get-Content (Join-Path $repoRoot 'src/vr/d3d9/device_probe.cpp') -Raw
-        if ($deviceProbe -notmatch [regex]::Escape('OutRunVR::Dxvk::ProbeProvider(device)')) {
-            throw 'DXVK provider census is not connected to the game-device lifecycle.'
+        if ($deviceProbe -notmatch [regex]::Escape('OutRunVR::Dxvk::LogProviderCensus')) {
+            throw 'DXVK provider census is not connected to the startup device lifecycle.'
         }
         $providerProbe = Get-Content (Join-Path $repoRoot 'src/vr/d3d9/dxvk_provider_probe.cpp') -Raw
         if ($providerProbe -notmatch [regex]::Escape('gameLocalProvider')) {
