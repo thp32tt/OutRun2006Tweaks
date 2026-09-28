@@ -35,3 +35,7 @@ R15 already publishes ResetEx failure through `RuntimeEligibility::ExternalSafet
 ## V6 intent
 
 No visual policy change. V6 is a structural-identity cleanup and regression guard on top of the current V5 runtime behavior.
+
+
+## Build gate
+The V6 candidate is accepted for HMD testing only if the dedicated structure-test workflow passes the proven-baseline, architecture, R32 review, Win32 game build, x64 host build, and deterministic no-HMD smoke tests.
