@@ -37,7 +37,9 @@ def main() -> None:
     census_contract = {
         "resourceIntrospectionComplete": "sample-level fail-closed resource observation",
         "ResourceIntrospectionFailureSamples": "durable failure counter",
-        "if (!signature.resourceIntrospectionComplete)": "exactness rejection gate",
+        "bool resourcesExact = signature.resourceIntrospectionComplete;": "exactness starts from observation completeness",
+        "if (!signature.resourceIntrospectionComplete)": "durable failure accounting gate",
+        "if (unsupported == PipelineUnsupportedNone && topology.exact && resourcesExact)": "exact sample fail-closed gate",
         "GetStreamSource": "vertex-buffer observation",
         "GetRenderTarget": "render-target observation",
         "GetDepthStencilSurface": "depth observation",
