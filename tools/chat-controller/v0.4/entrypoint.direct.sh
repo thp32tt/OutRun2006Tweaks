@@ -25,6 +25,11 @@ start_vnc
 websockify --web=/usr/share/novnc/ 6080 localhost:5900 >/logs/novnc.log 2>&1 &
 
 start_chrome() {
+  # A previous Chrome crash/replacement can leave ProcessSingleton files behind.
+  # Remove them only immediately before starting a new Chrome process.
+  rm -f /data/browser-profile/SingletonLock \
+        /data/browser-profile/SingletonCookie \
+        /data/browser-profile/SingletonSocket
   google-chrome --no-sandbox --disable-dev-shm-usage --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 --user-data-dir=/data/browser-profile --no-first-run --no-default-browser-check https://chatgpt.com/ >>/logs/chrome.log 2>&1 &
 }
 
@@ -55,6 +60,16 @@ for i in $(seq 1 60); do
     break
   fi
   sleep 1
+done
+
+# Do not start the controller into a guaranteed attach failure. Keep the UI
+# container alive and retry Chrome until DevTools is really reachable.
+while ! curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; do
+  echo "$(date -Is) Chrome DevTools still unavailable before controller start; retrying" >>/logs/controller-startup.log
+  pkill -x chrome >/dev/null 2>&1 || true
+  sleep 2
+  start_chrome
+  sleep 8
 done
 
 echo "$(date -Is) starting controller" >>/logs/controller-startup.log
