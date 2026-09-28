@@ -193,6 +193,8 @@ namespace OutRunVRStereo
         // false negatives are impossible because registration sets the bit.
         std::atomic<std::uint64_t> R30TrackedVertexBloom{ 0 };
         std::atomic<std::uint64_t> R30TrackedIndexBloom{ 0 };
+        std::atomic<std::uint32_t> R30VertexRegistrationsInFlight{ 0 };
+        std::atomic<std::uint32_t> R30IndexRegistrationsInFlight{ 0 };
 
         template <typename T>
         std::uint64_t R30ShadowBloomBit(T* buffer) noexcept
@@ -220,6 +222,48 @@ namespace OutRunVRStereo
                 (R30TrackedIndexBloom.load(
                     std::memory_order_relaxed) &
                  R30ShadowBloomBit(buffer)) != 0;
+        }
+
+        bool R30WaitForVertexRegistration(
+            IDirect3DVertexBuffer9* buffer) noexcept
+        {
+            if (!buffer)
+                return false;
+            if (R30MaybeTrackedVertex(buffer))
+            {
+                while (R30VertexRegistrationsInFlight.load(
+                           std::memory_order_acquire) != 0)
+                    SwitchToThread();
+                return R30MaybeTrackedVertex(buffer);
+            }
+            if (R30VertexRegistrationsInFlight.load(
+                    std::memory_order_acquire) == 0)
+                return false;
+            while (R30VertexRegistrationsInFlight.load(
+                       std::memory_order_acquire) != 0)
+                SwitchToThread();
+            return R30MaybeTrackedVertex(buffer);
+        }
+
+        bool R30WaitForIndexRegistration(
+            IDirect3DIndexBuffer9* buffer) noexcept
+        {
+            if (!buffer)
+                return false;
+            if (R30MaybeTrackedIndex(buffer))
+            {
+                while (R30IndexRegistrationsInFlight.load(
+                           std::memory_order_acquire) != 0)
+                    SwitchToThread();
+                return R30MaybeTrackedIndex(buffer);
+            }
+            if (R30IndexRegistrationsInFlight.load(
+                    std::memory_order_acquire) == 0)
+                return false;
+            while (R30IndexRegistrationsInFlight.load(
+                       std::memory_order_acquire) != 0)
+                SwitchToThread();
+            return R30MaybeTrackedIndex(buffer);
         }
 
         void R30RebuildTrackedBloomsLocked() noexcept
@@ -398,18 +442,23 @@ namespace OutRunVRStereo
             entry->size = desc.Size;
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
-            // Publish the fast-gate bit before the registry entry becomes
-            // visible. A concurrent Lock may see a transient false positive
-            // and wait on the registry mutex, which is safe; the reverse order
-            // could create a false negative and lose the first CPU write.
+            R30VertexRegistrationsInFlight.fetch_add(
+                1, std::memory_order_acq_rel);
             R30TrackedVertexBloom.fetch_or(
                 R30ShadowBloomBit(buffer), std::memory_order_release);
-            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-            auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
-            if (inserted)
-                R30ShadowRegistryGeneration.fetch_add(
-                    1, std::memory_order_release);
-            return inserted ? entry : it->second;
+            R30ShadowPtr result;
+            {
+                std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+                auto [it, inserted] =
+                    R30VertexShadows.emplace(buffer, entry);
+                if (inserted)
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                result = inserted ? entry : it->second;
+            }
+            R30VertexRegistrationsInFlight.fetch_sub(
+                1, std::memory_order_release);
+            return result;
         }
 
         R30ShadowPtr R30EnsureIndexShadow(IDirect3DIndexBuffer9* buffer)
@@ -429,14 +478,23 @@ namespace OutRunVRStereo
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
             entry->indexFormat = desc.Format;
+            R30IndexRegistrationsInFlight.fetch_add(
+                1, std::memory_order_acq_rel);
             R30TrackedIndexBloom.fetch_or(
                 R30ShadowBloomBit(buffer), std::memory_order_release);
-            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-            auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
-            if (inserted)
-                R30ShadowRegistryGeneration.fetch_add(
-                    1, std::memory_order_release);
-            return inserted ? entry : it->second;
+            R30ShadowPtr result;
+            {
+                std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+                auto [it, inserted] =
+                    R30IndexShadows.emplace(buffer, entry);
+                if (inserted)
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                result = inserted ? entry : it->second;
+            }
+            R30IndexRegistrationsInFlight.fetch_sub(
+                1, std::memory_order_release);
+            return result;
         }
 
         void R30BeginObservedLock(const R30ShadowPtr& entry,
@@ -573,7 +631,7 @@ namespace OutRunVRStereo
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && data && *data &&
-                R30MaybeTrackedVertex(buffer))
+                R30WaitForVertexRegistration(buffer))
             {
                 // The Bloom gate makes unrelated world-buffer locks a
                 // lock-free fast reject. Only draw-proven/explicit-XYZRHW
@@ -588,7 +646,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall R30VertexBufferUnlockDest(
             IDirect3DVertexBuffer9* buffer)
         {
-            const auto entry = R30MaybeTrackedVertex(buffer)
+            const auto entry = R30WaitForVertexRegistration(buffer)
                 ? R30FindVertexShadow(buffer)
                 : R30ShadowPtr{};
             // The pointer returned by Lock is guaranteed valid until Unlock,
@@ -610,7 +668,7 @@ namespace OutRunVRStereo
         {
             const ULONG refs =
                 R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0 && R30MaybeTrackedVertex(buffer))
+            if (refs == 0 && R30WaitForVertexRegistration(buffer))
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 if (R30VertexShadows.erase(buffer) != 0)
@@ -630,7 +688,7 @@ namespace OutRunVRStereo
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && data && *data &&
-                R30MaybeTrackedIndex(buffer))
+                R30WaitForIndexRegistration(buffer))
             {
                 if (auto entry = R30FindIndexShadow(buffer))
                     R30BeginObservedLock(
@@ -642,7 +700,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall R30IndexBufferUnlockDest(
             IDirect3DIndexBuffer9* buffer)
         {
-            const auto entry = R30MaybeTrackedIndex(buffer)
+            const auto entry = R30WaitForIndexRegistration(buffer)
                 ? R30FindIndexShadow(buffer)
                 : R30ShadowPtr{};
             if (entry)
@@ -662,7 +720,7 @@ namespace OutRunVRStereo
         {
             const ULONG refs =
                 R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0 && R30MaybeTrackedIndex(buffer))
+            if (refs == 0 && R30WaitForIndexRegistration(buffer))
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 if (R30IndexShadows.erase(buffer) != 0)
