@@ -177,8 +177,25 @@ require_all("src/hooks_graphics.cpp", [
 require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'R69IsSelectorAtlasReserveCandidate',
     'desc.Width == 2048 && desc.Height == 2048',
-    '384 MiB total cap preserved',
+    'R14GeneralShadowBytes',
+    'std::uint64_t bytes, bool emergencyReserve',
+    'later general textures retain the 368 MiB class budget',
+    'total remains capped at 384 MiB',
 ], "P8_SELECTOR_ATLAS_RESERVE")
+require_all("src/hooks_uiscaling.cpp", [
+    'Module::exe_ptr(0xBA9D0)',
+    'Module::exe_ptr(0xBAAA0)',
+    'Module::exe_ptr(0xBAAEA)',
+    'R70ExactScreenHudClipSpriteCalls',
+    '0x460F1, 0x463D6, 0x46410',
+    '0x97BB7, 0x97DA7',
+], "P8_R70_OUTRUN_HUD_EXACT_OWNERS")
+require_all("src/vr/hud_semantics.hpp", [
+    '"HUD_MENU_ARROW"',
+    '"HUD_OUTRUN_RESULT"',
+    'ClassifyCaller(0x0460F1)',
+    'ClassifyCaller(0x097BB7)',
+], "P8_R70_RUNTIME_SEMANTICS")
 require_all("src/game_addrs.hpp", [
     'is_vr_gameplay_presentation()',
     'GameState::STATE_START',
