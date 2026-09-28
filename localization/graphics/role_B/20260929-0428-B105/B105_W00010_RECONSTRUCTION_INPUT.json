@@ -1,0 +1,467 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00033",
+  "attempt": "1/3",
+  "wave_id": "W00010",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T04:28:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "2adf7aca8b9656947fa35cfb0e6ebae438715e71",
+  "final_precommit_head_sha": "e18578daebc5a99407b2590fcac4bfc93c083972",
+  "preserved_peer_lane_commit": true,
+  "peer_lane_task": "LOCALIZATION-LOCALIZATION_A-00032",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_LOCALIZE_TEXT_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PENDING_REMOTE_POSTCOMMIT",
+  "runtime_validation": "UNTESTED",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+    "MANDATORY_FALLBACK_LADDER_STEP_5_ASSET_SPECIFIC_QA_REBUILD_TOOLING"
+  ],
+  "source_policy": {
+    "target_ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "upstream_graphics_reference": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "upstream_tree_sha": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "queue": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "queue_blob_sha": "7268e6083554ab8e63506342345fc302a9038dfc",
+    "selected_even_indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "shared_queue_modified": false
+  },
+  "assets": [
+    {
+      "queue_index": 34,
+      "asset": "B7E25BAD",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "source_png_git_blob_sha": "44de47d0cd44d5f52edb4e8c493cdd2e83c3e11e",
+      "hd_release": {
+        "path": "Release/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+        "git_blob_sha": "9ca9aa7e2e2528a101379257035533ea9d175b17",
+        "bytes": 33554560,
+        "expected_dimensions": [
+          4096,
+          2048
+        ],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "hd_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_HOLL_RANK_Exst/4x_B7E25BAD_1024x512_atlas.json",
+        "git_blob_sha": "a6fbbfac9fd81e196b8c9a04c7efd797a0545ff9"
+      },
+      "elements": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrences": 1,
+          "sprite": "sprite_9",
+          "sprite_rect_hd": [
+            1280,
+            1032,
+            2048,
+            1016
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        }
+      ],
+      "preserve_original": [
+        "A/B/C/D/E rank-grade letters",
+        "Holly character artwork",
+        "lens flare",
+        "orange burst background"
+      ],
+      "material_advance": "Exact HD sprite-cell mapping pinned; prior classification-only state now has an executable immutable GitHub DDS/atlas source gate."
+    },
+    {
+      "queue_index": 44,
+      "asset": "19CEDB9",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_png_git_blob_sha": "788031fe1ec254239df83767daeb3a417516fe02",
+      "hd_release": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+        "git_blob_sha": "2c7fd312717fc7a8a8681ef112f32756f85e0ec3",
+        "bytes": 16777344,
+        "expected_dimensions": [
+          2048,
+          2048
+        ],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "hd_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/4x_019CEDB9_512x512_atlas.json",
+        "git_blob_sha": "c1b0897229077f8bc5987af25f14c5b751aa3411"
+      },
+      "elements": [
+        {
+          "source": "Sector2",
+          "korean": "섹터 2",
+          "sprite": "sprite_247",
+          "sprite_rect_hd": [
+            0,
+            96,
+            200,
+            72
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Sector1",
+          "korean": "섹터 1",
+          "sprite": "sprite_250",
+          "sprite_rect_hd": [
+            200,
+            96,
+            200,
+            72
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "WIN",
+          "korean": "승리",
+          "sprite": "sprite_251",
+          "sprite_rect_hd": [
+            400,
+            96,
+            120,
+            72
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "LOSE",
+          "korean": "패배",
+          "sprite": "sprite_252",
+          "sprite_rect_hd": [
+            520,
+            96,
+            120,
+            72
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Result",
+          "korean": "결과",
+          "sprite": "sprite_246",
+          "sprite_rect_hd": [
+            0,
+            168,
+            280,
+            104
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Ranking",
+          "korean": "랭킹",
+          "sprite": "sprite_261",
+          "sprite_rect_hd": [
+            280,
+            168,
+            280,
+            104
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Stage",
+          "korean": "스테이지",
+          "sprite": "sprite_262",
+          "sprite_rect_hd": [
+            560,
+            168,
+            216,
+            104
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Rank1",
+          "korean": "랭크 1",
+          "sprite": "sprite_263",
+          "sprite_rect_hd": [
+            776,
+            168,
+            200,
+            104
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "You",
+          "korean": "나",
+          "sprite": "sprite_272",
+          "sprite_rect_hd": [
+            1728,
+            184,
+            200,
+            88
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Diff",
+          "korean": "차이",
+          "sprite": "sprite_282",
+          "sprite_rect_hd": [
+            1840,
+            304,
+            136,
+            88
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Sector3",
+          "korean": "섹터 3",
+          "sprite": "sprite_336",
+          "sprite_rect_hd": [
+            1824,
+            1176,
+            200,
+            72
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "TOP",
+          "korean": "TOP",
+          "sprite": "sprite_352",
+          "sprite_rect_hd": [
+            288,
+            1408,
+            208,
+            144
+          ],
+          "render_action": "PRESERVE_EXACT_ORIGINAL_NO_GLYPH_CHANGE",
+          "pixel_mask_state": "PRESERVE_ORIGINAL"
+        },
+        {
+          "source": "Rival",
+          "korean": "라이벌",
+          "sprite": "sprite_353",
+          "sprite_rect_hd": [
+            496,
+            1412,
+            208,
+            140
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        }
+      ],
+      "preserve_original": [
+        "mph/km/h unit labels",
+        "all numeric glyphs",
+        "1P/2P/3P player markers",
+        "cars",
+        "rank digits/ordinals not listed for localization",
+        "bowling/checkered-flag and other icons"
+      ],
+      "material_advance": "Thirteen transcription segments are mapped to exact 4x atlas sprite cells; TOP is explicitly frozen because target text is unchanged."
+    },
+    {
+      "queue_index": 52,
+      "asset": "A8CE339F",
+      "queue_path": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+      "source_png_git_blob_sha": "adca9ddd8df0e0aaefa3ef81326e50fce26ad902",
+      "hd_release": {
+        "path": "Release/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+        "git_blob_sha": "53f75d347682c7b5f436a6d45dc3e1950a42b5eb",
+        "bytes": 2097280,
+        "expected_dimensions": [
+          2048,
+          1024
+        ],
+        "expected_format": "DXT5",
+        "expected_mipmaps": 1
+      },
+      "hd_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_fight_Exst/4x_A8CE339F_512x256_atlas.json",
+        "git_blob_sha": "67c08611ea816fb273c0fcdca3b9867b93a0b7fd"
+      },
+      "elements": [
+        {
+          "source": "Extra Time",
+          "korean": "추가 시간",
+          "physical_occurrences": 1,
+          "sprite": "sprite_26",
+          "sprite_rect_hd": [
+            0,
+            200,
+            504,
+            104
+          ],
+          "pixel_mask_state": "HOLD_EXACT_HD_DECODED_FULL_EFFECT_BBOX"
+        },
+        {
+          "source": "Start",
+          "korean": "시작",
+          "physical_occurrences": 1,
+          "sprite": "sprite_24",
+          "sprite_rect_hd": [
+            0,
+            304,
+            776,
+            104
+          ],
+          "pixel_mask_state": "HOLD_TEXT_ONLY_MASK_INSIDE_RULER_SPRITE"
+        },
+        {
+          "source": "Goal",
+          "korean": "골",
+          "physical_occurrences": 1,
+          "sprite": "sprite_24",
+          "sprite_rect_hd": [
+            0,
+            304,
+            776,
+            104
+          ],
+          "pixel_mask_state": "HOLD_TEXT_ONLY_MASK_INSIDE_RULER_SPRITE"
+        },
+        {
+          "source": "Start",
+          "korean": "시작",
+          "physical_occurrences": 1,
+          "sprite": "sprite_25",
+          "sprite_rect_hd": [
+            776,
+            304,
+            776,
+            104
+          ],
+          "pixel_mask_state": "HOLD_TEXT_ONLY_MASK_INSIDE_RULER_SPRITE"
+        },
+        {
+          "source": "Goal",
+          "korean": "골",
+          "physical_occurrences": 1,
+          "sprite": "sprite_25",
+          "sprite_rect_hd": [
+            776,
+            304,
+            776,
+            104
+          ],
+          "pixel_mask_state": "HOLD_TEXT_ONLY_MASK_INSIDE_RULER_SPRITE"
+        }
+      ],
+      "preserve_original": [
+        "6P/5P/4P/3P/2P/1P markers",
+        "1st/2nd/3rd/4th ordinal/rank tokens",
+        "digits 0-9",
+        "ruler/tick artwork"
+      ],
+      "material_advance": "All five physical text occurrences are assigned to exact HD atlas cells; ruler sprites are explicitly protected from whole-cell erasure."
+    },
+    {
+      "queue_index": 172,
+      "asset": "6C9B3611",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+      "source_png_git_blob_sha": "204536355e3b5378f8b51dc426509fa67d16d5d3",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+        "git_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800",
+        "bytes": 4194432,
+        "expected_dimensions": [
+          1024,
+          1024
+        ],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "hd_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_6C9B3611_256x256_atlas.json",
+        "git_blob_sha": "ec37221aeaa00a9eb3f1d1362b3b5985de351feb"
+      },
+      "elements": [
+        {
+          "source": "START",
+          "korean": "시작",
+          "physical_occurrences": 1,
+          "sprite": "sprite_788",
+          "sprite_rect_hd": [
+            0,
+            136,
+            748,
+            888
+          ],
+          "pixel_mask_state": "HOLD_TEXT_ONLY_MASK_INSIDE_COURSE_ART_SPRITE"
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "physical_occurrences": 1,
+          "sprite": "sprite_788",
+          "sprite_rect_hd": [
+            0,
+            136,
+            748,
+            888
+          ],
+          "pixel_mask_state": "HOLD_TEXT_ONLY_MASK_INSIDE_COURSE_ART_SPRITE"
+        }
+      ],
+      "preserve_original": [
+        "OutRun2SP logo",
+        "course montage/path artwork"
+      ],
+      "material_advance": "Both labels are tied to the exact only HD sprite cell and explicitly require text-only masks so protected course/logo art cannot be erased."
+    }
+  ],
+  "deterministic_tool": {
+    "path": "localization/graphics/role_B/20260929-0428-B105/B105_W00010_GITHUB_SOURCE_GATE.py",
+    "purpose": "Fetch pinned upstream GitHub raw DDS/atlas bytes, verify Git blob identities, DDS dimensions/format/mipmap count, and exact semantic sprite rectangles without N100 or a local clone.",
+    "expected_run_result": "PASS before any candidate renderer may write bytes"
+  },
+  "production_blocker": {
+    "scope": "CANDIDATE_DDS_WRITE",
+    "reason": "The connected GitHub file read path exposes the pinned large Release DDS blob identities but not their binary bodies. Without exact HD decoded pixels, full-effect English text bboxes, alpha/background reconstruction, raw orientation and 1-pixel containment cannot be safely proven in this worker.",
+    "unsafe_actions_rejected": [
+      "use N100/local clone",
+      "use uploaded/local ZIP as source",
+      "upscale stock PNG/DDS",
+      "erase whole mixed-art sprite cells",
+      "claim containment PASS without exact HD decoded pixels"
+    ],
+    "next_safe_action": "Run the committed GitHub-only source gate against the immutable upstream commit, decode exact HD pixels, derive text-only full-effect masks/bboxes, then render candidates and create identical-crop ENGLISH SOURCE vs KOREAN CANDIDATE proofs."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_34_44_52_172",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_PRECOMMIT_REFRESH_AFTER_A00032",
+    "peer_commit_preserved": "PASS_A00032_HEAD_USED_AS_BASE",
+    "immutable_git_source_identity": "PASS_PATHS_AND_BLOB_IDS_PINNED_4_OF_4",
+    "stock_visual_semantic_review": "PASS_4_OF_4_GITHUB_ORIGINAL_PNG",
+    "atlas_sprite_mapping": "PASS_NEW_LAYOUT_INPUT",
+    "candidate_dds_modified": false,
+    "mandatory_english_source_comparison_gate": "HOLD_NO_CANDIDATE_DDS_WRITTEN",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE_DDS_WRITTEN",
+    "dds_alpha_orientation": "HOLD_EXACT_HD_DECODE_REQUIRED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00010 lane B materially advanced four unfinished even-shard localize_text assets with exact HD atlas-cell translation mappings and a deterministic immutable-GitHub source gate. No unsafe DDS was guessed from lower-resolution or local data. Candidate production remains HOLD until exact HD decoded-pixel masks/bboxes can satisfy zero-pixel, alpha, orientation, artifact and English-source comparison gates. Runtime remains UNTESTED."
+}

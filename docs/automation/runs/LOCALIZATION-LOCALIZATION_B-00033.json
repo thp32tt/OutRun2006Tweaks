@@ -1,0 +1,37 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00033",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00010",
+  "recorded_at_kst": "2026-09-29T04:28:00+09:00",
+  "initial_head_sha": "2adf7aca8b9656947fa35cfb0e6ebae438715e71",
+  "final_precommit_head_sha": "e18578daebc5a99407b2590fcac4bfc93c083972",
+  "preserved_peer_lane_commit": true,
+  "peer_lane_task": "LOCALIZATION-LOCALIZATION_A-00032",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_LOCALIZE_TEXT_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PENDING_REMOTE_POSTCOMMIT",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20260929-0428-B105/B105_W00010_RECONSTRUCTION_INPUT.json",
+  "deterministic_tool": "localization/graphics/role_B/20260929-0428-B105/B105_W00010_GITHUB_SOURCE_GATE.py",
+  "material_deliverable": {
+    "type": "4_ASSET_EXACT_ATLAS_MAPPING_PLUS_PINNED_GITHUB_SOURCE_GATE",
+    "even_indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "candidate_dds_modified": false
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "B preserved A00032 and committed only B lane-local reconstruction/tooling evidence. Automatic post-commit validation is pending; runtime validation is UNTESTED."
+}
