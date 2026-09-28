@@ -226,6 +226,55 @@ ordered(
     "R23DirectHold.valid = true;",
 )
 
+# Set 08 F30 deliberately retains exactly one left/right CopyResource pair per
+# accepted DirectGPU producer frame. Guard against accidental reintroduction of
+# the legacy private snapshot/fence path or additional hold-copy amplification.
+if stage_body.count("CopyResource(") != 2:
+    raise SystemExit(
+        "R23StageDirectHold must contain exactly one left/right CopyResource pair"
+    )
+for forbidden in (
+    "directSnapshotLeft_",
+    "directSnapshotRight_",
+    "CommitDirectStereoSource(",
+    "context_->Flush()",
+    "c.context_->Flush()",
+):
+    if forbidden in stage_body:
+        raise SystemExit(
+            "R23StageDirectHold regressed into legacy snapshot/flush work: "
+            + forbidden
+        )
+
+direct_commit_start = host_r23.find("bool R23CommitDirectAfterValidation")
+classic_commit_start = host_r23.find(
+    "bool R23CommitClassicAfterValidation", direct_commit_start
+)
+if min(direct_commit_start, classic_commit_start) < 0:
+    raise SystemExit("could not isolate R23 production DirectGPU commit path")
+direct_commit_body = host_r23[direct_commit_start:classic_commit_start]
+ordered(
+    direct_commit_body,
+    "vrhost/src/main_r23.cpp::R23CommitDirectAfterValidation",
+    "c.PrepareDirectStereoSource(frame)",
+    "R23ValidateDirectResourceSize(c, frame)",
+    "R23StageDirectHold(c, frame)",
+    "c.directTransportReady_ = true;",
+    "c.directFrameValid_ = true;",
+)
+for forbidden in (
+    "CommitDirectStereoSource(",
+    "directSnapshotLeft_",
+    "directSnapshotRight_",
+    "CopyResource(",
+    "Flush()",
+):
+    if forbidden in direct_commit_body:
+        raise SystemExit(
+            "R23 production DirectGPU commit path bypasses the single-copy hold stage: "
+            + forbidden
+        )
+
 # Keep the smoke target in the host build graph; it provides compile-time ABI
 # checks in addition to this source-order/lifetime verifier.
 require(
