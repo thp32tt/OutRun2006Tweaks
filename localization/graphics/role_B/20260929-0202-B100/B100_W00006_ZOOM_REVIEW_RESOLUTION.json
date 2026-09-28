@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00021",
+  "wave_id": "W00006",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T02:02:28+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION",
+  "initial_head_sha": "4205e141d6a81df04ec4e38a55f569ab68c683da",
+  "final_precommit_head_sha": "2a6617c78b3fdd5c90747f6bc4292104d0f493f5",
+  "preserved_intervening_peer_head": true,
+  "peer_lane": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00020",
+    "commit_sha": "2a6617c78b3fdd5c90747f6bc4292104d0f493f5",
+    "task_record_blob_sha": "a452978e06f6db27612f9e51dd55a6592aac28cf",
+    "preserved": true
+  },
+  "queue": {
+    "git_blob_sha": "da7f46c94c028c51c086ee1207f1ed00f13358eb",
+    "rows_verified": {
+      "136": "136,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "144": "144,textures/load/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "146": "146,textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "148": "148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,zoom_review,blocked_review,needs_zoom_review,"
+    },
+    "authoritative_queue_modified": false,
+    "c_reconciliation_required": true,
+    "lane_local_resolved_count": 4,
+    "expected_unresolved_even_zoom_review_after_c_merge": 22
+  },
+  "source_policy": {
+    "source_repo": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "relation_to_project": "Canonical HD source upstream recorded by localization/graphics/HD_SOURCE_MIGRATION_20260926.json; stock original PNG is used as semantic/orientation reference.",
+    "preserve_rule": "Product/game logos and brand marks are preserve-original and are not translated."
+  },
+  "assets": [
+    {
+      "queue_index": 136,
+      "asset": "2B785F6A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.png",
+        "git_blob_sha": "6ffd6d7fc091b1c3362708c19028979985747127"
+      },
+      "original_dds_git_blob_sha": "3a7ec7d1e4f3a09fdeeb1108c8557f0fe166fd30",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds",
+        "git_blob_sha": "2dd6d11395800af8a61e3c80189a8b77787c0ee8",
+        "bytes": 16777344
+      },
+      "hd_working_source_png_git_blob_sha": "8205987d3e7917b2977ed3005dea241fb3ab9348",
+      "observed": "Eight scenic/course-card images with repeated OutRun2SP product logos; no other user-facing text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 144,
+      "asset": "35361191",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.png",
+        "git_blob_sha": "51c22507efd072fb067326091370b0e9882b30bb"
+      },
+      "original_dds_git_blob_sha": "d64c26fca89c0a06c316588b32451d910619d015",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds",
+        "git_blob_sha": "87d08832c10d4d30a618c129f4a5fde30c862b62",
+        "bytes": 16777344
+      },
+      "hd_working_source_png_git_blob_sha": "6e2071b544a6d711bf1c1f7d85f18c0bbb80d93b",
+      "observed": "Four scenic/course-card images with repeated OutRun2 product logos; no other user-facing text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2 logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 146,
+      "asset": "39018963",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.png",
+        "git_blob_sha": "f60fe87d1bfe12e25025bc4849dc4a3ffb9f0757"
+      },
+      "original_dds_git_blob_sha": "75919c8c1932b444bc22fea07ad65ce4382a6fa8",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds",
+        "git_blob_sha": "b76dc05046503a205893f2a1f2006894cf432729",
+        "bytes": 8388736
+      },
+      "hd_working_source_png_git_blob_sha": "0ef9f62d4507f57dd74f56218c6dea35a186d62b",
+      "observed": "Two scenic/course-card images with repeated OutRun2 product logos; no other user-facing text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2 logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 148,
+      "asset": "3AE1BB60",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.png",
+        "git_blob_sha": "db795333e7fc13fe4d83eb6df3d4776297434349"
+      },
+      "original_dds_git_blob_sha": "41b7e0cac5d3683031711daf5465cbb4dad66e77",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds",
+        "git_blob_sha": "eea91277881bf6b015777a2176622f624efc22a7",
+        "bytes": 4194432
+      },
+      "hd_working_source_png_git_blob_sha": "c11a57de89dfa2e4e7c1d103c790ef9918a9af2d",
+      "observed": "Two scenic/course-card images with repeated OutRun2SP product logos; no other user-facing text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS",
+    "direct_github_source_identity": "PASS",
+    "visual_zoom_review": "PASS_4_ASSETS",
+    "preserve_vs_translate_classification": "PASS_4_PRESERVE_ORIGINAL",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Resolved four previously blocked even-shard zoom_review rows using direct GitHub source evidence. Each contains scenic/course-card artwork plus only protected OutRun2/OutRun2SP logo text, so no Korean DDS candidate is required. The lane-local evidence is ready for C to reconcile into the shared queue; no shared state or peer files were changed and no runtime claim is made."
+}

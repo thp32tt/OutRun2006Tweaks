@@ -1,0 +1,67 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00021",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00006",
+  "recorded_at_kst": "2026-09-29T02:02:28+09:00",
+  "initial_head_sha": "4205e141d6a81df04ec4e38a55f569ab68c683da",
+  "final_precommit_head_sha": "2a6617c78b3fdd5c90747f6bc4292104d0f493f5",
+  "preserved_intervening_head": true,
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane B even-index primary shard; REWORK blockers skipped without repetition; mandatory fallback ladder step 2 resolved four zoom_review assets as preserve-original/no-localizable-text; no work stealing and no shared-state mutation.",
+  "report": "localization/graphics/role_B/20260929-0202-B100/B100_W00006_ZOOM_REVIEW_RESOLUTION.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_RESOLUTION",
+    "resolved_indices": [
+      136,
+      144,
+      146,
+      148
+    ],
+    "assets": [
+      "2B785F6A",
+      "35361191",
+      "39018963",
+      "3AE1BB60"
+    ],
+    "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+    "unresolved_even_zoom_review_before": 26,
+    "lane_local_unresolved_even_zoom_review_after": 22,
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "2B785F6A",
+    "35361191",
+    "39018963",
+    "3AE1BB60"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "peer_lane": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00020",
+    "commit_sha": "2a6617c78b3fdd5c90747f6bc4292104d0f493f5",
+    "task_record_blob_sha": "a452978e06f6db27612f9e51dd55a6592aac28cf",
+    "preserved": true
+  },
+  "conclusion": "W00006 B satisfies the minimum-progress contract with four machine-readable zoom-review resolutions. Indices 136, 144, 146 and 148 contain only scenic/course-card artwork plus protected OutRun2/OutRun2SP logos, so they require no Korean raster replacement. Runtime remains UNTESTED.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00020.json",
+    "localization/graphics/role_B/20260929-0202-B100/B100_W00006_ZOOM_REVIEW_RESOLUTION.json"
+  ]
+}
