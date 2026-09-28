@@ -18,6 +18,8 @@ services:
       CHAT_SLOTS: "3"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
+      CHATGPT_PROJECT_URL: "${VR_PROJECT_URL:-}"
+      REQUIRE_PROJECT_URL: "true"
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "false"
       FRESH_CHAT_EACH_RUN: "false"
