@@ -1,0 +1,679 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B94",
+  "task_id": "B94-20260928-1336",
+  "timestamp_kst": "2026-09-28T13:38:52+09:00",
+  "base_head": "bcc50a32b89414f866adc592b176acce7f4087dc",
+  "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "index": 60,
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "previous_candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+  "candidate_sha256": "4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7",
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "bytes": 33554560,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "reworked_elements": [
+    {
+      "key": "dumped_white",
+      "old_localized_bbox": [
+        3155,
+        273,
+        3605,
+        390
+      ],
+      "original_bbox": [
+        3169,
+        270,
+        3605,
+        390
+      ],
+      "target_bbox": [
+        3170,
+        276,
+        3604,
+        388
+      ],
+      "scale": 0.964444
+    },
+    {
+      "key": "dumped_big",
+      "old_localized_bbox": [
+        2652,
+        1300,
+        3437,
+        1504
+      ],
+      "original_bbox": [
+        2525,
+        1302,
+        3570,
+        1515
+      ],
+      "target_bbox": [
+        2652,
+        1303,
+        3437,
+        1507
+      ],
+      "scale": 1.0
+    },
+    {
+      "key": "target_top",
+      "old_localized_bbox": [
+        2943,
+        152,
+        3101,
+        238
+      ],
+      "original_bbox": [
+        2910,
+        145,
+        3134,
+        223
+      ],
+      "target_bbox": [
+        2952,
+        146,
+        3091,
+        222
+      ],
+      "scale": 0.883721
+    },
+    {
+      "key": "stage_clear",
+      "old_localized_bbox": [
+        3422,
+        355,
+        4062,
+        463
+      ],
+      "original_bbox": [
+        3444,
+        362,
+        3956,
+        462
+      ],
+      "target_bbox": [
+        3445,
+        366,
+        3955,
+        452
+      ],
+      "scale": 0.796875
+    },
+    {
+      "key": "rank_table",
+      "old_localized_bbox": [
+        1387,
+        817,
+        1568,
+        918
+      ],
+      "original_bbox": [
+        1320,
+        836,
+        1635,
+        940
+      ],
+      "target_bbox": [
+        1387,
+        837,
+        1568,
+        938
+      ],
+      "scale": 1.0
+    },
+    {
+      "key": "easy",
+      "old_localized_bbox": [
+        3258,
+        800,
+        3556,
+        970
+      ],
+      "original_bbox": [
+        3180,
+        825,
+        3624,
+        962
+      ],
+      "target_bbox": [
+        3289,
+        826,
+        3525,
+        961
+      ],
+      "scale": 0.794118
+    }
+  ],
+  "qa": {
+    "elements": 21,
+    "failed_elements": 0,
+    "rows": [
+      {
+        "key": "dumped_top",
+        "source": "DUMPED!",
+        "korean": "차였어요!",
+        "sprite_cell": [
+          165,
+          120,
+          665,
+          245
+        ],
+        "original_bbox": [
+          165,
+          120,
+          665,
+          245
+        ],
+        "localized_diff_bbox": [
+          165,
+          120,
+          665,
+          245
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "dumped_white",
+        "source": "DUMPED!",
+        "korean": "차였어요!",
+        "sprite_cell": [
+          3140,
+          270,
+          3605,
+          390
+        ],
+        "original_bbox": [
+          3169,
+          270,
+          3605,
+          390
+        ],
+        "localized_diff_bbox": [
+          3169,
+          270,
+          3605,
+          390
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "dumped_big",
+        "source": "DUMPED!",
+        "korean": "차였어요!",
+        "sprite_cell": [
+          2520,
+          1290,
+          3570,
+          1515
+        ],
+        "original_bbox": [
+          2525,
+          1302,
+          3570,
+          1515
+        ],
+        "localized_diff_bbox": [
+          2525,
+          1302,
+          3569,
+          1514
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "knockout_white",
+        "source": "KNOCKOUT!",
+        "korean": "탈락!",
+        "sprite_cell": [
+          825,
+          120,
+          1270,
+          250
+        ],
+        "original_bbox": [
+          833,
+          120,
+          1270,
+          250
+        ],
+        "localized_diff_bbox": [
+          833,
+          120,
+          1270,
+          250
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "knockout_in",
+        "source": "KNOCKOUT! IN...",
+        "korean": "탈락까지...",
+        "sprite_cell": [
+          1260,
+          120,
+          2270,
+          250
+        ],
+        "original_bbox": [
+          1260,
+          120,
+          2270,
+          250
+        ],
+        "localized_diff_bbox": [
+          1260,
+          120,
+          2270,
+          250
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "target_top",
+        "source": "Target",
+        "korean": "목표",
+        "sprite_cell": [
+          2910,
+          145,
+          3135,
+          245
+        ],
+        "original_bbox": [
+          2910,
+          145,
+          3134,
+          223
+        ],
+        "localized_diff_bbox": [
+          2910,
+          145,
+          3133,
+          223
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "target_bottom",
+        "source": "Target",
+        "korean": "목표",
+        "sprite_cell": [
+          3260,
+          1780,
+          3560,
+          1885
+        ],
+        "original_bbox": [
+          3260,
+          1780,
+          3560,
+          1885
+        ],
+        "localized_diff_bbox": [
+          3260,
+          1780,
+          3559,
+          1884
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "ranking",
+        "source": "Ranking",
+        "korean": "순위",
+        "sprite_cell": [
+          120,
+          245,
+          455,
+          350
+        ],
+        "original_bbox": [
+          120,
+          245,
+          455,
+          350
+        ],
+        "localized_diff_bbox": [
+          120,
+          245,
+          455,
+          349
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "stage",
+        "source": "Stage",
+        "korean": "스테이지",
+        "sprite_cell": [
+          455,
+          245,
+          690,
+          350
+        ],
+        "original_bbox": [
+          455,
+          245,
+          690,
+          350
+        ],
+        "localized_diff_bbox": [
+          455,
+          245,
+          690,
+          349
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "rank",
+        "source": "Rank",
+        "korean": "랭크",
+        "sprite_cell": [
+          690,
+          245,
+          875,
+          350
+        ],
+        "original_bbox": [
+          690,
+          245,
+          875,
+          350
+        ],
+        "localized_diff_bbox": [
+          690,
+          245,
+          875,
+          349
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "outrun_miles_white",
+        "source": "OUTRUN MILES!",
+        "korean": "아웃런 마일!",
+        "sprite_cell": [
+          1090,
+          245,
+          1930,
+          385
+        ],
+        "original_bbox": [
+          1090,
+          245,
+          1930,
+          385
+        ],
+        "localized_diff_bbox": [
+          1090,
+          245,
+          1929,
+          384
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "outrun_miles",
+        "source": "OUTRUN MILES:",
+        "korean": "아웃런 마일:",
+        "sprite_cell": [
+          2070,
+          250,
+          2860,
+          370
+        ],
+        "original_bbox": [
+          2081,
+          250,
+          2860,
+          370
+        ],
+        "localized_diff_bbox": [
+          2081,
+          250,
+          2860,
+          370
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "best_time",
+        "source": "BEST TIME:",
+        "korean": "최고 기록:",
+        "sprite_cell": [
+          2160,
+          365,
+          3065,
+          540
+        ],
+        "original_bbox": [
+          2179,
+          365,
+          3063,
+          540
+        ],
+        "localized_diff_bbox": [
+          2179,
+          365,
+          3062,
+          539
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "stage_clear",
+        "source": "STAGE CLEAR",
+        "korean": "스테이지 클리어",
+        "sprite_cell": [
+          3420,
+          355,
+          4090,
+          470
+        ],
+        "original_bbox": [
+          3444,
+          362,
+          3956,
+          462
+        ],
+        "localized_diff_bbox": [
+          3444,
+          362,
+          3956,
+          462
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "pass",
+        "source": "PASS!!!",
+        "korean": "통과!!!",
+        "sprite_cell": [
+          3620,
+          490,
+          4090,
+          625
+        ],
+        "original_bbox": [
+          3620,
+          490,
+          4054,
+          622
+        ],
+        "localized_diff_bbox": [
+          3620,
+          490,
+          4053,
+          621
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "continue",
+        "source": "CONTINUE?",
+        "korean": "계속?",
+        "sprite_cell": [
+          0,
+          570,
+          1090,
+          780
+        ],
+        "original_bbox": [
+          19,
+          570,
+          1090,
+          780
+        ],
+        "localized_diff_bbox": [
+          19,
+          570,
+          1089,
+          780
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "try_again",
+        "source": "TRY AGAIN?",
+        "korean": "다시 도전?",
+        "sprite_cell": [
+          0,
+          760,
+          1320,
+          1000
+        ],
+        "original_bbox": [
+          25,
+          760,
+          1320,
+          1000
+        ],
+        "localized_diff_bbox": [
+          25,
+          760,
+          1320,
+          999
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "rank_table",
+        "source": "Rank",
+        "korean": "랭크",
+        "sprite_cell": [
+          1320,
+          795,
+          1635,
+          940
+        ],
+        "original_bbox": [
+          1320,
+          836,
+          1635,
+          940
+        ],
+        "localized_diff_bbox": [
+          1320,
+          836,
+          1634,
+          939
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "retry",
+        "source": "RETRY",
+        "korean": "재도전",
+        "sprite_cell": [
+          1270,
+          570,
+          1900,
+          780
+        ],
+        "original_bbox": [
+          1270,
+          570,
+          1900,
+          780
+        ],
+        "localized_diff_bbox": [
+          1270,
+          570,
+          1899,
+          780
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "please_wait",
+        "source": "PLEASE WAIT",
+        "korean": "잠시만요",
+        "sprite_cell": [
+          2320,
+          565,
+          3540,
+          790
+        ],
+        "original_bbox": [
+          2320,
+          565,
+          3540,
+          778
+        ],
+        "localized_diff_bbox": [
+          2320,
+          565,
+          3539,
+          777
+        ],
+        "containment": "PASS"
+      },
+      {
+        "key": "easy",
+        "source": "EASY",
+        "korean": "쉬움",
+        "sprite_cell": [
+          3180,
+          795,
+          3635,
+          975
+        ],
+        "original_bbox": [
+          3180,
+          825,
+          3624,
+          962
+        ],
+        "localized_diff_bbox": [
+          3180,
+          825,
+          3623,
+          962
+        ],
+        "containment": "PASS"
+      }
+    ],
+    "changed_pixels_outside_reworked_cells": 0,
+    "changed_pixels_outside_all_declared_cells": 0,
+    "introduced_alpha_outside_all_declared_cells": 0,
+    "containment": "PASS"
+  },
+  "result": "B94_SELF_QA_PASS_PENDING_C_AND_DDS_ONLY_INGAME",
+  "runtime_validation": "UNTESTED",
+  "final_approval": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false,
+  "qa_image": "localization/graphics/role_B/20260928-1336-B94/B94_A064FDFC_BEFORE_AFTER_QA.png"
+}

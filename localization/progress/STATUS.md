@@ -606,3 +606,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - DXT5 endpoints/header/dimensions/mips preserved. Candidate SHA-256: `62BEBF33=503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e`; `E3FD08BE=51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548`.
 - Both remain zero-margin edge-touch high-risk; independent C final QA + isolated DDS_ONLY in-game validation required. Final approved count remains 0.
 - Remaining C85 production REWORK assets: 10.
+
+
+### B94 exact-bbox rework 2026-09-28T13:38:52+09:00
+- A064FDFC index 60: six C85 failures reworked against the canonical HD source.
+- Strict source-diff containment: 21/21 PASS; outside declared cells 0; collateral outside reworked cells 0.
+- DDS 4096x2048 RGBA32 mip1/header/raw mirror_y preserved. Candidate SHA-256 4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7.
+- Pending independent C and isolated DDS_ONLY in-game validation; runtime UNTESTED.

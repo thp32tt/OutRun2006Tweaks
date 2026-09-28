@@ -1,5 +1,5 @@
 {
-  "schema_version": 55,
+  "schema_version": 56,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B94: A064FDFC exact source-diff bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game.",
     "B92: 62BEBF33 and E3FD08BE reworked; exact source-bbox self-QA PASS, edge-touch high-risk, pending independent C and isolated DDS_ONLY in-game.",
     "Remaining C85 REWORK production: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
     "C85 static PASS pending in-game remains: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77.",
@@ -636,7 +637,13 @@
         "status": "B92_SELF_QA_PASS_PENDING_C_INGAME",
         "edge_touch_high_risk": true
       }
-    ]
+    ],
+    "b94_a064fdfc": {
+      "timestamp_kst": "2026-09-28T13:38:52+09:00",
+      "report": "localization/graphics/role_B/20260928-1336-B94/B94_A064FDFC_EXACT_BBOX_REWORK_REPORT.json",
+      "candidate_sha256": "4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7",
+      "status": "B94_SELF_QA_PASS_PENDING_C_INGAME"
+    }
   },
   "runtime_packages": {
     "k1": {

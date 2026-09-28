@@ -1008,3 +1008,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - DXT5 endpoints, 128-byte headers, 2048x256 dimensions and mip count are preserved. Both candidates are zero-margin edge-touch high-risk and remain pending independent C revalidation + isolated DDS_ONLY in-game validation.
 - Binary commit: `abba1c70e744d6c26cc2f3a5da4d50bcbfd1d5b0`; report: `localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json`.
 - Remaining C85 production REWORK assets: 10. No build, VR/FFB, or GPT Library use.
+
+
+## 2026-09-28T13:38:52+09:00 - B94 A064FDFC exact-bbox rework
+
+- B even shard index 60; six C85 failing regions reworked from current GitHub HD candidate/source only.
+- 21/21 source-diff bbox containment PASS; no outside-cell/collateral changes.
+- Candidate 4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7; C + isolated DDS_ONLY in-game pending; no build/VR/FFB/N100/GPT Library.
