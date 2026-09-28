@@ -7,6 +7,8 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <mutex>
+#include <unordered_set>
 
 #include <spdlog/spdlog.h>
 
@@ -27,9 +29,246 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> FixedFunctionSamples{0};
         std::atomic<std::uint64_t> ProgrammableSamples{0};
         std::atomic<std::uint64_t> UnsupportedTopologySamples{0};
+        std::atomic<std::uint64_t> UniqueDrawSignatures{0};
+        std::atomic<std::uint64_t> VertexDeclarationSamples{0};
+        std::atomic<std::uint64_t> IndexedSamples{0};
+        std::atomic<std::uint64_t> TexturedSamples{0};
         std::array<std::atomic<std::uint64_t>, UnsupportedBitCount>
             UnsupportedCounts{};
         std::atomic<ULONGLONG> LastLogMs{0};
+        std::mutex SignatureMutex;
+        std::unordered_set<std::uint64_t> SignatureHashes;
+
+        struct SourceSignature
+        {
+            DWORD fvf{};
+            UINT streamOffset{};
+            UINT stride{};
+            D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
+            D3DRESOURCETYPE texture0Type = D3DRTYPE_FORCE_DWORD;
+            D3DFORMAT texture0Format = D3DFMT_UNKNOWN;
+            D3DRESOURCETYPE texture1Type = D3DRTYPE_FORCE_DWORD;
+            D3DFORMAT texture1Format = D3DFMT_UNKNOWN;
+            DWORD colorOp0 = D3DTOP_DISABLE;
+            DWORD alphaOp0 = D3DTOP_DISABLE;
+            DWORD colorOp1 = D3DTOP_DISABLE;
+            DWORD alphaOp1 = D3DTOP_DISABLE;
+            DWORD minFilter = D3DTEXF_NONE;
+            DWORD magFilter = D3DTEXF_NONE;
+            DWORD mipFilter = D3DTEXF_NONE;
+            DWORD addressU = D3DTADDRESS_WRAP;
+            DWORD addressV = D3DTADDRESS_WRAP;
+            bool vertexDeclaration{};
+            bool indexed{};
+            bool textured{};
+            bool fixedFunction{};
+        };
+
+        std::uint64_t hash_mix(std::uint64_t hash, std::uint64_t value) noexcept
+        {
+            hash ^= value + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
+            return hash;
+        }
+
+        std::uint64_t hash_signature(
+            const SourceSignature& sig,
+            D3DPRIMITIVETYPE primitive) noexcept
+        {
+            std::uint64_t hash = 0xcbf29ce484222325ull;
+            hash = hash_mix(hash, static_cast<std::uint32_t>(primitive));
+            hash = hash_mix(hash, sig.fvf);
+            hash = hash_mix(hash, sig.streamOffset);
+            hash = hash_mix(hash, sig.stride);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.indexFormat));
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Type));
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Format));
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Type));
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Format));
+            hash = hash_mix(hash, sig.colorOp0);
+            hash = hash_mix(hash, sig.alphaOp0);
+            hash = hash_mix(hash, sig.colorOp1);
+            hash = hash_mix(hash, sig.alphaOp1);
+            hash = hash_mix(hash, sig.minFilter);
+            hash = hash_mix(hash, sig.magFilter);
+            hash = hash_mix(hash, sig.mipFilter);
+            hash = hash_mix(hash, sig.addressU);
+            hash = hash_mix(hash, sig.addressV);
+            hash = hash_mix(hash, sig.vertexDeclaration ? 1u : 0u);
+            hash = hash_mix(hash, sig.indexed ? 1u : 0u);
+            hash = hash_mix(hash, sig.textured ? 1u : 0u);
+            hash = hash_mix(hash, sig.fixedFunction ? 1u : 0u);
+            return hash;
+        }
+
+        void inspect_texture(
+            IDirect3DDevice9* device,
+            DWORD stage,
+            D3DRESOURCETYPE& type,
+            D3DFORMAT& format,
+            bool& present) noexcept
+        {
+            type = D3DRTYPE_FORCE_DWORD;
+            format = D3DFMT_UNKNOWN;
+            present = false;
+
+            IDirect3DBaseTexture9* base = nullptr;
+            if (FAILED(device->GetTexture(stage, &base)) || !base)
+                return;
+
+            present = true;
+            type = base->GetType();
+            if (type == D3DRTYPE_TEXTURE)
+            {
+                IDirect3DTexture9* texture = nullptr;
+                if (SUCCEEDED(base->QueryInterface(
+                        __uuidof(IDirect3DTexture9),
+                        reinterpret_cast<void**>(&texture))) && texture)
+                {
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                        format = desc.Format;
+                    texture->Release();
+                }
+            }
+            else if (type == D3DRTYPE_CUBETEXTURE)
+            {
+                IDirect3DCubeTexture9* texture = nullptr;
+                if (SUCCEEDED(base->QueryInterface(
+                        __uuidof(IDirect3DCubeTexture9),
+                        reinterpret_cast<void**>(&texture))) && texture)
+                {
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                        format = desc.Format;
+                    texture->Release();
+                }
+            }
+            else if (type == D3DRTYPE_VOLUMETEXTURE)
+            {
+                IDirect3DVolumeTexture9* texture = nullptr;
+                if (SUCCEEDED(base->QueryInterface(
+                        __uuidof(IDirect3DVolumeTexture9),
+                        reinterpret_cast<void**>(&texture))) && texture)
+                {
+                    D3DVOLUME_DESC desc{};
+                    if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                        format = desc.Format;
+                    texture->Release();
+                }
+            }
+            base->Release();
+        }
+
+        SourceSignature inspect_source_signature(
+            IDirect3DDevice9* device,
+            bool fixedFunction) noexcept
+        {
+            SourceSignature sig{};
+            sig.fixedFunction = fixedFunction;
+
+            device->GetFVF(&sig.fvf);
+
+            IDirect3DVertexDeclaration9* declaration = nullptr;
+            if (SUCCEEDED(device->GetVertexDeclaration(&declaration)) &&
+                declaration)
+            {
+                sig.vertexDeclaration = true;
+                declaration->Release();
+            }
+
+            IDirect3DVertexBuffer9* vb = nullptr;
+            if (SUCCEEDED(device->GetStreamSource(
+                    0, &vb, &sig.streamOffset, &sig.stride)) && vb)
+                vb->Release();
+
+            IDirect3DIndexBuffer9* ib = nullptr;
+            if (SUCCEEDED(device->GetIndices(&ib)) && ib)
+            {
+                D3DINDEXBUFFER_DESC desc{};
+                if (SUCCEEDED(ib->GetDesc(&desc)))
+                    sig.indexFormat = desc.Format;
+                sig.indexed = true;
+                ib->Release();
+            }
+
+            bool texture0 = false;
+            bool texture1 = false;
+            inspect_texture(
+                device, 0, sig.texture0Type, sig.texture0Format, texture0);
+            inspect_texture(
+                device, 1, sig.texture1Type, sig.texture1Format, texture1);
+            sig.textured = texture0 || texture1;
+
+            if (fixedFunction)
+            {
+                device->GetTextureStageState(
+                    0, D3DTSS_COLOROP, &sig.colorOp0);
+                device->GetTextureStageState(
+                    0, D3DTSS_ALPHAOP, &sig.alphaOp0);
+                device->GetTextureStageState(
+                    1, D3DTSS_COLOROP, &sig.colorOp1);
+                device->GetTextureStageState(
+                    1, D3DTSS_ALPHAOP, &sig.alphaOp1);
+            }
+
+            device->GetSamplerState(0, D3DSAMP_MINFILTER, &sig.minFilter);
+            device->GetSamplerState(0, D3DSAMP_MAGFILTER, &sig.magFilter);
+            device->GetSamplerState(0, D3DSAMP_MIPFILTER, &sig.mipFilter);
+            device->GetSamplerState(0, D3DSAMP_ADDRESSU, &sig.addressU);
+            device->GetSamplerState(0, D3DSAMP_ADDRESSV, &sig.addressV);
+            return sig;
+        }
+
+        void note_signature(
+            const SourceSignature& sig,
+            D3DPRIMITIVETYPE primitive) noexcept
+        {
+            const auto hash = hash_signature(sig, primitive);
+            bool inserted = false;
+            std::uint64_t unique = 0;
+            {
+                std::lock_guard<std::mutex> lock(SignatureMutex);
+                if (SignatureHashes.size() < 512)
+                    inserted = SignatureHashes.insert(hash).second;
+                unique = SignatureHashes.size();
+            }
+            UniqueDrawSignatures.store(unique, std::memory_order_relaxed);
+
+            if (sig.vertexDeclaration)
+                VertexDeclarationSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            if (sig.indexed)
+                IndexedSamples.fetch_add(1, std::memory_order_relaxed);
+            if (sig.textured)
+                TexturedSamples.fetch_add(1, std::memory_order_relaxed);
+
+            if (inserted && unique <= 64)
+            {
+                spdlog::info(
+                    "VR DX11 R72 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} stream0[offset={},stride={}] indexFmt={} tex0[type={},fmt={}] tex1[type={},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    unique,
+                    static_cast<int>(primitive),
+                    sig.fixedFunction ? 1 : 0,
+                    sig.fvf,
+                    sig.vertexDeclaration ? 1 : 0,
+                    sig.streamOffset,
+                    sig.stride,
+                    static_cast<int>(sig.indexFormat),
+                    static_cast<int>(sig.texture0Type),
+                    static_cast<int>(sig.texture0Format),
+                    static_cast<int>(sig.texture1Type),
+                    static_cast<int>(sig.texture1Format),
+                    sig.colorOp0,
+                    sig.alphaOp0,
+                    sig.colorOp1,
+                    sig.alphaOp1,
+                    sig.minFilter,
+                    sig.magFilter,
+                    sig.mipFilter,
+                    sig.addressU,
+                    sig.addressV);
+            }
+        }
 
         bool census_enabled() noexcept
         {
@@ -68,12 +307,16 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
                 ProgrammableSamples.load(std::memory_order_relaxed),
                 UnsupportedTopologySamples.load(std::memory_order_relaxed),
+                UniqueDrawSignatures.load(std::memory_order_relaxed),
+                VertexDeclarationSamples.load(std::memory_order_relaxed),
+                IndexedSamples.load(std::memory_order_relaxed),
+                TexturedSamples.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -129,6 +372,10 @@ namespace outrun::vr::dx11
             FixedFunctionSamples.fetch_add(1, std::memory_order_relaxed);
         else
             ProgrammableSamples.fetch_add(1, std::memory_order_relaxed);
+
+        const auto signature =
+            inspect_source_signature(device, fixedFunction);
+        note_signature(signature, primitive);
 
         if (unsupported == PipelineUnsupportedNone && topology.exact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
