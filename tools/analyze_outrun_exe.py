@@ -28,10 +28,24 @@ KNOWN_TARGETS = {
     0x02CCE0: "sprPrintf",
     0x02CDD0: "Sumo_Printf",
     0x049940: "Calc3D2D",
+    0x0BA9D0: "HudTextProducer_BA9D0",
     0x0BAD20: "RankMarker_sub_4BAD20",
 }
 
 KNOWN_CALL_SITES = {
+    # R70/R71 runtime + canonical-EXE exact anchors. Keeping these as exact
+    # sites lets later review shrink broad semantic ranges instead of widening
+    # them from runtime timing alone.
+    0x0460F1: "Menu/list arrow clip #1",
+    0x0463D6: "Menu/list arrow clip #2",
+    0x046410: "Menu/list arrow clip #3",
+    0x0975EE: "OutRun stage Sumo_Printf #1",
+    0x097727: "OutRun stage Sumo_Printf #2",
+    0x0977FB: "OutRun stage Sumo_Printf #3",
+    0x097BB7: "OutRun final-result clip #1",
+    0x097DA7: "OutRun final-result clip #2",
+    0x0BB6F0: "Rival marker Calc3D2D",
+    0x0BB796: "Rival marker sprani",
     0x0BB0FB: "RankMarker sprani #1",
     0x0BB133: "RankMarker sprani #2",
     0x0BB16C: "RankMarker sprani #3",
@@ -46,6 +60,19 @@ KNOWN_CALL_SITES = {
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
 # rather than D3D primitive-count heuristics.
+EXACT_SEMANTICS = {
+    0x0460F1: ("MenuExactArrow", "HUD_MENU_ARROW", "SCREEN_HUD"),
+    0x0463D6: ("MenuExactArrow", "HUD_MENU_ARROW", "SCREEN_HUD"),
+    0x046410: ("MenuExactArrow", "HUD_MENU_ARROW", "SCREEN_HUD"),
+    0x0975EE: ("OutRunStageResult", "HUD_OUTRUN_STAGE", "SCREEN_HUD"),
+    0x097727: ("OutRunStageResult", "HUD_OUTRUN_STAGE", "SCREEN_HUD"),
+    0x0977FB: ("OutRunStageResult", "HUD_OUTRUN_STAGE", "SCREEN_HUD"),
+    0x097BB7: ("OutRunFinalResult", "HUD_OUTRUN_RESULT", "SCREEN_HUD"),
+    0x097DA7: ("OutRunFinalResult", "HUD_OUTRUN_RESULT", "SCREEN_HUD"),
+    0x0BB6F0: ("RivalMarkerProjection", "WORLD_RIVAL_PROJECTED", "PROJECTED_WORLD_MARKER_2D"),
+    0x0BB796: ("RivalMarkerSprite", "WORLD_RIVAL_PROJECTED", "PROJECTED_WORLD_MARKER_2D"),
+}
+
 SEMANTIC_RANGES = (
     (0x05B300, 0x05B700, "HeartDisp_car_heart", "WORLD_HEART", "WORLD_BILLBOARD"),
     (0x081A00, 0x081B00, "C2C_Fruit", "HUD_FRUIT", "SCREEN_HUD"),
@@ -74,6 +101,9 @@ SEMANTIC_RANGES = (
 
 
 def classify_semantic(call_rva: int) -> tuple[str, str, str]:
+    exact = EXACT_SEMANTICS.get(call_rva)
+    if exact:
+        return exact
     for begin, end, area, semantic, space_policy in SEMANTIC_RANGES:
         if begin <= call_rva < end:
             return area, semantic, space_policy
