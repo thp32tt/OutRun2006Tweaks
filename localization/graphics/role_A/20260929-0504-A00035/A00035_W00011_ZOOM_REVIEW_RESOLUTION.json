@@ -1,0 +1,326 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00035",
+  "wave_id": "W00011",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T05:04:15+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_5_ZOOM_REVIEW_RESOLUTIONS_3_PRESERVE_2_LOCALIZABLE_REBUILD_SPECS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION_PLUS_STEP_4_REBUILD_INPUT",
+  "initial_head_sha": "81dccb23f48e440d2479ef526e1d22dce224893a",
+  "final_precommit_head_sha": "81dccb23f48e440d2479ef526e1d22dce224893a",
+  "preserved_intervening_peer_head": false,
+  "source_of_truth": {
+    "contract_path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "contract_git_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+    "queue_path": "localization/graphics/asset_queue.csv",
+    "queue_git_blob_sha": "866f7db6db15b87d97cfe3a62e6258786c12afac",
+    "source_identity_record": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "pending_localize_text_gate": "No safe DDS candidate write was justified because exact HD decoded-pixel text/effect bboxes and raw-orientation evidence are not materialized for the next pending assets; zero-pixel rules prohibit speculative raster writes.",
+    "chosen_zoom_review_indices": [
+      177,
+      189,
+      191,
+      217,
+      219
+    ],
+    "reason": "Resolve all five remaining unresolved odd-shard zoom-review rows. Three are preserve-original; two contain localizable UI text and receive deterministic exact-HD reconstruction inputs.",
+    "odd_zoom_review_remaining_after_c_reconcile": 0
+  },
+  "translation_cross_reference": [
+    {
+      "source": "START",
+      "korean": "시작",
+      "evidence_path": "localization/graphics/transcriptions.jsonl",
+      "reference_queue_index": 172,
+      "reference_asset": "6C9B3611"
+    },
+    {
+      "source": "GOAL",
+      "korean": "골",
+      "evidence_path": "localization/graphics/transcriptions.jsonl",
+      "reference_queue_index": 172,
+      "reference_asset": "6C9B3611"
+    },
+    {
+      "source": "COURSE SELECT",
+      "semantic_reference_source": "Select Course",
+      "korean": "코스 선택",
+      "evidence_path": "localization/graphics/transcriptions.jsonl",
+      "reference_queue_index": 121,
+      "reference_asset": "FD90AA9"
+    }
+  ],
+  "assets": [
+    {
+      "queue_index": 177,
+      "asset": "7978907D",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.png",
+        "git_blob_sha": "3a9e331532d877347af8c1dcd39ac5fdb9df4add"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128_atlas.json",
+        "git_blob_sha": "f4a60519a5a6ea988d162c2bc648dca1f783032c",
+        "regions": 3,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/7978907D_512x128.dds",
+        "git_blob_sha": "ac4d20abc96123d9eac1411e8ed9e43e20a2bc78",
+        "bytes": 1398288
+      },
+      "observed": "Three album/soundtrack-cover sprites. Visible English is protected OutRun2 branding and soundtrack/cover artwork, not game UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2 logo",
+        "soundtrack/album-cover artwork"
+      ],
+      "resolution": "NO_LOCALIZABLE_UI_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 189,
+      "asset": "8C9E91F8",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.png",
+        "git_blob_sha": "5da16057b94a696d159acf3493416504bfdf3235"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512_atlas.json",
+        "git_blob_sha": "4f75c20d623c5e90e913197f0d3b4dada458feb7",
+        "regions": 8,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/8C9E91F8_512x512.dds",
+        "git_blob_sha": "40d569a645ad3e952e82182c4bffebbe20b5b11b",
+        "bytes": 16777344
+      },
+      "observed": "Front-end header/background strips containing protected OutRun2/OutRun2SP logo fragments and non-text background art only; no localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2 logo",
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_UI_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 191,
+      "asset": "94BB6271",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.png",
+        "git_blob_sha": "09c047aee421e39532c57976763465f5541f8047"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256_atlas.json",
+        "git_blob_sha": "b94204597369559cfaf82374d95fe192f1bba9f6",
+        "regions": 4,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/94BB6271_512x256.dds",
+        "git_blob_sha": "3d962388b086a20e40c72856710d55471d206a13",
+        "bytes": 8388736
+      },
+      "observed": "Four scenic/course-card sprites with protected OutRun2SP logo artwork only; no localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_UI_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 217,
+      "asset": "D1039D6F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.png",
+        "git_blob_sha": "442354c65a73c17f915c553522b4f76d8634c2de"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512_atlas.json",
+        "git_blob_sha": "193e8dcba7743c807f1ec1be6a107a89eecffefa",
+        "regions": 4,
+        "rotations": false
+      },
+      "atlas_4x_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_D1039D6F_512x512_atlas.json",
+        "git_blob_sha": "f3afcf197fdc50346f942d14d83589c31caf707f"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+        "git_blob_sha": "544b638f755c2c1615ff1882853635bfd438e4c2",
+        "bytes": 16777344
+      },
+      "observed": "Four scenic/course-card sprites. The upper-right map card contains localizable START and GOAL labels in addition to protected OutRun2SP artwork.",
+      "localizable_text": [
+        {
+          "source": "START",
+          "korean": "시작",
+          "occurrences_observed": 1
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "occurrences_observed": 1
+        }
+      ],
+      "target_cell": {
+        "sprite": "sprite_764",
+        "stock_rect_xywh": [
+          187,
+          290,
+          187,
+          222
+        ],
+        "hd_4x_rect_xywh": [
+          748,
+          1160,
+          748,
+          888
+        ],
+        "normalized_rect_xywh": [
+          0.365234375,
+          0.56640625,
+          0.365234375,
+          0.43359375
+        ],
+        "rotation_flag": false
+      },
+      "resolution": "LOCALIZABLE_TEXT_IDENTIFIED_PENDING_EXACT_HD_DECODED_TEXT_BBOX_PRODUCTION",
+      "candidate_required": true,
+      "candidate_modified": false,
+      "rebuild_spec": {
+        "source": "Use exact pinned HD English DDS blob 544b638f755c2c1615ff1882853635bfd438e4c2 only.",
+        "target": "Decode sprite_764 from the exact HD DDS and derive separate full-effect non-transparent bboxes for START and GOAL before erase/render.",
+        "artwork": "Preserve the map/course-card image and protected OutRun2SP artwork; text-only masks.",
+        "translations": [
+          "START -> 시작",
+          "GOAL -> 골"
+        ],
+        "containment": "Each localized glyph/outline/shadow/alpha fringe must be a subset of its exact English-HD text bbox and remain within sprite_764; changed/introduced-alpha pixels outside target bboxes must be zero.",
+        "orientation": "Inspect exact raw HD DDS element orientation before render; do not infer from readable PNG.",
+        "side_by_side": "Future candidate must retain ENGLISH SOURCE vs KOREAN CANDIDATE proof at identical crop/orientation/scale."
+      }
+    },
+    {
+      "queue_index": 219,
+      "asset": "D263B3F1",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.png",
+        "git_blob_sha": "77eec8d773925b0a728bdcd24d34be188d85678e"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512_atlas.json",
+        "git_blob_sha": "e4f49a4e1d9ce073b49da2c562710e46d0de012c",
+        "regions": 7,
+        "rotations": false
+      },
+      "atlas_4x_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_D263B3F1_512x512_atlas.json",
+        "git_blob_sha": "4ba291f379f68de7eae54ee0426cd7ce6663c78a"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+        "git_blob_sha": "00c67f46fc7e402ce2341a13356abb09db9a8a1d",
+        "bytes": 16777344
+      },
+      "observed": "Course-selection atlas with protected OutRun2/OutRun2SP art plus a standalone COURSE SELECT UI heading.",
+      "localizable_text": [
+        {
+          "source": "COURSE SELECT",
+          "korean": "코스 선택",
+          "occurrences_observed": 1,
+          "semantic_cross_reference": "Select Course -> 코스 선택 at queue index 121"
+        }
+      ],
+      "target_cell": {
+        "sprite": "sprite_484",
+        "stock_rect_xywh": [
+          0,
+          251,
+          512,
+          39
+        ],
+        "hd_4x_rect_xywh": [
+          0,
+          1004,
+          2048,
+          156
+        ],
+        "normalized_rect_xywh": [
+          0,
+          0.490234375,
+          1,
+          0.076171875
+        ],
+        "rotation_flag": false
+      },
+      "resolution": "LOCALIZABLE_TEXT_IDENTIFIED_PENDING_EXACT_HD_DECODED_TEXT_BBOX_PRODUCTION",
+      "candidate_required": true,
+      "candidate_modified": false,
+      "rebuild_spec": {
+        "source": "Use exact pinned HD English DDS blob 00c67f46fc7e402ce2341a13356abb09db9a8a1d only.",
+        "target": "Decode sprite_484 from the exact HD DDS and derive the full-effect non-transparent COURSE SELECT text bbox before erase/render.",
+        "artwork": "Preserve both selector cards, logos, background and all pixels outside the heading's exact text footprint.",
+        "translation": "코스 선택",
+        "containment": "Localized pixels including outline/shadow/alpha fringe must be a subset of the exact English-HD heading bbox and sprite_484; changed/introduced-alpha pixels outside target bbox must be zero.",
+        "orientation": "Inspect exact raw HD DDS element orientation before render; do not infer from readable PNG.",
+        "side_by_side": "Future candidate must retain ENGLISH SOURCE vs KOREAN CANDIDATE proof at identical crop/orientation/scale."
+      }
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_177_189_191_217_219",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_HEAD_81dccb23",
+    "direct_github_source_identity": "PASS_PINNED_OR2006SPRITES_COMMIT",
+    "visual_zoom_review": "PASS_5_CLASSIFIED",
+    "preserve_vs_translate_classification": "PASS_3_PRESERVE_2_LOCALIZABLE",
+    "translation_cross_reference": "PASS_START_GOAL_AND_COURSE_SELECT",
+    "deterministic_rebuild_input": "PASS_D1039D6F_AND_D263B3F1",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "zero_pixel_containment": "HOLD_UNTIL_EXACT_HD_DECODED_TEXT_BBOX__NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "7978907D",
+    "8C9E91F8",
+    "94BB6271",
+    "D1039D6F",
+    "D263B3F1"
+  ],
+  "c_reconciliation_required": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00011 lane A resolves all five remaining odd-shard zoom-review rows: 7978907D/8C9E91F8/94BB6271 preserve original; D1039D6F and D263B3F1 contain localizable UI text and now have exact-HD-pinned reconstruction inputs. No speculative DDS bytes were written because exact decoded-pixel text bboxes remain mandatory. Runtime remains UNTESTED."
+}
