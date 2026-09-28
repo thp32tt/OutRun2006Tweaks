@@ -29,6 +29,8 @@ COPY localization_git_sync.md /opt/outrun/prompts/localization_git_sync.md
 COPY vr_A.md /opt/outrun/prompts/vr_A.md
 COPY vr_B.md /opt/outrun/prompts/vr_B.md
 COPY vr_C.md /opt/outrun/prompts/vr_C.md
+COPY conversion_dx11.md /opt/outrun/prompts/conversion_dx11.md
+COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md
 
 RUN chmod +x /opt/outrun/entrypoint.sh
 
