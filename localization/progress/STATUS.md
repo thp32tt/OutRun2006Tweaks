@@ -743,3 +743,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - W00008 introduced **0 new/reworked Korean DDS bytes**. Therefore clipping/Hangul-raster, zero-pixel containment, DDS format/mipmap/alpha/transparency/orientation, background/wrong-replacement and English-source side-by-side gates are not newly passed; the five promoted assets remain HOLD until exact HD decoded-source pixels are used for production. New approvals: **0**; approved/locked DDS count remains **0**.
 - No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
 - Machine report: `localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json`.
+
+## W00009 C synchronization barrier — 2026-09-29 04:14 KST
+- GitHub-only reconciliation base HEAD: `6d7913eaffa312c086993c9eda36af1d024b0501`. A00029 and B00030 both have durable W00009 terminal records; their remote validation failures are the same pre-existing C-owned W00008 shared-state drift.
+- C repaired that drift: `artwork_plan.jsonl` now includes 26/28/30/32/35 and `visual_review.csv` classifies those five as `localize_text`. Artwork plan and transcription are now aligned.
+- W00009 A merge: index 103 (`590A4724`) is promoted to `localize_text` for `Normal balance -> 일반 밸런스`; 151/153/155 are resolved preserve-original. Exact HD decoded full-effect bbox/raw orientation and source-vs-candidate proof remain mandatory before 103 can produce a passing DDS.
+- W00009 B cross-lane QA: 26/28/30/32 exact HD source identity, RGBA32/mip1 and mirror-Y evidence plus six decoded core/alpha metrics are retained. B's candidate trials showed English-effect residue/seams and were rejected/not persisted, so C makes no DDS approval claim.
+- Recomputed queue: 137 rows = 85 `localize_text` + 41 `zoom_review` + 9 font + 1 Hangul name-entry + 1 preserve-only. Unresolved zoom-review is 23; resolved preserve-original zoom-review is 18. Canonical transcription/artwork planning: 85 assets / 731 semantic segments.
+- W00009 persisted **0 new/reworked Korean DDS bytes**. New approvals: **0**; approved/locked DDS remains **0**. Runtime was not tested by C: `RUNTIME_VALIDATION=UNTESTED`.
+- Canonical progress and legacy `localization/progress.json` are written byte-for-byte identically. No N100/GPT Library/VR/FFB/DX/build work.
+- Machine report: `localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json`.
