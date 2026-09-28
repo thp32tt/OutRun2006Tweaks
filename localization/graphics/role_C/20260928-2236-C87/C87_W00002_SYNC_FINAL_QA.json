@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00010",
+  "lane": "LOCALIZATION_C",
+  "role": "CROSS_LANE_FINAL_QA_SYNC_BARRIER",
+  "wave_id": "W00002",
+  "recorded_at_kst": "2026-09-28T22:36:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head": "c7a7217735895473b6b8ff0326f458bb23446ec7",
+  "lane_terminals": {
+    "A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00008",
+      "commit": "f0f10146f37fa170c3838eac75721f6dff416047",
+      "result": "BLOCKED_NO_ACTION",
+      "candidate_dds_modified": false
+    },
+    "B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00009",
+      "commit": "207e153dbc9aac4bf14da87234bbfa223f050e52",
+      "result": "DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING",
+      "candidate_dds_modified": false
+    }
+  },
+  "queue_recompute": {
+    "rows": 137,
+    "actions": {
+      "localize_text": 79,
+      "zoom_review": 47,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "artwork_status": {
+      "c85_pixel_visual_pass_pending_ingame": 4,
+      "blocked_runtime_font": 9,
+      "blocked_runtime_name_entry": 1,
+      "blocked_review": 47,
+      "pending_artwork": 63,
+      "rework_required_zero_pixel_or_artifact": 6,
+      "b95_self_qa_pass_pending_c": 1,
+      "a_auto_self_qa_pass_pending_c": 1,
+      "b94_self_qa_pass_pending_c": 1,
+      "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+      "c86_containment_pass_high_risk_pending_ingame": 2,
+      "preserve_original": 1
+    }
+  },
+  "cross_lane_qa": {
+    "new_candidate_bytes_to_review": 0,
+    "repeated_completed_work": false,
+    "new_approvals": 0,
+    "approved_dds_count": 0,
+    "asset_queue_changed": false,
+    "preserved_holds": [
+      "C86 62BEBF33/E3FD08BE containment PASS high-risk edge-touch pending isolated DDS_ONLY in-game",
+      "C85 C4A2937B/9F060EC1/D6DC1380/48DEBE77 pixel+visual PASS pending isolated DDS_ONLY in-game",
+      "Existing REWORK_REQUIRED/PENDING_C rows remain unpromoted"
+    ],
+    "blockers": [
+      "GitHub-only source bytes are absent for many unfinished localize_text/zoom_review rows",
+      "FF2462BB and FD90AA9 require source-faithful rerender rather than speculative scaling",
+      "568D3696 specialized DXT5 decoded-pixel-safe path remains unresolved",
+      "C075FB49 retains overlap/artwork-sensitive failures",
+      "isolated DDS_ONLY in-game validation remains mandatory"
+    ]
+  },
+  "shared_state_updated": [
+    "localization/resume_state.json",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/progress/STATUS.md",
+    "localization/WORKLOG.md"
+  ],
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING_COMMIT_VERIFICATION",
+  "n100_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "vr_ffb_dx_changes": false
+}

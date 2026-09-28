@@ -674,3 +674,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C cross-lane reconciliation: **NO_NEW_ASSET_APPROVALS**. 62BEBF33/E3FD08BE retain C86 decoded-pixel containment PASS but exact-bbox top edge-touch high-risk HOLD.
 - Final promotion remains blocked by isolated `DDS_ONLY` in-game validation and outstanding zero-pixel/artifact rework. No real-game test was performed in this barrier; runtime validation remains **UNTESTED**.
 - Next controller action: dispatch the next disjoint A+B production wave from current queue state; prioritize REWORK_REQUIRED, then unfinished localize_text and unresolved zoom_review.
+
+## W00002 C synchronization barrier — 2026-09-28 22:36 KST
+- GitHub-only base HEAD: `c7a7217735895473b6b8ff0326f458bb23446ec7`; the later contract-only compatibility-path commit is preserved.
+- Lane A `LOCALIZATION-LOCALIZATION_A-00008` @ `f0f10146f37fa170c3838eac75721f6dff416047`: **BLOCKED_NO_ACTION**; FF2462BB/FD90AA9 require source-faithful rerender and prior 568D3696/C075FB49 blockers were not repeated. No candidate DDS changed.
+- Lane B `LOCALIZATION-LOCALIZATION_B-00009` @ `207e153dbc9aac4bf14da87234bbfa223f050e52`: **DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING**; completed B95/B94/B92/C86 work was not repeated. No candidate DDS changed.
+- Queue recomputed from `asset_queue.csv`: **137** rows = 79 localize_text + 47 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only. Current artwork states include 63 pending_artwork, 47 blocked_review, 6 REWORK_REQUIRED, 4 self-QA pending C, 2 C86 high-risk pending in-game, and 4 C85 pixel+visual PASS pending in-game.
+- C result: **NO_NEW_ASSET_APPROVALS** and no queue-row rewrite, because W00002 produced no new candidate bytes. Existing zero-pixel/HOLD states remain authoritative; completed QA was not rerun.
+- `approved_dds`/user lock count remains **0**. No real-game test was performed; `RUNTIME_VALIDATION=UNTESTED`. Isolated `DDS_ONLY` in-game validation remains mandatory before approval.
+- Canonical progress and the legacy compatibility mirror are updated byte-for-byte together. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Machine report: `localization/graphics/role_C/20260928-2236-C87/C87_W00002_SYNC_FINAL_QA.json`.

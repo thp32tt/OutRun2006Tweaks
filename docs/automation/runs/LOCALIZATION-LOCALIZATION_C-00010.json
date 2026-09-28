@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00010",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover_reconciled": [
+    1
+  ],
+  "wave_id": "W00002",
+  "recorded_at_kst": "2026-09-28T22:36:00+09:00",
+  "base_sha": "c7a7217735895473b6b8ff0326f458bb23446ec7",
+  "result_sha": "PENDING_SELF_REFERENCE_FINALIZATION",
+  "result": "PASS_BARRIER_RECONCILED_NO_NEW_APPROVALS",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "lane_terminals": {
+    "A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00008",
+      "commit": "f0f10146f37fa170c3838eac75721f6dff416047",
+      "result": "BLOCKED_NO_ACTION"
+    },
+    "B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00009",
+      "commit": "207e153dbc9aac4bf14da87234bbfa223f050e52",
+      "result": "DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING"
+    }
+  },
+  "report": "localization/graphics/role_C/20260928-2236-C87/C87_W00002_SYNC_FINAL_QA.json",
+  "summary": "W00002 synchronization barrier reconciled from GitHub-only state. Both A and B made no candidate DDS changes, so C preserved existing QA/HOLD/REWORK states, made no approvals, and updated shared state without repeating completed work.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00008.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00009.json",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json"
+  ],
+  "candidate_dds_modified": false,
+  "asset_queue_modified": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false
+}

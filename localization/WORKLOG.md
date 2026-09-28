@@ -1086,3 +1086,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Cross-lane C result: no new DDS approval. C86 binary revalidation remains authoritative for 62BEBF33/E3FD08BE: decoded alpha changes outside declared cell = 0 and introduced alpha outside = 0, but exact source bbox top-edge touch is high-risk.
 - Promotion remains held pending isolated `DDS_ONLY` in-game validation plus outstanding REWORK_REQUIRED assets. No real-game test was performed; `RUNTIME_VALIDATION=UNTESTED`.
 - No VR/FFB/DX changes, N100 clone/worktree, or GPT Library state used.
+
+## 2026-09-28 22:36 KST - W00002 C BARRIER (AUTO C-00010)
+
+- Re-fetched GitHub `korean-localization-clean` after both W00002 production lanes had durable terminal records; base HEAD for reconciliation: `c7a7217735895473b6b8ff0326f458bb23446ec7`.
+- A terminal `LOCALIZATION-LOCALIZATION_A-00008` (`f0f10146f37fa170c3838eac75721f6dff416047`): `BLOCKED_NO_ACTION`; no candidate DDS write.
+- B terminal `LOCALIZATION-LOCALIZATION_B-00009` (`207e153dbc9aac4bf14da87234bbfa223f050e52`): `DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING`; no candidate DDS write.
+- Recomputed full queue: 137 rows = 79 localize_text + 47 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only. Existing status distribution was preserved because neither lane produced new candidate bytes.
+- Cross-lane C result: no new DDS approvals, no duplicate production/QA, no asset_queue status mutation. Prior C86 high-risk edge-touch HOLDs and C85 pixel+visual PASS-pending-in-game states remain unchanged.
+- Final approved/locked count remains 0. Runtime was not tested; `RUNTIME_VALIDATION=UNTESTED`. Isolated one-DDS-at-a-time in-game validation remains a hard approval gate.
+- Updated shared resume/progress/status/worklog and kept `localization/progress/progress.json` and `localization/progress.json` byte-identical. No N100/GPT Library/VR/FFB/DX/build work.
+- Machine report: `localization/graphics/role_C/20260928-2236-C87/C87_W00002_SYNC_FINAL_QA.json`.
