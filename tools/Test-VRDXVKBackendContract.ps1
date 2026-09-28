@@ -54,10 +54,10 @@ TransparencySupersampling = true
 
     & $selector -Backend dxvk-safe -TestProfile CORRECTNESS -VariantId E_DXVK_SAFE
     $safeHash = (Get-FileHash $dxvkDll -Algorithm SHA256).Hash.ToLowerInvariant()
-    $active = Get-Content (Join-Path $sandbox "ACTIVE_VR_BACKEND.txt") -Raw
-    if ($active -notmatch "(?m)^backend=dxvk-safe$") { throw "DXVK SAFE backend identity missing" }
-    if ($active -notmatch "(?m)^provider=DXVK_X86_SAFE$") { throw "DXVK SAFE provider identity missing" }
-    if ($active -notmatch "(?m)^dxvkD3D9Sha256=$safeHash$") { throw "DXVK SAFE SHA256 identity missing" }
+    $active = Get-Content (Join-Path $sandbox "ACTIVE_VR_BACKEND.txt")
+    if ($active -notcontains "backend=dxvk-safe") { throw "DXVK SAFE backend identity missing" }
+    if ($active -notcontains "provider=DXVK_X86_SAFE") { throw "DXVK SAFE provider identity missing" }
+    if ($active -notcontains "dxvkD3D9Sha256=$safeHash") { throw "DXVK SAFE SHA256 identity missing" }
     if (Test-Path (Join-Path $sandbox "multiviewpatcher.dll")) { throw "DXVK SAFE must not install multiviewpatcher.dll" }
 
     $manifest = Get-Content (Join-Path $sandbox "CURRENT_VR_SESSION.json") -Raw | ConvertFrom-Json
@@ -67,9 +67,9 @@ TransparencySupersampling = true
 
     & $selector -Backend dxvk -TestProfile PERFORMANCE -VariantId E_DXVK_MULTIVIEW
     $patcherHash = (Get-FileHash $patcher -Algorithm SHA256).Hash.ToLowerInvariant()
-    $active = Get-Content (Join-Path $sandbox "ACTIVE_VR_BACKEND.txt") -Raw
-    if ($active -notmatch "(?m)^provider=DXVK_X86_MULTIVIEW$") { throw "DXVK multiview provider identity missing" }
-    if ($active -notmatch "(?m)^multiviewPatcherSha256=$patcherHash$") { throw "DXVK multiview patcher hash missing" }
+    $active = Get-Content (Join-Path $sandbox "ACTIVE_VR_BACKEND.txt")
+    if ($active -notcontains "provider=DXVK_X86_MULTIVIEW") { throw "DXVK multiview provider identity missing" }
+    if ($active -notcontains "multiviewPatcherSha256=$patcherHash") { throw "DXVK multiview patcher hash missing" }
 
     # Wrong-architecture provider must be rejected before it can replace the game-root d3d9.dll.
     $rootHashBefore = (Get-FileHash (Join-Path $sandbox "d3d9.dll") -Algorithm SHA256).Hash
