@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T07:01:00+09:00",
+  "updatedKst": "2026-09-29T07:52:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -396,10 +396,15 @@
       "summary": "Cross-backend frame-pacing optimization: quantify R29+ draw amplification, producer/consumer waits, copies and XR pacing without waiting for all visual cleanup. Correctness invariants remain hard gates.",
       "testLevel": "LEVEL2",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": true,
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "implementationProgress": "DXVK F30 regression sub-step complete: production R23 DirectGPU commit is statically guarded to exactly one left/right host-owned hold CopyResource pair, with no legacy directSnapshot/CommitDirectStereoSource/Flush work in the production wrapper.",
+      "dxvkCopyBudgetResultSha": "807c60a62a70451600f9cef50d031ff2883d5b72",
+      "dxvkCopyBudgetValidationRunId": 36493723474,
+      "dxvkCopyBudgetValidation": "AUTOMATION_VALIDATION_PASS",
+      "nextAction": "Use the next exact-build Quest3/VDXR PERFORMANCE FrameBudget evidence before changing the intentional hold pair. If host commit/render timing proves this pair is material, design a bounded optimization that preserves immutable-until-ACK and host-owned lifetime semantics; otherwise optimize the measured dominant stage instead."
     },
     {
       "id": "L1-RECENTER-001",

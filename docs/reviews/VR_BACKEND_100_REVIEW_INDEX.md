@@ -58,6 +58,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 - **DXVK SAFE clean-profile infrastructure closed 2026-09-28:** `dxvk-safe + PERFORMANCE` now consumes the canonical PERFORMANCE cadence policy, explicitly forces `HudInspector=false`, and disables shader fingerprinting while preserving DXVK provider/runtime-version logging. Source result `27bd1e89bdac1d547bd9994eb5ea51901d08d81a`; Build `36414470101`, OpenXR `36414470068`, and HUD Inspector `36414470078` PASS on validation checkpoint `d288dec167dc770db2ff2f2264b9781acded5929`.
 - DX11 performance methodology remains open because DX11 profile equivalence and census/fingerprint benchmark isolation are not closed by this DXVK-only task.
 - DXVK runtime/performance verdict remains **UNTESTED** until an exact-build Quest 3/VDXR same-scene PERFORMANCE run is available.
+- **F30 guarded 2026-09-29:** production R23 DirectGPU is statically bounded to exactly one left/right host-owned hold `CopyResource` pair, with legacy private snapshot/Flush work excluded from the production direct commit wrapper. Gate `36493723474` PASS on `807c60a62a70451600f9cef50d031ff2883d5b72`. This prevents copy amplification; it does not prove the pair is or is not a runtime bottleneck.
 - R32 ACK polling/pressure-only Flush policy is accepted.
 
 ### F. Diagnostics / CI

@@ -553,6 +553,16 @@
         ],
         "interpretation": "Existing R23/R32 telemetry is now machine-aggregated for the next exact-build performance comparison. This does not identify a bottleneck until Quest3/VDXR runtime evidence is collected.",
         "runtime_problem_status_unchanged": true
+      },
+      "hostCopyBudgetContract": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00031",
+        "result_sha": "807c60a62a70451600f9cef50d031ff2883d5b72",
+        "validation_run_id": 36493723474,
+        "invariant": "Production R23 DirectGPU stages exactly one left/right host-owned hold CopyResource pair per accepted frame and does not invoke legacy private snapshot/Flush work in the production commit wrapper.",
+        "verifier": "tools/verify_dxvk_host_owned_transport_contract.py",
+        "runtime_performance_effect": "UNTESTED",
+        "runtime_problem_status_unchanged": true
       }
     }
   ],

@@ -170,5 +170,20 @@
       "R32 producerFenceOk/producerBudgetFallback/backpressure/pendingDrain/pendingBlock/pendingError windows"
     ],
     "next_runtime_use": "Use exact-build DXVK PERFORMANCE data to localize the ~33.44 ms gameplay failure budget before making synchronization/copy/cadence optimizations."
+  },
+  "host_copy_budget_contract": {
+    "task_id": "CONVERSION-DXVK-00031",
+    "result_sha": "807c60a62a70451600f9cef50d031ff2883d5b72",
+    "automation_validation": "PASS",
+    "validation_run_id": 36493723474,
+    "runtime_validation": "UNTESTED",
+    "invariant": [
+      "R23StageDirectHold contains exactly two CopyResource calls: one left and one right eye",
+      "R23StageDirectHold contains no directSnapshotLeft_/directSnapshotRight_ legacy work",
+      "R23StageDirectHold contains no CommitDirectStereoSource or Flush",
+      "R23CommitDirectAfterValidation orders PrepareDirectStereoSource -> size validation -> R23StageDirectHold -> ready/valid publication",
+      "R23CommitDirectAfterValidation contains no duplicate CopyResource, snapshot or Flush work"
+    ],
+    "interpretation": "This prevents accidental copy amplification. It does not authorize removal of the hold pair; exact-build FrameBudget runtime evidence must first show it is a material bottleneck."
   }
 }

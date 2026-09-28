@@ -137,3 +137,12 @@ Task `CONVERSION-DXVK-00029` implemented the DXVK analyzer slice of `VR-PERF-COM
 Exact source `7da248c5389013e54b1331acf6450ed2a0f09c30` now writes a structured `FrameBudget` object into `AUTO_ANALYSIS_SUMMARY.json`. It includes host capture/commit-copy/render/xrEndFrame avg/max/P95 summaries, xrWaitFrame/xrFrameInterval/cadence/game-present-to-consume samples, and aggregated producer fence success/budget-fallback/backpressure/pending-drain/block/error counters. A synthetic two-window regression test verifies deterministic aggregation.
 
 Backend Conversion Gate `36489032539`, Build `36489037539`, OpenXR architecture `36489037480`, and HUD Inspector `36489037536` all passed on the exact SHA. This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. It does not prove where the current ~33.44 ms gameplay budget is spent. The next DXVK PERFORMANCE run should use these fields to choose a bounded optimization instead of tuning waits/copies/cadence by guesswork.
+
+
+## 2026-09-29 — DXVK DirectGPU hold-copy budget guarded
+
+Task `CONVERSION-DXVK-00031` strengthened the existing host-owned transport synchronization verifier around Set 08 F30. The production R23 direct path already used a host-owned left/right hold pair and bypassed the legacy private snapshot path, but the verifier only checked that the two copy statements existed and were ordered.
+
+Exact source `807c60a62a70451600f9cef50d031ff2883d5b72` now fails CI unless `R23StageDirectHold` contains exactly two `CopyResource` calls, contains no legacy direct-snapshot or Flush work, and `R23CommitDirectAfterValidation` reaches that stage in the expected order without adding duplicate copy/snapshot/Flush work. Backend Conversion Gate `36493723474`, Build `36493729345`, OpenXR architecture `36493729294`, and HUD Inspector `36493729281` all passed on the exact SHA.
+
+This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The hold pair remains an intentional lifetime-safety cost. It must not be removed based on static reasoning alone; the next exact-build Quest 3 / VDXR PERFORMANCE run should use the structured FrameBudget from `CONVERSION-DXVK-00029` to determine whether host commit/render cost is actually dominant.

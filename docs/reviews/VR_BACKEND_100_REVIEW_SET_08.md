@@ -14,7 +14,7 @@ Derived from Set 07 transport/synchronization findings. Set 08 reviews hot-path 
 | S08-R06 | Semantic tag mutex contention | LOW_TO_MEDIUM | Exact producer registration/consumption uses a shared mutex. The path is intentionally sparse and semantically valuable, but HUD-heavy frames can still incur cross-thread contention. Measure before optimizing; do not remove correctness ownership to save this cost. |
 | S08-R07 | Host ACK polling | PASS | R32 polls D3D11 EVENT queries with `D3D11_ASYNC_GETDATA_DONOTFLUSH`; steady-state polling does not force driver submission. |
 | S08-R08 | Flush escalation policy | PASS | Explicit D3D11 Flush is deferred until a direct-ring slot remains blocked after polling. This keeps steady frames batched and pays the flush only under real backpressure. |
-| S08-R09 | Host hold-copy cost | MEDIUM_INTENTIONAL | Current DirectGPU production path still copies left/right shared eyes once into host-owned hold textures each producer frame. R32 removed the redundant SafeEye copy/second projection, but the safety hold pair remains a measurable bandwidth cost that should be optimized only after ownership/ACK parity is preserved. |
+| S08-R09 | Host hold-copy cost | MEDIUM_INTENTIONAL_GUARDED | Current DirectGPU production path copies left/right shared eyes exactly once into host-owned hold textures per accepted producer frame. `CONVERSION-DXVK-00031` strengthens the transport verifier to require exactly two `CopyResource` calls in `R23StageDirectHold`, forbid legacy snapshot/Flush work there, and forbid duplicate copy/snapshot/Flush work in `R23CommitDirectAfterValidation`. The safety hold pair remains a runtime-measurable cost and is not removed without HMD FrameBudget evidence. |
 | S08-R10 | Performance verdict isolation | PARTIAL_CLOSED_DXVK_SAFE | DXVK SAFE now has a dedicated minimal-instrumentation, profile-equivalent `PERFORMANCE` launch path. This provides benchmark infrastructure only; an actual performance verdict still requires an exact-build Quest 3/VDXR same-scene run. DX11 remains methodology-open. |
 
 ## Findings carried forward
@@ -22,7 +22,7 @@ Derived from Set 07 transport/synchronization findings. Set 08 reviews hot-path 
 - **F27 PARTIAL CLOSED 2026-09-28:** DXVK SAFE `PERFORMANCE` now applies the canonical PERFORMANCE cadence policy; DX11 remains open.
 - **F28 DXVK SAFE CLOSED 2026-09-28:** DXVK SAFE `PERFORMANCE` explicitly disables HUD inspector; other correctness/discovery profiles intentionally retain it.
 - **F29 PARTIAL CLOSED 2026-09-28:** DXVK SAFE `PERFORMANCE` disables shader fingerprinting; DX11 census/fingerprint benchmark isolation remains open.
-- **F30 MEDIUM intentional cost:** one host-owned left/right hold CopyResource pair remains in the safe DirectGPU path.
+- **F30 MEDIUM intentional cost / automation guarded 2026-09-29:** exactly one host-owned left/right `CopyResource` pair remains in the production DirectGPU path. Exact-SHA Backend Conversion Gate `36493723474` PASS on `807c60a62a70451600f9cef50d031ff2883d5b72`; the verifier rejects extra copies, legacy direct snapshots, `CommitDirectStereoSource`, or `Flush` in the R23 production hold/commit path. Runtime cost is still UNTESTED.
 - R32 DONOTFLUSH polling and pressure-only Flush escalation are accepted as good performance-oriented synchronization choices.
 - The XR-cadence limiter itself has a safe 60-Hz startup fallback. DXVK SAFE `PERFORMANCE` now enters cadence mode; DX11 still bypasses it in the current launcher policy.
 

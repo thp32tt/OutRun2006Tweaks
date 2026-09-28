@@ -1,0 +1,76 @@
+{
+  "task_id": "CONVERSION-DXVK-00031",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "bfa2dd15071aa8de7c207ca078f6c45cc2a3544c",
+  "result_sha": "807c60a62a70451600f9cef50d031ff2883d5b72",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "L2-PERF-001-DXVK-F30-COPY-BUDGET-GUARD",
+  "summary": "Strengthened the existing DXVK host-owned transport verifier so the production R23 DirectGPU path is statically bounded to exactly one left/right host-owned hold CopyResource pair and cannot silently regress into the legacy private snapshot/fence/Flush path. No runtime code was changed.",
+  "changed_paths": [
+    "tools/verify_dxvk_host_owned_transport_contract.py"
+  ],
+  "review": {
+    "architecture": "Set 08 F30 identifies the host hold pair as intentional ownership/lifetime safety. The correct software-only action is to prevent amplification, not remove the copies without performance evidence.",
+    "ownership_lifetime": "The hold pair remains after producer-complete publication and before host projection/consumer ACK. No generation, fence or ACK semantics changed.",
+    "stereo_correctness": "No renderer, WVP, HUD/menu/effect/recenter behavior changed.",
+    "performance": "Verifier now caps production hold-copy amplification at exactly two CopyResource calls and excludes legacy snapshot/Flush work. Actual GPU cost remains runtime-unknown.",
+    "adversarial": "The guard fails if another CopyResource is added inside R23StageDirectHold, if legacy directSnapshot/CommitDirectStereoSource/Flush work reappears there, or if R23CommitDirectAfterValidation duplicates any copy/snapshot/Flush work."
+  },
+  "behavior_verified": [
+    "R23StageDirectHold contains exactly two CopyResource calls.",
+    "Those copies are left direct eye -> left host hold and right direct eye -> right host hold before hold frame/generation validity publication.",
+    "R23StageDirectHold contains no directSnapshotLeft_, directSnapshotRight_, CommitDirectStereoSource, or Flush.",
+    "R23CommitDirectAfterValidation orders PrepareDirectStereoSource, R23ValidateDirectResourceSize, R23StageDirectHold, directTransportReady and directFrameValid.",
+    "R23CommitDirectAfterValidation contains no extra CopyResource, legacy snapshot, CommitDirectStereoSource or Flush work."
+  ],
+  "queue_update": {
+    "item_id": "L2-PERF-001",
+    "status_unchanged": "READY",
+    "dxvk_substep": "F30_COPY_AMPLIFICATION_GUARD_COMPLETE_NEED_HMD_FRAME_BUDGET",
+    "reason": "Static regression risk is closed, but optimization choice depends on exact-build runtime FrameBudget evidence."
+  },
+  "evidence": [
+    "C0 recovered GitHub HEAD bfa2dd15071aa8de7c207ca078f6c45cc2a3544c, AGENTS.md, review index/Sets 08-10, QUEUE_CONTROLLER_CONTRACT.md, automation state, CONVERSION-DXVK-00029 and DXVK runtime regression evidence. N100/local clone was not used.",
+    "C1 confirmed existing synchronization verifier guaranteed the hold copy statements exist/order but not exact count or exclusion of legacy snapshot/Flush work in the production wrapper.",
+    "Backend Conversion Gate 36493723474 PASS on exact source SHA 807c60a62a70451600f9cef50d031ff2883d5b72, including the strengthened host-owned transport synchronization/copy-budget contract and all existing DXVK gates plus Win32 build/binary verification.",
+    "Build 36493729345 PASS on exact source SHA 807c60a62a70451600f9cef50d031ff2883d5b72.",
+    "OpenXR VR architecture 36493729294 PASS on exact source SHA 807c60a62a70451600f9cef50d031ff2883d5b72 across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36493729281 PASS on exact source SHA 807c60a62a70451600f9cef50d031ff2883d5b72.",
+    "PC Fast 36493723644 skipped; scheduled automation did not use the user's PC.",
+    "Backend artifact 11002838255 digest sha256:dfd9225585f1399800c875105d9f0d20f5f2829bf777935f8911200db0ab0f8f.",
+    "OpenXR host artifact 11002748772 digest sha256:22b76246d1ac4904cc5bc9fb3283f539fe3d8a59e9b712c3c06a339c8a9771ca.",
+    "HUD inspector artifact 11001674935 digest sha256:6ea6a0086cfe7d3fb940f3285c2bc00b6a0c5121c3666f9df5b52eb9d9216d2b.",
+    "Issue #14 implementation comment 5880022842 and validation comment 5880176975 record the transaction."
+  ],
+  "completed_work_items": [
+    "L2-PERF-001-DXVK-F30-COPY-BUDGET-GUARD"
+  ],
+  "blocked_runtime_items": [
+    "L2-PERF-001-DXVK-HOLD-COPY-COST-MEASUREMENT",
+    "VR-PERF-COMMON-001-DXVK-RUNTIME-BUDGET-LOCALIZATION",
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE"
+  ],
+  "next_action": "Run an exact-build Quest3/VDXR DXVK PERFORMANCE session using the FrameBudget fields from CONVERSION-DXVK-00029. Only consider changing the intentional hold pair if trusted runtime evidence shows host commit/render copy cost is material; preserve immutable-until-ACK and host-owned lifetime semantics.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36493723474,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36493729345,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36493729294,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36493729281,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36493723644,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 11002838255,
+    "backend_gate_artifact_digest": "sha256:dfd9225585f1399800c875105d9f0d20f5f2829bf777935f8911200db0ab0f8f",
+    "openxr_host_artifact_id": 11002748772,
+    "openxr_host_artifact_digest": "sha256:22b76246d1ac4904cc5bc9fb3283f539fe3d8a59e9b712c3c06a339c8a9771ca",
+    "hud_inspector_artifact_id": 11001674935,
+    "hud_inspector_artifact_digest": "sha256:6ea6a0086cfe7d3fb940f3285c2bc00b6a0c5121c3666f9df5b52eb9d9216d2b"
+  },
+  "recorded_at_kst": "2026-09-29T07:52:00+09:00"
+}
