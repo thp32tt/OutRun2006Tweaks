@@ -1,0 +1,53 @@
+name: Localization B93 Exact BBox Rework
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/B93-20260928-1304.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-b93-exact-bbox
+  cancel-in-progress: false
+
+jobs:
+  rework:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+      - name: Install image dependency
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Run B93 exact-bbox rework and exhaustive first QA
+        run: python tools/localization/b93_rework_2da.py
+      - name: Commit B93 localization result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add             localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds             localization/graphics/role_B/20260928-1304-B93             localization/graphics/asset_queue.csv             localization/progress/progress.json             localization/resume_state.json             localization/progress/STATUS.md             localization/WORKLOG.md
+          git commit -m "localization: B93 exact-bbox rework 2DA43E41 [AUTO:B93-20260928-1304]"
+          RESULT_SHA="$(git rev-parse HEAD)"
+          git push origin HEAD:korean-localization-clean
+          python - <<'PY'
+          import json, pathlib, subprocess
+          p=pathlib.Path("docs/automation/runs/B93-20260928-1304.json")
+          j=json.loads(p.read_text("utf-8"))
+          sha=subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip()
+          j["result_sha"]=sha
+          j["automation_validation"]="PASS"
+          j["summary"]="B93 2DA43E41 exact-bbox rework committed after exhaustive first QA; runtime/in-game validation remains untested."
+          j["evidence"].append("localization/graphics/role_B/20260928-1304-B93/B93_2DA43E41_EXACT_BBOX_REWORK_REPORT.json")
+          p.write_text(json.dumps(j,ensure_ascii=False,indent=2)+"\n","utf-8")
+          PY
+          git add docs/automation/runs/B93-20260928-1304.json
+          git commit -m "automation: record B93 result SHA [AUTO:B93-20260928-1304]"
+          git push origin HEAD:korean-localization-clean
