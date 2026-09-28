@@ -46,7 +46,11 @@ def main() -> None:
         "D3D11_INPUT_PER_VERTEX_DATA": "per-vertex slot classification",
         "DXGI_FORMAT_R32G32B32_FLOAT": "FLOAT3 layout mapping",
         "DXGI_FORMAT_B8G8R8A8_UNORM": "D3DCOLOR layout mapping",
-        "fvfPending": "FVF-only path remains explicitly pending",
+        "D3DFVF_XYZRHW": "FVF transformed-position mapping",
+        "D3DFVF_TEXCOORDSIZE4": "FVF texture-coordinate width mapping",
+        "fvfPath": "R79 explicit FVF path identity",
+        "XYZB1..XYZB5": "FVF blend encodings remain fail-closed",
+        "fvfPending": "unsupported FVF path remains explicitly pending",
     }
     missing_input_layout_contract = [
         meaning
@@ -72,8 +76,9 @@ def main() -> None:
         "GetTexture": "texture observation",
         "inputLayoutExact": "R78 sample-level input-layout readiness",
         "InputLayoutExactSamples": "R78 exact layout evidence counter",
-        "InputLayoutUnsupportedSamples": "R78 unsupported layout evidence counter",
-        "InputLayoutFvfPendingSamples": "R78 FVF-only blocker counter",
+        "InputLayoutUnsupportedSamples": "R78/R79 unsupported layout evidence counter",
+        "InputLayoutFvfExactSamples": "R79 exact FVF layout evidence counter",
+        "InputLayoutFvfPendingSamples": "R79 unsupported FVF blocker counter",
         "resourcesExact && inputLayoutExact": "R78 exact-sample layout gate",
         "translate_vertex_input_layout": "R78 runtime declaration classifier",
     }
@@ -254,7 +259,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R7[2345678] census": "R72/R73/R74/R75/R76/R77/R78 summary compatibility",
+        "R7[23456789] census": "R72/R73/R74/R75/R76/R77/R78/R79 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -281,8 +286,9 @@ def main() -> None:
         "managedShadowVersion": "R77 CPU-shadow version evidence",
         "managedMirrorReady": "R77 fail-closed mirror readiness evidence",
         "inputLayoutExact": "R78 exact input-layout evidence",
-        "inputLayoutUnsupported": "R78 unsupported input-layout evidence",
-        "inputLayoutFvfPending": "R78 FVF-only pending evidence",
+        "inputLayoutUnsupported": "R78/R79 unsupported input-layout evidence",
+        "inputLayoutFvfExact": "R79 exact FVF input-layout evidence",
+        "inputLayoutFvfPending": "R79 unsupported FVF pending evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
