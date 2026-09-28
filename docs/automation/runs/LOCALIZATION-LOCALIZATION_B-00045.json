@@ -1,0 +1,60 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00045",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00014",
+  "recorded_at_kst": "2026-09-29T06:25:00+09:00",
+  "initial_head_sha": "c50a81e07341bfd2a636650d724dfd3ef78ba1fc",
+  "material_commit": "1aeb013415d726b3de548d0461faf1a1168292d4",
+  "final_precommit_head_sha": "1aeb013415d726b3de548d0461faf1a1168292d4",
+  "peer_lane_commit_observed_before_terminal_commit": false,
+  "peer_lane_expected_task": "LOCALIZATION-LOCALIZATION_A-00044",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_HD_ATLAS_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT_REMOTE_POSTCOMMIT_PENDING",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20260929-0625-B109/B109_W00014_EVEN_HD_ATLAS_RECONSTRUCTION_INPUT.json",
+  "material_deliverable": {
+    "type": "4_EVEN_HD_ATLAS_RECONSTRUCTION_INPUTS",
+    "even_indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "semantic_segments_checked": 42,
+    "semantic_segments_with_exact_sprite_cell_mapping": 38,
+    "source_blob_identities_pinned": 12,
+    "remaining_explicit_hold": {
+      "index": 50,
+      "sources": [
+        "PLEASE WAIT",
+        "PLAYERS",
+        "YOUR FRIENDS",
+        "FRIEND REQUEST"
+      ]
+    },
+    "candidate_dds_modified": false
+  },
+  "preterminal_validation": {
+    "changed_files_from_initial_head": [
+      "localization/graphics/role_B/20260929-0625-B109/B109_W00014_EVEN_HD_ATLAS_RECONSTRUCTION_INPUT.json"
+    ],
+    "lane_local_only": true,
+    "parity": "PASS_EVEN_ONLY",
+    "source_identity": "PASS_12_OF_12_PINNED_GITHUB_BLOBS",
+    "transcription_artwork_plan": "PASS_4_OF_4_ASSET_SEGMENT_LISTS",
+    "shared_state_isolation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "B advanced four unfinished even-shard localize_text assets with exact pinned GitHub source/atlas evidence and deterministic semantic-to-sprite reconstruction constraints. No common state, odd-shard asset, DDS candidate, N100/local clone, GPT Library, VR/FFB/DX, or build work was performed. Runtime remains UNTESTED."
+}
