@@ -1,0 +1,33 @@
+name: Chat Controller Selftest
+
+on:
+  push:
+    branches: [chat-controller-downloads]
+    paths:
+      - 'tools/chat-controller/v0.4/**'
+      - '.github/workflows/chat-controller-selftest.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reassemble and compile controller
+        run: |
+          cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
+          python -m py_compile /tmp/controller.py
+
+      - name: Validate Portainer compose files
+        run: |
+          docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-vr.yml config >/tmp/vr-compose.txt
+          docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-localization.yml config >/tmp/loc-compose.txt
+
+      - name: Verify queue prompt files
+        run: |
+          test -s tools/chat-controller/v0.4/conversion_dx11.md
+          test -s tools/chat-controller/v0.4/conversion_dxvk.md
+          test -s tools/chat-controller/v0.4/localization_A.md
+          test -s tools/chat-controller/v0.4/localization_B.md
+          test -s tools/chat-controller/v0.4/localization_C.md
