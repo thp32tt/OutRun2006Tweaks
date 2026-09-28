@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 3,
+  "completedCycles": 4,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "199ca005ef21b40fe5d605c87743380d88ff4e68",
+  "currentHead": "e7b0f066398e7a5aa71bf217fef3a0f969ec7d66",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -86,18 +86,44 @@
       "automationValidation": "HUD_INSPECTOR_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "Consume the next canonical EXE inspector output, enumerate BA9D0 callers, then shrink the broad 0x097300-0x097F00 runtime classification if exact evidence permits."
+    },
+    {
+      "cycle": 4,
+      "lenses": [
+        "MANAGED resource lifetime",
+        "budget correctness",
+        "selector regression",
+        "concurrency/adversarial"
+      ],
+      "findingKeys": [
+        "R71-MANAGED-EMERGENCY-RESERVE-CUMULATIVE-001"
+      ],
+      "findings": [
+        "The intended single 16 MiB selector emergency class was enforced only per resource, not cumulatively. Multiple eligible 2048x2048 atlases could consume more than 16 MiB while bypassing the 368 MiB general counter, causing later general shadows to hit the 384 MiB total cap early."
+      ],
+      "changedFiles": [
+        "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+        "tools/verify_vr_proven_baseline.py"
+      ],
+      "commits": [
+        "1ea60e1ed5dd6de1da55fbef4f8058b557c1601f",
+        "e7b0f066398e7a5aa71bf217fef3a0f969ec7d66"
+      ],
+      "automationValidation": "EXACT_HEAD_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "Require exact-head build/baseline verifier pass; HMD selector/car-screen regression remains required before promotion."
     }
   ],
   "nextCycle": {
-    "cycle": 4,
+    "cycle": 5,
     "priority": [
-      "C3 exact-head CI results",
-      "canonical BA9D0 caller enumeration",
+      "consume PR #79 exact-parent CI",
+      "consume new HUD Inspector BA9D0 caller map",
       "host ACK/session lifetime reconciliation",
-      "R14 managed-shadow lifetime/budget",
-      "R30 SkyGlow additive intensity only after R71 HMD evidence"
+      "R14 external-write hot-path attribution before optimization",
+      "SkyGlow intensity deferred until frozen R71 HMD result"
     ],
     "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no synchronization behavior change without measurements."
   },
-  "updatedKst": "2026-09-29T02:33:45+09:00"
+  "updatedKst": "2026-09-29T02:38:00+09:00"
 }
