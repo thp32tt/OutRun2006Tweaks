@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "B92",
+  "timestamp_kst": "2026-09-28T12:31:00+09:00",
+  "base_head": "11631c5f12037bcd01cda1af57ec9bc564af4bcf",
+  "binary_commit": "abba1c70e744d6c26cc2f3a5da4d50bcbfd1d5b0",
+  "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "scope": "Even-index REWORK_REQUIRED DXT5 production lane: exact source-bbox one-pixel vertical correction",
+  "method": "Moved existing HD Korean raster exactly 1 raw-DDS pixel upward via DXT5 index remap while preserving DDS header, DXT5 endpoint bytes, dimensions, format and mip count.",
+  "assets": [
+    {
+      "asset": "62BEBF33",
+      "index": 104,
+      "korean": "아웃런 모드",
+      "previous_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+      "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
+      "original_bbox": [
+        392,
+        52,
+        1357,
+        201
+      ],
+      "localized_bbox": [
+        565,
+        52,
+        1186,
+        200
+      ],
+      "raw_localized_bbox": [
+        565,
+        56,
+        1186,
+        204
+      ],
+      "delta_left": 173,
+      "delta_right": 171,
+      "delta_top": 0,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "edge_touch_high_risk": true,
+      "header_128_exact": true,
+      "format": "DXT5",
+      "dimensions": [
+        2048,
+        256
+      ],
+      "mipmaps": 1,
+      "changed_payload_bytes": 6996,
+      "changed_dxt5_blocks": 2504,
+      "dxt5_endpoints_preserved": true,
+      "result": "B92_SELF_QA_PASS_PENDING_C_AND_INGAME"
+    },
+    {
+      "asset": "E3FD08BE",
+      "index": 116,
+      "korean": "하트 어택 모드",
+      "previous_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+      "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
+      "original_bbox": [
+        393,
+        54,
+        1628,
+        200
+      ],
+      "localized_bbox": [
+        632,
+        54,
+        1388,
+        199
+      ],
+      "raw_localized_bbox": [
+        632,
+        57,
+        1388,
+        202
+      ],
+      "delta_left": 239,
+      "delta_right": 240,
+      "delta_top": 0,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "edge_touch_high_risk": true,
+      "header_128_exact": true,
+      "format": "DXT5",
+      "dimensions": [
+        2048,
+        256
+      ],
+      "mipmaps": 1,
+      "changed_payload_bytes": 7322,
+      "changed_dxt5_blocks": 2800,
+      "dxt5_endpoints_preserved": true,
+      "result": "B92_SELF_QA_PASS_PENDING_C_AND_INGAME"
+    }
+  ],
+  "queue_sanity": {
+    "total": 137,
+    "localize_text": 79,
+    "zoom_review": 47,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "final_approval": false,
+  "approval_reason": "Both candidates touch the original bbox edge with zero margin. Independent C cross-lane revalidation and isolated DDS_ONLY in-game validation remain mandatory.",
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false
+}
