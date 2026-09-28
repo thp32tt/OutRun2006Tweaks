@@ -34,6 +34,7 @@ class StatusHandler(BaseHTTPRequestHandler):
 <p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
 <p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
 <p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
+<p><b>noVNC:</b> {f"<a href='{html.escape(NOVNC_PUBLIC_URL, quote=True)}' target='_blank' rel='noopener noreferrer'>{html.escape(NOVNC_PUBLIC_URL)}</a>" if NOVNC_PUBLIC_URL else "not configured"}</p>
 <h2>Queue State</h2><pre>{html.escape(json.dumps(q, ensure_ascii=False, indent=2))}</pre>
 <h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "rate_limit_attempts": reg.rate_limit_attempts, "rate_limit_until": reg.rate_limit_until, "last_global_send_at": reg.last_global_send_at, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
 <h2>Runtime</h2><pre>{html.escape(json.dumps(runtime, ensure_ascii=False, indent=2))}</pre>
