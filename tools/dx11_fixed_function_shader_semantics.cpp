@@ -12,14 +12,19 @@ namespace
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedNotReady;
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedResourceType;
     using outrun::vr::dx11::FixedFunctionStageState;
+    using outrun::vr::dx11::FixedFunctionUnsupportedArgument;
+    using outrun::vr::dx11::FixedFunctionUnsupportedSamplerFilter;
+    using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
+    using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::translate_fixed_function_readiness;
 
     void require(bool condition, const char* message)
     {
         if (!condition)
         {
-            std::cerr << "R86 semantic smoke failure: " << message << '\n';
+            std::cerr << "R87 semantic smoke failure: " << message << '\n';
             std::exit(1);
         }
     }
@@ -69,6 +74,28 @@ int main()
 {
     std::array<D3DRESOURCETYPE, 8> textureTypes{};
     textureTypes.fill(D3DRTYPE_TEXTURE);
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        const auto readiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x00, 0x00);
+        require(readiness.exact(), "zero-stage readiness was not exact");
+        require(readiness.activeStages == 0, "zero-stage active count drift");
+
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes);
+        require(prototype.generated(), "zero-stage passthrough was not generated");
+        require(prototype.activeStages == 0, "zero-stage prototype count drift");
+        require(
+            prototype.source.find("Texture2D texture") == std::string::npos,
+            "zero-stage shader emitted a texture declaration");
+        require(
+            prototype.source.find("return current;") != std::string::npos,
+            "zero-stage shader did not return diffuse current");
+        require_compiles(prototype, "zero-stage passthrough compile");
+    }
 
     {
         std::array<FixedFunctionStageState, 8> stages{};
@@ -174,6 +201,164 @@ int main()
     {
         std::array<FixedFunctionStageState, 8> stages{};
         stages[0] = active_stage(
+            D3DTOP_MODULATE,
+            D3DTA_TEXTURE,
+            D3DTA_DIFFUSE,
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            0);
+        stages[1] = active_stage(
+            D3DTOP_MODULATE,
+            D3DTA_CURRENT,
+            D3DTA_TEXTURE,
+            D3DTOP_SELECTARG1,
+            D3DTA_CURRENT,
+            D3DTA_TEXTURE,
+            1);
+        stages[2] = active_stage(
+            D3DTOP_SELECTARG2,
+            D3DTA_CURRENT,
+            D3DTA_TEXTURE,
+            D3DTOP_SELECTARG2,
+            D3DTA_CURRENT,
+            D3DTA_TEXTURE,
+            5);
+        stages[2].minFilter = D3DTEXF_LINEAR;
+        stages[2].magFilter = D3DTEXF_LINEAR;
+        stages[2].mipFilter = D3DTEXF_LINEAR;
+        stages[2].addressU = D3DTADDRESS_CLAMP;
+        stages[2].addressV = D3DTADDRESS_CLAMP;
+
+        const auto readiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x07, 0x07);
+        require(readiness.exact(), "stage2 SELECTARG2 readiness was not exact");
+        require(readiness.activeStages == 3, "stage2 active count drift");
+
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x07, 0x07, textureTypes);
+        require(prototype.generated(), "stage2 SELECTARG2 chain was not generated");
+        require(
+            prototype.source.find(
+                "Texture2D texture2 : register(t2);") != std::string::npos,
+            "stage2 texture register semantic drift");
+        require(
+            prototype.source.find(
+                "float4 sampled2 = texture2.Sample(sampler2, input.tex5.xy);") !=
+                std::string::npos,
+            "stage2 nonmatching texcoord semantic drift");
+        require(
+            prototype.source.find(
+                "float3 nextColor = sampled2.rgb;") != std::string::npos,
+            "stage2 SELECTARG2 color semantic drift");
+        require(
+            prototype.source.find(
+                "float nextAlpha = sampled2.a;") != std::string::npos,
+            "stage2 SELECTARG2 alpha semantic drift");
+        require_compiles(prototype, "stage2 SELECTARG2 chain compile");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[1] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            1);
+        const auto readiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x00, 0x00);
+        require(!readiness.exact(), "stage-chain hole did not fail closed");
+        require(
+            (readiness.unsupported & FixedFunctionUnsupportedStageChain) != 0,
+            "stage-chain hole did not set stage-chain blocker");
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes);
+        require(!prototype.generated(), "stage-chain hole generated HLSL");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE | D3DTA_COMPLEMENT,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            0);
+        const auto readiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        require(!readiness.exact(), "argument modifier did not fail closed");
+        require(
+            (readiness.unsupported & FixedFunctionUnsupportedArgument) != 0,
+            "argument modifier did not set argument blocker");
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x01, 0x01, textureTypes);
+        require(!prototype.generated(), "argument modifier generated HLSL");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            0);
+        stages[0].textureTransformFlags = D3DTTFF_COUNT2;
+        const auto readiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        require(!readiness.exact(), "texture transform did not fail closed");
+        require(
+            (readiness.unsupported &
+             FixedFunctionUnsupportedTextureTransform) != 0,
+            "texture transform did not set transform blocker");
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x01, 0x01, textureTypes);
+        require(!prototype.generated(), "texture transform generated HLSL");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            0);
+        stages[0].minFilter = D3DTEXF_ANISOTROPIC;
+        const auto readiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        require(!readiness.exact(), "anisotropic sampler did not fail closed");
+        require(
+            (readiness.unsupported &
+             FixedFunctionUnsupportedSamplerFilter) != 0,
+            "anisotropic sampler did not set sampler-filter blocker");
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x01, 0x01, textureTypes);
+        require(!prototype.generated(), "anisotropic sampler generated HLSL");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
             D3DTOP_SELECTARG1,
             D3DTA_TEXTURE,
             D3DTA_CURRENT,
@@ -221,6 +406,6 @@ int main()
         require(!probe.attempted, "compile probe ran for unsupported resource type");
     }
 
-    std::cout << "DX11 fixed-function shader semantics smoke: PASS\n";
+    std::cout << "DX11 fixed-function shader semantics smoke R87: PASS\n";
     return 0;
 }

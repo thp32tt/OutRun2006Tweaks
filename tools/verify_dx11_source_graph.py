@@ -393,25 +393,36 @@ def main() -> None:
             "DX11 R85 compiler probe requires d3dcompiler.lib in the checked-in CMake graph"
         )
 
-    r86_smoke_contract = {
-        "D3DTOP_SELECTARG1": "R86 SELECTARG1 semantic case",
-        "D3DTOP_MODULATE": "R86 MODULATE semantic case",
-        "D3DTA_CURRENT": "R86 CURRENT stage chaining case",
-        "D3DTA_TEXTURE": "R86 texture sampling case",
+    r87_smoke_contract = {
+        "D3DTOP_SELECTARG1": "R86/R87 SELECTARG1 semantic case",
+        "D3DTOP_SELECTARG2": "R87 SELECTARG2 semantic case",
+        "D3DTOP_MODULATE": "R86/R87 MODULATE semantic case",
+        "D3DTA_CURRENT": "R86/R87 CURRENT stage chaining case",
+        "D3DTA_TEXTURE": "R86/R87 texture sampling case",
+        "input.tex5.xy": "R87 nonmatching stage/texcoord selection case",
+        "D3DTEXF_LINEAR": "R87 supported linear filter readiness case",
+        "D3DTADDRESS_CLAMP": "R87 supported clamp addressing readiness case",
+        "FixedFunctionUnsupportedStageChain": "R87 stage-chain fail-closed reason",
+        "D3DTA_COMPLEMENT": "R87 unsupported argument modifier case",
+        "FixedFunctionUnsupportedArgument": "R87 argument fail-closed reason",
+        "D3DTTFF_COUNT2": "R87 unsupported texture-transform case",
+        "FixedFunctionUnsupportedTextureTransform": "R87 transform fail-closed reason",
+        "D3DTEXF_ANISOTROPIC": "R87 unsupported sampler-filter case",
+        "FixedFunctionUnsupportedSamplerFilter": "R87 sampler fail-closed reason",
         "FixedFunctionShaderPrototypeUnsupportedNotReady": "R86 missing-resource fail-closed case",
         "D3DRTYPE_CUBETEXTURE": "R86 unsupported resource-type case",
         "FixedFunctionShaderPrototypeUnsupportedResourceType": "R86 unsupported resource-type blocker",
-        "compile_fixed_function_pixel_shader_prototype": "R86 actual offline D3DCompile invocation",
-        "DX11 fixed-function shader semantics smoke: PASS": "R86 deterministic smoke completion marker",
+        "compile_fixed_function_pixel_shader_prototype": "R86/R87 actual offline D3DCompile invocation",
+        "DX11 fixed-function shader semantics smoke R87: PASS": "R87 deterministic smoke completion marker",
     }
-    missing_r86_smoke = [
+    missing_r87_smoke = [
         meaning
-        for token, meaning in r86_smoke_contract.items()
+        for token, meaning in r87_smoke_contract.items()
         if token not in SEMANTIC_SMOKE
     ]
-    if missing_r86_smoke:
+    if missing_r87_smoke:
         raise SystemExit(
-            "DX11 R86 semantic smoke drift: " + ", ".join(missing_r86_smoke)
+            "DX11 R87 semantic smoke drift: " + ", ".join(missing_r87_smoke)
         )
 
     for graph_name, graph in (
@@ -420,11 +431,11 @@ def main() -> None:
     ):
         if "dx11_fixed_function_shader_semantics" not in graph:
             raise SystemExit(
-                f"DX11 R86 semantic smoke target missing from {graph_name}"
+                f"DX11 R86/R87 semantic smoke target missing from {graph_name}"
             )
         if "tools/dx11_fixed_function_shader_semantics.cpp" not in graph:
             raise SystemExit(
-                f"DX11 R86 semantic smoke source missing from {graph_name}"
+                f"DX11 R86/R87 semantic smoke source missing from {graph_name}"
             )
 
     for token in (
@@ -434,7 +445,7 @@ def main() -> None:
     ):
         if token not in BACKEND_GATE:
             raise SystemExit(
-                "DX11 R86 semantic smoke missing from Backend Conversion Gate: "
+                "DX11 R86/R87 semantic smoke missing from Backend Conversion Gate: "
                 + token
             )
 
