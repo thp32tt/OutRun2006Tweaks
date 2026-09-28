@@ -661,6 +661,8 @@ namespace OutRunVRStereo
         {
             IDirect3DTexture9* reduced[2]{};
             IDirect3DTexture9* temp[2]{};
+            IDirect3DSurface9* reducedSurface[2]{};
+            IDirect3DSurface9* tempSurface[2]{};
             IDirect3DPixelShader9* bright = nullptr;
             IDirect3DPixelShader9* blur = nullptr;
             IDirect3DPixelShader9* composite = nullptr;
@@ -721,6 +723,8 @@ namespace OutRunVRStereo
         {
             for (int eye = 0; eye < 2; ++eye)
             {
+                ReleaseCom(R30SkyGlow.reducedSurface[eye]);
+                ReleaseCom(R30SkyGlow.tempSurface[eye]);
                 ReleaseCom(R30SkyGlow.reduced[eye]);
                 ReleaseCom(R30SkyGlow.temp[eye]);
             }
@@ -771,8 +775,12 @@ namespace OutRunVRStereo
         {
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
-            const int factor =
-                std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
+            // VR-only post-process policy: keep the normal 2D game path
+            // untouched, but render stereo SkyGlow at half width/height.
+            // The outer callers still honor SkyGlowFactor <= 0 as an explicit
+            // disable switch; once stereo SkyGlow is active its working factor
+            // is fixed at 2 to cut the post-process pixel count to 25%.
+            constexpr int factor = 2;
             const UINT glowWidth = std::max<UINT>(
                 160u, BackBufferDesc.Width /
                     static_cast<UINT>(factor));
@@ -782,6 +790,8 @@ namespace OutRunVRStereo
 
             if (R30SkyGlow.reduced[0] && R30SkyGlow.reduced[1] &&
                 R30SkyGlow.temp[0] && R30SkyGlow.temp[1] &&
+                R30SkyGlow.reducedSurface[0] && R30SkyGlow.reducedSurface[1] &&
+                R30SkyGlow.tempSurface[0] && R30SkyGlow.tempSurface[1] &&
                 R30SkyGlow.bright && R30SkyGlow.blur &&
                 R30SkyGlow.composite &&
                 R30SkyGlow.eyeWidth == BackBufferDesc.Width &&
@@ -804,7 +814,13 @@ namespace OutRunVRStereo
                         glowWidth, glowHeight, 1,
                         D3DUSAGE_RENDERTARGET,
                         D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
-                        &R30SkyGlow.temp[eye], nullptr)))
+                        &R30SkyGlow.temp[eye], nullptr)) ||
+                    FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &R30SkyGlow.reducedSurface[eye])) ||
+                    !R30SkyGlow.reducedSurface[eye] ||
+                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
+                        0, &R30SkyGlow.tempSurface[eye])) ||
+                    !R30SkyGlow.tempSurface[eye])
                 {
                     R30ReleaseSkyGlowResources();
                     return false;
@@ -970,17 +986,10 @@ namespace OutRunVRStereo
             bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced = nullptr;
-                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
-                        0, &reduced)) || !reduced)
-                {
-                    ok = false;
-                    break;
-                }
                 ok = SUCCEEDED(device->StretchRect(
-                    eyeSurface[eye], nullptr, reduced, nullptr,
+                    eyeSurface[eye], nullptr,
+                    R30SkyGlow.reducedSurface[eye], nullptr,
                     D3DTEXF_LINEAR));
-                reduced->Release();
             }
             if (ok)
                 R30SkyGlowSceneCaptureEpoch = PresentEpoch;
@@ -1031,18 +1040,10 @@ namespace OutRunVRStereo
             };
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced = nullptr;
-                IDirect3DSurface9* temp = nullptr;
-                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
-                        0, &reduced)) || !reduced ||
-                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
-                        0, &temp)) || !temp)
-                {
-                    if (temp) temp->Release();
-                    if (reduced) reduced->Release();
-                    ok = false;
-                    break;
-                }
+                IDirect3DSurface9* reduced =
+                    R30SkyGlow.reducedSurface[eye];
+                IDirect3DSurface9* temp =
+                    R30SkyGlow.tempSurface[eye];
 
                 if (R30SkyGlowSceneCaptureEpoch != PresentEpoch)
                 {
@@ -1064,43 +1065,31 @@ namespace OutRunVRStereo
                         R30SkyGlow.bright, zero, false);
                 }
 
-                const float horizontal[4]{
-                    1.0f /
-                        static_cast<float>(R30SkyGlow.glowWidth),
-                    0.0f, 0.0f, 0.0f
-                };
-                if (ok)
-                    ok = R30DrawSkyGlowPass(
-                        device, reduced,
-                        R30SkyGlow.glowWidth,
-                        R30SkyGlow.glowHeight,
-                        R30SkyGlow.temp[eye],
-                        R30SkyGlow.blur, horizontal, false);
-
-                // TwoStep exists to reduce aliasing after a downsample.
-                // At factor=1 there is no downsample, so a second full-resolution
-                // blur only doubles bandwidth. Also make sure the vertical pass,
-                // when requested for factor>1, is actually the composite source.
-                const bool effectiveTwoStep =
+                // Preserve the R69 visual result while removing dead work.
+                // R69 always composited TEMP when TwoStep was off, so its
+                // horizontal blur was unused. When TwoStep was on it composited
+                // REDUCED (the horizontal result), so the later vertical pass
+                // was also unused. Execute only the pass that actually feeds
+                // the final composite.
+                const bool useBlur =
                     Settings::SkyGlowTwoStep.get() &&
                     R30SkyGlow.factor > 1;
                 IDirect3DTexture9* compositeSource =
                     R30SkyGlow.temp[eye];
-                if (effectiveTwoStep)
+                if (useBlur)
                 {
-                    const float vertical[4]{
-                        0.0f,
+                    const float horizontal[4]{
                         1.0f /
-                            static_cast<float>(R30SkyGlow.glowHeight),
-                        0.0f, 0.0f
+                            static_cast<float>(R30SkyGlow.glowWidth),
+                        0.0f, 0.0f, 0.0f
                     };
                     if (ok)
                         ok = R30DrawSkyGlowPass(
-                            device, temp,
+                            device, reduced,
                             R30SkyGlow.glowWidth,
                             R30SkyGlow.glowHeight,
-                            R30SkyGlow.reduced[eye],
-                            R30SkyGlow.blur, vertical, false);
+                            R30SkyGlow.temp[eye],
+                            R30SkyGlow.blur, horizontal, false);
                     if (ok)
                         compositeSource = R30SkyGlow.reduced[eye];
                 }
@@ -1114,8 +1103,6 @@ namespace OutRunVRStereo
                         compositeSource,
                         R30SkyGlow.composite, composite, true);
 
-                temp->Release();
-                reduced->Release();
             }
 
             // Apply the captured pipeline state first, then explicitly restore
@@ -1146,7 +1133,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW: independent L/R extract + stereo blur + additive composite ACTIVE factor={} requestedTwoStep={} effectiveTwoStep={} buffer={}x{}",
+                        "VR SKY GLOW PERF P1: VR-only half-resolution L/R extract + dead-pass-elided blur + additive composite ACTIVE factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
