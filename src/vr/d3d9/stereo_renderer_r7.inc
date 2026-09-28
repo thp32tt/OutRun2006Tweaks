@@ -1635,12 +1635,16 @@ namespace OutRunVRStereo
 		read(D3DRS_SRCBLEND, out.srcBlend);
 		read(D3DRS_DESTBLEND, out.destBlend);
 		read(D3DRS_BLENDOP, out.blendOp);
+		read(D3DRS_SEPARATEALPHABLENDENABLE, out.separateAlphaBlendEnable);
 
 		read(D3DRS_ALPHATESTENABLE, out.alphaTestEnable);
 		read(D3DRS_ALPHAREF, out.alphaRef);
 		read(D3DRS_ALPHAFUNC, out.alphaFunc);
 
 		read(D3DRS_CULLMODE, out.cullMode);
+		read(D3DRS_FILLMODE, out.fillMode);
+		read(D3DRS_SCISSORTESTENABLE, out.scissorTestEnable);
+		read(D3DRS_SRGBWRITEENABLE, out.sRGBWriteEnable);
 		read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);
 		read(D3DRS_STENCILENABLE, out.stencilEnable);
 		read(D3DRS_STENCILWRITEMASK, out.stencilWriteMask);
