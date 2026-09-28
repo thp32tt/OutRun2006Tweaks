@@ -2,8 +2,9 @@
   "SchemaVersion": 1,
   "RendererTarget": "dxvk",
   "LaunchBackend": "dxvk-safe",
-  "Stage": "R71-stock-provider-two-pass-parity",
+  "Stage": "R71-stock-dxvk-3.1.1-two-pass-parity",
   "NativeDrawPathActive": false,
   "VariantId": "R69_FIXPACK",
-  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md"
+  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md",
+  "DxvkVersion": "3.1.1"
 }
