@@ -1,0 +1,87 @@
+{
+  "task_id": "CONVERSION-DXVK-00012",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 3,
+  "base_sha": "bec609e9b5c97cbe935d1b3aea905c536698e48e",
+  "result_sha": "9a815650fe05e7313c1922d2f8030d68d90840e0",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "DXVK-RUNTIME-SHARED-HANDLE-CLASSIFIER-REPAIR",
+  "summary": "Repaired the automatic runtime analyzer false-negative exposed by the exact Quest 3/VDXR DXVK session. Analyze-OutRunVRSession.ps1 now recognizes the legacy verification failure plus the two concrete stock-DXVK D3DKMT/shared-resource failure signatures, emits machine-readable failure reasons, and keeps the existing D3D9EX_SHARED_PROBE_FAILED flag. Added a behavior regression test reproducing the exact runtime signature and a direct-frames-active negative control, and wired it into Backend Conversion Gate. No renderer, Present, transport, OpenXR submission, cadence, HUD/menu or visual path changed.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "source_commits": [
+    "7c8589403b24664dfe472bca708679dbe19afbf2",
+    "b3e23ba5085a6cf1d329d8896d6594146b502ed7",
+    "9a815650fe05e7313c1922d2f8030d68d90840e0"
+  ],
+  "failure_context": {
+    "requested_failure_run_id": 36452535022,
+    "requested_failure": "The new behavior test reached PowerShell execution but mandatory string parameter HostLog rejected an empty fixture string. This was a test-fixture binding failure, not a renderer/build/runtime failure.",
+    "first_intermediate_failure": {
+      "run_id": 36452382752,
+      "cause": "PowerShell parser rejected \"$Name:\" string interpolation in the new test script.",
+      "repair_commit": "b3e23ba5085a6cf1d329d8896d6594146b502ed7"
+    },
+    "second_intermediate_failure": {
+      "run_id": 36452535022,
+      "cause": "HostLog mandatory string parameter rejected the intentionally empty host-log fixture.",
+      "repair_commit": "9a815650fe05e7313c1922d2f8030d68d90840e0"
+    },
+    "repeat_policy": "The same failure was not retried unchanged. Each failing signature was inspected from GitHub Actions logs and corrected before the next attempt."
+  },
+  "behavior_verified": [
+    "Exact runtime string 'Failed to open shared D3DKMT handle' sets SharedD3D9ExProbeFailed=true and reason DXVK_OPEN_D3DKMT.",
+    "Exact runtime string 'Failed to write shared resource info for a texture' sets SharedD3D9ExProbeFailed=true and reason DXVK_WRITE_SHARED_INFO.",
+    "Historical 'shared verification texture creation/upload failed' remains recognized as LEGACY_VERIFY.",
+    "A DXVK fixture with directFrames=240 and no failure signature remains SharedD3D9ExProbeFailed=false.",
+    "DirectFrames/DirectFallbacks/FenceTimeouts extraction and D3D9EX_SHARED_PROBE_FAILED flag remain covered."
+  ],
+  "regression_revalidation": [
+    "VR-DXVK-D3D9EX-SHARED-HANDLE-001: underlying runtime failure remains OPEN_USER_RUNTIME_VERIFIED_FAILURE; this task fixes only the diagnostic classifier false-negative.",
+    "Current host-owned shared-eye transport implementation 54be06b4bb8e6cc6d3b2995aa94369fdc9097b17 remains RUNTIME UNTESTED; analyzer/CI changes do not prove DirectGPU or performance recovery.",
+    "VR-STARTUP-WHITE-001 and VR-R50-FRAME-STABILITY-PRESERVE-001 are unaffected because no renderer/transport/cadence source changed."
+  ],
+  "evidence": [
+    "C0 recovered current GitHub branch state, AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, prior CONVERSION-DXVK-00010 record, runtime evidence and regression registry. N100/local clone was not used.",
+    "Runtime evidence DXVK-RUNTIME-20260929-93B69470 showed nativeTransportCandidate=1 but legacy D3D9Ex shared-handle DirectGPU failed with probeAck=0, directReady=0, directFrames=0, fallbacks=1504 and concrete DXVK D3DKMT/shared-info errors, while AUTO_ANALYSIS_SUMMARY incorrectly reported SharedD3D9ExProbeFailed=false.",
+    "Backend Conversion Gate 36452657989 PASS on exact source SHA 9a815650fe05e7313c1922d2f8030d68d90840e0; new runtime shared-handle classification regression step PASS, DXVK session analyzer PASS, pinned acquisition PASS, Win32 configure/build and binary verification PASS.",
+    "Build 36452663997 PASS; OpenXR VR architecture 36452663960 PASS for host-x64 and all Win32 jobs; HUD Inspector 36452664026 PASS. PC Fast 36452658105 was skipped.",
+    "Backend artifact 10984306158 digest sha256:7c0ce55da733a79ccb35341aa225e02d8084a0333a09d0bd98e8a6043fd602e1.",
+    "OpenXR host artifact 10984185863 digest sha256:eca0d6c2d5af0798caf9a6d5aaa8cf84c72a4e952e674943282c830ffff06bee.",
+    "HUD inspector game artifact 10984361276 digest sha256:0e51c889c775b4ac68e838be7cd2c4b39ec30f2b4ba0f564d3f68e2e90c8a879.",
+    "Issue #14 implementation comment 5874375862 and validation comment 5874517644 record the production/validation transaction."
+  ],
+  "completed_work_items": [
+    "DXVK-RUNTIME-SHARED-HANDLE-CLASSIFIER-REPAIR"
+  ],
+  "open_work_items": [
+    "DXVK-HOST-OWNED-SHARED-EYE-QUEST3-VDXR-RUNTIME-GATE",
+    "DXVK-DIRECTGPU-FALLBACK-PACING-RECOVERY",
+    "DXVK-EXACT-BUILD-VISUAL-PARITY-GATE"
+  ],
+  "next_action": "Use the repaired analyzer on the next exact-build Quest 3/VDXR test of the host-owned shared-eye transport. Runtime success requires directReady=1, directFrames>0, materially reduced fallback use, same-scene pacing recovery from the prior ~33.44 ms gameplay interval, and no startup/stereo/HUD/menu/recenter regression. Until that HMD evidence exists, the transport follow-up is BLOCKED_RUNTIME; independent software work may proceed without claiming runtime success.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36452657989,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36452663997,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36452663960,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36452664026,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36452658105,
+    "pc_fast_result": "SKIPPED",
+    "backend_gate_artifact_id": 10984306158,
+    "backend_gate_artifact_digest": "sha256:7c0ce55da733a79ccb35341aa225e02d8084a0333a09d0bd98e8a6043fd602e1",
+    "openxr_host_artifact_id": 10984185863,
+    "openxr_host_artifact_digest": "sha256:eca0d6c2d5af0798caf9a6d5aaa8cf84c72a4e952e674943282c830ffff06bee",
+    "hud_inspector_artifact_id": 10984361276,
+    "hud_inspector_artifact_digest": "sha256:0e51c889c775b4ac68e838be7cd2c4b39ec30f2b4ba0f564d3f68e2e90c8a879"
+  },
+  "recorded_at_kst": "2026-09-29T01:45:00+09:00"
+}

@@ -81,3 +81,12 @@ The session analyzer also misclassified `SharedD3D9ExProbeFailed=false`; raw DXV
 After this test, branch SHA `54be06b4bb8e6cc6d3b2995aa94369fdc9097b17` added a host-owned shared-eye transport. That SHA is **RUNTIME UNTESTED** and must not be marked fixed from source/build evidence alone. The next runtime gate is an exact Quest 3 / VDXR test requiring `directReady=1`, increasing `directFrames`, materially reduced fallback use, and same-scene pacing recovery without startup/stereo/HUD/menu/recenter regressions.
 
 Machine-readable evidence: `docs/automation/runtime/DXVK_RUNTIME_20260929_93b69470.json`. Issue #13 runtime event: comment `5874110684`.
+
+
+## 2026-09-29 — DXVK shared-probe analyzer false-negative fixed
+
+Task `CONVERSION-DXVK-00012` repaired only the automatic diagnostic classification associated with `VR-DXVK-D3D9EX-SHARED-HANDLE-001`. The prior Quest 3 / VDXR session had concrete DXVK errors `Failed to open shared D3DKMT handle` and `Failed to write shared resource info for a texture`, plus `directFrames=0` / fallback-only behavior, but `AUTO_ANALYSIS_SUMMARY` reported `SharedD3D9ExProbeFailed=false`.
+
+Result `9a815650fe05e7313c1922d2f8030d68d90840e0` recognizes those exact signatures and emits reason codes `DXVK_OPEN_D3DKMT` and `DXVK_WRITE_SHARED_INFO` while retaining the historical legacy marker. Backend Conversion Gate `36452657989` behavior-tested the exact failure fixture and a working direct-frames negative control, then completed the Win32 build successfully.
+
+This does **not** close the runtime regression. The host-owned shared-eye transport remains Quest 3 / VDXR runtime-untested; `VR-DXVK-D3D9EX-SHARED-HANDLE-001` stays OPEN until DirectGPU frames, fallback reduction and same-scene pacing recovery are observed.

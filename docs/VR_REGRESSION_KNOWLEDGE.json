@@ -434,6 +434,14 @@
         "telemetry": "nativeTransportCandidate=1; probeAck=0; directReady=0; directFrames=0; fallbacks=1504; gameplay interval≈33.44ms; menu interval≈11.10ms",
         "evidencePath": "docs/automation/runtime/DXVK_RUNTIME_20260929_93b69470.json",
         "issue13CommentId": 5874110684
+      },
+      "diagnosticClassifierFix": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00012",
+        "result_sha": "9a815650fe05e7313c1922d2f8030d68d90840e0",
+        "validation_run_id": 36452657989,
+        "behavior": "Concrete DXVK D3DKMT/shared-info failure signatures now force SharedD3D9ExProbeFailed=true with explicit reason codes.",
+        "runtime_problem_status_unchanged": true
       }
     }
   ],
