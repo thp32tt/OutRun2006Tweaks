@@ -57,14 +57,28 @@ Write-Host ''
 # One-click owns the complete preparation -> game -> host lifecycle. The game
 # DLL starts outrun-vr-host.exe via AutoLaunchHost; this launcher never starts a
 # second host process.
-& $selector -Backend $resolvedBackend -TestProfile $TestProfile -VariantId $resolvedVariant
-if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-    throw "Backend preparation failed with exit code $LASTEXITCODE"
+$oldDx11Census = $env:OUTRUN_VR_DX11_CENSUS
+if ($target -and [string]$target.RendererTarget -eq 'dx11-native') {
+    # R72 is observation-only. Source draw/state census is enabled
+    # automatically, but NativeDrawPathActive remains false and no draw is
+    # redirected to D3D11.
+    $env:OUTRUN_VR_DX11_CENSUS = '1'
+} else {
+    $env:OUTRUN_VR_DX11_CENSUS = $null
 }
 
-& $runner -TestProfile $TestProfile
-if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+try {
+    & $selector -Backend $resolvedBackend -TestProfile $TestProfile -VariantId $resolvedVariant
+    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+        throw "Backend preparation failed with exit code $LASTEXITCODE"
+    }
+
+    & $runner -TestProfile $TestProfile
+    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+} finally {
+    $env:OUTRUN_VR_DX11_CENSUS = $oldDx11Census
 }
 
 exit 0
