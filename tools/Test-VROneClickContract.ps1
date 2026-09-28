@@ -9,7 +9,6 @@ if (!(Test-Path $targetPath)) { throw "Missing one-click target metadata: $targe
 $parseFiles = @(
     'Invoke-OutRunVROneClick.ps1',
     'Test-OutRunVROneClickPreflight.ps1',
-    'analyze_dx11_census.py',
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
@@ -29,6 +28,20 @@ foreach ($name in $parseFiles) {
             "{0}:{1} {2}" -f $_.Extent.StartLineNumber,$_.Extent.StartColumnNumber,$_.Message
         }) -join '; '
         throw "PowerShell syntax error in $name :: $detail"
+    }
+}
+
+$pythonFiles = @(
+    'analyze_dx11_census.py'
+)
+$python = Get-Command python -ErrorAction SilentlyContinue
+if (!$python) { throw 'python is required for one-click analyzer syntax validation.' }
+foreach ($name in $pythonFiles) {
+    $path = Join-Path $toolsRoot $name
+    if (!(Test-Path $path)) { throw "Missing one-click Python analyzer: $path" }
+    & $python.Source -m py_compile $path
+    if ($LASTEXITCODE -ne 0) {
+        throw "Python syntax validation failed: $name"
     }
 }
 
