@@ -9,6 +9,7 @@
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
+	extern Setting<bool> VRTelemetry;
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
