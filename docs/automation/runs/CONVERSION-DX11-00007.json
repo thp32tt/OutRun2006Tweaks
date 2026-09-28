@@ -4,7 +4,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 2,
+  "chat_rollover": 3,
   "recorded_kst": "2026-09-28T18:23:11+09:00",
   "base_sha": "28147c3ea3854dfa16f8b7c0e6e2e8e7a075e466",
   "code_result_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
@@ -118,13 +118,15 @@
   ],
   "production_change_ledger": {
     "issue": 14,
-    "status": "IMPLEMENTATION_WRITTEN_VALIDATION_PENDING",
-    "implementation_comment_id": 5867005901
+    "status": "WRITTEN",
+    "implementation_comment_id": 5867005901,
+    "validation_comment_id": 5867095779,
+    "redundant_rollover_validation_comment_id": 5867105528
   },
   "rollover_recovery": {
     "status": "RECOVERED_WITHOUT_DUPLICATION",
-    "note": "CHAT_ROLLOVER=2 observed the newer same-task implementation commit 2e48bff6 on GitHub, stopped duplicate source work, and continued only exact-SHA validation and durable-state sealing."
+    "note": "CHAT_ROLLOVER=3 re-read GitHub after the R74 source commit and exact-SHA CI completed, detected the already-persisted run record from rollover 2, made no duplicate source change, and reconciled the production ledger to the canonical validation comment. A second validation comment was emitted during the concurrent rollover race and is recorded as redundant evidence only."
   },
   "next_action": "Keep NativeDrawPathActivationAllowed=false. In the next bounded DX11 task, classify supported VB/IB Lock flags against concrete D3D11 mirror update semantics, then add texture LockRect/UpdateTexture mutation coverage and a MANAGED CPU-shadow/reset-generation model. F19/F21 input-layout and shader/fixed-function readiness remain open. Do not claim runtime/visual parity or promote native draw ownership before exact-build Quest 3/VDXR validation.",
-  "finalized_kst": "2026-09-28T18:23:11+09:00"
+  "finalized_kst": "2026-09-28T18:24:36+09:00"
 }
