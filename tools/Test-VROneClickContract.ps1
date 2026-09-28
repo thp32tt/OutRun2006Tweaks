@@ -107,7 +107,10 @@ foreach ($requiredText in @(
     'Package source mismatch',
     'Package branch mismatch',
     'Package renderer mismatch',
-    'Package launch backend mismatch'
+    'Package launch backend mismatch',
+    'One-click slot source mismatch',
+    'One-click slot payload mismatch',
+    'SlotPayload'
 )) {
     if ($preflightText -notmatch [regex]::Escape($requiredText)) {
         throw "Runtime package identity preflight missing: $requiredText"
@@ -122,6 +125,16 @@ foreach ($required in @(
 )) {
     if ($package -notmatch [regex]::Escape($required)) {
         throw "PC FAST package does not include one-click dependency: $required"
+    }
+}
+
+foreach ($requiredText in @(
+    'Assert-RootPayloadIdentity',
+    'ROOT_PAYLOAD_ATTESTATION.json',
+    'RootPayloadAttestation'
+)) {
+    if ($selector -notmatch [regex]::Escape($requiredText)) {
+        throw "Selector root payload attestation contract missing: $requiredText"
     }
 }
 

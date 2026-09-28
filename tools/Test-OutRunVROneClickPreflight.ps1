@@ -81,6 +81,40 @@ $sourceShaPath = Require-File (Join-Path $d3d9Backend 'SOURCE_SHA.txt') 'Backend
 $sourceSha = (Get-Content $sourceShaPath -Raw).Trim()
 if ([string]::IsNullOrWhiteSpace($sourceSha)) { throw 'Backend SOURCE_SHA.txt is empty.' }
 
+# One-click must not allow an old variant slot to silently outrank the
+# package payload that was just verified above. A target-named slot is allowed
+# only when its source identity and executable bytes exactly match the
+# canonical D3D9 backend payload.
+$targetSlotPayload = Join-Path $root ("slots/" + [string]$target.VariantId)
+$slotIdentity = $null
+if (Test-Path $targetSlotPayload -PathType Container) {
+    $slotSourceShaPath = Require-File (Join-Path $targetSlotPayload 'SOURCE_SHA.txt') 'One-click slot source identity'
+    $slotSourceSha = (Get-Content $slotSourceShaPath -Raw).Trim()
+    if ($slotSourceSha -ne $sourceSha) {
+        throw "One-click slot source mismatch: variant=$($target.VariantId) slot=$slotSourceSha package=$sourceSha"
+    }
+
+    $canonicalGameIdentity = Get-Identity $gameDllPath 0x014C
+    $slotGameIdentity = Get-Identity (Join-Path $targetSlotPayload 'dinput8.dll') 0x014C
+    if ($slotGameIdentity.Sha256 -ne $canonicalGameIdentity.Sha256) {
+        throw "One-click slot payload mismatch: dinput8.dll variant=$($target.VariantId)"
+    }
+
+    $canonicalHostIdentity = Get-Identity $hostPath 0x8664
+    $slotHostIdentity = Get-Identity (Join-Path $targetSlotPayload 'outrun-vr-host.exe') 0x8664
+    if ($slotHostIdentity.Sha256 -ne $canonicalHostIdentity.Sha256) {
+        throw "One-click slot payload mismatch: outrun-vr-host.exe variant=$($target.VariantId)"
+    }
+
+    $slotIdentity = [ordered]@{
+        VariantId = [string]$target.VariantId
+        SourceSha = $slotSourceSha
+        GameVrDll = $slotGameIdentity
+        OpenXrHost = $slotHostIdentity
+        MatchesCanonicalPayload = $true
+    }
+}
+
 $buildInputsPath = Require-File (Join-Path $root 'BUILD_INPUTS.json') 'BUILD_INPUTS.json'
 try {
     $buildInputs = Get-Content $buildInputsPath -Raw | ConvertFrom-Json
@@ -110,6 +144,7 @@ $report = [ordered]@{
     ResolvedBackend = $resolvedBackend
     VariantId = [string]$target.VariantId
     SourceSha = $sourceSha
+    SlotPayload = $slotIdentity
     PackageBuildInputs = [ordered]@{
         BuildMatrixId = [string]$buildInputs.BuildMatrixId
         IntegrationSha = [string]$buildInputs.IntegrationSha

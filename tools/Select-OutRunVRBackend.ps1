@@ -113,6 +113,70 @@ function Remove-RootVerified([string]$name) {
     }
 }
 
+function Get-FileIdentity([string]$Path) {
+    if (-not (Test-Path $Path -PathType Leaf)) { return $null }
+    $resolved = (Resolve-Path $Path).Path
+    return [ordered]@{
+        Path = [IO.Path]::GetFileName($resolved)
+        Length = (Get-Item $resolved).Length
+        Sha256 = (Get-FileHash $resolved -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+}
+
+function Assert-SamePayloadFile([string]$ExpectedPath,[string]$ActualPath,[string]$Label) {
+    $expected = Get-FileIdentity $ExpectedPath
+    $actual = Get-FileIdentity $ActualPath
+    if ($null -eq $expected) { throw "Payload attestation source missing for $Label : $ExpectedPath" }
+    if ($null -eq $actual) { throw "Payload attestation root file missing for $Label : $ActualPath" }
+    if ($expected.Length -ne $actual.Length -or $expected.Sha256 -ne $actual.Sha256) {
+        throw "Root payload attestation mismatch for $Label : expected=$($expected.Sha256) actual=$($actual.Sha256)"
+    }
+    return [ordered]@{ Expected = $expected; Actual = $actual; Match = $true }
+}
+
+function Assert-RootPayloadIdentity {
+    $report = [ordered]@{
+        SchemaVersion = 1
+        VerifiedUtc = (Get-Date).ToUniversalTime().ToString('o')
+        Backend = $Backend
+        VariantId = $variant
+        SourceRoot = $src
+        Files = [ordered]@{}
+    }
+
+    $report.Files.dinput8 = Assert-SamePayloadFile (Join-Path $src 'dinput8.dll') (Join-Path $root 'dinput8.dll') 'dinput8.dll'
+
+    if ($Backend -eq '2d') {
+        foreach ($name in @('outrun-vr-host.exe','d3d9.dll','multiviewpatcher.dll')) {
+            if (Test-Path (Join-Path $root $name)) {
+                throw "Root payload attestation found forbidden file for 2d: $name"
+            }
+        }
+        return $report
+    }
+
+    $report.Files.host = Assert-SamePayloadFile (Join-Path $src 'outrun-vr-host.exe') (Join-Path $root 'outrun-vr-host.exe') 'outrun-vr-host.exe'
+
+    if ($Backend -eq 'dxvk-safe') {
+        $providerSource = Join-Path (Join-Path $backendRoot 'dxvk') 'd3d9.dll'
+        $report.Files.d3d9 = Assert-SamePayloadFile $providerSource (Join-Path $root 'd3d9.dll') 'd3d9.dll'
+        if (Test-Path (Join-Path $root 'multiviewpatcher.dll')) {
+            throw 'Root payload attestation found forbidden multiviewpatcher.dll in dxvk-safe mode.'
+        }
+    } elseif ($Backend -eq 'dxvk') {
+        $report.Files.d3d9 = Assert-SamePayloadFile (Join-Path $src 'd3d9.dll') (Join-Path $root 'd3d9.dll') 'd3d9.dll'
+        $report.Files.multiview = Assert-SamePayloadFile (Join-Path $src 'multiviewpatcher.dll') (Join-Path $root 'multiviewpatcher.dll') 'multiviewpatcher.dll'
+    } else {
+        foreach ($name in @('d3d9.dll','multiviewpatcher.dll')) {
+            if (Test-Path (Join-Path $root $name)) {
+                throw "Root payload attestation found forbidden file for $Backend : $name"
+            }
+        }
+    }
+
+    return $report
+}
+
 function Repair-IniSectionHeaders([string]$text) {
     $text = $text -replace '(?m)^\[VR\]\\\s*$', '[VR]'
     $text = $text -replace '(?m)^\\\s*$\r?\n?', ''
@@ -241,6 +305,13 @@ if (Test-Path $ini) {
     Set-Content $ini $text -Encoding UTF8
 }
 
+# Seal preflight-to-root continuity before any game launch/session handoff.
+# This is deliberately after binary + INI mutation and before session creation,
+# so a partial or stale selection fails closed instead of becoming runnable.
+$rootPayloadAttestation = Assert-RootPayloadIdentity
+$rootPayloadAttestationPath = Join-Path $root 'ROOT_PAYLOAD_ATTESTATION.json'
+$rootPayloadAttestation | ConvertTo-Json -Depth 8 | Set-Content $rootPayloadAttestationPath -Encoding UTF8
+
 $nl = [Environment]::NewLine
 $matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
 $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
@@ -264,7 +335,7 @@ Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding asci
 $configHash = "missing"
 if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
 $sessionManifest = [ordered]@{
-    SchemaVersion = 3
+    SchemaVersion = 4
     BuildMatrixId = $matrix
     VariantId = $variant
     Backend = $Backend
@@ -273,6 +344,7 @@ $sessionManifest = [ordered]@{
     SessionId = $session
     StartedUtc = $startedUtc.ToString("o")
     ConfigSha256 = $configHash
+    RootPayloadAttestation = $rootPayloadAttestation
     CollectionStatus = "started-before-game-launch"
     PreexistingLogs = @()
 }
@@ -285,6 +357,7 @@ if (Test-Path $ini) {
         Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
 }
 Copy-Item (Join-Path $root "ACTIVE_VR_BACKEND.txt") $sessionRoot -Force
+Copy-Item $rootPayloadAttestationPath $sessionRoot -Force
 if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
     Copy-Item (Join-Path $root "BUILD_INPUTS.json") $sessionRoot -Force
 }
