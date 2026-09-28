@@ -50,7 +50,9 @@ for r in fails:
         loc_patch=loc_patch.resize((tw,th),Image.Resampling.LANCZOS)
         move_mask=move_mask.resize((tw,th),Image.Resampling.NEAREST)
     after.paste(loc_patch,(nx0,ny0),move_mask)
-    recs.append({"key":r["key"],"target_bbox":[nx0,ny0,nx1,ny1],"move_mask":"source_diff_binary"})
+    mb=move_mask.getbbox()
+    moved_bbox=None if mb is None else [nx0+mb[0],ny0+mb[1],nx0+mb[2]-1,ny0+mb[3]-1]
+    recs.append({"key":r["key"],"target_bbox":[nx0,ny0,nx1,ny1],"moved_diff_bbox":moved_bbox,"move_mask":"source_diff_binary"})
 # Strict cleanup is asset-wide, not limited to the seven currently failing elements.
 # Historical candidate pixels outside every declared original text bbox must be restored
 # to canonical HD source before full source-diff containment can legitimately pass.
@@ -58,13 +60,30 @@ allc=mk_mask((w,h),[r["sprite_cell"] for r in rows])
 allowed=mk_mask((w,h),[r["original_bbox"] for r in rows])
 repair=ImageChops.multiply(allc,ImageOps.invert(allowed))
 after=Image.composite(src,after,repair)
-touch=allc
+
+# This atlas has overlapping sprite cells. Whole-cell source-diff bboxes are therefore
+# ambiguous: they can include pixels owned by another text element. Validate each
+# reworked element with its own moved source-diff mask and retain C85 element-bbox
+# evidence for untouched PASS elements, while enforcing asset-wide zero overflow.
+rec_by_key={r["key"]:r for r in recs}
 qa=[]; failed=[]
 for r in rows:
-    b=bbox(src,after,r["sprite_cell"]); ok=inside(b,r["original_bbox"]); q={"key":r["key"],"original_bbox":r["original_bbox"],"localized_diff_bbox":b,"containment":"PASS" if ok else "FAIL"}; qa.append(q); failed += ([] if ok else [q])
-changed=diffmask(before,after); collateral=nz(ImageChops.multiply(changed,ImageOps.invert(touch))); outside=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allc))); introduced=nz(ImageChops.multiply(ImageChops.subtract(after.getchannel("A"),src.getchannel("A")),ImageOps.invert(allc)))
-if failed or collateral or outside or introduced:
-    print(json.dumps({"failed":failed,"collateral_pixels":collateral,"outside_cells_changed_pixels":outside,"introduced_alpha_outside_cells":introduced},ensure_ascii=False,indent=2)); raise SystemExit("strict post-QA failed; candidate not written")
+    b=rec_by_key[r["key"]]["moved_diff_bbox"] if r["key"] in rec_by_key else r["localized_bbox"]
+    ok=inside(b,r["original_bbox"])
+    q={"key":r["key"],"original_bbox":r["original_bbox"],"localized_diff_bbox":b,"containment":"PASS" if ok else "FAIL","evidence":"moved_source_diff_mask" if r["key"] in rec_by_key else "C85_element_bbox_unchanged"}
+    qa.append(q); failed += ([] if ok else [q])
+
+changed=diffmask(before,after)
+edit_scope=mk_mask((w,h),[r["localized_bbox"] for r in fails]+[r["target_bbox"] for r in recs])
+collateral=nz(ImageChops.multiply(changed,ImageOps.invert(edit_scope)))
+outside=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allc)))
+outside_original_regions=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allowed)))
+introduced=nz(ImageChops.multiply(ImageChops.subtract(after.getchannel("A"),src.getchannel("A")),ImageOps.invert(allc)))
+pass_scope=mk_mask((w,h),[r["localized_bbox"] for r in rows if r["containment"]=="PASS"])
+untouched_pass_pixels=nz(ImageChops.multiply(changed,pass_scope))
+if failed or collateral or outside or outside_original_regions or introduced or untouched_pass_pixels:
+    print(json.dumps({"failed":failed,"collateral_pixels":collateral,"outside_cells_changed_pixels":outside,"outside_original_regions_changed_pixels":outside_original_regions,"introduced_alpha_outside_cells":introduced,"untouched_pass_pixels_changed":untouched_pass_pixels},ensure_ascii=False,indent=2))
+    raise SystemExit("strict post-QA failed; candidate not written")
 out=cb[:128]+after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","RGBA"); parse(out)
 if out[:128]!=sb[:128] or len(out)!=len(cb): raise SystemExit("structure changed")
 newsha=sha(out); oldsha=sha(cb)
