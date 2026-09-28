@@ -83,9 +83,15 @@ def main() -> int:
         if isinstance(provider, dict):
             expected_hash = provider.get("Sha256")
 
+    unique_versions = sorted(set(detected_versions))
     version_match = None
-    if expected_version and detected_versions:
-        version_match = expected_version in detected_versions
+    if expected_version and unique_versions:
+        # Exact runtime-version proof is part of the stock-provider verdict.
+        # Multiple distinct version lines are ambiguous evidence and must not
+        # satisfy the stock-version attestation.
+        version_match = (
+            len(unique_versions) == 1 and unique_versions[0] == expected_version
+        )
 
     if latest is None:
         status = "NO_DXVK_PROVIDER_CENSUS"
@@ -97,7 +103,11 @@ def main() -> int:
         status = "NONLOCAL_D3D9_PROVIDER_ACTIVE"
     elif not latest["stock_interop"]:
         status = "GAME_LOCAL_PROVIDER_WITHOUT_STOCK_DXVK_INTEROP"
-    elif version_match is False:
+    elif not expected_version:
+        status = "DXVK_PREFLIGHT_VERSION_MISSING"
+    elif not unique_versions:
+        status = "DXVK_RUNTIME_VERSION_UNOBSERVED"
+    elif version_match is not True:
         status = "DXVK_RUNTIME_VERSION_MISMATCH"
     else:
         status = "STOCK_DXVK_PROVIDER_VERIFIED"
@@ -115,7 +125,7 @@ def main() -> int:
         "AllProviderProbes": probes,
         "PreflightDxvkVersion": expected_version,
         "PreflightProviderSha256": expected_hash,
-        "DetectedDxvkVersions": sorted(set(detected_versions)),
+        "DetectedDxvkVersions": unique_versions,
         "RuntimeVersionMatchesPreflight": version_match,
         "DxvkLogFiles": sorted(set(dxvk_log_files)),
         "DeviceEvidence": device_lines,
