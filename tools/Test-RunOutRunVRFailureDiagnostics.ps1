@@ -30,6 +30,9 @@ try{
     @'
 param([switch]$All,[switch]$Emergency)
 Set-Content (Join-Path $PSScriptRoot 'COLLECTOR_CALLED.txt') ("emergency=" + [bool]$Emergency) -Encoding ascii
+if(Test-Path (Join-Path $PSScriptRoot 'FORCE_COLLECTOR_FAILURE.txt')){
+    throw 'simulated collector failure'
+}
 '@ | Set-Content (Join-Path $testRoot 'Collect-OutRunVRLogs.ps1') -Encoding UTF8
     @'
 function Get-OutRunVRTestProfile {
@@ -84,6 +87,57 @@ function Get-OutRunVRTestProfile {
         throw "F31 failure phase mismatch: $($launchFailure.Phase)"
     }
 
+    # Behavior-test F33 result precedence: if collection itself throws after a
+    # launch failure, the original runner failure must remain the propagated
+    # result while the collector failure is recorded separately.
+    Remove-Item (Join-Path $testRoot 'COLLECTOR_CALLED.txt') -Force -ErrorAction SilentlyContinue
+    Set-Content (Join-Path $testRoot 'FORCE_COLLECTOR_FAILURE.txt') '1' -Encoding ascii
+    $f33State=[ordered]@{
+        SchemaVersion=4
+        BuildMatrixId='TEST_MATRIX'
+        VariantId='E_DXVK_SAFE'
+        Backend='dxvk-safe'
+        TestProfile='CORRECTNESS'
+        SourceSha='test-source'
+        SessionId='collector-precedence'
+        StartedUtc=(Get-Date).ToUniversalTime().AddMinutes(-1).ToString('o')
+        ConfigSha256='missing'
+    }
+    $f33State | ConvertTo-Json | Set-Content (Join-Path $testRoot 'CURRENT_VR_SESSION.json') -Encoding UTF8
+    $f33Error=$null
+    try{
+        & (Join-Path $testRoot 'Run-OutRunVRTest.ps1') -TestProfile CORRECTNESS
+    }catch{
+        $f33Error=$_.Exception
+    }
+    if(!$f33Error){throw 'F33 behavior test expected the original launch failure to propagate.'}
+    if($f33Error.Message -match 'simulated collector failure'){
+        throw 'F33 collector failure obscured the original launch failure.'
+    }
+    if(!(Test-Path (Join-Path $testRoot 'COLLECTOR_CALLED.txt'))){
+        throw 'F33 collector was not attempted after the launch failure.'
+    }
+    $f33Root=Join-Path $testRoot 'logs/TEST_MATRIX/E_DXVK_SAFE/CORRECTNESS/collector-precedence'
+    $f33Runner=Get-Content (Join-Path $f33Root 'RUNNER_FAILURE.json') -Raw|ConvertFrom-Json
+    if([string]$f33Runner.Phase -ne 'GAME_LAUNCH_OR_WAIT'){
+        throw "F33 original runner failure was not preserved: $($f33Runner.Phase)"
+    }
+    $f33Collector=Get-Content (Join-Path $f33Root 'COLLECTOR_FAILURE.json') -Raw|ConvertFrom-Json
+    if([string]$f33Collector.Phase -ne 'DIAGNOSTIC_COLLECTION'){
+        throw "F33 collector phase mismatch: $($f33Collector.Phase)"
+    }
+    if([string]$f33Collector.PrimaryFailure -ne 'GAME_LAUNCH_OR_WAIT'){
+        throw "F33 collector primary-failure binding mismatch: $($f33Collector.PrimaryFailure)"
+    }
+    Remove-Item (Join-Path $testRoot 'FORCE_COLLECTOR_FAILURE.txt') -Force
+
+    $gameResultIndex=$runnerText.IndexOf('if($gameExitCode -ne 0){')
+    $collectorFailureIndex=$runnerText.LastIndexOf('if($collectorFailure){throw $collectorFailure}')
+    $collectorExitIndex=$runnerText.LastIndexOf('if($collectorExitCode -ne 0){exit $collectorExitCode}')
+    if($gameResultIndex -lt 0 -or $collectorFailureIndex -le $gameResultIndex -or $collectorExitIndex -le $gameResultIndex){
+        throw 'F33 source-order contract does not preserve game result ahead of collector failure.'
+    }
+
     # Behavior-test emergency collector semantics used by F32. It must create a
     # diagnostic archive without consuming source evidence or rotating session.
     $emergencyRoot = Join-Path $testRoot 'emergency'
@@ -132,7 +186,7 @@ function Get-OutRunVRTestProfile {
     $zip=@(Get-ChildItem $emergencyRoot -Filter 'OutRun2_VR_ANALYZE_*.zip' -File)
     if($zip.Count -ne 1){throw "F32 emergency diagnostic archive count mismatch: $($zip.Count)"}
 
-    Write-Host 'Runner launch/stuck-host diagnostic survivability PASS'
+    Write-Host 'Runner launch/stuck-host/collector-failure diagnostic survivability PASS'
 } finally {
     if(Test-Path $testRoot){
         Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue

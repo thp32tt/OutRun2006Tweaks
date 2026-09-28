@@ -370,16 +370,62 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
     Write-RunnerFailureDiagnostic -Phase 'HOST_TEARDOWN' -ErrorText $hostTeardownFailure.Message -HostStillRunning $true
 }
 
-if($hostTeardownFailure){
-    & $collector -Emergency
-}else{
-    & $collector
+$collectorFailure=$null
+$collectorExitCode=0
+try{
+    $LASTEXITCODE=0
+    if($hostTeardownFailure){
+        & $collector -Emergency
+    }else{
+        & $collector
+    }
+    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){
+        $collectorExitCode=[int]$LASTEXITCODE
+    }
+}catch{
+    $collectorFailure=$_.Exception
 }
-if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+
+if($collectorFailure -or $collectorExitCode -ne 0){
+    $primaryFailure=if($hostTeardownFailure){
+        'HOST_TEARDOWN'
+    }elseif($launchFailure){
+        'GAME_LAUNCH_OR_WAIT'
+    }elseif($gameExitCode -ne 0){
+        'GAME_EXIT'
+    }else{
+        'NONE'
+    }
+    $collectorError=if($collectorFailure){$collectorFailure.Message}else{"Collector exited with code $collectorExitCode"}
+    try{
+        [ordered]@{
+            SchemaVersion=1
+            RecordedUtc=(Get-Date).ToUniversalTime().ToString('o')
+            Phase='DIAGNOSTIC_COLLECTION'
+            Error=$collectorError
+            ExitCode=$collectorExitCode
+            PrimaryFailure=$primaryFailure
+            GameExitCode=$gameExitCode
+            Backend=$backend
+            VariantId=$variant
+            TestProfile=$TestProfile
+            SessionId=[string]$state.SessionId
+            SourceSha=$sourceSha
+        }|ConvertTo-Json -Depth 5|Set-Content (Join-Path $sessionRoot 'COLLECTOR_FAILURE.json') -Encoding UTF8
+    }catch{
+        Write-Warning ("Could not persist COLLECTOR_FAILURE.json: {0}" -f $_.Exception.Message)
+    }
+}
+
+# Preserve the original runner/game failure as the process result. Diagnostic
+# collection is secondary and only becomes the final failure when launch,
+# host teardown and the game itself all succeeded.
 if($hostTeardownFailure){throw $hostTeardownFailure}
 if($launchFailure){throw $launchFailure}
 if($gameExitCode -ne 0){
     Write-Warning ("OR2006C2C.EXE exited with code {0}; diagnostic collection completed before propagating failure." -f $gameExitCode)
     exit $gameExitCode
 }
+if($collectorFailure){throw $collectorFailure}
+if($collectorExitCode -ne 0){exit $collectorExitCode}
 exit 0

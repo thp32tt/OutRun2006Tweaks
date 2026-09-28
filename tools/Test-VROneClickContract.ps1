@@ -182,7 +182,9 @@ foreach ($requiredText in @(
     'GAME_LAUNCH_OR_WAIT',
     'HOST_TEARDOWN',
     '& $collector -Emergency',
-    'RUNNER_FAILURE.json'
+    'RUNNER_FAILURE.json',
+    'COLLECTOR_FAILURE.json',
+    'DIAGNOSTIC_COLLECTION'
 )) {
     if ($runnerText -notmatch [regex]::Escape($requiredText)) {
         throw "Runner failure diagnostic survivability contract missing: $requiredText"
