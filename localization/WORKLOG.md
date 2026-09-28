@@ -1126,3 +1126,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Durable report: `localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md`.
 - AUTOMATION_VALIDATION=PASS.
 - RUNTIME_VALIDATION=UNTESTED.
+
+
+## 2026-09-29 00:24 KST — user runtime feedback on 3-way crash diagnostics
+
+- User reports the new diagnostic test set no longer crashes in the tested path.
+- This is user runtime evidence that the crash is not reproducing with the diagnostic configuration that forces `UseNewTextureAllocator=false`, `EnableTextureCache=false`, and separates text/graphics responsibilities.
+- Root cause is not yet proven: the observation supports the allocator-path bypass as an effective mitigation, but does not establish that `UseNewTextureAllocator` was the sole cause.
+- Text runtime result: Korean text coverage is visibly sparse. The current overlay only covers strings that reach the tracked runtime text-print path; many UI labels remain sprite/DDS graphics and therefore are not expected to become Korean from `runtime_ko.tsv` alone.
+- Graphics runtime result: Korean artwork itself is generally clean, but visible breakage remains where replacement texture size/scaling, alpha/transparency, or sprite position does not match the game's runtime expectations.
+- Because GRAPHICS_ONLY/COMBINED contain all 16 current HD candidates, the runtime visual failures cannot yet be assigned to a specific DDS from this test alone.
+- Promotion remains blocked. Next graphics QA must prioritize runtime dimensions/scaling ratio, alpha/transparency geometry, and sprite-position compatibility before further visual polish; isolate offending DDS/assets before approval.
+- Current final approved DDS count remains 0.
+- RUNTIME_VALIDATION=PARTIAL_USER_TEST_NO_CRASH_WITH_VISUAL_FAILURES.
