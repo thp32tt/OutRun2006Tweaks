@@ -1,1 +1,1 @@
-OutRun 2006 한글화 B(:20) 전수 QA+재작업을 진행해줘. GitHub thp32tt/OutRun2006Tweaks의 korean-localization-clean 최신 상태에서 시작해 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md를 먼저 읽고 그 계약과 지정 기준 문서를 모두 적용해. A 결과와 기존 승인후보를 포함해 B 역할의 전수 픽셀 containment QA를 수행하고 1픽셀 초과도 즉시 재작업해. 변경이 있으면 같은 브랜치에 commit/push 후 SHA를 확인해. GPT Library, VR/FFB, 빌드는 사용하지 마.
+OutRun 한글화 B 실행
