@@ -290,9 +290,11 @@ if($dxvkMode){
     }
 }
 
+$gameExitCode=0
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
     $p.WaitForExit()
+    $gameExitCode=$p.ExitCode
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
@@ -333,3 +335,8 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
 
 & $collector
 if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+if($gameExitCode -ne 0){
+    Write-Warning ("OR2006C2C.EXE exited with code {0}; diagnostic collection completed before propagating failure." -f $gameExitCode)
+    exit $gameExitCode
+}
+exit 0
