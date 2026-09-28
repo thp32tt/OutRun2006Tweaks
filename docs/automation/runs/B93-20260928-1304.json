@@ -2,16 +2,17 @@
   "task_id": "B93-20260928-1304",
   "target_branch": "korean-localization-clean",
   "base_sha": "de9ad1261104bd4c9fe28e58caa7e114f64c43b8",
-  "result_sha": "PENDING",
-  "automation_validation": "PENDING",
+  "result_sha": "NO_CANDIDATE_CHANGE",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
-  "summary": "Final B93 automatic repair attempt: use source-vs-localized RGBA diff bbox per sprite cell to exclude unrelated non-text alpha while enforcing zero-pixel containment.",
+  "summary": "B93 exhausted 3 safe automatic repair attempts. Candidate DDS was never written because strict pre-commit QA still found overlapping-cell/source-diff containment failures for wait_now, view_change, and expert. Keep 2DA43E41 REWORK_REQUIRED and move to another independent B task.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json",
     "GitHub Actions run 36377946019 failed safely on DDS mask preflight before any candidate write.",
-    "GitHub Actions run 36378117505 failed safely before write because whole-cell alpha bbox included unrelated artwork; outside-cell/collateral checks were zero."
+    "GitHub Actions run 36378117505 failed safely before write because whole-cell alpha bbox included unrelated artwork; outside-cell/collateral checks were zero.",
+    "GitHub Actions run 36378227805: strict post-QA failed before candidate write; remaining failures wait_now/view_change/expert; collateral=0, outside declared cells=0, introduced alpha outside cells=0."
   ],
   "attempt": 3
 }
