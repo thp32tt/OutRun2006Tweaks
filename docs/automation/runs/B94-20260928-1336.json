@@ -1,16 +1,17 @@
 {
   "task_id": "B94-20260928-1336",
   "target_branch": "korean-localization-clean",
-  "base_sha": "016701f4eb5fa876915f9ef337982cf9ea8a54a6",
+  "base_sha": "a2794bd70dc6dbda39fda9ddf03aeb4a1ead68d9",
   "result_sha": "PENDING",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "summary": "Retry B94 after fixing a QA contact-sheet syntax error; attempt 1 exited before DDS processing and made no candidate changes.",
+  "summary": "Final B94 automatic repair attempt: restore every pixel outside each original permitted bbox to the canonical HD source before 21/21 containment QA.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json",
-    "GitHub Actions run 36378470154 failed before DDS processing due to executor syntax error."
+    "GitHub Actions run 36378470154 failed before DDS processing due to executor syntax error.",
+    "GitHub Actions run 36378523283: 20/21 passed; only stage_clear retained historical out-of-bbox source difference; no collateral/outside-cell/introduced-alpha changes."
   ],
-  "attempt": 2
+  "attempt": 3
 }
