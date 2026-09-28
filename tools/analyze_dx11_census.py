@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R7[23456789] census: "
+    r"VR DX11 R(?:7[23456789]|80) census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
@@ -54,6 +54,10 @@ SUMMARY_RE = re.compile(
     r"unsupported=(?P<inputLayoutUnsupported>\d+),"
     r"(?:fvfExact=(?P<inputLayoutFvfExact>\d+),)?"
     r"fvfPending=(?P<inputLayoutFvfPending>\d+)\] )?"
+    r"(?:shaderReadiness\[introspectionFailure=(?P<shaderIntrospectionFailure>\d+),"
+    r"mixedPair=(?P<shaderMixedPair>\d+),"
+    r"fixedFunctionPending=(?P<shaderFixedFunctionPending>\d+),"
+    r"programmablePending=(?P<shaderProgrammablePending>\d+)\] )?"
     r"unsupported\[incomplete=(?P<incomplete>\d+),"
     r"wbuffer=(?P<wbuffer>\d+),sepAlpha=(?P<sepAlpha>\d+),"
     r"alphaTest=(?P<alphaTest>\d+),stencil=(?P<stencil>\d+),"
@@ -77,7 +81,7 @@ STARTUP_RE = re.compile(
     r"msaa=(?P<msaa>-?\d+) bootstrapCompatible=(?P<bootstrapCompatible>[01])"
 )
 
-SIGNATURE_RE = re.compile(r"VR DX11 R7[23456789] signature#(?P<id>\d+): (?P<body>.*)")
+SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|80) signature#(?P<id>\d+): (?P<body>.*)")
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
@@ -125,7 +129,7 @@ def main() -> int:
         except OSError:
             continue
 
-        if "VR DX11 R7" not in text:
+        if "VR DX11 R7" not in text and "VR DX11 R80" not in text:
             continue
         source_logs.append(log_path.name)
 
@@ -208,6 +212,10 @@ def main() -> int:
             "textureMutationDescriptorFailures",
             "inputLayoutUnsupported",
             "inputLayoutFvfPending",
+            "shaderIntrospectionFailure",
+            "shaderMixedPair",
+            "shaderFixedFunctionPending",
+            "shaderProgrammablePending",
             "indexUnsupported",
             "textureUnsupported",
             "colorUnsupported",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72/R73/R74/R75/R76/R77/R78/R79 DX11 census analyzer compatibility."""
+"""Regression tests for R72/R73/R74/R75/R76/R77/R78/R79/R80 DX11 census analyzer compatibility."""
 
 from __future__ import annotations
 
@@ -232,6 +232,46 @@ def main() -> int:
     assert r79["LatestSummary"]["inputLayoutUnsupported"] == 2
     assert r79["LatestSummary"]["inputLayoutFvfExact"] == 12
     assert r79["LatestSummary"]["inputLayoutFvfPending"] == 2
+
+    r80 = run_case(
+        "VR DX11 R80 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4 "
+        "decl=0 declHash=0x0000000000000000 declElems=0 "
+        "inputLayout[exact=1,elements=4,fvfExact=1,fvfPending=0] "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=0,vsBytes=0,"
+        "vsVersion=0x00000000,vsHash=0x0000000000000000,psPresent=0,"
+        "psBytes=0,psVersion=0x00000000,psHash=0x0000000000000000]\n"
+        "VR DX11 R80 census: samples=64 exact=0 fixedFn=60 programmable=4 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=64 "
+        "texturedSamples=64 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "mutation[writeUnlocks=7,readOnlyUnlocks=2,discardWriteUnlocks=2,"
+        "noOverwriteWriteUnlocks=1] "
+        "mutationPlan[exact=5,unsupported=0,managedShadow=0,mapWrite=1,"
+        "mapDiscard=2,mapNoOverwrite=1,updateSubresource=1] "
+        "textureMutation[writeUnlocks=9,readOnlyUnlocks=2,descriptorFailures=0,"
+        "updateTextureSuccesses=4,updateTextureFailures=1,"
+        "updateSurfaceSuccesses=3,updateSurfaceFailures=2] "
+        "managedLifetime[shadowWrites=6,shadowReads=2,resetSuccesses=3,"
+        "shadowPreserved=3,deviceGeneration=4,shadowVersion=6,"
+        "mirrorGeneration=0,mirrorVersion=0,mirrorReady=0] "
+        "inputLayout[exact=64,unsupported=0,fvfExact=60,fvfPending=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,"
+        "fixedFunctionPending=60,programmablePending=4] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r80["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r80["NativeDrawPathActivationAllowed"] is False
+    assert r80["LatestSummary"]["shaderIntrospectionFailure"] == 0
+    assert r80["LatestSummary"]["shaderMixedPair"] == 0
+    assert r80["LatestSummary"]["shaderFixedFunctionPending"] == 60
+    assert r80["LatestSummary"]["shaderProgrammablePending"] == 4
+    assert r80["LatestSummary"]["inputLayoutUnsupported"] == 0
+    assert r80["LatestSummary"]["inputLayoutFvfPending"] == 0
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"

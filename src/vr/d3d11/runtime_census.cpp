@@ -8,6 +8,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <cstring>
 #include <mutex>
 #include <unordered_map>
 #include <unordered_set>
@@ -68,6 +69,10 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> InputLayoutUnsupportedSamples{0};
         std::atomic<std::uint64_t> InputLayoutFvfExactSamples{0};
         std::atomic<std::uint64_t> InputLayoutFvfPendingSamples{0};
+        std::atomic<std::uint64_t> ShaderIntrospectionFailureSamples{0};
+        std::atomic<std::uint64_t> ShaderMixedPairSamples{0};
+        std::atomic<std::uint64_t> ShaderFixedFunctionPendingSamples{0};
+        std::atomic<std::uint64_t> ShaderProgrammablePendingSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
         std::atomic<std::uint64_t> TexturedSamples{0};
         std::array<std::atomic<std::uint64_t>, UnsupportedBitCount>
@@ -120,6 +125,15 @@ namespace outrun::vr::dx11
             DWORD textureTransformFlags = D3DTTFF_DISABLE;
         };
 
+        struct ShaderFunctionSignature
+        {
+            bool present{};
+            bool observed{};
+            UINT byteSize{};
+            DWORD versionToken{};
+            std::uint64_t hash{};
+        };
+
         struct SourceSignature
         {
             DWORD fvf{};
@@ -162,6 +176,11 @@ namespace outrun::vr::dx11
             bool inputLayoutFvfExact{};
             bool inputLayoutFvfPending{};
             UINT inputLayoutElements{};
+            ShaderFunctionSignature vertexShader{};
+            ShaderFunctionSignature pixelShader{};
+            bool shaderIntrospectionComplete{};
+            bool shaderMixedPair{};
+            bool shaderTranslationExact{};
             bool vertexBufferPresent{};
             bool renderTargetPresent{};
             bool indexed{};
@@ -230,6 +249,23 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.addressU);
             hash = hash_mix(hash, sig.addressV);
             hash = hash_mix(hash, sig.vertexDeclaration ? 1u : 0u);
+            hash = hash_mix(hash, sig.inputLayoutExact ? 1u : 0u);
+            hash = hash_mix(hash, sig.inputLayoutFvfExact ? 1u : 0u);
+            hash = hash_mix(hash, sig.inputLayoutFvfPending ? 1u : 0u);
+            hash = hash_mix(hash, sig.inputLayoutElements);
+            hash = hash_mix(hash, sig.vertexShader.present ? 1u : 0u);
+            hash = hash_mix(hash, sig.vertexShader.observed ? 1u : 0u);
+            hash = hash_mix(hash, sig.vertexShader.byteSize);
+            hash = hash_mix(hash, sig.vertexShader.versionToken);
+            hash = hash_mix(hash, sig.vertexShader.hash);
+            hash = hash_mix(hash, sig.pixelShader.present ? 1u : 0u);
+            hash = hash_mix(hash, sig.pixelShader.observed ? 1u : 0u);
+            hash = hash_mix(hash, sig.pixelShader.byteSize);
+            hash = hash_mix(hash, sig.pixelShader.versionToken);
+            hash = hash_mix(hash, sig.pixelShader.hash);
+            hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
+            hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
             hash = hash_mix(hash, sig.vertexBufferPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.renderTargetPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.indexed ? 1u : 0u);
@@ -534,12 +570,68 @@ namespace outrun::vr::dx11
             return descriptorObserved;
         }
 
+        template <typename TShader>
+        ShaderFunctionSignature inspect_shader_function(
+            TShader* shader) noexcept
+        {
+            ShaderFunctionSignature out{};
+            out.present = shader != nullptr;
+            if (!shader)
+            {
+                out.observed = true;
+                return out;
+            }
+
+            UINT byteSize = 0;
+            if (FAILED(shader->GetFunction(nullptr, &byteSize)) ||
+                byteSize < sizeof(DWORD) ||
+                byteSize > (1024u * 1024u))
+                return out;
+
+            std::vector<std::uint8_t> bytecode(byteSize);
+            UINT actual = byteSize;
+            if (FAILED(shader->GetFunction(bytecode.data(), &actual)) ||
+                actual != byteSize)
+                return out;
+
+            out.observed = true;
+            out.byteSize = actual;
+            std::memcpy(
+                &out.versionToken, bytecode.data(), sizeof(out.versionToken));
+
+            std::uint64_t hash = 1469598103934665603ull;
+            for (const auto byte : bytecode)
+            {
+                hash ^= static_cast<std::uint64_t>(byte);
+                hash *= 1099511628211ull;
+            }
+            out.hash = hash;
+            return out;
+        }
+
         SourceSignature inspect_source_signature(
             IDirect3DDevice9* device,
-            bool fixedFunction) noexcept
+            bool fixedFunction,
+            IDirect3DVertexShader9* vertexShader,
+            IDirect3DPixelShader9* pixelShader,
+            bool shaderQueryComplete) noexcept
         {
             SourceSignature sig{};
             sig.fixedFunction = fixedFunction;
+            sig.vertexShader = inspect_shader_function(vertexShader);
+            sig.pixelShader = inspect_shader_function(pixelShader);
+            sig.shaderIntrospectionComplete =
+                shaderQueryComplete &&
+                sig.vertexShader.observed &&
+                sig.pixelShader.observed;
+            sig.shaderMixedPair =
+                shaderQueryComplete &&
+                ((vertexShader != nullptr) != (pixelShader != nullptr));
+
+            // R80 is deliberately fail-closed: no native D3D11 shader
+            // translator or complete fixed-function emulation exists yet.
+            // Fingerprints are evidence for F21; they are not readiness.
+            sig.shaderTranslationExact = false;
 
             device->GetFVF(&sig.fvf);
 
@@ -745,6 +837,20 @@ namespace outrun::vr::dx11
             if (sig.inputLayoutFvfPending)
                 InputLayoutFvfPendingSamples.fetch_add(
                     1, std::memory_order_relaxed);
+
+            if (!sig.shaderIntrospectionComplete)
+                ShaderIntrospectionFailureSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            else if (sig.shaderMixedPair)
+                ShaderMixedPairSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            else if (sig.fixedFunction)
+                ShaderFixedFunctionPendingSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            else
+                ShaderProgrammablePendingSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+
             if (sig.indexed)
                 IndexedSamples.fetch_add(1, std::memory_order_relaxed);
             if (sig.textured)
@@ -753,7 +859,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R79 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R80 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -765,6 +871,17 @@ namespace outrun::vr::dx11
                     sig.inputLayoutElements,
                     sig.inputLayoutFvfExact ? 1 : 0,
                     sig.inputLayoutFvfPending ? 1 : 0,
+                    sig.shaderIntrospectionComplete ? 1 : 0,
+                    sig.shaderMixedPair ? 1 : 0,
+                    sig.shaderTranslationExact ? 1 : 0,
+                    sig.vertexShader.present ? 1 : 0,
+                    sig.vertexShader.byteSize,
+                    sig.vertexShader.versionToken,
+                    sig.vertexShader.hash,
+                    sig.pixelShader.present ? 1 : 0,
+                    sig.pixelShader.byteSize,
+                    sig.pixelShader.versionToken,
+                    sig.pixelShader.hash,
                     sig.streamOffset,
                     sig.stride,
                     sig.vertexBufferPresent ? 1 : 0,
@@ -863,7 +980,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R79 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, MANAGED reset-generation evidence, and fail-closed declaration/FVF input-layout readiness; native draw routing remains disabled",
+                    "VR DX11 R80 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, declaration/FVF input-layout readiness, and fail-closed VS/PS fingerprint/readiness evidence; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -886,7 +1003,7 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R79 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R80 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -935,6 +1052,10 @@ namespace outrun::vr::dx11
                 InputLayoutUnsupportedSamples.load(std::memory_order_relaxed),
                 InputLayoutFvfExactSamples.load(std::memory_order_relaxed),
                 InputLayoutFvfPendingSamples.load(std::memory_order_relaxed),
+                ShaderIntrospectionFailureSamples.load(std::memory_order_relaxed),
+                ShaderMixedPairSamples.load(std::memory_order_relaxed),
+                ShaderFixedFunctionPendingSamples.load(std::memory_order_relaxed),
+                ShaderProgrammablePendingSamples.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -1118,20 +1239,26 @@ namespace outrun::vr::dx11
         IDirect3DPixelShader9* ps = nullptr;
         const bool vsOk = SUCCEEDED(device->GetVertexShader(&vs));
         const bool psOk = SUCCEEDED(device->GetPixelShader(&ps));
+        const bool shaderQueryComplete = vsOk && psOk;
         const bool fixedFunction =
-            (!vsOk || vs == nullptr) && (!psOk || ps == nullptr);
-        if (vs) vs->Release();
-        if (ps) ps->Release();
+            shaderQueryComplete && vs == nullptr && ps == nullptr;
+        const bool programmablePair =
+            shaderQueryComplete && vs != nullptr && ps != nullptr;
 
         if (fixedFunction)
             FixedFunctionSamples.fetch_add(1, std::memory_order_relaxed);
-        else
+        else if (programmablePair)
             ProgrammableSamples.fetch_add(1, std::memory_order_relaxed);
 
-        const auto signature =
-            inspect_source_signature(device, fixedFunction);
+        const auto signature = inspect_source_signature(
+            device, fixedFunction, vs, ps, shaderQueryComplete);
+        if (vs) vs->Release();
+        if (ps) ps->Release();
+
         note_signature(signature, primitive);
         const bool inputLayoutExact = signature.inputLayoutExact;
+        const bool shaderTranslationExact =
+            signature.shaderTranslationExact;
 
         bool resourcesExact = signature.resourceIntrospectionComplete;
         if (!signature.resourceIntrospectionComplete)
@@ -1229,7 +1356,7 @@ namespace outrun::vr::dx11
         }
 
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
-            resourcesExact && inputLayoutExact)
+            resourcesExact && inputLayoutExact && shaderTranslationExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
         maybe_log();

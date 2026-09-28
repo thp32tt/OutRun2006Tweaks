@@ -79,8 +79,16 @@ def main() -> None:
         "InputLayoutUnsupportedSamples": "R78/R79 unsupported layout evidence counter",
         "InputLayoutFvfExactSamples": "R79 exact FVF layout evidence counter",
         "InputLayoutFvfPendingSamples": "R79 unsupported FVF blocker counter",
-        "resourcesExact && inputLayoutExact": "R78 exact-sample layout gate",
+        "resourcesExact && inputLayoutExact && shaderTranslationExact": "R80 exact-sample shader readiness gate",
         "translate_vertex_input_layout": "R78 runtime declaration classifier",
+        "GetVertexShader": "vertex shader observation",
+        "GetPixelShader": "pixel shader observation",
+        "GetFunction": "shader bytecode fingerprint observation",
+        "ShaderIntrospectionFailureSamples": "shader introspection failure counter",
+        "ShaderMixedPairSamples": "mixed VS/PS fail-closed counter",
+        "ShaderFixedFunctionPendingSamples": "fixed-function F20 dependency counter",
+        "ShaderProgrammablePendingSamples": "programmable F21 dependency counter",
+        "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
     missing_contract = [
         meaning for token, meaning in census_contract.items() if token not in census
@@ -259,7 +267,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R7[23456789] census": "R72/R73/R74/R75/R76/R77/R78/R79 summary compatibility",
+        "R(?:7[23456789]|80) census": "R72 through R80 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -289,6 +297,10 @@ def main() -> None:
         "inputLayoutUnsupported": "R78/R79 unsupported input-layout evidence",
         "inputLayoutFvfExact": "R79 exact FVF input-layout evidence",
         "inputLayoutFvfPending": "R79 unsupported FVF pending evidence",
+        "shaderIntrospectionFailure": "R80 shader introspection failure evidence",
+        "shaderMixedPair": "R80 mixed VS/PS pair evidence",
+        "shaderFixedFunctionPending": "R80 fixed-function F20 dependency evidence",
+        "shaderProgrammablePending": "R80 programmable F21 dependency evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
