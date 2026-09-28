@@ -85,3 +85,10 @@ render-state/draw hook stack.
 The census output determines the next implementation order; unsupported alpha test,
 fixed-function lighting/fog, stencil, separate-alpha blend, sRGB and topology cases are not
 silently approximated.
+
+## R72/R73 resource-format exactness
+
+- Startup backbuffer and runtime texture/index format classification now use one conservative `resource_translation` contract.
+- Unsupported luminance/palettized/bump/floating or otherwise unproven formats stay inexact and therefore cannot be promoted to the native draw path.
+- The passive census reports unsupported index/texture format samples separately from pipeline-state failures.
+- This is observation/gating only; `NativeDrawPathActive` remains false until resource lifetime, shader/input translation and runtime visual parity are complete.
