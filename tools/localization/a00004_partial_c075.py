@@ -58,29 +58,30 @@ recs=[]
 for key in SAFE_KEYS:
     r=next(x for x in rows if x["key"]==key); old=r["localized_bbox"]; orig=r["original_bbox"]
     x0,y0,x1,y1=old; t=amap[key]["new_localized_bbox"]; tx0,ty0,tx1,ty1=t
-    patch=before.crop((x0,y0,x1+1,y1+1))
-    pmask=patch.getchannel("A")
-    pb=pmask.getbbox()
+    envelope=before.crop((x0,y0,x1+1,y1+1))
+    pb=envelope.getchannel("A").getbbox()
     if pb is None:
         raise SystemExit(f"{key}: empty localized patch")
-    # C85 localized_bbox is a tight foreground envelope; require alpha on every
-    # envelope edge before treating this rectangle as the Korean foreground patch.
-    if pb!=(0,0,patch.width,patch.height):
-        raise SystemExit(f"{key}: localized patch not tight {pb} vs {(0,0,patch.width,patch.height)}")
-    # Remove only pixels belonging to this foreground patch; do not clear unrelated
-    # alpha elsewhere in the sprite cell.
-    after.paste((0,0,0,0),(x0,y0,x1+1,y1+1),pmask)
-    transformed=patch
-    if patch.size!=(tx1-tx0+1,ty1-ty0+1):
-        transformed=patch.resize((tx1-tx0+1,ty1-ty0+1),Image.Resampling.LANCZOS)
-    after.alpha_composite(transformed,(tx0,ty0))
+    # C85 source-diff envelopes can be one pixel wider than the actual alpha edge.
+    # Tight-crop to real visible alpha and transform only those foreground pixels.
+    px0,py0,px1,py1=pb
+    patch=envelope.crop(pb)
+    pmask=patch.getchannel("A")
+    old_actual=[x0+px0,y0+py0,x0+px1-1,y0+py1-1]
+    # Remove only actual foreground alpha; unrelated cell artwork is untouched.
+    after.paste((0,0,0,0),(old_actual[0],old_actual[1],old_actual[2]+1,old_actual[3]+1),pmask)
+    sx=(tx1-tx0+1)/(x1-x0+1); sy=(ty1-ty0+1)/(y1-y0+1)
+    nw=max(1,round(patch.width*sx)); nh=max(1,round(patch.height*sy))
+    transformed=patch if (nw,nh)==patch.size else patch.resize((nw,nh),Image.Resampling.LANCZOS)
+    dest_x=tx0+round(px0*sx); dest_y=ty0+round(py0*sy)
+    after.alpha_composite(transformed,(dest_x,dest_y))
     ab0=transformed.getchannel("A").getbbox()
-    ab=None if ab0 is None else [tx0+ab0[0],ty0+ab0[1],tx0+ab0[2]-1,ty0+ab0[3]-1]
+    ab=None if ab0 is None else [dest_x+ab0[0],dest_y+ab0[1],dest_x+ab0[2]-1,dest_y+ab0[3]-1]
     if not inside(ab,orig):
         raise SystemExit(f"{key}: transformed foreground bbox {ab} outside {orig}")
-    recs.append({"key":key,"method":"c85_foreground_patch_alpha_fit","before_bbox":old,"target_bbox":t,
-                 "post_foreground_bbox":ab,"containment":"PASS",
-                 "scale_x":round(transformed.width/patch.width,6),"scale_y":round(transformed.height/patch.height,6)})
+    recs.append({"key":key,"method":"actual_alpha_tight_crop_fit","before_bbox":old,"before_actual_alpha_bbox":old_actual,
+                 "target_envelope":t,"post_foreground_bbox":ab,"containment":"PASS",
+                 "scale_x":round(sx,6),"scale_y":round(sy,6)})
 
 touch=mk_mask((w,h),[next(x for x in rows if x["key"]==k)["sprite_cell"] for k in SAFE_KEYS])
 changed=diffmask(before,after)
