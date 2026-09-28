@@ -36,6 +36,9 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> UnsupportedColorFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedDepthFormatSamples{0};
         std::atomic<std::uint64_t> ResourceIntrospectionFailureSamples{0};
+        std::atomic<std::uint64_t> ResourceBehaviorUnsupportedSamples{0};
+        std::atomic<std::uint64_t> ResourceMutationTelemetryRequiredSamples{0};
+        std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
@@ -66,12 +69,24 @@ namespace outrun::vr::dx11
             std::array<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> vertexDeclElementsData{};
             UINT streamOffset{};
             UINT stride{};
+            DWORD vertexUsage{};
+            D3DPOOL vertexPool = D3DPOOL_FORCE_DWORD;
+            DWORD indexUsage{};
+            D3DPOOL indexPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
+            DWORD renderTargetUsage{};
+            D3DPOOL renderTargetPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT renderTargetFormat = D3DFMT_UNKNOWN;
+            DWORD depthUsage{};
+            D3DPOOL depthPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT depthFormat = D3DFMT_UNKNOWN;
             D3DRESOURCETYPE texture0Type = D3DRTYPE_FORCE_DWORD;
+            DWORD texture0Usage{};
+            D3DPOOL texture0Pool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT texture0Format = D3DFMT_UNKNOWN;
             D3DRESOURCETYPE texture1Type = D3DRTYPE_FORCE_DWORD;
+            DWORD texture1Usage{};
+            D3DPOOL texture1Pool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT texture1Format = D3DFMT_UNKNOWN;
             std::array<FixedFunctionStageSignature, 4> fixedFunctionStages{};
             DWORD colorOp0 = D3DTOP_DISABLE;
@@ -84,6 +99,8 @@ namespace outrun::vr::dx11
             DWORD addressU = D3DTADDRESS_WRAP;
             DWORD addressV = D3DTADDRESS_WRAP;
             bool vertexDeclaration{};
+            bool vertexBufferPresent{};
+            bool renderTargetPresent{};
             bool indexed{};
             bool textured{};
             bool texture0Present{};
@@ -110,12 +127,24 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.vertexDeclElements);
             hash = hash_mix(hash, sig.streamOffset);
             hash = hash_mix(hash, sig.stride);
+            hash = hash_mix(hash, sig.vertexUsage);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.vertexPool));
+            hash = hash_mix(hash, sig.indexUsage);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.indexPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.indexFormat));
+            hash = hash_mix(hash, sig.renderTargetUsage);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetFormat));
+            hash = hash_mix(hash, sig.depthUsage);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthFormat));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Type));
+            hash = hash_mix(hash, sig.texture0Usage);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Pool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Format));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Type));
+            hash = hash_mix(hash, sig.texture1Usage);
+            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Pool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Format));
             hash = hash_mix(hash, sig.colorOp0);
             hash = hash_mix(hash, sig.alphaOp0);
@@ -138,6 +167,8 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.addressU);
             hash = hash_mix(hash, sig.addressV);
             hash = hash_mix(hash, sig.vertexDeclaration ? 1u : 0u);
+            hash = hash_mix(hash, sig.vertexBufferPresent ? 1u : 0u);
+            hash = hash_mix(hash, sig.renderTargetPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.indexed ? 1u : 0u);
             hash = hash_mix(hash, sig.textured ? 1u : 0u);
             hash = hash_mix(hash, sig.fixedFunction ? 1u : 0u);
@@ -148,10 +179,14 @@ namespace outrun::vr::dx11
             IDirect3DDevice9* device,
             DWORD stage,
             D3DRESOURCETYPE& type,
+            DWORD& usage,
+            D3DPOOL& pool,
             D3DFORMAT& format,
             bool& present) noexcept
         {
             type = D3DRTYPE_FORCE_DWORD;
+            usage = 0;
+            pool = D3DPOOL_FORCE_DWORD;
             format = D3DFMT_UNKNOWN;
             present = false;
 
@@ -175,6 +210,12 @@ namespace outrun::vr::dx11
                     D3DSURFACE_DESC desc{};
                     if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
                     {
+                        usage = desc.Usage;
+                        pool = desc.Pool;
+                        usage = desc.Usage;
+                        pool = desc.Pool;
+                        usage = desc.Usage;
+                        pool = desc.Pool;
                         format = desc.Format;
                         descriptorObserved = true;
                     }
@@ -271,8 +312,14 @@ namespace outrun::vr::dx11
             }
             else if (vb)
             {
+                sig.vertexBufferPresent = true;
                 D3DVERTEXBUFFER_DESC desc{};
-                if (FAILED(vb->GetDesc(&desc)))
+                if (SUCCEEDED(vb->GetDesc(&desc)))
+                {
+                    sig.vertexUsage = desc.Usage;
+                    sig.vertexPool = desc.Pool;
+                }
+                else
                     sig.resourceIntrospectionComplete = false;
                 vb->Release();
             }
@@ -285,9 +332,14 @@ namespace outrun::vr::dx11
             }
             else
             {
+                sig.renderTargetPresent = true;
                 D3DSURFACE_DESC desc{};
                 if (SUCCEEDED(rt0->GetDesc(&desc)))
+                {
+                    sig.renderTargetUsage = desc.Usage;
+                    sig.renderTargetPool = desc.Pool;
                     sig.renderTargetFormat = desc.Format;
+                }
                 else
                     sig.resourceIntrospectionComplete = false;
                 rt0->Release();
@@ -304,7 +356,11 @@ namespace outrun::vr::dx11
                 sig.depthPresent = true;
                 D3DSURFACE_DESC desc{};
                 if (SUCCEEDED(depth->GetDesc(&desc)))
+                {
+                    sig.depthUsage = desc.Usage;
+                    sig.depthPool = desc.Pool;
                     sig.depthFormat = desc.Format;
+                }
                 else
                     sig.resourceIntrospectionComplete = false;
                 depth->Release();
@@ -320,7 +376,11 @@ namespace outrun::vr::dx11
             {
                 D3DINDEXBUFFER_DESC desc{};
                 if (SUCCEEDED(ib->GetDesc(&desc)))
+                {
+                    sig.indexUsage = desc.Usage;
+                    sig.indexPool = desc.Pool;
                     sig.indexFormat = desc.Format;
+                }
                 else
                     sig.resourceIntrospectionComplete = false;
                 sig.indexed = true;
@@ -328,11 +388,11 @@ namespace outrun::vr::dx11
             }
 
             const bool texture0Observed = inspect_texture(
-                device, 0, sig.texture0Type, sig.texture0Format,
-                sig.texture0Present);
+                device, 0, sig.texture0Type, sig.texture0Usage,
+                sig.texture0Pool, sig.texture0Format, sig.texture0Present);
             const bool texture1Observed = inspect_texture(
-                device, 1, sig.texture1Type, sig.texture1Format,
-                sig.texture1Present);
+                device, 1, sig.texture1Type, sig.texture1Usage,
+                sig.texture1Pool, sig.texture1Format, sig.texture1Present);
             if (!texture0Observed || !texture1Observed)
                 sig.resourceIntrospectionComplete = false;
             sig.textured = sig.texture0Present || sig.texture1Present;
@@ -395,7 +455,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R72 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={}] indexFmt={} rtFmt={} depthFmt={} tex0[type={},fmt={}] tex1[type={},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R73 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -405,12 +465,30 @@ namespace outrun::vr::dx11
                     sig.vertexDeclElements,
                     sig.streamOffset,
                     sig.stride,
+                    sig.vertexBufferPresent ? 1 : 0,
+                    static_cast<int>(sig.vertexPool),
+                    sig.vertexUsage,
+                    sig.indexed ? 1 : 0,
+                    static_cast<int>(sig.indexPool),
+                    sig.indexUsage,
                     static_cast<int>(sig.indexFormat),
+                    sig.renderTargetPresent ? 1 : 0,
+                    static_cast<int>(sig.renderTargetPool),
+                    sig.renderTargetUsage,
                     static_cast<int>(sig.renderTargetFormat),
+                    sig.depthPresent ? 1 : 0,
+                    static_cast<int>(sig.depthPool),
+                    sig.depthUsage,
                     static_cast<int>(sig.depthFormat),
+                    sig.texture0Present ? 1 : 0,
                     static_cast<int>(sig.texture0Type),
+                    static_cast<int>(sig.texture0Pool),
+                    sig.texture0Usage,
                     static_cast<int>(sig.texture0Format),
+                    sig.texture1Present ? 1 : 0,
                     static_cast<int>(sig.texture1Type),
+                    static_cast<int>(sig.texture1Pool),
+                    sig.texture1Usage,
                     static_cast<int>(sig.texture1Format),
                     sig.colorOp0,
                     sig.alphaOp0,
@@ -483,7 +561,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R72 census ACTIVE: passive 1/{} draw sampling; native draw routing remains disabled",
+                    "VR DX11 R73 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -505,7 +583,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R73 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -516,6 +594,9 @@ namespace outrun::vr::dx11
                 IndexedSamples.load(std::memory_order_relaxed),
                 TexturedSamples.load(std::memory_order_relaxed),
                 ResourceIntrospectionFailureSamples.load(std::memory_order_relaxed),
+                ResourceBehaviorUnsupportedSamples.load(std::memory_order_relaxed),
+                ResourceMutationTelemetryRequiredSamples.load(std::memory_order_relaxed),
+                ResourceManagedShadowRequiredSamples.load(std::memory_order_relaxed),
                 UnsupportedIndexFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedTextureFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedColorFormatSamples.load(std::memory_order_relaxed),
@@ -584,6 +665,55 @@ namespace outrun::vr::dx11
         if (!signature.resourceIntrospectionComplete)
             ResourceIntrospectionFailureSamples.fetch_add(
                 1, std::memory_order_relaxed);
+
+        bool behaviorDescriptorExact = true;
+        bool mutationTelemetryRequired = false;
+        bool managedShadowRequired = false;
+        const auto observeBehavior = [&](bool present, ResourceRole role,
+                                         D3DPOOL pool, DWORD usage) noexcept
+        {
+            if (!present)
+                return;
+            const auto behavior = translate_resource_behavior(role, pool, usage);
+            behaviorDescriptorExact =
+                behaviorDescriptorExact && behavior.descriptorExact;
+            mutationTelemetryRequired =
+                mutationTelemetryRequired || behavior.requiresMutationTelemetry;
+            managedShadowRequired =
+                managedShadowRequired || behavior.requiresCpuShadow;
+        };
+
+        observeBehavior(
+            signature.vertexBufferPresent, ResourceRole::Vertex,
+            signature.vertexPool, signature.vertexUsage);
+        observeBehavior(
+            signature.indexed, ResourceRole::Index,
+            signature.indexPool, signature.indexUsage);
+        observeBehavior(
+            signature.texture0Present, ResourceRole::Texture,
+            signature.texture0Pool, signature.texture0Usage);
+        observeBehavior(
+            signature.texture1Present, ResourceRole::Texture,
+            signature.texture1Pool, signature.texture1Usage);
+        observeBehavior(
+            signature.renderTargetPresent, ResourceRole::Color,
+            signature.renderTargetPool, signature.renderTargetUsage);
+        observeBehavior(
+            signature.depthPresent, ResourceRole::DepthStencil,
+            signature.depthPool, signature.depthUsage);
+
+        if (!behaviorDescriptorExact)
+            ResourceBehaviorUnsupportedSamples.fetch_add(
+                1, std::memory_order_relaxed);
+        if (mutationTelemetryRequired)
+            ResourceMutationTelemetryRequiredSamples.fetch_add(
+                1, std::memory_order_relaxed);
+        if (managedShadowRequired)
+            ResourceManagedShadowRequiredSamples.fetch_add(
+                1, std::memory_order_relaxed);
+        if (!behaviorDescriptorExact || mutationTelemetryRequired ||
+            managedShadowRequired)
+            resourcesExact = false;
 
         if (signature.indexed &&
             !translate_resource_format(
