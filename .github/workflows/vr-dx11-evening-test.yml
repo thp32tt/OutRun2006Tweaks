@@ -1,0 +1,62 @@
+name: DX11 Evening Test Package
+
+on:
+  push:
+    branches:
+      - vr-dx11-evening-test-20260928
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dx11-evening-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Verify exact candidate identity
+        shell: pwsh
+        run: |
+          Write-Host "DX11 evening candidate SHA=$env:GITHUB_SHA"
+          if ((git rev-parse HEAD).Trim() -ne $env:GITHUB_SHA) {
+            throw "checkout SHA mismatch"
+          }
+
+      - name: Run static DX11 gates
+        shell: pwsh
+        run: |
+          python tools/verify_vr_proven_baseline.py
+          ./tools/Test-VROneClickContract.ps1
+          python tools/verify_vr_backend_disasm_contract.py
+          python tools/verify_dx11_source_graph.py
+          python tools/verify_dx11_native_transport_contract.py
+          python tools/test_analyze_dx11_census.py
+
+      - name: Build clean one-click test package
+        shell: pwsh
+        run: |
+          ./tools/Build-OutRunPCFast.ps1 -Clean
+          $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
+          if (-not (Test-Path $zip)) { throw "test ZIP missing: $zip" }
+          $dest = "out/pc-fast/OutRun2_VR_DX11_R74_EVENING_$env:GITHUB_SHA.zip"
+          Copy-Item $zip $dest -Force
+          $hash = (Get-FileHash $dest -Algorithm SHA256).Hash.ToLowerInvariant()
+          "EVENING_ZIP=$dest" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "EVENING_SHA256=$hash" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "DX11_EVENING_PACKAGE=$dest"
+          Write-Host "DX11_EVENING_SHA256=$hash"
+
+      - name: Upload evening test build
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX11-R74-EVENING-${{ github.sha }}
+          path: ${{ env.EVENING_ZIP }}
+          if-no-files-found: error
