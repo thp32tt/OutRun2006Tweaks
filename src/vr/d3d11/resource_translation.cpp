@@ -27,7 +27,7 @@ namespace outrun::vr::dx11
                 return { DXGI_FORMAT_D16_UNORM, true };
             case D3DFMT_D24S8:
                 return { DXGI_FORMAT_D24_UNORM_S8_UINT, true };
-            case D3DFMT_D32:
+            case D3DFMT_D32F_LOCKABLE:
                 return { DXGI_FORMAT_D32_FLOAT, true };
             default:
                 return {};
