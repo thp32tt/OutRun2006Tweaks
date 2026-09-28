@@ -17,7 +17,9 @@ $parseFiles = @(
     'OutRunVR-Test-Selector.ps1',
     'Build-OutRunPCFast.ps1',
     'Acquire-OutRunDXVK.ps1',
-    'Test-DxvkAcquisition.ps1'
+    'Test-DxvkAcquisition.ps1',
+    'OutRunVR-PackageIntegrity.ps1',
+    'Test-OutRunVRPackageIntegrity.ps1'
 )
 
 foreach ($name in $parseFiles) {
@@ -168,7 +170,11 @@ foreach ($requiredText in @(
     'One-click slot source mismatch',
     'One-click slot payload mismatch',
     'SlotPayload',
-    'Remove-Item $reportPath -Force'
+    'Remove-Item $reportPath -Force',
+    'OutRunVR-PackageIntegrity.ps1',
+    'SHA256SUMS.txt',
+    'Test-OutRunVRPackageIntegrity',
+    'PackageIntegrity'
 )) {
     if ($preflightText -notmatch [regex]::Escape($requiredText)) {
         throw "Runtime package identity preflight missing: $requiredText"
@@ -179,7 +185,8 @@ foreach ($required in @(
     'VR_ONE_CLICK_TARGET.json',
     'ONE_RUN_VISUAL_CHECKLIST.txt',
     'START_HERE_VR_TEST.cmd',
-    'Collect-OutRunVRLogs.ps1'
+    'Collect-OutRunVRLogs.ps1',
+    'OutRunVR-PackageIntegrity.ps1'
 )) {
     if ($package -notmatch [regex]::Escape($required)) {
         throw "PC FAST package does not include one-click dependency: $required"

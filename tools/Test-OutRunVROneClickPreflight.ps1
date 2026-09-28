@@ -76,6 +76,21 @@ if ($allowed -notcontains $resolvedBackend) {
     throw "Unsupported one-click backend: $resolvedBackend"
 }
 
+$packageIntegrity=$null
+$packageIntegrityLib=Require-File (Join-Path $root 'OutRunVR-PackageIntegrity.ps1') 'Package integrity verifier'
+. $packageIntegrityLib
+$packageManifestPath=Join-Path $root 'SHA256SUMS.txt'
+$requiresPackageManifest=($resolvedBackend -eq 'dxvk-safe' -or $resolvedBackend -eq 'dxvk')
+if($requiresPackageManifest -or (Test-Path $packageManifestPath -PathType Leaf)){
+    if(!(Test-Path $packageManifestPath -PathType Leaf)){
+        throw "DXVK package SHA256 manifest missing: $packageManifestPath"
+    }
+    $packageIntegrity=Test-OutRunVRPackageIntegrity -Root $root -ManifestPath $packageManifestPath
+    if(-not $packageIntegrity.Verified){
+        throw 'Package-wide SHA256 integrity verification did not return a verified result.'
+    }
+}
+
 $gamePath = Require-File (Join-Path $root 'OR2006C2C.EXE') 'OutRun executable'
 $iniPath = Require-File (Join-Path $root 'OutRun2006Tweaks.ini') 'OutRun2006Tweaks.ini'
 $d3d9Backend = Join-Path $root 'backends/d3d9'
@@ -150,6 +165,13 @@ $report = [ordered]@{
     ResolvedBackend = $resolvedBackend
     VariantId = [string]$target.VariantId
     SourceSha = $sourceSha
+    PackageIntegrity = if($null -ne $packageIntegrity){
+        [ordered]@{
+            Verified=[bool]$packageIntegrity.Verified
+            EntryCount=[int]$packageIntegrity.EntryCount
+            ManifestSha256=[string]$packageIntegrity.ManifestSha256
+        }
+    }else{$null}
     SlotPayload = $slotIdentity
     PackageBuildInputs = [ordered]@{
         BuildMatrixId = [string]$buildInputs.BuildMatrixId

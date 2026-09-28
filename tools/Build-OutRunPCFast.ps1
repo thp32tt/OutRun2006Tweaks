@@ -247,6 +247,7 @@ $runtimeFiles = @(
     'OutRunVR-Test-Selector.ps1',
     'Invoke-OutRunVROneClick.ps1',
     'Test-OutRunVROneClickPreflight.ps1',
+    'OutRunVR-PackageIntegrity.ps1',
     'analyze_dxvk_session.py',
     'VR_ONE_CLICK_TARGET.json',
     'ONE_RUN_VISUAL_CHECKLIST.txt',
