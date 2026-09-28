@@ -39,6 +39,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
 
+      - name: Test DX11 census analyzer
+        shell: pwsh
+        run: python tools/test_analyze_dx11_census.py
+
       - name: Verify consolidated wheel FFB source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
