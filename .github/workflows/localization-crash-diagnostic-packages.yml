@@ -28,8 +28,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build three crash-diagnostic packages
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           import hashlib
           import pathlib
           import shutil
