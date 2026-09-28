@@ -2,6 +2,8 @@
 
 This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-clean is the only work state; do not use GPT Library as a work store.
 
+Progress-path compatibility: `localization/progress/progress.json` is the canonical progress state. `localization/progress.json` exists only as an exact compatibility mirror for legacy project instructions and MUST remain byte-for-byte identical. New automation must use the canonical nested path. C synchronization is responsible for updating the compatibility mirror whenever canonical progress changes; CI rejects drift.
+
 ## Isolation and source rules
 - Work only on korean-localization-clean. Never merge VR/FFB source or history.
 - Preserve the independent original-mod Korean patch architecture.
