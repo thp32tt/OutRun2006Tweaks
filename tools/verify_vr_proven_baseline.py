@@ -204,6 +204,24 @@ require_all("src/vr/hud_semantics.hpp", [
     'ClassifyCaller(0x0460F1)',
     'ClassifyCaller(0x097BB7)',
 ], "P8_R70_RUNTIME_SEMANTICS")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'R71: the R70 HMD run proved the old "dead work"',
+    'R30SkyGlow.reduced[eye];',
+    'compositeSource = R30SkyGlow.temp[eye];',
+], "P8_R71_SKYGLOW_FINAL_BLUR_SOURCE")
+require_all("src/hooks_uiscaling.cpp", [
+    'R71RivalMarkerSpraniCall = 0xBB796',
+    'Module::exe_ptr(0xBB6F5)',
+    'R71RivalMarker_sprani',
+    '0x975EE, 0x97727, 0x977FB',
+    'R71OutRunPrintEnter',
+    'R71OutRunPrintLeave',
+], "P8_R71_RIVAL_AND_OUTRUN_STAGE_TEXT")
+require_all("src/vr/hud_semantics.hpp", [
+    '"HUD_OUTRUN_STAGE"',
+    'InRange(callRva, 0x097300, 0x097F00)',
+    'ClassifyCaller(0x0975EE)',
+], "P8_R71_OUTRUN_STAGE_SEMANTICS")
 require_all("src/game_addrs.hpp", [
     'is_vr_gameplay_presentation()',
     'GameState::STATE_START',
