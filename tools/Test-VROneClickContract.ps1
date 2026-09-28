@@ -68,10 +68,10 @@ if ([string]$performanceProfile.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -ne '1
 
 $runnerPerformanceText = Get-Content (Join-Path $toolsRoot 'Run-OutRunVRTest.ps1') -Raw
 foreach ($requiredText in @(
-    "$cleanDxvkPerformance = ($backend -eq 'dxvk-safe' -and $TestProfile -eq 'PERFORMANCE')",
-    "if($backend -eq 'd3d9' -or $cleanDxvkPerformance)",
-    "$gameArgs += '-HudInspector=false'",
-    "if($backend -ne '2d' -and -not $cleanDxvkPerformance)",
+    '$cleanDxvkPerformance = ($backend -eq ''dxvk-safe'' -and $TestProfile -eq ''PERFORMANCE'')',
+    'if($backend -eq ''d3d9'' -or $cleanDxvkPerformance)',
+    '$gameArgs += ''-HudInspector=false''',
+    'if($backend -ne ''2d'' -and -not $cleanDxvkPerformance)',
     '"cleanDxvkPerformance=$cleanDxvkPerformance"',
     '"shaderFingerprintEnabled=$($backend -ne ''2d'' -and -not $cleanDxvkPerformance)"'
 )) {
