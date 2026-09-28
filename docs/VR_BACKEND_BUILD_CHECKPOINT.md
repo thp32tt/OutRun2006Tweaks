@@ -15,3 +15,5 @@ Checkpoint refresh: stock DXVK 3.1.1 SAFE + game-local provider census + runtime
 
 Final one-run packaging checkpoint: machine-readable DXVK provider/session summary wired into the diagnostic ZIP.
 
+Identity-sealed checkpoint: BUILD_INPUTS, target metadata and backend SOURCE_SHA must agree before launch.
+
