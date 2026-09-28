@@ -7,6 +7,7 @@ on:
       - vr-d3d9ex-candidate/r69-perf-exp-all
       - vr-d3d9ex-candidate/r69-perf-exp-all-v2
       - vr-d3d9ex-candidate/r69-perf-exp-all-v3
+      - vr-d3d9ex-candidate/r69-perf-exp-all-v4
     paths:
       - 'src/vr/**'
       - 'vrhost/**'
@@ -51,6 +52,9 @@ jobs:
           - id: EXP_ALL_V3
             ref: f19745bf88bbab6dc765f326148cb557f3984631
             note: V3 selective XYZRHW shadow gate + relaxed diagnostics + deferred-query cleanup + smoke-tested CI
+          - id: EXP_ALL_V4
+            ref: 670fda17836012d61be399bd03ac3287ab689294
+            note: V4 closes shadow registration races and quarantines DirectGPU generations on unverifiable GPU completion
     steps:
       - uses: actions/checkout@v4
         with:
@@ -171,10 +175,10 @@ jobs:
             'OUTRUN R69 REMAINING PERFORMANCE EXPERIMENTS'
             ''
             'FAST TEST ORDER'
-            '1. EXP_ALL_V3 first.'
-            '2. If EXP_ALL_V3 is visually correct and the bad frame-drop section improves, stop.'
-            '3. If EXP_ALL_V3 shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
-            '4. If EXP_ALL_V3 shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
+            '1. EXP_ALL_V4 first.'
+            '2. If EXP_ALL_V4 is visually correct and the bad frame-drop section improves, stop.'
+            '3. If EXP_ALL_V4 shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
+            '4. If EXP_ALL_V4 shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
             '5. If only occasional hitch remains, test EXP_FENCE2.'
             '6. If HUD/particle-heavy CPU drops remain, test EXP_XYZCACHE.'
             '7. P5_BASE is only the before/after control.'
