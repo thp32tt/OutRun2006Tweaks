@@ -35,9 +35,9 @@ Each set contains ten distinct review passes and derives the next set's directio
 
 ### B. One-click payload identity
 - Preflight is strong before mutation.
-- A stale `slots/<VariantId>` payload can outrank the verified backend payload.
-- Selector mutation is sequential and has no rollback.
-- No post-selection attestation seals the exact root DLL/host/provider bytes that will load.
+- **F01/F03 structurally sealed for the one-click target path 2026-09-28:** a target-named `slots/<VariantId>` payload is rejected unless its source SHA plus game DLL/host hashes match the canonical packaged backend, and the selector attests the exact root game DLL/host/provider bytes plus forbidden-file state before session handoff. The attestation is persisted as `ROOT_PAYLOAD_ATTESTATION.json` (`e4f0ca88479d131a743b30e4ece92a90433b5784`, gate `36394761652` PASS).
+- **F06 remains open:** selector mutation is still sequential and has no rollback if a filesystem/INI mutation fails midway.
+- F07 remains open: failures before normal session creation still need stronger durable diagnostics/behavioral coverage.
 
 ### C. DX11 activation
 - Native draw remains correctly dormant.
@@ -50,7 +50,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 - Multiview isolation is correct.
 - **F08/F09 closed 2026-09-28:** DXVK 3.1.1 acquisition pins the expected release archive SHA-256, rejects mismatched/unpinned archives, repairs a tampered cache from verified archive bytes, and refuses an explicit package provider unless it exactly matches the verified stock provider. Pinned-acquisition regression and Win32 gate pass on `d2d02c774ee85046acd42a453f2cf1f392927a20` (gate `36391517935`).
 - **F24 closed 2026-09-28:** runtime analyzer requires preflight version plus one exact observed DXVK runtime version before claiming stock-provider verification; missing, mismatched, or ambiguous version evidence fails closed (`4fc17768bb3cbb8242567f5c9ca9ce54526339dd`, gate `36390216273`).
-- F12 remains open: a full game-device recreation still needs explicit provider/capability re-attestation.
+- **F12 closed 2026-09-28:** every successful classic/Ex device creation emits a provider/capability re-attestation; the DXVK analyzer requires creation attestations to be present and all to pass before a stock-provider verdict. Analyzer regression plus Backend Conversion Gate `36392744533` pass on `718aca2486857ae51da4e7797b1c5b3b9f38cb8f`. Runtime/HMD behavior remains untested.
 - Exact-build Quest 3 two-pass visual parity is still required.
 
 ### E. Performance evidence
@@ -68,9 +68,9 @@ Each set contains ten distinct review passes and derives the next set's directio
 
 1. **DONE 2026-09-28:** Reconcile stale gate verifiers and restore the accidentally truncated renderer bodies. Backend Conversion Gate run `36389674398` passes through Win32 build/binary verification/artifact upload on `e46be02786f80aa9e554a24323714194b586d1f6`; no runtime claim is made.
 2. **PARTIAL 2026-09-28:** F13/F14 producer-catalog drift/omissions are closed at `d2d02c774ee85046acd42a453f2cf1f392927a20` with exact-SHA gate `36391517935` PASS. F15 projected semantic expressiveness remains open.
-3. Seal selector payload identity and transactional failure behavior.
+3. **PARTIAL 2026-09-28:** F01/F03 one-click payload identity is structurally sealed at `e4f0ca88479d131a743b30e4ece92a90433b5784` with gate `36394761652` PASS. F06 transactional rollback and F07 pre-session failure diagnostics remain open.
 4. Tighten DX11 census/activation gates and transport parity.
-5. **PROVENANCE/VERSION DONE 2026-09-28:** F24 runtime-version attestation plus F08/F09 archive/cache/package-provider provenance are enforced and gate-tested. F12 device-recreation re-attestation is the remaining DXVK lifecycle evidence item.
+5. **PROVENANCE/VERSION/LIFECYCLE DONE 2026-09-28:** F24 runtime-version attestation, F08/F09 archive/cache/package-provider provenance, and F12 device-recreation provider/capability re-attestation are enforced and gate-tested. Hardware visual/runtime validation is still required.
 6. Obtain stock DXVK SAFE and DX11 observation one-run Quest 3 evidence.
 7. Separate clean performance profiles from discovery instrumentation.
 8. Only after graphics/lifecycle gates close, consider DXVK multiview or native DX11 draw ownership promotion.

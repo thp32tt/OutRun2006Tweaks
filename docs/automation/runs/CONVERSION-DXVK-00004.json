@@ -1,0 +1,43 @@
+{
+  "task_id": "CONVERSION-DXVK-00004",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "chat_rollover": 1,
+  "base_sha": "718aca2486857ae51da4e7797b1c5b3b9f38cb8f",
+  "result_sha": "e4f0ca88479d131a743b30e4ece92a90433b5784",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "Recovered branch state without repeating completed work. F12 device-recreation provider/capability re-attestation was already implemented on the current branch and exact-SHA Backend Conversion Gate 36392744533 had passed. This task then structurally sealed F01/F03 for the one-click target path by rejecting stale target-slot payloads that do not match canonical package identity and by attesting the exact selected root DLL/host/DXVK-provider bytes before session handoff. F06 selector rollback/transactionality and F07 pre-session failure diagnostics remain open.",
+  "selected_work_item": "ONECLICK-F01-F03-PAYLOAD-IDENTITY",
+  "evidence": [
+    "Recovered branch HEAD 718aca2486857ae51da4e7797b1c5b3b9f38cb8f and found no existing docs/automation/runs/CONVERSION-DXVK-00004 record.",
+    "F12 was not repeated: commits 09318039d7038df403017de1c2352727b36a61e6 through 718aca2486857ae51da4e7797b1c5b3b9f38cb8f already wire CreateDevice/CreateDeviceEx provider re-attestation, analyzer fail-closed logic, regression tests, and one-click contract coverage.",
+    "Backend Conversion Gate 36392744533 on 718aca2486857ae51da4e7797b1c5b3b9f38cb8f PASS, including DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification, and artifact upload.",
+    "Artifact 10956634929 for 718aca2486857ae51da4e7797b1c5b3b9f38cb8f digest sha256:8ac3394c7123e8d2b52834c5cadaa3933a6444c39b46a7511c69a84b79ed0a60.",
+    "e4f0ca88479d131a743b30e4ece92a90433b5784: one-click preflight rejects a target-named slot unless SOURCE_SHA and dinput8/host hashes match the canonical backend; selector records ROOT_PAYLOAD_ATTESTATION.json after verifying selected root bytes and forbidden-file state.",
+    "Backend Conversion Gate 36394761652 on e4f0ca88479d131a743b30e4ece92a90433b5784 PASS through one-click structure, disassembly/semantic checks, DXVK analyzer regression, pinned acquisition, Win32 configure/build, binary verification, and artifact upload.",
+    "Artifact 10958007316 for e4f0ca88479d131a743b30e4ece92a90433b5784 digest sha256:0649a1659d715765b0d07e64d3cedba9533c23527c8577f23204a37eedbd9ae7.",
+    "GitHub Issue #14 change-ledger comment 5865896743 records the CHAT_DIRECT production transaction for e4f0ca88479d131a743b30e4ece92a90433b5784.",
+    "No HMD, Quest 3, VDXR, or in-game runtime/visual validation was performed."
+  ],
+  "completed_work_items": [
+    "DXVK-F12-DEVICE-RECREATION-REATTESTATION-RECOVERED",
+    "ONECLICK-F01-F03-PAYLOAD-IDENTITY-STRUCTURAL-SEAL"
+  ],
+  "open_work_items": [
+    "ONECLICK-F06-TRANSACTIONAL-ROLLBACK",
+    "ONECLICK-F07-PRESESSION-FAILURE-DIAGNOSTICS",
+    "VR-BACKEND-F15-PROJECTED-SEMANTIC-EXPRESSIVENESS",
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY",
+    "DXVK-CLEAN-PERFORMANCE-PROFILE"
+  ],
+  "next_action": "Continue with the next independent one-click lifecycle item: design and behavior-test transactional selector rollback (F06) without weakening the newly added payload attestation. Then strengthen pre-session failure diagnostics (F07). Keep DXVK multiview blocked and RUNTIME_VALIDATION=UNTESTED until exact-build Quest 3/VDXR in-game visual evidence exists.",
+  "workflow_run_id": 36394761652,
+  "workflow_job_id": 108838431834,
+  "artifact_id": 10958007316,
+  "artifact_digest": "sha256:0649a1659d715765b0d07e64d3cedba9533c23527c8577f23204a37eedbd9ae7",
+  "recovered_f12_workflow_run_id": 36392744533,
+  "recovered_f12_artifact_id": 10956634929,
+  "recorded_at": "2026-09-28T17:06:00+09:00"
+}
