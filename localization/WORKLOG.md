@@ -1199,3 +1199,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
 - No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100, GPT Library, VR/FFB/DX, or game build work.
 - Machine report: `localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json`.
+
+## 2026-09-29 04:14 KST - W00009 C BARRIER + SHARED REPAIR/MERGE (AUTO C-00031)
+- Refreshed GitHub-only `korean-localization-clean` at `6d7913eaffa312c086993c9eda36af1d024b0501` after durable A00029/B00030 W00009 results.
+- Repaired pre-existing W00008 C93 shared-state drift that caused both lanes' remote `verify_state.py` failure: added artwork-plan rows and visual-review action reconciliation for 26/28/30/32/35.
+- Merged A00029: 103 becomes `localize_text/pending_artwork/transcribed_reviewed` for `Normal balance -> 일반 밸런스`; 151/153/155 become preserve-original/not-required.
+- Cross-lane reviewed B00030: exact HD identity + decoded pixel/core-alpha/mirror-Y preflight for 26/28/30/32 is useful reconstruction input, but rejected draft candidates were not persisted because of effect residue/seams. No DDS promotion.
+- Shared counts: queue 137 = 85 localize_text + 41 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; unresolved zoom-review 23; resolved preserve-original 18; transcriptions/artwork plan 85 assets / 731 segments.
+- No W00009 DDS bytes changed; approved DDS count 0; `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
+- Machine report: `localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json`.
