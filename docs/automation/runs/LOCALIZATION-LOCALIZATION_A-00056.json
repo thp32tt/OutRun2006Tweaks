@@ -1,0 +1,60 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00056",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00018",
+  "recorded_at_kst": "2026-09-29T08:25:05+09:00",
+  "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
+  "material_commit_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
+  "final_precommit_head_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
+  "preserved_peer_head": false,
+  "result": "PASS_MATERIAL_FALLBACK_4_NEW_ODD_EXACT_HD_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "material_deliverable": {
+    "indices": [
+      65,
+      95,
+      101,
+      107
+    ],
+    "assets": [
+      "EBEF6D20",
+      "37759842",
+      "560FA536",
+      "841E796B"
+    ],
+    "type": "FOUR_NEW_ODD_EXACT_HD_RECONSTRUCTION_INPUTS",
+    "report": "localization/graphics/role_A/20260929-0825-A00056/A00056_W00018_ODD_EXACT_HD_RECONSTRUCTION_INPUT.json",
+    "exact_release_dds_identities": 4,
+    "decoded_stock_source_identities": 4,
+    "exact_4x_atlas_identities": 4,
+    "semantic_segments": 34,
+    "exact_atlas_regions": 152,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "touched_assets": [
+    "EBEF6D20",
+    "37759842",
+    "560FA536",
+    "841E796B"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "fail_closed_reason": "Exact English HD Release DDS identities and atlas geometry are pinned, but exact decoded glyph/effect masks, complete clean plates, and measured Korean full-effect bboxes do not yet exist. No guessed DDS bytes were emitted; all containment/DDS/alpha/orientation gates remain HOLD_STRICT_RECHECK until pixel decode/render evidence exists.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
