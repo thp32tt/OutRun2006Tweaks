@@ -51,11 +51,18 @@ for r in fails:
         move_mask=move_mask.resize((tw,th),Image.Resampling.NEAREST)
     after.paste(loc_patch,(nx0,ny0),move_mask)
     recs.append({"key":r["key"],"target_bbox":[nx0,ny0,nx1,ny1],"move_mask":"source_diff_binary"})
-touch=mk_mask((w,h),[r["sprite_cell"] for r in fails]); allowed=mk_mask((w,h),[r["original_bbox"] for r in rows]); repair=ImageChops.multiply(touch,ImageOps.invert(allowed)); after=Image.composite(src,after,repair)
+# Strict cleanup is asset-wide, not limited to the seven currently failing elements.
+# Historical candidate pixels outside every declared original text bbox must be restored
+# to canonical HD source before full source-diff containment can legitimately pass.
+allc=mk_mask((w,h),[r["sprite_cell"] for r in rows])
+allowed=mk_mask((w,h),[r["original_bbox"] for r in rows])
+repair=ImageChops.multiply(allc,ImageOps.invert(allowed))
+after=Image.composite(src,after,repair)
+touch=allc
 qa=[]; failed=[]
 for r in rows:
     b=bbox(src,after,r["sprite_cell"]); ok=inside(b,r["original_bbox"]); q={"key":r["key"],"original_bbox":r["original_bbox"],"localized_diff_bbox":b,"containment":"PASS" if ok else "FAIL"}; qa.append(q); failed += ([] if ok else [q])
-changed=diffmask(before,after); collateral=nz(ImageChops.multiply(changed,ImageOps.invert(touch))); allc=mk_mask((w,h),[r["sprite_cell"] for r in rows]); outside=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allc))); introduced=nz(ImageChops.multiply(ImageChops.subtract(after.getchannel("A"),src.getchannel("A")),ImageOps.invert(allc)))
+changed=diffmask(before,after); collateral=nz(ImageChops.multiply(changed,ImageOps.invert(touch))); outside=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allc))); introduced=nz(ImageChops.multiply(ImageChops.subtract(after.getchannel("A"),src.getchannel("A")),ImageOps.invert(allc)))
 if failed or collateral or outside or introduced:
     print(json.dumps({"failed":failed,"collateral_pixels":collateral,"outside_cells_changed_pixels":outside,"introduced_alpha_outside_cells":introduced},ensure_ascii=False,indent=2)); raise SystemExit("strict post-QA failed; candidate not written")
 out=cb[:128]+after.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes("raw","RGBA"); parse(out)
