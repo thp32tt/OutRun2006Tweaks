@@ -629,3 +629,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Automated containment 21/21 PASS; outside/collateral 0. Candidate 641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3.
 - Visual proof: localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png. Independent C source-style/artifact QA + DDS_ONLY in-game remain required.
 - AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.
+
+
+### A AUTO 00001 2026-09-28T16:04:59+09:00
+- 39229D64 index 57 exact-bbox rework automated QA PASS 15/15; outside/collateral 0.
+- Candidate e98278b4dd1fea91cc23802f9ae0c64185edad96dc57177fe1f67b71f30fc8fa; AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; C + DDS_ONLY in-game pending.

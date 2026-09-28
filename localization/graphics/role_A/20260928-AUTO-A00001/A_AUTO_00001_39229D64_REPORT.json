@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A_AUTO_00001",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
+  "timestamp_kst": "2026-09-28T16:04:59+09:00",
+  "base_head": "7dc2dc298f5bd3a4e86a3e3035fca6ce3702afb7",
+  "asset": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+  "index": 57,
+  "previous_candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+  "candidate_sha256": "e98278b4dd1fea91cc23802f9ae0c64185edad96dc57177fe1f67b71f30fc8fa",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "reworked_elements": [
+    {
+      "key": "hearts",
+      "target_bbox": [
+        1797,
+        6,
+        1965,
+        99
+      ],
+      "moved_diff_bbox": [
+        1797,
+        6,
+        1965,
+        99
+      ],
+      "move_mask": "source_diff_binary"
+    },
+    {
+      "key": "target",
+      "target_bbox": [
+        2654,
+        556,
+        2797,
+        638
+      ],
+      "moved_diff_bbox": [
+        2654,
+        556,
+        2797,
+        638
+      ],
+      "move_mask": "source_diff_binary"
+    },
+    {
+      "key": "start",
+      "target_bbox": [
+        2502,
+        1017,
+        2617,
+        1084
+      ],
+      "moved_diff_bbox": [
+        2502,
+        1017,
+        2617,
+        1084
+      ],
+      "move_mask": "source_diff_binary"
+    },
+    {
+      "key": "goal",
+      "target_bbox": [
+        3027,
+        1017,
+        3130,
+        1084
+      ],
+      "moved_diff_bbox": [
+        3027,
+        1017,
+        3130,
+        1084
+      ],
+      "move_mask": "source_diff_binary"
+    },
+    {
+      "key": "hit_ghost",
+      "target_bbox": [
+        3178,
+        1018,
+        3618,
+        1105
+      ],
+      "moved_diff_bbox": [
+        3178,
+        1018,
+        3618,
+        1105
+      ],
+      "move_mask": "source_diff_binary"
+    },
+    {
+      "key": "exit",
+      "target_bbox": [
+        3151,
+        1144,
+        3464,
+        1280
+      ],
+      "moved_diff_bbox": [
+        3151,
+        1144,
+        3464,
+        1280
+      ],
+      "move_mask": "source_diff_binary"
+    },
+    {
+      "key": "collect_stars",
+      "target_bbox": [
+        3500,
+        1173,
+        3988,
+        1266
+      ],
+      "moved_diff_bbox": [
+        3500,
+        1173,
+        3987,
+        1266
+      ],
+      "move_mask": "source_diff_binary"
+    }
+  ],
+  "qa": {
+    "elements": 15,
+    "failed_elements": 0,
+    "rows": [
+      {
+        "key": "hearts",
+        "original_bbox": [
+          1715,
+          5,
+          2048,
+          102
+        ],
+        "localized_diff_bbox": [
+          1797,
+          6,
+          1965,
+          99
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "technical_bonus",
+        "original_bbox": [
+          2393,
+          77,
+          3610,
+          259
+        ],
+        "localized_diff_bbox": [
+          2475,
+          87,
+          3501,
+          258
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "mission_cleared",
+        "original_bbox": [
+          128,
+          256,
+          1587,
+          787
+        ],
+        "localized_diff_bbox": [
+          584,
+          273,
+          1092,
+          776
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "total_rank_green",
+        "original_bbox": [
+          512,
+          896,
+          1101,
+          1075
+        ],
+        "localized_diff_bbox": [
+          526,
+          905,
+          1087,
+          1065
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "storing",
+        "original_bbox": [
+          1652,
+          858,
+          2975,
+          998
+        ],
+        "localized_diff_bbox": [
+          1808,
+          860,
+          2850,
+          996
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "special_request",
+        "original_bbox": [
+          1644,
+          1114,
+          2624,
+          1267
+        ],
+        "localized_diff_bbox": [
+          1813,
+          1116,
+          2437,
+          1265
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "target",
+        "original_bbox": [
+          2625,
+          555,
+          2825,
+          640
+        ],
+        "localized_diff_bbox": [
+          2654,
+          556,
+          2797,
+          638
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "start",
+        "original_bbox": [
+          2487,
+          1016,
+          2662,
+          1085
+        ],
+        "localized_diff_bbox": [
+          2502,
+          1017,
+          2617,
+          1084
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "goal",
+        "original_bbox": [
+          2975,
+          1016,
+          3131,
+          1085
+        ],
+        "localized_diff_bbox": [
+          3027,
+          1017,
+          3130,
+          1084
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "hit_ghost",
+        "original_bbox": [
+          3163,
+          1017,
+          3633,
+          1106
+        ],
+        "localized_diff_bbox": [
+          3178,
+          1018,
+          3618,
+          1105
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "exit",
+        "original_bbox": [
+          3083,
+          1143,
+          3494,
+          1281
+        ],
+        "localized_diff_bbox": [
+          3151,
+          1144,
+          3464,
+          1280
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "collect_stars",
+        "original_bbox": [
+          3469,
+          1172,
+          3998,
+          1267
+        ],
+        "localized_diff_bbox": [
+          3500,
+          1173,
+          3987,
+          1266
+        ],
+        "containment": "PASS",
+        "evidence": "moved_source_diff_mask"
+      },
+      {
+        "key": "mission_failed",
+        "original_bbox": [
+          1984,
+          1280,
+          3187,
+          1792
+        ],
+        "localized_diff_bbox": [
+          2319,
+          1299,
+          2813,
+          1786
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "total_rank_brown",
+        "original_bbox": [
+          717,
+          1915,
+          1318,
+          2099
+        ],
+        "localized_diff_bbox": [
+          729,
+          1925,
+          1305,
+          2088
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      },
+      {
+        "key": "total_rank_pink",
+        "original_bbox": [
+          2598,
+          1900,
+          3238,
+          2099
+        ],
+        "localized_diff_bbox": [
+          2607,
+          1912,
+          3229,
+          2087
+        ],
+        "containment": "PASS",
+        "evidence": "C85_element_bbox_unchanged"
+      }
+    ],
+    "changed_pixels_outside_reworked_cells": 0,
+    "changed_pixels_outside_all_declared_cells": 0,
+    "introduced_alpha_outside_all_declared_cells": 0
+  },
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "final_approval": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false
+}
