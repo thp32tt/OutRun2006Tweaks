@@ -221,6 +221,28 @@ namespace OutRunVRStereo
                  R30ShadowBloomBit(buffer)) != 0;
         }
 
+        void R30RebuildTrackedBloomsLocked() noexcept
+        {
+            std::uint64_t vertexBits = 0;
+            for (const auto& [buffer, entry] : R30VertexShadows)
+            {
+                (void)entry;
+                vertexBits |= R30ShadowBloomBit(buffer);
+            }
+
+            std::uint64_t indexBits = 0;
+            for (const auto& [buffer, entry] : R30IndexShadows)
+            {
+                (void)entry;
+                indexBits |= R30ShadowBloomBit(buffer);
+            }
+
+            R30TrackedVertexBloom.store(
+                vertexBits, std::memory_order_relaxed);
+            R30TrackedIndexBloom.store(
+                indexBits, std::memory_order_relaxed);
+        }
+
         struct R30VertexShadowLookupCache
         {
             IDirect3DVertexBuffer9* key = nullptr;
@@ -587,8 +609,11 @@ namespace OutRunVRStereo
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 if (R30VertexShadows.erase(buffer) != 0)
+                {
+                    R30RebuildTrackedBloomsLocked();
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
+                }
             }
             return refs;
         }
@@ -636,8 +661,11 @@ namespace OutRunVRStereo
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 if (R30IndexShadows.erase(buffer) != 0)
+                {
+                    R30RebuildTrackedBloomsLocked();
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
+                }
             }
             return refs;
         }
