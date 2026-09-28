@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-28T09:10:45+09:00
+Updated: 2026-09-28T12:31:00+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -600,3 +600,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Current PASS pending isolated DDS_ONLY in-game: `C4A2937B, 9F060EC1, D6DC1380, 48DEBE77`. Final approved/locked count remains **0**.
 - Remaining full scope: 12 current reworks + 63 localize_text pending production + 47 zoom_review HOLD_STRICT_RECHECK. No build; no VR/FFB; no GPT Library.
 - Report: `localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json`.
+
+### B92 DXT5 zero-pixel rework — 2026-09-28T12:31:00+09:00
+- `62BEBF33` and `E3FD08BE`: one raw-pixel vertical correction completed; exact readable bbox containment now PASS for both.
+- DXT5 endpoints/header/dimensions/mips preserved. Candidate SHA-256: `62BEBF33=503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e`; `E3FD08BE=51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548`.
+- Both remain zero-margin edge-touch high-risk; independent C final QA + isolated DDS_ONLY in-game validation required. Final approved count remains 0.
+- Remaining C85 production REWORK assets: 10.
