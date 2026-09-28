@@ -1,0 +1,549 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00054",
+  "attempt": "1/3",
+  "wave_id": "W00017",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T08:01:55+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "b2ea44844b647f5844cd3fec24aa80e81bc69b2a",
+  "final_precommit_head_sha": "cf59cbf79091431fa4a88066e16981a0297d944b",
+  "peer_lane_commit_observed_before_commit": true,
+  "peer_lane_task_id": "LOCALIZATION-LOCALIZATION_A-00053",
+  "peer_lane_commit_sha": "cf59cbf79091431fa4a88066e16981a0297d944b",
+  "peer_lane_preserved": "YES_PARENTED_ON_A00053_HEAD",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_CLEAN_PLATE_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "tree_sha": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "identity_policy": "Immutable GitHub blob SHA pinning only. Exact English HD DDS remains pixel authority; upstream decoded PNG/atlas/working source are reconstruction references. No N100/local clone/GPT Library."
+  },
+  "queue_snapshot": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "selected_even_indices": [
+      130,
+      140,
+      154,
+      164
+    ],
+    "selected_state": "localize_text/pending_artwork",
+    "selection_reason": "Fresh even-shard pending assets not used in W00016; no work steal."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "description": "Pinned four fresh even-shard exact-HD source identities, decoded source identities, exact 4x atlas geometry, available layered/vector working-source identities, canonical translation sets, preserve masks and fail-closed clean-plate next actions.",
+    "core_source_identities_pinned": 12,
+    "working_source_identities_pinned": 6,
+    "semantic_segments_pinned": 16,
+    "exact_atlas_regions_pinned": 24,
+    "candidate_dds_written": false
+  },
+  "assets": [
+    {
+      "queue_index": 130,
+      "asset": "1762489B",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+        "git_blob_sha": "ce5158f8f3e78dc328227e4e76c7c71789b53060",
+        "size_bytes": 4194432,
+        "atlas_dimensions": [
+          2048,
+          512
+        ]
+      },
+      "decoded_original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.png",
+        "git_blob_sha": "9b960abbd475bb157d9dfdaf4c73caea891a4a79"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_1762489B_512x128_atlas.json",
+        "git_blob_sha": "d9de1e9ff9e91ecfe3a87e9d03a27f6c6cb50ec5",
+        "width": 2048,
+        "height": 512,
+        "regions_count": 6,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_1080",
+            "rect": [
+              0,
+              416,
+              1264,
+              96
+            ]
+          },
+          {
+            "idx": 1,
+            "name": "sprite_1081",
+            "rect": [
+              0,
+              320,
+              1264,
+              96
+            ]
+          },
+          {
+            "idx": 2,
+            "name": "sprite_1082",
+            "rect": [
+              0,
+              224,
+              1264,
+              96
+            ]
+          },
+          {
+            "idx": 3,
+            "name": "sprite_1083",
+            "rect": [
+              0,
+              128,
+              1264,
+              96
+            ]
+          },
+          {
+            "idx": 4,
+            "name": "sprite_1084",
+            "rect": [
+              1264,
+              448,
+              600,
+              64
+            ]
+          },
+          {
+            "idx": 5,
+            "name": "sprite_1085",
+            "rect": [
+              1864,
+              456,
+              128,
+              56
+            ]
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "MIX 1 COURSE",
+          "korean": "믹스 1 코스"
+        },
+        {
+          "source": "MIX 2 COURSE",
+          "korean": "믹스 2 코스"
+        },
+        {
+          "source": "OUTRUN2 COURSE",
+          "korean": "아웃런2 코스"
+        },
+        {
+          "source": "OUTRUN2SP COURSE",
+          "korean": "아웃런2 SP 코스"
+        },
+        {
+          "source": "AVERAGE RANK:",
+          "korean": "평균 랭크:"
+        }
+      ],
+      "preserve_original": [
+        "numeric rank marker",
+        "all non-text artwork/background outside source glyph/effect masks"
+      ],
+      "reconstruction_status": "READY_FOR_DECODED_GLYPH_MASK_EXTRACTION",
+      "mapping_note": "Five localizable semantic strings plus one preserved numeric marker are pinned against six exact 4x atlas cells. Do not assign semantics to cells by order alone; confirm from decoded English HD pixels.",
+      "next_action": "Decode exact HD source, identify complete English glyph/effect footprint in the six pinned cells, preserve the numeric marker cell, build protected masks and clean plates, then fit Korean strictly inside measured source text bboxes."
+    },
+    {
+      "queue_index": 140,
+      "asset": "31C58963",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+        "git_blob_sha": "b0079384796e645d2a7b759a017d071f041457b9",
+        "size_bytes": 8388736,
+        "atlas_dimensions": [
+          2048,
+          1024
+        ]
+      },
+      "decoded_original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.png",
+        "git_blob_sha": "1864f6abe58ababe303c0bf61b3808951e5d8584"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_31C58963_512x256_atlas.json",
+        "git_blob_sha": "7829c90426d563960440dd70b9b7ae74b3b76c0d",
+        "width": 2048,
+        "height": 1024,
+        "regions_count": 5,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_457",
+            "rect": [
+              0,
+              864,
+              1760,
+              160
+            ]
+          },
+          {
+            "idx": 1,
+            "name": "sprite_458",
+            "rect": [
+              0,
+              704,
+              1760,
+              160
+            ]
+          },
+          {
+            "idx": 2,
+            "name": "sprite_459",
+            "rect": [
+              0,
+              544,
+              1760,
+              160
+            ]
+          },
+          {
+            "idx": 3,
+            "name": "sprite_460",
+            "rect": [
+              0,
+              384,
+              1760,
+              160
+            ]
+          },
+          {
+            "idx": 4,
+            "name": "sprite_461",
+            "rect": [
+              0,
+              308,
+              744,
+              76
+            ]
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "PRESS START",
+          "korean": "START 버튼"
+        },
+        {
+          "source": "SHOWROOM",
+          "korean": "쇼룸"
+        },
+        {
+          "source": "SELECT MODE",
+          "korean": "모드 선택"
+        },
+        {
+          "source": "SELECT RACE",
+          "korean": "레이스 선택"
+        },
+        {
+          "source": "SELECT STAGE",
+          "korean": "스테이지 선택"
+        }
+      ],
+      "working_sources": [
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v01/spr_sprani_sumo_fe_cvt_Exst/PRESS START Variants/31C58963_512x256-v01.psd",
+          "git_blob_sha": "8faecf3fb1010c4e8cfec2cf32c772cfbf490606"
+        },
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_sumo_fe_cvt_Exst/31C58963-v02/31C58963_512x256-v02.psd",
+          "git_blob_sha": "1e00a7ab87ba5ad4d141fc6d36c4d4723134fe1e"
+        },
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_sumo_fe_cvt_Exst/31C58963-v02/31C58963_512x256-v02.ai",
+          "git_blob_sha": "107877727af23bedd4dfa059f64bd9e422ae7e17"
+        }
+      ],
+      "preserve_original": [
+        "button/icon artwork not part of translatable glyph mask",
+        "all panel/background pixels outside source glyph/effect masks"
+      ],
+      "reconstruction_status": "READY_FOR_WORKING_SOURCE_ASSISTED_CLEAN_PLATE",
+      "mapping_note": "Five semantic strings and five exact atlas cells are pinned, but cell-to-string assignment must be confirmed from decoded English HD pixels/working source; no order inference is permitted.",
+      "next_action": "Use pinned PSD/AI only as reconstruction reference while exact HD DDS remains pixel authority; extract source glyph/effect masks, protect button/icon geometry, create clean plates, then render measured Korean."
+    },
+    {
+      "queue_index": 154,
+      "asset": "4D38BBB0",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+        "git_blob_sha": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "size_bytes": 16777344,
+        "atlas_dimensions": [
+          4096,
+          1024
+        ]
+      },
+      "decoded_original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.png",
+        "git_blob_sha": "092d13a6d5f909f2aaf071116001a9278ec6dcc3"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_4D38BBB0_1024x256_atlas.json",
+        "git_blob_sha": "11f58c46008eb6ca355cd9b0d64f1fe268695838",
+        "width": 4096,
+        "height": 1024,
+        "regions_count": 10,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_4",
+            "rect": [
+              0,
+              704,
+              2044,
+              320
+            ]
+          },
+          {
+            "idx": 1,
+            "name": "sprite_5",
+            "rect": [
+              2044,
+              704,
+              516,
+              320
+            ]
+          },
+          {
+            "idx": 2,
+            "name": "sprite_6",
+            "rect": [
+              0,
+              532,
+              2000,
+              172
+            ]
+          },
+          {
+            "idx": 3,
+            "name": "sprite_7",
+            "rect": [
+              2000,
+              532,
+              1944,
+              172
+            ]
+          },
+          {
+            "idx": 4,
+            "name": "sprite_8",
+            "rect": [
+              0,
+              360,
+              1760,
+              172
+            ]
+          },
+          {
+            "idx": 5,
+            "name": "sprite_9",
+            "rect": [
+              1760,
+              360,
+              1688,
+              172
+            ]
+          },
+          {
+            "idx": 6,
+            "name": "sprite_10",
+            "rect": [
+              0,
+              188,
+              1604,
+              172
+            ]
+          },
+          {
+            "idx": 7,
+            "name": "sprite_11",
+            "rect": [
+              1604,
+              272,
+              1056,
+              88
+            ]
+          },
+          {
+            "idx": 8,
+            "name": "sprite_12",
+            "rect": [
+              2660,
+              272,
+              812,
+              88
+            ]
+          },
+          {
+            "idx": 9,
+            "name": "sprite_13",
+            "rect": [
+              2560,
+              936,
+              812,
+              88
+            ]
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "MULTIPLAYER",
+          "korean": "멀티플레이"
+        },
+        {
+          "source": "SINGLE PLAYER",
+          "korean": "싱글 플레이"
+        },
+        {
+          "source": "DEFAULT LICENSE",
+          "korean": "기본 라이선스"
+        },
+        {
+          "source": "CREATE NEW LICENSE",
+          "korean": "새 라이선스 만들기"
+        },
+        {
+          "source": "SELECT LICENSE",
+          "korean": "라이선스 선택"
+        }
+      ],
+      "working_sources": [
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Header Backgrounds/4D38BBB0_1024x256-v01.psd",
+          "git_blob_sha": "8cd88789b01c01326da64fd580a681b8d41f845a"
+        }
+      ],
+      "preserve_original": [
+        "all header/background geometry outside source glyph/effect masks",
+        "non-text decorative/header art"
+      ],
+      "reconstruction_status": "READY_FOR_WORKING_SOURCE_ASSISTED_CLEAN_PLATE",
+      "mapping_note": "Five semantic strings span ten exact atlas regions, likely multiple visual states/parts; pairing is intentionally left unassigned until decoded English HD inspection. No guessed pairing is allowed.",
+      "next_action": "Resolve semantic-to-region/state mapping from decoded English HD source and PSD reference, extract complete source glyph/effect masks, protect header geometry, create clean plates, then typeset Korean per state."
+    },
+    {
+      "queue_index": 164,
+      "asset": "5B65E08C",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+        "git_blob_sha": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "size_bytes": 8388736,
+        "atlas_dimensions": [
+          2048,
+          1024
+        ]
+      },
+      "decoded_original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.png",
+        "git_blob_sha": "ed299b6da90aa91fc95f19652183ef793ce98655"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_5B65E08C_512x256_atlas.json",
+        "git_blob_sha": "baf21ea53d31d9de0d153ccad9132e4af89a3c90",
+        "width": 2048,
+        "height": 1024,
+        "regions_count": 3,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_14",
+            "rect": [
+              0,
+              696,
+              2000,
+              328
+            ]
+          },
+          {
+            "idx": 1,
+            "name": "sprite_15",
+            "rect": [
+              0,
+              368,
+              560,
+              328
+            ]
+          },
+          {
+            "idx": 2,
+            "name": "sprite_16",
+            "rect": [
+              560,
+              532,
+              1168,
+              164
+            ]
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "SELECT LICENSE",
+          "korean": "라이선스 선택"
+        }
+      ],
+      "working_sources": [
+        {
+          "path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Header Backgrounds/5B65E08C_512x256-v01.psd",
+          "git_blob_sha": "e047817a9c72e4ab8ed07eef675573f379aaa31b"
+        }
+      ],
+      "preserve_original": [
+        "all non-text header/background geometry outside the SELECT LICENSE glyph/effect footprint"
+      ],
+      "reconstruction_status": "READY_FOR_WORKING_SOURCE_ASSISTED_CLEAN_PLATE",
+      "mapping_note": "One semantic string and three exact atlas regions are pinned; determine which region/state contains SELECT LICENSE from decoded English HD source/PSD rather than guessing.",
+      "next_action": "Locate SELECT LICENSE glyph/effect footprint in the exact HD DDS, create source mask/protected mask/clean plate, verify zero residue/seams, then fit Korean before any DDS candidate is emitted."
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_130_140_154_164",
+    "work_steal": "NONE",
+    "canonical_translation_match": "PASS_16_OF_16_AGAINST_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "immutable_upstream_identity": "PASS_12_CORE_BLOBS_PLUS_6_WORKING_SOURCE_REFS_PINNED_FROM_UPSTREAM_TREE",
+    "atlas_dimensions_region_counts": "PASS_4_OF_4_FROM_4X_ATLAS_JSON__24_REGIONS_TOTAL",
+    "generation_reset_source_rule": "PASS_EXACT_ENGLISH_HD_SOURCE_ONLY_NO_OLD_KOREAN_INPUT",
+    "source_text_mask": "HOLD_STRICT_RECHECK_NEXT_STAGE_NO_PIXEL_DECODE_THIS_RUN",
+    "clean_plate": "HOLD_STRICT_RECHECK_NEXT_STAGE_NO_PIXEL_DECODE_THIS_RUN",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE_WRITTEN",
+    "dds_header_alpha_orientation": "HOLD_EXACT_BINARY_HEADER_AND_PER_ELEMENT_ORIENTATION_NOT_DECODED_THIS_RUN_NO_DDS_WRITE",
+    "english_source_vs_korean_candidate_proof": "HOLD_NO_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Four fresh unfinished even-shard assets advanced from transcription-only pending_artwork to immutable GitHub-pinned clean-plate reconstruction inputs. Fail-closed reset rules prevented emitting guessed DDS bytes without decoded glyph/effect masks and clean-plate proof. Runtime remains untested."
+}
