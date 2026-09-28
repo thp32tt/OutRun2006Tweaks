@@ -84,7 +84,17 @@ logging.basicConfig(
 )
 log = logging.getLogger("outrun-controller")
 
-RATE_CONVERSATION_LIMIT_PATTERNS = [
+RATE_LIMIT_PATTERNS = [
+    r"too many requests",
+    r"http\s*429",
+    r"\b429\b.{0,80}(request|rate|limit)",
+    r"rate limit(?:ed|ing)?",
+    r"request(?:s)?.{0,30}(too many|limit|throttl)",
+    r"요청.{0,12}(너무 많|한도|제한)",
+    r"너무 많은 요청",
+]
+
+CONVERSATION_LIMIT_PATTERNS = [
     r"maximum (?:conversation|chat) length",
     r"(?:conversation|chat).{0,40}(?:too long|maximum length|length limit|limit reached)",
     r"you.?ve reached.{0,40}(?:maximum|limit).{0,40}(?:conversation|chat)",
@@ -93,16 +103,6 @@ RATE_CONVERSATION_LIMIT_PATTERNS = [
     r"이 대화.{0,30}(?:최대|한도|길이)",
     r"대화.{0,30}(?:너무 길|길이 한도|최대 길이|한도에 도달)",
     r"새 (?:채팅|대화).{0,40}(?:시작|계속|이어)",
-]
-
-LIMIT_PATTERNS = [
-    r"too many requests",
-    r"http\s*429",
-    r"\b429\b.{0,80}(request|rate|limit)",
-    r"rate limit(?:ed|ing)?",
-    r"request(?:s)?.{0,30}(too many|limit|throttl)",
-    r"요청.{0,12}(너무 많|한도|제한)",
-    r"너무 많은 요청",
 ]
 
 LIMIT_PATTERNS = [
@@ -115,6 +115,7 @@ LIMIT_PATTERNS = [
     r"사용 한도",
     r"나중에 다시",
 ]
+
 BUSY_SELECTORS = [
     "button[data-testid='stop-button']",
     "button:has-text('Stop generating')",
