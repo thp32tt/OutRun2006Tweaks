@@ -403,6 +403,7 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
 
 async def main_async(once: bool):
     start_status_server()
+    write_runtime(status="browser_connecting", last_action="Attaching controller to Chrome DevTools")
     async with async_playwright() as p:
         browser = None
         for _ in range(60):
@@ -415,8 +416,10 @@ async def main_async(once: bool):
             raise RuntimeError("Could not attach to Google Chrome on CDP port 9222")
 
         context = browser.contexts[0] if browser.contexts else await browser.new_context()
+        write_runtime(status="browser_attached", last_action="Chrome attached; restoring queue/chat state")
         reg = load_registry(datetime.now(TZ))
         pages = await prepare_slot_pages(context, reg)
+        write_runtime(status="controller_ready", last_action="Queue/chat state restored; checking login and starting scheduler")
 
         # Login check on slot A tab; session is shared by all tabs.
         first_page = pages[reg.slots[0].name]
