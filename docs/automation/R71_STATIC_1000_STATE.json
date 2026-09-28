@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 6,
+  "completedCycles": 7,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "cee9e99ff92eb7037474674f72a465c87118ec8c",
+  "currentHead": "7ecca8a5174bc707e83dd57960b3fb3c6908397c",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -172,18 +172,45 @@
       "automationValidation": "EXE_STATIC_ANALYSIS_EVIDENCE_PASS; FINAL_HEAD_BUILD_CI_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "Keep exact bracket hooks for OutRun stage text; no broad range restoration unless new runtime evidence proves a missing exact producer."
+    },
+    {
+      "cycle": 7,
+      "lenses": [
+        "DirectGPU ownership",
+        "zero-copy control flow",
+        "skipped-frame ACK durability",
+        "transition watermark",
+        "adversarial projection failure"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-PREMATURE-ACK-001",
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "VR-R41-SKIPPED-DIRECT-PREMATURE-ACK-001 is not reproduced on current R71 zero-copy flow: R23StageDirectHold borrows shared SRVs without CopyResource; failed fresh projection arms R23DeferredReferenceAck after queued GPU work; latest-frame skip excludes R23DeferredSlotBlocked identities.",
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001 remains open: immediate PublishCompletedFrame failure for a truly never-sampled older frame creates no durable retry owner, and later lastProcessedStereoFrame/watermark advancement can make that frame unreachable.",
+        "STOPPING, reference-space change and presentation-change paths still advance lastProcessedStereoFrame to a latest snapshot without first transferring never-touched DirectGPU releases into durable ownership."
+      ],
+      "changedFiles": [
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [],
+      "automationValidation": "STATIC_CONTROL_FLOW_REVIEW",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 8 should extract a pure skipped-release identity/retry state machine keyed by clientPid+runGeneration+transportGeneration+slot+frameId, add LEVEL0 tests first, then wire it into immediate skip and transition-watermark paths if tests pass."
     }
   ],
   "nextCycle": {
-    "cycle": 7,
+    "cycle": 8,
     "priority": [
-      "consume exact-parent CI",
-      "review skipped-frame/transition-watermark ACK ownership",
-      "instrument R14 external-write hook misses if evidence supports",
-      "review Reset/DirectGPU generation boundaries",
-      "defer visual tuning to user HMD"
+      "design/test durable skipped-release queue",
+      "full producer-run identity",
+      "transition watermark release-before-advance",
+      "consume exact-head CI",
+      "avoid touching already-safe deferred GPU-reference path"
     ],
-    "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no broad semantic heuristics."
+    "guard": "Do not re-port old CopyResource ownership logic; current R71 zero-copy/deferred-event path supersedes it. Keep sampled frames EVENT-owned and never-sampled frames retry-owned."
   },
-  "updatedKst": "2026-09-29T02:44:36+09:00"
+  "updatedKst": "2026-09-29T02:48:00+09:00"
 }
