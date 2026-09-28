@@ -185,6 +185,22 @@ namespace OutRunVRStereo
             R30VertexShadows;
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
             R30IndexShadows;
+        std::atomic<std::uint64_t> R30ShadowRegistryGeneration{ 1 };
+
+        struct R30VertexShadowLookupCache
+        {
+            IDirect3DVertexBuffer9* key = nullptr;
+            std::uint64_t generation = 0;
+            std::weak_ptr<R30BufferShadow> value;
+        };
+        struct R30IndexShadowLookupCache
+        {
+            IDirect3DIndexBuffer9* key = nullptr;
+            std::uint64_t generation = 0;
+            std::weak_ptr<R30BufferShadow> value;
+        };
+        thread_local R30VertexShadowLookupCache R30VertexShadowLookup{};
+        thread_local R30IndexShadowLookupCache R30IndexShadowLookup{};
         std::uint64_t R30ShadowWrites = 0;
         std::uint64_t R30ShadowReadHits = 0;
         std::uint64_t R30ShadowReadMisses = 0;
@@ -261,16 +277,46 @@ namespace OutRunVRStereo
 
         R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
         {
+            const auto generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_acquire);
+            if (R30VertexShadowLookup.key == buffer &&
+                R30VertexShadowLookup.generation == generation)
+            {
+                if (auto cached = R30VertexShadowLookup.value.lock())
+                    return cached;
+            }
+
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30VertexShadows.find(buffer);
-            return it == R30VertexShadows.end() ? nullptr : it->second;
+            R30ShadowPtr result =
+                it == R30VertexShadows.end() ? nullptr : it->second;
+            R30VertexShadowLookup.key = buffer;
+            R30VertexShadowLookup.generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_relaxed);
+            R30VertexShadowLookup.value = result;
+            return result;
         }
 
         R30ShadowPtr R30FindIndexShadow(IDirect3DIndexBuffer9* buffer)
         {
+            const auto generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_acquire);
+            if (R30IndexShadowLookup.key == buffer &&
+                R30IndexShadowLookup.generation == generation)
+            {
+                if (auto cached = R30IndexShadowLookup.value.lock())
+                    return cached;
+            }
+
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30IndexShadows.find(buffer);
-            return it == R30IndexShadows.end() ? nullptr : it->second;
+            R30ShadowPtr result =
+                it == R30IndexShadows.end() ? nullptr : it->second;
+            R30IndexShadowLookup.key = buffer;
+            R30IndexShadowLookup.generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_relaxed);
+            R30IndexShadowLookup.value = result;
+            return result;
         }
 
         R30ShadowPtr R30EnsureVertexShadow(IDirect3DVertexBuffer9* buffer)
@@ -289,6 +335,9 @@ namespace OutRunVRStereo
             entry->pool = desc.Pool;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
+            if (inserted)
+                R30ShadowRegistryGeneration.fetch_add(
+                    1, std::memory_order_release);
             return inserted ? entry : it->second;
         }
 
@@ -311,6 +360,9 @@ namespace OutRunVRStereo
             entry->indexFormat = desc.Format;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
+            if (inserted)
+                R30ShadowRegistryGeneration.fetch_add(
+                    1, std::memory_order_release);
             return inserted ? entry : it->second;
         }
 
@@ -481,7 +533,9 @@ namespace OutRunVRStereo
             if (refs == 0)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30VertexShadows.erase(buffer);
+                if (R30VertexShadows.erase(buffer) != 0)
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
             }
             return refs;
         }
@@ -524,7 +578,9 @@ namespace OutRunVRStereo
             if (refs == 0)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30IndexShadows.erase(buffer);
+                if (R30IndexShadows.erase(buffer) != 0)
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
             }
             return refs;
         }
