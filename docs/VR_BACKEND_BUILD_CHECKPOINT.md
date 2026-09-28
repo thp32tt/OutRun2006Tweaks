@@ -17,3 +17,5 @@ Final one-run packaging checkpoint: machine-readable DX11 census summary wired i
 
 Identity-sealed checkpoint: BUILD_INPUTS, target metadata and backend SOURCE_SHA must agree before launch.
 
+Code-freeze build checkpoint: one-click runtime, analyzers and syntax gates are wired; only build failures should change source after this point.
+
