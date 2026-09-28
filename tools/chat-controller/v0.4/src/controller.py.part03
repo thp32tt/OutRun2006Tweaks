@@ -677,27 +677,42 @@ def reconcile_legacy_conversion_blocked(q: dict) -> bool:
     """Move historical UI-detection false failures to completed when exact task SHA gate already passed."""
     if CONTROLLER_MODE != "conversion":
         return False
-    if int(q.get("conversion_blocked_reconcile_version", 0)) >= 1:
+    # v2 retries the earlier reconciliation because v1 could mark itself complete
+    # even after GitHub REST rate limiting interrupted the scan.
+    if int(q.get("conversion_blocked_reconcile_version", 0)) >= 2:
         return False
 
+    original = list(q.get("blocked", []))
     kept = []
     recovered = []
     lookup_failed = False
-    for record in q.get("blocked", []):
+
+    for idx, record in enumerate(original):
         task_id = record.get("task_id")
         branch = record.get("branch")
         workflow = record.get("workflow") or "Backend Conversion Gate"
         if not task_id or not branch:
             kept.append(record)
             continue
+
         commit = github_find_task_commit(branch, task_id)
         if commit is None:
             kept.append(record)
+            if _github_blocked_seconds() > 0:
+                lookup_failed = True
+                kept.extend(original[idx + 1:])
+                break
             continue
+
         run = github_gate_run(branch, commit["sha"], workflow)
         if run is None:
             kept.append(record)
+            if _github_blocked_seconds() > 0:
+                lookup_failed = True
+                kept.extend(original[idx + 1:])
+                break
             continue
+
         if run.get("status") == "completed" and run.get("conclusion") == "success":
             fixed = dict(record)
             fixed["result_sha"] = commit["sha"]
@@ -715,11 +730,26 @@ def reconcile_legacy_conversion_blocked(q: dict) -> bool:
 
     q["blocked"] = kept
     if recovered:
-        q["completed"] = (q.get("completed", []) + recovered)[-100:]
-    # Exact historical task/gate state is stable; one reconciliation pass is sufficient.
-    q["conversion_blocked_reconcile_version"] = 1
+        existing_ids = {r.get("task_id") for r in q.get("completed", [])}
+        q["completed"] = (
+            q.get("completed", []) + [r for r in recovered if r.get("task_id") not in existing_ids]
+        )[-100:]
+
     q["last_blocked_reconcile_at"] = datetime.now(TZ).isoformat()
     q["last_blocked_recovered_count"] = len(recovered)
+
+    if lookup_failed:
+        # Do not seal reconciliation while REST is rate-limited; retry automatically later.
+        q["conversion_blocked_reconcile_version"] = 1
+        save_queue_state(q)
+        write_runtime(
+            status="queue_history_reconcile_paused",
+            last_action=f"Recovered {len(recovered)} historical tasks; reconciliation paused by GitHub REST rate limit",
+            recovered_tasks=[r["task_id"] for r in recovered],
+        )
+        return bool(recovered)
+
+    q["conversion_blocked_reconcile_version"] = 2
     save_queue_state(q)
     if recovered:
         write_runtime(
