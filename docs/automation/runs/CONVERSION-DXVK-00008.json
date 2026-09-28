@@ -6,7 +6,7 @@
   "base_sha": "d76c5ba4895fbdcc865795f11a2404d1e18aaf17",
   "result_sha": "27bd1e89bdac1d547bd9994eb5ea51901d08d81a",
   "automation_validation": "PASS",
-  "runtime_validation": "UNTESTED",
+  "runtime_validation": "FAILED",
   "selected_work_item": "DXVK-CLEAN-PERFORMANCE-PROFILE",
   "summary": "Selected the highest-priority runnable DXVK item after CONVERSION-DXVK-00006: clean performance-profile isolation. The runner now allows only dxvk-safe + PERFORMANCE to consume the canonical PERFORMANCE profile cadence policy, explicitly forces HudInspector=false for that path, disables OUTRUN_VR_SHADER_FINGERPRINT for that path, and records clean-performance/instrumentation state in RUN_OVERRIDES.txt. DXVK CORRECTNESS, DXVK multiview, D3D9 reference behavior and renderer/provider ownership are unchanged. The one-click contract now parses the profile library, validates the PERFORMANCE cadence arguments and verifies the DXVK SAFE clean-performance branch/instrumentation guards.",
   "changed_paths": [
@@ -43,10 +43,12 @@
     "Build artifact 10966778726 digest sha256:789d54575f5b9da9869c1838fa6b2a00978f055084dcbf62d8f741b50dc42060. No N100 clone/worktree, PC-fast runner, Quest 3, VDXR or in-game runtime test was used."
   ],
   "open_work_items": [
+    "DXVK-DIRECT-GPU-TRANSPORT-WITHOUT-D3D9EX",
+    "DXVK-FAILSAFE-RUNTIME-LOG-COLLECTOR",
     "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY"
   ],
-  "next_action": "DXVK clean-performance profile infrastructure is complete at automated validation level. Next DXVK gate is exact-build Quest 3/VDXR two-pass visual parity and same-scene PERFORMANCE evidence. Until hardware testing exists, keep RUNTIME_VALIDATION=UNTESTED, make no performance-improvement claim, and do not promote DXVK multiview.",
-  "recorded_at": "2026-09-28T20:20:00+09:00",
+  "next_action": "Do not promote DXVK multiview. First remove the plain-D3D9 SBS/Desktop Duplication bottleneck by implementing and automatically validating a DXVK-native/direct GPU transport path that does not depend on IDirect3DDevice9Ex. In parallel, harden the runtime package collector so diagnostics are sealed even when the test is force-terminated. Re-run exact-build Quest 3/VDXR PERFORMANCE only after the transport path is active.",
+  "recorded_at": "2026-09-28T23:43:00+09:00",
   "validation_checkpoint_sha": "d288dec167dc770db2ff2f2264b9781acded5929",
   "review_checkpoint_commits": [
     "9e3f4b6710db692ff01dcd09aa3ab4bbef7436f1",
@@ -104,5 +106,22 @@
       "next_action": "Keep DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY open. Do not repeat completed clean-performance implementation. When Quest 3/VDXR evidence is supplied, compare exact build identity, visual parity and same-scene PERFORMANCE evidence before any DXVK promotion or multiview work.",
       "reviewed_at": "2026-09-28T22:46:24.676+09:00"
     }
+  ],
+  "runtime_failure": "Quest 3 / Virtual Desktop / VDXR HMD pacing failed on exact-source DXVK SAFE stock 3.1.1 two-pass runtime. V2 CORRECTNESS showed ~32-35 ms OpenXR frame intervals in gameplay while the runtime period was 11.111 ms (90 Hz); V3 PERFORMANCE_PLAIN_D3D9 removed the 60 fps cap, enabled cadence mode 1/interpolation/unlock and disabled HUD inspector/shader fingerprint, but the user reported the same severe HMD-only stutter. Desktop output remained comparatively smooth SBS.",
+  "runtime_evidence": {
+    "exact_source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "hardware": "Quest 3 + Virtual Desktop + VDXR; RTX 4070",
+    "dxvk": "3.1.1 x86 stock d3d9.dll",
+    "correctness_result": "FAIL_HMD_PACING",
+    "performance_result": "FAIL_HMD_PACING_SAME_AS_CORRECTNESS",
+    "transport_observation": "DXVK census reports stock interop present but IDirect3DDevice9Ex unavailable; zero-copy cross-process sharing is unavailable and SBS/Desktop Duplication fallback remains active.",
+    "visual_observation": "DXVK menu vehicle color/shading was reported normal where the DX9Ex path showed abnormal vehicle color; treat this as a cross-backend differential clue, not yet a root-cause proof.",
+    "v3_manifest": "DXVKPERF-20260928T143942Z: PERFORMANCE_PLAIN_D3D9, PreferD3D9Ex=false, FramerateLimit=0, FrameCadenceMode=1, HudInspector=false.",
+    "diagnostic_limitation": "The manually compressed V3 session folder contained only session_manifest.json and OR2006C2C_d3d9.log, indicating the ad-hoc package runner did not reach its finally/collector stage before termination. This does not negate the user-observed pacing failure; it limits current V3 host-timing telemetry."
+  },
+  "runtime_status_notes": [
+    "The prior UNTESTED hardware gate is now closed as a failure for HMD pacing on the tested stock DXVK SAFE two-pass fallback transport.",
+    "This is not a renderer-wide visual failure: desktop SBS remained comparatively smooth and menu vehicle color/shading was reported correct on DXVK.",
+    "The performance-profile experiment falsified the hypothesis that CORRECTNESS 60 fps/diagnostic settings were the primary cause of the HMD stutter."
   ]
 }
