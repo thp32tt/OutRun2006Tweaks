@@ -64,7 +64,7 @@ def main() -> None:
         "ResourceIntrospectionFailureSamples": "durable failure counter",
         "bool resourcesExact = signature.resourceIntrospectionComplete;": "exactness starts from observation completeness",
         "if (!signature.resourceIntrospectionComplete)": "durable failure accounting gate",
-        "if (unsupported == PipelineUnsupportedNone && topology.exact && resourcesExact)": "exact sample fail-closed gate",
+        "if (unsupported == PipelineUnsupportedNone && topology.exact &&": "pipeline/topology exact-sample gate",
         "GetStreamSource": "vertex-buffer observation",
         "GetRenderTarget": "render-target observation",
         "GetDepthStencilSurface": "depth observation",
