@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-09-24T14:24:08Z",
+  "updatedUtc": "2026-09-28T04:01:34Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "two-full-cycles-per-hour / HUD+PERF+DXVK+DX12 parallel development / no-PC-runner",
+  "phase": "DXVK identity infrastructure integrated / HUD+PERF+DXVK+DX12 parallel development / no-PC-runner",
   "checkpoint": "C6_STATE",
   "policy": {
     "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
@@ -136,7 +136,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "Run :00/:30 full cycles with NO-READY-PARKING: consume completed CI, implement bounded READY work immediately, repair deterministic blockers in-run, and leave only genuine HMD-only or hard-blocked work pending.",
+  "nextAction": "DXVK-REACTIVATE-001 identity infrastructure is build-verified and integrated. Next pin/package the actual x86 DXVK provider for E_DXVK_SAFE; rank-anchor candidate bdfcea9b is already CI-complete and needs HMD only. Continue independent DX12/PERF work without waiting on HUD.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -335,14 +335,21 @@
   },
   "activeValidation": {
     "workflow": "DX9Ex Active Validation",
-    "runId": 35530793478,
-    "sourceSha": "10df8cbe9b3f32d8844a2c4283bd5bed3c8950c3",
-    "status": "in-progress-at-state-write",
+    "runId": 36375594746,
+    "sourceSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+    "status": "success",
     "policy": "success",
+    "dxvkBackendIdentityContract": "success",
+    "canonicalExeContract": "success",
+    "architecture": "success",
+    "nearPlaneEligibility": "success",
     "host": "success",
-    "game": "in-progress",
-    "package": "pending",
-    "reason": "One-time validation triggered by candidate-branch CI/concurrency workflow change; runtime renderer source was not changed by this setup commit."
+    "noHmdHostSmokes": "8/8 success",
+    "game": "success",
+    "package": "success",
+    "artifactId": 10951140945,
+    "artifactDigest": "sha256:3ec0fd27f09789653d2925e94bfb4de47365cee0b29fc76693c9a63ed23b697f",
+    "reason": "Exact-SHA validation for DXVK selector/backend identity infrastructure; protected DX9Ex renderer source was not changed."
   },
   "coordination": {
     "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
@@ -586,7 +593,10 @@
       "E_DXVK: DXVK SAFE first, multiview next",
       "F_DX12: D3D9On12 strict/device-resource compatibility"
     ],
-    "nextAction": "Prepare D_PERF/E_DXVK/F_DX12 immediately in parallel with B_HUD/C_FLARE. Do not wait for HUD resolution."
+    "nextAction": "Pin/package actual x86 DXVK provider for E_DXVK_SAFE; HMD-test SAFE before multiview. Rank-anchor remains HMD-only. Continue F_DX12 and performance independently.",
+    "dxvkInfrastructureSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+    "dxvkInfrastructureRunId": 36375594746,
+    "dxvkInfrastructureStatus": "BUILD_VERIFIED_INTEGRATED"
   },
   "automationSchedule": {
     "contract": "TWO-FULL-CYCLES-PER-HOUR",
@@ -620,5 +630,20 @@
     "productionIntegrationWip": 1,
     "ownership": "remote GitHub claim/CAS; never concurrent source mutation",
     "waitingPolicy": "If one cycle waits on CI/HMD/review or another live writer, advance another independent lane instead of idling."
+  },
+  "lastChatDirectTransaction": {
+    "recordedAtKst": "2026-09-28T13:01:34+09:00",
+    "findingId": "DXVK-REACTIVATE-001",
+    "baseSha": "2c1d7877180d3ee6d89af8e1f5031e287d466a16",
+    "candidateBranch": "vr-d3d9ex-candidate/DXVK-REACTIVATE-001-CHAT-20260928-A",
+    "firstCandidateSha": "51c6196da5b99c8cecc645b26946d20afe28129f",
+    "validatedCandidateSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+    "validationRunId": 36375594746,
+    "validationResult": "SUCCESS",
+    "integrationSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+    "runtimeVisibleChange": false,
+    "hmdRequiredForInfrastructure": false,
+    "hmdRequiredForDxvkViability": true,
+    "pcRunnerUsed": false
   }
 }

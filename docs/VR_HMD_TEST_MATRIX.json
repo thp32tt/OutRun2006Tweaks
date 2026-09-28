@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-24T23:07:00+09:00",
+  "updatedKst": "2026-09-28T13:01:34+09:00",
   "policy": "IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX (HUD/PERF/DXVK/DX12 non-blocking)",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
@@ -132,7 +132,17 @@
       "hypothesis": "The x86 DXVK path can be restored as a repeatable backend while preserving the protected R51 world contract; SAFE compatibility is validated before multiview optimization.",
       "expectedObservable": "DXVK initialization/reset/gameplay/VR transport evidence with explicit backend identity; if SAFE is viable, continue immediately to multiview performance testing.",
       "blockedByHud": false,
-      "promotionGate": "May be built and HMD-tested now; default-backend promotion still requires R51 parity."
+      "promotionGate": "May be built and HMD-tested now; default-backend promotion still requires R51 parity.",
+      "infrastructureSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "infrastructureCiRunId": 36375594746,
+      "infrastructureStatus": "BUILD_VERIFIED_INTEGRATED",
+      "infrastructureEvidence": [
+        "DXVK SAFE and MULTIVIEW selector paths now require x86 PE providers.",
+        "Provider d3d9.dll and multiview patcher SHA256 identities are persisted per session.",
+        "Hosted DXVK selector/backend identity contract passed on exact SHA."
+      ],
+      "note": "Selector/backend identity infrastructure is integrated, but no actual pinned DXVK binary payload is frozen in this slot yet. E_DXVK is not HMD-ready until provider payload/package identity is created.",
+      "nextAction": "Pin/package the x86 DXVK provider for E_DXVK_SAFE, verify exact payload identity and initialization/reset/fail-open behavior, then perform Quest3/VDXR SAFE testing before multiview."
     },
     {
       "slotId": "F_DX12",

@@ -107,3 +107,15 @@ Current autonomous pipeline contract supersedes all older role descriptions:
 - Next checkpoint: trace exact producer -> node-tag -> queue-select -> c64 upload -> draw semantic lifetime, plus Calc3D2D/vehicle-anchor propagation for rival rank markers. Do not broaden generic queue-to-HUD ownership.
 - **PC runner is disabled until explicit user re-authorization.** Overnight scheduled work is review/static analysis/EXE-map/documentation and normal cloud CI only.
 
+## Checkpoint 2026-09-28 13:01 KST — DXVK backend identity infrastructure
+
+- C0 RECOVER: vr-d3d9ex-focus exact base was `2c1d7877180d3ee6d89af8e1f5031e287d466a16`; repository rules, queue, regression registry and Issues #13/#14 were reloaded from GitHub. No N100 clone/worktree was used.
+- C1 REVIEW: stale rank-anchor validation was resolved without repetition — candidate `bdfcea9b40d461fb6f043a9f5da73b61332d2570` already has successful DX9Ex Active Validation run `36009907829`; it is HMD-only now. The canonical host-smoke requirement is also satisfied by current Active Validation.
+- C2 IMPLEMENT: created `vr-d3d9ex-candidate/DXVK-REACTIVATE-001-CHAT-20260928-A`. DXVK SAFE/MULTIVIEW selection now validates x86 PE providers before copy, records provider + SHA256 identities, verifies installed hashes, and has a deterministic synthetic-PE CI contract.
+- C3 VALIDATE: first run `36375540353` exposed a CRLF-sensitive assertion in the new self-test; repaired in `2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7`. Exact-SHA run `36375594746` then passed policy/regression gates, DXVK identity contract, canonical EXE contract, architecture/near-plane gates, x64 host + 8/8 no-HMD smokes, Win32 game build, and package validation.
+- C4 COMMIT/INTEGRATE: focus was unchanged, so `2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7` was fast-forward integrated with no force. Changed implementation paths are only `tools/Select-OutRunVRBackend.ps1`, `tools/Test-VRDXVKBackendContract.ps1`, and `.github/workflows/vr-dx9ex-active.yml`; protected DX9Ex renderer source is unchanged.
+- C5 PACKAGE: hosted validation artifact `10951140945`, digest `sha256:3ec0fd27f09789653d2925e94bfb4de47365cee0b29fc76693c9a63ed23b697f`. This is validation evidence, not an E_DXVK runtime package.
+- C6 STATE: queue/matrix/state corrected. `DXVK-REACTIVATE-001` remains IN_PROGRESS because the actual pinned x86 DXVK provider payload/package is still missing. PC/self-hosted runner was not used.
+
+### Next action
+Pin and package the real x86 DXVK provider as E_DXVK_SAFE with exact hash identity, validate startup/reset/gameplay/VR transport, then HMD-test SAFE before attempting multiview. Do not promote DXVK over protected R51 without Quest3/VDXR parity.

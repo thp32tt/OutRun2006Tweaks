@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T23:24:08+09:00",
+  "updatedKst": "2026-09-28T13:01:34+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -99,13 +99,26 @@
       "status": "INTEGRATED_NEEDS_HMD",
       "integratedAtKst": "2026-09-24T22:46:00+09:00",
       "evidenceNote": "Prospective integration preserves candidate runtime/build-input blobs; intervening focus commits were queue/matrix documentation only."
+    },
+    "lastToolingIntegration": {
+      "candidateId": "DXVK-REACTIVATE-001-IDENTITY-INFRA",
+      "candidateBranch": "vr-d3d9ex-candidate/DXVK-REACTIVATE-001-CHAT-20260928-A",
+      "candidateSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "integrationSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "candidateCiRuns": [
+        36375594746
+      ],
+      "candidateCiResult": "SUCCESS",
+      "status": "INTEGRATED_BUILD_VERIFIED_INFRA",
+      "integratedAtKst": "2026-09-28T13:01:34+09:00",
+      "evidenceNote": "Tooling/workflow-only DXVK identity hardening; protected DX9Ex runtime renderer source unchanged. Actual DXVK provider package remains IMPLEMENT_NEXT/HMD-gated."
     }
   },
   "items": [
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
       "priority": 13,
-      "status": "VALIDATING",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Reconstruct rival rank-marker anchor propagation from Calc3D2D/vehicle source through sprani/put_clip SpriteNode and per-eye WORLD_BILLBOARD projection; current exact-callsite tags still leave markers head-locked/detached.",
       "testLevel": "LEVEL0",
@@ -121,9 +134,11 @@
       "candidateBranch": "vr-d3d9ex-candidate/RANK-ANCHOR-SIDECAR-20260924",
       "candidateSha": "bdfcea9b40d461fb6f043a9f5da73b61332d2570",
       "validationRunId": 36009907829,
-      "validationResult": "IN_PROGRESS",
+      "validationResult": "BUILD_VERIFIED",
       "implementationProgress": "Calc3D2D original 3D anchor + stock projected anchor are now preserved per rank SpriteNode via a sidecar; R30 telemetry confirms reachability at WORLD_BILLBOARD draw once runtime-exercised. Visual reprojection behavior is intentionally unchanged in this candidate.",
-      "nextAction": "Complete exact-SHA CI, then HMD-run this anchor-provenance candidate. If VR R51 RANK ANCHOR telemetry proves sidecar reachability, implement per-eye reprojection from the preserved world anchor rather than screen-space coordinates."
+      "nextAction": "Quest3/VDXR HMD-run the rank-anchor provenance candidate. If VR R51 RANK ANCHOR telemetry proves the sidecar reaches WORLD_BILLBOARD draw, implement per-eye reprojection from the preserved world anchor rather than screen-space coordinates.",
+      "validationSha": "bdfcea9b40d461fb6f043a9f5da73b61332d2570",
+      "validationCompletedAtKst": "2026-09-24T23:10:48+09:00"
     },
     {
       "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
@@ -280,7 +295,7 @@
     {
       "id": "DX9EX-TEST-HOST-SMOKES-CI-001",
       "priority": 9,
-      "status": "NEEDS_VALIDATION",
+      "status": "DONE",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Run existing deterministic no-HMD host smoke executables in DX9Ex Active Validation instead of merely building outrun-vr-host.",
       "testLevel": "LEVEL0",
@@ -289,8 +304,12 @@
       "runtimeCandidate": false,
       "candidateBranch": "vr-d3d9ex-candidate/DX9EX-TEST-HOST-SMOKES-CI-001-D-20260921T1147KST",
       "candidateSha": "bad74c80d37e5b57b9f7ae761cc7e7a2af180c29",
-      "validationRunId": 35555390587,
-      "validationState": "host build + eight smoke tests PASS; game/package still running at queue write"
+      "validationRunId": 36375594746,
+      "validationState": "host build + eight smoke tests PASS; game/package still running at queue write",
+      "validationSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "validationResult": "BUILD_VERIFIED",
+      "resolution": "Canonical DX9Ex Active Validation now runs all eight deterministic no-HMD host smoke executables; exact-SHA run 36375594746 passed policy, host smokes, Win32 game build and package validation.",
+      "nextAction": "Reopen only if the canonical workflow stops executing the smoke suite or a smoke regression fails."
     },
     {
       "id": "L0-CAPTURE-001",
@@ -306,16 +325,28 @@
     {
       "id": "DXVK-REACTIVATE-001",
       "priority": 13,
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
       "testLevel": "LEVEL2",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer.",
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "candidateBranch": "vr-d3d9ex-candidate/DXVK-REACTIVATE-001-CHAT-20260928-A",
+      "candidateSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "validationRunId": 36375594746,
+      "validationResult": "BUILD_VERIFIED_INFRA",
+      "integrationSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "infrastructureProgress": [
+        "Selector rejects non-x86 DXVK d3d9.dll and multiviewpatcher.dll before installation.",
+        "DXVK provider and payload SHA256 identities are recorded in ACTIVE_VR_BACKEND.txt and session_manifest.json.",
+        "Post-copy SHA256 verification detects installation mismatch.",
+        "Hosted synthetic-PE contract test covers DXVK SAFE, DXVK MULTIVIEW and x64-provider rejection."
+      ],
+      "nextAction": "Create or restore the actual pinned x86 DXVK provider payload for E_DXVK_SAFE, package an exact backend identity, then run DXVK SAFE startup/reset/gameplay/VR transport validation. Only proceed to multiview after SAFE viability; do not promote DXVK over the R51 DX9Ex baseline without Quest3/VDXR parity."
     },
     {
       "id": "DX12-D3D9ON12-REACTIVATE-001",
