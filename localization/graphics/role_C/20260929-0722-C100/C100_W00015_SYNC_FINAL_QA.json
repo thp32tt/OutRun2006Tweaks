@@ -1,0 +1,181 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00049",
+  "wave_id": "W00015",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_RECONCILIATION",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T07:22:45+09:00",
+  "base_head_sha": "39695007729513a325116d04bb7148efba0ccc19",
+  "barrier_gate": "PASS_A_B_DURABLE_TERMINAL_AND_REMOTE_CI_SUCCESS",
+  "lane_a": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00047",
+    "commit_sha": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
+    "result": "PASS_MATERIAL_FALLBACK_4_ODD_SOURCE_BBOX_MAPPING_INPUTS_GITHUB_ONLY",
+    "remote_checks": {
+      "verify": "success",
+      "validate": "success",
+      "guard": "success"
+    },
+    "indices": [
+      55,
+      59,
+      89,
+      119
+    ]
+  },
+  "lane_b": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00048",
+    "commit_sha": "39695007729513a325116d04bb7148efba0ccc19",
+    "result": "PASS_MATERIAL_FALLBACK_4_EVEN_EXACT_HD_DXT5_DECODED_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+    "remote_checks": {
+      "verify": "success",
+      "validate": "success",
+      "guard": "success"
+    },
+    "indices": [
+      92,
+      98,
+      112,
+      152
+    ]
+  },
+  "source_identity_validation": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "upstream_tree": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "expected_blobs": 24,
+    "matched_blobs": 24,
+    "result": "PASS_24_OF_24"
+  },
+  "semantic_validation": {
+    "canonical_files": [
+      "localization/graphics/transcriptions.jsonl",
+      "localization/graphics/artwork_plan.jsonl"
+    ],
+    "indices": [
+      55,
+      59,
+      89,
+      92,
+      98,
+      112,
+      119,
+      152
+    ],
+    "segments": 17,
+    "exact_matches": 17,
+    "result": "PASS_17_OF_17",
+    "context_term_note": "No canonical translation conflict found. Existing game-context terms such as 다음 라운드, 게임 오버, 아웃런 모드, 코스 기록, 여자친구와 함께 골, 타임 어택 모드 and music-mix abbreviations are retained unchanged."
+  },
+  "asset_results": [
+    {
+      "index": 55,
+      "asset": "2EA557B4",
+      "state": "RECONSTRUCTION_READY_HOLD_NO_KOREAN_HD_CANDIDATE",
+      "source": "exact HD 2048x256 BC3 + decoded full-effect bbox",
+      "orientation": "flip-Y",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 59,
+      "asset": "7CE1CFC5",
+      "state": "RECONSTRUCTION_MAPPING_READY_EXACT_HD_BBOX_HOLD",
+      "source": "exact HD 2048x512 blob + stock/4x mapping",
+      "orientation": "HOLD_EXACT_HD_CONFIRMATION",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 89,
+      "asset": "43B07A77",
+      "state": "RECONSTRUCTION_MAPPING_READY_BBOX_ORIENTATION_HOLD",
+      "source": "exact HD 2048x256 blob + atlas",
+      "orientation": "HOLD_STOCK_READABLE_VS_HISTORICAL_MIRROR_X_RECONCILIATION",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 119,
+      "asset": "F6811E94",
+      "state": "RECONSTRUCTION_READY_HOLD_NO_KOREAN_HD_CANDIDATE",
+      "source": "exact HD 2048x256 BC3 + decoded style/effect bboxes",
+      "orientation": "flip-Y",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 92,
+      "asset": "1A43E9D9",
+      "state": "EXACT_HD_DXT5_ALPHA_BANDS_READY_MAPPING_HOLD",
+      "source": "exact HD 2048x256 BC3 + two decoded alpha bands",
+      "orientation": "HOLD_EXACT_HD_READABLE_CONFIRMATION",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 98,
+      "asset": "42E618FD",
+      "state": "EXACT_HD_DXT5_EFFECT_ENVELOPE_READY_RENDER_HOLD",
+      "source": "exact HD 2048x128 BC3 + envelope [431,5,1673,121]",
+      "orientation": "HOLD_EXACT_HD_READABLE_CONFIRMATION",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 112,
+      "asset": "D41D0B1",
+      "state": "EXACT_HD_DXT5_EFFECT_ENVELOPE_READY_RENDER_HOLD",
+      "source": "exact HD 2048x256 BC3 + envelope [435,18,1356,236]",
+      "orientation": "HOLD_EXACT_HD_READABLE_CONFIRMATION",
+      "containment": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "index": 152,
+      "asset": "49BB5FE5",
+      "state": "EXACT_HD_DXT5_SIX_CELLS_READY_TEXT_MASK_MAPPING_HOLD",
+      "source": "exact HD 512x128 BC3 + six atlas cells",
+      "orientation": "HOLD_EXACT_HD_READABLE_CONFIRMATION",
+      "containment": "HOLD_STRICT_RECHECK",
+      "preserve": "'89/'86 and surrounding artwork"
+    }
+  ],
+  "candidate_dds_modified_by_wave": false,
+  "candidate_dds_modified_by_c": false,
+  "cross_lane_final_qa": {
+    "hangul_glyph_integrity": "NOT_APPLICABLE_NO_NEW_KOREAN_DDS_BYTES",
+    "clipping": "NOT_APPLICABLE_NO_NEW_KOREAN_DDS_BYTES",
+    "zero_pixel_containment": "HOLD_STRICT_RECHECK_UNTIL_KOREAN_HD_CANDIDATE_EXISTS",
+    "resolution": "SOURCE_DIMENSIONS_PINNED_NO_CANDIDATE_WRITE",
+    "dds_format_mipmap_alpha_transparency": "SOURCE_EVIDENCE_VALIDATED_NO_CANDIDATE_WRITE",
+    "background_wrong_replacement": "NO_CANDIDATE_WRITE_NO_NEW_RASTER_PASS_INFERRED",
+    "mandatory_english_source_comparison": "HOLD_UNTIL_KOREAN_HD_CANDIDATE_EXISTS",
+    "new_static_passes": 0,
+    "new_runtime_approvals": 0,
+    "approved_locked_dds_count": 0
+  },
+  "queue_after": {
+    "rows": 137,
+    "localize_text": 95,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1,
+    "unresolved_zoom_review": 0,
+    "resolved_preserve_original_zoom_review": 31,
+    "pending_production_localize_text": 78
+  },
+  "shared_state_updates": [
+    "localization/resume_state.json",
+    "localization/WORKLOG.md",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/progress/STATUS.md",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_W00015_SYNC_FINAL_QA_8_RECONSTRUCTION_INPUTS_0_NEW_DDS_STATIC_PASS_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

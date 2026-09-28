@@ -1,5 +1,5 @@
 {
-  "schema_version": 69,
+  "schema_version": 70,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,10 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Continue exact-HD source-faithful production for reconstruction-ready localize_text assets. W00014 completed index 195 (9CE4E175) static QA; remaining previously prepared indices 38/55/99/119 still require exact decoded full-effect English bboxes, raw orientation, text-only/background-safe masks and mandatory ENGLISH SOURCE vs KOREAN CANDIDATE proof before static promotion.",
-    "Use W00014 B00045 reconstruction inputs for even indices 46/48/62 after exact HD text/effect bboxes are recovered. Index 50 remains partial HOLD: PLEASE WAIT / PLAYERS / YOUR FRIENDS / FRIEND REQUEST require deterministic pixel-text detection before any render.",
-    "Continue runnable source-faithful REWORK/localize_text backlog without repeating unchanged dependency blockers. After the W00014 index-195 candidate, pending production localize_text is 78 against a 17-candidate strict static baseline.",
-    "Keep runtime validation separate from production/static QA. C99 performed no real-game test, so 9CE4E175 and the overall graphics set remain RUNTIME_VALIDATION=UNTESTED until user integrated-game evidence exists."
+    "Use W00015 reconstruction inputs for indices 55/119/98/112 only after exact-HD readable/raw orientation and text-only/background-safe masks are confirmed. Their English HD DXT5/BC3 source envelopes are pinned, but every Korean HD candidate must still pass zero-pixel containment and mandatory ENGLISH SOURCE vs KOREAN CANDIDATE proof before static promotion.",
+    "Keep indices 59/89/92/152 on strict reconstruction HOLD: 59 still needs exact decoded HD text/effect bboxes; 89 needs exact-HD bbox plus raw-orientation reconciliation; 92 needs exact-HD readable orientation and semantic-to-alpha-band mapping; 152 needs semantic-to-cell/text-only masks while preserving '89/'86 and surrounding artwork.",
+    "Retain prior W00014 reconstruction inputs 46/48/50/62 and earlier prepared localize_text work without repeating unchanged dependency blockers. W00015 changes no Korean DDS bytes, so pending production localize_text remains 78 against the existing 17-candidate strict static baseline.",
+    "Keep runtime validation separate from production/static QA. C100 performed no real-game test; W00015 reconstruction inputs and the overall graphics set remain RUNTIME_VALIDATION=UNTESTED until user integrated-game evidence exists."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",

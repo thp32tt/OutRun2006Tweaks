@@ -1267,3 +1267,17 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Report: `localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C100 W00015 synchronization barrier — 2026-09-29T07:22:45+09:00
+- Barrier gate: PASS. A00047 `61ef749089e7e031b3a1d2ba2d351acae5e38db6` and B00048 `39695007729513a325116d04bb7148efba0ccc19` are durable terminal commits in current HEAD ancestry; each exact SHA has successful `verify`, `validate`, and `guard` checks.
+- GitHub-only cross-lane source identity QA: **24/24** pinned upstream source/atlas blobs match `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`.
+- Canonical meaning/context/term QA: **17/17** semantic translations across indices **55/59/89/119/92/98/112/152** exactly match current `transcriptions.jsonl` and `artwork_plan.jsonl`. No terminology conflict was introduced.
+- A reconstruction inputs retained: 55 `2EA557B4` and 119 `F6811E94` have exact-HD decoded source envelopes; 59 `7CE1CFC5` remains exact-HD-bbox HOLD; 89 `43B07A77` remains exact-HD-bbox + raw-orientation-reconciliation HOLD.
+- B reconstruction inputs retained: 92 `1A43E9D9`, 98 `42E618FD`, 112 `D41D0B1`, 152 `49BB5FE5` have exact HD DXT5/header/alpha/atlas evidence. 92 still needs semantic-to-band mapping; 98/112 need text-only mask/orientation confirmation; 152 needs semantic-to-cell/text-only masks and preserves `'89/'86`.
+- W00015 changed **0 Korean DDS candidate bytes**. Therefore Hangul raster/clipping, zero-pixel containment, DDS candidate format/mipmap/alpha/transparency/orientation, background/artwork preservation, wrong-replacement, and mandatory ENGLISH SOURCE vs KOREAN CANDIDATE raster gates are **not promoted to PASS**. All eight remain reconstruction-ready or strict HOLD as recorded.
+- Queue counts remain **137 = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only**; unresolved zoom-review **0**; preserve-resolved zoom-review **31**; pending production localize_text **78**. New static passes **0**, runtime approvals **0**, approved/locked DDS **0**.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written byte-for-byte identically.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Report: `localization/graphics/role_C/20260929-0722-C100/C100_W00015_SYNC_FINAL_QA.json`.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`
