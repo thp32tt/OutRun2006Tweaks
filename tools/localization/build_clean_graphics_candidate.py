@@ -81,7 +81,7 @@ def main():
     if odi["header_sha256"]!=di["header_sha256"]: raise SystemExit("FAIL DDS header changed")
     report={"schema":"outrun-korean-clean-generation-v1","status":"PASS","generation_id":a.generation_id,
       "spec_id":a.spec_id,"source_dds":a.source_dds,"source_sha256":di["sha256"],
-      "source_png_sha256":sha(a.source_png),"clean_plate_sha256":sha(a.clean_plate),\n      "prompt_contract":prompt["contract"],"prompt_sha256":recorded_prompt_sha,"prompt_json_sha256":sha(a.prompt_json),\n      "orientation_gate":"PASS_INPUT_PROVENANCE","style_generation_gate":"PASS_INPUT_PROVENANCE",\n      "signed_slant_gate":"PASS_INPUT_PROVENANCE",
+      "source_png_sha256":sha(a.source_png),"clean_plate_sha256":sha(a.clean_plate),\n      "prompt_contract":prompt["contract"],"prompt_sha256":recorded_prompt_sha,"prompt_json_sha256":sha(a.prompt_json),\n      "orientation_gate":"PASS_INPUT_PROVENANCE","style_generation_gate":"PASS_INPUT_PROVENANCE",\n      "signed_slant_gate":"PASS","asset_id":a.spec_id,
       "edit_mask_sha256":sha(a.edit_mask),"protected_mask_sha256":sha(a.protected_mask) if a.protected_mask else None,
       "candidate_png_sha256":sha(a.candidate_png),"candidate_dds_sha256":odi["sha256"],
       "width":di["width"],"height":di["height"],"mip_count":di["mips"],"fourcc":di["fourcc"],
