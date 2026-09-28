@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T16:12:00+09:00",
+  "updated_at_kst": "2026-09-28T17:41:54+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B95: FA7BBB13 first successful candidate restored after duplicate-run guard; pending independent C visual/final QA and isolated DDS_ONLY in-game validation.",
+  "next_checkpoint": "A00004 411827E self-QA PASS; independent C visual/source-style QA and isolated DDS_ONLY in-game validation pending. 568D3696 DXT5 remains specialized rework.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -515,12 +515,12 @@
       "hd_rework_remaining": 0
     },
     "latest_a_production": {
-      "run": "A_AUTO_00001_FF2462BB",
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
-      "report": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
+      "run": "A00004",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+      "report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json",
       "assets": {
-        "FF2462BB": {
-          "candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+        "411827E": {
+          "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
           "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"
         }
       }

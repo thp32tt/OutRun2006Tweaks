@@ -653,3 +653,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - The first successful B95 FA7BBB13 payload from e5a3630055d4bbc8178e570ee367a744ab880edb is canonical for B first-QA. A later automatic re-application was reverted because it resampled already-reworked glyphs again and reduced effective text resolution.
 - Canonical candidate SHA-256: d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da. 17/17 bbox containment PASS; introduced alpha outside original bboxes 0; pass regions unchanged outside intentional overlap.
 - 142 RGB-only differences outside the union of original bboxes are fully transparent (alpha 0); they are recorded separately from visible/alpha overflow. Independent C visual/source-style QA and DDS_ONLY in-game validation remain required.
+
+
+### A00004 411827E rework — 2026-09-28T17:41:54+09:00
+- Odd index 97 REWORK: seconds minimally resized/repositioned; TUNED/NORMAL/RANDOM badge backgrounds were not resampled, only source pixels outside original permitted bboxes restored.
+- Automated foreground containment 7/7 PASS; changed pixels outside declared cells 0; collateral outside touched cells 0; introduced alpha outside original bboxes 0.
+- Candidate 5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948; AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; independent C visual/source-style + DDS_ONLY in-game pending.
+- 568D3696 index 53 deferred: DXT5 mip13 shrink cases exceed proven one-pixel remap; broad recompression not attempted.

@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A00004",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+  "timestamp_kst": "2026-09-28T17:41:54+09:00",
+  "base_head": "ddc57bdbf904d00fbc7b6900af82b10de2433059",
+  "asset": "411827E",
+  "index": 97,
+  "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "previous_candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+  "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rework": [
+    {
+      "key": "seconds",
+      "method": "localized_patch_minimal_lanczos",
+      "before_bbox": [
+        1349,
+        43,
+        1452,
+        142
+      ],
+      "target_bbox": [
+        1359,
+        63,
+        1442,
+        143
+      ],
+      "scale_x": 0.807692,
+      "scale_y": 0.81
+    },
+    {
+      "key": "tuned",
+      "method": "restore_source_outside_original_bbox_no_resample",
+      "original_bbox": [
+        843,
+        851,
+        1154,
+        965
+      ],
+      "restored_pixels": 528
+    },
+    {
+      "key": "normal",
+      "method": "restore_source_outside_original_bbox_no_resample",
+      "original_bbox": [
+        1235,
+        851,
+        1546,
+        965
+      ],
+      "restored_pixels": 157
+    },
+    {
+      "key": "random",
+      "method": "restore_source_outside_original_bbox_no_resample",
+      "original_bbox": [
+        1627,
+        856,
+        1901,
+        965
+      ],
+      "restored_pixels": 274
+    }
+  ],
+  "qa": {
+    "elements": 7,
+    "failed_elements": 0,
+    "rows": [
+      {
+        "key": "automatic",
+        "original_bbox": [
+          6,
+          178,
+          543,
+          288
+        ],
+        "localized_bbox": [
+          177,
+          178,
+          365,
+          286
+        ],
+        "delta_left": 171,
+        "delta_right": 178,
+        "delta_top": 0,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "evidence": "untouched_C85_foreground_bbox"
+      },
+      {
+        "key": "seconds",
+        "original_bbox": [
+          1237,
+          62,
+          1584,
+          144
+        ],
+        "localized_bbox": [
+          1359,
+          63,
+          1442,
+          143
+        ],
+        "delta_left": 122,
+        "delta_right": 142,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "evidence": "post_rework_actual_alpha_bbox"
+      },
+      {
+        "key": "engine",
+        "original_bbox": [
+          1492,
+          336,
+          1915,
+          408
+        ],
+        "localized_bbox": [
+          1507,
+          336,
+          1910,
+          398
+        ],
+        "delta_left": 15,
+        "delta_right": 5,
+        "delta_top": 0,
+        "delta_bottom": 10,
+        "containment": "PASS",
+        "evidence": "untouched_C85_foreground_bbox"
+      },
+      {
+        "key": "tuned",
+        "original_bbox": [
+          843,
+          851,
+          1154,
+          965
+        ],
+        "localized_bbox": [
+          843,
+          851,
+          1146,
+          965
+        ],
+        "delta_left": 0,
+        "delta_right": 8,
+        "delta_top": 0,
+        "delta_bottom": 0,
+        "containment": "PASS",
+        "evidence": "conservative_C85_foreground_envelope_after_source_restore"
+      },
+      {
+        "key": "normal",
+        "original_bbox": [
+          1235,
+          851,
+          1546,
+          965
+        ],
+        "localized_bbox": [
+          1269,
+          851,
+          1508,
+          950
+        ],
+        "delta_left": 34,
+        "delta_right": 38,
+        "delta_top": 0,
+        "delta_bottom": 15,
+        "containment": "PASS",
+        "evidence": "conservative_C85_foreground_envelope_after_source_restore"
+      },
+      {
+        "key": "random",
+        "original_bbox": [
+          1627,
+          856,
+          1901,
+          965
+        ],
+        "localized_bbox": [
+          1641,
+          856,
+          1886,
+          965
+        ],
+        "delta_left": 14,
+        "delta_right": 15,
+        "delta_top": 0,
+        "delta_bottom": 0,
+        "containment": "PASS",
+        "evidence": "conservative_C85_foreground_envelope_after_source_restore"
+      },
+      {
+        "key": "recommendation",
+        "original_bbox": [
+          1565,
+          1710,
+          2012,
+          2030
+        ],
+        "localized_bbox": [
+          1604,
+          1765,
+          1972,
+          1995
+        ],
+        "delta_left": 39,
+        "delta_right": 40,
+        "delta_top": 55,
+        "delta_bottom": 35,
+        "containment": "PASS",
+        "evidence": "untouched_C85_foreground_bbox"
+      }
+    ],
+    "changed_pixels_outside_touched_cells": 0,
+    "changed_pixels_outside_declared_cells": 0,
+    "introduced_alpha_outside_original_bboxes": 0,
+    "visual_proof": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_QA.png"
+  },
+  "deferred": {
+    "asset": "568D3696",
+    "reason": "DXT5/mip13 failures require shrink beyond proven one-pixel endpoint-preserving remap; no broad recompression attempted"
+  },
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "final_approval": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false
+}
