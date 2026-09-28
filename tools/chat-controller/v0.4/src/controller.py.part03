@@ -246,6 +246,14 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     page = await slot_page(context, pages, slot)
 
     if active["phase"] == "WAIT_CHAT":
+        if not slot.url or not is_project_scoped_chat_url(slot.url):
+            reason = "Active task chat URL is missing or outside the configured project after restart/project-scope reconciliation."
+            if await queue_rollover_chat(context, pages, active, reason):
+                save_queue_state(q)
+                return
+            if active.get("phase") == "BLOCKED":
+                save_queue_state(q)
+            return
         if await detect_conversation_limit(page):
             reason = "ChatGPT reported that the current conversation reached its length limit."
             if await queue_rollover_chat(context, pages, active, reason):
@@ -375,7 +383,11 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 await queue_cycle(context, pages)
             except Exception as e:
                 log.exception("queue cycle failed")
-                write_runtime(status="queue_error", last_error=repr(e))
+                write_runtime(
+                    status="queue_error",
+                    last_action=f"Queue cycle failed: {type(e).__name__}: {e}",
+                    last_error=repr(e),
+                )
         elif AUTO_SEND and not QUEUE_MODE:
             tick = now.strftime("%Y-%m-%dT%H:%M")
             if now.minute in SCHEDULE_MINUTES and tick != last_tick:
