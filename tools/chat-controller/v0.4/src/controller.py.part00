@@ -547,6 +547,38 @@ async def visible_error_surface_text(page: Page) -> str:
     return "\n".join(chunks).lower()
 
 
+async def retry_surface_text(page: Page) -> str:
+    """Read only the local UI around a visible Retry button; avoid chat-history false positives."""
+    loc = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
+    if loc is None:
+        return ""
+    try:
+        text = await loc.evaluate("""el => {
+            let node = el;
+            let best = '';
+            for (let i = 0; i < 6 && node; i++, node = node.parentElement) {
+                const t = (node.innerText || '').trim();
+                if (t.length > best.length && t.length <= 2000) best = t;
+            }
+            return best;
+        }""")
+        return (text || "").lower()
+    except Exception:
+        return ""
+
+
+async def retry_looks_rate_limited(page: Page) -> bool:
+    text = await retry_surface_text(page)
+    matched = [p for p in RATE_LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_rate_limit_match=matched[0],
+            last_rate_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
 async def detect_rate_limit(page: Page) -> bool:
     text = await visible_error_surface_text(page)
     matched = [p for p in RATE_LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
@@ -640,13 +672,23 @@ def mark_rate_limit(reg: Registry, now: datetime, source: str):
 
 
 def note_successful_request(reg: Registry, now: datetime):
+    """Record that a request was sent; do not clear rate-limit history until a real response is observed."""
     reg.last_global_send_at = now.isoformat()
-    reg.rate_limit_attempts = 0
-    reg.rate_limit_until = None
-    write_runtime(
-        rate_limit_attempts=0,
-        rate_limit_until=None,
-    )
+    save_registry(reg)
+    write_runtime(last_global_send_at=reg.last_global_send_at)
+
+
+def clear_rate_limit_after_response(reg: Registry):
+    """Clear adaptive backoff only after a genuine assistant response or durable result is observed."""
+    if reg.rate_limit_attempts or reg.rate_limit_until:
+        reg.rate_limit_attempts = 0
+        reg.rate_limit_until = None
+        save_registry(reg)
+        write_runtime(
+            rate_limit_attempts=0,
+            rate_limit_until=None,
+            last_action="Assistant response observed; adaptive rate-limit backoff cleared",
+        )
 
 
 def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Optional[str]:
