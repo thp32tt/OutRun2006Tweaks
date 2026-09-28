@@ -42,3 +42,11 @@ Goals:
 - Do not remove D3DSBT_ALL restoration yet; replace it only after P1-P4 runtime validation.
 - Do not alter the 8 ms legacy SafeEye fence path until logs confirm it is actually being entered during the observed frame drops.
 - Do not change stereo world draw ownership or semantic classification as a performance shortcut.
+
+
+## P5 — opt-in SkyGlow timing telemetry
+- Branch: `vr-d3d9ex-candidate/r69-perf-p5`
+- Source SHA: `b3eee3988998aac7cc9f38995ddb5110e4b3255c`
+- When `VRTelemetry=true`, the game records SkyGlow sample count, cumulative average microseconds and maximum microseconds.
+- The timing path is completely bypassed when telemetry is disabled, so production behavior keeps the P4 fast path.
+- Existing host telemetry already records capture/commit/render/end-frame and cadence wait timing; P5 adds the missing game-side SkyGlow cost needed to correlate scene-specific frame drops.
