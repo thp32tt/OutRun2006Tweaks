@@ -350,6 +350,26 @@ namespace
             R23SameDirectIdentity(pending.frame, frame);
     }
 
+    bool R23DeferredSlotBlocked(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        if (slot >= R23DeferredReferenceAcks.size())
+            return false;
+        const auto& pending = R23DeferredReferenceAcks[slot];
+        return pending.armed &&
+            pending.frame.clientPid == frame.clientPid &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex] ==
+                frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex] &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameRunGenerationIndex] ==
+                frame.reserved[
+                    OutRunVR::RenderFrameRunGenerationIndex];
+    }
+
     void R23PollDeferredReferenceAcks(StereoCompositor& c) noexcept
     {
         if (!c.context_)
@@ -474,7 +494,10 @@ namespace
             {
                 // A different frame in the same live producer slot while an
                 // older GPU reference is unresolved violates the lifetime
-                // contract. Fail closed.
+                // contract. Quarantine the whole generation; otherwise the
+                // latest-frame skip path could incorrectly treat the new slot
+                // contents as an unsampled frame and ACK them immediately.
+                OutRunVrR32DirectSubmit::MarkGenerationFault(generation);
                 pending.poisoned = true;
                 return false;
             }
@@ -2613,11 +2636,19 @@ int main(int argc, char** argv)
                                         continue;
 
                                     // Only frames never referenced by D3D11 may
-                                    // be ACKed immediately. A failed fresh
-                                    // projection has its own deferred EVENT and
-                                    // must remain immutable until that completes.
-                                    if (R23DeferredReferencePending(frame))
+                                    // be ACKed immediately. If the producer has
+                                    // already replaced a same-generation slot
+                                    // that still owns a deferred GPU reference,
+                                    // that is a lifetime-contract violation:
+                                    // quarantine the generation and never ACK
+                                    // either identity speculatively.
+                                    if (R23DeferredSlotBlocked(frame))
+                                    {
+                                        if (!R23DeferredReferencePending(frame))
+                                            OutRunVrR32DirectSubmit::
+                                                MarkGenerationFault(generation);
                                         continue;
+                                    }
                                     if (OutRunVrD3D9ExDirectPassthrough::
                                             PublishCompletedFrame(frame))
                                     {
