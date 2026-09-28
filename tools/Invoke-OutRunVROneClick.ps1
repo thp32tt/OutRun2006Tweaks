@@ -11,9 +11,11 @@ $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $selector = Join-Path $scriptRoot 'Select-OutRunVRBackend.ps1'
 $runner = Join-Path $scriptRoot 'Run-OutRunVRTest.ps1'
 $targetFile = Join-Path $scriptRoot 'VR_ONE_CLICK_TARGET.json'
+$preflight = Join-Path $scriptRoot 'Test-OutRunVROneClickPreflight.ps1'
 
 if (!(Test-Path $selector)) { throw "Select-OutRunVRBackend.ps1 not found: $selector" }
 if (!(Test-Path $runner)) { throw "Run-OutRunVRTest.ps1 not found: $runner" }
+if (!(Test-Path $preflight)) { throw "Test-OutRunVROneClickPreflight.ps1 not found: $preflight" }
 
 $target = $null
 if (Test-Path $targetFile) {
@@ -53,6 +55,15 @@ Write-Host ("Launch backend  : {0}" -f $resolvedBackend)
 Write-Host ("Test profile    : {0}" -f $TestProfile)
 Write-Host ("Variant         : {0}" -f $resolvedVariant)
 Write-Host ''
+
+# Fail before mutating the game directory when the packaged renderer/host/provider
+# identity does not match this branch target. The report is collected into the
+# same session ZIP for exact reproduction.
+& $preflight -Backend $resolvedBackend
+if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+    throw "One-click preflight failed with exit code $LASTEXITCODE"
+}
+
 
 # One-click owns the complete preparation -> game -> host lifecycle. The game
 # DLL starts outrun-vr-host.exe via AutoLaunchHost; this launcher never starts a
