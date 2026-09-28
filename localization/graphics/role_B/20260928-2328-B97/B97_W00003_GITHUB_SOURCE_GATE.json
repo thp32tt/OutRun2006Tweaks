@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00012",
+  "wave_id": "W00003",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-28T23:28:28+09:00",
+  "initial_head_sha": "a0bfd7a1aad68163034997c2c5c15595502dd343",
+  "refreshed_head_sha": "1649d1dc870651ec1085e88d1d80bf157962d0cf",
+  "final_precommit_head_sha": "a05a5cb36f7b1f325e564c2cc4e03b4ff2890286",
+  "peer_lane_commit_preserved": "a05a5cb36f7b1f325e564c2cc4e03b4ff2890286",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "BLOCKED_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "vr_ffb_dx_changes": false,
+  "queue_review": {
+    "even_rework": [
+      {
+        "index": 94,
+        "asset": "2DA43E41",
+        "status": "rework_required_zero_pixel_or_artifact",
+        "hd_source_in_git": true,
+        "decision": "NO_REPEAT_SAFE_BLOCKER",
+        "reason": "Same canonical source/candidate and evidence as B93. B93 already exhausted three safe automatic repair attempts; strict pre-commit QA still failed overlapping/source-diff containment for wait_now, view_change, and expert. No new source/render evidence exists in W00003, so speculative overwrite is prohibited."
+      },
+      {
+        "index": 102,
+        "asset": "571E78F3",
+        "status": "rework_required_zero_pixel_or_artifact",
+        "hd_source_in_git": true,
+        "decision": "NO_DUPLICATE_REWORK",
+        "reason": "Canonical HD DXT5 rebuild already has strict C validation; remaining gate is final/isolated DDS_ONLY in-game reapproval. No new production write is justified."
+      }
+    ],
+    "even_pending_localize_count": 29,
+    "even_pending_localize_with_hd_source_in_git": [],
+    "even_zoom_review_blocked_count": 26,
+    "even_zoom_review_with_hd_source_in_git": [],
+    "available_hd_source_keys": [
+      "2DA43E41",
+      "39229D64",
+      "411827E",
+      "48DEBE77",
+      "568D3696",
+      "571E78F3",
+      "62BEBF33",
+      "6B8ED9DA",
+      "9F060EC1",
+      "A064FDFC",
+      "C075FB49",
+      "C4A2937B",
+      "D6DC1380",
+      "E3FD08BE",
+      "FA7BBB13",
+      "FD90AA9",
+      "FF2462BB"
+    ]
+  },
+  "self_qa": {
+    "zero_pixel_containment": "NO_NEW_ASSET_WRITE; prior exact evidence reviewed for index 94 and 102",
+    "dds_alpha_orientation": "NO_NEW_ASSET_WRITE",
+    "source_availability_gate": "PASS_BLOCKER_CLASSIFICATION",
+    "anti_duplication": "PASS",
+    "peer_commit_preservation": "PASS"
+  },
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00009.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00011.json",
+    "docs/automation/runs/B93-20260928-1304.json",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json"
+  ],
+  "conclusion": "W00003 introduced no new GitHub-resident canonical/HD DDS bytes for unfinished even-index pending localize_text or zoom_review rows, and the only GitHub-backed even REWORK rows are either an already-exhausted safe blocker (94) or awaiting isolated in-game reapproval after strict C validation (102). Durable blocker recorded without repeating completed work."
+}
