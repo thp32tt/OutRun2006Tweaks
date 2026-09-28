@@ -190,6 +190,7 @@ $runtimeFiles = @(
     'Analyze-OutRunVRSession.ps1',
     'OutRunVR-Test-Selector.ps1',
     'Invoke-OutRunVROneClick.ps1',
+    'Test-OutRunVROneClickPreflight.ps1',
     'VR_ONE_CLICK_TARGET.json',
     'START_HERE_VR_TEST.cmd'
 )
