@@ -1108,3 +1108,21 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - No `asset_queue.csv` row changed because no wave result changed an asset state. Shared resume/progress/status/worklog were reconciled for W00003.
 - Final approved/locked count remains 0. Runtime was not tested; `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
 - Machine report: `localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json`.
+
+
+## 2026-09-28 24:00 KST — crash diagnostic 3-way test packages
+
+- Reconstructed the 2026-09-28 combined-test crash evidence and split the next user test into TEXT_ONLY / GRAPHICS_ONLY / COMBINED.
+- Crash stack entered `D3DXCreateTextureFromFileInMemory_Custom_dest` with `UseNewTextureAllocator=true`; current source confirms `UseNewTextureAllocator=false` selects the original D3DX `Orig_dest` path instead.
+- All diagnostic packages force `UseNewTextureAllocator=false`, `EnableTextureCache=false`, and `SceneTextureReplacement=false`; dedicated BAT launchers enforce these flags above any existing user.ini.
+- Current HD payload was regenerated directly from GitHub HEAD `950e339122cb3f86f089cb98fe746d2600888661` by Actions run `36440212867`; 16 DDS were included for GRAPHICS_ONLY/COMBINED and zero DDS for TEXT_ONLY.
+- Runtime commit `1326f96840bfec7accf2e4016c238b8980b82853` remains byte-source-valid for this diagnostic because no `src/**`, runtime INI, LODS INI, or `runtime_ko.tsv` changes exist through the packaging HEAD.
+- TEXT_ONLY SHA-256: `dbeb09bde1c2ab5ce0d0cdbdc96efb1f0a4acef647a2fcc96a1a33c92d766b46`.
+- GRAPHICS_ONLY SHA-256: `116209f429c851f86f49d7b09f21db5a5d84cd45bc9cd658f467ea324076e3e0`.
+- COMBINED SHA-256: `61246d8b641efdc5cf7b371297a0f8c80b82747bb10c40b7d7f5b99c49c29817`.
+- Static package QA: PASS (ZIP integrity, DDS counts 0/16/16, text rows 1355 where applicable, expected INI/BAT flags, no game EXE).
+- This bypasses the allocator path present in the recorded crash but does not prove the sole root cause.
+- GRAPHICS_ONLY/COMBINED are subsystem diagnostics, not per-DDS approval evidence. Existing isolated DDS_ONLY in-game gates remain mandatory.
+- Durable report: `localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md`.
+- AUTOMATION_VALIDATION=PASS.
+- RUNTIME_VALIDATION=UNTESTED.
