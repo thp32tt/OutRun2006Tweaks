@@ -43,13 +43,12 @@
     "Build artifact 10966778726 digest sha256:789d54575f5b9da9869c1838fa6b2a00978f055084dcbf62d8f741b50dc42060. No N100 clone/worktree, PC-fast runner, Quest 3, VDXR or in-game runtime test was used."
   ],
   "open_work_items": [
-    "DXVK-NATIVE-WINDOWS-DIRECTGPU-TRANSPORT",
-    "DXVK-SBS-HOST-PACING-END-FRAME-STALL",
-    "DXVK-FAILSAFE-RUNTIME-LOG-COLLECTOR-V6-RUNTIME-CONFIRMATION",
-    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY"
+    "DXVK-NATIVE-GPU-TRANSPORT-BYPASS-D3D9EX-SHARED-HANDLE",
+    "DXVK-HOST-XREND-FRAME-PACING",
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-MAJOR-CHANGE-GATE"
   ],
-  "next_action": "Use V7 for the next runtime check, not V5. First validate that the V6 collector embedded in V7 automatically produces the ZIP. Compare HMD pacing at fixed 45 Hz versus the failed native-90 cadence. In parallel, continue DXVK-native Windows DirectGPU transport design because stock DXVK legacy D3D9 shared KMT handles are not usable in this run.",
-  "recorded_at": "2026-09-29T00:24:00+09:00",
+  "next_action": "Stop cadence-only experiments. Implement a substantial DXVK-native GPU transport that bypasses the failing D3D9Ex shared-handle compatibility path (DXVK interop/Vulkan-to-shareable-D3D11 or equivalent), while preserving the known-good DXVK vehicle/menu rendering. Revisit host xrEndFrame pacing only with the new transport active. Hardware validation is blocked until that major change is built and CI-clean.",
+  "recorded_at": "2026-09-29T00:28:00+09:00",
   "validation_checkpoint_sha": "d288dec167dc770db2ff2f2264b9781acded5929",
   "review_checkpoint_commits": [
     "9e3f4b6710db692ff01dcd09aa3ab4bbef7436f1",
@@ -108,7 +107,7 @@
       "reviewed_at": "2026-09-28T22:46:24.676+09:00"
     }
   ],
-  "runtime_failure": "Quest 3 / Virtual Desktop / VDXR HMD pacing remains failed. V4 proved stock DXVK 3.1.1 provider-local Direct3DCreate9Ex promotion succeeds (D3D9Ex=1), but the cross-process D3D9Ex->D3D11 shared-resource probe never becomes ready and gameplay falls back to SBS/Desktop Duplication. User reports vehicle selection car color/shading remains correct under DXVK+D3D9Ex, while HMD pacing still stutters severely.",
+  "runtime_failure": "Quest 3 / Virtual Desktop / VDXR: V7 45 Hz cadence experiment still measured about 30 fps in Virtual Desktop and remained severely stuttery. Vehicle-selection car rendering/color remained visually correct on DXVK. No further micro-profile or cadence-only hardware tests should be requested; next runtime request is gated on a substantial transport/render architecture change.",
   "runtime_evidence": {
     "exact_source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
     "hardware": "Quest 3 + Virtual Desktop + VDXR; RTX 4070",
@@ -181,5 +180,23 @@
     ],
     "collector": "V6 fixed collector included; PowerShell $Host collision removed.",
     "runtime_validation": "UNTESTED"
+  },
+  "runtime_evidence_v7": {
+    "session_id": "DXVKEXPERF-20260928T152610Z",
+    "source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "requested_game_cadence_hz": 45,
+    "xr_runtime_hz": 90,
+    "user_observed_average_hmd_fps": "~30",
+    "direct_gpu": "NOT_READY",
+    "transport": "SBS/Desktop Duplication fallback",
+    "vehicle_selection_color": "PASS / normal",
+    "collector_v6": "PASS: automatic archive completed, no restore errors",
+    "collector_zip_sha256": "9948ecbd3eaf421ef7db3c9a52d8ffd84eefc3a25d79236fd9a26c788b1aa6c1",
+    "pipeline_observation": "Gameplay windows showed ~30-31 ms XR intervals with ~19-21 ms xrEndFrame cost despite capture itself typically staying sub-millisecond; DirectGPU probe handle was published but never acknowledged."
+  },
+  "test_request_policy": {
+    "effective_immediately": true,
+    "rule": "Do not request user hardware tests for cadence/profile/logging-only changes. Request the next Quest 3/VDXR test only after a substantial renderer/transport architecture change has been implemented, built, and automatically validated.",
+    "accepted_visual_baseline": "DXVK vehicle-selection car graphics/color are normal and should be treated as the comparison baseline."
   }
 }
