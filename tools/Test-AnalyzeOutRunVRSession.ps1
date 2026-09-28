@@ -37,36 +37,36 @@ function Invoke-AnalyzerCase {
 
     $summaryPath = Join-Path $caseRoot 'AUTO_ANALYSIS_SUMMARY.json'
     if(!(Test-Path $summaryPath -PathType Leaf)){
-        throw "$Name: AUTO_ANALYSIS_SUMMARY.json missing"
+        throw "${Name}: AUTO_ANALYSIS_SUMMARY.json missing"
     }
     $summary = Get-Content $summaryPath -Raw | ConvertFrom-Json
 
     if([bool]$summary.SharedD3D9ExProbeFailed -ne $ExpectedSharedFailure){
-        throw "$Name: SharedD3D9ExProbeFailed=$($summary.SharedD3D9ExProbeFailed), expected $ExpectedSharedFailure"
+        throw "${Name}: SharedD3D9ExProbeFailed=$($summary.SharedD3D9ExProbeFailed), expected $ExpectedSharedFailure"
     }
     if([int64]$summary.DirectFrames -ne $ExpectedDirectFrames){
-        throw "$Name: DirectFrames=$($summary.DirectFrames), expected $ExpectedDirectFrames"
+        throw "${Name}: DirectFrames=$($summary.DirectFrames), expected $ExpectedDirectFrames"
     }
     if([int64]$summary.DirectFallbacks -ne $ExpectedFallbacks){
-        throw "$Name: DirectFallbacks=$($summary.DirectFallbacks), expected $ExpectedFallbacks"
+        throw "${Name}: DirectFallbacks=$($summary.DirectFallbacks), expected $ExpectedFallbacks"
     }
 
     $actualReasons=@($summary.SharedD3D9ExProbeFailureReasons)
     foreach($reason in $ExpectedReasons){
         if($actualReasons -notcontains $reason){
-            throw "$Name: missing shared-probe reason $reason; actual=$($actualReasons -join ',')"
+            throw "${Name}: missing shared-probe reason $reason; actual=$($actualReasons -join ',')"
         }
     }
     if(-not $ExpectedSharedFailure -and $actualReasons.Count -ne 0){
-        throw "$Name: unexpected shared-probe reasons: $($actualReasons -join ',')"
+        throw "${Name}: unexpected shared-probe reasons: $($actualReasons -join ',')"
     }
 
     $flags=@($summary.Flags)
     if($ExpectedSharedFailure -and $flags -notcontains 'D3D9EX_SHARED_PROBE_FAILED'){
-        throw "$Name: D3D9EX_SHARED_PROBE_FAILED flag missing"
+        throw "${Name}: D3D9EX_SHARED_PROBE_FAILED flag missing"
     }
     if(-not $ExpectedSharedFailure -and $flags -contains 'D3D9EX_SHARED_PROBE_FAILED'){
-        throw "$Name: unexpected D3D9EX_SHARED_PROBE_FAILED flag"
+        throw "${Name}: unexpected D3D9EX_SHARED_PROBE_FAILED flag"
     }
 }
 
