@@ -4,13 +4,18 @@
   "target_branch": "korean-localization-clean",
   "attempt": 1,
   "base_sha": "cbe8e4a4974eb17ed5936574e0869fc383c290f3",
-  "automation_validation": "PENDING",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
-  "summary": "Dispatch A odd-shard index 57 39229D64 exact-bbox rework through GitHub Actions.",
+  "summary": "A index 57 39229D64 automatic exact-bbox rework was attempted in GitHub Actions and failed safely before candidate write. Strict post-QA still found source-diff containment failures in technical_bonus, mission_cleared, storing, special_request, exit, collect_stars, and mission_failed. Candidate DDS remains unchanged.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json",
-    "localization/progress.json absent; maintained file is localization/progress/progress.json"
-  ]
+    "localization/progress.json absent; maintained file is localization/progress/progress.json",
+    "GitHub Actions run 36379580218 failed safely before candidate write.",
+    "Strict post-QA: collateral_pixels=0; outside_cells_changed_pixels=0; introduced_alpha_outside_cells=0.",
+    "Remaining failed keys: technical_bonus, mission_cleared, storing, special_request, exit, collect_stars, mission_failed."
+  ],
+  "result_sha": "NO_CANDIDATE_CHANGE",
+  "note": "No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed."
 }
