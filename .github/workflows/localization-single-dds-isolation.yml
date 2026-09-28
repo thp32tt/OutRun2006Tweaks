@@ -76,8 +76,6 @@ jobs:
                   raise SystemExit(f"{case_id}: invalid candidate DDS")
               height, width = struct.unpack_from("<II", raw, 12)
               mipmaps = struct.unpack_from("<I", raw, 28)[0] or 1
-              fourcc = raw[84:88]
-              rgb_bits = struct.unpack_from("<I", raw, 88)[0]
               expected = data["candidate"]["dds"]
               if (width, height, mipmaps) != (
                   expected["width"], expected["height"], expected["mipmaps"]
