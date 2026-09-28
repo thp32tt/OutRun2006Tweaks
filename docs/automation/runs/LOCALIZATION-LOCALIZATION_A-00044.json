@@ -1,0 +1,57 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00044",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00014",
+  "recorded_at_kst": "2026-09-29T06:35:18+09:00",
+  "initial_head_sha": "c50a81e07341bfd2a636650d724dfd3ef78ba1fc",
+  "final_precommit_head_sha": "072307a244ae0c16b4d75a472165245ca8aee117",
+  "preserved_peer_head": true,
+  "peer_lane_terminal_sha": "072307a244ae0c16b4d75a472165245ca8aee117",
+  "result": "PASS_1_ODD_HD_BGRA32_CANDIDATE_SELF_QA_PENDING_C_RUNTIME",
+  "material_deliverable": {
+    "index": 195,
+    "asset": "9CE4E175",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "candidate_git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+    "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+    "full_proof_path": "localization/graphics/role_A/20260929-0635-A00044/A00044_9CE4E175_ENGLISH_SOURCE_vs_KOREAN_CANDIDATE_FULL.png",
+    "sprite_proof_path": "localization/graphics/role_A/20260929-0635-A00044/A00044_9CE4E175_ENGLISH_SOURCE_vs_KOREAN_CANDIDATE_SPRITE.png",
+    "role_report": "localization/graphics/role_A/20260929-0635-A00044/A00044_9CE4E175_SELF_QA.json"
+  },
+  "qa_summary": {
+    "original_bbox": [
+      95,
+      7,
+      489,
+      46
+    ],
+    "localized_bbox": [
+      215,
+      8,
+      369,
+      45
+    ],
+    "delta_left": 120,
+    "delta_right": -120,
+    "delta_top": 1,
+    "delta_bottom": -1,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "containment": "PASS",
+    "dds_alpha_orientation": "PASS",
+    "mandatory_english_source_comparison": "PASS",
+    "prior_orientation_note_corrected": "mirror-X -> exact-HD flip-Y"
+  },
+  "shared_state_modified": false,
+  "forbidden_shared_paths_modified": [],
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
