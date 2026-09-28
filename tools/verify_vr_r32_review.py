@@ -496,4 +496,28 @@ if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
+skipped_release = require(
+    "vrhost/src/runtime/r41_skipped_release.hpp",
+    "struct Identity",
+    "SameProducer",
+    "SameIdentity",
+    "StageResult::LiveSlotConflict",
+    "ReplacedStaleProducer",
+    "void Retry",
+    "SlotBlocked",
+)
+skipped_release_test = require(
+    "vrhost/tests/r41_skipped_release_smoke.cpp",
+    "StageResult::AlreadyPending",
+    "StageResult::LiveSlotConflict",
+    "StageResult::ReplacedStaleProducer",
+    "stalePublishAttempts != 0",
+)
+require(
+    "vrhost/CMakeLists.txt",
+    "outrun-vr-r41-skipped-release-smoke",
+    "Run R41 skipped-release LEVEL0 smoke",
+    "add_dependencies(outrun-vr-host outrun-vr-r41-skipped-release-smoke)",
+)
+
 print("R32-R34 + R15 D3D9Ex compatibility/Present verification passed")
