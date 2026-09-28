@@ -5,13 +5,13 @@
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
   "started_kst": "2026-09-28T13:49:55+09:00",
-  "recorded_kst": "2026-09-28T15:22:53+09:00",
+  "recorded_kst": "2026-09-28T15:41:00+09:00",
   "base_sha": "337d74c0980ad240030ec8ff5f5141ebf385157e",
-  "result_sha": "3c794a3d988a9b2c2a55983b38e42c341f8a7da0",
-  "automation_validation": "PASS",
+  "result_sha": "918f0121c8f2351625def04022b3f1ae1c85b766",
+  "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "summary": "Chat rollover 1 resumed the same ATTEMPT=1/3 without repeating completed work. Restored the independently truncated src/vr/game/outrun_renderer.cpp from its immediate pre-truncation parent while preserving the intended shared disassembly-contract include/WVP/RVA changes, and fixed the one-click verifier StrictMode literal-$backend interpolation defect. Backend Conversion Gate, normal Build, all OpenXR VR architecture jobs, and HUD Inspector CI passed on code result SHA 3c794a3d988a9b2c2a55983b38e42c341f8a7da0. No HMD/in-game runtime test was performed.",
-  "selected_work": "Continuation of CONVERSION-DX11-00001 from the prior durable checkpoint: repair the two independent blockers explicitly recorded as next_action (outrun_renderer.cpp truncation and Test-VROneClickContract.ps1 StrictMode interpolation), then re-run the GitHub validation matrix.",
+  "summary": "Chat rollover 2 continued ATTEMPT=1/3 from the completed repair checkpoint without repeating prior work. The next independent DX11 conversion blocker from the 100-review campaign was semantic producer catalog drift: ctrl_icon_work (0x060900-0x061100) and DispTempHeartNum (0x0BBA00-0x0BBC00) existed in hud_semantics.hpp but were missing from the shared disassembly contract and EXE analyzer. The ranges were restored and CI parity enforcement was added. Exact-SHA GitHub validation is running; no HMD/in-game runtime test was performed.",
+  "selected_work": "Close the next independent DX11 activation prerequisite after the prior verifier/truncation repair: make the shared disassembly producer ranges and EXE analyzer match the canonical hud_semantics.hpp catalog, and add a CI parity gate so future drift fails closed.",
   "changes": [
     {
       "path": "src/vr/d3d9/stereo_renderer_r7.inc",
@@ -37,6 +37,18 @@
       "action": "escape the literal $backend token inside the expected collector-text string so PowerShell StrictMode does not expand an undefined verifier variable",
       "before_blob": "a7948144d8daad95ef672c95820ca38097fe8216",
       "after_blob": "af81f771c15187d388acf93a99c6bce3ab87549d"
+    },
+    {
+      "path": "src/vr/game/disasm_render_contract.hpp",
+      "action": "expand CriticalProducerRanges from 23 to 25 by restoring ctrl_icon_work 0x060900-0x061100 and DispTempHeartNum 0x0BBA00-0x0BBC00 as SCREEN_HUD, with compile-time assertions"
+    },
+    {
+      "path": "tools/analyze_outrun_exe.py",
+      "action": "add the same two missing semantic ranges so EXE analysis matches the canonical HUD semantic catalog"
+    },
+    {
+      "path": "tools/verify_vr_backend_disasm_contract.py",
+      "action": "add semantic-range parity verification across disasm_render_contract.hpp, analyze_outrun_exe.py, and hud_semantics.hpp; fail closed on range/policy drift"
     }
   ],
   "evidence": {
@@ -123,6 +135,51 @@
         "conclusion": "success"
       },
       "validated_head_sha": "3c794a3d988a9b2c2a55983b38e42c341f8a7da0"
+    },
+    "rollover_2": {
+      "continuation_base_sha": "9f58bf2fbc7df7206a4eb98ce6ed18a4b42759d5",
+      "code_result_sha": "918f0121c8f2351625def04022b3f1ae1c85b766",
+      "attempt_preserved": "1/3",
+      "semantic_drift": {
+        "missing_shared_ranges": [
+          "0x060900-0x061100 ctrl_icon_work SCREEN_HUD",
+          "0x0BBA00-0x0BBC00 DispTempHeartNum SCREEN_HUD"
+        ],
+        "canonical_reference": "src/vr/hud_semantics.hpp"
+      },
+      "validation_runs": {
+        "backend_conversion_gate": {
+          "run_id": 36387380780,
+          "status": "in_progress",
+          "disassembly_contract_step": "PASS"
+        },
+        "build": {
+          "run_id": 36387384494,
+          "status": "in_progress",
+          "disassembly_contract_step": "PASS"
+        },
+        "openxr_vr_architecture": {
+          "run_id": 36387384457,
+          "status": "in_progress",
+          "host_x64": "PASS"
+        },
+        "hud_inspector": {
+          "run_id": 36387384404,
+          "status": "in_progress",
+          "static_exe_analysis": "PASS"
+        }
+      },
+      "next_independent_dx11_item": {
+        "finding": "native shared-eye transport has texture/query allocation but has not yet inherited the proven run/generation/fence/consumer-ACK lifetime contract",
+        "paths": [
+          "src/vr/core/transport.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.cpp"
+        ],
+        "constraint": "do not enable NativeDrawPathActive while transport/exactness activation gates remain open"
+      },
+      "runtime_test_performed": false,
+      "n100_used": false
     }
   },
   "validation_notes": [
@@ -130,8 +187,12 @@
     "The previously failing one-click structure contract now passes after escaping the literal $backend token.",
     "The previously truncated outrun_renderer.cpp now compiles successfully across the normal Build, HUD Inspector build, Backend Conversion Gate Win32 build, and all OpenXR VR architecture variants.",
     "RUNTIME_VALIDATION remains UNTESTED because no Quest 3/HMD/game-screen execution was performed.",
-    "No DX11 runtime-normality, visual correctness, synchronization correctness, or crash-free behavior is claimed."
+    "No DX11 runtime-normality, visual correctness, synchronization correctness, or crash-free behavior is claimed.",
+    "Rollover 2 exact-SHA static contract checks passed in Backend Conversion Gate and normal Build before compilation.",
+    "HUD Inspector static EXE analysis passed with the synchronized analyzer ranges.",
+    "Full compile matrix remains PENDING at this checkpoint and must not be reported as PASS until the exact SHA jobs finish.",
+    "RUNTIME_VALIDATION remains UNTESTED because no Quest 3/HMD/game-screen execution was performed."
   ],
-  "next_action": "Automatic repair/validation for CONVERSION-DX11-00001 is complete. Continue with the next independent DX11 conversion item; keep runtime-dependent visual/HMD claims UNTESTED until a real Quest 3/in-game validation run exists.",
-  "chat_rollover": 1
+  "next_action": "Consume exact-SHA CI runs 36387380780, 36387384494, 36387384457 and 36387384404 for 918f0121c8f2351625def04022b3f1ae1c85b766. If all pass, mark AUTOMATION_VALIDATION=PASS, then continue the next independent DX11 activation prerequisite: transport run/generation/fence/consumer-ACK parity without enabling NativeDrawPathActive. Keep runtime visual/HMD claims UNTESTED.",
+  "chat_rollover": 2
 }
