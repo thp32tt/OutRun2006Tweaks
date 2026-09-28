@@ -186,6 +186,40 @@ namespace OutRunVRStereo
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
             R30IndexShadows;
         std::atomic<std::uint64_t> R30ShadowRegistryGeneration{ 1 };
+        // Lock hooks are vtable-global. A tiny monotonic Bloom gate keeps
+        // unrelated VB/IB Lock calls out of the shadow registry mutex. False
+        // positives only cause an extra lookup; false negatives are impossible
+        // because every registered shadow sets its bit before use.
+        std::atomic<std::uint64_t> R30TrackedVertexBloom{ 0 };
+        std::atomic<std::uint64_t> R30TrackedIndexBloom{ 0 };
+
+        template <typename T>
+        std::uint64_t R30ShadowBloomBit(T* buffer) noexcept
+        {
+            const auto value =
+                reinterpret_cast<std::uintptr_t>(buffer);
+            const auto mixed =
+                (value >> 4) ^ (value >> 13) ^ (value >> 23);
+            return 1ull << (mixed & 63u);
+        }
+
+        bool R30MaybeTrackedVertex(
+            IDirect3DVertexBuffer9* buffer) noexcept
+        {
+            return buffer &&
+                (R30TrackedVertexBloom.load(
+                    std::memory_order_relaxed) &
+                 R30ShadowBloomBit(buffer)) != 0;
+        }
+
+        bool R30MaybeTrackedIndex(
+            IDirect3DIndexBuffer9* buffer) noexcept
+        {
+            return buffer &&
+                (R30TrackedIndexBloom.load(
+                    std::memory_order_relaxed) &
+                 R30ShadowBloomBit(buffer)) != 0;
+        }
 
         struct R30VertexShadowLookupCache
         {
@@ -343,6 +377,8 @@ namespace OutRunVRStereo
             entry->pool = desc.Pool;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
+            R30TrackedVertexBloom.fetch_or(
+                R30ShadowBloomBit(buffer), std::memory_order_relaxed);
             if (inserted)
                 R30ShadowRegistryGeneration.fetch_add(
                     1, std::memory_order_release);
@@ -368,6 +404,8 @@ namespace OutRunVRStereo
             entry->indexFormat = desc.Format;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
+            R30TrackedIndexBloom.fetch_or(
+                R30ShadowBloomBit(buffer), std::memory_order_relaxed);
             if (inserted)
                 R30ShadowRegistryGeneration.fetch_add(
                     1, std::memory_order_release);
@@ -507,14 +545,12 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
+            if (SUCCEEDED(hr) && data && *data &&
+                R30MaybeTrackedVertex(buffer))
             {
-                // Only buffers already proven relevant by an XYZRHW draw are
-                // shadowed. The hooks are vtable-global, so auto-registering
-                // every buffer here would make unrelated dynamic world VBs pay
-                // the memcpy cost after the first XYZRHW draw.
+                // The Bloom gate makes unrelated world-buffer locks a
+                // lock-free fast reject. Only draw-proven/explicit-XYZRHW
+                // buffers enter the shadow registry and memcpy path.
                 if (auto entry = R30FindVertexShadow(buffer))
                     R30BeginObservedLock(
                         entry, offset, size, *data, flags);
@@ -561,9 +597,8 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
+            if (SUCCEEDED(hr) && data && *data &&
+                R30MaybeTrackedIndex(buffer))
             {
                 if (auto entry = R30FindIndexShadow(buffer))
                     R30BeginObservedLock(
@@ -713,6 +748,10 @@ namespace OutRunVRStereo
                     R30ShadowRegistryMutex);
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
+                R30TrackedVertexBloom.store(
+                    0, std::memory_order_relaxed);
+                R30TrackedIndexBloom.store(
+                    0, std::memory_order_relaxed);
                 // Invalidate every thread-local weak lookup immediately. This
                 // also covers reset-time COM address reuse while an old
                 // shared_ptr is still draining on another thread.
