@@ -1,0 +1,68 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00023",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00007",
+  "recorded_at_kst": "2026-09-29T02:48:00+09:00",
+  "initial_head_sha": "bd99a3726927033658a52f6ec6b7c2c808e6dea7",
+  "final_precommit_head_sha": "12e0bb7f4b5cc8db7af9768e5cd70dc0717dfc87",
+  "preserved_intervening_head": true,
+  "preserved_peer_commit_sha": "ef10cf5f43c23368eb0ecd7b3a62771f556358fd",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; unchanged REWORK blockers skipped; mandatory fallback ladder step 2; no work stealing; no shared-state mutation.",
+  "report": "localization/graphics/role_A/20260929-0238-A00023/A00023_W00007_ZOOM_REVIEW_RESOLUTION.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_RESOLUTION",
+    "resolved_indices": [
+      25,
+      27,
+      29,
+      31
+    ],
+    "assets": [
+      "4AFC1BED",
+      "8B52FEEC",
+      "F043316B",
+      "A82266FC"
+    ],
+    "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+    "unresolved_odd_zoom_review_before": 21,
+    "lane_local_unresolved_odd_zoom_review_after": 17,
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "4AFC1BED",
+    "8B52FEEC",
+    "F043316B",
+    "A82266FC"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00007 A satisfies the minimum-progress contract with four odd-shard zoom-review resolutions. No DDS bytes were changed; exact runtime behavior is not claimed and remains UNTESTED.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "localization/graphics/role_A/20260929-0238-A00023/A00023_W00007_ZOOM_REVIEW_RESOLUTION.json"
+  ]
+}

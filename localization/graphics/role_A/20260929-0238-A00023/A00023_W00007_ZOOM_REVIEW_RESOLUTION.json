@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00023",
+  "wave_id": "W00007",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T02:48:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION",
+  "initial_head_sha": "bd99a3726927033658a52f6ec6b7c2c808e6dea7",
+  "final_precommit_head_sha": "12e0bb7f4b5cc8db7af9768e5cd70dc0717dfc87",
+  "preserved_intervening_peer_head": true,
+  "preserved_peer_commit": {
+    "sha": "ef10cf5f43c23368eb0ecd7b3a62771f556358fd",
+    "message": "localization(B): resolve four even zoom-review assets [AUTO:LOCALIZATION-LOCALIZATION_B-00024]"
+  },
+  "queue": {
+    "git_blob_sha": "66f0d33c9d363fa23c7fd7e7f0be1426e65d2765",
+    "rows_verified": {
+      "25": "25,textures/load/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "27": "27,textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "29": "29,textures/load/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "31": "31,textures/load/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,"
+    },
+    "authoritative_queue_modified": false,
+    "c_reconciliation_required": true,
+    "lane_local_resolved_count": 4,
+    "unresolved_odd_zoom_review_before": 21,
+    "expected_unresolved_odd_zoom_review_after_c_merge": 17
+  },
+  "source_policy": {
+    "source_repo": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "project_source_identity_record": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "relation_to_project": "Canonical OR2-HD-GUI-v0.25.10a upstream pinned by current localization migration record; decoded stock-original PNG is used as semantic/orientation evidence for zoom classification.",
+    "preserve_rule": "Rank-grade letters/symbols and embedded product/brand/logo artwork are preserved unless explicitly approved for translation."
+  },
+  "assets": [
+    {
+      "queue_index": 25,
+      "asset": "4AFC1BED",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.png",
+        "git_blob_sha": "fc1429d1ddb6d15d3893953a8945c25b042076b8"
+      },
+      "original_dds_git_blob_sha": "0a68864113d1e8850e8acf75c619ac5b315da3bb",
+      "hd_release": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds",
+        "git_blob_sha": "04e8ac7a2c4b8af34ae59e47865d7e15a7003a85"
+      },
+      "observed": "Girlfriend portrait, heart/airplane icons, and rank-grade letters A/B/C/D/E only; no localizable word text.",
+      "protected_or_symbolic_text": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 27,
+      "asset": "8B52FEEC",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.png",
+        "git_blob_sha": "5318009a9d7b3908e08c7d372dca490774393f82"
+      },
+      "original_dds_git_blob_sha": "3dcd48280b8ba41bc5dcc3b0610405b228794e4d",
+      "hd_release": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds",
+        "git_blob_sha": "57e693999d9364653c222575ffd54c9ccac7e35d"
+      },
+      "observed": "Three girlfriend character poses only; no visible user-facing word text.",
+      "protected_or_symbolic_text": [],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 29,
+      "asset": "F043316B",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.png",
+        "git_blob_sha": "c179a38cc90cf8514c7afe1af9a31bf3cd5b2146"
+      },
+      "original_dds_git_blob_sha": "837e66a67f737c5b6d141d0fc00ddef58bb82b73",
+      "hd_release": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds",
+        "git_blob_sha": "6263af3257a4cd571c7b1fba0d71fc03993987e1"
+      },
+      "observed": "Three girlfriend character poses only; no visible user-facing word text.",
+      "protected_or_symbolic_text": [],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 31,
+      "asset": "A82266FC",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.png",
+        "git_blob_sha": "542e75b83da8b1a1f14aae691c7bd0c4f0c5e13b"
+      },
+      "original_dds_git_blob_sha": "759909fcf2f62a53c3a5d237ad8e7a47edb7f400",
+      "hd_release": {
+        "path": "Release/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds",
+        "git_blob_sha": "6865c5afd2018a38cbc8ebccf4a638f09b415473"
+      },
+      "observed": "Mechanic character poses, a symbolic rank-grade A, and small embedded cap/shirt logo artwork; no localizable UI word text.",
+      "protected_or_symbolic_text": [
+        "A",
+        "embedded cap/shirt logo artwork"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS",
+    "direct_github_source_identity": "PASS",
+    "visual_zoom_review": "PASS_4_ASSETS",
+    "preserve_vs_translate_classification": "PASS_4_PRESERVE_ORIGINAL",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Resolved four previously blocked odd-shard zoom_review rows using direct GitHub source evidence. They contain character/icon/rank/logo artwork but no localizable UI word text, so no Korean DDS candidate is required. C must reconcile the authoritative queue; runtime remains UNTESTED."
+}
