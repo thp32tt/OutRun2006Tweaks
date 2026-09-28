@@ -159,6 +159,20 @@ target_include_directories(outrun-vr-direct-ack-identity-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-direct-ack-identity-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
+# R41 skipped-frame ACK durability is pure policy: never-sampled DirectGPU
+# frames need a durable retry owner, while sampled frames stay EVENT-owned.
+add_executable(outrun-vr-r41-skipped-release-smoke
+    tests/r41_skipped_release_smoke.cpp)
+target_include_directories(outrun-vr-r41-skipped-release-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/src"
+)
+target_compile_definitions(outrun-vr-r41-skipped-release-smoke PRIVATE
+    WIN32_LEAN_AND_MEAN NOMINMAX)
+add_custom_command(TARGET outrun-vr-r41-skipped-release-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-r41-skipped-release-smoke>"
+    COMMENT "Run R41 skipped-release LEVEL0 smoke")
+add_dependencies(outrun-vr-host outrun-vr-r41-skipped-release-smoke)
+
 foreach(target
     outrun-vr-host
     outrun-vr-diagnostic
@@ -171,7 +185,8 @@ foreach(target
     outrun-vr-runtime-eligibility-smoke
     outrun-vr-r23-verified-bundle-smoke
     outrun-vr-r32-policy-smoke
-    outrun-vr-direct-ack-identity-smoke)
+    outrun-vr-direct-ack-identity-smoke
+    outrun-vr-r41-skipped-release-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
