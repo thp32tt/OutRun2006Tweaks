@@ -5,5 +5,6 @@
   "Stage": "R71-bootstrap-dormant-native-renderer-host-directgpu-validation",
   "NativeDrawPathActive": false,
   "VariantId": "R69_FIXPACK",
-  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md"
+  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md",
+  "DevelopmentBranch": "vr-dx11-native-r71"
 }
