@@ -4,7 +4,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 4,
+  "chat_rollover": 5,
   "continued_from_chat_rollover": 1,
   "recorded_kst": "2026-09-28T16:36:33+09:00",
   "base_sha": "971806cade039a61ba64692487ee570660e0a6dc",
@@ -113,7 +113,8 @@
     "Chat rollover 3 recovered the already-completed task from GitHub HEAD and did not repeat source/CI work.",
     "Issue #14 comment 5865535111 is the canonical production ledger entry; recovery-created comment 5865540857 was marked SUPERSEDED/DUPLICATE.",
     "RUNTIME_VALIDATION remains UNTESTED; no Quest 3/HMD/in-game execution was performed in rollover 3.",
-    "Chat rollover 4 independently confirmed that a591f330e2e7342edfdd168fb50b4bd3333dcafe -> 67bffb50ac043b7af081e555223ef9f6873fd58a contains only docs/automation/runs/CONVERSION-DX11-00003.json changes; validated runtime/source inputs are unchanged, so completed source/CI work was not repeated."
+    "Chat rollover 4 independently confirmed that a591f330e2e7342edfdd168fb50b4bd3333dcafe -> 67bffb50ac043b7af081e555223ef9f6873fd58a contains only docs/automation/runs/CONVERSION-DX11-00003.json changes; validated runtime/source inputs are unchanged, so completed source/CI work was not repeated.",
+    "Chat rollover 5 recovered GitHub HEAD 4c2709626fd15a48babba496162071ff01733425. Compare from code_result_sha a591f330e2e7342edfdd168fb50b4bd3333dcafe to recovered HEAD still changes only docs/automation/runs/CONVERSION-DX11-00003.json, so validated DX11 source/config/build inputs are unchanged and completed code/CI work was not repeated."
   ],
   "production_change_ledger": {
     "issue": 14,
@@ -143,6 +144,20 @@
     "code_result_sha_unchanged": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
     "review": "GitHub compare shows four commits after the validated code SHA and the only changed path across that range is this durable automation run record. No production source/config/build input changed after the exact SHA that passed CI.",
     "action": "Did not repeat completed source edits or CI. Preserved the next queued activation prerequisite (F18/R73 resource behavior/lifetime evidence) for the next bounded DX11 conversion task.",
+    "source_changes": false,
+    "ci_repeated": false,
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "n100_used": false
+  },
+  "rollover_5": {
+    "recorded_kst": "2026-09-28T16:42:00+09:00",
+    "recovered_head_sha": "4c2709626fd15a48babba496162071ff01733425",
+    "attempt_preserved": "1/3",
+    "task_already_finalized": true,
+    "code_result_sha_unchanged": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+    "review": "GitHub compare confirms every commit after the validated code SHA changes only this durable task record. No production source, config, workflow or build input changed after the exact SHA that passed automation validation.",
+    "action": "Did not repeat completed source edits, builds or CI. Preserved F18/R73 resource behavior/lifetime evidence as the next bounded DX11 conversion task, rather than expanding finalized CONVERSION-DX11-00003.",
     "source_changes": false,
     "ci_repeated": false,
     "automation_validation": "PASS",
