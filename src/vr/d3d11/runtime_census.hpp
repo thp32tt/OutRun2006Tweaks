@@ -4,7 +4,7 @@
 
 namespace outrun::vr::dx11
 {
-    // Passive R72-R76 census. Enabled only when OUTRUN_VR_DX11_CENSUS=1.
+    // Passive R72-R77 census. Enabled only when OUTRUN_VR_DX11_CENSUS=1.
     // It never mutates D3D9 state and never routes a draw to D3D11.
     void observe_source_draw(
         IDirect3DDevice9* device,
@@ -56,4 +56,9 @@ namespace outrun::vr::dx11
         IDirect3DSurface9* source,
         IDirect3DSurface9* destination,
         HRESULT result) noexcept;
+
+    // R77 advances the modeled D3D11 device generation only after a successful
+    // D3D9 Reset. MANAGED CPU-shadow validity/version is preserved while any
+    // generation-bound mirror becomes stale.
+    void observe_device_reset_generation(HRESULT result) noexcept;
 }
