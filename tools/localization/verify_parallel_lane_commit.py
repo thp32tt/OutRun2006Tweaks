@@ -73,6 +73,18 @@ if lane in {"A", "B"}:
             print(f" - index={idx} {p}")
         raise SystemExit(1)
 
+    # Post-reset graphics candidates are fail-closed: a DDS change must carry
+    # clean-generation QA evidence from the same lane. Historical candidates
+    # cannot be promoted by a controller task without these records.
+    dds_changes = [p for p in changed if p.lower().endswith(".dds")]
+    if dds_changes:
+        evidence_prefix = f"localization/graphics/role_{lane}/"
+        evidence = [p for p in changed if p.startswith(evidence_prefix) and (p.endswith(".json") or p.endswith(".png") or p.endswith(".jpg"))]
+        required_tokens = ("CLEAN", "SOURCE", "CANDIDATE", "COMPARE", "QA", "MASK")
+        if not any(any(t in pathlib.PurePosixPath(p).name.upper() for t in required_tokens) for p in evidence):
+            print(f"{task_id}: DDS change blocked: missing post-reset clean-generation QA evidence")
+            raise SystemExit(1)
+
     run_prefix = "docs/automation/runs/"
     run_records = [p for p in changed if p.startswith(run_prefix) and task_id in p]
     if not run_records:
