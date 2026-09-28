@@ -29,6 +29,11 @@ def main() -> None:
             "RankMarkerRva = 0x000BAD20u",
             "0x000BB0FBu",
             "0x000BB2D0u",
+            "std::array<ProducerRange, 23>",
+            "0x00081A00u, 0x00081B00u, SpacePolicy::ScreenHud",
+            "0x000BE300u, 0x000BEA40u, SpacePolicy::ScreenHud",
+            "0x000FC800u, 0x000FC8A0u, SpacePolicy::ScreenHud",
+            "0x0005B300u, 0x0005B700u, SpacePolicy::WorldBillboard",
         ],
     )
     require(
