@@ -68,6 +68,13 @@ def main() -> None:
         "D3D11_BIND_DEPTH_STENCIL": "depth mirror role",
         "requiresMutationTelemetry": "lock/update evidence blocker",
         "requiresCpuShadow": "managed Reset-survival blocker",
+        "BufferMutationUpdateKind": "explicit VB/IB mutation update plan",
+        "translate_buffer_mutation": "Lock flag to D3D11 update classifier",
+        "D3D11_MAP_WRITE_DISCARD": "dynamic DISCARD map semantics",
+        "D3D11_MAP_WRITE_NO_OVERWRITE": "dynamic NOOVERWRITE map semantics",
+        "DefaultUpdateSubresource": "default-usage update semantics",
+        "ManagedCpuShadowRead": "managed read shadow dependency",
+        "ManagedCpuShadowWrite": "managed write shadow dependency",
     }
     missing_resource_contract = [
         meaning
@@ -121,6 +128,14 @@ def main() -> None:
         "ResourceMutationReadOnlyUnlocks": "successful READONLY Lock/Unlock counter",
         "ResourceMutationDiscardWriteUnlocks": "successful DISCARD write counter",
         "ResourceMutationNoOverwriteWriteUnlocks": "successful NOOVERWRITE write counter",
+        "ResourceMutationPlanExactUnlocks": "exact D3D11 mutation-plan counter",
+        "ResourceMutationPlanUnsupportedUnlocks": "unsupported mutation-plan counter",
+        "ResourceMutationManagedShadowUnlocks": "managed CPU-shadow dependency counter",
+        "ResourceMutationMapWriteUnlocks": "D3D11 MAP_WRITE counter",
+        "ResourceMutationMapDiscardUnlocks": "D3D11 MAP_WRITE_DISCARD counter",
+        "ResourceMutationMapNoOverwriteUnlocks": "D3D11 MAP_WRITE_NO_OVERWRITE counter",
+        "ResourceMutationUpdateSubresourceUnlocks": "UpdateSubresource counter",
+        "translate_buffer_mutation": "runtime R75 mutation-plan classification",
     }
     missing_mutation_counters = [
         meaning
@@ -170,11 +185,18 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R7[234] census": "R72/R73/R74 summary compatibility",
+        "R7[2345] census": "R72/R73/R74/R75 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
         "mutationNoOverwriteWriteUnlocks": "R74 NOOVERWRITE evidence",
+        "mutationPlanExact": "R75 exact mutation-plan evidence",
+        "mutationPlanUnsupported": "R75 unsupported mutation-plan evidence",
+        "mutationPlanManagedShadow": "R75 managed shadow dependency evidence",
+        "mutationPlanMapWrite": "R75 MAP_WRITE evidence",
+        "mutationPlanMapDiscard": "R75 MAP_WRITE_DISCARD evidence",
+        "mutationPlanMapNoOverwrite": "R75 MAP_WRITE_NO_OVERWRITE evidence",
+        "mutationPlanUpdateSubresource": "R75 UpdateSubresource evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
