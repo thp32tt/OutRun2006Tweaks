@@ -1474,9 +1474,33 @@ namespace OutRunVRStereo
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
-            R30SkyGlowSavedState savedState{};
-            if (!R30CaptureSkyGlowState(device, savedState))
+            // V7 correctness rollback: the explicit touched-state
+            // experiment left too much room for a missed D3D9 state to leak
+            // into the next game/UI draw. Restore the R69 full-state safety
+            // boundary while keeping the newer cached glow resources/passes.
+            IDirect3DStateBlock9* stateBlock = nullptr;
+            IDirect3DSurface9* savedRt = nullptr;
+            IDirect3DSurface9* savedDepth = nullptr;
+            D3DVIEWPORT9 savedViewport{};
+            if (FAILED(device->CreateStateBlock(
+                    D3DSBT_ALL, &stateBlock)) ||
+                !stateBlock ||
+                FAILED(device->GetRenderTarget(0, &savedRt)) ||
+                !savedRt ||
+                FAILED(device->GetViewport(&savedViewport)))
+            {
+                if (savedRt) savedRt->Release();
+                if (stateBlock) stateBlock->Release();
                 return false;
+            }
+            const HRESULT depthHr =
+                device->GetDepthStencilSurface(&savedDepth);
+            if (FAILED(depthHr) && depthHr != D3DERR_NOTFOUND)
+            {
+                savedRt->Release();
+                stateBlock->Release();
+                return false;
+            }
 
             bool ok = R30PrepareSkyGlowPipeline(device);
             IDirect3DSurface9* eyeSurface[2]{
@@ -1549,13 +1573,22 @@ namespace OutRunVRStereo
 
             }
 
-            // Experimental performance path: restore exactly the state touched
-            // by the stereo SkyGlow pass instead of creating/applying a full
-            // D3DSBT_ALL state block every Present. DrawPrimitiveUP clears
-            // stream 0, so the original stream binding is part of the explicit
-            // snapshot as well.
-            const bool restoreOk =
-                R30RestoreSkyGlowState(device, savedState);
+            bool restoreOk = SUCCEEDED(stateBlock->Apply());
+            restoreOk =
+                SUCCEEDED(device->SetRenderTarget(0, savedRt)) &&
+                restoreOk;
+            const HRESULT restoreDepth =
+                device->SetDepthStencilSurface(savedDepth);
+            restoreOk =
+                (SUCCEEDED(restoreDepth) ||
+                 (!savedDepth && restoreDepth == D3D_OK)) &&
+                restoreOk;
+            restoreOk =
+                SUCCEEDED(device->SetViewport(&savedViewport)) &&
+                restoreOk;
+            savedRt->Release();
+            if (savedDepth) savedDepth->Release();
+            stateBlock->Release();
 
             if (ok && restoreOk)
             {
@@ -1564,7 +1597,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW EXP STATEBLOCK V2: explicit touched-state restore + FVF/cull/scissor hardening ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
+                        "VR SKY GLOW V7 CORRECTNESS: R69 full D3DSBT_ALL restore ACTIVE; cached stereo glow resources retained factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
