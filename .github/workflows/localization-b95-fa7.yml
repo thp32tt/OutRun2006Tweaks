@@ -1,0 +1,78 @@
+name: Localization B95 FA7 Exact BBox Rework
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00002.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-b95-fa7
+  cancel-in-progress: false
+
+jobs:
+  rework:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Install image dependency
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Compile B95 executor
+        run: python -m py_compile tools/localization/b95_rework_fa7.py
+
+      - name: Run B95 production and first QA
+        run: python tools/localization/b95_rework_fa7.py
+
+      - name: Verify branch did not move during production
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin korean-localization-clean
+          REMOTE="$(git rev-parse origin/korean-localization-clean)"
+          LOCAL="$(git rev-parse HEAD)"
+          if [ "$REMOTE" != "$LOCAL" ]; then
+            echo "Remote branch moved during B95: local=$LOCAL remote=$REMOTE"
+            exit 42
+          fi
+
+      - name: Commit and push B95 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds \
+            localization/graphics/role_B/20260928-1552-B95 \
+            localization/graphics/asset_queue.csv \
+            localization/progress/progress.json \
+            localization/resume_state.json \
+            localization/progress/STATUS.md \
+            localization/WORKLOG.md
+          git commit -m "localization: B95 FA7 exact-bbox rework [AUTO:LOCALIZATION-LOCALIZATION_B-00002]"
+          RESULT_SHA="$(git rev-parse HEAD)"
+          git push origin HEAD:korean-localization-clean
+          python - <<'PY'
+          import json, pathlib, subprocess
+          p = pathlib.Path("docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00002.json")
+          j = json.loads(p.read_text("utf-8"))
+          j["result_sha"] = subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip()
+          j["automation_validation"] = "PASS"
+          j["runtime_validation"] = "UNTESTED"
+          j["summary"] = "B95 FA7BBB13 exact-bbox rework committed after B-lane exhaustive first QA; isolated in-game validation not performed."
+          j["evidence"].append("localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json")
+          p.write_text(json.dumps(j, ensure_ascii=False, indent=2) + "\n", "utf-8")
+          PY
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00002.json
+          git commit -m "automation: record B95 result [AUTO:LOCALIZATION-LOCALIZATION_B-00002]"
+          git push origin HEAD:korean-localization-clean
