@@ -34,11 +34,19 @@ def main() -> None:
     require(
         "src/vr/game/outrun_renderer.cpp",
         [
-            "OutRunWvpRegister = 64",
-            "OutRunWvpRegisterCount = 4",
-            "0x0095D860u - 0x00400000u",
-            "0x0095D8A0u - 0x00400000u",
-            "0x0095DB20u - 0x00400000u",
+            "OutRunVR::DisasmContract::WvpVsRegister",
+            "OutRunVR::DisasmContract::WvpVsRegisterCount",
+            "OutRunVR::DisasmContract::ViewRva",
+            "OutRunVR::DisasmContract::ProjectionRva",
+            "OutRunVR::DisasmContract::WorldViewRva",
+        ],
+    )
+    require(
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        [
+            "OutRunVR::DisasmContract::WvpVsRegister",
+            "OutRunVR::DisasmContract::WvpVsRegisterCount",
+            "OutRunVR::DisasmContract::ProjectionRva",
         ],
     )
     require(
