@@ -46,10 +46,11 @@
     "DXVK-PROVIDER-LOCAL-D3D9EX-DIRECTGPU-RUNTIME-PROBE",
     "DXVK-FAILSAFE-RUNTIME-LOG-COLLECTOR",
     "DXVK-DIRECT-GPU-TRANSPORT-WITHOUT-D3D9EX-FALLBACK",
-    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY"
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY",
+    "DXVK-V5-COLLECTOR-RUNTIME-CONFIRMATION"
   ],
-  "next_action": "Before implementing a new non-D3D9Ex transport, test the already-implemented provider-local DXVK D3D9Ex promotion path: stock DXVK 3.1.1 exports Direct3DCreate9Ex, and ex_device_upgrade.cpp explicitly permits a third-party provider's own Direct3DCreate9Ex while forbidding system/third-party object mixing. Run the exact 7f2ea390 payload with PreferD3D9Ex=true and PERFORMANCE settings, verify census D3D9Ex=1 plus DirectGPU probe/ring activation, HMD cadence, and menu vehicle color. Only if provider-local Ex cannot activate the verified ring should DXVK-DIRECT-GPU-TRANSPORT-WITHOUT-D3D9EX become the implementation priority. Keep multiview blocked.",
-  "recorded_at": "2026-09-28T23:48:00+09:00",
+  "next_action": "Run the V5 provider-local DXVK D3D9Ex/DirectGPU test. Verify both transport/pacing and that OutRun2_VR_ANALYZE_DXVKEX_<session>.zip is automatically produced. If automatic collection does not produce a ZIP, run COLLECT_DXVK_EX_LOGS_NOW.cmd; inspect COLLECTOR_FAILURE.json and keep the transport verdict separate from collector validation.",
+  "recorded_at": "2026-09-28T23:59:00+09:00",
   "validation_checkpoint_sha": "d288dec167dc770db2ff2f2264b9781acded5929",
   "review_checkpoint_commits": [
     "9e3f4b6710db692ff01dcd09aa3ab4bbef7436f1",
@@ -142,5 +143,19 @@
       "The test also discriminates the DX9Ex vehicle-color issue: if color regresses only after provider-local Ex promotion, the Ex compatibility/state layer becomes the primary suspect."
     ],
     "collector_hardening": "V4 ad-hoc package uses a detached finalizer plus manual COLLECT_DXVK_EX_LOGS_NOW.cmd fallback so forced game termination can still seal logs and restore managed files."
+  },
+  "collector_fix": {
+    "package_revision": "V5",
+    "issue": "Portable V4 collector used an in-session filesystem lock while compressing the same session tree; the lock could block Compress-Archive and a stale lock could prevent retry.",
+    "fix": [
+      "Replace filesystem lock with a named cross-process mutex that is automatically released if the collector dies.",
+      "Copy the complete sealed session into an external temporary staging directory before compression.",
+      "On normal game exit run synchronous collection in addition to the detached watcher; the mutex de-duplicates them.",
+      "Keep a manual retry command for the same session; it refuses to restore while the game PID is still alive.",
+      "Create FINALIZED.ok only after non-zero ZIP creation and SHA256 verification.",
+      "Persist COLLECTOR_STATUS.json or COLLECTOR_FAILURE.json."
+    ],
+    "validation": "Static package contract checks passed; Windows/Quest runtime of V5 collector remains untested until the next user run.",
+    "runtime_validation": "UNTESTED_FOR_COLLECTOR_V5"
   }
 }
