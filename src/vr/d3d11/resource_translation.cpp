@@ -1,7 +1,59 @@
 #include "resource_translation.hpp"
 
+#include <array>
+
 namespace outrun::vr::dx11
 {
+    namespace
+    {
+        struct ResourceBehaviorRule
+        {
+            ResourceRole role;
+            D3DPOOL pool;
+            DWORD allowedUsage;
+            DWORD requiredUsage;
+            UINT bindFlags;
+            ResourceMirrorLifetime lifetime;
+            bool requiresMutationTelemetry;
+            bool requiresCpuShadow;
+        };
+
+        constexpr std::array<ResourceBehaviorRule, 8> ResourceBehaviorRules{{
+            { ResourceRole::Vertex, D3DPOOL_DEFAULT,
+              D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 0,
+              D3D11_BIND_VERTEX_BUFFER, ResourceMirrorLifetime::DeviceGeneration,
+              true, false },
+            { ResourceRole::Vertex, D3DPOOL_MANAGED,
+              D3DUSAGE_WRITEONLY, 0,
+              D3D11_BIND_VERTEX_BUFFER, ResourceMirrorLifetime::ManagedCpuShadow,
+              true, true },
+            { ResourceRole::Index, D3DPOOL_DEFAULT,
+              D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 0,
+              D3D11_BIND_INDEX_BUFFER, ResourceMirrorLifetime::DeviceGeneration,
+              true, false },
+            { ResourceRole::Index, D3DPOOL_MANAGED,
+              D3DUSAGE_WRITEONLY, 0,
+              D3D11_BIND_INDEX_BUFFER, ResourceMirrorLifetime::ManagedCpuShadow,
+              true, true },
+            { ResourceRole::Texture, D3DPOOL_DEFAULT,
+              D3DUSAGE_DYNAMIC, 0,
+              D3D11_BIND_SHADER_RESOURCE, ResourceMirrorLifetime::DeviceGeneration,
+              true, false },
+            { ResourceRole::Texture, D3DPOOL_MANAGED,
+              0, 0,
+              D3D11_BIND_SHADER_RESOURCE, ResourceMirrorLifetime::ManagedCpuShadow,
+              true, true },
+            { ResourceRole::Color, D3DPOOL_DEFAULT,
+              D3DUSAGE_RENDERTARGET, D3DUSAGE_RENDERTARGET,
+              D3D11_BIND_RENDER_TARGET, ResourceMirrorLifetime::DeviceGeneration,
+              false, false },
+            { ResourceRole::DepthStencil, D3DPOOL_DEFAULT,
+              D3DUSAGE_DEPTHSTENCIL, D3DUSAGE_DEPTHSTENCIL,
+              D3D11_BIND_DEPTH_STENCIL, ResourceMirrorLifetime::DeviceGeneration,
+              false, false },
+        }};
+    }
+
     FormatTranslation translate_resource_format(
         D3DFORMAT source,
         ResourceRole role) noexcept
@@ -59,5 +111,43 @@ namespace outrun::vr::dx11
             // inexact until the matching shader/resource semantics are proven.
             return {};
         }
+    }
+
+    ResourceBehaviorTranslation translate_resource_behavior(
+        ResourceRole role,
+        D3DPOOL pool,
+        DWORD usage) noexcept
+    {
+        for (const auto& rule : ResourceBehaviorRules)
+        {
+            if (rule.role != role || rule.pool != pool)
+                continue;
+            if ((usage & ~rule.allowedUsage) != 0)
+                continue;
+            if ((usage & rule.requiredUsage) != rule.requiredUsage)
+                continue;
+
+            ResourceBehaviorTranslation out{};
+            out.bindFlags = rule.bindFlags;
+            out.lifetime = rule.lifetime;
+            out.descriptorExact = true;
+            out.requiresMutationTelemetry = rule.requiresMutationTelemetry;
+            out.requiresCpuShadow = rule.requiresCpuShadow;
+
+            if ((usage & D3DUSAGE_DYNAMIC) != 0)
+            {
+                out.usage = D3D11_USAGE_DYNAMIC;
+                out.cpuAccessFlags = D3D11_CPU_ACCESS_WRITE;
+            }
+            else
+            {
+                out.usage = D3D11_USAGE_DEFAULT;
+            }
+            return out;
+        }
+
+        // SYSTEMMEM/SCRATCH and unmodelled usage combinations deliberately
+        // fail closed until a concrete staging/update/reset policy exists.
+        return {};
     }
 }
