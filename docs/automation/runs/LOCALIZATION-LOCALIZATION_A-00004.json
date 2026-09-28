@@ -24,8 +24,9 @@
     "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json",
     "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_QA.png"
   ],
-  "result_sha": "PENDING_PRODUCTION_COMMIT",
+  "result_sha": "bd28cb592c6c3180eef7d88497f7fa0ceb311657",
   "note": "GitHub-only. 568D3696 index 53 deferred for specialized DXT5-safe shrink handling. No N100/GPT Library/VR/FFB/DX9Ex/DX11/DXVK/build. Runtime validation not performed.",
   "summary": "A00004 produced 411827E index 97 rework: 7/7 strict source-diff bbox containment PASS; badge backgrounds were not resampled. Independent C visual/source-style QA and isolated DDS_ONLY in-game remain required.",
-  "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948"
+  "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+  "production_commit_sha": "bd28cb592c6c3180eef7d88497f7fa0ceb311657"
 }
