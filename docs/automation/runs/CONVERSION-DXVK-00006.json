@@ -46,5 +46,8 @@
   "workflow_job_id": 108852689421,
   "artifact_id": 10959399294,
   "artifact_digest": "sha256:123aa95c1ca383376293d68499a82178bbd0a7a9f0d600a59207bc38ed4a9e5c",
-  "recorded_at": "2026-09-28T17:48:54+09:00"
+  "recorded_at": "2026-09-28T17:48:54+09:00",
+  "chat_rollover": 2,
+  "rollover_2_recovery": "Recovered from GitHub after exact-SHA validation completed; verified result SHA b0ae61d7f0eb930d252caafe3b9b9db603d44ee9, Backend Conversion Gate 36399100147 PASS, artifact 10959399294, and review-index closure. No completed implementation was repeated.",
+  "last_recovered_at": "2026-09-28T17:49:00+09:00"
 }
