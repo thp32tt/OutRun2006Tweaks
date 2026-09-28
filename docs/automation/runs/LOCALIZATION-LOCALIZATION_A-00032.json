@@ -1,0 +1,63 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00032",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00010",
+  "recorded_at_kst": "2026-09-29T04:31:16+09:00",
+  "initial_head_sha": "2adf7aca8b9656947fa35cfb0e6ebae438715e71",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_PRESERVE_CLASSIFICATIONS",
+  "automation_validation": "PENDING_REMOTE_CI",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; unchanged REWORK blockers skipped; fallback ladder step 2 classified indices 157/165/169/171 as preserve-original; no work stealing; no shared-state mutation.",
+  "report": "localization/graphics/role_A/20260929-0431-A00032/A00032_W00010_ZOOM_REVIEW_RESOLUTION.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_CLASSIFICATION",
+    "classified_indices": [
+      157,
+      165,
+      169,
+      171
+    ],
+    "preserve_original_indices": [
+      157,
+      165,
+      169,
+      171
+    ],
+    "localizable_text_identified_indices": [],
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "4DF4D7CD",
+    "5C98F2",
+    "638F38C0",
+    "67CE2848"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "localization/graphics/role_A/20260929-0431-A00032/A00032_W00010_ZOOM_REVIEW_RESOLUTION.json"
+  ],
+  "conclusion": "W00010 A satisfies the minimum-progress contract by resolving four previously unresolved odd-shard zoom-review rows as preserve-original. C must reconcile shared queue/progress state. Runtime remains UNTESTED."
+}

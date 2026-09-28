@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00032",
+  "wave_id": "W00010",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T04:31:16+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_PRESERVE_CLASSIFICATIONS",
+  "automation_validation": "PENDING_REMOTE_CI",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION",
+  "initial_head_sha": "2adf7aca8b9656947fa35cfb0e6ebae438715e71",
+  "source_of_truth": {
+    "contract_path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "contract_git_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+    "queue_path": "localization/graphics/asset_queue.csv",
+    "source_identity_record": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "skipped_pending_localize_text_reason": "Exact HD decoded-pixel text bbox/raw-orientation evidence is not materialized for a safe zero-pixel DDS write; unchanged blockers were not re-reviewed.",
+    "chosen_zoom_review_indices": [
+      157,
+      165,
+      169,
+      171
+    ],
+    "reason": "Fallback ladder step 2: resolve the next four unresolved odd-shard zoom-review rows using pinned GitHub source imagery and exact HD Release DDS identities."
+  },
+  "assets": [
+    {
+      "queue_index": 157,
+      "asset": "4DF4D7CD",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.png",
+        "git_blob_sha": "9138996688bb6f9e07adae3c429ff6cbad3c8380"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512_atlas.json",
+        "git_blob_sha": "2334bf89f5939121d0436dffc642caf1e8358746",
+        "regions": 4,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4DF4D7CD_512x512.dds",
+        "git_blob_sha": "29347a73d617ea12304176e72846e57f86f0f631",
+        "bytes": 16777344
+      },
+      "observed": "Four scenic/course-card images; each card contains protected OutRun2 logo artwork only. No localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2 logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 165,
+      "asset": "5C98F2",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5C98F2_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/005C98F2_512x512.png",
+        "git_blob_sha": "0c01df9df43997270454ceacbb6ff48e0f67eb11"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/005C98F2_512x512_atlas.json",
+        "git_blob_sha": "817584fbc79a91196ec8e6831649c5e64679b754",
+        "regions": 3,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/5C98F2_512x512.dds",
+        "git_blob_sha": "1acd3b2fdddf485ef6c0630135a127828b03d2b6",
+        "bytes": 16777344
+      },
+      "observed": "Three scenic/course-card images with protected OutRun2SP logo artwork only. No localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 169,
+      "asset": "638F38C0",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.png",
+        "git_blob_sha": "53006f8c9350550184d76d6f85dc96c580c997a4"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256_atlas.json",
+        "git_blob_sha": "6083ef7d32cb1fe0b367ab39ada8e4075d1faffb",
+        "regions": 4,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/638F38C0_512x256.dds",
+        "git_blob_sha": "118c25e11b0299e9cf68716ecc58949480289ab5",
+        "bytes": 8388736
+      },
+      "observed": "Logo/collage selector artwork containing protected OutRun2 and OutRun2SP logos, scenic postcards and a symbolic question-mark card; no localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2 logo",
+        "OutRun2SP logo",
+        "symbolic question mark"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 171,
+      "asset": "67CE2848",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256.png",
+        "git_blob_sha": "9cdd401ebb762d09f24b305e66f37db7bd8dda42"
+      },
+      "atlas_json": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256_atlas.json",
+        "git_blob_sha": "36f5d4a24055708c2026d00ae51d68d37aeff50e",
+        "regions": 2,
+        "rotations": false
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/67CE2848_512x256.dds",
+        "git_blob_sha": "4c0532bec5e2c004459bb935c948dbe12d782d64",
+        "bytes": 8388736
+      },
+      "observed": "Two scenic/course-card images with protected OutRun2SP/OutRun2 logo artwork only. No localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2SP logo",
+        "OutRun2 logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_157_165_169_171",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_HEAD_2adf7aca",
+    "direct_github_source_identity": "PASS_PINNED_OR2006SPRITES_COMMIT",
+    "visual_zoom_review": "PASS_4_CLASSIFIED",
+    "preserve_vs_translate_classification": "PASS_4_PRESERVE_0_LOCALIZABLE",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "UNCHANGED_PRESERVE_ORIGINAL",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "4DF4D7CD",
+    "5C98F2",
+    "638F38C0",
+    "67CE2848"
+  ],
+  "c_reconciliation_required": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00010 lane A materially resolves four unresolved odd-shard zoom-review assets as preserve-original using pinned GitHub source imagery and exact HD Release DDS identities. No DDS bytes changed; runtime remains UNTESTED."
+}
