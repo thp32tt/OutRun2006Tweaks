@@ -135,7 +135,17 @@ namespace OutRunVrR32DirectSubmit
     {
         if (!generation)
             return;
-        ObserveGeneration(generation);
+
+        // Never let a late failure from a superseded EVENT roll the active
+        // transport generation backwards or overwrite a newer generation's
+        // quarantine state. Exact old-slot lifetime is still handled by its
+        // pending/deferred owner.
+        if (ActiveAckGeneration != 0 &&
+            ActiveAckGeneration != generation)
+            return;
+
+        if (ActiveAckGeneration == 0)
+            ObserveGeneration(generation);
         AckFaultGeneration = generation;
     }
 
@@ -185,8 +195,7 @@ namespace OutRunVrR32DirectSubmit
                 const std::uint32_t generation =
                     pending.frame.reserved[
                         OutRunVR::RenderFrameDirectGenerationIndex];
-                if (generation)
-                    AckFaultGeneration = generation;
+                MarkGenerationFault(generation);
                 ++AckQueryErrors;
                 pending.armed = false;
                 pending.flushIssued = false;
