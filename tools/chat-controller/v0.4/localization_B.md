@@ -6,6 +6,6 @@ OutRun 2006 한글화 B 작업을 진행해줘. 역할은 병렬 생산 LANE B +
 
 B는 localization/graphics/asset_queue.csv의 짝수 index primary shard만 생산한다. 같은 wave에서 A가 병렬 실행 중이므로 홀수 shard를 작업하거나 work-steal하지 마. 미완료/REWORK/확실한 zoom_review 텍스트 대상을 실제 제작·수정하고, 모든 touched element에 1픽셀 containment 및 DDS/alpha/orientation/self-QA를 수행해. A 결과를 전수 재QA하는 것이 기본 업무가 아니며 C가 cross-lane final QA를 담당한다.
 
-병렬 안전 규칙: B는 자신의 DDS/증거/role_B report와 docs/automation/runs/<TASK_ID> 같은 lane-local 결과만 commit한다. localization/resume_state.json, localization/WORKLOG.md, localization/progress/STATUS.md, asset_queue.csv 등 공용 상태 파일은 수정하지 마. 공용 상태 병합은 C synchronization barrier가 담당한다.
+병렬 안전 규칙: B는 자신의 DDS/증거/role_B report와 docs/automation/runs/<TASK_ID> 같은 lane-local 결과만 commit한다. localization/resume_state.json, localization/WORKLOG.md, localization/progress/progress.json, 호환 미러 localization/progress.json, localization/progress/STATUS.md, asset_queue.csv 등 공용 상태 파일은 수정하지 마. 공용 상태 병합은 C synchronization barrier가 담당한다.
 
 commit 직전 최신 korean-localization-clean HEAD를 다시 읽고 A의 새 커밋을 보존한 상태에서 자신의 disjoint 파일만 반영해. 실제 변경 또는 no-action/blocker 기록을 Git에 남기고 commit 메시지에 컨트롤러가 지정한 [AUTO:TASK_ID]를 정확히 포함해. VR/FFB 및 빌드는 하지 마.
