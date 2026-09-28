@@ -3,13 +3,13 @@
   "role": "B",
   "run": "B95",
   "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
-  "timestamp_kst": "2026-09-28T16:06:49+09:00",
-  "base_head": "f331352434b9428c332ac237b9052a55f8b2490d",
+  "timestamp_kst": "2026-09-28T16:11:37+09:00",
+  "base_head": "9daf7aa870df5f48d1a68ee85a20a7a40000f51c",
   "asset": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
   "index": 54,
   "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
-  "previous_candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
-  "candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+  "previous_candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+  "candidate_sha256": "d7f8b9ba818921f309c7fa16c8b203a285fb6d85dc398738eece9437fe22673c",
   "structure": {
     "width": 4096,
     "height": 2048,
@@ -282,14 +282,14 @@
           123
         ],
         "localized_bbox": [
-          162,
-          36,
-          611,
+          184,
+          42,
+          589,
           122
         ],
-        "delta_left": 43,
-        "delta_right": 26,
-        "delta_top": 1,
+        "delta_left": 65,
+        "delta_right": 48,
+        "delta_top": 7,
         "delta_bottom": 1,
         "containment": "PASS",
         "rework_required": false
@@ -311,12 +311,12 @@
           208
         ],
         "localized_bbox": [
-          173,
+          178,
           110,
           593,
           198
         ],
-        "delta_left": 53,
+        "delta_left": 58,
         "delta_right": 42,
         "delta_top": 0,
         "delta_bottom": 10,
@@ -340,15 +340,15 @@
           123
         ],
         "localized_bbox": [
-          915,
-          36,
-          1362,
-          117
+          939,
+          40,
+          1330,
+          114
         ],
-        "delta_left": 1,
-        "delta_right": 1,
-        "delta_top": 1,
-        "delta_bottom": 6,
+        "delta_left": 25,
+        "delta_right": 33,
+        "delta_top": 5,
+        "delta_bottom": 9,
         "containment": "PASS",
         "rework_required": false
       },
@@ -369,15 +369,15 @@
           210
         ],
         "localized_bbox": [
-          916,
-          111,
-          1362,
-          194
+          940,
+          110,
+          1330,
+          191
         ],
-        "delta_left": 1,
-        "delta_right": 1,
-        "delta_top": 1,
-        "delta_bottom": 16,
+        "delta_left": 25,
+        "delta_right": 33,
+        "delta_top": 0,
+        "delta_bottom": 19,
         "containment": "PASS",
         "rework_required": false
       },
@@ -398,15 +398,15 @@
           116
         ],
         "localized_bbox": [
-          1692,
-          36,
-          2136,
-          115
+          1728,
+          40,
+          2101,
+          111
         ],
-        "delta_left": 14,
-        "delta_right": 45,
-        "delta_top": 1,
-        "delta_bottom": 1,
+        "delta_left": 50,
+        "delta_right": 80,
+        "delta_top": 5,
+        "delta_bottom": 5,
         "containment": "PASS",
         "rework_required": false
       },
@@ -427,12 +427,12 @@
           210
         ],
         "localized_bbox": [
-          1937,
+          1936,
           110,
           2470,
           210
         ],
-        "delta_left": 55,
+        "delta_left": 54,
         "delta_right": 0,
         "delta_top": 0,
         "delta_bottom": 0,
@@ -485,14 +485,14 @@
           205
         ],
         "localized_bbox": [
-          3462,
-          128,
-          3977,
+          3489,
+          134,
+          3948,
           204
         ],
-        "delta_left": 64,
-        "delta_right": 1,
-        "delta_top": 1,
+        "delta_left": 91,
+        "delta_right": 30,
+        "delta_top": 7,
         "delta_bottom": 1,
         "containment": "PASS",
         "rework_required": false
@@ -514,15 +514,15 @@
           307
         ],
         "localized_bbox": [
-          89,
-          231,
-          621,
-          306
+          129,
+          236,
+          580,
+          304
         ],
-        "delta_left": 38,
-        "delta_right": 40,
-        "delta_top": 1,
-        "delta_bottom": 1,
+        "delta_left": 78,
+        "delta_right": 81,
+        "delta_top": 6,
+        "delta_bottom": 3,
         "containment": "PASS",
         "rework_required": false
       },
@@ -543,15 +543,15 @@
           302
         ],
         "localized_bbox": [
-          804,
+          832,
           223,
-          1360,
-          301
+          1332,
+          295
         ],
-        "delta_left": 1,
-        "delta_right": 1,
+        "delta_left": 29,
+        "delta_right": 29,
         "delta_top": 13,
-        "delta_bottom": 1,
+        "delta_bottom": 7,
         "containment": "PASS",
         "rework_required": false
       },
@@ -573,14 +573,14 @@
         ],
         "localized_bbox": [
           2845,
-          224,
+          226,
           3246,
-          311
+          312
         ],
         "delta_left": 100,
         "delta_right": 68,
-        "delta_top": 1,
-        "delta_bottom": 5,
+        "delta_top": 3,
+        "delta_bottom": 4,
         "containment": "PASS",
         "rework_required": false
       },
@@ -601,15 +601,15 @@
           450
         ],
         "localized_bbox": [
-          2828,
-          374,
-          3341,
-          449
+          2856,
+          377,
+          3312,
+          448
         ],
-        "delta_left": 26,
-        "delta_right": 4,
-        "delta_top": 1,
-        "delta_bottom": 1,
+        "delta_left": 54,
+        "delta_right": 33,
+        "delta_top": 4,
+        "delta_bottom": 2,
         "containment": "PASS",
         "rework_required": false
       },
@@ -746,22 +746,22 @@
           559
         ],
         "localized_bbox": [
-          2957,
-          471,
+          2962,
+          474,
           3648,
           558
         ],
-        "delta_left": 33,
+        "delta_left": 38,
         "delta_right": 0,
-        "delta_top": 1,
+        "delta_top": 4,
         "delta_bottom": 1,
         "containment": "PASS",
         "rework_required": false
       }
     ],
     "changed_pixels_outside_old_or_new_rework_rects": 0,
-    "preexisting_source_diff_pixels_outside_union_original_bboxes": 156983,
-    "new_source_diff_pixels_outside_union_original_bboxes": 142,
+    "preexisting_source_diff_pixels_outside_union_original_bboxes": 152399,
+    "new_source_diff_pixels_outside_union_original_bboxes": 0,
     "introduced_alpha_outside_union_original_bboxes": 0,
     "changes_in_preexisting_pass_cells_outside_rework_overlap": {
       "count_gifts": 0,
