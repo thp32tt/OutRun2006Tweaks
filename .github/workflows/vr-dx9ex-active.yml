@@ -38,6 +38,8 @@ on:
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_nearplane_active_gate.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/Test-VRDXVKBackendContract.ps1'
       - '.github/workflows/vr-dx9ex-active.yml'
 
 concurrency:
@@ -55,6 +57,9 @@ jobs:
       - name: Verify durable regression knowledge
         shell: pwsh
         run: ./tools/Test-VRRegressionKnowledge.ps1
+      - name: Verify DXVK selector/backend identity contract
+        shell: pwsh
+        run: ./tools/Test-VRDXVKBackendContract.ps1
       - name: Verify canonical original-mod EXE binary contract
         shell: pwsh
         run: |

@@ -30,6 +30,56 @@ if (-not (Test-Path $src)) { throw "Test payload not found for variant=$variant 
 $sourceFile = Join-Path $src "SOURCE_SHA.txt"
 $sourceSha = if (Test-Path $sourceFile) { (Get-Content $sourceFile -Raw).Trim() } else { "unknown" }
 
+function Get-PeMachine([string]$Path) {
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -lt 256) { throw "PE file is too small: $Path" }
+    if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "Missing MZ header: $Path" }
+    $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+    if ($peOffset -lt 0 -or $peOffset + 6 -gt $bytes.Length) { throw "Invalid PE header offset: $Path" }
+    if ($bytes[$peOffset] -ne 0x50 -or $bytes[$peOffset + 1] -ne 0x45 -or
+        $bytes[$peOffset + 2] -ne 0 -or $bytes[$peOffset + 3] -ne 0) {
+        throw "Missing PE signature: $Path"
+    }
+    return [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+}
+
+function Assert-X86Pe([string]$Path,[string]$Label) {
+    if (-not (Test-Path $Path)) { throw "$Label missing: $Path" }
+    $machine = Get-PeMachine $Path
+    if ($machine -ne 0x014C) {
+        throw ("$Label must be x86 PE32 for OR2006C2C.EXE; machine=0x{0:X4}: {1}" -f $machine,$Path)
+    }
+}
+
+function Get-Sha256Lower([string]$Path) {
+    return (Get-FileHash $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+
+$backendProvider = switch ($Backend) {
+    "2d"        { "D3D9_NATIVE_2D" }
+    "d3d9"      { "D3D9EX_NATIVE" }
+    "dxvk-safe" { "DXVK_X86_SAFE" }
+    "dxvk"      { "DXVK_X86_MULTIVIEW" }
+    "dx12"      { "D3D9ON12_OS" }
+}
+$dxvkD3D9Source = $null
+$dxvkD3D9Sha256 = ""
+$multiviewPatcherSource = $null
+$multiviewPatcherSha256 = ""
+
+if ($Backend -eq "dxvk-safe") {
+    $dxvkD3D9Source = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"
+    Assert-X86Pe $dxvkD3D9Source "DXVK d3d9.dll"
+    $dxvkD3D9Sha256 = Get-Sha256Lower $dxvkD3D9Source
+} elseif ($Backend -eq "dxvk") {
+    $dxvkD3D9Source = Join-Path $src "d3d9.dll"
+    $multiviewPatcherSource = Join-Path $src "multiviewpatcher.dll"
+    Assert-X86Pe $dxvkD3D9Source "DXVK d3d9.dll"
+    Assert-X86Pe $multiviewPatcherSource "DXVK multiviewpatcher.dll"
+    $dxvkD3D9Sha256 = Get-Sha256Lower $dxvkD3D9Source
+    $multiviewPatcherSha256 = Get-Sha256Lower $multiviewPatcherSource
+}
+
 $logPatterns=@(
     'OutRun2006Tweaks*.log',
     'OutRun2006Tweaks-hudtrace*.csv',
@@ -162,9 +212,7 @@ if ($Backend -eq "2d") {
         Copy-Required "d3d9.dll"
         Copy-Required "multiviewpatcher.dll"
     } elseif ($Backend -eq "dxvk-safe") {
-        $dxvkProvider = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"
-        if (-not (Test-Path $dxvkProvider)) { throw "DXVK provider missing: $dxvkProvider" }
-        Copy-Item $dxvkProvider (Join-Path $root "d3d9.dll") -Force
+        Copy-Item $dxvkD3D9Source (Join-Path $root "d3d9.dll") -Force
         Remove-RootVerified "multiviewpatcher.dll"
     } else {
         Remove-RootVerified "d3d9.dll"
@@ -172,6 +220,23 @@ if ($Backend -eq "2d") {
         if (Test-Path (Join-Path $root "d3d9.dll")) {
             throw "Local d3d9.dll is still present; refusing $Backend mode."
         }
+    }
+}
+
+if ($dxvkD3D9Sha256) {
+    $installedDxvk = Join-Path $root "d3d9.dll"
+    if (-not (Test-Path $installedDxvk)) { throw "DXVK installation verification failed: d3d9.dll missing" }
+    $installedDxvkHash = Get-Sha256Lower $installedDxvk
+    if ($installedDxvkHash -ne $dxvkD3D9Sha256) {
+        throw "DXVK installation verification failed: d3d9.dll SHA256 mismatch"
+    }
+}
+if ($multiviewPatcherSha256) {
+    $installedPatcher = Join-Path $root "multiviewpatcher.dll"
+    if (-not (Test-Path $installedPatcher)) { throw "DXVK multiview verification failed: multiviewpatcher.dll missing" }
+    $installedPatcherHash = Get-Sha256Lower $installedPatcher
+    if ($installedPatcherHash -ne $multiviewPatcherSha256) {
+        throw "DXVK multiview verification failed: multiviewpatcher.dll SHA256 mismatch"
     }
 }
 
@@ -244,6 +309,9 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "provider=$backendProvider"
+    "dxvkD3D9Sha256=$dxvkD3D9Sha256"
+    "multiviewPatcherSha256=$multiviewPatcherSha256"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -254,10 +322,13 @@ Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding asci
 $configHash = "missing"
 if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
 $sessionManifest = [ordered]@{
-    SchemaVersion = 3
+    SchemaVersion = 4
     BuildMatrixId = $matrix
     VariantId = $variant
     Backend = $Backend
+    BackendProvider = $backendProvider
+    DxvkD3D9Sha256 = $dxvkD3D9Sha256
+    MultiviewPatcherSha256 = $multiviewPatcherSha256
     TestProfile = $TestProfile
     SourceSha = $sourceSha
     SessionId = $session
@@ -283,6 +354,9 @@ Write-Host "OutRun renderer mode activated: $Backend"
 Write-Host "Test variant: $variant"
 Write-Host "Test profile: $TestProfile"
 Write-Host "Source SHA: $sourceSha"
+Write-Host "Backend provider: $backendProvider"
+if ($dxvkD3D9Sha256) { Write-Host "DXVK d3d9.dll SHA256: $dxvkD3D9Sha256" }
+if ($multiviewPatcherSha256) { Write-Host "Multiview patcher SHA256: $multiviewPatcherSha256" }
 Write-Host "Diagnostic session prepared before launch: $session"
 Write-Host "Any previous root logs were archived before this session was created."
 switch ($Backend) {
