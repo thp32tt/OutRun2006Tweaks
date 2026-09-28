@@ -43,6 +43,11 @@ def inside(b,o):
 def clamp(v,lo,hi): return max(lo,min(v,hi))
 
 sb=SOURCE.read_bytes(); cb=CANDIDATE.read_bytes()
+# Completion guard: queued pre-close workflow runs may start after this task has
+# already committed the validated FF2462BB candidate. Never re-apply transforms.
+if sha(cb)=="641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3":
+    print("FF2462BB already completed; no rework applied")
+    raise SystemExit(0)
 w,h,m=parse(sb); w2,h2,m2=parse(cb)
 assert (w,h,m)==(w2,h2,m2)==(4096,2048,1) and sb[:128]==cb[:128]
 
