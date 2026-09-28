@@ -12,6 +12,9 @@ struct NativeBackendConfig {
     std::uint32_t height = 0;
     DXGI_FORMAT color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
     bool request_debug_layer = false;
+    bool adapter_luid_valid = false;
+    bool require_adapter_luid = false;
+    LUID adapter_luid{};
 };
 
 class NativeBackend final {
@@ -36,12 +39,20 @@ public:
     [[nodiscard]] ID3D11Texture2D* color_texture() const noexcept { return color_texture_.Get(); }
     [[nodiscard]] ID3D11RenderTargetView* color_rtv() const noexcept { return color_rtv_.Get(); }
     [[nodiscard]] ID3D11ShaderResourceView* color_srv() const noexcept { return color_srv_.Get(); }
+    [[nodiscard]] bool selected_adapter_luid_valid() const noexcept {
+        return selected_adapter_luid_valid_;
+    }
+    [[nodiscard]] LUID selected_adapter_luid() const noexcept {
+        return selected_adapter_luid_;
+    }
 
 private:
     bool create_color_target(std::uint32_t width, std::uint32_t height, DXGI_FORMAT format) noexcept;
 
     NativeBackendConfig config_{};
     D3D_FEATURE_LEVEL feature_level_ = D3D_FEATURE_LEVEL_9_1;
+    LUID selected_adapter_luid_{};
+    bool selected_adapter_luid_valid_ = false;
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> color_texture_;
