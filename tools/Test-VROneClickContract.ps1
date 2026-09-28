@@ -118,7 +118,8 @@ foreach ($requiredText in @(
     'Package launch backend mismatch',
     'One-click slot source mismatch',
     'One-click slot payload mismatch',
-    'SlotPayload'
+    'SlotPayload',
+    'Remove-Item $reportPath -Force'
 )) {
     if ($preflightText -notmatch [regex]::Escape($requiredText)) {
         throw "Runtime package identity preflight missing: $requiredText"
