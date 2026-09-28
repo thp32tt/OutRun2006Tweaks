@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00015",
+  "wave_id": "W00004",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T00:30:13+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "88c442010246e3a2c7d948d88c4d10de93ecd8dc",
+  "final_precommit_head_sha": "1f1b702d636e9a87e27f317bbfffd78a044c9524",
+  "peer_lane_commit_preserved": "latest_head_includes_A14_or_newer",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "queue_recompute": {
+    "total_rows": 137,
+    "even_rows": 68,
+    "even_rework": 2,
+    "even_pending_artwork": 29,
+    "even_zoom_review_hold": 26,
+    "even_runtime_font": 4,
+    "even_runtime_name_entry": 1,
+    "even_other_or_pending_c": 6
+  },
+  "reviewed_rework": [
+    {
+      "index": 94,
+      "asset": "2DA43E41",
+      "status": "REWORK_REQUIRED",
+      "hd_source_in_git": true,
+      "decision": "NO_REPEAT_SAFE_BLOCKER",
+      "reason": "B93 already exhausted three safe automatic repair attempts. Strict pre-commit QA still failed overlapping/source-diff containment for wait_now, view_change, and expert; no HD source/candidate DDS changed since W00003, so another speculative overwrite is prohibited."
+    },
+    {
+      "index": 102,
+      "asset": "571E78F3",
+      "status": "REWORK_REQUIRED",
+      "hd_source_in_git": true,
+      "decision": "NO_DUPLICATE_REWORK",
+      "reason": "Canonical HD DXT5 rebuild already received strict C validation. The remaining gate is isolated DDS_ONLY in-game reapproval; no new production write is justified without per-DDS runtime evidence."
+    }
+  ],
+  "source_gate": {
+    "previous_b_terminal": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+    "changes_since_previous_b_terminal": "Compared e692f6140c1c4a2b2e0d04279494aae1fa4db626 through b900d2e6eb6711fa89cb104e00b2887bed502802: no localization/graphics/hd_source DDS and no localization/graphics/hd_candidates DDS changed.",
+    "even_pending_localize_with_new_hd_source": 0,
+    "even_zoom_review_with_new_hd_source": 0,
+    "new_safe_production_input": false
+  },
+  "latest_runtime_context": {
+    "source_commit": "f5291bde9346f3f70f0d125536d3bf5a4ac61eb0",
+    "observed": "User reports the diagnostic test configuration no longer crashes, but the aggregate 16-DDS graphics set still shows runtime visual failures involving texture size/scaling, alpha/transparency, or sprite position.",
+    "lane_decision": "Aggregate GRAPHICS_ONLY/COMBINED feedback cannot identify the offending DDS. Do not guess or overwrite an even-shard candidate; require per-DDS isolation before runtime-sensitive rework or promotion.",
+    "task_runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "zero_pixel_containment": "NO_NEW_ASSET_WRITE; current B93/C80/C86 evidence reviewed for even REWORK rows",
+    "dds_format_compression_mips_alpha_orientation": "NO_NEW_ASSET_WRITE",
+    "runtime_dimension_scaling_alpha_position_gate": "BLOCKED_PENDING_PER_DDS_ISOLATION",
+    "source_availability_gate": "PASS_BLOCKER_CLASSIFICATION",
+    "anti_duplication": "PASS",
+    "parity_shard": "PASS_EVEN_ONLY",
+    "shared_state_isolation": "PASS",
+    "peer_commit_preservation": "PASS"
+  },
+  "touched_assets": [],
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/progress/progress.json",
+    "localization/resume_state.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00012.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00013.json",
+    "localization/graphics/role_B/20260928-2328-B97/B97_W00003_GITHUB_SOURCE_GATE.json",
+    "docs/automation/runs/B93-20260928-1304.json",
+    "localization/graphics/role_C/20260927-1826-C80/C80_2DA43E41_rework_metrics.json",
+    "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
+    "localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md",
+    "localization/graphics/role_A/20260929-A00014/A00014_W00004_RUNTIME_ISOLATION_GATE.json"
+  ],
+  "conclusion": "W00004 introduced runtime evidence but not per-DDS attribution or new GitHub-resident source/candidate bytes for B's unfinished even shard. Safe production remains blocked; durable blocker recorded without modifying shared state or repeating completed work."
+}

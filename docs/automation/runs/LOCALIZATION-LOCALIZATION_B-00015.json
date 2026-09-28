@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00015",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00004",
+  "recorded_at_kst": "2026-09-29T00:30:13+09:00",
+  "initial_head_sha": "88c442010246e3a2c7d948d88c4d10de93ecd8dc",
+  "commit_base_sha": "1f1b702d636e9a87e27f317bbfffd78a044c9524",
+  "result": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane B even-index primary shard refresh, REWORK-first anti-duplication review, source-byte delta gate, runtime-isolation gate, and self-QA eligibility check.",
+  "report": "localization/graphics/role_B/20260929-0030-B98/B98_W00004_RUNTIME_ISOLATION_GATE.json",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "reviewed_rework_indices": [
+    94,
+    102
+  ],
+  "pending_localize_without_new_github_hd_source": 29,
+  "blocked_zoom_review_without_new_github_hd_source": 26,
+  "peer_lane_commit_preserved": "1f1b702d636e9a87e27f317bbfffd78a044c9524",
+  "conclusion": "No safe new B-shard DDS production is justified from current GitHub-only inputs. Index 94 remains the exhausted B93 safe blocker; index 102 remains strict-C validated pending isolated DDS_ONLY reapproval; aggregate runtime failures require per-DDS isolation before any new overwrite.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-0030-B98/B98_W00004_RUNTIME_ISOLATION_GATE.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00014.json",
+    "localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md"
+  ]
+}
