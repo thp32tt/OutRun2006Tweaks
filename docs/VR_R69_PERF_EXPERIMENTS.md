@@ -56,3 +56,10 @@ For every run keep the same route, HMD refresh, Virtual Desktop quality/codec an
 
 ## Build trigger
 - The dedicated six-way test workflow is intentionally retriggered after its workflow file exists on the branch, so the push event can build P5_BASE, EXP_STATEBLOCK, EXP_ZEROCOPY, EXP_FENCE2, EXP_XYZCACHE and EXP_ALL in parallel.
+
+
+## EXP_ALL_V2
+- Reviewed source checkpoint: `60d1c483d79eb2d883ab9fd4f3d65bcbb693695b`.
+- Ten-pass static review status: PASS for HMD test.
+- Includes QPC 2 ms fence timing, FVF/cull/scissor SkyGlow restore hardening, reset-generation invalidation, and failed-projection deferred DirectGPU ACK protection.
+- Test EXP_ALL_V2 before the older EXP_ALL candidate.
