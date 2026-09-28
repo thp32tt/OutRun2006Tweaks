@@ -1,4 +1,4 @@
-name: Localization A AUTO 00001 392 Exact BBox Rework
+name: Localization A AUTO 00001 FF2462BB Exact BBox Rework
 on:
   push:
     branches: [korean-localization-clean]
@@ -16,14 +16,14 @@ jobs:
       - uses: actions/checkout@v4
         with: {ref: korean-localization-clean, fetch-depth: 0}
       - run: python -m pip install --disable-pip-version-check pillow
-      - run: python tools/localization/a_auto_00001_rework_392.py
+      - run: python tools/localization/a_auto_00001_rework_ff2462bb.py
       - shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds localization/graphics/role_A/20260928-AUTO-A00001 localization/graphics/asset_queue.csv localization/progress/progress.json localization/resume_state.json localization/progress/STATUS.md localization/WORKLOG.md
-          git commit -m "localization: A rework 39229D64 [AUTO:LOCALIZATION-LOCALIZATION_A-00001]"
+          git add localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB localization/graphics/asset_queue.csv localization/progress/progress.json localization/resume_state.json localization/progress/STATUS.md localization/WORKLOG.md
+          git commit -m "localization: A rework FF2462BB [AUTO:LOCALIZATION-LOCALIZATION_A-00001]"
           PROD_SHA="$(git rev-parse HEAD)"
           git pull --rebase origin korean-localization-clean
           git push origin HEAD:korean-localization-clean
@@ -31,11 +31,13 @@ jobs:
           import json,pathlib,sys
           p=pathlib.Path("docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00001.json"); j=json.loads(p.read_text("utf-8"))
           j["production_commit_sha"]=sys.argv[1]; j["automation_validation"]="PASS"; j["runtime_validation"]="UNTESTED"
-          j["summary"]="A index 57 39229D64 automated exact-bbox QA PASS; independent C and isolated DDS_ONLY in-game remain required."
-          j["evidence"].append("localization/graphics/role_A/20260928-AUTO-A00001/A_AUTO_00001_39229D64_REPORT.json")
+          j["summary"]="A index 51 FF2462BB automated exact-bbox self-QA PASS using no-resample/minimal-fit repair; independent C visual/source-style QA and isolated DDS_ONLY in-game remain required."
+          j["evidence"].append("localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json")
+          j["evidence"].append("localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png")
+          j["result_sha"]=sys.argv[1]
           p.write_text(json.dumps(j,ensure_ascii=False,indent=2)+"\n","utf-8")
           PY
           git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00001.json
-          git commit -m "automation: record A result [AUTO:LOCALIZATION-LOCALIZATION_A-00001]"
+          git commit -m "automation: record A FF2462BB result [AUTO:LOCALIZATION-LOCALIZATION_A-00001]"
           git pull --rebase origin korean-localization-clean
           git push origin HEAD:korean-localization-clean
