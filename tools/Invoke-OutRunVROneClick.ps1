@@ -19,6 +19,39 @@ if (!(Test-Path $selector)) { throw "Select-OutRunVRBackend.ps1 not found: $sele
 if (!(Test-Path $runner)) { throw "Run-OutRunVRTest.ps1 not found: $runner" }
 if (!(Test-Path $preflight)) { throw "Test-OutRunVROneClickPreflight.ps1 not found: $preflight" }
 
+function Write-OneClickPreflightFailureDiagnostic(
+    [string]$ErrorText,
+    [string]$RequestedBackend,
+    [string]$RequestedVariant
+) {
+    $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
+    $record = [ordered]@{
+        SchemaVersion = 1
+        RecordedUtc = (Get-Date).ToUniversalTime().ToString('o')
+        Phase = 'PREFLIGHT'
+        RequestedBackend = $RequestedBackend
+        RequestedVariant = $RequestedVariant
+        Error = $ErrorText
+        SessionCreated = $false
+    }
+
+    try {
+        $dest = Join-Path $scriptRoot ("logs/_preflight_failures/{0}" -f $stamp)
+        New-Item -ItemType Directory -Force $dest | Out-Null
+        $path = Join-Path $dest 'PREFLIGHT_FAILURE.json'
+        $record | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding UTF8
+        return $path
+    } catch {
+        try {
+            $path = Join-Path $scriptRoot ("VR_PREFLIGHT_FAILURE_{0}.json" -f $stamp)
+            $record | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding UTF8
+            return $path
+        } catch {
+            return 'diagnostic-write-failed'
+        }
+    }
+}
+
 $target = $null
 if (Test-Path $targetFile) {
     try {
@@ -73,9 +106,15 @@ Write-Host ''
 # Fail before mutating the game directory when the packaged renderer/host/provider
 # identity does not match this branch target. The report is collected into the
 # same session ZIP for exact reproduction.
-& $preflight -Backend $resolvedBackend
-if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-    throw "One-click preflight failed with exit code $LASTEXITCODE"
+try {
+    & $preflight -Backend $resolvedBackend
+    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+        throw "One-click preflight failed with exit code $LASTEXITCODE"
+    }
+} catch {
+    $preflightFailure = $_.Exception
+    $diagnostic = Write-OneClickPreflightFailureDiagnostic -ErrorText $preflightFailure.Message -RequestedBackend $resolvedBackend -RequestedVariant $resolvedVariant
+    throw ("One-click preflight failed before session creation. Diagnostic={0}; error={1}" -f $diagnostic,$preflightFailure.Message)
 }
 
 
