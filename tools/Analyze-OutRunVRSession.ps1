@@ -117,24 +117,6 @@ if($frameIntervals.Count -gt 0){
     if($avgFrameMs -gt 0){$approxHz=1000.0/$avgFrameMs}
 }
 
-$flags=@()
-if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
-if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
-if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
-if($dxvkHostBridgeAllocationFailed){$flags+='DXVK_HOST_BRIDGE_ALLOCATION_FAILED'}
-if($dxvkHostBridgeReady){$flags+='DXVK_HOST_BRIDGE_READY'}
-if($dxvkHostImportFailed){$flags+='DXVK_HOST_BRIDGE_IMPORT_FAILED'}
-if($dxvkHostImportReady){$flags+='DXVK_HOST_BRIDGE_IMPORT_READY'}
-if($dxvkHostPathActive){$flags+='DXVK_HOST_DIRECT_PATH_ACTIVE'}
-if($backend -match 'dxvk' -and $buildIdentityMismatch){$flags+='DXVK_BUILD_IDENTITY_MISMATCH'}
-elseif($backend -match 'dxvk' -and -not $buildIdentityComplete){$flags+='DXVK_BUILD_IDENTITY_INCOMPLETE'}
-elseif($backend -match 'dxvk' -and $buildIdentityVerified){$flags+='DXVK_BUILD_IDENTITY_VERIFIED'}
-if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
-if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
-if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
-if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
-if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
-
 $variant=if($session.VariantId){[string]$session.VariantId}else{'UNKNOWN'}
 $backend=if($session.Backend){[string]$session.Backend}else{'UNKNOWN'}
 $profile=if($session.TestProfile){[string]$session.TestProfile}else{'UNKNOWN'}
@@ -171,6 +153,24 @@ if($buildInputBackend -and $preflightBackend -and $buildInputBackend -ne $prefli
 $buildIdentityMismatch=($buildIdentityIssues.Count -gt 0)
 $buildIdentityComplete=($sourceSha -ne 'UNKNOWN' -and $buildInputSourceSha -and $preflightSourceSha -and $buildInputBackend -and $preflightBackend)
 $buildIdentityVerified=($buildIdentityComplete -and -not $buildIdentityMismatch)
+
+$flags=@()
+if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
+if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
+if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
+if($dxvkHostBridgeAllocationFailed){$flags+='DXVK_HOST_BRIDGE_ALLOCATION_FAILED'}
+if($dxvkHostBridgeReady){$flags+='DXVK_HOST_BRIDGE_READY'}
+if($dxvkHostImportFailed){$flags+='DXVK_HOST_BRIDGE_IMPORT_FAILED'}
+if($dxvkHostImportReady){$flags+='DXVK_HOST_BRIDGE_IMPORT_READY'}
+if($dxvkHostPathActive){$flags+='DXVK_HOST_DIRECT_PATH_ACTIVE'}
+if($backend -match 'dxvk' -and $buildIdentityMismatch){$flags+='DXVK_BUILD_IDENTITY_MISMATCH'}
+elseif($backend -match 'dxvk' -and -not $buildIdentityComplete){$flags+='DXVK_BUILD_IDENTITY_INCOMPLETE'}
+elseif($backend -match 'dxvk' -and $buildIdentityVerified){$flags+='DXVK_BUILD_IDENTITY_VERIFIED'}
+if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
+if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
+if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
+if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
+if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
 $status='OK'
 if($backend -match 'dxvk' -and $buildIdentityMismatch){$status='DXVK_BUILD_IDENTITY_MISMATCH'}
