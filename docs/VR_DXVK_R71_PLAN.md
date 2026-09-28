@@ -72,3 +72,14 @@ Do not bind the graphics-correctness path to the old custom fork before stock DX
 The DXVK branch PC FAST packager acquires the pinned official DXVK 3.1.1 x86 release when no explicit provider path is supplied. It verifies that `x32/d3d9.dll` is PE32/x86, records SHA-256 provenance, and packages it only under `backends/dxvk`. The package root must remain free of a preselected `d3d9.dll`; `START_HERE_VR_TEST.cmd` activates the backend atomically through the selector.
 
 At R71 the package intentionally contains no `multiviewpatcher.dll`. One-click therefore exercises stock DXVK SAFE/two-pass parity first; multiview remains blocked by the graphics-correctness gate.
+
+## R71 provider census wiring
+
+The passive provider census is now connected to the existing one-shot game device probe.
+After `Game::D3DDevice_ptr` is valid it records whether the loaded D3D9 provider is the
+Windows system provider or a local/non-system provider, whether stock DXVK interop is exposed,
+and whether that provider exposes D3D9Ex.
+
+No additional CreateDevice hook is installed, and the probe never mutates render state.
+This keeps stock-DXVK parity analysis on the same device lifecycle used by the proven R70
+renderer.
