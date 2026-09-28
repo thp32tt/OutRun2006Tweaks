@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "seriesId": "R71-STATIC-1000-20260929",
+  "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
+  "targetCycles": 1000,
+  "completedCycles": 3,
+  "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
+  "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
+  "currentHead": "199ca005ef21b40fe5d605c87743380d88ff4e68",
+  "frozenUserTestPackage": {
+    "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
+    "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
+    "sha256": "d95ee119e5da680d70a7717f7c5a2994a0856ec7eaf56d3846d94e23f8c34c55",
+    "immutableUntilUserTest": true
+  },
+  "runtimeValidation": "UNTESTED",
+  "integrationStatus": "NOT_INTEGRATED",
+  "cycles": [
+    {
+      "cycle": 1,
+      "lenses": [
+        "CI/validation contract",
+        "backend isolation",
+        "adversarial validation"
+      ],
+      "findingKeys": [
+        "R71-CI-BACKEND-CONTRACT-SANDBOX-001"
+      ],
+      "findings": [
+        "DX9Ex Active Validation could fail before game build because selector sandbox did not carry OutRunVR-BackendContract.ps1 while R71 selector requires it."
+      ],
+      "changedFiles": [
+        "tools/Test-VRDXVKBackendContract.ps1",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "commits": [
+        "59a6f0513a0b550985a35d1f487492e6de3bc926",
+        "8eea529972b92285d32525bab4af822c79080c89"
+      ],
+      "automationValidation": "PENDING_FINAL_HEAD_CI",
+      "runtimeValidation": "UNTESTED",
+      "next": "Run exact-head DX9Ex policy gate; retain backend test only if selector+contract sandbox passes."
+    },
+    {
+      "cycle": 2,
+      "lenses": [
+        "DirectGPU performance attribution",
+        "frame pacing",
+        "synchronization safety"
+      ],
+      "findingKeys": [
+        "VR-PERF-DIRECT-COPY-TELEMETRY-001"
+      ],
+      "findings": [
+        "R71 measured producer fence/backpressure but not CPU enqueue cost of the two eye StretchRect submissions, preventing copy-vs-fence attribution."
+      ],
+      "changedFiles": [
+        "src/vr/d3d9/stereo_renderer_r32.cpp"
+      ],
+      "commits": [
+        "9e77c2b3027c654dfcc7ab0d1e6a7a694ef73067"
+      ],
+      "automationValidation": "SOURCE_EQUIVALENT_TO_PRIOR_BUILD_VERIFIED_TELEMETRY_PATTERN; FINAL_HEAD_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "Use HMD PERFORMANCE telemetry later; do not change fence/copy behavior before measurement."
+    },
+    {
+      "cycle": 3,
+      "lenses": [
+        "HUD semantic precision",
+        "canonical EXE mapping",
+        "false-positive minimization"
+      ],
+      "findingKeys": [
+        "R71-OUTRUN-HUD-EXACT-MAP-001"
+      ],
+      "findings": [
+        "R71 exact OutRun Sumo_Printf/result/rival anchors were not durable analyzer anchors; BA9D0 callers could not be enumerated by the inspector."
+      ],
+      "changedFiles": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "commits": [
+        "199ca005ef21b40fe5d605c87743380d88ff4e68"
+      ],
+      "automationValidation": "HUD_INSPECTOR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "Consume the next canonical EXE inspector output, enumerate BA9D0 callers, then shrink the broad 0x097300-0x097F00 runtime classification if exact evidence permits."
+    }
+  ],
+  "nextCycle": {
+    "cycle": 4,
+    "priority": [
+      "C3 exact-head CI results",
+      "canonical BA9D0 caller enumeration",
+      "host ACK/session lifetime reconciliation",
+      "R14 managed-shadow lifetime/budget",
+      "R30 SkyGlow additive intensity only after R71 HMD evidence"
+    ],
+    "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no synchronization behavior change without measurements."
+  },
+  "updatedKst": "2026-09-29T02:33:45+09:00"
+}
