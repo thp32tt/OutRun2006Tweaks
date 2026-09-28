@@ -4,10 +4,10 @@
   "target_branch": "korean-localization-clean",
   "attempt": 1,
   "base_sha": "6926a40fec79d8d5c9d1eb87ded188ce4017cf28",
-  "result_sha": "e5a3630055d4bbc8178e570ee367a744ab880edb",
+  "result_sha": "4bd22a6c4de252e275a63057e9c4a81669e860d6",
   "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "summary": "B95 FA7BBB13 even-shard exact-bbox rework completed on GitHub. 17/17 bbox containment PASS, no introduced alpha outside original bboxes, and shared state was merged separately on latest HEAD. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain pending.",
+  "summary": "B95 FA7BBB13 index 54 completed. Canonical result restores the first successful B95 payload to avoid duplicate resampling, retires the one-shot auto-trigger, and records 17/17 zero-pixel containment PASS with no introduced alpha or newly visible overflow outside original permitted bboxes. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain pending.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
@@ -19,7 +19,11 @@
     "Result commit e5a3630055d4bbc8178e570ee367a744ab880edb: localization: B95 FA7 exact-bbox rework [AUTO:LOCALIZATION-LOCALIZATION_B-00002]",
     "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json",
     "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_BEFORE_AFTER_QA.png",
-    "GitHub Actions run 36389208077 / job 108823193794: B95 production/self-QA step PASS; later branch-move guard blocked a duplicate commit because the completed result already existed."
+    "GitHub Actions run 36389208077 / job 108823193794: B95 production/self-QA step PASS; later branch-move guard blocked a duplicate commit because the completed result already existed.",
+    "Canonicalization commit 4bd22a6c4de252e275a63057e9c4a81669e860d6 restored the first successful B95 DDS/QA blobs and retired the push-triggered one-shot workflow.",
+    "Canonical candidate SHA-256 d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da.",
+    "Later duplicate re-application was reverted because it unnecessarily resampled and shrank already-passing Korean rasters."
   ],
-  "execution_retry": 4
+  "execution_retry": 4,
+  "payload_commit": "e5a3630055d4bbc8178e570ee367a744ab880edb"
 }
