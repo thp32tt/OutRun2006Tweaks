@@ -1,0 +1,534 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00048",
+  "attempt": "1/3",
+  "wave_id": "W00015",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T07:10:26+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "3228922991713e7f12301ec50118ae5748a32496",
+  "final_precommit_head_sha": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
+  "preserved_peer_lane_commit": {
+    "sha": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00047",
+    "required_as_ancestor": true
+  },
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_EXACT_HD_DXT5_DECODED_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT"
+  ],
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ],
+    "dependency_blocker_rule": "Skipped unchanged even-shard REWORK/runtime dependencies rather than repeating identical reviews.",
+    "selected_pending_localize_text_indices": [
+      92,
+      98,
+      112,
+      152
+    ],
+    "parity_check": "PASS_EVEN_ONLY",
+    "work_steal": "NONE",
+    "queue_recheck_head_sha": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
+    "queue_states": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "reason": "Selected four independent even pending_artwork assets whose exact HD Release DDS bytes are directly retrievable from immutable GitHub and whose source constraints can be materially advanced without unsafe raster guessing."
+  },
+  "source_policy": {
+    "ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "contract_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+    "exact_hd_reference_repo": "Sonic-TV/OR2006Sprites",
+    "exact_hd_reference_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "exact_hd_reference_tree": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "retrieval": "GitHub fetch_file base64 only; DXT5 decoded in-memory for deterministic source metrics",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "assets": [
+    {
+      "queue_index": 92,
+      "asset": "1A43E9D9",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+      "translations": [
+        {
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드"
+        },
+        {
+          "source": "15 continuous course",
+          "korean": "15코스 연속"
+        }
+      ],
+      "exact_hd_source": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+        "git_blob_sha": "2a2019d5af833424e72c0cc6b0169f1b0699d897",
+        "bytes": 524416,
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.png",
+        "git_blob_sha": "95537ad11b58a319a2d53852c99f2731ed3f9e03"
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_1A43E9D9_512x64_atlas.json",
+        "git_blob_sha": "3fb741c06ff26a8ddf780dffa0467d97df1bc52a",
+        "canvas": [
+          2048,
+          256
+        ],
+        "regions": [
+          {
+            "sprite": "sprite_350",
+            "rect": [
+              0,
+              0,
+              2048,
+              256
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "decoded_source_alpha": {
+        "bbox_alpha_gt_0": [
+          387,
+          11,
+          1588,
+          242
+        ],
+        "bbox_alpha_gt_31": [
+          391,
+          14,
+          1584,
+          238
+        ],
+        "bbox_alpha_gt_127": [
+          395,
+          18,
+          1580,
+          234
+        ],
+        "nonzero_pixels_alpha_gt_0": 174327,
+        "alpha_gt_31_y_bands": [
+          {
+            "y": [
+              14,
+              125
+            ],
+            "x": [
+              522,
+              1584
+            ],
+            "pixels": 96202
+          },
+          {
+            "y": [
+              127,
+              238
+            ],
+            "x": [
+              391,
+              1062
+            ],
+            "pixels": 62640
+          }
+        ],
+        "interpretation": "Two separated full-effect alpha bands identified inside the single atlas sprite. Semantic-to-band assignment is intentionally not guessed until exact-HD readable-orientation visual confirmation."
+      },
+      "historical_stock_candidate": {
+        "sha256": "06acbaf643c72d367555f5b5199fdb6294c00eb5371da0378f1c403ceb81a4b1",
+        "raw_transform_reference": "mirror-Y",
+        "status": "HISTORICAL_STOCK_RESOLUTION_ONLY_NOT_REUSED_OR_UPSCALED"
+      },
+      "reconstruction_status": "EXACT_HD_DXT5_DECODED_ALPHA_BANDS_AND_ATLAS_LIMITS_READY__TEXT_BBOX_RENDER_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_HD_CANDIDATE",
+      "next_safe_action": "Confirm exact-HD readable/raw orientation, map the two English semantic strings to the two decoded effect bands, recover text-only full-effect bboxes, render Korean wholly inside those bboxes, BC3-encode with source header behavior, then retain exact ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+    },
+    {
+      "queue_index": 98,
+      "asset": "42E618FD",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "translations": [
+        {
+          "source": "Challenge the course record.",
+          "korean": "코스 기록에 도전하세요."
+        }
+      ],
+      "exact_hd_source": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+        "git_blob_sha": "04af6f19533c54e84f6bca3cd29e53aa1abf98d6",
+        "bytes": 262272,
+        "width": 2048,
+        "height": 128,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 262144
+      },
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/42E618FD_512x32.png",
+        "git_blob_sha": "6b3004ec7ebbe493f25443c9d1844ef6c6c9ed02"
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_42E618FD_512x32_atlas.json",
+        "git_blob_sha": "7b5d3539635847b62b04738f8d9a7454f25e6898",
+        "canvas": [
+          2048,
+          128
+        ],
+        "regions": [
+          {
+            "sprite": "sprite_355",
+            "rect": [
+              0,
+              0,
+              2048,
+              128
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "decoded_source_alpha": {
+        "bbox_alpha_gt_0": [
+          431,
+          5,
+          1673,
+          121
+        ],
+        "bbox_alpha_gt_31": [
+          435,
+          8,
+          1670,
+          118
+        ],
+        "bbox_alpha_gt_127": [
+          438,
+          11,
+          1667,
+          115
+        ],
+        "nonzero_pixels_alpha_gt_0": 93311,
+        "alpha_gt_31_y_bands": [
+          {
+            "y": [
+              8,
+              118
+            ],
+            "x": [
+              435,
+              1670
+            ],
+            "pixels": 82019
+          }
+        ],
+        "interpretation": "Single semantic text/effect envelope in a single full-width sprite; exact decoded source containment envelope is now pinned."
+      },
+      "historical_stock_candidate": {
+        "sha256": "89b89700efb486b48a0ea5039c76088b47ac6393c4653208a46ddb0b672bc5fa",
+        "raw_transform_reference": "mirror-Y",
+        "status": "HISTORICAL_STOCK_RESOLUTION_ONLY_NOT_REUSED_OR_UPSCALED"
+      },
+      "reconstruction_status": "EXACT_HD_DXT5_DECODED_EFFECT_ENVELOPE_AND_ATLAS_LIMIT_READY__RENDER_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_HD_CANDIDATE",
+      "next_safe_action": "Confirm exact-HD readable/raw orientation and text-only effect mask, render 코스 기록에 도전하세요. wholly within [431,5,1673,121] including effects, preserve all pixels outside the permitted source text region, BC3-encode, and retain exact English-source comparison proof."
+    },
+    {
+      "queue_index": 112,
+      "asset": "D41D0B1",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+      "translations": [
+        {
+          "source": "Try to reach the goal with your girlfriend.",
+          "korean": "여자친구와 함께 골에 도착하세요."
+        }
+      ],
+      "exact_hd_source": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+        "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+        "bytes": 524416,
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/0D41D0B1_512x64.png",
+        "git_blob_sha": "43028a73a69748d8496c314f841ddcbbeb8a8b67"
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_0D41D0B1_512x64_atlas.json",
+        "git_blob_sha": "55f610a9fc424679f1bed3a41987d853fe174960",
+        "canvas": [
+          2048,
+          256
+        ],
+        "regions": [
+          {
+            "sprite": "sprite_352",
+            "rect": [
+              0,
+              0,
+              2048,
+              256
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "decoded_source_alpha": {
+        "bbox_alpha_gt_0": [
+          435,
+          18,
+          1356,
+          236
+        ],
+        "bbox_alpha_gt_31": [
+          439,
+          21,
+          1353,
+          233
+        ],
+        "bbox_alpha_gt_127": [
+          442,
+          24,
+          1350,
+          230
+        ],
+        "nonzero_pixels_alpha_gt_0": 132035,
+        "alpha_gt_31_y_bands": [
+          {
+            "y": [
+              21,
+              233
+            ],
+            "x": [
+              439,
+              1353
+            ],
+            "pixels": 116201
+          }
+        ],
+        "interpretation": "Single semantic text/effect envelope in one atlas sprite; source effect limits are now exact decoded-pixel evidence."
+      },
+      "historical_stock_candidate": {
+        "sha256": "7a7b5279cd45fc5fa017ac0ee9357a738b5c98a506bbcbd7bb917ca6783e6120",
+        "raw_transform_reference": "mirror-Y",
+        "status": "HISTORICAL_STOCK_RESOLUTION_ONLY_NOT_REUSED_OR_UPSCALED"
+      },
+      "reconstruction_status": "EXACT_HD_DXT5_DECODED_EFFECT_ENVELOPE_AND_ATLAS_LIMIT_READY__RENDER_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_HD_CANDIDATE",
+      "next_safe_action": "Confirm exact-HD readable/raw orientation, isolate text-only effect pixels inside the decoded envelope, render 여자친구와 함께 골에 도착하세요. without any 1-pixel escape, BC3-encode source-faithfully, and retain exact English-source comparison proof."
+    },
+    {
+      "queue_index": 152,
+      "asset": "49BB5FE5",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "translations": [
+        {
+          "source": "'89",
+          "korean": "'89",
+          "preserve": true
+        },
+        {
+          "source": "'86",
+          "korean": "'86",
+          "preserve": true
+        },
+        {
+          "source": "PRO.",
+          "korean": "프로"
+        },
+        {
+          "source": "INS.",
+          "korean": "연주"
+        },
+        {
+          "source": "G.M.",
+          "korean": "기타"
+        },
+        {
+          "source": "E.R.",
+          "korean": "유로"
+        }
+      ],
+      "exact_hd_source": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+        "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+        "bytes": 65664,
+        "width": 512,
+        "height": 128,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 65536
+      },
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.png",
+        "git_blob_sha": "5f7d45e704262153c2ca1426c43d96b407dc1680"
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_49BB5FE5_128x32_atlas.json",
+        "git_blob_sha": "ca611e5b613c7fe73eee1b66d4fe89465b52b709",
+        "canvas": [
+          512,
+          128
+        ],
+        "regions": [
+          {
+            "sprite": "sprite_832",
+            "rect": [
+              0,
+              80,
+              116,
+              48
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_833",
+            "rect": [
+              116,
+              80,
+              116,
+              48
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_834",
+            "rect": [
+              232,
+              80,
+              116,
+              48
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_835",
+            "rect": [
+              348,
+              80,
+              116,
+              48
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_836",
+            "rect": [
+              0,
+              32,
+              116,
+              48
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_837",
+            "rect": [
+              116,
+              32,
+              116,
+              48
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "decoded_source_alpha": {
+        "bbox_alpha_gt_0": [
+          0,
+          0,
+          463,
+          95
+        ],
+        "bbox_alpha_gt_31": [
+          0,
+          0,
+          463,
+          95
+        ],
+        "bbox_alpha_gt_127": [
+          0,
+          0,
+          463,
+          95
+        ],
+        "nonzero_pixels_alpha_gt_0": 30888,
+        "interpretation": "Badge/panel artwork itself carries alpha; whole-atlas alpha cannot safely identify text pixels. Six exact atlas cells are pinned, but semantic-to-cell/text-only masks remain HOLD rather than guessed."
+      },
+      "historical_stock_candidate": {
+        "sha256": "7f8229ad0cbe3ae5b3a884bb025dc8669017c88d100e4933e58fec0497217ad3",
+        "raw_transform_reference": "mirror-Y",
+        "status": "HISTORICAL_STOCK_RESOLUTION_ONLY_NOT_REUSED_OR_UPSCALED"
+      },
+      "preserve": "Keep '89/'86 numerals and surrounding music/title/artwork unchanged; only the four already-approved generic mix-type abbreviations are localizable.",
+      "reconstruction_status": "EXACT_HD_DXT5_AND_6_ATLAS_CELLS_PINNED__TEXT_MASK_SEMANTIC_CELL_MAPPING_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_HD_CANDIDATE",
+      "next_safe_action": "Use exact-HD readable-orientation visual/pixel segmentation to map PRO./INS./G.M./E.R. to four of the six cells and recover text-only effect bboxes; preserve '89/'86 and all surrounding artwork, then render/BC3-encode with zero-pixel containment and English-source proof."
+    }
+  ],
+  "material_advance": {
+    "assets": 4,
+    "even_indices": [
+      92,
+      98,
+      112,
+      152
+    ],
+    "exact_hd_release_dds_decoded": 4,
+    "exact_source_dds_blob_identities_pinned": 4,
+    "stock_visual_blob_identities_pinned": 4,
+    "atlas_blob_identities_pinned": 4,
+    "source_alpha_effect_envelopes_pinned": 4,
+    "explicit_atlas_regions_pinned": 9,
+    "candidate_dds_modified": false,
+    "value": "Creates exact-HD decoded DXT5 source constraints that did not previously exist for these four pending even-shard assets, replacing unsafe reliance on historical stock-resolution Korean candidates and making the next source-faithful render/BC3 rewrite deterministic."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_92_98_112_152",
+    "work_steal": "NONE",
+    "current_queue_recheck": "PASS_AT_FINAL_PRECOMMIT_HEAD",
+    "exact_hd_source_identity": "PASS_4_OF_4_RELEASE_DDS_GIT_BLOBS",
+    "stock_visual_atlas_identity": "PASS_8_OF_8_GIT_BLOBS",
+    "dds_header_decode": "PASS_4_OF_4_DXT5_MIP1_DIMENSIONS_AND_LINEAR_SIZE",
+    "decoded_alpha_metrics": "PASS_4_OF_4_IN_MEMORY_FROM_EXACT_GITHUB_DDS_BYTES",
+    "raw_orientation": "HOLD_EXACT_HD_READABLE_VISUAL_RECONFIRMATION__HISTORICAL_MIRROR_Y_NOT_PROMOTED",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_HD_CANDIDATE",
+    "dds_alpha_orientation_candidate_qa": "NOT_APPLICABLE_NO_CANDIDATE_BYTES_TOUCHED",
+    "mandatory_english_source_comparison": "NOT_APPLICABLE_NO_NEW_OR_MATERIALLY_REWORKED_KOREAN_DDS",
+    "historical_candidate_policy": "PASS_NOT_REUSED_NOT_UPSCALED",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_FILES_TOUCHED",
+    "peer_lane_isolation": "PASS_A00047_HEAD_PRESERVED_AS_ANCESTOR",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_dds": [],
+  "reviewed_or_materially_advanced_assets": [
+    "1A43E9D9",
+    "42E618FD",
+    "D41D0B1",
+    "49BB5FE5"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00015 lane B materially advanced four unfinished even-shard DXT5 assets using exact GitHub HD bytes and deterministic decoded source/atlas constraints. No historical low-resolution Korean candidate was reused or upscaled, no common state was mutated, and no DDS candidate was falsely promoted. Raster containment remains HOLD until a new exact-HD Korean candidate exists. Runtime remains UNTESTED.",
+  "automation_validation": "PASS_STATIC_PRECOMMIT_GITHUB_ONLY_EXACT_DXT5_DECODE_4_ASSETS__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

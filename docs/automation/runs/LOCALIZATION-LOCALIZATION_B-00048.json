@@ -1,0 +1,55 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00048",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00015",
+  "recorded_at_kst": "2026-09-29T07:10:26+09:00",
+  "initial_head_sha": "3228922991713e7f12301ec50118ae5748a32496",
+  "final_precommit_head_sha": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
+  "peer_lane_commit_observed_before_commit": true,
+  "peer_lane_task_id": "LOCALIZATION-LOCALIZATION_A-00047",
+  "peer_lane_commit_sha": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
+  "peer_lane_preserved": true,
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_EXACT_HD_DXT5_DECODED_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT_GITHUB_ONLY_EXACT_DXT5_DECODE_4_ASSETS__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20260929-0710-B110/B110_W00015_EXACT_HD_DXT5_RECONSTRUCTION_INPUT.json",
+  "material_deliverable": {
+    "type": "4_EVEN_EXACT_HD_DXT5_DECODED_RECONSTRUCTION_INPUTS",
+    "even_indices": [
+      92,
+      98,
+      112,
+      152
+    ],
+    "assets": [
+      "1A43E9D9",
+      "42E618FD",
+      "D41D0B1",
+      "49BB5FE5"
+    ],
+    "exact_hd_release_dds_decoded": 4,
+    "exact_source_blob_identities_pinned": 12,
+    "candidate_dds_modified": false
+  },
+  "precommit_validation": {
+    "parity": "PASS_EVEN_ONLY",
+    "current_queue_states": "PASS_4_OF_4_PENDING_ARTWORK",
+    "exact_hd_source_decode": "PASS_4_OF_4_DXT5",
+    "shared_state_isolation": "PASS",
+    "peer_lane_head_preservation": "PASS_A00047",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "B created new exact-HD decoded reconstruction inputs for four unfinished even-shard DXT5 assets and preserved the concurrent A00047 commit. No common state or DDS candidate bytes were modified; runtime remains UNTESTED."
+}
