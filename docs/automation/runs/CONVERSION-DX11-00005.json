@@ -123,8 +123,10 @@
   ],
   "production_change_ledger": {
     "issue": 14,
-    "status": "WRITTEN_PENDING_FINAL_VALIDATION_EVENT",
-    "implementation_comment_id": 5866235057
+    "status": "WRITTEN",
+    "implementation_comment_id": 5866235057,
+    "validation_comment_id": 5866343874
   },
-  "next_action": "Keep NativeDrawPathActivationAllowed=false. In a later bounded DX11 task, add actual VB/IB/texture Lock/Unlock/Update mutation telemetry and a concrete MANAGED resource CPU-shadow/reset-generation model, then continue F19/F21 input-layout and shader/fixed-function readiness. Do not promote native draw ownership before exact-build Quest 3/OpenXR runtime parity."
+  "next_action": "Keep NativeDrawPathActivationAllowed=false. In a later bounded DX11 task, add actual VB/IB/texture Lock/Unlock/Update mutation telemetry and a concrete MANAGED resource CPU-shadow/reset-generation model, then continue F19/F21 input-layout and shader/fixed-function readiness. Do not promote native draw ownership before exact-build Quest 3/OpenXR runtime parity.",
+  "finalized_kst": "2026-09-28T17:30:54+09:00"
 }
