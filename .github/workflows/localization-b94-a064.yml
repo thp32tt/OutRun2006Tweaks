@@ -1,0 +1,45 @@
+name: Localization B94 A064 Exact BBox Rework
+on:
+  push:
+    branches: [korean-localization-clean]
+    paths: ['docs/automation/runs/B94-20260928-1336.json']
+permissions:
+  contents: write
+concurrency:
+  group: localization-b94-a064-exact-bbox
+  cancel-in-progress: false
+jobs:
+  rework:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+      - name: Install image dependency
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Run B94 rework and exhaustive first QA
+        run: python tools/localization/b94_rework_a064.py
+      - name: Commit B94 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds localization/graphics/role_B/20260928-1336-B94 localization/graphics/asset_queue.csv localization/progress/progress.json localization/resume_state.json localization/progress/STATUS.md localization/WORKLOG.md
+          git commit -m "localization: B94 exact-bbox rework A064FDFC [AUTO:B94-20260928-1336]"
+          git push origin HEAD:korean-localization-clean
+          python - <<'PY'
+          import json, pathlib, subprocess
+          p=pathlib.Path("docs/automation/runs/B94-20260928-1336.json")
+          j=json.loads(p.read_text("utf-8"))
+          j["result_sha"]=subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip()
+          j["automation_validation"]="PASS"
+          j["summary"]="B94 A064FDFC exact source-diff bbox rework committed after exhaustive first QA; runtime remains UNTESTED."
+          j["evidence"].append("localization/graphics/role_B/20260928-1336-B94/B94_A064FDFC_EXACT_BBOX_REWORK_REPORT.json")
+          p.write_text(json.dumps(j,ensure_ascii=False,indent=2)+"\n","utf-8")
+          PY
+          git add docs/automation/runs/B94-20260928-1336.json
+          git commit -m "automation: record B94 result SHA [AUTO:B94-20260928-1336]"
+          git push origin HEAD:korean-localization-clean
