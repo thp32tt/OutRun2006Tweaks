@@ -6,7 +6,7 @@
   "base_sha": "cbe8e4a4974eb17ed5936574e0869fc383c290f3",
   "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "summary": "A index 57 39229D64 automated exact-bbox QA PASS (15/15, zero outside/collateral/introduced-alpha); independent C and isolated DDS_ONLY in-game remain required.",
+  "summary": "A rollover continuation completed two odd-index REWORK targets on korean-localization-clean: FF2462BB index 51 automated bbox self-QA PASS (21/21) and 39229D64 index 57 automated bbox QA PASS (15/15). Both remain pending independent C visual/source-style QA and isolated DDS_ONLY in-game validation.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
@@ -30,10 +30,14 @@
     "GitHub Actions run 36389121231 attempt 4 completed SUCCESS after exact-bbox QA and state-write fixes.",
     "Actual remote production commit after rebase: d6800a8919733d6053e801d284e2b037b726ad83.",
     "Actual remote result-record commit: 2464ebdb7802e4104b258e5ff2fab951922c25e4.",
-    "Superseded FF2462BB experiment dispatch was removed by 641c6dcf0bf14e6794e2793d048c614ba85d537c; index 57 39229D64 is the task result recorded here."
+    "Superseded FF2462BB experiment dispatch was removed by 641c6dcf0bf14e6794e2793d048c614ba85d537c; index 57 39229D64 is the task result recorded here.",
+    "FF2462BB production commit 81384186d39367dfb80648d9af695c266b96536a [AUTO:LOCALIZATION-LOCALIZATION_A-00001].",
+    "39229D64 production commit d6800a8919733d6053e801d284e2b037b726ad83 [AUTO:LOCALIZATION-LOCALIZATION_A-00001].",
+    "39229D64 result-record commit 2464ebdb7802e4104b258e5ff2fab951922c25e4.",
+    "Superseded FF51 experimental runner removed from current tree; canonical result is localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/."
   ],
   "result_sha": "d6800a8919733d6053e801d284e2b037b726ad83",
-  "note": "No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed.",
+  "note": "GitHub-only work. No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. No real-game test performed; RUNTIME_VALIDATION=UNTESTED.",
   "production_commit_sha": "d6800a8919733d6053e801d284e2b037b726ad83",
   "result_record_commit_sha": "2464ebdb7802e4104b258e5ff2fab951922c25e4"
 }
