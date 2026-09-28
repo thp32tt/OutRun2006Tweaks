@@ -13,6 +13,7 @@ $parseFiles = @(
     'Test-BackendSelectorTransaction.ps1',
     'Test-RunOutRunVRFailureDiagnostics.ps1',
     'Run-OutRunVRTest.ps1',
+    'OutRunVR-TestProfiles.ps1',
     'OutRunVR-Test-Selector.ps1',
     'Build-OutRunPCFast.ps1',
     'Acquire-OutRunDXVK.ps1',
@@ -32,6 +33,50 @@ foreach ($name in $parseFiles) {
             "{0}:{1} {2}" -f $_.Extent.StartLineNumber,$_.Extent.StartColumnNumber,$_.Message
         }) -join '; '
         throw "PowerShell syntax error in $name :: $detail"
+    }
+}
+
+$profileLib = Join-Path $toolsRoot 'OutRunVR-TestProfiles.ps1'
+. $profileLib
+$performanceProfile = Get-OutRunVRTestProfile -Name PERFORMANCE
+foreach ($requiredArg in @(
+    '-FramerateLimit=0',
+    '-FramerateInterpolation=true',
+    '-FramerateUnlockExperimental=true',
+    '-FrameCadenceMode=1',
+    '-FrameCadenceTargetHz=0',
+    '-DisableDesktopVsync=true'
+)) {
+    if ($performanceProfile.Arguments -notcontains $requiredArg) {
+        throw "PERFORMANCE profile cadence contract missing: $requiredArg"
+    }
+}
+foreach ($forbiddenArg in @(
+    '-FramerateLimit=60',
+    '-FramerateInterpolation=false',
+    '-FramerateUnlockExperimental=false',
+    '-FrameCadenceMode=0',
+    '-DisableDesktopVsync=false'
+)) {
+    if ($performanceProfile.Arguments -contains $forbiddenArg) {
+        throw "PERFORMANCE profile still contains conservative cadence override: $forbiddenArg"
+    }
+}
+if ([string]$performanceProfile.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -ne '1') {
+    throw 'PERFORMANCE profile does not enable OUTRUN_VR_PERFORMANCE_PROFILE.'
+}
+
+$runnerPerformanceText = Get-Content (Join-Path $toolsRoot 'Run-OutRunVRTest.ps1') -Raw
+foreach ($requiredText in @(
+    "$cleanDxvkPerformance = ($backend -eq 'dxvk-safe' -and $TestProfile -eq 'PERFORMANCE')",
+    "if($backend -eq 'd3d9' -or $cleanDxvkPerformance)",
+    "$gameArgs += '-HudInspector=false'",
+    "if($backend -ne '2d' -and -not $cleanDxvkPerformance)",
+    '"cleanDxvkPerformance=$cleanDxvkPerformance"',
+    '"shaderFingerprintEnabled=$($backend -ne ''2d'' -and -not $cleanDxvkPerformance)"'
+)) {
+    if ($runnerPerformanceText -notmatch [regex]::Escape($requiredText)) {
+        throw "DXVK clean-performance runner contract missing: $requiredText"
     }
 }
 
