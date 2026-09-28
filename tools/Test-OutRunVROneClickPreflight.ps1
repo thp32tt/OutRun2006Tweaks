@@ -81,6 +81,25 @@ $sourceShaPath = Require-File (Join-Path $d3d9Backend 'SOURCE_SHA.txt') 'Backend
 $sourceSha = (Get-Content $sourceShaPath -Raw).Trim()
 if ([string]::IsNullOrWhiteSpace($sourceSha)) { throw 'Backend SOURCE_SHA.txt is empty.' }
 
+$buildInputsPath = Require-File (Join-Path $root 'BUILD_INPUTS.json') 'BUILD_INPUTS.json'
+try {
+    $buildInputs = Get-Content $buildInputsPath -Raw | ConvertFrom-Json
+} catch {
+    throw "Invalid BUILD_INPUTS.json: $($_.Exception.Message)"
+}
+if ([string]$buildInputs.IntegrationSha -ne $sourceSha) {
+    throw "Package source mismatch: BUILD_INPUTS=$($buildInputs.IntegrationSha) payload=$sourceSha"
+}
+if ([string]$buildInputs.DevelopmentBranch -ne [string]$target.DevelopmentBranch) {
+    throw "Package branch mismatch: BUILD_INPUTS=$($buildInputs.DevelopmentBranch) target=$($target.DevelopmentBranch)"
+}
+if ([string]$buildInputs.RendererTarget -ne [string]$target.RendererTarget) {
+    throw "Package renderer mismatch: BUILD_INPUTS=$($buildInputs.RendererTarget) target=$($target.RendererTarget)"
+}
+if ([string]$buildInputs.LaunchBackend -ne [string]$target.LaunchBackend) {
+    throw "Package launch backend mismatch: BUILD_INPUTS=$($buildInputs.LaunchBackend) target=$($target.LaunchBackend)"
+}
+
 $report = [ordered]@{
     SchemaVersion = 1
     VerifiedUtc = (Get-Date).ToUniversalTime().ToString('o')
@@ -91,6 +110,14 @@ $report = [ordered]@{
     ResolvedBackend = $resolvedBackend
     VariantId = [string]$target.VariantId
     SourceSha = $sourceSha
+    PackageBuildInputs = [ordered]@{
+        BuildMatrixId = [string]$buildInputs.BuildMatrixId
+        IntegrationSha = [string]$buildInputs.IntegrationSha
+        DevelopmentBranch = [string]$buildInputs.DevelopmentBranch
+        RendererTarget = [string]$buildInputs.RendererTarget
+        DevelopmentStage = [string]$buildInputs.DevelopmentStage
+        LaunchBackend = [string]$buildInputs.LaunchBackend
+    }
     Game = Get-Identity $gamePath 0x014C
     GameVrDll = Get-Identity $gameDllPath 0x014C
     OpenXrHost = Get-Identity $hostPath 0x8664
