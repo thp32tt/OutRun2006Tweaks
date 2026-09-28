@@ -52,14 +52,16 @@ namespace OutRunVR::DisasmContract
     // High-value producer ranges already recovered by analyze_outrun_exe.py.
     // Keep this deliberately small: backend code must not invent primitive,
     // alpha, depth or cull heuristics when exact game provenance exists.
-    inline constexpr std::array<ProducerRange, 23> CriticalProducerRanges = {{
+    inline constexpr std::array<ProducerRange, 25> CriticalProducerRanges = {{
         { 0x0005B300u, 0x0005B700u, SpacePolicy::WorldBillboard }, // HeartDisp_car_heart
+        { 0x00060900u, 0x00061100u, SpacePolicy::ScreenHud },      // ctrl_icon_work
         { 0x00081A00u, 0x00081B00u, SpacePolicy::ScreenHud },      // C2C_Fruit
         { 0x00081B00u, 0x00081C00u, SpacePolicy::ScreenHud },      // C2C_Heart
         { 0x00096A80u, 0x00096D00u, SpacePolicy::ScreenHud },      // C2CSpeechBubble
         { 0x000B9000u, 0x000B9200u, SpacePolicy::ScreenHud },      // DispGearPosition
         { 0x000B9E00u, 0x000BA100u, SpacePolicy::ScreenHud },      // DispRank
         { 0x000BAD20u, 0x000BB320u, SpacePolicy::WorldBillboard }, // RankMarker/sub_4BAD20
+        { 0x000BBA00u, 0x000BBC00u, SpacePolicy::ScreenHud },      // DispTempHeartNum
         { 0x000BD2E0u, 0x000BD360u, SpacePolicy::ScreenHud },      // C2CTestSlipstream
         { 0x000BD360u, 0x000BD500u, SpacePolicy::ScreenHud },      // C2CDontLoseGF
         { 0x000BD900u, 0x000BE100u, SpacePolicy::ScreenHud },      // GhostGap
@@ -116,6 +118,8 @@ namespace OutRunVR::DisasmContract
     static_assert(ClassifyCriticalProducer(0x000B9E00u) == SpacePolicy::ScreenHud);
     static_assert(ClassifyCriticalProducer(0x000BAD20u) == SpacePolicy::WorldBillboard);
     static_assert(IsRankMarkerCall(0x000BB0FBu));
+    static_assert(IsScreenHudProducer(0x00060900u));
+    static_assert(IsScreenHudProducer(0x000BBA00u));
     static_assert(IsScreenHudProducer(0x000BE300u));
     static_assert(IsWorldBillboardProducer(0x0005B300u));
 }
