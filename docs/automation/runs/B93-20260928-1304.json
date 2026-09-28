@@ -1,15 +1,16 @@
 {
   "task_id": "B93-20260928-1304",
   "target_branch": "korean-localization-clean",
-  "base_sha": "ebfe391b937a4b0c50259bffef2070032c9c4977",
+  "base_sha": "a42b4d2b92fede1f6a6406585ded20aa97af3b0b",
   "result_sha": "PENDING",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "summary": "Run B lane exact-bbox rework for 2DA43E41 index 94 from current GitHub HEAD only; revalidate all 11 elements and preserve HD DDS structure/orientation.",
+  "summary": "Retry B93 after correcting actual RGBA32 DDS channel masks observed in GitHub Actions; candidate was not modified by failed attempt 1.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
-    "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json"
+    "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json",
+    "GitHub Actions run 36377946019 failed safely on DDS mask preflight before any candidate write."
   ],
-  "attempt": 1
+  "attempt": 2
 }
