@@ -134,3 +134,32 @@ Priority:
 3. measure R14 external-write hook misses before optimization;
 4. review Reset/DirectGPU generation boundaries;
 5. defer visual tuning until frozen R71 HMD evidence is returned.
+
+## Cycle 0007 — zero-copy ownership revalidation / skipped-ACK residual
+
+Review lenses:
+1. DirectGPU producer-slot ownership;
+2. zero-copy control flow;
+3. projection-failure lifetime;
+4. skipped-frame ACK durability;
+5. STOPPING/reference-space/presentation watermark advancement.
+
+Findings:
+- Existing `VR-R41-SKIPPED-DIRECT-PREMATURE-ACK-001` is **not reproduced on the current R71 zero-copy path**. `R23StageDirectHold` now borrows the validated shared SRVs and does not queue the historical pre-projection `CopyResource` pair. If a fresh projection actually queues D3D11 work and fails, `R23ArmDeferredReferenceAck` inserts a D3D11 EVENT after that work. The latest-frame skip path checks `R23DeferredSlotBlocked` and does not immediate-ACK that touched identity.
+- Existing `VR-R41-SKIPPED-DIRECT-ACK-LOSS-001` remains **OPEN**. For a truly never-sampled older frame, `PublishCompletedFrame(frame)` is still a one-shot call; failure creates no durable retry owner. Once a newer frame or a transition advances `lastProcessedStereoFrame`, the failed older release can become unreachable.
+- STOPPING, LOCAL reference-space change and gameplay/theater presentation changes still assign a latest frame to `lastProcessedStereoFrame` without first transferring all never-touched current-run DirectGPU releases through that watermark into durable ownership.
+
+No runtime source was changed in this cycle. This intentionally avoids re-porting obsolete CopyResource ownership logic from older branches.
+
+- AUTOMATION_VALIDATION: `STATIC_CONTROL_FLOW_REVIEW`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: Cycle 0008 should extract/test a durable never-sampled release queue keyed by full producer identity `clientPid + runGeneration + transportGeneration + slot + frameId`; sampled/touched frames stay on EVENT-backed ownership.
+
+## Cycle 0008 — queued
+
+Priority:
+1. pure LEVEL0 skipped-release identity/retry state machine;
+2. transition release-before-watermark advancement;
+3. exact run/generation rollback rejection;
+4. consume exact-parent CI;
+5. keep the current zero-copy/deferred-event path unchanged.
