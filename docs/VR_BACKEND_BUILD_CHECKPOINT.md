@@ -19,3 +19,5 @@ Identity-sealed checkpoint: BUILD_INPUTS, target metadata and backend SOURCE_SHA
 
 Code-freeze build checkpoint: one-click runtime, analyzers and syntax gates are wired; only build failures should change source after this point.
 
+Final target-locked checkpoint: normal one-click execution cannot switch away from this branch target without explicit developer override.
+
