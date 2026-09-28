@@ -99,3 +99,12 @@ Task `CONVERSION-DXVK-00015` added diagnostics-only classification for the curre
 Exact source `b1057f02048048967b75e730c0952a4f8cad59ec` passed Backend Conversion Gate `36458351684`, Build `36458357368`, OpenXR architecture `36458357496`, and HUD Inspector `36458357217`. No HMD/game test was performed by this task.
 
 The next Quest 3 / VDXR bundle can now distinguish `DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED`, `DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED`, `DXVK_HOST_OWNED_IMPORT_FAILED`, and `DXVK_HOST_OWNED_DIRECTGPU_ACTIVE`. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` remains OPEN until DirectFrames > 0, fallback reduction, same-scene pacing recovery, and visual/startup regression checks pass.
+
+
+## 2026-09-29 — DXVK host-owned transport synchronization contract guarded
+
+Task `CONVERSION-DXVK-00017` added a CI-only contract for the host-owned DXVK shared-eye transport. It verifies that the DXVK bridge inherits the established DirectGPU synchronization/lifetime model instead of silently becoming a weaker parallel protocol: full left/right ring allocation precedes ready publication, bridge reads are seqlock-stable and identity/generation checked, producer EVENT completion precedes publication, published slots remain immutable until an exact R13 per-slot ACK, and R23 stages both eyes into host-owned hold textures before validated projection use.
+
+The first gate `36461911548` and follow-up `36462121987` exposed verifier-only false failures (an occurrence-count assumption and a comment-text marker). Those were replaced with concrete allocation and control-flow markers; no transport behavior was weakened. Final exact SHA `561f2fee1d000eee2334fc45e08e8b199ec063bc` passed Backend Conversion Gate `36462406084`, Build `36462414296`, OpenXR architecture `36462414281`, and HUD Inspector `36462414245`.
+
+This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` remains OPEN. Quest 3 / VDXR evidence is still required for DirectFrames, fallback reduction, pacing recovery and visual/startup regression checks.

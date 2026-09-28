@@ -120,5 +120,14 @@
       "DXVK_HOST_OWNED_DIRECTGPU_ACTIVE"
     ],
     "interpretation_rule": "Bridge-ready is not success. Runtime transport success requires game import/path activation and DirectFrames>0, then pacing/visual regression gates."
+  },
+  "host_owned_transport_sync_contract": {
+    "task_id": "CONVERSION-DXVK-00017",
+    "result_sha": "561f2fee1d000eee2334fc45e08e8b199ec063bc",
+    "automation_validation": "PASS",
+    "validation_run_id": 36462406084,
+    "verifier": "tools/verify_dxvk_host_owned_transport_contract.py",
+    "runtime_validation": "UNTESTED",
+    "interpretation": "Static synchronization/lifetime inheritance is guarded, but this does not prove the DXVK host-owned transport opens or performs correctly on Quest3/VDXR."
   }
 }

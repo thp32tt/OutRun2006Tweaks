@@ -472,6 +472,23 @@
           "DXVK_HOST_OWNED_DIRECTGPU_ACTIVE"
         ],
         "runtime_problem_status_unchanged": true
+      },
+      "hostOwnedTransportSyncContract": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00017",
+        "result_sha": "561f2fee1d000eee2334fc45e08e8b199ec063bc",
+        "validation_run_id": 36462406084,
+        "verifier": "tools/verify_dxvk_host_owned_transport_contract.py",
+        "protected_invariants": [
+          "bridge publish after complete left/right ring allocation",
+          "seqlock-stable bridge snapshot and valid header/flags/hostPid/generation",
+          "generation-bound DirectTransport resource import",
+          "producer EVENT completion before publication",
+          "published slot immutable until exact per-slot consumer ACK identity/completion",
+          "host-owned D3D11 hold copy before validated projection use"
+        ],
+        "review_basis": "VR_BACKEND_100_REVIEW_SET_07 S07-R01..R09",
+        "runtime_problem_status_unchanged": true
       }
     }
   ],
