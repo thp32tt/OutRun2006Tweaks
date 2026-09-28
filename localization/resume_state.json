@@ -7,9 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "B94: A064FDFC exact source-diff bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game.",
-    "B92: 62BEBF33 and E3FD08BE reworked; exact source-bbox self-QA PASS, edge-touch high-risk, pending independent C and isolated DDS_ONLY in-game.",
-    "Remaining C85 REWORK production: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
+    "C86: 62BEBF33 and E3FD08BE independently revalidated from current GitHub DDS; exact bbox containment PASS but top edge-touch high-risk. Keep unapproved until isolated DDS_ONLY in-game validation.",
+    "Remaining C85 production REWORK assets: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
     "C85 static PASS pending in-game remains: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77.",
     "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK."
   ],
@@ -1272,5 +1271,26 @@
     "direct_queue_scope": 126,
     "approved_dds_count": 0,
     "runtime_validation": "PENDING_ISOLATED_DDS_ONLY_INGAME"
+  },
+  "c86_b92_dxt5_final_qa": {
+    "timestamp_kst": "2026-09-28T13:20:00+09:00",
+    "report": "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
+    "base_head": "1697658f30d5178c89e223d03a296848433b2110",
+    "assets": {
+      "62BEBF33": {
+        "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
+        "result": "CONTAINMENT_PASS_HIGH_RISK_PENDING_INGAME"
+      },
+      "E3FD08BE": {
+        "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
+        "result": "CONTAINMENT_PASS_HIGH_RISK_PENDING_INGAME"
+      }
+    },
+    "independent_binary_revalidation": "PASS",
+    "approved_dds_changes": 0,
+    "approved_dds_count": 0,
+    "remaining_rework_assets": 10,
+    "build_performed": false,
+    "vr_ffb_changes": false
   }
 }
