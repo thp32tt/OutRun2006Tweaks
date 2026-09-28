@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - vr-d3d9ex-candidate/r69-perf-p4
+      - vr-d3d9ex-candidate/r69-perf-p5
     paths:
       - 'src/vr/**'
       - 'vrhost/**'
@@ -120,7 +120,7 @@ jobs:
           @(
             'OUTRUN R69 PERFORMANCE TEST ORDER'
             ''
-            '1. Test PERF_D_P4 first.'
+            '1. Test PERF_D_P5 first.'
             '2. If visuals are correct and the bad frame-drop section improves, stop.'
             '3. If D regresses visually, test PERF_C_P2.'
             '4. If C is good but D is bad, the regression is P3/P4.'
