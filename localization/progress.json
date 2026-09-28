@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T23:37:00+09:00",
+  "updated_at_kst": "2026-09-29T00:46:46+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "W00002 C barrier reconciled: A00008 BLOCKED_NO_ACTION + B00009 GitHub-source-byte blocker; no candidate DDS changed and no new approvals. Continue next A+B wave only where canonical/HD source bytes are available in GitHub; isolated DDS_ONLY in-game validation remains mandatory.",
+  "next_checkpoint": "W00004 C barrier reconciled: A00014 and B00015 are durable blockers with no new candidate DDS bytes. Preserve current C85/C86 zero-pixel/HOLD states; isolate the 16-DDS graphics payload one DDS at a time for runtime size/scaling/alpha/position diagnosis before any approval or runtime-sensitive rewrite.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -531,17 +531,26 @@
       }
     },
     "latest_c_barrier": {
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
-      "wave_id": "W00003",
-      "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
-      "base_head": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
-      "lane_a": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
-      "lane_b": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00016",
+      "wave_id": "W00004",
+      "result": "NO_NEW_ASSET_APPROVALS_RUNTIME_ISOLATION_BLOCKER_STATE_RECONCILED",
+      "base_head": "cb081778f6e0ccaaab255f51d3be13cc0105620b",
+      "lane_a": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+      "lane_b": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
       "candidate_dds_modified": false,
-      "asset_queue_modified": false,
+      "asset_queue_modified": true,
+      "asset_queue_status_changed": false,
+      "asset_queue_note_rows": [
+        51,
+        53,
+        94,
+        102,
+        111,
+        121
+      ],
       "approved_dds_count": 0,
       "runtime_validation": "UNTESTED",
-      "report": "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json"
+      "report": "localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json"
     }
   },
   "data_build": {
@@ -618,14 +627,23 @@
     },
     "clean_k1_ci_run_id": 36017712385,
     "incident_20260928": {
-      "status": "RETEST_REQUIRED",
+      "status": "PARTIAL_USER_TEST_NO_CRASH_WITH_VISUAL_FAILURES",
       "failed_package": "OutRun2_Korean_HD_Text_Test_20260927.zip",
       "crash": "0xC0000005 VCRUNTIME140.dll memmove via DINPUT8 TextureReplacement::D3DXCreateTextureFromFileInMemory_Custom_dest",
       "text_only": "RETEST_REQUIRED",
       "dds_candidates": "SUSPECT_UNISOLATED",
-      "combined": "BLOCKED",
+      "combined": "DIAGNOSTIC_NO_CRASH_BUT_VISUAL_FAILURES",
       "release": "BLOCKED",
-      "incident_report": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md"
+      "incident_report": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md",
+      "diagnostic_configuration": "UseNewTextureAllocator=false; EnableTextureCache=false; SceneTextureReplacement=false",
+      "diagnostic_user_feedback_recorded_in_git": true,
+      "diagnostic_crash_reproduced": false,
+      "root_cause": "UNPROVEN",
+      "text_runtime_observation": "Korean runtime text coverage visibly sparse; many UI labels remain DDS/sprite graphics",
+      "graphics_runtime_observation": "Aggregate 16-DDS graphics payload shows size/scaling, alpha/transparency, or sprite-position failures",
+      "per_dds_attribution": false,
+      "per_dds_approval_evidence": false,
+      "latest_c_runtime_validation": "UNTESTED"
     }
   },
   "graphics_zero_tolerance_boundary_audit": {

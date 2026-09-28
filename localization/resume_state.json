@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "W00001 C barrier: A00006 durable BLOCKED_NO_ACTION (568D3696 DXT5 exact-safe rework blocked; C075FB49 6 overlap/artwork-sensitive failures remain).",
-    "W00001 C barrier: B00005 durable review preserved B95/B94/B93/B92/C86 evidence; no duplicate DDS rework.",
-    "62BEBF33 and E3FD08BE: C86 decoded-pixel containment PASS but exact bbox top edge-touch high-risk; isolated DDS_ONLY in-game validation required before approval.",
-    "Next A+B wave: continue disjoint odd/even queue from REWORK_REQUIRED then unfinished localize_text/zoom_review; do not repeat current blockers without new safe evidence.",
-    "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK."
+    "W00004 C barrier: A00014 and B00015 are durable blockers; neither lane changed candidate DDS bytes.",
+    "Isolate the current 16 graphics candidates one DDS at a time in-game before runtime-sensitive rework or approval; inspect size/scaling ratio, alpha/transparency geometry, and sprite position.",
+    "Odd REWORK rows 51/53/111/121 remain blocked on source-faithful or decoded-pixel-safe reconstruction evidence; do not speculate.",
+    "Even REWORK row 94 remains the exhausted B93 safe blocker; row 102 has no new production input and requires isolated DDS_ONLY reapproval evidence.",
+    "Full queue remains active: 63 pending_artwork and 47 blocked_review rows plus runtime-blocked font/name-entry work; approved DDS count remains 0."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -1385,17 +1385,26 @@
     "next_action": "Next A+B wave remains source-gated on GitHub-available canonical/HD DDS bytes; preserve existing REWORK/HOLD/PENDING_C states and require isolated DDS_ONLY in-game validation before approval."
   },
   "latest_wave_barrier": {
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
-    "wave_id": "W00003",
-    "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
-    "base_head": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
-    "lane_a": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
-    "lane_b": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00016",
+    "wave_id": "W00004",
+    "result": "NO_NEW_ASSET_APPROVALS_RUNTIME_ISOLATION_BLOCKER_STATE_RECONCILED",
+    "base_head": "cb081778f6e0ccaaab255f51d3be13cc0105620b",
+    "lane_a": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+    "lane_b": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
     "candidate_dds_modified": false,
-    "asset_queue_modified": false,
+    "asset_queue_modified": true,
+    "asset_queue_status_changed": false,
+    "asset_queue_note_rows": [
+      51,
+      53,
+      94,
+      102,
+      111,
+      121
+    ],
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json"
+    "report": "localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json"
   },
   "c88_w00003_barrier": {
     "recorded_at_kst": "2026-09-28T23:37:00+09:00",
@@ -1458,6 +1467,86 @@
         "C86 containment PASS high-risk edge-touch pending isolated DDS_ONLY in-game: 62BEBF33, E3FD08BE",
         "Existing REWORK_REQUIRED, self-QA-pending-C, pending_artwork, blocked_review and runtime-blocked rows remain unpromoted"
       ]
+    }
+  },
+  "c89_w00004_barrier": {
+    "recorded_at_kst": "2026-09-29T00:46:46+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00016",
+    "wave_id": "W00004",
+    "result": "NO_NEW_ASSET_APPROVALS_RUNTIME_ISOLATION_BLOCKER_STATE_RECONCILED",
+    "base_head": "cb081778f6e0ccaaab255f51d3be13cc0105620b",
+    "lane_a": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+    "lane_b": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+    "candidate_dds_modified": false,
+    "asset_queue_modified": true,
+    "asset_queue_status_changed": false,
+    "asset_queue_note_rows": [
+      51,
+      53,
+      94,
+      102,
+      111,
+      121
+    ],
+    "approved_dds_count": 0,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json",
+    "lane_terminals": {
+      "A": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00014",
+        "commit": "1f1b702d636e9a87e27f317bbfffd78a044c9524",
+        "corrective_gate_commit": "1bb9e6e20861d3272ff1bd71384277733da77baa",
+        "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+        "candidate_dds_modified": false,
+        "automation_validation": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "B": {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00015",
+        "commit": "cb081778f6e0ccaaab255f51d3be13cc0105620b",
+        "result": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+        "candidate_dds_modified": false,
+        "automation_validation": "PASS",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    "queue_recompute": {
+      "rows": 137,
+      "actions": {
+        "localize_text": 79,
+        "font_pipeline": 9,
+        "hangul_name_entry": 1,
+        "zoom_review": 47,
+        "preserve_brand_song_credit": 1
+      },
+      "statuses": {
+        "c85_pixel_visual_pass_pending_ingame": 4,
+        "blocked_runtime_font": 9,
+        "blocked_runtime_name_entry": 1,
+        "blocked_review": 47,
+        "pending_artwork": 63,
+        "rework_required_zero_pixel_or_artifact": 6,
+        "b95_self_qa_pass_pending_c": 1,
+        "a_auto_self_qa_pass_pending_c": 1,
+        "b94_self_qa_pass_pending_c": 1,
+        "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+        "c86_containment_pass_high_risk_pending_ingame": 2,
+        "preserve_original": 1
+      },
+      "direct_image_scope": 126
+    },
+    "cross_lane_qa": {
+      "previous_c_barrier_commit": "3c95c44e5a2a35bb8c7af616ff5a0f93e4ff069e",
+      "commits_since_previous_c_barrier": 11,
+      "new_candidate_bytes_to_review": 0,
+      "new_hd_source_bytes_to_review": 0,
+      "new_approvals": 0,
+      "repeated_completed_work": false,
+      "semantic_context_review": "NO_NEW_TRANSLATION_OR_ARTWORK_BYTES; current reviewed terminology/context preserved",
+      "zero_pixel_boundary_review": "NO_NEW_ASSET_WRITE; C85/C86 machine-readable evidence preserved",
+      "dds_format_mipmap_alpha_orientation": "NO_NEW_ASSET_WRITE; current validated evidence preserved",
+      "background_wrong_replacement_hd_gui": "NO_NEW_ASSET_WRITE; aggregate runtime visual failures remain unisolated and are not per-DDS evidence",
+      "runtime_feedback": "Git-recorded user test did not reproduce the crash under the diagnostic configuration, but the 16-DDS aggregate graphics set still has size/scaling/alpha/position failures; root cause and offending DDS remain unproven"
     }
   }
 }

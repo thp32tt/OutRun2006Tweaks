@@ -1139,3 +1139,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Promotion remains blocked. Next graphics QA must prioritize runtime dimensions/scaling ratio, alpha/transparency geometry, and sprite-position compatibility before further visual polish; isolate offending DDS/assets before approval.
 - Current final approved DDS count remains 0.
 - RUNTIME_VALIDATION=PARTIAL_USER_TEST_NO_CRASH_WITH_VISUAL_FAILURES.
+
+## 2026-09-29 00:46 KST - W00004 C BARRIER (AUTO C-00016)
+
+- Re-fetched GitHub `korean-localization-clean` after W00004 A/B durable terminal results; reconciliation base HEAD: `cb081778f6e0ccaaab255f51d3be13cc0105620b`.
+- A terminal `LOCALIZATION-LOCALIZATION_A-00014` (current task-record commit `1f1b702d636e9a87e27f317bbfffd78a044c9524`, validated corrective gate commit `1bb9e6e20861d3272ff1bd71384277733da77baa`): `BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED`; no candidate DDS write.
+- B terminal `LOCALIZATION-LOCALIZATION_B-00015` (`cb081778f6e0ccaaab255f51d3be13cc0105620b`): `DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT`; no candidate DDS write.
+- Compared previous C barrier commit `3c95c44e5a2a35bb8c7af616ff5a0f93e4ff069e` through the W00004 pre-C HEAD: no `localization/graphics/hd_source/**.dds` or `hd_candidates/**.dds` changes and no previous asset-queue/canonical-progress/resume mutation.
+- Cross-lane C found **0 new candidate bytes to review** and made **0 new approvals**. C85/C86 zero-pixel, decoded-pixel, format/mipmap/alpha/orientation, background/artifact, and wrong-replacement evidence is preserved because the underlying DDS bytes are unchanged.
+- Git-recorded user runtime feedback is retained as partial external evidence: no crash reproduced under the diagnostic configuration, but aggregate 16-DDS visual failures remain unisolated. C did not perform that test and therefore records `RUNTIME_VALIDATION=UNTESTED` for this task.
+- Recomputed queue: 137 rows = 79 localize_text + 47 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only. Artwork statuses are unchanged; only notes for REWORK rows 51/53/94/102/111/121 were refreshed with W00004 blocker context.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are updated from identical content and remain byte-for-byte identical in this commit.
+- No N100/GPT Library/VR/FFB/DX/build work. Machine report: `localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json`.
+

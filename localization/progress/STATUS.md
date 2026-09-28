@@ -695,3 +695,15 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Final approved/locked count remains **0**. No real-game test was performed; `RUNTIME_VALIDATION=UNTESTED`. Isolated one-DDS-at-a-time in-game validation remains mandatory before approval.
 - `asset_queue.csv` required no row mutation because W00003 produced no new DDS/result state. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
 - Machine report: `localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json`.
+
+## W00004 C synchronization barrier — 2026-09-29 00:46 KST
+- GitHub-only reconciliation base HEAD: `cb081778f6e0ccaaab255f51d3be13cc0105620b`. A00014 and B00015 both have durable terminal records with `AUTOMATION_VALIDATION=PASS`; neither lane changed candidate DDS bytes.
+- Lane A `LOCALIZATION-LOCALIZATION_A-00014`: **BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED**. REWORK indices 51/53/111/121 remain blocked on source-faithful, decoded-pixel-safe, or overlap/artwork-sensitive reconstruction; no speculative DDS write was made.
+- Lane B `LOCALIZATION-LOCALIZATION_B-00015`: **DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT**. Index 94 remains the exhausted B93 safe blocker; index 102 has no new safe production input and still requires isolated DDS_ONLY reapproval evidence.
+- Delta from W00003 C commit `3c95c44e5a2a35bb8c7af616ff5a0f93e4ff069e` to the pre-C W00004 HEAD contains no `hd_source` or `hd_candidates` DDS changes and no prior queue/progress/resume mutation; only crash-diagnostic material, user runtime-feedback worklog, and A/B records were added.
+- Cross-lane C result: **NO_NEW_ASSET_APPROVALS**. Existing C85 pixel/visual PASS-pending-in-game evidence and C86 decoded-pixel high-risk HOLD evidence remain authoritative; completed binary/pixel QA was not repeated because the asset bytes did not change.
+- Git-recorded user runtime feedback: diagnostic configuration no longer reproduced the crash, but the aggregate 16-DDS graphics set still shows size/scaling, alpha/transparency, or sprite-position failures. This is not per-DDS approval evidence and does not prove root cause.
+- Queue remains 137 rows = 79 localize_text + 47 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; statuses are unchanged. Notes were refreshed only for W00004-reviewed REWORK rows 51/53/94/102/111/121; approved/locked DDS count remains **0**.
+- No real-game test was performed by C; `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or build was used.
+- Machine report: `localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json`.
+
