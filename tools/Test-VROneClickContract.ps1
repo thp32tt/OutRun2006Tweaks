@@ -91,6 +91,7 @@ foreach ($requiredText in @(
 foreach ($required in @(
     'Invoke-OutRunVROneClick.ps1',
     'VR_ONE_CLICK_TARGET.json',
+    'ONE_RUN_VISUAL_CHECKLIST.txt',
     'START_HERE_VR_TEST.cmd',
     'Collect-OutRunVRLogs.ps1'
 )) {
@@ -100,6 +101,9 @@ foreach ($required in @(
 }
 
 $collector = Get-Content (Join-Path $toolsRoot 'Collect-OutRunVRLogs.ps1') -Raw
+if ($collector -notmatch [regex]::Escape("VisualGateChecklist='ONE_RUN_VISUAL_CHECKLIST.txt'")) {
+    throw 'Collector does not bind the one-run visual gate into analysis metadata.'
+}
 if ($collector -notmatch [regex]::Escape('VR_ONE_CLICK_PREFLIGHT.json')) {
     throw 'Collector does not preserve one-click preflight report.'
 }
