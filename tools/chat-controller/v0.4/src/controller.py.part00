@@ -9,6 +9,9 @@ import os
 import re
 import threading
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -27,8 +30,19 @@ AUTO_SEND_REQUESTED = os.getenv("AUTO_SEND", "false").lower() == "true"
 PROJECT_SCOPE_READY = bool(CHATGPT_PROJECT_URL) or not REQUIRE_PROJECT_URL
 AUTO_SEND = AUTO_SEND_REQUESTED and PROJECT_SCOPE_READY
 CONTROLLER_MODE = os.getenv("CONTROLLER_MODE", "localization").strip().lower()
-if CONTROLLER_MODE not in {"localization", "vr"}:
-    raise ValueError(f"Unsupported CONTROLLER_MODE={CONTROLLER_MODE!r}; expected localization or vr")
+if CONTROLLER_MODE == "vr":
+    CONTROLLER_MODE = "conversion"
+if CONTROLLER_MODE not in {"localization", "conversion"}:
+    raise ValueError(f"Unsupported CONTROLLER_MODE={CONTROLLER_MODE!r}; expected localization or conversion")
+
+QUEUE_MODE = os.getenv("QUEUE_MODE", "true").lower() == "true"
+QUEUE_CHECK_SECONDS = max(10, int(os.getenv("QUEUE_CHECK_SECONDS", "15")))
+QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
+QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
+GITHUB_POLL_SECONDS = max(60, int(os.getenv("GITHUB_POLL_SECONDS", "180")))
+MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
+GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
 CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
 ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
@@ -56,6 +70,7 @@ PROFILE_DIR = Path("/data/browser-profile")
 STATE_DIR = Path("/data/state")
 REGISTRY_FILE = STATE_DIR / "chat_registry.json"
 RUNTIME_FILE = STATE_DIR / "runtime_status.json"
+QUEUE_FILE = STATE_DIR / "queue_state.json"
 PROMPTS_DIR = Path("/opt/outrun/prompts")
 LOG_FILE = Path("/logs/controller.log")
 
@@ -163,6 +178,11 @@ runtime = {
     "auto_send": AUTO_SEND,
     "auto_send_requested": AUTO_SEND_REQUESTED,
     "controller_mode": CONTROLLER_MODE,
+    "queue_mode": QUEUE_MODE,
+    "queue_check_seconds": QUEUE_CHECK_SECONDS,
+    "queue_stable_seconds": QUEUE_STABLE_SECONDS,
+    "github_poll_seconds": GITHUB_POLL_SECONDS,
+    "max_task_attempts": MAX_TASK_ATTEMPTS,
     "project_url_configured": bool(CHATGPT_PROJECT_URL),
     "require_project_url": REQUIRE_PROJECT_URL,
     "start_url": BASE_URL,
@@ -269,6 +289,148 @@ def save_registry(reg: Registry):
 def read_prompt(filename: str) -> str:
     path = PROMPTS_DIR / filename
     return path.read_text(encoding="utf-8").strip()
+
+
+def load_queue_state() -> dict:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    if not QUEUE_FILE.exists():
+        state = {
+            "counter": 0,
+            "active": None,
+            "completed": [],
+            "blocked": [],
+            "last_github_poll_at": None,
+        }
+        save_queue_state(state)
+        return state
+    try:
+        raw = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
+        raw.setdefault("counter", 0)
+        raw.setdefault("active", None)
+        raw.setdefault("completed", [])
+        raw.setdefault("blocked", [])
+        raw.setdefault("last_github_poll_at", None)
+        return raw
+    except Exception:
+        log.exception("queue state read failed; recreating")
+        state = {"counter": 0, "active": None, "completed": [], "blocked": [], "last_github_poll_at": None}
+        save_queue_state(state)
+        return state
+
+
+def save_queue_state(state: dict):
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    tmp = QUEUE_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(QUEUE_FILE)
+
+
+def github_api_json(path: str) -> dict:
+    url = "https://api.github.com" + path
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "outrun-chat-controller/0.5",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def github_branch_head(branch: str) -> Optional[str]:
+    try:
+        q = urllib.parse.quote(branch, safe="")
+        data = github_api_json(f"/repos/{GITHUB_REPO}/git/ref/heads/{q}")
+        return data.get("object", {}).get("sha")
+    except Exception as e:
+        log.warning("github branch lookup failed branch=%s error=%r", branch, e)
+        write_runtime(last_github_error=f"branch:{branch}:{e!r}")
+        return None
+
+
+def github_commit_message(sha: str) -> Optional[str]:
+    try:
+        data = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}")
+        return data.get("commit", {}).get("message", "")
+    except Exception as e:
+        log.warning("github commit lookup failed sha=%s error=%r", sha, e)
+        return None
+
+
+def github_gate_run(branch: str, sha: str, workflow_name: str) -> Optional[dict]:
+    try:
+        q = urllib.parse.urlencode({"branch": branch, "per_page": 30})
+        data = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
+        matches = [
+            r for r in data.get("workflow_runs", [])
+            if r.get("head_sha") == sha and r.get("name") == workflow_name
+        ]
+        if not matches:
+            return None
+        matches.sort(key=lambda r: r.get("created_at", ""), reverse=True)
+        r = matches[0]
+        return {
+            "id": r.get("id"),
+            "name": r.get("name"),
+            "status": r.get("status"),
+            "conclusion": r.get("conclusion"),
+            "html_url": r.get("html_url"),
+            "event": r.get("event"),
+        }
+    except Exception as e:
+        log.warning("github actions lookup failed branch=%s sha=%s error=%r", branch, sha, e)
+        write_runtime(last_github_error=f"actions:{branch}:{sha}:{e!r}")
+        return None
+
+
+def queue_target_for_slot(slot_name: str) -> dict:
+    if CONTROLLER_MODE == "conversion":
+        if slot_name == "B":
+            return {
+                "lane": "DXVK",
+                "branch": "vr-dxvk-r71-disasm",
+                "workflow": "Backend Conversion Gate",
+            }
+        return {
+            "lane": "DX11",
+            "branch": "vr-dx11-native-r71",
+            "workflow": "Backend Conversion Gate",
+        }
+    role = slot_name if slot_name in {"A", "B", "C"} else "A"
+    return {
+        "lane": f"LOCALIZATION_{role}",
+        "branch": "korean-localization-clean",
+        "workflow": "Localization Automation Gate",
+    }
+
+
+def queue_dynamic_prefix() -> str:
+    task_id = str(runtime.get("queue_task_id") or "").strip()
+    if not task_id:
+        return ""
+    lane = str(runtime.get("queue_lane") or "")
+    branch = str(runtime.get("queue_branch") or "")
+    attempt = int(runtime.get("queue_attempt") or 1)
+    failure = str(runtime.get("queue_failure_context") or "").strip()
+    lines = [
+        f"[자동 큐 작업] TASK_ID={task_id}",
+        f"LANE={lane}",
+        f"TARGET_BRANCH={branch}",
+        f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
+        "반드시 GitHub만 직접 사용하고 N100 로컬 저장소로 우회하지 마.",
+        "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
+        "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
+        "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
+    ]
+    if failure:
+        lines += [
+            "",
+            "이전 자동 검증이 실패했다. 같은 실패를 그대로 반복하지 말고 GitHub Actions 결과를 직접 확인해 원인을 수정해.",
+            "FAILURE_CONTEXT=" + failure,
+        ]
+    return "\n".join(lines) + "\n\n"
 
 
 async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
