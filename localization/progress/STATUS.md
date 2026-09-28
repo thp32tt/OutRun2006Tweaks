@@ -828,3 +828,16 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Combined canonical semantic validation **48/48**. Queue **137 = 95 localize_text / 31 zoom_review / 9 font / 1 Hangul name-entry / 1 preserve-only**; pending production localize_text **78**.
 - New full-asset static passes **0**; partial static segment passes **1**; runtime approvals **0**; approved DDS **0**. `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-0746-C101/C101_W00016_SYNC_FINAL_QA.json`.
+
+### C102 W00017 synchronization barrier — 2026-09-29T08:14:06+09:00
+- Barrier: PASS. A00053 `cf59cbf79091431fa4a88066e16981a0297d944b` and B00054 `41a95eddbef3d044206f4191fed9818621e245cb` are durable in current HEAD ancestry; later localization safeguards were preserved. Exact-SHA remote CI was not observed, so the remote gate remains pending.
+- A index 215 `C05E67EF`: accepted the new exact-HD source-derived GOAL A-E clean plate as reconstruction input. It removes 18,497 source alpha pixels with 0 RGB changes, 0 changes outside the source text mask, and 0 introduced alpha pixels. No Korean GOAL raster was emitted; no full-asset completion is claimed.
+- B indices 130/140/154/164: independently matched all **17/17 actually enumerated upstream references** (12 core HD/original/atlas + 5 working-source files). B00054 reports 6 working-source identities but enumerates 5; C records the corrected actual count without rewriting peer evidence.
+- Canonical semantics: B 16/16 pairs match transcription/artwork plan; A's five new GOAL pairs match and index 215 remains 6/6 including `15con. -> 15코스`. New W00017 reconstruction semantics match **21/21**. Index 140 remains source-mapping HOLD because upstream references expose a PRESS START/PRESS ENTER variant; exact Release HD DDS mapping is required before render.
+- W00017 changed **0 Korean DDS candidate bytes**. Hangul raster/clipping, zero-pixel containment, candidate DDS format/mipmap/alpha/transparency/orientation, compression round-trip, protected-artwork/background and ENGLISH SOURCE vs KOREAN CANDIDATE gates are not promoted to PASS; candidate-less assets remain `HOLD_STRICT_RECHECK`.
+- Queue unchanged: **137 = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only**; unresolved zoom-review 0; pending production localize_text 78; approved/locked DDS 0.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
+- No real-game test, N100/local clone, GPT Library, VR/FFB/DX work, or game build. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-0814-C102/C102_W00017_SYNC_FINAL_QA.json`.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`

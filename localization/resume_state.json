@@ -1,5 +1,5 @@
 {
-  "schema_version": 71,
+  "schema_version": 72,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,10 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Continue index 215 C05E67EF from the retained exact-HD partial candidate. Preserve the static-passing 15코스 segment; derive a source-faithful 골 treatment for GOAL A-E and require per-element zero-pixel containment plus exact ENGLISH SOURCE comparison before claiming full-asset static completion.",
-    "Use W00016 B00051 exact-HD reconstruction manifests for indices 86/100/106/128. Their 12 upstream source identities and all 42 canonical translations are pinned; map semantic strings to exact cells/text-only effect bboxes and preserve protected logos/model/song artwork before any DDS render.",
-    "Retain prior reconstruction-ready and dependency-blocked assets without repeating unchanged blocker reviews. W00016 adds one partial candidate but does not finish another localize_text asset, so pending production localize_text remains 78.",
-    "Keep runtime validation separate from production/static QA. C101 performed no real-game test; C05E67EF and the overall graphics set remain RUNTIME_VALIDATION=UNTESTED until user integrated-game evidence exists."
+    "Continue index 215 C05E67EF from A00053's exact-English-HD source-derived GOAL A-E clean plate. The prior 15con. -> 15코스 partial segment is historical static evidence only; do not reuse old Korean candidate pixels. Pin an approved source-faithful yellow-mask Hangul treatment, fit-before-render, then require per-element zero-pixel containment and exact ENGLISH SOURCE comparison before full-asset completion.",
+    "Continue W00017 B00054 indices 130/140/154/164 from the 17/17 actually enumerated and independently matched upstream references (12 core HD/original/atlas + 5 working-source files) and 16/16 canonical translation matches. B00054's summary count of 6 working-source identities is a metadata overcount; the report enumerates 5. Resolve exact semantic-to-cell/text-effect masks before any DDS render.",
+    "For index 140 31C58963, keep canonical PRESS START -> START 버튼 but do not guess source-cell mapping: upstream references expose a PRESS START/PRESS ENTER variant, so inspect/decode exact Release HD DDS before lettering. Other W00017 B assets remain fail-closed reconstruction inputs.",
+    "Queue remains 137 rows with 95 localize_text and 78 pending_artwork localize_text rows; unresolved zoom_review remains 0. Runtime remains separate: C102 performed no real-game test and RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -98,9 +98,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-29T07:46:09+09:00",
+      "updated_at_kst": "2026-09-29T08:14:06+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20260929-0746-C101/C101_W00016_SYNC_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20260929-0814-C102/C102_W00017_SYNC_FINAL_QA.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 203,
@@ -129,14 +129,27 @@
       "pending_production_localize_text": 78,
       "hold_strict_recheck_zoom_review": 0,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "W00016 C101 independently static-QA passed only the new C05E67EF 15코스 segment; five GOAL segments remain untouched/pending and four B-lane assets have reconstruction manifests without candidate DDS bytes. No runtime game validation was performed; full-asset completion, remaining production backlog, and integrated runtime validation are still pending.",
+      "promotion_hold_reason": "W00017 produced no new Korean DDS candidate bytes. A00053 advances C05E67EF with a source-derived GOAL clean plate but GOAL Korean lettering remains blocked; B00054 advances four assets with exact-HD reconstruction identities but no final candidate. Raster containment, glyph/clipping, DDS/alpha/orientation, compression-roundtrip, protected-artwork and ENGLISH SOURCE vs KOREAN CANDIDATE gates are not promoted to PASS. Runtime is UNTESTED.",
       "user_approved_locked": 0,
       "zoom_review_resolved_preserve_original": 31,
-      "queue_reconciled_at_kst": "2026-09-29T07:46:09+09:00",
+      "queue_reconciled_at_kst": "2026-09-29T08:14:06+09:00",
       "partial_pixel_visual_pass_assets": [
         "C05E67EF"
       ],
-      "partial_static_pass_segments": 1
+      "partial_static_pass_segments": 1,
+      "w00017_clean_plate_ready_indices": [
+        215
+      ],
+      "w00017_reconstruction_input_indices": [
+        130,
+        140,
+        154,
+        164
+      ],
+      "w00017_upstream_identity_validation": "PASS_A_1_OF_1_PLUS_B_17_OF_17_ENUMERATED__B_WORKING_SOURCE_COUNT_CORRECTED_6_TO_5",
+      "w00017_canonical_semantic_validation": "PASS_21_OF_21_NEW_WAVE__INDEX215_FULL_6_OF_6",
+      "w00017_candidate_dds_modified": false,
+      "runtime_validation": "UNTESTED"
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -703,25 +716,28 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_c_barrier": {
-      "run": "C101",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00052",
-      "wave_id": "W00016",
-      "result": "PASS_W00016_SYNC_FINAL_QA_1_PARTIAL_HD_SEGMENT_STATIC_PASS_4_RECONSTRUCTION_INPUTS_RUNTIME_UNTESTED",
+      "run": "C102",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00055",
+      "wave_id": "W00017",
+      "result": "PASS_W00017_SYNC_FINAL_QA_1_CLEAN_PLATE_4_RECONSTRUCTION_INPUTS_B_METADATA_COUNT_CORRECTED_RUNTIME_UNTESTED",
       "approved_dds_count": 0,
-      "material_backlog_action": "FINAL_QA_A00050_C05E67EF_PARTIAL_SEGMENT_AND_RECONCILE_B00051_RECONSTRUCTION_INPUTS",
+      "material_backlog_action": "FINALIZE_A00053_C05E67EF_CLEAN_PLATE_ELIGIBILITY_AND_RECONCILE_B00054_RECONSTRUCTION_INPUTS_WITH_WORKING_SOURCE_COUNT_CORRECTION",
       "static_pass_indices": [],
       "partial_static_pass_indices": [
         215
       ],
-      "reconstruction_input_indices": [
-        86,
-        100,
-        106,
-        128
+      "clean_plate_ready_indices": [
+        215
       ],
-      "upstream_source_blob_identity": "PASS_B_12_OF_12_PLUS_A_EXACT_HD_SOURCE_AND_CANDIDATE",
-      "canonical_semantic_translation_match": "PASS_48_OF_48",
-      "report": "localization/graphics/role_C/20260929-0746-C101/C101_W00016_SYNC_FINAL_QA.json",
+      "reconstruction_input_indices": [
+        130,
+        140,
+        154,
+        164
+      ],
+      "upstream_source_blob_identity": "PASS_A_1_OF_1_PLUS_B_17_OF_17_ENUMERATED__B_12_CORE_5_WORKING",
+      "canonical_semantic_translation_match": "PASS_21_OF_21_NEW_WAVE__INDEX215_FULL_6_OF_6",
+      "report": "localization/graphics/role_C/20260929-0814-C102/C102_W00017_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "zoom_review_unresolved": 6,
@@ -1415,43 +1431,42 @@
     "next_action": "Next A+B wave remains source-gated on GitHub-available canonical/HD DDS bytes; preserve existing REWORK/HOLD/PENDING_C states and require isolated DDS_ONLY in-game validation before approval."
   },
   "latest_wave_barrier": {
-    "recorded_at_kst": "2026-09-29T07:22:45+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00049",
-    "wave_id": "W00015",
-    "result": "PASS_W00015_SYNC_FINAL_QA_8_RECONSTRUCTION_INPUTS_0_NEW_DDS_STATIC_PASS_RUNTIME_UNTESTED",
-    "base_head": "39695007729513a325116d04bb7148efba0ccc19",
-    "canonical_state_commit": "27b5e52751ee9b2f7f3c02683a3bfeae1266a08e",
+    "recorded_at_kst": "2026-09-29T08:14:06+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00055",
+    "wave_id": "W00017",
+    "result": "PASS_W00017_SYNC_FINAL_QA_1_CLEAN_PLATE_4_RECONSTRUCTION_INPUTS_B_METADATA_COUNT_CORRECTED_RUNTIME_UNTESTED",
+    "base_head": "785528fee58a4f874a62b6e366f3a81d97f685f4",
     "lane_a": {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00047",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00053",
       "attempt": "1/3",
-      "result": "PASS_MATERIAL_FALLBACK_4_ODD_SOURCE_BBOX_MAPPING_INPUTS_GITHUB_ONLY",
-      "material_commit": "61ef749089e7e031b3a1d2ba2d351acae5e38db6",
-      "report": "localization/graphics/role_A/20260929-0705-A00047/A00047_W00015_ODD_RECONSTRUCTION_INPUTS.json",
+      "result": "PASS_MATERIAL_CLEAN_PLATE_RECONSTRUCTION_INPUT_NO_DDS_CANDIDATE_FAIL_CLOSED",
+      "material_commit": "cf59cbf79091431fa4a88066e16981a0297d944b",
+      "report": "localization/graphics/role_A/20260929-0754-A00053/A00053_C05E67EF_CLEAN_PLATE_RECONSTRUCTION.json",
       "runtime_validation": "UNTESTED"
     },
     "lane_b": {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00048",
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00054",
       "attempt": "1/3",
-      "result": "PASS_MATERIAL_FALLBACK_4_EVEN_EXACT_HD_DXT5_DECODED_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
-      "material_commit": "39695007729513a325116d04bb7148efba0ccc19",
-      "report": "localization/graphics/role_B/20260929-0710-B110/B110_W00015_EXACT_HD_DXT5_RECONSTRUCTION_INPUT.json",
+      "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_CLEAN_PLATE_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+      "material_commit": "41a95eddbef3d044206f4191fed9818621e245cb",
+      "report": "localization/graphics/role_B/20260929-0801-B112/B112_W00017_EXACT_HD_RECONSTRUCTION_INPUT.json",
       "runtime_validation": "UNTESTED"
     },
     "candidate_dds_modified": false,
     "c_reconciliation": {
-      "static_pass_indices": [],
-      "reconstruction_input_retained": [
-        55,
-        59,
-        89,
-        92,
-        98,
-        112,
-        119,
-        152
+      "clean_plate_ready": [
+        215
       ],
-      "translations_rechecked_segments": 17,
-      "upstream_source_blob_identity": "PASS_24_OF_24",
+      "reconstruction_input_retained": [
+        130,
+        140,
+        154,
+        164
+      ],
+      "translations_rechecked_new_segments": 21,
+      "upstream_source_blob_identity": "PASS_A_1_OF_1_PLUS_B_17_OF_17_ENUMERATED",
+      "b_declared_working_source_count": 6,
+      "b_actual_enumerated_working_source_count": 5,
       "new_static_passes": 0,
       "new_runtime_approvals": 0
     },
@@ -1465,19 +1480,12 @@
         "preserve_brand_song_credit": 1
       },
       "zoom_review_unresolved": 0,
-      "zoom_review_resolved_preserve_original": 31
-    },
-    "transcription": {
-      "assets": 95,
-      "segments": 750
-    },
-    "artwork_plan": {
-      "assets": 95,
-      "segments": 750
+      "zoom_review_resolved_preserve_original": 31,
+      "pending_production_localize_text": 78
     },
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-0722-C100/C100_W00015_SYNC_FINAL_QA.json"
+    "report": "localization/graphics/role_C/20260929-0814-C102/C102_W00017_SYNC_FINAL_QA.json"
   },
   "c88_w00003_barrier": {
     "recorded_at_kst": "2026-09-28T23:37:00+09:00",

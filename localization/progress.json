@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T07:46:09+09:00",
+  "updated_at_kst": "2026-09-29T08:14:06+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "W00016 C101 reconciliation: A00050/B00051 durable terminal commits and successful verify/validate/guard checks confirmed. C independently byte-validated index 215 C05E67EF against exact HD source: 512x256 RGBA32 pitch 2048 mip1, byte-identical 128-byte DDS header, 2423 alpha-only changed pixels confined to the reported 15con. region, zero introduced alpha outside the source region; 15con. -> 15코스 receives a touched-segment static PASS while GOAL A-E remain untouched/pending, so no full-asset static completion is claimed. B indices 86/100/106/128 retain exact-HD reconstruction manifests with 12/12 upstream blobs and 42/42 canonical translations matched; no Korean DDS candidates exist so raster gates remain HOLD_STRICT_RECHECK. Queue remains 137 rows = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; pending production localize_text remains 78; runtime UNTESTED.",
+  "next_checkpoint": "W00017 C102 reconciliation: A00053/B00054 durable terminal commits remain in current HEAD ancestry after newer localization safeguard commits. A index 215 C05E67EF source-derived GOAL A-E clean plate is accepted as material reconstruction input: 18497 source alpha pixels removed, RGB changes 0, changes outside source text mask 0, introduced alpha 0; no Korean GOAL raster was emitted, so full-asset completion is not claimed and the prior 15코스 touched-segment static evidence remains historical only. B indices 130/140/154/164 retain exact-HD reconstruction inputs; C independently matched all 17 actually enumerated B upstream references (12 core + 5 working), correcting B00054's summary overcount of 6 working sources, and matched all 16/16 B canonical translations. Across new W00017 reconstruction semantics 21/21 match canonical data; index 215 full canonical set remains 6/6. No W00017 Korean DDS candidate bytes changed, so glyph/clipping/zero-pixel/DDS/alpha/orientation/compression-roundtrip/background/protected-artwork/English-vs-Korean raster gates stay HOLD until candidates exist. Queue remains 137 rows = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; pending production localize_text remains 78; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

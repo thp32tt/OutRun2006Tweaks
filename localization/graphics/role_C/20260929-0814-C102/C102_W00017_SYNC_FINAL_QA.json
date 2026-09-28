@@ -1,0 +1,199 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00055",
+  "wave_id": "W00017",
+  "lane": "LOCALIZATION_C",
+  "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_RECONCILIATION",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T08:14:06+09:00",
+  "base_head_sha": "785528fee58a4f874a62b6e366f3a81d97f685f4",
+  "barrier_gate": "PASS_A_B_DURABLE_TERMINAL_IN_CURRENT_HEAD_ANCESTRY__EXACT_SHA_REMOTE_CI_NOT_OBSERVED",
+  "preserved_newer_safeguard_commits": [
+    "35b465ac76a1d233b44b54b94bf80518850d81d6",
+    "0d7b5e774088ec64f348df6cd5e0f2639f03215a",
+    "785528fee58a4f874a62b6e366f3a81d97f685f4"
+  ],
+  "lane_a": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00053",
+    "commit_sha": "cf59cbf79091431fa4a88066e16981a0297d944b",
+    "result": "PASS_MATERIAL_CLEAN_PLATE_RECONSTRUCTION_INPUT_NO_DDS_CANDIDATE_FAIL_CLOSED",
+    "indices": [
+      215
+    ],
+    "candidate_dds_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "lane_b": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00054",
+    "commit_sha": "41a95eddbef3d044206f4191fed9818621e245cb",
+    "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_CLEAN_PLATE_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+    "indices": [
+      130,
+      140,
+      154,
+      164
+    ],
+    "candidate_dds_modified": false,
+    "declared_core_source_identities": 12,
+    "declared_working_source_identities": 6,
+    "actual_enumerated_core_source_identities": 12,
+    "actual_enumerated_working_source_identities": 5,
+    "metadata_correction": "B00054 summary overcounts working_source identities by 1; peer evidence remains immutable and C reconciles the actual enumerated count as 5.",
+    "runtime_validation": "UNTESTED"
+  },
+  "source_identity_validation": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "lane_a_expected": 1,
+    "lane_a_matched": 1,
+    "lane_b_core_expected": 12,
+    "lane_b_core_matched": 12,
+    "lane_b_working_enumerated": 5,
+    "lane_b_working_matched": 5,
+    "total_enumerated_expected": 18,
+    "total_enumerated_matched": 18,
+    "result": "PASS_A_1_OF_1_PLUS_B_17_OF_17_ENUMERATED__B_WORKING_SOURCE_COUNT_CORRECTED_6_TO_5"
+  },
+  "semantic_validation": {
+    "canonical_files": [
+      "localization/graphics/transcriptions.jsonl",
+      "localization/graphics/artwork_plan.jsonl"
+    ],
+    "lane_a_new_goal_segments": 5,
+    "lane_a_new_goal_matches": 5,
+    "lane_a_full_canonical_segments": 6,
+    "lane_a_full_canonical_matches": 6,
+    "lane_b_segments": 16,
+    "lane_b_matches": 16,
+    "new_wave_reconstruction_segments": 21,
+    "new_wave_reconstruction_matches": 21,
+    "result": "PASS_21_OF_21_NEW_WAVE__INDEX215_FULL_6_OF_6",
+    "context_term_note": "Canonical translations are retained. Index 140 remains mapping-HOLD because upstream references expose PRESS START/PRESS ENTER source variants; exact Release HD DDS glyph mapping is required before rendering rather than guessing."
+  },
+  "asset_results": [
+    {
+      "index": 215,
+      "asset": "C05E67EF",
+      "state": "CLEAN_PLATE_READY_GOAL_LETTERING_BLOCKED_PARTIAL_15코스_HISTORY_RETAINED",
+      "source_dimensions": [
+        512,
+        256
+      ],
+      "source_format": "RGBA32_MASKS",
+      "source_mip_count": 1,
+      "raw_orientation": "flip-Y",
+      "clean_plate": {
+        "source_alpha_pixels_removed": 18497,
+        "rgb_components_changed": 0,
+        "changed_pixels_outside_source_text_mask": 0,
+        "introduced_alpha_pixels": 0,
+        "english_residue_in_goal_cells": "PASS_NONE",
+        "box_or_patch_introduced": "PASS_NONE",
+        "protected_artwork_changed": "PASS_NONE"
+      },
+      "korean_goal_candidate_emitted": false,
+      "zero_pixel_containment": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_GOAL_RASTER",
+      "font_style_gate": "BLOCKED_PENDING_APPROVED_SOURCE_FAITHFUL_HANGUL_GLYPH_SOURCE",
+      "full_asset_static_completion": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 130,
+      "asset": "1762489B",
+      "semantic_segments": 5,
+      "state": "EXACT_HD_RECONSTRUCTION_INPUT_RETAINED_HOLD_NO_KOREAN_DDS",
+      "source_identity": "PASS_HD_ORIGINAL_ATLAS",
+      "containment": "HOLD_STRICT_RECHECK",
+      "compression_roundtrip": "NOT_APPLICABLE_NO_CANDIDATE"
+    },
+    {
+      "index": 140,
+      "asset": "31C58963",
+      "semantic_segments": 5,
+      "state": "EXACT_HD_WORKING_SOURCE_RECONSTRUCTION_INPUT_RETAINED_MAPPING_HOLD_NO_KOREAN_DDS",
+      "source_identity": "PASS_HD_ORIGINAL_ATLAS_3_WORKING",
+      "source_variant_note": "Upstream references expose PRESS START/PRESS ENTER; exact Release DDS glyph/cell mapping required before render.",
+      "containment": "HOLD_STRICT_RECHECK",
+      "compression_roundtrip": "NOT_APPLICABLE_NO_CANDIDATE"
+    },
+    {
+      "index": 154,
+      "asset": "4D38BBB0",
+      "semantic_segments": 5,
+      "state": "EXACT_HD_WORKING_SOURCE_RECONSTRUCTION_INPUT_RETAINED_MAPPING_HOLD_NO_KOREAN_DDS",
+      "source_identity": "PASS_HD_ORIGINAL_ATLAS_1_WORKING",
+      "containment": "HOLD_STRICT_RECHECK",
+      "compression_roundtrip": "NOT_APPLICABLE_NO_CANDIDATE"
+    },
+    {
+      "index": 164,
+      "asset": "5B65E08C",
+      "semantic_segments": 1,
+      "state": "EXACT_HD_WORKING_SOURCE_RECONSTRUCTION_INPUT_RETAINED_MAPPING_HOLD_NO_KOREAN_DDS",
+      "source_identity": "PASS_HD_ORIGINAL_ATLAS_1_WORKING",
+      "containment": "HOLD_STRICT_RECHECK",
+      "compression_roundtrip": "NOT_APPLICABLE_NO_CANDIDATE"
+    }
+  ],
+  "candidate_dds_modified_by_wave": false,
+  "candidate_dds_modified_by_c": false,
+  "cross_lane_final_qa": {
+    "meaning_context_terms": "PASS_21_OF_21_NEW_RECONSTRUCTION_SEGMENTS",
+    "omissions": "PASS_NO_CANONICAL_SEGMENT_DROP_DETECTED",
+    "hangul_glyph_integrity": "HOLD_NO_NEW_KOREAN_RASTER",
+    "clipping": "HOLD_NO_NEW_KOREAN_RASTER",
+    "zero_pixel_containment": "HOLD_NEW_RASTERS_NOT_EMITTED__A_CLEAN_PLATE_ONLY",
+    "resolution": "PASS_SOURCE_IDENTITIES_PINNED__NO_CANDIDATE_RESOLUTION_CLAIM",
+    "dds_format_mipmap_alpha_transparency": "A_CLEAN_PLATE_SOURCE_RGBA32_MIP1_VALIDATION_RETAINED__B_HOLD_NO_CANDIDATE",
+    "raw_orientation": "A_FLIP_Y_SOURCE_INPUT_RETAINED__B_PER_ELEMENT_MAPPING_PENDING",
+    "compression_roundtrip": "NOT_APPLICABLE_NO_CHANGED_DDS_IN_W00017",
+    "background_artwork_wrong_replacement": "PASS_A_CLEAN_PLATE_EDIT_MASK_METRICS__B_NO_CANDIDATE_WRITE",
+    "mandatory_english_source_vs_korean_candidate": "HOLD_NO_NEW_KOREAN_CANDIDATE",
+    "new_full_asset_static_passes": 0,
+    "new_partial_static_segment_passes": 0,
+    "new_runtime_approvals": 0,
+    "approved_locked_dds_count": 0
+  },
+  "queue_after": {
+    "rows": 137,
+    "localize_text": 95,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1,
+    "unresolved_zoom_review": 0,
+    "resolved_preserve_original_zoom_review": 31,
+    "pending_production_localize_text": 78
+  },
+  "material_backlog_action": {
+    "type": "C_FINALIZE_NEW_FALLBACK_INPUTS_AND_CORRECT_RECONSTRUCTION_IDENTITY_ACCOUNTING",
+    "clean_plate_ready_index": 215,
+    "reconstruction_input_indices": [
+      130,
+      140,
+      154,
+      164
+    ],
+    "b_working_source_count_corrected_from": 6,
+    "b_working_source_count_corrected_to": 5,
+    "actionable_next_step": "Render only after exact source-to-cell/effect mapping and source-faithful Hangul/font style are pinned; then apply zero-pixel, protected-mask, compression-roundtrip and source-vs-candidate gates."
+  },
+  "shared_state_updates": [
+    "localization/resume_state.json",
+    "localization/WORKLOG.md",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/progress/STATUS.md",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_W00017_SYNC_FINAL_QA_1_CLEAN_PLATE_4_RECONSTRUCTION_INPUTS_B_METADATA_COUNT_CORRECTED_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
