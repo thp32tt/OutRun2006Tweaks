@@ -8,6 +8,7 @@ if (!(Test-Path $targetPath)) { throw "Missing one-click target metadata: $targe
 
 $parseFiles = @(
     'Invoke-OutRunVROneClick.ps1',
+    'Test-OutRunVROneClickPreflight.ps1',
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
@@ -44,6 +45,13 @@ if ($startHere -notmatch 'Invoke-OutRunVROneClick\.ps1') {
     throw 'START_HERE_VR_TEST.cmd does not route through the one-click launcher.'
 }
 
+$launcherText = Get-Content (Join-Path $toolsRoot 'Invoke-OutRunVROneClick.ps1') -Raw
+foreach ($required in @('Test-OutRunVROneClickPreflight.ps1','& $preflight -Backend $resolvedBackend')) {
+    if ($launcherText -notmatch [regex]::Escape($required)) {
+        throw "One-click launcher does not invoke runtime preflight: $required"
+    }
+}
+
 $selectorCmd = Get-Content (Join-Path $toolsRoot 'Select-OutRunVRBackend.cmd') -Raw
 $selectorUi = Get-Content (Join-Path $toolsRoot 'OutRunVR-Test-Selector.ps1') -Raw
 if ($selectorCmd -match '(?i)dx12' -or $selectorUi -match '(?i)dx12') {
@@ -69,6 +77,9 @@ foreach ($required in @(
 }
 
 $collector = Get-Content (Join-Path $toolsRoot 'Collect-OutRunVRLogs.ps1') -Raw
+if ($collector -notmatch [regex]::Escape('VR_ONE_CLICK_PREFLIGHT.json')) {
+    throw 'Collector does not preserve one-click preflight report.'
+}
 foreach ($requiredText in @(
     'VR_ONE_CLICK_TARGET.json',
     'IntegrationBranch=$developmentBranch',
