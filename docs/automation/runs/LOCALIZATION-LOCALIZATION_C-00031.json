@@ -1,0 +1,95 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00031",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "2/3",
+  "wave_id": "W00009",
+  "recorded_at_kst": "2026-09-29T04:20:00+09:00",
+  "reconciliation_base_head_sha": "a3dc407f132aa492f15dcae627bef25e435d7040",
+  "result": "PASS_W00009_SYNC_SHARED_STATE_REPAIRED_FINAL_B_ATTEMPT3_INCLUDED_NO_NEW_DDS_APPROVALS",
+  "automation_validation": "PASS_STATIC_CURRENT_GITHUB_STATE__FINAL_REMOTE_GATE_PENDING_AT_RECORD_CREATION",
+  "runtime_validation": "UNTESTED",
+  "failure_recovery": {
+    "failed_run_id": 36471592964,
+    "failed_job_id": 109094916692,
+    "failing_step": "Verify localization state",
+    "root_cause": "Intermediate commit ordering: B attempt-3 graphics/shared classification files reached 88 assets/737 segments before progress counters were updated from 85/731.",
+    "stale_failure_rerun": false,
+    "repair": "Current GitHub state reconciled progress/canonical mirror to 88 localize_text, 38 zoom_review, 88 transcriptions, 737 segments, 88 artwork-plan rows, 737 artwork-plan segments; visual-review actions match progress."
+  },
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00029",
+      "attempt": "3/3",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE_REBUILD_SPEC",
+      "runtime_validation": "UNTESTED"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00030",
+      "attempt": "3/3",
+      "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_ZOOM_REVIEW_RESOLUTIONS_C_RECONCILIATION_BLOCKER",
+      "report": "localization/graphics/role_B/20260929-0416-B104/B104_W00009_ATTEMPT3_ZOOM_REVIEW_RESOLUTION.json",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "cross_lane_qa": {
+    "promoted_to_localize_text": [
+      34,
+      52,
+      103,
+      172
+    ],
+    "resolved_preserve_original": [
+      151,
+      153,
+      155,
+      196
+    ],
+    "retained_hd_preflight": [
+      26,
+      28,
+      30,
+      32
+    ],
+    "translations": {
+      "Total Rank": "종합 랭크",
+      "Extra Time": "추가 시간",
+      "Start": "시작",
+      "Goal": "골",
+      "Normal balance": "일반 밸런스"
+    },
+    "candidate_dds_modified": false,
+    "new_candidate_dds_bytes": 0,
+    "clipping_hangul_raster": "NOT_APPLICABLE_NO_NEW_CANDIDATE_BYTES",
+    "zero_pixel_containment": "NOT_CLAIMED_NO_NEW_CANDIDATE_BYTES",
+    "dds_format_mipmap_alpha_transparency_orientation": "NO_NEW_CANDIDATE_BYTES; B source preflight retained only",
+    "background_wrong_replacement_hd_gui": "B rejected artifacting trial drafts before persistence; no unsafe replacement committed",
+    "approvals_added": 0,
+    "approved_dds_count": 0
+  },
+  "shared_state_merge": {
+    "queue_rows": 137,
+    "queue_actions": {
+      "localize_text": 88,
+      "zoom_review": 38,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "zoom_review_unresolved": 19,
+    "zoom_review_resolved_preserve_original": 19,
+    "transcription_assets": 88,
+    "transcription_semantic_segments": 737,
+    "artwork_plan_assets": 88,
+    "artwork_plan_segments": 737,
+    "canonical_progress_and_legacy_mirror_identical": true
+  },
+  "report": "localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00009 C repaired the failed intermediate-state mismatch, included final B attempt-3 results, and reconciled all shared state. No DDS candidate bytes were added or approved. Runtime remains UNTESTED."
+}
