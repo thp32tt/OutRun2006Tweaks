@@ -130,6 +130,28 @@ namespace OutRunVrR32DirectSubmit
         AckedGeneration.fill(0);
     }
 
+    inline void MarkGenerationFault(
+        std::uint32_t generation) noexcept
+    {
+        if (!generation)
+            return;
+        ObserveGeneration(generation);
+        AckFaultGeneration = generation;
+    }
+
+    inline bool GenerationFaulted(
+        std::uint32_t generation) noexcept
+    {
+        return generation != 0 &&
+            AckFaultGeneration == generation;
+    }
+
+    inline bool ActiveGenerationFaulted() noexcept
+    {
+        return ActiveAckGeneration != 0 &&
+            AckFaultGeneration == ActiveAckGeneration;
+    }
+
     inline bool EnsureFence(std::uint32_t slot) noexcept
     {
         if (slot >= Pending.size() || !OutRunVrFinalTest::Device)
