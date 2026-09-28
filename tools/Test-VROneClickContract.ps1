@@ -9,6 +9,7 @@ if (!(Test-Path $targetPath)) { throw "Missing one-click target metadata: $targe
 $parseFiles = @(
     'Invoke-OutRunVROneClick.ps1',
     'Test-OutRunVROneClickPreflight.ps1',
+    'analyze_dxvk_session.py',
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
@@ -145,6 +146,15 @@ switch ([string]$target.RendererTarget) {
         )) {
             if ($package -notmatch [regex]::Escape($required)) {
                 throw "DXVK one-click packaging contract missing: $required"
+            }
+        }
+        $collectorDxvk = Get-Content (Join-Path $toolsRoot 'Collect-OutRunVRLogs.ps1') -Raw
+        foreach ($requiredText in @(
+            'analyze_dxvk_session.py',
+            'DXVK_SESSION_SUMMARY.json'
+        )) {
+            if ($collectorDxvk -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK collector provider extraction missing: $requiredText"
             }
         }
         if (!(Test-Path (Join-Path $toolsRoot 'Acquire-OutRunDXVK.ps1'))) {
