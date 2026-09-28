@@ -49,6 +49,10 @@ for key, expected in expected_target.items():
 selector = require(
     "tools/Select-OutRunVRBackend.ps1",
     '"dxvk-safe"',
+    "Start-BackendSwitchTransaction",
+    "Restore-BackendSwitchTransaction",
+    "Complete-BackendSwitchTransaction",
+    "'ROOT_PAYLOAD_ATTESTATION.json'",
     '"dxvk-safe" { "E_DXVK_SAFE" }',
     '$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe" -or $Backend -eq "dx11") { "d3d9" } else { $Backend }',
     '$dxvkProvider = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"',
@@ -63,6 +67,24 @@ if selector.find('Copy-Item $dxvkProvider (Join-Path $root "d3d9.dll") -Force') 
     pass
 if "$rootPayloadAttestation = Assert-RootPayloadIdentity" not in selector:
     raise SystemExit("DXVK selector no longer performs post-selection root payload attestation")
+
+plan = require(
+    "docs/VR_DXVK_R71_PLAN.md",
+    "transactional root switch",
+    "snapshots every mutable root payload/config/state file",
+    "restores that snapshot and removes a partial session",
+    "`ROOT_PAYLOAD_ATTESTATION.json` before session handoff",
+    "not a filesystem-wide atomic rename",
+)
+
+transaction_test = require(
+    "tools/Test-BackendSelectorTransaction.ps1",
+    "Selector transaction test expected the injected post-attestation failure.",
+    "Rollback did not restore",
+    "Selector transaction backup directory was not cleaned after rollback.",
+    "Successful selector did not persist ROOT_PAYLOAD_ATTESTATION.json.",
+    "successful root attestation PASS",
+)
 
 preflight = require(
     "tools/Test-OutRunVROneClickPreflight.ps1",

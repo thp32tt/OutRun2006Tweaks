@@ -69,7 +69,7 @@ Do not bind the graphics-correctness path to the old custom fork before stock DX
 
 ## One-click package path
 
-The DXVK branch PC FAST packager acquires the pinned official DXVK 3.1.1 x86 release when no explicit provider path is supplied. It verifies that `x32/d3d9.dll` is PE32/x86, records SHA-256 provenance, and packages it only under `backends/dxvk`. The package root must remain free of a preselected `d3d9.dll`; `START_HERE_VR_TEST.cmd` activates the backend atomically through the selector.
+The DXVK branch PC FAST packager acquires the pinned official DXVK 3.1.1 x86 release when no explicit provider path is supplied. It verifies that `x32/d3d9.dll` is PE32/x86, records SHA-256 provenance, and packages it only under `backends/dxvk`. The package root must remain free of a preselected `d3d9.dll`; `START_HERE_VR_TEST.cmd` delegates activation to the selector's transactional root switch. Before mutation the selector snapshots every mutable root payload/config/state file, restores that snapshot and removes a partial session if any later activation step fails, and on success writes `ROOT_PAYLOAD_ATTESTATION.json` before session handoff. This is a bounded rollback transaction over the selector-owned root files, not a filesystem-wide atomic rename.
 
 At R71 the package intentionally contains no `multiviewpatcher.dll`. One-click therefore exercises stock DXVK SAFE/two-pass parity first; multiview remains blocked by the graphics-correctness gate.
 
