@@ -1,0 +1,400 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00041",
+  "wave_id": "W00013",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "b849f3c53bdac02742b06b60cb24d979a5635726",
+  "observed_peer_head_sha": "785164ee077f4eb37f1a9760dcd1fcef067e8e81",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ODD_HD_DECODED_PIXEL_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+  "runtime_validation": "UNTESTED",
+  "source_of_truth": {
+    "contract_path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "queue_path": "localization/graphics/asset_queue.csv",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "exact_source_rule": "Release DDS bytes fetched directly from pinned GitHub commit; no N100/local clone/GPT Library."
+  },
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "dependency_blocker_rule": "Unchanged dependency fingerprints from current shared queue; skipped without repeating identical blocker review.",
+    "selected_pending_localize_text_indices": [
+      55,
+      99,
+      119,
+      195
+    ],
+    "parity_check": "PASS_ODD_ONLY",
+    "work_steal": "NONE",
+    "reason": "W00012 35/43/47/49 exact HD blobs exceed GitHub Contents inline binary limit and remain decoded-pixel blocked. Selected next independent odd pending assets whose exact pinned HD Release DDS bytes are GitHub-readable, then decoded source pixels/headers into new executable reconstruction inputs."
+  },
+  "assets": [
+    {
+      "queue_index": 55,
+      "asset": "2EA557B4",
+      "queue_path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "translation": {
+        "source": "NEXT ROUND",
+        "korean": "다음 라운드"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+        "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+        "bytes": 524416
+      },
+      "header": {
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_game_cvt_Exst/4x_2EA557B4_512x64_atlas.json",
+        "git_blob_sha": "f5b75a016b70c528b4abc8d3067fc389209dd15a",
+        "canvas": [
+          2048,
+          256
+        ],
+        "region": {
+          "name": "sprite_337",
+          "rect": [
+            0,
+            92,
+            1456,
+            164
+          ],
+          "rotated": false
+        }
+      },
+      "decoded_source_metrics": {
+        "raw_visible_alpha_bbox": [
+          1,
+          8,
+          1089,
+          150
+        ],
+        "alpha_pixels": 116444,
+        "raw_alpha_ge128_bbox": [
+          2,
+          9,
+          1086,
+          149
+        ],
+        "alpha_ge128_pixels": 107196,
+        "raw_white_core_bbox": [
+          9,
+          22,
+          1077,
+          143
+        ],
+        "white_core_pixels": 38730
+      },
+      "orientation_evidence": {
+        "historical_source_faithful_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+        "raw_transform": "mirror-Y",
+        "hd_reconfirmation_required_before_render": true
+      },
+      "reconstruction_status": "SOURCE_HEADER_AND_DECODED_PIXEL_METRICS_READY__RENDER_HOLD",
+      "next_safe_action": "Reconcile the exact HD raw mirror-Y transform with the atlas region, derive the full English effect bbox in readable/game orientation, then render 다음 라운드 strictly inside that bbox and BC3-reencode without extra mips. Retain exact ENGLISH SOURCE vs KOREAN CANDIDATE proof.",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+    },
+    {
+      "queue_index": 99,
+      "asset": "4F68708E",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "translation": {
+        "source": "Drive against the Ghost Car and challenge for the course record!!",
+        "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+        "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+        "bytes": 524416
+      },
+      "header": {
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_4F68708E_512x64_atlas.json",
+        "git_blob_sha": "bb0c1f6cace28337dbfba90bac149ef2a14681a7",
+        "canvas": [
+          2048,
+          256
+        ],
+        "region": {
+          "name": "sprite_354",
+          "rect": [
+            0,
+            0,
+            2048,
+            256
+          ],
+          "rotated": false
+        }
+      },
+      "decoded_source_metrics": {
+        "raw_visible_alpha_bbox": [
+          514,
+          39,
+          1613,
+          218
+        ],
+        "alpha_pixels": 125223,
+        "raw_alpha_ge128_bbox": [
+          520,
+          45,
+          1607,
+          212
+        ],
+        "alpha_ge128_pixels": 95411,
+        "raw_white_core_bbox": [
+          528,
+          53,
+          1599,
+          204
+        ],
+        "white_core_pixels": 27195,
+        "dominant_opaque_color_bins": [
+          {
+            "rgb4": "003",
+            "percent": 55.17
+          },
+          {
+            "rgb4": "fff",
+            "percent": 26.93
+          }
+        ]
+      },
+      "orientation_evidence": {
+        "historical_source_faithful_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+        "raw_transform": "mirror-Y",
+        "hd_reconfirmation_required_before_render": true
+      },
+      "reconstruction_status": "SOURCE_HEADER_AND_DECODED_PIXEL_METRICS_READY__TEXT_PANEL_SEGMENTATION_REQUIRED",
+      "next_safe_action": "Use the decoded white-core/background bins to separate lettering from the dark panel, derive the complete English text-effect bbox without altering the panel, then fit the Korean sentence inside that exact bbox; BC3-reencode with mip count 1 and retain English-source comparison proof.",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+    },
+    {
+      "queue_index": 119,
+      "asset": "F6811E94",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+      "translation": {
+        "source": "Time Attack Mode",
+        "korean": "타임 어택 모드"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+        "git_blob_sha": "c6bcd8b847e0f0a2f34ca9f9ea3b1616512bd1e6",
+        "bytes": 524416
+      },
+      "header": {
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_F6811E94_512x64_atlas.json",
+        "git_blob_sha": "d25537314b6dd42b2eb624d4c4499fee8e666131",
+        "canvas": [
+          2048,
+          256
+        ],
+        "region": {
+          "name": "sprite_349",
+          "rect": [
+            0,
+            0,
+            2048,
+            256
+          ],
+          "rotated": false
+        }
+      },
+      "decoded_source_metrics": {
+        "raw_visible_alpha_bbox": [
+          390,
+          56,
+          1631,
+          201
+        ],
+        "alpha_pixels": 152306,
+        "raw_alpha_ge128_bbox": [
+          397,
+          63,
+          1623,
+          194
+        ],
+        "alpha_ge128_pixels": 126120,
+        "raw_orange_core_bbox": [
+          412,
+          78,
+          1609,
+          179
+        ],
+        "orange_core_pixels": 55319,
+        "raw_white_core_bbox": [
+          395,
+          61,
+          1626,
+          196
+        ],
+        "white_core_pixels": 29583,
+        "dominant_opaque_color_bins": [
+          {
+            "rgb4": "e80",
+            "percent": 38.07
+          },
+          {
+            "rgb4": "002",
+            "percent": 34.48
+          },
+          {
+            "rgb4": "fff",
+            "percent": 16.87
+          }
+        ]
+      },
+      "orientation_evidence": {
+        "historical_source_faithful_report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+        "raw_transform": "mirror-Y",
+        "hd_reconfirmation_required_before_render": true
+      },
+      "reconstruction_status": "SOURCE_HEADER_AND_DECODED_STYLE_METRICS_READY__RENDER_HOLD",
+      "next_safe_action": "Reconstruct the orange fill, dark outline/shadow and white highlight as separate source-faithful layers, confirm mirror-Y against exact HD pixels, fit 타임 어택 모드 wholly inside the English full-effect envelope, then BC3-reencode and compare side-by-side.",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+    },
+    {
+      "queue_index": 195,
+      "asset": "9CE4E175",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+      "translation": {
+        "source": "NOT AVAILABLE",
+        "korean": "이용 불가"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+        "git_blob_sha": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+        "bytes": 524416
+      },
+      "header": {
+        "width": 1024,
+        "height": 128,
+        "format": "BGRA32_ARGB_MASKS",
+        "mip_count": 1,
+        "pitch": 4096,
+        "masks": [
+          "0x00FF0000",
+          "0x0000FF00",
+          "0x000000FF",
+          "0xFF000000"
+        ]
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_9CE4E175_256x32_atlas.json",
+        "git_blob_sha": "0b87a3a9b40b06b8cadfc66643280ed5dee09a01",
+        "canvas": [
+          1024,
+          128
+        ],
+        "regions": [
+          {
+            "name": "sprite_18",
+            "rect": [
+              0,
+              72,
+              580,
+              56
+            ]
+          },
+          {
+            "name": "sprite_19",
+            "rect": [
+              580,
+              108,
+              56,
+              20
+            ]
+          }
+        ]
+      },
+      "decoded_source_metrics": {
+        "raw_visible_alpha_bbox": [
+          0,
+          0,
+          635,
+          56
+        ],
+        "alpha_pixels": 33550,
+        "raw_alpha_ge128_bbox": [
+          0,
+          0,
+          635,
+          55
+        ],
+        "alpha_ge128_pixels": 32960,
+        "raw_white_text_core_bbox": [
+          95,
+          7,
+          489,
+          46
+        ],
+        "white_core_pixels": 7119,
+        "source_edge_risk": "Nonzero source alpha reaches y=56 while primary declared sprite height is 56; do not infer permitted Korean full-effect bbox from whole alpha."
+      },
+      "orientation_evidence": {
+        "historical_source_faithful_report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
+        "raw_transform": "mirror-X",
+        "hd_reconfirmation_required_before_render": true
+      },
+      "reconstruction_status": "SOURCE_HEADER_AND_TEXT_CORE_METRICS_READY__ATLAS_ORIENTATION_RECONCILIATION_REQUIRED",
+      "next_safe_action": "Reconcile atlas coordinate origin with the exact raw mirror-X layout, isolate the NOT AVAILABLE full text effect from the red badge and secondary sprite, preserve both background sprites exactly, then render 이용 불가 inside the recovered text-only envelope. Header/pitch can be preserved byte-for-byte for a future BGRA32 rewrite.",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+    }
+  ],
+  "self_qa": {
+    "source_identity": "PASS_4_OF_4_PINNED_GITHUB_BLOBS",
+    "header_parse": "PASS_4_OF_4",
+    "decoded_pixel_metrics": "PASS_4_OF_4",
+    "format_detection": "PASS_3_DXT5_BC3_1_BGRA32",
+    "parity_shard": "PASS_ODD_ONLY_55_99_119_195",
+    "work_steal": "NONE",
+    "zero_pixel_containment": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "english_source_side_by_side": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "2EA557B4",
+    "4F68708E",
+    "F6811E94",
+    "9CE4E175"
+  ],
+  "material_deliverable": "New exact-HD decoded source/header/alpha/style metrics and deterministic next-rebuild constraints for four unfinished odd-shard localize_text assets. This materially reduces reconstruction uncertainty without a speculative DDS write.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00013 lane A advanced four unfinished odd assets with exact pinned HD pixel-level reconstruction inputs. No candidate was promoted because full text-effect/orientation segmentation is not yet exact enough for the zero-pixel gate. Runtime remains UNTESTED."
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00041",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00013",
+  "initial_head_sha": "b849f3c53bdac02742b06b60cb24d979a5635726",
+  "observed_peer_head_sha": "785164ee077f4eb37f1a9760dcd1fcef067e8e81",
+  "preserved_intervening_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK_4_ODD_HD_DECODED_PIXEL_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; unchanged REWORK blockers 51/53/111/121 skipped; exact pinned HD Release DDS bytes for 55/99/119/195 decoded into new source pixel/header/style reconstruction evidence; no work stealing; no shared-state mutation.",
+  "report": "localization/graphics/role_A/20260929-0552-A00041/A00041_W00013_HD_DECODED_SOURCE_METRICS.json",
+  "material_deliverable": {
+    "type": "EXACT_HD_DECODED_PIXEL_RECONSTRUCTION_INPUT",
+    "indices": [
+      55,
+      99,
+      119,
+      195
+    ],
+    "assets": [
+      "2EA557B4",
+      "4F68708E",
+      "F6811E94",
+      "9CE4E175"
+    ],
+    "exact_hd_release_dds_blob_identities": "PASS_4_OF_4",
+    "dds_header_parse": "PASS_4_OF_4",
+    "pixel_metrics": "PASS_4_OF_4",
+    "formats": "3 DXT5/BC3 + 1 BGRA32",
+    "candidate_dds_modified": false
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "2EA557B4",
+    "4F68708E",
+    "F6811E94",
+    "9CE4E175"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/transcriptions.jsonl",
+    "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+    "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "localization/graphics/role_A/20260929-0552-A00041/A00041_W00013_HD_DECODED_SOURCE_METRICS.json"
+  ],
+  "conclusion": "Minimum-progress contract satisfied by new exact-HD decoded pixel reconstruction inputs for four unfinished odd-shard assets. Runtime remains UNTESTED."
+}
