@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "started_kst": "2026-09-28T13:49:55+09:00",
+  "recorded_kst": "2026-09-28T14:04:17+09:00",
+  "base_sha": "337d74c0980ad240030ec8ff5f5141ebf385157e",
+  "result_sha": "7bb661d440d0f51472e282b374a19af8b568146c",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "summary": "Restored the accidentally truncated R7 D3D9 stereo implementation while preserving the intended shared disassembly WVP constants. The stale P8_STEREO_SHARED_PREDICATE gate now passes, but full automatic validation remains failed because independent pre-existing one-click verifier and renderer truncation defects prevent a successful Win32 build.",
+  "selected_work": "Evidence-driven implementation priority #1 from VR_BACKEND_100_REVIEW_INDEX: restore the proven-baseline CI path so validation can advance beyond P8_STEREO_SHARED_PREDICATE.",
+  "changes": [
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r7.inc",
+      "action": "restore accidentally deleted implementation tail from immediate pre-truncation parent while preserving current shared disassembly contract WVP constants",
+      "before_blob": "5c0cdea066792f01afbb70ac767ade12f03efc3d",
+      "reference_parent_commit": "a3fae79a473cfeffda9c2d046544cba23762d26f",
+      "reference_parent_blob": "453ba4bd3e74312632e524683bc13fae0acb08b3",
+      "after_blob": "da247b74126eea6fd13546ba38c55269eb4e70f7",
+      "culprit_commit": "f7adc004aca009edab53454f6989315444ad2695",
+      "culprit_evidence": "GitHub commit patch shows intended shared-WVP edits plus 1513 unintended deletions from stereo_renderer_r7.inc."
+    }
+  ],
+  "evidence": {
+    "pre_task_conversion_gate": {
+      "run_id": 36376987659,
+      "job_id": 108784726715,
+      "result": "FAIL",
+      "blocker": "P8_STEREO_SHARED_PREDICATE missing literal because R7 implementation had been truncated before this task."
+    },
+    "targeted_post_fix_gate": {
+      "run_id": 36379785307,
+      "job_id": 108792968423,
+      "proven_baseline": "PASS_44_GUARDS",
+      "p8_stereo_shared_predicate": "PASS",
+      "overall": "FAIL",
+      "next_independent_blocker": "tools/Test-VROneClickContract.ps1 line 136 expands undefined $backend under StrictMode while constructing an expected-text string."
+    },
+    "build_cross_check": {
+      "build_run_id": 36379788575,
+      "result": "FAIL",
+      "proven_baseline": "PASS_44_GUARDS",
+      "blocker": "same pre-existing Test-VROneClickContract.ps1 undefined-$backend validation-harness failure before compile"
+    },
+    "architecture_build_cross_check": {
+      "run_id": 36379788596,
+      "host_x64": "PASS",
+      "architecture_boundaries": "PASS",
+      "win32_configure": "PASS",
+      "win32_compile": "FAIL",
+      "blocker": "separate source truncation in src/vr/game/outrun_renderer.cpp causes unmatched namespace/brace and downstream missing identifiers in outrun_renderer_r13/r23."
+    },
+    "hud_inspector_cross_check": {
+      "run_id": 36379788606,
+      "static_exe_analysis": "PASS",
+      "build": "FAIL",
+      "blocker": "same independent outrun_renderer.cpp truncation chain"
+    },
+    "next_source_blocker": {
+      "path": "src/vr/game/outrun_renderer.cpp",
+      "current_blob": "e8c5e932cc7d46ba3c3819ac086b3703b98c09b6",
+      "current_line_count": 706,
+      "culprit_commit": "3c64693ed1ba926a1428296cd87e9d320e7633d4",
+      "culprit_message": "VR: centralize renderer WVP anchors in disassembly contract",
+      "culprit_patch_stats": "+14/-1237; patch ends mid-block after preserving intended shared WVP/address anchor edits",
+      "disposition": "NOT_FIXED_IN_THIS_TASK; one-task scope preserved"
+    },
+    "runtime_test_performed": false,
+    "n100_used": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "validation_notes": [
+    "AUTOMATION_VALIDATION is FAIL because the complete automatic gate/build did not pass, despite the selected P8 blocker being repaired and verified.",
+    "RUNTIME_VALIDATION remains UNTESTED because no Quest 3/HMD/game-screen execution was performed.",
+    "No DX11 runtime-normality, visual correctness, synchronization correctness or crash-free behavior is claimed."
+  ],
+  "next_action": "Queue a separate task to restore the independently truncated src/vr/game/outrun_renderer.cpp while preserving its intended shared disassembly address/WVP changes. Independently repair the one-click verifier's StrictMode string interpolation bug; do not combine either repair into this completed task."
+}
