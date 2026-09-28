@@ -61,6 +61,14 @@ Do not merge this branch into the production/reference line until
 
 ## DXVK version baseline
 
-Development targets stock DXVK 3.1 first. On 2026-09-28 the official DXVK `v3.1` and current `master` both declare `ID3D9VkInteropDevice` with IID `2eaa4b89-0107-4bdb-87f7-0f541c493ce0` in `src/d3d9/d3d9_interfaces.h`. The R71 passive probe uses exactly that IID.
+Development targets stock DXVK 3.1.1 first. On 2026-09-28, v3.1.1 is the latest
+official DXVK release. The R71 passive probe retains the stock
+`ID3D9VkInteropDevice` IID already validated against the upstream D3D9 interface.
 
-Do not bind the graphics-correctness path to the old custom fork before stock DXVK 3.1 parity is demonstrated.
+Do not bind the graphics-correctness path to the old custom fork before stock DXVK 3.1.1 parity is demonstrated.
+
+## One-click package path
+
+The DXVK branch PC FAST packager acquires the pinned official DXVK 3.1.1 x86 release when no explicit provider path is supplied. It verifies that `x32/d3d9.dll` is PE32/x86, records SHA-256 provenance, and packages it only under `backends/dxvk`. The package root must remain free of a preselected `d3d9.dll`; `START_HERE_VR_TEST.cmd` activates the backend atomically through the selector.
+
+At R71 the package intentionally contains no `multiviewpatcher.dll`. One-click therefore exercises stock DXVK SAFE/two-pass parity first; multiview remains blocked by the graphics-correctness gate.
