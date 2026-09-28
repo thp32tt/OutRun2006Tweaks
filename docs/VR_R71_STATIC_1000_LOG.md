@@ -271,3 +271,37 @@ Next:
 3. design/test bounded transition-history release enumeration;
 4. prove sampled/deferred identities cannot enter that transition queue;
 5. keep waits/copies/HUD/visual behavior unchanged without HMD evidence.
+
+
+## Cycle 0011 — transition watermark bounded-history falsification
+
+Review lenses:
+1. architecture/control flow — STOPPING / LOCAL reference-space / presentation watermark sites;
+2. lifetime/reset/sync — historical sampled ownership versus deferred EVENT;
+3. stereo/HUD/visual correctness — presentation and HUD paths unchanged;
+4. hot path/frame pacing/copies/waits — no behavior change without runtime evidence;
+5. adversarial/falsification — ring presence is not proof of never-sampled history.
+
+Evidence/result:
+- Reused `VR-R41-SKIPPED-DIRECT-ACK-LOSS-001`; no duplicate key.
+- PR #80 exact-head observed at `b03ca30c3e1229b33dbe8da58ee9a3134e5a31f6`.
+- HUD Inspector run `36497134904` static-exe-analysis completed SUCCESS.
+- Build `36497134902` passed baseline/FFB policy gates and was still building.
+- OpenXR `36497134942` host-x64 passed architecture/configure gates and was still building; remaining hosted jobs were also in progress.
+- `RenderFrameReader::ReadHistory` is a stable bounded current-run ring snapshot, but it does not preserve an independent fact that an older DirectGPU identity was never sampled.
+- STOPPING, LOCAL reference-space change, and presentation change currently advance `lastProcessedStereoFrame` from the latest snapshot. Enumerating the ring and ACKing all older DirectGPU frames at those sites would be unsafe because an identity previously sampled by D3D11 may still be EVENT-owned.
+- Consequently no transition runtime wiring was made in this cycle. The next safe prerequisite is a pure sampled-identity history/transition classifier with LEVEL0 coverage.
+
+Changed files:
+- `docs/automation/R71_STATIC_1000_STATE.json`
+- `docs/VR_R71_STATIC_1000_LOG.md`
+
+AUTOMATION_VALIDATION: `PARTIAL_GATE_PASS / EXACT_HEAD_PR80_BUILD_OPENXR_HUD_BUILD_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+1. consume exact-head PR #80 CI;
+2. repair deterministic CI failure only if present;
+3. add/test bounded sampled-identity history;
+4. prove EVENT-owned identities cannot enter transition skipped-release ownership;
+5. only then wire STOPPING / LOCAL / presentation release-before-watermark.
