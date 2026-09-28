@@ -2482,9 +2482,14 @@ int main(int argc, char** argv)
                     // being sampled by D3D11 are immediately per-slot ACKed so
                     // the producer can recycle them; the selected frame keeps
                     // R32's GPU EVENT completion ACK.
+                    // Failed fresh-projection references are independent
+                    // of direct-only policy; poll them in every gameplay frame
+                    // so hybrid/direct-enabled configurations cannot strand a
+                    // producer slot indefinitely.
+                    R23PollDeferredReferenceAcks(compositor);
+
                     if (directTransportOnly)
                     {
-                        R23PollDeferredReferenceAcks(compositor);
                         std::array<OutRunVR::SharedRenderFrameState,
                             OutRunVR::RenderFrameRingSize> history{};
                         std::size_t historyCount = 0;
