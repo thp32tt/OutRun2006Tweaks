@@ -1026,3 +1026,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Both touch the original top bbox edge with zero margin, so C86 marks them `CONTAINMENT_PASS_HIGH_RISK_PENDING_INGAME`; they are not promoted to `approved_dds`.
 - Current approved/locked count remains 0. Remaining current HD REWORK assets: 10. No build, VR/FFB, N100, or GPT Library use.
 - Machine report: `localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json`.
+
+
+## 2026-09-28T16:04:19+09:00 - A AUTO 00001 FF2462BB
+- GitHub-only index 51 FF2462BB rework; no N100/GPT Library/VR/FFB/build.
+- Repaired 21 exact-bbox failures without B91-style broad shrink: translate/trim without resampling where possible; only minimum-fit rows resampled.
+- Automated containment 21/21 PASS, outside/collateral 0; candidate 641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3.
+- Independent C visual/source-style QA and isolated DDS_ONLY in-game pending; RUNTIME_VALIDATION=UNTESTED.

@@ -1,0 +1,564 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A_AUTO_00001_FF2462BB",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
+  "timestamp_kst": "2026-09-28T16:04:19+09:00",
+  "base_head": "3a4fa5e2af7d2aea2d7d2afeff286e9923e6365e",
+  "asset": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "index": 51,
+  "previous_candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+  "structure": {
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "reworked_elements": [
+    {
+      "key": "SCREAMING",
+      "original_bbox": [
+        9,
+        260,
+        285,
+        301
+      ],
+      "before_localized_bbox": [
+        6,
+        261,
+        79,
+        301
+      ],
+      "localized_bbox": [
+        9,
+        261,
+        81,
+        300
+      ],
+      "method": "translate_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "containment": "PASS"
+    },
+    {
+      "key": "ENTER_ACCOUNT_NAME",
+      "original_bbox": [
+        2,
+        321,
+        558,
+        361
+      ],
+      "before_localized_bbox": [
+        6,
+        322,
+        261,
+        362
+      ],
+      "localized_bbox": [
+        6,
+        321,
+        260,
+        360
+      ],
+      "method": "translate_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "containment": "PASS"
+    },
+    {
+      "key": "CHEATING",
+      "original_bbox": [
+        1122,
+        197,
+        1356,
+        237
+      ],
+      "before_localized_bbox": [
+        1123,
+        196,
+        1273,
+        237
+      ],
+      "localized_bbox": [
+        1123,
+        197,
+        1272,
+        236
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.97619,
+      "containment": "PASS"
+    },
+    {
+      "key": "ENTER_ACCOUNT_PASSWORD",
+      "original_bbox": [
+        1137,
+        388,
+        1785,
+        429
+      ],
+      "before_localized_bbox": [
+        1138,
+        389,
+        1476,
+        430
+      ],
+      "localized_bbox": [
+        1138,
+        388,
+        1475,
+        428
+      ],
+      "method": "translate_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "containment": "PASS"
+    },
+    {
+      "key": "CREATE_ACCOUNT",
+      "original_bbox": [
+        2180,
+        133,
+        2584,
+        173
+      ],
+      "before_localized_bbox": [
+        2181,
+        132,
+        2379,
+        173
+      ],
+      "localized_bbox": [
+        2181,
+        133,
+        2378,
+        172
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.97619,
+      "containment": "PASS"
+    },
+    {
+      "key": "BAD_NAME",
+      "original_bbox": [
+        2241,
+        197,
+        2488,
+        236
+      ],
+      "before_localized_bbox": [
+        2241,
+        196,
+        2480,
+        237
+      ],
+      "localized_bbox": [
+        2241,
+        197,
+        2479,
+        236
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.952381,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOOD_ATTITUDE",
+      "original_bbox": [
+        2240,
+        261,
+        2603,
+        301
+      ],
+      "before_localized_bbox": [
+        2241,
+        260,
+        2402,
+        301
+      ],
+      "localized_bbox": [
+        2241,
+        261,
+        2401,
+        300
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.97619,
+      "containment": "PASS"
+    },
+    {
+      "key": "DELETE_ACCOUNT_SMALL",
+      "original_bbox": [
+        2560,
+        393,
+        2961,
+        433
+      ],
+      "before_localized_bbox": [
+        2561,
+        393,
+        2721,
+        434
+      ],
+      "localized_bbox": [
+        2561,
+        393,
+        2720,
+        433
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.97619,
+      "containment": "PASS"
+    },
+    {
+      "key": "LOAD_SAVE",
+      "original_bbox": [
+        3253,
+        136,
+        3546,
+        181
+      ],
+      "before_localized_bbox": [
+        3254,
+        138,
+        3520,
+        182
+      ],
+      "localized_bbox": [
+        3254,
+        137,
+        3519,
+        180
+      ],
+      "method": "translate_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "containment": "PASS"
+    },
+    {
+      "key": "IN_MENU",
+      "original_bbox": [
+        2414,
+        9,
+        2580,
+        49
+      ],
+      "before_localized_bbox": [
+        2463,
+        9,
+        2537,
+        50
+      ],
+      "localized_bbox": [
+        2463,
+        9,
+        2536,
+        49
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.97619,
+      "containment": "PASS"
+    },
+    {
+      "key": "SIGN_IN",
+      "original_bbox": [
+        0,
+        455,
+        268,
+        518
+      ],
+      "before_localized_bbox": [
+        7,
+        454,
+        187,
+        518
+      ],
+      "localized_bbox": [
+        7,
+        455,
+        186,
+        517
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.984615,
+      "containment": "PASS"
+    },
+    {
+      "key": "DELETE_ACCOUNT_BIG",
+      "original_bbox": [
+        3,
+        540,
+        641,
+        602
+      ],
+      "before_localized_bbox": [
+        6,
+        539,
+        265,
+        604
+      ],
+      "localized_bbox": [
+        6,
+        540,
+        264,
+        602
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.954545,
+      "containment": "PASS"
+    },
+    {
+      "key": "ENTER_XBOX_PASSCODE",
+      "original_bbox": [
+        906,
+        456,
+        1875,
+        522
+      ],
+      "before_localized_bbox": [
+        906,
+        455,
+        1487,
+        520
+      ],
+      "localized_bbox": [
+        906,
+        456,
+        1486,
+        520
+      ],
+      "method": "translate_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "containment": "PASS"
+    },
+    {
+      "key": "REGISTER_NEW_ACCOUNT_BIG",
+      "original_bbox": [
+        2470,
+        543,
+        3399,
+        606
+      ],
+      "before_localized_bbox": [
+        2476,
+        542,
+        2816,
+        607
+      ],
+      "localized_bbox": [
+        2476,
+        543,
+        2815,
+        606
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.969697,
+      "containment": "PASS"
+    },
+    {
+      "key": "LOGIN_TO_ACCOUNT",
+      "original_bbox": [
+        2470,
+        1333,
+        2920,
+        1380
+      ],
+      "before_localized_bbox": [
+        2594,
+        1329,
+        2793,
+        1370
+      ],
+      "localized_bbox": [
+        2594,
+        1333,
+        2792,
+        1373
+      ],
+      "method": "translate_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "containment": "PASS"
+    },
+    {
+      "key": "START_1",
+      "original_bbox": [
+        1335,
+        737,
+        1449,
+        785
+      ],
+      "before_localized_bbox": [
+        1341,
+        726,
+        1429,
+        779
+      ],
+      "localized_bbox": [
+        1345,
+        737,
+        1424,
+        785
+      ],
+      "method": "minimal_lanczos_fit",
+      "scale_x": 0.898876,
+      "scale_y": 0.907407,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOAL_1",
+      "original_bbox": [
+        1965,
+        737,
+        2068,
+        785
+      ],
+      "before_localized_bbox": [
+        1985,
+        727,
+        2033,
+        777
+      ],
+      "localized_bbox": [
+        1985,
+        737,
+        2032,
+        776
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.803922,
+      "containment": "PASS"
+    },
+    {
+      "key": "START_2",
+      "original_bbox": [
+        2111,
+        737,
+        2225,
+        785
+      ],
+      "before_localized_bbox": [
+        2119,
+        726,
+        2207,
+        779
+      ],
+      "localized_bbox": [
+        2123,
+        737,
+        2202,
+        785
+      ],
+      "method": "minimal_lanczos_fit",
+      "scale_x": 0.898876,
+      "scale_y": 0.907407,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOAL_2",
+      "original_bbox": [
+        2741,
+        737,
+        2844,
+        785
+      ],
+      "before_localized_bbox": [
+        2765,
+        727,
+        2813,
+        777
+      ],
+      "localized_bbox": [
+        2765,
+        737,
+        2812,
+        776
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.803922,
+      "containment": "PASS"
+    },
+    {
+      "key": "START_3",
+      "original_bbox": [
+        2887,
+        737,
+        3001,
+        785
+      ],
+      "before_localized_bbox": [
+        2899,
+        726,
+        2987,
+        779
+      ],
+      "localized_bbox": [
+        2903,
+        737,
+        2982,
+        785
+      ],
+      "method": "minimal_lanczos_fit",
+      "scale_x": 0.898876,
+      "scale_y": 0.907407,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOAL_3",
+      "original_bbox": [
+        3517,
+        737,
+        3620,
+        785
+      ],
+      "before_localized_bbox": [
+        3543,
+        727,
+        3591,
+        777
+      ],
+      "localized_bbox": [
+        3543,
+        737,
+        3590,
+        776
+      ],
+      "method": "trim_overflow_no_resample",
+      "scale_x": 1.0,
+      "scale_y": 0.803922,
+      "containment": "PASS"
+    }
+  ],
+  "qa": {
+    "elements_reworked": 21,
+    "failed_elements": 0,
+    "collateral_pixels": 0,
+    "changed_pixels_outside_all_declared_cells": 0,
+    "introduced_alpha_outside_all_declared_cells": 0,
+    "visual_proof": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png",
+    "style_preservation": "15 rows no broad resampling; only minimum-fit rows resampled"
+  },
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "final_approval": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false
+}

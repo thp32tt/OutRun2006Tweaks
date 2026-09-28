@@ -622,3 +622,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C86 report: `localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json`.
 - Current HD state from C85+C86: 4 pixel+visual PASS pending in-game, 2 containment PASS high-risk pending in-game, 10 REWORK_REQUIRED. Approved/locked count remains **0**.
 - Concurrent B93 work on `2DA43E41` was observed and left untouched. No build, VR/FFB, N100, or GPT Library use.
+
+
+### A AUTO 00001 FF2462BB 2026-09-28T16:04:19+09:00
+- Index 51 FF2462BB: 21 C85 bbox failures repaired with no broad shrink; no-resample translation/trim wherever possible, minimum-fit scaling only where required.
+- Automated containment 21/21 PASS; outside/collateral 0. Candidate 641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3.
+- Visual proof: localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png. Independent C source-style/artifact QA + DDS_ONLY in-game remain required.
+- AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.

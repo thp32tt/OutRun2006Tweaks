@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T13:38:52+09:00",
+  "updated_at_kst": "2026-09-28T16:04:19+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -512,6 +512,17 @@
       "48DEBE77": "PASS",
       "hd_rework_candidates_ready": 16,
       "hd_rework_remaining": 0
+    },
+    "latest_a_production": {
+      "run": "A_AUTO_00001_FF2462BB",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
+      "report": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
+      "assets": {
+        "FF2462BB": {
+          "candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+          "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"
+        }
+      }
     }
   },
   "data_build": {

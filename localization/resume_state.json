@@ -1,5 +1,5 @@
 {
-  "schema_version": 56,
+  "schema_version": 57,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
     "C86: 62BEBF33 and E3FD08BE independently revalidated from current GitHub DDS; exact bbox containment PASS but top edge-touch high-risk. Keep unapproved until isolated DDS_ONLY in-game validation.",
     "Remaining C85 production REWORK assets: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
     "C85 static PASS pending in-game remains: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77.",
@@ -642,6 +643,12 @@
       "report": "localization/graphics/role_B/20260928-1336-B94/B94_A064FDFC_EXACT_BBOX_REWORK_REPORT.json",
       "candidate_sha256": "4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7",
       "status": "B94_SELF_QA_PASS_PENDING_C_INGAME"
+    },
+    "a_auto_00001_ff2462bb": {
+      "timestamp_kst": "2026-09-28T16:04:19+09:00",
+      "report": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
+      "candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+      "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"
     }
   },
   "runtime_packages": {
