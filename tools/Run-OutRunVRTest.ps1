@@ -189,6 +189,29 @@ if($backend -ne '2d'){
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
 New-Item -ItemType Directory -Force $sessionRoot|Out-Null
 
+function Write-RunnerFailureDiagnostic(
+    [string]$Phase,
+    [string]$ErrorText,
+    [bool]$HostStillRunning = $false
+){
+    try{
+        [ordered]@{
+            SchemaVersion=1
+            RecordedUtc=(Get-Date).ToUniversalTime().ToString('o')
+            Phase=$Phase
+            Error=$ErrorText
+            Backend=$backend
+            VariantId=$variant
+            TestProfile=$TestProfile
+            SessionId=[string]$state.SessionId
+            SourceSha=$sourceSha
+            HostStillRunning=$HostStillRunning
+        }|ConvertTo-Json -Depth 5|Set-Content (Join-Path $sessionRoot 'RUNNER_FAILURE.json') -Encoding UTF8
+    }catch{
+        Write-Warning ("Could not persist RUNNER_FAILURE.json: {0}" -f $_.Exception.Message)
+    }
+}
+
 $assetAnalyzer=Join-Path $root 'tools/analyze_outrun_assets.py'
 if(!(Test-Path $assetAnalyzer)){
     $assetAnalyzer=Join-Path $root 'analyze_outrun_assets.py'
@@ -295,10 +318,16 @@ if($dxvkMode){
 }
 
 $gameExitCode=0
+$launchFailure=$null
 try{
-    $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
-    $p.WaitForExit()
-    $gameExitCode=$p.ExitCode
+    try{
+        $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
+        $p.WaitForExit()
+        $gameExitCode=$p.ExitCode
+    }catch{
+        $launchFailure=$_.Exception
+        Write-RunnerFailureDiagnostic -Phase 'GAME_LAUNCH_OR_WAIT' -ErrorText $launchFailure.Message
+    }
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
@@ -335,12 +364,20 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
         Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep -Milliseconds 750
 }
+$hostTeardownFailure=$null
 if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
-    throw 'Could not close outrun-vr-host.exe automatically; log collection was not started.'
+    $hostTeardownFailure=[InvalidOperationException]::new('Could not close outrun-vr-host.exe automatically; collecting an emergency snapshot before propagating failure.')
+    Write-RunnerFailureDiagnostic -Phase 'HOST_TEARDOWN' -ErrorText $hostTeardownFailure.Message -HostStillRunning $true
 }
 
-& $collector
+if($hostTeardownFailure){
+    & $collector -Emergency
+}else{
+    & $collector
+}
 if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+if($hostTeardownFailure){throw $hostTeardownFailure}
+if($launchFailure){throw $launchFailure}
 if($gameExitCode -ne 0){
     Write-Warning ("OR2006C2C.EXE exited with code {0}; diagnostic collection completed before propagating failure." -f $gameExitCode)
     exit $gameExitCode
