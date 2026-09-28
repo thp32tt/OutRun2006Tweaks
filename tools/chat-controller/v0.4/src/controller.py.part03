@@ -748,6 +748,22 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     page = await slot_page(context, pages, slot)
 
     if active["phase"] == "WAIT_CHAT":
+        # Durable Git is authoritative. ChatGPT UI response detection can fail even
+        # after the task already committed its result, so check the exact task marker first.
+        task_commit = github_find_task_commit(active["branch"], active["task_id"])
+        if task_commit:
+            active["result_sha"] = task_commit["sha"]
+            active["result_message"] = task_commit["message"]
+            active["phase"] = "WAIT_ACTIONS"
+            active["last_gate_poll_at"] = None
+            save_queue_state(q)
+            write_runtime(
+                status="queue_wait_actions",
+                last_action=f"{active['task_id']} durable task commit found -> {active['result_sha']}",
+                queue=active,
+            )
+            return
+
         if await queue_handle_retry_surface(page, reg, slot, active, q):
             return
         if not slot.url or not is_project_scoped_chat_url(slot.url):
@@ -796,14 +812,12 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
             return
 
-        head = github_branch_head(active["branch"])
-        if not head:
-            return
-        if head == active["base_sha"]:
+        task_commit = github_find_task_commit(active["branch"], active["task_id"])
+        if not task_commit:
             sent_at = _parse_iso(active.get("sent_at")) or now
             if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                 return
-            reason = "Chat response stabilized but target branch HEAD did not change; no durable Git result commit was found."
+            reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
             if active["attempt"] < MAX_TASK_ATTEMPTS:
                 previous_attempt = active["attempt"]
                 active["attempt"] = previous_attempt + 1
@@ -816,31 +830,17 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             active["failure_context"] = reason
             active["phase"] = "BLOCKED"
         else:
-            msg = github_commit_message(head) or ""
-            expected = f"[AUTO:{active['task_id']}]"
-            if expected not in msg:
-                reason = f"Target branch changed to {head} but commit message did not contain required task marker {expected}."
-                if active["attempt"] < MAX_TASK_ATTEMPTS:
-                    previous_attempt = active["attempt"]
-                    previous_base = active["base_sha"]
-                    active["attempt"] = previous_attempt + 1
-                    active["base_sha"] = head
-                    if await queue_send_retry(context, pages, active, reason):
-                        save_queue_state(q)
-                    else:
-                        active["attempt"] = previous_attempt
-                        active["base_sha"] = previous_base
-                        save_queue_state(q)
-                    return
-                active["failure_context"] = reason
-                active["phase"] = "BLOCKED"
-            else:
-                active["result_sha"] = head
-                active["phase"] = "WAIT_ACTIONS"
-                active["last_gate_poll_at"] = None
-                save_queue_state(q)
-                write_runtime(status="queue_wait_actions", last_action=f"{active['task_id']} -> {head}", queue=active)
-                return
+            active["result_sha"] = task_commit["sha"]
+            active["result_message"] = task_commit["message"]
+            active["phase"] = "WAIT_ACTIONS"
+            active["last_gate_poll_at"] = None
+            save_queue_state(q)
+            write_runtime(
+                status="queue_wait_actions",
+                last_action=f"{active['task_id']} -> {active['result_sha']} (exact task commit)",
+                queue=active,
+            )
+            return
 
     if active["phase"] == "WAIT_ACTIONS":
         last_poll = _parse_iso(active.get("last_gate_poll_at"))
