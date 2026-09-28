@@ -1,0 +1,64 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00008",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": 1,
+  "wave_id": "W00002",
+  "result": "BLOCKED_NO_ACTION",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "shard": "ODD_INDEX_PRIMARY_ONLY",
+  "selection_policy": "REWORK_REQUIRED first; no work-steal; skipped prior W00001 blockers without new safe evidence",
+  "reviewed_targets": [
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "queue_status": "rework_required_zero_pixel_or_artifact",
+      "c85_candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+      "c85_failed_elements": 21,
+      "c85_decision": "REWORK_REQUIRED_ARTIFACT",
+      "reason": "C85 direct decoded containment still has 21 failing elements in the canonical candidate, and staged shrink/rework was rejected for severe resampling/ragged-stroke degradation. A source-faithful rerender is required; speculative geometric shrink or background resampling is not safe."
+    },
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "queue_status": "rework_required_zero_pixel_or_artifact",
+      "c85_candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "c85_failed_elements": 19,
+      "c85_decision": "REWORK_REQUIRED_ZERO_PIXEL_BBOX",
+      "reason": "C85 canonical candidate has 19 exact-bbox failures, including course/select/description regions with large vertical and horizontal overflow. Safe correction requires source-faithful raster reconstruction and full per-element decoded-pixel QA; no speculative resize/reposition was committed."
+    }
+  ],
+  "previously_blocked_not_repeated": [
+    {
+      "index": 53,
+      "asset": "568D3696",
+      "reason": "W00001 blocker unchanged: DXT5 4096x4096 mip13 exact decoded-pixel-safe recompression evidence required."
+    },
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "reason": "W00001 blocker unchanged: overlap/artwork-sensitive remaining regions require a non-speculative source-faithful rebuild."
+    }
+  ],
+  "touched_assets": [],
+  "qa": {
+    "zero_pixel_containment": "REVIEWED_FROM_CURRENT_C85_EVIDENCE_NO_NEW_ASSET_WRITE",
+    "dds_alpha_orientation": "NO_NEW_ASSET_WRITE",
+    "self_qa": "PASS_BLOCKER_CLASSIFICATION_ONLY"
+  },
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00006.json"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "vr_ffb_dx_changes": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "note": "Durable W00002 lane-A no-action/blocker record. No real-game test was performed. Static review does not imply approval."
+}
