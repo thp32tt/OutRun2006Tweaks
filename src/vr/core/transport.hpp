@@ -20,7 +20,61 @@ namespace OutRunVR::Core
         D3D9ExShared = 1,
         DesktopDuplication = 2,
         Dxvk = 3,
+        D3D11NativeShared = 4,
     };
+
+    struct TransportIdentity
+    {
+        std::uint32_t producerPid{};
+        std::uint32_t consumerPid{};
+        std::uint32_t runGeneration{};
+        std::uint32_t generation{};
+
+        friend constexpr bool operator==(
+            const TransportIdentity&, const TransportIdentity&) = default;
+    };
+
+    struct FrameAck
+    {
+        std::uint32_t producerPid{};
+        std::uint32_t consumerPid{};
+        std::uint32_t runGeneration{};
+        std::uint32_t generation{};
+        std::uint32_t slot{};
+        std::uint64_t frameId{};
+    };
+
+    constexpr bool TransportIdentityValid(
+        const TransportIdentity& identity) noexcept
+    {
+        return identity.producerPid != 0 &&
+            identity.consumerPid != 0 &&
+            identity.runGeneration != 0 &&
+            identity.generation != 0;
+    }
+
+    constexpr bool TransportAckIdentityMatches(
+        const FrameAck& ack,
+        const TransportIdentity& identity) noexcept
+    {
+        return TransportIdentityValid(identity) &&
+            ack.producerPid == identity.producerPid &&
+            ack.consumerPid == identity.consumerPid &&
+            ack.runGeneration == identity.runGeneration &&
+            ack.generation == identity.generation;
+    }
+
+    constexpr bool TransportAckReleasesFrame(
+        const FrameAck& ack,
+        const TransportIdentity& identity,
+        std::uint32_t slot,
+        std::uint64_t frameId) noexcept
+    {
+        return frameId != 0 &&
+            ack.slot == slot &&
+            ack.frameId >= frameId &&
+            TransportAckIdentityMatches(ack, identity);
+    }
 
     struct FrameSlot
     {
