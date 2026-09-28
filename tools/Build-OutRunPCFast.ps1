@@ -239,6 +239,7 @@ $runtimeFiles = @(
     'Test-OutRunVROneClickPreflight.ps1',
     'analyze_dxvk_session.py',
     'VR_ONE_CLICK_TARGET.json',
+    'ONE_RUN_VISUAL_CHECKLIST.txt',
     'START_HERE_VR_TEST.cmd'
 )
 foreach ($file in $runtimeFiles) {
