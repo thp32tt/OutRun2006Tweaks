@@ -6,6 +6,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DX11 = ROOT / "src" / "vr" / "d3d11"
 CMAKE = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
+CMAKE_TOML = (ROOT / "cmake.toml").read_text(encoding="utf-8")
+BACKEND_GATE = (
+    ROOT / ".github" / "workflows" / "backend-conversion-gate.yml"
+).read_text(encoding="utf-8")
+SEMANTIC_SMOKE = (
+    ROOT / "tools" / "dx11_fixed_function_shader_semantics.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -385,6 +392,51 @@ def main() -> None:
         raise SystemExit(
             "DX11 R85 compiler probe requires d3dcompiler.lib in the checked-in CMake graph"
         )
+
+    r86_smoke_contract = {
+        "D3DTOP_SELECTARG1": "R86 SELECTARG1 semantic case",
+        "D3DTOP_MODULATE": "R86 MODULATE semantic case",
+        "D3DTA_CURRENT": "R86 CURRENT stage chaining case",
+        "D3DTA_TEXTURE": "R86 texture sampling case",
+        "FixedFunctionShaderPrototypeUnsupportedNotReady": "R86 missing-resource fail-closed case",
+        "D3DRTYPE_CUBETEXTURE": "R86 unsupported resource-type case",
+        "FixedFunctionShaderPrototypeUnsupportedResourceType": "R86 unsupported resource-type blocker",
+        "compile_fixed_function_pixel_shader_prototype": "R86 actual offline D3DCompile invocation",
+        "DX11 fixed-function shader semantics smoke: PASS": "R86 deterministic smoke completion marker",
+    }
+    missing_r86_smoke = [
+        meaning
+        for token, meaning in r86_smoke_contract.items()
+        if token not in SEMANTIC_SMOKE
+    ]
+    if missing_r86_smoke:
+        raise SystemExit(
+            "DX11 R86 semantic smoke drift: " + ", ".join(missing_r86_smoke)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_fixed_function_shader_semantics" not in graph:
+            raise SystemExit(
+                f"DX11 R86 semantic smoke target missing from {graph_name}"
+            )
+        if "tools/dx11_fixed_function_shader_semantics.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R86 semantic smoke source missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 fixed-function shader semantic smoke",
+        "Run DX11 fixed-function shader semantic smoke",
+        "dx11_fixed_function_shader_semantics",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R86 semantic smoke missing from Backend Conversion Gate: "
+                + token
+            )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 

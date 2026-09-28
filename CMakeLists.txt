@@ -732,3 +732,33 @@ set_target_properties(outrun2006tweaks PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO
 		"${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 )
+# Target: dx11_fixed_function_shader_semantics
+set(dx11_fixed_function_shader_semantics_SOURCES
+    "tools/dx11_fixed_function_shader_semantics.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_fixed_function_shader_semantics)
+
+target_sources(dx11_fixed_function_shader_semantics PRIVATE ${dx11_fixed_function_shader_semantics_SOURCES})
+
+target_compile_features(dx11_fixed_function_shader_semantics PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_fixed_function_shader_semantics PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_fixed_function_shader_semantics PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_fixed_function_shader_semantics PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)

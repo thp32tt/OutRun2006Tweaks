@@ -71,6 +71,17 @@ jobs:
       - name: Build Win32
         run: cmake --build build-auto --config Release --target outrun2006tweaks
 
+      - name: Build DX11 fixed-function shader semantic smoke
+        run: cmake --build build-auto --config Release --target dx11_fixed_function_shader_semantics
+
+      - name: Run DX11 fixed-function shader semantic smoke
+        shell: pwsh
+        run: |
+          $smoke = Get-ChildItem build-auto -Recurse -Filter dx11_fixed_function_shader_semantics.exe | Select-Object -First 1
+          if (-not $smoke) { throw "DX11 fixed-function shader semantic smoke executable missing" }
+          & $smoke.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 fixed-function shader semantic smoke failed with exit code $LASTEXITCODE" }
+
       - name: Verify binary exists
         shell: pwsh
         run: |
