@@ -379,6 +379,10 @@ namespace outrun::vr::dx11
                 VertexDeclarationSamples.load(std::memory_order_relaxed),
                 IndexedSamples.load(std::memory_order_relaxed),
                 TexturedSamples.load(std::memory_order_relaxed),
+                UnsupportedIndexFormatSamples.load(std::memory_order_relaxed),
+                UnsupportedTextureFormatSamples.load(std::memory_order_relaxed),
+                UnsupportedColorFormatSamples.load(std::memory_order_relaxed),
+                UnsupportedDepthFormatSamples.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
