@@ -34,7 +34,8 @@ foreach ($name in $parseFiles) {
 }
 
 $pythonFiles = @(
-    'analyze_dxvk_session.py'
+    'analyze_dxvk_session.py',
+    'test_analyze_dxvk_session.py'
 )
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (!$python) { throw 'python is required for one-click analyzer syntax validation.' }
@@ -270,6 +271,11 @@ switch ([string]$target.RendererTarget) {
             if ($dxvkAnalyzer -notmatch [regex]::Escape($requiredText)) {
                 throw "DXVK session analyzer recreation gate missing: $requiredText"
             }
+        }
+
+        & $python.Source (Join-Path $toolsRoot 'test_analyze_dxvk_session.py')
+        if ($LASTEXITCODE -ne 0) {
+            throw "DXVK session analyzer regression test failed with exit code $LASTEXITCODE"
         }
     }
 
