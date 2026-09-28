@@ -114,19 +114,21 @@
     "A redundant exact-SHA Build run 36402857566 was cancelled; the successful exact-SHA Build 36402477449 is the validation authority.",
     "AUTOMATION_VALIDATION=PASS is limited to static/CI/build evidence and does not assert in-game behavior.",
     "RUNTIME_VALIDATION=UNTESTED because no Quest 3/HMD/in-game execution was performed.",
-    "No N100 local clone/worktree and no PC Fast runner were used."
+    "No N100 local clone/worktree and no PC Fast runner were used.",
+    "Issue #14 comment 5867105528 is the canonical exact-SHA validation ledger entry; recovery-created comment 5867095779 is marked SUPERSEDED/DUPLICATE."
   ],
   "production_change_ledger": {
     "issue": 14,
     "status": "WRITTEN",
     "implementation_comment_id": 5867005901,
-    "validation_comment_id": 5867095779,
-    "redundant_rollover_validation_comment_id": 5867105528
+    "validation_comment_id": 5867105528,
+    "redundant_rollover_validation_comment_id": 5867095779,
+    "redundant_comment_status": "SUPERSEDED_DUPLICATE"
   },
   "rollover_recovery": {
     "status": "RECOVERED_WITHOUT_DUPLICATION",
-    "note": "CHAT_ROLLOVER=3 re-read GitHub after the R74 source commit and exact-SHA CI completed, detected the already-persisted run record from rollover 2, made no duplicate source change, and reconciled the production ledger to the canonical validation comment. A second validation comment was emitted during the concurrent rollover race and is recorded as redundant evidence only."
+    "note": "Concurrent rollovers recovered the already-committed R74 source work and exact-SHA CI without duplicating source changes. Issue #14 comment 5867105528 is the canonical validation ledger entry. Recovery-created comment 5867095779 was explicitly marked SUPERSEDED/DUPLICATE and must not be treated as a second validation event."
   },
   "next_action": "Keep NativeDrawPathActivationAllowed=false. In the next bounded DX11 task, classify supported VB/IB Lock flags against concrete D3D11 mirror update semantics, then add texture LockRect/UpdateTexture mutation coverage and a MANAGED CPU-shadow/reset-generation model. F19/F21 input-layout and shader/fixed-function readiness remain open. Do not claim runtime/visual parity or promote native draw ownership before exact-build Quest 3/VDXR validation.",
-  "finalized_kst": "2026-09-28T18:24:36+09:00"
+  "finalized_kst": "2026-09-28T18:25:00+09:00"
 }
