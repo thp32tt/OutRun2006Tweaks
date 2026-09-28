@@ -1208,3 +1208,4 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Shared counts: queue 137 = 85 localize_text + 41 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; unresolved zoom-review 23; resolved preserve-original 18; transcriptions/artwork plan 85 assets / 731 segments.
 - No W00009 DDS bytes changed; approved DDS count 0; `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
 - Machine report: `localization/graphics/role_C/20260929-0414-C94/C94_W00009_SYNC_FINAL_QA.json`.
+- ATTEMPT 2 inspected failed Automation Gate run `36471592964` job `109094916692`: `verify_state.py` failed only because an intermediate commit had graphics state at 88 assets / 737 segments while progress still said 85 / 731 and 85 localize_text / 41 zoom_review. Latest HEAD repairs the mismatch to 88 / 737 and 88 / 38; canonical/legacy progress mirrors are identical. The identical failure is not rerun on the stale SHA.
