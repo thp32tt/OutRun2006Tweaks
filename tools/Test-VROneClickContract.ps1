@@ -31,6 +31,9 @@ foreach ($name in $parseFiles) {
 }
 
 $target = Get-Content $targetPath -Raw | ConvertFrom-Json
+if (!$target.DevelopmentBranch) {
+    throw 'VR_ONE_CLICK_TARGET.json has no DevelopmentBranch.'
+}
 $allowed = @('2d','d3d9','dx11','dxvk-safe','dxvk')
 if ($allowed -notcontains [string]$target.LaunchBackend) {
     throw "Invalid LaunchBackend in VR_ONE_CLICK_TARGET.json: $($target.LaunchBackend)"
@@ -57,15 +60,31 @@ $package = Get-Content (Join-Path $toolsRoot 'Build-OutRunPCFast.ps1') -Raw
 foreach ($required in @(
     'Invoke-OutRunVROneClick.ps1',
     'VR_ONE_CLICK_TARGET.json',
-    'START_HERE_VR_TEST.cmd'
+    'START_HERE_VR_TEST.cmd',
+    'Collect-OutRunVRLogs.ps1'
 )) {
     if ($package -notmatch [regex]::Escape($required)) {
         throw "PC FAST package does not include one-click dependency: $required"
     }
 }
 
+$collector = Get-Content (Join-Path $toolsRoot 'Collect-OutRunVRLogs.ps1') -Raw
+foreach ($requiredText in @(
+    'VR_ONE_CLICK_TARGET.json',
+    'IntegrationBranch=$developmentBranch',
+    'RendererTarget=$rendererTarget',
+    "dxvk-safe' -or $backend -eq 'dx11"
+)) {
+    if ($collector -notmatch [regex]::Escape($requiredText)) {
+        throw "Collector is not branch-aware for one-click runs: $requiredText"
+    }
+}
+
 switch ([string]$target.RendererTarget) {
     'dx11-native' {
+        if ([string]$target.DevelopmentBranch -ne 'vr-dx11-native-r71') {
+            throw "DX11 one-click DevelopmentBranch mismatch: $($target.DevelopmentBranch)"
+        }
         if ([string]$target.LaunchBackend -ne 'dx11') {
             throw 'DX11-native development branch must currently launch the isolated dx11-host DirectGPU validation mode.'
         }
@@ -98,6 +117,9 @@ switch ([string]$target.RendererTarget) {
     }
 
     'dxvk' {
+        if ([string]$target.DevelopmentBranch -ne 'vr-dxvk-r71-disasm') {
+            throw "DXVK one-click DevelopmentBranch mismatch: $($target.DevelopmentBranch)"
+        }
         if ([string]$target.LaunchBackend -ne 'dxvk-safe') {
             throw 'DXVK R71 must stay on dxvk-safe until stock two-pass visual parity passes.'
         }
