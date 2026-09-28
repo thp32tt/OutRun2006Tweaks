@@ -1,5 +1,5 @@
 {
-  "schema_version": 65,
+  "schema_version": 66,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "W00005 C90 material action: D6DC1380 single-DDS isolation input is ready; package/test only this DDS and capture real-game runtime evidence before any approval.",
-    "Use localization/validation/single_dds/W00005_C00019_D6DC1380.json with the single-DDS packaging workflow; verify size/scaling ratio, alpha/transparency geometry, sprite position, clipping and crash behavior.",
-    "Keep D6DC1380 RUNTIME_VALIDATION=UNTESTED until the isolated real-game test occurs; approved DDS count remains 0.",
-    "Odd REWORK rows 51/53/111/121 and even rows 94/102 retain their existing blockers; W00005 added no new candidate bytes for them.",
-    "Continue unrelated pending_artwork/zoom_review production independently; runtime-isolation backlog is asset-local and must not block unrelated work."
+    "W00006 C91: C4A2937B single-DDS isolation input is promoted to localization/validation/single_dds/W00006_C00022_C4A2937B.json; test it alone before any approval.",
+    "Keep the existing D6DC1380 W00005 single-DDS isolation case active as a separate test; do not combine the two DDS for approval evidence.",
+    "Four zoom_review rows 136/144/146/148 are resolved as preserve-original because only protected OutRun2/OutRun2SP logos and scenic/course-card artwork are present; unresolved zoom_review count is now 43.",
+    "Odd REWORK rows 51/53/111/121 and even rows 94/102 retain their prior blockers; no W00006 candidate DDS bytes changed.",
+    "Continue unrelated pending_artwork and remaining zoom_review production; runtime-isolation backlog remains asset-local."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -127,10 +127,12 @@
       ],
       "failed_elements": 93,
       "pending_production_localize_text": 63,
-      "hold_strict_recheck_zoom_review": 47,
+      "hold_strict_recheck_zoom_review": 43,
       "promotion_hold_for_pixel_pass": true,
       "promotion_hold_reason": "W00001 C barrier reconciled; isolated DDS_ONLY in-game validation and remaining rework required",
-      "user_approved_locked": 0
+      "user_approved_locked": 0,
+      "zoom_review_resolved_preserve_original": 4,
+      "queue_reconciled_at_kst": "2026-09-29T02:14:53+09:00"
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -1385,39 +1387,42 @@
     "next_action": "Next A+B wave remains source-gated on GitHub-available canonical/HD DDS bytes; preserve existing REWORK/HOLD/PENDING_C states and require isolated DDS_ONLY in-game validation before approval."
   },
   "latest_wave_barrier": {
-    "recorded_at_kst": "2026-09-29T01:40:31+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00019",
-    "wave_id": "W00005",
-    "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
-    "base_head": "f4e1295a78eeb5a104fde45df24fbe9c1bf71a39",
-    "lane_a": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
-    "lane_b": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+    "recorded_at_kst": "2026-09-29T02:14:53+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00022",
+    "wave_id": "W00006",
+    "result": "PASS_W00006_SYNC_ZOOM_REVIEW_RESOLVED_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
+    "base_head": "5950156c25c6a8e246096abc21dadfadf0c6e869",
+    "lane_a": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_INPUT_READY",
+    "lane_b": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
     "lane_remote_ci": {
       "A": "PASS",
       "B": "PASS"
     },
     "candidate_dds_modified": false,
     "material_backlog_action": {
-      "type": "SINGLE_DDS_ISOLATION_INPUT_AND_PACKAGING_WORKFLOW",
-      "asset": "D6DC1380",
-      "queue_index": 12,
-      "manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+      "type": "SINGLE_DDS_ISOLATION_PROMOTION_PLUS_ZOOM_REVIEW_RESOLUTION",
+      "asset": "C4A2937B",
+      "queue_index": 61,
+      "manifest": "localization/validation/single_dds/W00006_C00022_C4A2937B.json",
       "workflow": ".github/workflows/localization-single-dds-isolation.yml",
       "state": "INPUT_READY_PENDING_INGAME",
-      "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
-      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00"
+      "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+      "zoom_review_resolved_indices": [
+        136,
+        144,
+        146,
+        148
+      ]
     },
     "asset_queue_modified": true,
     "asset_queue_status_changed": true,
-    "asset_queue_status_row": 12,
-    "asset_queue_note_rows": [
-      12,
-      51,
-      53,
-      94,
-      102,
-      111,
-      121
+    "asset_queue_status_rows": [
+      61,
+      136,
+      144,
+      146,
+      148
     ],
     "queue_recompute": {
       "rows": 137,
@@ -1430,10 +1435,11 @@
       },
       "statuses": {
         "c90_single_dds_isolation_ready_pending_ingame": 1,
-        "c85_pixel_visual_pass_pending_ingame": 3,
+        "c91_single_dds_isolation_ready_pending_ingame": 1,
+        "c85_pixel_visual_pass_pending_ingame": 2,
         "blocked_runtime_font": 9,
         "blocked_runtime_name_entry": 1,
-        "blocked_review": 47,
+        "blocked_review": 43,
         "pending_artwork": 63,
         "rework_required_zero_pixel_or_artifact": 6,
         "b95_self_qa_pass_pending_c": 1,
@@ -1441,13 +1447,15 @@
         "b94_self_qa_pass_pending_c": 1,
         "a00004_self_qa_pass_pending_c_visual_ingame": 1,
         "c86_containment_pass_high_risk_pending_ingame": 2,
-        "preserve_original": 1
+        "preserve_original": 5
       },
-      "direct_image_scope": 126
+      "direct_image_scope": 126,
+      "zoom_review_unresolved": 43,
+      "zoom_review_resolved_preserve_original": 4
     },
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json"
+    "report": "localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json"
   },
   "c88_w00003_barrier": {
     "recorded_at_kst": "2026-09-28T23:37:00+09:00",
@@ -1656,5 +1664,76 @@
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json"
+  },
+  "c91_w00006_barrier": {
+    "recorded_at_kst": "2026-09-29T02:14:53+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00022",
+    "wave_id": "W00006",
+    "result": "PASS_W00006_SYNC_ZOOM_REVIEW_RESOLVED_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
+    "base_head": "5950156c25c6a8e246096abc21dadfadf0c6e869",
+    "lane_a": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_INPUT_READY",
+    "lane_b": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+    "lane_remote_ci": {
+      "A": "PASS",
+      "B": "PASS"
+    },
+    "candidate_dds_modified": false,
+    "material_backlog_action": {
+      "type": "SINGLE_DDS_ISOLATION_PROMOTION_PLUS_ZOOM_REVIEW_RESOLUTION",
+      "asset": "C4A2937B",
+      "queue_index": 61,
+      "manifest": "localization/validation/single_dds/W00006_C00022_C4A2937B.json",
+      "workflow": ".github/workflows/localization-single-dds-isolation.yml",
+      "state": "INPUT_READY_PENDING_INGAME",
+      "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+      "zoom_review_resolved_indices": [
+        136,
+        144,
+        146,
+        148
+      ]
+    },
+    "asset_queue_modified": true,
+    "asset_queue_status_changed": true,
+    "asset_queue_status_rows": [
+      61,
+      136,
+      144,
+      146,
+      148
+    ],
+    "queue_recompute": {
+      "rows": 137,
+      "actions": {
+        "localize_text": 79,
+        "font_pipeline": 9,
+        "hangul_name_entry": 1,
+        "zoom_review": 47,
+        "preserve_brand_song_credit": 1
+      },
+      "statuses": {
+        "c90_single_dds_isolation_ready_pending_ingame": 1,
+        "c91_single_dds_isolation_ready_pending_ingame": 1,
+        "c85_pixel_visual_pass_pending_ingame": 2,
+        "blocked_runtime_font": 9,
+        "blocked_runtime_name_entry": 1,
+        "blocked_review": 43,
+        "pending_artwork": 63,
+        "rework_required_zero_pixel_or_artifact": 6,
+        "b95_self_qa_pass_pending_c": 1,
+        "a_auto_self_qa_pass_pending_c": 1,
+        "b94_self_qa_pass_pending_c": 1,
+        "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+        "c86_containment_pass_high_risk_pending_ingame": 2,
+        "preserve_original": 5
+      },
+      "direct_image_scope": 126,
+      "zoom_review_unresolved": 43,
+      "zoom_review_resolved_preserve_original": 4
+    },
+    "approved_dds_count": 0,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json"
   }
 }

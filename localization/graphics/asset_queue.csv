@@ -40,7 +40,7 @@ index,path,action,artwork_status,transcription_status,notes
 57,textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds,localize_text,a_auto_self_qa_pass_pending_c,transcribed_reviewed,C78 corrected Total Rank x3 background artifacts; candidate f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4; A82/B83/D77/D78 old SHA superseded for binary validation; D + in-game pending; A AUTO exact source-bbox PASS 15/15; C + DDS_ONLY in-game pending
 59,textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 60,textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds,localize_text,b94_self_qa_pass_pending_c,transcribed_reviewed,B84 production + C79 strict QA PASS 17 semantic/21 physical; candidate unchanged; D78 same-SHA preflight valid; final D reconcile + in-game pending; B94 exact source-diff bbox rework PASS 21/21; C + isolated DDS_ONLY in-game pending
-61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,localize_text,c85_pixel_visual_pass_pending_ingame,transcribed_reviewed,C80 strict QA PASS unchanged B85 SHA; D80 same-SHA preflight valid; Drift and runtime composition + final D/in-game pending
+61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,localize_text,c91_single_dds_isolation_ready_pending_ingame,transcribed_reviewed,W00006 C91: A00020 single-DDS isolation input promoted to shared manifest; source/candidate blobs unchanged from C85; runtime UNTESTED
 62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
 63,textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds,localize_text,c85_pixel_visual_pass_pending_ingame,transcribed_reviewed,B90 CREATE_NEW_HD 2048x2048 candidate C83 strict QA PASS unchanged; START x2/GOAL x1; all pixel/alpha changes confined to 3 cells; raw mirror_y; D + in-game pending
 65,textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
@@ -70,15 +70,15 @@ index,path,action,artwork_status,transcription_status,notes
 132,textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
 133,textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
 135,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
-136,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
+136,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds,zoom_review,preserve_original,not_required,W00006 B100+C91 zoom review resolved: scenic/course-card artwork plus protected OutRun2SP logo only; no localizable text; preserve original
 137,textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 139,textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
 140,textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 143,textures/load/spr_sprani_sumo_fe_cvt_Exst/34923C8A_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass8 transcription saved
-144,textures/load/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
-146,textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
+144,textures/load/spr_sprani_sumo_fe_cvt_Exst/35361191_512x512.dds,zoom_review,preserve_original,not_required,W00006 B100+C91 zoom review resolved: scenic/course-card artwork plus protected OutRun2 logo only; no localizable text; preserve original
+146,textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds,zoom_review,preserve_original,not_required,W00006 B100+C91 zoom review resolved: scenic/course-card artwork plus protected OutRun2 logo only; no localizable text; preserve original
 147,textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass8 transcription saved
-148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,zoom_review,blocked_review,needs_zoom_review,
+148,textures/load/spr_sprani_sumo_fe_cvt_Exst/3AE1BB60_256x256.dds,zoom_review,preserve_original,not_required,W00006 B100+C91 zoom review resolved: scenic/course-card artwork plus protected OutRun2SP logo only; no localizable text; preserve original
 150,textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds,zoom_review,blocked_review,needs_zoom_review,
 151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 152,textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds,localize_text,pending_artwork,transcribed_reviewed,pass12 semantics resolved via index198 music-label cross-reference

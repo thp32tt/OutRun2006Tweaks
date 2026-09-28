@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "case_id": "W00006_C00022_C4A2937B",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00022",
+  "wave_id": "W00006",
+  "lane": "LOCALIZATION_C",
+  "created_at_kst": "2026-09-29T02:14:53+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "5950156c25c6a8e246096abc21dadfadf0c6e869",
+  "active": true,
+  "purpose": "Isolate C4A2937B alone for runtime size/scaling, alpha/transparency, sprite position, clipping, crash behavior, and Drift and / 드리프트하고 adjacent-sprite composition before any approval.",
+  "asset": {
+    "id": "C4A2937B",
+    "queue_index": 61,
+    "queue_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "raw_orientation": "mirror_y"
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+    "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "qa_evidence": {
+    "c85_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "c85_status": "C85_PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "text_elements": 21,
+    "containment_pass_count": 21,
+    "containment_fail_count": 0,
+    "outside_declared_cells_changed_nontransparent_pixels": 0,
+    "structure": "4096x4096 RGBA32 / 1 mip / source-candidate header 128 bytes exact",
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Test C4A2937B as the only replacement DDS.",
+    "Capture readable/game-orientation evidence for the affected Heart Attack mission sprites.",
+    "Verify runtime dimensions/scaling, alpha/transparency geometry, sprite position, clipping and zero-pixel overflow.",
+    "Explicitly verify the adjacent-sprite composition of Drift and / 드리프트하고.",
+    "Do not promote or approve the DDS unless isolated runtime behavior is correct."
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED"
+}

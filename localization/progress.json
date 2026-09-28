@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T01:40:31+09:00",
+  "updated_at_kst": "2026-09-29T02:14:53+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "W00005 C material reconciliation: D6DC1380 deterministic single-DDS isolation input is ready. Package/test only D6DC1380 with the recorded safe diagnostic overrides and capture in-game size/scaling, alpha/transparency, sprite-position, clipping and crash evidence; keep RUNTIME_VALIDATION=UNTESTED until that real-game test occurs. Continue unrelated pending graphics production independently.",
+  "next_checkpoint": "W00006 C91 reconciliation: C4A2937B deterministic single-DDS isolation input is promoted and four zoom_review rows are resolved as preserve-original/no-localizable-text. Package/test D6DC1380 and C4A2937B only as separate DDS_ONLY cases before approval; keep RUNTIME_VALIDATION=UNTESTED until real-game tests occur. Continue unrelated pending localize_text and unresolved zoom_review production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -531,31 +531,37 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C90",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00019",
-      "wave_id": "W00005",
-      "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
+      "run": "C91",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00022",
+      "wave_id": "W00006",
+      "result": "PASS_W00006_SYNC_ZOOM_REVIEW_RESOLVED_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
       "approved_dds_count": 0,
-      "material_backlog_action": "D6DC1380_SINGLE_DDS_ISOLATION_INPUT_READY",
-      "report": "localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json",
+      "material_backlog_action": "C4A2937B_SINGLE_DDS_ISOLATION_READY_AND_4_ZOOM_REVIEWS_RESOLVED_PRESERVE_ORIGINAL",
+      "report": "localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {
       "status": "input_ready_pending_ingame",
       "latest_case": {
-        "case_id": "W00005_C00019_D6DC1380",
-        "asset": "D6DC1380",
-        "queue_index": 12,
-        "manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+        "case_id": "W00006_C00022_C4A2937B",
+        "asset": "C4A2937B",
+        "queue_index": 61,
+        "manifest": "localization/validation/single_dds/W00006_C00022_C4A2937B.json",
         "packaging_workflow": ".github/workflows/localization-single-dds-isolation.yml",
-        "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
-        "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+        "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+        "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
         "package_mode": "DDS_ONLY",
         "expected_dds_count": 1,
         "runtime_validation": "UNTESTED"
       },
-      "ready_cases": 1
-    }
+      "ready_cases": 2,
+      "ready_case_ids": [
+        "W00005_C00019_D6DC1380",
+        "W00006_C00022_C4A2937B"
+      ]
+    },
+    "zoom_review_unresolved": 43,
+    "zoom_review_resolved_preserve_original": 4
   },
   "data_build": {
     "draft_bin_entries": 1356,

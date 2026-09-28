@@ -1163,3 +1163,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Real-game validation was not performed by C. `RUNTIME_VALIDATION=UNTESTED`; D6DC1380 is not approved. Final approved/locked DDS count remains 0.
 - Canonical `localization/progress/progress.json` and legacy `localization/progress.json` use identical content. No N100, GPT Library, VR/FFB/DX work, or game build was used.
 - Machine report: `localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json`.
+
+## 2026-09-29 02:14 KST - W00006 C BARRIER + SHARED MERGE (AUTO C-00022)
+
+- Refreshed GitHub-only `korean-localization-clean` at `5950156c25c6a8e246096abc21dadfadf0c6e869` after both W00006 production lanes reached durable terminal results.
+- A00020: `PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_INPUT_READY`; material deliverable is a deterministic C4A2937B single-DDS isolation input. No candidate DDS bytes changed. Current source blob `aa0e87be65349bca1ddad278f8f336f9511c95f5` and candidate blob `0b5f45ec475af6edcc982ce5aafa35dd05e9a66d` exactly match the lane report and retained C85 evidence.
+- B00021: `PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL`; indices 136/144/146/148 were classified as preserve-original with no Korean candidate required. C revalidated the exact upstream source/release blob identities recorded by B100 and merged the four queue resolutions.
+- Shared manifest promoted: `localization/validation/single_dds/W00006_C00022_C4A2937B.json`. Keep C4A2937B and the existing D6DC1380 W00005 case as separate one-DDS runtime tests; aggregate graphics results are not per-DDS approval evidence.
+- Queue recompute: 137 rows; unresolved zoom_review 43; resolved zoom_review preserve-original 4; row 61 is `c91_single_dds_isolation_ready_pending_ingame`. REWORK rows 51/53/94/102/111/121 are unchanged.
+- Cross-lane final QA added 0 approvals because W00006 changed no DDS bytes and no isolated in-game validation was performed. approved/locked count remains 0; `RUNTIME_VALIDATION=UNTESTED`.
+- Canonical progress and legacy progress mirror are written from identical bytes. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Machine report: `localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json`.

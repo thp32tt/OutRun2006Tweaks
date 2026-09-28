@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-28T12:31:00+09:00
+Updated: 2026-09-29T02:14:53+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -715,3 +715,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Queue row 12 is now `c90_single_dds_isolation_ready_pending_ingame`; rows 51, 53, 94, 102, 111, 121 remain REWORK/HOLD as before.
 - No real-game test was performed in this task: `RUNTIME_VALIDATION=UNTESTED`. No game build, VR/FFB/DX, N100, or GPT Library use.
 - Report: `localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json`.
+
+## W00006 C synchronization barrier — 2026-09-29 02:14 KST
+- GitHub-only reconciliation base HEAD: `5950156c25c6a8e246096abc21dadfadf0c6e869`. A00020 and B00021 both have durable W00006 terminal records; Automation Gate, Localization State, and Domain Isolation Guard passed for both lane commits.
+- Lane A produced no DDS byte change; C revalidated the current C4A2937B source/candidate Git blobs against A00020 and retained C85 zero-pixel containment 21/21 PASS. Shared DDS_ONLY manifest: `localization/validation/single_dds/W00006_C00022_C4A2937B.json`.
+- Lane B resolved zoom-review indices 136, 144, 146 and 148 as preserve-original/no-localizable-text. Their exact upstream original PNG and HD release DDS blob identities at Sonic-TV/OR2006Sprites commit `a95efe01d1f136514cef94b0d9e9fd61df021754` match B100 evidence; only protected OutRun2/OutRun2SP logos are retained.
+- Queue remains 137 rows. Unresolved zoom_review decreases from 47 to **43**; four zoom-review rows are now preserve-original. Row 61 advances to `c91_single_dds_isolation_ready_pending_ingame`; D6DC1380 remains separately ready from W00005.
+- No new candidate DDS bytes and no new approvals. approved_dds remains **0**. Existing REWORK/HOLD states remain unchanged.
+- No real-game test was performed by C; `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
+- Machine report: `localization/graphics/role_C/20260929-0214-C91/C91_W00006_SYNC_FINAL_QA.json`.
