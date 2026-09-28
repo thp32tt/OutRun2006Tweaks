@@ -53,6 +53,10 @@ jobs:
         shell: pwsh
         run: ./tools/Test-AnalyzeOutRunVRSession.ps1
 
+      - name: Verify DXVK host-owned transport synchronization contract
+        shell: pwsh
+        run: python tools/verify_dxvk_host_owned_transport_contract.py
+
       - name: Test DXVK pinned acquisition
         shell: pwsh
         run: ./tools/Test-DxvkAcquisition.ps1
