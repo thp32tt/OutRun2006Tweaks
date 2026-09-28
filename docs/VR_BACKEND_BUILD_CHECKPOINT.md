@@ -15,3 +15,5 @@ Checkpoint refresh: one-run census JSON extraction + resource/declaration/FFP ce
 
 Final one-run packaging checkpoint: machine-readable DX11 census summary wired into the diagnostic ZIP.
 
+Identity-sealed checkpoint: BUILD_INPUTS, target metadata and backend SOURCE_SHA must agree before launch.
+
