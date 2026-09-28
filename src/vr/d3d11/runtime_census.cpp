@@ -57,6 +57,10 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceUpdateTextureFailures{0};
         std::atomic<std::uint64_t> ResourceUpdateSurfaceSuccesses{0};
         std::atomic<std::uint64_t> ResourceUpdateSurfaceFailures{0};
+        std::atomic<std::uint64_t> ResourceManagedShadowWrites{0};
+        std::atomic<std::uint64_t> ResourceManagedShadowReads{0};
+        std::atomic<std::uint64_t> ResourceManagedResetSuccesses{0};
+        std::atomic<std::uint64_t> ResourceManagedResetShadowPreserved{0};
         std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
@@ -85,6 +89,7 @@ namespace outrun::vr::dx11
         std::mutex MutationEvidenceMutex;
         BufferMutationRegistry VertexMutationEvidence;
         BufferMutationRegistry IndexMutationEvidence;
+        ManagedMirrorLifetimeState ManagedLifetimeEvidence{};
 
         struct TextureMutationEvidence
         {
@@ -250,6 +255,28 @@ namespace outrun::vr::dx11
             evidence.flags = flags;
         }
 
+        void note_managed_lifetime_access(bool write) noexcept
+        {
+            if (write)
+                ResourceManagedShadowWrites.fetch_add(
+                    1, std::memory_order_relaxed);
+            else
+                ResourceManagedShadowReads.fetch_add(
+                    1, std::memory_order_relaxed);
+
+            if (!write)
+                return;
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            ManagedLifetimeEvidence =
+                note_managed_shadow_write(ManagedLifetimeEvidence);
+        }
+
+        ManagedMirrorLifetimeState managed_lifetime_snapshot() noexcept
+        {
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            return ManagedLifetimeEvidence;
+        }
+
         void finish_observed_buffer_unlock(
             BufferMutationRegistry& registry,
             const void* resource,
@@ -326,9 +353,14 @@ namespace outrun::vr::dx11
                     1, std::memory_order_relaxed);
                 break;
             case BufferMutationUpdateKind::ManagedCpuShadowRead:
+                ResourceMutationManagedShadowUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+                note_managed_lifetime_access(false);
+                break;
             case BufferMutationUpdateKind::ManagedCpuShadowWrite:
                 ResourceMutationManagedShadowUnlocks.fetch_add(
                     1, std::memory_order_relaxed);
+                note_managed_lifetime_access(true);
                 break;
             case BufferMutationUpdateKind::Unsupported:
             default:
@@ -397,12 +429,18 @@ namespace outrun::vr::dx11
 
             if (!pending || FAILED(result))
                 return;
-            if ((evidence.flags & D3DLOCK_READONLY) != 0)
+            const bool readOnly =
+                (evidence.flags & D3DLOCK_READONLY) != 0;
+            if (readOnly)
                 ResourceTextureMutationReadOnlyUnlocks.fetch_add(
                     1, std::memory_order_relaxed);
             else
                 ResourceTextureMutationWriteUnlocks.fetch_add(
                     1, std::memory_order_relaxed);
+
+            if (evidence.descriptorObserved &&
+                evidence.pool == D3DPOOL_MANAGED)
+                note_managed_lifetime_access(!readOnly);
         }
 
         bool inspect_texture(
@@ -685,7 +723,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R76 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R77 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -791,7 +829,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R76 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, classified VB/IB update plans, and texture mutation/update observation; native draw routing remains disabled",
+                    "VR DX11 R77 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, classified VB/IB update plans, texture mutation/update observation, and MANAGED reset-generation evidence; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -812,8 +850,9 @@ namespace outrun::vr::dx11
                 unsupported[i] =
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
+            const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R76 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R77 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -849,6 +888,15 @@ namespace outrun::vr::dx11
                 ResourceUpdateTextureFailures.load(std::memory_order_relaxed),
                 ResourceUpdateSurfaceSuccesses.load(std::memory_order_relaxed),
                 ResourceUpdateSurfaceFailures.load(std::memory_order_relaxed),
+                ResourceManagedShadowWrites.load(std::memory_order_relaxed),
+                ResourceManagedShadowReads.load(std::memory_order_relaxed),
+                ResourceManagedResetSuccesses.load(std::memory_order_relaxed),
+                ResourceManagedResetShadowPreserved.load(std::memory_order_relaxed),
+                managedLifetime.deviceGeneration,
+                managedLifetime.cpuShadowVersion,
+                managedLifetime.mirrorGeneration,
+                managedLifetime.mirrorShadowVersion,
+                managed_mirror_ready(managedLifetime) ? 1 : 0,
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -975,6 +1023,30 @@ namespace outrun::vr::dx11
         (SUCCEEDED(result)
             ? ResourceUpdateSurfaceSuccesses
             : ResourceUpdateSurfaceFailures).fetch_add(
+                1, std::memory_order_relaxed);
+    }
+
+    void observe_device_reset_generation(HRESULT result) noexcept
+    {
+        if (FAILED(result) || !census_enabled())
+            return;
+
+        ResourceManagedResetSuccesses.fetch_add(
+            1, std::memory_order_relaxed);
+        bool shadowPreserved = false;
+        {
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            const auto before = ManagedLifetimeEvidence;
+            ManagedLifetimeEvidence =
+                advance_managed_device_generation(ManagedLifetimeEvidence);
+            shadowPreserved =
+                before.cpuShadowValid &&
+                ManagedLifetimeEvidence.cpuShadowValid &&
+                before.cpuShadowVersion ==
+                    ManagedLifetimeEvidence.cpuShadowVersion;
+        }
+        if (shadowPreserved)
+            ResourceManagedResetShadowPreserved.fetch_add(
                 1, std::memory_order_relaxed);
     }
 
