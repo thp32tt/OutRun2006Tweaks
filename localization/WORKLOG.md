@@ -1046,3 +1046,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Repaired 21 exact-bbox failures without B91-style broad shrink: translate/trim without resampling where possible; only minimum-fit rows resampled.
 - Automated containment 21/21 PASS, outside/collateral 0; candidate f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb.
 - Independent C visual/source-style QA and isolated DDS_ONLY in-game pending; RUNTIME_VALIDATION=UNTESTED.
+
+## 2026-09-28T16:06:49+09:00 - B95 FA7BBB13 rework [LOCALIZATION-LOCALIZATION_B-00002]
+
+- GitHub-only B production on even shard index 54; N100/GPT Library/VR/FFB/build not used.
+- Reworked 10 C85 zero-pixel failures while retaining all 17 reviewed Korean translations.
+- 17/17 exact bbox containment PASS. Pixel changes outside the old/new rework rectangles = 0; introduced alpha outside the union of original permitted bboxes = 0; pre-existing PASS cells outside rework overlap unchanged.
+- Candidate SHA-256 d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; pending independent C + isolated DDS_ONLY in-game.
+- A queued duplicate B95 rerun was blocked by branch-move protection after production because the result commit already existed; no second candidate was committed.
