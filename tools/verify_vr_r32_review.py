@@ -246,12 +246,19 @@ host_direct = require(
 if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" in host_direct:
     raise SystemExit("R32 host must not Flush every direct frame")
 query_error = host_direct.find("if (FAILED(hr))")
-fault_generation = host_direct.find("AckFaultGeneration = generation", query_error)
+fault_generation = host_direct.find("MarkGenerationFault(generation)", query_error)
 fast_gate = host_direct.find("AckFaultGeneration == generation")
 if min(query_error, fault_generation, fast_gate) < 0:
     raise SystemExit("R32 host ACK query failure must disable fast-submit for that generation")
 if not (query_error < fault_generation < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
+
+ensure_fence_failure = host_direct.find("if (!EnsureFence(slot))")
+ensure_fence_fault = host_direct.find(
+    "MarkGenerationFault(generation)", ensure_fence_failure)
+if min(ensure_fence_failure, ensure_fence_fault) < 0 or         ensure_fence_fault < ensure_fence_failure:
+    raise SystemExit(
+        "R32 EVENT allocation failure must quarantine the active DirectGPU generation")
 
 r34 = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",
