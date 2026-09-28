@@ -6,7 +6,7 @@
   "base_sha": "cbe8e4a4974eb17ed5936574e0869fc383c290f3",
   "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "summary": "A index 51 FF2462BB automated exact-bbox self-QA PASS using no-resample/minimal-fit repair; independent C visual/source-style QA and isolated DDS_ONLY in-game remain required.",
+  "summary": "A index 57 39229D64 automated exact-bbox QA PASS; independent C and isolated DDS_ONLY in-game remain required.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
@@ -25,9 +25,10 @@
     "Reworker commit 71f348f618667c0919c6e9e56b96f9b39f3423ad.",
     "Workflow retarget commit dc12c3d458d8d4dbf51b8bc55dc8b36e41dba159.",
     "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
-    "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png"
+    "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png",
+    "localization/graphics/role_A/20260928-AUTO-A00001/A_AUTO_00001_39229D64_REPORT.json"
   ],
   "result_sha": "81384186d39367dfb80648d9af695c266b96536a",
   "note": "No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed.",
-  "production_commit_sha": "81384186d39367dfb80648d9af695c266b96536a"
+  "production_commit_sha": "19125bf123c14f7d0806f7780e1cd748279819b6"
 }
