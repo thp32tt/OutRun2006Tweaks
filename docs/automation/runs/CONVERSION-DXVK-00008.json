@@ -48,8 +48,8 @@
     "DXVK-FAILSAFE-RUNTIME-LOG-COLLECTOR-V6-RUNTIME-CONFIRMATION",
     "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY"
   ],
-  "next_action": "Do not test V5. Use V6 only when another runtime capture is needed. Renderer priority is no longer provider-local Ex promotion: that succeeded. Investigate a DXVK-native Windows GPU transport that does not depend on the legacy D3D9 shared KMT handle path, and independently profile/mitigate SBS fallback GPU completion causing xrEndFrame stalls. Keep multiview blocked until transport/pacing is solved.",
-  "recorded_at": "2026-09-29T00:20:00+09:00",
+  "next_action": "Use V7 for the next runtime check, not V5. First validate that the V6 collector embedded in V7 automatically produces the ZIP. Compare HMD pacing at fixed 45 Hz versus the failed native-90 cadence. In parallel, continue DXVK-native Windows DirectGPU transport design because stock DXVK legacy D3D9 shared KMT handles are not usable in this run.",
+  "recorded_at": "2026-09-29T00:24:00+09:00",
   "validation_checkpoint_sha": "d288dec167dc770db2ff2f2264b9781acded5929",
   "review_checkpoint_commits": [
     "9e3f4b6710db692ff01dcd09aa3ab4bbef7436f1",
@@ -167,5 +167,19 @@
     ],
     "v6_static_validation": "PASS",
     "runtime_validation": "UNTESTED_FOR_COLLECTOR_V6"
+  },
+  "runtime_pacing_candidate": {
+    "package": "OutRun2_VR_DXVK_D3D9EX_45HZ_FALLBACK_TEST_7f2ea390_V7",
+    "source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "binary_payload_change": false,
+    "rationale": "V4 gameplay telemetry shows a 90 Hz XR period of 11.111 ms while actual stereo production fluctuates roughly 28-45 fps and sampled XR gameplay intervals are commonly 34-36 ms. Until DXVK native DirectGPU transport exists, fix the producer cadence at 45 Hz so the 90 Hz runtime sees an exact 2:1 ratio and the game avoids attempting an unsustainable 90 Hz stereo producer cadence.",
+    "launch_delta": [
+      "FrameCadenceTargetHz=45",
+      "PreferD3D9Ex=true",
+      "DirectGpuOnly=false",
+      "HudInspector=false"
+    ],
+    "collector": "V6 fixed collector included; PowerShell $Host collision removed.",
+    "runtime_validation": "UNTESTED"
   }
 }
