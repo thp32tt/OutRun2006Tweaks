@@ -53,6 +53,8 @@ QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
 QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
 GITHUB_POLL_SECONDS = max(60, int(os.getenv("GITHUB_POLL_SECONDS", "180")))
 QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "180")))
+LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
+PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "60")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
@@ -210,6 +212,8 @@ runtime = {
     "queue_stable_seconds": QUEUE_STABLE_SECONDS,
     "github_poll_seconds": GITHUB_POLL_SECONDS,
     "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
+    "localization_parallel": LOCALIZATION_PARALLEL,
+    "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
     "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
@@ -330,6 +334,10 @@ def load_queue_state() -> dict:
         state = {
             "counter": 0,
             "active": None,
+            "active_by_lane": {},
+            "wave_counter": 0,
+            "wave_id": None,
+            "wave_started_at": None,
             "completed": [],
             "blocked": [],
             "last_github_poll_at": None,
@@ -340,13 +348,17 @@ def load_queue_state() -> dict:
         raw = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
         raw.setdefault("counter", 0)
         raw.setdefault("active", None)
+        raw.setdefault("active_by_lane", {})
+        raw.setdefault("wave_counter", 0)
+        raw.setdefault("wave_id", None)
+        raw.setdefault("wave_started_at", None)
         raw.setdefault("completed", [])
         raw.setdefault("blocked", [])
         raw.setdefault("last_github_poll_at", None)
         return raw
     except Exception:
         log.exception("queue state read failed; recreating")
-        state = {"counter": 0, "active": None, "completed": [], "blocked": [], "last_github_poll_at": None}
+        state = {"counter": 0, "active": None, "active_by_lane": {}, "wave_counter": 0, "wave_id": None, "wave_started_at": None, "completed": [], "blocked": [], "last_github_poll_at": None}
         save_queue_state(state)
         return state
 
@@ -389,6 +401,27 @@ def github_commit_message(sha: str) -> Optional[str]:
         return data.get("commit", {}).get("message", "")
     except Exception as e:
         log.warning("github commit lookup failed sha=%s error=%r", sha, e)
+        return None
+
+
+def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> Optional[dict]:
+    """Find this task's durable commit even when another parallel lane moved branch HEAD."""
+    try:
+        q = urllib.parse.urlencode({"sha": branch, "per_page": max(1, min(per_page, 100))})
+        data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
+        expected = f"[AUTO:{task_id}]"
+        for item in data if isinstance(data, list) else []:
+            message = item.get("commit", {}).get("message", "")
+            if expected in message:
+                return {
+                    "sha": item.get("sha"),
+                    "message": message,
+                    "html_url": item.get("html_url"),
+                }
+        return None
+    except Exception as e:
+        log.warning("github task commit lookup failed branch=%s task=%s error=%r", branch, task_id, e)
+        write_runtime(last_github_error=f"task-commit:{branch}:{task_id}:{e!r}")
         return None
 
 
@@ -447,11 +480,13 @@ def queue_dynamic_prefix() -> str:
     branch = str(runtime.get("queue_branch") or "")
     attempt = int(runtime.get("queue_attempt") or 1)
     failure = str(runtime.get("queue_failure_context") or "").strip()
+    wave_id = str(runtime.get("queue_wave_id") or "").strip()
     lines = [
         f"[자동 큐 작업] TASK_ID={task_id}",
         f"LANE={lane}",
         f"TARGET_BRANCH={branch}",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
+        *([f"WAVE_ID={wave_id}"] if wave_id else []),
         "반드시 GitHub만 직접 사용하고 N100 로컬 저장소로 우회하지 마.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
