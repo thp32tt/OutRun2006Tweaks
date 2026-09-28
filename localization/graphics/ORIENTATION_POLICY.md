@@ -321,3 +321,22 @@ When detection, removal, reconstruction, orientation, font coverage, fitting or 
 - Record offline/static validation separately from runtime validation.
 - A generated file is never equivalent to a completed/approved asset.
 
+## Additional safeguards from further open-source pipeline review
+
+Effective 2026-09-29:
+
+- **Mask dilation is source-effect aware:** the removal mask must expand enough to include antialias/shadow/glow residue, but expansion is clipped by protected artwork masks. Blind rectangular dilation is forbidden.
+- **High-resolution removal:** perform source-text removal/reconstruction at the exact HD source resolution. Do not downscale for inpainting and upscale the result back into the DDS.
+- **Intermediate preservation:** retain source mask, protected mask, clean plate and final lettering as separate QA artifacts. A flattened final image alone is insufficient evidence.
+- **Typography measurement:** estimate source text height/scale/alignment first; Korean font sizing begins from measured source typography rather than an arbitrary maximum box size.
+- **Confidence/fail-closed threshold:** uncertain text detection, ambiguous masks, uncertain reconstruction or missing glyph coverage must stop automatic promotion rather than guessing.
+- **Two-stage residue detection:** scan once immediately after source-text removal and again after final Korean lettering. The first scan must not be confused by Korean glyphs.
+- **Protected-boundary masks:** panel outlines, sprite boundaries, separators, icons, logos, preserve-original labels and neighboring cells are protected masks. Any changed pixel inside a protected mask fails.
+- **No generic readability effects:** do not add a white/black stroke, shadow, backing, glow or border merely for legibility. Effects are reproduced only when present in the exact source element.
+- **No artificial upscaling as evidence:** upscaled views may be used for human inspection only; containment and artifact decisions are made against exact decoded source-resolution pixels.
+- **Retry limit:** automatic reconstruction may retry with alternate source-constrained methods, but repeated failure ends in `MANUAL_RECONSTRUCTION_REQUIRED` rather than progressively destructive edits.
+
+Tool enforcement:
+- `tools/localization/render_artwork.py` is PROOF-ONLY and requires explicit acknowledgement; its transparent lettering output is forbidden as final DDS artwork.
+- `tools/localization/validate_clean_plate.py` provides a fail-closed source/candidate edit-mask gate and rejects changed pixels outside the permitted edit mask, protected-mask changes and alpha changes outside the permitted mask.
+
