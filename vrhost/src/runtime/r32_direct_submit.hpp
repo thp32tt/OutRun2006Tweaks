@@ -268,8 +268,18 @@ namespace OutRunVrR32DirectSubmit
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (slot >= Pending.size() || !generation || !EnsureFence(slot))
+        if (slot >= Pending.size() || !generation)
             return false;
+        if (!EnsureFence(slot))
+        {
+            // Repeated EVENT allocation failure should not re-enter the fast
+            // path every XR tick and pressure more producer slots. Quarantine
+            // this generation and let the lower SafeEye copy/fence path own
+            // recovery without publishing an unsafe ACK.
+            MarkGenerationFault(generation);
+            ++AckQueryErrors;
+            return false;
+        }
 
         if (AckedGeneration[slot] == generation &&
             AckedFrame[slot] == frame.frameId)
