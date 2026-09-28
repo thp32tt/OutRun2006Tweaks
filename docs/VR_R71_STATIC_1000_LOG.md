@@ -84,3 +84,26 @@ Priority:
 3. reconcile host DirectGPU ACK/session lifetime branches without wholesale replacement;
 4. measure R14 external-write hook hot-path cost before changing it;
 5. keep SkyGlow intensity frozen until the user's R71 HMD result.
+
+## Cycle 0005 — OpenXR session / DirectGPU ACK lifetime
+
+- Compared current R71 host ownership with the prior build-verified ACK-lifetime hardening instead of replacing the host branch wholesale.
+- Current R71 `xrDestroySession` called `ReleasePending()`, which released incomplete D3D11 EVENT query owners even though those queries protect GPU consumption of producer textures, not the lifetime of the XrSession object.
+- Replaced only that destruction boundary with `PollCompletedAcks()`; incomplete EVENT owners remain alive across XR session recreation while completed owners are retired normally.
+- Added a structural verifier that requires `PollCompletedAcks()` inside `DestroySession` and forbids `ReleasePending()` before the underlying session destroy call.
+- Commits:
+  - `330f2ffcfb5ef9bcdeb03af79f4913e698627a4f`
+  - `ab79e6b871e91cea4f8e7ef52c7a67448bfbd669`
+- Finding: `VR-HOST-XR-DESTROY-PENDING-ACK-OWNER-001`
+- AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: host build/architecture pass, then HMD reset/session-recreation validation later.
+
+## Cycle 0006 — queued
+
+Priority:
+1. consume exact-parent CI and refreshed HUD Inspector;
+2. narrow BA9D0 ownership from exact caller evidence;
+3. review skipped-frame / transition-watermark ACK ownership without mixing divergent branches;
+4. measure R14 external-write-hook miss cost before optimizing it;
+5. keep SkyGlow intensity unchanged until frozen R71 HMD evidence arrives.
