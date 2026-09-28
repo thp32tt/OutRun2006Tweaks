@@ -1015,3 +1015,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B even shard index 60; six C85 failing regions reworked from current GitHub HD candidate/source only.
 - 21/21 source-diff bbox containment PASS; no outside-cell/collateral changes.
 - Candidate 4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7; C + isolated DDS_ONLY in-game pending; no build/VR/FFB/N100/GPT Library.
+
+## 2026-09-28 13:20 KST — C86 B92 DXT5 final QA
+
+- Started from current GitHub `korean-localization-clean`; during the run B93 concurrently advanced the branch for separate asset `2DA43E41`, so C86 refreshed HEAD and preserved that work.
+- Independently fetched current B92 candidates and canonical HD DDS for `62BEBF33` and `E3FD08BE` directly from GitHub.
+- Both candidates revalidated as 2048×256 DXT5 / 1 mip with exact canonical 128-byte headers.
+- Decoded DXT5 alpha comparison found **0 alpha changes outside declared cells** and **0 introduced alpha outside declared cells** for both assets.
+- B92 exact source-bbox evidence is reconciled as PASS: `62BEBF33` original [392,52,1357,201], localized [565,52,1186,200]; `E3FD08BE` original [393,54,1628,200], localized [632,54,1388,199].
+- Both touch the original top bbox edge with zero margin, so C86 marks them `CONTAINMENT_PASS_HIGH_RISK_PENDING_INGAME`; they are not promoted to `approved_dds`.
+- Current approved/locked count remains 0. Remaining current HD REWORK assets: 10. No build, VR/FFB, N100, or GPT Library use.
+- Machine report: `localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json`.
