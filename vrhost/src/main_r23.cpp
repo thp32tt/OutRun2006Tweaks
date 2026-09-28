@@ -284,6 +284,21 @@ namespace
         }
     };
     R23DirectHoldState R23DirectHold{};
+    struct R23DirectDescCacheEntry
+    {
+        ID3D11Texture2D* left = nullptr;   // weak identity only
+        ID3D11Texture2D* right = nullptr;  // weak identity only
+        std::uint32_t leftHandle = 0;
+        std::uint32_t rightHandle = 0;
+        std::uint32_t generation = 0;
+        D3D11_TEXTURE2D_DESC leftDesc{};
+        D3D11_TEXTURE2D_DESC rightDesc{};
+        bool valid = false;
+    };
+
+    std::array<R23DirectDescCacheEntry, OutRunVR::RenderFrameRingSize>
+        R23DirectDescCache{};
+
     bool R23FirstDirectHoldLogged = false;
     bool R36FirstDirectBootstrapLogged = false;
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
@@ -336,8 +351,28 @@ namespace
 
         D3D11_TEXTURE2D_DESC left{};
         D3D11_TEXTURE2D_DESC right{};
-        c.directLeft_[slot]->GetDesc(&left);
-        c.directRight_[slot]->GetDesc(&right);
+        auto& descCache = R23DirectDescCache[slot];
+        const std::uint32_t leftHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+        const std::uint32_t rightHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
+        const bool cachedDesc =
+            descCache.valid &&
+            descCache.left == c.directLeft_[slot] &&
+            descCache.right == c.directRight_[slot] &&
+            descCache.leftHandle == leftHandle &&
+            descCache.rightHandle == rightHandle &&
+            descCache.generation == generation;
+        if (cachedDesc)
+        {
+            left = descCache.leftDesc;
+            right = descCache.rightDesc;
+        }
+        else
+        {
+            c.directLeft_[slot]->GetDesc(&left);
+            c.directRight_[slot]->GetDesc(&right);
+        }
         if (!left.Width || !left.Height || left.Width != right.Width ||
             left.Height != right.Height || left.MipLevels != right.MipLevels ||
             left.ArraySize != right.ArraySize || left.Format != right.Format ||
@@ -345,6 +380,18 @@ namespace
             left.Width != frame.backbufferWidth ||
             left.Height != frame.backbufferHeight)
             return false;
+
+        if (!cachedDesc)
+        {
+            descCache.left = c.directLeft_[slot];
+            descCache.right = c.directRight_[slot];
+            descCache.leftHandle = leftHandle;
+            descCache.rightHandle = rightHandle;
+            descCache.generation = generation;
+            descCache.leftDesc = left;
+            descCache.rightDesc = right;
+            descCache.valid = true;
+        }
 
         const bool recreate =
             !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
@@ -395,7 +442,7 @@ namespace
         {
             R23FirstDirectHoldLogged = true;
             std::cout
-                << "DirectGPU single-copy production path active; legacy private snapshot/fence bypassed and grace projection samples only host-owned hold textures.\n";
+                << "DirectGPU PERF P4: single-copy hold path active; validated source descriptors are cached per ring slot/generation and duplicate per-frame GetDesc validation is removed.\n";
         }
         return true;
     }
@@ -1081,20 +1128,6 @@ namespace
         return found && R23FrameUnchanged(reader, selected);
     }
 
-    bool R23ValidateDirectResourceSize(StereoCompositor& c,
-        const OutRunVR::SharedRenderFrameState& frame)
-    {
-        const std::uint32_t slot = frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
-        const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
-        const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
-        if (slot >= OutRunVR::RenderFrameRingSize || !width || !height ||
-            width != frame.backbufferWidth || height != frame.backbufferHeight ||
-            !c.directLeft_[slot] || !c.directRight_[slot]) return false;
-        D3D11_TEXTURE2D_DESC l{}, r{};
-        c.directLeft_[slot]->GetDesc(&l); c.directRight_[slot]->GetDesc(&r);
-        return l.Width == width && l.Height == height && r.Width == width && r.Height == height &&
-            l.Format == r.Format && l.SampleDesc.Count == 1 && r.SampleDesc.Count == 1;
-    }
 
     void R23InvalidateDirect(StereoCompositor& c)
     {
@@ -1107,7 +1140,6 @@ namespace
         const OutRunVR::SharedRenderFrameState& frame)
     {
         if (!c.PrepareDirectStereoSource(frame) ||
-            !R23ValidateDirectResourceSize(c, frame) ||
             !R23StageDirectHold(c, frame))
         {
             R23InvalidateDirect(c);
