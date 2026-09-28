@@ -45,11 +45,11 @@ index,path,text_detected,action,review_status,notes
 43,textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds,yes,localize_text,visual_reviewed,
 44,textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 45,textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds,maybe,zoom_review,visual_reviewed,
-46,textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds,yes,localize_text,visual_reviewed,
+46,textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds,yes,localize_text,visual_reviewed,W00014 B00045+C99 reconstruction mapping verified 21/21; exact bbox/render HOLD; runtime UNTESTED
 47,textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds,yes,localize_text,visual_reviewed,
-48,textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds,yes,localize_text,visual_reviewed,
+48,textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds,yes,localize_text,visual_reviewed,W00014 B00045+C99 reconstruction mapping verified 9/9; shared NAME/STATUS bbox split HOLD; runtime UNTESTED
 49,textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds,yes,localize_text,visual_reviewed,
-50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,yes,localize_text,visual_reviewed,
+50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,yes,localize_text,visual_reviewed,W00014 B00045+C99 partial mapping 3/7; four explicit text-sprite detection HOLDs retained; runtime UNTESTED
 51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,yes,localize_text,visual_reviewed,
 52,textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds,yes,localize_text,visual_reviewed,W00010 B00033+C95: localizable UI text retained; exact HD reconstruction input/source identity advanced; candidate still pending exact decoded-pixel bbox QA
 53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,yes,localize_text,visual_reviewed,
@@ -61,7 +61,7 @@ index,path,text_detected,action,review_status,notes
 59,textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds,yes,localize_text,visual_reviewed,
 60,textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds,yes,localize_text,visual_reviewed,
 61,textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds,yes,localize_text,visual_reviewed,
-62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,yes,localize_text,visual_reviewed,W00011 B00036+C96: Diverge/Left/Right/HARD/EASY confirmed localizable; preserve road/arrows; candidate pending exact decoded-pixel mask QA
+62,textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds,yes,localize_text,visual_reviewed,W00011 B00036+C96: Diverge/Left/Right/HARD/EASY confirmed localizable; preserve road/arrows; candidate pending exact decoded-pixel mask QA; W00014 B00045+C99 mapping verified 5 semantic/7 physical; exact text-effect bbox/render HOLD; runtime UNTESTED
 63,textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds,yes,localize_text,visual_reviewed,
 64,textures/load/spr_sprani_loading_cvt_Exst/4E9FE840_32x512.dds,no,no_localization,visual_reviewed,
 65,textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds,yes,localize_text,visual_reviewed,
@@ -194,7 +194,7 @@ index,path,text_detected,action,review_status,notes
 192,textures/load/spr_sprani_sumo_fe_cvt_Exst/96F4DFEE_256x128.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 193,textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds,yes,localize_text,visual_reviewed,
 194,textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds,maybe,zoom_review,visual_reviewed,
-195,textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds,yes,localize_text,visual_reviewed,
+195,textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds,yes,localize_text,visual_reviewed,"W00014 A00044+C99 STATIC PASS: exact-HD 1024x128 BGRA32; 이용 불가; bbox contained, alpha/header/orientation/source-vs-candidate visual QA PASS; runtime UNTESTED"
 196,textures/load/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds,no,zoom_review,visual_reviewed,W00009 B00030 attempt3+C94: resolved preserve-original; no localizable UI prose
 197,textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds,yes,localize_text,visual_reviewed,
 198,textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds,yes,localize_text,visual_reviewed,

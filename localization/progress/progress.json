@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T06:19:30+09:00",
+  "updated_at_kst": "2026-09-29T06:51:53+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -247,26 +247,27 @@
     "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
     "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "latest_hd_production_candidate": {
-      "asset": "48DEBE77",
+      "asset": "9CE4E175",
+      "queue_index": 195,
       "policy": "CREATE_NEW_HD_KOREAN_ASSET",
-      "coverage": "2 semantic / 3 physical",
+      "coverage": "1 semantic / 1 physical",
       "source_dimensions": [
-        512,
-        512
+        1024,
+        128
       ],
       "candidate_dimensions": [
-        2048,
-        2048
+        1024,
+        128
       ],
-      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
-      "report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
-      "status": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
-      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
-      "raw_orientation": "mirror_y",
-      "prior_korean_reused": false,
-      "c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
-      "c_candidate_changed": false,
-      "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
+      "source_git_blob_sha": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+      "candidate_git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+      "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+      "report": "localization/graphics/role_A/20260929-0635-A00044/A00044_9CE4E175_SELF_QA.json",
+      "status": "C99_STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+      "raw_orientation": "flip_y",
+      "c_final_qa_report": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
     },
     "next_hd_rework": {
       "asset": "FF2462BB",
@@ -535,27 +536,23 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C98",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00043",
-      "wave_id": "W00013",
-      "result": "PASS_W00013_SYNC_FINAL_ZOOM_REVIEW_RESOLVED_5_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
+      "run": "C99",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00046",
+      "wave_id": "W00014",
+      "result": "PASS_W00014_SYNC_FINAL_QA_1_NEW_HD_STATIC_PASS_4_RECONSTRUCTION_INPUTS_RUNTIME_UNTESTED",
       "approved_dds_count": 0,
-      "material_backlog_action": "RECONCILE_A00041_B00042_FINAL_ZOOM_REVIEW_AND_HD_RECONSTRUCTION_INPUTS",
-      "promoted_indices": [
-        38
-      ],
-      "resolved_preserve_indices": [
-        238
-      ],
-      "reconstruction_input_indices": [
-        38,
-        55,
-        99,
-        119,
+      "material_backlog_action": "FINAL_QA_A00044_9CE4E175_AND_RECONCILE_B00045_RECONSTRUCTION_INPUTS",
+      "static_pass_indices": [
         195
       ],
-      "upstream_source_blob_identity": "PASS_14_OF_14_EXPECTED_BLOBS",
-      "report": "localization/graphics/role_C/20260929-0619-C98/C98_W00013_SYNC_FINAL_QA.json",
+      "reconstruction_input_indices": [
+        46,
+        48,
+        50,
+        62
+      ],
+      "upstream_source_blob_identity": "PASS_B_12_OF_12_PLUS_A_EXACT_SOURCE_AND_CANDIDATE_BLOBS",
+      "report": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {
@@ -578,8 +575,46 @@
         "W00006_C00022_C4A2937B"
       ]
     },
-    "zoom_review_unresolved": 2,
-    "zoom_review_resolved_preserve_original": 30
+    "zoom_review_unresolved": 0,
+    "zoom_review_resolved_preserve_original": 31,
+    "c99_9ce4e175": {
+      "source_text": "NOT AVAILABLE",
+      "korean_text": "이용 불가",
+      "source_git_blob_sha": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+      "candidate_git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+      "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+      "dimensions": [
+        1024,
+        128
+      ],
+      "format": "BGRA32_ARGB_MASKS",
+      "mip_count": 1,
+      "pitch": 4096,
+      "header_128_byte_identical": true,
+      "raw_to_readable_orientation": "flip-Y",
+      "original_bbox": [
+        95,
+        7,
+        489,
+        46
+      ],
+      "localized_bbox": [
+        215,
+        8,
+        369,
+        45
+      ],
+      "changed_pixels": 8776,
+      "changed_pixels_outside_source_region": 0,
+      "alpha_changed_pixels": 0,
+      "introduced_alpha_outside_source_region": 0,
+      "clipping": "PASS_STATIC_VISUAL",
+      "english_residue": "PASS_NONE_VISIBLE",
+      "artwork_background_preservation": "PASS",
+      "mandatory_english_source_comparison": "PASS_C_INDEPENDENT_RENDER",
+      "result": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "report": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json"
+    }
   },
   "data_build": {
     "draft_bin_entries": 1356,
@@ -675,25 +710,26 @@
     }
   },
   "graphics_zero_tolerance_boundary_audit": {
-    "timestamp_kst": "2026-09-28T10:09:21+09:00",
+    "timestamp_kst": "2026-09-29T06:51:53+09:00",
     "report": "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json",
-    "detail_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "detail_report": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json",
     "max_outside_pixels": 0,
-    "current_hd_candidates": 16,
-    "pixel_visual_pass": 4,
+    "current_hd_candidates": 17,
+    "pixel_visual_pass": 5,
     "rework_required": 12,
-    "elements_total": 201,
+    "elements_total": 202,
     "elements_fail": 93,
     "direct_queue_scope": 126,
-    "pending_production_localize_text": 76,
-    "hold_strict_recheck_zoom_review": 6,
+    "pending_production_localize_text": 78,
+    "hold_strict_recheck_zoom_review": 0,
     "isolated_ingame_required": 4,
     "approved_lock_count": 0,
     "pixel_pass_pending_ingame": [
       "C4A2937B",
       "9F060EC1",
       "D6DC1380",
-      "48DEBE77"
+      "48DEBE77",
+      "9CE4E175"
     ],
     "rework_required_assets": [
       "FF2462BB",
