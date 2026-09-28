@@ -614,7 +614,7 @@ Never compare slant sign directly in differently transformed raw/display coordin
 ### Mandatory GitHub PNG review set
 
 Every newly generated production candidate must save human-review PNG artifacts under:
-`localization/graphics/generated_png/<asset_id>/`
+`KOREAN_PNG_REVIEW/<asset_id>/`
 
 Required files:
 - `source_display.png` — exact HD source normalized to readable display orientation;
