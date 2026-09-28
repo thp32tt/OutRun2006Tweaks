@@ -113,6 +113,76 @@ function Remove-RootVerified([string]$name) {
     }
 }
 
+$transactionFileNames = @(
+    'dinput8.dll',
+    'outrun-vr-host.exe',
+    'd3d9.dll',
+    'multiviewpatcher.dll',
+    'OutRun2006Tweaks.ini',
+    'ACTIVE_VR_BACKEND.txt',
+    'CURRENT_VR_SESSION.json',
+    'ROOT_PAYLOAD_ATTESTATION.json'
+)
+
+function Start-BackendSwitchTransaction {
+    $backupRoot = Join-Path $root ('.vr-backend-switch-' + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force $backupRoot | Out-Null
+
+    $original = [ordered]@{}
+    foreach ($name in $transactionFileNames) {
+        $sourcePath = Join-Path $root $name
+        $present = Test-Path $sourcePath -PathType Leaf
+        $original[$name] = $present
+        if ($present) {
+            Copy-Item $sourcePath (Join-Path $backupRoot $name) -Force
+        }
+    }
+
+    return [pscustomobject]@{
+        BackupRoot = $backupRoot
+        Original = $original
+        SessionRoot = $null
+    }
+}
+
+function Restore-BackendSwitchTransaction($State) {
+    $rollbackErrors = @()
+    foreach ($name in $transactionFileNames) {
+        try {
+            $destinationPath = Join-Path $root $name
+            if ([bool]$State.Original[$name]) {
+                $backupPath = Join-Path $State.BackupRoot $name
+                if (-not (Test-Path $backupPath -PathType Leaf)) {
+                    throw "Backup file missing: $backupPath"
+                }
+                Copy-Item $backupPath $destinationPath -Force
+            } elseif (Test-Path $destinationPath) {
+                Remove-Item $destinationPath -Force
+            }
+        } catch {
+            $rollbackErrors += ("{0}: {1}" -f $name,$_.Exception.Message)
+        }
+    }
+
+    if ($State.SessionRoot -and (Test-Path $State.SessionRoot)) {
+        try {
+            Remove-Item $State.SessionRoot -Recurse -Force
+        } catch {
+            $rollbackErrors += ("session-root: {0}" -f $_.Exception.Message)
+        }
+    }
+
+    if ($rollbackErrors.Count -gt 0) {
+        throw ("Backend selection rollback failed: " + ($rollbackErrors -join '; '))
+    }
+}
+
+function Remove-BackendSwitchTransaction($State) {
+    if ($State -and $State.BackupRoot -and (Test-Path $State.BackupRoot)) {
+        Remove-Item $State.BackupRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
 function Get-FileIdentity([string]$Path) {
     if (-not (Test-Path $Path -PathType Leaf)) { return $null }
     $resolved = (Resolve-Path $Path).Path
@@ -214,6 +284,8 @@ if ($running) { throw "OutRun or outrun-vr-host.exe is still running. Close it b
 # session. This makes game-side truncate/overwrite behavior harmless.
 Seal-PendingSessionLogs
 
+$backendSwitchTransaction = Start-BackendSwitchTransaction
+try {
 Copy-Required "dinput8.dll"
 
 if ($Backend -eq "2d") {
@@ -318,6 +390,7 @@ $matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } e
 $startedUtc = (Get-Date).ToUniversalTime()
 $session = $startedUtc.ToString("yyyyMMddTHHmmssfffZ") + "-" + [guid]::NewGuid().ToString("N").Substring(0,8)
 $sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$TestProfile,$session)
+$backendSwitchTransaction.SessionRoot = $sessionRoot
 New-Item -ItemType Directory -Force $sessionRoot | Out-Null
 
 $activeText = @(
@@ -360,6 +433,17 @@ Copy-Item (Join-Path $root "ACTIVE_VR_BACKEND.txt") $sessionRoot -Force
 Copy-Item $rootPayloadAttestationPath $sessionRoot -Force
 if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
     Copy-Item (Join-Path $root "BUILD_INPUTS.json") $sessionRoot -Force
+}
+} catch {
+    $selectionFailure = $_.Exception
+    try {
+        Restore-BackendSwitchTransaction $backendSwitchTransaction
+    } catch {
+        throw ("Backend selection failed: {0}; rollback failed: {1}" -f $selectionFailure.Message,$_.Exception.Message)
+    }
+    throw $selectionFailure
+} finally {
+    Remove-BackendSwitchTransaction $backendSwitchTransaction
 }
 
 Write-Host "OutRun renderer mode activated: $Backend"
