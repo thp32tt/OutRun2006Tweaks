@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 7,
+  "completedCycles": 8,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "7ecca8a5174bc707e83dd57960b3fb3c6908397c",
+  "currentHead": "ed05f657272ec9f0ba32a758d2cb82dc9e700c33",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -199,18 +199,53 @@
       "automationValidation": "STATIC_CONTROL_FLOW_REVIEW",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 8 should extract a pure skipped-release identity/retry state machine keyed by clientPid+runGeneration+transportGeneration+slot+frameId, add LEVEL0 tests first, then wire it into immediate skip and transition-watermark paths if tests pass."
+    },
+    {
+      "cycle": 8,
+      "lenses": [
+        "DirectGPU unsampled-frame ownership",
+        "full producer identity and generation rollback",
+        "fail-closed same-slot conflict handling",
+        "LEVEL0 executable regression coverage",
+        "validation/build contract durability"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "A failed per-slot completion ACK for a never-sampled older DirectGPU frame needs a durable retry owner; otherwise lastProcessedStereoFrame/watermark advancement can make that release unreachable.",
+        "Added a pure per-slot retry state machine keyed by clientPid+runGeneration+transportGeneration+slot+frameId. Same live producer slot with a different frame fails closed; stale producer identities are replaced/dropped without writing into a new mapping.",
+        "Added a LEVEL0 smoke executable and made outrun-vr-host depend on it so host builds execute the state-machine regression before completing.",
+        "Runtime wiring is intentionally deferred until the LEVEL0 state machine and exact-head host build are green; sampled frames remain on existing D3D11 EVENT ownership."
+      ],
+      "changedFiles": [
+        "vrhost/src/runtime/r41_skipped_release.hpp",
+        "vrhost/tests/r41_skipped_release_smoke.cpp",
+        "vrhost/CMakeLists.txt",
+        "tools/verify_vr_r32_review.py"
+      ],
+      "commits": [
+        "3bb8128cf86c5b25d85bce109d3b1ab0106e2369",
+        "3d5d4584eb370a71eebb691217c17653226789c9",
+        "3caa860ccd34338b364e5f43ec4751dbacb53135",
+        "c12e98d18d02f6ff572cb2474ccf4e0719f08493",
+        "ed05f657272ec9f0ba32a758d2cb82dc9e700c33"
+      ],
+      "automationValidation": "LEVEL0_STATE_MACHINE_AND_HOST_BUILD_CONTRACT_ADDED; PR80 exact-parent CI queued (Build/OpenXR/HUD Inspector); no pass claimed yet",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 9: consume PR #80 exact-head host/build results. If LEVEL0 is green, wire only never-sampled immediate-skip and transition-watermark release retry into main_r23.cpp; do not touch sampled EVENT ownership."
     }
   ],
   "nextCycle": {
-    "cycle": 8,
+    "cycle": 9,
     "priority": [
-      "design/test durable skipped-release queue",
-      "full producer-run identity",
-      "transition watermark release-before-advance",
-      "consume exact-head CI",
-      "avoid touching already-safe deferred GPU-reference path"
+      "consume PR #80 exact-head Build/OpenXR results",
+      "wire retry queue only after LEVEL0 PASS",
+      "release-before-watermark transition helper",
+      "same-live-slot conflict must quarantine/fail closed",
+      "keep sampled deferred EVENT ACK path unchanged"
     ],
-    "guard": "Do not re-port old CopyResource ownership logic; current R71 zero-copy/deferred-event path supersedes it. Keep sampled frames EVENT-owned and never-sampled frames retry-owned."
+    "guard": "Do not ACK or retry frames already sampled by D3D11 through the skipped-release queue. Runtime wiring is blocked until the new LEVEL0 smoke/build passes."
   },
-  "updatedKst": "2026-09-29T02:48:00+09:00"
+  "updatedKst": "2026-09-29T03:07:20+09:00"
 }
