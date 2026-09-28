@@ -52,8 +52,12 @@ namespace outrun::vr::dx11
         [[nodiscard]] bool ready() const noexcept { return ready_; }
         [[nodiscard]] bool activation_ready() const noexcept
         {
-            return ready_ &&
+            return ready_ && !synchronization_faulted_ &&
                 OutRunVR::Core::TransportIdentityValid(identity_);
+        }
+        [[nodiscard]] bool synchronization_faulted() const noexcept
+        {
+            return synchronization_faulted_;
         }
         [[nodiscard]] bool all_slots_idle() const noexcept;
         [[nodiscard]] const OutRunVR::Core::TransportIdentity&
@@ -119,6 +123,9 @@ namespace outrun::vr::dx11
         std::uint32_t height_{};
         DXGI_FORMAT format_ = DXGI_FORMAT_UNKNOWN;
         bool ready_ = false;
+        // Any unexpected GetData result leaves GPU completion unknowable.
+        // Quarantine the allocation until shutdown() recreates the resources.
+        bool synchronization_faulted_ = false;
     };
 
     static_assert(OutRunVR::RenderFrameRingSize == 4);

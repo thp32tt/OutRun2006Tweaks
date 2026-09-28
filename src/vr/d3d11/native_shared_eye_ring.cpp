@@ -96,6 +96,7 @@ namespace outrun::vr::dx11
         width_ = width;
         height_ = height;
         format_ = format;
+        synchronization_faulted_ = false;
         ready_ = true;
         return true;
     }
@@ -120,6 +121,7 @@ namespace outrun::vr::dx11
         height_ = 0;
         format_ = DXGI_FORMAT_UNKNOWN;
         ready_ = false;
+        synchronization_faulted_ = false;
     }
 
     bool NativeSharedEyeRing::bind_lifetime(
@@ -135,7 +137,8 @@ namespace outrun::vr::dx11
             transport_generation,
         };
 
-        if (!ready_ || !OutRunVR::Core::TransportIdentityValid(next))
+        if (!ready_ || synchronization_faulted_ ||
+            !OutRunVR::Core::TransportIdentityValid(next))
             return false;
         if (identity_ == next)
             return true;
@@ -189,15 +192,22 @@ namespace outrun::vr::dx11
         const HRESULT status = context->GetData(
             slot.producer_fence.Get(), nullptr, 0,
             D3D11_ASYNC_GETDATA_DONOTFLUSH);
+        if (status == S_OK)
+        {
+            // This unpublished frame's GPU writes are complete and it missed
+            // its advertisement window, so no consumer could have observed it.
+            reset_slot_lifetime(slot);
+            return true;
+        }
         if (status == S_FALSE)
             return false;
 
-        // S_OK means this unpublished frame's GPU writes are complete and it
-        // missed its advertisement window, so no consumer could have observed
-        // it. A hard query error also discards the unpublished frame; either
-        // case is safe to reclaim because Published was never reached.
-        reset_slot_lifetime(slot);
-        return true;
+        // A query error does not prove GPU completion. Keep ProducerPending
+        // intact and quarantine the entire allocation until shutdown() creates
+        // a fresh transport generation; reusing this texture could overlap the
+        // still-running old GPU write with a new frame.
+        synchronization_faulted_ = true;
+        return false;
     }
 
     bool NativeSharedEyeRing::try_acquire_slot(
@@ -222,7 +232,11 @@ namespace outrun::vr::dx11
 
             if (slot.state == SharedEyeSlotState::ProducerPending &&
                 !refresh_unpublished_fence(context, slot))
+            {
+                if (synchronization_faulted_)
+                    return false;
                 continue;
+            }
 
             if (slot.state == SharedEyeSlotState::Published)
             {
@@ -306,9 +320,10 @@ namespace outrun::vr::dx11
             return false;
         if (status != S_OK)
         {
-            // The frame was never advertised, so no ACK is required. Discard it
-            // rather than exposing handles without a proven producer fence.
-            reset_slot_lifetime(entry);
+            // The frame was never advertised, but a query error still does not
+            // prove its GPU writes completed. Preserve ProducerPending and
+            // quarantine the ring; only shutdown() may retire this allocation.
+            synchronization_faulted_ = true;
             return false;
         }
 
