@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00019",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00005",
+  "recorded_at_kst": "2026-09-29T01:40:31+09:00",
+  "commit_base_sha": "f4e1295a78eeb5a104fde45df24fbe9c1bf71a39",
+  "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "lane_terminals": {
+    "A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00017",
+      "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+      "effective_automation_validation": "PASS_REMOTE_CI_CONFIRMED",
+      "runtime_validation": "UNTESTED",
+      "candidate_dds_modified": false
+    },
+    "B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00018",
+      "result": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+      "effective_automation_validation": "PASS_REMOTE_CI_CONFIRMED",
+      "runtime_validation": "UNTESTED",
+      "candidate_dds_modified": false
+    }
+  },
+  "material_backlog_action": {
+    "asset": "D6DC1380",
+    "queue_index": 12,
+    "manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+    "packaging_workflow": ".github/workflows/localization-single-dds-isolation.yml",
+    "state": "INPUT_READY_PENDING_INGAME",
+    "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352"
+  },
+  "report": "localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json",
+  "candidate_dds_modified": false,
+  "approved_dds_count": 0,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "summary": "W00005 lane outputs contained no new DDS bytes. Under the latest minimum-progress contract C created a deterministic one-DDS runtime-isolation input and packaging workflow for D6DC1380, preserved unchanged C85/C86 QA states, made no approval, and will reconcile shared state to mark this isolated test input ready."
+}

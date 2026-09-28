@@ -707,3 +707,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No real-game test was performed by C; `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or build was used.
 - Machine report: `localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json`.
 
+## W00005 C synchronization + material fallback — 2026-09-29 01:40 KST
+- A00017/B00018 durable records and remote CI are present, but W00005 production lanes added no candidate DDS bytes. Current contract disallows a no-op C barrier.
+- C material action: **D6DC1380 DDS_ONLY isolation input ready**. Manifest `localization/validation/single_dds/W00005_C00019_D6DC1380.json`; source SHA-256 `42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352`; candidate SHA-256 `53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00`.
+- A reusable GitHub packaging workflow verifies exact hashes/blob identity and DDS structure, and stages exactly one DDS with the safe diagnostic override set.
+- Existing C85/C86 cross-lane QA is preserved because asset bytes did not change; no prior PASS/HOLD was promoted. Approved/locked DDS count remains **0**.
+- Queue row 12 is now `c90_single_dds_isolation_ready_pending_ingame`; rows 51, 53, 94, 102, 111, 121 remain REWORK/HOLD as before.
+- No real-game test was performed in this task: `RUNTIME_VALIDATION=UNTESTED`. No game build, VR/FFB/DX, N100, or GPT Library use.
+- Report: `localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json`.

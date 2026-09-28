@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C90",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00019",
+  "wave_id": "W00005",
+  "timestamp_kst": "2026-09-29T01:40:31+09:00",
+  "branch": "korean-localization-clean",
+  "reconciliation_base_head": "f4e1295a78eeb5a104fde45df24fbe9c1bf71a39",
+  "contract_sha": "52967107df145723dbc565e2a7df63f679c1e90c",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00017",
+      "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+      "candidate_dds_modified": false,
+      "runtime_validation": "UNTESTED",
+      "remote_ci": "PASS"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00018",
+      "result": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+      "candidate_dds_modified": false,
+      "runtime_validation": "UNTESTED",
+      "remote_ci": "PASS"
+    }
+  },
+  "current_contract_reconciliation": {
+    "contract_changed_after_lane_terminals": true,
+    "observation": "Current HEAD requires material output and forbids C no-op barriers while graphics work remains.",
+    "c_action": "Create deterministic single-DDS isolation input/package workflow for D6DC1380 and merge that material backlog advance into shared state."
+  },
+  "cross_lane_final_qa": {
+    "new_A_B_candidate_bytes": 0,
+    "new_A_B_translation_or_artwork_bytes": 0,
+    "repeated_completed_pixel_qa": false,
+    "decision": "Preserve existing C85/C86 machine-readable QA because underlying DDS bytes did not change.",
+    "preserved_pixel_visual_pass_pending_ingame": [
+      "C4A2937B",
+      "9F060EC1",
+      "D6DC1380",
+      "48DEBE77"
+    ],
+    "preserved_containment_pass_high_risk_pending_ingame": [
+      "62BEBF33",
+      "E3FD08BE"
+    ],
+    "semantic_context_terminology": "No W00005 translation/artwork byte delta; existing reviewed Korean terminology/context retained.",
+    "omission_hangul_clipping_overflow": "No W00005 artwork byte delta; prior zero-pixel and visual evidence retained, no new PASS inferred.",
+    "resolution_format_mipmap_alpha_transparency_orientation": "No W00005 DDS delta; prior C85/C86 structure evidence retained.",
+    "background_wrong_replacement_hd_gui": "Aggregate runtime visual failures remain unisolated; D6DC1380 selected for first deterministic one-DDS isolation case."
+  },
+  "material_backlog_action": {
+    "type": "SINGLE_DDS_ISOLATION_INPUT_AND_PACKAGING_WORKFLOW",
+    "asset": "D6DC1380",
+    "queue_index": 12,
+    "manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+    "workflow": ".github/workflows/localization-single-dds-isolation.yml",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+    "source_git_blob_sha": "39ce635200bf4084b78dfd13a7d0e8bb8f67cedb",
+    "candidate_git_blob_sha": "6d8dc84ae10a5468a470d87b595e023fa3cc6fab",
+    "package_mode": "DDS_ONLY",
+    "expected_dds_count": 1,
+    "state": "INPUT_READY_PENDING_INGAME"
+  },
+  "approvals": {
+    "new_approvals": 0,
+    "approved_dds_count": 0
+  },
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS"
+}

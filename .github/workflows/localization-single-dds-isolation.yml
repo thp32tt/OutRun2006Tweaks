@@ -1,0 +1,118 @@
+name: Korean single-DDS isolation payload
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - localization/validation/single_dds/*.json
+      - .github/workflows/localization-single-dds-isolation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout localization branch snapshot
+        uses: actions/checkout@v4
+
+      - name: Verify manifests and stage one-DDS cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import shutil
+          import struct
+          import subprocess
+
+          root = pathlib.Path(".")
+          manifest_dir = root / "localization/validation/single_dds"
+          out_root = root / "dist"
+          manifests = sorted(manifest_dir.glob("*.json"))
+          if not manifests:
+              raise SystemExit("no single-DDS isolation manifests found")
+
+          active_count = 0
+          for manifest_path in manifests:
+              data = json.loads(manifest_path.read_text(encoding="utf-8"))
+              if not data.get("active", False):
+                  continue
+              active_count += 1
+              case_id = data["case_id"]
+              source = root / data["source"]["repository_path"]
+              candidate = root / data["candidate"]["repository_path"]
+
+              def sha256(path):
+                  h = hashlib.sha256()
+                  with path.open("rb") as fh:
+                      for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+                          h.update(chunk)
+                  return h.hexdigest()
+
+              def git_blob(path):
+                  return subprocess.check_output(
+                      ["git", "hash-object", str(path)], text=True
+                  ).strip()
+
+              if not source.is_file() or not candidate.is_file():
+                  raise SystemExit(f"{case_id}: source/candidate file missing")
+              if sha256(source) != data["source"]["sha256"]:
+                  raise SystemExit(f"{case_id}: source SHA-256 mismatch")
+              if sha256(candidate) != data["candidate"]["sha256"]:
+                  raise SystemExit(f"{case_id}: candidate SHA-256 mismatch")
+              if git_blob(source) != data["source"]["git_blob_sha"]:
+                  raise SystemExit(f"{case_id}: source Git blob mismatch")
+              if git_blob(candidate) != data["candidate"]["git_blob_sha"]:
+                  raise SystemExit(f"{case_id}: candidate Git blob mismatch")
+
+              raw = candidate.read_bytes()
+              if len(raw) < 128 or raw[:4] != b"DDS ":
+                  raise SystemExit(f"{case_id}: invalid candidate DDS")
+              height, width = struct.unpack_from("<II", raw, 12)
+              mipmaps = struct.unpack_from("<I", raw, 28)[0] or 1
+              fourcc = raw[84:88]
+              rgb_bits = struct.unpack_from("<I", raw, 88)[0]
+              expected = data["candidate"]["dds"]
+              if (width, height, mipmaps) != (
+                  expected["width"], expected["height"], expected["mipmaps"]
+              ):
+                  raise SystemExit(f"{case_id}: DDS dimensions/mips mismatch")
+              if expected["format"] == "RGBA32" and not (fourcc == b"\\x00"*4 and rgb_bits == 32):
+                  raise SystemExit(f"{case_id}: expected RGBA32 candidate")
+
+              case_dir = out_root / case_id
+              target = case_dir / data["package"]["relative_path"]
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(candidate, target)
+              shutil.copy2(manifest_path, case_dir / "ISOLATION_MANIFEST.json")
+              (case_dir / "DDS_SHA256SUMS.txt").write_text(
+                  f'{data["candidate"]["sha256"]}  {data["package"]["relative_path"]}\n',
+                  encoding="utf-8",
+              )
+              overrides = data["package"]["runtime_overrides"]
+              (case_dir / "RUNTIME_OVERRIDES.txt").write_text(
+                  "".join(f"{k}={v}\n" for k, v in overrides.items()),
+                  encoding="utf-8",
+              )
+              dds_files = list(case_dir.rglob("*.dds"))
+              if len(dds_files) != 1:
+                  raise SystemExit(f"{case_id}: payload must contain exactly one DDS")
+
+          if active_count == 0:
+              raise SystemExit("no active single-DDS isolation cases")
+          print(f"active_single_dds_cases={active_count}")
+          print("AUTOMATION_VALIDATION=PASS")
+          print("RUNTIME_VALIDATION=UNTESTED")
+          PY
+
+      - name: Upload single-DDS isolation payloads
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: korean-single-dds-isolation-${{ github.sha }}
+          path: dist/

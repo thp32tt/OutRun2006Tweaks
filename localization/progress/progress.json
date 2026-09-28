@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T00:46:46+09:00",
+  "updated_at_kst": "2026-09-29T01:40:31+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "W00004 C barrier reconciled: A00014 and B00015 are durable blockers with no new candidate DDS bytes. Preserve current C85/C86 zero-pixel/HOLD states; isolate the 16-DDS graphics payload one DDS at a time for runtime size/scaling/alpha/position diagnosis before any approval or runtime-sensitive rewrite.",
+  "next_checkpoint": "W00005 C material reconciliation: D6DC1380 deterministic single-DDS isolation input is ready. Package/test only D6DC1380 with the recorded safe diagnostic overrides and capture in-game size/scaling, alpha/transparency, sprite-position, clipping and crash evidence; keep RUNTIME_VALIDATION=UNTESTED until that real-game test occurs. Continue unrelated pending graphics production independently.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -531,26 +531,30 @@
       }
     },
     "latest_c_barrier": {
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00016",
-      "wave_id": "W00004",
-      "result": "NO_NEW_ASSET_APPROVALS_RUNTIME_ISOLATION_BLOCKER_STATE_RECONCILED",
-      "base_head": "cb081778f6e0ccaaab255f51d3be13cc0105620b",
-      "lane_a": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
-      "lane_b": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
-      "candidate_dds_modified": false,
-      "asset_queue_modified": true,
-      "asset_queue_status_changed": false,
-      "asset_queue_note_rows": [
-        51,
-        53,
-        94,
-        102,
-        111,
-        121
-      ],
+      "run": "C90",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00019",
+      "wave_id": "W00005",
+      "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
       "approved_dds_count": 0,
-      "runtime_validation": "UNTESTED",
-      "report": "localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json"
+      "material_backlog_action": "D6DC1380_SINGLE_DDS_ISOLATION_INPUT_READY",
+      "report": "localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "single_dds_isolation": {
+      "status": "input_ready_pending_ingame",
+      "latest_case": {
+        "case_id": "W00005_C00019_D6DC1380",
+        "asset": "D6DC1380",
+        "queue_index": 12,
+        "manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+        "packaging_workflow": ".github/workflows/localization-single-dds-isolation.yml",
+        "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+        "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+        "package_mode": "DDS_ONLY",
+        "expected_dds_count": 1,
+        "runtime_validation": "UNTESTED"
+      },
+      "ready_cases": 1
     }
   },
   "data_build": {

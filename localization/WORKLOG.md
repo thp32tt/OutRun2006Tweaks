@@ -1152,3 +1152,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are updated from identical content and remain byte-for-byte identical in this commit.
 - No N100/GPT Library/VR/FFB/DX/build work. Machine report: `localization/graphics/role_C/20260929-0046-C89/C89_W00004_SYNC_FINAL_QA.json`.
 
+## 2026-09-29 01:40 KST - W00005 C BARRIER + MATERIAL RUNTIME-ISOLATION FALLBACK (AUTO C-00019)
+
+- Latest GitHub-only base HEAD: `f4e1295a78eeb5a104fde45df24fbe9c1bf71a39`; current automation contract now forbids a no-op C barrier while graphics work remains.
+- W00005 lane A `LOCALIZATION-LOCALIZATION_A-00017` and lane B `LOCALIZATION-LOCALIZATION_B-00018` both have durable Git records and successful remote Automation Gate / Localization State / Domain Isolation checks, but neither changed candidate DDS bytes.
+- Cross-lane C therefore did not repeat unchanged pixel/binary QA. Existing C85/C86 zero-pixel, decoded-pixel, format/mipmap/alpha/orientation and visual/source-style evidence remains authoritative; **0 new DDS approvals** were made.
+- Material backlog action: prepared deterministic isolated runtime input for queue index 12 `D6DC1380`. Source SHA-256 `42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352`; candidate SHA-256 `53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00`.
+- Manifest: `localization/validation/single_dds/W00005_C00019_D6DC1380.json`. Packaging workflow: `.github/workflows/localization-single-dds-isolation.yml`. The workflow verifies source/candidate SHA-256 + Git blob, DDS dimensions/mips/format, then emits a case containing exactly one DDS plus manifest/hash/runtime-override files.
+- Queue row 12 advances from C85 pass-pending-in-game to `c90_single_dds_isolation_ready_pending_ingame`. Rows 51/53/94/102/111/121 retain REWORK status with W00005 blocker provenance only.
+- Real-game validation was not performed by C. `RUNTIME_VALIDATION=UNTESTED`; D6DC1380 is not approved. Final approved/locked DDS count remains 0.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` use identical content. No N100, GPT Library, VR/FFB/DX work, or game build was used.
+- Machine report: `localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json`.
