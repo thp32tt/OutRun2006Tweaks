@@ -733,3 +733,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Because W00007 introduced no Korean DDS bytes, zero-pixel containment, clipping, DDS format/mipmap/alpha/transparency/orientation and side-by-side English-vs-Korean raster gates are recorded as not applicable for new data; no prior PASS is promoted or inferred.
 - No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/GPT Library/VR/FFB/DX/build work.
 - Machine report: `localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json`.
+
+## W00008 C synchronization barrier — 2026-09-29 03:19 KST
+- GitHub-only reconciliation base HEAD: `9e33ff5f28a5db8b05195d5b071b7e9f4714a90f`. A00026 and B00027 both have durable W00008 terminal results; B records successful Localization State / Automation Gate / Domain Isolation Guard on its material commit, while A's durable terminal record carries static precommit validation.
+- C independently revalidated all eight recorded upstream original-PNG blob identities at `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754` and visually confirmed the A/B classifications. Indices 26/28/30/32/35 contain localizable `Total Rank`; canonical project terminology remains `종합 랭크`. Indices 33/37/45 contain no localizable UI prose and remain preserve-original.
+- Shared queue merge promotes 26/28/30/32/35 from `zoom_review` to `localize_text / pending_artwork / transcribed_reviewed`, and resolves 33/37/45 as `preserve_original / not_required`.
+- Queue remains 137 rows and is now 84 `localize_text` + 42 `zoom_review` + 9 font + 1 Hangul name-entry + 1 preserve-only. Unresolved `zoom_review` decreases **35 -> 27**; resolved preserve-original `zoom_review` increases **12 -> 15**. Canonical transcription coverage becomes 84 assets / 730 semantic segments.
+- `artwork_plan.jsonl` remains at the prior 79 assets / 725 segments, so planning is explicitly marked pending extension for the five promoted assets rather than falsely reporting completion.
+- W00008 introduced **0 new/reworked Korean DDS bytes**. Therefore clipping/Hangul-raster, zero-pixel containment, DDS format/mipmap/alpha/transparency/orientation, background/wrong-replacement and English-source side-by-side gates are not newly passed; the five promoted assets remain HOLD until exact HD decoded-source pixels are used for production. New approvals: **0**; approved/locked DDS count remains **0**.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Machine report: `localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json`.
