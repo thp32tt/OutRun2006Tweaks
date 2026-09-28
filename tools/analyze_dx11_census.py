@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R7[234567] census: "
+    r"VR DX11 R7[2345678] census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
@@ -50,6 +50,9 @@ SUMMARY_RE = re.compile(
     r"mirrorGeneration=(?P<managedMirrorGeneration>\d+),"
     r"mirrorVersion=(?P<managedMirrorVersion>\d+),"
     r"mirrorReady=(?P<managedMirrorReady>\d+)\] )?"
+    r"(?:inputLayout\[exact=(?P<inputLayoutExact>\d+),"
+    r"unsupported=(?P<inputLayoutUnsupported>\d+),"
+    r"fvfPending=(?P<inputLayoutFvfPending>\d+)\] )?"
     r"unsupported\[incomplete=(?P<incomplete>\d+),"
     r"wbuffer=(?P<wbuffer>\d+),sepAlpha=(?P<sepAlpha>\d+),"
     r"alphaTest=(?P<alphaTest>\d+),stencil=(?P<stencil>\d+),"
@@ -73,7 +76,7 @@ STARTUP_RE = re.compile(
     r"msaa=(?P<msaa>-?\d+) bootstrapCompatible=(?P<bootstrapCompatible>[01])"
 )
 
-SIGNATURE_RE = re.compile(r"VR DX11 R7[234567] signature#(?P<id>\d+): (?P<body>.*)")
+SIGNATURE_RE = re.compile(r"VR DX11 R7[2345678] signature#(?P<id>\d+): (?P<body>.*)")
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
@@ -202,6 +205,8 @@ def main() -> int:
             "mutationPlanUnsupported",
             "mutationPlanManagedShadow",
             "textureMutationDescriptorFailures",
+            "inputLayoutUnsupported",
+            "inputLayoutFvfPending",
             "indexUnsupported",
             "textureUnsupported",
             "colorUnsupported",
