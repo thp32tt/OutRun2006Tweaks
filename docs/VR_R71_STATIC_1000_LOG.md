@@ -59,3 +59,28 @@ Priority:
 5. defer SkyGlow intensity tuning until the frozen R71 HMD result.
 
 No direct merge to `vr-d3d9ex-focus`. No self-hosted PC runner.
+
+## Cycle 0004 — MANAGED selector reserve cumulative-cap correctness
+
+- Re-reviewed R14 CPU-shadow accounting, device replacement, retire/unlock and selector emergency paths.
+- Confirmed the R70 policy intended a single 16 MiB emergency class inside the 384 MiB absolute cap, with ordinary shadows isolated to 368 MiB.
+- Found a concrete accounting hole: emergency eligibility was checked per texture but emergency bytes were not accumulated. Multiple exact 2048x2048 atlases could therefore bypass the general counter simultaneously until the absolute cap was reached.
+- Added `R14EmergencyShadowBytes` and a 16 MiB cumulative emergency budget. Reservation failure rolls back the total counter; detach/destructor paths release the emergency counter symmetrically.
+- The pre-allocation gate now checks total/general/emergency classes separately.
+- Added verifier guards so later cleanup cannot silently remove the cumulative cap.
+- Commits:
+  - `1ea60e1ed5dd6de1da55fbef4f8058b557c1601f`
+  - `e7b0f066398e7a5aa71bf217fef3a0f969ec7d66`
+- Finding: `R71-MANAGED-EMERGENCY-RESERVE-CUMULATIVE-001`
+- AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: exact-head build/verifier, then preserve selector/car-screen as an HMD gate before any promotion.
+
+## Cycle 0005 — queued
+
+Priority:
+1. consume PR #79 exact-parent CI and repair deterministic failures only;
+2. consume the refreshed canonical EXE/HUD report and enumerate BA9D0 callers;
+3. reconcile host DirectGPU ACK/session lifetime branches without wholesale replacement;
+4. measure R14 external-write hook hot-path cost before changing it;
+5. keep SkyGlow intensity frozen until the user's R71 HMD result.
