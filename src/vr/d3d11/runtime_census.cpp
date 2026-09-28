@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include "runtime_census.hpp"
+#include "resource_translation.hpp"
 
 #include <array>
 #include <atomic>
@@ -29,6 +30,8 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> FixedFunctionSamples{0};
         std::atomic<std::uint64_t> ProgrammableSamples{0};
         std::atomic<std::uint64_t> UnsupportedTopologySamples{0};
+        std::atomic<std::uint64_t> UnsupportedIndexFormatSamples{0};
+        std::atomic<std::uint64_t> UnsupportedTextureFormatSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
@@ -307,7 +310,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[indexUnsupported={},textureUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -349,6 +352,20 @@ namespace outrun::vr::dx11
             OutRunVRStereo::CaptureTrackedRenderStateSnapshot(device, source);
         const auto translated = translate_pipeline(source);
         const auto topology = translate_primitive(primitive);
+
+        if (sig.indexFormat != D3DFMT_UNKNOWN &&
+            !translate_resource_format(sig.indexFormat, ResourceRole::Index).exact)
+        {
+            UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
+        }
+        for (const D3DFORMAT format : { sig.texture0Format, sig.texture1Format })
+        {
+            if (format != D3DFMT_UNKNOWN &&
+                !translate_resource_format(format, ResourceRole::Texture).exact)
+            {
+                UnsupportedTextureFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            }
+        }
 
         Samples.fetch_add(1, std::memory_order_relaxed);
         std::uint32_t unsupported = translated.unsupported;
