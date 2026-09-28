@@ -21,7 +21,7 @@ Derived from Set 08 runner/profile findings. Set 09 reviews failure handling, di
 
 - **F31 HIGH diagnostics:** Start-Process launch exceptions bypass automatic collection.
 - **F32 HIGH diagnostics:** an unkillable/stuck host blocks automatic collection.
-- **F33 MEDIUM diagnostics:** collector failure can obscure the saved game exit code in the final process status.
+- **F33 CLOSED 2026-09-28:** collector failure is now secondary to host-teardown, launch/wait, and game-exit results. `COLLECTOR_FAILURE.json` records diagnostic-collection failure separately, and the Windows behavior test verifies a forced collector exception cannot replace the original launch failure. Exact-SHA gate `36400113895` PASS on `f6e98496c236244c608a5e0d0ac9fe723b87dd96`.
 - **F34 MEDIUM integrity:** complete SHA256SUMS is generated but not enforced at runtime.
 - **F35 HIGH test gap:** one-click CI is structural/textual rather than an end-to-end selector/preflight behavior test.
 - Existing F03/F06 are reinforced: the weakest diagnostic boundary is the same pre-session sequential mutation window.
