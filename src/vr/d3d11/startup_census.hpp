@@ -15,6 +15,8 @@ namespace outrun::vr::dx11
         DXGI_FORMAT native_format = DXGI_FORMAT_UNKNOWN;
         D3DMULTISAMPLE_TYPE multisample = D3DMULTISAMPLE_NONE;
         DWORD behavior_flags{};
+        LUID adapter_luid{};
+        bool adapter_luid_valid{};
         bool format_supported{};
         bool single_sample{};
         bool native_bootstrap_compatible{};
