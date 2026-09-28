@@ -8,6 +8,7 @@ namespace OutRunVR::Dxvk
     {
         bool d3d9ProviderLoaded{};
         bool nonSystemProvider{};
+        bool gameLocalProvider{};
         bool stockDxvkInterop{};
         bool d3d9ExAvailable{};
         long stockDxvkInteropHr{};
