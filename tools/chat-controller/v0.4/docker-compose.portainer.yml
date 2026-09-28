@@ -16,7 +16,7 @@ services:
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       PREFERRED_THINKING_LEVEL: "High"
-      STRICT_THINKING_LEVEL: "false"
+      STRICT_THINKING_LEVEL: "true"
       FRESH_CHAT_EACH_RUN: "false"
       RETRY_BUTTON_COOLDOWN_SECONDS: "45"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"

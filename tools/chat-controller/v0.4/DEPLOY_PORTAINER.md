@@ -138,8 +138,12 @@ In queue mode the watchdog may recover Retry / Continue generating / browser-com
 AUTO_SEND=true
 WATCHDOG_ENABLED=true
 QUEUE_MODE=true
+PREFERRED_THINKING_LEVEL=High
+STRICT_THINKING_LEVEL=true
 GITHUB_POLL_SECONDS=180
 MAX_TASK_ATTEMPTS=3
 ```
+
+`STRICT_THINKING_LEVEL=true` is mandatory for automated sends. If High cannot be positively verified in the ChatGPT UI, the controller must block that send instead of falling back to another thinking level.
 
 If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each stack after this controller update.

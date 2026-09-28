@@ -34,6 +34,16 @@ jobs:
           docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-vr.yml config >/tmp/vr-compose.txt
           docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-localization.yml config >/tmp/loc-compose.txt
 
+      - name: Verify High-only automation policy
+        run: |
+          for compose in \
+            tools/chat-controller/v0.4/docker-compose.portainer-vr.yml \
+            tools/chat-controller/v0.4/docker-compose.portainer-localization.yml \
+            tools/chat-controller/v0.4/docker-compose.portainer.yml; do
+            grep -Fq 'PREFERRED_THINKING_LEVEL: "High"' "$compose"
+            grep -Fq 'STRICT_THINKING_LEVEL: "true"' "$compose"
+          done
+
       - name: Verify queue prompt files
         run: |
           test -s tools/chat-controller/v0.4/conversion_dx11.md
