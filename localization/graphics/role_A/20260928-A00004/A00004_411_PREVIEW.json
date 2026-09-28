@@ -1,0 +1,8 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+  "asset": "411827E",
+  "mode": "source-current-diff-preview",
+  "source": "canonical HD source",
+  "candidate": "current canonical hd_candidate",
+  "runtime_validation": "UNTESTED"
+}
