@@ -128,11 +128,20 @@ class UIScaling : public Hook
 		0xE481B, 0xE4833, 0xE485C, 0xE4887,
 		// R69 generic menu/list boundary arrows.
 		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3,
-		// V7 runtime-verified OutRun/menu arrows. The V6 HMD trace observed
-		// sprite 0x3004A directly from these three call edges while the older
-		// 12 owner edges had zero hits. Keep ownership exact and reuse the
-		// existing queued-node pinning path.
+		// V7 runtime-verified OutRun/menu arrows.
 		0x460F1, 0x463D6, 0x46410
+	};
+
+	// V7 exact OutRun-mode HUD producers recovered from the V6 HMD trace.
+	// These are intentionally narrow: do not promote generic put_sprite paths.
+	static constexpr int OutRunCheckpoint_PutSprite2Calls[] = {
+		0x2D5A0
+	};
+	static constexpr int OutRunResult_PutSpriteCalls[] = {
+		0x2D26C, 0x2D2EC
+	};
+	static constexpr int OutRunResult_ClipSpriteCalls[] = {
+		0x97BB7, 0x97DA7
 	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
@@ -613,6 +622,82 @@ class UIScaling : public Hook
 					"VR R66 OPTION ARROW: exact node pinned prio={} kind={} hits={}",
 					prio, node->kind_C, hit);
 		}
+		return result;
+	}
+
+	static void RegisterNewestScreenHudNode(
+		float priority, SpriteNode* tailBefore, const char* label) noexcept
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (!node || node == tailBefore)
+			return;
+		OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+			node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		if (Settings::VRTelemetry)
+			spdlog::info(
+				"VR V7 OUTRUN HUD: exact node pinned owner={} prio={} kind={}",
+				label, prio, node->kind_C);
+	}
+
+	static void __cdecl OutRunResult_putSprite(
+		SPRARGS* args, float priority)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			Game::put_sprite_ex(args, priority);
+		}
+		RegisterNewestScreenHudNode(priority, tailBefore, "result-put-sprite");
+	}
+
+	static int __cdecl OutRunCheckpoint_putSprite2(
+		SPRARGS2* args, float priority)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+		using Fn = int(__cdecl*)(SPRARGS2*, float);
+		auto original = reinterpret_cast<Fn>(Module::exe_ptr(0x2D0C0));
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = original(args, priority);
+		}
+		RegisterNewestScreenHudNode(
+			priority, tailBefore, "checkpoint-put-sprite2");
+		return result;
+	}
+
+	static int __cdecl OutRunResult_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		RegisterNewestScreenHudNode(
+			priority, tailBefore, "result-put-clip");
 		return result;
 	}
 
@@ -1100,6 +1185,19 @@ public:
 		for (int addr : OptionArrow_ClipSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), OptionArrow_putClipSprite,
+				Memory::HookType::Call);
+
+		for (int addr : OutRunCheckpoint_PutSprite2Calls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), OutRunCheckpoint_putSprite2,
+				Memory::HookType::Call);
+		for (int addr : OutRunResult_PutSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), OutRunResult_putSprite,
+				Memory::HookType::Call);
+		for (int addr : OutRunResult_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), OutRunResult_putClipSprite,
 				Memory::HookType::Call);
 
 		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
