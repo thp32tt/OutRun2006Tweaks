@@ -1070,3 +1070,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 411827E: seconds resized only within its transparent text cell; tuned/normal/random badge artwork was not scaled. Source pixels were restored only outside each original permitted text bbox.
 - Self-QA: 7/7 exact source-diff containment PASS; foreground containment 7/7 PASS; changed pixels outside declared cells=0, collateral outside touched cells=0, introduced alpha outside original bboxes=0. Candidate 5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948.
 - AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED. Independent C visual/source-style review and isolated DDS_ONLY in-game validation remain required. No build/N100/GPT Library/VR/FFB work.
+
+
+## 2026-09-28T17:51:17+09:00 - A00004 C075FB49 partial safe rework
+- Continued throughput after 411827E. Modified only three independently isolated text-only regions: long_distance, for_experts, new_course_desc.
+- Actual alpha bbox precondition matched C85 for all three before edit; post alpha bboxes are contained. No changes outside touched cells and no introduced alpha outside their original bboxes. Candidate b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791.
+- Six remaining failures are left for dedicated overlap/artwork-safe rework; asset remains REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED; no build/N100/GPT Library/VR/FFB work.

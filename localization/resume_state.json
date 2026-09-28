@@ -1,5 +1,5 @@
 {
-  "schema_version": 62,
+  "schema_version": 63,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A00004: C075FB49 partial safe rework fixed long_distance/for_experts/new_course_desc; 6 failures remain. 411827E pending C visual + DDS_ONLY in-game.",
     "A00004: 411827E self-QA PASS; C visual/source-style + isolated DDS_ONLY in-game pending. 568D3696 remains DXT5 specialized rework.",
     "B95: FA7BBB13 first successful candidate restored and duplicate auto-run retired; pending independent C visual/final QA and isolated DDS_ONLY in-game.",
     "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
@@ -676,6 +677,12 @@
       "report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json",
       "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
       "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"
+    },
+    "a00004_c075fb49": {
+      "timestamp_kst": "2026-09-28T17:51:17+09:00",
+      "report": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json",
+      "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+      "status": "PARTIAL_REWORK_3_SAFE_6_REMAIN"
     }
   },
   "runtime_packages": {

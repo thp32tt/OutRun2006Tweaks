@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "A00004",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+  "timestamp_kst": "2026-09-28T17:51:17+09:00",
+  "asset": "C075FB49",
+  "index": 111,
+  "base_head": "0bea1eba0e9b7d04bcdb2a85dc450e3fc785a5ba",
+  "previous_candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+  "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "reworked_elements": [
+    {
+      "key": "long_distance",
+      "method": "actual_alpha_tight_crop_fit",
+      "before_bbox": [
+        712,
+        25,
+        948,
+        119
+      ],
+      "before_actual_alpha_bbox": [
+        712,
+        25,
+        947,
+        118
+      ],
+      "target_envelope": [
+        712,
+        30,
+        948,
+        124
+      ],
+      "post_foreground_bbox": [
+        712,
+        30,
+        947,
+        123
+      ],
+      "containment": "PASS",
+      "scale_x": 1.0,
+      "scale_y": 1.0
+    },
+    {
+      "key": "for_experts",
+      "method": "actual_alpha_tight_crop_fit",
+      "before_bbox": [
+        1530,
+        230,
+        1985,
+        340
+      ],
+      "before_actual_alpha_bbox": [
+        1530,
+        230,
+        1984,
+        339
+      ],
+      "target_envelope": [
+        1531,
+        231,
+        1979,
+        339
+      ],
+      "post_foreground_bbox": [
+        1531,
+        231,
+        1978,
+        338
+      ],
+      "containment": "PASS",
+      "scale_x": 0.984649,
+      "scale_y": 0.981982
+    },
+    {
+      "key": "new_course_desc",
+      "method": "actual_alpha_tight_crop_fit",
+      "before_bbox": [
+        234,
+        1418,
+        770,
+        1581
+      ],
+      "before_actual_alpha_bbox": [
+        234,
+        1418,
+        770,
+        1580
+      ],
+      "target_envelope": [
+        243,
+        1420,
+        766,
+        1579
+      ],
+      "post_foreground_bbox": [
+        243,
+        1420,
+        766,
+        1578
+      ],
+      "containment": "PASS",
+      "scale_x": 0.975791,
+      "scale_y": 0.97561
+    }
+  ],
+  "remaining_rework_elements": [
+    "keep_passing",
+    "drift",
+    "maximum_speed",
+    "tuned_setting",
+    "normal_setting",
+    "random"
+  ],
+  "qa": {
+    "touched_elements": 3,
+    "touched_failed": 0,
+    "changed_pixels_outside_touched_cells": 0,
+    "changed_pixels_outside_declared_cells": 0,
+    "introduced_alpha_outside_safe_original_bboxes": 0,
+    "visual_proof": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_QA.png"
+  },
+  "status": "PARTIAL_REWORK_PASS_3_SAFE_6_REMAIN",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "final_approval": false,
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false
+}

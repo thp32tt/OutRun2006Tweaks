@@ -660,3 +660,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Automated foreground containment 7/7 PASS; changed pixels outside declared cells 0; collateral outside touched cells 0; introduced alpha outside original bboxes 0.
 - Candidate 5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948; AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; independent C visual/source-style + DDS_ONLY in-game pending.
 - 568D3696 index 53 deferred: DXT5 mip13 shrink cases exceed proven one-pixel remap; broad recompression not attempted.
+
+
+### A00004 C075FB49 partial safe rework — 2026-09-28T17:51:17+09:00
+- Odd index 111: fixed three non-overlapping text-only C85 failures: long_distance, for_experts, new_course_desc. Each post alpha bbox is inside the original permitted bbox.
+- DDS 2048x2048 RGBA32/mip1/header/raw mirror_y preserved; changed pixels outside touched cells=0; introduced alpha outside safe original bboxes=0.
+- Candidate b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791; six C85 failures intentionally remain REWORK_REQUIRED because they overlap adjacent cells or artwork/badges. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.

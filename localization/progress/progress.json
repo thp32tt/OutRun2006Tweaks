@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T17:41:54+09:00",
+  "updated_at_kst": "2026-09-28T17:51:17+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A00004 411827E self-QA PASS; independent C visual/source-style QA and isolated DDS_ONLY in-game validation pending. 568D3696 DXT5 remains specialized rework.",
+  "next_checkpoint": "A00004: 411827E self-QA PASS; C075FB49 partial safe rework 3/9 completed with 6 failures remaining; 568D3696 specialized DXT5 rework remains.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -517,11 +517,16 @@
     "latest_a_production": {
       "run": "A00004",
       "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
-      "report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json",
       "assets": {
         "411827E": {
           "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
-          "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME"
+          "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME",
+          "report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json"
+        },
+        "C075FB49": {
+          "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+          "status": "A_PARTIAL_REWORK_3_SAFE_6_REMAIN",
+          "report": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json"
         }
       }
     }
