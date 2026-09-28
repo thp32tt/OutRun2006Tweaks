@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C93",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00028",
+  "wave_id": "W00008",
+  "timestamp_kst": "2026-09-29T03:19:00+09:00",
+  "branch": "korean-localization-clean",
+  "reconciliation_base_head": "9e33ff5f28a5db8b05195d5b071b7e9f4714a90f",
+  "contract_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00026",
+      "material_commit_sha": "050acd9feec61a535107104784a6b69586872464",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE",
+      "candidate_dds_modified": false,
+      "material_deliverable": "3_PRESERVE_ORIGINAL_PLUS_1_LOCALIZABLE_ZOOM_REVIEW_CLASSIFICATION",
+      "automation_validation": "PASS_STATIC_PRECOMMIT",
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_A/20260929-0315-A00026/A00026_W00008_ZOOM_REVIEW_RESOLUTION.json"
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00027",
+      "material_commit_sha": "5814a150ea14b1d5bea58ce00d3c9e3e58bde390",
+      "terminal_record_commit_sha": "9e33ff5f28a5db8b05195d5b071b7e9f4714a90f",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
+      "candidate_dds_modified": false,
+      "material_deliverable": "4_LOCALIZABLE_TOTAL_RANK_REBUILD_SPECS",
+      "automation_validation": "PASS",
+      "remote_ci": "PASS_RECORDED_IN_TERMINAL_JSON",
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_B/20260929-0305-B102/B102_W00008_ZOOM_REVIEW_TEXT_RECONSTRUCTION_SPEC.json"
+    }
+  },
+  "cross_lane_final_qa": {
+    "new_A_B_candidate_dds_bytes": 0,
+    "repeated_completed_pixel_qa": false,
+    "source_upstream_repo": "Sonic-TV/OR2006Sprites",
+    "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "source_identity": "PASS_8_ORIGINAL_PNG_BLOB_IDENTITIES_REVALIDATED",
+    "assets": [
+      {
+        "lane": "B",
+        "queue_index": 26,
+        "asset": "63C91067",
+        "original_png_git_blob_sha": "b89129cbf06e537f9b15a6dc6ee9a74d5587cdd1",
+        "observed": "two Total Rank labels in pink/brown bubbles",
+        "resolution": "LOCALIZABLE_TEXT_CONFIRMED_PROMOTE_TO_LOCALIZE_TEXT_HOLD_EXACT_HD_PIXELS",
+        "candidate_required": true,
+        "physical_occurrences": 2
+      },
+      {
+        "lane": "B",
+        "queue_index": 28,
+        "asset": "A05BF610",
+        "original_png_git_blob_sha": "37cc15a90eb5f823f05fad3b68ca3232b8b416b1",
+        "observed": "one Total Rank label in green bubble; lens flare preserved",
+        "resolution": "LOCALIZABLE_TEXT_CONFIRMED_PROMOTE_TO_LOCALIZE_TEXT_HOLD_EXACT_HD_PIXELS",
+        "candidate_required": true,
+        "physical_occurrences": 1
+      },
+      {
+        "lane": "B",
+        "queue_index": 30,
+        "asset": "8215FD25",
+        "original_png_git_blob_sha": "b3f201c2894f7fe0c2c5229829228ffa29f0a7d9",
+        "observed": "two Total Rank labels; rank B/C/D/E and character art preserved",
+        "resolution": "LOCALIZABLE_TEXT_CONFIRMED_PROMOTE_TO_LOCALIZE_TEXT_HOLD_EXACT_HD_PIXELS",
+        "candidate_required": true,
+        "physical_occurrences": 2
+      },
+      {
+        "lane": "B",
+        "queue_index": 32,
+        "asset": "DCC7B488",
+        "original_png_git_blob_sha": "9cbd9af75d4dabf4f1ea84ff45998cd6c2d345d2",
+        "observed": "one Total Rank label in green bubble",
+        "resolution": "LOCALIZABLE_TEXT_CONFIRMED_PROMOTE_TO_LOCALIZE_TEXT_HOLD_EXACT_HD_PIXELS",
+        "candidate_required": true,
+        "physical_occurrences": 1
+      },
+      {
+        "lane": "A",
+        "queue_index": 33,
+        "asset": "FBCAB18D",
+        "original_png_git_blob_sha": "8fe5548942a4d41011dcc8de967ad7fc3fc07eba",
+        "observed": "mechanic poses and embedded logo artwork only",
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "A",
+        "queue_index": 35,
+        "asset": "E989E3B7",
+        "original_png_git_blob_sha": "7377da8531185e7e0df1bd399c044a0f1e85bd9b",
+        "observed": "two Total Rank labels plus girlfriend poses",
+        "resolution": "LOCALIZABLE_TEXT_CONFIRMED_PROMOTE_TO_LOCALIZE_TEXT_HOLD_EXACT_HD_PIXELS",
+        "candidate_required": true,
+        "physical_occurrences": 2
+      },
+      {
+        "lane": "A",
+        "queue_index": 37,
+        "asset": "515DCBB2",
+        "original_png_git_blob_sha": "e3ff5510f7d08200964ab481642da9b08fa0b407",
+        "observed": "girlfriend character poses only",
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      },
+      {
+        "lane": "A",
+        "queue_index": 45,
+        "asset": "1F77CB88",
+        "original_png_git_blob_sha": "f6e8aee6a2ae6008888a98eb17416403d1be7a48",
+        "observed": "F1/F2/Esc/Tab/Enter and directional-arrow physical key legends",
+        "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "candidate_required": false
+      }
+    ],
+    "canonical_translation": {
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "evidence": "existing localization/graphics/transcriptions.jsonl canonical entries including indices 51 and 57",
+      "result": "PASS_TERMINOLOGY_AND_CONTEXT"
+    },
+    "semantic_context_terms": "PASS_FIVE_LOCALIZABLE_THREE_PRESERVE",
+    "omission_hangul_clipping_overflow": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_KOREAN_DDS_BYTES",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE; FIVE_PROMOTED_ASSETS_HOLD_UNTIL_EXACT_HD_DECODED_SOURCE_BBOX",
+    "dds_format_mipmap_alpha_transparency_orientation": "UNCHANGED_NO_DDS_WRITE",
+    "background_wrong_replacement_hd_gui": "NO_REPLACEMENT_INTRODUCED; FUTURE_PRODUCTION_MUST_USE_EXACT_HD_ENGLISH_SOURCE",
+    "english_source_side_by_side": "PENDING_FUTURE_CANDIDATE_PRODUCTION_FOR_FIVE_PROMOTED_ASSETS",
+    "approvals_added": 0
+  },
+  "shared_state_merge": {
+    "queue_rows_changed": [
+      26,
+      28,
+      30,
+      32,
+      33,
+      35,
+      37,
+      45
+    ],
+    "promoted_to_localize_text": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ],
+    "resolved_preserve_original": [
+      33,
+      37,
+      45
+    ],
+    "transcriptions_added": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ],
+    "localize_text_before": 79,
+    "localize_text_after": 84,
+    "zoom_review_before": 47,
+    "zoom_review_after": 42,
+    "zoom_review_unresolved_before": 35,
+    "zoom_review_unresolved_after": 27,
+    "zoom_review_resolved_preserve_original_before": 12,
+    "zoom_review_resolved_preserve_original_after": 15,
+    "canonical_progress_and_legacy_mirror_identical": true
+  },
+  "queue_recompute": {
+    "rows": 137,
+    "actions": {
+      "localize_text": 84,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "zoom_review": 42,
+      "preserve_brand_song_credit": 1
+    },
+    "statuses": {
+      "c90_single_dds_isolation_ready_pending_ingame": 1,
+      "blocked_runtime_font": 9,
+      "blocked_runtime_name_entry": 1,
+      "preserve_original": 16,
+      "pending_artwork": 68,
+      "blocked_review": 27,
+      "rework_required_zero_pixel_or_artifact": 6,
+      "b95_self_qa_pass_pending_c": 1,
+      "a_auto_self_qa_pass_pending_c": 1,
+      "b94_self_qa_pass_pending_c": 1,
+      "c91_single_dds_isolation_ready_pending_ingame": 1,
+      "c85_pixel_visual_pass_pending_ingame": 2,
+      "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+      "c86_containment_pass_high_risk_pending_ingame": 2
+    },
+    "direct_image_scope": 126,
+    "zoom_review_unresolved": 27,
+    "zoom_review_resolved_preserve_original": 15
+  },
+  "planning_followup": {
+    "artwork_plan_assets_current": 79,
+    "artwork_plan_segments_current": 725,
+    "localize_text_targets_current": 84,
+    "pending_plan_assets": 5,
+    "pending_indices": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ],
+    "state": "NEEDS_EXTENSION_BEFORE_CANDIDATE_PRODUCTION"
+  },
+  "approvals": {
+    "new_approvals": 0,
+    "approved_dds_count": 0
+  },
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_W00008_SYNC_5_LOCALIZABLE_PROMOTED_3_PRESERVE_NO_NEW_DDS_APPROVALS"
+}
