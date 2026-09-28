@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72/R73/R74/R75 DX11 census analyzer compatibility."""
+"""Regression tests for R72/R73/R74/R75/R76 DX11 census analyzer compatibility."""
 
 from __future__ import annotations
 
@@ -103,6 +103,36 @@ def main() -> int:
     assert r75["LatestSummary"]["mutationPlanMapDiscard"] == 2
     assert r75["LatestSummary"]["mutationPlanMapNoOverwrite"] == 1
     assert r75["LatestSummary"]["mutationPlanUpdateSubresource"] == 1
+
+    r76 = run_case(
+        "VR DX11 R76 signature#1: primitive=4 fixedFn=1\n"
+        "VR DX11 R76 census: samples=64 exact=0 fixedFn=64 programmable=0 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=64 "
+        "texturedSamples=64 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=64,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "mutation[writeUnlocks=7,readOnlyUnlocks=2,discardWriteUnlocks=2,"
+        "noOverwriteWriteUnlocks=1] "
+        "mutationPlan[exact=5,unsupported=1,managedShadow=3,mapWrite=1,"
+        "mapDiscard=2,mapNoOverwrite=1,updateSubresource=1] "
+        "textureMutation[writeUnlocks=9,readOnlyUnlocks=2,descriptorFailures=1,"
+        "updateTextureSuccesses=4,updateTextureFailures=1,"
+        "updateSurfaceSuccesses=3,updateSurfaceFailures=2] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r76["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r76["NativeDrawPathActivationAllowed"] is False
+    assert r76["LatestSummary"]["textureMutationWriteUnlocks"] == 9
+    assert r76["LatestSummary"]["textureMutationReadOnlyUnlocks"] == 2
+    assert r76["LatestSummary"]["textureMutationDescriptorFailures"] == 1
+    assert r76["LatestSummary"]["textureUpdateTextureSuccesses"] == 4
+    assert r76["LatestSummary"]["textureUpdateTextureFailures"] == 1
+    assert r76["LatestSummary"]["textureUpdateSurfaceSuccesses"] == 3
+    assert r76["LatestSummary"]["textureUpdateSurfaceFailures"] == 2
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
