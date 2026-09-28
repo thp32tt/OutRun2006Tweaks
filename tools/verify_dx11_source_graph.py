@@ -54,14 +54,66 @@ def main() -> None:
             "DX11 resource observation contract drift: " + ", ".join(missing_contract)
         )
 
+    resource_translation = (DX11 / "resource_translation.cpp").read_text(
+        encoding="utf-8"
+    )
+    resource_contract = {
+        "ResourceBehaviorRules": "explicit VB/IB/texture/RT/depth behavior table",
+        "ResourceMirrorLifetime::DeviceGeneration": "default-pool reset lifetime",
+        "ResourceMirrorLifetime::ManagedCpuShadow": "managed-pool CPU shadow lifetime",
+        "D3D11_BIND_VERTEX_BUFFER": "vertex-buffer mirror role",
+        "D3D11_BIND_INDEX_BUFFER": "index-buffer mirror role",
+        "D3D11_BIND_SHADER_RESOURCE": "texture mirror role",
+        "D3D11_BIND_RENDER_TARGET": "render-target mirror role",
+        "D3D11_BIND_DEPTH_STENCIL": "depth mirror role",
+        "requiresMutationTelemetry": "lock/update evidence blocker",
+        "requiresCpuShadow": "managed Reset-survival blocker",
+    }
+    missing_resource_contract = [
+        meaning
+        for token, meaning in resource_contract.items()
+        if token not in resource_translation
+    ]
+    if missing_resource_contract:
+        raise SystemExit(
+            "DX11 R73 resource behavior contract drift: "
+            + ", ".join(missing_resource_contract)
+        )
+
+    census_r73_contract = {
+        "ResourceBehaviorUnsupportedSamples": "unmodelled descriptor counter",
+        "ResourceMutationTelemetryRequiredSamples": "lock/update blocker counter",
+        "ResourceManagedShadowRequiredSamples": "managed shadow blocker counter",
+        "translate_resource_behavior": "per-bound-resource behavior classification",
+        "mutationTelemetryRequired": "exact-sample mutation gate",
+        "managedShadowRequired": "exact-sample managed lifetime gate",
+    }
+    missing_r73 = [
+        meaning for token, meaning in census_r73_contract.items() if token not in census
+    ]
+    if missing_r73:
+        raise SystemExit(
+            "DX11 R73 census resource gate drift: " + ", ".join(missing_r73)
+        )
+
     analyzer = (ROOT / "tools" / "analyze_dx11_census.py").read_text(
         encoding="utf-8"
     )
     if '"NativeDrawPathActivationAllowed": False' not in analyzer:
         raise SystemExit("DX11 census must remain observation-only")
-    if "introspectionFailure" not in analyzer:
+    analyzer_contract = {
+        "introspectionFailure": "resource introspection failure evidence",
+        "behaviorUnsupported": "descriptor behavior evidence",
+        "mutationTelemetryRequired": "lock/update blocker evidence",
+        "managedShadowRequired": "managed lifetime blocker evidence",
+        "R7[23] census": "R72/R73 summary compatibility",
+    }
+    missing_analyzer = [
+        meaning for token, meaning in analyzer_contract.items() if token not in analyzer
+    ]
+    if missing_analyzer:
         raise SystemExit(
-            "DX11 analyzer must surface resource introspection failures"
+            "DX11 analyzer resource evidence drift: " + ", ".join(missing_analyzer)
         )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
