@@ -55,12 +55,19 @@ if dds:
     records=qa_pass_records()
     if not records:
         raise SystemExit("DDS changed but no machine-readable PASS record exists in changed QA JSON")
+    required_post_reset=("source_sha256","candidate_dds_sha256","runtime_validation")
     zero_keys=("changed_pixels_outside_edit_mask","changed_pixels_outside_source_region",
                "changed_pixels_in_protected_mask","introduced_alpha_outside_source_region",
                "alpha_changed_outside_edit_mask")
     bad=[]
     seen_zero_gate=False
+    seen_post_reset=False
     for rel,d in records:
+        if all(k in d for k in required_post_reset):
+            seen_post_reset=True
+            rv=str(d.get("runtime_validation","")).upper()
+            if rv not in {"UNTESTED","PASS"}:
+                bad.append(f"{rel}:runtime_validation={rv}")
         for k in zero_keys:
             if k in d:
                 seen_zero_gate=True
@@ -71,6 +78,8 @@ if dds:
         raise SystemExit("post-reset zero-pixel QA failed: "+"; ".join(bad))
     if not seen_zero_gate:
         raise SystemExit("DDS changed but PASS reports contain no post-reset zero-pixel/protected-mask metrics")
+    if not seen_post_reset:
+        raise SystemExit("DDS changed but PASS reports lack post-reset provenance fields (source/candidate SHA and runtime validation)")
 
 print(f"changed_dds={len(dds)} qa_reports={len(report_paths)}")
 print("AUTOMATION_VALIDATION strict machine-readable graphics gate PASS; runtime remains UNTESTED unless separately proven")
