@@ -326,11 +326,27 @@ for marker in (
     "R41ReleaseNeverSampled(frame)",
     "R41RetrySkippedReleases();",
     "R23DeferredSlotBlocked(frame)",
-    "MarkGenerationFault(identity.transportGeneration)",
 ):
     if marker not in host_r23:
         raise SystemExit(
             f"R41 skipped DirectGPU durable-release invariant missing: {marker}")
+
+# Do not make this structural guard whitespace-sensitive. The source formats
+# MarkGenerationFault and identity.transportGeneration across lines.
+release_fn_start = host_r23.find("bool R41ReleaseNeverSampled")
+release_fn_end = host_r23.find("bool R23SameDirectIdentity", release_fn_start)
+if min(release_fn_start, release_fn_end) < 0:
+    raise SystemExit("could not bound R41ReleaseNeverSampled")
+release_fn = host_r23[release_fn_start:release_fn_end]
+for marker in (
+    "StageResult::LiveSlotConflict",
+    "MarkGenerationFault(",
+    "identity.transportGeneration",
+):
+    if marker not in release_fn:
+        raise SystemExit(
+            f"R41 live-slot conflict fail-close invariant missing: {marker}")
+
 skip_guard = host_r23.find("if (R23DeferredSlotBlocked(frame))")
 stage_release = host_r23.find("R41ReleaseNeverSampled(frame)", skip_guard)
 if min(skip_guard, stage_release) < 0 or skip_guard > stage_release:
