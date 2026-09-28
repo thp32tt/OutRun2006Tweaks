@@ -38,7 +38,18 @@ $sbsFallback=($combined -match 'transport=SBS Desktop Duplication' -or
     $combined -match 'SBS/Desktop Duplication remains active' -or
     $combined -match 'keeping SBS/Desktop Duplication fallback')
 $plainD3D9=($combined -match 'plain IDirect3DDevice9 detected')
-$sharedProbeFailed=($combined -match 'shared verification texture creation/upload failed')
+$sharedProbeFailurePatterns=[ordered]@{
+    LEGACY_VERIFY='shared verification texture creation/upload failed'
+    DXVK_OPEN_D3DKMT='Failed to open shared D3DKMT handle'
+    DXVK_WRITE_SHARED_INFO='Failed to write shared resource info for a texture'
+}
+$sharedProbeFailureReasons=@()
+foreach($entry in $sharedProbeFailurePatterns.GetEnumerator()){
+    if($combined -match [regex]::Escape([string]$entry.Value)){
+        $sharedProbeFailureReasons+=[string]$entry.Key
+    }
+}
+$sharedProbeFailed=($sharedProbeFailureReasons.Count -gt 0)
 $driverSeatCount=([regex]::Matches($gameLog,'VR DRIVER SEAT CAMERA:')).Count
 $crashEvidence=($combined -match '(?im)\b(crash|unhandled exception|access violation|fatal error)\b')
 $whiteScreenEvidence=($combined -match '(?im)white screen|white-screen|startup white')
@@ -113,6 +124,7 @@ $result=[ordered]@{
     SBSDesktopDupFallback=$sbsFallback
     PlainD3D9Device=$plainD3D9
     SharedD3D9ExProbeFailed=$sharedProbeFailed
+    SharedD3D9ExProbeFailureReasons=@($sharedProbeFailureReasons)
     DirectFrames=$directFrames
     DirectFallbacks=$directFallbacks
     FenceTimeouts=$fenceTimeout
@@ -141,6 +153,7 @@ $lines=@(
     "sbsDesktopDupFallback=$sbsFallback"
     "plainD3D9Device=$plainD3D9"
     "sharedD3D9ExProbeFailed=$sharedProbeFailed"
+    "sharedD3D9ExProbeFailureReasons=$($sharedProbeFailureReasons -join ',')"
     "directFrames=$directFrames"
     "directFallbacks=$directFallbacks"
     "fenceTimeouts=$fenceTimeout"

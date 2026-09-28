@@ -49,6 +49,10 @@ jobs:
         shell: pwsh
         run: python tools/test_analyze_dxvk_session.py
 
+      - name: Test runtime shared-handle failure classification
+        shell: pwsh
+        run: ./tools/Test-AnalyzeOutRunVRSession.ps1
+
       - name: Test DXVK pinned acquisition
         shell: pwsh
         run: ./tools/Test-DxvkAcquisition.ps1
