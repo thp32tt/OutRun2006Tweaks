@@ -66,6 +66,28 @@ if ($selector -notmatch $quotedBackend) {
 }
 
 $package = Get-Content (Join-Path $toolsRoot 'Build-OutRunPCFast.ps1') -Raw
+foreach ($requiredText in @(
+    'DevelopmentBranch = [string]$oneClickTarget.DevelopmentBranch',
+    'RendererTarget = [string]$oneClickTarget.RendererTarget',
+    'DevelopmentStage = [string]$oneClickTarget.Stage',
+    'LaunchBackend = [string]$oneClickTarget.LaunchBackend'
+)) {
+    if ($package -notmatch [regex]::Escape($requiredText)) {
+        throw "Package source/branch identity contract missing: $requiredText"
+    }
+}
+$preflightText = Get-Content (Join-Path $toolsRoot 'Test-OutRunVROneClickPreflight.ps1') -Raw
+foreach ($requiredText in @(
+    'BUILD_INPUTS.json',
+    'Package source mismatch',
+    'Package branch mismatch',
+    'Package renderer mismatch',
+    'Package launch backend mismatch'
+)) {
+    if ($preflightText -notmatch [regex]::Escape($requiredText)) {
+        throw "Runtime package identity preflight missing: $requiredText"
+    }
+}
 foreach ($required in @(
     'Invoke-OutRunVROneClick.ps1',
     'VR_ONE_CLICK_TARGET.json',
