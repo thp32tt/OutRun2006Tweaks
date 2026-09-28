@@ -1,0 +1,38 @@
+name: Localization Automation Gate
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+  workflow_dispatch:
+
+concurrency:
+  group: localization-automation-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Verify queue automation contract
+        run: test -f docs/automation/QUEUE_CONTROLLER_CONTRACT.md
+
+      - name: Verify localization state
+        run: python tools/localization/verify_state.py
+
+      - name: Verify changed localization payload structure
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+        run: python tools/localization/verify_automation_commit.py
+
+      - name: Mark candidate semantics
+        run: |
+          echo "AUTOMATION_VALIDATION=PASS"
+          echo "RUNTIME_VALIDATION=UNTESTED"
