@@ -511,7 +511,7 @@ Effective 2026-09-29 after first post-reset sample review. Orientation and lette
 
 ### Orientation must be proven from source pixels
 
-- Never trust filename conventions, historical notes, previous candidates, or a transcription note such as `raw normal` by itself.
+- Never trust filename conventions, historical notes, previous candidates, or a transcription note such as `raw normal` by itself. When exact-source pixel inspection contradicts metadata/notes, exact-source pixels win and the stale orientation record must be corrected before production.
 - Before generation, inspect the exact HD source DDS in raw pixel order and in the game's expected display transform when known.
 - Record a discrete `source_text_transform`: `normal`, `flip_x`, `flip_y`, `rotate_180`, `rotate_90_cw`, `rotate_90_ccw`, or an explicitly documented composition.
 - Record the observed source reading direction and baseline vector in raw coordinates.
