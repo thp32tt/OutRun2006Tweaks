@@ -24,8 +24,27 @@ namespace outrun::vr::dx11
             return out;
 
         D3DDEVICE_CREATION_PARAMETERS creation{};
-        if (SUCCEEDED(device->GetCreationParameters(&creation)))
+        const bool creationValid =
+            SUCCEEDED(device->GetCreationParameters(&creation));
+        if (creationValid)
             out.behavior_flags = creation.BehaviorFlags;
+
+        if (creationValid)
+        {
+            IDirect3D9* d3d = nullptr;
+            IDirect3D9Ex* d3dEx = nullptr;
+            if (SUCCEEDED(device->GetDirect3D(&d3d)) && d3d &&
+                SUCCEEDED(d3d->QueryInterface(
+                    __uuidof(IDirect3D9Ex),
+                    reinterpret_cast<void**>(&d3dEx))) && d3dEx)
+            {
+                out.adapter_luid_valid = SUCCEEDED(
+                    d3dEx->GetAdapterLUID(
+                        creation.AdapterOrdinal, &out.adapter_luid));
+            }
+            if (d3dEx) d3dEx->Release();
+            if (d3d) d3d->Release();
+        }
 
         IDirect3DSurface9* backbuffer = nullptr;
         const HRESULT backHr = device->GetBackBuffer(
