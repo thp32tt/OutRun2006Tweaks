@@ -1304,7 +1304,8 @@ namespace OutRunVRStereo
 		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9* device,
 			D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
 		{
-			outrun::vr::dx11::observe_source_draw(device, type);
+			if (!InternalStereoPass)
+				outrun::vr::dx11::observe_source_draw(device, type);
 			auto call = [&]() {
 				return DrawPrimitiveHook.stdcall<HRESULT>(
 					device, type, startVertex, primitiveCount);
@@ -1316,7 +1317,8 @@ namespace OutRunVRStereo
 			D3DPRIMITIVETYPE type, INT baseVertexIndex, UINT minVertexIndex,
 			UINT numVertices, UINT startIndex, UINT primitiveCount)
 		{
-			outrun::vr::dx11::observe_source_draw(device, type);
+			if (!InternalStereoPass)
+				outrun::vr::dx11::observe_source_draw(device, type);
 			auto call = [&]() {
 				return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
 					device, type, baseVertexIndex, minVertexIndex, numVertices,
@@ -1345,7 +1347,8 @@ namespace OutRunVRStereo
 			UINT primitiveCount, const void* indexData, D3DFORMAT indexFormat,
 			const void* vertexData, UINT stride)
 		{
-			outrun::vr::dx11::observe_source_draw(device, type);
+			if (!InternalStereoPass)
+				outrun::vr::dx11::observe_source_draw(device, type);
 			auto call = [&]() {
 				return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
 					device, type, minVertexIndex, numVertices, primitiveCount,
