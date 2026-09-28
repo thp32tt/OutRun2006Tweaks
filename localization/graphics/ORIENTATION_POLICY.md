@@ -169,3 +169,84 @@ Effective 2026-09-29:
 - Any clipped Korean glyph/effect, pixel outside the permitted source text region, overlap with an icon/artwork/neighbor sprite, or accidental modification of preserved artwork is `REWORK_REQUIRED`.
 - Comparison proof PNGs must be retained with lane QA evidence so the user can visually review the same source-vs-candidate pair.
 - In-game testing is intentionally deferred during production. The user will perform the final integrated game test and return screenshots/files for defects. Such later runtime defects become rework inputs; until then use `RUNTIME_VALIDATION=UNTESTED`.
+
+## Generation reset and zero-artifact reconstruction contract
+
+Effective 2026-09-29 after user visual QA:
+
+### Generation reset
+
+- All previously generated Korean graphics candidates are **SUPERSEDED / NOT REUSABLE AS ARTWORK**. They may remain only as historical failure/QA evidence.
+- No pixel, cleaned background, glyph, mask, patch, crop, or composited region from an older Korean candidate may be used as construction input.
+- Every localized graphic must restart from the exact English HD source DDS. Stock original may be used only when the HD source has no corresponding asset and that fallback is explicitly recorded.
+- Existing PASS/DONE/static-pass labels from pre-reset candidates do not grant approval. New-generation assets must pass this contract from scratch.
+
+### No-overlay / no-box rule
+
+- Never place Korean text on top of visible English text.
+- Never hide English using a black/white/solid/semitransparent rectangle, badge, strip, blur, flood fill, or arbitrary opaque patch.
+- Never introduce a rectangular background that is absent from the exact English source, even if it makes Korean easier to read.
+- The localized result must preserve the original background/artwork continuously through the former English glyph area.
+- Any visible English stroke, shadow, outline, antialias fringe, glow, underline, or previous-letter silhouette is an automatic **REWORK_REQUIRED**.
+- Any new box, seam, flat-color patch, halo, edge, mismatched gradient, or transparency discontinuity is an automatic **REWORK_REQUIRED**.
+
+### Reconstruct-before-typeset rule
+
+For each translatable text element:
+
+1. Start from the exact English HD source.
+2. Identify the complete English glyph footprint including outline, shadow, glow, antialiasing and effects.
+3. Reconstruct the background under that complete footprint so it visually continues the surrounding original artwork.
+4. Only after the English text and all effects are fully removed may Korean be rendered.
+5. Render Korean within the original permitted sprite/text region, reproducing the source orientation and source-faithful typography/effects.
+6. Composite only the minimum required text/effect pixels. Preserve all unrelated source pixels bit-for-bit whenever technically possible.
+7. Produce full-atlas and per-sprite ENGLISH SOURCE vs KOREAN CANDIDATE proof images.
+
+### Redraw-if-clean-removal-is-not-possible rule
+
+- If the original background cannot be cleanly recovered by deterministic pixel reconstruction, do **not** cover the defect.
+- Redraw/reconstruct the affected background or UI element from the exact source's surrounding visual language before adding Korean.
+- A redraw must match the source geometry, gradient, border, texture, transparency and neighboring pixels; it must not invent a replacement panel style.
+- If faithful reconstruction is not achievable automatically, stop the asset as **MANUAL_RECONSTRUCTION_REQUIRED**. Do not emit a compromised candidate.
+
+### Hard automatic rejection gates
+
+A candidate cannot be retained when any of the following is true:
+
+- source width or height differs;
+- DDS format/compression/mipmap/alpha behavior differs without an explicitly documented source-required reason;
+- any translated pixel escapes its permitted source region by >= 1 pixel;
+- any Korean glyph/effect is clipped;
+- any translatable English residue remains;
+- any old Korean-candidate residue is present;
+- any solid/opaque/semitransparent cover box or artificial backing panel was introduced;
+- preserved artwork outside the approved edit mask changed;
+- background reconstruction leaves seams, halos, flat patches, mismatched gradients or transparency discontinuities;
+- another glyph/icon/sprite was erased, shifted, covered or contaminated;
+- raw DDS orientation differs from the corresponding source element;
+- readable/game-orientation preview reveals an artifact not obvious in raw orientation.
+
+A failure of any single gate is **REWORK_REQUIRED**, never PASS-with-warning.
+
+### Mandatory clean-generation evidence
+
+Every new candidate must record:
+
+- exact source path + SHA-256;
+- candidate SHA-256;
+- source/candidate dimensions, DDS format and mip count;
+- per-element edit mask/ROI;
+- changed-pixel count inside ROI;
+- changed-pixel count outside ROI (must be 0 except explicitly enumerated source-faithful reconstruction pixels belonging to the same element);
+- introduced alpha outside ROI (must be 0);
+- English-residue inspection result;
+- box/seam/artifact inspection result;
+- full-atlas ENGLISH SOURCE vs KOREAN CANDIDATE comparison;
+- enlarged comparison for every translated element;
+- raw-orientation and readable-orientation inspection result;
+- RUNTIME_VALIDATION=UNTESTED until actual user in-game evidence exists.
+
+### Promotion rule
+
+Only candidates created after this reset and passing every clean-generation gate may enter the active HD candidate set. Historical candidates must never be copied forward merely because their dimensions/header/containment checks pass.
+
