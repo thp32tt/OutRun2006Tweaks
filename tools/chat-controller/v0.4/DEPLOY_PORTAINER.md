@@ -99,3 +99,47 @@ Each controller:
 ## Safety
 
 If GitHub access is unavailable, the controller prompt instructs ChatGPT to report the failure. It must not fall back to the N100 local repository.
+
+
+## Queue mode (v0.5 behavior in v0.4 deployment path)
+
+Both existing Portainer compose paths now run the GitHub-gated queue engine.
+
+### Conversion stack
+The existing `docker-compose.portainer-vr.yml` path is retained for compatibility, but its controller mode is now `conversion`.
+
+- lane A: DX11 -> `vr-dx11-native-r71`
+- lane B: DXVK -> `vr-dxvk-r71-disasm`
+- required workflow: `Backend Conversion Gate`
+- only one modifying task is active at a time
+- successful automatic validation advances immediately to the next independent lane
+- runtime/HMD validation remains `UNTESTED` unless separately proven
+
+### Localization stack
+- lane A/B/C: production / exhaustive QA / final QA
+- branch: `korean-localization-clean`
+- required workflow: `Localization Automation Gate`
+- automatic validation may advance while runtime validation remains `UNTESTED`
+
+### Controller completion rule
+A chat response is not completion. The controller requires:
+1. target branch HEAD changed from the task base SHA;
+2. result commit message contains `[AUTO:<TASK_ID>]`;
+3. required GitHub Actions workflow exists for that exact result SHA;
+4. workflow conclusion is `success`.
+
+A missing workflow run remains validation-pending. A failed run triggers a repair turn in the same task chat. Maximum repair attempts: 3. After that, the task is recorded BLOCKED and the controller advances to another independent task.
+
+### Watchdog
+In queue mode the watchdog may recover Retry / Continue generating / browser-composer failures, but it does not select or send the next work item. Task ownership remains with the queue engine.
+
+### Recommended environment
+```
+AUTO_SEND=true
+WATCHDOG_ENABLED=true
+QUEUE_MODE=true
+GITHUB_POLL_SECONDS=180
+MAX_TASK_ATTEMPTS=3
+```
+
+If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each stack after this controller update.
