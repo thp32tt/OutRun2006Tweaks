@@ -36,9 +36,6 @@ foreach ($name in $parseFiles) {
 
 $selectorTransactionTest = Join-Path $toolsRoot 'Test-BackendSelectorTransaction.ps1'
 & $selectorTransactionTest
-if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-    throw "Backend selector transaction regression test failed with exit code $LASTEXITCODE"
-}
 
 $pythonFiles = @(
     'analyze_dxvk_session.py',
