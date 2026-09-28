@@ -2,16 +2,17 @@
   "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
   "lane": "LOCALIZATION_B",
   "target_branch": "korean-localization-clean",
-  "attempt": 1,
-  "base_sha": "8a92245efd4350a2a6d962f6c822fcd34b22b9d3",
+  "attempt": 2,
+  "base_sha": "4f1ea8e8f23680ee820b61f3b2f069eaf31b4a09",
   "result_sha": "PENDING",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "summary": "B lane GitHub-only rework of FA7BBB13 index 54 from current HEAD; ten C85 zero-pixel failures, 17-element exhaustive first QA, no N100/GPT Library/VR/FFB/build.",
+  "summary": "Retry B95 after correcting the regression gate: preserve pre-existing source-vs-candidate differences, but reject any newly introduced source differences outside original permitted bboxes.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json",
-    "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_FINAL_STAGED_QA.json"
+    "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_FINAL_STAGED_QA.json",
+    "GitHub Actions run 36389208077: 17/17 bbox rows passed, changed pixels outside rework rectangles=0, pass-cell changes outside rework overlap=0; failed only because pre-existing source differences outside bbox were incorrectly treated as new regression."
   ]
 }
