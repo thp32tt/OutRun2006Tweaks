@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "branch": "korean-localization-clean",
+  "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "command_map": {
+    "A": "OutRun 한글화 A 실행",
+    "B": "OutRun 한글화 B 실행",
+    "C": "OutRun 한글화 C 실행"
+  },
+  "schedule": {
+    "A": ":00",
+    "B": ":20",
+    "C": ":40"
+  },
+  "lanes": {
+    "A": {
+      "mode": "production+self_qa",
+      "primary_index_parity": "odd"
+    },
+    "B": {
+      "mode": "production+self_qa",
+      "primary_index_parity": "even"
+    },
+    "C": {
+      "mode": "cross_lane_final_qa+approval",
+      "primary_index_parity": "all"
+    }
+  },
+  "queue_source": "localization/graphics/asset_queue.csv",
+  "priorities": [
+    "REWORK_REQUIRED",
+    "unfinished_localize_text",
+    "zoom_review_localizable_text",
+    "other_pending"
+  ],
+  "zero_pixel_overflow": true,
+  "missing_evidence_status": "HOLD_STRICT_RECHECK",
+  "controller_prompt_policy": "Keep prompts minimal; workflow rules live in Git. Do not duplicate contract logic in Docker.",
+  "work_steal": {
+    "enabled": true,
+    "condition": "primary shard has no actionable production work and latest Git refresh confirms target has no newer current-cycle production/state change",
+    "report_field": "work_stolen_from_lane"
+  }
+}
