@@ -1,0 +1,535 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00057",
+  "attempt": "1/3",
+  "wave_id": "W00018",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T08:30:22+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
+  "final_precommit_head_sha": "47f97d9f270eb7768554c4adadcca5b709985b23",
+  "peer_lane_commit_observed_before_commit": true,
+  "peer_lane_task_id": "LOCALIZATION-LOCALIZATION_A-00056",
+  "peer_lane_material_commit_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
+  "peer_lane_preserved": "YES_CURRENT_HEAD_INCLUDES_A00056_AND_LATER_LOCALIZATION_SAFEGUARDS",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "identity_policy": "Exact Release DDS Git blob is pixel authority; decoded stock PNG and 4x atlas are reconstruction/mapping references only. No N100/local clone/GPT Library.",
+    "latest_prompt_policy_sha": "5b469c303ef06e83148b2f23a9444196d4ab725f",
+    "prompt_contract": "outrun-first-pass-edit-v1",
+    "prompt_provenance_gate_commit": "47f97d9f270eb7768554c4adadcca5b709985b23"
+  },
+  "queue_snapshot": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "queue_blob_sha": "fdce9105501da896cf97a4dfdc09c3fa009b75c9",
+    "selected_even_indices": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "selected_state": "localize_text/pending_artwork",
+    "selection_reason": "Fresh even-shard pending assets not advanced in W00017; peer A00056 uses odd indices 65/95/101/107; no work steal."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "description": "Pinned four fresh even-shard exact-HD Release DDS identities, decoded stock-source identities, exact 4x atlas geometry, canonical translation sets, preserve-original constraints and fail-closed reconstruction next actions. Latest first-pass prompt provenance contract is explicitly carried forward; no prompt or DDS candidate was emitted without mandatory measured pixel facts.",
+    "core_source_identities_pinned": 12,
+    "semantic_segments_pinned": 20,
+    "exact_atlas_regions_pinned": 106,
+    "candidate_dds_written": false
+  },
+  "assets": [
+    {
+      "queue_index": 132,
+      "asset": "1F5FE6E9",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+        "git_blob_sha": "a89e403c92d335f83c808e5f10dcc9e584d4ff7c",
+        "expected_canvas_from_4x_atlas": [
+          4096,
+          2048
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.png",
+        "git_blob_sha": "e72ae022ad8b1bff7657237beb056680ab47dbc1"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_1F5FE6E9_1024x512_atlas.json",
+        "git_blob_sha": "f7bb4e1f974afc0719311f8bbbf36e82303961f6",
+        "width": 4096,
+        "height": 2048,
+        "regions_count": 21,
+        "rotations": false
+      },
+      "translations": [
+        {
+          "source": "REQUEST",
+          "korean": "요청"
+        },
+        {
+          "source": "SPECIAL REQUEST 1",
+          "korean": "스페셜 요청 1"
+        },
+        {
+          "source": "SPECIAL REQUEST 2",
+          "korean": "스페셜 요청 2"
+        },
+        {
+          "source": "SPECIAL REQUEST 3",
+          "korean": "스페셜 요청 3"
+        }
+      ],
+      "preserve_original": [
+        "colored menu panels",
+        "all non-text artwork/background outside confirmed source glyph/effect masks"
+      ],
+      "element_gates": [
+        {
+          "source": "REQUEST",
+          "korean": "요청",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "SPECIAL REQUEST 1",
+          "korean": "스페셜 요청 1",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "SPECIAL REQUEST 2",
+          "korean": "스페셜 요청 2",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "SPECIAL REQUEST 3",
+          "korean": "스페셜 요청 3",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Four semantics are canonical, but 21 atlas regions include artwork/states. Do not infer semantic-to-region mapping by order.",
+      "next_action": "Decode exact Release DDS; identify complete English glyph/effect masks and protected panel/artwork masks; measure source bbox/alignment/colors/effects/alpha/background class; only then assemble the mandated first-pass prompt, clean plate, Korean lettering and decoded-final containment proof."
+    },
+    {
+      "queue_index": 176,
+      "asset": "75C3586A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+        "git_blob_sha": "9d21e4fb47d3b17dab89a05b9552cfeaa913eac9",
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          2048
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.png",
+        "git_blob_sha": "8979db22c2fd2669f50581c8cf50b1f2edc8bb37"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_75C3586A_512x512_atlas.json",
+        "git_blob_sha": "07620598cd03cc6d62455b57d3537158cabfc21a",
+        "width": 2048,
+        "height": 2048,
+        "regions_count": 53,
+        "rotations": false
+      },
+      "translations": [
+        {
+          "source": "FLAGMAN 4",
+          "korean": "플래그맨 4"
+        },
+        {
+          "source": "HOLLY",
+          "korean": "홀리"
+        },
+        {
+          "source": "JENNIFER",
+          "korean": "제니퍼"
+        },
+        {
+          "source": "CLARISSA",
+          "korean": "클라리사"
+        }
+      ],
+      "preserve_original": [
+        "route/map artwork",
+        "character portraits and non-text portrait framing",
+        "all pixels outside confirmed source glyph/effect masks"
+      ],
+      "element_gates": [
+        {
+          "source": "FLAGMAN 4",
+          "korean": "플래그맨 4",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "HOLLY",
+          "korean": "홀리",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "JENNIFER",
+          "korean": "제니퍼",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "CLARISSA",
+          "korean": "클라리사",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Four localizable names are canonical, but the 53-region atlas contains portraits, route/map sprites and UI states. Mapping must be pixel-confirmed against exact HD.",
+      "next_action": "Decode exact Release DDS and map each canonical name to its source glyph/effect footprint without touching portraits/map art; measure mandatory prompt facts before generation, then run zero-pixel, alpha/orientation and source-vs-candidate proof."
+    },
+    {
+      "queue_index": 220,
+      "asset": "D657C2EB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+        "git_blob_sha": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          512
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.png",
+        "git_blob_sha": "9cbd3400096e4f9282a43d9fc61bdd67f5f671e7"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_D657C2EB_512x128_atlas.json",
+        "git_blob_sha": "4c6af70c683fb6c298e32c289d762a1f7e6a56b5",
+        "width": 2048,
+        "height": 512,
+        "regions_count": 7,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_131",
+            "rect": [
+              0,
+              340,
+              1780,
+              172
+            ]
+          },
+          {
+            "idx": 1,
+            "name": "sprite_132",
+            "rect": [
+              0,
+              252,
+              1004,
+              88
+            ]
+          },
+          {
+            "idx": 2,
+            "name": "sprite_133",
+            "rect": [
+              1004,
+              252,
+              800,
+              88
+            ]
+          },
+          {
+            "idx": 3,
+            "name": "sprite_134",
+            "rect": [
+              0,
+              164,
+              788,
+              88
+            ]
+          },
+          {
+            "idx": 4,
+            "name": "sprite_135",
+            "rect": [
+              788,
+              164,
+              668,
+              88
+            ]
+          },
+          {
+            "idx": 5,
+            "name": "sprite_136",
+            "rect": [
+              0,
+              100,
+              1116,
+              64
+            ]
+          },
+          {
+            "idx": 6,
+            "name": "sprite_137",
+            "rect": [
+              0,
+              36,
+              1116,
+              64
+            ]
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "REMOVE FRIEND",
+          "korean": "친구 삭제"
+        },
+        {
+          "source": "SEND GAME INVITE",
+          "korean": "게임 초대 보내기"
+        },
+        {
+          "source": "TIME ATTACK",
+          "korean": "타임 어택"
+        },
+        {
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런"
+        },
+        {
+          "source": "HEART ATTACK",
+          "korean": "하트 어택"
+        }
+      ],
+      "preserve_original": [
+        "all non-heading UI artwork and separators",
+        "all pixels outside confirmed source glyph/effect masks"
+      ],
+      "element_gates": [
+        {
+          "source": "REMOVE FRIEND",
+          "korean": "친구 삭제",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "SEND GAME INVITE",
+          "korean": "게임 초대 보내기",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "TIME ATTACK",
+          "korean": "타임 어택",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "HEART ATTACK",
+          "korean": "하트 어택",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Six canonical headings and seven exact atlas regions are pinned; at least one region/state is non-semantic or alternate. Confirm mapping from exact HD pixels, never array order.",
+      "next_action": "Decode exact HD, map six strings to source cells, extract text/effect masks and protected separators/background, measure prompt facts, create clean plates and only then typeset Korean inside measured bboxes."
+    },
+    {
+      "queue_index": 222,
+      "asset": "DDF0392A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+        "git_blob_sha": "1ff7680eb71750d884b0e69fe058aef3a5cf5fa2",
+        "expected_canvas_from_4x_atlas": [
+          1024,
+          2048
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.png",
+        "git_blob_sha": "30705f99267e355badf706ed67fccf2135dcfe43"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_DDF0392A_256x512_atlas.json",
+        "git_blob_sha": "819d31b1cd9c59fb6d011f3f0361d6ed7114c286",
+        "width": 1024,
+        "height": 2048,
+        "regions_count": 25,
+        "rotations": false,
+        "region_pattern": "25 rows, sprite_401..sprite_425, each rect 960x76 at descending Y positions; exact semantic mapping requires decoded HD inspection"
+      },
+      "translations": [
+        {
+          "source": "Rush A Difficulty",
+          "korean": "난이도에 도전"
+        },
+        {
+          "source": "Shake The Street",
+          "korean": "거리를 뒤흔들어라"
+        },
+        {
+          "source": "Who Are You?",
+          "korean": "당신은 누구?"
+        },
+        {
+          "source": "Journey Mode / Random",
+          "korean": "저니 모드 / 무작위"
+        },
+        {
+          "source": "OutRun 1986",
+          "korean": "아웃런 1986"
+        },
+        {
+          "source": "OutRun Mode / 15 C.",
+          "korean": "아웃런 모드 / 15코스"
+        }
+      ],
+      "preserve_original": [
+        "Ferrari model names",
+        "song titles Passing Breeze, Risky Ride, Shiny World and Splash Wave",
+        "all other proper-title/work-label text not in the six canonical localizable segments",
+        "all non-text artwork outside confirmed source glyph/effect masks"
+      ],
+      "element_gates": [
+        {
+          "source": "Rush A Difficulty",
+          "korean": "난이도에 도전",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "Shake The Street",
+          "korean": "거리를 뒤흔들어라",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "Who Are You?",
+          "korean": "당신은 누구?",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "Journey Mode / Random",
+          "korean": "저니 모드 / 무작위",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "OutRun 1986",
+          "korean": "아웃런 1986",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        },
+        {
+          "source": "OutRun Mode / 15 C.",
+          "korean": "아웃런 모드 / 15코스",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Six localizable strings coexist with preserved Ferrari/song/proper-title text across 25 rows. Exact per-row classification and protected masks are mandatory before any erase or lettering.",
+      "next_action": "Decode exact Release DDS; classify every row as localize vs preserve; derive pixel-level glyph/effect and protected masks; measure prompt facts; produce clean plates and candidate only after protected-title integrity and zero-pixel containment can be proven."
+    }
+  ],
+  "prompt_generation": {
+    "contract": "outrun-first-pass-edit-v1",
+    "latest_policy_requires": [
+      "prompt_contract",
+      "prompt_sha256",
+      "prompt_json_sha256"
+    ],
+    "candidate_prompt_emitted": false,
+    "status": "HOLD_MANDATORY_MEASURED_PIXEL_FACTS_MISSING",
+    "missing_before_prompt": [
+      "exact decoded HD source glyph/effect bbox per translated element",
+      "per-element raw orientation",
+      "protected pixel masks",
+      "source alignment/baseline/text height",
+      "sampled fill/outline/shadow/glow colors and extents",
+      "alpha/transparency behavior inside edit region",
+      "background reconstruction class and clean-plate evidence"
+    ],
+    "rationale": "The new prompt contract forbids free-form generation without measured facts. Emitting a prompt or candidate now would violate current HEAD policy, so this run stops at reproducible reconstruction input rather than guessing."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_132_176_220_222",
+    "work_steal": "NONE",
+    "canonical_translation_match": "PASS_20_OF_20_AGAINST_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "immutable_upstream_identity": "PASS_12_OF_12_CORE_GITHUB_BLOBS_PINNED_AT_IMMUTABLE_UPSTREAM_COMMIT",
+    "atlas_dimensions_region_counts": "PASS_4_OF_4_FROM_4X_ATLAS_JSON__106_REGIONS_TOTAL",
+    "generation_reset_source_rule": "PASS_EXACT_ENGLISH_HD_RELEASE_IDENTITY_ONLY_NO_OLD_KOREAN_INPUT",
+    "prompt_contract_head_rule": "PASS_READ_AND_APPLIED_FIRST_PASS_PROMPT_CONTRACT_AND_STRICT_PROMPT_PROVENANCE_GATE",
+    "source_text_mask": "HOLD_STRICT_RECHECK_NEXT_STAGE_NO_EXACT_HD_PIXEL_MASK_THIS_RUN",
+    "clean_plate": "HOLD_STRICT_RECHECK_NEXT_STAGE_NO_EXACT_HD_CLEAN_PLATE_THIS_RUN",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE_WRITTEN",
+    "dds_header_alpha_orientation": "HOLD_EXACT_DECODED_HD_HEADER_ALPHA_PER_ELEMENT_ORIENTATION_NOT_VALIDATED_NO_DDS_WRITE",
+    "english_source_vs_korean_candidate_proof": "HOLD_NO_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Four fresh unfinished even-shard assets advanced from transcription-only pending_artwork to immutable GitHub-pinned exact-HD reconstruction inputs under the latest prompt-provenance policy. No guessed prompt or Korean DDS bytes were emitted without mandatory decoded-pixel measurements. Runtime remains UNTESTED."
+}
