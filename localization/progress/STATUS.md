@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-26 22:51 KST
+Updated: 2026-09-28T09:10:45+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -582,3 +582,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - **Watch:** C075FB49 minimum bbox margin = 0 (touches boundary, does not escape). 568D3696 DXT5 retains decoded-pixel recheck caution for final proof.
 - **Rework/obsolete:** historical low-res approved_dds 571E78F3 / 62BEBF33 / E3FD08BE are not valid against the canonical HD baseline.
 - **Report:** `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
+
+## C84 zero-pixel bbox final QA — 2026-09-28T09:10:45+09:00
+- Contract: `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md`; canonical HD DDS + current candidates were directly rescanned per text element.
+- Result: **3/16 PIXEL_CONTAINMENT_PASS**, **13/16 REWORK_REQUIRED**; **201** elements checked, **114** exact source-bbox failures.
+- Pixel-pass only: `9F060EC1`, `D6DC1380`, `48DEBE77`. They remain unapproved until isolated `DDS_ONLY` in-game screenshot validation passes.
+- Rework required: `FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, C4A2937B, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9`.
+- Historical `approved_dds` 571E78F3 / 62BEBF33 / E3FD08BE removed: obsolete low-res baseline; their current HD candidates also fail the exact bbox gate.
+- Final approved/locked count: **0**. Build not run; VR/FFB and GPT Library not used.
+- Machine report: `localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json`.

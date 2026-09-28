@@ -981,3 +981,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - `568D3696` is DXT5/BC3; its current QA confines changes to the 14 source regions and has no source-box edge alpha failures, but decoded-pixel evidence remains the preferred final proof because 4x4 compression blocks can cross logical edges.
 - Historical low-resolution `approved_dds` copies of `571E78F3`, `62BEBF33`, `E3FD08BE` remain REWORK/obsolete for the current HD baseline (512x64 RGBA32 vs canonical 2048x256 DXT5); current HD rebuilds are separate candidates.
 - No current approved lock was created. Report: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
+
+## C84 final QA + approval reconciliation — 2026-09-28T09:10:45+09:00
+- Started from `983f14391d8d3ad63e14d98525e2bfdbe1be80f6` and applied `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md` plus the designated localization/graphics policy files.
+- Direct canonical-HD-vs-current-candidate alpha-bbox scan: **16 assets / 201 text elements**. Exact source-bbox result: **3 asset PASS, 13 asset FAIL; 114 elements FAIL**.
+- PASS: `9F060EC1`, `D6DC1380`, `48DEBE77`. These are pixel-gate PASS only; isolated `DDS_ONLY` in-game evidence is still mandatory, so no final promotion occurred.
+- FAIL / REWORK_REQUIRED: `FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, C4A2937B, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9`. Any negative bbox delta is treated as a 1px-or-more escape; outline/shadow/glow/alpha fringe are included.
+- Removed obsolete historical low-res files from `localization/graphics/approved_dds`: `571E78F3`, `62BEBF33`, `E3FD08BE`. Their HD replacements also fail the new exact source-bbox gate.
+- Final approved/user-locked count: **0**. No build performed. VR/FFB and GPT Library were not used.
+- Report: `localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json`; summary audit: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.

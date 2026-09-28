@@ -1,8 +1,10 @@
 {
-  "schema_version": 1,
-  "audit": "FULL_PIXEL_BOUNDARY_ZERO_TOLERANCE",
-  "timestamp_kst": "2026-09-28T07:10:00+09:00",
+  "schema_version": 2,
+  "audit": "FULL_PIXEL_BOUNDARY_ZERO_TOLERANCE_EXACT_SOURCE_BBOX",
+  "timestamp_kst": "2026-09-28T09:10:45+09:00",
   "branch": "korean-localization-clean",
+  "base_head": "983f14391d8d3ad63e14d98525e2bfdbe1be80f6",
+  "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "rule": {
     "max_outside_pixels": 0,
     "max_introduced_alpha_outside_pixels": 0,
@@ -21,182 +23,252 @@
     "historical_role_a_work_dds": 4,
     "historical_lowres_approved_dds": 3
   },
+  "detailed_report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
   "current_hd_candidates": [
     {
       "asset": "FF2462BB",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C75: a76 outside 32 regions exact; a77 outside 35 boxes exact; A78 YOU-box exact; edge nontransparent=0; D74 pass"
+      "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+      "text_elements": 36,
+      "failed_elements": 21,
+      "minimum_bbox_delta_px": -11,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "568D3696",
-      "status": "STATIC_BOUNDARY_PASS_DXT5_RECHECK_CAUTION_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C76: changed payload confined to scaled 14 text regions; source_box_edge_alpha_failures=[]; non-text payload outside touched DXT5 blocks exact. Keep decoded-pixel caution because DXT5 works in 4x4 blocks."
+      "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+      "text_elements": 14,
+      "failed_elements": 6,
+      "minimum_bbox_delta_px": -9,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "FA7BBB13",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C77/D77: outside 17 text cells=0; introduced alpha outside=0; candidate alpha bboxes inside source cells"
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
+      "text_elements": 17,
+      "failed_elements": 10,
+      "minimum_bbox_delta_px": -38,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "39229D64",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C78/D79: outside all 15 source cells=0; introduced alpha outside=0"
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+      "text_elements": 15,
+      "failed_elements": 7,
+      "minimum_bbox_delta_px": -26,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "A064FDFC",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "min_margin_px": 3,
-      "evidence": "C79/D79"
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "text_elements": 21,
+      "failed_elements": 6,
+      "minimum_bbox_delta_px": -106,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "C4A2937B",
-      "status": "STATIC_BOUNDARY_PASS_CONTEXT_HOLD_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C80/D82: outside 21 source cells=0; introduced alpha outside=0"
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "text_elements": 21,
+      "failed_elements": 21,
+      "minimum_bbox_delta_px": -106,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "2DA43E41",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C80/D82: raw payload pixel changes outside all 11 cells=0; introduced alpha outside=0"
+      "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+      "text_elements": 11,
+      "failed_elements": 7,
+      "minimum_bbox_delta_px": -37,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "411827E",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C80/D82: raw payload pixel changes outside all 7 cells=0; introduced alpha outside=0"
+      "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+      "text_elements": 7,
+      "failed_elements": 4,
+      "minimum_bbox_delta_px": -19,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "571E78F3",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME_REAPPROVAL",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C81/D83: decoded outside cells=0; DXT5 blocks outside cells=0"
+      "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+      "text_elements": 2,
+      "failed_elements": 2,
+      "minimum_bbox_delta_px": -3,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "62BEBF33",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME_REAPPROVAL",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C81/D83: decoded outside cells=0; DXT5 blocks outside cells=0"
+      "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+      "text_elements": 1,
+      "failed_elements": 1,
+      "minimum_bbox_delta_px": -1,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "E3FD08BE",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME_REAPPROVAL",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "evidence": "C81/D83: decoded outside cells=0; DXT5 blocks outside cells=0"
+      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+      "text_elements": 1,
+      "failed_elements": 1,
+      "minimum_bbox_delta_px": -1,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "C075FB49",
-      "status": "STATIC_BOUNDARY_PASS_ZERO_MARGIN_RISK_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "min_margin_px": 0,
-      "evidence": "C82/D84: outside corrected 17 cells=0; setting label touches boundary but does not escape; high-zoom no clipping/escape"
+      "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "text_elements": 17,
+      "failed_elements": 9,
+      "minimum_bbox_delta_px": -23,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "FD90AA9",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "min_margin_px": 13,
-      "evidence": "C82/D84"
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+      "text_elements": 29,
+      "failed_elements": 19,
+      "minimum_bbox_delta_px": -169,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
     },
     {
       "asset": "9F060EC1",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "min_margin_px": 4,
-      "evidence": "C82/D84"
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "text_elements": 5,
+      "failed_elements": 0,
+      "minimum_bbox_delta_px": 4,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "PIXEL_CONTAINMENT_PASS_PENDING_INGAME"
     },
     {
       "asset": "D6DC1380",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "min_margin_ltrb": [
-        175,
-        1,
-        175,
-        1
-      ],
-      "evidence": "C83/D85 exact scaled source alpha bbox [32,40,992,176] vs candidate [207,41,817,175]"
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+      "text_elements": 1,
+      "failed_elements": 0,
+      "minimum_bbox_delta_px": 1,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "PIXEL_CONTAINMENT_PASS_PENDING_INGAME"
     },
     {
       "asset": "48DEBE77",
-      "status": "STATIC_BOUNDARY_PASS_PENDING_INGAME",
-      "outside_pixels": 0,
-      "introduced_alpha_outside": 0,
-      "min_margin_px": 4,
-      "evidence": "C83/D85: outside 3 source text cells=0; alpha changes outside=0"
-    }
-  ],
-  "historical_role_a_work_dds": [
-    {
-      "path": "localization/graphics/role_A/20260927-0850-A71/FF2462BB_A71_v2.dds",
-      "status": "BOUNDARY_EVIDENCE_PASS_BUT_SUPERSEDED",
-      "note": "A71 records outside localization bboxes=0 and edge nontransparent=0; includes one 1px safety margin but no escape."
-    },
-    {
-      "path": "localization/graphics/role_A/20260927-1038-A76/FF2462BB_A76_COMPLETE_CANDIDATE.dds",
-      "status": "BOUNDARY_EVIDENCE_PASS_BUT_SUPERSEDED",
-      "note": "Outside 32 localized regions exact canonical; GOAL/GHOST alpha bboxes inside source bounds."
-    },
-    {
-      "path": "localization/graphics/role_A/20260927-1207-A77/FF2462BB_A77_FULL_CANDIDATE.dds",
-      "status": "BOUNDARY_EVIDENCE_PASS_BUT_SUPERSEDED",
-      "note": "A77 writes constrained to declared original boxes; superseded by A78/current FF candidate."
-    },
-    {
-      "path": "localization/graphics/role_A/20260927-1215-A78/FF2462BB_A78_FULL_CANDIDATE.dds",
-      "status": "BOUNDARY_PASS_CURRENT_FF_LINEAGE",
-      "note": "Same final lineage validated by B79/C75/D74."
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "text_elements": 3,
+      "failed_elements": 0,
+      "minimum_bbox_delta_px": 0,
+      "outside_declared_cells_changed_nontransparent_pixels": 0,
+      "status": "PIXEL_CONTAINMENT_PASS_PENDING_INGAME"
     }
   ],
   "rework_required": [
     {
-      "path": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
-      "reason": "HISTORICAL_LOWRES_BASELINE_MISMATCH: 512x64 RGBA32 vs canonical HD 2048x256 DXT5; not valid current original-bound reference."
+      "asset": "FF2462BB",
+      "failed_elements": 21,
+      "candidate_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c"
     },
     {
-      "path": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
-      "reason": "HISTORICAL_LOWRES_BASELINE_MISMATCH: 512x64 RGBA32 vs canonical HD 2048x256 DXT5; not valid current original-bound reference."
+      "asset": "568D3696",
+      "failed_elements": 6,
+      "candidate_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c"
     },
     {
-      "path": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
-      "reason": "HISTORICAL_LOWRES_BASELINE_MISMATCH: 512x64 RGBA32 vs canonical HD 2048x256 DXT5; not valid current original-bound reference."
+      "asset": "FA7BBB13",
+      "failed_elements": 10,
+      "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d"
+    },
+    {
+      "asset": "39229D64",
+      "failed_elements": 7,
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4"
+    },
+    {
+      "asset": "A064FDFC",
+      "failed_elements": 6,
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1"
+    },
+    {
+      "asset": "C4A2937B",
+      "failed_elements": 21,
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99"
+    },
+    {
+      "asset": "2DA43E41",
+      "failed_elements": 7,
+      "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563"
+    },
+    {
+      "asset": "411827E",
+      "failed_elements": 4,
+      "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74"
+    },
+    {
+      "asset": "571E78F3",
+      "failed_elements": 2,
+      "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4"
+    },
+    {
+      "asset": "62BEBF33",
+      "failed_elements": 1,
+      "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d"
+    },
+    {
+      "asset": "E3FD08BE",
+      "failed_elements": 1,
+      "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc"
+    },
+    {
+      "asset": "C075FB49",
+      "failed_elements": 9,
+      "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9"
+    },
+    {
+      "asset": "FD90AA9",
+      "failed_elements": 19,
+      "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445"
     }
   ],
-  "qa_preview_png": {
-    "count": 139,
-    "status": "QA_EVIDENCE_ONLY_NOT_DEPLOYABLE_TEXTURES",
-    "note": "Preview/compare PNGs are excluded from deployable DDS boundary promotion; their purpose is visual evidence."
-  },
+  "pixel_pass_pending_ingame": [
+    {
+      "asset": "9F060EC1",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60"
+    },
+    {
+      "asset": "D6DC1380",
+      "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00"
+    },
+    {
+      "asset": "48DEBE77",
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0"
+    }
+  ],
+  "historical_approved_dds_removed": [
+    "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+    "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds"
+  ],
   "runtime_gate": {
     "incident": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md",
     "result": "ALL_16_CURRENT_HD_CANDIDATES_REMAIN_UNAPPROVED",
     "required": "TEXT_ONLY first, then DDS_ONLY exactly one candidate at a time, then combined only after isolated passes"
   },
   "summary": {
-    "current_hd_static_boundary_pass": 16,
-    "current_hd_static_boundary_fail": 0,
-    "current_hd_reapproval_or_ingame_hold": 16,
-    "historical_lowres_rework_required": 3,
+    "current_hd_pixel_bbox_pass": 3,
+    "current_hd_pixel_bbox_fail": 13,
+    "elements_total": 201,
+    "elements_fail": 114,
+    "current_hd_reapproval_or_ingame_hold": 3,
+    "rework_required": 13,
+    "approved_dds_count": 0,
     "current_approved_lock_count": 0
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T01:16:00+09:00",
+  "updated_at_kst": "2026-09-28T09:10:45+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,7 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
-      "status": "source_faithful_rework_in_progress",
+      "status": "zero_pixel_bbox_rework_required",
       "transcription_percent": 100,
       "draft_artwork_percent": 100,
       "final_artwork_percent": 0,
@@ -110,7 +110,7 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "source_faithful_rework_in_progress",
+      "status": "zero_pixel_bbox_rework_required",
       "final_artwork_percent": 0,
       "draft_percent": 100,
       "completed": 0,
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "P0 runtime recovery after failed 16-DDS combined test: build/test TEXT_ONLY with zero replacement DDS first; then validate each HD candidate one-at-a-time as DDS_ONLY with KoreanTextOverlayTest=false. COMBINED and RELEASE remain blocked until isolated INGAME_PASS evidence exists for text and every included DDS.",
+  "next_checkpoint": "C84 exact source-bbox zero-pixel gate reopened 13/16 HD candidates for rework. Rework all 13; rerun per-element bbox QA; then isolated DDS_ONLY in-game validation. 9F060EC1/D6DC1380/48DEBE77 are pixel-pass only and remain unapproved pending in-game.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,9 +265,29 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "asset": null,
-      "status": "HD_MIGRATION_QUEUE_COMPLETE_FINAL_STATIC_QA_PENDING_INGAME",
-      "note": "All 16 graphics-rework targets have current candidates. Final two D6DC1380/48DEBE77 now pass C83+D85 static QA; mandatory in-game validation remains."
+      "asset": "FF2462BB",
+      "status": "ZERO_PIXEL_BBOX_REWORK_REQUIRED",
+      "assets": [
+        "FF2462BB",
+        "568D3696",
+        "FA7BBB13",
+        "39229D64",
+        "A064FDFC",
+        "C4A2937B",
+        "2DA43E41",
+        "411827E",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE",
+        "C075FB49",
+        "FD90AA9"
+      ],
+      "remaining": 13,
+      "pixel_pass_pending_ingame": [
+        "9F060EC1",
+        "D6DC1380",
+        "48DEBE77"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -291,25 +311,35 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C83",
-      "report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
-      "result": "D6DC1380_48DEBE77_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
+      "run": "C84",
+      "report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+      "result": "3_PIXEL_BBOX_PASS_13_FAIL_0_FINAL_APPROVED",
       "candidate_changed_by_C": false,
-      "assets": {
-        "D6DC1380": {
-          "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
-          "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
-          "alpha_outside_allowed_bbox_pixels": 0,
-          "min_vertical_margin_px": 1
-        },
-        "48DEBE77": {
-          "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
-          "status": "C83_STATIC_STRICT_QA_PASS_PENDING_D_INGAME",
-          "outside_text_cells_changed_pixels": 0,
-          "alpha_changes_outside_text_cells": 0,
-          "transparent_to_nontransparent_pixels_total": 0
-        }
-      }
+      "assets_total": 16,
+      "elements_total": 201,
+      "elements_fail": 114,
+      "pixel_pass_assets": [
+        "9F060EC1",
+        "D6DC1380",
+        "48DEBE77"
+      ],
+      "rework_required_assets": [
+        "FF2462BB",
+        "568D3696",
+        "FA7BBB13",
+        "39229D64",
+        "A064FDFC",
+        "C4A2937B",
+        "2DA43E41",
+        "411827E",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE",
+        "C075FB49",
+        "FD90AA9"
+      ],
+      "approved_dds_count": 0,
+      "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
     "latest_b_first_qa": {
       "run": "B90",
@@ -572,21 +602,38 @@
     }
   },
   "graphics_zero_tolerance_boundary_audit": {
-    "timestamp_kst": "2026-09-28T07:10:00+09:00",
+    "timestamp_kst": "2026-09-28T09:10:45+09:00",
     "report": "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json",
+    "detail_report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
     "max_outside_pixels": 0,
     "current_hd_candidates": 16,
-    "static_boundary_pass": 16,
-    "static_boundary_fail": 0,
-    "isolated_ingame_required": 16,
+    "pixel_bbox_pass": 3,
+    "pixel_bbox_fail": 13,
+    "elements_total": 201,
+    "elements_fail": 114,
+    "isolated_ingame_required": 3,
     "approved_lock_count": 0,
-    "zero_margin_watch": [
-      "C075FB49"
+    "pixel_pass_pending_ingame": [
+      "9F060EC1",
+      "D6DC1380",
+      "48DEBE77"
     ],
-    "dxt5_final_decode_caution": [
-      "568D3696"
+    "rework_required": [
+      "FF2462BB",
+      "568D3696",
+      "FA7BBB13",
+      "39229D64",
+      "A064FDFC",
+      "C4A2937B",
+      "2DA43E41",
+      "411827E",
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE",
+      "C075FB49",
+      "FD90AA9"
     ],
-    "historical_lowres_rework_required": [
+    "historical_lowres_approved_dds_removed": [
       "571E78F3",
       "62BEBF33",
       "E3FD08BE"

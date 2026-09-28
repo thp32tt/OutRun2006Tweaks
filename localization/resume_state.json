@@ -1,5 +1,5 @@
 {
-  "schema_version": 52,
+  "schema_version": 53,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,13 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "APPROVAL STATE: current user-approved lock count remains 0. D6DC1380 and 48DEBE77 now pass C83 + D85 final static QA; mandatory in-game screenshots remain required before promotion. D84 and earlier final-static holds remain unchanged.",
-    "HD GRAPHICS: migration candidate production and static QA are complete at 16 ready / 0 remaining. Next graphics gate is in-game validation, not further HD candidate production.",
-    "PRESERVE all non-queued HD graphics as the canonical base; edit only exact text cells required for Korean.",
-    "FONT: keep 6B8ED9DA in the Hangul runtime font pipeline; do not treat it as a generic graphics repaint.",
-    "Never upscale prior stock-resolution Korean DDS candidates.",
-    "Strict-QA Batch66 candidates in runtime before promotion; keep raw atlas orientation and bounds.",
-    "If GitHub write fails, persist exact candidate/QA logs internally and retry without losing completed work."
+    "C84 ZERO-PIXEL BBOX: 9F060EC1, D6DC1380, 48DEBE77 pass exact source-bbox containment but remain HOLD_PENDING_ISOLATED_DDS_ONLY_INGAME; final approved lock count is 0.",
+    "REWORK 13 assets against canonical HD source actual text bboxes: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, C4A2937B, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9. Any 1px overflow including outline/shadow/glow/alpha fringe must be corrected.",
+    "approved_dds historical 571E78F3/62BEBF33/E3FD08BE binaries were removed: low-res baseline is obsolete and current HD replacements fail exact bbox containment.",
+    "After each rework, rerun exact original_bbox/localized_bbox delta QA, then isolated DDS_ONLY in-game screenshot validation before promotion.",
+    "Never upscale prior stock-resolution Korean DDS; preserve raw orientation and protected non-text/brand/model/song/legal artwork."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -101,20 +99,41 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-26T21:43:00+09:00",
-      "user_approved_locked": 0,
-      "historical_package_assets_scanned": 32,
-      "remaining_rework_required": 28,
-      "original_safe_hold": [
-        "37759842"
+      "updated_at_kst": "2026-09-28T09:10:45+09:00",
+      "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+      "report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+      "assets_scanned": 16,
+      "elements_scanned": 201,
+      "pixel_bbox_pass_assets": [
+        "9F060EC1",
+        "D6DC1380",
+        "48DEBE77"
       ],
-      "promotion_hold_for_nonapproved": true,
-      "queue": "localization/graphics/FULL_STRICT_REVIEW_QUEUE.md",
-      "historical_lowres_approvals_superseded": [
+      "pixel_bbox_fail_assets": [
+        "FF2462BB",
+        "568D3696",
+        "FA7BBB13",
+        "39229D64",
+        "A064FDFC",
+        "C4A2937B",
+        "2DA43E41",
+        "411827E",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE",
+        "C075FB49",
+        "FD90AA9"
+      ],
+      "failed_elements": 114,
+      "remaining_rework_required": 13,
+      "promotion_hold_for_pixel_pass": true,
+      "promotion_hold_reason": "isolated DDS_ONLY in-game validation required",
+      "historical_lowres_approvals_removed": [
         "571E78F3",
         "62BEBF33",
         "E3FD08BE"
-      ]
+      ],
+      "user_approved_locked": 0
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -127,9 +146,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
-    "hd_rework_candidates_ready": 16,
-    "hd_rework_remaining": 0,
+    "latest_hd_rework_batch": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+    "hd_rework_candidates_ready": 3,
+    "hd_rework_remaining": 13,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -449,7 +468,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -484,12 +503,24 @@
       "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
     },
     "next_hd_rework": {
-      "asset": null,
-      "status": "QUEUE_COMPLETE_FINAL_STATIC_QA_PENDING_INGAME",
+      "asset": "FF2462BB",
+      "status": "ZERO_PIXEL_BBOX_REWORK_REQUIRED",
       "assets": [
-        "D6DC1380",
-        "48DEBE77"
-      ]
+        "FF2462BB",
+        "568D3696",
+        "FA7BBB13",
+        "39229D64",
+        "A064FDFC",
+        "C4A2937B",
+        "2DA43E41",
+        "411827E",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE",
+        "C075FB49",
+        "FD90AA9"
+      ],
+      "remaining": 13
     },
     "c80": {
       "timestamp_kst": "2026-09-27T18:29:48+09:00",
@@ -523,7 +554,7 @@
         ],
         "canonical_hd_format": "DXT5",
         "canonical_upstream_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
-        "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "status": "C84_ZERO_PIXEL_BBOX_FAIL_APPROVED_DDS_REMOVED_REWORK_REQUIRED",
         "hd_candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
         "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json"
       },
@@ -540,7 +571,7 @@
         ],
         "canonical_hd_format": "DXT5",
         "canonical_upstream_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
-        "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "status": "C84_ZERO_PIXEL_BBOX_FAIL_APPROVED_DDS_REMOVED_REWORK_REQUIRED",
         "hd_candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
         "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json"
       },
@@ -557,7 +588,7 @@
         ],
         "canonical_hd_format": "DXT5",
         "canonical_upstream_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
-        "status": "B87_HD_REBUILD_FIRST_QA_PASS_PENDING_C_D_INGAME",
+        "status": "C84_ZERO_PIXEL_BBOX_FAIL_APPROVED_DDS_REMOVED_REWORK_REQUIRED",
         "hd_candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
         "b_first_qa_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json"
       }
@@ -1163,5 +1194,34 @@
     "text_reviewed_non_null": 1355,
     "build_performed": false,
     "vr_ffb_changes": false
+  },
+  "c84_final_zero_pixel_qa": {
+    "timestamp_kst": "2026-09-28T09:10:45+09:00",
+    "report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+    "base_head": "983f14391d8d3ad63e14d98525e2bfdbe1be80f6",
+    "pixel_pass_assets": [
+      "9F060EC1",
+      "D6DC1380",
+      "48DEBE77"
+    ],
+    "rework_required_assets": [
+      "FF2462BB",
+      "568D3696",
+      "FA7BBB13",
+      "39229D64",
+      "A064FDFC",
+      "C4A2937B",
+      "2DA43E41",
+      "411827E",
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE",
+      "C075FB49",
+      "FD90AA9"
+    ],
+    "elements_total": 201,
+    "elements_fail": 114,
+    "approved_dds_count": 0,
+    "runtime_validation": "PENDING_ISOLATED_DDS_ONLY_INGAME"
   }
 }
