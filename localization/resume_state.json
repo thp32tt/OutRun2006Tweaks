@@ -1,5 +1,5 @@
 {
-  "schema_version": 63,
+  "schema_version": 64,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,15 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "A00004: C075FB49 partial safe rework fixed long_distance/for_experts/new_course_desc; 6 failures remain. 411827E pending C visual + DDS_ONLY in-game.",
-    "A00004: 411827E self-QA PASS; C visual/source-style + isolated DDS_ONLY in-game pending. 568D3696 remains DXT5 specialized rework.",
-    "B95: FA7BBB13 first successful candidate restored and duplicate auto-run retired; pending independent C visual/final QA and isolated DDS_ONLY in-game.",
-    "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
-    "A AUTO 00001: 39229D64 self-QA PASS; pending independent C and DDS_ONLY in-game.",
-    "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
-    "C86: 62BEBF33 and E3FD08BE independently revalidated from current GitHub DDS; exact bbox containment PASS but top edge-touch high-risk. Keep unapproved until isolated DDS_ONLY in-game validation.",
-    "Remaining C85 production REWORK assets: FF2462BB, 568D3696, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
-    "C85 static PASS pending in-game remains: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77.",
+    "W00001 C barrier: A00006 durable BLOCKED_NO_ACTION (568D3696 DXT5 exact-safe rework blocked; C075FB49 6 overlap/artwork-sensitive failures remain).",
+    "W00001 C barrier: B00005 durable review preserved B95/B94/B93/B92/C86 evidence; no duplicate DDS rework.",
+    "62BEBF33 and E3FD08BE: C86 decoded-pixel containment PASS but exact bbox top edge-touch high-risk; isolated DDS_ONLY in-game validation required before approval.",
+    "Next A+B wave: continue disjoint odd/even queue from REWORK_REQUIRED then unfinished localize_text/zoom_review; do not repeat current blockers without new safe evidence.",
     "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK."
   ],
   "prototype_history": {
@@ -104,7 +99,7 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-28T10:09:21+09:00",
+      "updated_at_kst": "2026-09-28T22:18:00+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
       "report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
       "direct_queue_scope": 126,
@@ -134,7 +129,7 @@
       "pending_production_localize_text": 63,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "isolated DDS_ONLY in-game validation required",
+      "promotion_hold_reason": "W00001 C barrier reconciled; isolated DDS_ONLY in-game validation and remaining rework required",
       "user_approved_locked": 0
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
@@ -683,6 +678,23 @@
       "report": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json",
       "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
       "status": "PARTIAL_REWORK_3_SAFE_6_REMAIN"
+    },
+    "latest_wave_barrier": {
+      "wave_id": "W00001",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00007",
+      "base_head": "3d72d9d5331ee7ae2db5e0a3967f948571e73413",
+      "lane_a": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00006",
+        "result": "BLOCKED_NO_ACTION",
+        "commit": "d0dec00942571e1d6eafa0bc6787a028e9af670f"
+      },
+      "lane_b": {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00005",
+        "result": "DURABLE_REVIEW_NO_DUPLICATE_REWORK",
+        "commit": "3d72d9d5331ee7ae2db5e0a3967f948571e73413"
+      },
+      "cross_lane_qa": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
+      "runtime_validation": "UNTESTED"
     }
   },
   "runtime_packages": {
