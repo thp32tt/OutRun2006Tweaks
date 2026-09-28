@@ -87,6 +87,67 @@ namespace outrun::vr::dx11
             }
         }
 
+        bool fixed_function_argument_supported(DWORD value) noexcept
+        {
+            if ((value & ~static_cast<DWORD>(D3DTA_SELECTMASK)) != 0)
+                return false;
+
+            switch (value & D3DTA_SELECTMASK)
+            {
+            case D3DTA_DIFFUSE:
+            case D3DTA_CURRENT:
+            case D3DTA_TEXTURE:
+                return true;
+            default:
+                return false;
+            }
+        }
+
+        bool fixed_function_filter_supported(
+            DWORD value, bool mip) noexcept
+        {
+            if (mip && value == D3DTEXF_NONE)
+                return true;
+            return value == D3DTEXF_POINT || value == D3DTEXF_LINEAR;
+        }
+
+        bool fixed_function_address_supported(DWORD value) noexcept
+        {
+            return value == D3DTADDRESS_WRAP ||
+                   value == D3DTADDRESS_CLAMP;
+        }
+
+        void validate_fixed_function_op(
+            DWORD op,
+            DWORD arg1,
+            DWORD arg2,
+            std::uint32_t opBit,
+            FixedFunctionTranslationReadiness& out) noexcept
+        {
+            bool useArg1 = false;
+            bool useArg2 = false;
+            switch (op)
+            {
+            case D3DTOP_SELECTARG1:
+                useArg1 = true;
+                break;
+            case D3DTOP_SELECTARG2:
+                useArg2 = true;
+                break;
+            case D3DTOP_MODULATE:
+                useArg1 = true;
+                useArg2 = true;
+                break;
+            default:
+                out.unsupported |= opBit;
+                return;
+            }
+
+            if ((useArg1 && !fixed_function_argument_supported(arg1)) ||
+                (useArg2 && !fixed_function_argument_supported(arg2)))
+                out.unsupported |= FixedFunctionUnsupportedArgument;
+        }
+
         bool append_fvf_element(
             VertexInputLayoutTranslation& out,
             const char* semantic,
@@ -248,6 +309,70 @@ namespace outrun::vr::dx11
 
             return out.elementCount > 0;
         }
+    }
+
+    FixedFunctionTranslationReadiness translate_fixed_function_readiness(
+        const std::array<FixedFunctionStageState, 8>& source,
+        bool observationComplete) noexcept
+    {
+        FixedFunctionTranslationReadiness out{};
+        if (!observationComplete)
+            out.unsupported |=
+                FixedFunctionUnsupportedIncompleteObservation;
+
+        bool colorChainDisabled = false;
+        for (std::size_t stageIndex = 0;
+             stageIndex < source.size(); ++stageIndex)
+        {
+            const auto& stage = source[stageIndex];
+
+            if (stage.colorOp == D3DTOP_DISABLE)
+            {
+                colorChainDisabled = true;
+                if (stage.alphaOp != D3DTOP_DISABLE)
+                    out.unsupported |= FixedFunctionUnsupportedStageChain;
+                continue;
+            }
+
+            if (colorChainDisabled)
+                out.unsupported |= FixedFunctionUnsupportedStageChain;
+
+            ++out.activeStages;
+
+            // Resource exactness currently observes source textures only on
+            // stages 0 and 1. Higher active stages therefore remain
+            // deliberately fail-closed even though R81 records their state.
+            if (stageIndex >= 2)
+                out.unsupported |=
+                    FixedFunctionUnsupportedResourceStageCoverage;
+
+            validate_fixed_function_op(
+                stage.colorOp, stage.colorArg1, stage.colorArg2,
+                FixedFunctionUnsupportedColorOp, out);
+            validate_fixed_function_op(
+                stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
+                FixedFunctionUnsupportedAlphaOp, out);
+
+            const DWORD coord = stage.texCoordIndex & 0xFFFFu;
+            const DWORD coordFlags = stage.texCoordIndex & 0xFFFF0000u;
+            if (coordFlags != 0 || coord >= 8)
+                out.unsupported |= FixedFunctionUnsupportedTexCoord;
+
+            if (stage.textureTransformFlags != D3DTTFF_DISABLE)
+                out.unsupported |=
+                    FixedFunctionUnsupportedTextureTransform;
+
+            if (!fixed_function_filter_supported(stage.minFilter, false) ||
+                !fixed_function_filter_supported(stage.magFilter, false) ||
+                !fixed_function_filter_supported(stage.mipFilter, true))
+                out.unsupported |= FixedFunctionUnsupportedSamplerFilter;
+
+            if (!fixed_function_address_supported(stage.addressU) ||
+                !fixed_function_address_supported(stage.addressV))
+                out.unsupported |= FixedFunctionUnsupportedSamplerAddress;
+        }
+
+        return out;
     }
 
     PipelineTranslation translate_pipeline(

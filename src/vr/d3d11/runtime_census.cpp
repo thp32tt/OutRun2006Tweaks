@@ -75,6 +75,8 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ShaderProgrammablePendingSamples{0};
         std::atomic<std::uint64_t> FixedFunctionStateCoverageExactSamples{0};
         std::atomic<std::uint64_t> FixedFunctionStateCoverageFailureSamples{0};
+        std::atomic<std::uint64_t> FixedFunctionTranslationReadySamples{0};
+        std::atomic<std::uint64_t> FixedFunctionTranslationPendingSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
         std::atomic<std::uint64_t> TexturedSamples{0};
         std::array<std::atomic<std::uint64_t>, UnsupportedBitCount>
@@ -115,23 +117,6 @@ namespace outrun::vr::dx11
                 std::unordered_map<UINT, TextureMutationEvidence>>;
         TextureMutationRegistry TextureMutationEvidenceRegistry;
 
-        struct FixedFunctionStageSignature
-        {
-            DWORD colorOp = D3DTOP_DISABLE;
-            DWORD colorArg1 = D3DTA_TEXTURE;
-            DWORD colorArg2 = D3DTA_CURRENT;
-            DWORD alphaOp = D3DTOP_DISABLE;
-            DWORD alphaArg1 = D3DTA_TEXTURE;
-            DWORD alphaArg2 = D3DTA_CURRENT;
-            DWORD texCoordIndex = 0;
-            DWORD textureTransformFlags = D3DTTFF_DISABLE;
-            DWORD minFilter = D3DTEXF_NONE;
-            DWORD magFilter = D3DTEXF_NONE;
-            DWORD mipFilter = D3DTEXF_NONE;
-            DWORD addressU = D3DTADDRESS_WRAP;
-            DWORD addressV = D3DTADDRESS_WRAP;
-        };
-
         struct ShaderFunctionSignature
         {
             bool present{};
@@ -171,7 +156,7 @@ namespace outrun::vr::dx11
             // D3D9 fixed-function texture blending exposes stages 0..7.
             // R81 observes all eight stages and the currently modeled sampler
             // fields for each stage; this remains evidence, not emulation.
-            std::array<FixedFunctionStageSignature, 8> fixedFunctionStages{};
+            std::array<FixedFunctionStageState, 8> fixedFunctionStages{};
             DWORD colorOp0 = D3DTOP_DISABLE;
             DWORD alphaOp0 = D3DTOP_DISABLE;
             DWORD colorOp1 = D3DTOP_DISABLE;
@@ -192,6 +177,9 @@ namespace outrun::vr::dx11
             bool shaderMixedPair{};
             bool shaderTranslationExact{};
             bool fixedFunctionStateCoverageExact{};
+            bool fixedFunctionTranslationReady{};
+            std::uint32_t fixedFunctionTranslationUnsupported{};
+            UINT fixedFunctionActiveStages{};
             bool vertexBufferPresent{};
             bool renderTargetPresent{};
             bool indexed{};
@@ -284,6 +272,11 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.fixedFunctionStateCoverageExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.fixedFunctionTranslationUnsupported);
+            hash = hash_mix(hash, sig.fixedFunctionActiveStages);
             hash = hash_mix(hash, sig.vertexBufferPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.renderTargetPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.indexed ? 1u : 0u);
@@ -835,6 +828,14 @@ namespace outrun::vr::dx11
                 sig.mipFilter = sig.fixedFunctionStages[0].mipFilter;
                 sig.addressU = sig.fixedFunctionStages[0].addressU;
                 sig.addressV = sig.fixedFunctionStages[0].addressV;
+
+                const auto readiness = translate_fixed_function_readiness(
+                    sig.fixedFunctionStages,
+                    sig.fixedFunctionStateCoverageExact);
+                sig.fixedFunctionTranslationReady = readiness.exact();
+                sig.fixedFunctionTranslationUnsupported =
+                    readiness.unsupported;
+                sig.fixedFunctionActiveStages = readiness.activeStages;
             }
 
             const auto inputLayout = translate_vertex_input_layout(
@@ -899,6 +900,10 @@ namespace outrun::vr::dx11
                     ? FixedFunctionStateCoverageExactSamples
                     : FixedFunctionStateCoverageFailureSamples).fetch_add(
                         1, std::memory_order_relaxed);
+                (sig.fixedFunctionTranslationReady
+                    ? FixedFunctionTranslationReadySamples
+                    : FixedFunctionTranslationPendingSamples).fetch_add(
+                        1, std::memory_order_relaxed);
             }
 
             if (sig.indexed)
@@ -909,7 +914,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R81 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R82 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -933,6 +938,9 @@ namespace outrun::vr::dx11
                     sig.pixelShader.versionToken,
                     sig.pixelShader.hash,
                     sig.fixedFunctionStateCoverageExact ? 1 : 0,
+                    sig.fixedFunctionTranslationReady ? 1 : 0,
+                    sig.fixedFunctionTranslationUnsupported,
+                    sig.fixedFunctionActiveStages,
                     sig.streamOffset,
                     sig.stride,
                     sig.vertexBufferPresent ? 1 : 0,
@@ -982,7 +990,7 @@ namespace outrun::vr::dx11
                             continue;
 
                         spdlog::info(
-                            "VR DX11 R81 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={}]",
+                            "VR DX11 R82 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={}]",
                             unique,
                             stageIndex,
                             stage.colorOp,
@@ -1036,7 +1044,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R81 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, declaration/FVF input-layout readiness, fail-closed VS/PS readiness, and 8-stage fixed-function/sampler coverage evidence; native draw routing remains disabled",
+                    "VR DX11 R82 census ACTIVE: passive 1/{} draw sampling with resource/input-layout/shader gates plus conservative fixed-function translation readiness; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -1059,7 +1067,7 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R81 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R82 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1115,6 +1123,10 @@ namespace outrun::vr::dx11
                 FixedFunctionStateCoverageExactSamples.load(
                     std::memory_order_relaxed),
                 FixedFunctionStateCoverageFailureSamples.load(
+                    std::memory_order_relaxed),
+                FixedFunctionTranslationReadySamples.load(
+                    std::memory_order_relaxed),
+                FixedFunctionTranslationPendingSamples.load(
                     std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],

@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R(?:7[23456789]|8[01]) census: "
+    r"VR DX11 R(?:7[23456789]|8[012]) census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
@@ -60,6 +60,8 @@ SUMMARY_RE = re.compile(
     r"programmablePending=(?P<shaderProgrammablePending>\d+)\] )?"
     r"(?:ffpCoverage\[exact=(?P<fixedFunctionCoverageExact>\d+),"
     r"queryFailure=(?P<fixedFunctionQueryFailure>\d+)\] )?"
+    r"(?:ffpReadiness\[ready=(?P<fixedFunctionReadinessReady>\d+),"
+    r"pending=(?P<fixedFunctionReadinessPending>\d+)\] )?"
     r"unsupported\[incomplete=(?P<incomplete>\d+),"
     r"wbuffer=(?P<wbuffer>\d+),sepAlpha=(?P<sepAlpha>\d+),"
     r"alphaTest=(?P<alphaTest>\d+),stencil=(?P<stencil>\d+),"
@@ -83,14 +85,14 @@ STARTUP_RE = re.compile(
     r"msaa=(?P<msaa>-?\d+) bootstrapCompatible=(?P<bootstrapCompatible>[01])"
 )
 
-SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[01]) signature#(?P<id>\d+): (?P<body>.*)")
+SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[012]) signature#(?P<id>\d+): (?P<body>.*)")
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
     r"method=(?P<method>\d+) usage=(?P<usage>\d+) usageIndex=(?P<usageIndex>\d+)"
 )
 FFP_RE = re.compile(
-    r"VR DX11 R(?:72|81) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"VR DX11 R(?:72|8[12]) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"color\[op=(?P<colorOp>\d+),arg1=0x(?P<colorArg1>[0-9A-Fa-f]+),"
     r"arg2=0x(?P<colorArg2>[0-9A-Fa-f]+)\] "
     r"alpha\[op=(?P<alphaOp>\d+),arg1=0x(?P<alphaArg1>[0-9A-Fa-f]+),"
@@ -138,6 +140,7 @@ def main() -> int:
             "VR DX11 R7" not in text
             and "VR DX11 R80" not in text
             and "VR DX11 R81" not in text
+            and "VR DX11 R82" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -228,6 +231,7 @@ def main() -> int:
             "shaderFixedFunctionPending",
             "shaderProgrammablePending",
             "fixedFunctionQueryFailure",
+            "fixedFunctionReadinessPending",
             "indexUnsupported",
             "textureUnsupported",
             "colorUnsupported",

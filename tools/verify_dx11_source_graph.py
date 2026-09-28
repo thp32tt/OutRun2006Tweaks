@@ -51,6 +51,14 @@ def main() -> None:
         "fvfPath": "R79 explicit FVF path identity",
         "XYZB1..XYZB5": "FVF blend encodings remain fail-closed",
         "fvfPending": "unsupported FVF path remains explicitly pending",
+        "FixedFunctionTranslationReadiness": "R82 conservative F20 readiness result",
+        "translate_fixed_function_readiness": "R82 fixed-function readiness classifier",
+        "FixedFunctionUnsupportedResourceStageCoverage": "R82 stages above current texture resource coverage fail closed",
+        "D3DTOP_MODULATE": "R82 conservative fixed-function op subset",
+        "D3DTA_SELECTMASK": "R82 conservative texture-argument subset",
+        "D3DTTFF_DISABLE": "R82 texture transforms remain fail closed",
+        "D3DTEXF_LINEAR": "R82 point/linear sampler filter subset",
+        "D3DTADDRESS_CLAMP": "R82 wrap/clamp address subset",
     }
     missing_input_layout_contract = [
         meaning
@@ -88,7 +96,7 @@ def main() -> None:
         "ShaderMixedPairSamples": "mixed VS/PS fail-closed counter",
         "ShaderFixedFunctionPendingSamples": "fixed-function F20 dependency counter",
         "ShaderProgrammablePendingSamples": "programmable F21 dependency counter",
-        "std::array<FixedFunctionStageSignature, 8>": "R81 all eight fixed-function texture stages",
+        "std::array<FixedFunctionStageState, 8>": "R81/R82 all eight fixed-function texture stages",
         "D3DSAMP_MINFILTER": "R81 per-stage sampler min filter observation",
         "D3DSAMP_MAGFILTER": "R81 per-stage sampler mag filter observation",
         "D3DSAMP_MIPFILTER": "R81 per-stage sampler mip filter observation",
@@ -97,6 +105,10 @@ def main() -> None:
         "fixedFunctionStateCoverageExact": "R81 fixed-function coverage readiness evidence",
         "FixedFunctionStateCoverageExactSamples": "R81 complete FFP observation counter",
         "FixedFunctionStateCoverageFailureSamples": "R81 failed FFP observation counter",
+        "FixedFunctionTranslationReadySamples": "R82 conservative F20 readiness counter",
+        "FixedFunctionTranslationPendingSamples": "R82 fail-closed F20 pending counter",
+        "translate_fixed_function_readiness": "R82 runtime readiness classifier use",
+        "fixedFunctionTranslationUnsupported": "R82 readiness reason mask evidence",
         "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
     missing_contract = [
@@ -276,7 +288,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R(?:7[23456789]|8[01]) census": "R72 through R81 summary compatibility",
+        "R(?:7[23456789]|8[012]) census": "R72 through R82 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -312,6 +324,8 @@ def main() -> None:
         "shaderProgrammablePending": "R80 programmable F21 dependency evidence",
         "fixedFunctionCoverageExact": "R81 complete fixed-function coverage evidence",
         "fixedFunctionQueryFailure": "R81 failed fixed-function coverage evidence",
+        "fixedFunctionReadinessReady": "R82 conservative F20 readiness evidence",
+        "fixedFunctionReadinessPending": "R82 fail-closed F20 readiness evidence",
         "samplerMin": "R81 per-stage sampler parser evidence",
         "samplerAddressV": "R81 per-stage sampler parser evidence",
     }
