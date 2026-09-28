@@ -73,11 +73,12 @@ try {
     $providerSha = (Get-FileHash $providerDll -Algorithm SHA256).Hash.ToLowerInvariant()
     Copy-Item $providerDll (Join-Path $OutputDirectory "d3d9.dll") -Force
 
-    $license = Get-ChildItem $extractRoot -Recurse -File | Where-Object {
-        $_.Name -match '^LICENSE(\.txt)?$'
-    } | Select-Object -First 1
-    if (-not $license) { throw "DXVK release license file not found" }
-    Copy-Item $license.FullName (Join-Path $OutputDirectory "DXVK_LICENSE.txt") -Force
+    if (-not $manifest.licenseUrl) { throw "Pinned DXVK license URL missing from manifest" }
+    $licensePath = Join-Path $OutputDirectory "DXVK_LICENSE.txt"
+    Invoke-WebRequest -Uri ([string]$manifest.licenseUrl) -OutFile $licensePath
+    if (-not (Test-Path $licensePath) -or (Get-Item $licensePath).Length -lt 100) {
+        throw "Pinned DXVK license download is missing or unexpectedly small"
+    }
 
     $identity = [ordered]@{
         SchemaVersion = 1
