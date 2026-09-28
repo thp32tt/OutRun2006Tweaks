@@ -537,7 +537,12 @@ namespace OutRunVrR32DirectSubmit
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session) noexcept
     {
-        ReleasePending();
+        // STATIC1000 CYCLE 0005: D3D11 EVENT queries own GPU-consumption
+        // lifetime, not XrSession lifetime. Session loss/recreation can happen
+        // while the same host D3D11 device remains alive. Retire completed ACKs
+        // now but preserve incomplete EVENT owners so their producer slots can
+        // still be released safely after the new session starts.
+        PollCompletedAcks();
         OutRunVrD3D9ExDirectPassthrough::R32ResetDirectCaches();
         return OutRunVrR24BlackScreenGuard::DestroySession(session);
     }
