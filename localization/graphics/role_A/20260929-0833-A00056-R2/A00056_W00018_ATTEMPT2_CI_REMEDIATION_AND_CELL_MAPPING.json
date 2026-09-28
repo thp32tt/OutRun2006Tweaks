@@ -1,0 +1,233 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00056",
+  "wave_id": "W00018",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA_RETRY",
+  "target_branch": "korean-localization-clean",
+  "attempt": "2/3",
+  "recorded_at_kst": "2026-09-29T08:33:37+09:00",
+  "initial_attempt_material_commit": "9b87b86447a36320970354c7127b85c4c69b0896",
+  "initial_attempt_task_record_commit": "84115b00d2b3e47248312c2ab4e7d07c71032e71",
+  "final_precommit_head_sha": "a6d4c9fb716eff955f7c59b810d0333db24aa0b2",
+  "peer_head_preserved": true,
+  "failure_context": {
+    "workflow": "Localization Automation Gate",
+    "failed_run_id": 36498038890,
+    "failed_head_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
+    "failed_step": "Verify parallel lane isolation",
+    "exact_error": "LOCALIZATION-LOCALIZATION_A-00056: missing unique durable task record under docs/automation/runs/",
+    "root_cause": "Attempt 1 pushed the material role_A report first and the durable task record in a second commit. The gate evaluates each AUTO commit independently, so the first push was invalid even though the follow-up task-record commit later passed.",
+    "confirming_followup_gate": {
+      "run_id": 36498060631,
+      "head_sha": "84115b00d2b3e47248312c2ab4e7d07c71032e71",
+      "conclusion": "success"
+    },
+    "remediation": "This retry writes the new lane-local material report and the updated durable TASK_ID record in one atomic Git commit based on the latest branch tree."
+  },
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "DIRECT_SOURCE_VISUAL_SEMANTIC_TO_ATLAS_CELL_MAPPING",
+    "source_repository": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "description": "Resolved previously-unassigned physical source cells for two odd-shard assets by direct inspection of immutable upstream decoded source PNGs and exact stock/4x atlas geometry. This removes cell-order guessing before exact-HD mask extraction."
+  },
+  "assets": [
+    {
+      "queue_index": 65,
+      "asset": "EBEF6D20",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "canonical_translation": {
+        "source": "Loading",
+        "korean": "로딩"
+      },
+      "source_evidence": {
+        "decoded_png_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.png",
+        "decoded_png_git_blob_sha": "ba1573f05e927c749aee9cd28da99a0127edb99d",
+        "exact_release_dds_path": "Release/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+        "exact_release_dds_git_blob_sha": "f05e35654433b4ce010d119d4a705f505cdd80c2",
+        "atlas4x_git_blob_sha": "6f30c47b87dd67726d0945a04096fae7670b0526"
+      },
+      "physical_mapping": {
+        "semantic_occurrences": 1,
+        "physical_occurrences": 2,
+        "confirmation": "PASS_DIRECT_SOURCE_VISUAL_INSPECTION",
+        "occurrences": [
+          {
+            "sprite": "sprite_11",
+            "stock_rect": [
+              0,
+              106,
+              230,
+              30
+            ],
+            "hd_4x_rect": [
+              0,
+              424,
+              920,
+              120
+            ],
+            "source_text": "Loading",
+            "korean": "로딩"
+          },
+          {
+            "sprite": "sprite_12",
+            "stock_rect": [
+              230,
+              106,
+              230,
+              30
+            ],
+            "hd_4x_rect": [
+              920,
+              424,
+              920,
+              120
+            ],
+            "source_text": "Loading",
+            "korean": "로딩"
+          }
+        ],
+        "note": "The two top Loading labels are the only physical occurrences assigned to the canonical Loading semantic entry in this retry. Left/Right/Diverge are visible source artwork but are not added to canonical translation state by lane A."
+      },
+      "raw_orientation": "HISTORICAL_MIRROR_Y; EXACT_HD_PIXEL_ORIENTATION_RECONFIRM_REQUIRED_BEFORE_RENDER",
+      "protected_artwork": [
+        "OutRun2SP logo",
+        "OutRun2 logo",
+        "road/branch artwork",
+        "Left/Right/Diverge source artwork unless shared canonical semantics are reconciled",
+        "all pixels outside confirmed Loading glyph/effect masks"
+      ],
+      "touched_elements": [
+        {
+          "sprite": "sprite_11",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_GLYPH_MASK_NOT_DECODED",
+          "dds_alpha_orientation": "HOLD_NO_CANDIDATE"
+        },
+        {
+          "sprite": "sprite_12",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_GLYPH_MASK_NOT_DECODED",
+          "dds_alpha_orientation": "HOLD_NO_CANDIDATE"
+        }
+      ],
+      "next_action": "Decode exact Release DDS; derive complete glyph/effect masks inside sprite_11/sprite_12 4x cells; build clean plates; then render 로딩 with mirror-Y source transform and reject any 1px escape."
+    },
+    {
+      "queue_index": 107,
+      "asset": "841E796B",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "canonical_translation": {
+        "source": "No Handicap",
+        "korean": "핸디캡 없음"
+      },
+      "source_evidence": {
+        "decoded_png_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/841E796B_512x128.png",
+        "decoded_png_git_blob_sha": "165502f5ab2d9ea7ddb84487377de7ea06808f3b",
+        "exact_release_dds_path": "Release/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+        "exact_release_dds_git_blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+        "atlas4x_git_blob_sha": "95d88252f0169246e1640904431044b198c80083"
+      },
+      "physical_mapping": {
+        "semantic_occurrences": 1,
+        "physical_occurrences": 1,
+        "confirmation": "PASS_DIRECT_SOURCE_VISUAL_INSPECTION",
+        "occurrence": {
+          "sprite": "sprite_516",
+          "stock_rect": [
+            369,
+            53,
+            90,
+            50
+          ],
+          "hd_4x_rect": [
+            1476,
+            212,
+            360,
+            200
+          ],
+          "source_text": "No Handicap",
+          "korean": "핸디캡 없음"
+        },
+        "preserve_cells": [
+          "sprite_507",
+          "sprite_508",
+          "sprite_509",
+          "sprite_510",
+          "sprite_511",
+          "sprite_512",
+          "sprite_513",
+          "sprite_514",
+          "sprite_515"
+        ],
+        "note": "The bottom-right yellow No Handicap card is sprite_516. All nine blue Ferrari/model cards are preserve-only."
+      },
+      "raw_orientation": "HISTORICAL_MIRROR_Y; EXACT_HD_PIXEL_ORIENTATION_RECONFIRM_REQUIRED_BEFORE_RENDER",
+      "protected_artwork": [
+        "Ferrari/model names",
+        "vehicle pictograms",
+        "blue model cards",
+        "yellow card geometry outside source glyph/effect mask",
+        "all brand/model artwork"
+      ],
+      "touched_elements": [
+        {
+          "sprite": "sprite_516",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_GLYPH_MASK_NOT_DECODED",
+          "dds_alpha_orientation": "HOLD_NO_CANDIDATE"
+        }
+      ],
+      "next_action": "Decode exact Release DDS; isolate No Handicap glyph/effect mask only within sprite_516; keep the yellow card and all nine model cards exact; render 핸디캡 없음 only after measured bbox/style extraction."
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_65_107",
+    "work_steal": "NONE",
+    "source_identity": "PASS_IMMUTABLE_GITHUB_BLOBS",
+    "semantic_to_physical_mapping": "PASS_3_PHYSICAL_OCCURRENCES_RESOLVED_FROM_DIRECT_SOURCE_VISUAL_EVIDENCE",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "dds_format_compression_mips_alpha": "HOLD_NO_DDS_WRITE",
+    "raw_orientation": "HOLD_EXACT_HD_RECONFIRM_BEFORE_RENDER",
+    "mandatory_english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_ATTEMPT2_CI_ROOT_CAUSE_REMEDIATED_AND_2_ODD_ASSET_CELL_MAPPING_ADVANCED",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

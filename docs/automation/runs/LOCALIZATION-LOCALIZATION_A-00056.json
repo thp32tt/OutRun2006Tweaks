@@ -3,14 +3,14 @@
   "task_id": "LOCALIZATION-LOCALIZATION_A-00056",
   "lane": "LOCALIZATION_A",
   "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "wave_id": "W00018",
-  "recorded_at_kst": "2026-09-29T08:25:05+09:00",
+  "recorded_at_kst": "2026-09-29T08:33:37+09:00",
   "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
   "material_commit_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
   "final_precommit_head_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
   "preserved_peer_head": false,
-  "result": "PASS_MATERIAL_FALLBACK_4_NEW_ODD_EXACT_HD_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "result": "PASS_ATTEMPT2_CI_ROOT_CAUSE_REMEDIATED_AND_2_ODD_ASSET_CELL_MAPPING_ADVANCED",
   "material_deliverable": {
     "indices": [
       65,
@@ -36,8 +36,6 @@
   },
   "touched_assets": [
     "EBEF6D20",
-    "37759842",
-    "560FA536",
     "841E796B"
   ],
   "dependency_blocked_rework_indices": [
@@ -46,7 +44,7 @@
     111,
     121
   ],
-  "fail_closed_reason": "Exact English HD Release DDS identities and atlas geometry are pinned, but exact decoded glyph/effect masks, complete clean plates, and measured Korean full-effect bboxes do not yet exist. No guessed DDS bytes were emitted; all containment/DDS/alpha/orientation gates remain HOLD_STRICT_RECHECK until pixel decode/render evidence exists.",
+  "fail_closed_reason": "No exact-HD glyph/effect pixel masks or new Korean raster were emitted in retry. Per-element 1px containment and DDS/alpha/orientation remain HOLD_STRICT_RECHECK until exact Release DDS pixels are decoded and measured.",
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "runtime_test_performed": false,
@@ -56,5 +54,40 @@
   "gpt_library_used": false,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "retry_parent_head_sha": "a6d4c9fb716eff955f7c59b810d0333db24aa0b2",
+  "failure_context": {
+    "failed_run_id": 36498038890,
+    "failed_head_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
+    "failed_step": "Verify parallel lane isolation",
+    "exact_error": "missing unique durable task record under docs/automation/runs/",
+    "root_cause": "material report and durable task record were pushed in separate commits",
+    "confirming_followup_success_run_id": 36498060631
+  },
+  "retry_remediation": {
+    "atomic_single_commit": true,
+    "material_report": "localization/graphics/role_A/20260929-0833-A00056-R2/A00056_W00018_ATTEMPT2_CI_REMEDIATION_AND_CELL_MAPPING.json",
+    "material_advance": "Resolved EBEF6D20 Loading x2 -> sprite_11/sprite_12 and 841E796B No Handicap -> sprite_516 using immutable upstream decoded source plus exact 4x atlas geometry.",
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false
+  },
+  "material_deliverable_retry": {
+    "indices": [
+      65,
+      107
+    ],
+    "assets": [
+      "EBEF6D20",
+      "841E796B"
+    ],
+    "physical_occurrences_mapped": 3,
+    "report": "localization/graphics/role_A/20260929-0833-A00056-R2/A00056_W00018_ATTEMPT2_CI_REMEDIATION_AND_CELL_MAPPING.json",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "touched_elements": [
+    "EBEF6D20:sprite_11",
+    "EBEF6D20:sprite_12",
+    "841E796B:sprite_516"
+  ]
 }
