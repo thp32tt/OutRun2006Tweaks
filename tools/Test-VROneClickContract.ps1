@@ -241,6 +241,36 @@ switch ([string]$target.RendererTarget) {
         if ($providerProbe -notmatch [regex]::Escape('gameLocalProvider')) {
             throw 'DXVK provider census does not verify game-local provider identity.'
         }
+        foreach ($requiredText in @(
+            'LogProviderCensus',
+            'source={} attestation={}'
+        )) {
+            if ($providerProbe -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK provider re-attestation logger missing: $requiredText"
+            }
+        }
+
+        $exUpgrade = Get-Content (Join-Path $repoRoot 'src/vr/d3d9/ex_device_upgrade.cpp') -Raw
+        foreach ($requiredText in @(
+            'create-device-classic',
+            'create-device-ex',
+            'OutRunVR::Dxvk::LogProviderCensus'
+        )) {
+            if ($exUpgrade -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK device recreation re-attestation wiring missing: $requiredText"
+            }
+        }
+
+        $dxvkAnalyzer = Get-Content (Join-Path $toolsRoot 'analyze_dxvk_session.py') -Raw
+        foreach ($requiredText in @(
+            'DXVK_DEVICE_CREATION_REATTESTATION_MISSING',
+            'DXVK_DEVICE_CREATION_REATTESTATION_FAILED',
+            'DeviceCreationReattestationPassed'
+        )) {
+            if ($dxvkAnalyzer -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK session analyzer recreation gate missing: $requiredText"
+            }
+        }
     }
 
     default {
