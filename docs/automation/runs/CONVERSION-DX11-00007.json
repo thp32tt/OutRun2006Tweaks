@@ -4,7 +4,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 4,
+  "chat_rollover": 5,
   "recorded_kst": "2026-09-28T18:23:11+09:00",
   "base_sha": "28147c3ea3854dfa16f8b7c0e6e2e8e7a075e466",
   "code_result_sha": "2e48bff6eb0d0ec955e39c1c373bd44df8313cec",
@@ -127,8 +127,8 @@
   },
   "rollover_recovery": {
     "status": "RECOVERED_WITHOUT_DUPLICATION",
-    "note": "CHAT_ROLLOVER=4 re-read the current GitHub branch, canonical run record, exact-SHA Actions results and Issue #14 ledger. The R74 source implementation and C6 validation/state sealing were already complete, so no source work or validation ledger event was duplicated. This commit records the rollover-4 recovery only."
+    "note": "CHAT_ROLLOVER=5 re-read the current GitHub branch, canonical run record, exact-SHA Actions results and Issue #14 implementation/validation ledger. The R74 source implementation and C6 validation/state sealing were already complete, so no source work, CI rerun, or validation ledger event was duplicated. This commit records the rollover-5 recovery only."
   },
   "next_action": "Keep NativeDrawPathActivationAllowed=false. In the next bounded DX11 task, classify supported VB/IB Lock flags against concrete D3D11 mirror update semantics, then add texture LockRect/UpdateTexture mutation coverage and a MANAGED CPU-shadow/reset-generation model. F19/F21 input-layout and shader/fixed-function readiness remain open. Do not claim runtime/visual parity or promote native draw ownership before exact-build Quest 3/VDXR validation.",
-  "finalized_kst": "2026-09-28T18:26:00+09:00"
+  "finalized_kst": "2026-09-28T19:02:00+09:00"
 }
