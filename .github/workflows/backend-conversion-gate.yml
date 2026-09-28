@@ -45,6 +45,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_dx11_native_transport_contract.py
 
+      - name: Verify DX11 source graph
+        shell: pwsh
+        run: python tools/verify_dx11_source_graph.py
+
       - name: Configure Win32
         shell: pwsh
         run: |
