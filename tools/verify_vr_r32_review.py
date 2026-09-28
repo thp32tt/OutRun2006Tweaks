@@ -247,10 +247,12 @@ if "Context->End(pending.fence);\n        OutRunVrFinalTest::Context->Flush();" 
     raise SystemExit("R32 host must not Flush every direct frame")
 query_error = host_direct.find("if (FAILED(hr))")
 fault_generation = host_direct.find("MarkGenerationFault(generation)", query_error)
-fast_gate = host_direct.find("AckFaultGeneration == generation")
-if min(query_error, fault_generation, fast_gate) < 0:
+can_fast_submit = host_direct.find("inline bool CanFastSubmit")
+fast_gate = host_direct.find(
+    "AckFaultGeneration == generation", can_fast_submit)
+if min(query_error, fault_generation, can_fast_submit, fast_gate) < 0:
     raise SystemExit("R32 host ACK query failure must disable fast-submit for that generation")
-if not (query_error < fault_generation < fast_gate):
+if not (query_error < fault_generation < can_fast_submit < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
 
 ensure_fence_failure = host_direct.find("if (!EnsureFence(slot))")
