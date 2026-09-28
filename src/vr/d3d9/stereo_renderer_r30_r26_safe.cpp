@@ -4083,19 +4083,22 @@ namespace OutRunVRStereo
                 R30ArmSafeFallback();
             }
 
-            static std::atomic<std::uint64_t> projectedDraws{ 0 };
-            static std::atomic<std::uint64_t> hudDraws{ 0 };
-            auto& counter = projected ? projectedDraws : hudDraws;
-            const auto hit =
-                counter.fetch_add(1, std::memory_order_relaxed) + 1;
-            if ((hit & (hit - 1)) == 0)
-                spdlog::info(
-                    "VR R62 FIXEDFN KIND0: owner={} fvf=0x{:08X} prim={} marker={} hits={}",
-                    projected ? "PROJECTED_WORLD_MARKER_2D" : "SCREEN_HUD",
-                    static_cast<unsigned>(fvf),
-                    primitiveCount,
-                    OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
-                    hit);
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> projectedDraws{ 0 };
+                static std::atomic<std::uint64_t> hudDraws{ 0 };
+                auto& counter = projected ? projectedDraws : hudDraws;
+                const auto hit =
+                    counter.fetch_add(1, std::memory_order_relaxed) + 1;
+                if ((hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR R62 FIXEDFN KIND0: owner={} fvf=0x{:08X} prim={} marker={} hits={}",
+                        projected ? "PROJECTED_WORLD_MARKER_2D" : "SCREEN_HUD",
+                        static_cast<unsigned>(fvf),
+                        primitiveCount,
+                        OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                        hit);
+            }
             return hr;
         }
 
@@ -4103,7 +4106,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, const char* method,
             D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
         {
-            if (!device ||
+            if (!Settings::VRTelemetry || !device ||
                 OutRunVR::GameSemantic::CurrentQueueExactScope !=
                     OutRunVR::GameSemantic::RenderScope::ScreenHud)
                 return;
@@ -4141,8 +4144,9 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
-            R63TraceExactScreenHudDraw(
-                device, "DrawPrimitive", type, primitiveCount);
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawPrimitive", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
@@ -4171,8 +4175,9 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
-            R63TraceExactScreenHudDraw(
-                device, "DrawIndexedPrimitive", type, primitiveCount);
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawIndexedPrimitive", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
@@ -4211,8 +4216,9 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
-            R63TraceExactScreenHudDraw(
-                device, "DrawPrimitiveUP", type, primitiveCount);
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawPrimitiveUP", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
@@ -4242,8 +4248,9 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
-            R63TraceExactScreenHudDraw(
-                device, "DrawIndexedPrimitiveUP", type, primitiveCount);
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawIndexedPrimitiveUP", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
