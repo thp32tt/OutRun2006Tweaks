@@ -23,8 +23,11 @@ function Invoke-AnalyzerCase {
         [bool]$ExpectedDirectPathActive=$false,
         [Nullable[bool]]$ExpectedGenerationMatches=$null,
         [ValidateSet('MATCH','MISMATCH','INCOMPLETE')][string]$IdentityMode='MATCH',
+        [ValidateSet('VERIFIED','UNVERIFIED','MISSING')][string]$PackageIntegrityMode='VERIFIED',
         [Nullable[bool]]$ExpectedBuildIdentityVerified=$true,
-        [bool]$ExpectedBuildIdentityMismatch=$false
+        [bool]$ExpectedBuildIdentityMismatch=$false,
+        [bool]$ExpectedDirectEvidenceTrusted=$false,
+        [string[]]$ExpectedDirectEvidenceBlockers=@()
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -56,6 +59,11 @@ function Invoke-AnalyzerCase {
             ResolvedBackend='dxvk-safe'
             VariantId='E_DXVK_SAFE'
             SourceSha='fixture-source'
+            PackageIntegrity=if($PackageIntegrityMode -eq 'MISSING'){$null}else{[ordered]@{
+                Verified=($PackageIntegrityMode -eq 'VERIFIED')
+                EntryCount=42
+                ManifestSha256=('a'*64)
+            }}
             PackageBuildInputs=[ordered]@{
                 IntegrationSha=$fixtureBuildSha
                 DevelopmentBranch='vr-dxvk-r71-disasm'
@@ -105,6 +113,15 @@ function Invoke-AnalyzerCase {
     }
     if([bool]$summary.BuildIdentityMismatch -ne $ExpectedBuildIdentityMismatch){
         throw "${Name}: BuildIdentityMismatch=$($summary.BuildIdentityMismatch), expected $ExpectedBuildIdentityMismatch"
+    }
+    if([bool]$summary.DxvkDirectEvidenceTrusted -ne $ExpectedDirectEvidenceTrusted){
+        throw "${Name}: DxvkDirectEvidenceTrusted=$($summary.DxvkDirectEvidenceTrusted), expected $ExpectedDirectEvidenceTrusted"
+    }
+    $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
+    foreach($blocker in $ExpectedDirectEvidenceBlockers){
+        if($actualDirectBlockers -notcontains $blocker){
+            throw "${Name}: missing direct-evidence blocker $blocker; actual=$($actualDirectBlockers -join ',')"
+        }
     }
     if($null -ne $ExpectedBuildIdentityVerified){
         if([bool]$summary.BuildIdentityVerified -ne [bool]$ExpectedBuildIdentityVerified){
@@ -193,7 +210,51 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
         -ExpectedStatus 'DXVK_HOST_OWNED_DIRECTGPU_ACTIVE' `
         -ExpectedBridgeReady $true -ExpectedImportReady $true `
-        -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true
+        -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true `
+        -ExpectedDirectEvidenceTrusted $true
+
+    # Direct frames alone are not promotion evidence when exact-build identity
+    # is incomplete.
+    Invoke-AnalyzerCase -Name 'direct-active-identity-incomplete' `
+        -GameLog "VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring 2124x2284 generation=12345`nVR stereo: path=DXVK host-owned D3D11 KMT import`ndirect[frames=240,fallbacks=1,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
+        -ExpectedStatus 'DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED' `
+        -ExpectedBridgeReady $true -ExpectedImportReady $true -ExpectedDirectPathActive $true `
+        -ExpectedGenerationMatches $true -IdentityMode 'INCOMPLETE' `
+        -ExpectedBuildIdentityVerified $false `
+        -ExpectedDirectEvidenceTrusted $false `
+        -ExpectedDirectEvidenceBlockers @('BUILD_IDENTITY_UNVERIFIED','PACKAGE_INTEGRITY_EVIDENCE_MISSING')
+
+    # Package integrity is a separate promotion prerequisite from source/backend
+    # identity.
+    Invoke-AnalyzerCase -Name 'direct-active-package-unverified' `
+        -GameLog "VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring 2124x2284 generation=12345`nVR stereo: path=DXVK host-owned D3D11 KMT import`ndirect[frames=240,fallbacks=1,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
+        -ExpectedStatus 'DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED' `
+        -ExpectedBridgeReady $true -ExpectedImportReady $true -ExpectedDirectPathActive $true `
+        -ExpectedGenerationMatches $true -PackageIntegrityMode 'UNVERIFIED' `
+        -ExpectedDirectEvidenceTrusted $false `
+        -ExpectedDirectEvidenceBlockers @('PACKAGE_INTEGRITY_NOT_VERIFIED')
+
+    # Host and game must refer to the same bridge generation before direct-frame
+    # telemetry is trusted.
+    Invoke-AnalyzerCase -Name 'direct-active-generation-mismatch' `
+        -GameLog "VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring 2124x2284 generation=54321`nVR stereo: path=DXVK host-owned D3D11 KMT import`ndirect[frames=240,fallbacks=1,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
+        -ExpectedStatus 'DXVK_HOST_GENERATION_MISMATCH' `
+        -ExpectedBridgeReady $true -ExpectedImportReady $true -ExpectedDirectPathActive $true `
+        -ExpectedGenerationMatches $false `
+        -ExpectedDirectEvidenceTrusted $false `
+        -ExpectedDirectEvidenceBlockers @('HOST_IMPORT_GENERATION_MISMATCH')
 
     # Even apparently successful DirectGPU telemetry must fail closed when
     # session/build/preflight source identity disagrees.
@@ -207,7 +268,9 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedBridgeReady $true -ExpectedImportReady $true `
         -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true `
         -IdentityMode 'MISMATCH' -ExpectedBuildIdentityVerified $false `
-        -ExpectedBuildIdentityMismatch $true
+        -ExpectedBuildIdentityMismatch $true `
+        -ExpectedDirectEvidenceTrusted $false `
+        -ExpectedDirectEvidenceBlockers @('BUILD_IDENTITY_MISMATCH')
 
     # Missing optional package identity reduces confidence but is not fabricated
     # into a mismatch; older/manual bundles remain analyzable.

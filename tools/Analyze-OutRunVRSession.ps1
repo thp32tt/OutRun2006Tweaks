@@ -154,6 +154,30 @@ $buildIdentityMismatch=($buildIdentityIssues.Count -gt 0)
 $buildIdentityComplete=($sourceSha -ne 'UNKNOWN' -and $buildInputSourceSha -and $preflightSourceSha -and $buildInputBackend -and $preflightBackend)
 $buildIdentityVerified=($buildIdentityComplete -and -not $buildIdentityMismatch)
 
+$packageIntegrityEvidenceAvailable=$false
+$packageIntegrityVerified=$false
+$packageIntegrityEntryCount=0
+$packageIntegrityManifestSha=''
+if($null -ne $oneClickPreflight -and $oneClickPreflight.PackageIntegrity){
+    $packageIntegrityEvidenceAvailable=$true
+    $packageIntegrityVerified=[bool]$oneClickPreflight.PackageIntegrity.Verified
+    if($oneClickPreflight.PackageIntegrity.EntryCount){$packageIntegrityEntryCount=[int]$oneClickPreflight.PackageIntegrity.EntryCount}
+    if($oneClickPreflight.PackageIntegrity.ManifestSha256){$packageIntegrityManifestSha=[string]$oneClickPreflight.PackageIntegrity.ManifestSha256}
+}
+
+$dxvkHostGenerationMismatch=($dxvkHostBridgeReady -and $dxvkHostImportReady -and $null -ne $dxvkHostGenerationMatches -and -not [bool]$dxvkHostGenerationMatches)
+$dxvkDirectEvidenceBlockers=@()
+if($backend -match 'dxvk'){
+    if($buildIdentityMismatch){$dxvkDirectEvidenceBlockers+='BUILD_IDENTITY_MISMATCH'}
+    elseif(-not $buildIdentityVerified){$dxvkDirectEvidenceBlockers+='BUILD_IDENTITY_UNVERIFIED'}
+    if(-not $packageIntegrityEvidenceAvailable){$dxvkDirectEvidenceBlockers+='PACKAGE_INTEGRITY_EVIDENCE_MISSING'}
+    elseif(-not $packageIntegrityVerified){$dxvkDirectEvidenceBlockers+='PACKAGE_INTEGRITY_NOT_VERIFIED'}
+    if($dxvkHostGenerationMismatch){$dxvkDirectEvidenceBlockers+='HOST_IMPORT_GENERATION_MISMATCH'}
+    if(-not $dxvkHostPathActive){$dxvkDirectEvidenceBlockers+='HOST_DIRECT_PATH_NOT_ACTIVE'}
+    if($directFrames -le 0){$dxvkDirectEvidenceBlockers+='DIRECT_FRAMES_ZERO'}
+}
+$dxvkDirectEvidenceTrusted=($backend -match 'dxvk' -and $dxvkDirectEvidenceBlockers.Count -eq 0)
+
 $flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
@@ -166,6 +190,14 @@ if($dxvkHostPathActive){$flags+='DXVK_HOST_DIRECT_PATH_ACTIVE'}
 if($backend -match 'dxvk' -and $buildIdentityMismatch){$flags+='DXVK_BUILD_IDENTITY_MISMATCH'}
 elseif($backend -match 'dxvk' -and -not $buildIdentityComplete){$flags+='DXVK_BUILD_IDENTITY_INCOMPLETE'}
 elseif($backend -match 'dxvk' -and $buildIdentityVerified){$flags+='DXVK_BUILD_IDENTITY_VERIFIED'}
+if($backend -match 'dxvk'){
+    if($packageIntegrityVerified){$flags+='DXVK_PACKAGE_INTEGRITY_VERIFIED'}
+    elseif($packageIntegrityEvidenceAvailable){$flags+='DXVK_PACKAGE_INTEGRITY_NOT_VERIFIED'}
+    else{$flags+='DXVK_PACKAGE_INTEGRITY_EVIDENCE_MISSING'}
+    if($dxvkHostGenerationMismatch){$flags+='DXVK_HOST_GENERATION_MISMATCH'}
+    if($dxvkDirectEvidenceTrusted){$flags+='DXVK_DIRECT_EVIDENCE_TRUSTED'}
+    elseif($dxvkHostPathActive -and $directFrames -gt 0){$flags+='DXVK_DIRECT_EVIDENCE_UNTRUSTED'}
+}
 if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
 if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
 if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
@@ -174,7 +206,9 @@ if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
 $status='OK'
 if($backend -match 'dxvk' -and $buildIdentityMismatch){$status='DXVK_BUILD_IDENTITY_MISMATCH'}
-elseif($backend -match 'dxvk' -and $dxvkHostPathActive -and $directFrames -gt 0){$status='DXVK_HOST_OWNED_DIRECTGPU_ACTIVE'}
+elseif($backend -match 'dxvk' -and $dxvkHostGenerationMismatch){$status='DXVK_HOST_GENERATION_MISMATCH'}
+elseif($backend -match 'dxvk' -and $dxvkHostPathActive -and $directFrames -gt 0 -and -not $dxvkDirectEvidenceTrusted){$status='DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED'}
+elseif($backend -match 'dxvk' -and $dxvkHostPathActive -and $directFrames -gt 0 -and $dxvkDirectEvidenceTrusted){$status='DXVK_HOST_OWNED_DIRECTGPU_ACTIVE'}
 elseif($backend -match 'dxvk' -and $dxvkHostImportFailed){$status='DXVK_HOST_OWNED_IMPORT_FAILED'}
 elseif($backend -match 'dxvk' -and $dxvkHostBridgeAllocationFailed){$status='DXVK_HOST_OWNED_BRIDGE_ALLOCATION_FAILED'}
 elseif($backend -match 'dxvk' -and $dxvkHostBridgeReady -and -not $dxvkHostImportReady -and $directFrames -eq 0 -and $directFallbacks -gt 0){$status='DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED'}
@@ -197,6 +231,13 @@ $result=[ordered]@{
     PreflightSourceSha=$preflightSourceSha
     BuildInputBackend=$buildInputBackend
     PreflightBackend=$preflightBackend
+    PackageIntegrityEvidenceAvailable=$packageIntegrityEvidenceAvailable
+    PackageIntegrityVerified=$packageIntegrityVerified
+    PackageIntegrityEntryCount=$packageIntegrityEntryCount
+    PackageIntegrityManifestSha256=$packageIntegrityManifestSha
+    DxvkDirectEvidenceTrusted=$dxvkDirectEvidenceTrusted
+    DxvkDirectEvidenceBlockers=@($dxvkDirectEvidenceBlockers)
+    DxvkHostGenerationMismatch=$dxvkHostGenerationMismatch
     Provider=$provider
     SBSDesktopDupFallback=$sbsFallback
     PlainD3D9Device=$plainD3D9
@@ -247,6 +288,13 @@ $lines=@(
     "preflightSourceSha=$preflightSourceSha"
     "buildInputBackend=$buildInputBackend"
     "preflightBackend=$preflightBackend"
+    "packageIntegrityEvidenceAvailable=$packageIntegrityEvidenceAvailable"
+    "packageIntegrityVerified=$packageIntegrityVerified"
+    "packageIntegrityEntryCount=$packageIntegrityEntryCount"
+    "packageIntegrityManifestSha256=$packageIntegrityManifestSha"
+    "dxvkDirectEvidenceTrusted=$dxvkDirectEvidenceTrusted"
+    "dxvkDirectEvidenceBlockers=$($dxvkDirectEvidenceBlockers -join ',')"
+    "dxvkHostGenerationMismatch=$dxvkHostGenerationMismatch"
     "provider=$provider"
     "sbsDesktopDupFallback=$sbsFallback"
     "plainD3D9Device=$plainD3D9"
@@ -280,6 +328,12 @@ $lines=@(
 )
 if($status -eq 'DXVK_BUILD_IDENTITY_MISMATCH'){
     $lines+='interpretation=DXVK runtime evidence identity is inconsistent across session/build/preflight metadata; do not attribute DirectGPU or pacing results to a source SHA until the package/session mismatch is resolved.'
+}
+elseif($status -eq 'DXVK_HOST_GENERATION_MISMATCH'){
+    $lines+='interpretation=DXVK host bridge and game import generations disagree; direct-frame telemetry is not trusted until the same transport generation is observed at both ends.'
+}
+elseif($status -eq 'DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED'){
+    $lines+='interpretation=DXVK DirectGPU frames were observed, but exact-build/package-integrity evidence is incomplete or unverified; do not use this bundle to promote the transport. Inspect DxvkDirectEvidenceBlockers.'
 }
 elseif($status -eq 'DXVK_HOST_OWNED_DIRECTGPU_ACTIVE'){
     $lines+='interpretation=DXVK host-owned shared-eye bridge was created, imported by the game, selected as the direct path, and produced DirectGPU frames.'
