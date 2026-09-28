@@ -4,7 +4,7 @@
 
 namespace outrun::vr::dx11
 {
-    // Passive R72/R73/R74 census. Enabled only when OUTRUN_VR_DX11_CENSUS=1.
+    // Passive R72-R76 census. Enabled only when OUTRUN_VR_DX11_CENSUS=1.
     // It never mutates D3D9 state and never routes a draw to D3D11.
     void observe_source_draw(
         IDirect3DDevice9* device,
@@ -35,4 +35,25 @@ namespace outrun::vr::dx11
         HRESULT result) noexcept;
     void forget_index_buffer_mutation(
         IDirect3DIndexBuffer9* buffer) noexcept;
+
+    // R76 adds passive texture mutation/update coverage. These observation
+    // points record successful 2D LockRect/UnlockRect pairs plus device-level
+    // UpdateTexture/UpdateSurface outcomes only. They do not create D3D11
+    // mirrors, clear the R73 mutation gate, or enable native draw routing.
+    void observe_texture_lock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        DWORD flags) noexcept;
+    void observe_texture_unlock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        HRESULT result) noexcept;
+    void observe_update_texture(
+        IDirect3DBaseTexture9* source,
+        IDirect3DBaseTexture9* destination,
+        HRESULT result) noexcept;
+    void observe_update_surface(
+        IDirect3DSurface9* source,
+        IDirect3DSurface9* destination,
+        HRESULT result) noexcept;
 }
