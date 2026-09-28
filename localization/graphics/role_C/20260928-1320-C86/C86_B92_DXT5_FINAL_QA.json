@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C86",
+  "timestamp_kst": "2026-09-28T13:20:00+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "1697658f30d5178c89e223d03a296848433b2110",
+  "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "scope": "Cross-lane final QA of B92 one-pixel DXT5 reworks for 62BEBF33 and E3FD08BE; no build; no VR/FFB; GitHub branch only",
+  "concurrent_state": "B93 automation for separate asset 2DA43E41 observed at base HEAD and intentionally not modified",
+  "inputs": [
+    "localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json",
+    "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+    "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json"
+  ],
+  "independent_binary_revalidation": {
+    "method": "Fetched current candidate and canonical HD DDS directly from GitHub; decoded DXT5 alpha per pixel and compared DDS header/cell containment.",
+    "assets": {
+      "62BEBF33": {
+        "git_blob_candidate": "a5cd9697dec6ea04a1c67fa31619a28e86b5acb2",
+        "git_blob_source": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5",
+        "mipmaps": 1,
+        "bytes": 524416,
+        "header_diff_bytes_vs_canonical": 0,
+        "changed_dxt5_blocks": 10168,
+        "alpha_changed_pixels": 83195,
+        "alpha_changed_bbox": [
+          392,
+          55,
+          1357,
+          204
+        ],
+        "alpha_changed_outside_declared_cell": 0,
+        "introduced_alpha_outside_declared_cell": 0
+      },
+      "E3FD08BE": {
+        "git_blob_candidate": "96a9aa5d3d99a97bf4b386102ef8d43ee537f1c1",
+        "git_blob_source": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5",
+        "mipmaps": 1,
+        "bytes": 524416,
+        "header_diff_bytes_vs_canonical": 0,
+        "changed_dxt5_blocks": 12915,
+        "alpha_changed_pixels": 117528,
+        "alpha_changed_bbox": [
+          393,
+          56,
+          1628,
+          202
+        ],
+        "alpha_changed_outside_declared_cell": 0,
+        "introduced_alpha_outside_declared_cell": 0
+      }
+    }
+  },
+  "exact_bbox_evidence_from_B92": {
+    "62BEBF33": {
+      "original_bbox": [
+        392,
+        52,
+        1357,
+        201
+      ],
+      "localized_bbox": [
+        565,
+        52,
+        1186,
+        200
+      ],
+      "delta_left": 173,
+      "delta_right": 171,
+      "delta_top": 0,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "edge_touch_high_risk": true
+    },
+    "E3FD08BE": {
+      "original_bbox": [
+        393,
+        54,
+        1628,
+        200
+      ],
+      "localized_bbox": [
+        632,
+        54,
+        1388,
+        199
+      ],
+      "delta_left": 239,
+      "delta_right": 240,
+      "delta_top": 0,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "edge_touch_high_risk": true
+    }
+  },
+  "semantic_orientation_reconciliation": {
+    "62BEBF33": {
+      "source": "OutRun Mode",
+      "korean": "아웃런 모드",
+      "raw_orientation": "mirror_y",
+      "prior_C81_visual_style_gate": "PASS"
+    },
+    "E3FD08BE": {
+      "source": "Heart Attack Mode",
+      "korean": "하트 어택 모드",
+      "raw_orientation": "mirror_y",
+      "prior_C81_visual_style_gate": "PASS"
+    }
+  },
+  "result": {
+    "62BEBF33": "CONTAINMENT_PASS_HOLD_HIGH_ZOOM_AND_DDS_ONLY_INGAME",
+    "E3FD08BE": "CONTAINMENT_PASS_HOLD_HIGH_ZOOM_AND_DDS_ONLY_INGAME"
+  },
+  "approval": {
+    "approved_dds_promotion": false,
+    "current_approved_lock_count": 0,
+    "reason": "Both candidates touch the original exact bbox on one edge. Contract requires high-risk visual/readable-orientation and isolated DDS_ONLY in-game validation before approval."
+  },
+  "limitations": [
+    "C verified current binary structure and decoded-pixel cell containment independently, but did not obtain new in-game screenshots in this run.",
+    "Because both exact bboxes have zero top margin, they are not promoted to approved_dds and remain HOLD rather than final visual approval."
+  ],
+  "build_performed": false,
+  "vr_ffb_changes": false,
+  "gpt_library_used": false,
+  "n100_used": false
+}
