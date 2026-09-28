@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-28T13:01:34+09:00",
+  "updatedKst": "2026-09-28T13:24:10+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -112,6 +112,24 @@
       "status": "INTEGRATED_BUILD_VERIFIED_INFRA",
       "integratedAtKst": "2026-09-28T13:01:34+09:00",
       "evidenceNote": "Tooling/workflow-only DXVK identity hardening; protected DX9Ex runtime renderer source unchanged. Actual DXVK provider package remains IMPLEMENT_NEXT/HMD-gated."
+    },
+    "lastBackendPackageIntegration": {
+      "candidateId": "DXVK-REACTIVATE-001-E-DXVK-SAFE",
+      "candidateBranch": "vr-d3d9ex-candidate/DXVK-SAFE-PROVIDER-20260928-A2",
+      "candidateSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
+      "integrationSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
+      "candidateCiRuns": [
+        36376927194
+      ],
+      "candidateCiResult": "SUCCESS",
+      "status": "INTEGRATED_BUILD_VERIFIED_NEEDS_HMD",
+      "integratedAtKst": "2026-09-28T13:24:10+09:00",
+      "providerReleaseTag": "v3.1.1",
+      "providerArchiveSha256": "40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608",
+      "providerD3D9Sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+      "artifactId": 10952070042,
+      "artifactDigest": "sha256:aab6cdbf5dc68aaeaa9e55577bd9af59c6b56a5431b37ac810d9669461fd5cb1",
+      "evidenceNote": "E_DXVK_SAFE is an exact pinned provider/package identity and is ready for Quest3/VDXR testing. It is not USER_RUNTIME_VERIFIED and does not authorize multiview promotion."
     }
   },
   "items": [
@@ -325,7 +343,7 @@
     {
       "id": "DXVK-REACTIVATE-001",
       "priority": 13,
-      "status": "IN_PROGRESS",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
       "testLevel": "LEVEL2",
@@ -335,18 +353,33 @@
       "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer.",
       "parallelIndependent": true,
       "blockedByHud": false,
-      "candidateBranch": "vr-d3d9ex-candidate/DXVK-REACTIVATE-001-CHAT-20260928-A",
-      "candidateSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
-      "validationRunId": 36375594746,
-      "validationResult": "BUILD_VERIFIED_INFRA",
-      "integrationSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
+      "candidateBranch": "vr-d3d9ex-candidate/DXVK-SAFE-PROVIDER-20260928-A2",
+      "candidateSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
+      "validationRunId": 36376927194,
+      "validationResult": "BUILD_VERIFIED_HMD_PACKAGE_READY",
+      "integrationSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
       "infrastructureProgress": [
         "Selector rejects non-x86 DXVK d3d9.dll and multiviewpatcher.dll before installation.",
         "DXVK provider and payload SHA256 identities are recorded in ACTIVE_VR_BACKEND.txt and session_manifest.json.",
         "Post-copy SHA256 verification detects installation mismatch.",
         "Hosted synthetic-PE contract test covers DXVK SAFE, DXVK MULTIVIEW and x64-provider rejection."
       ],
-      "nextAction": "Create or restore the actual pinned x86 DXVK provider payload for E_DXVK_SAFE, package an exact backend identity, then run DXVK SAFE startup/reset/gameplay/VR transport validation. Only proceed to multiview after SAFE viability; do not promote DXVK over the R51 DX9Ex baseline without Quest3/VDXR parity."
+      "nextAction": "Quest3/VDXR test E_DXVK_SAFE with CORRECTNESS: confirm logo/startup -> menu/gameplay, DXVK provider identity, classic DXVK/SBS/Desktop Duplication fail-open, no provider-local CreateDeviceEx stall, and reset/alt-tab stability. Upload the generated analysis ZIP. Proceed to DXVK multiview only after SAFE runtime passes.",
+      "validationSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
+      "providerReleaseTag": "v3.1.1",
+      "providerSourceCommit": "b1a1c99ab52b687cf950d62c88bc2fa316b41663",
+      "providerArchiveSha256": "40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608",
+      "providerD3D9Sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+      "packageArtifactId": 10952070042,
+      "packageArtifactDigest": "sha256:aab6cdbf5dc68aaeaa9e55577bd9af59c6b56a5431b37ac810d9669461fd5cb1",
+      "packageAttempts": 2,
+      "packageEvidence": [
+        "Official doitsujin/dxvk v3.1.1 release archive is pinned by GitHub asset SHA256.",
+        "Pinned archive extracted exactly one x86 PE32 x32/d3d9.dll.",
+        "E_DXVK_SAFE package contains the pinned x86 provider, DXVK license, D3D9 game/host payload, selector, collector and exact build identities.",
+        "Packaged selector activated DXVK_X86_SAFE and installed a d3d9.dll whose SHA256 exactly matches the pinned provider identity.",
+        "SAFE package contains no multiviewpatcher.dll."
+      ]
     },
     {
       "id": "DX12-D3D9ON12-REACTIVATE-001",

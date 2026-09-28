@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-09-28T13:01:34+09:00",
+  "updatedKst": "2026-09-28T13:24:10+09:00",
   "policy": "IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX (HUD/PERF/DXVK/DX12 non-blocking)",
   "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
   "integrationBranch": "vr-d3d9ex-focus",
@@ -120,9 +120,9 @@
     {
       "slotId": "E_DXVK",
       "backend": "DXVK",
-      "status": "IMPLEMENT_NEXT",
-      "sourceSha": null,
-      "profile": "PERFORMANCE",
+      "status": "HMD_EXPERIMENT_READY",
+      "sourceSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
+      "profile": "CORRECTNESS",
       "backendMode": "dxvk-safe",
       "followupMode": "dxvk",
       "featureFlags": [
@@ -130,7 +130,7 @@
         "DXVK_MULTIVIEW_AFTER_SAFE"
       ],
       "hypothesis": "The x86 DXVK path can be restored as a repeatable backend while preserving the protected R51 world contract; SAFE compatibility is validated before multiview optimization.",
-      "expectedObservable": "DXVK initialization/reset/gameplay/VR transport evidence with explicit backend identity; if SAFE is viable, continue immediately to multiview performance testing.",
+      "expectedObservable": "DXVK v3.1.1 x86 loads under SAFE mode, OutRun reaches menu/gameplay without provider-local D3D9Ex CreateDevice stall, and existing SBS/Desktop Duplication fail-open carries VR frames. Reset/alt-tab must remain bounded and stable.",
       "blockedByHud": false,
       "promotionGate": "May be built and HMD-tested now; default-backend promotion still requires R51 parity.",
       "infrastructureSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
@@ -141,8 +141,18 @@
         "Provider d3d9.dll and multiview patcher SHA256 identities are persisted per session.",
         "Hosted DXVK selector/backend identity contract passed on exact SHA."
       ],
-      "note": "Selector/backend identity infrastructure is integrated, but no actual pinned DXVK binary payload is frozen in this slot yet. E_DXVK is not HMD-ready until provider payload/package identity is created.",
-      "nextAction": "Pin/package the x86 DXVK provider for E_DXVK_SAFE, verify exact payload identity and initialization/reset/fail-open behavior, then perform Quest3/VDXR SAFE testing before multiview."
+      "note": "Official pinned DXVK SAFE package is exact-SHA build/package verified. Runtime correctness, pacing and HMD parity are not yet verified. MULTIVIEW remains blocked until SAFE passes.",
+      "nextAction": "Quest3/VDXR E_DXVK_SAFE CORRECTNESS test first. Upload the generated analysis ZIP; only after SAFE passes create/test the multiview variant.",
+      "branch": "vr-d3d9ex-candidate/DXVK-SAFE-PROVIDER-20260928-A2",
+      "ciRunId": 36376927194,
+      "ciResult": "SUCCESS",
+      "artifactRef": "github-actions:36376927194/artifact:10952070042",
+      "artifactDigest": "sha256:aab6cdbf5dc68aaeaa9e55577bd9af59c6b56a5431b37ac810d9669461fd5cb1",
+      "providerReleaseTag": "v3.1.1",
+      "providerSourceCommit": "b1a1c99ab52b687cf950d62c88bc2fa316b41663",
+      "providerArchiveSha256": "40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608",
+      "providerD3D9Sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+      "multiviewPatcherIncluded": false
     },
     {
       "slotId": "F_DX12",

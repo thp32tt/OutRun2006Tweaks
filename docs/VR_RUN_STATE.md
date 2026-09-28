@@ -119,3 +119,17 @@ Current autonomous pipeline contract supersedes all older role descriptions:
 
 ### Next action
 Pin and package the real x86 DXVK provider as E_DXVK_SAFE with exact hash identity, validate startup/reset/gameplay/VR transport, then HMD-test SAFE before attempting multiview. Do not promote DXVK over protected R51 without Quest3/VDXR parity.
+
+## Checkpoint 2026-09-28 13:24 KST — E_DXVK_SAFE package ready
+
+- C0 RECOVER: GitHub `vr-d3d9ex-focus` exact base was `bb4cdd87ff65f0555ce5cdb008e085e726ed3fd7`; repository rules/state, regression history and Issues #13/#14 were reloaded. GitHub push permission was confirmed. N100/local worktrees were not used.
+- C1 REVIEW: current focus already fails closed on third-party D3D9 providers for D3D9Ex promotion, and the non-DX9Ex runner does not re-enable `PreferD3D9Ex`. Therefore E_DXVK_SAFE can stay on classic DXVK/SBS/Desktop Duplication without recreating the historical provider-local CreateDeviceEx stall path.
+- C2 IMPLEMENT: created `vr-d3d9ex-candidate/DXVK-SAFE-PROVIDER-20260928-A2` and pinned official DXVK `v3.1.1` release asset `dxvk-3.1.1.tar.gz` by archive SHA256 `40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608`. Added an isolated provider preparer and `DXVK SAFE Candidate` hosted workflow. Runtime renderer/HUD source was not changed.
+- C3 VALIDATE: first provider run `36376817673` verified the archive hash/x86 provider but exposed that the binary release archive does not contain the source LICENSE. The bounded repair pinned the verified v3.1.1 source commit and fetched its LICENSE. Exact-SHA run `36376927194` then passed policy, DXVK selector contract, provider verification, x64 host build, Win32 game build, package assembly and in-package selector validation.
+- Provider identity: official DXVK `v3.1.1`, source commit `b1a1c99ab52b687cf950d62c88bc2fa316b41663`, archive SHA256 `40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608`, x86 `d3d9.dll` SHA256 `265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa`.
+- C4 COMMIT/INTEGRATE: focus remained unchanged; candidate `85e710d8c878a7db82a567a733b9797af4db7f6e` was fast-forward integrated without force. Implementation delta is only `.github/workflows/vr-dxvk-safe.yml`, `docs/VR_DXVK_PROVIDER.json`, and `tools/Prepare-OutRunVRDXVKSafe.ps1`.
+- C5 PACKAGE: E_DXVK_SAFE artifact `10952070042`, digest `sha256:aab6cdbf5dc68aaeaa9e55577bd9af59c6b56a5431b37ac810d9669461fd5cb1`. Package validation executed its own selector and confirmed `DXVK_X86_SAFE`, exact provider hash, and no `multiviewpatcher.dll`.
+- C6 STATE: E_DXVK_SAFE is now HMD_EXPERIMENT_READY / NEED_HMD_TEST only. No runtime success, performance parity or multiview promotion is claimed. PC/self-hosted runner was not used.
+
+### Next action
+Quest3/VDXR: run E_DXVK_SAFE with CORRECTNESS, verify startup -> menu/gameplay, provider identity, SBS/Desktop Duplication fail-open, reset/alt-tab and frame transport, then upload the generated analysis ZIP. Start multiview only after SAFE passes. DX12/PERF can continue independently.
