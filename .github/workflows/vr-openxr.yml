@@ -733,6 +733,12 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-r32-policy-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "R32 policy regression failed: $LASTEXITCODE" }
 
+      - name: Run direct transport identity regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-direct-ack-identity-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "direct transport identity regression failed: $LASTEXITCODE" }
+
       - name: Verify x64 R32 host binary
         shell: pwsh
         run: |

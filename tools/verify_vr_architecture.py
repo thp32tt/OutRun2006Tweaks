@@ -48,6 +48,8 @@ required = [
     "src/vr/core/frame_types.hpp",
     "src/vr/core/matrix.hpp",
     "src/vr/core/transport.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
     "src/vr/game/game_adapter.hpp",
     "src/vr/d3d9/stereo_backend.hpp",
     "vrhost/src/main.cpp",
@@ -484,7 +486,38 @@ cmake_root = require(
 math_core = require("src/vr/core/matrix.hpp", "struct Matrix4", "InverseRigid", "Invert(")
 if "#include <d3d9.h>" in math_core or "#include <openxr/" in math_core:
     raise SystemExit("core matrix layer must not depend on D3D9/OpenXR headers")
-require("src/vr/core/transport.hpp", "class IFrameProducer", "class IFrameConsumer", "D3D9ExShared", "DesktopDuplication")
+require(
+    "src/vr/core/transport.hpp",
+    "class IFrameProducer",
+    "class IFrameConsumer",
+    "D3D9ExShared",
+    "DesktopDuplication",
+    "NativeD3D11",
+    "producerPid",
+    "consumerPid",
+    "runGeneration",
+    "ConsumerAckCoversFrame",
+)
+require(
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "acquire_writable_slot",
+    "signal_producer_complete",
+    "publish_completed",
+    "acknowledge",
+    "synchronization_faulted",
+)
+require(
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "D3D11_ASYNC_GETDATA_DONOTFLUSH",
+    "Completion is unknowable",
+    "ConsumerAckCoversFrame",
+    "slot.published",
+)
+require(
+    "CMakeLists.txt",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+)
 require("src/vr/game/game_adapter.hpp", "class IGameAdapter", "latchRenderPose", "buildStereoMatrices")
 require("src/vr/d3d9/stereo_backend.hpp", "class IStereoBackend", "drawWorldStereo", "drawScreenSpaceStereo")
 
