@@ -113,7 +113,7 @@ for r in fails:
     W=900; scale=min(1.0,(W//2-12)/b.width,180/b.height); sz=(max(1,int(b.width*scale)),max(1,int(b.height*scale)))
     p=Image.new("RGBA",(W,max(64,sz[1]+28)),(30,30,30,255)); p.paste(b.resize(sz,Image.Resampling.LANCZOS),(5,24)); p.paste(a.resize(sz,Image.Resampling.LANCZOS),(W//2+5,24))
     d=ImageDraw.Draw(p); d.text((5,5),r["key"]+" BEFORE",fill="white"); d.text((W//2+5,5),r["key"]+" AFTER",fill="white"); panels.append(p)
-sheet=Image.new("RGBA",(900,sum(p.height for p in panels)),(20,20,20,255); y=0
+sheet=Image.new("RGBA",(900,sum(p.height for p in panels)),(20,20,20,255)); y=0
 for p in panels: sheet.paste(p,(0,y)); y+=p.height
 sheet.convert("RGB").save(QA_PNG,quality=93)
 
