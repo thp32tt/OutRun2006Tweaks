@@ -561,7 +561,9 @@ namespace OutRunVRStereo
         HRESULT __stdcall R30VertexBufferUnlockDest(
             IDirect3DVertexBuffer9* buffer)
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = R30MaybeTrackedVertex(buffer)
+                ? R30FindVertexShadow(buffer)
+                : R30ShadowPtr{};
             // The pointer returned by Lock is guaranteed valid until Unlock,
             // so snapshot bytes before forwarding the real Unlock.
             if (entry)
@@ -581,7 +583,7 @@ namespace OutRunVRStereo
         {
             const ULONG refs =
                 R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0)
+            if (refs == 0 && R30MaybeTrackedVertex(buffer))
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 if (R30VertexShadows.erase(buffer) != 0)
@@ -610,7 +612,9 @@ namespace OutRunVRStereo
         HRESULT __stdcall R30IndexBufferUnlockDest(
             IDirect3DIndexBuffer9* buffer)
         {
-            const auto entry = R30FindIndexShadow(buffer);
+            const auto entry = R30MaybeTrackedIndex(buffer)
+                ? R30FindIndexShadow(buffer)
+                : R30ShadowPtr{};
             if (entry)
                 R30FinishObservedLock(entry, true);
             const HRESULT hr =
@@ -628,7 +632,7 @@ namespace OutRunVRStereo
         {
             const ULONG refs =
                 R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0)
+            if (refs == 0 && R30MaybeTrackedIndex(buffer))
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 if (R30IndexShadows.erase(buffer) != 0)
