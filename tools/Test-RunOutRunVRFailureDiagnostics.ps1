@@ -11,7 +11,7 @@ $runnerText = Get-Content $runnerSource -Raw
 foreach($required in @(
     "GAME_LAUNCH_OR_WAIT",
     "HOST_TEARDOWN",
-    "& $collector -Emergency",
+    '& $collector -Emergency',
     "RUNNER_FAILURE.json"
 )){
     if($runnerText -notmatch [regex]::Escape($required)){
