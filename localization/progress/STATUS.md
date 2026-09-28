@@ -591,3 +591,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Historical `approved_dds` 571E78F3 / 62BEBF33 / E3FD08BE removed: obsolete low-res baseline; their current HD candidates also fail the exact bbox gate.
 - Final approved/locked count: **0**. Build not run; VR/FFB and GPT Library not used.
 - Machine report: `localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json`.
+
+## C85 cross-lane final QA — 2026-09-28T10:09:21+09:00
+- Full queue: 137 rows; direct image scope **126** = 79 localize_text + 47 zoom_review.
+- Current 16 HD candidates after C review: **4 pixel+visual PASS pending in-game / 12 REWORK_REQUIRED**; 201 elements, 93 current bbox failures.
+- B91 staged 9 RGBA attempts were re-decoded from actual DDS. Only `C4A2937B` passed bbox + collateral + visual/artifact QA and was promoted to canonical hd_candidates.
+- `FF2462BB` bbox PASS but resampling/ragged-stroke artifact FAIL; `411827E` bbox PASS but TUNED/NORMAL/RANDOM source-residue artifact FAIL; other B91 staged failures remained unpromoted.
+- Current PASS pending isolated DDS_ONLY in-game: `C4A2937B, 9F060EC1, D6DC1380, 48DEBE77`. Final approved/locked count remains **0**.
+- Remaining full scope: 12 current reworks + 63 localize_text pending production + 47 zoom_review HOLD_STRICT_RECHECK. No build; no VR/FFB; no GPT Library.
+- Report: `localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json`.

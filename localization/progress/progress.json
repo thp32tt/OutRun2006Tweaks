@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T09:10:45+09:00",
+  "updated_at_kst": "2026-09-28T10:09:21+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C84 exact source-bbox zero-pixel gate reopened 13/16 HD candidates for rework. Rework all 13; rerun per-element bbox QA; then isolated DDS_ONLY in-game validation. 9F060EC1/D6DC1380/48DEBE77 are pixel-pass only and remain unapproved pending in-game.",
+  "next_checkpoint": "C85: 4 current HD candidates pass exact pixel+visual static QA but remain unapproved pending isolated DDS_ONLY in-game. 12 current candidates require rework; 63 additional localize_text rows remain pending production; 47 zoom_review rows remain HOLD_STRICT_RECHECK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -266,14 +266,13 @@
     },
     "next_hd_rework": {
       "asset": "FF2462BB",
-      "status": "ZERO_PIXEL_BBOX_REWORK_REQUIRED",
+      "status": "ZERO_PIXEL_OR_ARTIFACT_REWORK_REQUIRED",
       "assets": [
         "FF2462BB",
         "568D3696",
         "FA7BBB13",
         "39229D64",
         "A064FDFC",
-        "C4A2937B",
         "2DA43E41",
         "411827E",
         "571E78F3",
@@ -282,8 +281,9 @@
         "C075FB49",
         "FD90AA9"
       ],
-      "remaining": 13,
-      "pixel_pass_pending_ingame": [
+      "remaining": 12,
+      "pixel_visual_pass_pending_ingame": [
+        "C4A2937B",
         "9F060EC1",
         "D6DC1380",
         "48DEBE77"
@@ -311,14 +311,16 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C84",
-      "report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
-      "result": "3_PIXEL_BBOX_PASS_13_FAIL_0_FINAL_APPROVED",
-      "candidate_changed_by_C": false,
+      "run": "C85",
+      "report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+      "result": "4_PIXEL_VISUAL_PASS_12_REWORK_0_FINAL_APPROVED",
+      "candidate_changed_by_C": true,
+      "promoted_candidate": "C4A2937B",
       "assets_total": 16,
       "elements_total": 201,
-      "elements_fail": 114,
-      "pixel_pass_assets": [
+      "elements_fail": 93,
+      "pixel_visual_pass_assets": [
+        "C4A2937B",
         "9F060EC1",
         "D6DC1380",
         "48DEBE77"
@@ -329,7 +331,6 @@
         "FA7BBB13",
         "39229D64",
         "A064FDFC",
-        "C4A2937B",
         "2DA43E41",
         "411827E",
         "571E78F3",
@@ -602,29 +603,32 @@
     }
   },
   "graphics_zero_tolerance_boundary_audit": {
-    "timestamp_kst": "2026-09-28T09:10:45+09:00",
+    "timestamp_kst": "2026-09-28T10:09:21+09:00",
     "report": "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json",
-    "detail_report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+    "detail_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "max_outside_pixels": 0,
     "current_hd_candidates": 16,
-    "pixel_bbox_pass": 3,
-    "pixel_bbox_fail": 13,
+    "pixel_visual_pass": 4,
+    "rework_required": 12,
     "elements_total": 201,
-    "elements_fail": 114,
-    "isolated_ingame_required": 3,
+    "elements_fail": 93,
+    "direct_queue_scope": 126,
+    "pending_production_localize_text": 63,
+    "hold_strict_recheck_zoom_review": 47,
+    "isolated_ingame_required": 4,
     "approved_lock_count": 0,
     "pixel_pass_pending_ingame": [
+      "C4A2937B",
       "9F060EC1",
       "D6DC1380",
       "48DEBE77"
     ],
-    "rework_required": [
+    "rework_required_assets": [
       "FF2462BB",
       "568D3696",
       "FA7BBB13",
       "39229D64",
       "A064FDFC",
-      "C4A2937B",
       "2DA43E41",
       "411827E",
       "571E78F3",
@@ -632,11 +636,6 @@
       "E3FD08BE",
       "C075FB49",
       "FD90AA9"
-    ],
-    "historical_lowres_approved_dds_removed": [
-      "571E78F3",
-      "62BEBF33",
-      "E3FD08BE"
     ]
   }
 }

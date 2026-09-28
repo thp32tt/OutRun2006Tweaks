@@ -1,9 +1,9 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "audit": "FULL_PIXEL_BOUNDARY_ZERO_TOLERANCE_EXACT_SOURCE_BBOX",
-  "timestamp_kst": "2026-09-28T09:10:45+09:00",
+  "timestamp_kst": "2026-09-28T10:09:21+09:00",
   "branch": "korean-localization-clean",
-  "base_head": "983f14391d8d3ad63e14d98525e2bfdbe1be80f6",
+  "base_head": "aa3abfa38cea3b2e05a34d210331b07248837c29",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "rule": {
     "max_outside_pixels": 0,
@@ -23,7 +23,7 @@
     "historical_role_a_work_dds": 4,
     "historical_lowres_approved_dds": 3
   },
-  "detailed_report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+  "detailed_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
   "current_hd_candidates": [
     {
       "asset": "FF2462BB",
@@ -31,8 +31,7 @@
       "text_elements": 36,
       "failed_elements": 21,
       "minimum_bbox_delta_px": -11,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "568D3696",
@@ -40,8 +39,7 @@
       "text_elements": 14,
       "failed_elements": 6,
       "minimum_bbox_delta_px": -9,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "FA7BBB13",
@@ -49,8 +47,7 @@
       "text_elements": 17,
       "failed_elements": 10,
       "minimum_bbox_delta_px": -38,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "39229D64",
@@ -58,8 +55,7 @@
       "text_elements": 15,
       "failed_elements": 7,
       "minimum_bbox_delta_px": -26,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "A064FDFC",
@@ -67,17 +63,15 @@
       "text_elements": 21,
       "failed_elements": 6,
       "minimum_bbox_delta_px": -106,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "C4A2937B",
-      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
       "text_elements": 21,
-      "failed_elements": 21,
-      "minimum_bbox_delta_px": -106,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "failed_elements": 0,
+      "minimum_bbox_delta_px": 1,
+      "status": "PIXEL_VISUAL_PASS_PENDING_INGAME"
     },
     {
       "asset": "2DA43E41",
@@ -85,8 +79,7 @@
       "text_elements": 11,
       "failed_elements": 7,
       "minimum_bbox_delta_px": -37,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "411827E",
@@ -94,8 +87,7 @@
       "text_elements": 7,
       "failed_elements": 4,
       "minimum_bbox_delta_px": -19,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "571E78F3",
@@ -103,8 +95,7 @@
       "text_elements": 2,
       "failed_elements": 2,
       "minimum_bbox_delta_px": -3,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "62BEBF33",
@@ -112,8 +103,7 @@
       "text_elements": 1,
       "failed_elements": 1,
       "minimum_bbox_delta_px": -1,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "E3FD08BE",
@@ -121,8 +111,7 @@
       "text_elements": 1,
       "failed_elements": 1,
       "minimum_bbox_delta_px": -1,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "C075FB49",
@@ -130,8 +119,7 @@
       "text_elements": 17,
       "failed_elements": 9,
       "minimum_bbox_delta_px": -23,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "FD90AA9",
@@ -139,8 +127,7 @@
       "text_elements": 29,
       "failed_elements": 19,
       "minimum_bbox_delta_px": -169,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "REWORK_REQUIRED_ZERO_PIXEL_BBOX"
+      "status": "REWORK_REQUIRED"
     },
     {
       "asset": "9F060EC1",
@@ -148,8 +135,7 @@
       "text_elements": 5,
       "failed_elements": 0,
       "minimum_bbox_delta_px": 4,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "PIXEL_CONTAINMENT_PASS_PENDING_INGAME"
+      "status": "PIXEL_VISUAL_PASS_PENDING_INGAME"
     },
     {
       "asset": "D6DC1380",
@@ -157,8 +143,7 @@
       "text_elements": 1,
       "failed_elements": 0,
       "minimum_bbox_delta_px": 1,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "PIXEL_CONTAINMENT_PASS_PENDING_INGAME"
+      "status": "PIXEL_VISUAL_PASS_PENDING_INGAME"
     },
     {
       "asset": "48DEBE77",
@@ -166,8 +151,7 @@
       "text_elements": 3,
       "failed_elements": 0,
       "minimum_bbox_delta_px": 0,
-      "outside_declared_cells_changed_nontransparent_pixels": 0,
-      "status": "PIXEL_CONTAINMENT_PASS_PENDING_INGAME"
+      "status": "PIXEL_VISUAL_PASS_PENDING_INGAME"
     }
   ],
   "rework_required": [
@@ -195,11 +179,6 @@
       "asset": "A064FDFC",
       "failed_elements": 6,
       "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1"
-    },
-    {
-      "asset": "C4A2937B",
-      "failed_elements": 21,
-      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99"
     },
     {
       "asset": "2DA43E41",
@@ -239,6 +218,10 @@
   ],
   "pixel_pass_pending_ingame": [
     {
+      "asset": "C4A2937B",
+      "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593"
+    },
+    {
       "asset": "9F060EC1",
       "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60"
     },
@@ -262,12 +245,13 @@
     "required": "TEXT_ONLY first, then DDS_ONLY exactly one candidate at a time, then combined only after isolated passes"
   },
   "summary": {
-    "current_hd_pixel_bbox_pass": 3,
-    "current_hd_pixel_bbox_fail": 13,
+    "current_hd_pixel_visual_pass": 4,
+    "current_hd_rework_required": 12,
     "elements_total": 201,
-    "elements_fail": 114,
-    "current_hd_reapproval_or_ingame_hold": 3,
-    "rework_required": 13,
+    "elements_fail": 93,
+    "direct_queue_scope": 126,
+    "pending_production_localize_text": 63,
+    "hold_strict_recheck_zoom_review": 47,
     "approved_dds_count": 0,
     "current_approved_lock_count": 0
   }

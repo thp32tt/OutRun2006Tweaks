@@ -990,3 +990,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Removed obsolete historical low-res files from `localization/graphics/approved_dds`: `571E78F3`, `62BEBF33`, `E3FD08BE`. Their HD replacements also fail the new exact source-bbox gate.
 - Final approved/user-locked count: **0**. No build performed. VR/FFB and GPT Library were not used.
 - Report: `localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json`; summary audit: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
+
+## C85 cross-lane final QA + Git sync — 2026-09-28T10:09:21+09:00
+- Started from GitHub HEAD `aa3abfa38cea3b2e05a34d210331b07248837c29` after reading the automation contract and required policy/state files.
+- Queue sanity recomputed: 137 total = 79 localize_text + 47 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; direct image scope = 126.
+- B91 staged 9 RGBA candidates revalidated from actual DDS bytes. C direct decode result was 4 bbox-pass/5 bbox-fail, and additional collateral/visual gates rejected FF2462BB, FA7BBB13 and 411827E.
+- Only `C4A2937B` advanced to canonical `hd_candidates`; staged SHA `28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593`.
+- Current canonical candidate state: PASS pending in-game `C4A2937B, 9F060EC1, D6DC1380, 48DEBE77`; REWORK `FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9`. 201 elements / 93 failing exact source-bbox checks.
+- Final `approved_dds` remains empty because isolated DDS_ONLY in-game validation is mandatory before final approval.
+- No build, VR/FFB, or GPT Library use. Report: `localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json`.

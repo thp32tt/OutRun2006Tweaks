@@ -1,0 +1,6689 @@
+{
+  "schema_version": 2,
+  "role": "B",
+  "run": "B91",
+  "phase": "RGBA_FINAL_STAGED_QA",
+  "rule": "each localized element bbox including transformed outline/shadow/alpha must remain inside canonical original text bbox in readable and raw orientation; no B91 changes outside old/new text bboxes; existing PASS elements unchanged",
+  "summary": {
+    "assets_total": 9,
+    "assets_pass": 6,
+    "assets_fail": 3,
+    "elements_total": 174,
+    "elements_fail": 0,
+    "collateral_count": 8
+  },
+  "assets": [
+    {
+      "asset": "FF2462BB",
+      "status": "PASS",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 36,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [],
+      "rows": [
+        {
+          "key": "ACCOUNT_NAME",
+          "source": "ACCOUNT NAME:",
+          "korean": "계정 이름:",
+          "original_bbox": [
+            5,
+            69,
+            394,
+            109
+          ],
+          "localized_bbox": [
+            6,
+            69,
+            172,
+            108
+          ],
+          "delta_left": 1,
+          "delta_right": 222,
+          "delta_top": 0,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            5,
+            1939,
+            394,
+            1979
+          ],
+          "raw_localized_bbox": [
+            6,
+            1940,
+            172,
+            1979
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "ACCOUNT_PASSWORD",
+          "source": "ACCOUNT PASSWORD:",
+          "korean": "계정 비밀번호:",
+          "original_bbox": [
+            1,
+            132,
+            500,
+            173
+          ],
+          "localized_bbox": [
+            6,
+            132,
+            257,
+            173
+          ],
+          "delta_left": 5,
+          "delta_right": 243,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1,
+            1875,
+            500,
+            1916
+          ],
+          "raw_localized_bbox": [
+            6,
+            1875,
+            257,
+            1916
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "CURSING_LEWDNESS",
+          "source": "CURSING OR LEWDNESS",
+          "korean": "욕설 또는 음란 표현",
+          "original_bbox": [
+            4,
+            196,
+            557,
+            237
+          ],
+          "localized_bbox": [
+            6,
+            196,
+            340,
+            237
+          ],
+          "delta_left": 2,
+          "delta_right": 217,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            4,
+            1811,
+            557,
+            1852
+          ],
+          "raw_localized_bbox": [
+            6,
+            1811,
+            340,
+            1852
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "SCREAMING",
+          "source": "SCREAMING",
+          "korean": "고성",
+          "original_bbox": [
+            9,
+            260,
+            285,
+            301
+          ],
+          "localized_bbox": [
+            10,
+            261,
+            81,
+            300
+          ],
+          "delta_left": 1,
+          "delta_right": 204,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            9,
+            1747,
+            285,
+            1788
+          ],
+          "raw_localized_bbox": [
+            10,
+            1748,
+            81,
+            1787
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "ENTER_ACCOUNT_NAME",
+          "source": "ENTER ACCOUNT NAME:",
+          "korean": "계정 이름 입력:",
+          "original_bbox": [
+            2,
+            321,
+            558,
+            361
+          ],
+          "localized_bbox": [
+            12,
+            322,
+            254,
+            360
+          ],
+          "delta_left": 10,
+          "delta_right": 304,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2,
+            1687,
+            558,
+            1727
+          ],
+          "raw_localized_bbox": [
+            12,
+            1688,
+            254,
+            1726
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "DONT_SIGN_IN",
+          "source": "DON'T SIGN-IN",
+          "korean": "로그인 안 함",
+          "original_bbox": [
+            4,
+            388,
+            324,
+            429
+          ],
+          "localized_bbox": [
+            6,
+            389,
+            217,
+            429
+          ],
+          "delta_left": 2,
+          "delta_right": 107,
+          "delta_top": 1,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            4,
+            1619,
+            324,
+            1660
+          ],
+          "raw_localized_bbox": [
+            6,
+            1619,
+            217,
+            1659
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "EXIT_OUTRUN_PLUS",
+          "source": "EXIT OUTRUN PLUS",
+          "korean": "아웃런 플러스 종료",
+          "original_bbox": [
+            1061,
+            68,
+            1528,
+            109
+          ],
+          "localized_bbox": [
+            1061,
+            68,
+            1380,
+            108
+          ],
+          "delta_left": 0,
+          "delta_right": 148,
+          "delta_top": 0,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1061,
+            1939,
+            1528,
+            1980
+          ],
+          "raw_localized_bbox": [
+            1061,
+            1940,
+            1380,
+            1980
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "ACCOUNTS",
+          "source": "ACCOUNTS:",
+          "korean": "계정:",
+          "original_bbox": [
+            1106,
+            132,
+            1363,
+            173
+          ],
+          "localized_bbox": [
+            1106,
+            132,
+            1193,
+            173
+          ],
+          "delta_left": 0,
+          "delta_right": 170,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1106,
+            1875,
+            1363,
+            1916
+          ],
+          "raw_localized_bbox": [
+            1106,
+            1875,
+            1193,
+            1916
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "CHEATING",
+          "source": "CHEATING",
+          "korean": "부정행위",
+          "original_bbox": [
+            1122,
+            197,
+            1356,
+            237
+          ],
+          "localized_bbox": [
+            1128,
+            198,
+            1267,
+            236
+          ],
+          "delta_left": 6,
+          "delta_right": 89,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1122,
+            1811,
+            1356,
+            1851
+          ],
+          "raw_localized_bbox": [
+            1128,
+            1812,
+            1267,
+            1850
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "OFFENSIVE_MESSAGE",
+          "source": "OFFENSIVE MESSAGE",
+          "korean": "모욕적 메시지",
+          "original_bbox": [
+            1122,
+            260,
+            1623,
+            301
+          ],
+          "localized_bbox": [
+            1123,
+            260,
+            1359,
+            301
+          ],
+          "delta_left": 1,
+          "delta_right": 264,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1122,
+            1747,
+            1623,
+            1788
+          ],
+          "raw_localized_bbox": [
+            1123,
+            1747,
+            1359,
+            1788
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "GREAT_SESSION",
+          "source": "GREAT SESSION",
+          "korean": "즐거운 경기",
+          "original_bbox": [
+            1125,
+            324,
+            1486,
+            365
+          ],
+          "localized_bbox": [
+            1126,
+            324,
+            1324,
+            365
+          ],
+          "delta_left": 1,
+          "delta_right": 162,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1125,
+            1683,
+            1486,
+            1724
+          ],
+          "raw_localized_bbox": [
+            1126,
+            1683,
+            1324,
+            1724
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "ENTER_ACCOUNT_PASSWORD",
+          "source": "ENTER ACCOUNT PASSWORD:",
+          "korean": "계정 비밀번호 입력:",
+          "original_bbox": [
+            1137,
+            388,
+            1785,
+            429
+          ],
+          "localized_bbox": [
+            1146,
+            389,
+            1467,
+            428
+          ],
+          "delta_left": 9,
+          "delta_right": 318,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1137,
+            1619,
+            1785,
+            1660
+          ],
+          "raw_localized_bbox": [
+            1146,
+            1620,
+            1467,
+            1659
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "REGISTER_NEW_ACCOUNT_SMALL",
+          "source": "REGISTER NEW ACCOUNT",
+          "korean": "새 계정 등록",
+          "original_bbox": [
+            2123,
+            68,
+            2718,
+            109
+          ],
+          "localized_bbox": [
+            2124,
+            68,
+            2330,
+            108
+          ],
+          "delta_left": 1,
+          "delta_right": 388,
+          "delta_top": 0,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2123,
+            1939,
+            2718,
+            1980
+          ],
+          "raw_localized_bbox": [
+            2124,
+            1940,
+            2330,
+            1980
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "CREATE_ACCOUNT",
+          "source": "CREATE ACCOUNT",
+          "korean": "계정 만들기",
+          "original_bbox": [
+            2180,
+            133,
+            2584,
+            173
+          ],
+          "localized_bbox": [
+            2188,
+            134,
+            2371,
+            172
+          ],
+          "delta_left": 8,
+          "delta_right": 213,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2180,
+            1875,
+            2584,
+            1915
+          ],
+          "raw_localized_bbox": [
+            2188,
+            1876,
+            2371,
+            1914
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "BAD_NAME",
+          "source": "BAD NAME",
+          "korean": "부적절한 이름",
+          "original_bbox": [
+            2241,
+            197,
+            2488,
+            236
+          ],
+          "localized_bbox": [
+            2253,
+            198,
+            2468,
+            235
+          ],
+          "delta_left": 12,
+          "delta_right": 20,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2241,
+            1812,
+            2488,
+            1851
+          ],
+          "raw_localized_bbox": [
+            2253,
+            1813,
+            2468,
+            1850
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "GOOD_ATTITUDE",
+          "source": "GOOD ATTITUDE",
+          "korean": "좋은 태도",
+          "original_bbox": [
+            2240,
+            261,
+            2603,
+            301
+          ],
+          "localized_bbox": [
+            2247,
+            262,
+            2396,
+            300
+          ],
+          "delta_left": 7,
+          "delta_right": 207,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2240,
+            1747,
+            2603,
+            1787
+          ],
+          "raw_localized_bbox": [
+            2247,
+            1748,
+            2396,
+            1786
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "THREATS_HARASSMENT",
+          "source": "THREATS OR HARASSMENT",
+          "korean": "협박 또는 괴롭힘",
+          "original_bbox": [
+            2243,
+            324,
+            2876,
+            365
+          ],
+          "localized_bbox": [
+            2244,
+            324,
+            2529,
+            365
+          ],
+          "delta_left": 1,
+          "delta_right": 347,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2243,
+            1683,
+            2876,
+            1724
+          ],
+          "raw_localized_bbox": [
+            2244,
+            1683,
+            2529,
+            1724
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "DELETE_ACCOUNT_SMALL",
+          "source": "DELETE ACCOUNT",
+          "korean": "계정 삭제",
+          "original_bbox": [
+            2560,
+            393,
+            2961,
+            433
+          ],
+          "localized_bbox": [
+            2567,
+            394,
+            2715,
+            432
+          ],
+          "delta_left": 7,
+          "delta_right": 246,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2560,
+            1615,
+            2961,
+            1655
+          ],
+          "raw_localized_bbox": [
+            2567,
+            1616,
+            2715,
+            1654
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "SOUNDTRACK",
+          "source": "SOUNDTRACK",
+          "korean": "사운드트랙",
+          "original_bbox": [
+            3195,
+            53,
+            3500,
+            109
+          ],
+          "localized_bbox": [
+            3201,
+            67,
+            3390,
+            108
+          ],
+          "delta_left": 6,
+          "delta_right": 110,
+          "delta_top": 14,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3195,
+            1939,
+            3500,
+            1995
+          ],
+          "raw_localized_bbox": [
+            3201,
+            1940,
+            3390,
+            1981
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "LOAD_SAVE",
+          "source": "LOAD / SAVE",
+          "korean": "불러오기 / 저장",
+          "original_bbox": [
+            3253,
+            136,
+            3546,
+            181
+          ],
+          "localized_bbox": [
+            3258,
+            137,
+            3517,
+            180
+          ],
+          "delta_left": 5,
+          "delta_right": 29,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3253,
+            1867,
+            3546,
+            1912
+          ],
+          "raw_localized_bbox": [
+            3258,
+            1868,
+            3517,
+            1911
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "LOGIN_SMALL",
+          "source": "LOGIN:",
+          "korean": "로그인:",
+          "original_bbox": [
+            3348,
+            197,
+            3505,
+            252
+          ],
+          "localized_bbox": [
+            3349,
+            202,
+            3475,
+            242
+          ],
+          "delta_left": 1,
+          "delta_right": 30,
+          "delta_top": 5,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3348,
+            1796,
+            3505,
+            1851
+          ],
+          "raw_localized_bbox": [
+            3349,
+            1806,
+            3475,
+            1846
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "IN_MENU",
+          "source": "In Menu",
+          "korean": "메뉴",
+          "original_bbox": [
+            2414,
+            9,
+            2580,
+            49
+          ],
+          "localized_bbox": [
+            2466,
+            10,
+            2534,
+            48
+          ],
+          "delta_left": 52,
+          "delta_right": 46,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2414,
+            1999,
+            2580,
+            2039
+          ],
+          "raw_localized_bbox": [
+            2466,
+            2000,
+            2534,
+            2038
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "OK",
+          "source": "OK",
+          "korean": "확인",
+          "original_bbox": [
+            2960,
+            4,
+            3025,
+            55
+          ],
+          "localized_bbox": [
+            2961,
+            11,
+            3016,
+            43
+          ],
+          "delta_left": 1,
+          "delta_right": 9,
+          "delta_top": 7,
+          "delta_bottom": 12,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2960,
+            1993,
+            3025,
+            2044
+          ],
+          "raw_localized_bbox": [
+            2961,
+            2005,
+            3016,
+            2037
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "SIGN_IN",
+          "source": "SIGN IN",
+          "korean": "로그인",
+          "original_bbox": [
+            0,
+            455,
+            268,
+            518
+          ],
+          "localized_bbox": [
+            12,
+            456,
+            183,
+            517
+          ],
+          "delta_left": 12,
+          "delta_right": 85,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            0,
+            1530,
+            268,
+            1593
+          ],
+          "raw_localized_bbox": [
+            12,
+            1531,
+            183,
+            1592
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "DELETE_ACCOUNT_BIG",
+          "source": "DELETE ACCOUNT",
+          "korean": "계정 삭제",
+          "original_bbox": [
+            3,
+            540,
+            641,
+            602
+          ],
+          "localized_bbox": [
+            16,
+            541,
+            255,
+            601
+          ],
+          "delta_left": 13,
+          "delta_right": 386,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3,
+            1446,
+            641,
+            1508
+          ],
+          "raw_localized_bbox": [
+            16,
+            1447,
+            255,
+            1507
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "ENTER_XBOX_PASSCODE",
+          "source": "ENTER XBOX PASSCODE",
+          "korean": "XBOX 패스코드 입력",
+          "original_bbox": [
+            906,
+            456,
+            1875,
+            522
+          ],
+          "localized_bbox": [
+            910,
+            457,
+            1482,
+            521
+          ],
+          "delta_left": 4,
+          "delta_right": 393,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            906,
+            1526,
+            1875,
+            1592
+          ],
+          "raw_localized_bbox": [
+            910,
+            1527,
+            1482,
+            1591
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "REGISTER_NEW_ACCOUNT_BIG",
+          "source": "REGISTER NEW ACCOUNT",
+          "korean": "새 계정 등록",
+          "original_bbox": [
+            2470,
+            543,
+            3399,
+            606
+          ],
+          "localized_bbox": [
+            2486,
+            544,
+            2805,
+            605
+          ],
+          "delta_left": 16,
+          "delta_right": 594,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2470,
+            1442,
+            3399,
+            1505
+          ],
+          "raw_localized_bbox": [
+            2486,
+            1443,
+            2805,
+            1504
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "PLAYER_FEEDBACK",
+          "source": "PLAYER FEEDBACK",
+          "korean": "플레이어 피드백",
+          "original_bbox": [
+            2320,
+            633,
+            3500,
+            706
+          ],
+          "localized_bbox": [
+            2327,
+            635,
+            2773,
+            700
+          ],
+          "delta_left": 7,
+          "delta_right": 727,
+          "delta_top": 2,
+          "delta_bottom": 6,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2320,
+            1342,
+            3500,
+            1415
+          ],
+          "raw_localized_bbox": [
+            2327,
+            1348,
+            2773,
+            1413
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "LOGIN_TO_ACCOUNT",
+          "source": "LOGIN TO ACCOUNT",
+          "korean": "계정 로그인",
+          "original_bbox": [
+            2470,
+            1333,
+            2920,
+            1380
+          ],
+          "localized_bbox": [
+            2594,
+            1334,
+            2793,
+            1375
+          ],
+          "delta_left": 124,
+          "delta_right": 127,
+          "delta_top": 1,
+          "delta_bottom": 5,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2470,
+            668,
+            2920,
+            715
+          ],
+          "raw_localized_bbox": [
+            2594,
+            673,
+            2793,
+            714
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "START_1",
+          "source": "Start",
+          "korean": "시작",
+          "original_bbox": [
+            1335,
+            737,
+            1449,
+            785
+          ],
+          "localized_bbox": [
+            1347,
+            738,
+            1423,
+            784
+          ],
+          "delta_left": 12,
+          "delta_right": 26,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1335,
+            1263,
+            1449,
+            1311
+          ],
+          "raw_localized_bbox": [
+            1347,
+            1264,
+            1423,
+            1310
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "GOAL_1",
+          "source": "Goal",
+          "korean": "골",
+          "original_bbox": [
+            1965,
+            737,
+            2068,
+            785
+          ],
+          "localized_bbox": [
+            1987,
+            738,
+            2031,
+            784
+          ],
+          "delta_left": 22,
+          "delta_right": 37,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1965,
+            1263,
+            2068,
+            1311
+          ],
+          "raw_localized_bbox": [
+            1987,
+            1264,
+            2031,
+            1310
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "START_2",
+          "source": "Start",
+          "korean": "시작",
+          "original_bbox": [
+            2111,
+            737,
+            2225,
+            785
+          ],
+          "localized_bbox": [
+            2125,
+            738,
+            2201,
+            784
+          ],
+          "delta_left": 14,
+          "delta_right": 24,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2111,
+            1263,
+            2225,
+            1311
+          ],
+          "raw_localized_bbox": [
+            2125,
+            1264,
+            2201,
+            1310
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "GOAL_2",
+          "source": "Goal",
+          "korean": "골",
+          "original_bbox": [
+            2741,
+            737,
+            2844,
+            785
+          ],
+          "localized_bbox": [
+            2767,
+            738,
+            2811,
+            784
+          ],
+          "delta_left": 26,
+          "delta_right": 33,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2741,
+            1263,
+            2844,
+            1311
+          ],
+          "raw_localized_bbox": [
+            2767,
+            1264,
+            2811,
+            1310
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "START_3",
+          "source": "Start",
+          "korean": "시작",
+          "original_bbox": [
+            2887,
+            737,
+            3001,
+            785
+          ],
+          "localized_bbox": [
+            2905,
+            738,
+            2981,
+            784
+          ],
+          "delta_left": 18,
+          "delta_right": 20,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2887,
+            1263,
+            3001,
+            1311
+          ],
+          "raw_localized_bbox": [
+            2905,
+            1264,
+            2981,
+            1310
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "GOAL_3",
+          "source": "Goal",
+          "korean": "골",
+          "original_bbox": [
+            3517,
+            737,
+            3620,
+            785
+          ],
+          "localized_bbox": [
+            3545,
+            738,
+            3589,
+            784
+          ],
+          "delta_left": 28,
+          "delta_right": 31,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3517,
+            1263,
+            3620,
+            1311
+          ],
+          "raw_localized_bbox": [
+            3545,
+            1264,
+            3589,
+            1310
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "YOU",
+          "source": "YOU",
+          "korean": "나",
+          "original_bbox": [
+            1862,
+            660,
+            1966,
+            709
+          ],
+          "localized_bbox": [
+            1898,
+            666,
+            1933,
+            706
+          ],
+          "delta_left": 36,
+          "delta_right": 33,
+          "delta_top": 6,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1862,
+            1339,
+            1966,
+            1388
+          ],
+          "raw_localized_bbox": [
+            1898,
+            1342,
+            1933,
+            1382
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "FA7BBB13",
+      "status": "FAIL",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 17,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [
+        {
+          "key": "count_gifts",
+          "localized_bbox": [
+            178,
+            121,
+            594,
+            199
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            133,
+            11,
+            414,
+            13
+          ]
+        },
+        {
+          "key": "honk_horn",
+          "localized_bbox": [
+            1937,
+            121,
+            2414,
+            199
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            101,
+            11,
+            299,
+            13
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "key": "match_total",
+          "source": "Match the total!",
+          "korean": "합계를 맞히세요!",
+          "original_bbox": [
+            119,
+            35,
+            637,
+            123
+          ],
+          "localized_bbox": [
+            162,
+            36,
+            611,
+            122
+          ],
+          "delta_left": 43,
+          "delta_right": 26,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            119,
+            1925,
+            637,
+            2013
+          ],
+          "raw_localized_bbox": [
+            162,
+            1926,
+            611,
+            2012
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "count_gifts",
+          "source": "Count the gifts!",
+          "korean": "선물을 세세요!",
+          "original_bbox": [
+            120,
+            110,
+            635,
+            208
+          ],
+          "localized_bbox": [
+            178,
+            121,
+            594,
+            199
+          ],
+          "delta_left": 58,
+          "delta_right": 41,
+          "delta_top": 11,
+          "delta_bottom": 9,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            120,
+            1840,
+            635,
+            1938
+          ],
+          "raw_localized_bbox": [
+            178,
+            1849,
+            594,
+            1927
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "hit_boost",
+          "source": "Hit the boost!",
+          "korean": "부스트를 밟으세요!",
+          "original_bbox": [
+            914,
+            35,
+            1363,
+            123
+          ],
+          "localized_bbox": [
+            915,
+            36,
+            1362,
+            117
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 1,
+          "delta_bottom": 6,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            914,
+            1925,
+            1363,
+            2013
+          ],
+          "raw_localized_bbox": [
+            915,
+            1931,
+            1362,
+            2012
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "keep_control",
+          "source": "Keep control!",
+          "korean": "차량을 제어하세요!",
+          "original_bbox": [
+            915,
+            110,
+            1363,
+            210
+          ],
+          "localized_bbox": [
+            916,
+            124,
+            1362,
+            194
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 14,
+          "delta_bottom": 16,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            915,
+            1838,
+            1363,
+            1938
+          ],
+          "raw_localized_bbox": [
+            916,
+            1854,
+            1362,
+            1924
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "hold_line",
+          "source": "Hold the line!",
+          "korean": "라인을 유지하세요!",
+          "original_bbox": [
+            1678,
+            35,
+            2181,
+            116
+          ],
+          "localized_bbox": [
+            1692,
+            36,
+            2136,
+            115
+          ],
+          "delta_left": 14,
+          "delta_right": 45,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1678,
+            1932,
+            2181,
+            2013
+          ],
+          "raw_localized_bbox": [
+            1692,
+            1933,
+            2136,
+            2012
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "honk_horn",
+          "source": "Honk the horn!",
+          "korean": "경적을 울리세요!",
+          "original_bbox": [
+            1882,
+            110,
+            2470,
+            210
+          ],
+          "localized_bbox": [
+            1937,
+            121,
+            2414,
+            199
+          ],
+          "delta_left": 55,
+          "delta_right": 56,
+          "delta_top": 11,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1882,
+            1838,
+            2470,
+            1938
+          ],
+          "raw_localized_bbox": [
+            1937,
+            1849,
+            2414,
+            1927
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "do_math",
+          "source": "Do the math!",
+          "korean": "계산하세요!",
+          "original_bbox": [
+            2683,
+            110,
+            3143,
+            205
+          ],
+          "localized_bbox": [
+            2764,
+            120,
+            3118,
+            205
+          ],
+          "delta_left": 81,
+          "delta_right": 25,
+          "delta_top": 10,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2683,
+            1843,
+            3143,
+            1938
+          ],
+          "raw_localized_bbox": [
+            2764,
+            1843,
+            3118,
+            1928
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "guess_sound",
+          "source": "Guess the sound!",
+          "korean": "소리를 맞혀 보세요!",
+          "original_bbox": [
+            3398,
+            127,
+            3978,
+            205
+          ],
+          "localized_bbox": [
+            3462,
+            128,
+            3977,
+            204
+          ],
+          "delta_left": 64,
+          "delta_right": 1,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3398,
+            1843,
+            3978,
+            1921
+          ],
+          "raw_localized_bbox": [
+            3462,
+            1844,
+            3977,
+            1920
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "count_green",
+          "source": "Count Green Cars!",
+          "korean": "초록색 차를 세세요!",
+          "original_bbox": [
+            51,
+            230,
+            661,
+            307
+          ],
+          "localized_bbox": [
+            89,
+            231,
+            621,
+            306
+          ],
+          "delta_left": 38,
+          "delta_right": 40,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            51,
+            1741,
+            661,
+            1818
+          ],
+          "raw_localized_bbox": [
+            89,
+            1742,
+            621,
+            1817
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "count_blue",
+          "source": "Count Blue Cars!",
+          "korean": "파란색 차를 세세요!",
+          "original_bbox": [
+            803,
+            210,
+            1361,
+            302
+          ],
+          "localized_bbox": [
+            804,
+            223,
+            1360,
+            301
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 13,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            803,
+            1746,
+            1361,
+            1838
+          ],
+          "raw_localized_bbox": [
+            804,
+            1747,
+            1360,
+            1825
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "count_sheep",
+          "source": "Count the sheep!",
+          "korean": "양을 세세요!",
+          "original_bbox": [
+            2745,
+            223,
+            3314,
+            316
+          ],
+          "localized_bbox": [
+            2845,
+            224,
+            3247,
+            312
+          ],
+          "delta_left": 100,
+          "delta_right": 67,
+          "delta_top": 1,
+          "delta_bottom": 4,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2745,
+            1732,
+            3314,
+            1825
+          ],
+          "raw_localized_bbox": [
+            2845,
+            1736,
+            3247,
+            1824
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "count_red",
+          "source": "Count Red Cars!",
+          "korean": "빨간색 차를 세세요!",
+          "original_bbox": [
+            2802,
+            373,
+            3345,
+            450
+          ],
+          "localized_bbox": [
+            2828,
+            374,
+            3341,
+            449
+          ],
+          "delta_left": 26,
+          "delta_right": 4,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2802,
+            1598,
+            3345,
+            1675
+          ],
+          "raw_localized_bbox": [
+            2828,
+            1599,
+            3341,
+            1674
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "memorize_sequence",
+          "source": "Memorize the sequence!",
+          "korean": "순서를 기억하세요!",
+          "original_bbox": [
+            0,
+            456,
+            786,
+            559
+          ],
+          "localized_bbox": [
+            91,
+            468,
+            695,
+            556
+          ],
+          "delta_left": 91,
+          "delta_right": 91,
+          "delta_top": 12,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            0,
+            1489,
+            786,
+            1592
+          ],
+          "raw_localized_bbox": [
+            91,
+            1492,
+            695,
+            1580
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "drive_above_speed",
+          "source": "Drive above the speed!",
+          "korean": "지정 속도 이상으로 달리세요!",
+          "original_bbox": [
+            786,
+            456,
+            1562,
+            559
+          ],
+          "localized_bbox": [
+            788,
+            468,
+            1560,
+            556
+          ],
+          "delta_left": 2,
+          "delta_right": 2,
+          "delta_top": 12,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            786,
+            1489,
+            1562,
+            1592
+          ],
+          "raw_localized_bbox": [
+            788,
+            1492,
+            1560,
+            1580
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "spot_odd",
+          "source": "Spot the odd one out!",
+          "korean": "다른 하나를 찾으세요!",
+          "original_bbox": [
+            1562,
+            456,
+            2324,
+            559
+          ],
+          "localized_bbox": [
+            1598,
+            466,
+            2288,
+            557
+          ],
+          "delta_left": 36,
+          "delta_right": 36,
+          "delta_top": 10,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1562,
+            1489,
+            2324,
+            1592
+          ],
+          "raw_localized_bbox": [
+            1598,
+            1491,
+            2288,
+            1582
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "slipstream_cars",
+          "source": "Slipstream the cars!",
+          "korean": "차량 뒤에서 슬립스트림하세요!",
+          "original_bbox": [
+            2324,
+            456,
+            2924,
+            559
+          ],
+          "localized_bbox": [
+            2326,
+            475,
+            2922,
+            549
+          ],
+          "delta_left": 2,
+          "delta_right": 2,
+          "delta_top": 19,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2324,
+            1489,
+            2924,
+            1592
+          ],
+          "raw_localized_bbox": [
+            2326,
+            1499,
+            2922,
+            1573
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "run_green",
+          "source": "Run through green!",
+          "korean": "초록색을 통과하세요!",
+          "original_bbox": [
+            2924,
+            470,
+            3648,
+            559
+          ],
+          "localized_bbox": [
+            2957,
+            471,
+            3614,
+            558
+          ],
+          "delta_left": 33,
+          "delta_right": 34,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2924,
+            1489,
+            3648,
+            1578
+          ],
+          "raw_localized_bbox": [
+            2957,
+            1490,
+            3614,
+            1577
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "39229D64",
+      "status": "PASS",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 15,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [],
+      "rows": [
+        {
+          "key": "hearts",
+          "source": "Hearts",
+          "korean": "하트",
+          "original_bbox": [
+            1715,
+            5,
+            2048,
+            102
+          ],
+          "localized_bbox": [
+            1797,
+            6,
+            1965,
+            99
+          ],
+          "delta_left": 82,
+          "delta_right": 83,
+          "delta_top": 1,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1715,
+            3994,
+            2048,
+            4091
+          ],
+          "raw_localized_bbox": [
+            1797,
+            3997,
+            1965,
+            4090
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "technical_bonus",
+          "source": "Technical Bonus",
+          "korean": "테크니컬 보너스",
+          "original_bbox": [
+            2393,
+            77,
+            3610,
+            259
+          ],
+          "localized_bbox": [
+            2475,
+            87,
+            3501,
+            258
+          ],
+          "delta_left": 82,
+          "delta_right": 109,
+          "delta_top": 10,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2393,
+            3837,
+            3610,
+            4019
+          ],
+          "raw_localized_bbox": [
+            2475,
+            3838,
+            3501,
+            4009
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "mission_cleared",
+          "source": "MISSION CLEARED!",
+          "korean": "미션 성공!",
+          "original_bbox": [
+            128,
+            256,
+            1587,
+            787
+          ],
+          "localized_bbox": [
+            584,
+            273,
+            1092,
+            776
+          ],
+          "delta_left": 456,
+          "delta_right": 495,
+          "delta_top": 17,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            128,
+            3309,
+            1587,
+            3840
+          ],
+          "raw_localized_bbox": [
+            584,
+            3320,
+            1092,
+            3823
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "total_rank_green",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "original_bbox": [
+            512,
+            896,
+            1101,
+            1075
+          ],
+          "localized_bbox": [
+            526,
+            905,
+            1087,
+            1065
+          ],
+          "delta_left": 14,
+          "delta_right": 14,
+          "delta_top": 9,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            512,
+            3021,
+            1101,
+            3200
+          ],
+          "raw_localized_bbox": [
+            526,
+            3031,
+            1087,
+            3191
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "storing",
+          "source": "STORING ONLINE RECORD...",
+          "korean": "온라인 기록 저장 중...",
+          "original_bbox": [
+            1652,
+            858,
+            2975,
+            998
+          ],
+          "localized_bbox": [
+            1808,
+            860,
+            2850,
+            996
+          ],
+          "delta_left": 156,
+          "delta_right": 125,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1652,
+            3098,
+            2975,
+            3238
+          ],
+          "raw_localized_bbox": [
+            1808,
+            3100,
+            2850,
+            3236
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "special_request",
+          "source": "SPECIAL REQUEST",
+          "korean": "스페셜 요청",
+          "original_bbox": [
+            1644,
+            1114,
+            2624,
+            1267
+          ],
+          "localized_bbox": [
+            1813,
+            1116,
+            2437,
+            1265
+          ],
+          "delta_left": 169,
+          "delta_right": 187,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1644,
+            2829,
+            2624,
+            2982
+          ],
+          "raw_localized_bbox": [
+            1813,
+            2831,
+            2437,
+            2980
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "target",
+          "source": "Target",
+          "korean": "목표",
+          "original_bbox": [
+            2625,
+            555,
+            2825,
+            640
+          ],
+          "localized_bbox": [
+            2654,
+            556,
+            2797,
+            638
+          ],
+          "delta_left": 29,
+          "delta_right": 28,
+          "delta_top": 1,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2625,
+            3456,
+            2825,
+            3541
+          ],
+          "raw_localized_bbox": [
+            2654,
+            3458,
+            2797,
+            3540
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "start",
+          "source": "START",
+          "korean": "시작",
+          "original_bbox": [
+            2487,
+            1016,
+            2662,
+            1085
+          ],
+          "localized_bbox": [
+            2502,
+            1017,
+            2617,
+            1084
+          ],
+          "delta_left": 15,
+          "delta_right": 45,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2487,
+            3011,
+            2662,
+            3080
+          ],
+          "raw_localized_bbox": [
+            2502,
+            3012,
+            2617,
+            3079
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "goal",
+          "source": "GOAL",
+          "korean": "골",
+          "original_bbox": [
+            2975,
+            1016,
+            3131,
+            1085
+          ],
+          "localized_bbox": [
+            3027,
+            1017,
+            3130,
+            1084
+          ],
+          "delta_left": 52,
+          "delta_right": 1,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2975,
+            3011,
+            3131,
+            3080
+          ],
+          "raw_localized_bbox": [
+            3027,
+            3012,
+            3130,
+            3079
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "hit_ghost",
+          "source": "Hit the ghost!",
+          "korean": "고스트를 맞히세요!",
+          "original_bbox": [
+            3163,
+            1017,
+            3633,
+            1106
+          ],
+          "localized_bbox": [
+            3178,
+            1018,
+            3618,
+            1105
+          ],
+          "delta_left": 15,
+          "delta_right": 15,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3163,
+            2990,
+            3633,
+            3079
+          ],
+          "raw_localized_bbox": [
+            3178,
+            2991,
+            3618,
+            3078
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "exit",
+          "source": "EXIT",
+          "korean": "종료",
+          "original_bbox": [
+            3083,
+            1143,
+            3494,
+            1281
+          ],
+          "localized_bbox": [
+            3161,
+            1144,
+            3474,
+            1280
+          ],
+          "delta_left": 78,
+          "delta_right": 20,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3083,
+            2815,
+            3494,
+            2953
+          ],
+          "raw_localized_bbox": [
+            3161,
+            2816,
+            3474,
+            2952
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "collect_stars",
+          "source": "Collect the stars!",
+          "korean": "별을 모으세요!",
+          "original_bbox": [
+            3469,
+            1172,
+            3998,
+            1267
+          ],
+          "localized_bbox": [
+            3500,
+            1173,
+            3988,
+            1266
+          ],
+          "delta_left": 31,
+          "delta_right": 10,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3469,
+            2829,
+            3998,
+            2924
+          ],
+          "raw_localized_bbox": [
+            3500,
+            2830,
+            3988,
+            2923
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "mission_failed",
+          "source": "MISSION FAILED!",
+          "korean": "미션 실패!",
+          "original_bbox": [
+            1984,
+            1280,
+            3187,
+            1792
+          ],
+          "localized_bbox": [
+            2319,
+            1299,
+            2813,
+            1786
+          ],
+          "delta_left": 335,
+          "delta_right": 374,
+          "delta_top": 19,
+          "delta_bottom": 6,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1984,
+            2304,
+            3187,
+            2816
+          ],
+          "raw_localized_bbox": [
+            2319,
+            2310,
+            2813,
+            2797
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "total_rank_brown",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "original_bbox": [
+            717,
+            1915,
+            1318,
+            2099
+          ],
+          "localized_bbox": [
+            729,
+            1925,
+            1305,
+            2088
+          ],
+          "delta_left": 12,
+          "delta_right": 13,
+          "delta_top": 10,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            717,
+            1997,
+            1318,
+            2181
+          ],
+          "raw_localized_bbox": [
+            729,
+            2008,
+            1305,
+            2171
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "total_rank_pink",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "original_bbox": [
+            2598,
+            1900,
+            3238,
+            2099
+          ],
+          "localized_bbox": [
+            2607,
+            1912,
+            3229,
+            2087
+          ],
+          "delta_left": 9,
+          "delta_right": 9,
+          "delta_top": 12,
+          "delta_bottom": 12,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2598,
+            1997,
+            3238,
+            2196
+          ],
+          "raw_localized_bbox": [
+            2607,
+            2009,
+            3229,
+            2184
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "A064FDFC",
+      "status": "PASS",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 21,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [],
+      "rows": [
+        {
+          "key": "dumped_top",
+          "source": "DUMPED!",
+          "korean": "차였어요!",
+          "original_bbox": [
+            165,
+            120,
+            665,
+            245
+          ],
+          "localized_bbox": [
+            204,
+            123,
+            625,
+            242
+          ],
+          "delta_left": 39,
+          "delta_right": 40,
+          "delta_top": 3,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            165,
+            1803,
+            665,
+            1928
+          ],
+          "raw_localized_bbox": [
+            204,
+            1806,
+            625,
+            1925
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "dumped_white",
+          "source": "DUMPED!",
+          "korean": "차였어요!",
+          "original_bbox": [
+            3169,
+            270,
+            3605,
+            390
+          ],
+          "localized_bbox": [
+            3170,
+            276,
+            3604,
+            388
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 6,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3169,
+            1658,
+            3605,
+            1778
+          ],
+          "raw_localized_bbox": [
+            3170,
+            1660,
+            3604,
+            1772
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "dumped_big",
+          "source": "DUMPED!",
+          "korean": "차였어요!",
+          "original_bbox": [
+            2525,
+            1302,
+            3570,
+            1515
+          ],
+          "localized_bbox": [
+            2652,
+            1303,
+            3437,
+            1507
+          ],
+          "delta_left": 127,
+          "delta_right": 133,
+          "delta_top": 1,
+          "delta_bottom": 8,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2525,
+            533,
+            3570,
+            746
+          ],
+          "raw_localized_bbox": [
+            2652,
+            541,
+            3437,
+            745
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "knockout_white",
+          "source": "KNOCKOUT!",
+          "korean": "탈락!",
+          "original_bbox": [
+            833,
+            120,
+            1270,
+            250
+          ],
+          "localized_bbox": [
+            922,
+            125,
+            1172,
+            245
+          ],
+          "delta_left": 89,
+          "delta_right": 98,
+          "delta_top": 5,
+          "delta_bottom": 5,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            833,
+            1798,
+            1270,
+            1928
+          ],
+          "raw_localized_bbox": [
+            922,
+            1803,
+            1172,
+            1923
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "knockout_in",
+          "source": "KNOCKOUT! IN...",
+          "korean": "탈락까지...",
+          "original_bbox": [
+            1260,
+            120,
+            2270,
+            250
+          ],
+          "localized_bbox": [
+            1506,
+            123,
+            2024,
+            247
+          ],
+          "delta_left": 246,
+          "delta_right": 246,
+          "delta_top": 3,
+          "delta_bottom": 3,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1260,
+            1798,
+            2270,
+            1928
+          ],
+          "raw_localized_bbox": [
+            1506,
+            1801,
+            2024,
+            1925
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "target_top",
+          "source": "Target",
+          "korean": "목표",
+          "original_bbox": [
+            2910,
+            145,
+            3134,
+            223
+          ],
+          "localized_bbox": [
+            2952,
+            146,
+            3091,
+            222
+          ],
+          "delta_left": 42,
+          "delta_right": 43,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2910,
+            1825,
+            3134,
+            1903
+          ],
+          "raw_localized_bbox": [
+            2952,
+            1826,
+            3091,
+            1902
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "target_bottom",
+          "source": "Target",
+          "korean": "목표",
+          "original_bbox": [
+            3260,
+            1780,
+            3560,
+            1885
+          ],
+          "localized_bbox": [
+            3341,
+            1796,
+            3479,
+            1869
+          ],
+          "delta_left": 81,
+          "delta_right": 81,
+          "delta_top": 16,
+          "delta_bottom": 16,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3260,
+            163,
+            3560,
+            268
+          ],
+          "raw_localized_bbox": [
+            3341,
+            179,
+            3479,
+            252
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "ranking",
+          "source": "Ranking",
+          "korean": "순위",
+          "original_bbox": [
+            120,
+            245,
+            455,
+            350
+          ],
+          "localized_bbox": [
+            204,
+            248,
+            370,
+            346
+          ],
+          "delta_left": 84,
+          "delta_right": 85,
+          "delta_top": 3,
+          "delta_bottom": 4,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            120,
+            1698,
+            455,
+            1803
+          ],
+          "raw_localized_bbox": [
+            204,
+            1702,
+            370,
+            1800
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "stage",
+          "source": "Stage",
+          "korean": "스테이지",
+          "original_bbox": [
+            455,
+            245,
+            690,
+            350
+          ],
+          "localized_bbox": [
+            461,
+            249,
+            685,
+            345
+          ],
+          "delta_left": 6,
+          "delta_right": 5,
+          "delta_top": 4,
+          "delta_bottom": 5,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            455,
+            1698,
+            690,
+            1803
+          ],
+          "raw_localized_bbox": [
+            461,
+            1703,
+            685,
+            1799
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "rank",
+          "source": "Rank",
+          "korean": "랭크",
+          "original_bbox": [
+            690,
+            245,
+            875,
+            350
+          ],
+          "localized_bbox": [
+            702,
+            252,
+            862,
+            342
+          ],
+          "delta_left": 12,
+          "delta_right": 13,
+          "delta_top": 7,
+          "delta_bottom": 8,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            690,
+            1698,
+            875,
+            1803
+          ],
+          "raw_localized_bbox": [
+            702,
+            1706,
+            862,
+            1796
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "outrun_miles_white",
+          "source": "OUTRUN MILES!",
+          "korean": "아웃런 마일!",
+          "original_bbox": [
+            1090,
+            245,
+            1930,
+            385
+          ],
+          "localized_bbox": [
+            1241,
+            245,
+            1913,
+            370
+          ],
+          "delta_left": 151,
+          "delta_right": 17,
+          "delta_top": 0,
+          "delta_bottom": 15,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1090,
+            1663,
+            1930,
+            1803
+          ],
+          "raw_localized_bbox": [
+            1241,
+            1678,
+            1913,
+            1803
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "outrun_miles",
+          "source": "OUTRUN MILES:",
+          "korean": "아웃런 마일:",
+          "original_bbox": [
+            2081,
+            250,
+            2860,
+            370
+          ],
+          "localized_bbox": [
+            2197,
+            253,
+            2742,
+            370
+          ],
+          "delta_left": 116,
+          "delta_right": 118,
+          "delta_top": 3,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2081,
+            1678,
+            2860,
+            1798
+          ],
+          "raw_localized_bbox": [
+            2197,
+            1678,
+            2742,
+            1795
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "best_time",
+          "source": "BEST TIME:",
+          "korean": "최고 기록:",
+          "original_bbox": [
+            2179,
+            365,
+            3063,
+            540
+          ],
+          "localized_bbox": [
+            2281,
+            365,
+            2943,
+            536
+          ],
+          "delta_left": 102,
+          "delta_right": 120,
+          "delta_top": 0,
+          "delta_bottom": 4,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2179,
+            1508,
+            3063,
+            1683
+          ],
+          "raw_localized_bbox": [
+            2281,
+            1512,
+            2943,
+            1683
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "stage_clear",
+          "source": "STAGE CLEAR",
+          "korean": "스테이지 클리어",
+          "original_bbox": [
+            3444,
+            362,
+            3956,
+            462
+          ],
+          "localized_bbox": [
+            3445,
+            366,
+            3955,
+            452
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 4,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3444,
+            1586,
+            3956,
+            1686
+          ],
+          "raw_localized_bbox": [
+            3445,
+            1596,
+            3955,
+            1682
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "pass",
+          "source": "PASS!!!",
+          "korean": "통과!!!",
+          "original_bbox": [
+            3620,
+            490,
+            4054,
+            622
+          ],
+          "localized_bbox": [
+            3703,
+            504,
+            4006,
+            611
+          ],
+          "delta_left": 83,
+          "delta_right": 48,
+          "delta_top": 14,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3620,
+            1426,
+            4054,
+            1558
+          ],
+          "raw_localized_bbox": [
+            3703,
+            1437,
+            4006,
+            1544
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "continue",
+          "source": "CONTINUE?",
+          "korean": "계속?",
+          "original_bbox": [
+            19,
+            570,
+            1090,
+            780
+          ],
+          "localized_bbox": [
+            331,
+            579,
+            759,
+            771
+          ],
+          "delta_left": 312,
+          "delta_right": 331,
+          "delta_top": 9,
+          "delta_bottom": 9,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            19,
+            1268,
+            1090,
+            1478
+          ],
+          "raw_localized_bbox": [
+            331,
+            1277,
+            759,
+            1469
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "try_again",
+          "source": "TRY AGAIN?",
+          "korean": "다시 도전?",
+          "original_bbox": [
+            25,
+            760,
+            1320,
+            1000
+          ],
+          "localized_bbox": [
+            261,
+            760,
+            1058,
+            975
+          ],
+          "delta_left": 236,
+          "delta_right": 262,
+          "delta_top": 0,
+          "delta_bottom": 25,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            25,
+            1048,
+            1320,
+            1288
+          ],
+          "raw_localized_bbox": [
+            261,
+            1073,
+            1058,
+            1288
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "rank_table",
+          "source": "Rank",
+          "korean": "랭크",
+          "original_bbox": [
+            1320,
+            836,
+            1635,
+            940
+          ],
+          "localized_bbox": [
+            1387,
+            837,
+            1568,
+            938
+          ],
+          "delta_left": 67,
+          "delta_right": 67,
+          "delta_top": 1,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1320,
+            1108,
+            1635,
+            1212
+          ],
+          "raw_localized_bbox": [
+            1387,
+            1110,
+            1568,
+            1211
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "retry",
+          "source": "RETRY",
+          "korean": "재도전",
+          "original_bbox": [
+            1270,
+            570,
+            1900,
+            780
+          ],
+          "localized_bbox": [
+            1354,
+            587,
+            1815,
+            763
+          ],
+          "delta_left": 84,
+          "delta_right": 85,
+          "delta_top": 17,
+          "delta_bottom": 17,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1270,
+            1268,
+            1900,
+            1478
+          ],
+          "raw_localized_bbox": [
+            1354,
+            1285,
+            1815,
+            1461
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "please_wait",
+          "source": "PLEASE WAIT",
+          "korean": "잠시만요",
+          "original_bbox": [
+            2320,
+            565,
+            3540,
+            778
+          ],
+          "localized_bbox": [
+            2633,
+            592,
+            3226,
+            762
+          ],
+          "delta_left": 313,
+          "delta_right": 314,
+          "delta_top": 27,
+          "delta_bottom": 16,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2320,
+            1270,
+            3540,
+            1483
+          ],
+          "raw_localized_bbox": [
+            2633,
+            1286,
+            3226,
+            1456
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "easy",
+          "source": "EASY",
+          "korean": "쉬움",
+          "original_bbox": [
+            3180,
+            825,
+            3624,
+            962
+          ],
+          "localized_bbox": [
+            3289,
+            826,
+            3525,
+            961
+          ],
+          "delta_left": 109,
+          "delta_right": 99,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3180,
+            1086,
+            3624,
+            1223
+          ],
+          "raw_localized_bbox": [
+            3289,
+            1087,
+            3525,
+            1222
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "C4A2937B",
+      "status": "PASS",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 21,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [],
+      "rows": [
+        {
+          "key": "go_gate",
+          "source": "Go through the gate!",
+          "korean": "게이트를 통과하세요!",
+          "original_bbox": [
+            2067,
+            998,
+            2547,
+            1106
+          ],
+          "localized_bbox": [
+            2068,
+            1006,
+            2546,
+            1099
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 8,
+          "delta_bottom": 7,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2067,
+            2990,
+            2547,
+            3098
+          ],
+          "raw_localized_bbox": [
+            2068,
+            2997,
+            2546,
+            3090
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "cut_line",
+          "source": "Cut the line!",
+          "korean": "라인을 끊으세요!",
+          "original_bbox": [
+            2596,
+            998,
+            3028,
+            1106
+          ],
+          "localized_bbox": [
+            2597,
+            1008,
+            3027,
+            1096
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 10,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2596,
+            2990,
+            3028,
+            3098
+          ],
+          "raw_localized_bbox": [
+            2597,
+            3000,
+            3027,
+            3088
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "keep_passing",
+          "source": "Keep passing the cars!",
+          "korean": "계속 차량을 추월하세요!",
+          "original_bbox": [
+            3068,
+            1023,
+            3567,
+            1106
+          ],
+          "localized_bbox": [
+            3100,
+            1024,
+            3541,
+            1105
+          ],
+          "delta_left": 32,
+          "delta_right": 26,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3068,
+            2990,
+            3567,
+            3073
+          ],
+          "raw_localized_bbox": [
+            3100,
+            2991,
+            3541,
+            3072
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "double_speed",
+          "source": "Double the speed!",
+          "korean": "속도를 2배로!",
+          "original_bbox": [
+            3608,
+            1026,
+            4031,
+            1106
+          ],
+          "localized_bbox": [
+            3640,
+            1027,
+            4023,
+            1105
+          ],
+          "delta_left": 32,
+          "delta_right": 8,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3608,
+            2990,
+            4031,
+            3070
+          ],
+          "raw_localized_bbox": [
+            3640,
+            2991,
+            4023,
+            3069
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "hit_blue_cone",
+          "source": "Hit the blue cone!",
+          "korean": "파란 콘을 맞히세요!",
+          "original_bbox": [
+            1039,
+            1487,
+            1510,
+            1567
+          ],
+          "localized_bbox": [
+            1104,
+            1488,
+            1460,
+            1566
+          ],
+          "delta_left": 65,
+          "delta_right": 50,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1039,
+            2529,
+            1510,
+            2609
+          ],
+          "raw_localized_bbox": [
+            1104,
+            2530,
+            1460,
+            2608
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "dont_crash",
+          "source": "Don't crash!",
+          "korean": "충돌하지 마세요!",
+          "original_bbox": [
+            1567,
+            1488,
+            1989,
+            1566
+          ],
+          "localized_bbox": [
+            1634,
+            1489,
+            1951,
+            1565
+          ],
+          "delta_left": 67,
+          "delta_right": 38,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1567,
+            2530,
+            1989,
+            2608
+          ],
+          "raw_localized_bbox": [
+            1634,
+            2531,
+            1951,
+            2607
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "collect_coins",
+          "source": "Collect coins!",
+          "korean": "코인을 모으세요!",
+          "original_bbox": [
+            2054,
+            1487,
+            2516,
+            1567
+          ],
+          "localized_bbox": [
+            2132,
+            1488,
+            2460,
+            1566
+          ],
+          "delta_left": 78,
+          "delta_right": 56,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2054,
+            2529,
+            2516,
+            2609
+          ],
+          "raw_localized_bbox": [
+            2132,
+            2530,
+            2460,
+            2608
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "run_red",
+          "source": "Run through red!",
+          "korean": "빨간색을 통과하세요!",
+          "original_bbox": [
+            1031,
+            1604,
+            1554,
+            1695
+          ],
+          "localized_bbox": [
+            1043,
+            1605,
+            1533,
+            1694
+          ],
+          "delta_left": 12,
+          "delta_right": 21,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1031,
+            2401,
+            1554,
+            2492
+          ],
+          "raw_localized_bbox": [
+            1043,
+            2402,
+            1533,
+            2491
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "run_blue",
+          "source": "Run through blue!",
+          "korean": "파란색을 통과하세요!",
+          "original_bbox": [
+            1554,
+            1604,
+            2053,
+            1695
+          ],
+          "localized_bbox": [
+            1572,
+            1605,
+            2033,
+            1694
+          ],
+          "delta_left": 18,
+          "delta_right": 20,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1554,
+            2401,
+            2053,
+            2492
+          ],
+          "raw_localized_bbox": [
+            1572,
+            2402,
+            2033,
+            2491
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "pass_convoy",
+          "source": "Pass the convoy!",
+          "korean": "차량 행렬을 추월하세요!",
+          "original_bbox": [
+            2053,
+            1604,
+            2573,
+            1694
+          ],
+          "localized_bbox": [
+            2069,
+            1605,
+            2570,
+            1693
+          ],
+          "delta_left": 16,
+          "delta_right": 3,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2053,
+            2402,
+            2573,
+            2492
+          ],
+          "raw_localized_bbox": [
+            2069,
+            2403,
+            2570,
+            2491
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "catch_heart",
+          "source": "Catch the Heart!",
+          "korean": "하트를 잡으세요!",
+          "original_bbox": [
+            2555,
+            1607,
+            3067,
+            1687
+          ],
+          "localized_bbox": [
+            2592,
+            1608,
+            3030,
+            1686
+          ],
+          "delta_left": 37,
+          "delta_right": 37,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2555,
+            2409,
+            3067,
+            2489
+          ],
+          "raw_localized_bbox": [
+            2592,
+            2410,
+            3030,
+            2488
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "beat_car_1",
+          "source": "Beat that car!",
+          "korean": "저 차를 이기세요!",
+          "original_bbox": [
+            3055,
+            1608,
+            3525,
+            1686
+          ],
+          "localized_bbox": [
+            3088,
+            1609,
+            3513,
+            1685
+          ],
+          "delta_left": 33,
+          "delta_right": 12,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3055,
+            2410,
+            3525,
+            2488
+          ],
+          "raw_localized_bbox": [
+            3088,
+            2411,
+            3513,
+            2487
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "red",
+          "source": "RED",
+          "korean": "빨강",
+          "original_bbox": [
+            3110,
+            1446,
+            3443,
+            1583
+          ],
+          "localized_bbox": [
+            3151,
+            1447,
+            3377,
+            1582
+          ],
+          "delta_left": 41,
+          "delta_right": 66,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3110,
+            2513,
+            3443,
+            2650
+          ],
+          "raw_localized_bbox": [
+            3151,
+            2514,
+            3377,
+            2649
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "blue",
+          "source": "BLUE",
+          "korean": "파랑",
+          "original_bbox": [
+            3571,
+            1446,
+            3904,
+            1581
+          ],
+          "localized_bbox": [
+            3614,
+            1447,
+            3837,
+            1580
+          ],
+          "delta_left": 43,
+          "delta_right": 67,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3571,
+            2515,
+            3904,
+            2650
+          ],
+          "raw_localized_bbox": [
+            3614,
+            2516,
+            3837,
+            2649
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "drift",
+          "source": "Drift!",
+          "korean": "드리프트!",
+          "original_bbox": [
+            3708,
+            1608,
+            3880,
+            1687
+          ],
+          "localized_bbox": [
+            3710,
+            1626,
+            3879,
+            1675
+          ],
+          "delta_left": 2,
+          "delta_right": 1,
+          "delta_top": 18,
+          "delta_bottom": 12,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3708,
+            2409,
+            3880,
+            2488
+          ],
+          "raw_localized_bbox": [
+            3710,
+            2421,
+            3879,
+            2470
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "stage_bonus",
+          "source": "STAGE BONUS",
+          "korean": "스테이지 / 보너스",
+          "original_bbox": [
+            3814,
+            1799,
+            4075,
+            1894
+          ],
+          "localized_bbox": [
+            3872,
+            1800,
+            4028,
+            1893
+          ],
+          "delta_left": 58,
+          "delta_right": 47,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3814,
+            2202,
+            4075,
+            2297
+          ],
+          "raw_localized_bbox": [
+            3872,
+            2203,
+            4028,
+            2296
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "get",
+          "source": "GET!!",
+          "korean": "획득!!",
+          "original_bbox": [
+            3595,
+            1894,
+            3930,
+            2033
+          ],
+          "localized_bbox": [
+            3596,
+            1895,
+            3891,
+            2032
+          ],
+          "delta_left": 1,
+          "delta_right": 39,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3595,
+            2063,
+            3930,
+            2202
+          ],
+          "raw_localized_bbox": [
+            3596,
+            2064,
+            3891,
+            2201
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "beat_car_2",
+          "source": "Beat that car!",
+          "korean": "저 차를 이기세요!",
+          "original_bbox": [
+            3519,
+            2061,
+            3989,
+            2139
+          ],
+          "localized_bbox": [
+            3537,
+            2062,
+            3988,
+            2138
+          ],
+          "delta_left": 18,
+          "delta_right": 1,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3519,
+            1957,
+            3989,
+            2035
+          ],
+          "raw_localized_bbox": [
+            3537,
+            1958,
+            3988,
+            2034
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "next_stage",
+          "source": "NEXT STAGE",
+          "korean": "다음 스테이지",
+          "original_bbox": [
+            2558,
+            2180,
+            3014,
+            2271
+          ],
+          "localized_bbox": [
+            2588,
+            2181,
+            2993,
+            2270
+          ],
+          "delta_left": 30,
+          "delta_right": 21,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2558,
+            1825,
+            3014,
+            1916
+          ],
+          "raw_localized_bbox": [
+            2588,
+            1826,
+            2993,
+            1915
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "drift_and",
+          "source": "Drift and",
+          "korean": "드리프트하고",
+          "original_bbox": [
+            3053,
+            2186,
+            3400,
+            2265
+          ],
+          "localized_bbox": [
+            3071,
+            2187,
+            3348,
+            2264
+          ],
+          "delta_left": 18,
+          "delta_right": 52,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3053,
+            1831,
+            3400,
+            1910
+          ],
+          "raw_localized_bbox": [
+            3071,
+            1832,
+            3348,
+            1909
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "position",
+          "source": "Position",
+          "korean": "순위",
+          "original_bbox": [
+            1395,
+            2721,
+            1725,
+            2829
+          ],
+          "localized_bbox": [
+            1482,
+            2722,
+            1656,
+            2828
+          ],
+          "delta_left": 87,
+          "delta_right": 69,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1395,
+            1267,
+            1725,
+            1375
+          ],
+          "raw_localized_bbox": [
+            1482,
+            1268,
+            1656,
+            1374
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "2DA43E41",
+      "status": "PASS",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 11,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [],
+      "rows": [
+        {
+          "key": "course_or2",
+          "source": "OutRun2 · 15 Continuous Course has been selected.",
+          "korean": "OutRun2 · 15코스 연속 / 선택되었습니다.",
+          "original_bbox": [
+            115,
+            192,
+            2056,
+            448
+          ],
+          "localized_bbox": [
+            569,
+            207,
+            1645,
+            429
+          ],
+          "delta_left": 454,
+          "delta_right": 411,
+          "delta_top": 15,
+          "delta_bottom": 19,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            115,
+            3648,
+            2056,
+            3904
+          ],
+          "raw_localized_bbox": [
+            569,
+            3667,
+            1645,
+            3889
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "course_sp",
+          "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+          "korean": "OutRun2: SP · 15코스 연속 / 선택되었습니다.",
+          "original_bbox": [
+            132,
+            488,
+            2078,
+            717
+          ],
+          "localized_bbox": [
+            494,
+            489,
+            1733,
+            709
+          ],
+          "delta_left": 362,
+          "delta_right": 345,
+          "delta_top": 1,
+          "delta_bottom": 8,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            132,
+            3379,
+            2078,
+            3608
+          ],
+          "raw_localized_bbox": [
+            494,
+            3387,
+            1733,
+            3607
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "wait_other",
+          "source": "Waiting for other players. Please stand by.",
+          "korean": "다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+          "original_bbox": [
+            2200,
+            192,
+            3533,
+            448
+          ],
+          "localized_bbox": [
+            2205,
+            206,
+            3519,
+            427
+          ],
+          "delta_left": 5,
+          "delta_right": 14,
+          "delta_top": 14,
+          "delta_bottom": 21,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2200,
+            3648,
+            3533,
+            3904
+          ],
+          "raw_localized_bbox": [
+            2205,
+            3669,
+            3519,
+            3890
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "wait_now",
+          "source": "Now waiting for other players. Please stand by.",
+          "korean": "현재 다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+          "original_bbox": [
+            2228,
+            461,
+            3776,
+            717
+          ],
+          "localized_bbox": [
+            2229,
+            477,
+            3775,
+            696
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 16,
+          "delta_bottom": 21,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2228,
+            3379,
+            3776,
+            3635
+          ],
+          "raw_localized_bbox": [
+            2229,
+            3400,
+            3775,
+            3619
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "acceleration",
+          "source": "加速度:",
+          "korean": "가속:",
+          "original_bbox": [
+            3826,
+            247,
+            4016,
+            320
+          ],
+          "localized_bbox": [
+            3827,
+            248,
+            4015,
+            306
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 1,
+          "delta_bottom": 14,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3826,
+            3776,
+            4016,
+            3849
+          ],
+          "raw_localized_bbox": [
+            3827,
+            3790,
+            4015,
+            3848
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "max_speed",
+          "source": "最高速:",
+          "korean": "최고 속도:",
+          "original_bbox": [
+            3827,
+            319,
+            4018,
+            410
+          ],
+          "localized_bbox": [
+            3828,
+            334,
+            4017,
+            387
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 15,
+          "delta_bottom": 23,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3827,
+            3686,
+            4018,
+            3777
+          ],
+          "raw_localized_bbox": [
+            3828,
+            3709,
+            4017,
+            3762
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "handling",
+          "source": "ハンドリング:",
+          "korean": "핸들링:",
+          "original_bbox": [
+            1677,
+            896,
+            2112,
+            1050
+          ],
+          "localized_bbox": [
+            1731,
+            920,
+            2066,
+            1026
+          ],
+          "delta_left": 54,
+          "delta_right": 46,
+          "delta_top": 24,
+          "delta_bottom": 24,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1677,
+            3046,
+            2112,
+            3200
+          ],
+          "raw_localized_bbox": [
+            1731,
+            3070,
+            2066,
+            3176
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "view_change",
+          "source": "View Change Button :",
+          "korean": "시점 변경 버튼:",
+          "original_bbox": [
+            3430,
+            998,
+            3896,
+            1102
+          ],
+          "localized_bbox": [
+            3431,
+            1012,
+            3895,
+            1101
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 14,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3430,
+            2994,
+            3896,
+            3098
+          ],
+          "raw_localized_bbox": [
+            3431,
+            2995,
+            3895,
+            3084
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "single_play",
+          "source": "Single Play.",
+          "korean": "싱글 플레이",
+          "original_bbox": [
+            1677,
+            1075,
+            2355,
+            1229
+          ],
+          "localized_bbox": [
+            1719,
+            1085,
+            2308,
+            1219
+          ],
+          "delta_left": 42,
+          "delta_right": 47,
+          "delta_top": 10,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1677,
+            2867,
+            2355,
+            3021
+          ],
+          "raw_localized_bbox": [
+            1719,
+            2877,
+            2308,
+            3011
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "expert",
+          "source": "For Expert Drivers",
+          "korean": "상급자용",
+          "original_bbox": [
+            2842,
+            1124,
+            3479,
+            1229
+          ],
+          "localized_bbox": [
+            2980,
+            1125,
+            3327,
+            1228
+          ],
+          "delta_left": 138,
+          "delta_right": 152,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2842,
+            2867,
+            3479,
+            2972
+          ],
+          "raw_localized_bbox": [
+            2980,
+            2868,
+            3327,
+            2971
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "special_course",
+          "source": "Special Course",
+          "korean": "스페셜 코스",
+          "original_bbox": [
+            3137,
+            1279,
+            3879,
+            1403
+          ],
+          "localized_bbox": [
+            3232,
+            1280,
+            3780,
+            1402
+          ],
+          "delta_left": 95,
+          "delta_right": 99,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3137,
+            2693,
+            3879,
+            2817
+          ],
+          "raw_localized_bbox": [
+            3232,
+            2694,
+            3780,
+            2816
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "411827E",
+      "status": "PASS",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 7,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [],
+      "rows": [
+        {
+          "key": "automatic",
+          "source": "Automatic",
+          "korean": "자동",
+          "original_bbox": [
+            6,
+            178,
+            543,
+            288
+          ],
+          "localized_bbox": [
+            177,
+            178,
+            365,
+            286
+          ],
+          "delta_left": 171,
+          "delta_right": 178,
+          "delta_top": 0,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            6,
+            1760,
+            543,
+            1870
+          ],
+          "raw_localized_bbox": [
+            177,
+            1762,
+            365,
+            1870
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "seconds",
+          "source": "seconds",
+          "korean": "초",
+          "original_bbox": [
+            1237,
+            62,
+            1584,
+            144
+          ],
+          "localized_bbox": [
+            1359,
+            63,
+            1442,
+            143
+          ],
+          "delta_left": 122,
+          "delta_right": 142,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1237,
+            1904,
+            1584,
+            1986
+          ],
+          "raw_localized_bbox": [
+            1359,
+            1905,
+            1442,
+            1985
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "engine",
+          "source": "More Engine sound",
+          "korean": "엔진음 크게",
+          "original_bbox": [
+            1492,
+            336,
+            1915,
+            408
+          ],
+          "localized_bbox": [
+            1507,
+            336,
+            1910,
+            398
+          ],
+          "delta_left": 15,
+          "delta_right": 5,
+          "delta_top": 0,
+          "delta_bottom": 10,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1492,
+            1640,
+            1915,
+            1712
+          ],
+          "raw_localized_bbox": [
+            1507,
+            1650,
+            1910,
+            1712
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "tuned",
+          "source": "TUNED",
+          "korean": "튜닝",
+          "original_bbox": [
+            843,
+            851,
+            1154,
+            965
+          ],
+          "localized_bbox": [
+            844,
+            852,
+            1142,
+            964
+          ],
+          "delta_left": 1,
+          "delta_right": 12,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            843,
+            1083,
+            1154,
+            1197
+          ],
+          "raw_localized_bbox": [
+            844,
+            1084,
+            1142,
+            1196
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "normal",
+          "source": "NORMAL",
+          "korean": "일반",
+          "original_bbox": [
+            1235,
+            851,
+            1546,
+            965
+          ],
+          "localized_bbox": [
+            1269,
+            852,
+            1508,
+            952
+          ],
+          "delta_left": 34,
+          "delta_right": 38,
+          "delta_top": 1,
+          "delta_bottom": 13,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1235,
+            1083,
+            1546,
+            1197
+          ],
+          "raw_localized_bbox": [
+            1269,
+            1096,
+            1508,
+            1196
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "random",
+          "source": "RANDOM",
+          "korean": "무작위",
+          "original_bbox": [
+            1627,
+            856,
+            1901,
+            965
+          ],
+          "localized_bbox": [
+            1646,
+            857,
+            1880,
+            964
+          ],
+          "delta_left": 19,
+          "delta_right": 21,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1627,
+            1083,
+            1901,
+            1192
+          ],
+          "raw_localized_bbox": [
+            1646,
+            1084,
+            1880,
+            1191
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "recommendation",
+          "source": "Recommendation",
+          "korean": "추천",
+          "original_bbox": [
+            1565,
+            1710,
+            2012,
+            2030
+          ],
+          "localized_bbox": [
+            1604,
+            1765,
+            1972,
+            1995
+          ],
+          "delta_left": 39,
+          "delta_right": 40,
+          "delta_top": 55,
+          "delta_bottom": 35,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1565,
+            18,
+            2012,
+            338
+          ],
+          "raw_localized_bbox": [
+            1604,
+            53,
+            1972,
+            283
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "C075FB49",
+      "status": "FAIL",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 17,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [
+        {
+          "key": "transmission",
+          "localized_bbox": [
+            43,
+            200,
+            600,
+            330
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            43,
+            0,
+            600,
+            45
+          ]
+        },
+        {
+          "key": "dont_crash",
+          "localized_bbox": [
+            550,
+            200,
+            1070,
+            337
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            0,
+            0,
+            520,
+            45
+          ]
+        },
+        {
+          "key": "go_gate",
+          "localized_bbox": [
+            1020,
+            200,
+            1590,
+            336
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            0,
+            0,
+            570,
+            125
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "key": "long_distance",
+          "source": "Long distance",
+          "korean": "장거리",
+          "original_bbox": [
+            574,
+            29,
+            1120,
+            129
+          ],
+          "localized_bbox": [
+            712,
+            30,
+            948,
+            124
+          ],
+          "delta_left": 138,
+          "delta_right": 172,
+          "delta_top": 1,
+          "delta_bottom": 5,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            574,
+            1919,
+            1120,
+            2019
+          ],
+          "raw_localized_bbox": [
+            712,
+            1924,
+            948,
+            2018
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "keep_passing",
+          "source": "Keep passing the cars!",
+          "korean": "계속 차량을 추월하세요!",
+          "original_bbox": [
+            1,
+            143,
+            520,
+            236
+          ],
+          "localized_bbox": [
+            65,
+            144,
+            496,
+            235
+          ],
+          "delta_left": 64,
+          "delta_right": 24,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1,
+            1812,
+            520,
+            1905
+          ],
+          "raw_localized_bbox": [
+            65,
+            1813,
+            496,
+            1904
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "drift",
+          "source": "Drift!",
+          "korean": "드리프트!",
+          "original_bbox": [
+            500,
+            120,
+            720,
+            228
+          ],
+          "localized_bbox": [
+            516,
+            130,
+            719,
+            227
+          ],
+          "delta_left": 16,
+          "delta_right": 1,
+          "delta_top": 10,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            500,
+            1820,
+            720,
+            1928
+          ],
+          "raw_localized_bbox": [
+            516,
+            1821,
+            719,
+            1918
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "maximum_speed",
+          "source": "Maximum Speed",
+          "korean": "최고 속도",
+          "original_bbox": [
+            680,
+            120,
+            1137,
+            227
+          ],
+          "localized_bbox": [
+            681,
+            135,
+            1136,
+            226
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 15,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            680,
+            1821,
+            1137,
+            1928
+          ],
+          "raw_localized_bbox": [
+            681,
+            1822,
+            1136,
+            1913
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "transmission",
+          "source": "Transmission",
+          "korean": "변속기",
+          "original_bbox": [
+            1,
+            200,
+            600,
+            370
+          ],
+          "localized_bbox": [
+            43,
+            200,
+            600,
+            330
+          ],
+          "delta_left": 42,
+          "delta_right": 0,
+          "delta_top": 0,
+          "delta_bottom": 40,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1,
+            1678,
+            600,
+            1848
+          ],
+          "raw_localized_bbox": [
+            43,
+            1718,
+            600,
+            1848
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "dont_crash",
+          "source": "Don't crash!",
+          "korean": "충돌하지 마세요!",
+          "original_bbox": [
+            550,
+            200,
+            1070,
+            370
+          ],
+          "localized_bbox": [
+            550,
+            200,
+            1070,
+            337
+          ],
+          "delta_left": 0,
+          "delta_right": 0,
+          "delta_top": 0,
+          "delta_bottom": 33,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            550,
+            1678,
+            1070,
+            1848
+          ],
+          "raw_localized_bbox": [
+            550,
+            1711,
+            1070,
+            1848
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "go_gate",
+          "source": "Go through the gate!",
+          "korean": "게이트를 통과하세요!",
+          "original_bbox": [
+            1020,
+            200,
+            1590,
+            370
+          ],
+          "localized_bbox": [
+            1020,
+            200,
+            1590,
+            336
+          ],
+          "delta_left": 0,
+          "delta_right": 0,
+          "delta_top": 0,
+          "delta_bottom": 34,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1020,
+            1678,
+            1590,
+            1848
+          ],
+          "raw_localized_bbox": [
+            1020,
+            1712,
+            1590,
+            1848
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "for_experts",
+          "source": "For Experts:",
+          "korean": "상급자용:",
+          "original_bbox": [
+            1530,
+            200,
+            1980,
+            370
+          ],
+          "localized_bbox": [
+            1531,
+            231,
+            1979,
+            339
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 31,
+          "delta_bottom": 31,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1530,
+            1678,
+            1980,
+            1848
+          ],
+          "raw_localized_bbox": [
+            1531,
+            1709,
+            1979,
+            1817
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "tuned_setting",
+          "source": "Tuned Setting",
+          "korean": "튜닝 / 설정",
+          "original_bbox": [
+            40,
+            1195,
+            245,
+            1305
+          ],
+          "localized_bbox": [
+            51,
+            1196,
+            229,
+            1304
+          ],
+          "delta_left": 11,
+          "delta_right": 16,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            40,
+            743,
+            245,
+            853
+          ],
+          "raw_localized_bbox": [
+            51,
+            744,
+            229,
+            852
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "normal_setting",
+          "source": "Normal Setting",
+          "korean": "일반 / 설정",
+          "original_bbox": [
+            381,
+            1195,
+            600,
+            1305
+          ],
+          "localized_bbox": [
+            395,
+            1196,
+            588,
+            1304
+          ],
+          "delta_left": 14,
+          "delta_right": 12,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            381,
+            743,
+            600,
+            853
+          ],
+          "raw_localized_bbox": [
+            395,
+            744,
+            588,
+            852
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "new_course_desc",
+          "source": "A brand new course designed for OutRun2: SP.",
+          "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+          "original_bbox": [
+            242,
+            1394,
+            767,
+            1602
+          ],
+          "localized_bbox": [
+            243,
+            1420,
+            766,
+            1579
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 26,
+          "delta_bottom": 23,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            242,
+            446,
+            767,
+            654
+          ],
+          "raw_localized_bbox": [
+            243,
+            469,
+            766,
+            628
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "original_course_desc",
+          "source": "The course from the original OutRun2.",
+          "korean": "오리지널 아웃런2의 / 코스입니다.",
+          "original_bbox": [
+            830,
+            1394,
+            1305,
+            1609
+          ],
+          "localized_bbox": [
+            839,
+            1418,
+            1299,
+            1586
+          ],
+          "delta_left": 9,
+          "delta_right": 6,
+          "delta_top": 24,
+          "delta_bottom": 23,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            830,
+            439,
+            1305,
+            654
+          ],
+          "raw_localized_bbox": [
+            839,
+            462,
+            1299,
+            630
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "conditions",
+          "source": "Conditions:",
+          "korean": "조건:",
+          "original_bbox": [
+            1325,
+            1410,
+            1655,
+            1545
+          ],
+          "localized_bbox": [
+            1353,
+            1435,
+            1655,
+            1534
+          ],
+          "delta_left": 28,
+          "delta_right": 0,
+          "delta_top": 25,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1325,
+            503,
+            1655,
+            638
+          ],
+          "raw_localized_bbox": [
+            1353,
+            514,
+            1655,
+            613
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "random",
+          "source": "RANDOM",
+          "korean": "무작위",
+          "original_bbox": [
+            1710,
+            1435,
+            2008,
+            1515
+          ],
+          "localized_bbox": [
+            1721,
+            1436,
+            1997,
+            1514
+          ],
+          "delta_left": 11,
+          "delta_right": 11,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1710,
+            533,
+            2008,
+            613
+          ],
+          "raw_localized_bbox": [
+            1721,
+            534,
+            1997,
+            612
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "normal_balance",
+          "source": "Normal balance",
+          "korean": "일반 밸런스",
+          "original_bbox": [
+            875,
+            1632,
+            1265,
+            1704
+          ],
+          "localized_bbox": [
+            896,
+            1644,
+            1250,
+            1693
+          ],
+          "delta_left": 21,
+          "delta_right": 15,
+          "delta_top": 12,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            875,
+            344,
+            1265,
+            416
+          ],
+          "raw_localized_bbox": [
+            896,
+            355,
+            1250,
+            404
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "more_bgm_1",
+          "source": "More BGM",
+          "korean": "BGM 더 많이",
+          "original_bbox": [
+            890,
+            1720,
+            1265,
+            1792
+          ],
+          "localized_bbox": [
+            928,
+            1728,
+            1225,
+            1777
+          ],
+          "delta_left": 38,
+          "delta_right": 40,
+          "delta_top": 8,
+          "delta_bottom": 15,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            890,
+            256,
+            1265,
+            328
+          ],
+          "raw_localized_bbox": [
+            928,
+            271,
+            1225,
+            320
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "more_bgm_2",
+          "source": "More BGM",
+          "korean": "BGM 더 많이",
+          "original_bbox": [
+            1300,
+            1720,
+            1655,
+            1792
+          ],
+          "localized_bbox": [
+            1338,
+            1728,
+            1649,
+            1777
+          ],
+          "delta_left": 38,
+          "delta_right": 6,
+          "delta_top": 8,
+          "delta_bottom": 15,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1300,
+            256,
+            1655,
+            328
+          ],
+          "raw_localized_bbox": [
+            1338,
+            271,
+            1649,
+            320
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        }
+      ]
+    },
+    {
+      "asset": "FD90AA9",
+      "status": "FAIL",
+      "header_128_exact": true,
+      "file_size_exact": true,
+      "elements": 29,
+      "failed_elements": 0,
+      "b91_change_outside_old_or_new_text_bbox": null,
+      "preexisting_pass_element_collateral_changes": [
+        {
+          "key": "for_experts",
+          "localized_bbox": [
+            1794,
+            704,
+            2304,
+            896
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            28,
+            73,
+            525,
+            192
+          ]
+        },
+        {
+          "key": "selected_out2",
+          "localized_bbox": [
+            202,
+            1306,
+            2069,
+            1477
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            112,
+            0,
+            1979,
+            71
+          ]
+        },
+        {
+          "key": "versus_mode",
+          "localized_bbox": [
+            2311,
+            1306,
+            2995,
+            1475
+          ],
+          "actual_localized_pixel_change_bbox_local": [
+            269,
+            0,
+            845,
+            71
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "key": "outsp_course",
+          "source": "OutRun2SP Course",
+          "korean": "아웃런2 SP 코스",
+          "original_bbox": [
+            1126,
+            374,
+            1678,
+            449
+          ],
+          "localized_bbox": [
+            1175,
+            375,
+            1641,
+            448
+          ],
+          "delta_left": 49,
+          "delta_right": 37,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1126,
+            3647,
+            1678,
+            3722
+          ],
+          "raw_localized_bbox": [
+            1175,
+            3648,
+            1641,
+            3721
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "out2_course",
+          "source": "OutRun2 Course",
+          "korean": "아웃런2 코스",
+          "original_bbox": [
+            1776,
+            374,
+            2232,
+            449
+          ],
+          "localized_bbox": [
+            1821,
+            375,
+            2186,
+            448
+          ],
+          "delta_left": 45,
+          "delta_right": 46,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1776,
+            3647,
+            2232,
+            3722
+          ],
+          "raw_localized_bbox": [
+            1821,
+            3648,
+            2186,
+            3721
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "more_engine",
+          "source": "More Engine sound",
+          "korean": "엔진음 크게",
+          "original_bbox": [
+            2772,
+            376,
+            3187,
+            448
+          ],
+          "localized_bbox": [
+            2793,
+            377,
+            3160,
+            447
+          ],
+          "delta_left": 21,
+          "delta_right": 27,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2772,
+            3648,
+            3187,
+            3720
+          ],
+          "raw_localized_bbox": [
+            2793,
+            3649,
+            3160,
+            3719
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "you",
+          "source": "You",
+          "korean": "나",
+          "original_bbox": [
+            3169,
+            376,
+            3334,
+            445
+          ],
+          "localized_bbox": [
+            3234,
+            377,
+            3297,
+            443
+          ],
+          "delta_left": 65,
+          "delta_right": 37,
+          "delta_top": 1,
+          "delta_bottom": 2,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3169,
+            3651,
+            3334,
+            3720
+          ],
+          "raw_localized_bbox": [
+            3234,
+            3653,
+            3297,
+            3719
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "gas_pedal",
+          "source": "Gas Pedal :",
+          "korean": "가속 페달:",
+          "original_bbox": [
+            3490,
+            391,
+            3748,
+            440
+          ],
+          "localized_bbox": [
+            3531,
+            392,
+            3717,
+            439
+          ],
+          "delta_left": 41,
+          "delta_right": 31,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3490,
+            3656,
+            3748,
+            3705
+          ],
+          "raw_localized_bbox": [
+            3531,
+            3657,
+            3717,
+            3704
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "run15",
+          "source": "You will run 15 courses continuously.",
+          "korean": "15코스를 연속으로 달립니다.",
+          "original_bbox": [
+            0,
+            517,
+            934,
+            620
+          ],
+          "localized_bbox": [
+            62,
+            533,
+            864,
+            604
+          ],
+          "delta_left": 62,
+          "delta_right": 70,
+          "delta_top": 16,
+          "delta_bottom": 16,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            0,
+            3476,
+            934,
+            3579
+          ],
+          "raw_localized_bbox": [
+            62,
+            3492,
+            864,
+            3563
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "maximum_speed",
+          "source": "Maximum Speed",
+          "korean": "최고 속도",
+          "original_bbox": [
+            922,
+            499,
+            1408,
+            620
+          ],
+          "localized_bbox": [
+            995,
+            518,
+            1327,
+            600
+          ],
+          "delta_left": 73,
+          "delta_right": 81,
+          "delta_top": 19,
+          "delta_bottom": 20,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            922,
+            3476,
+            1408,
+            3597
+          ],
+          "raw_localized_bbox": [
+            995,
+            3496,
+            1327,
+            3578
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "enter_selection",
+          "source": "Enter Selection",
+          "korean": "선택 확정",
+          "original_bbox": [
+            3456,
+            517,
+            3893,
+            627
+          ],
+          "localized_bbox": [
+            3550,
+            532,
+            3828,
+            611
+          ],
+          "delta_left": 94,
+          "delta_right": 65,
+          "delta_top": 15,
+          "delta_bottom": 16,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3456,
+            3469,
+            3893,
+            3579
+          ],
+          "raw_localized_bbox": [
+            3550,
+            3485,
+            3828,
+            3564
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "same_conditions",
+          "source": "Do you want to set up under the same conditions as your former race?",
+          "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?",
+          "original_bbox": [
+            14,
+            614,
+            1894,
+            730
+          ],
+          "localized_bbox": [
+            193,
+            631,
+            1691,
+            712
+          ],
+          "delta_left": 179,
+          "delta_right": 203,
+          "delta_top": 17,
+          "delta_bottom": 18,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            14,
+            3366,
+            1894,
+            3482
+          ],
+          "raw_localized_bbox": [
+            193,
+            3384,
+            1691,
+            3465
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "transmission2",
+          "source": "Transmission",
+          "korean": "변속기",
+          "original_bbox": [
+            1221,
+            722,
+            1805,
+            843
+          ],
+          "localized_bbox": [
+            1369,
+            742,
+            1804,
+            842
+          ],
+          "delta_left": 148,
+          "delta_right": 1,
+          "delta_top": 20,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1221,
+            3253,
+            1805,
+            3374
+          ],
+          "raw_localized_bbox": [
+            1369,
+            3254,
+            1804,
+            3354
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "experts_long",
+          "source": "For Experts & Long distance to the goal",
+          "korean": "상급자용 · 골까지 장거리",
+          "original_bbox": [
+            1907,
+            602,
+            3406,
+            781
+          ],
+          "localized_bbox": [
+            1907,
+            624,
+            3314,
+            781
+          ],
+          "delta_left": 0,
+          "delta_right": 92,
+          "delta_top": 22,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1907,
+            3315,
+            3406,
+            3494
+          ],
+          "raw_localized_bbox": [
+            1907,
+            3315,
+            3314,
+            3472
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "view_choices",
+          "source": "View Choices",
+          "korean": "선택 보기",
+          "original_bbox": [
+            3525,
+            614,
+            3882,
+            730
+          ],
+          "localized_bbox": [
+            3563,
+            632,
+            3855,
+            712
+          ],
+          "delta_left": 38,
+          "delta_right": 27,
+          "delta_top": 18,
+          "delta_bottom": 18,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3525,
+            3366,
+            3882,
+            3482
+          ],
+          "raw_localized_bbox": [
+            3563,
+            3384,
+            3855,
+            3464
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "for_experts",
+          "source": "For Experts",
+          "korean": "상급자용",
+          "original_bbox": [
+            1766,
+            704,
+            2304,
+            896
+          ],
+          "localized_bbox": [
+            1794,
+            704,
+            2304,
+            896
+          ],
+          "delta_left": 28,
+          "delta_right": 0,
+          "delta_top": 0,
+          "delta_bottom": 0,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1766,
+            3200,
+            2304,
+            3392
+          ],
+          "raw_localized_bbox": [
+            1794,
+            3200,
+            2304,
+            3392
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "normal_difficult",
+          "source": "Normal difficult",
+          "korean": "보통 난이도",
+          "original_bbox": [
+            2547,
+            704,
+            3354,
+            896
+          ],
+          "localized_bbox": [
+            2613,
+            704,
+            3314,
+            871
+          ],
+          "delta_left": 66,
+          "delta_right": 40,
+          "delta_top": 0,
+          "delta_bottom": 25,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2547,
+            3200,
+            3354,
+            3392
+          ],
+          "raw_localized_bbox": [
+            2613,
+            3225,
+            3314,
+            3392
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "select_game_mode",
+          "source": "Select Game Mode",
+          "korean": "게임 모드 선택",
+          "original_bbox": [
+            166,
+            819,
+            1166,
+            973
+          ],
+          "localized_bbox": [
+            327,
+            820,
+            1057,
+            972
+          ],
+          "delta_left": 161,
+          "delta_right": 109,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            166,
+            3123,
+            1166,
+            3277
+          ],
+          "raw_localized_bbox": [
+            327,
+            3124,
+            1057,
+            3276
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "select_car",
+          "source": "Select your car",
+          "korean": "차량 선택",
+          "original_bbox": [
+            243,
+            947,
+            1156,
+            1111
+          ],
+          "localized_bbox": [
+            412,
+            948,
+            1029,
+            1110
+          ],
+          "delta_left": 169,
+          "delta_right": 127,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            243,
+            2985,
+            1156,
+            3149
+          ],
+          "raw_localized_bbox": [
+            412,
+            2986,
+            1029,
+            3148
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "select_course",
+          "source": "Select Course",
+          "korean": "코스 선택",
+          "original_bbox": [
+            302,
+            1062,
+            1085,
+            1213
+          ],
+          "localized_bbox": [
+            378,
+            1063,
+            1084,
+            1212
+          ],
+          "delta_left": 76,
+          "delta_right": 1,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            302,
+            2883,
+            1085,
+            3034
+          ],
+          "raw_localized_bbox": [
+            378,
+            2884,
+            1084,
+            3033
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "select_music",
+          "source": "Select your music",
+          "korean": "음악 선택",
+          "original_bbox": [
+            1549,
+            819,
+            2571,
+            990
+          ],
+          "localized_bbox": [
+            1647,
+            820,
+            2418,
+            989
+          ],
+          "delta_left": 98,
+          "delta_right": 153,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1549,
+            3106,
+            2571,
+            3277
+          ],
+          "raw_localized_bbox": [
+            1647,
+            3107,
+            2418,
+            3276
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "select_transmission",
+          "source": "Select Transmission",
+          "korean": "변속 방식 선택",
+          "original_bbox": [
+            1563,
+            947,
+            2589,
+            1092
+          ],
+          "localized_bbox": [
+            1788,
+            948,
+            2385,
+            1091
+          ],
+          "delta_left": 225,
+          "delta_right": 204,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1563,
+            3004,
+            2589,
+            3149
+          ],
+          "raw_localized_bbox": [
+            1788,
+            3005,
+            2385,
+            3148
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "shortcut_features",
+          "source": "Shortcut Features",
+          "korean": "바로가기 기능",
+          "original_bbox": [
+            1587,
+            1062,
+            2611,
+            1213
+          ],
+          "localized_bbox": [
+            1681,
+            1063,
+            2581,
+            1212
+          ],
+          "delta_left": 94,
+          "delta_right": 30,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1587,
+            2883,
+            2611,
+            3034
+          ],
+          "raw_localized_bbox": [
+            1681,
+            2884,
+            2581,
+            3033
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "selected_sp",
+          "source": "Outrun2: SP Course has been selected.",
+          "korean": "아웃런2 SP 코스가 선택되었습니다.",
+          "original_bbox": [
+            63,
+            1183,
+            2227,
+            1348
+          ],
+          "localized_bbox": [
+            346,
+            1184,
+            2051,
+            1347
+          ],
+          "delta_left": 283,
+          "delta_right": 176,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            63,
+            2748,
+            2227,
+            2913
+          ],
+          "raw_localized_bbox": [
+            346,
+            2749,
+            2051,
+            2912
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "selected_out2",
+          "source": "Outrun2 Course has been selected.",
+          "korean": "아웃런2 코스가 선택되었습니다.",
+          "original_bbox": [
+            90,
+            1306,
+            2125,
+            1484
+          ],
+          "localized_bbox": [
+            202,
+            1306,
+            2069,
+            1477
+          ],
+          "delta_left": 112,
+          "delta_right": 56,
+          "delta_top": 0,
+          "delta_bottom": 7,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            90,
+            2612,
+            2125,
+            2790
+          ],
+          "raw_localized_bbox": [
+            202,
+            2619,
+            2069,
+            2790
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "select_car_setting",
+          "source": "Select car setting",
+          "korean": "차량 설정 선택",
+          "original_bbox": [
+            2419,
+            1183,
+            3394,
+            1367
+          ],
+          "localized_bbox": [
+            2448,
+            1184,
+            3316,
+            1366
+          ],
+          "delta_left": 29,
+          "delta_right": 78,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2419,
+            2729,
+            3394,
+            2913
+          ],
+          "raw_localized_bbox": [
+            2448,
+            2730,
+            3316,
+            2912
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "versus_mode",
+          "source": "Versus Mode.",
+          "korean": "대전 모드",
+          "original_bbox": [
+            2226,
+            1306,
+            2995,
+            1486
+          ],
+          "localized_bbox": [
+            2311,
+            1306,
+            2995,
+            1475
+          ],
+          "delta_left": 85,
+          "delta_right": 0,
+          "delta_top": 0,
+          "delta_bottom": 11,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            2226,
+            2610,
+            2995,
+            2790
+          ],
+          "raw_localized_bbox": [
+            2311,
+            2621,
+            2995,
+            2790
+          ],
+          "raw_containment": "PASS",
+          "reworked": false,
+          "rework_required": false
+        },
+        {
+          "key": "gear_change",
+          "source": "Gear change",
+          "korean": "기어 변속",
+          "original_bbox": [
+            3587,
+            1304,
+            4034,
+            1501
+          ],
+          "localized_bbox": [
+            3588,
+            1349,
+            4033,
+            1489
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 45,
+          "delta_bottom": 12,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3587,
+            2595,
+            4034,
+            2792
+          ],
+          "raw_localized_bbox": [
+            3588,
+            2607,
+            4033,
+            2747
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "player_battle_desc",
+          "source": "A course designed for player battle.",
+          "korean": "플레이어 대전을 위해 / 설계된 코스입니다.",
+          "original_bbox": [
+            3093,
+            1446,
+            3994,
+            1668
+          ],
+          "localized_bbox": [
+            3094,
+            1448,
+            3993,
+            1667
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 2,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3093,
+            2428,
+            3994,
+            2650
+          ],
+          "raw_localized_bbox": [
+            3094,
+            2429,
+            3993,
+            2648
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "new_course_desc",
+          "source": "A brand new course designed for OutRun2: SP.",
+          "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+          "original_bbox": [
+            3008,
+            1587,
+            3828,
+            1827
+          ],
+          "localized_bbox": [
+            3009,
+            1599,
+            3827,
+            1826
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 12,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3008,
+            2269,
+            3828,
+            2509
+          ],
+          "raw_localized_bbox": [
+            3009,
+            2270,
+            3827,
+            2497
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "orig_course_desc",
+          "source": "The course from the original OutRun2.",
+          "korean": "오리지널 아웃런2의 / 코스입니다.",
+          "original_bbox": [
+            3008,
+            1754,
+            3662,
+            1995
+          ],
+          "localized_bbox": [
+            3009,
+            1790,
+            3661,
+            1979
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 36,
+          "delta_bottom": 16,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            3008,
+            2101,
+            3662,
+            2342
+          ],
+          "raw_localized_bbox": [
+            3009,
+            2117,
+            3661,
+            2306
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        },
+        {
+          "key": "random_music",
+          "source": "Music will be Randomly Selected.",
+          "korean": "음악이 무작위로 / 선택됩니다.",
+          "original_bbox": [
+            1741,
+            2360,
+            2720,
+            2573
+          ],
+          "localized_bbox": [
+            1912,
+            2361,
+            2576,
+            2572
+          ],
+          "delta_left": 171,
+          "delta_right": 144,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "containment": "PASS",
+          "raw_original_bbox": [
+            1741,
+            1523,
+            2720,
+            1736
+          ],
+          "raw_localized_bbox": [
+            1912,
+            1524,
+            2576,
+            1735
+          ],
+          "raw_containment": "PASS",
+          "reworked": true,
+          "rework_required": false
+        }
+      ]
+    }
+  ],
+  "superseded_by_c85": true,
+  "c85_superseding_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+  "c85_note": "C85 direct re-decode of actual staged DDS takes precedence over action-reported bboxes. Direct result: 4 bbox PASS / 5 bbox FAIL; additional collateral/visual gates leave only C4A2937B promotable."
+}

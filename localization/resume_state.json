@@ -1,5 +1,5 @@
 {
-  "schema_version": 53,
+  "schema_version": 54,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "C84 ZERO-PIXEL BBOX: 9F060EC1, D6DC1380, 48DEBE77 pass exact source-bbox containment but remain HOLD_PENDING_ISOLATED_DDS_ONLY_INGAME; final approved lock count is 0.",
-    "REWORK 13 assets against canonical HD source actual text bboxes: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, C4A2937B, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9. Any 1px overflow including outline/shadow/glow/alpha fringe must be corrected.",
-    "approved_dds historical 571E78F3/62BEBF33/E3FD08BE binaries were removed: low-res baseline is obsolete and current HD replacements fail exact bbox containment.",
-    "After each rework, rerun exact original_bbox/localized_bbox delta QA, then isolated DDS_ONLY in-game screenshot validation before promotion.",
-    "Never upscale prior stock-resolution Korean DDS; preserve raw orientation and protected non-text/brand/model/song/legal artwork."
+    "C85: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77 pass current exact pixel+visual static QA but remain pending isolated DDS_ONLY in-game; approved lock count 0.",
+    "REWORK 12 current candidates: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9.",
+    "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK.",
+    "B91 staged attempts were independently re-decoded by C; only C4A2937B was promoted to canonical candidate.",
+    "Never approve on cell-only or reported bbox evidence when current DDS re-decode or visual artifact checks disagree."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -99,23 +99,24 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-28T09:10:45+09:00",
+      "updated_at_kst": "2026-09-28T10:09:21+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
-      "assets_scanned": 16,
+      "report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+      "direct_queue_scope": 126,
+      "current_candidates_scanned": 16,
       "elements_scanned": 201,
-      "pixel_bbox_pass_assets": [
+      "pixel_visual_pass_assets": [
+        "C4A2937B",
         "9F060EC1",
         "D6DC1380",
         "48DEBE77"
       ],
-      "pixel_bbox_fail_assets": [
+      "rework_required_assets": [
         "FF2462BB",
         "568D3696",
         "FA7BBB13",
         "39229D64",
         "A064FDFC",
-        "C4A2937B",
         "2DA43E41",
         "411827E",
         "571E78F3",
@@ -124,15 +125,11 @@
         "C075FB49",
         "FD90AA9"
       ],
-      "failed_elements": 114,
-      "remaining_rework_required": 13,
+      "failed_elements": 93,
+      "pending_production_localize_text": 63,
+      "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
       "promotion_hold_reason": "isolated DDS_ONLY in-game validation required",
-      "historical_lowres_approvals_removed": [
-        "571E78F3",
-        "62BEBF33",
-        "E3FD08BE"
-      ],
       "user_approved_locked": 0
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
@@ -146,9 +143,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
-    "hd_rework_candidates_ready": 3,
-    "hd_rework_remaining": 13,
+    "latest_hd_rework_batch": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "hd_rework_candidates_ready": 4,
+    "hd_rework_remaining": 12,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -468,7 +465,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-0900-C84/C84_FULL_ZERO_PIXEL_BBOX_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -504,14 +501,13 @@
     },
     "next_hd_rework": {
       "asset": "FF2462BB",
-      "status": "ZERO_PIXEL_BBOX_REWORK_REQUIRED",
+      "status": "ZERO_PIXEL_OR_ARTIFACT_REWORK_REQUIRED",
       "assets": [
         "FF2462BB",
         "568D3696",
         "FA7BBB13",
         "39229D64",
         "A064FDFC",
-        "C4A2937B",
         "2DA43E41",
         "411827E",
         "571E78F3",
@@ -520,7 +516,7 @@
         "C075FB49",
         "FD90AA9"
       ],
-      "remaining": 13
+      "remaining": 12
     },
     "c80": {
       "timestamp_kst": "2026-09-27T18:29:48+09:00",
@@ -1221,6 +1217,37 @@
     ],
     "elements_total": 201,
     "elements_fail": 114,
+    "approved_dds_count": 0,
+    "runtime_validation": "PENDING_ISOLATED_DDS_ONLY_INGAME"
+  },
+  "c85_cross_lane_final_qa": {
+    "timestamp_kst": "2026-09-28T10:09:21+09:00",
+    "report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "base_head": "aa3abfa38cea3b2e05a34d210331b07248837c29",
+    "promoted_candidate": "C4A2937B",
+    "pixel_visual_pass_assets": [
+      "C4A2937B",
+      "9F060EC1",
+      "D6DC1380",
+      "48DEBE77"
+    ],
+    "rework_required_assets": [
+      "FF2462BB",
+      "568D3696",
+      "FA7BBB13",
+      "39229D64",
+      "A064FDFC",
+      "2DA43E41",
+      "411827E",
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE",
+      "C075FB49",
+      "FD90AA9"
+    ],
+    "elements_total": 201,
+    "elements_fail": 93,
+    "direct_queue_scope": 126,
     "approved_dds_count": 0,
     "runtime_validation": "PENDING_ISOLATED_DDS_ONLY_INGAME"
   }
