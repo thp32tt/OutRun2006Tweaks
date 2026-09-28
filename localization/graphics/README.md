@@ -58,3 +58,10 @@ Key requirements:
 - preserve per-sprite mirror/rotation exactly as stored in the original raw DDS;
 - apply the same raw transform to Korean replacements when the original text is mirrored/rotated;
 - never normalize an entire atlas simply to make it upright in an image viewer.
+
+## 2026-09-29 graphics generation reset
+
+All pre-reset Korean graphics candidates are historical evidence only and must not be used as artwork inputs. Active production restarts from the exact English HD source under the mandatory zero-artifact reconstruction contract in `ORIENTATION_POLICY.md`.
+
+Production must not cover English with boxes or render Korean over English. Remove the complete English glyph/effect footprint, faithfully reconstruct the original background, then typeset Korean. If clean reconstruction is not possible, redraw the affected source element faithfully or stop as `MANUAL_RECONSTRUCTION_REQUIRED`; never retain a visibly patched candidate.
+
