@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T16:07:15+09:00",
+  "updated_at_kst": "2026-09-28T16:06:49+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B94: A064FDFC exact source-diff bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game.",
+  "next_checkpoint": "B95: FA7BBB13 exact-bbox rework self-QA PASS; pending independent C visual/final QA and isolated DDS_ONLY in-game validation.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -345,13 +345,14 @@
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
     "latest_b_first_qa": {
-      "run": "B94",
-      "report": "localization/graphics/role_B/20260928-1336-B94/B94_A064FDFC_EXACT_BBOX_REWORK_REPORT.json",
-      "result": "1_RGBA_REWORK_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B95",
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
+      "report": "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json",
+      "result": "FA7BBB13_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "A064FDFC": {
-          "candidate_sha256": "4a4116205a8d87619b421a6423c8946e4911204e27b9aa755af00015a593bfe7",
-          "status": "B94_SELF_QA_PASS_PENDING_C_INGAME"
+        "FA7BBB13": {
+          "candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+          "status": "B95_SELF_QA_PASS_PENDING_C_INGAME"
         }
       }
     },
