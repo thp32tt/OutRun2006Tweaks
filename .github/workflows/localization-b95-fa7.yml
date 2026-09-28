@@ -1,69 +1,13 @@
-name: Localization B95 FA7 Exact BBox Rework
+name: Localization B95 FA7 Exact BBox Rework (retired)
 
 on:
-  push:
-    branches:
-      - korean-localization-clean
-    paths:
-      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00002.json'
+  workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: localization-b95-fa7
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  rework:
-    if: github.actor != 'github-actions[bot]'
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: korean-localization-clean
-          fetch-depth: 0
-
-      - name: Install image dependency
-        run: python -m pip install --disable-pip-version-check pillow
-
-      - name: Compile B95 executor
-        run: python -m py_compile tools/localization/b95_rework_fa7.py
-
-      - name: Run B95 production and first QA
-        run: python tools/localization/b95_rework_fa7.py
-
-      - name: Isolate binary and QA evidence
-        shell: bash
-        run: |
-          set -euo pipefail
-          git restore \
-            localization/graphics/asset_queue.csv \
-            localization/progress/progress.json \
-            localization/resume_state.json \
-            localization/progress/STATUS.md \
-            localization/WORKLOG.md
-          git status --short
-
-      - name: Commit and rebase B95 binary result
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          BASE="$(git rev-parse HEAD)"
-          git add \
-            localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds \
-            localization/graphics/role_B/20260928-1552-B95
-          git commit -m "localization: B95 FA7 exact-bbox rework [AUTO:LOCALIZATION-LOCALIZATION_B-00002]"
-          git fetch origin korean-localization-clean
-          if ! git diff --quiet "$BASE..origin/korean-localization-clean" -- \
-            localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds \
-            localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json \
-            localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json; then
-            echo "Relevant FA7 baseline changed concurrently; refusing to overwrite."
-            exit 42
-          fi
-          git rebase origin/korean-localization-clean
-          git push origin HEAD:korean-localization-clean
-          echo "RESULT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - run: echo "B95 is complete; one-shot automatic push trigger retired to prevent duplicate resampling."

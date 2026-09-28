@@ -1,5 +1,5 @@
 {
-  "schema_version": 60,
+  "schema_version": 61,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,13 +7,12 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "B95: FA7BBB13 exact-bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game.",
-    "Refresh current GitHub queue before next B target; do not repeat B95 FA7BBB13.",
+    "B95: FA7BBB13 first successful candidate restored and duplicate auto-run retired; pending independent C visual/final QA and isolated DDS_ONLY in-game.",
     "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
     "A AUTO 00001: 39229D64 self-QA PASS; pending independent C and DDS_ONLY in-game.",
     "A AUTO 00001: FF2462BB containment self-QA PASS; pending independent C visual/source-style review and DDS_ONLY in-game.",
     "C86: 62BEBF33 and E3FD08BE independently revalidated from current GitHub DDS; exact bbox containment PASS but top edge-touch high-risk. Keep unapproved until isolated DDS_ONLY in-game validation.",
-    "Remaining C85 production REWORK assets: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
+    "Remaining C85 production REWORK assets: FF2462BB, 568D3696, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
     "C85 static PASS pending in-game remains: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77.",
     "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK."
   ],
@@ -661,11 +660,15 @@
       "status": "A_SELF_QA_PASS_PENDING_C_INGAME"
     },
     "b95_fa7bbb13": {
-      "timestamp_kst": "2026-09-28T16:06:49+09:00",
+      "timestamp_kst": "2026-09-28T16:12:00+09:00",
       "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
       "report": "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json",
       "candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
-      "status": "B95_SELF_QA_PASS_PENDING_C_INGAME"
+      "payload_commit": "e5a3630055d4bbc8178e570ee367a744ab880edb",
+      "status": "B95_SELF_QA_PASS_PENDING_C_INGAME",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "duplicate_run_policy": "Later automatic re-application was reverted because it unnecessarily resampled/shrank already-passing Korean rasters."
     }
   },
   "runtime_packages": {

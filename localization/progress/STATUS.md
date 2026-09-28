@@ -647,3 +647,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Strict B self-QA: 17/17 bbox containment PASS; changes outside old/new rework rectangles 0; introduced alpha outside original bboxes 0; pre-existing PASS cells outside rework overlap unchanged.
 - DDS 4096×2048 RGBA32 / 1 mip / exact header / raw mirror_y preserved. Candidate SHA-256 d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da.
 - AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain mandatory.
+
+
+### B95 duplicate-run correction — 2026-09-28T16:12:00+09:00
+- The first successful B95 FA7BBB13 payload from e5a3630055d4bbc8178e570ee367a744ab880edb is canonical for B first-QA. A later automatic re-application was reverted because it resampled already-reworked glyphs again and reduced effective text resolution.
+- Canonical candidate SHA-256: d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da. 17/17 bbox containment PASS; introduced alpha outside original bboxes 0; pass regions unchanged outside intentional overlap.
+- 142 RGB-only differences outside the union of original bboxes are fully transparent (alpha 0); they are recorded separately from visible/alpha overflow. Independent C visual/source-style QA and DDS_ONLY in-game validation remain required.

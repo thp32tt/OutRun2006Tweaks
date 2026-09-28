@@ -1054,3 +1054,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 17/17 exact bbox containment PASS. Pixel changes outside the old/new rework rectangles = 0; introduced alpha outside the union of original permitted bboxes = 0; pre-existing PASS cells outside rework overlap unchanged.
 - Candidate SHA-256 d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; pending independent C + isolated DDS_ONLY in-game.
 - A queued duplicate B95 rerun was blocked by branch-move protection after production because the result commit already existed; no second candidate was committed.
+
+
+## 2026-09-28T16:12:00+09:00 - B95 FA7BBB13 exact-bbox completion [LOCALIZATION-LOCALIZATION_B-00002]
+
+- GitHub-only B lane index 54. No N100 local files/worktree, GPT Library, VR/FFB, or game build used.
+- Canonical B95 payload is the first successful result commit e5a3630055d4bbc8178e570ee367a744ab880edb, candidate SHA-256 d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da.
+- Automated first QA: 17/17 containment PASS; zero changed pixels outside old/new rework rectangles; zero introduced alpha outside original permitted bboxes; pre-existing PASS cells unchanged outside intentional overlap.
+- A later automatic re-application of the same one-shot rework caused unnecessary second resampling/shrink and was reverted to the first successful Git blob. The one-shot workflow was retired to prevent recurrence.
+- AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain pending.

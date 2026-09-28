@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T16:06:49+09:00",
+  "updated_at_kst": "2026-09-28T16:12:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B95: FA7BBB13 exact-bbox rework self-QA PASS; pending independent C visual/final QA and isolated DDS_ONLY in-game validation.",
+  "next_checkpoint": "B95: FA7BBB13 first successful candidate restored after duplicate-run guard; pending independent C visual/final QA and isolated DDS_ONLY in-game validation.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -270,7 +270,6 @@
       "assets": [
         "FF2462BB",
         "568D3696",
-        "FA7BBB13",
         "39229D64",
         "2DA43E41",
         "411827E",
@@ -278,7 +277,7 @@
         "C075FB49",
         "FD90AA9"
       ],
-      "remaining": 9,
+      "remaining": 8,
       "pixel_visual_pass_pending_ingame": [
         "C4A2937B",
         "9F060EC1",
@@ -288,7 +287,8 @@
       "pending_c_revalidation": [
         "62BEBF33",
         "E3FD08BE",
-        "A064FDFC"
+        "A064FDFC",
+        "FA7BBB13"
       ]
     },
     "latest_d_final_qa": {
