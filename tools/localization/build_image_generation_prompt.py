@@ -29,12 +29,12 @@ def main():
         req(s,k)
     els=[]
     for e in s["elements"]:
-        for k in ("source_text","korean","source_bbox","permitted_region","alignment","text_height_px","line_count","colors","effects"):
+        for k in ("source_text","korean","source_bbox","permitted_region","alignment","text_height_px","line_count","colors","effects","source_text_transform","baseline_vector","style_traits"):
             req(e,k)
         els.append({
           "source_text":e["source_text"],"approved_korean":e["korean"],"source_bbox":e["source_bbox"],
           "permitted_region":e["permitted_region"],"alignment":e["alignment"],"text_height_px":e["text_height_px"],
-          "line_count":e["line_count"],"colors":e["colors"],"effects":e["effects"]})
+          "line_count":e["line_count"],"colors":e["colors"],"effects":e["effects"],\n          "source_text_transform":e["source_text_transform"],"baseline_vector":e["baseline_vector"],\n          "style_traits":e["style_traits"]})
     prompt={
       "contract":"outrun-first-pass-edit-v1",
       "priority":[
@@ -43,7 +43,7 @@ def main():
        "Completely remove each specified source text plus its own outline/shadow/glow/antialias fringe.",
        "Reconstruct the exposed background as a seamless continuation of the exact surrounding source.",
        "Render only the approved Korean strings in the cleared regions.",
-       "Match measured source typography, alignment and effects as closely as Korean geometry permits.",
+       "Match measured source typography, alignment, slant, width, weight, corner character and effects as closely as Korean geometry permits.",\n       "Use exactly the proven raw-coordinate source text transform and baseline direction; never assume the game will correct an upright render.",
        "If faithful reconstruction or fitting is uncertain, emit no production candidate and flag manual reconstruction."
       ],
       "asset":{"id":s["asset_id"],"source_path":s["source_path"],"source_sha256":s["source_sha256"],
@@ -54,12 +54,12 @@ def main():
         "Reconstruct only masked source-text pixels from exact neighboring/source structure; no covering panel."),
       "fit_order":["source-faithful spacing","source-faithful line break","modest font-size reduction","approved shorter translation only"],
       "forbidden":NEG,
-      "pre_output_check":[
+      "orientation_preflight":"Prove raw source transform and baseline vector before production rendering; unresolved orientation blocks generation.",\n      "style_fit_order":["source-like Korean-capable font","measured affine slant/width adjustment","source-faithful effects","custom/redrawn Korean lettering"],\n      "pre_output_check":[
        "no source-language text/effect residue",
        "no cover box, patch, seam or invented panel",
        "protected artwork unchanged",
        "Korean fully inside permitted region and unclipped",
-       "canvas, raw orientation and transparency unchanged"
+       "canvas, raw orientation and transparency unchanged",\n       "Korean baseline/direction exactly follows source_text_transform",\n       "slant/width/weight/corners/outline/shadow materially match source style"
       ],
       "failure_behavior":"Do not produce a production candidate; flag MANUAL_RECONSTRUCTION_REQUIRED."
     }
