@@ -136,6 +136,16 @@ if(Test-Path $captureRoot){
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
 
+$visualChecklistPath=Join-Path $root 'ONE_RUN_VISUAL_CHECKLIST.txt'
+if(Test-Path $visualChecklistPath){
+    try{
+        Copy-Item $visualChecklistPath $dest -Force
+        $copied+='ONE_RUN_VISUAL_CHECKLIST.txt'
+    }catch{
+        Write-Warning "Could not collect ONE_RUN_VISUAL_CHECKLIST.txt: $($_.Exception.Message)"
+    }
+}
+
 $oneClickPreflightPath=Join-Path $root 'VR_ONE_CLICK_PREFLIGHT.json'
 if(Test-Path $oneClickPreflightPath){
     try{
@@ -361,6 +371,7 @@ $analysisRequest=[ordered]@{
     ExeIdentityFile='EXE_IDENTITY.txt'
     PrimaryManifest='variant_manifest.json'
     OneClickPreflightFile='VR_ONE_CLICK_PREFLIGHT.json'
+    VisualGateChecklist='ONE_RUN_VISUAL_CHECKLIST.txt'
     BackendSummaryFile=$(if($rendererTarget -eq 'dx11-native'){'DX11_CENSUS_SUMMARY.json'}elseif($rendererTarget -eq 'dxvk'){'DXVK_SESSION_SUMMARY.json'}else{''})
     AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
 }
