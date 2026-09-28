@@ -62,11 +62,11 @@ Each set contains ten distinct review passes and derives the next set's directio
 - Normal game failures are sealed before exit-code propagation.
 - Launch exceptions, stuck host teardown and pre-session selector failures can bypass automatic ZIP collection.
 - One-click CI is mostly structural/textual; behavior tests are still needed.
-- The stale baseline and one-click verifier literals were reconciled on 2026-09-28 (`243f5600dc2064cb795a283286e27ae399510b32`, `1090264633ee7dd30eba883721114ed7a5039620`). Backend Conversion Gate run `36388906952` passes the queue, HMD-proven baseline, one-click and backend-disassembly contracts plus Win32 configure, then fails during Win32 compilation in the R70 stereo pipeline with unresolved helper identifiers. Compilation is now the automated blocker.
+- The stale baseline/one-click verifier literals were reconciled (`243f5600dc2064cb795a283286e27ae399510b32`, `1090264633ee7dd30eba883721114ed7a5039620`). The exposed compile failure was traced to accidental truncation of `outrun_renderer.cpp` and `stereo_renderer_r7.inc` by earlier disassembly-contract centralization commits; full bodies were restored without reverting the intended shared-contract substitutions (`8cbf77086ce143c496e66f94d815c760df9c6c30`, `e46be02786f80aa9e554a24323714194b586d1f6`). Backend Conversion Gate run `36389674398` then passed through Win32 build, binary verification and artifact upload. Runtime/HMD validation remains UNTESTED.
 
 ## Evidence-driven implementation order
 
-1. **DONE 2026-09-28:** Reconcile stale gate verifiers so CI reaches configure/compile. Run `36388906952` reaches `Build Win32`; the next independent blocker is the R70 stereo-pipeline compile failure and must be handled as a separate bounded task.
+1. **DONE 2026-09-28:** Reconcile stale gate verifiers and restore the accidentally truncated renderer bodies. Backend Conversion Gate run `36389674398` passes through Win32 build/binary verification/artifact upload on `e46be02786f80aa9e554a24323714194b586d1f6`; no runtime claim is made.
 2. Unify semantic catalogs and runtime producer classification.
 3. Seal selector payload identity and transactional failure behavior.
 4. Tighten DX11 census/activation gates and transport parity.
