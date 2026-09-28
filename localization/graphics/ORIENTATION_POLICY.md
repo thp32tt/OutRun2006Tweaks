@@ -65,7 +65,10 @@ An asset cannot move to final candidate status until all are checked:
 - Korean text rendered with matching raw transform,
 - non-text original artwork preserved where possible,
 - dimensions/alpha/DDS format/mip behavior preserved,
-- in-game screenshot validation completed.
+- side-by-side static visual comparison against the exact English HD source completed.
+- no untranslated English residue remains in any region classified for translation.
+- Korean glyphs, outlines, shadows and effects do not clip, escape the original text region, or intrude into icons/artwork.
+- in-game screenshot validation is deferred to the user's final integrated test and is NOT a production/static-QA completion gate.
 
 ## Resume rule
 
@@ -148,8 +151,21 @@ Effective 2026-09-28:
 - The allowed overflow is **0 pixels**. If any Korean glyph/text pixel extends even **1 pixel** outside the original source text region or sprite cell, classify the asset as **REWORK_REQUIRED**.
 - A candidate bbox must be a subset of the original source bbox/cell on all four sides. Width/height growth is allowed only when the result still remains fully contained in the original source region.
 - `changed_pixels_outside_source_region` must be `0` and `introduced_alpha_outside_source_region` must be `0`.
-- A zero-margin edge touch is not an automatic failure, but must be recorded as a high-risk condition and checked at high zoom and in game. Any clipping or escape fails the gate.
+- A zero-margin edge touch is not an automatic failure, but must be recorded as a high-risk condition and checked at high zoom in the English-source vs Korean-candidate comparison. Any clipping or escape fails the static gate.
 - For DXT5/BC3 assets, 4x4 block confinement alone is not sufficient for final approval when exact decoded-pixel evidence is unavailable. Keep such evidence on hold/recheck; never infer PASS from compression-block containment alone.
 - Missing or ambiguous source-region evidence is **HOLD_STRICT_RECHECK**, not PASS.
-- Static containment PASS does not override the mandatory isolated `DDS_ONLY` in-game validation gate.
+- Production/static QA does not require isolated `DDS_ONLY` in-game validation. Runtime validation is deferred to the user's final integrated test; until user evidence exists, record `RUNTIME_VALIDATION=UNTESTED` and never claim runtime success.
 - Canonical audit record: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
+
+
+## Mandatory English-source side-by-side visual QA
+
+Effective 2026-09-29:
+
+- Every newly created or materially reworked Korean DDS MUST have a comparison proof using the exact English HD source DDS as the left/reference image and the current Korean candidate as the right image.
+- Use identical crop coordinates, orientation, zoom and scale for both sides. Label them clearly `ENGLISH SOURCE` and `KOREAN CANDIDATE`.
+- Do not use an older Korean candidate as the left-side baseline. Before/after-Korean-only comparisons may be supplementary evidence but never replace the English-source comparison.
+- Inspect the full atlas and every translated sprite at readable zoom. Any untranslated English residue in a region classified for translation is `REWORK_REQUIRED`.
+- Any clipped Korean glyph/effect, pixel outside the permitted source text region, overlap with an icon/artwork/neighbor sprite, or accidental modification of preserved artwork is `REWORK_REQUIRED`.
+- Comparison proof PNGs must be retained with lane QA evidence so the user can visually review the same source-vs-candidate pair.
+- In-game testing is intentionally deferred during production. The user will perform the final integrated game test and return screenshots/files for defects. Such later runtime defects become rework inputs; until then use `RUNTIME_VALIDATION=UNTESTED`.
