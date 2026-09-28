@@ -136,6 +136,16 @@ if(Test-Path $captureRoot){
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
 
+$oneClickPreflightPath=Join-Path $root 'VR_ONE_CLICK_PREFLIGHT.json'
+if(Test-Path $oneClickPreflightPath){
+    try{
+        Copy-Item $oneClickPreflightPath $dest -Force
+        $copied+='VR_ONE_CLICK_PREFLIGHT.json'
+    }catch{
+        Write-Warning "Could not collect VR_ONE_CLICK_PREFLIGHT.json: $($_.Exception.Message)"
+    }
+}
+
 $oneClickTargetPath=Join-Path $root 'VR_ONE_CLICK_TARGET.json'
 $oneClickTarget=$null
 $developmentBranch='unknown'
