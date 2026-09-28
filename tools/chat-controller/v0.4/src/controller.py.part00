@@ -343,6 +343,7 @@ def load_queue_state() -> dict:
             "completed": [],
             "blocked": [],
             "last_github_poll_at": None,
+            "conversion_blocked_reconcile_version": 0,
         }
         save_queue_state(state)
         return state
@@ -357,10 +358,11 @@ def load_queue_state() -> dict:
         raw.setdefault("completed", [])
         raw.setdefault("blocked", [])
         raw.setdefault("last_github_poll_at", None)
+        raw.setdefault("conversion_blocked_reconcile_version", 0)
         return raw
     except Exception:
         log.exception("queue state read failed; recreating")
-        state = {"counter": 0, "active": None, "active_by_lane": {}, "wave_counter": 0, "wave_id": None, "wave_started_at": None, "completed": [], "blocked": [], "last_github_poll_at": None}
+        state = {"counter": 0, "active": None, "active_by_lane": {}, "wave_counter": 0, "wave_id": None, "wave_started_at": None, "completed": [], "blocked": [], "last_github_poll_at": None, "conversion_blocked_reconcile_version": 0}
         save_queue_state(state)
         return state
 
