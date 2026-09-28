@@ -360,6 +360,8 @@ $analysisRequest=[ordered]@{
     ConfigSha256=$configHash
     ExeIdentityFile='EXE_IDENTITY.txt'
     PrimaryManifest='variant_manifest.json'
+    OneClickPreflightFile='VR_ONE_CLICK_PREFLIGHT.json'
+    BackendSummaryFile=$(if($rendererTarget -eq 'dx11-native'){'DX11_CENSUS_SUMMARY.json'}elseif($rendererTarget -eq 'dxvk'){'DXVK_SESSION_SUMMARY.json'}else{''})
     AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
 }
 $analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_REQUEST.json') -Encoding UTF8
