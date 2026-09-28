@@ -52,3 +52,7 @@ These candidates are TEST-ONLY. They are not approved for `vr-d3d9ex-focus` inte
 6. Use P5_BASE only for a before/after confirmation.
 
 For every run keep the same route, HMD refresh, Virtual Desktop quality/codec and in-game settings. Exit the game normally and upload only the generated `OutRun2_VR_ANALYZE_*.zip`.
+
+
+## Build trigger
+- The dedicated six-way test workflow is intentionally retriggered after its workflow file exists on the branch, so the push event can build P5_BASE, EXP_STATEBLOCK, EXP_ZEROCOPY, EXP_FENCE2, EXP_XYZCACHE and EXP_ALL in parallel.
