@@ -22,14 +22,16 @@
 
 namespace OutRunVrD3D9ExDirectPassthrough
 {
-    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-R23-20260916";
+    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-EXP-FENCE2-20260928";
     inline constexpr const char* LegacyBuildId = "D3D9Ex-direct-passthrough-20260915";
     inline constexpr ULONGLONG FallbackSourceMaxAgeMs = 250;
 
-    // 90 Hz gives roughly 11.1 ms for a complete frame. A 25 ms synchronous
-    // GPU fence wait could consume more than two frames before fallback. Keep
-    // this bounded so a delayed direct copy fails closed to the classic path.
-    inline constexpr ULONGLONG CopyFenceTimeoutMs = 8;
+    // Experimental hitch-control build. The legacy SafeEye recovery path is
+    // not the normal R32 fast path; when it is entered, cap the synchronous
+    // copy fence to 2 ms instead of allowing an 8 ms CPU-side stall. A copy
+    // that misses this budget fails closed to the existing fallback/cached
+    // projection chain.
+    inline constexpr ULONGLONG CopyFenceTimeoutMs = 2;
 
     inline std::uint64_t DirectPassFrames = 0;
     inline std::uint64_t FallbackFrames = 0;
@@ -455,7 +457,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
                     std::cerr
                         << "[D3D9Ex R23] direct copy fence exceeded "
                         << CopyFenceTimeoutMs
-                        << "ms VR budget; dropping direct candidate to fallback\n";
+                        << "ms EXP-FENCE2 budget; dropping direct candidate to fallback/cached projection\n";
                 }
                 return false;
             }
