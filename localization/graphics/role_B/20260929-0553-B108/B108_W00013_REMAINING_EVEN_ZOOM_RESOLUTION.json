@@ -1,0 +1,130 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00042",
+  "attempt": "1/3",
+  "wave_id": "W00013",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T05:53:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "b849f3c53bdac02742b06b60cb24d979a5635726",
+  "final_precommit_head_sha": "b849f3c53bdac02742b06b60cb24d979a5635726",
+  "peer_lane_commit_observed_before_commit": false,
+  "peer_lane_expected_task": "LOCALIZATION-LOCALIZATION_A-00041",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_RESOLVED_LAST_2_EVEN_ZOOM_REVIEW_ROWS",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_2_RESOLVE_ZOOM_REVIEW"
+  ],
+  "source_policy": {
+    "ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "immutable_reference_repo": "Sonic-TV/OR2006Sprites",
+    "immutable_reference_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "queue": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "queue_blob_sha": "c88bb65e2fbfc99a5741c9135bf5c0052896ff0a",
+    "selected_even_indices": [38, 238],
+    "shared_queue_modified": false
+  },
+  "assets": [
+    {
+      "queue_index": 38,
+      "asset": "6AB5CEE",
+      "queue_path": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+      "classification": "LOCALIZABLE_TEXT_CONFIRMED",
+      "reference_alias": {
+        "stock_source_basename": "06AB5CEE_1024x1024",
+        "hd_release_basename": "6AB5CEE_1024x1024",
+        "basis": "Immutable reference tree maps the no-leading-zero HD release name to the leading-zero stock source/atlas already used by W00011 index 36."
+      },
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.png",
+        "git_blob_sha": "ffe7d0366a8c71986e3e96c3b1214373295705d7",
+        "visual_finding": "Three visible Total Rank labels; grade letters, heart icon, flare, Jennifer art and speech/starburst backgrounds are non-localizable artwork."
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_JENN_RANK_Exst/4x_06AB5CEE_1024x1024_atlas.json",
+        "git_blob_sha": "b777ed9ee87333ec4617a2b283136cdc5189517d",
+        "text_sprites": ["sprite_7", "sprite_8", "sprite_9"]
+      },
+      "hd_release": {
+        "path": "Release/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+        "git_blob_sha": "2302d1218646d51f3d23ce7b93ce9c941ceaaf93",
+        "bytes": 67108992,
+        "expected_dimensions": [4096, 4096],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "elements": [
+        {"source": "Total Rank", "korean": "종합 랭크", "sprite": "sprite_7"},
+        {"source": "Total Rank", "korean": "종합 랭크", "sprite": "sprite_8"},
+        {"source": "Total Rank", "korean": "종합 랭크", "sprite": "sprite_9"}
+      ],
+      "production_state": "PENDING_EXACT_HD_DECODED_TEXT_EFFECT_BBOX_AND_SOURCE_FAITHFUL_RENDER",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 238,
+      "asset": "132A1B1F",
+      "queue_path": "textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds",
+      "classification": "PRESERVE_ORIGINAL",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.png",
+        "git_blob_sha": "0fb60cad692f022fa4ea6f9734d3d7716735661f",
+        "visual_finding": "OutRun 2006 Coast 2 Coast logo/branding on a loading background; no independent localizable UI prose."
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_loading_Exst/4x_132A1B1F_512x512_atlas.json",
+        "git_blob_sha": "2b424f07960d73ad6895dc6e526283bf68640399",
+        "regions": [{"name": "sprite_0", "rect": [0, 128, 2048, 1920]}]
+      },
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds",
+        "git_blob_sha": "5a4f2443a6207d2465b60c17272eaf07c7d9a394",
+        "bytes": 16777344,
+        "expected_dimensions": [2048, 2048],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "preserve_reason": "Brand/logo artwork is excluded from localization by the current contract. No separate UI word text is present.",
+      "candidate_dds_modified": false
+    }
+  ],
+  "material_advance": {
+    "remaining_even_unresolved_zoom_review_rows_before": [38, 238],
+    "resolved_this_run": [38, 238],
+    "localizable_confirmed": [38],
+    "preserve_original_confirmed": [238],
+    "remaining_even_unresolved_zoom_review_rows_after_c_merge_expected": [],
+    "candidate_dds_modified": false
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_38_238",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_HEAD_B849F3C5_QUEUE_C88BB65E",
+    "source_visual_identity": "PASS_PINNED_GITHUB_BLOB_IDS_2_OF_2",
+    "localizable_semantics": "PASS_INDEX38_TOTAL_RANK_X3",
+    "preserve_policy": "PASS_INDEX238_BRAND_LOGO_ONLY",
+    "one_pixel_containment": "NOT_APPLICABLE_NO_CANDIDATE_DDS_WRITTEN",
+    "dds_alpha_orientation": "NOT_APPLICABLE_NO_CANDIDATE_DDS_WRITTEN",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_NO_ODD_FILES_TOUCHED",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00013 lane B resolved the final two even-shard unresolved zoom-review rows from immutable GitHub visual evidence. Index 38 contains three localizable Total Rank labels and is ready for exact-HD text-mask reconstruction; index 238 is logo-only and must preserve original artwork. No unsafe DDS bytes were guessed. Runtime remains UNTESTED."
+}
