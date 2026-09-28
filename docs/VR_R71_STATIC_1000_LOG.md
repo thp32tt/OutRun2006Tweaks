@@ -238,3 +238,36 @@ Next cycle priority:
 3. wire immediate-skip retry only after that LEVEL0 contract passes;
 4. then cover STOPPING / LOCAL reference-space / presentation transitions;
 5. keep waits/copies/HUD/visual behavior unchanged without runtime evidence.
+
+
+## Cycle 0010 — durable skipped ACK runtime wiring
+
+Review lenses:
+1. architecture/control flow — latest-frame skip ownership;
+2. lifetime/reset/sync — stage-before-ACK durability;
+3. stereo/HUD/visual correctness — rendering classification unchanged;
+4. hot path/frame pacing/copies/waits — metadata ACK retry only, no new GPU wait/copy;
+5. adversarial/falsification — deferred EVENT exclusion and same-live-slot conflict.
+
+Changes/evidence:
+- Reused `VR-R41-SKIPPED-DIRECT-ACK-LOSS-001`.
+- `960b63acd0a3c51be622cb15e950ef758d646b39`: the existing latest-frame-wins older DirectGPU skip path now calls `R41ReleaseNeverSampled` only after `R23DeferredSlotBlocked` has excluded sampled/deferred ownership.
+- The retry queue stages the full producer identity before `PublishCompletedFrame`. A transient publication failure therefore remains owned even after a newer selected frame advances the processing watermark.
+- Pending skipped releases are retried on later gameplay ticks. Producer identity changes drop stale retry ownership without writing into the new mapping.
+- A same-live-producer/same-slot different-frame conflict faults the transport generation and fails closed.
+- `26b56df6d8f35f45eacb927e85d97fae37424c7f`: LEVEL0 smoke now proves failed ACK ownership survives a simulated watermark advance and models deferred EVENT exclusion.
+- `fa735613decd14685c4ac4b2bd14a76c47d675b5`: structural verifier requires deferred-owner exclusion to precede skipped-release staging.
+- Issue #14 updated with production-change evidence, comment `5880071326`.
+- STOPPING / LOCAL reference-space / presentation transition enumeration was not wired. A bounded history adapter is still required before those watermarks can safely transfer never-sampled ownership.
+
+Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+
+AUTOMATION_VALIDATION: `EXACT_HEAD_PR80_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+1. consume exact-head PR #80 Build/OpenXR/HUD Inspector;
+2. repair deterministic failures only;
+3. design/test bounded transition-history release enumeration;
+4. prove sampled/deferred identities cannot enter that transition queue;
+5. keep waits/copies/HUD/visual behavior unchanged without HMD evidence.
