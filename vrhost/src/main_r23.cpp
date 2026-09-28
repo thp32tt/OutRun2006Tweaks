@@ -412,6 +412,18 @@ namespace
         }
     }
 
+    void R23ReleaseDeferredReferenceAcks() noexcept
+    {
+        for (auto& pending : R23DeferredReferenceAcks)
+        {
+            ReleaseCom(pending.fence);
+            pending.armed = false;
+            pending.poisoned = false;
+            pending.frame = {};
+        }
+    }
+
+
     bool R23ArmDeferredReferenceAck(
         StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame) noexcept
@@ -3199,6 +3211,7 @@ int main(int argc, char** argv)
         }
 
         OutRunVrR23VerifiedBundle::Invalidate();
+        R23ReleaseDeferredReferenceAcks();
         compositor.Shutdown();
         if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);
         if (localSpace != XR_NULL_HANDLE) xrDestroySpace(localSpace);
@@ -3210,6 +3223,7 @@ int main(int argc, char** argv)
     {
         std::cerr << "OutRun VR host error: " << e.what() << "\n";
         OutRunVrR23VerifiedBundle::Invalidate();
+        R23ReleaseDeferredReferenceAcks();
         if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);
         if (localSpace != XR_NULL_HANDLE) xrDestroySpace(localSpace);
         if (session != XR_NULL_HANDLE) xrDestroySession(session);
