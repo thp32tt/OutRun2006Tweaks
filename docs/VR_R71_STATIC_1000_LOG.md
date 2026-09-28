@@ -201,3 +201,40 @@ Next:
 - Cycle 0009 first consumes PR #80 hosted results.
 - Only if the LEVEL0/host build is green, wire the retry queue into the never-sampled immediate-skip and transition watermark paths.
 - Do not change the sampled/deferred GPU EVENT ownership path.
+
+
+## Cycle 0009 — hosted gate consumed / transition ownership falsification
+
+Review lenses:
+1. architecture/control flow — transition watermark ownership;
+2. lifetime/reset/sync — sampled EVENT vs never-sampled retry separation;
+3. stereo/HUD/visual correctness — preserve R71 projection/HUD behavior unchanged;
+4. hot path/frame pacing/copies/waits — no behavior change without runtime telemetry;
+5. adversarial/falsification — prove transition enumeration safe before runtime wiring.
+
+Finding/evidence:
+- Reused stable key `VR-R41-SKIPPED-DIRECT-ACK-LOSS-001`; no duplicate finding key was created.
+- PR #80 remains an exact-R71-parent validation-only surface. GitHub-hosted Build `36463037708` completed SUCCESS.
+- OpenXR architecture `36463038710` completed SUCCESS, including `host-x64` job `109066117776`. This consumes the cycle-8 LEVEL0/host-build gate for `r41_skipped_release_smoke`.
+- HUD Inspector `36463038533` completed SUCCESS.
+- The pure skipped-release queue is therefore statically/build validated, but `main_r23.cpp` transition sites still advance `lastProcessedStereoFrame` from a latest snapshot. They do not first enumerate every older current-generation DirectGPU identity and prove it was never sampled.
+- The normal latest-frame skip already excludes `R23DeferredSlotBlocked` identities, but a failed immediate `PublishCompletedFrame` still has no runtime retry owner.
+- Adversarial result: directly wiring the queue at STOPPING, LOCAL reference-space change, or presentation change would be premature because an insufficiently bounded enumerator could overlap the sampled/deferred D3D11 EVENT owner. No speculative ACK/synchronization change was made.
+
+Changed files:
+- `docs/automation/R71_STATIC_1000_STATE.json`
+- `docs/VR_R71_STATIC_1000_LOG.md`
+
+Production/runtime source changes: none.
+Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+State commit: `36043600bc72ca9067495816d276133d39cdcfbe`.
+
+AUTOMATION_VALIDATION: `PASS — Build 36463037708; OpenXR architecture 36463038710 / host-x64 109066117776; HUD Inspector 36463038533`
+RUNTIME_VALIDATION: `UNTESTED`
+
+Next cycle priority:
+1. add a bounded/testable release-before-watermark enumerator or adapter using full producer identity;
+2. prove sampled/deferred EVENT identities cannot enter the skipped-release queue;
+3. wire immediate-skip retry only after that LEVEL0 contract passes;
+4. then cover STOPPING / LOCAL reference-space / presentation transitions;
+5. keep waits/copies/HUD/visual behavior unchanged without runtime evidence.
