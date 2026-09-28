@@ -94,10 +94,18 @@ now=datetime.now(ZoneInfo("Asia/Seoul")).replace(microsecond=0).isoformat()
 report={"schema_version":1,"role":"A","run":"A_AUTO_00001","task_id":TASK_ID,"timestamp_kst":now,"base_head":os.environ.get("GITHUB_SHA"),"asset":str(CANDIDATE.relative_to(ROOT)),"index":INDEX,"previous_candidate_sha256":oldsha,"candidate_sha256":newsha,"structure":{"dimensions":[w,h],"format":"RGBA32","mipmaps":m,"header_128_exact":True,"raw_orientation":"mirror_y"},"reworked_elements":recs,"qa":{"elements":len(qa),"failed_elements":0,"rows":qa,"changed_pixels_outside_reworked_cells":collateral,"changed_pixels_outside_all_declared_cells":outside,"introduced_alpha_outside_all_declared_cells":introduced},"automation_validation":"PASS","runtime_validation":"UNTESTED","final_approval":False,"build_performed":False,"vr_ffb_changes":False,"gpt_library_used":False}
 REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n","utf-8")
 q=ROOT/"localization/graphics/asset_queue.csv"
-with q.open("r",encoding="utf-8",newline="") as f: qr=list(csv.DictReader(f)); fields=list(qr[0])
-for row in qr:
-    if int(row["index"])==INDEX: row["artwork_status"]="a_auto_self_qa_pass_pending_c"; row["notes"]=(row.get("notes","").rstrip("; ")+"; A AUTO exact source-bbox PASS 15/15; C + DDS_ONLY in-game pending").strip("; ")
-with q.open("w",encoding="utf-8",newline="") as f: wr=csv.DictWriter(f,fieldnames=fields,lineterminator="\n"); wr.writeheader(); wr.writerows(qr)
+# Preserve the queue byte-for-byte except the owned index-57 line. Historical notes
+# contain unquoted commas, so DictReader/DictWriter would reinterpret/corrupt rows.
+qlines=q.read_text("utf-8").splitlines()
+prefix=f"{INDEX},"
+hits=[i for i,line in enumerate(qlines) if line.startswith(prefix)]
+if len(hits)!=1: raise SystemExit(f"expected one queue row for index {INDEX}, got {len(hits)}")
+i=hits[0]; parts=qlines[i].split(",",5)
+if len(parts)!=6: raise SystemExit("unexpected queue row shape")
+parts[3]="a_auto_self_qa_pass_pending_c"
+parts[5]=(parts[5].rstrip("; ")+"; A AUTO exact source-bbox PASS 15/15; C + DDS_ONLY in-game pending").strip("; ")
+qlines[i]=",".join(parts)
+q.write_text("\n".join(qlines)+"\n","utf-8")
 pp=ROOT/"localization/progress/progress.json"; p=json.loads(pp.read_text("utf-8")); p["updated_at_kst"]=now; p.setdefault("graphics",{})["latest_a_production"]={"run":"A_AUTO_00001","task_id":TASK_ID,"report":str(REPORT.relative_to(ROOT)),"assets":{ASSET:{"candidate_sha256":newsha,"status":"A_SELF_QA_PASS_PENDING_C_INGAME"}}}; pp.write_text(json.dumps(p,ensure_ascii=False,indent=2)+"\n","utf-8")
 rp=ROOT/"localization/resume_state.json"; rs=json.loads(rp.read_text("utf-8")); rs["schema_version"]=int(rs.get("schema_version",55))+1; rs.setdefault("next_actions",[]).insert(0,"A AUTO 00001: 39229D64 self-QA PASS; pending independent C and DDS_ONLY in-game."); rs.setdefault("graphics_checkpoint",{})["a_auto_00001_39229d64"]={"timestamp_kst":now,"report":str(REPORT.relative_to(ROOT)),"candidate_sha256":newsha,"status":"A_SELF_QA_PASS_PENDING_C_INGAME"}; rp.write_text(json.dumps(rs,ensure_ascii=False,indent=2)+"\n","utf-8")
 sp=ROOT/"localization/progress/STATUS.md"; sp.write_text(sp.read_text("utf-8")+f"\n\n### A AUTO 00001 {now}\n- 39229D64 index 57 exact-bbox rework automated QA PASS 15/15; outside/collateral 0.\n- Candidate {newsha}; AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; C + DDS_ONLY in-game pending.\n","utf-8")
