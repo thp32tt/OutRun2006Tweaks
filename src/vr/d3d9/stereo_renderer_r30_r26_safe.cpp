@@ -949,6 +949,7 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowPerfTotalUs = 0;
         std::uint64_t R30SkyGlowPerfMaxUs = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
+        std::uint64_t R30SkyGlowAppliedEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
         OutRunVR::FrameState::FrameContext R69FrameContext{};
@@ -978,6 +979,7 @@ namespace OutRunVRStereo
                 frame.stageHoldRemaining = R68StageHoldPresents;
                 ++frame.stageTransitionHolds;
                 R30SkyGlowSceneCaptureEpoch = 0;
+                R30SkyGlowAppliedEpoch = 0;
                 spdlog::info(
                     "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
                     previous, stage, R68StageHoldPresents,
@@ -1584,6 +1586,51 @@ namespace OutRunVRStereo
             return false;
         }
 
+        bool R30ApplyStereoSkyGlowOnce(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (R30SkyGlowAppliedEpoch == PresentEpoch)
+                return true;
+
+            static const LARGE_INTEGER perfFrequency = []() noexcept {
+                LARGE_INTEGER value{};
+                QueryPerformanceFrequency(&value);
+                return value;
+            }();
+            LARGE_INTEGER perfStart{}, perfEnd{};
+            const bool measureSkyGlow =
+                Settings::VRTelemetry &&
+                perfFrequency.QuadPart > 0 &&
+                QueryPerformanceCounter(&perfStart);
+
+            bool ok = false;
+            {
+                InternalPassScope guard;
+                ok = R30ApplyStereoSkyGlow(device);
+            }
+
+            if (measureSkyGlow &&
+                QueryPerformanceCounter(&perfEnd) &&
+                perfEnd.QuadPart >= perfStart.QuadPart)
+            {
+                const auto elapsedUs =
+                    static_cast<std::uint64_t>(
+                        (static_cast<long double>(
+                            perfEnd.QuadPart - perfStart.QuadPart) *
+                            1000000.0L) /
+                        static_cast<long double>(
+                            perfFrequency.QuadPart));
+                ++R30SkyGlowPerfSamples;
+                R30SkyGlowPerfTotalUs += elapsedUs;
+                R30SkyGlowPerfMaxUs =
+                    std::max(R30SkyGlowPerfMaxUs, elapsedUs);
+            }
+
+            if (ok)
+                R30SkyGlowAppliedEpoch = PresentEpoch;
+            return ok;
+        }
+
         ULONGLONG R30LastTelemetryMs = 0;
 
         void R30MaybeLogTelemetry()
@@ -1645,36 +1692,10 @@ namespace OutRunVRStereo
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
             {
-                static const LARGE_INTEGER perfFrequency = []() noexcept {
-                    LARGE_INTEGER value{};
-                    QueryPerformanceFrequency(&value);
-                    return value;
-                }();
-                LARGE_INTEGER perfStart{}, perfEnd{};
-                const bool measureSkyGlow =
-                    Settings::VRTelemetry &&
-                    perfFrequency.QuadPart > 0 &&
-                    QueryPerformanceCounter(&perfStart);
-                {
-                    InternalPassScope guard;
-                    R30ApplyStereoSkyGlow(device);
-                }
-                if (measureSkyGlow &&
-                    QueryPerformanceCounter(&perfEnd) &&
-                    perfEnd.QuadPart >= perfStart.QuadPart)
-                {
-                    const auto elapsedUs =
-                        static_cast<std::uint64_t>(
-                            (static_cast<long double>(
-                                perfEnd.QuadPart - perfStart.QuadPart) *
-                                1000000.0L) /
-                            static_cast<long double>(
-                                perfFrequency.QuadPart));
-                    ++R30SkyGlowPerfSamples;
-                    R30SkyGlowPerfTotalUs += elapsedUs;
-                    R30SkyGlowPerfMaxUs =
-                        std::max(R30SkyGlowPerfMaxUs, elapsedUs);
-                }
+                // Fallback for frames with no recognized HUD boundary. Normal
+                // HUD frames composite SkyGlow before the first HUD draw so
+                // additive world glow never washes over menu/HUD alpha.
+                R30ApplyStereoSkyGlowOnce(device);
             }
             return R30PresentR26Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
@@ -1687,6 +1708,7 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R30SkyGlowAppliedEpoch = 0;
             R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
@@ -3216,7 +3238,10 @@ namespace OutRunVRStereo
             const char* site)
         {
             if (!state.worldEffect)
-                R30CaptureSkyGlowSceneBeforeHud(device);
+            {
+                if (R30CaptureSkyGlowSceneBeforeHud(device))
+                    R30ApplyStereoSkyGlowOnce(device);
+            }
 
             ++R9DrawCalls;
             R9MonoBackupGap = true;
@@ -4217,10 +4242,12 @@ namespace OutRunVRStereo
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
-            // Capture the completed world eyes before the first recognized HUD
-            // draw. Present then extracts glow from this snapshot, so bright HUD
-            // text/icons are never themselves bloom sources.
-            R30CaptureSkyGlowSceneBeforeHud(device);
+            // Capture the completed world eyes and composite glow before the
+            // first recognized HUD draw. This preserves the original ordering
+            // world -> glow -> HUD; compositing at Present put additive glow on
+            // top of HUD/menu pixels and made them look washed/translucent.
+            if (R30CaptureSkyGlowSceneBeforeHud(device))
+                R30ApplyStereoSkyGlowOnce(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
