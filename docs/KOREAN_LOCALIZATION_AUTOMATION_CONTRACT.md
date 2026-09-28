@@ -40,10 +40,13 @@ The controller prompt may be intentionally minimal. The following commands are s
 
 On any of those commands, first fetch the latest `korean-localization-clean`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
-## Dual-production lane schedule
-- A (:00): PRODUCTION LANE A + self-QA. Create/rework actual localization assets continuously from A's queue shard. Run zero-pixel-overflow QA on every touched element and immediately fix failures in the same run. Do not spend the run only reviewing when producible work remains.
-- B (:20): PRODUCTION LANE B + self-QA. B is no longer review-only. Create/rework actual localization assets continuously from B's queue shard, including promoting positively identified `zoom_review` text assets into production. Run the same zero-pixel-overflow QA and immediately fix failures in the same run.
-- C (:40): CROSS-LANE FINAL QA + approval + Git synchronization. Revalidate new/changed A and B results plus approval candidates. Only exact containment PASS results may advance. C may immediately perform small corrective rework it discovers and revalidate it; larger failures return to `REWORK_REQUIRED` for the next A/B production cycle.
+## Parallel dual-production dispatch
+- A and B are independent production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
+- A: PRODUCTION LANE A + self-QA on the odd-index shard. Create/rework actual localization assets continuously from A's shard and immediately fix zero-pixel-overflow failures in the same run.
+- B: PRODUCTION LANE B + self-QA on the even-index shard. Create/rework actual localization assets continuously from B's shard, including positively identified `zoom_review` text assets, and immediately fix zero-pixel-overflow failures in the same run.
+- C is a synchronization barrier, not a third concurrent modifier. Start C only after the current A and B tasks have each produced a durable Git result (PASS, no-action, or recorded blocker), then refresh HEAD and run CROSS-LANE FINAL QA + approval.
+- After C records its durable result, dispatch the next A+B production wave.
+- If the controller runtime cannot actually launch two workers concurrently, fall back to sequential queue execution and report that mode accurately; Git configuration alone must not be treated as proof of runtime parallelism.
 
 ## A/B work sharding and anti-duplication
 - Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
@@ -51,7 +54,9 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - B primary shard: rows with an EVEN numeric `index`.
 - Each role prioritizes in this order inside its shard: `REWORK_REQUIRED` -> unfinished `localize_text` -> unresolved `zoom_review` that contains localizable text -> other role-specific pending work.
 - A/B must refresh branch HEAD and queue state immediately before selecting work and again before commit. If an item is already completed or changed by the other role, skip it rather than redo it.
-- A/B must not wait for the other lane merely because that lane owns a different index parity. When a primary shard has no actionable production work, the role may work-steal the oldest actionable item from the other shard only after refreshing Git and confirming that item has no newer production result/state change in the current cycle. Record `work_stolen_from_lane` in the role report.
+- A/B concurrent runs must remain on disjoint primary shards. Do not work-steal while the peer production lane is active.
+- Work stealing is allowed only after the peer lane is confirmed idle/completed, followed by a fresh GitHub HEAD/queue refresh proving the target is unclaimed and has no newer current-cycle production/state change. Record `work_stolen_from_lane` in the role report.
+- Concurrent workers must never blindly overwrite shared state from their starting snapshot. Before writing `resume_state.json`, progress/status, worklog, queue state, or other shared reports, re-fetch latest HEAD and reconcile the worker's result with already committed peer-lane changes.
 - B must not re-QA all of A's output as its default job; C owns cross-lane final QA. B should maximize new production throughput.
 - C does not use parity sharding and reviews both lanes.
 
