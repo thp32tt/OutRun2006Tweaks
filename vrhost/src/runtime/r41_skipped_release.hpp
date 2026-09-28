@@ -3,7 +3,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <utility>
 
 namespace OutRunVrR41SkippedRelease
 {
@@ -103,14 +102,13 @@ namespace OutRunVrR41SkippedRelease
                 if (!entry.pending)
                     continue;
 
-                if (!std::forward<IsCurrentProducer>(
-                        isCurrentProducer)(entry.identity))
+                if (!isCurrentProducer(entry.identity))
                 {
                     entry = {};
                     continue;
                 }
 
-                if (std::forward<Publish>(publish)(entry.identity))
+                if (publish(entry.identity))
                     entry = {};
             }
         }
