@@ -2,7 +2,7 @@
   "task_id": "CONVERSION-DXVK-00019",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 1,
+  "attempt": 2,
   "base_sha": "fad2588a3d6c2cbd6c1138694daf7d41044da9ad",
   "result_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
   "automation_validation": "PASS",
@@ -59,7 +59,8 @@
     "Backend artifact 10989054992 digest sha256:58abdbbb7fb246a3efcea72cd657897c1b835b3005d50801848e6409abe6ab9b.",
     "OpenXR host artifact 10988833973 digest sha256:11a17f23221eb3f8a5668a8558fd2500b2694fe10b22748a1d7885d9424b6dbd.",
     "HUD inspector game artifact 10989189598 digest sha256:085ed959243bbf033368238ee5ab82c7d20d1d5c20e1c3e29accfe6dee381edb.",
-    "Issue #14 implementation comment 5876111577 and validation comment 5876294226 record the production/validation transaction."
+    "Issue #14 implementation comment 5876111577 and validation comment 5876294226 record the production/validation transaction.",
+    "Controller ATTEMPT=2 supplied stale failure context run 36465739251. Direct comparison confirmed that failure belongs to f4b6dbc3; its repaired descendant ffebc679 passed Backend Conversion Gate 36465995809 with the previously failing behavior step plus synchronization contract, Win32 build and binary verification all successful. Per C0 skip-unchanged rule, source work was not repeated."
   ],
   "completed_work_items": [
     "DXVK-RUNTIME-EVIDENCE-EXACT-BUILD-IDENTITY-GATE"
@@ -88,5 +89,28 @@
     "hud_inspector_artifact_id": 10989189598,
     "hud_inspector_artifact_digest": "sha256:085ed959243bbf033368238ee5ab82c7d20d1d5c20e1c3e29accfe6dee381edb"
   },
-  "recorded_at_kst": "2026-09-29T03:42:00+09:00"
+  "recorded_at_kst": "2026-09-29T03:44:00+09:00",
+  "controller_retry_reconciliation": {
+    "status": "SUPERSEDED_FAILURE_CONTEXT",
+    "received_attempt": "2/3",
+    "supplied_failure_run_id": 36465739251,
+    "supplied_failure_head_sha": "f4b6dbc39aa9590dd68e1a23623abc381c7b3487",
+    "supplied_failure_signature": "Test runtime shared-handle failure classification failed because Analyze-OutRunVRSession.ps1 evaluated identity-derived flags before session/backend identity initialization under PowerShell Set-StrictMode.",
+    "already_repaired_by_sha": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "replacement_success_run_id": 36465995809,
+    "replacement_success_result": "PASS",
+    "replacement_success_evidence": [
+      "Test runtime shared-handle failure classification PASS",
+      "Verify DXVK host-owned transport synchronization contract PASS",
+      "Build Win32 PASS",
+      "Verify binary exists PASS",
+      "Build workflow 36466003756 PASS",
+      "OpenXR VR architecture 36466003736 PASS",
+      "HUD Inspector 36466003758 PASS"
+    ],
+    "action_taken": "No source or test logic was repeated or changed in controller attempt 2 because the supplied failure context was already repaired and exact-SHA validated. Only this durable reconciliation record was updated.",
+    "result_sha_unchanged": "ffebc679e30c0f742953c02e7b961f79ead6ea37",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  }
 }
