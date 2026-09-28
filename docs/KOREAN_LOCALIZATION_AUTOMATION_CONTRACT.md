@@ -56,7 +56,9 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - A/B must refresh branch HEAD and queue state immediately before selecting work and again before commit. If an item is already completed or changed by the other role, skip it rather than redo it.
 - A/B concurrent runs must remain on disjoint primary shards. Do not work-steal while the peer production lane is active.
 - Work stealing is allowed only after the peer lane is confirmed idle/completed, followed by a fresh GitHub HEAD/queue refresh proving the target is unclaimed and has no newer current-cycle production/state change. Record `work_stolen_from_lane` in the role report.
-- Concurrent workers must never blindly overwrite shared state from their starting snapshot. Before writing `resume_state.json`, progress/status, worklog, queue state, or other shared reports, re-fetch latest HEAD and reconcile the worker's result with already committed peer-lane changes.
+- A/B concurrent workers MUST NOT modify shared state files in their production commits: `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv`, or equivalent shared queue/progress summaries.
+- A/B may write only their disjoint DDS/candidate assets, lane-local evidence under `localization/graphics/role_A/` or `role_B/`, and their unique `docs/automation/runs/<TASK_ID>` record.
+- C is the only worker that reconciles the current wave into shared resume/worklog/progress/asset_queue state. C must re-fetch latest HEAD after both A/B terminal results and preserve both lane commits.
 - B must not re-QA all of A's output as its default job; C owns cross-lane final QA. B should maximize new production throughput.
 - C does not use parity sharding and reviews both lanes.
 
@@ -66,6 +68,9 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - Do not require Docker/controller configuration changes for workflow-rule changes; modify this Git contract/state instead.
 
 ## State and completion
-Do not repeat completed work. Resume from current Git progress/resume state. Each completed batch updates its machine-readable report, localization/WORKLOG.md and localization/progress/STATUS.md as applicable.
+Do not repeat completed work. Resume from current Git progress/resume state.
+- A/B production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state while the peer lane can still be active.
+- C synchronization-barrier completion reconciles both A/B terminal results into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable.
+- A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
 Before approval inspect raw DDS and readable/game orientation; use in-game screenshot validation when available.
-Git synchronization is mandatory at the end of each role when that role changed files: commit/push only its localization changes to korean-localization-clean and verify the resulting commit SHA. Do not create empty commits. Resolve conflicts by preserving current localization work and never importing VR/FFB changes.
+Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
