@@ -272,6 +272,8 @@ namespace
         UINT arraySize = 0;
         std::uint32_t frameId = 0;
         std::uint32_t generation = 0;
+        std::uint32_t borrowedSlot = OutRunVR::RenderFrameRingSize;
+        bool borrowed = false;
         bool valid = false;
 
         ~R23DirectHoldState()
@@ -327,6 +329,8 @@ namespace
         R23DirectHold.arraySize = 0;
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.borrowedSlot = OutRunVR::RenderFrameRingSize;
+        R23DirectHold.borrowed = false;
         R23DirectHold.valid = false;
     }
 
@@ -334,6 +338,8 @@ namespace
     {
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.borrowedSlot = OutRunVR::RenderFrameRingSize;
+        R23DirectHold.borrowed = false;
         R23DirectHold.valid = false;
     }
 
@@ -393,48 +399,19 @@ namespace
             descCache.valid = true;
         }
 
-        const bool recreate =
-            !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
-            !R23DirectHold.srv[0] || !R23DirectHold.srv[1] ||
-            R23DirectHold.width != left.Width ||
-            R23DirectHold.height != left.Height ||
-            R23DirectHold.mipLevels != left.MipLevels ||
-            R23DirectHold.arraySize != left.ArraySize ||
-            R23DirectHold.format != left.Format;
-        if (recreate)
-        {
-            R23ReleaseDirectHoldResources();
-            D3D11_TEXTURE2D_DESC hold = left;
-            hold.Usage = D3D11_USAGE_DEFAULT;
-            hold.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-            hold.CPUAccessFlags = 0;
-            hold.MiscFlags = 0;
-            for (int eye = 0; eye < 2; ++eye)
-            {
-                if (FAILED(c.device_->CreateTexture2D(
-                        &hold, nullptr, &R23DirectHold.eye[eye])) ||
-                    !R23DirectHold.eye[eye] ||
-                    FAILED(c.device_->CreateShaderResourceView(
-                        R23DirectHold.eye[eye], nullptr,
-                        &R23DirectHold.srv[eye])) ||
-                    !R23DirectHold.srv[eye])
-                {
-                    R23ReleaseDirectHoldResources();
-                    return false;
-                }
-            }
-            R23DirectHold.width = left.Width;
-            R23DirectHold.height = left.Height;
-            R23DirectHold.mipLevels = left.MipLevels;
-            R23DirectHold.arraySize = left.ArraySize;
-            R23DirectHold.format = left.Format;
-        }
-
-        // Immediate-context ordering guarantees that both copies execute before
-        // the following projection draw samples this host-owned pair. The R32
-        // EVENT fence then covers the copy + projection work before producer ACK.
-        c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
-        c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        // Experimental zero-copy path. PrepareDirectStereoSource already
+        // owns SRVs for the exact shared ring slot. Keep the producer slot
+        // borrowed until R32's asynchronous EVENT reports that projection
+        // sampling completed, then publish the per-slot ACK. No host-owned
+        // full-eye CopyResource is needed on the fresh-frame path.
+        R23ReleaseDirectHoldResources();
+        R23DirectHold.width = left.Width;
+        R23DirectHold.height = left.Height;
+        R23DirectHold.mipLevels = left.MipLevels;
+        R23DirectHold.arraySize = left.ArraySize;
+        R23DirectHold.format = left.Format;
+        R23DirectHold.borrowedSlot = slot;
+        R23DirectHold.borrowed = true;
         R23DirectHold.frameId = frame.frameId;
         R23DirectHold.generation = generation;
         R23DirectHold.valid = true;
@@ -442,7 +419,7 @@ namespace
         {
             R23FirstDirectHoldLogged = true;
             std::cout
-                << "DirectGPU PERF P4: single-copy hold path active; validated source descriptors are cached per ring slot/generation and duplicate per-frame GetDesc validation is removed.\n";
+                << "DirectGPU EXP ZERO-COPY: projection samples the validated shared ring SRVs directly; producer slot release remains gated by the R32 asynchronous GPU-completion ACK.\n";
         }
         return true;
     }
@@ -1169,11 +1146,14 @@ namespace
         ID3D11ShaderResourceView* srv[2]{};
         DXGI_FORMAT fmt[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
         if (c.directFrameValid_ && R23DirectHold.valid &&
-            R23DirectHold.srv[0] && R23DirectHold.srv[1])
+            R23DirectHold.borrowed &&
+            R23DirectHold.borrowedSlot < OutRunVR::RenderFrameRingSize &&
+            c.directLeftSrv_[R23DirectHold.borrowedSlot] &&
+            c.directRightSrv_[R23DirectHold.borrowedSlot])
         {
             eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
-            srv[0] = R23DirectHold.srv[0];
-            srv[1] = R23DirectHold.srv[1];
+            srv[0] = c.directLeftSrv_[R23DirectHold.borrowedSlot];
+            srv[1] = c.directRightSrv_[R23DirectHold.borrowedSlot];
             fmt[0] = fmt[1] = R23DirectHold.format;
         }
         else
