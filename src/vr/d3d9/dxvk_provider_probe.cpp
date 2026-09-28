@@ -3,9 +3,13 @@
 #include <Windows.h>
 #include <d3d9.h>
 
+#include <atomic>
+#include <cstdint>
 #include <cwchar>
 #include <filesystem>
 #include <string>
+
+#include <spdlog/spdlog.h>
 
 #include "vr/d3d9/dxvk_provider_probe.hpp"
 #include "vr/game/disasm_render_contract.hpp"
@@ -56,6 +60,8 @@ namespace OutRunVR::Dxvk
             return modulePath.size() >= prefix.size() &&
                 _wcsnicmp(modulePath.c_str(), prefix.c_str(), prefix.size()) == 0;
         }
+
+        std::atomic<std::uint64_t> ProviderAttestationSequence{0};
 
         bool IsGameLocalD3D9Provider(HMODULE module) noexcept
         {
@@ -138,5 +144,25 @@ namespace OutRunVR::Dxvk
             deviceEx->Release();
 
         return snapshot;
+    }
+
+    void LogProviderCensus(
+        IDirect3DDevice9* device,
+        const char* source) noexcept
+    {
+        const auto snapshot = ProbeProvider(device);
+        const auto attestation =
+            ProviderAttestationSequence.fetch_add(1, std::memory_order_relaxed) + 1;
+        spdlog::info(
+            "VR DXVK R71 census: providerLoaded={} nonSystem={} gameLocal={} stockInterop={} D3D9Ex={} stockHr=0x{:08X} exHr=0x{:08X} source={} attestation={}",
+            snapshot.d3d9ProviderLoaded ? 1 : 0,
+            snapshot.nonSystemProvider ? 1 : 0,
+            snapshot.gameLocalProvider ? 1 : 0,
+            snapshot.stockDxvkInterop ? 1 : 0,
+            snapshot.d3d9ExAvailable ? 1 : 0,
+            static_cast<unsigned>(snapshot.stockDxvkInteropHr),
+            static_cast<unsigned>(snapshot.d3d9ExHr),
+            source ? source : "unknown",
+            attestation);
     }
 }
