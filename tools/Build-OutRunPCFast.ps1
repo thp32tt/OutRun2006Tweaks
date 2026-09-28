@@ -205,8 +205,8 @@ Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md
     ''
     'Use only START_HERE_VR_TEST.cmd.'
     'Do not add additional selector CMD/PS1 files to test packages.'
-    'When the active test matrix changes, update OutRunVR-Test-Selector.ps1 in place.'
-    'Helper scripts remain implementation details and are not alternate entry points.'
+    'The default branch target is controlled only by VR_ONE_CLICK_TARGET.json.'
+    'Diagnostic selector/helper scripts remain implementation details and are not alternate entry points.'
 ) | Set-Content (Join-Path $packageDir 'START_HERE_ONLY.txt') -Encoding UTF8
 
 @(
