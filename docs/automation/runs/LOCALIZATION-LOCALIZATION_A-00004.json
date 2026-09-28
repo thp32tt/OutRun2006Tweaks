@@ -26,10 +26,11 @@
     "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json",
     "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_QA.png"
   ],
-  "result_sha": "PENDING_LATEST_PRODUCTION_COMMIT",
+  "result_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088",
   "note": "GitHub-only. 568D3696 index 53 deferred for specialized DXT5-safe shrink handling. No N100/GPT Library/VR/FFB/DX9Ex/DX11/DXVK/build. Runtime validation not performed.",
   "summary": "A00004 produced 411827E full self-QA PASS (7/7) and C075FB49 partial safe rework (3 independent text failures fixed; 6 failures remain). 568D3696 DXT5 specialized rework deferred. C visual/final QA and isolated DDS_ONLY in-game validation remain required.",
   "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
   "production_commit_sha": "bd28cb592c6c3180eef7d88497f7fa0ceb311657",
-  "c075_candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791"
+  "c075_candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+  "latest_production_commit_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088"
 }
