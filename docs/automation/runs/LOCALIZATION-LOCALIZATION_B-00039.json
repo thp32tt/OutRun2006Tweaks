@@ -1,0 +1,45 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00039",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00012",
+  "recorded_at_kst": "2026-09-29T05:27:00+09:00",
+  "initial_head_sha": "162cc60882752eb519836d9ad67e7b541656135b",
+  "final_precommit_head_sha": "162cc60882752eb519836d9ad67e7b541656135b",
+  "peer_lane_commit_observed_before_commit": false,
+  "peer_lane_expected_task": "LOCALIZATION-LOCALIZATION_A-00038",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_ZOOM_REVIEW_RESOLUTIONS_2_LOCALIZABLE_REBUILD_INPUTS_2_PRESERVE",
+  "automation_validation": "PASS_STATIC_PRECOMMIT_REMOTE_POSTCOMMIT_PENDING",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20260929-0527-B107/B107_W00012_ZOOM_REVIEW_RESOLUTION.json",
+  "deterministic_tool": "localization/graphics/role_B/20260929-0527-B107/B107_W00012_GITHUB_SOURCE_GATE.py",
+  "material_deliverable": {
+    "type": "4_EVEN_ZOOM_REVIEW_RESOLUTIONS_WITH_2_LOCALIZABLE_RECONSTRUCTION_INPUTS",
+    "even_indices": [
+      202,
+      206,
+      210,
+      214
+    ],
+    "localizable_confirmed": [
+      206,
+      214
+    ],
+    "preserve_original_confirmed": [
+      202,
+      210
+    ],
+    "candidate_dds_modified": false
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "B committed only lane-local W00012 material evidence/tooling and the unique task record. Static validation passes; post-commit GitHub Actions are pending. Runtime validation is UNTESTED."
+}
