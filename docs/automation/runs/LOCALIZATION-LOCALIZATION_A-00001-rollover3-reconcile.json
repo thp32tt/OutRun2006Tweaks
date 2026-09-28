@@ -1,0 +1,35 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00001",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": 1,
+  "chat_rollover": 3,
+  "reconciled_at_kst": "2026-09-28T16:05:07+09:00",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "results": [
+    {
+      "index": 57,
+      "asset": "39229D64",
+      "result": "A_SELF_QA_PASS_PENDING_C_AND_DDS_ONLY_INGAME",
+      "report": "localization/graphics/role_A/20260928-AUTO-A00001/A_AUTO_00001_39229D64_REPORT.json",
+      "candidate_sha256": "e98278b4dd1fea91cc23802f9ae0c64185edad96dc57177fe1f67b71f30fc8fa",
+      "qa": "15/15 containment PASS; changed pixels outside reworked/all declared cells 0; introduced alpha outside declared cells 0"
+    },
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "result": "A_SELF_QA_PASS_PENDING_INDEPENDENT_C_VISUAL_SOURCE_STYLE_AND_DDS_ONLY_INGAME",
+      "production_commit_sha": "81384186d39367dfb80648d9af695c266b96536a",
+      "report": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
+      "visual_proof": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_QA.png",
+      "candidate_sha256": "641e317c9085e2e0f748ab4eab0618a53b20861bd65abc6373c0ac36453bfda3",
+      "qa": "21/21 containment PASS; collateral 0; changed pixels outside declared cells 0; introduced alpha outside declared cells 0",
+      "method": "Avoided B91 broad shrink: translate/trim without broad resampling where possible; minimum-fit scaling only where required."
+    }
+  ],
+  "main_task_record_note": "The canonical task JSON was updated by overlapping A workflows near-simultaneously: its summary names 39229D64 while result_sha 81384186... is the FF2462BB production commit. This reconciliation record preserves both completed A results without re-triggering the task-path workflow.",
+  "no_runtime_claim": true,
+  "no_n100_local_worktree": true,
+  "no_vr_ffb_graphics_dev": true
+}
