@@ -1110,7 +1110,7 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Machine report: `localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json`.
 
 
-## 2026-09-28 24:00 KST — crash diagnostic 3-way test packages
+## 2026-09-29 00:04 KST — crash diagnostic 3-way test packages
 
 - Reconstructed the 2026-09-28 combined-test crash evidence and split the next user test into TEXT_ONLY / GRAPHICS_ONLY / COMBINED.
 - Crash stack entered `D3DXCreateTextureFromFileInMemory_Custom_dest` with `UseNewTextureAllocator=true`; current source confirms `UseNewTextureAllocator=false` selects the original D3DX `Orig_dest` path instead.
