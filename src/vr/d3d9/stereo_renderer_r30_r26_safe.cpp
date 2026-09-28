@@ -1048,12 +1048,13 @@ namespace OutRunVRStereo
         {
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
-            // VR-only post-process policy: keep the normal 2D game path
-            // untouched, but render stereo SkyGlow at half width/height.
-            // The outer callers still honor SkyGlowFactor <= 0 as an explicit
-            // disable switch; once stereo SkyGlow is active its working factor
-            // is fixed at 2 to cut the post-process pixel count to 25%.
-            constexpr int factor = 2;
+            // Preserve the configured visual policy. Perf P1 briefly
+            // forced factor=2 for every VR frame, but runtime feedback showed
+            // that overriding an explicit SkyGlowFactor=1 washed out the image
+            // and made HUD/menu contrast look translucent. The callers still
+            // treat <=0 as disabled; active factors follow the user's setting.
+            const int factor = std::clamp(
+                Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
                 160u, BackBufferDesc.Width /
                     static_cast<UINT>(factor));
