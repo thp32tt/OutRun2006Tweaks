@@ -6,7 +6,7 @@
   "completedCycles": 11,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "6947c733dcb1bf40159246881478527979fe6565",
+  "currentHead": "b03ca30c3e1229b33dbe8da58ee9a3134e5a31f6",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -351,18 +351,56 @@
       "automationValidation": "PARTIAL_GATE_PASS / EXACT_HEAD_PR80_BUILD_OPENXR_HUD_BUILD_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 12: consume exact-head CI; if green, add a pure sampled-identity history/transition classifier first, with LEVEL0 proof that EVENT-owned identities are excluded before any transition ACK wiring."
+    },
+    {
+      "cycle": 11,
+      "lenses": [
+        "architecture/control-flow: transition watermark boundaries",
+        "lifetime/reset/sync: never-sampled retry vs sampled EVENT ownership",
+        "stereo/HUD/visual correctness: no renderer/HUD behavior change",
+        "hot path/frame pacing: metadata-only ACK path, no wait/copy changes",
+        "adversarial/falsification: verifier false-negative and transition double-ownership"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "Cycle-10 runtime code compiled in Win32 Build and HUD Inspector, but OpenXR architecture failed only because verify_vr_r32_review.py searched for one whitespace-sensitive literal MarkGenerationFault(identity.transportGeneration).",
+        "The runtime already contains the fail-closed call, formatted across lines. Replaced the brittle literal with a bounded R41ReleaseNeverSampled function-slice check requiring LiveSlotConflict, MarkGenerationFault( and identity.transportGeneration.",
+        "Transition sites at STOPPING, LOCAL reference-space change and presentation change still advance lastProcessedStereoFrame from a latest snapshot. A future bounded transition adapter must enumerate current-run DirectGPU history before the watermark jump.",
+        "Transition eligibility must exclude R23DeferredSlotBlocked sampled/EVENT-owned identities and identities already recorded in R37BootstrapSubmittedFrame/Generation; retry ownership remains only for never-sampled frames.",
+        "R41RetrySkippedReleases currently runs in the gameplay branch, so pending metadata ACK retries can be delayed after switching to Theater/STOPPING. This is recorded for cycle 12; no runtime behavior was changed here."
+      ],
+      "evidence": [
+        "OpenXR architecture run 36494189003 failed at Verify reconstructed VR architecture boundaries with: R41 skipped DirectGPU durable-release invariant missing: MarkGenerationFault(identity.transportGeneration)",
+        "Win32 Build run 36494189133 success",
+        "HUD Inspector run 36494189022 success",
+        "main_r23.cpp R41ReleaseNeverSampled contains MarkGenerationFault(identity.transportGeneration) across line formatting",
+        "new exact-head b03ca30c CI started: Build 36497134902/36497135541, OpenXR 36497134942/36497135495, HUD Inspector 36497134904/36497135556"
+      ],
+      "changedFiles": [
+        "tools/verify_vr_r32_review.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "b03ca30c3e1229b33dbe8da58ee9a3134e5a31f6"
+      ],
+      "automationValidation": "DETERMINISTIC_VERIFIER_FALSE_NEGATIVE_REPAIRED; exact-head Build/OpenXR/HUD CI running at checkpoint",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 12: consume b03ca30c exact-head CI. If OpenXR architecture is green, add a bounded transition-history eligibility helper/test that excludes deferred EVENT-owned and R37 already-sampled/released identities before any runtime transition wiring."
     }
   ],
   "nextCycle": {
     "cycle": 12,
     "priority": [
-      "consume exact-head b03ca30c PR #80 Build/OpenXR/HUD results",
-      "repair deterministic CI failure only if present",
-      "add pure bounded sampled-identity history/transition classifier",
-      "LEVEL0 prove EVENT-owned identities excluded from transition release",
-      "wire transition release only after that proof"
+      "consume b03ca30c exact-head Build/OpenXR/HUD results",
+      "add pure transition-history eligibility helper and LEVEL0 tests",
+      "exclude R23DeferredSlotBlocked identities",
+      "exclude R37 already-sampled/released slot identities",
+      "only then wire release-before-watermark at STOPPING/reference-space/presentation transitions"
     ],
-    "guard": "Never infer never-sampled from ring presence alone. Frozen 34eef500 package remains immutable."
+    "guard": "Frozen 34eef500 user-test package remains immutable. No visual tuning, waits/copies changes, or sampled EVENT ownership changes without runtime evidence."
   },
-  "updatedKst": "2026-09-29T08:12:00+09:00"
+  "updatedKst": "2026-09-29T08:18:00+09:00"
 }
