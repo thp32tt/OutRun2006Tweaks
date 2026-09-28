@@ -527,6 +527,32 @@
         ],
         "blocker_field": "DxvkDirectEvidenceBlockers",
         "runtime_problem_status_unchanged": true
+      },
+      "frameBudgetAnalyzer": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00029",
+        "result_sha": "7da248c5389013e54b1331acf6450ed2a0f09c30",
+        "validation_run_id": 36489032539,
+        "fields": [
+          "FrameBudgetEvidenceAvailable",
+          "FrameBudget.HostPipelineWindowCount",
+          "FrameBudget.CaptureMs",
+          "FrameBudget.CommitCopyMs",
+          "FrameBudget.RenderMs",
+          "FrameBudget.XrEndFrameMs",
+          "FrameBudget.XrWaitFrameMs",
+          "FrameBudget.XrFrameIntervalMs",
+          "FrameBudget.CadenceSerialWaitMs",
+          "FrameBudget.GamePresentToConsumeMs",
+          "FrameBudget.GameProducer.ProducerFenceOk",
+          "FrameBudget.GameProducer.ProducerBudgetFallback",
+          "FrameBudget.GameProducer.Backpressure",
+          "FrameBudget.GameProducer.PendingDrain",
+          "FrameBudget.GameProducer.PendingBlock",
+          "FrameBudget.GameProducer.PendingError"
+        ],
+        "interpretation": "Existing R23/R32 telemetry is now machine-aggregated for the next exact-build performance comparison. This does not identify a bottleneck until Quest3/VDXR runtime evidence is collected.",
+        "runtime_problem_status_unchanged": true
       }
     }
   ],

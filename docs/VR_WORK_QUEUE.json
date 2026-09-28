@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T06:20:00+09:00",
+  "updatedKst": "2026-09-29T07:01:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -347,11 +347,17 @@
       "summary": "Create a common frame-budget telemetry and optimization lane covering game-thread producer fence wait, host copy/fence wait, draw amplification, capture/commit copy, render and xrEndFrame timing across backends.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence.",
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "implementationProgress": "DXVK branch analyzer sub-step complete: existing R23 host pipeline timing windows and R32 DirectGPU producer counters are now emitted as structured AUTO_ANALYSIS_SUMMARY.FrameBudget fields. No new runtime instrumentation or optimization was added.",
+      "dxvkAnalyzerResultSha": "7da248c5389013e54b1331acf6450ed2a0f09c30",
+      "dxvkAnalyzerValidationRunId": 36489032539,
+      "dxvkAnalyzerValidation": "AUTOMATION_VALIDATION_PASS",
+      "dxvkRuntimeEvidenceStatus": "NEED_HMD_TEST",
+      "nextAction": "Run an exact-build Quest3/VDXR DXVK PERFORMANCE session with PackageIntegrity.Verified=true, BuildIdentityVerified=true and DxvkDirectEvidenceTrusted=true. Use FrameBudget host capture/commit/render/xrEndFrame plus producer fence/backpressure counters to identify the dominant budget before any wait/copy/draw optimization. Keep the cross-backend item open until equivalent evidence is available outside this DXVK branch."
     },
     {
       "id": "L1-VIS-002",

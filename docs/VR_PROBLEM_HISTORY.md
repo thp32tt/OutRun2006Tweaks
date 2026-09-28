@@ -128,3 +128,12 @@ Task `CONVERSION-DXVK-00025` closed a remaining evidence-classification gap arou
 Exact source `4394b69096fa529cfef90eaa06001442da3272ba` now emits trusted DirectGPU evidence only when build identity is verified, package integrity is verified, host/import bridge generations agree, the host-owned direct path is active, and DirectFrames is positive. Incomplete or unverified evidence reports `DXVK_DIRECTGPU_EVIDENCE_UNTRUSTED`; generation disagreement reports `DXVK_HOST_GENERATION_MISMATCH`; machine-readable blockers are exposed as `DxvkDirectEvidenceBlockers`.
 
 Backend Conversion Gate `36480684112`, Build `36480692985`, OpenXR architecture `36480693052`, and HUD Inspector `36480692977` all passed on the exact source SHA. This remains **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. The underlying `VR-DXVK-D3D9EX-SHARED-HANDLE-001` stays OPEN until a Quest 3 / VDXR exact-build test has `DxvkDirectEvidenceTrusted=true` and separately demonstrates fallback reduction, pacing recovery, and no startup/stereo/HUD/menu/recenter regression.
+
+
+## 2026-09-29 — DXVK frame-budget evidence structured
+
+Task `CONVERSION-DXVK-00029` implemented the DXVK analyzer slice of `VR-PERF-COMMON-001` without changing the game or host hot path. The runtime already emitted R23 host pipeline timing windows and R32 DirectGPU producer/fence counters; the missing step was durable machine aggregation.
+
+Exact source `7da248c5389013e54b1331acf6450ed2a0f09c30` now writes a structured `FrameBudget` object into `AUTO_ANALYSIS_SUMMARY.json`. It includes host capture/commit-copy/render/xrEndFrame avg/max/P95 summaries, xrWaitFrame/xrFrameInterval/cadence/game-present-to-consume samples, and aggregated producer fence success/budget-fallback/backpressure/pending-drain/block/error counters. A synthetic two-window regression test verifies deterministic aggregation.
+
+Backend Conversion Gate `36489032539`, Build `36489037539`, OpenXR architecture `36489037480`, and HUD Inspector `36489037536` all passed on the exact SHA. This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. It does not prove where the current ~33.44 ms gameplay budget is spent. The next DXVK PERFORMANCE run should use these fields to choose a bounded optimization instead of tuning waits/copies/cadence by guesswork.

@@ -156,5 +156,19 @@
       "DirectFrames>0"
     ],
     "interpretation": "A trusted evidence verdict only establishes that the DirectGPU transport telemetry belongs to an integrity-verified exact build and coherent bridge generation. Quest3/VDXR still must prove fallback reduction, pacing recovery and visual/startup/recenter correctness."
+  },
+  "frame_budget_analyzer": {
+    "task_id": "CONVERSION-DXVK-00029",
+    "result_sha": "7da248c5389013e54b1331acf6450ed2a0f09c30",
+    "automation_validation": "PASS",
+    "validation_run_id": 36489032539,
+    "runtime_validation": "UNTESTED",
+    "summary_field": "FrameBudget",
+    "source_telemetry": [
+      "R23 host capture/commit/render/xrEndFrame avg/max/P95 windows",
+      "R23 xrWaitFrame/xrFrameInterval/cadenceSerialWait/gamePresentToConsume scalar samples",
+      "R32 producerFenceOk/producerBudgetFallback/backpressure/pendingDrain/pendingBlock/pendingError windows"
+    ],
+    "next_runtime_use": "Use exact-build DXVK PERFORMANCE data to localize the ~33.44 ms gameplay failure budget before making synchronization/copy/cadence optimizations."
   }
 }
