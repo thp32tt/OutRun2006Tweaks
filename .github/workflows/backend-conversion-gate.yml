@@ -69,6 +69,10 @@ jobs:
         shell: pwsh
         run: ./tools/Test-DxvkAcquisition.ps1
 
+      - name: Verify DXVK SAFE reactivation contract
+        shell: pwsh
+        run: python tools/verify_dxvk_reactivation_contract.py
+
       - name: Configure Win32
         shell: pwsh
         run: |
