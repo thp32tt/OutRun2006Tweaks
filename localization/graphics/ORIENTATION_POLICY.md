@@ -250,3 +250,74 @@ Every new candidate must record:
 
 Only candidates created after this reset and passing every clean-generation gate may enter the active HD candidate set. Historical candidates must never be copied forward merely because their dimensions/header/containment checks pass.
 
+## Imported open-source image-localization safeguards
+
+Effective 2026-09-29. These safeguards adapt useful practices observed in open-source image/game localization pipelines to OutRun's DDS/atlas constraints. OutRun's exact HD source, raw sprite transforms, DDS properties and zero-pixel containment remain authoritative.
+
+### Glyph-footprint removal, never rectangle erasure
+
+- Build the removal mask from the complete source glyph/effect footprint, not from the OCR/text bounding rectangle.
+- The mask must include source glyph fill, outline, shadow, glow and antialias fringe, but must exclude surrounding borders, icons and unrelated artwork.
+- Never erase/fill an entire OCR rectangle merely because text was detected there.
+- Protect sprite borders, panel borders, separator lines, icons and neighboring glyphs as explicit no-edit masks.
+
+### Background-class reconstruction
+
+Classify the pixels beneath/around each source text element before removal:
+
+- flat/near-flat background -> reconstruct from verified neighboring source pixels;
+- smooth gradient -> reconstruct a continuous gradient from source-side samples;
+- patterned/textured/artwork background -> use source-constrained reconstruction/inpainting or faithful redraw;
+- transparent/semitransparent artwork -> reconstruct RGB and alpha together; never synthesize an opaque backing.
+
+After reconstruction, re-inspect the cleaned region before Korean lettering. If the cleaned region still contains source-letter traces or a visible seam, do not proceed to lettering.
+
+### Clean-plate intermediate gate
+
+Every translated element must have a clean-plate intermediate state:
+
+`EXACT_HD_SOURCE -> SOURCE_TEXT_MASK -> CLEAN_PLATE -> KOREAN_LETTERING -> DDS_CANDIDATE`
+
+The CLEAN_PLATE must be retained as QA evidence. Korean lettering is forbidden until the clean plate passes:
+- no English/source-script residue;
+- no old Korean residue;
+- no rectangular patch/box;
+- no damaged border/icon/artwork;
+- no gradient/texture discontinuity;
+- no alpha discontinuity.
+
+### Fit-before-render gate
+
+- Measure the target Korean glyphs with the actual selected font/effects before committing pixels.
+- Compare the rendered glyph/effect mask to the permitted sprite/text region.
+- If it does not fit, retry in this order: tighter source-faithful tracking/line break -> smaller source-faithful font size -> approved shorter translation.
+- Never horizontally/vertically distort glyphs beyond a source-faithful range merely to force a fit.
+- If legibility or style would be lost before it fits, stop as `MANUAL_RECONSTRUCTION_REQUIRED`; do not render a bad candidate.
+
+### Font coverage gate
+
+Before rendering, verify that the chosen font contains every required Hangul/symbol glyph. Missing glyph boxes, fallback-font mixing, tofu, or silently substituted glyphs are automatic rejection.
+
+### Post-clean and post-letter validation
+
+Run validation twice:
+1. on CLEAN_PLATE, before Korean text exists;
+2. on final KOREAN_CANDIDATE.
+
+The clean-plate validation detects removal/reconstruction defects independently from lettering defects. Final validation checks containment, overlap, clipping, source-script residue, protected-artwork changes, alpha and DDS properties.
+
+### Pairwise overlap gate
+
+For atlases containing multiple translated elements, compare all translated masks pairwise. Any overlap not present in the source layout is `REWORK_REQUIRED`. Also reject overlap with protected masks for icons, borders, neighboring sprites and preserve-original text.
+
+### Fail-safe generation rule
+
+When detection, removal, reconstruction, orientation, font coverage, fitting or validation is ambiguous, preserve the exact source and flag the element instead of emitting a guessed localized candidate. Automatic production must fail closed, not fail open.
+
+### Immutable-source and candidate-lineage rule
+
+- Keep exact source artifacts immutable and hash them.
+- Write every newly generated candidate as a new generation with explicit source SHA-256 and generation ID.
+- Record offline/static validation separately from runtime validation.
+- A generated file is never equivalent to a completed/approved asset.
+
