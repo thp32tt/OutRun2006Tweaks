@@ -132,13 +132,23 @@ namespace OutRunVRStereo
         // Observe the game's own Lock/Unlock writes instead and keep the exact
         // CPU byte ranges that are known current. Draw then consumes only this
         // shadow and fails open to R29 when a range was never observed.
+        constexpr std::size_t R30CreateTextureVtableIndex = 23;
         constexpr std::size_t R30CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
+        constexpr std::size_t R30UpdateSurfaceVtableIndex = 30;
+        constexpr std::size_t R30UpdateTextureVtableIndex = 31;
         constexpr std::size_t R30BufferReleaseVtableIndex = 2;
         constexpr std::size_t R30BufferLockVtableIndex = 11;
         constexpr std::size_t R30BufferUnlockVtableIndex = 12;
+        constexpr std::size_t R30TextureLockRectVtableIndex = 19;
+        constexpr std::size_t R30TextureUnlockRectVtableIndex = 20;
         constexpr UINT R30MaxShadowBytes = 16u * 1024u * 1024u;
 
+        SafetyHookInline R30CreateTextureHook{};
+        SafetyHookInline R30UpdateSurfaceHook{};
+        SafetyHookInline R30UpdateTextureHook{};
+        SafetyHookInline R30TextureLockRectHook{};
+        SafetyHookInline R30TextureUnlockRectHook{};
         SafetyHookInline R30CreateVertexBufferHook{};
         SafetyHookInline R30CreateIndexBufferHook{};
         SafetyHookInline R30VertexBufferReleaseHook{};
@@ -535,6 +545,45 @@ namespace OutRunVRStereo
             return refs;
         }
 
+        HRESULT __stdcall R30TextureLockRectDest(
+            IDirect3DTexture9* texture, UINT level,
+            D3DLOCKED_RECT* lockedRect, const RECT* rect, DWORD flags)
+        {
+            const HRESULT hr = R30TextureLockRectHook.stdcall<HRESULT>(
+                texture, level, lockedRect, rect, flags);
+            if (SUCCEEDED(hr) && lockedRect && lockedRect->pBits)
+                outrun::vr::dx11::observe_texture_lock_rect(
+                    texture, level, flags);
+            return hr;
+        }
+
+        HRESULT __stdcall R30TextureUnlockRectDest(
+            IDirect3DTexture9* texture, UINT level)
+        {
+            const HRESULT hr =
+                R30TextureUnlockRectHook.stdcall<HRESULT>(texture, level);
+            outrun::vr::dx11::observe_texture_unlock_rect(
+                texture, level, hr);
+            return hr;
+        }
+
+        bool R30EnsureTextureMutationHooks(IDirect3DTexture9* texture)
+        {
+            if (!texture)
+                return false;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            auto** vtable = *reinterpret_cast<void***>(texture);
+            if (!R30TextureLockRectHook)
+                R30TextureLockRectHook = safetyhook::create_inline(
+                    vtable[R30TextureLockRectVtableIndex],
+                    R30TextureLockRectDest);
+            if (!R30TextureUnlockRectHook)
+                R30TextureUnlockRectHook = safetyhook::create_inline(
+                    vtable[R30TextureUnlockRectVtableIndex],
+                    R30TextureUnlockRectDest);
+            return R30TextureLockRectHook && R30TextureUnlockRectHook;
+        }
+
         bool R30EnsureVertexBufferHooks(IDirect3DVertexBuffer9* buffer)
         {
             if (!buffer)
@@ -579,6 +628,42 @@ namespace OutRunVRStereo
                 R30IndexBufferUnlockHook && R30IndexBufferReleaseHook;
         }
 
+        HRESULT __stdcall R30CreateTextureDest(
+            IDirect3DDevice9* device, UINT width, UINT height, UINT levels,
+            DWORD usage, D3DFORMAT format, D3DPOOL pool,
+            IDirect3DTexture9** out, HANDLE* shared)
+        {
+            const HRESULT hr = R30CreateTextureHook.stdcall<HRESULT>(
+                device, width, height, levels, usage, format, pool, out, shared);
+            if (SUCCEEDED(hr) && out && *out)
+                R30EnsureTextureMutationHooks(*out);
+            return hr;
+        }
+
+        HRESULT __stdcall R30UpdateSurfaceDest(
+            IDirect3DDevice9* device,
+            IDirect3DSurface9* source, const RECT* sourceRect,
+            IDirect3DSurface9* destination, const POINT* destinationPoint)
+        {
+            const HRESULT hr = R30UpdateSurfaceHook.stdcall<HRESULT>(
+                device, source, sourceRect, destination, destinationPoint);
+            outrun::vr::dx11::observe_update_surface(
+                source, destination, hr);
+            return hr;
+        }
+
+        HRESULT __stdcall R30UpdateTextureDest(
+            IDirect3DDevice9* device,
+            IDirect3DBaseTexture9* source,
+            IDirect3DBaseTexture9* destination)
+        {
+            const HRESULT hr = R30UpdateTextureHook.stdcall<HRESULT>(
+                device, source, destination);
+            outrun::vr::dx11::observe_update_texture(
+                source, destination, hr);
+            return hr;
+        }
+
         HRESULT __stdcall R30CreateVertexBufferDest(
             IDirect3DDevice9* device, UINT length, DWORD usage, DWORD fvf,
             D3DPOOL pool, IDirect3DVertexBuffer9** out, HANDLE* shared)
@@ -617,6 +702,18 @@ namespace OutRunVRStereo
             if (!device)
                 return;
             auto** vtable = *reinterpret_cast<void***>(device);
+            if (!R30CreateTextureHook)
+                R30CreateTextureHook = safetyhook::create_inline(
+                    vtable[R30CreateTextureVtableIndex],
+                    R30CreateTextureDest);
+            if (!R30UpdateSurfaceHook)
+                R30UpdateSurfaceHook = safetyhook::create_inline(
+                    vtable[R30UpdateSurfaceVtableIndex],
+                    R30UpdateSurfaceDest);
+            if (!R30UpdateTextureHook)
+                R30UpdateTextureHook = safetyhook::create_inline(
+                    vtable[R30UpdateTextureVtableIndex],
+                    R30UpdateTextureDest);
             if (!R30CreateVertexBufferHook)
                 R30CreateVertexBufferHook = safetyhook::create_inline(
                     vtable[R30CreateVertexBufferVtableIndex],
@@ -625,9 +722,11 @@ namespace OutRunVRStereo
                 R30CreateIndexBufferHook = safetyhook::create_inline(
                     vtable[R30CreateIndexBufferVtableIndex],
                     R30CreateIndexBufferDest);
-            if (!R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
+            if (!R30CreateTextureHook || !R30UpdateSurfaceHook ||
+                !R30UpdateTextureHook ||
+                !R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
                 spdlog::warn(
-                    "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
+                    "VR R30.6 RESOURCE OBSERVER: buffer/texture creation or update hook incomplete; DX11 census remains fail-closed");
         }
 
         void R30RollbackBufferShadowHooks() noexcept
@@ -636,6 +735,11 @@ namespace OutRunVRStereo
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
             // shadow object.
+            R30UpdateTextureHook = {};
+            R30UpdateSurfaceHook = {};
+            R30CreateTextureHook = {};
+            R30TextureUnlockRectHook = {};
+            R30TextureLockRectHook = {};
             R30CreateIndexBufferHook = {};
             R30CreateVertexBufferHook = {};
             R30IndexBufferUnlockHook = {};
