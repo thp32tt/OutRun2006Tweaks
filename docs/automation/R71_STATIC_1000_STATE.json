@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 5,
+  "completedCycles": 6,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "ab79e6b871e91cea4f8e7ef52c7a67448bfbd669",
+  "currentHead": "cee9e99ff92eb7037474674f72a465c87118ec8c",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -138,18 +138,52 @@
       "automationValidation": "EXACT_HEAD_CI_PENDING; bounded fix matches previously build-verified lifetime policy",
       "runtimeValidation": "UNTESTED",
       "next": "Require host architecture/build pass; later HMD reset/session-recreation test must confirm no DirectGPU ring stall."
+    },
+    {
+      "cycle": 6,
+      "lenses": [
+        "HUD false-positive minimization",
+        "canonical EXE evidence",
+        "semantic ownership precision",
+        "regression containment"
+      ],
+      "findingKeys": [
+        "R71-OUTRUN-HUD-BROAD-RANGE-REMOVAL-001"
+      ],
+      "findings": [
+        "Refreshed canonical analyzer enumerated all direct BA9D0 callers and found none in 0x097300-0x097F00. The broad R71 semantic range was therefore unnecessary for the BA9D0 bridge and could create false-positive ScreenHud classification in other consumers."
+      ],
+      "evidence": [
+        "HUD Inspector static analysis run 36459711964 static-exe-analysis SUCCESS",
+        "artifact 10986444684",
+        "exact OutRun Sumo_Printf 0x975EE/0x97727/0x977FB",
+        "exact result clip 0x97BB7/0x97DA7",
+        "exact rival projection/sprani 0xBB6F0/0xBB796",
+        "BA9D0 callers only in 0xBBACB-0xBEA3B families"
+      ],
+      "changedFiles": [
+        "src/vr/hud_semantics.hpp",
+        "tools/verify_vr_proven_baseline.py"
+      ],
+      "commits": [
+        "450d8a119b58e67f6599ecde174df54283722645",
+        "cee9e99ff92eb7037474674f72a465c87118ec8c"
+      ],
+      "automationValidation": "EXE_STATIC_ANALYSIS_EVIDENCE_PASS; FINAL_HEAD_BUILD_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "Keep exact bracket hooks for OutRun stage text; no broad range restoration unless new runtime evidence proves a missing exact producer."
     }
   ],
   "nextCycle": {
-    "cycle": 6,
+    "cycle": 7,
     "priority": [
-      "consume exact-parent CI/HUD Inspector",
-      "narrow BA9D0 ownership from exact analyzer output",
-      "review skipped-frame ACK/watermark ownership without mixing divergent patches",
-      "measure R14 external-write-hook misses before optimization",
-      "defer SkyGlow intensity to user HMD"
+      "consume exact-parent CI",
+      "review skipped-frame/transition-watermark ACK ownership",
+      "instrument R14 external-write hook misses if evidence supports",
+      "review Reset/DirectGPU generation boundaries",
+      "defer visual tuning to user HMD"
     ],
-    "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no wholesale host branch cherry-pick."
+    "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no broad semantic heuristics."
   },
-  "updatedKst": "2026-09-29T02:41:29+09:00"
+  "updatedKst": "2026-09-29T02:44:36+09:00"
 }
