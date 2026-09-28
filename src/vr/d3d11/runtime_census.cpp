@@ -50,6 +50,7 @@ namespace outrun::vr::dx11
             DWORD fvf{};
             std::uint64_t vertexDeclHash{};
             UINT vertexDeclElements{};
+            std::array<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> vertexDeclElementsData{};
             UINT streamOffset{};
             UINT stride{};
             D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
@@ -211,6 +212,8 @@ namespace outrun::vr::dx11
                         }
                         sig.vertexDeclHash = declHash;
                         sig.vertexDeclElements = actual;
+                        for (UINT i = 0; i < actual; ++i)
+                            sig.vertexDeclElementsData[i] = elements[i];
                     }
                 }
                 declaration->Release();
@@ -329,6 +332,24 @@ namespace outrun::vr::dx11
                     sig.mipFilter,
                     sig.addressU,
                     sig.addressV);
+
+                if (sig.vertexDeclaration && sig.vertexDeclElements > 0)
+                {
+                    for (UINT i = 0; i < sig.vertexDeclElements; ++i)
+                    {
+                        const auto& element = sig.vertexDeclElementsData[i];
+                        spdlog::info(
+                            "VR DX11 R72 decl signature#{} elem#{}: stream={} offset={} type={} method={} usage={} usageIndex={}",
+                            unique,
+                            i,
+                            element.Stream,
+                            element.Offset,
+                            element.Type,
+                            element.Method,
+                            element.Usage,
+                            element.UsageIndex);
+                    }
+                }
             }
         }
 
