@@ -42,16 +42,18 @@ namespace outrun::vr::dx11
     [[nodiscard]] PipelineTranslation translate_pipeline(
         const OutRunVR::DrawState::RenderStateSnapshot& source) noexcept;
 
-    // R78 translates an explicit D3D9 declaration into a canonical D3D11
-    // input-layout descriptor. FVF-only draws intentionally remain pending;
-    // programmable shader-signature compatibility remains an independent F21
-    // gate. exact therefore means descriptor-level translatability only.
+    // R79 translates either an explicit D3D9 declaration or a conservative
+    // supported FVF subset into canonical D3D11 input-layout descriptors.
+    // FVF blend-weight/index encodings and any unmodelled flag combination
+    // remain fail-closed. Programmable shader-signature compatibility remains
+    // an independent F21 gate; exact means descriptor-level readiness only.
     struct VertexInputLayoutTranslation
     {
         std::array<D3D11_INPUT_ELEMENT_DESC, MAXD3DDECLLENGTH> elements{};
         UINT elementCount = 0;
         bool exact = false;
         bool declarationPath = false;
+        bool fvfPath = false;
         bool fvfPending = false;
     };
 
