@@ -70,3 +70,10 @@ For every run keep the same route, HMD refresh, Virtual Desktop quality/codec an
 - Adds draw-proven selective XYZRHW shadow ownership, lock-free Bloom fast rejection for untracked VB/IB Lock/Unlock/Release, long-session Bloom rebuild, relaxed atomic diagnostics, explicit deferred-query cleanup, and deterministic smoke-test execution for every experiment matrix candidate.
 - Additional orthogonal review: `docs/VR_R69_PERF_REVIEW_V3.md`.
 - Test EXP_ALL_V3 before V2/older combined candidates.
+
+
+## EXP_ALL_V4
+- Source checkpoint: `670fda17836012d61be399bd03ac3287ab689294`.
+- Adds exception-safe XYZRHW registration fencing, definitive post-insert Bloom publication, DirectGPU generation quarantine for unverifiable deferred EVENT completion, same-slot lifetime violation quarantine, and stale-generation fault isolation.
+- Second diversified 100-unit review: `docs/VR_R69_PERF_REVIEW_V4_100.md`.
+- Test EXP_ALL_V4 before V3/older combined candidates.
