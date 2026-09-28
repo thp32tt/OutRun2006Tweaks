@@ -1,5 +1,5 @@
 {
-  "schema_version": 66,
+  "schema_version": 67,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "W00007 C92: zoom_review indices 25/27/29/31/150/174/180/194 are resolved as preserve-original/no-localizable-text after A/B durable review plus C source-identity/provenance cross-check.",
-    "Remaining unresolved zoom_review count is 35; resolved preserve-original zoom_review count is 12.",
-    "Keep D6DC1380 (W00005) and C4A2937B (W00006) single-DDS isolation cases active as separate runtime tests; no W00007 DDS bytes changed.",
-    "Existing REWORK/HOLD DDS states remain unchanged; do not infer new pixel/format/alpha/orientation PASS from this metadata-only wave.",
-    "Continue unrelated pending_artwork and remaining zoom_review production; runtime-isolation backlog remains asset-local."
+    "W00008 C93: produce promoted Total Rank assets 26/28/30/32/35 from each exact HD English DDS; canonical wording is 종합 랭크 and exact decoded-pixel source bbox is mandatory before any candidate write.",
+    "Rows 33/37/45 are resolved preserve-original; remaining unresolved zoom_review count is 27 and resolved preserve-original zoom_review count is 15.",
+    "Keep D6DC1380 (W00005) and C4A2937B (W00006) single-DDS isolation cases active as separate runtime tests; W00008 changed no DDS bytes.",
+    "Existing REWORK/HOLD DDS states remain unchanged; do not infer pixel/format/mipmap/alpha/orientation PASS from the W00008 metadata-only classification.",
+    "Extend artwork planning for newly promoted indices 26/28/30/32/35, then continue pending localize_text and remaining zoom_review production."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -1387,60 +1387,64 @@
     "next_action": "Next A+B wave remains source-gated on GitHub-available canonical/HD DDS bytes; preserve existing REWORK/HOLD/PENDING_C states and require isolated DDS_ONLY in-game validation before approval."
   },
   "latest_wave_barrier": {
-    "recorded_at_kst": "2026-09-29T02:54:00+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00025",
-    "wave_id": "W00007",
-    "result": "PASS_W00007_SYNC_8_ZOOM_REVIEW_RESOLVED_PRESERVE_ORIGINAL_NO_NEW_APPROVALS",
-    "base_head": "747c4bafac2afdd1d7b1355ecbfc712377dcc0a4",
-    "lane_a": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
-    "lane_b": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+    "recorded_at_kst": "2026-09-29T03:19:00+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00028",
+    "wave_id": "W00008",
+    "result": "PASS_W00008_SYNC_5_LOCALIZABLE_PROMOTED_3_PRESERVE_NO_NEW_DDS_APPROVALS",
+    "base_head": "9e33ff5f28a5db8b05195d5b071b7e9f4714a90f",
+    "lane_a": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE",
+    "lane_b": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
     "lane_remote_ci": {
-      "A": "PASS",
+      "A": "NOT_RECORDED_IN_A_TERMINAL_JSON_STATIC_PRECOMMIT_DURABLE",
       "B": "PASS"
     },
     "candidate_dds_modified": false,
     "material_backlog_action": {
-      "type": "ZOOM_REVIEW_RESOLUTION_MERGE",
-      "zoom_review_resolved_indices": [
-        25,
-        27,
-        29,
-        31,
-        150,
-        174,
-        180,
-        194
+      "type": "ZOOM_REVIEW_RECONCILIATION",
+      "promoted_to_localize_text": [
+        26,
+        28,
+        30,
+        32,
+        35
       ],
-      "state": "PRESERVE_ORIGINAL_NO_LOCALIZABLE_TEXT"
+      "preserve_original": [
+        33,
+        37,
+        45
+      ],
+      "canonical_translation": {
+        "Total Rank": "종합 랭크"
+      }
     },
     "asset_queue_modified": true,
     "asset_queue_status_changed": true,
     "asset_queue_status_rows": [
-      25,
-      27,
-      29,
-      31,
-      150,
-      174,
-      180,
-      194
+      26,
+      28,
+      30,
+      32,
+      33,
+      35,
+      37,
+      45
     ],
     "queue_recompute": {
       "rows": 137,
       "actions": {
-        "localize_text": 79,
+        "localize_text": 84,
         "font_pipeline": 9,
         "hangul_name_entry": 1,
-        "zoom_review": 47,
+        "zoom_review": 42,
         "preserve_brand_song_credit": 1
       },
       "statuses": {
         "c90_single_dds_isolation_ready_pending_ingame": 1,
         "blocked_runtime_font": 9,
         "blocked_runtime_name_entry": 1,
-        "preserve_original": 13,
-        "blocked_review": 35,
-        "pending_artwork": 63,
+        "preserve_original": 16,
+        "pending_artwork": 68,
+        "blocked_review": 27,
         "rework_required_zero_pixel_or_artifact": 6,
         "b95_self_qa_pass_pending_c": 1,
         "a_auto_self_qa_pass_pending_c": 1,
@@ -1451,12 +1455,12 @@
         "c86_containment_pass_high_risk_pending_ingame": 2
       },
       "direct_image_scope": 126,
-      "zoom_review_unresolved": 35,
-      "zoom_review_resolved_preserve_original": 12
+      "zoom_review_unresolved": 27,
+      "zoom_review_resolved_preserve_original": 15
     },
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json"
+    "report": "localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json"
   },
   "c88_w00003_barrier": {
     "recorded_at_kst": "2026-09-28T23:37:00+09:00",
@@ -1808,5 +1812,81 @@
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json"
+  },
+  "c93_w00008_barrier": {
+    "recorded_at_kst": "2026-09-29T03:19:00+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00028",
+    "wave_id": "W00008",
+    "result": "PASS_W00008_SYNC_5_LOCALIZABLE_PROMOTED_3_PRESERVE_NO_NEW_DDS_APPROVALS",
+    "base_head": "9e33ff5f28a5db8b05195d5b071b7e9f4714a90f",
+    "lane_a": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE",
+    "lane_b": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
+    "lane_remote_ci": {
+      "A": "NOT_RECORDED_IN_A_TERMINAL_JSON_STATIC_PRECOMMIT_DURABLE",
+      "B": "PASS"
+    },
+    "candidate_dds_modified": false,
+    "material_backlog_action": {
+      "type": "ZOOM_REVIEW_RECONCILIATION",
+      "promoted_to_localize_text": [
+        26,
+        28,
+        30,
+        32,
+        35
+      ],
+      "preserve_original": [
+        33,
+        37,
+        45
+      ],
+      "canonical_translation": {
+        "Total Rank": "종합 랭크"
+      }
+    },
+    "asset_queue_modified": true,
+    "asset_queue_status_changed": true,
+    "asset_queue_status_rows": [
+      26,
+      28,
+      30,
+      32,
+      33,
+      35,
+      37,
+      45
+    ],
+    "queue_recompute": {
+      "rows": 137,
+      "actions": {
+        "localize_text": 84,
+        "font_pipeline": 9,
+        "hangul_name_entry": 1,
+        "zoom_review": 42,
+        "preserve_brand_song_credit": 1
+      },
+      "statuses": {
+        "c90_single_dds_isolation_ready_pending_ingame": 1,
+        "blocked_runtime_font": 9,
+        "blocked_runtime_name_entry": 1,
+        "preserve_original": 16,
+        "pending_artwork": 68,
+        "blocked_review": 27,
+        "rework_required_zero_pixel_or_artifact": 6,
+        "b95_self_qa_pass_pending_c": 1,
+        "a_auto_self_qa_pass_pending_c": 1,
+        "b94_self_qa_pass_pending_c": 1,
+        "c91_single_dds_isolation_ready_pending_ingame": 1,
+        "c85_pixel_visual_pass_pending_ingame": 2,
+        "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+        "c86_containment_pass_high_risk_pending_ingame": 2
+      },
+      "direct_image_scope": 126,
+      "zoom_review_unresolved": 27,
+      "zoom_review_resolved_preserve_original": 15
+    },
+    "approved_dds_count": 0,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json"
   }
 }
