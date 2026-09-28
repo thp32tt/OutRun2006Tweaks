@@ -39,6 +39,25 @@ namespace outrun::vr::dx11
         bool requiresCpuShadow = false;
     };
 
+    enum class BufferMutationUpdateKind : std::uint8_t
+    {
+        Unsupported = 0,
+        DynamicMapWrite,
+        DynamicMapWriteDiscard,
+        DynamicMapWriteNoOverwrite,
+        DefaultUpdateSubresource,
+        ManagedCpuShadowRead,
+        ManagedCpuShadowWrite,
+    };
+
+    struct BufferMutationTranslation
+    {
+        BufferMutationUpdateKind kind = BufferMutationUpdateKind::Unsupported;
+        D3D11_MAP mapType = D3D11_MAP_WRITE;
+        bool planExact = false;
+        bool requiresCpuShadow = false;
+    };
+
     // Conservative translation contract used by the passive R72/R73 census.
     // "exact" means the source format can be represented without inventing
     // channel/depth semantics. Unknown/inexact formats remain on the D3D9 path.
@@ -55,4 +74,15 @@ namespace outrun::vr::dx11
         ResourceRole role,
         D3DPOOL pool,
         DWORD usage) noexcept;
+
+    // R75 classifies VB/IB Lock flags into a concrete future D3D11 mirror
+    // update operation. planExact describes the translation plan only; it
+    // does not mean that a live D3D11 mirror path or native draw is enabled.
+    // MANAGED locks remain explicitly pending until the CPU-shadow/reset
+    // generation model exists.
+    [[nodiscard]] BufferMutationTranslation translate_buffer_mutation(
+        ResourceRole role,
+        D3DPOOL pool,
+        DWORD usage,
+        DWORD lockFlags) noexcept;
 }
