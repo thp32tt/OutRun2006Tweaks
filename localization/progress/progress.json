@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T05:40:00+09:00",
+  "updated_at_kst": "2026-09-29T06:19:30+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -52,11 +52,11 @@
     "graphics_localization": {
       "status": "zero_pixel_bbox_rework_required",
       "transcription_percent": 100,
-      "draft_artwork_percent": 84.04,
+      "draft_artwork_percent": 83.16,
       "final_artwork_percent": 0,
-      "transcribed_assets": 94,
+      "transcribed_assets": 95,
       "full_draft_candidates": 79,
-      "total_artwork_targets": 94,
+      "total_artwork_targets": 95,
       "source_faithful_reviewed": 32,
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1
@@ -103,43 +103,43 @@
     "graphics_transcription": {
       "status": "done",
       "percent": 100,
-      "transcribed_assets": 94,
-      "localize_text_targets": 94,
-      "transcribed_segments": 749,
+      "transcribed_assets": 95,
+      "localize_text_targets": 95,
+      "transcribed_segments": 750,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
     "graphics_artwork": {
       "status": "zero_pixel_bbox_rework_required",
       "final_artwork_percent": 0,
-      "draft_percent": 84.04,
+      "draft_percent": 83.16,
       "completed": 0,
       "full_draft_candidates": 79,
-      "total": 94,
+      "total": 95,
       "source_faithful_reviewed": 32,
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
-      "percent": 7.45,
+      "percent": 7.37,
       "proof_specs": 7,
       "final_artwork_completed": 0,
-      "total": 94
+      "total": 95
     },
     "graphics_artwork_planning": {
       "status": "done",
       "percent": 100,
-      "planned_assets": 94,
-      "translated_segments": 749,
+      "planned_assets": 95,
+      "translated_segments": 750,
       "plan_file": "localization/graphics/artwork_plan.jsonl",
-      "localize_text_targets": 94,
-      "transcribed_segments": 749,
+      "localize_text_targets": 95,
+      "transcribed_segments": 750,
       "pending_plan_assets": 0,
       "pending_indices": []
     }
   },
-  "next_checkpoint": "W00012 C97 reconciliation: A00038/B00039 durable terminal commits and successful lane CI confirmed. C retained A reconstruction inputs 35/43/47/49; promoted 206/214 to localize_text with route-map START/GOAL -> 출발/골; resolved 202/210 as preserve-original. Queue is 94 localize_text + 32 zoom_review; unresolved zoom_review 2, resolved preserve-original zoom_review 30. Canonical transcription/artwork planning are 94 assets / 749 semantic segments. No W00012 DDS candidate bytes were persisted or approved; runtime UNTESTED.",
+  "next_checkpoint": "W00013 C98 reconciliation: A00041/B00042 durable terminal commits and successful lane CI confirmed. C retained exact-HD decoded reconstruction inputs 55/99/119/195; promoted final unresolved zoom-review index 38 to localize_text (Total Rank -> 종합 랭크) and resolved 238 as preserve-original branding. Queue is 95 localize_text + 31 zoom_review; unresolved zoom_review 0, resolved preserve-original zoom_review 31. Canonical transcription/artwork planning are 95 assets / 750 semantic segments. No W00013 DDS candidate bytes were persisted or approved; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -159,17 +159,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 94,
+    "localize_text": 95,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 32,
+    "zoom_review": 31,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 94,
-    "transcribed_segments": 749,
+    "transcribed_assets": 95,
+    "transcribed_segments": 750,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -185,8 +185,8 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 94,
-    "artwork_plan_segments": 749,
+    "artwork_plan_assets": 95,
+    "artwork_plan_segments": 750,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -535,30 +535,27 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C97",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00040",
-      "wave_id": "W00012",
-      "result": "PASS_W00012_SYNC_2_PROMOTED_2_PRESERVE_6_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
+      "run": "C98",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00043",
+      "wave_id": "W00013",
+      "result": "PASS_W00013_SYNC_FINAL_ZOOM_REVIEW_RESOLVED_5_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
       "approved_dds_count": 0,
-      "material_backlog_action": "RECONCILE_A00038_B00039_RECONSTRUCTION_INPUTS_AND_ZOOM_REVIEW_CLASSIFICATIONS",
+      "material_backlog_action": "RECONCILE_A00041_B00042_FINAL_ZOOM_REVIEW_AND_HD_RECONSTRUCTION_INPUTS",
       "promoted_indices": [
-        206,
-        214
+        38
       ],
       "resolved_preserve_indices": [
-        202,
-        210
+        238
       ],
       "reconstruction_input_indices": [
-        35,
-        43,
-        47,
-        49,
-        206,
-        214
+        38,
+        55,
+        99,
+        119,
+        195
       ],
-      "upstream_source_blob_identity": "PASS_32_OF_32_EXPECTED_BLOBS",
-      "report": "localization/graphics/role_C/20260929-0540-C97/C97_W00012_SYNC_FINAL_QA.json",
+      "upstream_source_blob_identity": "PASS_14_OF_14_EXPECTED_BLOBS",
+      "report": "localization/graphics/role_C/20260929-0619-C98/C98_W00013_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {

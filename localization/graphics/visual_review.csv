@@ -37,7 +37,7 @@ index,path,text_detected,action,review_status,notes
 35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,yes,localize_text,visual_reviewed,W00008 C93 classification reconciled by W00009 C94: Total Rank confirmed localizable
 36,textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds,yes,localize_text,visual_reviewed,W00011 B00036+C96: Total Rank x3 confirmed localizable; source PNG/4x atlas Git identities revalidated; candidate pending exact decoded-pixel bbox QA
 37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,maybe,zoom_review,visual_reviewed,
-38,textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds,maybe,zoom_review,visual_reviewed,
+38,textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds,yes,localize_text,visual_reviewed,W00013 B00042+C98: Total Rank x3 confirmed localizable -> 종합 랭크; candidate pending exact HD decoded-pixel bbox QA
 39,textures/load/spr_sprani_common_cvt_xst/110B6849_256x256.dds,no,no_localization,visual_reviewed,
 40,textures/load/spr_sprani_common_cvt_xst/16729EC5_128x64.dds,no,no_localization,visual_reviewed,
 41,textures/load/spr_sprani_common_cvt_xst/553BF480_128x128.dds,no,no_localization,visual_reviewed,
@@ -237,7 +237,7 @@ index,path,text_detected,action,review_status,notes
 235,textures/load/spr_sprani_sumo_fe_cvt_Exst/F813D9D3_512x32.dds,no,no_localization,visual_reviewed,
 236,textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds,yes,localize_text,visual_reviewed,
 237,textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds,yes,localize_text,visual_reviewed,
-238,textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds,maybe,zoom_review,visual_reviewed,
+238,textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds,no,zoom_review,visual_reviewed,W00013 B00042+C98 resolved: OutRun 2006 Coast 2 Coast logo/branding only; preserve original
 239,textures/load/spr_sprani_sumo_loading_Exst/1EC9612_64x64.dds,no,no_localization,visual_reviewed,
 240,textures/load/spr_sprani_sumo_loading_Exst/4E9FE840_32x512.dds,no,no_localization,visual_reviewed,
 241,textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds,yes,localize_text,visual_reviewed,
