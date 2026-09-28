@@ -125,6 +125,65 @@ namespace outrun::vr::dx11
             }
         }
 
+        std::string fixed_function_argument_expression(
+            DWORD value,
+            std::size_t stageIndex,
+            const char* swizzle)
+        {
+            std::string base;
+            switch (value & D3DTA_SELECTMASK)
+            {
+            case D3DTA_DIFFUSE:
+                base = "input.diffuse";
+                break;
+            case D3DTA_CURRENT:
+                base = "current";
+                break;
+            case D3DTA_TEXTURE:
+                base = "sampled" + std::to_string(stageIndex);
+                break;
+            default:
+                return {};
+            }
+            base += swizzle;
+            return base;
+        }
+
+        std::string fixed_function_op_expression(
+            DWORD op,
+            DWORD arg1,
+            DWORD arg2,
+            std::size_t stageIndex,
+            const char* swizzle)
+        {
+            const auto first = fixed_function_argument_expression(
+                arg1, stageIndex, swizzle);
+            const auto second = fixed_function_argument_expression(
+                arg2, stageIndex, swizzle);
+            switch (op)
+            {
+            case D3DTOP_SELECTARG1:
+                return first;
+            case D3DTOP_SELECTARG2:
+                return second;
+            case D3DTOP_MODULATE:
+                return first + " * " + second;
+            default:
+                return {};
+            }
+        }
+
+        std::uint64_t hash_shader_source(const std::string& source) noexcept
+        {
+            std::uint64_t hash = 1469598103934665603ull;
+            for (const unsigned char byte : source)
+            {
+                hash ^= static_cast<std::uint64_t>(byte);
+                hash *= 1099511628211ull;
+            }
+            return hash;
+        }
+
         bool fixed_function_filter_supported(
             DWORD value, bool mip) noexcept
         {
@@ -402,6 +461,145 @@ namespace outrun::vr::dx11
                 out.unsupported |= FixedFunctionUnsupportedSamplerAddress;
         }
 
+        return out;
+    }
+
+    FixedFunctionPixelShaderPrototype
+    generate_fixed_function_pixel_shader_prototype(
+        const std::array<FixedFunctionStageState, 8>& source,
+        bool observationComplete,
+        std::uint8_t textureResourcePresentMask,
+        std::uint8_t textureResourceExactMask,
+        const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes)
+    {
+        FixedFunctionPixelShaderPrototype out{};
+        const auto readiness = translate_fixed_function_readiness(
+            source,
+            observationComplete,
+            textureResourcePresentMask,
+            textureResourceExactMask);
+        out.activeStages = readiness.activeStages;
+        if (!readiness.exact())
+        {
+            out.unsupported |=
+                FixedFunctionShaderPrototypeUnsupportedNotReady;
+            return out;
+        }
+
+        for (std::size_t stageIndex = 0;
+             stageIndex < source.size(); ++stageIndex)
+        {
+            const auto& stage = source[stageIndex];
+            if (stage.colorOp == D3DTOP_DISABLE)
+                break;
+
+            const bool usesTexture =
+                fixed_function_op_uses_texture(
+                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                fixed_function_op_uses_texture(
+                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+            if (usesTexture &&
+                textureResourceTypes[stageIndex] != D3DRTYPE_TEXTURE)
+            {
+                out.unsupported |=
+                    FixedFunctionShaderPrototypeUnsupportedResourceType;
+                return out;
+            }
+        }
+
+        auto& shader = out.source;
+        shader.reserve(4096);
+        shader +=
+            "// R84 diagnostic-only fixed-function pixel-shader prototype\n"
+            "struct PSInput\n"
+            "{\n"
+            "    float4 diffuse : COLOR0;\n";
+        for (std::size_t index = 0; index < source.size(); ++index)
+        {
+            shader += "    float4 tex";
+            shader += std::to_string(index);
+            shader += " : TEXCOORD";
+            shader += std::to_string(index);
+            shader += ";\n";
+        }
+        shader += "};\n";
+
+        for (std::size_t stageIndex = 0;
+             stageIndex < source.size(); ++stageIndex)
+        {
+            const auto& stage = source[stageIndex];
+            if (stage.colorOp == D3DTOP_DISABLE)
+                break;
+            const bool usesTexture =
+                fixed_function_op_uses_texture(
+                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                fixed_function_op_uses_texture(
+                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+            if (!usesTexture)
+                continue;
+
+            shader += "Texture2D texture";
+            shader += std::to_string(stageIndex);
+            shader += " : register(t";
+            shader += std::to_string(stageIndex);
+            shader += ");\nSamplerState sampler";
+            shader += std::to_string(stageIndex);
+            shader += " : register(s";
+            shader += std::to_string(stageIndex);
+            shader += ");\n";
+        }
+
+        shader +=
+            "float4 main(PSInput input) : SV_Target\n"
+            "{\n"
+            "    float4 current = input.diffuse;\n";
+
+        for (std::size_t stageIndex = 0;
+             stageIndex < source.size(); ++stageIndex)
+        {
+            const auto& stage = source[stageIndex];
+            if (stage.colorOp == D3DTOP_DISABLE)
+                break;
+
+            shader += "    { // stage ";
+            shader += std::to_string(stageIndex);
+            shader += "\n";
+
+            const bool usesTexture =
+                fixed_function_op_uses_texture(
+                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                fixed_function_op_uses_texture(
+                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+            if (usesTexture)
+            {
+                const auto coord = static_cast<unsigned>(
+                    stage.texCoordIndex & 0xFFFFu);
+                shader += "        float4 sampled";
+                shader += std::to_string(stageIndex);
+                shader += " = texture";
+                shader += std::to_string(stageIndex);
+                shader += ".Sample(sampler";
+                shader += std::to_string(stageIndex);
+                shader += ", input.tex";
+                shader += std::to_string(coord);
+                shader += ".xy);\n";
+            }
+
+            shader += "        float3 nextColor = ";
+            shader += fixed_function_op_expression(
+                stage.colorOp, stage.colorArg1, stage.colorArg2,
+                stageIndex, ".rgb");
+            shader += ";\n        float nextAlpha = ";
+            shader += fixed_function_op_expression(
+                stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
+                stageIndex, ".a");
+            shader +=
+                ";\n        current = float4(nextColor, nextAlpha);\n"
+                "    }\n";
+        }
+
+        shader += "    return current;\n}\n";
+        out.sourceHash = hash_shader_source(shader);
         return out;
     }
 

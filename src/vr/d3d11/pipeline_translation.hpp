@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 #include <d3d9.h>
 #include <d3d11.h>
 
@@ -95,6 +96,40 @@ namespace outrun::vr::dx11
         bool observationComplete,
         std::uint8_t textureResourcePresentMask,
         std::uint8_t textureResourceExactMask) noexcept;
+
+    // R84 is a diagnostic-only pixel-shader source prototype. It consumes
+    // only R82/R83-ready fixed-function states, emits no D3D11 shader object,
+    // and must never be interpreted as native-draw activation proof.
+    enum FixedFunctionShaderPrototypeUnsupported : std::uint32_t
+    {
+        FixedFunctionShaderPrototypeUnsupportedNone = 0,
+        FixedFunctionShaderPrototypeUnsupportedNotReady = 1u << 0,
+        FixedFunctionShaderPrototypeUnsupportedResourceType = 1u << 1,
+    };
+
+    struct FixedFunctionPixelShaderPrototype
+    {
+        std::uint32_t unsupported =
+            FixedFunctionShaderPrototypeUnsupportedNone;
+        UINT activeStages = 0;
+        std::uint64_t sourceHash = 0;
+        std::string source;
+
+        [[nodiscard]] bool generated() const noexcept
+        {
+            return unsupported ==
+                       FixedFunctionShaderPrototypeUnsupportedNone &&
+                   !source.empty();
+        }
+    };
+
+    [[nodiscard]] FixedFunctionPixelShaderPrototype
+    generate_fixed_function_pixel_shader_prototype(
+        const std::array<FixedFunctionStageState, 8>& source,
+        bool observationComplete,
+        std::uint8_t textureResourcePresentMask,
+        std::uint8_t textureResourceExactMask,
+        const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes);
 
     // R79 translates either an explicit D3D9 declaration or a conservative
     // supported FVF subset into canonical D3D11 input-layout descriptors.
