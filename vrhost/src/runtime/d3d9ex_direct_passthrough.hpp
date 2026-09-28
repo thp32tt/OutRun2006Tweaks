@@ -15,6 +15,7 @@
 #endif
 
 #include <d3d9types.h>
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <cstring>
