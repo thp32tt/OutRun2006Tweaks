@@ -1,0 +1,50 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00050",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00016",
+  "recorded_at_kst": "2026-09-29T07:38:29+09:00",
+  "initial_head_sha": "27b5e52751ee9b2f7f3c02683a3bfeae1266a08e",
+  "final_precommit_head_sha": "76120d704630fe9aa9c07ab7be40ea36a76e40ae",
+  "preserved_peer_head": true,
+  "result": "PASS_PARTIAL_HD_RGBA32_CANDIDATE_1_OF_6_SEGMENTS_SELF_QA_PENDING_C_RUNTIME",
+  "material_deliverable": {
+    "index": 215,
+    "asset": "C05E67EF",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+    "candidate_git_blob_sha": "d25457980a5b6c69602751e010e7585b29f2d8ca",
+    "candidate_sha256": "fe0d8eb827bbe7ee170f87b5b8498f02f1fb103c8aede7bdd230d41dd3d963e9",
+    "localized_segment": "15con. -> 15코스",
+    "localized_segments_this_run": 1,
+    "total_segments": 6,
+    "report": "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_PARTIAL_SELF_QA.json",
+    "proofs": [
+      "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_ENGLISH_SOURCE_vs_KOREAN_CANDIDATE_FULL.png",
+      "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_SPRITE465_ENGLISH_SOURCE_vs_KOREAN_CANDIDATE.png",
+      "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_KOSU_GLYPH_REFERENCE_MASK.png"
+    ]
+  },
+  "candidate_dds_modified": true,
+  "partial_asset": true,
+  "touched_assets": [
+    "C05E67EF"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

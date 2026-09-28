@@ -1,0 +1,344 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00050",
+  "wave_id": "W00016",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T07:38:29+09:00",
+  "initial_head_sha": "27b5e52751ee9b2f7f3c02683a3bfeae1266a08e",
+  "final_precommit_head_sha": "76120d704630fe9aa9c07ab7be40ea36a76e40ae",
+  "preserved_peer_head": {
+    "sha": "76120d704630fe9aa9c07ab7be40ea36a76e40ae",
+    "message": "localization(B): pin W00016 HD reconstruction manifests [AUTO:LOCALIZATION-LOCALIZATION_B-00051]",
+    "result": "PASS_B_W00016_HEAD_PRESERVED"
+  },
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "dependency_blocker_rule": "Unchanged dependency fingerprints; skipped without repeating identical review.",
+    "selected_index": 215,
+    "asset": "C05E67EF",
+    "queue_state_at_precommit": "215,textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass10 transcription saved",
+    "queue_blob_sha": "ab48f42403cebc04c40f3aa3e83032edbbdc7a04",
+    "rationale": "Exact GitHub HD source is 512x256 uncompressed RGBA-mask DDS and directly writable without recompression. The 15con. segment can be localized safely using a GitHub-resident Korean glyph raster reference while preserving the five GOAL labels untouched."
+  },
+  "source_identity": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "exact_hd": {
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+      "git_blob_sha": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+      "sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+      "bytes": 524416
+    },
+    "stock_png": {
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.png",
+      "git_blob_sha": "63f6cbbaeb2f1140b9e6b5b8e80ff07283a6d09f"
+    },
+    "stock_atlas": {
+      "git_blob_sha": "c3720d705ac494378805e2f70b6b12f47fde5cbc"
+    },
+    "hd_4x_atlas": {
+      "git_blob_sha": "d59e6fed81902cbadb2aa962d30e2eafa230669f"
+    },
+    "glyph_reference": {
+      "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+      "git_blob_sha": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+      "sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+      "usage": "READ_ONLY_GLYPH_CORE_REFERENCE_FOR_코_스; EVEN_SHARD_ASSET_NOT_MODIFIED",
+      "readable_orientation": "flip-Y",
+      "reference_text": "15코스 연속"
+    }
+  },
+  "dds": {
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+    "candidate_git_blob_sha": "d25457980a5b6c69602751e010e7585b29f2d8ca",
+    "candidate_sha256": "fe0d8eb827bbe7ee170f87b5b8498f02f1fb103c8aede7bdd230d41dd3d963e9",
+    "bytes": 524416,
+    "width": 512,
+    "height": 256,
+    "pitch": 2048,
+    "mip_count": 1,
+    "format": "RGBA32_MASKS",
+    "masks": [
+      "0x000000FF",
+      "0x0000FF00",
+      "0x00FF0000",
+      "0xFF000000"
+    ],
+    "header_128_byte_identical": true,
+    "rgb_bytes_changed": 0,
+    "raw_to_readable_orientation": "flip-Y"
+  },
+  "cell_mapping": [
+    {
+      "sprite": "sprite_464",
+      "source": "GOAL A",
+      "korean": "골 A",
+      "readable_cell": [
+        0,
+        0,
+        244,
+        80
+      ],
+      "source_alpha_bbox": [
+        5,
+        30,
+        243,
+        79
+      ],
+      "status": "PENDING_NOT_TOUCHED"
+    },
+    {
+      "sprite": "sprite_465",
+      "source": "15con.",
+      "korean": "15코스",
+      "readable_cell": [
+        244,
+        0,
+        244,
+        80
+      ],
+      "source_alpha_bbox": [
+        244,
+        30,
+        427,
+        79
+      ],
+      "candidate_alpha_bbox": [
+        244,
+        30,
+        419,
+        79
+      ],
+      "status": "PARTIAL_CANDIDATE_TOUCHED"
+    },
+    {
+      "sprite": "sprite_466",
+      "source": "GOAL C",
+      "korean": "골 C",
+      "readable_cell": [
+        0,
+        80,
+        244,
+        80
+      ],
+      "source_alpha_bbox": [
+        5,
+        80,
+        243,
+        159
+      ],
+      "status": "PENDING_NOT_TOUCHED"
+    },
+    {
+      "sprite": "sprite_467",
+      "source": "GOAL B",
+      "korean": "골 B",
+      "readable_cell": [
+        244,
+        80,
+        244,
+        80
+      ],
+      "source_alpha_bbox": [
+        244,
+        80,
+        427,
+        159
+      ],
+      "status": "PENDING_NOT_TOUCHED"
+    },
+    {
+      "sprite": "sprite_468",
+      "source": "GOAL E",
+      "korean": "골 E",
+      "readable_cell": [
+        0,
+        160,
+        244,
+        80
+      ],
+      "source_alpha_bbox": [
+        5,
+        160,
+        177,
+        239
+      ],
+      "status": "PENDING_NOT_TOUCHED"
+    },
+    {
+      "sprite": "sprite_469",
+      "source": "GOAL D",
+      "korean": "골 D",
+      "readable_cell": [
+        244,
+        160,
+        244,
+        80
+      ],
+      "source_alpha_bbox": [
+        246,
+        160,
+        418,
+        239
+      ],
+      "status": "PENDING_NOT_TOUCHED"
+    }
+  ],
+  "touched_element": {
+    "source": "15con.",
+    "korean": "15코스",
+    "sprite": "sprite_465",
+    "source_element_bbox": [
+      244,
+      30,
+      427,
+      79
+    ],
+    "localized_element_bbox": [
+      244,
+      30,
+      419,
+      79
+    ],
+    "delta_left": 0,
+    "delta_right": -8,
+    "delta_top": 0,
+    "delta_bottom": 0,
+    "edge_touch": true,
+    "edge_touch_reason": "unchanged source digits '15' retain original left/top/bottom extrema",
+    "replaced_source_bbox": [
+      318,
+      43,
+      427,
+      79
+    ],
+    "localized_replaced_bbox": [
+      326,
+      44,
+      419,
+      78
+    ],
+    "replaced_delta_left": 8,
+    "replaced_delta_right": -8,
+    "replaced_delta_top": 1,
+    "replaced_delta_bottom": -1,
+    "changed_pixels": 2423,
+    "changed_pixels_outside_replaced_bbox": 0,
+    "alpha_changed_pixels": 2423,
+    "introduced_alpha_outside_source_region": 0,
+    "rgb_changed_components": 0,
+    "render_spec": {
+      "preserve_prefix": "15",
+      "erase_readable_bbox": [
+        318,
+        43,
+        427,
+        79
+      ],
+      "ko_reference_crop_readable": [
+        924,
+        157,
+        79,
+        62
+      ],
+      "seu_reference_crop_readable": [
+        1006,
+        157,
+        80,
+        62
+      ],
+      "extraction": "orange core -> 1px dilation -> area downsample",
+      "ko_target_bbox": [
+        326,
+        44,
+        368,
+        78
+      ],
+      "seu_target_bbox": [
+        377,
+        44,
+        419,
+        78
+      ],
+      "target_glyph_size": [
+        43,
+        35
+      ]
+    },
+    "containment": "PASS_HIGH_RISK_EDGE_TOUCH_UNCHANGED_PREFIX",
+    "rework_status": "PARTIAL_ASSET_1_OF_6_SEGMENTS_LOCALIZED"
+  },
+  "visual_proof": {
+    "full_atlas": {
+      "path": "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_ENGLISH_SOURCE_vs_KOREAN_CANDIDATE_FULL.png",
+      "git_blob_sha": "591a34c200c3c2e787b5bdba717cf42d7606b8e7",
+      "sha256": "bd155c9344dde58be3fb718dc632082c32c46c519f097ee78883195530f6bb25",
+      "same_crop_orientation_zoom_scale": true
+    },
+    "touched_cell": {
+      "path": "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_SPRITE465_ENGLISH_SOURCE_vs_KOREAN_CANDIDATE.png",
+      "git_blob_sha": "9d38492d2dd2cfdfff78713fe9d9dfebdf1deb31",
+      "sha256": "1cc89f716cf5af8b88ad3d807d3ec3111d0a5ad7756269c53d4460b3860bf895",
+      "same_crop_orientation_zoom_scale": true
+    },
+    "glyph_reference_mask": {
+      "path": "localization/graphics/role_A/20260929-0738-A00050/A00050_C05E67EF_KOSU_GLYPH_REFERENCE_MASK.png",
+      "git_blob_sha": "35651218e8b74f1e2e9566a3424933a8a3054236",
+      "sha256": "7bbb49f5ec23150a0584586589a38c04d6b62a11f25686d98760455204f233c1"
+    },
+    "untranslated_english_residue_touched_region": "PASS_NONE_VISIBLE",
+    "clipped_korean_glyphs": "PASS_NONE_VISIBLE",
+    "neighboring_sprite_overlap": "PASS_NONE",
+    "erasure_residue": "PASS_NONE_VISIBLE",
+    "untouched_goal_cells": "BYTE_IDENTICAL"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_ODD_INDEX_215",
+    "work_steal": "NONE",
+    "source_identity": "PASS",
+    "dds_header_dimensions_format_mips": "PASS",
+    "alpha_behavior": "PASS_ALPHA_ONLY_INTENDED_REGION",
+    "raw_orientation": "PASS_FLIP_Y_READABLE",
+    "one_pixel_containment": "PASS_TOUCHED_REPLACED_REGION_8PX_LR_1PX_TB_MARGIN",
+    "whole_element_edge_touch": "HIGH_RISK_UNCHANGED_15_PREFIX_ONLY",
+    "mandatory_english_source_comparison": "PASS_FULL_ATLAS_AND_TOUCHED_CELL",
+    "wrong_replacement": "PASS_ASSET_AND_CELL_IDENTITY",
+    "background_preservation": "PASS_RGB_BYTE_IDENTICAL_AND_5_OTHER_CELLS_UNCHANGED",
+    "hangul_glyph_integrity": "PASS_STATIC_VISUAL_GITHUB_RASTER_REFERENCE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_B_W00016_FILES_UNMODIFIED",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": true,
+  "partial_asset": true,
+  "localized_segments_this_run": 1,
+  "total_segments": 6,
+  "remaining_segments": 5,
+  "touched_assets": [
+    "C05E67EF"
+  ],
+  "reviewed_or_materially_advanced_assets": [
+    "C05E67EF"
+  ],
+  "next_safe_action": "Localize GOAL A-E only after a source-faithful 골 glyph treatment is derived and each GOAL+letter full-effect bbox passes zero-pixel containment. Do not overwrite the static-passing 15코스 segment unless QA finds a defect.",
+  "result": "PASS_PARTIAL_HD_RGBA32_CANDIDATE_1_OF_6_SEGMENTS_SELF_QA_PENDING_C_RUNTIME",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
