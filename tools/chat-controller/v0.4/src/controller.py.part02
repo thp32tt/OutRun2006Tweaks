@@ -294,21 +294,31 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         if retry_visible:
             if QUEUE_MODE:
                 # In queue mode Retry is owned exclusively by the queue engine.
-                # Watchdog must never create a second retry stream.
+                # Ignore stale Retry UI from inactive tabs so it cannot overwrite
+                # the status of the actually active task.
+                qstate = load_queue_state()
+                active_slots = set()
+                if qstate.get("active") and qstate["active"].get("slot"):
+                    active_slots.add(qstate["active"]["slot"])
+                for lane_task in qstate.get("active_by_lane", {}).values():
+                    if lane_task and lane_task.get("phase") != "DONE" and lane_task.get("slot"):
+                        active_slots.add(lane_task["slot"])
                 slot.last_result = "watchdog_retry_deferred_to_queue"
                 slot.last_watchdog_at = now.isoformat()
                 save_registry(reg)
+                if slot.name not in active_slots:
+                    continue
                 if rate_limit_active(reg, datetime.now(TZ)):
                     write_runtime(
                         status="rate_limited_backoff",
-                        last_action=f"Retry visible on slot {slot.name}; queue engine waiting for adaptive backoff",
+                        last_action=f"Retry visible on active slot {slot.name}; queue engine waiting for adaptive backoff",
                         rate_limit_attempts=reg.rate_limit_attempts,
                         rate_limit_until=reg.rate_limit_until,
                     )
                 else:
                     write_runtime(
                         status="retry_deferred_to_queue",
-                        last_action=f"Retry visible on slot {slot.name}; queue engine owns retry/backoff",
+                        last_action=f"Retry visible on active slot {slot.name}; queue engine owns retry/backoff",
                     )
                 continue
 
