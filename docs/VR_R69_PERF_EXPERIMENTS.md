@@ -77,3 +77,16 @@ For every run keep the same route, HMD refresh, Virtual Desktop quality/codec an
 - Adds exception-safe XYZRHW registration fencing, definitive post-insert Bloom publication, DirectGPU generation quarantine for unverifiable deferred EVENT completion, same-slot lifetime violation quarantine, and stale-generation fault isolation.
 - Second diversified 100-unit review: `docs/VR_R69_PERF_REVIEW_V4_100.md`.
 - Test EXP_ALL_V4 before V3/older combined candidates.
+
+
+## EXP_ALL_V5 — 2026-09-28 evening test
+- Source checkpoint: `fe317bc7a06359c5ee460770fd82c0f402f6830a`.
+- V4 plus:
+  - 64-bucket registration-in-flight waits instead of a global per-class wait.
+  - shadow allocation/registration is fully fail-open on allocation exceptions.
+  - COM Release cleanup erases only the exact pre-Release shadow identity.
+  - CreateVertexBuffer/CreateIndexBuffer purge stale raw-pointer registry identity before reuse.
+  - R32 EVENT allocation failure quarantines the DirectGPU generation and drops to the lower SafeEye recovery path.
+- Dedicated build workflow: `.github/workflows/vr-r69-v5-evening-test.yml`.
+- Artifact: `OutRun2_VR_R69_V5_EVENING_TEST.zip`.
+- Status: TEST_ONLY_NOT_FOR_INTEGRATION until HMD validation.
