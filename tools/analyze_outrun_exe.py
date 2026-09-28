@@ -18,6 +18,7 @@ from pathlib import Path
 
 KNOWN_TARGETS = {
     0x02CFE0: "put_sprite_ex",
+    0x02D0C0: "put_sprite_ex2",
     0x029580: "sprani_play_ae_auth_alpha",
     0x02D280: "put_clip_sprite",
     0x02CCB0: "sprSetFontPriority",
@@ -213,7 +214,15 @@ def parse_pe(data: bytes) -> PE:
 
 def guess_function_start(text: bytes, text_rva: int, index: int) -> int | None:
     lo = max(0, index - 0x500)
-    prologues = (b"\x55\x8b\xec", b"\x53\x56\x57", b"\x56\x8b\xf1")
+    prologues = (
+        b"\x55\x8b\xec",
+        b"\x8b\xff\x55\x8b\xec",
+        b"\x53\x56\x57",
+        b"\x56\x8b\xf1",
+        b"\x83\xec",
+        b"\x81\xec",
+        b"\x6a\xff\x68",
+    )
     for pos in range(index, lo - 1, -1):
         if any(text.startswith(p, pos) for p in prologues):
             return text_rva + pos
