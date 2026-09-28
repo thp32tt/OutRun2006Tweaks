@@ -1232,3 +1232,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - W00011 persisted **0 new/reworked Korean DDS bytes**. No clipping/1-pixel containment, DDS format/mipmap/alpha/transparency/orientation, background/artifact or ENGLISH SOURCE vs KOREAN CANDIDATE raster PASS is inferred; new approvals **0**, approved/locked DDS **0**.
 - No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone, GPT Library, VR/FFB/DX work, or game build was used.
 - Machine report: `localization/graphics/role_C/20260929-0513-C96/C96_W00011_SYNC_FINAL_QA.json`.
+
+### C97 W00012 synchronization barrier — 2026-09-29T05:40:00+09:00
+- Barrier gate: PASS. A00038 `c9d1e7c1bb39d3a450660fa5750620b74e4f2859` and B00039 `9cac14635213638f148b09f4ea0baf053423e4e6` are durable in current HEAD ancestry; Localization Automation Gate / Localization State / Domain Isolation Guard succeeded on both exact lane commits.
+- GitHub-only cross-lane source identity QA: **32/32** expected original/HD/atlas Git blobs match `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`.
+- A reconstruction inputs retained: 35 `E989E3B7`, 43 `455717B2`, 47 `AD720950`, 49 `BF3EE5C6`. B promotions: 206 `AEA507A4` START -> `출발`; 214 `BF229CF4` START/GOAL -> `출발`/`골`. Preserve-original: 202 `AB56F682`, 210 `B5BB7AB0`.
+- Queue: 137 rows = **94 localize_text / 32 zoom_review / 9 font / 1 Hangul name-entry / 1 preserve-only**; unresolved zoom-review **2**, resolved preserve-original **30**. Transcription/artwork plan: **94 assets / 749 semantic segments**.
+- Candidate DDS writes: **0**. New static approvals: **0**. Because no candidate bytes changed, clipping/Hangul-raster, zero-pixel containment, DDS format/mipmap/alpha/transparency/orientation, background/wrong-replacement and English-source-vs-Korean raster promotion are **NOT_APPLICABLE for new bytes**; newly promoted assets remain HOLD until exact HD decoded-pixel reconstruction and side-by-side proof exist.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
+- Report: `localization/graphics/role_C/20260929-0540-C97/C97_W00012_SYNC_FINAL_QA.json`.
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`

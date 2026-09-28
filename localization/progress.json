@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T05:13:00+09:00",
+  "updated_at_kst": "2026-09-29T05:40:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -52,11 +52,11 @@
     "graphics_localization": {
       "status": "zero_pixel_bbox_rework_required",
       "transcription_percent": 100,
-      "draft_artwork_percent": 85.87,
+      "draft_artwork_percent": 84.04,
       "final_artwork_percent": 0,
-      "transcribed_assets": 92,
+      "transcribed_assets": 94,
       "full_draft_candidates": 79,
-      "total_artwork_targets": 92,
+      "total_artwork_targets": 94,
       "source_faithful_reviewed": 32,
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1
@@ -103,43 +103,43 @@
     "graphics_transcription": {
       "status": "done",
       "percent": 100,
-      "transcribed_assets": 92,
-      "localize_text_targets": 92,
-      "transcribed_segments": 746,
+      "transcribed_assets": 94,
+      "localize_text_targets": 94,
+      "transcribed_segments": 749,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
     "graphics_artwork": {
       "status": "zero_pixel_bbox_rework_required",
       "final_artwork_percent": 0,
-      "draft_percent": 85.87,
+      "draft_percent": 84.04,
       "completed": 0,
       "full_draft_candidates": 79,
-      "total": 92,
+      "total": 94,
       "source_faithful_reviewed": 32,
       "source_faithful_localized_candidates": 31,
       "reset_to_original_pending_rework": 1
     },
     "graphics_artwork_pipeline": {
       "status": "proof_renderer_ready",
-      "percent": 7.61,
+      "percent": 7.45,
       "proof_specs": 7,
       "final_artwork_completed": 0,
-      "total": 92
+      "total": 94
     },
     "graphics_artwork_planning": {
       "status": "done",
       "percent": 100,
-      "planned_assets": 92,
-      "translated_segments": 746,
+      "planned_assets": 94,
+      "translated_segments": 749,
       "plan_file": "localization/graphics/artwork_plan.jsonl",
-      "localize_text_targets": 92,
-      "transcribed_segments": 746,
+      "localize_text_targets": 94,
+      "transcribed_segments": 749,
       "pending_plan_assets": 0,
       "pending_indices": []
     }
   },
-  "next_checkpoint": "W00011 C96 reconciliation: A00035/B00036 durable terminal commits and successful lane CI were confirmed. C promoted indices 36/62/217/219 to localize_text and resolved 166/177/178/189/191 as preserve-original. Queue is 92 localize_text + 34 zoom_review; unresolved zoom_review 6, resolved preserve-original zoom_review 28. Canonical transcription/artwork planning are 92 assets / 746 semantic segments. Index 217 START is context-corrected to 출발 for route-map labeling. No W00011 DDS candidate bytes were persisted or approved; runtime UNTESTED.",
+  "next_checkpoint": "W00012 C97 reconciliation: A00038/B00039 durable terminal commits and successful lane CI confirmed. C retained A reconstruction inputs 35/43/47/49; promoted 206/214 to localize_text with route-map START/GOAL -> 출발/골; resolved 202/210 as preserve-original. Queue is 94 localize_text + 32 zoom_review; unresolved zoom_review 2, resolved preserve-original zoom_review 30. Canonical transcription/artwork planning are 94 assets / 749 semantic segments. No W00012 DDS candidate bytes were persisted or approved; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -159,17 +159,17 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 92,
+    "localize_text": 94,
     "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
-    "zoom_review": 34,
+    "zoom_review": 32,
     "no_localization": 74,
     "work_queue_total": 137,
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
-    "transcribed_assets": 92,
-    "transcribed_segments": 746,
+    "transcribed_assets": 94,
+    "transcribed_segments": 749,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -185,8 +185,8 @@
     },
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
-    "artwork_plan_assets": 92,
-    "artwork_plan_segments": 746,
+    "artwork_plan_assets": 94,
+    "artwork_plan_segments": 749,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -535,26 +535,30 @@
       }
     },
     "latest_c_barrier": {
-      "run": "C95",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00034",
-      "wave_id": "W00010",
-      "result": "PASS_W00010_SYNC_4_PRESERVE_4_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
+      "run": "C97",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00040",
+      "wave_id": "W00012",
+      "result": "PASS_W00012_SYNC_2_PROMOTED_2_PRESERVE_6_RECONSTRUCTION_INPUTS_NO_NEW_DDS_APPROVALS",
       "approved_dds_count": 0,
-      "material_backlog_action": "RECONCILE_A00032_PRESERVE_CLASSIFICATIONS_AND_B00033_EXACT_HD_RECONSTRUCTION_INPUTS",
-      "promoted_indices": [],
+      "material_backlog_action": "RECONCILE_A00038_B00039_RECONSTRUCTION_INPUTS_AND_ZOOM_REVIEW_CLASSIFICATIONS",
+      "promoted_indices": [
+        206,
+        214
+      ],
       "resolved_preserve_indices": [
-        157,
-        165,
-        169,
-        171
+        202,
+        210
       ],
       "reconstruction_input_indices": [
-        34,
-        44,
-        52,
-        172
+        35,
+        43,
+        47,
+        49,
+        206,
+        214
       ],
-      "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json",
+      "upstream_source_blob_identity": "PASS_32_OF_32_EXPECTED_BLOBS",
+      "report": "localization/graphics/role_C/20260929-0540-C97/C97_W00012_SYNC_FINAL_QA.json",
       "runtime_validation": "UNTESTED"
     },
     "single_dds_isolation": {
@@ -577,8 +581,8 @@
         "W00006_C00022_C4A2937B"
       ]
     },
-    "zoom_review_unresolved": 6,
-    "zoom_review_resolved_preserve_original": 28
+    "zoom_review_unresolved": 2,
+    "zoom_review_resolved_preserve_original": 30
   },
   "data_build": {
     "draft_bin_entries": 1356,

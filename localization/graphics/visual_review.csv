@@ -201,19 +201,19 @@ index,path,text_detected,action,review_status,notes
 199,textures/load/spr_sprani_sumo_fe_cvt_Exst/A737D1C1_512x512.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 200,textures/load/spr_sprani_sumo_fe_cvt_Exst/A80D3DD_1024x512.dds,no,no_localization,visual_reviewed,
 201,textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds,yes,localize_text,visual_reviewed,
-202,textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds,maybe,zoom_review,visual_reviewed,
+202,textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds,no,zoom_review,visual_reviewed,W00012 B00039+C97 resolved: scenic/course-card + protected OutRun2SP logo artwork only; preserve original
 203,textures/load/spr_sprani_sumo_fe_cvt_Exst/AC5857B2_512x256.dds,no,no_localization,visual_reviewed,
 204,textures/load/spr_sprani_sumo_fe_cvt_Exst/ACBA3534_128x128.dds,no,no_localization,visual_reviewed,
 205,textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds,yes,localize_text,visual_reviewed,
-206,textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds,maybe,zoom_review,visual_reviewed,
+206,textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds,yes,localize_text,visual_reviewed,W00012 B00039+C97: route-map START confirmed localizable -> 출발; candidate pending exact decoded-pixel bbox QA
 207,textures/load/spr_sprani_sumo_fe_cvt_Exst/AF711D18_256x256.dds,no,no_localization,visual_reviewed,
 208,textures/load/spr_sprani_sumo_fe_cvt_Exst/B2EC23A1_1024x128.dds,no,no_localization,visual_reviewed,
 209,textures/load/spr_sprani_sumo_fe_cvt_Exst/B3D9B074_256x512.dds,yes,localize_text,visual_reviewed,
-210,textures/load/spr_sprani_sumo_fe_cvt_Exst/B5BB7AB0_512x512.dds,maybe,zoom_review,visual_reviewed,
+210,textures/load/spr_sprani_sumo_fe_cvt_Exst/B5BB7AB0_512x512.dds,no,zoom_review,visual_reviewed,W00012 B00039+C97 resolved: scenic/course-card + protected OutRun2SP logo artwork only; preserve original
 211,textures/load/spr_sprani_sumo_fe_cvt_Exst/B9B5B1BC_64x64.dds,yes_preserve,preserve_brand_song_credit,visual_reviewed,
 212,textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds,yes,localize_text,visual_reviewed,
 213,textures/load/spr_sprani_sumo_fe_cvt_Exst/BB30665E_512x128.dds,no,no_localization,visual_reviewed,
-214,textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds,maybe,zoom_review,visual_reviewed,
+214,textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds,yes,localize_text,visual_reviewed,W00012 B00039+C97: route-map START/GOAL confirmed localizable -> 출발/골; candidate pending exact decoded-pixel bbox QA
 215,textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds,yes,localize_text,visual_reviewed,
 216,textures/load/spr_sprani_sumo_fe_cvt_Exst/C0E7DBE8_256x256.dds,no,no_localization,visual_reviewed,
 217,textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds,yes,localize_text,visual_reviewed,W00011 A00035+C96: route-map START/GOAL confirmed localizable; START canonicalized to 출발 for route-map context; candidate pending exact decoded-pixel bbox QA
