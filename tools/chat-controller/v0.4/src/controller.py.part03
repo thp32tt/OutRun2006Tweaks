@@ -37,39 +37,244 @@ def start_status_server():
     log.info("status server listening on :%s", STATUS_PORT)
 
 
+
+async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
+    reg = load_registry(datetime.now(TZ))
+    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
+    if slot is None:
+        return False
+    page = await slot_page(context, pages, slot)
+    if await detect_busy(page):
+        return False
+    runtime["queue_task_id"] = active["task_id"]
+    runtime["queue_lane"] = active["lane"]
+    runtime["queue_branch"] = active["branch"]
+    runtime["queue_attempt"] = active["attempt"]
+    runtime["queue_failure_context"] = reason
+    prompt = prompt_for_slot(slot, "repair")
+    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+        return False
+    result = await send_message(page, prompt)
+    if result != "sent":
+        write_runtime(status="queue_retry_send_failed", last_action=f"{active['task_id']} retry send failed: {result}")
+        return False
+    now = datetime.now(TZ)
+    active["sent_at"] = now.isoformat()
+    active["last_hash"] = None
+    active["last_hash_changed_at"] = now.isoformat()
+    active["result_sha"] = None
+    active["phase"] = "WAIT_CHAT"
+    active["last_gate_poll_at"] = None
+    active["failure_context"] = reason
+    slot.last_sent_at = now.isoformat()
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = now.isoformat()
+    slot.last_result = "queue_retry_sent"
+    save_registry(reg)
+    return True
+
+
+async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
+    now = datetime.now(TZ)
+    q = load_queue_state()
+    reg = load_registry(now)
+    active = q.get("active")
+
+    if not active:
+        slot = reg.slots[reg.next_slot]
+        target = queue_target_for_slot(slot.name)
+        base_sha = github_branch_head(target["branch"])
+        if not base_sha:
+            write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
+            return
+        q["counter"] = int(q.get("counter", 0)) + 1
+        task_id = f"{CONTROLLER_MODE.upper()}-{target['lane']}-{q['counter']:05d}"
+        runtime["queue_task_id"] = task_id
+        runtime["queue_lane"] = target["lane"]
+        runtime["queue_branch"] = target["branch"]
+        runtime["queue_attempt"] = 1
+        runtime["queue_failure_context"] = ""
+        slot_name = slot.name
+        await run_cycle(context, pages)
+        if runtime.get("status") != "sent":
+            q["counter"] -= 1
+            save_queue_state(q)
+            return
+        q["active"] = {
+            "task_id": task_id,
+            "slot": slot_name,
+            "lane": target["lane"],
+            "branch": target["branch"],
+            "workflow": target["workflow"],
+            "base_sha": base_sha,
+            "result_sha": None,
+            "attempt": 1,
+            "phase": "WAIT_CHAT",
+            "sent_at": datetime.now(TZ).isoformat(),
+            "last_hash": None,
+            "last_hash_changed_at": datetime.now(TZ).isoformat(),
+            "last_gate_poll_at": None,
+            "failure_context": "",
+        }
+        save_queue_state(q)
+        write_runtime(status="queue_wait_chat", last_action=f"Sent {task_id}", queue=q["active"])
+        return
+
+    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
+    if slot is None:
+        active["failure_context"] = "slot_missing"
+        q["blocked"].append(active)
+        q["active"] = None
+        save_queue_state(q)
+        return
+    page = await slot_page(context, pages, slot)
+
+    if active["phase"] == "WAIT_CHAT":
+        if await detect_busy(page):
+            return
+        text = await last_assistant_text(page)
+        if not text:
+            return
+        h = stable_hash(text)
+        changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
+        if h != active.get("last_hash"):
+            active["last_hash"] = h
+            active["last_hash_changed_at"] = now.isoformat()
+            save_queue_state(q)
+            return
+        if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
+            return
+
+        head = github_branch_head(active["branch"])
+        if not head:
+            return
+        if head == active["base_sha"]:
+            sent_at = _parse_iso(active.get("sent_at")) or now
+            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                return
+            reason = "Chat response stabilized but target branch HEAD did not change; no durable Git result commit was found."
+            if active["attempt"] < MAX_TASK_ATTEMPTS:
+                active["attempt"] += 1
+                if await queue_send_retry(context, pages, active, reason):
+                    save_queue_state(q)
+                return
+            active["failure_context"] = reason
+            active["phase"] = "BLOCKED"
+        else:
+            msg = github_commit_message(head) or ""
+            expected = f"[AUTO:{active['task_id']}]"
+            if expected not in msg:
+                reason = f"Target branch changed to {head} but commit message did not contain required task marker {expected}."
+                if active["attempt"] < MAX_TASK_ATTEMPTS:
+                    active["attempt"] += 1
+                    active["base_sha"] = head
+                    if await queue_send_retry(context, pages, active, reason):
+                        save_queue_state(q)
+                    return
+                active["failure_context"] = reason
+                active["phase"] = "BLOCKED"
+            else:
+                active["result_sha"] = head
+                active["phase"] = "WAIT_ACTIONS"
+                active["last_gate_poll_at"] = None
+                save_queue_state(q)
+                write_runtime(status="queue_wait_actions", last_action=f"{active['task_id']} -> {head}", queue=active)
+                return
+
+    if active["phase"] == "WAIT_ACTIONS":
+        last_poll = _parse_iso(active.get("last_gate_poll_at"))
+        if last_poll and (now - last_poll).total_seconds() < GITHUB_POLL_SECONDS:
+            return
+        active["last_gate_poll_at"] = now.isoformat()
+        run = github_gate_run(active["branch"], active["result_sha"], active["workflow"])
+        save_queue_state(q)
+        if run is None:
+            write_runtime(status="queue_validation_pending", last_action=f"No {active['workflow']} run yet for {active['result_sha']}", queue=active)
+            return
+        active["gate_run"] = run
+        if run["status"] != "completed":
+            save_queue_state(q)
+            write_runtime(status="queue_validation_running", last_action=f"{active['workflow']} run {run['id']} is {run['status']}", queue=active)
+            return
+        if run.get("conclusion") == "success":
+            record = dict(active)
+            record["automation_validation"] = "PASS"
+            record["runtime_validation"] = "UNTESTED"
+            record["completed_at"] = now.isoformat()
+            q["completed"] = (q.get("completed", []) + [record])[-100:]
+            q["active"] = None
+            save_queue_state(q)
+            write_runtime(status="queue_pass", last_action=f"{record['task_id']} automation PASS; runtime UNTESTED", last_completed=record)
+            return
+
+        reason = f"{active['workflow']} run {run.get('id')} concluded {run.get('conclusion')}; inspect {run.get('html_url')}"
+        if active["attempt"] < MAX_TASK_ATTEMPTS:
+            active["attempt"] += 1
+            active["base_sha"] = active["result_sha"]
+            if await queue_send_retry(context, pages, active, reason):
+                save_queue_state(q)
+            return
+        active["failure_context"] = reason
+        active["phase"] = "BLOCKED"
+
+    if active["phase"] == "BLOCKED":
+        record = dict(active)
+        record["automation_validation"] = "FAIL"
+        record["runtime_validation"] = "UNTESTED"
+        record["blocked_at"] = now.isoformat()
+        q["blocked"] = (q.get("blocked", []) + [record])[-100:]
+        q["active"] = None
+        save_queue_state(q)
+        write_runtime(status="queue_blocked", last_action=f"{record['task_id']} blocked after {record['attempt']} attempts; advancing to next independent task", last_blocked=record)
+
+
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     if once:
-        await run_cycle(context, pages)
+        if QUEUE_MODE:
+            await queue_cycle(context, pages)
+        else:
+            await run_cycle(context, pages)
         return
     last_tick = None
     last_watchdog_check = 0.0
+    last_queue_check = 0.0
     write_runtime(status="idle", tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot", tab_count=len(pages))
     while True:
         now = datetime.now(TZ)
-        tick = now.strftime("%Y-%m-%dT%H:%M")
-        did_scheduled = False
-        if AUTO_SEND and now.minute in SCHEDULE_MINUTES and tick != last_tick:
-            last_tick = tick
-            did_scheduled = True
-            write_runtime(last_tick=tick, status="running")
+        mono = time.monotonic()
+        did_work = False
+
+        if AUTO_SEND and QUEUE_MODE and mono - last_queue_check >= QUEUE_CHECK_SECONDS:
+            last_queue_check = mono
+            did_work = True
             try:
-                await run_cycle(context, pages)
+                await queue_cycle(context, pages)
             except Exception as e:
-                log.exception("scheduled cycle failed")
-                write_runtime(status="error", last_error=repr(e))
+                log.exception("queue cycle failed")
+                write_runtime(status="queue_error", last_error=repr(e))
+        elif AUTO_SEND and not QUEUE_MODE:
+            tick = now.strftime("%Y-%m-%dT%H:%M")
+            if now.minute in SCHEDULE_MINUTES and tick != last_tick:
+                last_tick = tick
+                did_work = True
+                write_runtime(last_tick=tick, status="running")
+                try:
+                    await run_cycle(context, pages)
+                except Exception as e:
+                    log.exception("scheduled cycle failed")
+                    write_runtime(status="error", last_error=repr(e))
         elif not AUTO_SEND:
             if runtime.get("status") not in ("login_required", "manual_mode"):
                 write_runtime(status="manual_mode", last_action="AUTO_SEND=false; waiting for manual login/setup")
 
-        mono = time.monotonic()
-        if AUTO_SEND and WATCHDOG_ENABLED and not did_scheduled and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
+        if AUTO_SEND and WATCHDOG_ENABLED and not did_work and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
             last_watchdog_check = mono
             try:
                 await watchdog_cycle(context, pages)
             except Exception as e:
                 log.exception("watchdog cycle failed")
                 write_runtime(status="watchdog_error", last_error=repr(e))
-        await asyncio.sleep(10)
+        await asyncio.sleep(5)
 
 
 async def main_async(once: bool):
