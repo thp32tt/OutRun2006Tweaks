@@ -389,3 +389,12 @@ Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance;
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: inspect R32 inactive-eye fallback ordering.
+
+
+## Cycle 0016 — R32 fallback ordering
+
+Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance; falsification. Both eyes copy into inactive resources; fence and ACK must succeed before active-pair swap, preserving pair identity on timeout or ACK failure. No production behavior changed.
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review gameplay bootstrap freshness.
