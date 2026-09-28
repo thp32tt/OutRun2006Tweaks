@@ -2,9 +2,11 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/hud_semantics.hpp"
 
 #include <array>
 #include <atomic>
+#include <intrin.h>
 
 namespace Settings
 {
@@ -130,6 +132,13 @@ class UIScaling : public Hook
 		// disassembly shows sprite 0x3004A/0x3004B emitted only at list
 		// previous/next boundaries; keep these exact instead of widening HUD rules.
 		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
+	};
+
+	// R70 exact HMD-trace owners: three menu/list arrow edges and two
+	// OutRun final-result edges. Keep these exact; do not widen queue ownership.
+	static constexpr int R70ExactScreenHudClipSpriteCalls[] = {
+		0x460F1, 0x463D6, 0x46410,
+		0x97BB7, 0x97DA7
 	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
@@ -440,6 +449,168 @@ class UIScaling : public Hook
 		return result;
 	}
 
+
+	// R70 restores the exact R51 EXE-map producer bridge lost from the later
+	// R69 lineage. FUN_004BA9D0 is the shared numeric/text producer; its
+	// internal 0xBAAA0 put_clip_sprite and 0xBAAEA sprani edges otherwise lose
+	// the higher-level caller identity before queued SpriteNode presentation.
+	static inline SafetyHookInline R70HudTextProducer_hk{};
+	inline static thread_local bool R70HudTextProducerScreenHud = false;
+	inline static std::atomic<std::uint64_t> R70HudTextTaggedNodes{ 0 };
+
+	static std::uint32_t R70ExeCallRva(const void* returnAddress) noexcept
+	{
+		const auto base = reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+		const auto value = reinterpret_cast<std::uintptr_t>(returnAddress);
+		if (!base || value < base + 5)
+			return 0;
+		const auto returnRva = value - base;
+		return returnRva >= 5 && returnRva <= 0xFFFFFFFFu
+			? static_cast<std::uint32_t>(returnRva - 5) : 0;
+	}
+
+	static std::uint64_t R70TagAppendedSpriteNodes(
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
+		OutRunVR::GameSemantic::RenderScope scope) noexcept
+	{
+		std::uint64_t tagged = 0;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == before[prio])
+				continue;
+			SpriteNode* node = before[prio]
+				? before[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < 0x230; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				++tagged;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+		return tagged;
+	}
+
+	static int __cdecl R70HudText_sprani(
+		std::uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		if (!R70HudTextProducerScreenHud)
+			return Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+		}
+		const auto tagged = R70TagAppendedSpriteNodes(
+			before, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		const auto total = R70HudTextTaggedNodes.fetch_add(
+			tagged, std::memory_order_relaxed) + tagged;
+		if (tagged && (total & (total - 1)) == 0)
+			spdlog::info(
+				"VR R70 OUTRUN HUD: BA9D0 sprani nodes pinned SCREEN_HUD tagged={} total={}",
+				tagged, total);
+		return result;
+	}
+
+	static int __cdecl R70HudText_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		if (!R70HudTextProducerScreenHud)
+			return Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount
+				? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			const auto total = R70HudTextTaggedNodes.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((total & (total - 1)) == 0)
+				spdlog::info(
+					"VR R70 OUTRUN HUD: BA9D0 clip node pinned SCREEN_HUD total={}",
+					total);
+		}
+		return result;
+	}
+
+	static void __cdecl R70HudTextProducer_dest(
+		int glyphSet, int x, int y, const char* text, int a4, float alpha)
+	{
+		const std::uint32_t callRva = R70ExeCallRva(_ReturnAddress());
+		const auto semantic = OutRunVRHudSemantics::ClassifyCaller(callRva);
+		const bool previous = R70HudTextProducerScreenHud;
+		R70HudTextProducerScreenHud =
+			previous ||
+			semantic.space == OutRunVR::GameSemantic::RenderScope::ScreenHud;
+
+		static std::atomic<bool> firstLogged{ false };
+		if (R70HudTextProducerScreenHud && !firstLogged.exchange(true))
+			spdlog::info(
+				"VR R70 OUTRUN HUD: FUN_004BA9D0 exact producer restored callerRva=0x{:X} semantic={}",
+				callRva, semantic.semantic);
+
+		R70HudTextProducer_hk.call(
+			glyphSet, x, y, text, a4, alpha);
+		R70HudTextProducerScreenHud = previous;
+	}
+
+	static int __cdecl R70ExactScreenHud_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount
+				? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
 
 	using DispRankSpraniFn =
 		int(__cdecl*)(std::uint32_t, float, float, int, int);
@@ -1088,6 +1259,17 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+
+		// R70 exact producer/edge ownership from the 92ce3403 HMD trace.
+		R70HudTextProducer_hk = safetyhook::create_inline(
+			Module::exe_ptr(0xBA9D0), R70HudTextProducer_dest);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBAAA0),
+			R70HudText_putClipSprite, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBAAEA),
+			R70HudText_sprani, Memory::HookType::Call);
+		for (int addr : R70ExactScreenHudClipSpriteCalls)
+			Memory::VP::InjectHook(Module::exe_ptr(addr),
+				R70ExactScreenHud_putClipSprite, Memory::HookType::Call);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarker_SpraniCalls)
