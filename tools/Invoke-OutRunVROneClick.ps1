@@ -3,7 +3,8 @@ param(
     [string]$Backend = 'auto',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
-    [string]$VariantId = 'AUTO'
+    [string]$VariantId = 'AUTO',
+    [switch]$AllowTargetOverride
 )
 
 $ErrorActionPreference = 'Stop'
@@ -37,6 +38,15 @@ if ($resolvedBackend -eq 'auto') {
 }
 if ($resolvedVariant -eq 'AUTO' -and $target -and $target.VariantId) {
     $resolvedVariant = [string]$target.VariantId
+}
+
+if ($target -and -not $AllowTargetOverride) {
+    if ($resolvedBackend -ne [string]$target.LaunchBackend) {
+        throw "One-click backend override blocked: requested=$resolvedBackend target=$($target.LaunchBackend). Use -AllowTargetOverride only for explicit developer diagnostics."
+    }
+    if ($resolvedVariant -ne [string]$target.VariantId) {
+        throw "One-click variant override blocked: requested=$resolvedVariant target=$($target.VariantId). Use -AllowTargetOverride only for explicit developer diagnostics."
+    }
 }
 
 $validBackends = @('2d','d3d9','dx11','dxvk-safe','dxvk')
