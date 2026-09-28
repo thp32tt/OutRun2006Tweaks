@@ -1,0 +1,44 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00027",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00008",
+  "recorded_at_kst": "2026-09-29T03:05:00+09:00",
+  "initial_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
+  "final_precommit_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane B even-index primary shard; positive zoom_review text classification plus deterministic source-faithful reconstruction input for indices 26/28/30/32; no shared-state mutation; no work stealing; no VR/FFB/build.",
+  "report": "localization/graphics/role_B/20260929-0305-B102/B102_W00008_ZOOM_REVIEW_TEXT_RECONSTRUCTION_SPEC.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_TEXT_RECONSTRUCTION_SPEC",
+    "classified_indices": [
+      26,
+      28,
+      30,
+      32
+    ],
+    "assets": [
+      "63C91067",
+      "A05BF610",
+      "8215FD25",
+      "DCC7B488"
+    ],
+    "source_text": "Total Rank",
+    "korean": "종합 랭크",
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Material fallback is not a no-op: four unresolved even zoom-review assets are now positively classified and have immutable source/HD identities, exact HD sprite rectangles, canonical translation and a deterministic rebuild contract. DDS write is held rather than guessed because exact HD decoded pixels are required by the zero-pixel rule.",
+  "preserved_intervening_head": true
+}

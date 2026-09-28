@@ -1,0 +1,283 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00027",
+  "wave_id": "W00008",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T03:05:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "initial_head_sha": "88ae680879070a4695e4556075ee6d2bb7899111",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_POSITIVE_TEXT_CLASSIFICATION",
+    "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT"
+  ],
+  "queue": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "authoritative_queue_modified": false,
+    "c_reconciliation_required": true,
+    "rows_verified": {
+      "26": "26,textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "28": "28,textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "30": "30,textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "32": "32,textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds,zoom_review,blocked_review,needs_zoom_review,"
+    },
+    "unresolved_even_zoom_review_before": 18,
+    "newly_classified_localizable_text": 4,
+    "expected_unresolved_even_zoom_review_after_c_merge": 14
+  },
+  "source_policy": {
+    "source_repo": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "source_tree_sha": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "semantic_reference": "decoded stock-original PNG at exact upstream commit",
+    "hd_baseline": "Release DDS at the same immutable upstream commit",
+    "canonical_translation_reference": [
+      "localization/graphics/transcriptions.jsonl index 57",
+      "localization/graphics/transcriptions.jsonl index 51",
+      "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
+    ],
+    "translation": {
+      "Total Rank": "종합 랭크"
+    },
+    "preserve_rule": "Rank letters, character artwork, lens flare, logos and non-text bubble/background artwork remain original."
+  },
+  "assets": [
+    {
+      "queue_index": 26,
+      "asset": "63C91067",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.png",
+        "git_blob_sha": "b89129cbf06e537f9b15a6dc6ee9a74d5587cdd1"
+      },
+      "original_dds_git_blob_sha": "649ca5d694d80fe1db90fee62c046200a1160da9",
+      "atlas_json_git_blob_sha": "08226a0d0b22fdea05f489a4cc7d5974416f9827",
+      "hd_release": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+        "git_blob_sha": "9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9",
+        "bytes": 16777344,
+        "expected_dimensions": [
+          2048,
+          2048
+        ]
+      },
+      "observed": "Two localizable Total Rank labels: pink speech bubble and brown burst bubble.",
+      "localizable_text": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_15",
+          "hd_sprite_rect": [
+            0,
+            16,
+            1720,
+            1016
+          ]
+        },
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_14",
+          "hd_sprite_rect": [
+            0,
+            1032,
+            2048,
+            1016
+          ]
+        }
+      ],
+      "resolution": "LOCALIZABLE_TEXT_CONFIRMED_REBUILD_SPEC_READY_HOLD_EXACT_HD_PIXEL_BBOX"
+    },
+    {
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.png",
+        "git_blob_sha": "37cc15a90eb5f823f05fad3b68ca3232b8b416b1"
+      },
+      "original_dds_git_blob_sha": "c506fb5b087626bc9cedd4760611e413a2aeb7eb",
+      "atlas_json_git_blob_sha": "cb68236efdcd1d175120fae61f47dba94324f75f",
+      "hd_release": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+        "git_blob_sha": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+        "bytes": 16777344,
+        "expected_dimensions": [
+          2048,
+          2048
+        ]
+      },
+      "observed": "One localizable Total Rank label in the green speech bubble; lens flare is non-text artwork.",
+      "localizable_text": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_16",
+          "hd_sprite_rect": [
+            0,
+            1032,
+            1640,
+            1016
+          ]
+        }
+      ],
+      "protected_artwork": [
+        "sprite_17 lens flare"
+      ],
+      "resolution": "LOCALIZABLE_TEXT_CONFIRMED_REBUILD_SPEC_READY_HOLD_EXACT_HD_PIXEL_BBOX"
+    },
+    {
+      "queue_index": 30,
+      "asset": "8215FD25",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.png",
+        "git_blob_sha": "b3f201c2894f7fe0c2c5229829228ffa29f0a7d9"
+      },
+      "original_dds_git_blob_sha": "929586fdd32643fcbc1705c97141598f600e9bc3",
+      "atlas_json_git_blob_sha": "9b8f9ae2fa4bb928fdd72225b453d828407f9565",
+      "hd_release": {
+        "path": "Release/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+        "git_blob_sha": "64a92104d3158614283d0d63baee7ec29ca45316",
+        "bytes": 33554560,
+        "expected_dimensions": [
+          4096,
+          2048
+        ]
+      },
+      "observed": "Two localizable Total Rank labels in pink/brown bubbles. Flagman artwork and rank letters B/C/D/E are protected original tokens/artwork.",
+      "localizable_text": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_10",
+          "hd_sprite_rect": [
+            1088,
+            16,
+            1720,
+            1016
+          ]
+        },
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_9",
+          "hd_sprite_rect": [
+            1088,
+            1032,
+            2048,
+            1016
+          ]
+        }
+      ],
+      "protected_text": [
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "protected_artwork": [
+        "flagman character",
+        "lens flare"
+      ],
+      "resolution": "LOCALIZABLE_TEXT_CONFIRMED_REBUILD_SPEC_READY_HOLD_EXACT_HD_PIXEL_BBOX"
+    },
+    {
+      "queue_index": 32,
+      "asset": "DCC7B488",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.png",
+        "git_blob_sha": "9cbd9af75d4dabf4f1ea84ff45998cd6c2d345d2"
+      },
+      "original_dds_git_blob_sha": "6338f01d62cedafa72545be30d28319207e46073",
+      "atlas_json_git_blob_sha": "6052908b68f019b17cb649dcd9eeb894b4d9d912",
+      "hd_release": {
+        "path": "Release/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+        "git_blob_sha": "7f8f0d10f2ac8a19bda1933d6a324a37123b48c0",
+        "bytes": 8388736,
+        "expected_dimensions": [
+          2048,
+          1024
+        ]
+      },
+      "observed": "One localizable Total Rank label in the green speech bubble.",
+      "localizable_text": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_16",
+          "hd_sprite_rect": [
+            0,
+            8,
+            1640,
+            1016
+          ]
+        }
+      ],
+      "resolution": "LOCALIZABLE_TEXT_CONFIRMED_REBUILD_SPEC_READY_HOLD_EXACT_HD_PIXEL_BBOX"
+    }
+  ],
+  "deterministic_rebuild_spec": {
+    "style_exemplar": {
+      "asset": "39229D64",
+      "current_candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "strict_qa_report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json",
+      "metrics": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_METRICS.json",
+      "instruction": "Reuse only the established white/navy Total Rank typography treatment and Korean wording; never copy the exemplar bubble/background pixels into another asset."
+    },
+    "steps": [
+      "Decode the exact immutable HD Release DDS named for each asset and preserve its header/format/mip/alpha/orientation properties.",
+      "Within each listed HD sprite rectangle, derive the exact English Total Rank full-effect pixel bbox from the HD source itself, including outline/shadow/alpha fringe.",
+      "Erase/reconstruct only English glyph pixels from the same asset's HD background; do not substitute background pixels from 39229D64 or another atlas.",
+      "Render 종합 랭크 centered to the source label using the established white fill/navy outline source-family style; shrink/reposition until the localized full-effect bbox is contained inside the exact English permitted bbox on all four edges.",
+      "Require all pixels outside the intended text mask/region to remain source-identical; preserve all character art, rank letters, flare and bubble artwork.",
+      "Generate mandatory ENGLISH SOURCE vs KOREAN CANDIDATE proof with identical crop/orientation/zoom and run readable/raw orientation visual QA.",
+      "Record original_bbox, localized_bbox and delta_left/right/top/bottom per physical label. Any 1px escape is REWORK_REQUIRED."
+    ],
+    "final_gate": "HOLD_STRICT_RECHECK_UNTIL_EXACT_HD_DECODED_PIXEL_EVIDENCE_EXISTS"
+  },
+  "production_blocker": {
+    "scope": "DDS_WRITE_ONLY",
+    "reason": "The exact HD Release DDS blobs are multi-megabyte files whose binary body is not exposed by the GitHub contents read path available to this GitHub-only worker. Guessing from the stock PNG or producing an upscaled low-resolution candidate would violate the HD-baseline and zero-pixel rules.",
+    "unsafe_actions_rejected": [
+      "upscale stock DDS/PNG",
+      "reuse another Korean bubble background",
+      "declare containment PASS without exact HD decoded pixels"
+    ],
+    "material_progress": "Four unresolved zoom_review rows are positively classified as localizable text and now have immutable source identities, HD sprite rectangles, canonical wording and a deterministic source-faithful rebuild recipe."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_26_28_30_32",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_INITIAL_HEAD",
+    "direct_github_source_identity": "PASS_EXACT_COMMIT_TREE_AND_BLOB_IDENTITIES",
+    "visual_zoom_review": "PASS_4_TEXT_ASSETS_CONFIRMED",
+    "semantic_translation": "PASS_CANONICAL_TOTAL_RANK_TO_종합_랭크",
+    "mandatory_english_source_comparison_gate": "HOLD_NO_CANDIDATE_DDS_WRITTEN",
+    "zero_pixel_containment": "HOLD_EXACT_HD_DECODE_REQUIRED_NO_CANDIDATE_DDS_WRITTEN",
+    "dds_format_compression_mips_alpha_orientation": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "reviewed_or_materially_advanced_assets": [
+    "63C91067",
+    "A05BF610",
+    "8215FD25",
+    "DCC7B488"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00008 lane B converted four previously unresolved even-shard zoom_review assets into deterministic localizable-text reconstruction inputs. No DDS bytes were guessed or upscaled; exact-HD pixel containment remains HOLD until the immutable Release DDS pixels can be decoded. C must reconcile the shared queue. Runtime remains UNTESTED."
+}
