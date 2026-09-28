@@ -1,0 +1,588 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00020",
+  "wave_id": "W00006",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "material_deliverable_type": "SINGLE_DDS_ISOLATION_INPUT_SET",
+  "recorded_at_kst": "2026-09-29T01:52:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head": "4205e141d6a81df04ec4e38a55f569ab68c683da",
+  "contract_sha": "52967107df145723dbc565e2a7df63f679c1e90c",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_INPUT_READY",
+  "asset": {
+    "id": "C4A2937B",
+    "queue_index": 61,
+    "queue_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "queue_status": "c85_pixel_visual_pass_pending_ingame",
+    "raw_orientation": "mirror_y",
+    "runtime_context_followup": "Drift and / 드리프트하고 adjacent-sprite composition remains in-game-only."
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+    "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "qa_evidence": {
+    "authoritative_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "status": "C85_PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "text_elements": 21,
+    "containment_pass_count": 21,
+    "containment_fail_count": 0,
+    "outside_declared_cells_changed_nontransparent_pixels": 0,
+    "structure": {
+      "source": {
+        "width": 4096,
+        "height": 4096,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bpp": 32,
+        "mips": 1,
+        "pitch": 16384
+      },
+      "candidate": {
+        "width": 4096,
+        "height": 4096,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bpp": 32,
+        "mips": 1,
+        "pitch": 16384
+      },
+      "same_dimensions": true,
+      "same_fourcc": true,
+      "same_bpp": true,
+      "same_mips": true,
+      "header_128_exact": true
+    },
+    "elements": [
+      {
+        "key": "go_gate",
+        "original_bbox": [
+          2067,
+          998,
+          2547,
+          1106
+        ],
+        "localized_bbox": [
+          2068,
+          1006,
+          2546,
+          1099
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 8,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "cut_line",
+        "original_bbox": [
+          2596,
+          998,
+          3028,
+          1106
+        ],
+        "localized_bbox": [
+          2597,
+          1008,
+          3027,
+          1096
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 10,
+        "delta_bottom": 10,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "keep_passing",
+        "original_bbox": [
+          3068,
+          1023,
+          3567,
+          1106
+        ],
+        "localized_bbox": [
+          3100,
+          1024,
+          3541,
+          1105
+        ],
+        "delta_left": 32,
+        "delta_right": 26,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "double_speed",
+        "original_bbox": [
+          3608,
+          1026,
+          4031,
+          1106
+        ],
+        "localized_bbox": [
+          3640,
+          1027,
+          4023,
+          1105
+        ],
+        "delta_left": 32,
+        "delta_right": 8,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "hit_blue_cone",
+        "original_bbox": [
+          1039,
+          1487,
+          1510,
+          1567
+        ],
+        "localized_bbox": [
+          1104,
+          1488,
+          1460,
+          1566
+        ],
+        "delta_left": 65,
+        "delta_right": 50,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "dont_crash",
+        "original_bbox": [
+          1567,
+          1488,
+          1989,
+          1566
+        ],
+        "localized_bbox": [
+          1634,
+          1489,
+          1951,
+          1565
+        ],
+        "delta_left": 67,
+        "delta_right": 38,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "collect_coins",
+        "original_bbox": [
+          2054,
+          1487,
+          2516,
+          1567
+        ],
+        "localized_bbox": [
+          2132,
+          1488,
+          2460,
+          1566
+        ],
+        "delta_left": 78,
+        "delta_right": 56,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "run_red",
+        "original_bbox": [
+          1031,
+          1604,
+          1554,
+          1695
+        ],
+        "localized_bbox": [
+          1043,
+          1605,
+          1533,
+          1694
+        ],
+        "delta_left": 12,
+        "delta_right": 21,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "run_blue",
+        "original_bbox": [
+          1554,
+          1604,
+          2053,
+          1695
+        ],
+        "localized_bbox": [
+          1572,
+          1605,
+          2033,
+          1694
+        ],
+        "delta_left": 18,
+        "delta_right": 20,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "pass_convoy",
+        "original_bbox": [
+          2053,
+          1604,
+          2573,
+          1694
+        ],
+        "localized_bbox": [
+          2069,
+          1605,
+          2570,
+          1693
+        ],
+        "delta_left": 16,
+        "delta_right": 3,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "catch_heart",
+        "original_bbox": [
+          2555,
+          1607,
+          3067,
+          1687
+        ],
+        "localized_bbox": [
+          2563,
+          1608,
+          3030,
+          1686
+        ],
+        "delta_left": 8,
+        "delta_right": 37,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "beat_car_1",
+        "original_bbox": [
+          3055,
+          1608,
+          3525,
+          1686
+        ],
+        "localized_bbox": [
+          3088,
+          1609,
+          3513,
+          1685
+        ],
+        "delta_left": 33,
+        "delta_right": 12,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "red",
+        "original_bbox": [
+          3110,
+          1446,
+          3443,
+          1583
+        ],
+        "localized_bbox": [
+          3151,
+          1447,
+          3377,
+          1582
+        ],
+        "delta_left": 41,
+        "delta_right": 66,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "blue",
+        "original_bbox": [
+          3571,
+          1446,
+          3904,
+          1581
+        ],
+        "localized_bbox": [
+          3614,
+          1447,
+          3837,
+          1580
+        ],
+        "delta_left": 43,
+        "delta_right": 67,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "drift",
+        "original_bbox": [
+          3708,
+          1608,
+          3880,
+          1687
+        ],
+        "localized_bbox": [
+          3710,
+          1626,
+          3879,
+          1675
+        ],
+        "delta_left": 2,
+        "delta_right": 1,
+        "delta_top": 18,
+        "delta_bottom": 12,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "stage_bonus",
+        "original_bbox": [
+          3814,
+          1799,
+          4075,
+          1894
+        ],
+        "localized_bbox": [
+          3872,
+          1800,
+          4028,
+          1893
+        ],
+        "delta_left": 58,
+        "delta_right": 47,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "get",
+        "original_bbox": [
+          3595,
+          1894,
+          3930,
+          2033
+        ],
+        "localized_bbox": [
+          3596,
+          1895,
+          3891,
+          2032
+        ],
+        "delta_left": 1,
+        "delta_right": 39,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "beat_car_2",
+        "original_bbox": [
+          3519,
+          2061,
+          3989,
+          2139
+        ],
+        "localized_bbox": [
+          3537,
+          2062,
+          3988,
+          2138
+        ],
+        "delta_left": 18,
+        "delta_right": 1,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "next_stage",
+        "original_bbox": [
+          2558,
+          2180,
+          3014,
+          2271
+        ],
+        "localized_bbox": [
+          2588,
+          2181,
+          2993,
+          2270
+        ],
+        "delta_left": 30,
+        "delta_right": 21,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "drift_and",
+        "original_bbox": [
+          3053,
+          2186,
+          3400,
+          2265
+        ],
+        "localized_bbox": [
+          3071,
+          2187,
+          3348,
+          2264
+        ],
+        "delta_left": 18,
+        "delta_right": 52,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      },
+      {
+        "key": "position",
+        "original_bbox": [
+          1395,
+          2721,
+          1725,
+          2829
+        ],
+        "localized_bbox": [
+          1482,
+          2722,
+          1656,
+          2828
+        ],
+        "delta_left": 87,
+        "delta_right": 69,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS",
+        "rework_required": false
+      }
+    ],
+    "final_approved": false
+  },
+  "package_input": {
+    "manifest_contract": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+    "packaging_workflow": ".github/workflows/localization-single-dds-isolation.yml",
+    "lane_local_staging": true,
+    "c_promotion_target": "localization/validation/single_dds/W00006_A00020_C4A2937B.json",
+    "c_promotion_action": "Copy this lane-local manifest data into the shared single_dds manifest namespace only after C verifies the pinned source/candidate blobs are unchanged.",
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Test C4A2937B as the only replacement DDS.",
+    "Reproduce the same navigation/gameplay path used for the aggregate graphics diagnostic where possible.",
+    "Capture readable/game-orientation evidence for the affected Heart Attack mission sprites.",
+    "Verify runtime dimensions/scaling, alpha/transparency geometry, sprite position, clipping and zero-pixel overflow.",
+    "Explicitly verify the adjacent-sprite composition of Drift and / 드리프트하고.",
+    "Do not promote or approve the DDS unless isolated runtime behavior is correct."
+  ],
+  "blocker_skips": {
+    "unchanged_dependency_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "reason": "Current contract says unchanged dependency-blocked REWORK rows are skipped rather than re-reviewed; W00006 material progress is made through an independent odd-shard runtime-isolation input."
+  },
+  "queue_snapshot": {
+    "total_rows": 137,
+    "odd_rows": 69,
+    "odd_rework_dependency_blocked": 4,
+    "odd_pending_artwork": 34,
+    "odd_zoom_review_unresolved": 21
+  },
+  "self_qa": {
+    "zero_pixel_containment": "PASS_21_OF_21_USING_CURRENT_C85_AUTHORITATIVE_EVIDENCE",
+    "dds_format": "PASS_RGBA32",
+    "dimensions": "PASS_4096x4096_SOURCE_AND_CANDIDATE",
+    "mipmaps": "PASS_1",
+    "alpha_and_outside_cell": "PASS_C85_OUTSIDE_CHANGED_NONTRANSPARENT_0",
+    "orientation": "PASS_RAW_MIRROR_Y_EVIDENCE_PINNED",
+    "candidate_bytes_modified": false,
+    "source_candidate_blobs_pinned": true,
+    "parity_shard": "PASS_ODD_INDEX_61",
+    "shared_state_isolation": "PASS",
+    "work_steal": false
+  },
+  "automation_validation": {
+    "static_precommit": "PASS",
+    "remote_ci": "PENDING_AT_COMMIT"
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false
+}

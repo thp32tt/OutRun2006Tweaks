@@ -1,0 +1,55 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00020",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00006",
+  "recorded_at_kst": "2026-09-29T01:52:00+09:00",
+  "initial_head_sha": "2f22654b533c27ce0cd22f8cf093b727987e9e24",
+  "final_precommit_head_sha": "4205e141d6a81df04ec4e38a55f569ab68c683da",
+  "preserved_intervening_head": true,
+  "result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_INPUT_READY",
+  "automation_validation": "PASS_PENDING_REMOTE_CI_CONFIRMATION",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; dependency-blocked REWORK skip; mandatory fallback ladder step 3; no work stealing; no shared-state mutation.",
+  "material_deliverable": {
+    "type": "SINGLE_DDS_ISOLATION_INPUT_SET",
+    "asset": "C4A2937B",
+    "queue_index": 61,
+    "report": "localization/graphics/role_A/20260929-0152-A00020/A00020_W00006_C4A2937B_SINGLE_DDS_ISOLATION.json",
+    "shared_manifest_promotion_target": "localization/validation/single_dds/W00006_A00020_C4A2937B.json",
+    "candidate_dds_modified": false,
+    "source_git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+    "candidate_git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "C4A2937B"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00006 A satisfies the current minimum-progress contract by producing a new deterministic single-DDS isolation input for odd-shard C4A2937B. Its current C85 PASS candidate/source blobs and all 21 containment records are pinned for C promotion into the shared packaging workflow; real-game validation remains UNTESTED.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "localization/graphics/role_C/20260929-0140-C90/C90_W00005_SYNC_FINAL_QA.json",
+    "localization/graphics/role_A/20260929-0152-A00020/A00020_W00006_C4A2937B_SINGLE_DDS_ISOLATION.json"
+  ]
+}
