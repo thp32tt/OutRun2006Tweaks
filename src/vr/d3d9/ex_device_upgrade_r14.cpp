@@ -99,7 +99,10 @@ namespace OutRunVRD3D9ExUpgradeR13
                  desc.Format == D3DFMT_X8R8G8B8);
         }
 
+        // R70: track the 368 MiB general class separately from the exact
+        // 2048x2048 selector reserve while retaining the absolute 384 MiB cap.
         std::atomic<std::uint64_t> R14ShadowBytes{0};
+        std::atomic<std::uint64_t> R14GeneralShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
         struct R14ShadowEntry
@@ -118,6 +121,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             bool retirePending = false;
             bool externalWriteDuringLock = false;
             std::uint64_t shadowBytes = 0;
+            bool countsAgainstGeneralBudget = false;
 
             ~R14ShadowEntry()
             {
@@ -125,8 +129,13 @@ namespace OutRunVRD3D9ExUpgradeR13
                 if (cpu) cpu->Release();
                 if (device) device->Release();
                 if (shadowBytes)
+                {
                     R14ShadowBytes.fetch_sub(
                         shadowBytes, std::memory_order_acq_rel);
+                    if (countsAgainstGeneralBudget)
+                        R14GeneralShadowBytes.fetch_sub(
+                            shadowBytes, std::memory_order_acq_rel);
+                }
                 --R14InternalReleaseDepth;
             }
         };
@@ -195,7 +204,11 @@ namespace OutRunVRD3D9ExUpgradeR13
             {
                 R14ShadowBytes.fetch_sub(
                     entry.shadowBytes, std::memory_order_acq_rel);
+                if (entry.countsAgainstGeneralBudget)
+                    R14GeneralShadowBytes.fetch_sub(
+                        entry.shadowBytes, std::memory_order_acq_rel);
                 entry.shadowBytes = 0;
+                entry.countsAgainstGeneralBudget = false;
             }
             entry.mode = R14ShadowMode::DirectOnly;
             entry.validMask = 0;
@@ -405,18 +418,39 @@ namespace OutRunVRD3D9ExUpgradeR13
         }
 
         bool R14ReserveShadowBytes(
-            std::uint64_t bytes) noexcept
+            std::uint64_t bytes, bool emergencyReserve) noexcept
         {
             if (!bytes || bytes > R14ShadowBudgetBytes)
                 return false;
-            std::uint64_t current =
+
+            std::uint64_t total =
                 R14ShadowBytes.load(std::memory_order_acquire);
             for (;;)
             {
-                if (current > R14ShadowBudgetBytes - bytes)
+                if (total > R14ShadowBudgetBytes - bytes)
                     return false;
                 if (R14ShadowBytes.compare_exchange_weak(
-                        current, current + bytes,
+                        total, total + bytes,
+                        std::memory_order_acq_rel,
+                        std::memory_order_acquire))
+                    break;
+            }
+
+            if (emergencyReserve)
+                return true;
+
+            std::uint64_t general =
+                R14GeneralShadowBytes.load(std::memory_order_acquire);
+            for (;;)
+            {
+                if (general > R14GeneralShadowBudgetBytes - bytes)
+                {
+                    R14ShadowBytes.fetch_sub(
+                        bytes, std::memory_order_acq_rel);
+                    return false;
+                }
+                if (R14GeneralShadowBytes.compare_exchange_weak(
+                        general, general + bytes,
                         std::memory_order_acq_rel,
                         std::memory_order_acquire))
                     return true;
@@ -433,13 +467,20 @@ namespace OutRunVRD3D9ExUpgradeR13
                 entry->gpu = gpu;
                 entry->device = device;
                 entry->shadowBytes = R14EstimateShadowBytes(gpu);
-                if (!R14ReserveShadowBytes(entry->shadowBytes))
+                D3DSURFACE_DESC level0{};
+                const UINT levels = gpu->GetLevelCount();
+                const bool emergencyReserve =
+                    SUCCEEDED(gpu->GetLevelDesc(0, &level0)) &&
+                    R69IsSelectorAtlasReserveCandidate(
+                        level0, levels, entry->shadowBytes);
+                if (!R14ReserveShadowBytes(
+                        entry->shadowBytes, emergencyReserve))
                 {
                     entry->shadowBytes = 0;
                     ++R14ShadowBudgetRejects;
                     return false;
                 }
-                const UINT levels = gpu->GetLevelCount();
+                entry->countsAgainstGeneralBudget = !emergencyReserve;
                 entry->validMask = levels >= R14MaxTrackedLevels
                     ? 0xFFFFFFFFu : ((1u << levels) - 1u);
                 device->AddRef();
@@ -514,32 +555,35 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return D3DERR_NOTAVAILABLE;
 
             const std::uint64_t estimate = R14EstimateShadowBytes(gpu);
-            const std::uint64_t current =
+            const std::uint64_t currentTotal =
                 R14ShadowBytes.load(std::memory_order_acquire);
+            const std::uint64_t currentGeneral =
+                R14GeneralShadowBytes.load(std::memory_order_acquire);
 
             const bool emergencyAtlasEligible =
                 R69IsSelectorAtlasReserveCandidate(
                     desc, levels, estimate);
-            const std::uint64_t softBudget = emergencyAtlasEligible
-                ? R14ShadowBudgetBytes
-                : R14GeneralShadowBudgetBytes;
 
-            if (!estimate || estimate > softBudget ||
-                current > softBudget - estimate)
+            if (!estimate || estimate > R14ShadowBudgetBytes ||
+                currentTotal > R14ShadowBudgetBytes - estimate ||
+                (!emergencyAtlasEligible &&
+                 (estimate > R14GeneralShadowBudgetBytes ||
+                  currentGeneral >
+                    R14GeneralShadowBudgetBytes - estimate)))
             {
                 ++R14ShadowBudgetRejects;
                 return D3DERR_OUTOFVIDEOMEMORY;
             }
 
             if (emergencyAtlasEligible &&
-                current > R14GeneralShadowBudgetBytes - estimate &&
                 !R14FirstEmergencyReserveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R69 EX: in-budget MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} currentMiB={:.1f}; 384 MiB total cap preserved",
+                    "VR R70 EX: isolated MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f}; later general textures retain the 368 MiB class budget and total remains capped at 384 MiB",
                     desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
                     estimate,
-                    static_cast<double>(current) / (1024.0 * 1024.0));
+                    static_cast<double>(currentTotal) / (1024.0 * 1024.0),
+                    static_cast<double>(currentGeneral) / (1024.0 * 1024.0));
             }
 
             const HRESULT hr = device->CreateTexture(
