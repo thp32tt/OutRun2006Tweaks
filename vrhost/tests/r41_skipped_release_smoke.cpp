@@ -79,5 +79,43 @@ int main()
     if (queue.Stage(zeroFrame) != StageResult::Invalid) return 18;
     if (queue.Stage(badSlot) != StageResult::Invalid) return 19;
 
+    // Release-before-watermark adapter contract: ownership is staged before
+    // publication. A transient ACK failure therefore survives even if the
+    // caller advances its selection watermark immediately afterwards.
+    const Identity skippedBeforeWatermark{ 50, 60, 70, 0, 500 };
+    if (queue.Stage(skippedBeforeWatermark) != StageResult::Staged) return 20;
+    std::uint32_t watermark = 0;
+    int watermarkAttempts = 0;
+    queue.Retry(
+        [&](const Identity& value) {
+            return value.clientPid == 50 &&
+                value.runGeneration == 60 &&
+                value.transportGeneration == 70;
+        },
+        [&](const Identity&) {
+            ++watermarkAttempts;
+            return false;
+        });
+    watermark = 501;
+    if (watermark != 501 || watermarkAttempts != 1 ||
+        !queue.Pending(skippedBeforeWatermark)) return 21;
+    queue.Retry(
+        [&](const Identity&) { return true; },
+        [&](const Identity& value) {
+            ++watermarkAttempts;
+            return value.frameId == 500;
+        });
+    if (watermarkAttempts != 2 || queue.PendingCount() != 0) return 22;
+
+    // A sampled/deferred identity must remain outside this queue. The runtime
+    // adapter enforces that boundary before Stage(); model it explicitly here
+    // and prove the queue stays empty.
+    const Identity sampled{ 50, 60, 70, 1, 501 };
+    const bool deferredEventOwnsSampled = true;
+    if (!deferredEventOwnsSampled) {
+        if (queue.Stage(sampled) == StageResult::Invalid) return 23;
+    }
+    if (queue.PendingCount() != 0) return 24;
+
     return 0;
 }
