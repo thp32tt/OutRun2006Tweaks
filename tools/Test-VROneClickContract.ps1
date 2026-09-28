@@ -118,6 +118,8 @@ switch ([string]$target.RendererTarget) {
             'src/vr/d3d11/startup_census.cpp',
             'src/vr/d3d11/pipeline_translation.cpp',
             'src/vr/d3d11/runtime_census.cpp',
+            'src/vr/d3d11/resource_translation.cpp',
+            'src/vr/d3d11/resource_translation.hpp',
             'src/vr/core/d3d9_draw_state.hpp',
             'src/vr/game/disasm_render_contract.hpp'
         )) {
