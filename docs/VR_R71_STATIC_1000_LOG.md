@@ -163,3 +163,41 @@ Priority:
 3. exact run/generation rollback rejection;
 4. consume exact-parent CI;
 5. keep the current zero-copy/deferred-event path unchanged.
+
+
+## Cycle 0008 — durable never-sampled DirectGPU release state machine
+
+Review lenses:
+1. DirectGPU unsampled-frame ownership;
+2. full producer identity / run-generation rollback;
+3. same-slot conflict fail-closed behavior;
+4. LEVEL0 executable regression coverage;
+5. build/validation-contract durability.
+
+Findings and changes:
+- Reconfirmed `VR-R41-SKIPPED-DIRECT-ACK-LOSS-001`: a never-sampled older DirectGPU frame can lose its only release opportunity when `PublishCompletedFrame` fails once and a later frame/transition advances the processing watermark.
+- Added `r41_skipped_release.hpp`, a pure per-slot retry owner keyed by `clientPid + runGeneration + transportGeneration + slot + frameId`.
+- A different frame in the same slot for the same live producer identity is `LiveSlotConflict` and fails closed instead of replacing the unresolved release.
+- A different producer run/generation may replace a stale retry owner because the old ACK mapping must never be written after identity change.
+- Added `r41_skipped_release_smoke.cpp` covering failure->retry success, dedup, live-slot conflict, stale-producer replacement/drop and invalid identities.
+- `outrun-vr-host` now depends on this smoke target; its POST_BUILD command executes the LEVEL0 test on hosted x64 builds.
+- Extended `verify_vr_r32_review.py` so later cleanup cannot silently remove the state-machine/test/build contract.
+- Runtime `main_r23.cpp` is deliberately unchanged in this cycle. Sampled frames remain owned by the existing D3D11 EVENT path.
+
+Commits:
+- `3bb8128cf86c5b25d85bce109d3b1ab0106e2369`
+- `3d5d4584eb370a71eebb691217c17653226789c9`
+- `3caa860ccd34338b364e5f43ec4751dbacb53135`
+- `c12e98d18d02f6ff572cb2474ccf4e0719f08493`
+- `ed05f657272ec9f0ba32a758d2cb82dc9e700c33`
+
+Validation:
+- Draft validation PR: #80, exact base `34eef500b2f79e7e68477d7ffe675f803e809e01`.
+- Build / OpenXR architecture / HUD Inspector are queued for the changed-input identity.
+- AUTOMATION_VALIDATION: `LEVEL0_STATE_MACHINE_AND_HOST_BUILD_CONTRACT_ADDED / EXACT_HEAD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+- Cycle 0009 first consumes PR #80 hosted results.
+- Only if the LEVEL0/host build is green, wire the retry queue into the never-sampled immediate-skip and transition watermark paths.
+- Do not change the sampled/deferred GPU EVENT ownership path.
