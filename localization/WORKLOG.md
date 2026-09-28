@@ -15,7 +15,7 @@
 
 ### Resume contract
 
-1. Read `localization/progress.json`.
+1. Read `localization/progress/progress.json`.
 2. Read `localization/resume_state.json`.
 3. Continue from the current `resume_from` and queue statuses.
 4. Never overwrite original game assets in Git. Store only translation/manifest/patch metadata.
