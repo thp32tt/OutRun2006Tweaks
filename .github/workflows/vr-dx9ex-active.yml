@@ -18,6 +18,7 @@ on:
       - 'src/hooks_framerate.cpp'
       - 'src/interpolation.cpp'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_uiscaling.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'src/hooks_textures.cpp'
       - 'vrhost/**'
