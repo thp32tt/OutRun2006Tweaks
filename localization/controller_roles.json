@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -7,23 +7,35 @@
     "B": "OutRun 한글화 B 실행",
     "C": "OutRun 한글화 C 실행"
   },
-  "schedule": {
-    "A": ":00",
-    "B": ":20",
-    "C": ":40"
+  "execution": {
+    "mode": "parallel_production_with_qa_barrier",
+    "max_parallel_production": 2,
+    "concurrent_group": [
+      "A",
+      "B"
+    ],
+    "barrier_role": "C",
+    "next_wave_after": "C_DURABLE_RESULT",
+    "compatibility_fallback": "sequential_queue"
   },
   "lanes": {
     "A": {
       "mode": "production+self_qa",
-      "primary_index_parity": "odd"
+      "primary_index_parity": "odd",
+      "parallel_group": "production"
     },
     "B": {
       "mode": "production+self_qa",
-      "primary_index_parity": "even"
+      "primary_index_parity": "even",
+      "parallel_group": "production"
     },
     "C": {
       "mode": "cross_lane_final_qa+approval",
-      "primary_index_parity": "all"
+      "primary_index_parity": "all",
+      "starts_after": [
+        "A_DURABLE_RESULT",
+        "B_DURABLE_RESULT"
+      ]
     }
   },
   "queue_source": "localization/graphics/asset_queue.csv",
@@ -36,9 +48,18 @@
   "zero_pixel_overflow": true,
   "missing_evidence_status": "HOLD_STRICT_RECHECK",
   "controller_prompt_policy": "Keep prompts minimal; workflow rules live in Git. Do not duplicate contract logic in Docker.",
+  "concurrency_safety": {
+    "refresh_head_before_claim": true,
+    "refresh_head_before_commit": true,
+    "disjoint_primary_shards": true,
+    "stale_state_overwrite_forbidden": true,
+    "shared_state_reconcile_from_latest_head": true,
+    "c_reads_only_durable_ab_results": true
+  },
   "work_steal": {
     "enabled": true,
-    "condition": "primary shard has no actionable production work and latest Git refresh confirms target has no newer current-cycle production/state change",
+    "disabled_while_peer_lane_active": true,
+    "condition": "peer production lane is confirmed idle/completed, latest Git refresh confirms target is unclaimed, and target has no newer current-cycle production/state change",
     "report_field": "work_stolen_from_lane"
   }
 }
