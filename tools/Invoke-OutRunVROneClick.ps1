@@ -67,6 +67,7 @@ if ($target -and [string]$target.RendererTarget -eq 'dx11-native') {
     $env:OUTRUN_VR_DX11_CENSUS = $null
 }
 
+$oneClickExitCode = 0
 try {
     & $selector -Backend $resolvedBackend -TestProfile $TestProfile -VariantId $resolvedVariant
     if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
@@ -75,10 +76,10 @@ try {
 
     & $runner -TestProfile $TestProfile
     if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
+        $oneClickExitCode = $LASTEXITCODE
     }
 } finally {
     $env:OUTRUN_VR_DX11_CENSUS = $oldDx11Census
 }
 
-exit 0
+exit $oneClickExitCode
