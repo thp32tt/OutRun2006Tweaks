@@ -20,7 +20,7 @@ Derived from Set 05. Set 06 reviews the stock-DXVK SAFE/provider boundary in ten
 ## Findings carried forward
 
 - **F24 HIGH DXVK:** provider analyzer can claim verified stock DXVK 3.1.1 without observing a runtime version line.
-- **F25 MEDIUM documentation:** DXVK plan's “atomically” wording conflicts with actual sequential selector behavior.
+- **F25 IMPLEMENTED_PENDING_CI 2026-09-29:** `CONVERSION-DXVK-00033` replaces the ambiguous “atomically” wording with the actual bounded selector transaction: snapshot selector-owned mutable root files, restore/remove partial session on failure, and persist `ROOT_PAYLOAD_ATTESTATION.json` before successful handoff. The DXVK reactivation verifier now requires both the corrected plan markers and executable selector rollback/success-attestation behavior. Exact-SHA hosted validation is queued due repository runner saturation; do not mark CLOSED until those runs complete.
 - F08/F09 remain open for provider provenance.
 - F12 remains open for revalidation after full device recreation.
 - Same-provider D3D9/D3D9Ex handling is accepted as a strong design and should be preserved.

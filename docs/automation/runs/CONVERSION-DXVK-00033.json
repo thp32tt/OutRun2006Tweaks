@@ -1,0 +1,58 @@
+{
+  "task_id": "CONVERSION-DXVK-00033",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "bd8a729f85f7a49fcd7dfbfd08bfae07afd13987",
+  "result_sha": "3d95696e65aff8a2a374dc9c126199428b763e9f",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_06-F25-DXVK-PLAN-TRANSACTION-RECONCILIATION",
+  "summary": "Reconciled the DXVK R71 plan's historical atomic-activation wording with the selector's current bounded transaction semantics and strengthened the DXVK SAFE reactivation verifier to require selector transaction functions plus executable rollback/success-attestation behavior. Hosted validation has not started because repository Actions runners are saturated, so F25 is implemented but not yet closed.",
+  "changed_paths": [
+    "docs/VR_DXVK_R71_PLAN.md",
+    "tools/verify_dxvk_reactivation_contract.py"
+  ],
+  "review": {
+    "architecture": "Documentation now distinguishes bounded selector-owned rollback from filesystem-wide atomic replacement.",
+    "ownership_lifetime": "No runtime ownership/resource behavior changed.",
+    "stereo_correctness": "No renderer/stereo/HUD/menu/effect/recenter behavior changed.",
+    "performance": "No runtime or performance path changed.",
+    "adversarial": "The verifier now fails if the plan loses its bounded transaction wording, selector transaction functions disappear, or the executable transaction test no longer proves post-attestation rollback/cleanup and successful root attestation."
+  },
+  "evidence": [
+    "C0 recovered GitHub HEAD bd8a729f85f7a49fcd7dfbfd08bfae07afd13987, AGENTS.md, review Sets 06-10, QUEUE_CONTROLLER_CONTRACT.md, automation state, CONVERSION-DXVK-00031 and runtime regression evidence. N100/local clone was not used.",
+    "C1 rechecked remaining DXVK software findings. Set 06 F25 was the remaining HMD-independent inconsistency: the plan said activation was atomic while the current selector implements a bounded snapshot/rollback/attestation transaction.",
+    "Source 3d95696e65aff8a2a374dc9c126199428b763e9f updates the plan and extends tools/verify_dxvk_reactivation_contract.py with plan/selector/transaction-test requirements.",
+    "Backend Conversion Gate 36499169322 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "Build 36499173742 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "OpenXR VR architecture 36499173709 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "HUD Inspector 36499173751 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
+    "PC Fast 36499169338 skipped as required for scheduled automation.",
+    "Repository Actions observation at checkpoint: 9 runs in progress and 94 queued, dominated by unrelated R71-STATIC-1000/localization automation. No 00033 hosted job had started; this is capacity backlog, not a validation failure.",
+    "Issue #14 implementation comment 5880779818 records the production transaction."
+  ],
+  "completed_work_items": [
+    "F25-DOCUMENTATION-AND-CONTRACT-IMPLEMENTATION"
+  ],
+  "pending_validation_items": [
+    "Backend Conversion Gate 36499169322",
+    "Build 36499173742",
+    "OpenXR VR architecture 36499173709",
+    "HUD Inspector 36499173751"
+  ],
+  "next_action": "Do not recreate the F25 change. Resume by inspecting the exact queued run IDs for source 3d95696e65aff8a2a374dc9c126199428b763e9f. If Backend Conversion Gate and standard Build/OpenXR/HUD workflows pass, change AUTOMATION_VALIDATION to PASS and mark F25 CLOSED. If a run fails, inspect that failure before any repair. Runtime remains UNTESTED because this task changes no HMD-visible behavior.",
+  "validation": {
+    "backend_conversion_gate_run_id": 36499169322,
+    "backend_conversion_gate_result": "QUEUED",
+    "build_workflow_run_id": 36499173742,
+    "build_result": "QUEUED",
+    "openxr_workflow_run_id": 36499173709,
+    "openxr_result": "QUEUED",
+    "hud_workflow_run_id": 36499173751,
+    "hud_result": "QUEUED",
+    "pc_fast_run_id": 36499169338,
+    "pc_fast_result": "SKIPPED"
+  },
+  "recorded_at_kst": "2026-09-29T08:44:00+09:00"
+}
