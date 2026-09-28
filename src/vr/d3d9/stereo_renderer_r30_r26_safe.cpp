@@ -895,6 +895,155 @@ namespace OutRunVRStereo
             float u, v;
         };
 
+        struct R30SkyGlowSavedState
+        {
+            IDirect3DSurface9* renderTarget = nullptr;
+            IDirect3DSurface9* depthStencil = nullptr;
+            IDirect3DVertexShader9* vertexShader = nullptr;
+            IDirect3DVertexDeclaration9* vertexDeclaration = nullptr;
+            IDirect3DPixelShader9* pixelShader = nullptr;
+            IDirect3DBaseTexture9* texture0 = nullptr;
+            IDirect3DVertexBuffer9* stream0 = nullptr;
+            D3DVIEWPORT9 viewport{};
+            UINT streamOffset = 0;
+            UINT streamStride = 0;
+            DWORD samplerMin = 0;
+            DWORD samplerMag = 0;
+            DWORD samplerMip = 0;
+            DWORD samplerAddressU = 0;
+            DWORD samplerAddressV = 0;
+            DWORD zEnable = 0;
+            DWORD zWrite = 0;
+            DWORD stencilEnable = 0;
+            DWORD alphaTestEnable = 0;
+            DWORD alphaBlendEnable = 0;
+            DWORD srcBlend = 0;
+            DWORD destBlend = 0;
+            DWORD blendOp = 0;
+            DWORD colorWrite = 0;
+            float psConstant0[4]{};
+
+            ~R30SkyGlowSavedState()
+            {
+                ReleaseCom(stream0);
+                ReleaseCom(texture0);
+                ReleaseCom(pixelShader);
+                ReleaseCom(vertexDeclaration);
+                ReleaseCom(vertexShader);
+                ReleaseCom(depthStencil);
+                ReleaseCom(renderTarget);
+            }
+        };
+
+        bool R30CaptureSkyGlowState(
+            IDirect3DDevice9* device,
+            R30SkyGlowSavedState& state) noexcept
+        {
+            if (!device ||
+                FAILED(device->GetRenderTarget(0, &state.renderTarget)) ||
+                !state.renderTarget ||
+                FAILED(device->GetViewport(&state.viewport)) ||
+                FAILED(device->GetVertexShader(&state.vertexShader)) ||
+                FAILED(device->GetVertexDeclaration(
+                    &state.vertexDeclaration)) ||
+                FAILED(device->GetPixelShader(&state.pixelShader)) ||
+                FAILED(device->GetTexture(0, &state.texture0)) ||
+                FAILED(device->GetStreamSource(
+                    0, &state.stream0,
+                    &state.streamOffset, &state.streamStride)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_MINFILTER, &state.samplerMin)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_MAGFILTER, &state.samplerMag)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_MIPFILTER, &state.samplerMip)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_ADDRESSU, &state.samplerAddressU)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_ADDRESSV, &state.samplerAddressV)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ZENABLE, &state.zEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ZWRITEENABLE, &state.zWrite)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_STENCILENABLE, &state.stencilEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ALPHATESTENABLE, &state.alphaTestEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &state.alphaBlendEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_SRCBLEND, &state.srcBlend)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_DESTBLEND, &state.destBlend)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_BLENDOP, &state.blendOp)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_COLORWRITEENABLE, &state.colorWrite)) ||
+                FAILED(device->GetPixelShaderConstantF(
+                    0, state.psConstant0, 1)))
+                return false;
+
+            const HRESULT depthHr =
+                device->GetDepthStencilSurface(&state.depthStencil);
+            return SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
+        }
+
+        bool R30RestoreSkyGlowState(
+            IDirect3DDevice9* device,
+            const R30SkyGlowSavedState& state) noexcept
+        {
+            if (!device || !state.renderTarget)
+                return false;
+
+            bool ok = true;
+            auto keep = [&](HRESULT hr) noexcept {
+                if (FAILED(hr))
+                    ok = false;
+            };
+
+            keep(device->SetRenderTarget(0, state.renderTarget));
+            keep(device->SetDepthStencilSurface(state.depthStencil));
+            keep(device->SetViewport(&state.viewport));
+            keep(device->SetVertexShader(state.vertexShader));
+            keep(device->SetVertexDeclaration(state.vertexDeclaration));
+            keep(device->SetPixelShader(state.pixelShader));
+            keep(device->SetTexture(0, state.texture0));
+            keep(device->SetStreamSource(
+                0, state.stream0,
+                state.streamOffset, state.streamStride));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_MINFILTER, state.samplerMin));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_MAGFILTER, state.samplerMag));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_MIPFILTER, state.samplerMip));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_ADDRESSU, state.samplerAddressU));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_ADDRESSV, state.samplerAddressV));
+            keep(device->SetRenderState(
+                D3DRS_ZENABLE, state.zEnable));
+            keep(device->SetRenderState(
+                D3DRS_ZWRITEENABLE, state.zWrite));
+            keep(device->SetRenderState(
+                D3DRS_STENCILENABLE, state.stencilEnable));
+            keep(device->SetRenderState(
+                D3DRS_ALPHATESTENABLE, state.alphaTestEnable));
+            keep(device->SetRenderState(
+                D3DRS_ALPHABLENDENABLE, state.alphaBlendEnable));
+            keep(device->SetRenderState(
+                D3DRS_SRCBLEND, state.srcBlend));
+            keep(device->SetRenderState(
+                D3DRS_DESTBLEND, state.destBlend));
+            keep(device->SetRenderState(
+                D3DRS_BLENDOP, state.blendOp));
+            keep(device->SetRenderState(
+                D3DRS_COLORWRITEENABLE, state.colorWrite));
+            keep(device->SetPixelShaderConstantF(
+                0, state.psConstant0, 1));
+            return ok;
+        }
+
         bool R30PrepareSkyGlowPipeline(
             IDirect3DDevice9* device) noexcept
         {
@@ -1032,31 +1181,9 @@ namespace OutRunVRStereo
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
-            IDirect3DStateBlock9* stateBlock = nullptr;
-            IDirect3DSurface9* savedRt = nullptr;
-            IDirect3DSurface9* savedDepth = nullptr;
-            D3DVIEWPORT9 savedViewport{};
-            if (FAILED(device->CreateStateBlock(
-                    D3DSBT_ALL, &stateBlock)) ||
-                !stateBlock ||
-                FAILED(device->GetRenderTarget(0, &savedRt)) ||
-                !savedRt ||
-                FAILED(device->GetViewport(&savedViewport)))
-            {
-                if (savedRt) savedRt->Release();
-                if (stateBlock) stateBlock->Release();
+            R30SkyGlowSavedState savedState{};
+            if (!R30CaptureSkyGlowState(device, savedState))
                 return false;
-            }
-            const HRESULT depthHr =
-                device->GetDepthStencilSurface(&savedDepth);
-            const bool depthOk =
-                SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
-            if (!depthOk)
-            {
-                savedRt->Release();
-                stateBlock->Release();
-                return false;
-            }
 
             bool ok = R30PrepareSkyGlowPipeline(device);
             IDirect3DSurface9* eyeSurface[2]{
@@ -1129,26 +1256,13 @@ namespace OutRunVRStereo
 
             }
 
-            // Apply the captured pipeline state first, then explicitly restore
-            // RT/depth/viewport last. This guarantees the game bindings win even
-            // if a driver/state-block implementation restores more state than
-            // the code path historically relied on.
-            bool restoreOk = SUCCEEDED(stateBlock->Apply());
-            restoreOk =
-                SUCCEEDED(device->SetRenderTarget(0, savedRt)) &&
-                restoreOk;
-            const HRESULT restoreDepth =
-                device->SetDepthStencilSurface(savedDepth);
-            restoreOk =
-                (SUCCEEDED(restoreDepth) ||
-                 (!savedDepth && restoreDepth == D3D_OK)) &&
-                restoreOk;
-            restoreOk =
-                SUCCEEDED(device->SetViewport(&savedViewport)) &&
-                restoreOk;
-            savedRt->Release();
-            if (savedDepth) savedDepth->Release();
-            stateBlock->Release();
+            // Experimental performance path: restore exactly the state touched
+            // by the stereo SkyGlow pass instead of creating/applying a full
+            // D3DSBT_ALL state block every Present. DrawPrimitiveUP clears
+            // stream 0, so the original stream binding is part of the explicit
+            // snapshot as well.
+            const bool restoreOk =
+                R30RestoreSkyGlowState(device, savedState);
 
             if (ok && restoreOk)
             {
@@ -1157,7 +1271,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW PERF P3: VR-only half-resolution L/R extract + dead-pass-elided blur + batched invariant D3D9 state ACTIVE factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
+                        "VR SKY GLOW EXP STATEBLOCK: explicit touched-state restore ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
