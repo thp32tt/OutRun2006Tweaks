@@ -1,0 +1,991 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00045",
+  "attempt": "1/3",
+  "wave_id": "W00014",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T06:25:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "final_pre_material_commit_head_sha": "c50a81e07341bfd2a636650d724dfd3ef78ba1fc",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_HD_ATLAS_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT"
+  ],
+  "source_policy": {
+    "ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "contract_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+    "queue_blob_sha": "9ed1f1772e56315ca6355272672848679f2df95f",
+    "immutable_reference_repo": "Sonic-TV/OR2006Sprites",
+    "immutable_reference_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "selection": {
+    "selected_pending_localize_text_indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "parity_check": "PASS_EVEN_ONLY",
+    "work_steal": "NONE",
+    "reason": "All zoom_review rows are resolved; unchanged REWORK/runtime blockers were not repeated. Selected four independent even pending_artwork localize_text assets lacking exact semantic-to-atlas reconstruction inputs."
+  },
+  "assets": [
+    {
+      "queue_index": 46,
+      "asset": "AA04D779",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "translation_segment_count": 21,
+      "transcription_artwork_plan_parity": "PASS",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/AA04D779_512x512.png",
+        "git_blob_sha": "658b74a2bc6b282f4951c88336439310f421b806",
+        "visual_review": "DIRECT_GITHUB_STOCK_PNG_REVIEWED"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/4x_AA04D779_512x512_atlas.json",
+        "git_blob_sha": "256b0b0d9b93abfb16ad08d6afa3954348f1f013",
+        "canvas": [
+          2048,
+          2048
+        ],
+        "frame_count": 69,
+        "rotated_frame_count": 0
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "contents_api_inline_payload_bytes": 0,
+        "header_decode_status": "BLOCKED_GITHUB_CONTENTS_LARGE_BINARY_NO_INLINE_PAYLOAD"
+      },
+      "mapped_elements": [
+        {
+          "source": "Palm Beach",
+          "korean": "팜 비치",
+          "sprite": "sprite_173",
+          "atlas_rect_4x": [
+            0,
+            408,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            102,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Coniferous Forest",
+          "korean": "침엽수림",
+          "sprite": "sprite_172",
+          "atlas_rect_4x": [
+            0,
+            560,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            140,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Snow Mountain",
+          "korean": "스노 마운틴",
+          "sprite": "sprite_171",
+          "atlas_rect_4x": [
+            0,
+            712,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            178,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Ancient Ruins",
+          "korean": "고대 유적",
+          "sprite": "sprite_170",
+          "atlas_rect_4x": [
+            0,
+            864,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            216,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Bay Area",
+          "korean": "베이 에어리어",
+          "sprite": "sprite_169",
+          "atlas_rect_4x": [
+            0,
+            1016,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            254,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Big Forest",
+          "korean": "빅 포레스트",
+          "sprite": "sprite_208",
+          "atlas_rect_4x": [
+            168,
+            1184,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            42,
+            296,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Castle Wall",
+          "korean": "캐슬 월",
+          "sprite": "sprite_196",
+          "atlas_rect_4x": [
+            504,
+            560,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            126,
+            140,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Industrial Complex",
+          "korean": "인더스트리얼 컴플렉스",
+          "sprite": "sprite_199",
+          "atlas_rect_4x": [
+            504,
+            712,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            126,
+            178,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Metropolis",
+          "korean": "메트로폴리스",
+          "sprite": "sprite_202",
+          "atlas_rect_4x": [
+            504,
+            864,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            126,
+            216,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Sunny Beach",
+          "korean": "서니 비치",
+          "sprite": "sprite_205",
+          "atlas_rect_4x": [
+            504,
+            1016,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            126,
+            254,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Water Falls",
+          "korean": "워터폴스",
+          "sprite": "sprite_209",
+          "atlas_rect_4x": [
+            672,
+            1184,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            168,
+            296,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Alpine",
+          "korean": "알파인",
+          "sprite": "sprite_194",
+          "atlas_rect_4x": [
+            1008,
+            432,
+            596,
+            128
+          ],
+          "atlas_rect_stock_scale": [
+            252,
+            108,
+            149,
+            32
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Cloudy Highland",
+          "korean": "클라우디 하이랜드",
+          "sprite": "sprite_197",
+          "atlas_rect_4x": [
+            1008,
+            560,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            252,
+            140,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Tulip Garden",
+          "korean": "튤립 가든",
+          "sprite": "sprite_200",
+          "atlas_rect_4x": [
+            1008,
+            712,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            252,
+            178,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Cape Way",
+          "korean": "케이프 웨이",
+          "sprite": "sprite_203",
+          "atlas_rect_4x": [
+            1008,
+            864,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            252,
+            216,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "National Park",
+          "korean": "내셔널 파크",
+          "sprite": "sprite_210",
+          "atlas_rect_4x": [
+            1176,
+            1184,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            294,
+            296,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Deep Lake",
+          "korean": "딥 레이크",
+          "sprite": "sprite_195",
+          "atlas_rect_4x": [
+            1604,
+            440,
+            384,
+            120
+          ],
+          "atlas_rect_stock_scale": [
+            401,
+            110,
+            96,
+            30
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Desert",
+          "korean": "사막",
+          "sprite": "sprite_198",
+          "atlas_rect_4x": [
+            1512,
+            560,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            378,
+            140,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Ghost Forest",
+          "korean": "고스트 포레스트",
+          "sprite": "sprite_201",
+          "atlas_rect_4x": [
+            1512,
+            712,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            378,
+            178,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Imperial Avenue",
+          "korean": "임페리얼 애비뉴",
+          "sprite": "sprite_204",
+          "atlas_rect_4x": [
+            1512,
+            864,
+            504,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            378,
+            216,
+            126,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Sector4",
+          "korean": "섹터 4",
+          "sprite": "sprite_188",
+          "atlas_rect_4x": [
+            188,
+            336,
+            200,
+            72
+          ],
+          "atlas_rect_stock_scale": [
+            47,
+            84,
+            50,
+            18
+          ],
+          "atlas_rotated": false
+        }
+      ],
+      "unmapped_semantic_segments": [],
+      "preserve": "REV/TOP/player-number labels and non-text course icons/artwork",
+      "mapping_note": "All 21 semantic segments visually pinned to exact atlas sprite cells; course-label sprites include icon/artwork, so future render requires text-only masks inside each cell.",
+      "reconstruction_status": "ATLAS_SOURCE_IDENTITY_AND_SEMANTIC_SPRITE_MAPPING_READY__TEXT_EFFECT_BBOX_RENDER_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_safe_action": "Decode the exact pinned HD Release DDS, reconfirm raw per-element orientation, isolate each English full-effect text bbox inside the recorded atlas cell without modifying preserved artwork, then render Korean wholly inside that bbox and retain ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+    },
+    {
+      "queue_index": 48,
+      "asset": "B1696633",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "translation_segment_count": 9,
+      "transcription_artwork_plan_parity": "PASS",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/B1696633_512x512.png",
+        "git_blob_sha": "37a6b5b71140f987942148184eeafb26fea2bc2f",
+        "visual_review": "DIRECT_GITHUB_STOCK_PNG_REVIEWED"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/4x_B1696633_512x512_atlas.json",
+        "git_blob_sha": "29420fe4664added35beb4589e92b5c2846523ae",
+        "canvas": [
+          2048,
+          2048
+        ],
+        "frame_count": 164,
+        "rotated_frame_count": 0
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+        "git_blob_sha": "cf1c92d295191bf955b9bb1614860614965529f2",
+        "contents_api_inline_payload_bytes": 0,
+        "header_decode_status": "BLOCKED_GITHUB_CONTENTS_LARGE_BINARY_NO_INLINE_PAYLOAD"
+      },
+      "mapped_elements": [
+        {
+          "source": "NAME",
+          "korean": "이름",
+          "sprite": "sprite_20",
+          "atlas_rect_4x": [
+            0,
+            756,
+            1920,
+            64
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            189,
+            480,
+            16
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "STATUS",
+          "korean": "상태",
+          "sprite": "sprite_20",
+          "atlas_rect_4x": [
+            0,
+            756,
+            1920,
+            64
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            189,
+            480,
+            16
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Stage",
+          "korean": "스테이지",
+          "sprite": "sprite_66",
+          "atlas_rect_4x": [
+            1084,
+            828,
+            144,
+            72
+          ],
+          "atlas_rect_stock_scale": [
+            271,
+            207,
+            36,
+            18
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Next Stage",
+          "korean": "다음 스테이지",
+          "sprite": "sprite_72",
+          "atlas_rect_4x": [
+            1308,
+            900,
+            328,
+            88
+          ],
+          "atlas_rect_stock_scale": [
+            327,
+            225,
+            82,
+            22
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Ghost",
+          "korean": "고스트",
+          "sprite": "sprite_73",
+          "atlas_rect_4x": [
+            1636,
+            900,
+            200,
+            88
+          ],
+          "atlas_rect_stock_scale": [
+            409,
+            225,
+            50,
+            22
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Total Time",
+          "korean": "총 시간",
+          "sprite": "sprite_2",
+          "atlas_rect_4x": [
+            0,
+            1696,
+            840,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            424,
+            210,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Slipstream",
+          "korean": "슬립스트림",
+          "sprite": "sprite_156",
+          "atlas_rect_4x": [
+            840,
+            1696,
+            600,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            210,
+            424,
+            150,
+            38
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "NEW Record!!",
+          "korean": "신기록!!",
+          "sprite": "sprite_158",
+          "atlas_rect_4x": [
+            1608,
+            1728,
+            280,
+            120
+          ],
+          "atlas_rect_stock_scale": [
+            402,
+            432,
+            70,
+            30
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Extend Time",
+          "korean": "시간 연장",
+          "sprite": "sprite_163",
+          "atlas_rect_4x": [
+            800,
+            1896,
+            1016,
+            152
+          ],
+          "atlas_rect_stock_scale": [
+            200,
+            474,
+            254,
+            38
+          ],
+          "atlas_rotated": false
+        }
+      ],
+      "unmapped_semantic_segments": [],
+      "preserve": "numeric/rank glyphs, arrows/icons, bars and non-text UI artwork",
+      "mapping_note": "All 9 semantic segments visually pinned. NAME and STATUS share sprite_20, so future render must segment two independent text bboxes inside that shared cell.",
+      "reconstruction_status": "ATLAS_SOURCE_IDENTITY_AND_SEMANTIC_SPRITE_MAPPING_READY__TEXT_EFFECT_BBOX_RENDER_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_safe_action": "Decode the exact pinned HD Release DDS, reconfirm raw per-element orientation, isolate each English full-effect text bbox inside the recorded atlas cell without modifying preserved artwork, then render Korean wholly inside that bbox and retain ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+    },
+    {
+      "queue_index": 50,
+      "asset": "CBF8ECBF",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "translation_segment_count": 7,
+      "transcription_artwork_plan_parity": "PASS",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.png",
+        "git_blob_sha": "89f7689340b531319e4d7283f26aac640a43a456",
+        "visual_review": "DIRECT_GITHUB_STOCK_PNG_REVIEWED"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/4x_CBF8ECBF_1024x512_atlas.json",
+        "git_blob_sha": "f0103428d8d9e9a4eda7406d5b7b5a83120b5258",
+        "canvas": [
+          4096,
+          2048
+        ],
+        "frame_count": 116,
+        "rotated_frame_count": 0
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+        "git_blob_sha": "8aa143bb3518713687bdaf565101bc0a437fc2ed",
+        "contents_api_inline_payload_bytes": 0,
+        "header_decode_status": "BLOCKED_GITHUB_CONTENTS_LARGE_BINARY_NO_INLINE_PAYLOAD"
+      },
+      "mapped_elements": [
+        {
+          "source": "Time Over",
+          "korean": "시간 종료",
+          "sprite": "sprite_441",
+          "atlas_rect_4x": [
+            0,
+            1236,
+            1916,
+            292
+          ],
+          "atlas_rect_stock_scale": [
+            0,
+            309,
+            479,
+            73
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Game Over",
+          "korean": "게임 오버",
+          "sprite": "sprite_541",
+          "atlas_rect_4x": [
+            1916,
+            1280,
+            1496,
+            248
+          ],
+          "atlas_rect_stock_scale": [
+            479,
+            320,
+            374,
+            62
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "sprite": "sprite_548",
+          "atlas_rect_4x": [
+            1444,
+            1576,
+            1540,
+            472
+          ],
+          "atlas_rect_stock_scale": [
+            361,
+            394,
+            385,
+            118
+          ],
+          "atlas_rotated": false
+        }
+      ],
+      "unmapped_semantic_segments": [
+        {
+          "source": "PLEASE WAIT",
+          "korean": "잠시만요"
+        },
+        {
+          "source": "PLAYERS",
+          "korean": "플레이어"
+        },
+        {
+          "source": "YOUR FRIENDS",
+          "korean": "내 친구"
+        },
+        {
+          "source": "FRIEND REQUEST",
+          "korean": "친구 요청"
+        }
+      ],
+      "preserve": "controller/steering-wheel art, rank ordinals, Ferrari/logo artwork and all non-target UI panels",
+      "mapping_note": "3 of 7 semantic segments are visually pinned to exact large atlas sprites. PLEASE WAIT / PLAYERS / YOUR FRIENDS / FRIEND REQUEST remain unmapped rather than guessed; deterministic pixel-text detection is required before render.",
+      "reconstruction_status": "ATLAS_SOURCE_IDENTITY_AND_3_OF_7_TEXT_SPRITES_PINNED__4_TEXT_SPRITES_NEED_PIXEL_DETECTION",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_safe_action": "Decode the exact pinned HD Release DDS, reconfirm raw per-element orientation, isolate each English full-effect text bbox inside the recorded atlas cell without modifying preserved artwork, then render Korean wholly inside that bbox and retain ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+    },
+    {
+      "queue_index": 62,
+      "asset": "33491F83",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "translation_segment_count": 5,
+      "transcription_artwork_plan_parity": "PASS",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/33491F83_512x256.png",
+        "git_blob_sha": "8e6461404d8bfe7e8a2891fad6df1140e1c33c70",
+        "visual_review": "DIRECT_GITHUB_STOCK_PNG_REVIEWED"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/4x_33491F83_512x256_atlas.json",
+        "git_blob_sha": "e479291b454b69ea0eb8301b9ad1e0df60819fe6",
+        "canvas": [
+          2048,
+          1024
+        ],
+        "frame_count": 5,
+        "rotated_frame_count": 0
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+        "git_blob_sha": "00a94c32cc35fc773ceed0ece6d1f2f64da841f5",
+        "contents_api_inline_payload_bytes": 0,
+        "header_decode_status": "BLOCKED_GITHUB_CONTENTS_LARGE_BINARY_NO_INLINE_PAYLOAD"
+      },
+      "mapped_elements": [
+        {
+          "source": "Diverge",
+          "korean": "분기",
+          "sprite": "sprite_13",
+          "atlas_rect_4x": [
+            4,
+            4,
+            1192,
+            808
+          ],
+          "atlas_rect_stock_scale": [
+            1,
+            1,
+            298,
+            202
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Left",
+          "korean": "왼쪽",
+          "sprite": "sprite_13",
+          "atlas_rect_4x": [
+            4,
+            4,
+            1192,
+            808
+          ],
+          "atlas_rect_stock_scale": [
+            1,
+            1,
+            298,
+            202
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "Right",
+          "korean": "오른쪽",
+          "sprite": "sprite_13",
+          "atlas_rect_4x": [
+            4,
+            4,
+            1192,
+            808
+          ],
+          "atlas_rect_stock_scale": [
+            1,
+            1,
+            298,
+            202
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "HARD",
+          "korean": "어려움",
+          "sprite": "sprite_14",
+          "atlas_rect_4x": [
+            1204,
+            4,
+            504,
+            120
+          ],
+          "atlas_rect_stock_scale": [
+            301,
+            1,
+            126,
+            30
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "EASY",
+          "korean": "쉬움",
+          "sprite": "sprite_15",
+          "atlas_rect_4x": [
+            1204,
+            132,
+            504,
+            120
+          ],
+          "atlas_rect_stock_scale": [
+            301,
+            33,
+            126,
+            30
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "HARD",
+          "korean": "어려움",
+          "sprite": "sprite_16",
+          "atlas_rect_4x": [
+            1716,
+            4,
+            320,
+            120
+          ],
+          "atlas_rect_stock_scale": [
+            429,
+            1,
+            80,
+            30
+          ],
+          "atlas_rotated": false
+        },
+        {
+          "source": "EASY",
+          "korean": "쉬움",
+          "sprite": "sprite_17",
+          "atlas_rect_4x": [
+            1716,
+            132,
+            320,
+            120
+          ],
+          "atlas_rect_stock_scale": [
+            429,
+            33,
+            80,
+            30
+          ],
+          "atlas_rotated": false
+        }
+      ],
+      "unmapped_semantic_segments": [],
+      "preserve": "road geometry, arrows, signals and all non-text loading artwork",
+      "mapping_note": "All 5 semantic segments / 7 physical text occurrences are pinned. Diverge/Left/Right share the large road-art sprite_13; HARD/EASY occur in separate arrow-label sprites 14-17.",
+      "reconstruction_status": "ATLAS_SOURCE_IDENTITY_AND_SEMANTIC_SPRITE_MAPPING_READY__TEXT_EFFECT_BBOX_RENDER_HOLD",
+      "containment_state": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_safe_action": "Decode the exact pinned HD Release DDS, reconfirm raw per-element orientation, isolate each English full-effect text bbox inside the recorded atlas cell without modifying preserved artwork, then render Korean wholly inside that bbox and retain ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+    }
+  ],
+  "material_advance": {
+    "semantic_segments_checked": 42,
+    "semantic_segments_with_exact_sprite_cell_mapping": 38,
+    "remaining_unmapped_semantic_segments": [
+      {
+        "queue_index": 50,
+        "sources": [
+          "PLEASE WAIT",
+          "PLAYERS",
+          "YOUR FRIENDS",
+          "FRIEND REQUEST"
+        ]
+      }
+    ],
+    "exact_upstream_blob_identities_pinned": 12,
+    "candidate_dds_modified": false,
+    "value": "New exact GitHub source/atlas identity plus deterministic semantic-to-sprite layout constraints for four unfinished even-shard assets; removes sprite-selection ambiguity for 38/42 semantic segments and explicitly isolates the remaining 4 instead of guessing."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_46_48_50_62",
+    "work_steal": "NONE",
+    "transcription_artwork_plan": "PASS_4_OF_4_ASSET_SEGMENT_LISTS",
+    "source_identity": "PASS_12_OF_12_PINNED_GITHUB_BLOBS",
+    "stock_visual_review": "PASS_4_OF_4_GITHUB_PNGS",
+    "atlas_cell_mapping": "PASS_38_OF_42_SEMANTIC_SEGMENTS__4_EXPLICIT_HOLD",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE__EXACT_ATLAS_CELL_LIMITS_RECORDED_FOR_MAPPED_ELEMENTS",
+    "dds_format_alpha_mips": "NO_DDS_WRITE__EXACT_RELEASE_BLOB_PINNED__HEADER_DECODE_HELD_WHERE_GITHUB_CONTENTS_OMITS_LARGE_BINARY_PAYLOAD",
+    "orientation": "HOLD_EXACT_HD_RAW_DDS_RECONFIRMATION_BEFORE_RENDER__ATLAS_ROTATED_FLAGS_RECORDED",
+    "mandatory_english_source_comparison": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_KOREAN_DDS",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_FILES_TOUCHED",
+    "peer_lane_isolation": "PASS_NO_ODD_SHARD_FILES_TOUCHED",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_dds": [],
+  "reviewed_or_materially_advanced_assets": [
+    "AA04D779",
+    "B1696633",
+    "CBF8ECBF",
+    "33491F83"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00014 lane B materially advanced four unfinished even-shard localize_text assets with exact pinned GitHub source identities and semantic-to-atlas reconstruction constraints. No DDS bytes were guessed or promoted; zero-pixel, DDS/alpha/orientation raster gates remain HOLD/NO-WRITE until exact HD decoding and a Korean candidate exist. Runtime remains UNTESTED."
+}
