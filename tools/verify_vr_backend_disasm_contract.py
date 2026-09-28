@@ -29,11 +29,13 @@ def main() -> None:
             "RankMarkerRva = 0x000BAD20u",
             "0x000BB0FBu",
             "0x000BB2D0u",
-            "std::array<ProducerRange, 23>",
-            "0x00081A00u, 0x00081B00u, SpacePolicy::ScreenHud",
-            "0x000BE300u, 0x000BEA40u, SpacePolicy::ScreenHud",
-            "0x000FC800u, 0x000FC8A0u, SpacePolicy::ScreenHud",
-            "0x0005B300u, 0x0005B700u, SpacePolicy::WorldBillboard",
+            "std::array<ProducerRange, 25>",
+            '0x00060900u, 0x00061100u, "ctrl_icon_work", "HUD_CTRL_ICON", SpacePolicy::ScreenHud',
+            '0x000BBA00u, 0x000BBC00u, "DispTempHeartNum", "HUD_TEMP_HEART", SpacePolicy::ScreenHud',
+            '0x00081A00u, 0x00081B00u, "C2C_Fruit", "HUD_FRUIT", SpacePolicy::ScreenHud',
+            '0x000BE300u, 0x000BEA40u, "DispTimeAttack2D", "HUD_TIME_ATTACK", SpacePolicy::ScreenHud',
+            '0x000FC800u, 0x000FC8A0u, "C2CSpeechBubbleGF_RankEmoji", "HUD_RANK_EMOJI", SpacePolicy::ScreenHud',
+            '0x0005B300u, 0x0005B700u, "HeartDisp_car_heart", "WORLD_HEART", SpacePolicy::WorldBillboard',
         ],
     )
     require(
