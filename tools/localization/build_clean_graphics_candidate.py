@@ -58,12 +58,12 @@ def main():
     ap.add_argument("--clean-plate",required=True); ap.add_argument("--candidate-png",required=True)
     ap.add_argument("--edit-mask",required=True); ap.add_argument("--protected-mask")
     ap.add_argument("--output-dds",required=True); ap.add_argument("--report",required=True)
-    ap.add_argument("--generation-id",required=True); ap.add_argument("--spec-id",required=True)
+    ap.add_argument("--generation-id",required=True); ap.add_argument("--spec-id",required=True)\n    ap.add_argument("--prompt-json",required=True, help="Strict prompt JSON produced by build_image_generation_prompt.py")
     a=ap.parse_args()
-    source=img(a.source_png); clean=img(a.clean_plate); cand=img(a.candidate_png)
+    prompt=json.loads(Path(a.prompt_json).read_text(encoding="utf-8"))\n    if prompt.get("contract")!="outrun-first-pass-edit-v1": raise SystemExit("FAIL wrong/missing strict prompt contract")\n    recorded_prompt_sha=prompt.get("prompt_sha256","")\n    unsigned=dict(prompt); unsigned.pop("prompt_sha256",None)\n    canonical=json.dumps(unsigned,ensure_ascii=False,sort_keys=True,separators=(",",":"))\n    calculated_prompt_sha=hashlib.sha256(canonical.encode()).hexdigest()\n    if recorded_prompt_sha!=calculated_prompt_sha: raise SystemExit("FAIL prompt JSON hash mismatch")\n    source=img(a.source_png); clean=img(a.clean_plate); cand=img(a.candidate_png)
     if not(source.size==clean.size==cand.size): raise SystemExit("FAIL PNG dimensions differ")
     di=dds_info(a.source_dds)
-    if source.size!=(di["width"],di["height"]): raise SystemExit("FAIL decoded source PNG != DDS dimensions")
+    if source.size!=(di["width"],di["height"]): raise SystemExit("FAIL decoded source PNG != DDS dimensions")\n    pa=prompt.get("asset",{})\n    if pa.get("source_sha256")!=di["sha256"]: raise SystemExit("FAIL prompt source SHA does not match DDS")\n    if pa.get("canvas")!=[di["width"],di["height"]]: raise SystemExit("FAIL prompt canvas does not match DDS")\n    if str(pa.get("id"))!=str(a.spec_id): raise SystemExit("FAIL prompt asset id does not match --spec-id")
     # Require supplied source PNG to be exact decode of uncompressed DDS.
     decoded=decode_uncompressed(a.source_dds)
     if ImageChops.difference(decoded,source).getbbox(): raise SystemExit("FAIL source PNG is not exact DDS decode")
@@ -81,7 +81,7 @@ def main():
     if odi["header_sha256"]!=di["header_sha256"]: raise SystemExit("FAIL DDS header changed")
     report={"schema":"outrun-korean-clean-generation-v1","status":"PASS","generation_id":a.generation_id,
       "spec_id":a.spec_id,"source_dds":a.source_dds,"source_sha256":di["sha256"],
-      "source_png_sha256":sha(a.source_png),"clean_plate_sha256":sha(a.clean_plate),
+      "source_png_sha256":sha(a.source_png),"clean_plate_sha256":sha(a.clean_plate),\n      "prompt_contract":prompt["contract"],"prompt_sha256":recorded_prompt_sha,"prompt_json_sha256":sha(a.prompt_json),
       "edit_mask_sha256":sha(a.edit_mask),"protected_mask_sha256":sha(a.protected_mask) if a.protected_mask else None,
       "candidate_png_sha256":sha(a.candidate_png),"candidate_dds_sha256":odi["sha256"],
       "width":di["width"],"height":di["height"],"mip_count":di["mips"],"fourcc":di["fourcc"],
