@@ -50,6 +50,13 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceMutationMapDiscardUnlocks{0};
         std::atomic<std::uint64_t> ResourceMutationMapNoOverwriteUnlocks{0};
         std::atomic<std::uint64_t> ResourceMutationUpdateSubresourceUnlocks{0};
+        std::atomic<std::uint64_t> ResourceTextureMutationWriteUnlocks{0};
+        std::atomic<std::uint64_t> ResourceTextureMutationReadOnlyUnlocks{0};
+        std::atomic<std::uint64_t> ResourceTextureMutationDescriptorFailures{0};
+        std::atomic<std::uint64_t> ResourceUpdateTextureSuccesses{0};
+        std::atomic<std::uint64_t> ResourceUpdateTextureFailures{0};
+        std::atomic<std::uint64_t> ResourceUpdateSurfaceSuccesses{0};
+        std::atomic<std::uint64_t> ResourceUpdateSurfaceFailures{0};
         std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
@@ -78,6 +85,19 @@ namespace outrun::vr::dx11
         std::mutex MutationEvidenceMutex;
         BufferMutationRegistry VertexMutationEvidence;
         BufferMutationRegistry IndexMutationEvidence;
+
+        struct TextureMutationEvidence
+        {
+            bool descriptorObserved{};
+            D3DPOOL pool = D3DPOOL_FORCE_DWORD;
+            DWORD usage{};
+            DWORD flags{};
+        };
+
+        using TextureMutationRegistry =
+            std::unordered_map<const void*,
+                std::unordered_map<UINT, TextureMutationEvidence>>;
+        TextureMutationRegistry TextureMutationEvidenceRegistry;
 
         struct FixedFunctionStageSignature
         {
@@ -326,6 +346,63 @@ namespace outrun::vr::dx11
                 return;
             std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
             registry.erase(resource);
+        }
+
+        void begin_observed_texture_lock(
+            const void* resource,
+            UINT level,
+            bool descriptorObserved,
+            D3DPOOL pool,
+            DWORD usage,
+            DWORD flags) noexcept
+        {
+            if (!resource)
+                return;
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            auto& evidence = TextureMutationEvidenceRegistry[resource][level];
+            evidence.descriptorObserved = descriptorObserved;
+            evidence.pool = pool;
+            evidence.usage = usage;
+            evidence.flags = flags;
+            if (!descriptorObserved)
+                ResourceTextureMutationDescriptorFailures.fetch_add(
+                    1, std::memory_order_relaxed);
+        }
+
+        void finish_observed_texture_unlock(
+            const void* resource,
+            UINT level,
+            HRESULT result) noexcept
+        {
+            if (!resource)
+                return;
+
+            TextureMutationEvidence evidence{};
+            bool pending = false;
+            {
+                std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+                const auto resourceIt =
+                    TextureMutationEvidenceRegistry.find(resource);
+                if (resourceIt == TextureMutationEvidenceRegistry.end())
+                    return;
+                const auto levelIt = resourceIt->second.find(level);
+                if (levelIt == resourceIt->second.end())
+                    return;
+                evidence = levelIt->second;
+                pending = true;
+                resourceIt->second.erase(levelIt);
+                if (resourceIt->second.empty())
+                    TextureMutationEvidenceRegistry.erase(resourceIt);
+            }
+
+            if (!pending || FAILED(result))
+                return;
+            if ((evidence.flags & D3DLOCK_READONLY) != 0)
+                ResourceTextureMutationReadOnlyUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
+            else
+                ResourceTextureMutationWriteUnlocks.fetch_add(
+                    1, std::memory_order_relaxed);
         }
 
         bool inspect_texture(
@@ -608,7 +685,7 @@ namespace outrun::vr::dx11
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R75 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R76 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -714,7 +791,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R75 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates and classified VB/IB D3D11 mirror update plans; native draw routing remains disabled",
+                    "VR DX11 R76 census ACTIVE: passive 1/{} draw sampling with resource lifetime/mutation gates, classified VB/IB update plans, and texture mutation/update observation; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -736,7 +813,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R75 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R76 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -765,6 +842,13 @@ namespace outrun::vr::dx11
                 ResourceMutationMapDiscardUnlocks.load(std::memory_order_relaxed),
                 ResourceMutationMapNoOverwriteUnlocks.load(std::memory_order_relaxed),
                 ResourceMutationUpdateSubresourceUnlocks.load(std::memory_order_relaxed),
+                ResourceTextureMutationWriteUnlocks.load(std::memory_order_relaxed),
+                ResourceTextureMutationReadOnlyUnlocks.load(std::memory_order_relaxed),
+                ResourceTextureMutationDescriptorFailures.load(std::memory_order_relaxed),
+                ResourceUpdateTextureSuccesses.load(std::memory_order_relaxed),
+                ResourceUpdateTextureFailures.load(std::memory_order_relaxed),
+                ResourceUpdateSurfaceSuccesses.load(std::memory_order_relaxed),
+                ResourceUpdateSurfaceFailures.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -841,6 +925,57 @@ namespace outrun::vr::dx11
         IDirect3DIndexBuffer9* buffer) noexcept
     {
         forget_observed_buffer(IndexMutationEvidence, buffer);
+    }
+
+    void observe_texture_lock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        DWORD flags) noexcept
+    {
+        if (!texture || !census_enabled())
+            return;
+        D3DSURFACE_DESC desc{};
+        const bool descriptorObserved =
+            SUCCEEDED(texture->GetLevelDesc(level, &desc));
+        begin_observed_texture_lock(
+            texture, level, descriptorObserved,
+            desc.Pool, desc.Usage, flags);
+    }
+
+    void observe_texture_unlock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        HRESULT result) noexcept
+    {
+        if (!texture || !census_enabled())
+            return;
+        finish_observed_texture_unlock(texture, level, result);
+    }
+
+    void observe_update_texture(
+        IDirect3DBaseTexture9* source,
+        IDirect3DBaseTexture9* destination,
+        HRESULT result) noexcept
+    {
+        if (!source || !destination || !census_enabled())
+            return;
+        (SUCCEEDED(result)
+            ? ResourceUpdateTextureSuccesses
+            : ResourceUpdateTextureFailures).fetch_add(
+                1, std::memory_order_relaxed);
+    }
+
+    void observe_update_surface(
+        IDirect3DSurface9* source,
+        IDirect3DSurface9* destination,
+        HRESULT result) noexcept
+    {
+        if (!source || !destination || !census_enabled())
+            return;
+        (SUCCEEDED(result)
+            ? ResourceUpdateSurfaceSuccesses
+            : ResourceUpdateSurfaceFailures).fetch_add(
+                1, std::memory_order_relaxed);
     }
 
     void observe_source_draw(
