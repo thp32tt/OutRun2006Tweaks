@@ -1,0 +1,38 @@
+name: Localization A00004 411 Production
+on:
+  push:
+    branches: [korean-localization-clean]
+    paths: ['docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00004.prod.dispatch.json']
+permissions:
+  contents: write
+concurrency:
+  group: localization-a00004-411-production
+  cancel-in-progress: false
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: korean-localization-clean, fetch-depth: 0}
+      - run: python -m pip install --disable-pip-version-check pillow
+      - run: python tools/localization/a00004_rework_411.py
+      - shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds                   localization/graphics/role_A/20260928-A00004                   localization/graphics/asset_queue.csv localization/progress/progress.json                   localization/resume_state.json localization/progress/STATUS.md localization/WORKLOG.md                   docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00004.json
+          git commit -m "localization: A00004 rework 411827E [AUTO:LOCALIZATION-LOCALIZATION_A-00004]"
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
+          PROD_SHA="$(git rev-parse HEAD)"
+          python - "$PROD_SHA" <<'PY'
+          import json,pathlib,sys
+          p=pathlib.Path("docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00004.json")
+          j=json.loads(p.read_text("utf-8")); j["result_sha"]=sys.argv[1]; j["production_commit_sha"]=sys.argv[1]
+          p.write_text(json.dumps(j,ensure_ascii=False,indent=2)+"\n","utf-8")
+          PY
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00004.json
+          git commit -m "automation: record A00004 result [AUTO:LOCALIZATION-LOCALIZATION_A-00004]"
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
