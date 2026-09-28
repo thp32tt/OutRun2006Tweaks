@@ -24,10 +24,22 @@ from playwright.async_api import async_playwright, BrowserContext, Page, Timeout
 TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
 CHATGPT_BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/").strip()
 CHATGPT_PROJECT_URL = os.getenv("CHATGPT_PROJECT_URL", "").strip()
+EXPECTED_PROJECT_ID = os.getenv("EXPECTED_PROJECT_ID", "").strip()
 BASE_URL = CHATGPT_PROJECT_URL or CHATGPT_BASE_URL
 REQUIRE_PROJECT_URL = os.getenv("REQUIRE_PROJECT_URL", "false").lower() == "true"
+
+def _project_id_from_url(url: str) -> Optional[str]:
+    try:
+        path = urllib.parse.urlparse(url or "").path
+    except Exception:
+        return None
+    m = re.search(r"/g/(g-p-[A-Za-z0-9]+)", path)
+    return m.group(1) if m else None
+
+CONFIGURED_PROJECT_ID = _project_id_from_url(CHATGPT_PROJECT_URL)
+PROJECT_ID_MATCH = not EXPECTED_PROJECT_ID or CONFIGURED_PROJECT_ID == EXPECTED_PROJECT_ID
 AUTO_SEND_REQUESTED = os.getenv("AUTO_SEND", "false").lower() == "true"
-PROJECT_SCOPE_READY = bool(CHATGPT_PROJECT_URL) or not REQUIRE_PROJECT_URL
+PROJECT_SCOPE_READY = (bool(CHATGPT_PROJECT_URL) or not REQUIRE_PROJECT_URL) and PROJECT_ID_MATCH
 AUTO_SEND = AUTO_SEND_REQUESTED and PROJECT_SCOPE_READY
 CONTROLLER_MODE = os.getenv("CONTROLLER_MODE", "localization").strip().lower()
 if CONTROLLER_MODE == "vr":
@@ -201,6 +213,9 @@ runtime = {
     "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
     "project_url_configured": bool(CHATGPT_PROJECT_URL),
     "require_project_url": REQUIRE_PROJECT_URL,
+    "configured_project_id": CONFIGURED_PROJECT_ID,
+    "expected_project_id": EXPECTED_PROJECT_ID or None,
+    "project_id_match": PROJECT_ID_MATCH,
     "start_url": BASE_URL,
     "schedule_minutes": SCHEDULE_MINUTES,
     "status": "starting",

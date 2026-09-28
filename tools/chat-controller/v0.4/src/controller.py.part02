@@ -150,6 +150,15 @@ async def slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot)
         page = await context.new_page()
         pages[slot.name] = page
         await page.goto(slot.url or BASE_URL, wait_until="domcontentloaded", timeout=60000)
+    elif REQUIRE_PROJECT_URL and not is_configured_project_url(page.url):
+        log.warning("slot tab escaped configured project; restoring slot=%s url=%s", slot.name, page.url)
+        target = slot.url if slot.url and is_project_scoped_chat_url(slot.url) else BASE_URL
+        if target == BASE_URL:
+            slot.url = None
+            slot.last_assistant_hash = None
+            slot.last_assistant_change_at = None
+        await page.goto(target, wait_until="domcontentloaded", timeout=60000)
+        await page.wait_for_timeout(700)
     elif not slot.url and "/c/local-chatgpt" in page.url.lower():
         await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(700)

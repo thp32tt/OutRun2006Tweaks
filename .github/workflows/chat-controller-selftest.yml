@@ -43,6 +43,7 @@ jobs:
             grep -Fq 'PREFERRED_THINKING_LEVEL: "High"' "$compose"
             grep -Fq 'STRICT_THINKING_LEVEL: "true"' "$compose"
           done
+          grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
 
       - name: Verify queue prompt files
         run: |

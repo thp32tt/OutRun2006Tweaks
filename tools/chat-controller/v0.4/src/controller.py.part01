@@ -446,6 +446,15 @@ def _normalize_composer_text(value: str) -> str:
 
 async def send_message(page: Page, message: str) -> str:
     """Insert and send a prompt, returning the exact stage result for diagnostics."""
+    if REQUIRE_PROJECT_URL and not is_configured_project_url(page.url):
+        log.error("blocked prompt send outside configured project url=%s expected_project_id=%s", page.url, CONFIGURED_PROJECT_ID)
+        write_runtime(
+            status="wrong_project_blocked",
+            last_action="Prompt send blocked because the active tab is outside the configured ChatGPT project",
+            current_url=page.url,
+            configured_project_id=CONFIGURED_PROJECT_ID,
+        )
+        return "wrong_project"
     box = await first_visible(page, INPUT_SELECTORS)
     if box is None:
         return "not_found"
@@ -498,20 +507,13 @@ def is_persistable_chat_url(url: Optional[str]) -> bool:
 
 
 def configured_project_id() -> Optional[str]:
-    """Extract the stable g-p-* project id from the configured project URL."""
-    if not CHATGPT_PROJECT_URL:
-        return None
-    try:
-        path = urllib.parse.urlparse(CHATGPT_PROJECT_URL).path
-    except Exception:
-        return None
-    m = re.search(r"/g/(g-p-[A-Za-z0-9]+)", path)
-    return m.group(1) if m else None
+    """Return the stable configured g-p-* project id."""
+    return CONFIGURED_PROJECT_ID
 
 
-def is_project_scoped_chat_url(url: Optional[str]) -> bool:
-    """Hard guard: persisted chats must belong to the configured ChatGPT project."""
-    if not is_persistable_chat_url(url):
+def is_configured_project_url(url: Optional[str]) -> bool:
+    """Return True only for pages inside the configured ChatGPT project."""
+    if not url:
         return False
     if not REQUIRE_PROJECT_URL:
         return True
@@ -519,13 +521,18 @@ def is_project_scoped_chat_url(url: Optional[str]) -> bool:
     if not project_id:
         return False
     try:
-        parsed = urllib.parse.urlparse(url or "")
+        parsed = urllib.parse.urlparse(url)
     except Exception:
         return False
     if parsed.netloc.lower() not in {"chatgpt.com", "www.chatgpt.com"}:
         return False
     prefix = f"/g/{project_id}"
-    return parsed.path.startswith(prefix + "/") or parsed.path.startswith(prefix + "-")
+    return parsed.path == prefix or parsed.path.startswith(prefix + "/") or parsed.path.startswith(prefix + "-")
+
+
+def is_project_scoped_chat_url(url: Optional[str]) -> bool:
+    """Hard guard: persisted chats must belong to the configured ChatGPT project."""
+    return is_persistable_chat_url(url) and is_configured_project_url(url)
 
 
 async def wait_for_chat_url(page: Page, timeout_sec: int = 30) -> Optional[str]:

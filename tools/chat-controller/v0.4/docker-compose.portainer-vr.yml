@@ -28,6 +28,7 @@ services:
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${VR_PROJECT_URL:-}"
+      EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"
       REQUIRE_PROJECT_URL: "true"
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "true"

@@ -27,7 +27,7 @@ Compose path:
 
 Environment variables:
 
-- `VR_PROJECT_URL=<full ChatGPT VR project URL>`
+- `VR_PROJECT_URL=https://chatgpt.com/g/g-p-6ab9a64fc428819198c7f39765d764bf/project`
 - `AUTO_SEND=false`
 - `WATCHDOG_ENABLED=false`
 - `VNC_PASSWORD=<your password>`
@@ -37,7 +37,7 @@ Access:
 - noVNC: `http://<N100-IP>:6080`
 - status: `http://<N100-IP>:8787`
 
-Log in with the VR ChatGPT account and verify the configured project opens.
+Log in with the VR ChatGPT account and verify the configured project opens. The controller also pins `EXPECTED_PROJECT_ID=g-p-6ab9a64fc428819198c7f39765d764bf`; if `VR_PROJECT_URL` points at another project, `AUTO_SEND` is disabled.
 
 ## Localization stack
 
