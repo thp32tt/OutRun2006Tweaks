@@ -1,0 +1,107 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00028",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00008",
+  "recorded_at_kst": "2026-09-29T03:19:00+09:00",
+  "reconciliation_base_head_sha": "9e33ff5f28a5db8b05195d5b071b7e9f4714a90f",
+  "shared_state_verified_head_sha": "0bc83c18ffe6cd40051c7e12fa9b7e1059190b25",
+  "result": "PASS_W00008_SYNC_5_LOCALIZABLE_PROMOTED_3_PRESERVE_NO_NEW_DDS_APPROVALS",
+  "automation_validation": "PASS_STATIC_GITHUB_POSTCOMMIT",
+  "runtime_validation": "UNTESTED",
+  "barrier_inputs": {
+    "lane_A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00026",
+      "material_commit_sha": "050acd9feec61a535107104784a6b69586872464",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE",
+      "candidate_dds_modified": false
+    },
+    "lane_B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00027",
+      "material_commit_sha": "5814a150ea14b1d5bea58ce00d3c9e3e58bde390",
+      "terminal_record_commit_sha": "9e33ff5f28a5db8b05195d5b071b7e9f4714a90f",
+      "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_TEXT_ASSETS_CONFIRMED_REBUILD_SPEC_READY",
+      "candidate_dds_modified": false,
+      "remote_ci": "PASS_RECORDED_BY_B"
+    }
+  },
+  "cross_lane_qa": {
+    "exact_upstream_original_png_blob_identities_revalidated": 8,
+    "visual_classification_revalidated": true,
+    "canonical_translation": {
+      "Total Rank": "종합 랭크"
+    },
+    "promoted_to_localize_text": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ],
+    "resolved_preserve_original": [
+      33,
+      37,
+      45
+    ],
+    "candidate_dds_modified": false,
+    "new_candidate_dds_bytes": 0,
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE_FIVE_PROMOTED_ASSETS_HOLD_EXACT_HD_DECODED_SOURCE_BBOX",
+    "clipping_hangul_raster": "NOT_APPLICABLE_NO_NEW_KOREAN_DDS_BYTES",
+    "dds_format_mipmap_alpha_transparency_orientation": "UNCHANGED_NO_DDS_WRITE",
+    "background_wrong_replacement_hd_gui": "NO_REPLACEMENT_INTRODUCED",
+    "english_source_side_by_side": "PENDING_FUTURE_CANDIDATE_PRODUCTION",
+    "approvals_added": 0,
+    "approved_dds_count": 0
+  },
+  "shared_state_merge": {
+    "queue_rows": 137,
+    "queue_actions": {
+      "localize_text": 84,
+      "zoom_review": 42,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "zoom_review_unresolved": 27,
+    "zoom_review_resolved_preserve_original": 15,
+    "transcription_assets": 84,
+    "transcription_semantic_segments": 730,
+    "artwork_plan_assets": 79,
+    "artwork_plan_segments": 725,
+    "artwork_plan_pending_extension_indices": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ],
+    "canonical_progress_and_legacy_mirror_identical": true,
+    "files": [
+      "localization/graphics/asset_queue.csv",
+      "localization/graphics/transcriptions.jsonl",
+      "localization/resume_state.json",
+      "localization/WORKLOG.md",
+      "localization/progress/progress.json",
+      "localization/progress.json",
+      "localization/progress/STATUS.md",
+      "localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json"
+    ]
+  },
+  "report": "localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json",
+  "static_postcommit_verification": {
+    "verified_head_sha": "0bc83c18ffe6cd40051c7e12fa9b7e1059190b25",
+    "queue_counts": "PASS",
+    "canonical_legacy_progress_byte_identity": "PASS",
+    "progress_resume_task_linkage": "PASS",
+    "status_worklog_presence": "PASS",
+    "c93_report_presence_and_result": "PASS"
+  },
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00008 C reconciled both durable lane results. Five Total Rank texture rows are promoted to the Korean production backlog with canonical wording 종합 랭크 and strict exact-HD pixel HOLD; three rows are resolved preserve-original. No Korean DDS bytes were changed or approved. Shared state is internally consistent and canonical/legacy progress mirrors are byte-identical. Runtime remains UNTESTED."
+}
