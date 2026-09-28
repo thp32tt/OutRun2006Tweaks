@@ -416,37 +416,6 @@ namespace outrun::vr::dx11
         const auto translated = translate_pipeline(source);
         const auto topology = translate_primitive(primitive);
 
-        bool resourcesExact = true;
-        if (sig.indexFormat != D3DFMT_UNKNOWN &&
-            !translate_resource_format(sig.indexFormat, ResourceRole::Index).exact)
-        {
-            UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
-            resourcesExact = false;
-        }
-        for (const D3DFORMAT format : { sig.texture0Format, sig.texture1Format })
-        {
-            if (format != D3DFMT_UNKNOWN &&
-                !translate_resource_format(format, ResourceRole::Texture).exact)
-            {
-                UnsupportedTextureFormatSamples.fetch_add(1, std::memory_order_relaxed);
-                resourcesExact = false;
-            }
-        }
-        if (sig.renderTargetFormat != D3DFMT_UNKNOWN &&
-            !translate_resource_format(
-                sig.renderTargetFormat, ResourceRole::Color).exact)
-        {
-            UnsupportedColorFormatSamples.fetch_add(1, std::memory_order_relaxed);
-            resourcesExact = false;
-        }
-        if (sig.depthFormat != D3DFMT_UNKNOWN &&
-            !translate_resource_format(
-                sig.depthFormat, ResourceRole::DepthStencil).exact)
-        {
-            UnsupportedDepthFormatSamples.fetch_add(1, std::memory_order_relaxed);
-            resourcesExact = false;
-        }
-
         Samples.fetch_add(1, std::memory_order_relaxed);
         std::uint32_t unsupported = translated.unsupported;
         if (!captured)
@@ -473,6 +442,38 @@ namespace outrun::vr::dx11
         const auto signature =
             inspect_source_signature(device, fixedFunction);
         note_signature(signature, primitive);
+
+        bool resourcesExact = true;
+        if (signature.indexFormat != D3DFMT_UNKNOWN &&
+            !translate_resource_format(signature.indexFormat, ResourceRole::Index).exact)
+        {
+            UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            resourcesExact = false;
+        }
+        for (const D3DFORMAT format : { signature.texture0Format, signature.texture1Format })
+        {
+            if (format != D3DFMT_UNKNOWN &&
+                !translate_resource_format(format, ResourceRole::Texture).exact)
+            {
+                UnsupportedTextureFormatSamples.fetch_add(1, std::memory_order_relaxed);
+                resourcesExact = false;
+            }
+        }
+        if (signature.renderTargetFormat != D3DFMT_UNKNOWN &&
+            !translate_resource_format(
+                signature.renderTargetFormat, ResourceRole::Color).exact)
+        {
+            UnsupportedColorFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            resourcesExact = false;
+        }
+        if (signature.depthFormat != D3DFMT_UNKNOWN &&
+            !translate_resource_format(
+                signature.depthFormat, ResourceRole::DepthStencil).exact)
+        {
+            UnsupportedDepthFormatSamples.fetch_add(1, std::memory_order_relaxed);
+            resourcesExact = false;
+        }
+
 
         if (unsupported == PipelineUnsupportedNone && topology.exact && resourcesExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
