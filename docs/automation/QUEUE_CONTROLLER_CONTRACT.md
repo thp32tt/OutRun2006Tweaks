@@ -31,7 +31,8 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - A and B must use stable odd/even queue sharding as the primary anti-duplication mechanism and must refresh GitHub HEAD immediately before target selection and immediately before commit.
 - If HEAD changed during a run, re-fetch current state and preserve the other lane's committed work. Never overwrite a newer state/report with a stale snapshot.
 - Work stealing across A/B shards is disabled while both production lanes are active concurrently. It is allowed only when the other production lane is confirmed idle/completed and the target is unclaimed after a fresh GitHub check.
-- Shared state files must be reconciled from latest HEAD after production commits; do not let concurrent workers blindly replace `resume_state.json`, worklog, progress/status, or queue state from stale bases.
+- A/B must not modify shared state files while running concurrently. Their commits are lane-local only; C alone reconciles `resume_state.json`, worklog, progress/status, asset_queue and shared queue summaries after both production lanes reach terminal durable results.
+- Parallel completion is task-commit based, not branch-HEAD based. The controller must find the commit carrying that lane's exact `[AUTO:<TASK_ID>]` marker and validate Actions for that exact SHA even if the peer lane moved branch HEAD later.
 - Keep changes narrowly scoped.
 - Maximum automatic repair attempts: 3.
 - After 3 failed attempts, record the blocker and move to another independent runnable task.
