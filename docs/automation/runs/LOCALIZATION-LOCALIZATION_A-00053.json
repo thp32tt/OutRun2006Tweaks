@@ -1,0 +1,54 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00053",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00017",
+  "recorded_at_kst": "2026-09-29T07:54:00+09:00",
+  "initial_head_sha": "b2ea44844b647f5844cd3fec24aa80e81bc69b2a",
+  "final_precommit_head_sha": "ec78d8d7463ae11b9417a9f949490ed561117b8f",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_CLEAN_PLATE_RECONSTRUCTION_INPUT_NO_DDS_CANDIDATE_FAIL_CLOSED",
+  "material_deliverable": {
+    "index": 215,
+    "asset": "C05E67EF",
+    "type": "SOURCE_DERIVED_CLEAN_PLATE_AND_PER_ELEMENT_RECONSTRUCTION_INPUT",
+    "source_text_mask": "localization/graphics/role_A/20260929-0754-A00053/A00053_C05E67EF_GOAL_SOURCE_TEXT_MASK_READABLE.png",
+    "clean_plate": "localization/graphics/role_A/20260929-0754-A00053/A00053_C05E67EF_GOAL_CLEAN_PLATE_READABLE.png",
+    "report": "localization/graphics/role_A/20260929-0754-A00053/A00053_C05E67EF_CLEAN_PLATE_RECONSTRUCTION.json",
+    "source_alpha_pixels_removed": 18497,
+    "rgb_components_changed": 0,
+    "changed_pixels_outside_source_text_mask": 0,
+    "introduced_alpha_pixels": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "touched_assets": [
+    "C05E67EF"
+  ],
+  "touched_elements": [
+    "GOAL A",
+    "GOAL B",
+    "GOAL C",
+    "GOAL D",
+    "GOAL E"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "fail_closed_reason": "Post-reset rules forbid reuse of older Korean candidate glyph pixels; no approved source-faithful Hangul glyph/font treatment for this exact yellow alpha-mask style is pinned. Clean plate is ready; Korean DDS emission is blocked until that input is approved/pinned and fit-before-render passes.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

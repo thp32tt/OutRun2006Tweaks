@@ -1,0 +1,247 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00053",
+  "wave_id": "W00017",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "generation_id": "A00053-C05E67EF-CLEANPLATE-G1",
+  "source_reset_applied": true,
+  "source_identity": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+    "git_blob_sha": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+    "sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+    "bytes": 524416,
+    "dimensions": [
+      512,
+      256
+    ],
+    "pitch": 2048,
+    "mip_count": 1,
+    "format": "RGBA32_MASKS",
+    "channel_masks": [
+      "0x000000FF",
+      "0x0000FF00",
+      "0x00FF0000",
+      "0xFF000000"
+    ],
+    "raw_to_readable_orientation": "flip-Y"
+  },
+  "selection": {
+    "index": 215,
+    "asset": "C05E67EF",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+    "shard": "ODD_INDEX_PRIMARY",
+    "rationale": "Continue the unfinished odd-shard asset from the exact English HD source under the new clean-generation contract without reusing any prior Korean candidate pixels."
+  },
+  "reset_lineage": {
+    "prior_candidate_pixels_used": false,
+    "prior_korean_glyph_pixels_used": false,
+    "old_candidate_as_construction_input": false,
+    "exact_english_hd_source_only": true,
+    "note": "A00050 candidate remains historical QA evidence only for this generation. No pixels/masks/glyphs from it were used."
+  },
+  "background_classification": "TRANSPARENT_RGBA_TEXT_MASK",
+  "source_style": {
+    "rgb_nonzero_alpha": [
+      255,
+      243,
+      0
+    ],
+    "alpha_behavior": "opaque core plus antialias fringe",
+    "background": "transparent; no panel/background pixels inside the five GOAL cells",
+    "reconstruction": "remove source glyph/effect footprint by alpha->0 only; preserve RGB bytes and all pixels outside the mask"
+  },
+  "elements": [
+    {
+      "sprite": "sprite_464",
+      "source": "GOAL A",
+      "korean": "골 A",
+      "readable_cell": [
+        0,
+        0,
+        244,
+        80
+      ],
+      "original_bbox": [
+        5,
+        30,
+        243,
+        79
+      ],
+      "source_alpha_pixels": 3526,
+      "opaque_pixels": 2897,
+      "antialias_partial_alpha_pixels": 629,
+      "delta_left": null,
+      "delta_right": null,
+      "delta_top": null,
+      "delta_bottom": null,
+      "containment": "PRE_RENDER_GATE_NOT_APPLICABLE",
+      "rework_status": "CLEAN_PLATE_READY_LETTERING_BLOCKED"
+    },
+    {
+      "sprite": "sprite_466",
+      "source": "GOAL C",
+      "korean": "골 C",
+      "readable_cell": [
+        0,
+        80,
+        244,
+        80
+      ],
+      "original_bbox": [
+        5,
+        80,
+        243,
+        159
+      ],
+      "source_alpha_pixels": 3458,
+      "opaque_pixels": 2825,
+      "antialias_partial_alpha_pixels": 633,
+      "delta_left": null,
+      "delta_right": null,
+      "delta_top": null,
+      "delta_bottom": null,
+      "containment": "PRE_RENDER_GATE_NOT_APPLICABLE",
+      "rework_status": "CLEAN_PLATE_READY_LETTERING_BLOCKED"
+    },
+    {
+      "sprite": "sprite_467",
+      "source": "GOAL B",
+      "korean": "골 B",
+      "readable_cell": [
+        244,
+        80,
+        244,
+        80
+      ],
+      "original_bbox": [
+        244,
+        80,
+        427,
+        159
+      ],
+      "source_alpha_pixels": 3694,
+      "opaque_pixels": 3013,
+      "antialias_partial_alpha_pixels": 681,
+      "delta_left": null,
+      "delta_right": null,
+      "delta_top": null,
+      "delta_bottom": null,
+      "containment": "PRE_RENDER_GATE_NOT_APPLICABLE",
+      "rework_status": "CLEAN_PLATE_READY_LETTERING_BLOCKED"
+    },
+    {
+      "sprite": "sprite_468",
+      "source": "GOAL E",
+      "korean": "골 E",
+      "readable_cell": [
+        0,
+        160,
+        244,
+        80
+      ],
+      "original_bbox": [
+        5,
+        160,
+        177,
+        239
+      ],
+      "source_alpha_pixels": 3832,
+      "opaque_pixels": 3140,
+      "antialias_partial_alpha_pixels": 692,
+      "delta_left": null,
+      "delta_right": null,
+      "delta_top": null,
+      "delta_bottom": null,
+      "containment": "PRE_RENDER_GATE_NOT_APPLICABLE",
+      "rework_status": "CLEAN_PLATE_READY_LETTERING_BLOCKED"
+    },
+    {
+      "sprite": "sprite_469",
+      "source": "GOAL D",
+      "korean": "골 D",
+      "readable_cell": [
+        244,
+        160,
+        244,
+        80
+      ],
+      "original_bbox": [
+        246,
+        160,
+        418,
+        239
+      ],
+      "source_alpha_pixels": 3987,
+      "opaque_pixels": 3337,
+      "antialias_partial_alpha_pixels": 650,
+      "delta_left": null,
+      "delta_right": null,
+      "delta_top": null,
+      "delta_bottom": null,
+      "containment": "PRE_RENDER_GATE_NOT_APPLICABLE",
+      "rework_status": "CLEAN_PLATE_READY_LETTERING_BLOCKED"
+    }
+  ],
+  "clean_plate": {
+    "source_text_mask_png": "localization/graphics/role_A/20260929-0754-A00053/A00053_C05E67EF_GOAL_SOURCE_TEXT_MASK_READABLE.png",
+    "source_text_mask_git_blob_sha": "24215472bf7ddeec298b1031804b9deb14a53a8e",
+    "clean_plate_png": "localization/graphics/role_A/20260929-0754-A00053/A00053_C05E67EF_GOAL_CLEAN_PLATE_READABLE.png",
+    "clean_plate_git_blob_sha": "c92222c97a8060e351d0cd2dfa8369904c60978b",
+    "source_mask_rule": "Within each exact GOAL sprite cell, every source pixel with alpha>0 belongs to the text/effect footprint. Preserve RGB; set only those alpha bytes to 0.",
+    "removed_source_alpha_pixels": 18497,
+    "rgb_components_changed": 0,
+    "changed_pixels_outside_source_text_mask": 0,
+    "introduced_alpha_pixels": 0,
+    "source_script_residue_after_clean": "PASS_NONE_IN_FIVE_GOAL_CELLS",
+    "box_or_patch_introduced": "PASS_NONE",
+    "seam_or_gradient_discontinuity": "PASS_NOT_APPLICABLE_TRANSPARENT_MASK_BACKGROUND",
+    "alpha_discontinuity": "PASS_SOURCE_MASK_REMOVED_TO_FULL_TRANSPARENCY_ONLY",
+    "protected_artwork_changed": "PASS_NONE",
+    "untouched_sprite_465_15con": "PASS_SOURCE_IDENTICAL"
+  },
+  "fit_before_render": {
+    "korean_texts": [
+      "골 A",
+      "골 B",
+      "골 C",
+      "골 D",
+      "골 E"
+    ],
+    "permitted_bboxes": "Each final Korean full-effect mask must be a subset of its element original_bbox and sprite cell.",
+    "pairwise_overlap_gate": "Required; the five cells are disjoint and any cross-cell alpha is automatic FAIL.",
+    "font_coverage_gate": "BLOCKED_PENDING_APPROVED_SOURCE_FAITHFUL_HANGUL_GLYPH_SOURCE",
+    "source_faithful_style_gate": "BLOCKED",
+    "reason": "The generation reset forbids reuse of older Korean candidate glyph pixels. No approved source-faithful Hangul glyph/font treatment for this yellow alpha-mask style is pinned in current Git state.",
+    "fail_safe_action": "Do not emit a Korean DDS candidate until a source-faithful Hangul glyph source is approved/pinned and measured. Preserve exact English HD source for candidate bytes in this run."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_ODD_INDEX_215",
+    "work_steal": "NONE",
+    "exact_hd_source": "PASS_GIT_BLOB_MATCH",
+    "source_dimensions_format_mips": "PASS_512x256_RGBA32_MASKS_MIP1",
+    "raw_orientation": "PASS_FLIP_Y_READABLE_EVIDENCE",
+    "source_text_mask": "PASS_COMPLETE_ALPHA_FOOTPRINT_PER_CELL",
+    "clean_plate_validation": "PASS_POST_CLEAN",
+    "one_pixel_containment": "NOT_RENDERED_FINAL_KOREAN_MASK_REQUIRED_BEFORE_CANDIDATE",
+    "alpha_behavior": "PASS_NO_NEW_ALPHA_AND_NO_RGB_CHANGE",
+    "background_reconstruction": "PASS_TRANSPARENT_MASK_CLASS_NO_RECTANGLE_FILL",
+    "english_residue": "PASS_NONE_AFTER_CLEAN_IN_GOAL_CELLS",
+    "pairwise_overlap": "PASS_CLEAN_PLATE_DISJOINT_CELLS",
+    "prior_candidate_reuse": "PASS_NONE",
+    "candidate_dds_emitted": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "NEW_SOURCE_DERIVED_CLEAN_PLATE_AND_PER_ELEMENT_RECONSTRUCTION_INPUT",
+    "materially_reduces_unresolved_work": true,
+    "next_executable_step": "Pin an approved source-faithful Hangul glyph/font treatment; render 골+letter from clean plate; measure full-effect masks; reject on any 1px bbox/cell escape; then emit a new-generation DDS from exact HD source."
+  },
+  "result": "PASS_MATERIAL_CLEAN_PLATE_RECONSTRUCTION_INPUT_NO_DDS_CANDIDATE_FAIL_CLOSED",
+  "runtime_validation": "UNTESTED"
+}
