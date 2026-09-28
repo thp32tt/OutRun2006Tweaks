@@ -1,7 +1,7 @@
 // R30 screen-space asymmetric-FOV correction overlay.
 //
-// R29 restores conservative world/effect classification and removes the steady-
-// state third mono draw. R30 fixes the remaining HUD convergence problem without
+// The active production owner is the HMD-proven R26/R23 world/effect chain.
+// R30 fixes the remaining HUD convergence problem without
 // moving the world image: only main-backbuffer orthographic/ScreenSpace2D draws
 // receive an eye-specific clip-space X affine. The affine maps one common
 // head-relative tangent-angle interval into each eye's actual asymmetric OpenXR
@@ -9,7 +9,7 @@
 //
 // This is intentionally an interim projection-layer HUD solution. It does not
 // pretend to be XrCompositionLayerQuad: perspective world draws and fragile
-// perspective effects remain entirely owned by R29/R13.
+// perspective effects remain owned by the R26/R23/R13 lower chain.
 
 #include "stereo_renderer_r26.cpp"
 #include "vr/game/render_semantics.hpp"
@@ -48,7 +48,7 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        // R26-safe comparison owner: R26 remains the world/effect authority;
+        // R26+HUD production owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
         std::atomic<std::uint64_t> R57ProjectedMarkerDeltaBuilds{ 0 };
@@ -85,10 +85,10 @@ namespace OutRunVRStereo
             return OutRunVR::SafetyPolicy::CanReplayStereo(state);
         }
 
-        SafetyHookInline R30DrawPrimitiveR29Hook{};
-        SafetyHookInline R30DrawIndexedPrimitiveR29Hook{};
-        SafetyHookInline R30DrawPrimitiveUPR29Hook{};
-        SafetyHookInline R30DrawIndexedPrimitiveUPR29Hook{};
+        SafetyHookInline R30DrawPrimitiveR26Hook{};
+        SafetyHookInline R30DrawIndexedPrimitiveR26Hook{};
+        SafetyHookInline R30DrawPrimitiveUPR26Hook{};
+        SafetyHookInline R30DrawIndexedPrimitiveUPR26Hook{};
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R30InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -924,8 +924,8 @@ namespace OutRunVRStereo
         // original mono post-process disabled and run a completely separate
         // reduced/blurred chain for each completed eye immediately before the
         // renderer composes/publishes the stereo frame.
-        SafetyHookInline R30PresentR29Hook{};
-        SafetyHookInline R30ResetR29Hook{};
+        SafetyHookInline R30PresentR26Hook{};
+        SafetyHookInline R30ResetR26Hook{};
 
         struct R30SkyGlowResources
         {
@@ -1676,7 +1676,7 @@ namespace OutRunVRStereo
                         std::max(R30SkyGlowPerfMaxUs, elapsedUs);
                 }
             }
-            return R30PresentR29Hook.stdcall<HRESULT>(
+            return R30PresentR26Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
         }
@@ -1690,7 +1690,7 @@ namespace OutRunVRStereo
             R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
-            return R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            return R30ResetR26Hook.stdcall<HRESULT>(device, params);
         }
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
@@ -4365,9 +4365,9 @@ namespace OutRunVRStereo
             return leftHr;
         }
 
-        template <typename ActualDraw, typename R29Draw>
+        template <typename ActualDraw, typename LowerDraw>
         HRESULT R30GuardScreenSpace(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, R29Draw&& r29Draw,
+            ActualDraw&& actualDraw, LowerDraw&& lowerDraw,
             const char* site)
         {
             const HRESULT hr = R30TryScreenSpaceFovDraw(
@@ -4375,7 +4375,7 @@ namespace OutRunVRStereo
             if (hr != E_NOTIMPL)
                 return hr;
             ++R30ScreenSpaceFallbacks;
-            return r29Draw();
+            return lowerDraw();
         }
 
         HRESULT R62TryFixedFunctionSpriteIndexed(
@@ -4631,12 +4631,12 @@ namespace OutRunVRStereo
                 return DrawPrimitiveHook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            auto r29 = [&]() {
-                return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+            auto lower = [&]() {
+                return R30DrawPrimitiveR26Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitive");
+                device, actual, lower, "R30/DrawPrimitive");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR30(
@@ -4672,13 +4672,13 @@ namespace OutRunVRStereo
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
-            auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device, type,
+            auto lower = [&]() {
+                return R30DrawIndexedPrimitiveR26Hook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitive");
+                device, actual, lower, "R30/DrawIndexedPrimitive");
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR30(
@@ -4703,12 +4703,12 @@ namespace OutRunVRStereo
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            auto r29 = [&]() {
-                return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+            auto lower = [&]() {
+                return R30DrawPrimitiveUPR26Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitiveUP");
+                device, actual, lower, "R30/DrawPrimitiveUP");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
@@ -4737,34 +4737,34 @@ namespace OutRunVRStereo
                     minVertexIndex, numVertices, primitiveCount, indexData,
                     indexFormat, vertexData, stride);
             };
-            auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
+            auto lower = [&]() {
+                return R30DrawIndexedPrimitiveUPR26Hook.stdcall<HRESULT>(device,
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+                device, actual, lower, "R30/DrawIndexedPrimitiveUP");
         }
 
         void R30RollbackHooks() noexcept
         {
-            R30ResetR29Hook = {};
-            R30PresentR29Hook = {};
-            R30DrawIndexedPrimitiveUPR29Hook = {};
-            R30DrawPrimitiveUPR29Hook = {};
-            R30DrawIndexedPrimitiveR29Hook = {};
-            R30DrawPrimitiveR29Hook = {};
+            R30ResetR26Hook = {};
+            R30PresentR26Hook = {};
+            R30DrawIndexedPrimitiveUPR26Hook = {};
+            R30DrawPrimitiveUPR26Hook = {};
+            R30DrawIndexedPrimitiveR26Hook = {};
+            R30DrawPrimitiveR26Hook = {};
         }
 
         bool R30EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
-                &R30PresentR29Hook,
-                &R30ResetR29Hook,
-                &R30DrawPrimitiveR29Hook,
-                &R30DrawIndexedPrimitiveR29Hook,
-                &R30DrawPrimitiveUPR29Hook,
-                &R30DrawIndexedPrimitiveUPR29Hook
+                &R30PresentR26Hook,
+                &R30ResetR26Hook,
+                &R30DrawPrimitiveR26Hook,
+                &R30DrawIndexedPrimitiveR26Hook,
+                &R30DrawPrimitiveUPR26Hook,
+                &R30DrawIndexedPrimitiveUPR26Hook
             };
             for (auto* hook : hooks)
             {
@@ -4787,38 +4787,38 @@ namespace OutRunVRStereo
                 // Creation hooks do not create general shadows: only a VB
                 // whose creation FVF explicitly declares XYZRHW is registered.
                 // Other buffers remain draw-proven and lazy.
-                const auto r29 = R26InstallState.load(
+                const auto r26 = R26InstallState.load(
                     std::memory_order_acquire);
-                if (r29 == State::Failed)
+                if (r26 == State::Failed)
                 {
                     R30RollbackBufferShadowHooks();
                     R30InstallState.store(State::Failed,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
                     spdlog::error(
-                        "VR R30 HUD: R29 prerequisite failed; R29 remains active without screen-space FOV correction");
+                        "VR R30 HUD: R26 prerequisite failed; R26 remains active without screen-space FOV correction");
                     return 0;
                 }
 
-                if (r29 == State::Ready)
+                if (r26 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R30PresentR29Hook = safetyhook::create_inline(
+                    R30PresentR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR27),
                         PresentDestR30, disabled);
-                    R30ResetR29Hook = safetyhook::create_inline(
+                    R30ResetR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResetDestR22),
                         ResetDestR30, disabled);
-                    R30DrawPrimitiveR29Hook = safetyhook::create_inline(
+                    R30DrawPrimitiveR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveDestR26),
                         DrawPrimitiveDestR30, disabled);
-                    R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(
+                    R30DrawIndexedPrimitiveR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR26),
                         DrawIndexedPrimitiveDestR30, disabled);
-                    R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(
+                    R30DrawPrimitiveUPR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveUPDestR26),
                         DrawPrimitiveUPDestR30, disabled);
-                    R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(
+                    R30DrawIndexedPrimitiveUPR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR26),
                         DrawIndexedPrimitiveUPDestR30, disabled);
 
@@ -4831,7 +4831,7 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR30HUD", false);
                         spdlog::error(
-                            "VR R30 HUD: disabled-first hook transaction failed; R29 remains active");
+                            "VR R30 HUD: disabled-first hook transaction failed; R26 remains active");
                         return 0;
                     }
 
@@ -4852,7 +4852,7 @@ namespace OutRunVRStereo
             R30InstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
             spdlog::error(
-                "VR R30 HUD: timed out waiting for R29; R29 remains active");
+                "VR R30 HUD: timed out waiting for R26; R26 remains active");
             return 0;
         }
 
