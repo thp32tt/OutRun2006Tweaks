@@ -196,6 +196,21 @@ namespace OutRunVRStereo
         std::atomic<std::uint32_t> R30VertexRegistrationsInFlight{ 0 };
         std::atomic<std::uint32_t> R30IndexRegistrationsInFlight{ 0 };
 
+        struct R30RegistrationFlightGuard
+        {
+            std::atomic<std::uint32_t>& counter;
+            explicit R30RegistrationFlightGuard(
+                std::atomic<std::uint32_t>& value) noexcept
+                : counter(value)
+            {
+                counter.fetch_add(1, std::memory_order_acq_rel);
+            }
+            ~R30RegistrationFlightGuard()
+            {
+                counter.fetch_sub(1, std::memory_order_release);
+            }
+        };
+
         template <typename T>
         std::uint64_t R30ShadowBloomBit(T* buffer) noexcept
         {
@@ -442,11 +457,11 @@ namespace OutRunVRStereo
             entry->size = desc.Size;
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
-            R30VertexRegistrationsInFlight.fetch_add(
-                1, std::memory_order_acq_rel);
+            R30RegistrationFlightGuard registration(
+                R30VertexRegistrationsInFlight);
             R30TrackedVertexBloom.fetch_or(
                 R30ShadowBloomBit(buffer), std::memory_order_release);
-            R30ShadowPtr result;
+            try
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 auto [it, inserted] =
@@ -454,11 +469,12 @@ namespace OutRunVRStereo
                 if (inserted)
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
-                result = inserted ? entry : it->second;
+                return inserted ? entry : it->second;
             }
-            R30VertexRegistrationsInFlight.fetch_sub(
-                1, std::memory_order_release);
-            return result;
+            catch (...)
+            {
+                return nullptr;
+            }
         }
 
         R30ShadowPtr R30EnsureIndexShadow(IDirect3DIndexBuffer9* buffer)
@@ -478,11 +494,11 @@ namespace OutRunVRStereo
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
             entry->indexFormat = desc.Format;
-            R30IndexRegistrationsInFlight.fetch_add(
-                1, std::memory_order_acq_rel);
+            R30RegistrationFlightGuard registration(
+                R30IndexRegistrationsInFlight);
             R30TrackedIndexBloom.fetch_or(
                 R30ShadowBloomBit(buffer), std::memory_order_release);
-            R30ShadowPtr result;
+            try
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
                 auto [it, inserted] =
@@ -490,11 +506,12 @@ namespace OutRunVRStereo
                 if (inserted)
                     R30ShadowRegistryGeneration.fetch_add(
                         1, std::memory_order_release);
-                result = inserted ? entry : it->second;
+                return inserted ? entry : it->second;
             }
-            R30IndexRegistrationsInFlight.fetch_sub(
-                1, std::memory_order_release);
-            return result;
+            catch (...)
+            {
+                return nullptr;
+            }
         }
 
         void R30BeginObservedLock(const R30ShadowPtr& entry,
