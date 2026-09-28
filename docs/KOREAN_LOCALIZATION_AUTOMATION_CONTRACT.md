@@ -30,9 +30,18 @@ Machine-readable QA must record per asset/element: original_bbox, localized_bbox
 - A run MUST continue from pending/rework rows in the full queue; it MUST NOT declare graphics complete merely because every currently committed candidate DDS passed.
 - For each localized/reviewed element, any 1-pixel escape from the original/HD source permitted region is `REWORK_REQUIRED`. Such an item MUST NOT be promoted to approval, packaging, or completed state.
 - If original-region evidence is missing/ambiguous, classify `HOLD_STRICT_RECHECK`, never PASS. For BC/DXT/DXT5 assets, block-level containment alone is not sufficient for final approval when decoded-pixel evidence is unavailable.
-- Edge-touch with zero outside pixels may remain a containment PASS, but must be marked high-risk and receive high-zoom/readable-orientation and in-game validation before final approval.
+- Edge-touch with zero outside pixels may remain a containment PASS, but must be marked high-risk and receive high-zoom/readable-orientation review against the exact English HD source before static approval.
 - QA/report state must distinguish `PASS`, `REWORK_REQUIRED`, and `HOLD_STRICT_RECHECK`; do not collapse HOLD into PASS.
 - PNG comparison/proof images are evidence only and do not count as completed deployable DDS assets.
+
+
+## Mandatory English-source comparison gate
+- For every newly created or materially reworked DDS, generate and retain a side-by-side comparison proof: `ENGLISH SOURCE` on the left and `KOREAN CANDIDATE` on the right.
+- Both sides MUST use the exact same crop coordinates, raw/readable orientation, zoom and display scale. The English side MUST be the canonical HD English source for that asset, never a previous Korean candidate.
+- Review the whole atlas and each translated sprite for untranslated English residue, clipped Korean glyphs/effects, source-bbox escape, icon/artwork intrusion, neighboring-sprite overlap, erasure residue and unintended changes to preserved artwork.
+- Any such defect is `REWORK_REQUIRED` even if automated bbox/alpha checks pass. Automated containment PASS alone is insufficient.
+- Lane-local QA evidence must retain the comparison PNG or deterministic proof artifact so the user can inspect it directly.
+- Do not block A/B production or C static QA waiting for an in-game test. Runtime/game validation is deferred to the user's final integrated test. Until user runtime evidence exists, record `RUNTIME_VALIDATION=UNTESTED` and do not claim runtime success.
 
 ## Short controller dispatch
 The controller prompt may be intentionally minimal. The following commands are sufficient entry points once this repository/branch is selected:
@@ -96,5 +105,5 @@ Do not repeat completed work. Resume from current Git progress/resume state.
 - A/B production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state while the peer lane can still be active.
 - C synchronization-barrier completion reconciles both A/B terminal results into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable.
 - A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
-Before approval inspect raw DDS and readable/game orientation; use in-game screenshot validation when available.
+Before static approval inspect raw DDS and readable/game orientation and require the exact English-HD-source vs current-Korean-candidate side-by-side proof. Production runs do not require in-game testing; keep `RUNTIME_VALIDATION=UNTESTED` until the user's final integrated game test supplies runtime evidence.
 Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
