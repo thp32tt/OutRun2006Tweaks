@@ -1,0 +1,2530 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00056",
+  "wave_id": "W00018",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T08:25:05+09:00",
+  "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
+  "final_precommit_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "dependency_blocker_rule": "Unchanged source-faithful/DXT5/runtime dependency fingerprints in current shared queue; skipped without repeating identical blocker review.",
+    "selected_pending_localize_text_indices": [
+      65,
+      95,
+      101,
+      107
+    ],
+    "queue_blob_sha": "fdce9105501da896cf97a4dfdc09c3fa009b75c9",
+    "parity_check": "PASS_ODD_ONLY",
+    "work_stolen_from_lane": null
+  },
+  "source_of_truth": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "identity_policy": "Exact Release DDS Git blob is pixel authority; decoded stock PNG and 4x atlas are reconstruction/mapping references only.",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "assets": [
+    {
+      "queue_index": 65,
+      "asset": "EBEF6D20",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "prior_artwork_plan_state": {
+        "layout_status": "source_orientation_verified",
+        "render_status": "sourcefaithful_candidate_ready",
+        "dds_status": "candidate_ready",
+        "ingame_status": "pending"
+      },
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+        "git_blob_sha": "f05e35654433b4ce010d119d4a705f505cdd80c2",
+        "contents_inline_available": false,
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          2048
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.png",
+        "git_blob_sha": "ba1573f05e927c749aee9cd28da99a0127edb99d"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/4x_EBEF6D20_512x512_atlas.json",
+        "git_blob_sha": "6f30c47b87dd67726d0945a04096fae7670b0526",
+        "width": 2048,
+        "height": 2048,
+        "regions_count": 7,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_6",
+            "rect": [
+              0,
+              1240,
+              1192,
+              808
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 1,
+            "name": "sprite_7",
+            "rect": [
+              1192,
+              1720,
+              600,
+              328
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 2,
+            "name": "sprite_8",
+            "rect": [
+              0,
+              912,
+              600,
+              328
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 3,
+            "name": "sprite_9",
+            "rect": [
+              0,
+              712,
+              1480,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 4,
+            "name": "sprite_10",
+            "rect": [
+              0,
+              544,
+              1192,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 5,
+            "name": "sprite_11",
+            "rect": [
+              0,
+              424,
+              920,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 6,
+            "name": "sprite_12",
+            "rect": [
+              920,
+              424,
+              920,
+              120
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "Loading",
+          "korean": "로딩"
+        }
+      ],
+      "preserve_original": [
+        "OutRun logos",
+        "non-text route/loading artwork",
+        "all pixels outside confirmed source glyph/effect masks"
+      ],
+      "raw_orientation": "HISTORICAL_SOURCE_ORIENTATION_VERIFIED_MIRROR_Y_REQUIRES_EXACT_HD_RECONFIRM",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "Loading",
+          "korean": "로딩",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Semantic translations and exact 4x atlas geometry are pinned. Do not infer semantic-to-region mapping by array order; confirm from decoded exact English HD DDS before any pixel rewrite.",
+      "next_action": "Decode exact Release DDS, identify each English glyph/effect mask inside the pinned atlas cells, preserve non-text pixels, build clean plate, render measured Korean, then require per-element 1px containment + alpha/orientation + identical-crop ENGLISH SOURCE/KOREAN CANDIDATE proof before DDS emission."
+    },
+    {
+      "queue_index": 95,
+      "asset": "37759842",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "prior_artwork_plan_state": {
+        "layout_status": "pending",
+        "render_status": "pending",
+        "dds_status": "pending",
+        "ingame_status": "pending"
+      },
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+        "git_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+        "contents_inline_available": false,
+        "expected_canvas_from_4x_atlas": [
+          4096,
+          4096
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/37759842_1024x1024.png",
+        "git_blob_sha": "02534e3285537142581a06bb5b4dc4d76a32925e"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_37759842_1024x1024_atlas.json",
+        "git_blob_sha": "581d42b49da9b882f2a54cdfef7675d147afacaa",
+        "width": 4096,
+        "height": 4096,
+        "regions_count": 87,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_382",
+            "rect": [
+              0,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 1,
+            "name": "sprite_383",
+            "rect": [
+              2920,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 2,
+            "name": "sprite_384",
+            "rect": [
+              3504,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 3,
+            "name": "sprite_385",
+            "rect": [
+              0,
+              3216,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 4,
+            "name": "sprite_386",
+            "rect": [
+              584,
+              3216,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 5,
+            "name": "sprite_387",
+            "rect": [
+              1168,
+              3216,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 6,
+            "name": "sprite_388",
+            "rect": [
+              1752,
+              3216,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 7,
+            "name": "sprite_389",
+            "rect": [
+              2336,
+              3216,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 8,
+            "name": "sprite_390",
+            "rect": [
+              584,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 9,
+            "name": "sprite_391",
+            "rect": [
+              1168,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 10,
+            "name": "sprite_392",
+            "rect": [
+              1752,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 11,
+            "name": "sprite_393",
+            "rect": [
+              2336,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 12,
+            "name": "sprite_394",
+            "rect": [
+              976,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 13,
+            "name": "sprite_395",
+            "rect": [
+              1464,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 14,
+            "name": "sprite_396",
+            "rect": [
+              1952,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 15,
+            "name": "sprite_397",
+            "rect": [
+              2440,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 16,
+            "name": "sprite_398",
+            "rect": [
+              2928,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 17,
+            "name": "sprite_399",
+            "rect": [
+              3416,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 18,
+            "name": "sprite_400",
+            "rect": [
+              2920,
+              3216,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 19,
+            "name": "sprite_401",
+            "rect": [
+              3408,
+              3216,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 20,
+            "name": "sprite_402",
+            "rect": [
+              0,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 21,
+            "name": "sprite_403",
+            "rect": [
+              488,
+              2776,
+              488,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 22,
+            "name": "sprite_404",
+            "rect": [
+              0,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 23,
+            "name": "sprite_405",
+            "rect": [
+              2600,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 24,
+            "name": "sprite_406",
+            "rect": [
+              3120,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 25,
+            "name": "sprite_407",
+            "rect": [
+              0,
+              1504,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 26,
+            "name": "sprite_408",
+            "rect": [
+              520,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 27,
+            "name": "sprite_409",
+            "rect": [
+              1560,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 28,
+            "name": "sprite_410",
+            "rect": [
+              1560,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 29,
+            "name": "sprite_411",
+            "rect": [
+              2080,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 30,
+            "name": "sprite_412",
+            "rect": [
+              3120,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 31,
+            "name": "sprite_413",
+            "rect": [
+              0,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 32,
+            "name": "sprite_414",
+            "rect": [
+              520,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 33,
+            "name": "sprite_415",
+            "rect": [
+              1040,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 34,
+            "name": "sprite_416",
+            "rect": [
+              1040,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 35,
+            "name": "sprite_417",
+            "rect": [
+              2080,
+              1928,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 36,
+            "name": "sprite_418",
+            "rect": [
+              2600,
+              2352,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 37,
+            "name": "sprite_419",
+            "rect": [
+              520,
+              1552,
+              536,
+              376
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 38,
+            "name": "sprite_420",
+            "rect": [
+              1056,
+              1552,
+              440,
+              376
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 39,
+            "name": "sprite_421",
+            "rect": [
+              1496,
+              1632,
+              584,
+              296
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 40,
+            "name": "sprite_422",
+            "rect": [
+              2080,
+              1632,
+              584,
+              296
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 41,
+            "name": "sprite_423",
+            "rect": [
+              2352,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 42,
+            "name": "sprite_424",
+            "rect": [
+              2744,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 43,
+            "name": "sprite_425",
+            "rect": [
+              2664,
+              1648,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 44,
+            "name": "sprite_426",
+            "rect": [
+              3056,
+              1648,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 45,
+            "name": "sprite_427",
+            "rect": [
+              3448,
+              1648,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 46,
+            "name": "sprite_428",
+            "rect": [
+              3640,
+              2072,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 47,
+            "name": "sprite_429",
+            "rect": [
+              3640,
+              2496,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 48,
+            "name": "sprite_430",
+            "rect": [
+              0,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 49,
+            "name": "sprite_431",
+            "rect": [
+              392,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 50,
+            "name": "sprite_432",
+            "rect": [
+              784,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 51,
+            "name": "sprite_433",
+            "rect": [
+              1176,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 52,
+            "name": "sprite_434",
+            "rect": [
+              1568,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 53,
+            "name": "sprite_435",
+            "rect": [
+              1960,
+              1224,
+              392,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 54,
+            "name": "sprite_436",
+            "rect": [
+              0,
+              944,
+              360,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 55,
+            "name": "sprite_437",
+            "rect": [
+              360,
+              944,
+              360,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 56,
+            "name": "sprite_438",
+            "rect": [
+              3136,
+              1224,
+              360,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 57,
+            "name": "sprite_439",
+            "rect": [
+              3496,
+              1224,
+              360,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 58,
+            "name": "sprite_440",
+            "rect": [
+              720,
+              944,
+              328,
+              280
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 59,
+            "name": "sprite_441",
+            "rect": [
+              1048,
+              968,
+              1024,
+              256
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 60,
+            "name": "sprite_442",
+            "rect": [
+              2072,
+              968,
+              1024,
+              256
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 61,
+            "name": "sprite_443",
+            "rect": [
+              0,
+              728,
+              1560,
+              216
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 62,
+            "name": "sprite_444",
+            "rect": [
+              1560,
+              744,
+              1840,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 63,
+            "name": "sprite_445",
+            "rect": [
+              0,
+              528,
+              1544,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 64,
+            "name": "sprite_446",
+            "rect": [
+              1544,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 65,
+            "name": "sprite_447",
+            "rect": [
+              1904,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 66,
+            "name": "sprite_448",
+            "rect": [
+              2264,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 67,
+            "name": "sprite_449",
+            "rect": [
+              2624,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 68,
+            "name": "sprite_450",
+            "rect": [
+              2984,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 69,
+            "name": "sprite_451",
+            "rect": [
+              3344,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 70,
+            "name": "sprite_452",
+            "rect": [
+              3704,
+              528,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 71,
+            "name": "sprite_453",
+            "rect": [
+              3400,
+              744,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 72,
+            "name": "sprite_454",
+            "rect": [
+              1520,
+              344,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 73,
+            "name": "sprite_455",
+            "rect": [
+              760,
+              344,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 74,
+            "name": "sprite_456",
+            "rect": [
+              3040,
+              344,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 75,
+            "name": "sprite_457",
+            "rect": [
+              0,
+              160,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 76,
+            "name": "sprite_458",
+            "rect": [
+              0,
+              344,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 77,
+            "name": "sprite_459",
+            "rect": [
+              3096,
+              1040,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 78,
+            "name": "sprite_460",
+            "rect": [
+              760,
+              160,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 79,
+            "name": "sprite_461",
+            "rect": [
+              2280,
+              344,
+              760,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 80,
+            "name": "sprite_462",
+            "rect": [
+              1520,
+              184,
+              720,
+              160
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 81,
+            "name": "sprite_463",
+            "rect": [
+              2240,
+              192,
+              560,
+              152
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 82,
+            "name": "sprite_464",
+            "rect": [
+              2800,
+              208,
+              552,
+              136
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 83,
+            "name": "sprite_465",
+            "rect": [
+              0,
+              40,
+              1624,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 84,
+            "name": "sprite_466",
+            "rect": [
+              1624,
+              40,
+              1352,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 85,
+            "name": "sprite_467",
+            "rect": [
+              2976,
+              40,
+              392,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 86,
+            "name": "sprite_468",
+            "rect": [
+              0,
+              16,
+              1192,
+              24
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "For Expert Drivers : The car is difficult to control.",
+          "korean": "상급자용: 조작이 어려운 차량입니다."
+        },
+        {
+          "source": "For Experts : Gear changes are required.",
+          "korean": "상급자용: 기어 변속이 필요합니다."
+        },
+        {
+          "source": "Tuned",
+          "korean": "튜닝"
+        },
+        {
+          "source": "Manual",
+          "korean": "수동"
+        },
+        {
+          "source": "Please stand by.",
+          "korean": "잠시 기다려 주세요."
+        },
+        {
+          "source": "Waiting for entries.",
+          "korean": "참가자를 기다리는 중입니다."
+        },
+        {
+          "source": "Entry has been closed.",
+          "korean": "참가 접수가 종료되었습니다."
+        },
+        {
+          "source": "Manual Transmission",
+          "korean": "수동 변속"
+        },
+        {
+          "source": "Automatic Transmission",
+          "korean": "자동 변속"
+        },
+        {
+          "source": "Real Player Only",
+          "korean": "실제 플레이어 전용"
+        },
+        {
+          "source": "操作が難しい車です。",
+          "korean": "조작이 어려운 차량입니다."
+        },
+        {
+          "source": "上級者向け",
+          "korean": "상급자용"
+        },
+        {
+          "source": "Heart Attack Mode",
+          "korean": "하트 어택 모드"
+        },
+        {
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드"
+        },
+        {
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드"
+        },
+        {
+          "source": "YES",
+          "korean": "예"
+        },
+        {
+          "source": "NO",
+          "korean": "아니오"
+        },
+        {
+          "source": "RANDOM",
+          "korean": "무작위"
+        },
+        {
+          "source": "Time Attack Mode 15 continuous course",
+          "korean": "타임 어택 모드 15코스 연속"
+        },
+        {
+          "source": "OutRun Mode 15 continuous course",
+          "korean": "아웃런 모드 15코스 연속"
+        }
+      ],
+      "preserve_original": [
+        "song titles",
+        "Ferrari model names",
+        "MT/AT badges",
+        "brand logos",
+        "all non-text artwork outside source glyph/effect masks"
+      ],
+      "raw_orientation": "HOLD_EXACT_HD_RAW_ORIENTATION_NOT_DECODED",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "For Expert Drivers : The car is difficult to control.",
+          "korean": "상급자용: 조작이 어려운 차량입니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 1,
+          "source": "For Experts : Gear changes are required.",
+          "korean": "상급자용: 기어 변속이 필요합니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 2,
+          "source": "Tuned",
+          "korean": "튜닝",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 3,
+          "source": "Manual",
+          "korean": "수동",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 4,
+          "source": "Please stand by.",
+          "korean": "잠시 기다려 주세요.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 5,
+          "source": "Waiting for entries.",
+          "korean": "참가자를 기다리는 중입니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 6,
+          "source": "Entry has been closed.",
+          "korean": "참가 접수가 종료되었습니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 7,
+          "source": "Manual Transmission",
+          "korean": "수동 변속",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 8,
+          "source": "Automatic Transmission",
+          "korean": "자동 변속",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 9,
+          "source": "Real Player Only",
+          "korean": "실제 플레이어 전용",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 10,
+          "source": "操作が難しい車です。",
+          "korean": "조작이 어려운 차량입니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 11,
+          "source": "上級者向け",
+          "korean": "상급자용",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 12,
+          "source": "Heart Attack Mode",
+          "korean": "하트 어택 모드",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 13,
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 14,
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 15,
+          "source": "YES",
+          "korean": "예",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 16,
+          "source": "NO",
+          "korean": "아니오",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 17,
+          "source": "RANDOM",
+          "korean": "무작위",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 18,
+          "source": "Time Attack Mode 15 continuous course",
+          "korean": "타임 어택 모드 15코스 연속",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 19,
+          "source": "OutRun Mode 15 continuous course",
+          "korean": "아웃런 모드 15코스 연속",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Semantic translations and exact 4x atlas geometry are pinned. Do not infer semantic-to-region mapping by array order; confirm from decoded exact English HD DDS before any pixel rewrite.",
+      "next_action": "Decode exact Release DDS, identify each English glyph/effect mask inside the pinned atlas cells, preserve non-text pixels, build clean plate, render measured Korean, then require per-element 1px containment + alpha/orientation + identical-crop ENGLISH SOURCE/KOREAN CANDIDATE proof before DDS emission."
+    },
+    {
+      "queue_index": 101,
+      "asset": "560FA536",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "prior_artwork_plan_state": {
+        "layout_status": "pending",
+        "render_status": "pending",
+        "dds_status": "pending",
+        "ingame_status": "pending"
+      },
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+        "git_blob_sha": "1e95df72109411fb1f9c398445db583ed31de2a1",
+        "contents_inline_available": false,
+        "expected_canvas_from_4x_atlas": [
+          4096,
+          4096
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.png",
+        "git_blob_sha": "a746ee3dd7bfe917f11a204ac4beba46b62e88d8"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_560FA536_1024x1024_atlas.json",
+        "git_blob_sha": "90b0122b7fdc44a553eff3f3e83278725ad0f24b",
+        "width": 4096,
+        "height": 4096,
+        "regions_count": 48,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_85",
+            "rect": [
+              0,
+              3096,
+              1400,
+              1000
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 1,
+            "name": "sprite_86",
+            "rect": [
+              1400,
+              3144,
+              1400,
+              952
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 2,
+            "name": "sprite_87",
+            "rect": [
+              0,
+              2144,
+              1400,
+              952
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 3,
+            "name": "sprite_88",
+            "rect": [
+              1400,
+              2144,
+              1400,
+              952
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 4,
+            "name": "sprite_89",
+            "rect": [
+              0,
+              1192,
+              1400,
+              952
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 5,
+            "name": "sprite_90",
+            "rect": [
+              1400,
+              1640,
+              504,
+              504
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 6,
+            "name": "sprite_91",
+            "rect": [
+              1904,
+              1640,
+              504,
+              504
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 7,
+            "name": "sprite_92",
+            "rect": [
+              2408,
+              1640,
+              504,
+              504
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 8,
+            "name": "sprite_93",
+            "rect": [
+              2912,
+              1640,
+              504,
+              504
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 9,
+            "name": "sprite_94",
+            "rect": [
+              3416,
+              1640,
+              504,
+              504
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 10,
+            "name": "sprite_95",
+            "rect": [
+              2800,
+              2592,
+              504,
+              504
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 11,
+            "name": "sprite_96",
+            "rect": [
+              3304,
+              2656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 12,
+            "name": "sprite_97",
+            "rect": [
+              2800,
+              3656,
+              584,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 13,
+            "name": "sprite_98",
+            "rect": [
+              3384,
+              3656,
+              504,
+              440
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 14,
+            "name": "sprite_99",
+            "rect": [
+              0,
+              768,
+              520,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 15,
+            "name": "sprite_100",
+            "rect": [
+              520,
+              768,
+              232,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 16,
+            "name": "sprite_101",
+            "rect": [
+              752,
+              768,
+              232,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 17,
+            "name": "sprite_102",
+            "rect": [
+              984,
+              768,
+              216,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 18,
+            "name": "sprite_103",
+            "rect": [
+              1200,
+              768,
+              216,
+              424
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 19,
+            "name": "sprite_104",
+            "rect": [
+              1416,
+              800,
+              392,
+              392
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 20,
+            "name": "sprite_105",
+            "rect": [
+              1808,
+              800,
+              392,
+              392
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 21,
+            "name": "sprite_106",
+            "rect": [
+              2200,
+              936,
+              1024,
+              256
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 22,
+            "name": "sprite_107",
+            "rect": [
+              0,
+              512,
+              1024,
+              256
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 23,
+            "name": "sprite_108",
+            "rect": [
+              1024,
+              520,
+              248,
+              248
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 24,
+            "name": "sprite_109",
+            "rect": [
+              1272,
+              584,
+              1848,
+              184
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 25,
+            "name": "sprite_110",
+            "rect": [
+              0,
+              344,
+              1448,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 26,
+            "name": "sprite_111",
+            "rect": [
+              1448,
+              344,
+              1448,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 27,
+            "name": "sprite_112",
+            "rect": [
+              0,
+              176,
+              1448,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 28,
+            "name": "sprite_113",
+            "rect": [
+              1448,
+              176,
+              1448,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 29,
+            "name": "sprite_114",
+            "rect": [
+              0,
+              8,
+              1448,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 30,
+            "name": "sprite_115",
+            "rect": [
+              1448,
+              8,
+              1448,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 31,
+            "name": "sprite_116",
+            "rect": [
+              2896,
+              8,
+              1048,
+              168
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 32,
+            "name": "sprite_117",
+            "rect": [
+              1400,
+              1504,
+              2216,
+              136
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 33,
+            "name": "sprite_118",
+            "rect": [
+              2896,
+              224,
+              808,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 34,
+            "name": "sprite_119",
+            "rect": [
+              2896,
+              392,
+              808,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 35,
+            "name": "sprite_120",
+            "rect": [
+              3704,
+              224,
+              392,
+              120
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 36,
+            "name": "sprite_121",
+            "rect": [
+              2200,
+              832,
+              1160,
+              104
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 37,
+            "name": "sprite_122",
+            "rect": [
+              3120,
+              664,
+              936,
+              104
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 38,
+            "name": "sprite_123",
+            "rect": [
+              3704,
+              424,
+              328,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 39,
+            "name": "sprite_124",
+            "rect": [
+              3224,
+              1104,
+              248,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 40,
+            "name": "sprite_125",
+            "rect": [
+              3944,
+              88,
+              72,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 41,
+            "name": "sprite_126",
+            "rect": [
+              4016,
+              88,
+              72,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 42,
+            "name": "sprite_127",
+            "rect": [
+              3472,
+              1104,
+              72,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 43,
+            "name": "sprite_128",
+            "rect": [
+              3544,
+              1104,
+              72,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 44,
+            "name": "sprite_129",
+            "rect": [
+              3360,
+              864,
+              552,
+              72
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 45,
+            "name": "sprite_130",
+            "rect": [
+              3616,
+              1120,
+              248,
+              72
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 46,
+            "name": "sprite_131",
+            "rect": [
+              3616,
+              1568,
+              248,
+              72
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 47,
+            "name": "sprite_132",
+            "rect": [
+              1272,
+              528,
+              520,
+              56
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "Every player must participate at the same time to play this mode.",
+          "korean": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다."
+        },
+        {
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드"
+        },
+        {
+          "source": "中級者向けの車です。",
+          "korean": "중급자용 차량입니다."
+        },
+        {
+          "source": "To switch to \"Single Player Mode\", press the \"View Change Button\" and the \"Brake Pedal\" at the same time.",
+          "korean": "싱글 플레이 모드로 전환하려면 시점 변경 버튼과 브레이크 페달을 동시에 누르세요."
+        },
+        {
+          "source": "You will run 15 courses continuously.",
+          "korean": "15코스를 연속으로 달립니다."
+        },
+        {
+          "source": "The distance to the final goal will be very long.",
+          "korean": "최종 골까지의 거리가 매우 깁니다."
+        },
+        {
+          "source": "Steering Wheel :",
+          "korean": "스티어링 휠:"
+        },
+        {
+          "source": "初級者向けの車です。",
+          "korean": "초급자용 차량입니다."
+        },
+        {
+          "source": "Versus Special Course has been selected.",
+          "korean": "대전 스페셜 코스가 선택되었습니다."
+        },
+        {
+          "source": "TUNED",
+          "korean": "튜닝"
+        },
+        {
+          "source": "NORMAL",
+          "korean": "일반"
+        },
+        {
+          "source": "RANDOM",
+          "korean": "무작위"
+        }
+      ],
+      "preserve_original": [
+        "song titles",
+        "speed values",
+        "all non-text artwork outside source glyph/effect masks"
+      ],
+      "raw_orientation": "HOLD_EXACT_HD_RAW_ORIENTATION_NOT_DECODED",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "Every player must participate at the same time to play this mode.",
+          "korean": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 1,
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 2,
+          "source": "中級者向けの車です。",
+          "korean": "중급자용 차량입니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 3,
+          "source": "To switch to \"Single Player Mode\", press the \"View Change Button\" and the \"Brake Pedal\" at the same time.",
+          "korean": "싱글 플레이 모드로 전환하려면 시점 변경 버튼과 브레이크 페달을 동시에 누르세요.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 4,
+          "source": "You will run 15 courses continuously.",
+          "korean": "15코스를 연속으로 달립니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 5,
+          "source": "The distance to the final goal will be very long.",
+          "korean": "최종 골까지의 거리가 매우 깁니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 6,
+          "source": "Steering Wheel :",
+          "korean": "스티어링 휠:",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 7,
+          "source": "初級者向けの車です。",
+          "korean": "초급자용 차량입니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 8,
+          "source": "Versus Special Course has been selected.",
+          "korean": "대전 스페셜 코스가 선택되었습니다.",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 9,
+          "source": "TUNED",
+          "korean": "튜닝",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 10,
+          "source": "NORMAL",
+          "korean": "일반",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        },
+        {
+          "element_index": 11,
+          "source": "RANDOM",
+          "korean": "무작위",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Semantic translations and exact 4x atlas geometry are pinned. Do not infer semantic-to-region mapping by array order; confirm from decoded exact English HD DDS before any pixel rewrite.",
+      "next_action": "Decode exact Release DDS, identify each English glyph/effect mask inside the pinned atlas cells, preserve non-text pixels, build clean plate, render measured Korean, then require per-element 1px containment + alpha/orientation + identical-crop ENGLISH SOURCE/KOREAN CANDIDATE proof before DDS emission."
+    },
+    {
+      "queue_index": 107,
+      "asset": "841E796B",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "prior_artwork_plan_state": {
+        "layout_status": "source_orientation_verified",
+        "render_status": "sourcefaithful_candidate_ready",
+        "dds_status": "candidate_ready",
+        "ingame_status": "pending"
+      },
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+        "git_blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+        "contents_inline_available": false,
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          512
+        ]
+      },
+      "decoded_stock_source_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/841E796B_512x128.png",
+        "git_blob_sha": "165502f5ab2d9ea7ddb84487377de7ea06808f3b"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_841E796B_512x128_atlas.json",
+        "git_blob_sha": "95d88252f0169246e1640904431044b198c80083",
+        "width": 2048,
+        "height": 512,
+        "regions_count": 10,
+        "rotations": false,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_507",
+            "rect": [
+              4,
+              4,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 1,
+            "name": "sprite_508",
+            "rect": [
+              372,
+              4,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 2,
+            "name": "sprite_509",
+            "rect": [
+              740,
+              4,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 3,
+            "name": "sprite_510",
+            "rect": [
+              1108,
+              4,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 4,
+            "name": "sprite_511",
+            "rect": [
+              1476,
+              4,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 5,
+            "name": "sprite_512",
+            "rect": [
+              4,
+              212,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 6,
+            "name": "sprite_513",
+            "rect": [
+              372,
+              212,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 7,
+            "name": "sprite_514",
+            "rect": [
+              740,
+              212,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 8,
+            "name": "sprite_515",
+            "rect": [
+              1108,
+              212,
+              360,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "idx": 9,
+            "name": "sprite_516",
+            "rect": [
+              1476,
+              212,
+              360,
+              200
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "translations": [
+        {
+          "source": "No Handicap",
+          "korean": "핸디캡 없음"
+        }
+      ],
+      "preserve_original": [
+        "Ferrari vehicle/model cards",
+        "vehicle pictograms",
+        "vehicle/model names",
+        "brand/logo artwork",
+        "all pixels outside No Handicap glyph/effect mask"
+      ],
+      "raw_orientation": "HISTORICAL_SOURCE_ORIENTATION_VERIFIED_MIRROR_Y_REQUIRES_EXACT_HD_RECONFIRM",
+      "element_gates": [
+        {
+          "element_index": 0,
+          "source": "No Handicap",
+          "korean": "핸디캡 없음",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+          "rework_status": "RECONSTRUCTION_INPUT_READY_PIXEL_MASK_AND_CELL_MAPPING_PENDING"
+        }
+      ],
+      "reconstruction_status": "READY_FOR_EXACT_HD_DECODED_TEXT_MASK_AND_CLEAN_PLATE",
+      "mapping_note": "Semantic translations and exact 4x atlas geometry are pinned. Do not infer semantic-to-region mapping by array order; confirm from decoded exact English HD DDS before any pixel rewrite.",
+      "next_action": "Decode exact Release DDS, identify each English glyph/effect mask inside the pinned atlas cells, preserve non-text pixels, build clean plate, render measured Korean, then require per-element 1px containment + alpha/orientation + identical-crop ENGLISH SOURCE/KOREAN CANDIDATE proof before DDS emission."
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_65_95_101_107",
+    "work_steal": "NONE",
+    "current_queue_selection": "PASS_4_OF_4_PENDING_LOCALIZE_TEXT_AT_FINAL_PREFLIGHT",
+    "canonical_translation_match": "PASS_34_OF_34_AGAINST_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "immutable_upstream_identity": "PASS_4_EXACT_RELEASE_DDS_BLOBS_PLUS_4_DECODED_STOCK_PNG_BLOBS_PLUS_4_4X_ATLAS_BLOBS_PINNED",
+    "atlas_geometry": "PASS_4_OF_4_JSON_GEOMETRY_PINNED",
+    "source_text_mask": "HOLD_STRICT_RECHECK_EXACT_HD_PIXEL_DECODE_NEXT_STAGE",
+    "clean_plate": "HOLD_STRICT_RECHECK_EXACT_HD_PIXEL_DECODE_NEXT_STAGE",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE_ALL_TOUCHED_ELEMENTS_RECORDED",
+    "dds_format_compression_mips_alpha": "HOLD_EXACT_BINARY_HEADER_AND_PIXEL_DECODE_NEXT_STAGE_NO_DDS_WRITE",
+    "raw_orientation": "PARTIAL_HISTORICAL_65_107_MIRROR_Y__HOLD_EXACT_HD_RECONFIRM_ALL",
+    "mandatory_english_source_comparison": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_NEW_ODD_EXACT_HD_RECONSTRUCTION_INPUTS",
+    "indices": [
+      65,
+      95,
+      101,
+      107
+    ],
+    "exact_release_dds_identities": 4,
+    "decoded_stock_source_identities": 4,
+    "exact_4x_atlas_identities": 4,
+    "semantic_segments": 34,
+    "exact_atlas_regions": 152,
+    "materially_reduces_unresolved_work": true
+  },
+  "result": "PASS_MATERIAL_FALLBACK_4_NEW_ODD_EXACT_HD_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
