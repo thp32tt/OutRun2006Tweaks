@@ -232,62 +232,10 @@ rep = {
 }
 REPORT.write_text(json.dumps(rep, ensure_ascii=False, indent=2) + "\n", "utf-8")
 
-qpath = ROOT / "localization/graphics/asset_queue.csv"
-with qpath.open("r", encoding="utf-8", newline="") as f:
-    qrows = list(csv.DictReader(f))
-    fields = list(qrows[0].keys())
-for q in qrows:
-    if int(q["index"]) == INDEX:
-        q["artwork_status"] = "b95_self_qa_pass_pending_c"
-        q["notes"] = (q.get("notes", "").rstrip("; ") + "; B95 10-element exact-bbox rework PASS 17/17; source-diff outside original bboxes 0; C + isolated DDS_ONLY in-game pending").strip("; ")
-with qpath.open("w", encoding="utf-8", newline="") as f:
-    wr = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
-    wr.writeheader()
-    wr.writerows(qrows)
-
-pp = ROOT / "localization/progress/progress.json"
-p = json.loads(pp.read_text("utf-8"))
-p["updated_at_kst"] = now
-g = p.setdefault("graphics", {})
-g["latest_b_first_qa"] = {
-    "run": "B95", "task_id": TASK_ID, "report": str(REPORT.relative_to(ROOT)),
-    "result": "FA7BBB13_SELF_QA_PASS_PENDING_C_INGAME",
-    "assets": {ASSET: {"candidate_sha256": newsha, "status": "B95_SELF_QA_PASS_PENDING_C_INGAME"}}
-}
-nr = g.get("next_hd_rework", {})
-nr["assets"] = [x for x in nr.get("assets", []) if x != ASSET]
-nr["remaining"] = len(nr["assets"])
-pend = nr.setdefault("pending_c_revalidation", [])
-if ASSET not in pend:
-    pend.append(ASSET)
-g["next_hd_rework"] = nr
-p["next_checkpoint"] = "B95: FA7BBB13 exact-bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game."
-pp.write_text(json.dumps(p, ensure_ascii=False, indent=2) + "\n", "utf-8")
-
-rp = ROOT / "localization/resume_state.json"
-rs = json.loads(rp.read_text("utf-8"))
-rs["schema_version"] = int(rs.get("schema_version", 56)) + 1
-acts = [x for x in rs.get("next_actions", []) if not x.startswith("Remaining C85 production REWORK assets:")]
-acts.insert(0, "B95: FA7BBB13 exact-bbox rework self-QA PASS; pending independent C and isolated DDS_ONLY in-game.")
-acts.insert(1, "Refresh current GitHub queue before next B target; do not repeat B95 FA7BBB13.")
-rs["next_actions"] = acts
-rs.setdefault("graphics_checkpoint", {})["b95_fa7bbb13"] = {
-    "timestamp_kst": now, "task_id": TASK_ID, "report": str(REPORT.relative_to(ROOT)),
-    "candidate_sha256": newsha, "status": "B95_SELF_QA_PASS_PENDING_C_INGAME"
-}
-rp.write_text(json.dumps(rs, ensure_ascii=False, indent=2) + "\n", "utf-8")
-
-sp = ROOT / "localization/progress/STATUS.md"
-with sp.open("a", encoding="utf-8") as f:
-    f.write("\n\n### B95 FA7BBB13 exact-bbox rework — " + now + "\n")
-    f.write("- B even shard index 54; ten C85 failing Korean text regions reworked using existing HD Korean rasters.\n")
-    f.write("- Strict self-QA: 17/17 bbox containment PASS; changes outside old/new rework rectangles 0; new visible source-diff outside original text bboxes 0; introduced alpha outside original bboxes 0.\n")
-    f.write("- DDS 4096x2048 RGBA32 / 1 mip / exact header / raw mirror_y preserved. Candidate SHA-256 " + newsha + ".\n")
-    f.write("- Automatic validation PASS; runtime validation UNTESTED. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain mandatory.\n")
-
-with (ROOT / "localization/WORKLOG.md").open("a", encoding="utf-8") as f:
-    f.write("\n\n## " + now + " - B95 FA7BBB13 rework [" + TASK_ID + "]\n\n")
-    f.write("- GitHub-only B production on even shard index 54; N100/GPT Library/VR/FFB/build not used.\n")
-    f.write("- Reworked 10 C85 zero-pixel failures while retaining all 17 reviewed Korean translations.\n")
-    f.write("- 17/17 exact bbox containment PASS. All pixel changes are confined to the old/new rework rectangles; new visible canonical-source differences and introduced alpha outside the union of original permitted bboxes are 0; fully transparent RGB differences are recorded separately and do not count as rendered overflow.\n")
-    f.write("- Candidate SHA-256 " + newsha + ". AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED; pending independent C + isolated DDS_ONLY in-game.\n")
+print(json.dumps({
+    "task_id": TASK_ID,
+    "candidate_sha256": newsha,
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "report": str(REPORT.relative_to(ROOT))
+}, ensure_ascii=False))
