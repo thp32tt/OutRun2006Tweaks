@@ -505,3 +505,73 @@ The final paragraph of every generation prompt must require an internal pre-outp
 
 The exact final prompt text (or structured prompt JSON) used for each production candidate must be saved with the QA artifacts and hashed. This makes prompt regressions auditable and allows a successful first-pass recipe to be reused for visually equivalent source families.
 
+## Mandatory orientation and source-letterform generation gate
+
+Effective 2026-09-29 after first post-reset sample review. Orientation and letterform style are generation inputs, not optional visual-QA observations.
+
+### Orientation must be proven from source pixels
+
+- Never trust filename conventions, historical notes, previous candidates, or a transcription note such as `raw normal` by itself.
+- Before generation, inspect the exact HD source DDS in raw pixel order and in the game's expected display transform when known.
+- Record a discrete `source_text_transform`: `normal`, `flip_x`, `flip_y`, `rotate_180`, `rotate_90_cw`, `rotate_90_ccw`, or an explicitly documented composition.
+- Record the observed source reading direction and baseline vector in raw coordinates.
+- The Korean candidate must use the **same raw-coordinate transform/baseline direction** as the source element. Do not render upright first and assume the DDS/game will fix it.
+- If source orientation cannot be proven, generation is blocked as `ORIENTATION_UNRESOLVED`.
+
+### Orientation preflight before expensive generation
+
+Before background reconstruction or Korean rendering:
+1. derive/confirm source text transform from exact HD source;
+2. map source bbox, permitted region and protected masks into the same raw coordinate system;
+3. generate a temporary orientation proof containing only geometry/baseline markers, not production artwork;
+4. verify that the proof follows the same source baseline direction;
+5. only then allow clean-plate/Korean generation.
+
+A candidate produced without this preflight is not promotable.
+
+### Orientation postflight
+
+After candidate generation and after DDS round-trip decode:
+- compare candidate text baseline/direction to recorded source transform;
+- verify edit mask and candidate lettering were not accidentally flipped relative to one another;
+- verify raw DDS view and intended display view separately;
+- any mismatch is `REWORK_REQUIRED`, even when containment is 0px-clean.
+
+### Source-letterform style is a hard generation input
+
+Before rendering, record source visual traits:
+- slant/italic angle or direction;
+- condensed/normal/expanded width character;
+- stroke weight;
+- corner character (square, rounded, beveled);
+- outline count, thickness and colors;
+- shadow direction, distance, hardness and opacity;
+- highlight/bevel/glow treatment;
+- source text height and width occupancy;
+- tracking and punctuation treatment.
+
+The prompt must tell the generator to reproduce these traits for Korean as closely as Hangul geometry permits. A generic Korean system font is not acceptable merely because it fits.
+
+### Style-fit hierarchy
+
+Prefer:
+1. a Korean-capable font with source-like slant/width/weight;
+2. deterministic affine slant/width adjustment within measured source proportions;
+3. source-faithful outline/shadow/effect construction;
+4. custom/redrawn Korean lettering when no font can match adequately.
+
+Do not accept a visibly upright, rounded, overly bold/thin or otherwise generic Korean word when the English source is distinctly angled, condensed, outlined or arcade-styled.
+
+### First-pass rejection conditions
+
+The generation step must reject its own candidate before DDS output when:
+- text transform differs from the source;
+- reading/baseline direction differs;
+- source is slanted but Korean is visibly upright, or vice versa;
+- width/weight/corner character is materially inconsistent;
+- outline/shadow hierarchy is materially inconsistent;
+- punctuation orientation/placement is inconsistent;
+- the only way to fit is to violate source style or permitted geometry.
+
+These checks are required even if pixel containment, alpha and protected-mask metrics are otherwise perfect.
+
