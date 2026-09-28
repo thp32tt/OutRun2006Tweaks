@@ -666,3 +666,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Odd index 111: fixed three non-overlapping text-only C85 failures: long_distance, for_experts, new_course_desc. Each post alpha bbox is inside the original permitted bbox.
 - DDS 2048x2048 RGBA32/mip1/header/raw mirror_y preserved; changed pixels outside touched cells=0; introduced alpha outside safe original bboxes=0.
 - Candidate b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791; six C85 failures intentionally remain REWORK_REQUIRED because they overlap adjacent cells or artwork/badges. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.
+
+
+## W00001 C synchronization barrier — 2026-09-28 22:18 KST
+- A terminal: `LOCALIZATION-LOCALIZATION_A-00006` = **BLOCKED_NO_ACTION**; no candidate DDS changed. 568D3696 remains specialized DXT5 rework; C075FB49 retains 6 overlap/artwork-sensitive failures.
+- B terminal: `LOCALIZATION-LOCALIZATION_B-00005` = **DURABLE_REVIEW_NO_DUPLICATE_REWORK**; existing B95/B94/B93/B92/C86 evidence preserved and no completed/blocked DDS work repeated.
+- C cross-lane reconciliation: **NO_NEW_ASSET_APPROVALS**. 62BEBF33/E3FD08BE retain C86 decoded-pixel containment PASS but exact-bbox top edge-touch high-risk HOLD.
+- Final promotion remains blocked by isolated `DDS_ONLY` in-game validation and outstanding zero-pixel/artifact rework. No real-game test was performed in this barrier; runtime validation remains **UNTESTED**.
+- Next controller action: dispatch the next disjoint A+B production wave from current queue state; prioritize REWORK_REQUIRED, then unfinished localize_text and unresolved zoom_review.
