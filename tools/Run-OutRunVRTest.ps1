@@ -234,6 +234,8 @@ $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
+$oldDxvkLogPath = $env:DXVK_LOG_PATH
+$oldDxvkLogLevel = $env:DXVK_LOG_LEVEL
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
@@ -282,6 +284,8 @@ if($dxvkMode){
     $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
     $env:VK_INSTANCE_LAYERS=$null
     $env:VK_LOADER_DEBUG='error,warn,layer'
+    $env:DXVK_LOG_PATH=$sessionRoot
+    $env:DXVK_LOG_LEVEL='info'
     $bandicam=Get-Process -ErrorAction SilentlyContinue|Where-Object{
         $_.ProcessName -match '^bdcam' -or $_.ProcessName -match 'bandicam'
     }
@@ -313,6 +317,8 @@ try{
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
         $env:VK_LOADER_DEBUG=$oldVkDebug
+        $env:DXVK_LOG_PATH=$oldDxvkLogPath
+        $env:DXVK_LOG_LEVEL=$oldDxvkLogLevel
     }
 }
 
