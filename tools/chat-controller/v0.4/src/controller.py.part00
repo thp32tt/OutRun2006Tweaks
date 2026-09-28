@@ -41,6 +41,8 @@ QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
 QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
 GITHUB_POLL_SECONDS = max(60, int(os.getenv("GITHUB_POLL_SECONDS", "180")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
+CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
+MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
@@ -82,7 +84,18 @@ logging.basicConfig(
 )
 log = logging.getLogger("outrun-controller")
 
-RATE_LIMIT_PATTERNS = [
+RATE_CONVERSATION_LIMIT_PATTERNS = [
+    r"maximum (?:conversation|chat) length",
+    r"(?:conversation|chat).{0,40}(?:too long|maximum length|length limit|limit reached)",
+    r"you.?ve reached.{0,40}(?:maximum|limit).{0,40}(?:conversation|chat)",
+    r"start (?:a )?new (?:chat|conversation).{0,60}(?:continue|because|limit|length)",
+    r"(?:continue|start over).{0,40}(?:new chat|new conversation)",
+    r"이 대화.{0,30}(?:최대|한도|길이)",
+    r"대화.{0,30}(?:너무 길|길이 한도|최대 길이|한도에 도달)",
+    r"새 (?:채팅|대화).{0,40}(?:시작|계속|이어)",
+]
+
+LIMIT_PATTERNS = [
     r"too many requests",
     r"http\s*429",
     r"\b429\b.{0,80}(request|rate|limit)",
@@ -183,6 +196,8 @@ runtime = {
     "queue_stable_seconds": QUEUE_STABLE_SECONDS,
     "github_poll_seconds": GITHUB_POLL_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
+    "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
+    "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
     "project_url_configured": bool(CHATGPT_PROJECT_URL),
     "require_project_url": REQUIRE_PROJECT_URL,
     "start_url": BASE_URL,
@@ -523,6 +538,28 @@ async def detect_rate_limit(page: Page) -> bool:
         write_runtime(
             last_rate_limit_match=matched[0],
             last_rate_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
+async def detect_conversation_limit(page: Page) -> bool:
+    """Detect a per-thread length limit, distinct from account/rate limits."""
+    surface = await visible_error_surface_text(page)
+    matched = [p for p in CONVERSATION_LIMIT_PATTERNS if re.search(p, surface, flags=re.I | re.S)]
+    if not matched:
+        # Some conversation-length notices replace the composer without using a
+        # toast/dialog. Only inspect the full page when the composer is absent.
+        composer = await first_visible(page, INPUT_SELECTORS, total_wait_ms=500)
+        if composer is None:
+            body = await page_text(page)
+            matched = [p for p in CONVERSATION_LIMIT_PATTERNS if re.search(p, body, flags=re.I | re.S)]
+            if matched:
+                surface = body
+    if matched:
+        write_runtime(
+            last_conversation_limit_match=matched[0],
+            last_conversation_limit_surface=surface[:500],
         )
         return True
     return False
