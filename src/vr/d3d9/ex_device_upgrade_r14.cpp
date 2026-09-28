@@ -82,6 +82,11 @@ namespace OutRunVRD3D9ExUpgradeR13
             384ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
             16ull * 1024ull * 1024ull;
+        // The reserve is a class budget, not merely a per-texture size test.
+        // Without a cumulative counter, multiple exact 2048x2048 atlases can
+        // consume more than the intended 16 MiB emergency headroom.
+        constexpr std::uint64_t R14EmergencyShadowBudgetBytes =
+            16ull * 1024ull * 1024ull;
 
         bool R69IsSelectorAtlasReserveCandidate(
             const D3DSURFACE_DESC& desc, UINT levels,
@@ -103,6 +108,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         // 2048x2048 selector reserve while retaining the absolute 384 MiB cap.
         std::atomic<std::uint64_t> R14ShadowBytes{0};
         std::atomic<std::uint64_t> R14GeneralShadowBytes{0};
+        std::atomic<std::uint64_t> R14EmergencyShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
         struct R14ShadowEntry
@@ -122,6 +128,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             bool externalWriteDuringLock = false;
             std::uint64_t shadowBytes = 0;
             bool countsAgainstGeneralBudget = false;
+            bool countsAgainstEmergencyBudget = false;
 
             ~R14ShadowEntry()
             {
@@ -134,6 +141,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                         shadowBytes, std::memory_order_acq_rel);
                     if (countsAgainstGeneralBudget)
                         R14GeneralShadowBytes.fetch_sub(
+                            shadowBytes, std::memory_order_acq_rel);
+                    if (countsAgainstEmergencyBudget)
+                        R14EmergencyShadowBytes.fetch_sub(
                             shadowBytes, std::memory_order_acq_rel);
                 }
                 --R14InternalReleaseDepth;
@@ -207,8 +217,12 @@ namespace OutRunVRD3D9ExUpgradeR13
                 if (entry.countsAgainstGeneralBudget)
                     R14GeneralShadowBytes.fetch_sub(
                         entry.shadowBytes, std::memory_order_acq_rel);
+                if (entry.countsAgainstEmergencyBudget)
+                    R14EmergencyShadowBytes.fetch_sub(
+                        entry.shadowBytes, std::memory_order_acq_rel);
                 entry.shadowBytes = 0;
                 entry.countsAgainstGeneralBudget = false;
+                entry.countsAgainstEmergencyBudget = false;
             }
             entry.mode = R14ShadowMode::DirectOnly;
             entry.validMask = 0;
@@ -437,7 +451,25 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
 
             if (emergencyReserve)
-                return true;
+            {
+                std::uint64_t emergency =
+                    R14EmergencyShadowBytes.load(std::memory_order_acquire);
+                for (;;)
+                {
+                    if (bytes > R14EmergencyShadowBudgetBytes ||
+                        emergency > R14EmergencyShadowBudgetBytes - bytes)
+                    {
+                        R14ShadowBytes.fetch_sub(
+                            bytes, std::memory_order_acq_rel);
+                        return false;
+                    }
+                    if (R14EmergencyShadowBytes.compare_exchange_weak(
+                            emergency, emergency + bytes,
+                            std::memory_order_acq_rel,
+                            std::memory_order_acquire))
+                        return true;
+                }
+            }
 
             std::uint64_t general =
                 R14GeneralShadowBytes.load(std::memory_order_acquire);
@@ -481,6 +513,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     return false;
                 }
                 entry->countsAgainstGeneralBudget = !emergencyReserve;
+                entry->countsAgainstEmergencyBudget = emergencyReserve;
                 entry->validMask = levels >= R14MaxTrackedLevels
                     ? 0xFFFFFFFFu : ((1u << levels) - 1u);
                 device->AddRef();
@@ -559,6 +592,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14ShadowBytes.load(std::memory_order_acquire);
             const std::uint64_t currentGeneral =
                 R14GeneralShadowBytes.load(std::memory_order_acquire);
+            const std::uint64_t currentEmergency =
+                R14EmergencyShadowBytes.load(std::memory_order_acquire);
 
             const bool emergencyAtlasEligible =
                 R69IsSelectorAtlasReserveCandidate(
@@ -566,6 +601,10 @@ namespace OutRunVRD3D9ExUpgradeR13
 
             if (!estimate || estimate > R14ShadowBudgetBytes ||
                 currentTotal > R14ShadowBudgetBytes - estimate ||
+                (emergencyAtlasEligible &&
+                 (estimate > R14EmergencyShadowBudgetBytes ||
+                  currentEmergency >
+                    R14EmergencyShadowBudgetBytes - estimate)) ||
                 (!emergencyAtlasEligible &&
                  (estimate > R14GeneralShadowBudgetBytes ||
                   currentGeneral >
@@ -579,11 +618,12 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !R14FirstEmergencyReserveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R70 EX: isolated MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f}; later general textures retain the 368 MiB class budget and total remains capped at 384 MiB",
+                    "VR R71 STATIC: isolated MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}; emergency class is cumulatively capped at 16 MiB, general stays capped at 368 MiB, total at 384 MiB",
                     desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
                     estimate,
                     static_cast<double>(currentTotal) / (1024.0 * 1024.0),
-                    static_cast<double>(currentGeneral) / (1024.0 * 1024.0));
+                    static_cast<double>(currentGeneral) / (1024.0 * 1024.0),
+                    static_cast<double>(currentEmergency) / (1024.0 * 1024.0));
             }
 
             const HRESULT hr = device->CreateTexture(
