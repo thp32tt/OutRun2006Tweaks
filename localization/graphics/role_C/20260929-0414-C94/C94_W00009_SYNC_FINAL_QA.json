@@ -4,9 +4,9 @@
   "wave_id": "W00009",
   "lane": "LOCALIZATION_C",
   "role": "SYNC_BARRIER_CROSS_LANE_FINAL_QA_SHARED_STATE_MERGE",
-  "recorded_at_kst": "2026-09-29T04:14:00+09:00",
+  "recorded_at_kst": "2026-09-29T04:18:00+09:00",
   "target_branch": "korean-localization-clean",
-  "base_head_sha": "6d7913eaffa312c086993c9eda36af1d024b0501",
+  "base_head_sha": "75f2f5a6e78ad3d1aedf2e23c3a27844d5f16c84",
   "a_terminal": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00029.json",
   "b_terminal": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00030.json",
   "durable_terminal_gate": "PASS_BOTH_PRESENT",
@@ -42,7 +42,27 @@
       "raw_orientation": "mirror_y",
       "physical_labels": 6,
       "candidate_trials": "REJECTED_NOT_PERSISTED_ARTIFACT_CLEANLINESS_FAIL",
-      "containment": "HOLD_STRICT_RECHECK"
+      "containment": "HOLD_STRICT_RECHECK",
+      "latest_attempt3": {
+        "report": "localization/graphics/role_B/20260929-0416-B104/B104_W00009_ATTEMPT3_ZOOM_REVIEW_RESOLUTION.json",
+        "promoted_localizable": [
+          34,
+          52,
+          172
+        ],
+        "preserve_original": [
+          196
+        ],
+        "translations": {
+          "Total Rank": "종합 랭크",
+          "Extra Time": "추가 시간",
+          "Start": "시작",
+          "Goal": "골",
+          "START": "시작",
+          "GOAL": "골"
+        },
+        "candidate_dds_modified": false
+      }
     },
     "semantic_terminology": "PASS_REUSES_CANONICAL_TRANSLATIONS",
     "hangul_clipping_pixel_overflow": "NO_NEW_CANDIDATE_BYTES__NOT_CLAIMED",
@@ -65,22 +85,25 @@
       35
     ],
     "w00009_transcription_artwork_plan_added": [
-      103
+      34,
+      52,
+      103,
+      172
     ]
   },
   "final_counts": {
     "queue_rows": 137,
-    "localize_text": 85,
-    "zoom_review": 41,
-    "zoom_review_unresolved": 23,
-    "zoom_review_resolved_preserve_original": 18,
-    "transcribed_assets": 85,
-    "transcribed_segments": 731,
-    "artwork_plan_assets": 85,
-    "artwork_plan_segments": 731,
+    "localize_text": 88,
+    "zoom_review": 38,
+    "zoom_review_unresolved": 19,
+    "zoom_review_resolved_preserve_original": 19,
+    "transcribed_assets": 88,
+    "transcribed_segments": 737,
+    "artwork_plan_assets": 88,
+    "artwork_plan_segments": 737,
     "approved_dds": 0
   },
-  "static_precommit_validation": "PASS_IN_MEMORY_VERIFY_STATE_EQUIVALENT_CORE_COUNTS_AND_INDEX_SETS",
+  "static_precommit_validation": "PASS_CURRENT_GITHUB_STATE_CORE_VERIFY_COUNTS_INDEX_SETS_AND_PROGRESS_MIRROR",
   "automation_validation": "PENDING_REMOTE_GITHUB_ACTIONS_AFTER_COMMIT",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
