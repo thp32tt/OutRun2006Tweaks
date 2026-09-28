@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-24T23:24:08+09:00",
+  "updatedKst": "2026-09-29T06:20:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -306,16 +306,24 @@
     {
       "id": "DXVK-REACTIVATE-001",
       "priority": 13,
-      "status": "READY",
+      "status": "DONE",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
       "testLevel": "LEVEL2",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer.",
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "validationSha": "8f812341ff6cb7d6a5605f6203d5601b22dad832",
+      "validationRunId": 36484701256,
+      "validationResult": "AUTOMATION_VALIDATION_PASS",
+      "resolution": "Stale READY item reconciled under AGENTS staleQueueRule. The isolated x86 stock-DXVK SAFE path is already repeatable and now guarded by tools/verify_dxvk_reactivation_contract.py: target/selector/provider provenance/preflight/package identity/device re-attestation/analyzer/build contracts all pass on exact SHA.",
+      "runtimeValidation": "UNTESTED",
+      "nextAction": "Software reactivation is complete. Do not recreate this item. Next DXVK gate is exact-build Quest3/VDXR stock SAFE/host-owned transport visual+pacing validation with DxvkDirectEvidenceTrusted=true.",
+      "closedByTask": "CONVERSION-DXVK-00027",
+      "closedAtKst": "2026-09-29T06:20:00+09:00"
     },
     {
       "id": "DX12-D3D9ON12-REACTIVATE-001",
