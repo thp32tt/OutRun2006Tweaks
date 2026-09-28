@@ -1185,3 +1185,17 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
 - No real-game test was performed by C; `RUNTIME_VALIDATION=UNTESTED`. No N100 clone/worktree, GPT Library, VR/FFB/DX work, or game build was used.
 - Machine report: `localization/graphics/role_C/20260929-0254-C92/C92_W00007_SYNC_FINAL_QA.json`.
+
+## 2026-09-29 03:19 KST - W00008 C BARRIER + SHARED CLASSIFICATION MERGE (AUTO C-00028)
+
+- Refreshed GitHub-only `korean-localization-clean` at `9e33ff5f28a5db8b05195d5b071b7e9f4714a90f` after both W00008 production lanes reached durable terminal state.
+- A terminal `LOCALIZATION-LOCALIZATION_A-00026` material commit `050acd9feec61a535107104784a6b69586872464`: classified odd zoom-review indices 33/35/37/45 as three preserve-original plus one localizable-text asset (E989E3B7). No candidate DDS bytes changed; runtime UNTESTED.
+- B terminal `LOCALIZATION-LOCALIZATION_B-00027` material commit `5814a150ea14b1d5bea58ce00d3c9e3e58bde390`, final task-record commit `9e33ff5f28a5db8b05195d5b071b7e9f4714a90f`: classified even indices 26/28/30/32 as `Total Rank` text assets with deterministic HD reconstruction specs. B's recorded Localization State / Automation Gate / Domain Isolation Guard runs succeeded; no DDS bytes changed; runtime UNTESTED.
+- C independently fetched and visually reviewed the exact upstream original PNGs for all eight rows at `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`; all recorded PNG blob SHAs matched. 63C91067/A05BF610/8215FD25/DCC7B488/E989E3B7 visibly contain `Total Rank`; FBCAB18D/515DCBB2/1F77CB88 contain only character/logo or physical-key artwork with no localizable UI prose.
+- Existing canonical transcription entries independently confirm `Total Rank -> 종합 랭크`. C merged the five positive assets into `localize_text` and added canonical transcription records; three non-text rows become preserve-original.
+- Recomputed queue: 137 rows = 84 localize_text + 42 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only. Unresolved zoom-review **35 -> 27**; resolved preserve-original zoom-review **12 -> 15**. Transcription coverage is 84 assets / 730 semantic segments.
+- Existing artwork planning remains 79 assets / 725 segments and is now explicitly incomplete for indices 26/28/30/32/35. These five require exact HD English source reconstruction plus zero-pixel and mandatory source-vs-candidate visual QA before any candidate may pass.
+- Because W00008 has no new/reworked Korean DDS bytes, C did not infer containment, clipping, format/mipmap/alpha/transparency/orientation, background, wrong-replacement or side-by-side PASS. Existing DDS REWORK/HOLD states remain unchanged; approved/locked DDS count remains 0.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
+- No real-game test was performed by C: `RUNTIME_VALIDATION=UNTESTED`. No N100, GPT Library, VR/FFB/DX, or game build work.
+- Machine report: `localization/graphics/role_C/20260929-0319-C93/C93_W00008_SYNC_FINAL_QA.json`.
