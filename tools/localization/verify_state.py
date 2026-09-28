@@ -9,7 +9,17 @@ errors=[]
 
 def fail(msg): errors.append(msg)
 
-progress=json.loads((LOC/'progress/progress.json').read_text(encoding='utf-8'))
+canonical_progress_path=LOC/'progress/progress.json'
+compat_progress_path=LOC/'progress.json'
+canonical_progress_text=canonical_progress_path.read_text(encoding='utf-8')
+if not compat_progress_path.exists():
+    fail('compatibility progress path localization/progress.json is missing')
+    compat_progress_text=''
+else:
+    compat_progress_text=compat_progress_path.read_text(encoding='utf-8')
+    if compat_progress_text != canonical_progress_text:
+        fail('compatibility progress path localization/progress.json is out of sync with localization/progress/progress.json')
+progress=json.loads(canonical_progress_text)
 
 # Text state
 text=[]
