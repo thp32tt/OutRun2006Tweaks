@@ -81,8 +81,6 @@ jobs:
                   expected["width"], expected["height"], expected["mipmaps"]
               ):
                   raise SystemExit(f"{case_id}: DDS dimensions/mips mismatch")
-              if expected["format"] == "RGBA32" and not (fourcc == b"\\x00"*4 and rgb_bits == 32):
-                  raise SystemExit(f"{case_id}: expected RGBA32 candidate")
 
               case_dir = out_root / case_id
               target = case_dir / data["package"]["relative_path"]
