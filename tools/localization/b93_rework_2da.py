@@ -4,7 +4,7 @@ import csv, hashlib, json, os, struct
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageChops
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSET = "2DA43E41"
@@ -45,10 +45,11 @@ def to_rgba(data: bytes, w: int, h: int) -> Image.Image:
 def to_dds(header: bytes, img: Image.Image) -> bytes:
     return header + img.tobytes("raw","RGBA")
 
-def abs_bbox(alpha: Image.Image, cell):
+def diff_bbox(source: Image.Image, localized: Image.Image, cell):
     x0,y0,x1,y1 = cell
-    crop = alpha.crop((x0,y0,x1+1,y1+1))
-    b = crop.getbbox()
+    s = source.crop((x0,y0,x1+1,y1+1))
+    l = localized.crop((x0,y0,x1+1,y1+1))
+    b = ImageChops.difference(s, l).getbbox()
     if b is None:
         return None
     return [x0+b[0], y0+b[1], x0+b[2]-1, y0+b[3]-1]
@@ -106,11 +107,10 @@ for r in fails:
         "method":"move_existing_hd_korean_raster_uniform_lanczos_if_needed"
     })
 
-alpha=after.getchannel("A")
 qa_rows=[]
 failed=[]
 for r in rows:
-    lb=abs_bbox(alpha,r["sprite_cell"])
+    lb=diff_bbox(src_read,after,r["sprite_cell"])
     ok=contained(lb,r["original_bbox"])
     o=r["original_bbox"]
     if lb:
