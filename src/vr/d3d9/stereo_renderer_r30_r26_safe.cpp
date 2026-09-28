@@ -1050,12 +1050,13 @@ namespace OutRunVRStereo
         {
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
-            // VR-only post-process policy: keep the normal 2D game path
-            // untouched, but render stereo SkyGlow at half width/height.
-            // The outer callers still honor SkyGlowFactor <= 0 as an explicit
-            // disable switch; once stereo SkyGlow is active its working factor
-            // is fixed at 2 to cut the post-process pixel count to 25%.
-            constexpr int factor = 2;
+            // Respect the requested visual-quality contract. CORRECTNESS
+            // explicitly launches with SkyGlowFactor=1; the earlier performance
+            // experiment silently forced factor=2, changing bloom footprint and
+            // making the image look soft/washed. Performance runs may still
+            // request factor=2 explicitly.
+            const int factor = std::clamp(
+                Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
                 160u, BackBufferDesc.Width /
                     static_cast<UINT>(factor));
@@ -1566,7 +1567,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW EXP STATEBLOCK V2: explicit touched-state restore + FVF/cull/scissor hardening ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
+                        "VR V7 SKY GLOW: requested factor honored + pre-HUD composite + explicit touched-state restore ACTIVE; factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
