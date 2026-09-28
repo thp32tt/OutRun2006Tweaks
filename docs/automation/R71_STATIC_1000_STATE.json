@@ -6,7 +6,7 @@
   "completedCycles": 10,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "fa735613decd14685c4ac4b2bd14a76c47d675b5",
+  "currentHead": "d3544e7f09ee7e4aaaed9e7c47793ce19f75ead7",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -306,7 +306,9 @@
       "commits": [
         "960b63acd0a3c51be622cb15e950ef758d646b39",
         "26b56df6d8f35f45eacb927e85d97fae37424c7f",
-        "fa735613decd14685c4ac4b2bd14a76c47d675b5"
+        "fa735613decd14685c4ac4b2bd14a76c47d675b5",
+        "c1fa2a35587dcd3606da42f956f8b49c6fc1eb18",
+        "d3544e7f09ee7e4aaaed9e7c47793ce19f75ead7"
       ],
       "automationValidation": "EXACT_HEAD_PR80_CI_PENDING",
       "runtimeValidation": "UNTESTED",
