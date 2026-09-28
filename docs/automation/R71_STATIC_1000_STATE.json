@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 4,
+  "completedCycles": 5,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "e7b0f066398e7a5aa71bf217fef3a0f969ec7d66",
+  "currentHead": "ab79e6b871e91cea4f8e7ef52c7a67448bfbd669",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -112,18 +112,44 @@
       "automationValidation": "EXACT_HEAD_CI_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "Require exact-head build/baseline verifier pass; HMD selector/car-screen regression remains required before promotion."
+    },
+    {
+      "cycle": 5,
+      "lenses": [
+        "OpenXR session lifecycle",
+        "DirectGPU ACK lifetime",
+        "GPU ownership",
+        "recreation recovery"
+      ],
+      "findingKeys": [
+        "VR-HOST-XR-DESTROY-PENDING-ACK-OWNER-001"
+      ],
+      "findings": [
+        "Current R71 xrDestroySession called ReleasePending(), releasing incomplete D3D11 EVENT owners even though GPU-consumption lifetime is independent of XrSession lifetime. On session recreation this can lose the only owner able to publish completion ACKs for already-sampled producer slots."
+      ],
+      "changedFiles": [
+        "vrhost/src/runtime/r32_direct_submit.hpp",
+        "tools/verify_vr_r32_review.py"
+      ],
+      "commits": [
+        "330f2ffcfb5ef9bcdeb03af79f4913e698627a4f",
+        "ab79e6b871e91cea4f8e7ef52c7a67448bfbd669"
+      ],
+      "automationValidation": "EXACT_HEAD_CI_PENDING; bounded fix matches previously build-verified lifetime policy",
+      "runtimeValidation": "UNTESTED",
+      "next": "Require host architecture/build pass; later HMD reset/session-recreation test must confirm no DirectGPU ring stall."
     }
   ],
   "nextCycle": {
-    "cycle": 5,
+    "cycle": 6,
     "priority": [
-      "consume PR #79 exact-parent CI",
-      "consume new HUD Inspector BA9D0 caller map",
-      "host ACK/session lifetime reconciliation",
-      "R14 external-write hot-path attribution before optimization",
-      "SkyGlow intensity deferred until frozen R71 HMD result"
+      "consume exact-parent CI/HUD Inspector",
+      "narrow BA9D0 ownership from exact analyzer output",
+      "review skipped-frame ACK/watermark ownership without mixing divergent patches",
+      "measure R14 external-write-hook misses before optimization",
+      "defer SkyGlow intensity to user HMD"
     ],
-    "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no synchronization behavior change without measurements."
+    "guard": "No HMD-visible correctness claim; no focus merge; no self-hosted PC; no wholesale host branch cherry-pick."
   },
-  "updatedKst": "2026-09-29T02:38:00+09:00"
+  "updatedKst": "2026-09-29T02:41:29+09:00"
 }
