@@ -412,6 +412,7 @@ def github_api_json(path: str) -> dict:
                 github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
                 github_rate_limit_reset=reset,
                 github_api_blocked_until=None,
+                last_github_error=None,
             )
             return data
     except urllib.error.HTTPError as e:
