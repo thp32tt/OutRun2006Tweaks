@@ -43,6 +43,40 @@ KNOWN_CALL_SITES = {
     0x0BB2D0: "RankMarker clip #5",
 }
 
+# V7 targeted reverse-analysis probes. These are not semantic promotions.
+# They exist to decode exact rel32 targets around runtime-observed UNKNOWN HUD
+# callers and the 15 historical TimeAttack adjustment sites before changing
+# producer ownership.
+TARGETED_CALL_PROBES = {
+    0x0BAAA0: "OutRun gap clip",
+    0x0BAAEA: "OutRun gap sprani",
+    0x0BAB10: "OutRun gap locate",
+    0x0BABA4: "OutRun gap clip 2",
+    0x0BABC6: "OutRun gap locate 2",
+    0x0BB3D6: "post-rank Calc3D2D",
+    0x0BB550: "post-rank sprani A",
+    0x0BB60D: "post-rank Sumo_Printf",
+    0x0BB6F0: "post-rank Calc3D2D 2",
+    0x0BB796: "post-rank sprani B",
+    0x0BE5CD: "TimeAttack handoff 01",
+    0x0BE603: "TimeAttack handoff 02",
+    0x0BE633: "TimeAttack handoff 03",
+    0x0BE66D: "TimeAttack handoff 04",
+    0x0BE690: "TimeAttack handoff 05",
+    0x0BE6B5: "TimeAttack handoff 06",
+    0x0BE6D5: "TimeAttack handoff 07",
+    0x0BE8D8: "TimeAttack handoff 08",
+    0x0BE915: "TimeAttack handoff 09",
+    0x0BE94A: "TimeAttack handoff 10",
+    0x0BE97A: "TimeAttack handoff 11",
+    0x0BE9A3: "TimeAttack handoff 12",
+    0x0BE7E8: "TimeAttack handoff 13",
+    0x0BE802: "TimeAttack handoff 14",
+    0x0BE81C: "TimeAttack handoff 15",
+    0x0BEA5A: "Goal helper 020 edge",
+    0x0BEA5F: "Goal helper 150 edge",
+}
+
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
 # rather than D3D primitive-count heuristics.
@@ -226,6 +260,27 @@ def find_calls(pe: PE) -> list[dict]:
     return found
 
 
+def decode_targeted_calls(pe: PE) -> list[dict]:
+    out: list[dict] = []
+    for rva, label in TARGETED_CALL_PROBES.items():
+        raw = pe.bytes_at_rva(rva, 16)
+        item = {
+            "rva": rva,
+            "label": label,
+            "bytes16": raw.hex(" "),
+            "opcode": raw[0] if raw else None,
+            "target_rva": None,
+            "target_name": "",
+        }
+        if len(raw) >= 5 and raw[0] == 0xE8:
+            rel = struct.unpack_from("<i", raw, 1)[0]
+            target_rva = (rva + 5 + rel) & 0xFFFFFFFF
+            item["target_rva"] = target_rva
+            item["target_name"] = KNOWN_TARGETS.get(target_rva, "")
+        out.append(item)
+    return out
+
+
 def extract_hud_strings(pe: PE) -> list[dict]:
     results: list[dict] = []
     for section in pe.sections:
@@ -304,6 +359,21 @@ def render_markdown(report: dict) -> str:
 
     lines += [
         "",
+        "## Targeted V7 call probes",
+        "",
+        "| RVA | Label | Opcode | rel32 target | Known target | First 16 bytes |",
+        "|---:|---|---:|---:|---|---|",
+    ]
+    for item in report["targeted_call_probes"]:
+        opcode = "-" if item["opcode"] is None else f"0x{item['opcode']:02X}"
+        lines.append(
+            f"| {hexrva(item['rva'])} | {item['label']} | {opcode} | "
+            f"{hexrva(item['target_rva'])} | {item['target_name']} | "
+            f"{item['bytes16']} |"
+        )
+
+    lines += [
+        "",
         "## HUD-related ASCII strings",
         "",
         "| RVA | Section | Text |",
@@ -360,6 +430,7 @@ def main() -> int:
         },
         "symbols": symbol_fingerprints(pe),
         "calls": calls,
+        "targeted_call_probes": decode_targeted_calls(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
