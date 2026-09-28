@@ -107,3 +107,30 @@ Priority:
 3. review skipped-frame / transition-watermark ACK ownership without mixing divergent branches;
 4. measure R14 external-write-hook miss cost before optimizing it;
 5. keep SkyGlow intensity unchanged until frozen R71 HMD evidence arrives.
+
+## Cycle 0006 — exact OutRun HUD ownership / false-positive removal
+
+- Consumed canonical EXE HUD Inspector static analysis run `36459711964` (static-exe-analysis SUCCESS), artifact `10986444684`.
+- The refreshed analyzer enumerated the shared `0xBA9D0` text-producer callers and found them only in the `0xBBACB..0xBEA3B` families. There is no BA9D0 caller in the R71 `0x097300..0x097F00` range.
+- Therefore the broad range was not needed by the R70/R71 BA9D0 producer bridge and could only widen classification for unrelated consumers.
+- Replaced it with exact semantic anchors:
+  - `0x975EE / 0x97727 / 0x977FB` — OutRun stage/checkpoint Sumo_Printf;
+  - `0x97BB7 / 0x97DA7` — final-result clip;
+  - `0xBB6F0 / 0xBB796` — rival vehicle projection/sprani.
+- Added a verifier that explicitly forbids restoration of the broad `0x097300..0x097F00` range.
+- Commits:
+  - `450d8a119b58e67f6599ecde174df54283722645`
+  - `cee9e99ff92eb7037474674f72a465c87118ec8c`
+- Finding: `R71-OUTRUN-HUD-BROAD-RANGE-REMOVAL-001`
+- AUTOMATION_VALIDATION: `EXE_STATIC_ANALYSIS_EVIDENCE_PASS / FINAL_HEAD_BUILD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Next: exact-parent build/host checks, then continue ACK/watermark and resource hot-path review.
+
+## Cycle 0007 — queued
+
+Priority:
+1. consume exact-parent Build/OpenXR/HUD Inspector;
+2. review skipped-frame and transition-watermark ACK ownership;
+3. measure R14 external-write hook misses before optimization;
+4. review Reset/DirectGPU generation boundaries;
+5. defer visual tuning until frozen R71 HMD evidence is returned.
