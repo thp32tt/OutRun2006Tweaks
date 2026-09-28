@@ -212,10 +212,6 @@ namespace outrun::vr::dx11
                     {
                         usage = desc.Usage;
                         pool = desc.Pool;
-                        usage = desc.Usage;
-                        pool = desc.Pool;
-                        usage = desc.Usage;
-                        pool = desc.Pool;
                         format = desc.Format;
                         descriptorObserved = true;
                     }
@@ -232,6 +228,8 @@ namespace outrun::vr::dx11
                     D3DSURFACE_DESC desc{};
                     if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
                     {
+                        usage = desc.Usage;
+                        pool = desc.Pool;
                         format = desc.Format;
                         descriptorObserved = true;
                     }
@@ -248,6 +246,8 @@ namespace outrun::vr::dx11
                     D3DVOLUME_DESC desc{};
                     if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
                     {
+                        usage = desc.Usage;
+                        pool = desc.Pool;
                         format = desc.Format;
                         descriptorObserved = true;
                     }
