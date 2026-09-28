@@ -68,5 +68,24 @@
     "openxr_host_artifact_digest": "sha256:f915a0845dcd2662c194b7b002c862f0e667d843303f6ce548c5457aa02bd8f0",
     "hud_artifact_id": 10966798628,
     "hud_artifact_digest": "sha256:b776c3fdaa217379463b12f5e68cd9b6767006d507b846dd35e203e22deabbf3"
-  }
+  },
+  "rollover_reviews": [
+    {
+      "chat_rollover": 4,
+      "attempt": 1,
+      "reviewed_head": "a06c3c29f64420be469220d7cea4517c67d0d232",
+      "review_status": "NO_NEW_RUNNABLE_SOFTWARE_WORK",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": [
+        "Recovered vr-dxvk-r71-disasm HEAD a06c3c29f64420be469220d7cea4517c67d0d232 directly from GitHub; no N100 clone/worktree was used.",
+        "Compared source result 27bd1e89bdac1d547bd9994eb5ea51901d08d81a through reviewed HEAD: four later commits changed only CONVERSION-DXVK-00008 run/review documentation; no renderer/runner/test source drift was introduced.",
+        "Reviewed-head workflows all completed successfully: Build 36415535914, OpenXR VR architecture 36415535854, OutRun EXE HUD Inspector CI 36415535922.",
+        "Reviewed-head Build artifact 10968180473 targets head_sha a06c3c29f64420be469220d7cea4517c67d0d232 and has digest sha256:ce5923daf3bae09241edfb9a52bbba15abf9b5a115f5868324a9aac3132360ec.",
+        "The only remaining task item is exact-build Quest 3/VDXR two-pass visual parity plus same-scene PERFORMANCE evidence; GitHub-only automation cannot satisfy that hardware/runtime gate."
+      ],
+      "next_action": "Keep DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY open. Do not repeat completed clean-performance implementation. When Quest 3/VDXR evidence is supplied, compare exact build identity, visual parity and same-scene PERFORMANCE evidence before any DXVK promotion or multiview work.",
+      "reviewed_at": "2026-09-28T22:12:00+09:00"
+    }
+  ]
 }
