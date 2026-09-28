@@ -14,12 +14,16 @@ namespace OutRunVR::DrawState
         DWORD srcBlend = D3DBLEND_ONE;
         DWORD destBlend = D3DBLEND_ZERO;
         DWORD blendOp = D3DBLENDOP_ADD;
+        DWORD separateAlphaBlendEnable = FALSE;
 
         DWORD alphaTestEnable = FALSE;
         DWORD alphaRef = 0;
         DWORD alphaFunc = D3DCMP_ALWAYS;
 
         DWORD cullMode = D3DCULL_CCW;
+        DWORD fillMode = D3DFILL_SOLID;
+        DWORD scissorTestEnable = FALSE;
+        DWORD sRGBWriteEnable = FALSE;
         DWORD colorWriteEnable =
             D3DCOLORWRITEENABLE_RED |
             D3DCOLORWRITEENABLE_GREEN |
