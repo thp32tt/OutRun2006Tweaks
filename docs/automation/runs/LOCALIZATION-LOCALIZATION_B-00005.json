@@ -1,0 +1,33 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00005",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "base_sha": "d0dec00942571e1d6eafa0bc6787a028e9af670f",
+  "result": "DURABLE_REVIEW_NO_DUPLICATE_REWORK",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only B even-index production shard refresh and anti-duplication review; no N100/local clone; no VR/FFB.",
+  "findings": [
+    "FA7BBB13 index 54 already has B95 exact-bbox self-QA PASS pending C; do not repeat.",
+    "A064FDFC index 60 already has B94 exact source-diff bbox PASS pending C; do not repeat.",
+    "2DA43E41 index 94 remains REWORK_REQUIRED but B93 exhausted 3 safe automatic repair attempts without writing a candidate; keep blocker rather than repeat identical failed repair.",
+    "571E78F3 index 102 has B87 canonical HD rebuild + C81 strict QA PASS unchanged and D82 same-SHA preflight; only final/in-game reapproval remains.",
+    "62BEBF33 index 104 and E3FD08BE index 116 have B92 exact-bbox PASS and C86 independent binary containment PASS; both remain high-risk HOLD pending isolated DDS_ONLY in-game validation.",
+    "Other even-index localize_text/zoom_review rows remain pending for future production waves; this rollover did not claim an additional asset because current task history had no durable B-00005 record and the first priority was safe state reconciliation without duplicating peer/current work."
+  ],
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "docs/automation/runs/B93-20260928-1304.json",
+    "docs/automation/runs/B94-20260928-1336.json",
+    "localization/graphics/role_B/20260928-1552-B95/",
+    "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json"
+  ],
+  "shared_state_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false
+}
