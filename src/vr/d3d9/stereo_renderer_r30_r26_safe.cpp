@@ -1511,33 +1511,47 @@ namespace OutRunVRStereo
                         R30SkyGlow.bright, zero, false);
                 }
 
-                // Preserve the R69 visual result while removing dead work.
-                // R69 always composited TEMP when TwoStep was off, so its
-                // horizontal blur was unused. When TwoStep was on it composited
-                // REDUCED (the horizontal result), so the later vertical pass
-                // was also unused. Execute only the pass that actually feeds
-                // the final composite.
-                const bool useBlur =
+                // R71: the R70 HMD run proved the old "dead work"
+                // optimization was visually wrong: factor=1 composited the
+                // unblurred bright-pass TEMP texture, washing out sky/cloud
+                // detail. Always consume the horizontal blur result. When the
+                // optional second pass is active it writes reduced -> temp, so
+                // TEMP becomes the final composite source.
+                const float horizontal[4]{
+                    1.0f /
+                        static_cast<float>(R30SkyGlow.glowWidth),
+                    0.0f, 0.0f, 0.0f
+                };
+                if (ok)
+                    ok = R30DrawSkyGlowPass(
+                        device, reduced,
+                        R30SkyGlow.glowWidth,
+                        R30SkyGlow.glowHeight,
+                        R30SkyGlow.temp[eye],
+                        R30SkyGlow.blur, horizontal, false);
+
+                const bool effectiveTwoStep =
                     Settings::SkyGlowTwoStep.get() &&
                     R30SkyGlow.factor > 1;
                 IDirect3DTexture9* compositeSource =
-                    R30SkyGlow.temp[eye];
-                if (useBlur)
+                    R30SkyGlow.reduced[eye];
+                if (effectiveTwoStep)
                 {
-                    const float horizontal[4]{
+                    const float vertical[4]{
+                        0.0f,
                         1.0f /
-                            static_cast<float>(R30SkyGlow.glowWidth),
-                        0.0f, 0.0f, 0.0f
+                            static_cast<float>(R30SkyGlow.glowHeight),
+                        0.0f, 0.0f
                     };
                     if (ok)
                         ok = R30DrawSkyGlowPass(
-                            device, reduced,
+                            device, temp,
                             R30SkyGlow.glowWidth,
                             R30SkyGlow.glowHeight,
-                            R30SkyGlow.temp[eye],
-                            R30SkyGlow.blur, horizontal, false);
+                            R30SkyGlow.reduced[eye],
+                            R30SkyGlow.blur, vertical, false);
                     if (ok)
-                        compositeSource = R30SkyGlow.reduced[eye];
+                        compositeSource = R30SkyGlow.temp[eye];
                 }
 
                 const float composite[4]{ 0.38f, 0, 0, 0 };
