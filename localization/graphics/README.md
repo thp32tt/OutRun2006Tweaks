@@ -24,6 +24,22 @@ The game assets themselves are not committed here. Use the catalog generator aga
 6. Keep Korean raster replacements separate from runtime font work.
 7. Record each localized texture by SHA-256 and relative path before packaging.
 
+## Controller work-scope rule
+The automation/controller MUST derive graphics scope from `asset_queue.csv`, not from the number of DDS files currently committed.
+
+Current sanity baseline (2026-09-28):
+- total queue: 137 rows
+- direct `localize_text`: 79
+- `zoom_review`: 47
+- direct containment/review scope: 126 rows
+- `font_pipeline`: 9
+- `hangul_name_entry`: 1
+- preserve-only: 1
+
+The controller must recompute these counts every run. The existing committed DDS set is only a partial working set.
+
+For every localized texture element, compare the localized non-transparent pixel bbox to the original/HD source permitted bbox/cell. A 1-pixel escape in any direction is `REWORK_REQUIRED` and blocks approval. Missing or ambiguous evidence is `HOLD_STRICT_RECHECK`, not PASS. BC/DXT/DXT5 block-only evidence cannot substitute for decoded-pixel containment at final approval when exact evidence is unavailable.
+
 ## Current visual review
 Reviewed: `game_ui`, `common_ui`, `ranking`, `font`.
 
