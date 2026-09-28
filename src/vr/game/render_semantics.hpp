@@ -1,5 +1,7 @@
 #pragma once
 
+#include "disasm_render_contract.hpp"
+
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -31,6 +33,29 @@ namespace OutRunVR::GameSemantic
         // screen space. Treat it as eye-FOV-corrected 2D without HUD ownership.
         ProjectedScreenEffect2D,
     };
+
+    [[nodiscard]] constexpr RenderScope RenderScopeFromSpacePolicy(
+        OutRunVR::DisasmContract::SpacePolicy policy) noexcept
+    {
+        using Policy = OutRunVR::DisasmContract::SpacePolicy;
+        switch (policy)
+        {
+        case Policy::ScreenHud: return RenderScope::ScreenHud;
+        case Policy::WorldBillboard: return RenderScope::WorldBillboard;
+        case Policy::ProjectedWorldMarker2D:
+            return RenderScope::ProjectedWorldMarker2D;
+        case Policy::ProjectedScreenEffect2D:
+            return RenderScope::ProjectedScreenEffect2D;
+        default: return RenderScope::None;
+        }
+    }
+
+    static_assert(RenderScopeFromSpacePolicy(
+        OutRunVR::DisasmContract::SpacePolicy::ProjectedWorldMarker2D) ==
+        RenderScope::ProjectedWorldMarker2D);
+    static_assert(RenderScopeFromSpacePolicy(
+        OutRunVR::DisasmContract::SpacePolicy::ProjectedScreenEffect2D) ==
+        RenderScope::ProjectedScreenEffect2D);
 
     struct ProjectedMarkerInfo
     {

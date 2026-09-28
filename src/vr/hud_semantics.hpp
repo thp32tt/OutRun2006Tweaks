@@ -31,6 +31,10 @@ namespace OutRunVRHudSemantics
         {
         case SpacePolicy::ScreenHud: return "SCREEN_HUD";
         case SpacePolicy::WorldBillboard: return "WORLD_BILLBOARD";
+        case SpacePolicy::ProjectedWorldMarker2D:
+            return "PROJECTED_WORLD_MARKER_2D";
+        case SpacePolicy::ProjectedScreenEffect2D:
+            return "PROJECTED_SCREEN_EFFECT_2D";
         default: return "UNKNOWN";
         }
     }

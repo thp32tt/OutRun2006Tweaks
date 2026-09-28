@@ -10,16 +10,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "src" / "vr" / "game" / "disasm_render_contract.hpp"
 HUD = ROOT / "src" / "vr" / "hud_semantics.hpp"
+RUNTIME_SEMANTICS = ROOT / "src" / "vr" / "game" / "render_semantics.hpp"
 ANALYZER = ROOT / "tools" / "analyze_outrun_exe.py"
 
 ENTRY_RE = re.compile(
     r'\{\s*0x([0-9A-Fa-f]+)u,\s*0x([0-9A-Fa-f]+)u,\s*'
     r'"([^"]+)",\s*"([^"]+)",\s*'
-    r'SpacePolicy::(ScreenHud|WorldBillboard)\s*\}'
+    r'SpacePolicy::(ScreenHud|WorldBillboard|ProjectedWorldMarker2D|'
+    r'ProjectedScreenEffect2D)\s*\}'
 )
 POLICY_NAMES = {
     "ScreenHud": "SCREEN_HUD",
     "WorldBillboard": "WORLD_BILLBOARD",
+    "ProjectedWorldMarker2D": "PROJECTED_WORLD_MARKER_2D",
+    "ProjectedScreenEffect2D": "PROJECTED_SCREEN_EFFECT_2D",
 }
 
 
@@ -77,6 +81,21 @@ def main() -> int:
         raise AssertionError("runtime HUD classifier does not consume shared catalog")
     if "InRange(callRva" in hud_source:
         raise AssertionError("runtime HUD classifier still contains a duplicate range map")
+
+    contract_source = CONTRACT.read_text(encoding="utf-8")
+    runtime_source = RUNTIME_SEMANTICS.read_text(encoding="utf-8")
+    for policy in ("ProjectedWorldMarker2D", "ProjectedScreenEffect2D"):
+        if policy not in contract_source:
+            raise AssertionError(f"F15 shared SpacePolicy missing {policy}")
+        if f"SpacePolicy::{policy}" not in hud_source:
+            raise AssertionError(f"F15 HUD policy naming missing {policy}")
+        if (
+            f"Policy::{policy}" not in runtime_source
+            or f"RenderScope::{policy}" not in runtime_source
+        ):
+            raise AssertionError(
+                f"F15 shared-to-runtime projected policy bridge missing {policy}"
+            )
 
     expected_f14 = {
         (0x060900, 0x061100, "ctrl_icon_work", "HUD_CTRL_ICON", "SCREEN_HUD"),
