@@ -57,6 +57,10 @@ def main() -> None:
     resource_translation = (DX11 / "resource_translation.cpp").read_text(
         encoding="utf-8"
     )
+    resource_header = (DX11 / "resource_translation.hpp").read_text(
+        encoding="utf-8"
+    )
+    resource_translation_contract = resource_translation + "\n" + resource_header
     resource_contract = {
         "ResourceBehaviorRules": "explicit VB/IB/texture/RT/depth behavior table",
         "ResourceMirrorLifetime::DeviceGeneration": "default-pool reset lifetime",
@@ -75,11 +79,17 @@ def main() -> None:
         "DefaultUpdateSubresource": "default-usage update semantics",
         "ManagedCpuShadowRead": "managed read shadow dependency",
         "ManagedCpuShadowWrite": "managed write shadow dependency",
+        "ManagedMirrorLifetimeState": "managed mirror lifetime state machine",
+        "note_managed_shadow_write": "managed CPU-shadow version transition",
+        "note_managed_mirror_upload": "managed mirror upload transition",
+        "advance_managed_device_generation": "Reset generation transition",
+        "managed_mirror_ready": "generation/version readiness gate",
+        "static_assert": "compile-time managed lifetime transition checks",
     }
     missing_resource_contract = [
         meaning
         for token, meaning in resource_contract.items()
-        if token not in resource_translation
+        if token not in resource_translation_contract
     ]
     if missing_resource_contract:
         raise SystemExit(
@@ -115,6 +125,7 @@ def main() -> None:
         "observe_texture_unlock_rect": "texture UnlockRect observation API",
         "observe_update_texture": "device UpdateTexture observation API",
         "observe_update_surface": "device UpdateSurface observation API",
+        "observe_device_reset_generation": "successful Reset generation observation API",
     }
     missing_mutation_api = [
         meaning
@@ -146,6 +157,12 @@ def main() -> None:
         "ResourceUpdateTextureFailures": "UpdateTexture failure counter",
         "ResourceUpdateSurfaceSuccesses": "UpdateSurface success counter",
         "ResourceUpdateSurfaceFailures": "UpdateSurface failure counter",
+        "ResourceManagedShadowWrites": "managed CPU-shadow write evidence counter",
+        "ResourceManagedShadowReads": "managed CPU-shadow read evidence counter",
+        "ResourceManagedResetSuccesses": "successful Reset generation counter",
+        "ResourceManagedResetShadowPreserved": "CPU-shadow Reset survival counter",
+        "ManagedLifetimeEvidence": "runtime managed lifetime evidence state",
+        "advance_managed_device_generation": "runtime generation transition",
         "translate_buffer_mutation": "runtime R75 mutation-plan classification",
     }
     missing_mutation_counters = [
@@ -183,6 +200,7 @@ def main() -> None:
             "observe_texture_unlock_rect": "texture UnlockRect bridge",
             "observe_update_texture": "UpdateTexture bridge",
             "observe_update_surface": "UpdateSurface bridge",
+            "observe_device_reset_generation": "successful Reset generation bridge",
         }
         missing_bridge = [
             meaning
@@ -205,7 +223,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R7[23456] census": "R72/R73/R74/R75/R76 summary compatibility",
+        "R7[234567] census": "R72/R73/R74/R75/R76/R77 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -224,6 +242,13 @@ def main() -> None:
         "textureUpdateTextureFailures": "R76 UpdateTexture failure evidence",
         "textureUpdateSurfaceSuccesses": "R76 UpdateSurface success evidence",
         "textureUpdateSurfaceFailures": "R76 UpdateSurface failure evidence",
+        "managedShadowWrites": "R77 managed CPU-shadow write evidence",
+        "managedShadowReads": "R77 managed CPU-shadow read evidence",
+        "managedResetSuccesses": "R77 successful Reset evidence",
+        "managedResetShadowPreserved": "R77 CPU-shadow Reset survival evidence",
+        "managedDeviceGeneration": "R77 device-generation evidence",
+        "managedShadowVersion": "R77 CPU-shadow version evidence",
+        "managedMirrorReady": "R77 fail-closed mirror readiness evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
