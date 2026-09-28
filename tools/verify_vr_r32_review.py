@@ -298,8 +298,10 @@ host_r23 = require(
     "R23DirectHoldState",
     "R23StageDirectHold",
     "PrepareDirectStereoSource",
-    "single-copy production path active",
-    "srv[0] = R23DirectHold.srv[0]",
+    "DirectGPU EXP ZERO-COPY",
+    "c.directLeftSrv_[R23DirectHold.borrowedSlot]",
+    "c.directRightSrv_[R23DirectHold.borrowedSlot]",
+    "producer slot release remains gated by the R32 asynchronous GPU-completion ACK",
 )
 if "c.CommitDirectStereoSource(frame)" in host_r23:
     raise SystemExit(
