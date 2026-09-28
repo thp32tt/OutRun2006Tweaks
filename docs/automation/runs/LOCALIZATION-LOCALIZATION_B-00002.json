@@ -4,10 +4,10 @@
   "target_branch": "korean-localization-clean",
   "attempt": 1,
   "base_sha": "6926a40fec79d8d5c9d1eb87ded188ce4017cf28",
-  "result_sha": "PENDING",
-  "automation_validation": "PENDING",
+  "result_sha": "e5a3630055d4bbc8178e570ee367a744ab880edb",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "summary": "Continue the same controller ATTEMPT=1. B95 strict QA passed through candidate/report generation; shared-state serialization is now removed from the runner and will be merged separately on latest HEAD.",
+  "summary": "B95 FA7BBB13 even-shard exact-bbox rework completed on GitHub. 17/17 bbox containment PASS, no introduced alpha outside original bboxes, and shared state was merged separately on latest HEAD. Independent C visual/final QA and isolated DDS_ONLY in-game validation remain pending.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
@@ -15,7 +15,11 @@
     "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_FINAL_STAGED_QA.json",
     "GitHub Actions run 36389208077: 17/17 bbox rows passed, changed pixels outside rework rectangles=0, pass-cell changes outside rework overlap=0; failed only because pre-existing source differences outside bbox were incorrectly treated as new regression.",
     "GitHub Actions run 36389394862: 17/17 bbox PASS, changed pixels outside rework rectangles=0, introduced alpha outside original bboxes=0, pass-cell changes outside rework overlap=0; 4,051 newly differing pixels outside original bboxes were fully transparent RGB-only data.",
-    "GitHub Actions run 36389584263 reached post-QA state but failed only while serializing shared asset_queue.csv; no result was committed."
+    "GitHub Actions run 36389584263 reached post-QA state but failed only while serializing shared asset_queue.csv; no result was committed.",
+    "Result commit e5a3630055d4bbc8178e570ee367a744ab880edb: localization: B95 FA7 exact-bbox rework [AUTO:LOCALIZATION-LOCALIZATION_B-00002]",
+    "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json",
+    "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_BEFORE_AFTER_QA.png",
+    "GitHub Actions run 36389208077 / job 108823193794: B95 production/self-QA step PASS; later branch-move guard blocked a duplicate commit because the completed result already existed."
   ],
   "execution_retry": 4
 }
