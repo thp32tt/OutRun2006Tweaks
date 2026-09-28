@@ -887,6 +887,24 @@ class UIScaling : public Hook
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
 	}
 
+	static std::array<SafetyHookMid, 11> V7OutRunHudGapProbeHooks{};
+
+	template <std::uint32_t CallerRva>
+	static void V7OutRunHudGapProbe(safetyhook::Context&)
+	{
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) != 0)
+			return;
+		const int mode = Game::current_mode
+			? static_cast<int>(*Game::current_mode) : -1;
+		const int stage = Game::stg_stage_num
+			? static_cast<int>(*Game::stg_stage_num) : -1;
+		spdlog::info(
+			"VR V7 HUD GAP PROBE: caller=0x{:05X} mode={} stage={} hits={}",
+			CallerRva, mode, stage, hit);
+	}
+
 	// R66: NaviPub_DispTimeAttackGoal (RVA 0xBEA50) does not execute the
 	// DispTimeAttack2D callsites above. Disassembly proves it calls only
 	// 0xBE020 and 0xBE150 after the 120-frame gate. Own only those two exact
@@ -1154,6 +1172,33 @@ public:
 		draw_sprite_custom_matrix_multi_CenterSprite_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_multi__case2_Addr), draw_sprite_custom_matrix_multi_CenterSprite);
 		draw_sprite_custom_matrix_multi_CenterSprite2_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_multi__case3_Addr), draw_sprite_custom_matrix_multi_CenterSprite2);
 		draw_sprite_custom_matrix_multi_CenterSprite3_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_multi__case4_Addr), draw_sprite_custom_matrix_multi_CenterSprite3);
+
+		// V7 diagnostic only: BA9D0 is a shared scrolling-HUD helper. Static
+		// xrefs prove known TimeAttack/Ghost/mission HUD callers plus these
+		// still-UNKNOWN direct callers. Mark only which unknown caller is live;
+		// do not promote its semantic until runtime evidence identifies it.
+		V7OutRunHudGapProbeHooks[0] = safetyhook::create_mid(
+			Module::exe_ptr(0xBBACB), V7OutRunHudGapProbe<0xBBACB>);
+		V7OutRunHudGapProbeHooks[1] = safetyhook::create_mid(
+			Module::exe_ptr(0xBC9AB), V7OutRunHudGapProbe<0xBC9AB>);
+		V7OutRunHudGapProbeHooks[2] = safetyhook::create_mid(
+			Module::exe_ptr(0xBCEF4), V7OutRunHudGapProbe<0xBCEF4>);
+		V7OutRunHudGapProbeHooks[3] = safetyhook::create_mid(
+			Module::exe_ptr(0xBCFC9), V7OutRunHudGapProbe<0xBCFC9>);
+		V7OutRunHudGapProbeHooks[4] = safetyhook::create_mid(
+			Module::exe_ptr(0xBD057), V7OutRunHudGapProbe<0xBD057>);
+		V7OutRunHudGapProbeHooks[5] = safetyhook::create_mid(
+			Module::exe_ptr(0xBD1C1), V7OutRunHudGapProbe<0xBD1C1>);
+		V7OutRunHudGapProbeHooks[6] = safetyhook::create_mid(
+			Module::exe_ptr(0xBD2AB), V7OutRunHudGapProbe<0xBD2AB>);
+		V7OutRunHudGapProbeHooks[7] = safetyhook::create_mid(
+			Module::exe_ptr(0xBD5E6), V7OutRunHudGapProbe<0xBD5E6>);
+		V7OutRunHudGapProbeHooks[8] = safetyhook::create_mid(
+			Module::exe_ptr(0xBD722), V7OutRunHudGapProbe<0xBD722>);
+		V7OutRunHudGapProbeHooks[9] = safetyhook::create_mid(
+			Module::exe_ptr(0xBE135), V7OutRunHudGapProbe<0xBE135>);
+		V7OutRunHudGapProbeHooks[10] = safetyhook::create_mid(
+			Module::exe_ptr(0xBE22B), V7OutRunHudGapProbe<0xBE22B>);
 
 		// Fixes for the time displays in time attack mode
 		DispTimeAttack2D_SpriteScalingForceRight_hk = safetyhook::create_mid((void*)0x4BE4BC, SpriteSpacingForceRight);
