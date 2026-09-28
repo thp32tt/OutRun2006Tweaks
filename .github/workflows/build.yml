@@ -2,8 +2,12 @@ name: Build
 
 on:
   push:
-    branches-ignore: [ vr-d3d9ex-focus, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
+    branches-ignore: [ vr-d3d9ex-focus, vr-dx11-native-r71, vr-dxvk-r71-disasm, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
   pull_request:
+
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
