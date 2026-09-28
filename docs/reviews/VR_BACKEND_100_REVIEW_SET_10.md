@@ -30,7 +30,7 @@ This final set is derived from Sets 01-09 and is intentionally a convergence rev
 ### Validation-quality blockers
 
 6. Separate discovery instrumentation from clean performance benchmarking and apply equivalent cadence/profile policy across backends.
-7. Add behavior-level one-click tests for payload precedence, mutation failure, target locking and post-selection identity.
+7. **DXVK one-click closed 2026-09-29:** behavior-level tests now execute payload precedence, mutation rollback, target locking and post-selection identity on the DXVK branch. Equivalent adoption remains required on the other active backend branch.
 8. Seal diagnostics even when process launch or host teardown fails.
 
 ## What should remain unchanged
@@ -55,3 +55,8 @@ This final set is derived from Sets 01-09 and is intentionally a convergence rev
 ## Post-campaign DXVK closure — F34 package-wide integrity
 
 On 2026-09-29, `CONVERSION-DXVK-00021` closed Set 09 F34 for the DXVK one-click path. DXVK preflight now verifies the generated `SHA256SUMS.txt` before selector mutation, including launcher/analyzer/checklist/helper files rather than only critical binaries. Unsafe/malformed/duplicate manifest entries, missing files, and hash mismatches fail closed. Exact-SHA Backend Conversion Gate `36470762665` PASS on `1d46bf5a4ce1cba8752d481db297a44cf850a64c`, with Build `36470774288`, OpenXR architecture `36470773858`, and HUD Inspector `36470774360` also PASS. This is software integrity evidence only and does not change the still-open Quest 3 / VDXR runtime gate for DXVK SAFE.
+
+
+## Post-campaign DXVK closure — F35 one-click behavioral CI
+
+On 2026-09-29, `CONVERSION-DXVK-00023` closed Set 09 F35 for the DXVK one-click path. A temporary package now executes the actual preflight with synthetic x86/x64 PE identities, BUILD_INPUTS, target metadata, stock-DXVK hash metadata and SHA256 manifest. The test proves valid target-slot precedence, rejects mismatched slot bytes/package source/DXVK provider metadata, and executes the launcher with wrong backend/variant against throwing stubs to prove target-lock rejection occurs before preflight/selector/runner. The selector transaction test additionally executes a successful `dxvk-safe` selection and verifies `ROOT_PAYLOAD_ATTESTATION.json`, embedded session attestation, root payload hashes and multiview absence; its existing injected-failure path continues to prove rollback and pre-session diagnostics. Exact-SHA Backend Conversion Gate `36475255748` PASS on `45e13a807c2deea6d66987331a9ca5dc32bf19a5`, with Build `36475262987`, OpenXR architecture `36475262975`, and HUD Inspector `36475262962` also PASS. This strengthens CI evidence only; the Quest 3 / VDXR runtime merge gate remains open.
