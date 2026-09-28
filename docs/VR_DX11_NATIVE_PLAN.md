@@ -63,3 +63,25 @@ hooks or alter DX9Ex Reset/StateBlock, transport, HUD semantics or host behavior
 - Use `src/vr/game/disasm_render_contract.hpp` as the backend-neutral EXE contract; do not re-infer HUD/world ownership from primitive/state heuristics.
 - DX12 is frozen and is no longer a target for this renderer effort.
 - Merge only after static/build validation and Quest 3/OpenXR runtime evidence show the menu/HUD/rank-marker/flare/shadow corruption set is closed.
+
+## R72 passive census foundation
+
+R72 now reuses the validated D3D9 stereo hook chain instead of installing a second
+render-state/draw hook stack.
+
+- `device_probe.cpp` records the live OutRun backbuffer size/format/MSAA and reports
+  whether the dormant R71 native target can represent it.
+- `vr/core/d3d9_draw_state.hpp` exposes a backend-neutral snapshot backed by the existing
+  periodically revalidated D3D9 render-state shadow.
+- `pipeline_translation.cpp` converts the captured subset into D3D11 blend/depth/raster
+  descriptors with an explicit unsupported bitmask.
+- `runtime_census.cpp` samples one of every 64 game-authored draws when
+  `OUTRUN_VR_DX11_CENSUS=1`, counting exact vs unsupported pipeline states and
+  fixed-function vs programmable draws.
+- The DX11 one-click target enables this census automatically and restores the environment
+  after the run.
+- `NativeDrawPathActive` remains false. No game draw is redirected to D3D11 in R72.
+
+The census output determines the next implementation order; unsupported alpha test,
+fixed-function lighting/fog, stencil, separate-alpha blend, sRGB and topology cases are not
+silently approximated.
