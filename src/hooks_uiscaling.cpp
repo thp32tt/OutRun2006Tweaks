@@ -843,18 +843,44 @@ class UIScaling : public Hook
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
 	}
 
-	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
+	static int __cdecl TimeRecord_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
 	{
-		AddSpriteSpacing((int*)(ctx.esp + 4), false);
-		// These 15 exact DispTimeAttack2D callsites are already individually
-		// identified by the original UI-scaling patch. Arm only the immediate
-		// render handoff instead of promoting generic put_scroll/put_clip paths.
-		OutRunVR::GameSemantic::ArmNextDraw(
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
-		static std::atomic<std::uint64_t> hits{ 0 };
-		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
-		if ((hit & (hit - 1)) == 0)
-			spdlog::info("VR R65 TIME HUD: exact DispTimeAttack2D handoff hits={}", hit);
+		AddSpriteSpacing(&x, false);
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// V7: static EXE analysis proves all 15 historical TimeAttack sites are
+		// direct calls to put_clip_sprite. Rendering is deferred through the
+		// SpriteNode queue, so one-shot ArmNextDraw can expire long before draw.
+		// Pin the exact appended node instead.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> hits{ 0 };
+			const auto hit = hits.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR V7 TIME HUD: exact DispTimeAttack2D node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
+		return result;
 	}
 	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
 	{
@@ -1135,21 +1161,51 @@ public:
 		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
 		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
 
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE5CD), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE603), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE633), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE66D), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE690), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE6B5), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE6D5), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE8D8), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE915), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE94A), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE97A), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE9A3), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE7E8), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE802), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBE81C), TimeRecord_putClipSprite,
+			Memory::HookType::Call);
 
 		// R68 canonical font glyph ownership. Disassembly proves two
 		// independent character renderers call put_sprite_ex directly:
