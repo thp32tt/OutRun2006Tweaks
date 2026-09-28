@@ -6,5 +6,6 @@
   "NativeDrawPathActive": false,
   "VariantId": "R69_FIXPACK",
   "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md",
-  "DxvkVersion": "3.1.1"
+  "DxvkVersion": "3.1.1",
+  "DevelopmentBranch": "vr-dxvk-r71-disasm"
 }
