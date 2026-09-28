@@ -320,6 +320,23 @@ if "c.CommitDirectStereoSource(frame)" in host_r23:
     raise SystemExit(
         "R23 production DirectGPU path must bypass legacy snapshot/fence commit")
 
+for marker in (
+    '#include "runtime/r41_skipped_release.hpp"',
+    "R41SkippedReleaseQueue",
+    "R41ReleaseNeverSampled(frame)",
+    "R41RetrySkippedReleases();",
+    "R23DeferredSlotBlocked(frame)",
+    "MarkGenerationFault(identity.transportGeneration)",
+):
+    if marker not in host_r23:
+        raise SystemExit(
+            f"R41 skipped DirectGPU durable-release invariant missing: {marker}")
+skip_guard = host_r23.find("if (R23DeferredSlotBlocked(frame))")
+stage_release = host_r23.find("R41ReleaseNeverSampled(frame)", skip_guard)
+if min(skip_guard, stage_release) < 0 or skip_guard > stage_release:
+    raise SystemExit(
+        "R41 never-sampled retry ownership must be reached only after deferred EVENT ownership is excluded")
+
 r14 = require(
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
     "singleLevelTexture",
