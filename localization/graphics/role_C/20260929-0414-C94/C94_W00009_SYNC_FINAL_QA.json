@@ -103,12 +103,28 @@
     "artwork_plan_segments": 737,
     "approved_dds": 0
   },
-  "static_precommit_validation": "PASS_CURRENT_GITHUB_STATE_CORE_VERIFY_COUNTS_INDEX_SETS_AND_PROGRESS_MIRROR",
-  "automation_validation": "PENDING_REMOTE_GITHUB_ACTIONS_AFTER_COMMIT",
+  "static_precommit_validation": "PASS_CURRENT_GITHUB_STATE: canonical/legacy progress byte-identical; transcription=artwork_plan=88 assets/737 segments; index sets equal; visual actions match progress 88 localize_text/38 zoom_review",
+  "automation_validation": "PASS_STATIC_CURRENT_GITHUB_STATE__REMOTE_FINAL_COMMIT_CHECK_PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "build_performed": false,
   "n100_used": false,
   "gpt_library_used": false,
-  "vr_ffb_dx_changes": false
+  "vr_ffb_dx_changes": false,
+  "attempt": "2/3",
+  "failure_context": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36471592964,
+    "job_id": 109094916692,
+    "conclusion": "failure",
+    "failing_step": "Verify localization state",
+    "observed_errors": [
+      "graphics transcription count 88 != 85",
+      "graphics transcription segments 737 != 731",
+      "artwork-plan count 88 != localize_text target 85",
+      "graphics action counts localize_text=88 zoom_review=38 != progress localize_text=85 zoom_review=41"
+    ],
+    "root_cause": "INTERMEDIATE_MULTI_COMMIT_STATE_AFTER_B_ATTEMPT3_GRAPHICS_MERGE_BEFORE_PROGRESS_COUNTER_UPDATE",
+    "stale_failure_not_rerun": true
+  }
 }
