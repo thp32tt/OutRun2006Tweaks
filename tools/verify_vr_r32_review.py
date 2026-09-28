@@ -255,6 +255,19 @@ if min(query_error, fault_generation, can_fast_submit, fast_gate) < 0:
 if not (query_error < fault_generation < can_fast_submit < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
 
+destroy_session = host_direct.find("inline XrResult XRAPI_CALL DestroySession")
+destroy_poll = host_direct.find("PollCompletedAcks();", destroy_session)
+destroy_return = host_direct.find(
+    "return OutRunVrR24BlackScreenGuard::DestroySession", destroy_session)
+destroy_release = host_direct.find("ReleasePending();", destroy_session)
+if min(destroy_session, destroy_poll, destroy_return) < 0 or not (
+        destroy_session < destroy_poll < destroy_return):
+    raise SystemExit(
+        "R32 xrDestroySession must poll completed ACKs while preserving incomplete D3D11 EVENT owners")
+if destroy_release >= 0 and destroy_release < destroy_return:
+    raise SystemExit(
+        "R32 xrDestroySession must not release incomplete GPU ACK owners")
+
 ensure_fence_failure = host_direct.find("if (!EnsureFence(slot))")
 ensure_fence_fault = host_direct.find(
     "MarkGenerationFault(generation)", ensure_fence_failure)
