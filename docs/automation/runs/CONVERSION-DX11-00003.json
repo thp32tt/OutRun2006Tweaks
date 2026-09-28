@@ -4,7 +4,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 2,
+  "chat_rollover": 3,
   "continued_from_chat_rollover": 1,
   "recorded_kst": "2026-09-28T16:36:33+09:00",
   "base_sha": "971806cade039a61ba64692487ee570660e0a6dc",
@@ -109,7 +109,10 @@
     "OpenXR architecture completed all six jobs successfully; HUD Inspector completed both static analysis and build successfully.",
     "AUTOMATION_VALIDATION=PASS applies to code_result_sha a591f330e2e7342edfdd168fb50b4bd3333dcafe.",
     "RUNTIME_VALIDATION=UNTESTED because no Quest 3/HMD/in-game execution was performed.",
-    "No runtime-normality, visual-correctness, crash-free, or frame-pacing claim is made."
+    "No runtime-normality, visual-correctness, crash-free, or frame-pacing claim is made.",
+    "Chat rollover 3 recovered the already-completed task from GitHub HEAD and did not repeat source/CI work.",
+    "Issue #14 comment 5865535111 is the canonical production ledger entry; recovery-created comment 5865540857 was marked SUPERSEDED/DUPLICATE.",
+    "RUNTIME_VALIDATION remains UNTESTED; no Quest 3/HMD/in-game execution was performed in rollover 3."
   ],
   "production_change_ledger": {
     "issue": 14,
@@ -117,5 +120,18 @@
     "comment_id": 5865535111,
     "record_commit_before_ledger_seal": "d8a549ba54cd502d88314d87c9f8da390e307d42"
   },
-  "next_action": "Keep NativeDrawPathActivationAllowed=false. Continue one bounded DX11 activation prerequisite at a time. Next, address F18 resource behavior/lifetime evidence and R73 explicit VB/IB/texture/render-target/depth mirror lifetime tables; then F19/F21 input-layout and shader/fixed-function translation readiness. Do not promote native draw ownership before exact-build Quest 3/OpenXR runtime parity."
+  "next_action": "Keep NativeDrawPathActivationAllowed=false. Continue one bounded DX11 activation prerequisite at a time. Next, address F18 resource behavior/lifetime evidence and R73 explicit VB/IB/texture/render-target/depth mirror lifetime tables; then F19/F21 input-layout and shader/fixed-function translation readiness. Do not promote native draw ownership before exact-build Quest 3/OpenXR runtime parity.",
+  "finalized_kst": "2026-09-28T16:38:00+09:00",
+  "rollover_3": {
+    "recovered_head_sha": "83105307b2dc2783be7ac342c482ef7a7adfa742",
+    "attempt_preserved": "1/3",
+    "result_sha_unchanged": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+    "action": "Recovered after concurrent rollover seal; did not repeat completed source or CI work. Verified canonical Issue #14 ledger entry and marked the recovery-created duplicate ledger comment superseded.",
+    "canonical_production_ledger_comment_id": 5865535111,
+    "superseded_duplicate_comment_id": 5865540857,
+    "source_changes": false,
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "n100_used": false
+  }
 }
