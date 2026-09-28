@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "provider": "DXVK",
+  "sourceRepository": "doitsujin/dxvk",
+  "releaseTag": "v3.1.1",
+  "releasePublishedUtc": "2026-09-15T17:43:25Z",
+  "assetId": 566164743,
+  "assetName": "dxvk-3.1.1.tar.gz",
+  "assetUrl": "https://github.com/doitsujin/dxvk/releases/download/v3.1.1/dxvk-3.1.1.tar.gz",
+  "assetSha256": "40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608",
+  "x86D3D9RelativeSuffix": "x32/d3d9.dll",
+  "intendedSlot": "E_DXVK_SAFE",
+  "backendMode": "dxvk-safe",
+  "policy": {
+    "preferD3D9Ex": false,
+    "directGpuOnly": false,
+    "disableDesktopDuplication": false,
+    "multiviewPatcherIncluded": false,
+    "promotionRequiresQuest3VdxrParity": true
+  },
+  "provenanceNote": "Pinned official DXVK release asset. The package workflow verifies this archive digest before extracting the x86 d3d9.dll and records the extracted DLL SHA256."
+}
