@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72/R73/R74/R75/R76/R77/R78/R79/R80/R81/R82/R83/R84 DX11 census analyzer compatibility."""
+"""Regression tests for R72/R73/R74/R75/R76/R77/R78/R79/R80/R81/R82/R83/R84/R85 DX11 census analyzer compatibility."""
 
 from __future__ import annotations
 
@@ -472,6 +472,65 @@ def main() -> int:
     assert proto["source_hash_hex"] == "0x0123456789ABCDEF"
     assert proto["bytes"] == 768
     assert proto["active_stages"] == 2
+
+    r85 = run_case(
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4 "
+        "decl=0 declHash=0x0000000000000000 declElems=0 "
+        "inputLayout[exact=1,elements=4,fvfExact=1,fvfPending=0] "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=0,vsBytes=0,"
+        "vsVersion=0x00000000,vsHash=0x0000000000000000,psPresent=0,"
+        "psBytes=0,psVersion=0x00000000,psHash=0x0000000000000000] "
+        "ffpCoverage[exact=1] ffpReadiness[ready=1,mask=0x00000000,"
+        "activeStages=2] texMask[present=0x03,exact=0x03]\n"
+        "VR DX11 R85 ffp shader prototype#1: generated=1 mask=0x00000000 "
+        "hash=0x0123456789ABCDEF bytes=768 activeStages=2\n"
+        "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
+        "hr=0x00000000 bytecodeHash=0xA1B2C3D4E5F60718 bytecodeBytes=512 "
+        "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
+        "VR DX11 R85 texture signature#1 stage#1: observed=1 type=3 pool=1 "
+        "usage=0x00000000 fmt=21 exact=1\n"
+        "VR DX11 R85 census: samples=1 exact=0 fixedFn=1 programmable=0 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
+        "texturedSamples=1 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "mutation[writeUnlocks=0,readOnlyUnlocks=0,discardWriteUnlocks=0,"
+        "noOverwriteWriteUnlocks=0] "
+        "mutationPlan[exact=0,unsupported=0,managedShadow=0,mapWrite=0,"
+        "mapDiscard=0,mapNoOverwrite=0,updateSubresource=0] "
+        "textureMutation[writeUnlocks=0,readOnlyUnlocks=0,descriptorFailures=0,"
+        "updateTextureSuccesses=0,updateTextureFailures=0,"
+        "updateSurfaceSuccesses=0,updateSurfaceFailures=0] "
+        "managedLifetime[shadowWrites=0,shadowReads=0,resetSuccesses=0,"
+        "shadowPreserved=0,deviceGeneration=1,shadowVersion=0,"
+        "mirrorGeneration=0,mirrorVersion=0,mirrorReady=0] "
+        "inputLayout[exact=1,unsupported=0,fvfExact=1,fvfPending=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,"
+        "fixedFunctionPending=1,programmablePending=0] "
+        "ffpCoverage[exact=1,queryFailure=0] "
+        "ffpReadiness[ready=1,pending=0] "
+        "ffpShaderPrototype[generated=1,pending=0] "
+        "ffpShaderCompile[succeeded=1,failed=0,skippedCap=0] "
+        "textureStageResource[bound=2,exact=2,pending=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r85["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r85["NativeDrawPathActivationAllowed"] is False
+    assert r85["LatestSummary"]["fixedFunctionShaderCompileSucceeded"] == 1
+    assert r85["LatestSummary"]["fixedFunctionShaderCompileFailed"] == 0
+    assert r85["LatestSummary"]["fixedFunctionShaderCompileSkippedCap"] == 0
+    compile_probe = r85["Signatures"][0]["fixed_function_shader_compile"]
+    assert compile_probe["attempted"] is True
+    assert compile_probe["succeeded"] is True
+    assert compile_probe["result_hex"] == "0x00000000"
+    assert compile_probe["bytecode_hash_hex"] == "0xA1B2C3D4E5F60718"
+    assert compile_probe["bytecode_bytes"] == 512
+    assert compile_probe["diagnostics_bytes"] == 0
+    assert compile_probe["profile"] == "ps_4_0"
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"

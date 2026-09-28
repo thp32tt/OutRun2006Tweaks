@@ -1,5 +1,7 @@
 #include "pipeline_translation.hpp"
 
+#include <d3dcompiler.h>
+
 #include "state_translation.hpp"
 
 namespace outrun::vr::dx11
@@ -173,15 +175,22 @@ namespace outrun::vr::dx11
             }
         }
 
-        std::uint64_t hash_shader_source(const std::string& source) noexcept
+        std::uint64_t hash_bytes(
+            const void* data, std::size_t size) noexcept
         {
             std::uint64_t hash = 1469598103934665603ull;
-            for (const unsigned char byte : source)
+            const auto* bytes = static_cast<const unsigned char*>(data);
+            for (std::size_t index = 0; index < size; ++index)
             {
-                hash ^= static_cast<std::uint64_t>(byte);
+                hash ^= static_cast<std::uint64_t>(bytes[index]);
                 hash *= 1099511628211ull;
             }
             return hash;
+        }
+
+        std::uint64_t hash_shader_source(const std::string& source) noexcept
+        {
+            return hash_bytes(source.data(), source.size());
         }
 
         bool fixed_function_filter_supported(
@@ -600,6 +609,56 @@ namespace outrun::vr::dx11
 
         shader += "    return current;\n}\n";
         out.sourceHash = hash_shader_source(shader);
+        return out;
+    }
+
+    FixedFunctionPixelShaderCompileProbe
+    compile_fixed_function_pixel_shader_prototype(
+        const FixedFunctionPixelShaderPrototype& prototype) noexcept
+    {
+        FixedFunctionPixelShaderCompileProbe out{};
+        if (!prototype.generated())
+            return out;
+
+        out.attempted = true;
+        ID3DBlob* bytecode = nullptr;
+        ID3DBlob* diagnostics = nullptr;
+        out.result = D3DCompile(
+            prototype.source.data(),
+            prototype.source.size(),
+            "OutRunR84FixedFunctionPrototype",
+            nullptr,
+            nullptr,
+            "main",
+            "ps_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0,
+            &bytecode,
+            &diagnostics);
+
+        if (diagnostics)
+        {
+            out.diagnosticsBytes =
+                static_cast<UINT>(diagnostics->GetBufferSize());
+            out.diagnosticsHash = hash_bytes(
+                diagnostics->GetBufferPointer(),
+                diagnostics->GetBufferSize());
+        }
+
+        if (SUCCEEDED(out.result) && bytecode)
+        {
+            out.succeeded = true;
+            out.bytecodeBytes =
+                static_cast<UINT>(bytecode->GetBufferSize());
+            out.bytecodeHash = hash_bytes(
+                bytecode->GetBufferPointer(),
+                bytecode->GetBufferSize());
+        }
+
+        if (diagnostics)
+            diagnostics->Release();
+        if (bytecode)
+            bytecode->Release();
         return out;
     }
 

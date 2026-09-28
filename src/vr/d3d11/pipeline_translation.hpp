@@ -131,6 +131,24 @@ namespace outrun::vr::dx11
         std::uint8_t textureResourceExactMask,
         const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes);
 
+    // R85 compiles the generated R84 source only as an offline diagnostic
+    // probe. The bytecode is immediately discarded and never bound to a
+    // D3D11 device; success therefore proves compiler acceptance only.
+    struct FixedFunctionPixelShaderCompileProbe
+    {
+        bool attempted = false;
+        bool succeeded = false;
+        HRESULT result = E_FAIL;
+        UINT bytecodeBytes = 0;
+        std::uint64_t bytecodeHash = 0;
+        UINT diagnosticsBytes = 0;
+        std::uint64_t diagnosticsHash = 0;
+    };
+
+    [[nodiscard]] FixedFunctionPixelShaderCompileProbe
+    compile_fixed_function_pixel_shader_prototype(
+        const FixedFunctionPixelShaderPrototype& prototype) noexcept;
+
     // R79 translates either an explicit D3D9 declaration or a conservative
     // supported FVF subset into canonical D3D11 input-layout descriptors.
     // FVF blend-weight/index encodings and any unmodelled flag combination

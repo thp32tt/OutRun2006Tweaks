@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R(?:7[23456789]|8[01234]) census: "
+    r"VR DX11 R(?:7[23456789]|8[012345]) census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
@@ -64,6 +64,9 @@ SUMMARY_RE = re.compile(
     r"pending=(?P<fixedFunctionReadinessPending>\d+)\] )?"
     r"(?:ffpShaderPrototype\[generated=(?P<fixedFunctionShaderPrototypeGenerated>\d+),"
     r"pending=(?P<fixedFunctionShaderPrototypePending>\d+)\] )?"
+    r"(?:ffpShaderCompile\[succeeded=(?P<fixedFunctionShaderCompileSucceeded>\d+),"
+    r"failed=(?P<fixedFunctionShaderCompileFailed>\d+),"
+    r"skippedCap=(?P<fixedFunctionShaderCompileSkippedCap>\d+)\] )?"
     r"(?:textureStageResource\[bound=(?P<textureStageBound>\d+),"
     r"exact=(?P<textureStageExact>\d+),"
     r"pending=(?P<textureStagePending>\d+)\] )?"
@@ -90,14 +93,14 @@ STARTUP_RE = re.compile(
     r"msaa=(?P<msaa>-?\d+) bootstrapCompatible=(?P<bootstrapCompatible>[01])"
 )
 
-SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[01234]) signature#(?P<id>\d+): (?P<body>.*)")
+SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[012345]) signature#(?P<id>\d+): (?P<body>.*)")
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
     r"method=(?P<method>\d+) usage=(?P<usage>\d+) usageIndex=(?P<usageIndex>\d+)"
 )
 FFP_RE = re.compile(
-    r"VR DX11 R(?:72|8[1234]) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"VR DX11 R(?:72|8[12345]) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"color\[op=(?P<colorOp>\d+),arg1=0x(?P<colorArg1>[0-9A-Fa-f]+),"
     r"arg2=0x(?P<colorArg2>[0-9A-Fa-f]+)\] "
     r"alpha\[op=(?P<alphaOp>\d+),arg1=0x(?P<alphaArg1>[0-9A-Fa-f]+),"
@@ -109,16 +112,26 @@ FFP_RE = re.compile(
     r"v=(?P<samplerAddressV>\d+)\])?"
 )
 TEXTURE_RE = re.compile(
-    r"VR DX11 R8[34] texture signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"VR DX11 R8[345] texture signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"observed=(?P<observed>[01]) type=(?P<type>-?\d+) "
     r"pool=(?P<pool>-?\d+) usage=0x(?P<usage>[0-9A-Fa-f]+) "
     r"fmt=(?P<format>-?\d+) exact=(?P<exact>[01])"
 )
 FFP_SHADER_PROTOTYPE_RE = re.compile(
-    r"VR DX11 R84 ffp shader prototype#(?P<signature>\d+): "
+    r"VR DX11 R8[45] ffp shader prototype#(?P<signature>\d+): "
     r"generated=(?P<generated>[01]) mask=0x(?P<mask>[0-9A-Fa-f]+) "
     r"hash=0x(?P<hash>[0-9A-Fa-f]+) bytes=(?P<bytes>\d+) "
     r"activeStages=(?P<activeStages>\d+)"
+)
+FFP_SHADER_COMPILE_RE = re.compile(
+    r"VR DX11 R85 ffp shader compile#(?P<signature>\d+): "
+    r"attempted=(?P<attempted>[01]) succeeded=(?P<succeeded>[01]) "
+    r"hr=0x(?P<hr>[0-9A-Fa-f]+) "
+    r"bytecodeHash=0x(?P<bytecodeHash>[0-9A-Fa-f]+) "
+    r"bytecodeBytes=(?P<bytecodeBytes>\d+) "
+    r"diagnosticsHash=0x(?P<diagnosticsHash>[0-9A-Fa-f]+) "
+    r"diagnosticsBytes=(?P<diagnosticsBytes>\d+) "
+    r"profile=(?P<profile>[A-Za-z0-9_]+)"
 )
 
 
@@ -147,6 +160,7 @@ def main() -> int:
     fixed_function: dict[int, list[dict]] = {}
     texture_stages: dict[int, list[dict]] = {}
     fixed_function_shader_prototypes: dict[int, dict] = {}
+    fixed_function_shader_compiles: dict[int, dict] = {}
     source_logs: list[str] = []
 
     for log_path in log_files:
@@ -162,6 +176,7 @@ def main() -> int:
             and "VR DX11 R82" not in text
             and "VR DX11 R83" not in text
             and "VR DX11 R84" not in text
+            and "VR DX11 R85" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -206,6 +221,25 @@ def main() -> int:
                 data = int_fields(match)
                 signature_id = data.pop("signature")
                 declarations.setdefault(signature_id, []).append(data)
+                continue
+
+            match = FFP_SHADER_COMPILE_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                fixed_function_shader_compiles[signature_id] = {
+                    "attempted": bool(int(data["attempted"])),
+                    "succeeded": bool(int(data["succeeded"])),
+                    "result": int(data["hr"], 16),
+                    "result_hex": "0x" + data["hr"].upper(),
+                    "bytecode_hash": int(data["bytecodeHash"], 16),
+                    "bytecode_hash_hex": "0x" + data["bytecodeHash"].upper(),
+                    "bytecode_bytes": int(data["bytecodeBytes"]),
+                    "diagnostics_hash": int(data["diagnosticsHash"], 16),
+                    "diagnostics_hash_hex": "0x" + data["diagnosticsHash"].upper(),
+                    "diagnostics_bytes": int(data["diagnosticsBytes"]),
+                    "profile": data["profile"],
+                }
                 continue
 
             match = FFP_SHADER_PROTOTYPE_RE.search(line)
@@ -268,6 +302,9 @@ def main() -> int:
         signature["fixed_function_shader_prototype"] = (
             fixed_function_shader_prototypes.get(signature_id)
         )
+        signature["fixed_function_shader_compile"] = (
+            fixed_function_shader_compiles.get(signature_id)
+        )
 
     latest = summaries[-1] if summaries else None
     unsupported_total = None
@@ -289,6 +326,7 @@ def main() -> int:
             "shaderProgrammablePending",
             "fixedFunctionQueryFailure",
             "fixedFunctionReadinessPending",
+            "fixedFunctionShaderCompileFailed",
             "indexUnsupported",
             "textureUnsupported",
             "colorUnsupported",

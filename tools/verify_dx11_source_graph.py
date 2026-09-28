@@ -67,6 +67,11 @@ def main() -> None:
         "SamplerState sampler": "R84 HLSL sampler declarations",
         "SV_Target": "R84 HLSL pixel-shader output",
         "hash_shader_source": "R84 deterministic generated-source fingerprint",
+        "FixedFunctionPixelShaderCompileProbe": "R85 non-routing compiler probe result",
+        "compile_fixed_function_pixel_shader_prototype": "R85 offline compiler probe",
+        "D3DCompile": "R85 HLSL compiler acceptance probe",
+        "ps_4_0": "R85 diagnostic compiler target",
+        "D3DCOMPILE_ENABLE_STRICTNESS": "R85 strict compiler acceptance",
         "D3DTEXF_LINEAR": "R82 point/linear sampler filter subset",
         "D3DTADDRESS_CLAMP": "R82 wrap/clamp address subset",
     }
@@ -129,6 +134,11 @@ def main() -> None:
         "FixedFunctionShaderPrototypePendingSamples": "R84 pending-source counter",
         "fixedFunctionShaderPrototypeHash": "R84 generated-source hash evidence",
         "generate_fixed_function_pixel_shader_prototype": "R84 runtime source-generation evidence",
+        "FixedFunctionShaderCompileSucceededSignatures": "R85 successful unique-signature compile probes",
+        "FixedFunctionShaderCompileFailedSignatures": "R85 failed unique-signature compile probes",
+        "FixedFunctionShaderCompileSkippedSignatureCap": "R85 bounded instrumentation cap",
+        "compile_fixed_function_pixel_shader_prototype": "R85 census compiler probe invocation",
+        "unique <= 64": "R85 compile instrumentation remains bounded to detailed-signature cap",
         "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
     missing_contract = [
@@ -308,7 +318,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R(?:7[23456789]|8[01234]) census": "R72 through R84 summary compatibility",
+        "R(?:7[23456789]|8[012345]) census": "R72 through R85 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -355,6 +365,11 @@ def main() -> None:
         "fixedFunctionShaderPrototypePending": "R84 pending-source summary evidence",
         "FFP_SHADER_PROTOTYPE_RE": "R84 generated-source fingerprint parser",
         "fixed_function_shader_prototype": "R84 per-signature generated-source evidence",
+        "fixedFunctionShaderCompileSucceeded": "R85 successful compile summary evidence",
+        "fixedFunctionShaderCompileFailed": "R85 failed compile summary evidence",
+        "fixedFunctionShaderCompileSkippedCap": "R85 bounded compile summary evidence",
+        "FFP_SHADER_COMPILE_RE": "R85 compiler result parser",
+        "fixed_function_shader_compile": "R85 per-signature compiler evidence",
         "samplerMin": "R81 per-stage sampler parser evidence",
         "samplerAddressV": "R81 per-stage sampler parser evidence",
     }
@@ -364,6 +379,11 @@ def main() -> None:
     if missing_analyzer:
         raise SystemExit(
             "DX11 analyzer resource evidence drift: " + ", ".join(missing_analyzer)
+        )
+
+    if "d3dcompiler.lib" not in CMAKE:
+        raise SystemExit(
+            "DX11 R85 compiler probe requires d3dcompiler.lib in the checked-in CMake graph"
         )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
