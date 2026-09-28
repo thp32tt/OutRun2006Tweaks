@@ -218,14 +218,13 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """Select the isolated three-stage prompt set for this controller instance."""
-    if CONTROLLER_MODE == "vr":
+    """Select a queue-isolated prompt and prepend the current task contract."""
+    if CONTROLLER_MODE == "conversion":
         role_prompts = {
-            "A": "vr_A.md",
-            "B": "vr_B.md",
-            "C": "vr_C.md",
+            "A": "conversion_dx11.md",
+            "B": "conversion_dxvk.md",
         }
-        default_prompt = "vr_A.md"
+        default_prompt = "conversion_dx11.md"
     else:
         role_prompts = {
             "A": "localization_A.md",
@@ -233,7 +232,7 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
             "C": "localization_C.md",
         }
         default_prompt = "localization_A.md"
-    return read_prompt(role_prompts.get(slot.name, default_prompt))
+    return queue_dynamic_prefix() + read_prompt(role_prompts.get(slot.name, default_prompt))
 
 
 async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
@@ -362,6 +361,16 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         elif stale_min < WATCHDOG_STALL_MINUTES:
             slot.last_watchdog_at = now.isoformat()
             save_registry(reg)
+            continue
+
+        if QUEUE_MODE:
+            slot.last_result = "watchdog_queue_observe_only"
+            slot.last_watchdog_at = now.isoformat()
+            save_registry(reg)
+            write_runtime(
+                status="watchdog_observe_only",
+                last_action=f"Queue mode: watchdog observed slot {slot.name}; task selection remains owned by queue engine",
+            )
             continue
 
         guard = send_guard_reason(reg, slot, datetime.now(TZ))
