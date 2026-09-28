@@ -1,0 +1,138 @@
+name: R69 Performance Checkpoints
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-candidate/r69-perf-p4
+    paths:
+      - 'src/vr/**'
+      - 'vrhost/**'
+      - 'docs/VR_R69_PERF_HISTORY.md'
+      - '.github/workflows/vr-r69-perf-checkpoints.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vr-r69-perf-checkpoints
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: PERF_A_S10
+            ref: b61b81504f9138a2d082e980dc177f877f0b658b
+            note: S10 structural-cleanup baseline
+          - id: PERF_B_P1
+            ref: 13025145a4e110928e0e97fe4b6a6d9a983e5196
+            note: VR SkyGlow factor2 + dead-pass/surface-cache optimization
+          - id: PERF_C_P2
+            ref: 72408ba589e0440d8ce7876f1689cb83b9e61497
+            note: P1 + production HUD diagnostic hot-path cleanup
+          - id: PERF_D_P4
+            ref: 83acbf3a38338b483a91891ddd42fd7179eb676f
+            note: P2 + SkyGlow state batching + DirectGPU descriptor cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Configure and build Win32 game
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+          cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Build x64 D3D11 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+
+      - name: Assemble checkpoint
+        shell: pwsh
+        run: |
+          $id='${{ matrix.id }}'
+          $ref='${{ matrix.ref }}'
+          $note='${{ matrix.note }}'
+          $dir=Join-Path 'checkpoint' $id
+          $backend=Join-Path $dir 'backends/d3d9'
+          New-Item -ItemType Directory -Force $backend | Out-Null
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if(-not $dll){ throw 'dinput8.dll missing' }
+          if(!(Test-Path build-host/bin/outrun-vr-host.exe)){ throw 'outrun-vr-host.exe missing' }
+          Copy-Item $dll.FullName (Join-Path $backend 'dinput8.dll')
+          Copy-Item build-host/bin/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
+          Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $ref -Encoding ascii
+          foreach($file in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
+            if(Test-Path $file){ Copy-Item $file (Join-Path $dir $file) }
+          }
+          foreach($file in @(
+            'OutRunVR-TestProfiles.ps1','OutRunVR-BackendContract.ps1',
+            'Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1',
+            'Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1',
+            'START_HERE_VR_TEST.cmd'
+          )){
+            $src=Join-Path 'tools' $file
+            if(Test-Path $src){ Copy-Item $src (Join-Path $dir $file) }
+          }
+          @(
+            "CHECKPOINT=$id"
+            "SOURCE_REF=$ref"
+            "PURPOSE=$note"
+            "TEST_PROFILE=CORRECTNESS"
+            "UPLOAD=OutRun2_VR_ANALYZE_*.zip"
+          ) | Set-Content (Join-Path $dir 'PERF_CHECKPOINT.txt') -Encoding UTF8
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath "$id.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-${{ matrix.id }}
+          path: ${{ matrix.id }}.zip
+          if-no-files-found: error
+
+  bundle:
+    needs: build
+    runs-on: windows-2022
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: all
+      - name: Create limited-time performance test bundle
+        shell: pwsh
+        run: |
+          @(
+            'OUTRUN R69 PERFORMANCE TEST ORDER'
+            ''
+            '1. Test PERF_D_P4 first.'
+            '2. If visuals are correct and the bad frame-drop section improves, stop.'
+            '3. If D regresses visually, test PERF_C_P2.'
+            '4. If C is good but D is bad, the regression is P3/P4.'
+            '5. If C still has the issue, test PERF_B_P1 to isolate diagnostics vs SkyGlow.'
+            '6. Use PERF_A_S10 only when a clean before/after baseline is needed.'
+            ''
+            'Keep the same route, HMD refresh, Virtual Desktop settings and in-game settings.'
+            'Exit after each run and upload the generated OutRun2_VR_ANALYZE_*.zip.'
+          ) | Set-Content all/TEST_ORDER.txt -Encoding UTF8
+          Compress-Archive -Path 'all/*' -DestinationPath 'OutRun2_VR_R69_PERF_CHECKPOINTS.zip' -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-R69-PERF-CHECKPOINTS
+          path: OutRun2_VR_R69_PERF_CHECKPOINTS.zip
+          if-no-files-found: error
