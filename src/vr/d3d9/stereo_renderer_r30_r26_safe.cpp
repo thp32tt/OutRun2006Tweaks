@@ -1048,12 +1048,13 @@ namespace OutRunVRStereo
         {
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
-            // VR-only post-process policy: keep the normal 2D game path
-            // untouched, but render stereo SkyGlow at half width/height.
-            // The outer callers still honor SkyGlowFactor <= 0 as an explicit
-            // disable switch; once stereo SkyGlow is active its working factor
-            // is fixed at 2 to cut the post-process pixel count to 25%.
-            constexpr int factor = 2;
+            // Correctness-first V7: honor the user's configured SkyGlow
+            // reduction again. The forced factor=2 performance experiment
+            // changed the visual glow footprint and was never HMD-proven.
+            // Keep resource caching/dead-pass removal, but preserve R69's
+            // configured appearance (the test session uses factor=4).
+            const int factor =
+                std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
                 160u, BackBufferDesc.Width /
                     static_cast<UINT>(factor));
