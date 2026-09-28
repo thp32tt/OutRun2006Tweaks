@@ -41,6 +41,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_vr_backend_disasm_contract.py
 
+      - name: Verify VR semantic catalog
+        shell: pwsh
+        run: python tools/verify_vr_semantic_catalog.py
+
       - name: Test DXVK session analyzer
         shell: pwsh
         run: python tools/test_analyze_dxvk_session.py
