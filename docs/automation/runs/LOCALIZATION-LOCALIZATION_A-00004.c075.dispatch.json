@@ -1,0 +1,13 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+  "lane": "LOCALIZATION_A",
+  "asset": "C075FB49",
+  "index": 111,
+  "action": "partial_safe_rework",
+  "safe_keys": [
+    "long_distance",
+    "for_experts",
+    "new_course_desc"
+  ],
+  "runtime_validation": "UNTESTED"
+}
