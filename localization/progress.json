@@ -1,0 +1,662 @@
+{
+  "schema_version": 4,
+  "updated_at_kst": "2026-09-28T22:18:00+09:00",
+  "branch": "korean-localization-clean",
+  "base": {
+    "repository": "emoose/OutRun2006Tweaks",
+    "ref": "master",
+    "commit": "08e5efb4deea4066c440307ec009c868a30562d3"
+  },
+  "isolation": {
+    "vr_source_present": false,
+    "vr_merge_allowed": false,
+    "ffb_feature_merge_allowed": false,
+    "shared_knowledge_only": true
+  },
+  "source_archive": {
+    "analyzed_files": 324,
+    "dds_textures": 243,
+    "text_entries_total": 1356,
+    "text_simple_records": 1351,
+    "text_special_records": 4,
+    "text_null_records": 1
+  },
+  "workstreams": {
+    "clean_branch": {
+      "status": "done",
+      "percent": 100
+    },
+    "txet_parser_roundtrip": {
+      "status": "done",
+      "percent": 100
+    },
+    "text_inventory": {
+      "status": "done",
+      "percent": 100
+    },
+    "text_translation": {
+      "status": "done",
+      "percent": 100,
+      "translation_coverage_percent": 100,
+      "translated_non_null": 1355,
+      "total_non_null": 1355,
+      "reviewed": 1355,
+      "context_drafts": 0,
+      "context_review_ids": []
+    },
+    "graphics_inventory": {
+      "status": "done",
+      "percent": 100,
+      "total": 243
+    },
+    "graphics_localization": {
+      "status": "zero_pixel_bbox_rework_required",
+      "transcription_percent": 100,
+      "draft_artwork_percent": 100,
+      "final_artwork_percent": 0,
+      "transcribed_assets": 79,
+      "full_draft_candidates": 79,
+      "total_artwork_targets": 79,
+      "source_faithful_reviewed": 32,
+      "source_faithful_localized_candidates": 31,
+      "reset_to_original_pending_rework": 1
+    },
+    "runtime_text_trace": {
+      "status": "clean_k1_package_ready",
+      "percent": 75,
+      "clean_build_run_id": 36017712385,
+      "domain_isolation_run_id": 36017712430,
+      "localization_state_run_id": 36017712175,
+      "clean_build_status": "pass",
+      "clean_build_head": "079d890c2bdb87590f2f95e55281a7c4627401df"
+    },
+    "unicode_runtime": {
+      "status": "k3_trace_build_pass_package_ready",
+      "percent": 45,
+      "evidence": {
+        "string_width_va": "0x42C480",
+        "pair_spacing_va": "0x42C410",
+        "cursor_advance_va": "0x42C610",
+        "glyph_draw_va": "0x42C720",
+        "glyph_metadata_va": "0x42C2F0",
+        "glyph_ascii_limit": "0x7F"
+      }
+    },
+    "hangul_font": {
+      "status": "two_page_atlas_proof_generated",
+      "percent": 45,
+      "required_unique_hangul_syllables": 505,
+      "atlas_pages": 2,
+      "page_capacity": 256,
+      "manifest": "localization/font/hangul_glyph_manifest.json"
+    },
+    "packaging": {
+      "status": "not_started",
+      "percent": 0
+    },
+    "graphics_visual_review": {
+      "status": "done",
+      "percent": 100,
+      "reviewed": 243,
+      "total": 243
+    },
+    "graphics_transcription": {
+      "status": "done",
+      "percent": 100,
+      "transcribed_assets": 79,
+      "localize_text_targets": 79,
+      "transcribed_segments": 725,
+      "blocked_context_assets": 0,
+      "blocked_context_indices": []
+    },
+    "graphics_artwork": {
+      "status": "zero_pixel_bbox_rework_required",
+      "final_artwork_percent": 0,
+      "draft_percent": 100,
+      "completed": 0,
+      "full_draft_candidates": 79,
+      "total": 79,
+      "source_faithful_reviewed": 32,
+      "source_faithful_localized_candidates": 31,
+      "reset_to_original_pending_rework": 1
+    },
+    "graphics_artwork_pipeline": {
+      "status": "proof_renderer_ready",
+      "percent": 8.9,
+      "proof_specs": 7,
+      "final_artwork_completed": 0,
+      "total": 79
+    },
+    "graphics_artwork_planning": {
+      "status": "done",
+      "percent": 100,
+      "planned_assets": 79,
+      "translated_segments": 725,
+      "plan_file": "localization/graphics/artwork_plan.jsonl"
+    }
+  },
+  "next_checkpoint": "W00001 C barrier reconciled: A00006 BLOCKED_NO_ACTION + B00005 durable no-duplicate review; no new approvals. Next A+B wave continues full queue; isolated DDS_ONLY in-game validation remains mandatory.",
+  "text": {
+    "total_ids": 1356,
+    "non_null_ids": 1355,
+    "unique_source_strings": 1067,
+    "reviewed": 1351,
+    "reviewed_special": 4,
+    "draft_context": 0,
+    "blocked_null": 1,
+    "todo": 0,
+    "translated_non_null": 1355,
+    "translation_coverage_non_null_percent": 100,
+    "context_review_ids": [],
+    "config_text_rows": 23,
+    "config_text_reviewed": 23,
+    "placeholder_qa": "pass"
+  },
+  "graphics": {
+    "total_dds": 243,
+    "visually_reviewed": 243,
+    "localize_text": 79,
+    "preserve_brand_song_credit": 33,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "zoom_review": 47,
+    "no_localization": 74,
+    "work_queue_total": 137,
+    "work_queue_file": "localization/graphics/asset_queue.csv",
+    "artwork_completed": 0,
+    "transcribed_assets": 79,
+    "transcribed_segments": 725,
+    "transcription_state_file": "localization/graphics/transcriptions.jsonl",
+    "artwork_proof_specs": 7,
+    "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
+    "first_dds_candidate": {
+      "source_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "korean": "계속?",
+      "dimensions": "256x64",
+      "source_bytes": 65664,
+      "candidate_bytes": 65664,
+      "header_128_byte_identical": true,
+      "candidate_sha256": "847aa537f1651239a794b531438cb26e8dd7302738df65c5858f6cf6b55c3999",
+      "status": "candidate_pending_ingame_validation"
+    },
+    "blocked_context_assets": 0,
+    "blocked_context_indices": [],
+    "artwork_plan_assets": 79,
+    "artwork_plan_segments": 725,
+    "artwork_proof_candidates": 7,
+    "simple6_package": {
+      "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
+      "sha256": "e334254f82105a016f4ab2fa548265431a7877d92283c926ea83e569a1d3f21b",
+      "indices": [
+        55,
+        89,
+        102,
+        104,
+        116,
+        119
+      ],
+      "status": "ready_for_ingame_validation"
+    },
+    "full_draft_package": {
+      "name": "OutRun2_Korean_GFX_FULL_DRAFT_Test.zip",
+      "sha256": "5512dad798a4ddb4872e4aa3e69438537f75f488f439317d7b95c0eb372b6c78",
+      "assets": 79,
+      "rendered_segments": 674,
+      "final_validated_assets": 0,
+      "report": "localization/graphics/FULL_DRAFT_REPORT.json",
+      "status": "ready_for_ingame_validation"
+    },
+    "orientation_policy": "localization/graphics/ORIENTATION_POLICY.md",
+    "source_faithful_reviewed_assets": 32,
+    "source_faithful_localized_candidates": 31,
+    "source_faithful_reset_to_original": 1,
+    "source_faithful_batches": {
+      "batch3": {
+        "assets": 10,
+        "report": "localization/graphics/BATCH3_SOURCEFAITHFUL_REPORT.json",
+        "package_name": "OutRun2_Korean_GFX_Batch3_SourceFaithful_Test.zip",
+        "package_sha256": "02d848b9746cb474d52d500cc849294fe55baca0e1bbe618f5faa39ee3b1c69c"
+      },
+      "batch4": {
+        "assets": 5,
+        "report": "localization/graphics/BATCH4_SOURCEFAITHFUL_REPORT.json",
+        "package_name": "OutRun2_Korean_GFX_Batch4_SourceFaithful_Test.zip",
+        "package_sha256": "cfddc6c758bfdc8313dd624bbe9211ce6d2221bd04985ee6856d449e66cffb95"
+      },
+      "batch5": {
+        "assets": 5,
+        "localized_candidates": 2,
+        "reset_original": 3,
+        "report": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
+        "package_name": "OutRun2_Korean_GFX_Batch5_SourceFaithful_Test.zip",
+        "package_sha256": "1d5de3dcc55caefba4e904e3d0030b6ae5fbd70f479546641add3d967cf3459f"
+      }
+    },
+    "pending_source_faithful_rework": [
+      "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds"
+    ],
+    "current_state_file": "localization/graphics/SOURCE_FAITHFUL_CURRENT.json",
+    "current_combined_package": {
+      "name": "OutRun2_Korean_GFX_SourceFaithful_Combined_B3-B38_QA_Test.zip",
+      "sha256": "7464c92bf3e0a02e6bf4aa14b6ba85ff17c66652a64265083b3bb9d702633a02"
+    },
+    "latest_safe_hold_report": "localization/graphics/BATCH42_FINAL_PENDING_SAFE_HOLD_REPORT.json",
+    "latest_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
+    "latest_hd_production_candidate": {
+      "asset": "48DEBE77",
+      "policy": "CREATE_NEW_HD_KOREAN_ASSET",
+      "coverage": "2 semantic / 3 physical",
+      "source_dimensions": [
+        512,
+        512
+      ],
+      "candidate_dimensions": [
+        2048,
+        2048
+      ],
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
+      "status": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "raw_orientation": "mirror_y",
+      "prior_korean_reused": false,
+      "c_strict_qa_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+      "c_candidate_changed": false,
+      "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
+    },
+    "next_hd_rework": {
+      "asset": "FF2462BB",
+      "status": "ZERO_PIXEL_OR_ARTIFACT_REWORK_REQUIRED",
+      "assets": [
+        "FF2462BB",
+        "568D3696",
+        "39229D64",
+        "2DA43E41",
+        "411827E",
+        "571E78F3",
+        "C075FB49",
+        "FD90AA9"
+      ],
+      "remaining": 8,
+      "pixel_visual_pass_pending_ingame": [
+        "C4A2937B",
+        "9F060EC1",
+        "D6DC1380",
+        "48DEBE77"
+      ],
+      "pending_c_revalidation": [
+        "62BEBF33",
+        "E3FD08BE",
+        "A064FDFC",
+        "FA7BBB13"
+      ]
+    },
+    "latest_d_final_qa": {
+      "run": "D85",
+      "report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
+      "result": "NO_NEW_APPROVALS",
+      "approved_dds_count": 0,
+      "user_approved_locked": 0,
+      "D6DC1380": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "48DEBE77": "D85_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "C075FB49": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "FD90AA9": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "9F060EC1": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
+      "571E78F3": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+      "62BEBF33": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+      "E3FD08BE": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+      "C4A2937B": "D82_FINAL_STATIC_PASS_CONTEXT_HOLD_PENDING_INGAME",
+      "2DA43E41": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
+      "411827E": "D82_FINAL_STATIC_PASS_PENDING_INGAME",
+      "FA7BBB13": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "39229D64": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME",
+      "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
+    },
+    "latest_c_strict_qa": {
+      "run": "C85",
+      "report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+      "result": "4_PIXEL_VISUAL_PASS_12_REWORK_0_FINAL_APPROVED",
+      "candidate_changed_by_C": true,
+      "promoted_candidate": "C4A2937B",
+      "assets_total": 16,
+      "elements_total": 201,
+      "elements_fail": 93,
+      "pixel_visual_pass_assets": [
+        "C4A2937B",
+        "9F060EC1",
+        "D6DC1380",
+        "48DEBE77"
+      ],
+      "rework_required_assets": [
+        "FF2462BB",
+        "568D3696",
+        "FA7BBB13",
+        "39229D64",
+        "A064FDFC",
+        "2DA43E41",
+        "411827E",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE",
+        "C075FB49",
+        "FD90AA9"
+      ],
+      "approved_dds_count": 0,
+      "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
+    },
+    "latest_b_first_qa": {
+      "run": "B95",
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00002",
+      "report": "localization/graphics/role_B/20260928-1552-B95/B95_FA7BBB13_EXACT_BBOX_REWORK_REPORT.json",
+      "result": "FA7BBB13_SELF_QA_PASS_PENDING_C_INGAME",
+      "assets": {
+        "FA7BBB13": {
+          "candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+          "status": "B95_SELF_QA_PASS_PENDING_C_INGAME"
+        }
+      }
+    },
+    "c78_39229d64": {
+      "candidate_sha256": "f5e6d28211bba350e081f1f714b1fe58d76c15d209b4f312598be6278c8e92a4",
+      "superseded_candidate_sha256": "5d72a1d377fe6148f108a1f37f2dedb09c5f82783e255a0583cbb56ad60b4077",
+      "status": "C78_REWORK_STATIC_PASS_PENDING_D_INGAME",
+      "d77_d78_binary_validation": "SUPERSEDED_REVALIDATION_REQUIRED",
+      "report": "localization/graphics/role_C/20260927-1527-C78/C78_39229D64_STRICT_QA_REWORK_REPORT.json"
+    },
+    "c79_a064fdfc": {
+      "candidate_sha256": "e51095161993e64f979ba82bcd532a98b323ee9e8ccf9b4588a1d0574efa75f1",
+      "status": "C79_STATIC_PASS_D78_SAME_SHA_PENDING_D_RECONCILE_INGAME",
+      "d78_same_sha_binary_preflight_valid": true,
+      "report": "localization/graphics/role_C/20260927-1559-C79/C79_A064FDFC_STRICT_QA_REPORT.json"
+    },
+    "b85_c4a2937b": {
+      "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+      "superseded_a83_sha256": "7e246c770177353bebb860877ff2b06e3df95ca9e0f5ca69a1e8f196f97edc7e",
+      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "cut_line": "하트선을 통과하세요!",
+      "drift_and_context": "PENDING_INGAME",
+      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
+    },
+    "b85_2da43e41": {
+      "candidate_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+      "superseded_a84_sha256": "0efaaa86849c66c94a4d5e1d5f7fbd86caa8935b5a5cb24ccbb26fc29f97d355",
+      "status": "B85_REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "acceleration_label": "가속도:",
+      "source_residue_reworked": true,
+      "report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json"
+    },
+    "b86_c075fb49_transcription": {
+      "prior_semantic_entries": 14,
+      "reviewed_semantic_entries": 16,
+      "expected_physical_text_occurrences": 17,
+      "new_omissions": [
+        {
+          "source": "Maximum Speed",
+          "korean": "최고 속도"
+        },
+        {
+          "source": "Transmission",
+          "korean": "변속기"
+        }
+      ],
+      "duplicate_physical_occurrences": {
+        "More BGM": 2
+      },
+      "status": "TRANSCRIPTION_EXPANDED_READY_FOR_CANONICAL_HD_RENDER",
+      "report": "localization/graphics/role_B/20260927-1800-B86/B86_411827E_FIRST_QA_AND_C075FB49_TRANSCRIPTION.json"
+    },
+    "c80_assets": {
+      "C4A2937B": {
+        "candidate_sha256": "f6f837cd854e6b8f65a92e6fc787e15d45cb1dfa1189e75973f0bfe83d8faf99",
+        "status": "STATIC_PASS_CONTEXT_HOLD_PENDING_D_RECONCILE_INGAME"
+      },
+      "2DA43E41": {
+        "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+        "superseded_sha256": "7b3fd5ac25ee9a4c99b981969a48d5f04412f3e81f2b9324c1b19ee9e9a3cef1",
+        "status": "REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
+      },
+      "411827E": {
+        "candidate_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+        "superseded_sha256": "8ffb3dce0b77bcde03a675c7d841050cb53cca5a618c72ff86b84ab3f53a7d02",
+        "status": "REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME"
+      },
+      "report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json"
+    },
+    "b87_p0_hd_rebuild": {
+      "timestamp_kst": "2026-09-27T18:55:16+09:00",
+      "assets": {
+        "571E78F3": {
+          "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+          "canonical_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+          "canonical_git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        },
+        "62BEBF33": {
+          "candidate_sha256": "def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+          "canonical_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+          "canonical_git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        },
+        "E3FD08BE": {
+          "candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+          "canonical_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+          "canonical_git_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+          "status": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+        }
+      },
+      "report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json"
+    },
+    "c81_p0_hd_trio": {
+      "report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "d82_same_sha_binary_preflight_valid": true,
+      "in_game_validation": "PENDING",
+      "reapproval_locked": false
+    },
+    "b88_c075fb49_fd90aa9": {
+      "timestamp_kst": "2026-09-27T20:11:31+09:00",
+      "report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+      "C075FB49": {
+        "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+        "superseded_sha256": "d310c7da75c4efe7959ec28b7e5125208d37483052b4e5c56c54cc0d4f16e3c1",
+        "corrected_new_course_desc_cell": [
+          225,
+          1370,
+          830,
+          1620
+        ],
+        "result": "REWORK_FIRST_QA_PASS_PENDING_C_D_INGAME"
+      },
+      "FD90AA9": {
+        "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+        "result": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+      },
+      "next_asset": "9F060EC1"
+    },
+    "b89_9f060ec1": {
+      "timestamp_kst": "2026-09-27T21:01:48+09:00",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "canonical_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+      "candidate_changed_by_B": false,
+      "semantic_entries": 5,
+      "physical_regions": 5,
+      "result": "FIRST_QA_PASS_PENDING_C_D_INGAME",
+      "outside_cells_changed_pixels": 0,
+      "alpha_changes_outside_cells": 0
+    },
+    "c82_assets": {
+      "report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "C075FB49": "PASS",
+      "FD90AA9": "PASS",
+      "9F060EC1": "PASS"
+    },
+    "b90_d6dc_48debe77": {
+      "timestamp_kst": "2026-09-27T22:05:59+09:00",
+      "report": "localization/graphics/role_B/20260927-2145-B90/B90_D6DC1380_48DEBE77_REPORT.json",
+      "D6DC1380": {
+        "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+        "result": "FIRST_QA_PASS_PENDING_C_D_INGAME"
+      },
+      "48DEBE77": {
+        "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+        "result": "CREATE_NEW_HD_PRODUCTION_FIRST_QA_PASS_PENDING_C_D_INGAME"
+      },
+      "hd_rework_candidates_ready": 16,
+      "hd_rework_remaining": 0
+    },
+    "c83_final_hd_migration_assets": {
+      "report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+      "candidate_changed_by_C": false,
+      "D6DC1380": "PASS",
+      "48DEBE77": "PASS",
+      "hd_rework_candidates_ready": 16,
+      "hd_rework_remaining": 0
+    },
+    "latest_a_production": {
+      "run": "A00004",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+      "assets": {
+        "411827E": {
+          "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+          "status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME",
+          "report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json"
+        },
+        "C075FB49": {
+          "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+          "status": "A_PARTIAL_REWORK_3_SAFE_6_REMAIN",
+          "report": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json"
+        }
+      }
+    },
+    "latest_c_barrier": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00007",
+      "wave_id": "W00001",
+      "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
+      "lane_a": "BLOCKED_NO_ACTION",
+      "lane_b": "DURABLE_REVIEW_NO_DUPLICATE_REWORK",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "data_build": {
+    "draft_bin_entries": 1356,
+    "draft_bin_size": 58438,
+    "draft_bin_sha256": "20d5c3cc245855d55d9dc9bfe90d0269c0ba8c1242b35779f979b974dec56440",
+    "result": "pass",
+    "deployable": false
+  },
+  "runtime": {
+    "k0_txet_roundtrip": "pass",
+    "k1_trace_hook": "migrated_to_clean_branch",
+    "prototype_k1_ci_run_id": 35981045694,
+    "prototype_evidence_role": "historical_only",
+    "clean_k1_ci": "pass",
+    "hangul_runtime_render": "blocked_pending_clean_runtime_trace_and_font",
+    "clean_k1_test_package": {
+      "build_head": "079d890c2bdb87590f2f95e55281a7c4627401df",
+      "artifact_id": 10816665179,
+      "package_name": "OutRun2_Korean_Clean_K1_Trace.zip",
+      "package_sha256": "930a510bf8c6ffaa589da51bd805047bbfc1cef9d43076149e1fcef86899b287",
+      "includes_game_exe": false,
+      "korean_trace": true,
+      "proof_text_override": false,
+      "status": "ready_for_runtime_log"
+    },
+    "clean_k2_ascii_test_package": {
+      "build_head": "079d890c2bdb87590f2f95e55281a7c4627401df",
+      "package_name": "OutRun2_Korean_Clean_K2_ASCII_Proof.zip",
+      "package_sha256": "0d68692be110175bd49d4d84f926f673eb6ca09cc32b9410bac6e847755f1229",
+      "includes_game_exe": false,
+      "korean_trace": true,
+      "proof_text_override": true,
+      "expected_id0": "[KOR-PROOF] Screen Position",
+      "status": "ready_after_k1"
+    },
+    "k3": {
+      "trace_setting": "KoreanK3Trace",
+      "behavior_change": false,
+      "width_trace_rva": "0x2C480",
+      "glyph_trace_rva": "0x2C720",
+      "signatures_verified_against_uploaded_exe": true,
+      "unique_hangul_syllables": 505,
+      "compact_pages_required": 2,
+      "build_status": "pass",
+      "build_head": "3af9dec1650245272dfd594cad6a8885b11480a6",
+      "build_run_id": 36029358510,
+      "artifact_id": 10820094736,
+      "test_package": {
+        "name": "OutRun2_Korean_Clean_K3_Trace.zip",
+        "sha256": "695db84089a79cce47693dbb90183dd34202d120db66230ec5f7e335464a0046",
+        "dll_sha256": "887d79188c358edba93dc2b4857b4757c6cfa1194b0c1c3c426f3d62bf5fe7cd",
+        "includes_game_exe": false,
+        "korean_trace": true,
+        "proof_text_override": false,
+        "k3_trace": true,
+        "status": "ready_for_runtime_log"
+      },
+      "ini_newline_bug": "fixed_in_branch_and_package"
+    },
+    "k3_atlas_proof": {
+      "glyphs": 505,
+      "pages": 2,
+      "page_size": "1024x1024",
+      "grid": "16x16",
+      "cell_px": 64,
+      "font_size_px": 48,
+      "source_font_file_distributed": false,
+      "page0_sha256": "9a916857a850b4c8697d784706952adddb9f7b8513eb7b37f26274ce30664546",
+      "page1_sha256": "8c3136cd113e635d6ccfdbbfc2de4e9efce11e036e250f1516117eff0a62881c",
+      "metrics_sha256": "f4908dcfefd318d629645a97ca74261a6b9053337d77bac5181fac4af3bae91b",
+      "package_sha256": "33a4e2b69a1a288582a6b028430ac70338eca66e4e72cdf2655abc5db89b4c0a",
+      "status": "development_proof_not_ingame_validated"
+    },
+    "clean_k1_ci_run_id": 36017712385,
+    "incident_20260928": {
+      "status": "RETEST_REQUIRED",
+      "failed_package": "OutRun2_Korean_HD_Text_Test_20260927.zip",
+      "crash": "0xC0000005 VCRUNTIME140.dll memmove via DINPUT8 TextureReplacement::D3DXCreateTextureFromFileInMemory_Custom_dest",
+      "text_only": "RETEST_REQUIRED",
+      "dds_candidates": "SUSPECT_UNISOLATED",
+      "combined": "BLOCKED",
+      "release": "BLOCKED",
+      "incident_report": "localization/validation/INCIDENT_20260928_TESTPATCH_FAIL.md"
+    }
+  },
+  "graphics_zero_tolerance_boundary_audit": {
+    "timestamp_kst": "2026-09-28T10:09:21+09:00",
+    "report": "localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json",
+    "detail_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "max_outside_pixels": 0,
+    "current_hd_candidates": 16,
+    "pixel_visual_pass": 4,
+    "rework_required": 12,
+    "elements_total": 201,
+    "elements_fail": 93,
+    "direct_queue_scope": 126,
+    "pending_production_localize_text": 63,
+    "hold_strict_recheck_zoom_review": 47,
+    "isolated_ingame_required": 4,
+    "approved_lock_count": 0,
+    "pixel_pass_pending_ingame": [
+      "C4A2937B",
+      "9F060EC1",
+      "D6DC1380",
+      "48DEBE77"
+    ],
+    "rework_required_assets": [
+      "FF2462BB",
+      "568D3696",
+      "FA7BBB13",
+      "39229D64",
+      "A064FDFC",
+      "2DA43E41",
+      "411827E",
+      "571E78F3",
+      "62BEBF33",
+      "E3FD08BE",
+      "C075FB49",
+      "FD90AA9"
+    ]
+  }
+}
