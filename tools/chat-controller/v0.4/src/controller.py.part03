@@ -151,13 +151,94 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     return True
 
 
+async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, active: dict, q: dict) -> bool:
+    """Serialize Retry handling with adaptive backoff. Returns True when Retry owns this cycle."""
+    retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
+    if retry is None:
+        return False
+
+    now = datetime.now(TZ)
+    if rate_limit_active(reg, now):
+        write_runtime(
+            status="rate_limited_backoff",
+            last_action=f"Retry visible for {active['task_id']}; waiting {rate_limit_seconds_remaining(reg, now)}s before any retry",
+            rate_limit_attempts=reg.rate_limit_attempts,
+            rate_limit_until=reg.rate_limit_until,
+        )
+        return True
+
+    last_backoff = _parse_iso(active.get("last_retry_backoff_at"))
+    last_click = _parse_iso(active.get("last_retry_click_at"))
+
+    # First Retry after a send (or Retry returned after our last click): assume
+    # request pressure until proven otherwise. This prevents rapid Retry storms.
+    if last_backoff is None or (last_click is not None and (last_backoff is None or last_click > last_backoff)):
+        context = await retry_surface_text(page)
+        source = f"queue-retry:{active['task_id']}"
+        if await retry_looks_rate_limited(page):
+            source += ":too-many-requests"
+        else:
+            source += ":conservative"
+        mark_rate_limit(reg, now, source)
+        active["last_retry_backoff_at"] = now.isoformat()
+        active["last_retry_context"] = context[:500]
+        slot.last_result = "queue_retry_backoff"
+        slot.last_watchdog_at = now.isoformat()
+        save_registry(reg)
+        save_queue_state(q)
+        return True
+
+    # Backoff has expired and no retry has been clicked since that backoff.
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(
+            status="retry_wait",
+            last_action=f"Retry for {active['task_id']} waiting for {guard}",
+        )
+        return True
+
+    if await click_retry_generation(page):
+        request_now = datetime.now(TZ)
+        note_successful_request(reg, request_now)
+        active["last_retry_click_at"] = request_now.isoformat()
+        active["sent_at"] = request_now.isoformat()
+        active["last_hash"] = None
+        active["last_hash_changed_at"] = request_now.isoformat()
+        slot.last_sent_at = request_now.isoformat()
+        slot.last_assistant_hash = None
+        slot.last_assistant_change_at = request_now.isoformat()
+        slot.last_result = "queue_retry_clicked_after_backoff"
+        save_registry(reg)
+        save_queue_state(q)
+        write_runtime(
+            status="queue_retry_clicked",
+            last_action=f"Clicked one controlled Retry for {active['task_id']} after adaptive backoff",
+            queue=active,
+        )
+        return True
+
+    write_runtime(
+        status="retry_wait",
+        last_action=f"Retry visible for {active['task_id']} but controlled click was not available",
+    )
+    return True
+
+
 async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
-    reg = load_registry(datetime.now(TZ))
+    now = datetime.now(TZ)
+    reg = load_registry(now)
     slot = next((s for s in reg.slots if s.name == active["slot"]), None)
     if slot is None:
         return False
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send waiting for {guard}")
+        return False
     page = await slot_page(context, pages, slot)
     if await detect_busy(page):
+        return False
+    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
+        write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send deferred because Retry UI is active")
         return False
     runtime["queue_task_id"] = active["task_id"]
     runtime["queue_lane"] = active["lane"]
@@ -193,7 +274,24 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     reg = load_registry(now)
     active = q.get("active")
 
+    if rate_limit_active(reg, now):
+        write_runtime(
+            status="rate_limited_backoff",
+            last_action=f"Queue paused for adaptive rate-limit backoff ({rate_limit_seconds_remaining(reg, now)}s remaining)",
+            rate_limit_attempts=reg.rate_limit_attempts,
+            rate_limit_until=reg.rate_limit_until,
+        )
+        return
+
     if not active:
+        not_before = _parse_iso(q.get("next_task_not_before"))
+        if not_before and now < not_before:
+            remaining = max(1, int((not_before - now).total_seconds()))
+            write_runtime(
+                status="queue_next_task_cooldown",
+                last_action=f"Previous task finished; waiting {remaining}s before starting the next ChatGPT request",
+            )
+            return
         slot = reg.slots[reg.next_slot]
         target = queue_target_for_slot(slot.name)
         base_sha = github_branch_head(target["branch"])
@@ -246,6 +344,8 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     page = await slot_page(context, pages, slot)
 
     if active["phase"] == "WAIT_CHAT":
+        if await queue_handle_retry_surface(page, reg, slot, active, q):
+            return
         if not slot.url or not is_project_scoped_chat_url(slot.url):
             reason = "Active task chat URL is missing or outside the configured project after restart/project-scope reconciliation."
             if await queue_rollover_chat(context, pages, active, reason):
@@ -279,6 +379,9 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             if active.get("phase") == "BLOCKED":
                 save_queue_state(q)
             return
+        clear_rate_limit_after_response(reg)
+        active["last_retry_backoff_at"] = None
+        active["last_retry_click_at"] = None
         h = stable_hash(text)
         changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
         if h != active.get("last_hash"):
@@ -298,8 +401,12 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
                 return
             reason = "Chat response stabilized but target branch HEAD did not change; no durable Git result commit was found."
             if active["attempt"] < MAX_TASK_ATTEMPTS:
-                active["attempt"] += 1
+                previous_attempt = active["attempt"]
+                active["attempt"] = previous_attempt + 1
                 if await queue_send_retry(context, pages, active, reason):
+                    save_queue_state(q)
+                else:
+                    active["attempt"] = previous_attempt
                     save_queue_state(q)
                 return
             active["failure_context"] = reason
@@ -310,9 +417,15 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             if expected not in msg:
                 reason = f"Target branch changed to {head} but commit message did not contain required task marker {expected}."
                 if active["attempt"] < MAX_TASK_ATTEMPTS:
-                    active["attempt"] += 1
+                    previous_attempt = active["attempt"]
+                    previous_base = active["base_sha"]
+                    active["attempt"] = previous_attempt + 1
                     active["base_sha"] = head
                     if await queue_send_retry(context, pages, active, reason):
+                        save_queue_state(q)
+                    else:
+                        active["attempt"] = previous_attempt
+                        active["base_sha"] = previous_base
                         save_queue_state(q)
                     return
                 active["failure_context"] = reason
@@ -347,15 +460,22 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             record["completed_at"] = now.isoformat()
             q["completed"] = (q.get("completed", []) + [record])[-100:]
             q["active"] = None
+            q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
             save_queue_state(q)
             write_runtime(status="queue_pass", last_action=f"{record['task_id']} automation PASS; runtime UNTESTED", last_completed=record)
             return
 
         reason = f"{active['workflow']} run {run.get('id')} concluded {run.get('conclusion')}; inspect {run.get('html_url')}"
         if active["attempt"] < MAX_TASK_ATTEMPTS:
-            active["attempt"] += 1
+            previous_attempt = active["attempt"]
+            previous_base = active["base_sha"]
+            active["attempt"] = previous_attempt + 1
             active["base_sha"] = active["result_sha"]
             if await queue_send_retry(context, pages, active, reason):
+                save_queue_state(q)
+            else:
+                active["attempt"] = previous_attempt
+                active["base_sha"] = previous_base
                 save_queue_state(q)
             return
         active["failure_context"] = reason
@@ -368,6 +488,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         record["blocked_at"] = now.isoformat()
         q["blocked"] = (q.get("blocked", []) + [record])[-100:]
         q["active"] = None
+        q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
         save_queue_state(q)
         write_runtime(status="queue_blocked", last_action=f"{record['task_id']} blocked after {record['attempt']} attempts; advancing to next independent task", last_blocked=record)
 
