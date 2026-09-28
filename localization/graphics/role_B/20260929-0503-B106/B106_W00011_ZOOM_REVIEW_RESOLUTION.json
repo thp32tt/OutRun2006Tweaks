@@ -1,0 +1,337 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00036",
+  "attempt": "1/3",
+  "wave_id": "W00011",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T05:03:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "81dccb23f48e440d2479ef526e1d22dce224893a",
+  "final_precommit_head_sha": "b43934d94af5d37e86b363841205c1e57bd061a4",
+  "preserved_peer_lane_commit": true,
+  "peer_lane_task": "LOCALIZATION-LOCALIZATION_A-00035",
+  "peer_lane_commit": "b43934d94af5d37e86b363841205c1e57bd061a4",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_EVEN_ZOOM_REVIEW_RESOLUTIONS_2_LOCALIZABLE_REBUILD_INPUTS_2_PRESERVE",
+  "contract_fallback": [
+    "MANDATORY_FALLBACK_LADDER_STEP_2_RESOLVE_ZOOM_REVIEW",
+    "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT"
+  ],
+  "source_policy": {
+    "ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "visual_reference_repo": "Sonic-TV/OR2006Sprites",
+    "visual_reference_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "queue": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "queue_blob_sha": "866f7db6db15b87d97cfe3a62e6258786c12afac",
+    "selected_even_indices": [
+      36,
+      62,
+      166,
+      178
+    ],
+    "shared_queue_modified": false
+  },
+  "assets": [
+    {
+      "queue_index": 36,
+      "asset": "06AB5CEE",
+      "queue_path": "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+      "classification": "LOCALIZABLE_TEXT_CONFIRMED",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.png",
+        "git_blob_sha": "ffe7d0366a8c71986e3e96c3b1214373295705d7",
+        "visual_finding": "Three visible Total Rank labels; grade letters/heart/lens-flare/Jennifer artwork are preserved."
+      },
+      "hd_release": {
+        "path": "Release/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+        "git_blob_sha": "2302d1218646d51f3d23ce7b93ce9c941ceaaf93",
+        "bytes": 67108992,
+        "expected_dimensions": [
+          4096,
+          4096
+        ],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "hd_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_JENN_RANK_Exst/4x_06AB5CEE_1024x1024_atlas.json",
+        "git_blob_sha": "b777ed9ee87333ec4617a2b283136cdc5189517d"
+      },
+      "elements": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_7",
+          "sprite_rect_hd": [
+            1088,
+            3080,
+            2048,
+            1016
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        },
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_8",
+          "sprite_rect_hd": [
+            0,
+            1488,
+            1720,
+            1016
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        },
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_9",
+          "sprite_rect_hd": [
+            1720,
+            1488,
+            1640,
+            1016
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        }
+      ],
+      "preserve_original": [
+        "A/B/C/D/E grade artwork",
+        "heart/icon artwork",
+        "lens flare",
+        "Jennifer character art",
+        "speech/starburst backgrounds"
+      ],
+      "next_safe_step": "Decode exact HD DDS, isolate each English text/effect bbox inside the three mapped sprites, render only text pixels, preserve raw orientation/background, then generate identical-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+    },
+    {
+      "queue_index": 62,
+      "asset": "33491F83",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "classification": "LOCALIZABLE_TEXT_CONFIRMED",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/33491F83_512x256.png",
+        "git_blob_sha": "8e6461404d8bfe7e8a2891fad6df1140e1c33c70",
+        "visual_finding": "Visible Diverge/Left/Right route labels and HARD/EASY difficulty labels; road/arrows are non-text artwork."
+      },
+      "hd_release": {
+        "path": "Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+        "git_blob_sha": "00a94c32cc35fc773ceed0ece6d1f2f64da841f5",
+        "bytes": 8388736,
+        "expected_dimensions": [
+          2048,
+          1024
+        ],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1
+      },
+      "hd_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/4x_33491F83_512x256_atlas.json",
+        "git_blob_sha": "e479291b454b69ea0eb8301b9ad1e0df60819fe6"
+      },
+      "elements": [
+        {
+          "source": "Diverge",
+          "korean": "분기",
+          "sprite": "sprite_13",
+          "sprite_rect_hd": [
+            4,
+            4,
+            1192,
+            808
+          ],
+          "state": "HOLD_TEXT_ONLY_MASK_INSIDE_ROUTE_ART"
+        },
+        {
+          "source": "Left",
+          "korean": "왼쪽",
+          "sprite": "sprite_13",
+          "sprite_rect_hd": [
+            4,
+            4,
+            1192,
+            808
+          ],
+          "state": "HOLD_TEXT_ONLY_MASK_INSIDE_ROUTE_ART"
+        },
+        {
+          "source": "Right",
+          "korean": "오른쪽",
+          "sprite": "sprite_13",
+          "sprite_rect_hd": [
+            4,
+            4,
+            1192,
+            808
+          ],
+          "state": "HOLD_TEXT_ONLY_MASK_INSIDE_ROUTE_ART"
+        },
+        {
+          "source": "HARD",
+          "korean": "어려움",
+          "sprite": "sprite_14",
+          "sprite_rect_hd": [
+            1204,
+            4,
+            504,
+            120
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        },
+        {
+          "source": "EASY",
+          "korean": "쉬움",
+          "sprite": "sprite_15",
+          "sprite_rect_hd": [
+            1204,
+            132,
+            504,
+            120
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        },
+        {
+          "source": "HARD",
+          "korean": "어려움",
+          "sprite": "sprite_16",
+          "sprite_rect_hd": [
+            1716,
+            4,
+            320,
+            120
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        },
+        {
+          "source": "EASY",
+          "korean": "쉬움",
+          "sprite": "sprite_17",
+          "sprite_rect_hd": [
+            1716,
+            132,
+            320,
+            120
+          ],
+          "state": "HOLD_EXACT_HD_DECODED_TEXT_EFFECT_BBOX"
+        }
+      ],
+      "translation_consistency": {
+        "EASY": "쉬움",
+        "evidence": "existing canonical index 60 transcription"
+      },
+      "preserve_original": [
+        "road/branch artwork",
+        "direction arrows",
+        "difficulty arrows",
+        "icons and non-text background"
+      ],
+      "next_safe_step": "Decode exact HD DDS and derive text-only masks so route art/arrows remain byte-faithful outside text regions; then zero-pixel containment and English-source comparison."
+    },
+    {
+      "queue_index": 166,
+      "asset": "5EBD7FE8",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds",
+      "classification": "PRESERVE_ORIGINAL",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.png",
+        "git_blob_sha": "cd4e86d7d3738f778db16253ec2bf1ece6f17d17",
+        "visual_finding": "Album/CD-cover collage containing OutRun branding and song/track-title typography only."
+      },
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds",
+        "git_blob_sha": "33997a03ce38cadb8821612f9f4dcc501e0b1805",
+        "bytes": 22369776
+      },
+      "preserve_reason": "Translation exclusion policy preserves brand/logos/song titles/music credits. No independent localizable UI prose is present in the reviewed source."
+    },
+    {
+      "queue_index": 178,
+      "asset": "798A1E",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds",
+      "classification": "PRESERVE_ORIGINAL",
+      "stock_visual": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/00798A1E_1024x256.png",
+        "git_blob_sha": "0fbb4928e87eba60373c500479d6253527b6e2a3",
+        "source_name_alias": "queue/release drops leading stock 00 prefix",
+        "visual_finding": "Two music/album panels with OutRun2 branding and song-title artwork; no independent localizable UI prose."
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/00798A1E_1024x256_atlas.json",
+        "git_blob_sha": "0ae1695babad99928e4dd02bc50ce71b63948dce",
+        "regions": [
+          {
+            "name": "sprite_627",
+            "rect": [
+              0,
+              0,
+              290,
+              256
+            ]
+          },
+          {
+            "name": "sprite_628",
+            "rect": [
+              290,
+              0,
+              290,
+              256
+            ]
+          }
+        ]
+      },
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds",
+        "git_blob_sha": "4b6a0f01ce813bcfaa1a8b3d3666ceb2879c8763",
+        "bytes": 16777344
+      },
+      "preserve_reason": "Translation exclusion policy preserves brand/logos/song titles/music credits. No independent localizable UI prose is present in the reviewed source."
+    }
+  ],
+  "material_advance": {
+    "unresolved_zoom_review_rows_reduced_by_c_after_merge": 4,
+    "localizable_confirmed": [
+      36,
+      62
+    ],
+    "preserve_original_confirmed": [
+      166,
+      178
+    ],
+    "new_reconstruction_inputs": [
+      36,
+      62
+    ],
+    "candidate_dds_modified": false
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_36_62_166_178",
+    "work_steal": "NONE",
+    "peer_commit_preserved": "PASS_A00035_PARENT_HEAD",
+    "source_visual_identity": "PASS_PINNED_GITHUB_BLOB_IDS_4_OF_4",
+    "preserve_policy": "PASS_166_178_MUSIC_BRAND_ONLY",
+    "localizable_semantics": "PASS_36_62",
+    "one_pixel_containment": "NOT_APPLICABLE_NO_CANDIDATE_DDS_WRITTEN",
+    "dds_alpha_orientation": "HOLD_EXACT_HD_DECODE_REQUIRED_FOR_36_62_NO_DDS_WRITE",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_CANDIDATE_DDS_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00011 lane B resolved four previously blocked even-shard zoom-review rows from immutable GitHub visual evidence. Indices 36 and 62 are positively localizable and now have exact HD atlas-cell reconstruction inputs; indices 166 and 178 are preserve-original under the music/brand exclusion policy. No DDS bytes were guessed without exact HD decoded-pixel masks. Runtime remains UNTESTED."
+}
