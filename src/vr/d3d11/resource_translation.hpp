@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
 #include <d3d9.h>
 #include <d3d11.h>
 
@@ -57,6 +58,75 @@ namespace outrun::vr::dx11
         bool planExact = false;
         bool requiresCpuShadow = false;
     };
+
+    // R77 models the lifetime contract a future MANAGED D3D11 mirror must obey.
+    // CPU shadow contents survive a successful D3D9 Reset; the GPU mirror is
+    // generation-bound and must be recreated/reuploaded before use.
+    struct ManagedMirrorLifetimeState
+    {
+        std::uint64_t deviceGeneration = 1;
+        std::uint64_t cpuShadowVersion = 0;
+        std::uint64_t mirrorGeneration = 0;
+        std::uint64_t mirrorShadowVersion = 0;
+        bool cpuShadowValid = false;
+        bool mirrorValid = false;
+    };
+
+    [[nodiscard]] constexpr ManagedMirrorLifetimeState
+    note_managed_shadow_write(ManagedMirrorLifetimeState state) noexcept
+    {
+        state.cpuShadowVersion =
+            state.cpuShadowVersion == std::numeric_limits<std::uint64_t>::max()
+                ? 1
+                : state.cpuShadowVersion + 1;
+        state.cpuShadowValid = true;
+        state.mirrorValid = false;
+        return state;
+    }
+
+    [[nodiscard]] constexpr ManagedMirrorLifetimeState
+    note_managed_mirror_upload(ManagedMirrorLifetimeState state) noexcept
+    {
+        if (!state.cpuShadowValid)
+            return state;
+        state.mirrorGeneration = state.deviceGeneration;
+        state.mirrorShadowVersion = state.cpuShadowVersion;
+        state.mirrorValid = true;
+        return state;
+    }
+
+    [[nodiscard]] constexpr ManagedMirrorLifetimeState
+    advance_managed_device_generation(ManagedMirrorLifetimeState state) noexcept
+    {
+        state.deviceGeneration =
+            state.deviceGeneration == std::numeric_limits<std::uint64_t>::max()
+                ? 1
+                : state.deviceGeneration + 1;
+        state.mirrorValid = false;
+        return state;
+    }
+
+    [[nodiscard]] constexpr bool
+    managed_mirror_ready(const ManagedMirrorLifetimeState& state) noexcept
+    {
+        return state.cpuShadowValid &&
+            state.mirrorValid &&
+            state.mirrorGeneration == state.deviceGeneration &&
+            state.mirrorShadowVersion == state.cpuShadowVersion;
+    }
+
+    static_assert(note_managed_shadow_write({}).cpuShadowValid);
+    static_assert(
+        managed_mirror_ready(
+            note_managed_mirror_upload(note_managed_shadow_write({}))));
+    static_assert(
+        advance_managed_device_generation(
+            note_managed_mirror_upload(note_managed_shadow_write({})))
+            .cpuShadowValid);
+    static_assert(
+        !managed_mirror_ready(
+            advance_managed_device_generation(
+                note_managed_mirror_upload(note_managed_shadow_write({})))));
 
     // Conservative translation contract used by the passive R72/R73 census.
     // "exact" means the source format can be represented without inventing
