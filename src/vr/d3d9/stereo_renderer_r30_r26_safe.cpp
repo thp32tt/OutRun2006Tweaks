@@ -892,6 +892,38 @@ namespace OutRunVRStereo
             float u, v;
         };
 
+        bool R30PrepareSkyGlowPipeline(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+
+            // These states are invariant for every SkyGlow pass in the frame.
+            // Set them once instead of repeating the same driver calls for
+            // bright/blur/composite on both eyes.
+            return SUCCEEDED(device->SetDepthStencilSurface(nullptr)) &&
+                SUCCEEDED(device->SetVertexShader(nullptr)) &&
+                SUCCEEDED(device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_MIPFILTER, D3DTEXF_NONE)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_ZENABLE, D3DZB_FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_ZWRITEENABLE, FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_STENCILENABLE, FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_ALPHATESTENABLE, FALSE));
+        }
+
         bool R30DrawSkyGlowPass(IDirect3DDevice9* device,
             IDirect3DSurface9* target, UINT width, UINT height,
             IDirect3DTexture9* source,
@@ -903,8 +935,7 @@ namespace OutRunVRStereo
                 !width || !height)
                 return false;
 
-            if (FAILED(device->SetRenderTarget(0, target)) ||
-                FAILED(device->SetDepthStencilSurface(nullptr)))
+            if (FAILED(device->SetRenderTarget(0, target)))
                 return false;
 
             D3DVIEWPORT9 viewport{};
@@ -926,21 +957,11 @@ namespace OutRunVRStereo
                     0.0f, 1.0f, 1.0f, 1.0f }
             };
 
-            device->SetVertexShader(nullptr);
-            device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
-            device->SetPixelShader(shader);
-            device->SetTexture(0, source);
-            device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-            device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-            device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-            device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-            device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-            device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-            device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-            device->SetRenderState(D3DRS_ALPHABLENDENABLE,
-                additive ? TRUE : FALSE);
+            if (FAILED(device->SetPixelShader(shader)) ||
+                FAILED(device->SetTexture(0, source)) ||
+                FAILED(device->SetRenderState(
+                    D3DRS_ALPHABLENDENABLE, additive ? TRUE : FALSE)))
+                return false;
             if (additive)
             {
                 device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -959,11 +980,11 @@ namespace OutRunVRStereo
                     D3DCOLORWRITEENABLE_BLUE |
                     D3DCOLORWRITEENABLE_ALPHA);
             }
-            device->SetPixelShaderConstantF(0, constant, 1);
-            const HRESULT hr = device->DrawPrimitiveUP(
-                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex));
-            device->SetTexture(0, nullptr);
-            return SUCCEEDED(hr);
+            if (FAILED(device->SetPixelShaderConstantF(
+                    0, constant, 1)))
+                return false;
+            return SUCCEEDED(device->DrawPrimitiveUP(
+                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex)));
         }
 
         bool R30CaptureSkyGlowSceneBeforeHud(
@@ -1034,7 +1055,7 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            bool ok = true;
+            bool ok = R30PrepareSkyGlowPipeline(device);
             IDirect3DSurface9* eyeSurface[2]{
                 BackBuffer, RightEyeSurface
             };
@@ -1133,7 +1154,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW PERF P1: VR-only half-resolution L/R extract + dead-pass-elided blur + additive composite ACTIVE factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
+                        "VR SKY GLOW PERF P3: VR-only half-resolution L/R extract + dead-pass-elided blur + batched invariant D3D9 state ACTIVE factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
