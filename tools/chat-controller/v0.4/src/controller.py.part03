@@ -672,10 +672,70 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         return
 
 
+def reconcile_legacy_conversion_blocked(q: dict) -> bool:
+    """Move historical UI-detection false failures to completed when exact task SHA gate already passed."""
+    if CONTROLLER_MODE != "conversion":
+        return False
+    if int(q.get("conversion_blocked_reconcile_version", 0)) >= 1:
+        return False
+
+    kept = []
+    recovered = []
+    lookup_failed = False
+    for record in q.get("blocked", []):
+        task_id = record.get("task_id")
+        branch = record.get("branch")
+        workflow = record.get("workflow") or "Backend Conversion Gate"
+        if not task_id or not branch:
+            kept.append(record)
+            continue
+        commit = github_find_task_commit(branch, task_id)
+        if commit is None:
+            kept.append(record)
+            continue
+        run = github_gate_run(branch, commit["sha"], workflow)
+        if run is None:
+            kept.append(record)
+            continue
+        if run.get("status") == "completed" and run.get("conclusion") == "success":
+            fixed = dict(record)
+            fixed["result_sha"] = commit["sha"]
+            fixed["result_message"] = commit["message"]
+            fixed["gate_run"] = run
+            fixed["automation_validation"] = "PASS"
+            fixed["runtime_validation"] = record.get("runtime_validation") or "UNTESTED"
+            fixed["recovered_from_false_blocked"] = True
+            fixed["recovered_at"] = datetime.now(TZ).isoformat()
+            fixed["original_failure_context"] = record.get("failure_context")
+            fixed["failure_context"] = ""
+            recovered.append(fixed)
+        else:
+            kept.append(record)
+
+    q["blocked"] = kept
+    if recovered:
+        q["completed"] = (q.get("completed", []) + recovered)[-100:]
+    # Exact historical task/gate state is stable; one reconciliation pass is sufficient.
+    q["conversion_blocked_reconcile_version"] = 1
+    q["last_blocked_reconcile_at"] = datetime.now(TZ).isoformat()
+    q["last_blocked_recovered_count"] = len(recovered)
+    save_queue_state(q)
+    if recovered:
+        write_runtime(
+            status="queue_history_reconciled",
+            last_action=f"Recovered {len(recovered)} historical conversion tasks that had durable PASS commits/gates",
+            recovered_tasks=[r["task_id"] for r in recovered],
+        )
+    return bool(recovered)
+
+
 async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     now = datetime.now(TZ)
     q = load_queue_state()
     reg = load_registry(now)
+    if CONTROLLER_MODE == "conversion":
+        reconcile_legacy_conversion_blocked(q)
+        q = load_queue_state()
     active = q.get("active")
 
     if rate_limit_active(reg, now):
