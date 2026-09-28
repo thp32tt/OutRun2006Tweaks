@@ -186,10 +186,11 @@ namespace OutRunVRStereo
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
             R30IndexShadows;
         std::atomic<std::uint64_t> R30ShadowRegistryGeneration{ 1 };
-        // Lock hooks are vtable-global. A tiny monotonic Bloom gate keeps
-        // unrelated VB/IB Lock calls out of the shadow registry mutex. False
-        // positives only cause an extra lookup; false negatives are impossible
-        // because every registered shadow sets its bit before use.
+        // Lock hooks are vtable-global. A tiny Bloom gate keeps unrelated
+        // VB/IB Lock/Unlock/Release calls out of the shadow registry mutex.
+        // It is rebuilt after tracked releases, so long sessions do not
+        // accumulate stale bits. False positives only cause an extra lookup;
+        // false negatives are impossible because registration sets the bit.
         std::atomic<std::uint64_t> R30TrackedVertexBloom{ 0 };
         std::atomic<std::uint64_t> R30TrackedIndexBloom{ 0 };
 
