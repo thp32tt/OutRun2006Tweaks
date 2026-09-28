@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-candidate/r69-perf-exp-all
+      - vr-d3d9ex-candidate/r69-perf-exp-all-v2
     paths:
       - 'src/vr/**'
       - 'vrhost/**'
@@ -42,7 +43,10 @@ jobs:
             note: XYZRHW shadow registry lookup cache
           - id: EXP_ALL
             ref: 14c5b45e790bb691e884010de8886a0def1be865
-            note: all four remaining experiments combined
+            note: original combined experiment before review fixes
+          - id: EXP_ALL_V2
+            ref: 60d1c483d79eb2d883ab9fd4f3d65bcbb693695b
+            note: reviewed V2 with QPC fence, explicit-state hardening, deferred failed-render ACK and shadow reset
     steps:
       - uses: actions/checkout@v4
         with:
@@ -141,10 +145,10 @@ jobs:
             'OUTRUN R69 REMAINING PERFORMANCE EXPERIMENTS'
             ''
             'FAST TEST ORDER'
-            '1. EXP_ALL first.'
-            '2. If EXP_ALL is visually correct and the bad frame-drop section improves, stop.'
-            '3. If EXP_ALL shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
-            '4. If EXP_ALL shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
+            '1. EXP_ALL_V2 first.'
+            '2. If EXP_ALL_V2 is visually correct and the bad frame-drop section improves, stop.'
+            '3. If EXP_ALL_V2 shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
+            '4. If EXP_ALL_V2 shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
             '5. If only occasional hitch remains, test EXP_FENCE2.'
             '6. If HUD/particle-heavy CPU drops remain, test EXP_XYZCACHE.'
             '7. P5_BASE is only the before/after control.'
