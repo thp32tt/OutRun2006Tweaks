@@ -21,5 +21,12 @@ namespace OutRunVR::Dxvk
     [[nodiscard]] ProviderSnapshot ProbeProvider(
         IDirect3DDevice9* device) noexcept;
 
+    // Emit one provider/capability attestation. Device-creation call sites use
+    // this on every successful CreateDevice/CreateDeviceEx so a later full
+    // device recreation cannot silently inherit the startup-only census.
+    void LogProviderCensus(
+        IDirect3DDevice9* device,
+        const char* source) noexcept;
+
     [[nodiscard]] bool PreflightNonSystemProvider() noexcept;
 }
