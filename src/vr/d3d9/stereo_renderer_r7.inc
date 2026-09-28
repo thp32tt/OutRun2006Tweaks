@@ -17,6 +17,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
+#include "vr/core/d3d9_draw_state.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -1609,6 +1610,45 @@ namespace OutRunVRStereo
 			return 0;
 		}
 
+	}
+
+	bool CaptureTrackedRenderStateSnapshot(
+		IDirect3DDevice9* device,
+		OutRunVR::DrawState::RenderStateSnapshot& out) noexcept
+	{
+		out = {};
+		if (!device || InternalStereoPass || !IsGameDevice(device))
+			return false;
+
+		bool ok = true;
+		auto read = [&](D3DRENDERSTATETYPE state, DWORD& value)
+		{
+			if (!ReadTrackedRenderState(device, state, value))
+				ok = false;
+		};
+
+		read(D3DRS_ZENABLE, out.zEnable);
+		read(D3DRS_ZWRITEENABLE, out.zWriteEnable);
+		read(D3DRS_ZFUNC, out.zFunc);
+
+		read(D3DRS_ALPHABLENDENABLE, out.alphaBlendEnable);
+		read(D3DRS_SRCBLEND, out.srcBlend);
+		read(D3DRS_DESTBLEND, out.destBlend);
+		read(D3DRS_BLENDOP, out.blendOp);
+
+		read(D3DRS_ALPHATESTENABLE, out.alphaTestEnable);
+		read(D3DRS_ALPHAREF, out.alphaRef);
+		read(D3DRS_ALPHAFUNC, out.alphaFunc);
+
+		read(D3DRS_CULLMODE, out.cullMode);
+		read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);
+		read(D3DRS_STENCILENABLE, out.stencilEnable);
+		read(D3DRS_STENCILWRITEMASK, out.stencilWriteMask);
+		read(D3DRS_FOGENABLE, out.fogEnable);
+		read(D3DRS_LIGHTING, out.lighting);
+
+		out.complete = ok;
+		return ok;
 	}
 
 	bool InstallStereoHooksSynchronously(IDirect3DDevice9* device) noexcept
