@@ -1,0 +1,47 @@
+services:
+  outrun-chat-controller-vr:
+    build:
+      context: .
+      dockerfile: Dockerfile.portainer
+    container_name: outrun-chat-controller-vr
+    restart: unless-stopped
+    init: true
+    shm_size: "768m"
+    mem_limit: 3g
+    mem_reservation: 1g
+    cpus: 1.5
+    environment:
+      TZ: Asia/Seoul
+      CONTROLLER_MODE: "vr"
+      AUTO_SEND: "${AUTO_SEND:-false}"
+      SCHEDULE_MINUTES: "10,30,50"
+      CHAT_SLOTS: "3"
+      CHAT_DAY_ROLLOVER_HOUR: "2"
+      CHATGPT_BASE_URL: "https://chatgpt.com/"
+      PREFERRED_THINKING_LEVEL: "High"
+      STRICT_THINKING_LEVEL: "false"
+      FRESH_CHAT_EACH_RUN: "false"
+      RETRY_BUTTON_COOLDOWN_SECONDS: "60"
+      VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
+      STATUS_PORT: "8787"
+      WATCHDOG_ENABLED: "${WATCHDOG_ENABLED:-false}"
+      WATCHDOG_STALL_MINUTES: "15"
+      WATCHDOG_BUSY_STALL_MINUTES: "20"
+      WATCHDOG_CHECK_SECONDS: "30"
+      WATCHDOG_MAX_RESUMES_PER_RUN: "1"
+      WATCHDOG_FORCE_STOP_STALLED: "false"
+      RATE_LIMIT_BACKOFF_SECONDS: "120,300,600,1200"
+      MIN_SEND_GAP_SECONDS: "60"
+      SLOT_DEDUP_SECONDS: "180"
+    ports:
+      - "6080:6080"
+      - "8787:8787"
+    volumes:
+      - outrun_chat_vr_data:/data
+      - outrun_chat_vr_logs:/logs
+
+volumes:
+  outrun_chat_vr_data:
+    name: outrun_chat_vr_data
+  outrun_chat_vr_logs:
+    name: outrun_chat_vr_logs
