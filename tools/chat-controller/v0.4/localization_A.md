@@ -1,1 +1,1 @@
-OutRun 2006 한글화 A(:00) 제작 작업을 진행해줘. GitHub thp32tt/OutRun2006Tweaks의 korean-localization-clean 브랜치를 유일한 작업 기준으로 사용해. 시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md를 읽고 그 계약과 거기 지정된 기준 문서를 모두 적용해. A 역할(실제 제작 + 수정 항목 픽셀 containment 검사/즉시 재작업)을 끝까지 수행하고, 변경이 있으면 같은 브랜치에 commit/push 후 SHA를 확인해. GPT Library, VR/FFB, 빌드는 사용하지 마.
+OutRun 한글화 A 실행
