@@ -150,4 +150,75 @@ namespace outrun::vr::dx11
         // fail closed until a concrete staging/update/reset policy exists.
         return {};
     }
+
+    BufferMutationTranslation translate_buffer_mutation(
+        ResourceRole role,
+        D3DPOOL pool,
+        DWORD usage,
+        DWORD lockFlags) noexcept
+    {
+        if (role != ResourceRole::Vertex && role != ResourceRole::Index)
+            return {};
+
+        constexpr DWORD classifiedFlags =
+            D3DLOCK_READONLY | D3DLOCK_DISCARD | D3DLOCK_NOOVERWRITE;
+        if ((lockFlags & ~classifiedFlags) != 0)
+            return {};
+
+        const bool readOnly = (lockFlags & D3DLOCK_READONLY) != 0;
+        const bool discard = (lockFlags & D3DLOCK_DISCARD) != 0;
+        const bool noOverwrite = (lockFlags & D3DLOCK_NOOVERWRITE) != 0;
+        if ((readOnly && (discard || noOverwrite)) ||
+            (discard && noOverwrite))
+            return {};
+        if (readOnly && (usage & D3DUSAGE_WRITEONLY) != 0)
+            return {};
+
+        const auto behavior = translate_resource_behavior(role, pool, usage);
+        if (!behavior.descriptorExact)
+            return {};
+
+        BufferMutationTranslation out{};
+        if (pool == D3DPOOL_MANAGED)
+        {
+            if (discard || noOverwrite)
+                return {};
+            out.kind = readOnly
+                ? BufferMutationUpdateKind::ManagedCpuShadowRead
+                : BufferMutationUpdateKind::ManagedCpuShadowWrite;
+            out.requiresCpuShadow = true;
+            return out;
+        }
+
+        if (readOnly)
+            return {};
+
+        if (behavior.usage == D3D11_USAGE_DYNAMIC)
+        {
+            out.planExact = true;
+            if (discard)
+            {
+                out.kind = BufferMutationUpdateKind::DynamicMapWriteDiscard;
+                out.mapType = D3D11_MAP_WRITE_DISCARD;
+            }
+            else if (noOverwrite)
+            {
+                out.kind = BufferMutationUpdateKind::DynamicMapWriteNoOverwrite;
+                out.mapType = D3D11_MAP_WRITE_NO_OVERWRITE;
+            }
+            else
+            {
+                out.kind = BufferMutationUpdateKind::DynamicMapWrite;
+                out.mapType = D3D11_MAP_WRITE;
+            }
+            return out;
+        }
+
+        if (discard || noOverwrite)
+            return {};
+
+        out.kind = BufferMutationUpdateKind::DefaultUpdateSubresource;
+        out.planExact = true;
+        return out;
+    }
 }
