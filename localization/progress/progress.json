@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T17:51:17+09:00",
+  "updated_at_kst": "2026-09-28T22:18:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A00004: 411827E self-QA PASS; C075FB49 partial safe rework 3/9 completed with 6 failures remaining; 568D3696 specialized DXT5 rework remains.",
+  "next_checkpoint": "W00001 C barrier reconciled: A00006 BLOCKED_NO_ACTION + B00005 durable no-duplicate review; no new approvals. Next A+B wave continues full queue; isolated DDS_ONLY in-game validation remains mandatory.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -529,6 +529,14 @@
           "report": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json"
         }
       }
+    },
+    "latest_c_barrier": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00007",
+      "wave_id": "W00001",
+      "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
+      "lane_a": "BLOCKED_NO_ACTION",
+      "lane_b": "DURABLE_REVIEW_NO_DUPLICATE_REWORK",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
