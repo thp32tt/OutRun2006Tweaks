@@ -30,9 +30,8 @@ Each set contains ten distinct review passes and derives the next set's directio
 
 ### A. Backend-neutral semantics
 - Shared WVP/address anchors are live and consistent.
-- Producer/HUD catalogs are not yet one source of truth.
-- `hud_semantics.hpp` has ranges missing from the analyzer/shared producer map.
-- Projected-world/projected-screen classes are richer than the current shared SpacePolicy.
+- **F13/F14 closed 2026-09-28:** the reviewed 25-range producer catalog is centralized in `disasm_render_contract.hpp`; runtime `hud_semantics.hpp` delegates to it and `analyze_outrun_exe.py` is mechanically checked against it. Exact-SHA gate `36391517935` passes on `d2d02c774ee85046acd42a453f2cf1f392927a20`.
+- Projected-world/projected-screen classes are still richer than the current shared SpacePolicy (F15 remains open).
 
 ### B. One-click payload identity
 - Preflight is strong before mutation.
@@ -49,8 +48,9 @@ Each set contains ten distinct review passes and derives the next set's directio
 ### D. DXVK SAFE
 - Same-provider D3D9/D3D9Ex behavior is strong.
 - Multiview isolation is correct.
-- Provider cache/upstream provenance needs stronger enforcement.
+- **F08/F09 closed 2026-09-28:** DXVK 3.1.1 acquisition pins the expected release archive SHA-256, rejects mismatched/unpinned archives, repairs a tampered cache from verified archive bytes, and refuses an explicit package provider unless it exactly matches the verified stock provider. Pinned-acquisition regression and Win32 gate pass on `d2d02c774ee85046acd42a453f2cf1f392927a20` (gate `36391517935`).
 - **F24 closed 2026-09-28:** runtime analyzer requires preflight version plus one exact observed DXVK runtime version before claiming stock-provider verification; missing, mismatched, or ambiguous version evidence fails closed (`4fc17768bb3cbb8242567f5c9ca9ce54526339dd`, gate `36390216273`).
+- F12 remains open: a full game-device recreation still needs explicit provider/capability re-attestation.
 - Exact-build Quest 3 two-pass visual parity is still required.
 
 ### E. Performance evidence
@@ -67,10 +67,10 @@ Each set contains ten distinct review passes and derives the next set's directio
 ## Evidence-driven implementation order
 
 1. **DONE 2026-09-28:** Reconcile stale gate verifiers and restore the accidentally truncated renderer bodies. Backend Conversion Gate run `36389674398` passes through Win32 build/binary verification/artifact upload on `e46be02786f80aa9e554a24323714194b586d1f6`; no runtime claim is made.
-2. Unify semantic catalogs and runtime producer classification.
+2. **PARTIAL 2026-09-28:** F13/F14 producer-catalog drift/omissions are closed at `d2d02c774ee85046acd42a453f2cf1f392927a20` with exact-SHA gate `36391517935` PASS. F15 projected semantic expressiveness remains open.
 3. Seal selector payload identity and transactional failure behavior.
 4. Tighten DX11 census/activation gates and transport parity.
-5. **PARTIAL 2026-09-28:** DXVK runtime-version attestation F24 is closed at `4fc17768bb3cbb8242567f5c9ca9ce54526339dd` with exact-SHA gate `36390216273` PASS. Acquisition/cache provenance (F09) still needs pinned-release digest enforcement.
+5. **PROVENANCE/VERSION DONE 2026-09-28:** F24 runtime-version attestation plus F08/F09 archive/cache/package-provider provenance are enforced and gate-tested. F12 device-recreation re-attestation is the remaining DXVK lifecycle evidence item.
 6. Obtain stock DXVK SAFE and DX11 observation one-run Quest 3 evidence.
 7. Separate clean performance profiles from discovery instrumentation.
 8. Only after graphics/lifecycle gates close, consider DXVK multiview or native DX11 draw ownership promotion.
