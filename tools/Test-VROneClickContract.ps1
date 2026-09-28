@@ -72,10 +72,23 @@ switch ([string]$target.RendererTarget) {
         if ([bool]$target.NativeDrawPathActive) {
             throw 'NativeDrawPathActive must remain false until the native D3D11 draw owner is actually connected.'
         }
+        foreach ($requiredText in @(
+            'OUTRUN_VR_DX11_CENSUS',
+            "RendererTarget -eq 'dx11-native'"
+        )) {
+            $launcher = Get-Content (Join-Path $toolsRoot 'Invoke-OutRunVROneClick.ps1') -Raw
+            if ($launcher -notmatch [regex]::Escape($requiredText)) {
+                throw "DX11 one-click census activation missing: $requiredText"
+            }
+        }
         foreach ($path in @(
             'src/vr/d3d11/native_backend.cpp',
             'src/vr/d3d11/native_backend.hpp',
             'src/vr/d3d11/state_translation.cpp',
+            'src/vr/d3d11/startup_census.cpp',
+            'src/vr/d3d11/pipeline_translation.cpp',
+            'src/vr/d3d11/runtime_census.cpp',
+            'src/vr/core/d3d9_draw_state.hpp',
             'src/vr/game/disasm_render_contract.hpp'
         )) {
             if (!(Test-Path (Join-Path $repoRoot $path))) {
@@ -106,6 +119,10 @@ switch ([string]$target.RendererTarget) {
         }
         if (!(Test-Path (Join-Path $repoRoot 'src/vr/d3d9/dxvk_provider_probe.cpp'))) {
             throw 'DXVK passive provider probe is missing.'
+        }
+        $deviceProbe = Get-Content (Join-Path $repoRoot 'src/vr/d3d9/device_probe.cpp') -Raw
+        if ($deviceProbe -notmatch [regex]::Escape('OutRunVR::Dxvk::ProbeProvider(device)')) {
+            throw 'DXVK provider census is not connected to the game-device lifecycle.'
         }
     }
 
