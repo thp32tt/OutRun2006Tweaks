@@ -3,7 +3,7 @@
   "task_id": "LOCALIZATION-LOCALIZATION_A-00029",
   "lane": "LOCALIZATION_A",
   "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
+  "attempt": "3/3",
   "wave_id": "W00009",
   "recorded_at_kst": "2026-09-29T03:40:00+09:00",
   "initial_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
@@ -11,7 +11,7 @@
   "preserved_intervening_head": false,
   "preserved_head_message": "localization(C): finalize W00008 synchronization [AUTO:LOCALIZATION-LOCALIZATION_C-00028]",
   "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE_REBUILD_SPEC",
-  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "scope": "GitHub-only lane A odd-index primary shard; unchanged REWORK blockers skipped; fallback ladder step 2 classified indices 103/151/153/155 and added deterministic rebuild input for 103; no work stealing; no shared-state mutation.",
   "report": "localization/graphics/role_A/20260929-0340-A00029/A00029_W00009_ZOOM_REVIEW_RESOLUTION.json",
@@ -78,6 +78,24 @@
     "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
     "localization/graphics/transcriptions.jsonl",
     "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
-    "localization/graphics/role_A/20260929-0340-A00029/A00029_W00009_ZOOM_REVIEW_RESOLUTION.json"
+    "localization/graphics/role_A/20260929-0340-A00029/A00029_W00009_ZOOM_REVIEW_RESOLUTION.json",
+    "GitHub Actions Localization Automation Gate run 36467350013 / job 109080648395",
+    "GitHub Actions Localization State run 36465939122 on pre-A C00028 head 79300d3e017f0325e29e4d9afb894252b4fee89b",
+    "GitHub Actions Localization Automation Gate run 36465939135 on pre-A C00028 head 79300d3e017f0325e29e4d9afb894252b4fee89b",
+    "tools/localization/verify_state.py",
+    "localization/graphics/role_A/20260929-0340-A00029/A00029_ATTEMPT3_CI_FAILURE_DIAGNOSIS.json"
+  ],
+  "base_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "result_sha": "34df11681bce9662d1033f7b356f9a5706a2f88c",
+  "summary": "A00029 material fallback remains valid, but automatic validation is blocked by a preexisting W00008 C shared-state inconsistency. Attempt 3 inspected the failing Actions logs, identified the exact C repair (artwork_plan + visual_review for indices 26/28/30/32/35), and did not violate A/B shared-state isolation.",
+  "retry_diagnosis": "localization/graphics/role_A/20260929-0340-A00029/A00029_ATTEMPT3_CI_FAILURE_DIAGNOSIS.json",
+  "failure_root_cause": "PREEXISTING_C_SHARED_STATE_INCONSISTENCY_ARTWORK_PLAN_AND_VISUAL_REVIEW_NOT_RECONCILED_FOR_26_28_30_32_35",
+  "required_next_owner": "LOCALIZATION_C",
+  "required_c_repair_indices": [
+    26,
+    28,
+    30,
+    32,
+    35
   ]
 }

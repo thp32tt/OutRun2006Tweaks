@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00029",
+  "attempt": "3/3",
+  "wave_id": "W00009",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-29T03:49:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "material_result_sha": "34df11681bce9662d1033f7b356f9a5706a2f88c",
+  "final_precommit_head_sha": "34df11681bce9662d1033f7b356f9a5706a2f88c",
+  "preserved_intervening_head": false,
+  "preserved_head_message": "localization(A): classify four odd zoom-review assets [AUTO:LOCALIZATION-LOCALIZATION_A-00029]",
+  "peer_lane_B_task_record_at_precommit": "NOT_PRESENT",
+  "failure_context": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36467350013,
+    "job_id": 109080648395,
+    "conclusion": "failure",
+    "failing_step": "Verify localization state",
+    "verifier": "tools/localization/verify_state.py",
+    "observed_errors": [
+      "artwork-plan indices do not match transcription indices",
+      "artwork-plan segment total 725 != transcription total 730",
+      "artwork-plan count 79 != localize_text target 84",
+      "graphics action counts visual_review localize_text=79 zoom_review=47 != progress localize_text=84 zoom_review=42"
+    ],
+    "preexisting_proof": {
+      "c00028_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+      "localization_state_run_id": 36465939122,
+      "localization_automation_gate_run_id": 36465939135,
+      "same_verify_state_failure_before_A00029": true
+    }
+  },
+  "root_cause": {
+    "owner": "C synchronization/shared-state reconciliation",
+    "promoted_indices": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ],
+    "promoted_translation": {
+      "source": "Total Rank",
+      "korean": "종합 랭크"
+    },
+    "current_transcriptions": {
+      "assets": 84,
+      "segments": 730
+    },
+    "current_artwork_plan": {
+      "assets": 79,
+      "segments": 725
+    },
+    "current_progress": {
+      "localize_text": 84,
+      "zoom_review": 42
+    },
+    "current_visual_review": {
+      "localize_text": 79,
+      "zoom_review": 47
+    },
+    "exact_required_shared_repair": [
+      "Add artwork_plan.jsonl rows for indices 26/28/30/32/35 with segment_count=1 and current transcribed Total Rank -> 종합 랭크 data; keep exact-HD decoded-pixel bbox production status pending.",
+      "Change visual_review.csv action for indices 26/28/30/32/35 from zoom_review to localize_text while preserving row order/path and visual_reviewed classification.",
+      "Re-run tools/localization/verify_state.py; expected artwork/transcription counts become 84 assets / 730 segments and visual action counts match progress."
+    ]
+  },
+  "lane_A_scope_decision": {
+    "shared_files_not_modified": [
+      "localization/graphics/artwork_plan.jsonl",
+      "localization/graphics/visual_review.csv",
+      "localization/resume_state.json",
+      "localization/WORKLOG.md",
+      "localization/progress/progress.json",
+      "localization/progress.json",
+      "localization/progress/STATUS.md",
+      "localization/graphics/asset_queue.csv"
+    ],
+    "reason": "Current Git contract permits A/B only disjoint DDS/candidate assets, lane-local evidence and the unique task record; C owns shared-state reconciliation. Repairing the root cause inside lane A would violate the authoritative parallel-isolation contract.",
+    "duplicate_failure_suppression": "No new automatic validation is claimed as PASS. This attempt records the blocker and exact C repair rather than re-running the known failing state as if it were fixed."
+  },
+  "production_result_preserved": {
+    "material_commit_sha": "34df11681bce9662d1033f7b356f9a5706a2f88c",
+    "reviewed_indices": [
+      103,
+      151,
+      153,
+      155
+    ],
+    "preserve_original_indices": [
+      151,
+      153,
+      155
+    ],
+    "localizable_text_identified_indices": [
+      103
+    ],
+    "localizable_asset": "590A4724",
+    "translation": {
+      "source": "Normal balance",
+      "korean": "일반 밸런스"
+    },
+    "candidate_dds_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "FAIL_PREEXISTING_SHARED_STATE_C_REPAIR_REQUIRED",
+  "runtime_validation": "UNTESTED",
+  "conclusion": "Attempt 3 confirms the A material result is lane-local and the CI failure predates A00029. The only correct root repair is a C/shared-state reconciliation of artwork_plan.jsonl and visual_review.csv for promoted indices 26/28/30/32/35. Lane A does not mutate those shared files or claim CI PASS."
+}
