@@ -1,0 +1,27 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": 1,
+  "base_sha": "8a089c241674d1217e89ed942167621bbd86df3d",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "selected_asset": {
+    "index": 97,
+    "asset": "411827E",
+    "reason": "odd-index REWORK_REQUIRED RGBA32; four bbox failures; B91 bbox-pass staged attempt rejected only for TUNED/NORMAL/RANDOM source-English/erasure residue"
+  },
+  "deferred_asset": {
+    "index": 53,
+    "asset": "568D3696",
+    "reason": "DXT5/mip13; six failures include height/width shrink beyond B92 one-pixel index-remap method; do not risk broad recompression without specialized decoded-pixel proof"
+  },
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "localization/graphics/role_B/20260928-0920-B91/B91_RGBA_REWORK_ACTIONS.json"
+  ],
+  "result_sha": "PENDING",
+  "note": "GitHub-only. No N100/GPT Library/VR/FFB/DX9Ex/DX11/DXVK/build. Runtime validation not performed."
+}
