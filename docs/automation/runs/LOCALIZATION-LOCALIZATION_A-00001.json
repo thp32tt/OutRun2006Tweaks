@@ -4,9 +4,9 @@
   "target_branch": "korean-localization-clean",
   "attempt": 1,
   "base_sha": "cbe8e4a4974eb17ed5936574e0869fc383c290f3",
-  "automation_validation": "FAIL",
+  "automation_validation": "RETRY_PENDING",
   "runtime_validation": "UNTESTED",
-  "summary": "A index 57 39229D64 exact-bbox rework retry failed safely in GitHub Actions before candidate DDS write. Strict post-QA still reports six source-diff containment failures; no collateral or outside-cell change was introduced. Candidate remains unchanged. Next A-shard rework candidate is index 51 FF2462BB, whose last B91 shrink variant passed decoded containment but failed source-style/artifact QA due ragged resampling.",
+  "summary": "A index 57 39229D64 retry queued with overlapping-sprite-cell QA disambiguation: per-element moved source-diff masks plus asset-wide zero-overflow enforcement.",
   "evidence": [
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
     "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
@@ -18,8 +18,9 @@
     "Remaining 39229D64 failed keys: technical_bonus, mission_cleared, storing, special_request, exit, mission_failed.",
     "Strict post-QA on retry: collateral_pixels=0; outside_cells_changed_pixels=0; introduced_alpha_outside_cells=0.",
     "Next A-shard REWORK_REQUIRED candidate by queue priority/index age: FF2462BB index 51; C85 reason REWORK_REQUIRED_ARTIFACT (ragged stroke degradation after shrink).",
-    "localization/progress.json absent; maintained file is localization/progress/progress.json"
+    "localization/progress.json absent; maintained file is localization/progress/progress.json",
+    "QA ownership fix commit f37fe7080bbf3ec7f77b25a4507885bbe905d208: overlapping sprite cells no longer use ambiguous whole-cell bbox attribution."
   ],
-  "result_sha": "NO_CANDIDATE_CHANGE",
+  "result_sha": "PENDING_GITHUB_ACTIONS_RETRY",
   "note": "No N100/local worktree/GPT Library/VR/FFB/DX9Ex/DX11/DXVK work used. Runtime/in-game test not performed."
 }
