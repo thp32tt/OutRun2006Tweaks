@@ -144,7 +144,8 @@ foreach ($requiredText in @(
     'Write-BackendSelectionFailureDiagnostic',
     '_selector_failures',
     'VR_SELECTOR_FAILURE_',
-    'RollbackStatus'
+    'RollbackStatus',
+    'SOURCE_RESOLUTION'
 )) {
     if ($selector -notmatch [regex]::Escape($requiredText)) {
         throw "Selector root payload attestation contract missing: $requiredText"

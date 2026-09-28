@@ -25,10 +25,7 @@ $variant = if ($VariantId -eq "AUTO") { $defaultVariant } else { $VariantId }
 $slotPayload = Join-Path $root ("slots/" + $variant)
 $backendPayload = Join-Path $backendRoot $payloadBackend
 $src = if (Test-Path $slotPayload) { $slotPayload } else { $backendPayload }
-if (-not (Test-Path $src)) { throw "Test payload not found for variant=$variant backend=$Backend : $src" }
-
-$sourceFile = Join-Path $src "SOURCE_SHA.txt"
-$sourceSha = if (Test-Path $sourceFile) { (Get-Content $sourceFile -Raw).Trim() } else { "unknown" }
+$sourceSha = "unknown"
 
 $logPatterns=@(
     'OutRun2006Tweaks*.log',
@@ -224,6 +221,14 @@ function Write-BackendSelectionFailureDiagnostic(
         }
     }
 }
+
+if (-not (Test-Path $src)) {
+    $message = "Test payload not found for variant=$variant backend=$Backend : $src"
+    $diagnostic = Write-BackendSelectionFailureDiagnostic -Phase 'SOURCE_RESOLUTION' -ErrorText $message -RollbackStatus 'not-required'
+    throw ("{0} Diagnostic={1}" -f $message,$diagnostic)
+}
+$sourceFile = Join-Path $src "SOURCE_SHA.txt"
+$sourceSha = if (Test-Path $sourceFile) { (Get-Content $sourceFile -Raw).Trim() } else { "unknown" }
 
 function Get-FileIdentity([string]$Path) {
     if (-not (Test-Path $Path -PathType Leaf)) { return $null }

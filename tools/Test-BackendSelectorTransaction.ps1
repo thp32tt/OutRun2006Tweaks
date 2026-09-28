@@ -86,6 +86,31 @@ try {
         throw 'Selector failure diagnostic incorrectly claims a normal session was created.'
     }
 
+    $missingSourceRoot = Join-Path $testRoot 'missing-source-case'
+    New-Item -ItemType Directory -Force $missingSourceRoot | Out-Null
+    $missingSelector = Join-Path $missingSourceRoot 'Select-OutRunVRBackend.ps1'
+    Copy-Item $selectorSource $missingSelector -Force
+    $sourceFailed = $false
+    try {
+        & $missingSelector -Backend d3d9 -TestProfile CORRECTNESS -VariantId A_CONTROL | Out-Null
+    } catch {
+        $sourceFailed = $true
+    }
+    if (-not $sourceFailed) {
+        throw 'Selector source-resolution diagnostic test expected a missing-payload failure.'
+    }
+    $sourceFailureReport = @(Get-ChildItem (Join-Path $missingSourceRoot 'logs/_selector_failures') -Filter 'SELECTOR_FAILURE.json' -File -Recurse -ErrorAction SilentlyContinue)
+    if ($sourceFailureReport.Count -ne 1) {
+        throw "Expected one source-resolution failure diagnostic, found $($sourceFailureReport.Count)."
+    }
+    $sourceFailureRecord = Get-Content $sourceFailureReport[0].FullName -Raw | ConvertFrom-Json
+    if ([string]$sourceFailureRecord.Phase -ne 'SOURCE_RESOLUTION') {
+        throw "Source-resolution diagnostic phase mismatch: $($sourceFailureRecord.Phase)"
+    }
+    if ([string]$sourceFailureRecord.RollbackStatus -ne 'not-required') {
+        throw "Source-resolution rollback status mismatch: $($sourceFailureRecord.RollbackStatus)"
+    }
+
     Write-Host 'Backend selector transactional rollback + pre-session diagnostic PASS'
 } finally {
     if (Test-Path $testRoot) {
