@@ -224,9 +224,16 @@ require_all("src/hooks_uiscaling.cpp", [
 ], "P8_R71_RIVAL_AND_OUTRUN_STAGE_TEXT")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
-    'InRange(callRva, 0x097300, 0x097F00)',
+    'callRva == 0x0975EE || callRva == 0x097727',
+    'callRva == 0x0977FB',
+    '"WORLD_RIVAL_PROJECTED"',
+    'callRva == 0x0BB6F0 || callRva == 0x0BB796',
     'ClassifyCaller(0x0975EE)',
+    'ClassifyCaller(0x0BB6F0)',
 ], "P8_R71_OUTRUN_STAGE_SEMANTICS")
+forbid("src/vr/hud_semantics.hpp",
+       "InRange(callRva, 0x097300, 0x097F00)",
+       "P8_NO_BROAD_R71_OUTRUN_RANGE")
 require_all("src/game_addrs.hpp", [
     'is_vr_gameplay_presentation()',
     'GameState::STATE_START',
