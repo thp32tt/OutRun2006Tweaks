@@ -58,11 +58,17 @@ namespace OutRunVRHudSemantics
             return { "MenuExactArrow", "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud };
         if (callRva == 0x097BB7 || callRva == 0x097DA7)
             return { "OutRunFinalResult", "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud };
-        // R71 canonical-EXE inspection + R70 HMD evidence: the bounded
-        // 0x4973xx-0x497Exx cluster owns OutRun checkpoint/stage/result text.
-        // Keep this narrow; it is not a blanket mode-16 HUD rule.
-        if (InRange(callRva, 0x097300, 0x097F00))
+        // R71 static cycle 0006: canonical EXE analysis found no BA9D0
+        // caller anywhere in the old 0x097300..0x097F00 range. Keep only the
+        // three proven Sumo_Printf stage/checkpoint calls as semantic anchors;
+        // hooks_uiscaling brackets those exact call instructions directly.
+        if (callRva == 0x0975EE || callRva == 0x097727 ||
+            callRva == 0x0977FB)
             return { "OutRunStageResult", "HUD_OUTRUN_STAGE", OutRunVR::GameSemantic::RenderScope::ScreenHud };
+        // Gameplay rival indicator has its own vehicle-relative Calc3D2D
+        // projection and exact sprani producer outside sub_4BAD20.
+        if (callRva == 0x0BB6F0 || callRva == 0x0BB796)
+            return { "RivalMarkerProjected", "WORLD_RIVAL_PROJECTED", OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D };
 
         // HAM attached-heart draw; anchored by HeartDisp_PulseAngle=0x05B43A.
         if (InRange(callRva, 0x05B300, 0x05B700))
@@ -131,12 +137,17 @@ namespace OutRunVRHudSemantics
     // Exact reverse-engineered anchor inventory from hooks_uiscaling.cpp.
     // This is a review/test source-of-truth, even where the anchor itself is
     // not a direct sprite call and therefore may not appear in hudtrace.csv.
-    inline constexpr std::array<SemanticAnchor, 60> Anchors{{
+    inline constexpr std::array<SemanticAnchor, 65> Anchors{{
         {0x0460F1, "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact menu/list arrow #1"},
         {0x0463D6, "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact menu/list arrow #2"},
         {0x046410, "HUD_MENU_ARROW", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact menu/list arrow #3"},
         {0x097BB7, "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact OutRun result #1"},
         {0x097DA7, "HUD_OUTRUN_RESULT", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R70 runtime exact OutRun result #2"},
+        {0x0975EE, "HUD_OUTRUN_STAGE", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R71 exact OutRun stage/checkpoint text #1"},
+        {0x097727, "HUD_OUTRUN_STAGE", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R71 exact OutRun stage/checkpoint text #2"},
+        {0x0977FB, "HUD_OUTRUN_STAGE", OutRunVR::GameSemantic::RenderScope::ScreenHud, "R71 exact OutRun stage/checkpoint text #3"},
+        {0x0BB6F0, "WORLD_RIVAL_PROJECTED", OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D, "R71 rival vehicle Calc3D2D projection"},
+        {0x0BB796, "WORLD_RIVAL_PROJECTED", OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D, "R71 rival exact sprani producer"},
         {0x05B43A, "WORLD_HEART", OutRunVR::GameSemantic::RenderScope::WorldBillboard, "HeartDisp_car_heart pulse angle"},
         {0x060A21, "HUD_CTRL_ICON", OutRunVR::GameSemantic::RenderScope::ScreenHud, "set_icon_work girlfriend/control icon"},
         {0x060D40, "HUD_CTRL_ICON", OutRunVR::GameSemantic::RenderScope::ScreenHud, "ctrl_icon_work adjustment #1"},
@@ -204,6 +215,8 @@ namespace OutRunVRHudSemantics
     static_assert(ClassifyCaller(0x0460F1).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x097BB7).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0975EE).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
+    static_assert(ClassifyCaller(0x0BB6F0).space == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D);
+    static_assert(ClassifyCaller(0x0BB796).space == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D);
     static_assert(ClassifyCaller(0x060D40).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0BBA89).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
     static_assert(ClassifyCaller(0x0B9F3A).space == OutRunVR::GameSemantic::RenderScope::ScreenHud);
