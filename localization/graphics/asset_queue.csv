@@ -11,22 +11,22 @@ index,path,action,artwork_status,transcription_status,notes
 23,textures/load/spr_font_xst/FDC6BAD7_512x128.dds,font_pipeline,blocked_runtime_font,glyph_atlas,
 24,textures/load/spr_name_entry_xst/66743AA8_1024x1024.dds,hangul_name_entry,blocked_runtime_name_entry,glyph_atlas,
 25,textures/load/spr_sprani_CLAR_RANK_Exst/4AFC1BED_512x512.dds,zoom_review,preserve_original,not_required,W00007 A00023+C92 zoom review resolved: girlfriend portrait/icons + symbolic rank A/B/C/D/E only; no localizable UI word text; preserve original
-26,textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
+26,textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,W00008 B00027+C93: Total Rank x2 confirmed -> 종합 랭크; promoted from zoom_review to localize_text; exact HD source-faithful rebuild required; HOLD exact HD decoded-pixel bbox/zero-pixel + ENGLISH SOURCE side-by-side before candidate; no DDS bytes yet; runtime UNTESTED
 27,textures/load/spr_sprani_CLAR_RANK_Exst/8B52FEEC_1024x512.dds,zoom_review,preserve_original,not_required,W00007 A00023+C92 zoom review resolved: girlfriend character poses only; no localizable UI word text; preserve original
-28,textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
+28,textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,W00008 B00027+C93: Total Rank x1 confirmed -> 종합 랭크; promoted from zoom_review to localize_text; exact HD source-faithful rebuild required; HOLD exact HD decoded-pixel bbox/zero-pixel + ENGLISH SOURCE side-by-side before candidate; no DDS bytes yet; runtime UNTESTED
 29,textures/load/spr_sprani_CLAR_RANK_Exst/F043316B_1024x512.dds,zoom_review,preserve_original,not_required,W00007 A00023+C92 zoom review resolved: girlfriend character poses only; no localizable UI word text; preserve original
-30,textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,
+30,textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,W00008 B00027+C93: Total Rank x2 confirmed -> 종합 랭크; promoted from zoom_review to localize_text; exact HD source-faithful rebuild required; HOLD exact HD decoded-pixel bbox/zero-pixel + ENGLISH SOURCE side-by-side before candidate; no DDS bytes yet; runtime UNTESTED
 31,textures/load/spr_sprani_FLAG_RANK_Exst/A82266FC_1024x512.dds,zoom_review,preserve_original,not_required,W00007 A00023+C92 zoom review resolved: mechanic poses + symbolic rank A + embedded logo artwork only; no localizable UI word text; preserve original
-32,textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
-33,textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,
+32,textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,W00008 B00027+C93: Total Rank x1 confirmed -> 종합 랭크; promoted from zoom_review to localize_text; exact HD source-faithful rebuild required; HOLD exact HD decoded-pixel bbox/zero-pixel + ENGLISH SOURCE side-by-side before candidate; no DDS bytes yet; runtime UNTESTED
+33,textures/load/spr_sprani_FLAG_RANK_Exst/FBCAB18D_1024x512.dds,zoom_review,preserve_original,not_required,W00008 A00026+C93 zoom review resolved: mechanic character poses + embedded cap/shirt logo artwork only; no localizable UI prose; preserve original
 34,textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds,zoom_review,blocked_review,needs_zoom_review,
-35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,zoom_review,blocked_review,needs_zoom_review,
+35,textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds,localize_text,pending_artwork,transcribed_reviewed,W00008 A00026+C93: Total Rank x2 confirmed -> 종합 랭크; promoted from zoom_review to localize_text; exact HD source-faithful rebuild required; HOLD exact HD decoded-pixel bbox/zero-pixel + ENGLISH SOURCE side-by-side before candidate; no DDS bytes yet; runtime UNTESTED
 36,textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds,zoom_review,blocked_review,needs_zoom_review,
-37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,zoom_review,blocked_review,needs_zoom_review,
+37,textures/load/spr_sprani_JENN_RANK_Exst/515DCBB2_1024x1024.dds,zoom_review,preserve_original,not_required,W00008 A00026+C93 zoom review resolved: girlfriend character poses only; no localizable UI prose; preserve original
 38,textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds,zoom_review,blocked_review,needs_zoom_review,
 43,textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 44,textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass3 transcription saved
-45,textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds,zoom_review,blocked_review,needs_zoom_review,
+45,textures/load/spr_sprani_etc_cvt_Exst/1F77CB88_128x128.dds,zoom_review,preserve_original,not_required,W00008 A00026+C93 zoom review resolved: keyboard key legends F1/F2/Esc/Tab/Enter/arrows; physical input labels; no localizable UI prose; preserve original
 46,textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 47,textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass3 transcription saved
 48,textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
