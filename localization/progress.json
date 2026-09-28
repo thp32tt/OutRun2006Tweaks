@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-28T22:36:00+09:00",
+  "updated_at_kst": "2026-09-28T23:37:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -531,17 +531,17 @@
       }
     },
     "latest_c_barrier": {
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00010",
-      "wave_id": "W00002",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
+      "wave_id": "W00003",
       "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
-      "base_head": "c7a7217735895473b6b8ff0326f458bb23446ec7",
-      "lane_a": "BLOCKED_NO_ACTION",
-      "lane_b": "DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING",
+      "base_head": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+      "lane_a": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
+      "lane_b": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
       "candidate_dds_modified": false,
       "asset_queue_modified": false,
       "approved_dds_count": 0,
       "runtime_validation": "UNTESTED",
-      "report": "localization/graphics/role_C/20260928-2236-C87/C87_W00002_SYNC_FINAL_QA.json"
+      "report": "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json"
     }
   },
   "data_build": {

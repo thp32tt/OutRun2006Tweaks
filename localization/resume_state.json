@@ -1385,41 +1385,79 @@
     "next_action": "Next A+B wave remains source-gated on GitHub-available canonical/HD DDS bytes; preserve existing REWORK/HOLD/PENDING_C states and require isolated DDS_ONLY in-game validation before approval."
   },
   "latest_wave_barrier": {
-    "timestamp_kst": "2026-09-28T22:36:00+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00010",
-    "wave_id": "W00002",
-    "base_head": "c7a7217735895473b6b8ff0326f458bb23446ec7",
-    "lane_a": {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00008",
-      "result": "BLOCKED_NO_ACTION",
-      "commit": "f0f10146f37fa170c3838eac75721f6dff416047",
-      "candidate_dds_modified": false
-    },
-    "lane_b": {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00009",
-      "result": "DURABLE_BLOCKER_GITHUB_SOURCE_BYTES_MISSING",
-      "commit": "207e153dbc9aac4bf14da87234bbfa223f050e52",
-      "candidate_dds_modified": false
-    },
-    "queue_recomputed": {
-      "total": 137,
-      "localize_text": 79,
-      "zoom_review": 47,
-      "font_pipeline": 9,
-      "hangul_name_entry": 1,
-      "preserve_brand_song_credit": 1,
-      "pending_artwork": 63,
-      "blocked_review": 47,
-      "rework_required": 6,
-      "self_qa_pending_c": 4,
-      "c86_high_risk_pending_ingame": 2,
-      "c85_pixel_visual_pass_pending_ingame": 4
-    },
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
+    "wave_id": "W00003",
     "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
-    "approved_dds_count": 0,
+    "base_head": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+    "lane_a": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
+    "lane_b": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
     "candidate_dds_modified": false,
     "asset_queue_modified": false,
+    "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
-    "next_action": "Next A+B wave remains source-gated on GitHub-available canonical/HD DDS bytes; preserve existing REWORK/HOLD/PENDING_C states and require isolated DDS_ONLY in-game validation before approval."
+    "report": "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json"
+  },
+  "c88_w00003_barrier": {
+    "recorded_at_kst": "2026-09-28T23:37:00+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
+    "wave_id": "W00003",
+    "result": "NO_NEW_ASSET_APPROVALS_STATE_RECONCILED",
+    "base_head": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+    "lane_a": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
+    "lane_b": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+    "candidate_dds_modified": false,
+    "asset_queue_modified": false,
+    "approved_dds_count": 0,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json",
+    "lane_terminals": {
+      "A": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00011",
+        "commit": "a05a5cb36f7b1f325e564c2cc4e03b4ff2890286",
+        "result": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
+        "candidate_dds_modified": false
+      },
+      "B": {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00012",
+        "commit": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+        "result": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+        "candidate_dds_modified": false
+      }
+    },
+    "queue_recompute": {
+      "rows": 137,
+      "actions": {
+        "localize_text": 79,
+        "font_pipeline": 9,
+        "hangul_name_entry": 1,
+        "zoom_review": 47,
+        "preserve_brand_song_credit": 1
+      },
+      "statuses": {
+        "c85_pixel_visual_pass_pending_ingame": 4,
+        "blocked_runtime_font": 9,
+        "blocked_runtime_name_entry": 1,
+        "blocked_review": 47,
+        "pending_artwork": 63,
+        "rework_required_zero_pixel_or_artifact": 6,
+        "b95_self_qa_pass_pending_c": 1,
+        "a_auto_self_qa_pass_pending_c": 1,
+        "b94_self_qa_pass_pending_c": 1,
+        "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+        "c86_containment_pass_high_risk_pending_ingame": 2,
+        "preserve_original": 1
+      },
+      "direct_image_scope": 126
+    },
+    "cross_lane_qa": {
+      "new_candidate_bytes_to_review": 0,
+      "new_approvals": 0,
+      "repeated_completed_work": false,
+      "preserved_states": [
+        "C85 pixel+visual PASS pending isolated DDS_ONLY in-game: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77",
+        "C86 containment PASS high-risk edge-touch pending isolated DDS_ONLY in-game: 62BEBF33, E3FD08BE",
+        "Existing REWORK_REQUIRED, self-QA-pending-C, pending_artwork, blocked_review and runtime-blocked rows remain unpromoted"
+      ]
+    }
   }
 }

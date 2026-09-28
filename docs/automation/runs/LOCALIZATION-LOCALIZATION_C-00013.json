@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00003",
+  "recorded_at_kst": "2026-09-28T23:37:00+09:00",
+  "commit_base_sha": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+  "result": "PASS_BARRIER_RECONCILED_NO_NEW_APPROVALS",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "lane_terminals": {
+    "A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00011",
+      "commit": "a05a5cb36f7b1f325e564c2cc4e03b4ff2890286",
+      "result": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE"
+    },
+    "B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00012",
+      "commit": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+      "result": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT"
+    }
+  },
+  "report": "localization/graphics/role_C/20260928-2337-C88/C88_W00003_SYNC_FINAL_QA.json",
+  "summary": "W00003 synchronization barrier reconciled from GitHub-only state. Both A and B produced durable no-write/blocker results, so C preserved current QA/HOLD/REWORK states, made no approvals, and updated shared state without repeating completed work.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00011.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00012.json",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/role_A/20260928-A00011/A00011_W00003_GITHUB_SOURCE_GATE.json",
+    "localization/graphics/role_B/20260928-2328-B97/B97_W00003_GITHUB_SOURCE_GATE.json",
+    "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json"
+  ],
+  "candidate_dds_modified": false,
+  "asset_queue_modified": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "vr_ffb_dx_changes": false
+}

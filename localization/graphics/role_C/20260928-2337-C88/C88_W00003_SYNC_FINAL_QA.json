@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00013",
+  "lane": "LOCALIZATION_C",
+  "role": "CROSS_LANE_FINAL_QA_SYNC_BARRIER",
+  "wave_id": "W00003",
+  "recorded_at_kst": "2026-09-28T23:37:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+  "lane_terminals": {
+    "A": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00011",
+      "commit": "a05a5cb36f7b1f325e564c2cc4e03b4ff2890286",
+      "result": "BLOCKED_NO_ACTION_NO_NEW_SAFE_GITHUB_EVIDENCE",
+      "candidate_dds_modified": false,
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED"
+    },
+    "B": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00012",
+      "commit": "e692f6140c1c4a2b2e0d04279494aae1fa4db626",
+      "result": "DURABLE_BLOCKER_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+      "candidate_dds_modified": false,
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "queue_recompute": {
+    "rows": 137,
+    "actions": {
+      "localize_text": 79,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "zoom_review": 47,
+      "preserve_brand_song_credit": 1
+    },
+    "statuses": {
+      "c85_pixel_visual_pass_pending_ingame": 4,
+      "blocked_runtime_font": 9,
+      "blocked_runtime_name_entry": 1,
+      "blocked_review": 47,
+      "pending_artwork": 63,
+      "rework_required_zero_pixel_or_artifact": 6,
+      "b95_self_qa_pass_pending_c": 1,
+      "a_auto_self_qa_pass_pending_c": 1,
+      "b94_self_qa_pass_pending_c": 1,
+      "a00004_self_qa_pass_pending_c_visual_ingame": 1,
+      "c86_containment_pass_high_risk_pending_ingame": 2,
+      "preserve_original": 1
+    },
+    "direct_image_scope": 126
+  },
+  "cross_lane_qa": {
+    "new_candidate_bytes_to_review": 0,
+    "repeated_completed_work": false,
+    "new_approvals": 0,
+    "approved_dds_count": 0,
+    "asset_queue_changed": false,
+    "semantic_context_review": "NO_NEW_TRANSLATION_OR_ARTWORK_BYTES; current terminology/context state preserved",
+    "zero_pixel_boundary_review": "NO_NEW_ASSET_WRITE; current C85/C86 evidence preserved",
+    "dds_format_mipmap_alpha_orientation": "NO_NEW_ASSET_WRITE; current validated evidence preserved",
+    "background_wrong_replacement_hd_gui": "NO_NEW_ASSET_WRITE; no new replacement to promote",
+    "preserved_holds": [
+      "C85 C4A2937B/9F060EC1/D6DC1380/48DEBE77 pixel+visual PASS pending isolated DDS_ONLY in-game",
+      "C86 62BEBF33/E3FD08BE decoded-pixel containment PASS, zero top margin high-risk pending high-zoom + isolated DDS_ONLY in-game",
+      "Existing REWORK_REQUIRED and self-QA-pending-C rows remain unpromoted"
+    ],
+    "blockers": [
+      "FF2462BB source-faithful rerender/artifact risk",
+      "568D3696 specialized DXT5 decoded-pixel-safe recompression/mip validation",
+      "C075FB49 overlap/artwork-sensitive remaining regions",
+      "FD90AA9 source-faithful reconstruction/collateral risk",
+      "2DA43E41 B93 safe-repair attempts exhausted",
+      "isolated DDS_ONLY in-game validation remains mandatory for approval"
+    ]
+  },
+  "shared_state_updated": [
+    "localization/resume_state.json",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/progress/STATUS.md",
+    "localization/WORKLOG.md"
+  ],
+  "asset_queue_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PASS",
+  "n100_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "vr_ffb_dx_changes": false
+}
