@@ -10,6 +10,7 @@ $parseFiles = @(
     'Invoke-OutRunVROneClick.ps1',
     'Test-OutRunVROneClickPreflight.ps1',
     'Select-OutRunVRBackend.ps1',
+    'Test-BackendSelectorTransaction.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
     'Build-OutRunPCFast.ps1',
@@ -31,6 +32,12 @@ foreach ($name in $parseFiles) {
         }) -join '; '
         throw "PowerShell syntax error in $name :: $detail"
     }
+}
+
+$selectorTransactionTest = Join-Path $toolsRoot 'Test-BackendSelectorTransaction.ps1'
+& $selectorTransactionTest
+if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+    throw "Backend selector transaction regression test failed with exit code $LASTEXITCODE"
 }
 
 $pythonFiles = @(
@@ -131,7 +138,11 @@ foreach ($required in @(
 foreach ($requiredText in @(
     'Assert-RootPayloadIdentity',
     'ROOT_PAYLOAD_ATTESTATION.json',
-    'RootPayloadAttestation'
+    'RootPayloadAttestation',
+    'Start-BackendSwitchTransaction',
+    'Restore-BackendSwitchTransaction',
+    'Remove-BackendSwitchTransaction',
+    'Backend selection rollback failed'
 )) {
     if ($selector -notmatch [regex]::Escape($requiredText)) {
         throw "Selector root payload attestation contract missing: $requiredText"
