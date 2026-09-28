@@ -19,7 +19,8 @@ $parseFiles = @(
     'Acquire-OutRunDXVK.ps1',
     'Test-DxvkAcquisition.ps1',
     'OutRunVR-PackageIntegrity.ps1',
-    'Test-OutRunVRPackageIntegrity.ps1'
+    'Test-OutRunVRPackageIntegrity.ps1',
+    'Test-OutRunVROneClickBehavior.ps1'
 )
 
 foreach ($name in $parseFiles) {
@@ -84,6 +85,12 @@ foreach ($requiredText in @(
 
 $selectorTransactionTest = Join-Path $toolsRoot 'Test-BackendSelectorTransaction.ps1'
 & $selectorTransactionTest
+
+$oneClickBehaviorTest = Join-Path $toolsRoot 'Test-OutRunVROneClickBehavior.ps1'
+if (!(Test-Path $oneClickBehaviorTest -PathType Leaf)) {
+    throw "Missing one-click behavior test: $oneClickBehaviorTest"
+}
+& $oneClickBehaviorTest
 
 $runnerFailureTest = Join-Path $toolsRoot 'Test-RunOutRunVRFailureDiagnostics.ps1'
 & $runnerFailureTest

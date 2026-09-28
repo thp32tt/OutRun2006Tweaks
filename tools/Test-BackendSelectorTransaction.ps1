@@ -111,7 +111,49 @@ try {
         throw "Source-resolution rollback status mismatch: $($sourceFailureRecord.RollbackStatus)"
     }
 
-    Write-Host 'Backend selector transactional rollback + pre-session diagnostic PASS'
+    # Successful selection must persist the same root payload identity that the
+    # selector verified after mutation and before session handoff.
+    $successRoot = Join-Path $testRoot 'success-attestation-case'
+    New-Item -ItemType Directory -Force $successRoot | Out-Null
+    $successSelector = Join-Path $successRoot 'Select-OutRunVRBackend.ps1'
+    Copy-Item $selectorSource $successSelector -Force
+    $successSlot = Join-Path $successRoot 'slots/A_CONTROL'
+    $successDxvk = Join-Path $successRoot 'backends/dxvk'
+    New-Item -ItemType Directory -Force $successSlot | Out-Null
+    New-Item -ItemType Directory -Force $successDxvk | Out-Null
+    Set-Content (Join-Path $successSlot 'SOURCE_SHA.txt') 'success-source-sha' -Encoding ascii
+    Set-Content (Join-Path $successSlot 'dinput8.dll') 'success-game-dll' -Encoding ascii
+    Set-Content (Join-Path $successSlot 'outrun-vr-host.exe') 'success-host' -Encoding ascii
+    Set-Content (Join-Path $successDxvk 'd3d9.dll') 'success-dxvk-provider' -Encoding ascii
+    Set-Content (Join-Path $successRoot 'OutRun2006Tweaks.ini') "[VR]`r`nEnabled = false`r`nRenderBackend = 1`r`n" -Encoding UTF8
+    Set-Content (Join-Path $successRoot 'BUILD_MATRIX_ID.txt') 'selector-behavior' -Encoding ascii
+
+    & $successSelector -Backend dxvk-safe -TestProfile CORRECTNESS -VariantId A_CONTROL | Out-Null
+
+    $attestationPath = Join-Path $successRoot 'ROOT_PAYLOAD_ATTESTATION.json'
+    if (!(Test-Path $attestationPath -PathType Leaf)) {
+        throw 'Successful selector did not persist ROOT_PAYLOAD_ATTESTATION.json.'
+    }
+    $attestation = Get-Content $attestationPath -Raw | ConvertFrom-Json
+    foreach ($field in @('dinput8','host','d3d9')) {
+        if (-not [bool]$attestation.Files.$field.Match) {
+            throw "Successful selector root attestation did not match $field."
+        }
+    }
+    if (Test-Path (Join-Path $successRoot 'multiviewpatcher.dll')) {
+        throw 'dxvk-safe successful selection left forbidden multiviewpatcher.dll.'
+    }
+    $current = Get-Content (Join-Path $successRoot 'CURRENT_VR_SESSION.json') -Raw | ConvertFrom-Json
+    if ([string]$current.Backend -ne 'dxvk-safe' -or [string]$current.SourceSha -ne 'success-source-sha') {
+        throw "Successful selector session identity mismatch: backend=$($current.Backend) source=$($current.SourceSha)"
+    }
+    if (-not [bool]$current.RootPayloadAttestation.Files.dinput8.Match -or
+        -not [bool]$current.RootPayloadAttestation.Files.host.Match -or
+        -not [bool]$current.RootPayloadAttestation.Files.d3d9.Match) {
+        throw 'Successful selector session did not embed verified root payload attestation.'
+    }
+
+    Write-Host 'Backend selector transactional rollback + pre-session diagnostic + successful root attestation PASS'
 } finally {
     if (Test-Path $testRoot) {
         Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
