@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72/R73/R74/R75/R76/R77 DX11 census analyzer compatibility."""
+"""Regression tests for R72/R73/R74/R75/R76/R77/R78 DX11 census analyzer compatibility."""
 
 from __future__ import annotations
 
@@ -166,6 +166,38 @@ def main() -> int:
     assert r77["LatestSummary"]["managedDeviceGeneration"] == 4
     assert r77["LatestSummary"]["managedShadowVersion"] == 6
     assert r77["LatestSummary"]["managedMirrorReady"] == 0
+
+    r78 = run_case(
+        "VR DX11 R78 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
+        "decl=1 declHash=0x0000000000000001 declElems=3 "
+        "inputLayout[exact=1,elements=2,fvfPending=0]\n"
+        "VR DX11 R78 census: samples=64 exact=0 fixedFn=0 programmable=64 "
+        "topologyUnsupported=0 signatures=1 declSamples=64 indexedSamples=64 "
+        "texturedSamples=64 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=64,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "mutation[writeUnlocks=7,readOnlyUnlocks=2,discardWriteUnlocks=2,"
+        "noOverwriteWriteUnlocks=1] "
+        "mutationPlan[exact=5,unsupported=1,managedShadow=0,mapWrite=1,"
+        "mapDiscard=2,mapNoOverwrite=1,updateSubresource=1] "
+        "textureMutation[writeUnlocks=9,readOnlyUnlocks=2,descriptorFailures=0,"
+        "updateTextureSuccesses=4,updateTextureFailures=1,"
+        "updateSurfaceSuccesses=3,updateSurfaceFailures=2] "
+        "managedLifetime[shadowWrites=6,shadowReads=2,resetSuccesses=3,"
+        "shadowPreserved=3,deviceGeneration=4,shadowVersion=6,"
+        "mirrorGeneration=0,mirrorVersion=0,mirrorReady=0] "
+        "inputLayout[exact=63,unsupported=1,fvfPending=1] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r78["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r78["NativeDrawPathActivationAllowed"] is False
+    assert r78["LatestSummary"]["inputLayoutExact"] == 63
+    assert r78["LatestSummary"]["inputLayoutUnsupported"] == 1
+    assert r78["LatestSummary"]["inputLayoutFvfPending"] == 1
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
