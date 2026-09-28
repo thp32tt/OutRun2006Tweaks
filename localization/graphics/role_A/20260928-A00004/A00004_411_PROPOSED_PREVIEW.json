@@ -1,0 +1,10 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00004",
+  "asset": "411827E",
+  "candidate_written": false,
+  "proposal": {
+    "seconds": "minimal resize to B91 contained bbox",
+    "tuned_normal_random": "restore canonical source only outside original bbox"
+  },
+  "runtime_validation": "UNTESTED"
+}
