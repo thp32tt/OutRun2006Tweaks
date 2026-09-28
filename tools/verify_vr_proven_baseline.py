@@ -168,6 +168,14 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
     'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
 ], "P7_FLARE_R26HUD_PATH")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'std::clamp(Settings::SkyGlowFactor.get(), 1, 16)',
+    'Keep the stereo',
+    'factor semantics',
+], "P7_R70_SKYGLOW_FACTOR_SETTING")
+forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+       "constexpr int factor = 2;",
+       "P7_NO_FORCED_SKYGLOW_FACTOR2")
 
 # PASS 8 — VR keeps stock PC shadow behavior and selector texture headroom.
 require_all("src/hooks_graphics.cpp", [
