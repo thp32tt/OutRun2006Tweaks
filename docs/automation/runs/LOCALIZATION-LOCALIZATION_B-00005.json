@@ -29,5 +29,14 @@
   "candidate_dds_modified": false,
   "runtime_test_performed": false,
   "n100_used": false,
-  "gpt_library_used": false
+  "gpt_library_used": false,
+  "marker_reconciliation": {
+    "timestamp_kst": "2026-09-28T19:25:00+09:00",
+    "reason": "Stale CHAT_ROLLOVER=1 request arrived after durable CHAT_ROLLOVER=5 terminal record; preserved newer state and did not repeat completed/blocked DDS work.",
+    "prior_terminal_result": "DURABLE_REVIEW_NO_DUPLICATE_REWORK",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "dds_rework_repeated": false,
+    "shared_state_modified": false
+  }
 }
