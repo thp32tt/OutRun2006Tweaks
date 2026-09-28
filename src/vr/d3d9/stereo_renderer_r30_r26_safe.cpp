@@ -653,8 +653,15 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30CreateVertexBufferHook.stdcall<HRESULT>(
                 device, length, usage, fvf, pool, out, shared);
-            // Buffer shadow ownership is draw-proven, not creation-wide.
-            // Do not auto-register arbitrary world buffers here.
+            if (SUCCEEDED(hr) && out && *out &&
+                (fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZRHW)
+            {
+                // Fixed-function XYZRHW is direct semantic evidence at
+                // creation time. Register only this proven class so its first
+                // Lock can be shadowed without reintroducing world-wide copies.
+                R30EnsureVertexBufferHooks(*out);
+                R30EnsureVertexShadow(*out);
+            }
             return hr;
         }
 
@@ -4579,9 +4586,12 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                // Do not hook CreateVertexBuffer/CreateIndexBuffer globally.
-                // The first actual XYZRHW VB/IB draw installs the common
-                // buffer Lock/Unlock/Release vtable hooks lazily.
+                if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
+                    R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
+
+                // Creation hooks do not create general shadows: only a VB
+                // whose creation FVF explicitly declares XYZRHW is registered.
+                // Other buffers remain draw-proven and lazy.
                 const auto r29 = R26InstallState.load(
                     std::memory_order_acquire);
                 if (r29 == State::Failed)
