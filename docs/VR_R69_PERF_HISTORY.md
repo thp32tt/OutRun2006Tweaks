@@ -11,8 +11,9 @@ Goals:
 ## P1 — VR SkyGlow bandwidth reduction
 - Branch: `vr-d3d9ex-candidate/r69-perf-p1`
 - Source SHA: `13025145a4e110928e0e97fe4b6a6d9a983e5196`
-- Stereo SkyGlow working resolution is fixed to factor 2 while the normal 2D path remains untouched.
-- A half-width/half-height buffer uses 25% of the factor-1 pixel count.
+- Historical P1 forced stereo SkyGlow working resolution to factor 2 while the normal 2D path remained untouched.
+- V7 runtime feedback showed that this changed the requested factor-1 visual policy (washed-out/hazy image and low HUD/menu contrast). V7 restores `SkyGlowFactor` as the authority; factor 2 remains available only when explicitly configured.
+- A half-width/half-height factor-2 buffer uses 25% of the factor-1 pixel count.
 - Cached reduced/temp render-target surfaces replace per-frame GetSurfaceLevel/Release traffic.
 - Removed SkyGlow blur passes whose output was not consumed by the R69 composite path. This preserves the R69 visual source selection while eliminating dead GPU work.
 
