@@ -1,0 +1,60 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00047",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00015",
+  "recorded_at_kst": "2026-09-29T07:05:49+09:00",
+  "initial_head_sha": "3228922991713e7f12301ec50118ae5748a32496",
+  "final_precommit_head_sha": "3228922991713e7f12301ec50118ae5748a32496",
+  "result": "PASS_MATERIAL_FALLBACK_4_ODD_SOURCE_BBOX_MAPPING_INPUTS_GITHUB_ONLY",
+  "scope": "GitHub-only odd-index A shard. Unchanged REWORK blockers 51/53/111/121 skipped. Material reconstruction evidence produced for 55/59/89/119; no work stealing and no shared-state mutation.",
+  "material_deliverable": {
+    "type": "SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+    "indices": [
+      55,
+      59,
+      89,
+      119
+    ],
+    "assets": [
+      "2EA557B4",
+      "7CE1CFC5",
+      "43B07A77",
+      "F6811E94"
+    ],
+    "report": "localization/graphics/role_A/20260929-0705-A00047/A00047_W00015_ODD_RECONSTRUCTION_INPUTS.json",
+    "evidence_pngs": [
+      "localization/graphics/role_A/20260929-0705-A00047/A00047_55_2EA557B4_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-0705-A00047/A00047_59_7CE1CFC5_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-0705-A00047/A00047_89_43B07A77_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-0705-A00047/A00047_119_F6811E94_ENGLISH_SOURCE.png"
+    ],
+    "candidate_dds_modified": false
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "2EA557B4",
+    "7CE1CFC5",
+    "43B07A77",
+    "F6811E94"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,463 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00047",
+  "wave_id": "W00015",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T07:05:49+09:00",
+  "initial_head_sha": "3228922991713e7f12301ec50118ae5748a32496",
+  "final_precommit_head_sha": "3228922991713e7f12301ec50118ae5748a32496",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "dependency_blocker_rule": "Unchanged dependency fingerprints from current shared queue; skipped without repeating identical review.",
+    "selected_pending_localize_text_indices": [
+      55,
+      59,
+      89,
+      119
+    ],
+    "parity_check": "PASS_ODD_ONLY",
+    "work_stolen_from_lane": null,
+    "queue_blob_sha": "0fec95ebf81cbc11062bc3e1f23c75e93a61c87d",
+    "queue_rows_at_precommit": [
+      "55,textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,W00013 A00041+C98 reconstruction input ready: exact HD 2048x256 BC3 header/decoded source metrics retained; NEXT ROUND -> 다음 라운드; raw mirror-Y requires HD reconfirmation; exact full-effect bbox + zero-pixel ENGLISH SOURCE proof still required; no DDS bytes; runtime UNTESTED",
+      "59,textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved",
+      "89,textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved",
+      "119,textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,W00013 A00041+C98 reconstruction input ready: exact HD 2048x256 BC3 style metrics retained; Time Attack Mode -> 타임 어택 모드; raw mirror-Y/style layers + exact full-effect bbox + zero-pixel ENGLISH SOURCE proof required; no DDS bytes; runtime UNTESTED"
+    ],
+    "reason": "No safe new Korean raster can be committed for these BC3/HD assets without an exact source-faithful Hangul render plus final decoded-pixel text envelope. This run materially advances four odd assets with exact-HD envelopes where available and deterministic stock-to-HD semantic/cell mapping where GitHub Contents cannot inline the larger HD blob."
+  },
+  "source_of_truth": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "upstream_tree": "1204f28afb7fb7d791d8f7a536dbdf3186d8e172",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "assets": [
+    {
+      "queue_index": 55,
+      "asset": "2EA557B4",
+      "queue_path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "translation": {
+        "source": "NEXT ROUND",
+        "korean": "다음 라운드"
+      },
+      "exact_hd_source": {
+        "path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+        "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+        "bytes": 524416,
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_game_cvt_Exst/4x_2EA557B4_512x64_atlas.json",
+        "git_blob_sha": "f5b75a016b70c528b4abc8d3067fc389209dd15a",
+        "cell": {
+          "name": "sprite_337",
+          "rect": [
+            0,
+            92,
+            1456,
+            164
+          ],
+          "rotated": false
+        }
+      },
+      "decoded_exact_hd": {
+        "raw_visible_alpha_bbox": [
+          1,
+          8,
+          1089,
+          150
+        ],
+        "raw_alpha_ge128_bbox": [
+          2,
+          9,
+          1086,
+          149
+        ],
+        "readable_visible_alpha_bbox": [
+          1,
+          105,
+          1089,
+          247
+        ],
+        "readable_alpha_ge128_bbox": [
+          2,
+          106,
+          1086,
+          246
+        ],
+        "raw_orientation": "flip-Y_to_readable"
+      },
+      "reconstruction_spec": {
+        "permitted_full_effect_bbox_raw": [
+          1,
+          8,
+          1089,
+          150
+        ],
+        "permitted_cell_raw": [
+          0,
+          92,
+          1456,
+          164
+        ],
+        "render_readable_then_transform_back": "flip-Y",
+        "bc3_patch_rule": "Only BC3 blocks intersecting the exact source text envelope may be rewritten; blocks outside must remain byte-identical.",
+        "target_text": "다음 라운드",
+        "mandatory_proof": "Exact HD ENGLISH SOURCE vs KOREAN CANDIDATE at identical crop/orientation/zoom/scale."
+      },
+      "evidence_png": "localization/graphics/role_A/20260929-0705-A00047/A00047_55_2EA557B4_ENGLISH_SOURCE.png",
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+    },
+    {
+      "queue_index": 59,
+      "asset": "7CE1CFC5",
+      "queue_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+      "translations": [
+        {
+          "source": "NEXT MISSION",
+          "korean": "다음 미션",
+          "sprite": "sprite_327",
+          "stock_cell": [
+            0,
+            86,
+            439,
+            42
+          ],
+          "stock_text_bbox": [
+            30,
+            86,
+            438,
+            124
+          ],
+          "predicted_4x_bbox_only": [
+            120,
+            344,
+            1752,
+            496
+          ]
+        },
+        {
+          "source": "Race The Rivals!",
+          "korean": "라이벌과 레이스!",
+          "sprite": "sprite_328",
+          "stock_cell": [
+            0,
+            44,
+            176,
+            42
+          ],
+          "stock_text_bbox": [
+            19,
+            52,
+            155,
+            71
+          ],
+          "predicted_4x_bbox_only": [
+            76,
+            208,
+            620,
+            284
+          ]
+        },
+        {
+          "source": "Drift To Score!",
+          "korean": "드리프트 점수 도전!",
+          "sprite": "sprite_329",
+          "stock_cell": [
+            0,
+            2,
+            176,
+            42
+          ],
+          "stock_text_bbox": [
+            4,
+            2,
+            175,
+            33
+          ],
+          "predicted_4x_bbox_only": [
+            16,
+            8,
+            700,
+            132
+          ]
+        },
+        {
+          "source": "Slipstream To Score!",
+          "korean": "슬립스트림 점수 도전!",
+          "sprite": "sprite_335",
+          "stock_cell": [
+            176,
+            44,
+            176,
+            42
+          ],
+          "stock_text_bbox": [
+            180,
+            48,
+            350,
+            85
+          ],
+          "predicted_4x_bbox_only": [
+            720,
+            192,
+            1400,
+            340
+          ]
+        }
+      ],
+      "stock_source": {
+        "dds_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+        "dds_blob_sha": "d6e407f195ac200920b53f1ac64a034353017c96",
+        "png_blob_sha": "5eeb22c4be7e759f03c3c08c50f84d1db70484b4",
+        "format": "DXT5",
+        "width": 512,
+        "height": 128
+      },
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+        "git_blob_sha": "8e79a14a4453c7e015144c1c2e25a4aacc633645",
+        "bytes": 1048704,
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          512
+        ],
+        "contents_inline_available": false
+      },
+      "atlas_4x": {
+        "git_blob_sha": "1a13020899080238d4177800382137f0a3e291a5",
+        "regions_count": 10
+      },
+      "mapping_result": "PASS_4_OF_4_SEMANTIC_TEXTS_TO_EXACT_STOCK_SPRITE_CELLS",
+      "note": "predicted_4x_bbox_only is a reconstruction locator, not an HD containment PASS. Exact decoded HD bboxes remain mandatory before raster write.",
+      "evidence_png": "localization/graphics/role_A/20260929-0705-A00047/A00047_59_7CE1CFC5_ENGLISH_SOURCE.png",
+      "containment": "HOLD_STRICT_RECHECK_EXACT_HD_BBOX_REQUIRED"
+    },
+    {
+      "queue_index": 89,
+      "asset": "43B07A77",
+      "queue_path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "translation": {
+        "source": "Game Over",
+        "korean": "게임 오버"
+      },
+      "stock_source": {
+        "dds_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+        "dds_blob_sha": "9c521d628e104b8d4833fbcaf7869f6d9e4d7e74",
+        "png_blob_sha": "d9ef69b7287cef2eb6beb29325f3b519cb335dde",
+        "format": "DXT5",
+        "width": 512,
+        "height": 64,
+        "cell": {
+          "name": "sprite_77",
+          "rect": [
+            0,
+            2,
+            374,
+            62
+          ]
+        },
+        "visible_alpha_bbox": [
+          0,
+          2,
+          373,
+          60
+        ],
+        "alpha_ge128_bbox": [
+          0,
+          2,
+          372,
+          59
+        ],
+        "predicted_4x_bbox_only": [
+          0,
+          8,
+          1492,
+          240
+        ]
+      },
+      "exact_hd_release": {
+        "path": "Release/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+        "git_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+        "bytes": 2097280,
+        "expected_canvas_from_4x_atlas": [
+          2048,
+          256
+        ],
+        "contents_inline_available": false
+      },
+      "atlas_4x": {
+        "git_blob_sha": "9577fff86937f0dfa48bd595ead9b7b7f22bfa38",
+        "cell": {
+          "name": "sprite_77",
+          "rect": [
+            0,
+            8,
+            1496,
+            248
+          ],
+          "rotated": false
+        }
+      },
+      "orientation_evidence": {
+        "stock_png_readable": "upright Game Over",
+        "historical_batch4_record": "mirror-X",
+        "result": "HOLD_EXACT_HD_RAW_ORIENTATION_RECONCILIATION_REQUIRED"
+      },
+      "evidence_png": "localization/graphics/role_A/20260929-0705-A00047/A00047_89_43B07A77_ENGLISH_SOURCE.png",
+      "containment": "HOLD_STRICT_RECHECK_EXACT_HD_BBOX_AND_ORIENTATION_REQUIRED"
+    },
+    {
+      "queue_index": 119,
+      "asset": "F6811E94",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+      "translation": {
+        "source": "Time Attack Mode",
+        "korean": "타임 어택 모드"
+      },
+      "exact_hd_source": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+        "git_blob_sha": "c6bcd8b847e0f0a2f34ca9f9ea3b1616512bd1e6",
+        "bytes": 524416,
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "linear_size": 524288
+      },
+      "atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/4x_F6811E94_512x64_atlas.json",
+        "git_blob_sha": "d25537314b6dd42b2eb624d4c4499fee8e666131",
+        "cell": {
+          "name": "sprite_349",
+          "rect": [
+            0,
+            0,
+            2048,
+            256
+          ],
+          "rotated": false
+        }
+      },
+      "decoded_exact_hd": {
+        "raw_visible_alpha_bbox": [
+          390,
+          56,
+          1631,
+          201
+        ],
+        "raw_alpha_ge128_bbox": [
+          397,
+          63,
+          1623,
+          194
+        ],
+        "raw_orange_core_bbox": [
+          412,
+          78,
+          1608,
+          179
+        ],
+        "raw_white_effect_bbox": [
+          397,
+          63,
+          1623,
+          194
+        ],
+        "readable_visible_alpha_bbox": [
+          390,
+          54,
+          1631,
+          199
+        ],
+        "readable_alpha_ge128_bbox": [
+          397,
+          61,
+          1623,
+          192
+        ],
+        "readable_orange_core_bbox": [
+          412,
+          76,
+          1608,
+          177
+        ],
+        "readable_white_effect_bbox": [
+          397,
+          61,
+          1623,
+          192
+        ],
+        "raw_orientation": "flip-Y_to_readable"
+      },
+      "reconstruction_spec": {
+        "permitted_full_effect_bbox_raw": [
+          390,
+          56,
+          1631,
+          201
+        ],
+        "style_layers": "orange fill/core + dark outline/shadow + white highlight/effect",
+        "render_readable_then_transform_back": "flip-Y",
+        "bc3_patch_rule": "Only BC3 blocks intersecting exact source text envelope may be rewritten; all outside blocks byte-identical.",
+        "target_text": "타임 어택 모드",
+        "mandatory_proof": "Exact HD ENGLISH SOURCE vs KOREAN CANDIDATE at identical crop/orientation/zoom/scale."
+      },
+      "evidence_png": "localization/graphics/role_A/20260929-0705-A00047/A00047_119_F6811E94_ENGLISH_SOURCE.png",
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE"
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_55_59_89_119",
+    "work_steal": "NONE",
+    "unchanged_rework_blockers_skipped": "PASS_51_53_111_121",
+    "exact_hd_source_identity": "PASS_55_119; PINNED_59_89_CONTENTS_LIMIT",
+    "source_semantic_mapping": "PASS_59_4_OF_4_AND_89_1_OF_1",
+    "exact_full_effect_bbox": "PASS_SOURCE_ENVELOPE_55_119; HOLD_EXACT_HD_59_89",
+    "zero_pixel_containment": "HOLD_NO_NEW_KOREAN_CANDIDATE",
+    "dds_format_compression_mips_alpha_orientation": "SOURCE_EVIDENCE_RECORDED; NO_DDS_WRITE",
+    "mandatory_english_source_comparison": "HOLD_UNTIL_KOREAN_CANDIDATE_EXISTS",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "2EA557B4",
+    "7CE1CFC5",
+    "43B07A77",
+    "F6811E94"
+  ],
+  "material_deliverable": "New machine-readable exact-HD full-effect envelopes/orientation for 55/119 plus deterministic semantic sprite-cell mappings and stock text bboxes for 59/89, with four source evidence PNGs. These inputs remove text-cell ambiguity and define executable next-render constraints.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK_4_ODD_SOURCE_BBOX_MAPPING_INPUTS_GITHUB_ONLY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
