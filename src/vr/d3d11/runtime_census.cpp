@@ -732,6 +732,8 @@ namespace outrun::vr::dx11
     void forget_vertex_buffer_mutation(
         IDirect3DVertexBuffer9* buffer) noexcept
     {
+        if (!buffer || !census_enabled())
+            return;
         forget_observed_buffer(VertexMutationEvidence, buffer);
     }
 
@@ -760,6 +762,8 @@ namespace outrun::vr::dx11
     void forget_index_buffer_mutation(
         IDirect3DIndexBuffer9* buffer) noexcept
     {
+        if (!buffer || !census_enabled())
+            return;
         forget_observed_buffer(IndexMutationEvidence, buffer);
     }
 
