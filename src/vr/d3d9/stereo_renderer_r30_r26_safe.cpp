@@ -203,13 +203,13 @@ namespace OutRunVRStereo
         };
         thread_local R30VertexShadowLookupCache R30VertexShadowLookup{};
         thread_local R30IndexShadowLookupCache R30IndexShadowLookup{};
-        std::uint64_t R30ShadowWrites = 0;
-        std::uint64_t R30ShadowReadHits = 0;
-        std::uint64_t R30ShadowReadMisses = 0;
-        std::uint64_t R30ShadowDiscardInvalidations = 0;
+        std::atomic<std::uint64_t> R30ShadowWrites{ 0 };
+        std::atomic<std::uint64_t> R30ShadowReadHits{ 0 };
+        std::atomic<std::uint64_t> R30ShadowReadMisses{ 0 };
+        std::atomic<std::uint64_t> R30ShadowDiscardInvalidations{ 0 };
         std::atomic<bool> R30BufferShadowCaptureArmed{ false };
-        bool R30FirstShadowMissLogged = false;
-        bool R30FirstShadowArmLogged = false;
+        std::atomic<bool> R30FirstShadowMissLogged{ false };
+        std::atomic<bool> R30FirstShadowArmLogged{ false };
 
         struct R30ScratchBuffers
         {
@@ -450,9 +450,9 @@ namespace OutRunVRStereo
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
                 ++R30ShadowReadMisses;
-                if (!R30FirstShadowMissLogged)
+                if (!R30FirstShadowMissLogged.exchange(
+                        true, std::memory_order_acq_rel))
                 {
-                    R30FirstShadowMissLogged = true;
                     spdlog::info(
                         "VR R30.6 BUFFER SHADOW: draw-time GPU Lock removed; an unobserved VB/IB range will fail open until the game's next write Lock/Unlock supplies CPU bytes");
                 }
@@ -1399,8 +1399,10 @@ namespace OutRunVRStereo
             spdlog::info(
                 "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{},samples={},avgUs={},maxUs={}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
-                R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
-                R30ShadowDiscardInvalidations,
+                R30ShadowWrites.load(std::memory_order_relaxed),
+                R30ShadowReadHits.load(std::memory_order_relaxed),
+                R30ShadowReadMisses.load(std::memory_order_relaxed),
+                R30ShadowDiscardInvalidations.load(std::memory_order_relaxed),
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
                 R30XyzrhwWorldLockedHudDraws,
                 R47SemanticHudAccepted,
@@ -3280,9 +3282,10 @@ namespace OutRunVRStereo
             const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
                 true, std::memory_order_acq_rel);
             R30EnsureVertexShadow(vb);
-            if (!wasArmed && !R30FirstShadowArmLogged)
+            if (!wasArmed &&
+                !R30FirstShadowArmLogged.exchange(
+                    true, std::memory_order_acq_rel))
             {
-                R30FirstShadowArmLogged = true;
                 spdlog::info(
                     "VR R30 BUFFER SHADOW V3: draw-proven selective capture armed after real XYZRHW VB draw; untracked world buffers bypass shadow memcpy");
             }
@@ -3390,9 +3393,10 @@ namespace OutRunVRStereo
                 true, std::memory_order_acq_rel);
             R30EnsureVertexShadow(vb);
             R30EnsureIndexShadow(ib);
-            if (!wasArmed && !R30FirstShadowArmLogged)
+            if (!wasArmed &&
+                !R30FirstShadowArmLogged.exchange(
+                    true, std::memory_order_acq_rel))
             {
-                R30FirstShadowArmLogged = true;
                 spdlog::info(
                     "VR R30 BUFFER SHADOW V3: draw-proven selective capture armed after real XYZRHW VB/IB draw; untracked world buffers bypass shadow memcpy");
             }
