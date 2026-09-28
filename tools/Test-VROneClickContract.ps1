@@ -214,6 +214,27 @@ if ($collector -notmatch [regex]::Escape('VR_ONE_CLICK_PREFLIGHT.json')) {
     throw 'Collector does not preserve one-click preflight report.'
 }
 foreach ($requiredText in @(
+    "BUILD_INPUTS.json",
+    "Analyze-OutRunVRSession.ps1",
+    "AUTO_ANALYSIS_SUMMARY.json"
+)) {
+    if ($collector -notmatch [regex]::Escape($requiredText)) {
+        throw "Collector exact-build analysis identity contract missing: $requiredText"
+    }
+}
+$runtimeAnalyzer = Get-Content (Join-Path $toolsRoot 'Analyze-OutRunVRSession.ps1') -Raw
+foreach ($requiredText in @(
+    'BuildIdentityVerified',
+    'BuildIdentityMismatch',
+    'DXVK_BUILD_IDENTITY_MISMATCH',
+    'SESSION_BUILD_INPUT_SOURCE_MISMATCH',
+    'SESSION_PREFLIGHT_SOURCE_MISMATCH'
+)) {
+    if ($runtimeAnalyzer -notmatch [regex]::Escape($requiredText)) {
+        throw "Runtime analyzer exact-build identity gate missing: $requiredText"
+    }
+}
+foreach ($requiredText in @(
     '[switch]$Emergency',
     'emergency-snapshot-running-process',
     'Source logs/captures and CURRENT_VR_SESSION.json were preserved'

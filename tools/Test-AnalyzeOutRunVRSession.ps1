@@ -21,7 +21,10 @@ function Invoke-AnalyzerCase {
         [bool]$ExpectedImportReady=$false,
         [bool]$ExpectedImportFailed=$false,
         [bool]$ExpectedDirectPathActive=$false,
-        [Nullable[bool]]$ExpectedGenerationMatches=$null
+        [Nullable[bool]]$ExpectedGenerationMatches=$null,
+        [ValidateSet('MATCH','MISMATCH','INCOMPLETE')][string]$IdentityMode='MATCH',
+        [Nullable[bool]]$ExpectedBuildIdentityVerified=$true,
+        [bool]$ExpectedBuildIdentityMismatch=$false
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -34,6 +37,35 @@ function Invoke-AnalyzerCase {
         TestProfile='CORRECTNESS'
         SourceSha='fixture-source'
     } | ConvertTo-Json | Set-Content (Join-Path $caseRoot 'session_manifest.json') -Encoding UTF8
+
+    if($IdentityMode -ne 'INCOMPLETE'){
+        $fixtureBuildSha=if($IdentityMode -eq 'MISMATCH'){'different-build-sha'}else{'fixture-source'}
+        [ordered]@{
+            IntegrationSha=$fixtureBuildSha
+            DevelopmentBranch='vr-dxvk-r71-disasm'
+            RendererTarget='dxvk'
+            DevelopmentStage='SAFE'
+            LaunchBackend='dxvk-safe'
+            BuildMatrixId='fixture-matrix'
+        } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $caseRoot 'BUILD_INPUTS.json') -Encoding UTF8
+        [ordered]@{
+            SchemaVersion=1
+            DevelopmentBranch='vr-dxvk-r71-disasm'
+            RendererTarget='dxvk'
+            Stage='SAFE'
+            ResolvedBackend='dxvk-safe'
+            VariantId='E_DXVK_SAFE'
+            SourceSha='fixture-source'
+            PackageBuildInputs=[ordered]@{
+                IntegrationSha=$fixtureBuildSha
+                DevelopmentBranch='vr-dxvk-r71-disasm'
+                RendererTarget='dxvk'
+                DevelopmentStage='SAFE'
+                LaunchBackend='dxvk-safe'
+                BuildMatrixId='fixture-matrix'
+            }
+        } | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $caseRoot 'VR_ONE_CLICK_PREFLIGHT.json') -Encoding UTF8
+    }
 
     Set-Content (Join-Path $caseRoot 'OutRun2006Tweaks.log') $GameLog -Encoding UTF8
     Set-Content (Join-Path $caseRoot 'OR2006C2C_d3d9.log') $DxvkLog -Encoding UTF8
@@ -70,6 +102,14 @@ function Invoke-AnalyzerCase {
     }
     if([bool]$summary.DxvkHostDirectPathActive -ne $ExpectedDirectPathActive){
         throw "${Name}: DxvkHostDirectPathActive=$($summary.DxvkHostDirectPathActive), expected $ExpectedDirectPathActive"
+    }
+    if([bool]$summary.BuildIdentityMismatch -ne $ExpectedBuildIdentityMismatch){
+        throw "${Name}: BuildIdentityMismatch=$($summary.BuildIdentityMismatch), expected $ExpectedBuildIdentityMismatch"
+    }
+    if($null -ne $ExpectedBuildIdentityVerified){
+        if([bool]$summary.BuildIdentityVerified -ne [bool]$ExpectedBuildIdentityVerified){
+            throw "${Name}: BuildIdentityVerified=$($summary.BuildIdentityVerified), expected $ExpectedBuildIdentityVerified"
+        }
     }
     if($null -ne $ExpectedGenerationMatches){
         if($null -eq $summary.DxvkHostGenerationMatches -or [bool]$summary.DxvkHostGenerationMatches -ne [bool]$ExpectedGenerationMatches){
@@ -154,6 +194,31 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedStatus 'DXVK_HOST_OWNED_DIRECTGPU_ACTIVE' `
         -ExpectedBridgeReady $true -ExpectedImportReady $true `
         -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true
+
+    # Even apparently successful DirectGPU telemetry must fail closed when
+    # session/build/preflight source identity disagrees.
+    Invoke-AnalyzerCase -Name 'direct-active-build-identity-mismatch' `
+        -GameLog "VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring 2124x2284 generation=12345; Desktop Duplication is no longer required for gameplay frames`nVR stereo: path=DXVK host-owned D3D11 KMT import`ndirect[frames=240,fallbacks=1,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345; Desktop Duplication remains menu/fail-open only." `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
+        -ExpectedStatus 'DXVK_BUILD_IDENTITY_MISMATCH' `
+        -ExpectedBridgeReady $true -ExpectedImportReady $true `
+        -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true `
+        -IdentityMode 'MISMATCH' -ExpectedBuildIdentityVerified $false `
+        -ExpectedBuildIdentityMismatch $true
+
+    # Missing optional package identity reduces confidence but is not fabricated
+    # into a mismatch; older/manual bundles remain analyzable.
+    Invoke-AnalyzerCase -Name 'identity-incomplete-no-false-mismatch' `
+        -GameLog "direct[frames=0,fallbacks=2,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" -HostLog "" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 0 -ExpectedFallbacks 2 `
+        -ExpectedStatus 'DIRECT_GPU_UNAVAILABLE' `
+        -IdentityMode 'INCOMPLETE' -ExpectedBuildIdentityVerified $false `
+        -ExpectedBuildIdentityMismatch $false
 
     Write-Host 'OutRun VR session analyzer shared-probe regression tests: PASS'
 } finally {
