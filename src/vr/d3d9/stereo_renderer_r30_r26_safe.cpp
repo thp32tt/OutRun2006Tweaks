@@ -398,10 +398,14 @@ namespace OutRunVRStereo
             entry->size = desc.Size;
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
+            // Publish the fast-gate bit before the registry entry becomes
+            // visible. A concurrent Lock may see a transient false positive
+            // and wait on the registry mutex, which is safe; the reverse order
+            // could create a false negative and lose the first CPU write.
+            R30TrackedVertexBloom.fetch_or(
+                R30ShadowBloomBit(buffer), std::memory_order_release);
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
-            R30TrackedVertexBloom.fetch_or(
-                R30ShadowBloomBit(buffer), std::memory_order_relaxed);
             if (inserted)
                 R30ShadowRegistryGeneration.fetch_add(
                     1, std::memory_order_release);
@@ -425,10 +429,10 @@ namespace OutRunVRStereo
             entry->usage = desc.Usage;
             entry->pool = desc.Pool;
             entry->indexFormat = desc.Format;
+            R30TrackedIndexBloom.fetch_or(
+                R30ShadowBloomBit(buffer), std::memory_order_release);
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
-            R30TrackedIndexBloom.fetch_or(
-                R30ShadowBloomBit(buffer), std::memory_order_relaxed);
             if (inserted)
                 R30ShadowRegistryGeneration.fetch_add(
                     1, std::memory_order_release);
