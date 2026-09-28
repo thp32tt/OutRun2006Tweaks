@@ -305,3 +305,37 @@ Next:
 3. add/test bounded sampled-identity history;
 4. prove EVENT-owned identities cannot enter transition skipped-release ownership;
 5. only then wire STOPPING / LOCAL / presentation release-before-watermark.
+
+
+## Cycle 0011 — exact-head verifier repair / transition adapter design
+
+Review lenses:
+1. architecture/control-flow — transition watermark boundaries;
+2. lifetime/reset/sync — never-sampled retry vs sampled EVENT ownership;
+3. stereo/HUD/visual correctness — no renderer/HUD behavior change;
+4. hot path/frame pacing — metadata-only ACK path, no wait/copy changes;
+5. adversarial/falsification — verifier false-negative and transition double-ownership.
+
+Results:
+- Cycle-10 code itself compiled: Win32 Build `36494189133` and HUD Inspector `36494189022` passed.
+- OpenXR architecture `36494189003` failed before host/game build because `verify_vr_r32_review.py` required the whitespace-sensitive literal `MarkGenerationFault(identity.transportGeneration)`.
+- The actual runtime already contains that fail-closed behavior across a line break. The verifier now bounds `R41ReleaseNeverSampled` and independently requires `StageResult::LiveSlotConflict`, `MarkGenerationFault(`, and `identity.transportGeneration`.
+- Runtime rendering/synchronization code was not changed.
+- Transition review confirmed STOPPING, LOCAL reference-space change and presentation-change paths advance `lastProcessedStereoFrame` from a latest snapshot. The next adapter must enumerate current-run DirectGPU history before that watermark changes.
+- Any transition release helper must exclude `R23DeferredSlotBlocked` EVENT-owned frames and identities already represented by `R37BootstrapSubmittedFrame/Generation`; only proven never-sampled frames may enter `R41SkippedReleaseQueue`.
+- `R41RetrySkippedReleases` is currently called inside gameplay processing, so a pending metadata ACK can be delayed after switching to Theater/STOPPING. This is next-cycle evidence, not a behavior change in this cycle.
+
+Commit:
+- `b03ca30c3e1229b33dbe8da58ee9a3134e5a31f6` — whitespace-robust bounded verifier.
+
+Validation:
+- Exact-head CI started:
+  - Build `36497134902 / 36497135541`
+  - OpenXR architecture `36497134942 / 36497135495`
+  - HUD Inspector `36497134904 / 36497135556`
+- AUTOMATION_VALIDATION: `DETERMINISTIC_VERIFIER_FALSE_NEGATIVE_REPAIRED / EXACT_HEAD_CI_RUNNING`
+- RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+- Consume the exact-head CI first.
+- If green, add a pure LEVEL0 transition-history eligibility helper before touching runtime transition paths.
