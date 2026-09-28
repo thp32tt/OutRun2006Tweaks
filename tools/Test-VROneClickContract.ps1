@@ -12,7 +12,9 @@ $parseFiles = @(
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'OutRunVR-Test-Selector.ps1',
-    'Build-OutRunPCFast.ps1'
+    'Build-OutRunPCFast.ps1',
+    'Acquire-OutRunDXVK.ps1',
+    'Test-DxvkAcquisition.ps1'
 )
 
 foreach ($name in $parseFiles) {
@@ -185,6 +187,26 @@ switch ([string]$target.RendererTarget) {
         }
         if ([string]$target.DxvkVersion -ne '3.1.1') {
             throw "Unexpected pinned DXVK version: $($target.DxvkVersion)"
+        }
+
+        $acquireDxvk = Get-Content (Join-Path $toolsRoot 'Acquire-OutRunDXVK.ps1') -Raw
+        foreach ($requiredText in @(
+            '40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608',
+            'PINNED_ARCHIVE_SHA256_AND_EXTRACTED_PROVIDER',
+            'No pinned DXVK archive SHA256',
+            'DXVK provider does not match x32/d3d9.dll extracted from the pinned archive'
+        )) {
+            if ($acquireDxvk -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK pinned acquisition contract missing: $requiredText"
+            }
+        }
+        foreach ($requiredText in @(
+            'officialDxvkProviderSha',
+            'Explicit DXVK provider does not match pinned official DXVK'
+        )) {
+            if ($package -notmatch [regex]::Escape($requiredText)) {
+                throw "DXVK stock-provider package enforcement missing: $requiredText"
+            }
         }
         foreach ($required in @(
             'Acquire-OutRunDXVK.ps1',
