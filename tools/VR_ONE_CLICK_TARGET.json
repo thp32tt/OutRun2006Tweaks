@@ -1,0 +1,9 @@
+{
+  "SchemaVersion": 1,
+  "RendererTarget": "dx11-native",
+  "LaunchBackend": "dx11",
+  "Stage": "R71-bootstrap-dormant-native-renderer-host-directgpu-validation",
+  "NativeDrawPathActive": false,
+  "VariantId": "R69_FIXPACK",
+  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md"
+}
