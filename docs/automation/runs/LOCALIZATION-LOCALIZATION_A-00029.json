@@ -1,0 +1,83 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00029",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00009",
+  "recorded_at_kst": "2026-09-29T03:40:00+09:00",
+  "initial_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "final_precommit_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "preserved_intervening_head": false,
+  "preserved_head_message": "localization(C): finalize W00008 synchronization [AUTO:LOCALIZATION-LOCALIZATION_C-00028]",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE_REBUILD_SPEC",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; unchanged REWORK blockers skipped; fallback ladder step 2 classified indices 103/151/153/155 and added deterministic rebuild input for 103; no work stealing; no shared-state mutation.",
+  "report": "localization/graphics/role_A/20260929-0340-A00029/A00029_W00009_ZOOM_REVIEW_RESOLUTION.json",
+  "material_deliverable": {
+    "type": "MACHINE_READABLE_ZOOM_REVIEW_CLASSIFICATION_AND_REBUILD_SPEC",
+    "classified_indices": [
+      103,
+      151,
+      153,
+      155
+    ],
+    "preserve_original_indices": [
+      151,
+      153,
+      155
+    ],
+    "localizable_text_identified_indices": [
+      103
+    ],
+    "localizable_asset": "590A4724",
+    "localizable_text": [
+      {
+        "source": "Normal balance",
+        "korean": "일반 밸런스",
+        "occurrences_observed": 1
+      }
+    ],
+    "exact_hd_source_blob_sha": "66c88580fbd4a73f6e10b5e9066a6c996346578c",
+    "normalized_sprite_cell_xywh": [
+      0.68359375,
+      0.95703125,
+      0.20703125,
+      0.04296875
+    ],
+    "candidate_dds_modified": false,
+    "c_merge_required": true
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "590A4724",
+    "4668C688",
+    "4C972A19",
+    "4D49CA85"
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00009 A satisfies the minimum-progress contract with four new odd-shard zoom-review resolutions and deterministic exact-HD reconstruction input for 590A4724. Three assets require no Korean candidate; 590A4724 is promoted for Normal balance -> 일반 밸런스 after C reconciliation. No DDS bytes changed; runtime remains UNTESTED.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "localization/graphics/transcriptions.jsonl",
+    "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "localization/graphics/role_A/20260929-0340-A00029/A00029_W00009_ZOOM_REVIEW_RESOLUTION.json"
+  ]
+}

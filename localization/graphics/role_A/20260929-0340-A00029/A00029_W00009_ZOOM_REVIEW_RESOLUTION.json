@@ -1,0 +1,232 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00029",
+  "wave_id": "W00009",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T03:40:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_CLASSIFICATIONS_3_PRESERVE_1_LOCALIZABLE_REBUILD_SPEC",
+  "automation_validation": "PASS_STATIC_PRECOMMIT",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION_PLUS_REBUILD_INPUT",
+  "initial_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "final_precommit_head_sha": "79300d3e017f0325e29e4d9afb894252b4fee89b",
+  "preserved_intervening_peer_head": false,
+  "preserved_head_message": "localization(C): finalize W00008 synchronization [AUTO:LOCALIZATION-LOCALIZATION_C-00028]",
+  "source_of_truth": {
+    "contract_path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "contract_git_blob_sha": "5a3b0f26014947529fdd2ea7f8c4eeab0850beb7",
+    "queue_path": "localization/graphics/asset_queue.csv",
+    "queue_git_blob_sha": "255216f02ac8b15d1764cfc40c630190b52a1b6e",
+    "source_identity_record": "localization/graphics/HD_SOURCE_MIGRATION_20260926.json",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "selection": {
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "promoted_pending_localize_text_index_35": {
+      "asset": "E989E3B7",
+      "reason_not_written": "Exact 67,108,992-byte HD English DDS exists in pinned GitHub source, but exact decoded-pixel text bbox/raw-orientation evidence is not materialized in current Git state; zero-pixel contract forbids a speculative candidate write."
+    },
+    "chosen_zoom_review_indices": [
+      103,
+      151,
+      153,
+      155
+    ],
+    "reason": "No safe candidate write was justified without exact decoded-pixel source-region evidence, so the contract fallback ladder advanced the next four unresolved odd-shard zoom-review rows."
+  },
+  "queue_snapshot": {
+    "rows_verified": {
+      "103": "103,textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "151": "151,textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "153": "153,textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "155": "155,textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds,zoom_review,blocked_review,needs_zoom_review,"
+    },
+    "authoritative_queue_modified": false,
+    "c_reconciliation_required": true
+  },
+  "translation_cross_reference": {
+    "source": "Normal balance",
+    "korean": "일반 밸런스",
+    "evidence_path": "localization/graphics/transcriptions.jsonl",
+    "reference_queue_index": 111,
+    "reference_asset": "C075FB49"
+  },
+  "assets": [
+    {
+      "queue_index": 103,
+      "asset": "590A4724",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/590A4724_512x512.png",
+        "git_blob_sha": "dcf27c1c700f686d3b2d77b1c2be0f7b25805105"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+        "git_blob_sha": "66c88580fbd4a73f6e10b5e9066a6c996346578c",
+        "bytes": 16777344
+      },
+      "atlas_evidence": {
+        "stock_1x_cell": {
+          "sprite": "sprite_522",
+          "rect_xywh": [
+            350,
+            490,
+            106,
+            22
+          ],
+          "canvas": [
+            512,
+            512
+          ]
+        },
+        "stock_4x_cell": {
+          "sprite": "sprite_522",
+          "rect_xywh": [
+            1400,
+            1960,
+            424,
+            88
+          ],
+          "canvas": [
+            2048,
+            2048
+          ]
+        },
+        "normalized_cell_xywh": [
+          0.68359375,
+          0.95703125,
+          0.20703125,
+          0.04296875
+        ],
+        "rotation_flag": false
+      },
+      "observed": "Scenic artwork plus a bottom-right UI label reading Normal balance.",
+      "localizable_text": [
+        {
+          "source": "Normal balance",
+          "korean": "일반 밸런스",
+          "occurrences_observed": 1
+        }
+      ],
+      "resolution": "LOCALIZABLE_TEXT_IDENTIFIED_PENDING_EXACT_HD_DECODED_BBOX_PRODUCTION",
+      "candidate_required": true,
+      "candidate_modified": false,
+      "rebuild_spec": {
+        "source": "Use only exact pinned HD English DDS blob 66c88580fbd4a73f6e10b5e9066a6c996346578c.",
+        "target_cell": "Locate the sprite cell by normalized atlas geometry, then derive the exact non-transparent English text bbox from the decoded HD DDS before any erase/render step.",
+        "artwork": "Preserve both scenic images and all pixels outside the Normal balance text cell.",
+        "translation": "일반 밸런스",
+        "containment": "Localized pixels including outline/shadow/alpha fringe must be a subset of the exact English-HD permitted text bbox; zero outside pixels.",
+        "orientation": "Do not infer readable/raw transform from PNG; inspect exact raw HD DDS before write.",
+        "side_by_side": "Future candidate must retain ENGLISH SOURCE vs KOREAN CANDIDATE proof at identical crop/orientation/scale."
+      }
+    },
+    {
+      "queue_index": 151,
+      "asset": "4668C688",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.png",
+        "git_blob_sha": "721ce48ea624c05a3aa06b8efc6b9f18b69a8d21"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4668C688_512x512.dds",
+        "git_blob_sha": "b7e66582369505ea37aec567ce9759cd30e798c9",
+        "bytes": 16777344
+      },
+      "observed": "Eight scenic/course-card images with protected OutRun2 logo artwork only; no localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2 logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 153,
+      "asset": "4C972A19",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.png",
+        "git_blob_sha": "0f2a66c5d47f3b0d4a2ed47ed459e22fffc45864"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4C972A19_512x512.dds",
+        "git_blob_sha": "b751a64af13d3e4c3485fc19b85e22b64bb09d39",
+        "bytes": 16777344
+      },
+      "observed": "Course-card artwork, protected OutRun2 logos, rank ordinals/numerals and symbolic arrow/icon strips; no translatable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2 logo",
+        "1st",
+        "2nd",
+        "3rd",
+        "rank numerals",
+        "ordinal suffixes",
+        "symbolic arrows/icons"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 155,
+      "asset": "4D49CA85",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.png",
+        "git_blob_sha": "ff854118306143e94647b350b45ff61125dadaf7"
+      },
+      "exact_hd_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4D49CA85_512x256.dds",
+        "git_blob_sha": "a6fe81518229b59bef670ca89a1ba76aff35ebe8",
+        "bytes": 8388736
+      },
+      "observed": "Two scenic/course-card images with protected OutRun2SP logo artwork only; no localizable UI prose.",
+      "protected_or_symbolic_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_103_151_153_155",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS_CURRENT_HEAD",
+    "direct_github_source_identity": "PASS_PINNED_OR2006SPRITES_COMMIT",
+    "visual_zoom_review": "PASS_4_CLASSIFIED",
+    "preserve_vs_translate_classification": "PASS_3_PRESERVE_1_LOCALIZABLE",
+    "translation_cross_reference": "PASS_NORMAL_BALANCE_TO_일반_밸런스",
+    "normalized_sprite_cell_spec_103": "PASS_STOCK_1X_AND_4X_GEOMETRY_CONSISTENT",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE__INDEX_103_HELD_UNTIL_EXACT_HD_DECODED_BBOX",
+    "dds_format_compression_mips_alpha_orientation": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_or_materially_advanced_assets": [
+    "590A4724",
+    "4668C688",
+    "4C972A19",
+    "4D49CA85"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "W00009 lane A materially advances four unresolved odd-shard zoom-review assets. Three are preserve-original; 590A4724 is positively identified as localizable Normal balance -> 일반 밸런스 and gains a deterministic normalized-cell reconstruction spec pinned to the exact HD GitHub DDS blob. No DDS bytes were changed because exact HD decoded text bbox/raw-orientation evidence is still mandatory; runtime remains UNTESTED."
+}
