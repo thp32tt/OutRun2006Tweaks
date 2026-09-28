@@ -1008,14 +1008,15 @@ namespace OutRunVRStereo
                 !state.renderTarget ||
                 FAILED(device->GetViewport(&state.viewport)) ||
                 FAILED(device->GetVertexShader(&state.vertexShader)) ||
-                FAILED(device->GetVertexDeclaration(
-                    &state.vertexDeclaration)) ||
                 FAILED(device->GetPixelShader(&state.pixelShader)) ||
                 FAILED(device->GetTexture(0, &state.texture0)) ||
                 FAILED(device->GetStreamSource(
                     0, &state.stream0,
                     &state.streamOffset, &state.streamStride)) ||
                 FAILED(device->GetFVF(&state.fvf)) ||
+                (state.fvf == 0 &&
+                 FAILED(device->GetVertexDeclaration(
+                    &state.vertexDeclaration))) ||
                 FAILED(device->GetSamplerState(
                     0, D3DSAMP_MINFILTER, &state.samplerMin)) ||
                 FAILED(device->GetSamplerState(
