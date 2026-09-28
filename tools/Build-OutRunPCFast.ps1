@@ -237,6 +237,7 @@ $runtimeFiles = @(
     'OutRunVR-Test-Selector.ps1',
     'Invoke-OutRunVROneClick.ps1',
     'Test-OutRunVROneClickPreflight.ps1',
+    'analyze_dxvk_session.py',
     'VR_ONE_CLICK_TARGET.json',
     'START_HERE_VR_TEST.cmd'
 )
