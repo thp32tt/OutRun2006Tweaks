@@ -1,5 +1,5 @@
 {
-  "schema_version": 54,
+  "schema_version": 55,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "C85: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77 pass current exact pixel+visual static QA but remain pending isolated DDS_ONLY in-game; approved lock count 0.",
-    "REWORK 12 current candidates: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9.",
-    "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK.",
-    "B91 staged attempts were independently re-decoded by C; only C4A2937B was promoted to canonical candidate.",
-    "Never approve on cell-only or reported bbox evidence when current DDS re-decode or visual artifact checks disagree."
+    "B92: 62BEBF33 and E3FD08BE reworked; exact source-bbox self-QA PASS, edge-touch high-risk, pending independent C and isolated DDS_ONLY in-game.",
+    "Remaining C85 REWORK production: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, C075FB49, FD90AA9.",
+    "C85 static PASS pending in-game remains: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77.",
+    "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -145,7 +144,7 @@
     },
     "latest_hd_rework_batch": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
     "hd_rework_candidates_ready": 4,
-    "hd_rework_remaining": 12,
+    "hd_rework_remaining": 10,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "STATIC_QA_PASS_PENDING_INGAME",
@@ -621,7 +620,23 @@
         "48DEBE77": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0"
       },
       "result": "STATIC_STRICT_QA_PASS_PENDING_D_INGAME"
-    }
+    },
+    "b92_pending_c_revalidation": [
+      {
+        "asset": "62BEBF33",
+        "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
+        "report": "localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json",
+        "status": "B92_SELF_QA_PASS_PENDING_C_INGAME",
+        "edge_touch_high_risk": true
+      },
+      {
+        "asset": "E3FD08BE",
+        "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
+        "report": "localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json",
+        "status": "B92_SELF_QA_PASS_PENDING_C_INGAME",
+        "edge_touch_high_risk": true
+      }
+    ]
   },
   "runtime_packages": {
     "k1": {
