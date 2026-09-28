@@ -1,0 +1,248 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00030",
+  "attempt": "3/3",
+  "wave_id": "W00009",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T04:16:40+09:00",
+  "base_head_sha": "5fb0315853fd8914acc7bba1229e1cc46768db80",
+  "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_ZOOM_REVIEW_RESOLUTIONS",
+  "runtime_validation": "UNTESTED",
+  "failure_context": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36469777692,
+    "failed_commit": "6d3180cbc772241b9be9426cb9a7ac0c2404d491",
+    "direct_log_findings": [
+      "artwork-plan indices do not match transcription indices",
+      "artwork-plan segment total 725 != transcription total 730",
+      "artwork-plan count 79 != localize_text target 84",
+      "graphics inventory action counts 79 localize_text / 47 zoom_review != authoritative queue 84 / 42"
+    ],
+    "ownership": "C_SHARED_STATE_RECONCILIATION_REQUIRED",
+    "lane_b_rule": "DO_NOT_MODIFY_SHARED_PROGRESS_RESUME_WORKLOG_STATUS_OR_ASSET_QUEUE",
+    "retry_strategy": "Do not rerun the identical known failing verify_state gate from B. Produce new lane-local material work and leave exact C reconciliation inputs."
+  },
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "policy": "Immutable decoded original PNG is classification evidence; Release DDS blob is pinned as HD reconstruction source identity. No N100/local clone/GPT Library used."
+  },
+  "queue_snapshot": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "queue_blob_sha": "255216f02ac8b15d1764cfc40c630190b52a1b6e",
+    "rows": 137,
+    "action_counts": {
+      "localize_text": 84,
+      "zoom_review": 42,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1
+    },
+    "selected_even_indices": [
+      34,
+      52,
+      172,
+      196
+    ]
+  },
+  "assets": [
+    {
+      "queue_index": 34,
+      "asset": "B7E25BAD",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "prior_state": "zoom_review/blocked_review",
+      "decoded_png_blob_sha": "44de47d0cd44d5f52edb4e8c493cdd2e83c3e11e",
+      "atlas_blob_sha": "fd3a8bc296019d2b7cde68e82d30a8969ba5d927",
+      "hd_release_dds_blob_sha": "9ca9aa7e2e2528a101379257035533ea9d175b17",
+      "visual_classification": "LOCALIZABLE_TEXT_CONFIRMED",
+      "observed_localizable_text": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrences": 1
+        }
+      ],
+      "preserve_original": [
+        "A/B/C/D/E rank-grade letters",
+        "character artwork",
+        "lens flare",
+        "burst background"
+      ],
+      "atlas_reference": {
+        "sprite_9_rect": [
+          320,
+          258,
+          512,
+          254
+        ]
+      },
+      "production_state": "READY_FOR_C_PROMOTION_THEN_EXACT_HD_DECODED_PIXEL_REBUILD",
+      "static_candidate": "NOT_WRITTEN_HOLD_EXACT_HD_PIXEL_BBOX"
+    },
+    {
+      "queue_index": 52,
+      "asset": "A8CE339F",
+      "queue_path": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+      "prior_state": "zoom_review/blocked_review",
+      "decoded_png_blob_sha": "adca9ddd8df0e0aaefa3ef81326e50fce26ad902",
+      "atlas_blob_sha": "7840c830d6960e4a52fe281b9cfbbc8af018e967",
+      "hd_release_dds_blob_sha": "53f75d347682c7b5f436a6d45dc3e1950a42b5eb",
+      "visual_classification": "LOCALIZABLE_TEXT_CONFIRMED",
+      "observed_localizable_text": [
+        {
+          "source": "Extra Time",
+          "korean": "추가 시간",
+          "physical_occurrences": 1
+        },
+        {
+          "source": "Start",
+          "korean": "시작",
+          "physical_occurrences": 2
+        },
+        {
+          "source": "Goal",
+          "korean": "골",
+          "physical_occurrences": 2
+        }
+      ],
+      "preserve_original": [
+        "6P/5P/4P/3P/2P/1P player markers",
+        "1st/2nd/3rd/4th ordinal rank tokens",
+        "digits 0-9",
+        "meter/tick artwork"
+      ],
+      "canonical_translation_evidence": [
+        "Start -> 시작 and Goal -> 골 from transcription index 51"
+      ],
+      "production_state": "READY_FOR_C_PROMOTION_THEN_EXACT_HD_DECODED_PIXEL_REBUILD",
+      "static_candidate": "NOT_WRITTEN_HOLD_EXACT_HD_PIXEL_BBOX"
+    },
+    {
+      "queue_index": 172,
+      "asset": "6C9B3611",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+      "prior_state": "zoom_review/blocked_review",
+      "decoded_png_blob_sha": "204536355e3b5378f8b51dc426509fa67d16d5d3",
+      "atlas_blob_sha": "7d40cebe159448795f3f50582e8c64586b30bd18",
+      "hd_release_dds_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800",
+      "visual_classification": "LOCALIZABLE_TEXT_CONFIRMED",
+      "observed_localizable_text": [
+        {
+          "source": "START",
+          "korean": "시작",
+          "physical_occurrences": 1
+        },
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "physical_occurrences": 1
+        }
+      ],
+      "preserve_original": [
+        "OutRun2SP logo",
+        "route/course thumbnail artwork"
+      ],
+      "atlas_reference": {
+        "sprite_788_rect": [
+          0,
+          34,
+          187,
+          222
+        ]
+      },
+      "production_state": "READY_FOR_C_PROMOTION_THEN_EXACT_HD_DECODED_PIXEL_REBUILD",
+      "static_candidate": "NOT_WRITTEN_HOLD_EXACT_HD_PIXEL_BBOX"
+    },
+    {
+      "queue_index": 196,
+      "asset": "9EF903AF",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9EF903AF_512x512.dds",
+      "prior_state": "zoom_review/blocked_review",
+      "decoded_png_blob_sha": "1c6fcc3f43228fab1f4888e7473206440a1fb20a",
+      "atlas_blob_sha": "97fd4067a171a1d651ac5dbba64ea9c36d9a34be",
+      "hd_release_dds_blob_sha": "d40127bf5c63e73ac93bdc391c05d58f850c0106",
+      "visual_classification": "NO_LOCALIZABLE_UI_TEXT_PRESERVE_ORIGINAL",
+      "observed_text": [
+        "OutRun2 logo only"
+      ],
+      "preserve_original": [
+        "OutRun2 logos",
+        "four course-card images"
+      ],
+      "atlas_reference": {
+        "sprite_290_rect": [
+          0,
+          290,
+          187,
+          222
+        ],
+        "sprite_291_rect": [
+          187,
+          290,
+          187,
+          222
+        ],
+        "sprite_292_rect": [
+          0,
+          68,
+          187,
+          222
+        ],
+        "sprite_293_rect": [
+          187,
+          68,
+          187,
+          222
+        ]
+      },
+      "production_state": "C_CAN_RESOLVE_ZOOM_REVIEW_TO_PRESERVE_ORIGINAL",
+      "static_candidate": "NOT_REQUIRED"
+    }
+  ],
+  "c_reconciliation_input": {
+    "promote_zoom_review_to_localize_text": [
+      34,
+      52,
+      172
+    ],
+    "resolve_zoom_review_preserve_original": [
+      196
+    ],
+    "required_shared_updates_by_c": [
+      "asset_queue.csv",
+      "transcriptions.jsonl/artwork_plan.jsonl/graphics visual inventory as applicable",
+      "progress/resume/worklog/status mirrors"
+    ],
+    "existing_w00008_repair_still_required": [
+      26,
+      28,
+      30,
+      32,
+      35
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_34_52_172_196",
+    "work_steal": "NONE",
+    "exact_git_source_identity": "PASS_ALL_4_PNG_ATLAS_HD_RELEASE_BLOBS_PINNED",
+    "visual_zoom_review": "PASS_4_RESOLVED",
+    "localizable_assets": 3,
+    "preserve_original_assets": 1,
+    "candidate_dds_modified": false,
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE_WRITTEN",
+    "dds_alpha_orientation": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Attempt 3 did not repeat the known shared-state verification failure. It materially reduced the even zoom-review backlog with three positive localizable classifications and one preserve-original resolution, all pinned to immutable GitHub source/HD identities. C remains the only role authorized to reconcile the shared state that currently blocks verify_state."
+}
