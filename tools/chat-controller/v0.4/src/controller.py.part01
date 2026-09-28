@@ -497,13 +497,44 @@ def is_persistable_chat_url(url: Optional[str]) -> bool:
     return "local-chatgpt%3a" not in lowered and "local-chatgpt:" not in lowered
 
 
+def configured_project_id() -> Optional[str]:
+    """Extract the stable g-p-* project id from the configured project URL."""
+    if not CHATGPT_PROJECT_URL:
+        return None
+    try:
+        path = urllib.parse.urlparse(CHATGPT_PROJECT_URL).path
+    except Exception:
+        return None
+    m = re.search(r"/g/(g-p-[A-Za-z0-9]+)", path)
+    return m.group(1) if m else None
+
+
+def is_project_scoped_chat_url(url: Optional[str]) -> bool:
+    """Hard guard: persisted chats must belong to the configured ChatGPT project."""
+    if not is_persistable_chat_url(url):
+        return False
+    if not REQUIRE_PROJECT_URL:
+        return True
+    project_id = configured_project_id()
+    if not project_id:
+        return False
+    try:
+        parsed = urllib.parse.urlparse(url or "")
+    except Exception:
+        return False
+    if parsed.netloc.lower() not in {"chatgpt.com", "www.chatgpt.com"}:
+        return False
+    prefix = f"/g/{project_id}"
+    return parsed.path.startswith(prefix + "/") or parsed.path.startswith(prefix + "-")
+
+
 async def wait_for_chat_url(page: Page, timeout_sec: int = 30) -> Optional[str]:
     deadline = time.time() + timeout_sec
     while time.time() < deadline:
-        if is_persistable_chat_url(page.url):
+        if is_project_scoped_chat_url(page.url):
             return page.url
         await page.wait_for_timeout(500)
-    return page.url if is_persistable_chat_url(page.url) else None
+    return page.url if is_project_scoped_chat_url(page.url) else None
 
 
 async def previous_run_still_busy(page: Page, reg: Registry) -> bool:
@@ -511,7 +542,7 @@ async def previous_run_still_busy(page: Page, reg: Registry) -> bool:
         return False
     prev_idx = (reg.next_slot - 1) % len(reg.slots)
     prev = reg.slots[prev_idx]
-    if not prev.url:
+    if not prev.url or not is_project_scoped_chat_url(prev.url):
         return False
     try:
         await page.goto(prev.url, wait_until="domcontentloaded", timeout=60000)
