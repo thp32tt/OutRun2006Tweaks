@@ -43,14 +43,13 @@
     "Build artifact 10966778726 digest sha256:789d54575f5b9da9869c1838fa6b2a00978f055084dcbf62d8f741b50dc42060. No N100 clone/worktree, PC-fast runner, Quest 3, VDXR or in-game runtime test was used."
   ],
   "open_work_items": [
-    "DXVK-PROVIDER-LOCAL-D3D9EX-DIRECTGPU-RUNTIME-PROBE",
-    "DXVK-FAILSAFE-RUNTIME-LOG-COLLECTOR",
-    "DXVK-DIRECT-GPU-TRANSPORT-WITHOUT-D3D9EX-FALLBACK",
-    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY",
-    "DXVK-V5-COLLECTOR-RUNTIME-CONFIRMATION"
+    "DXVK-NATIVE-WINDOWS-DIRECTGPU-TRANSPORT",
+    "DXVK-SBS-HOST-PACING-END-FRAME-STALL",
+    "DXVK-FAILSAFE-RUNTIME-LOG-COLLECTOR-V6-RUNTIME-CONFIRMATION",
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY"
   ],
-  "next_action": "Run the V5 provider-local DXVK D3D9Ex/DirectGPU test. Verify both transport/pacing and that OutRun2_VR_ANALYZE_DXVKEX_<session>.zip is automatically produced. If automatic collection does not produce a ZIP, run COLLECT_DXVK_EX_LOGS_NOW.cmd; inspect COLLECTOR_FAILURE.json and keep the transport verdict separate from collector validation.",
-  "recorded_at": "2026-09-28T23:59:00+09:00",
+  "next_action": "Do not test V5. Use V6 only when another runtime capture is needed. Renderer priority is no longer provider-local Ex promotion: that succeeded. Investigate a DXVK-native Windows GPU transport that does not depend on the legacy D3D9 shared KMT handle path, and independently profile/mitigate SBS fallback GPU completion causing xrEndFrame stalls. Keep multiview blocked until transport/pacing is solved.",
+  "recorded_at": "2026-09-29T00:20:00+09:00",
   "validation_checkpoint_sha": "d288dec167dc770db2ff2f2264b9781acded5929",
   "review_checkpoint_commits": [
     "9e3f4b6710db692ff01dcd09aa3ab4bbef7436f1",
@@ -109,7 +108,7 @@
       "reviewed_at": "2026-09-28T22:46:24.676+09:00"
     }
   ],
-  "runtime_failure": "Quest 3 / Virtual Desktop / VDXR HMD pacing failed on exact-source DXVK SAFE stock 3.1.1 two-pass runtime. V2 CORRECTNESS showed ~32-35 ms OpenXR frame intervals in gameplay while the runtime period was 11.111 ms (90 Hz); V3 PERFORMANCE_PLAIN_D3D9 removed the 60 fps cap, enabled cadence mode 1/interpolation/unlock and disabled HUD inspector/shader fingerprint, but the user reported the same severe HMD-only stutter. Desktop output remained comparatively smooth SBS.",
+  "runtime_failure": "Quest 3 / Virtual Desktop / VDXR HMD pacing remains failed. V4 proved stock DXVK 3.1.1 provider-local Direct3DCreate9Ex promotion succeeds (D3D9Ex=1), but the cross-process D3D9Ex->D3D11 shared-resource probe never becomes ready and gameplay falls back to SBS/Desktop Duplication. User reports vehicle selection car color/shading remains correct under DXVK+D3D9Ex, while HMD pacing still stutters severely.",
   "runtime_evidence": {
     "exact_source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
     "hardware": "Quest 3 + Virtual Desktop + VDXR; RTX 4070",
@@ -119,12 +118,21 @@
     "transport_observation": "DXVK census reports stock interop present but IDirect3DDevice9Ex unavailable; zero-copy cross-process sharing is unavailable and SBS/Desktop Duplication fallback remains active.",
     "visual_observation": "DXVK menu vehicle color/shading was reported normal where the DX9Ex path showed abnormal vehicle color; treat this as a cross-backend differential clue, not yet a root-cause proof.",
     "v3_manifest": "DXVKPERF-20260928T143942Z: PERFORMANCE_PLAIN_D3D9, PreferD3D9Ex=false, FramerateLimit=0, FrameCadenceMode=1, HudInspector=false.",
-    "diagnostic_limitation": "The manually compressed V3 session folder contained only session_manifest.json and OR2006C2C_d3d9.log, indicating the ad-hoc package runner did not reach its finally/collector stage before termination. This does not negate the user-observed pacing failure; it limits current V3 host-timing telemetry."
+    "diagnostic_limitation": "The manually compressed V3 session folder contained only session_manifest.json and OR2006C2C_d3d9.log, indicating the ad-hoc package runner did not reach its finally/collector stage before termination. This does not negate the user-observed pacing failure; it limits current V3 host-timing telemetry.",
+    "v4_session": "DXVKEXPERF-20260928T150149Z",
+    "v4_game_exit_code": 0,
+    "v4_d3d9ex_promotion": "PASS: same game-local DXVK provider exposes Direct3DCreate9Ex; CreateDevice promoted successfully; census D3D9Ex=1 stockHr=0 exHr=0.",
+    "v4_directgpu": "FAIL: host reports directSupported=1 but directReady=0; probe handle becomes non-zero but probeAck remains 0. Game reports direct frames=0 with SBS/Desktop Duplication fallback.",
+    "v4_dxvk_shared_handle_failure": "DXVK log reports Failed to open shared D3DKMT handle and Failed to write shared resource info for a texture while probing the shared D3D9 resource.",
+    "v4_pipeline": "Gameplay host telemetry commonly shows 34-36 ms XR frame intervals against an 11.111 ms display period, with xrEndFrame around 24-26 ms while capture/render CPU timings are sub-millisecond in the sampled intervals.",
+    "v4_visual": "Menu vehicle color/shading reported correct even after DXVK provider-local D3D9Ex promotion. Therefore the DX9Ex color regression is not caused by D3D9Ex promotion alone; native/system-provider compatibility/state differences remain a stronger suspect.",
+    "v4_user_result": "HMD stutter unchanged/severe; desktop presentation comparatively smooth."
   },
   "runtime_status_notes": [
-    "The prior UNTESTED hardware gate is now closed as a failure for HMD pacing on the tested stock DXVK SAFE two-pass fallback transport.",
-    "This is not a renderer-wide visual failure: desktop SBS remained comparatively smooth and menu vehicle color/shading was reported correct on DXVK.",
-    "The performance-profile experiment falsified the hypothesis that CORRECTNESS 60 fps/diagnostic settings were the primary cause of the HMD stutter."
+    "V4 closes the provider-local D3D9Ex question: DXVK 3.1.1 Create9Ex promotion works, but legacy D3D9 shared-handle DirectGPU interop does not become usable on this native Windows run.",
+    "DirectGPU failure is now transport-specific, not an Ex-promotion failure.",
+    "Vehicle selector color remains correct on DXVK with D3D9Ex=1, weakening the hypothesis that the common Ex promotion/state layer alone causes the DX9Ex color bug.",
+    "The HMD pacing failure persists because V4 remains on SBS/Desktop Duplication; sampled gameplay XR cadence is frequently around one frame per ~34-36 ms."
   ],
   "runtime_probe_candidate": {
     "package": "OutRun2_VR_DXVK_D3D9EX_DIRECTGPU_TEST_7f2ea390_V4",
@@ -145,17 +153,19 @@
     "collector_hardening": "V4 ad-hoc package uses a detached finalizer plus manual COLLECT_DXVK_EX_LOGS_NOW.cmd fallback so forced game termination can still seal logs and restore managed files."
   },
   "collector_fix": {
-    "package_revision": "V5",
-    "issue": "Portable V4 collector used an in-session filesystem lock while compressing the same session tree; the lock could block Compress-Archive and a stale lock could prevent retry.",
-    "fix": [
-      "Replace filesystem lock with a named cross-process mutex that is automatically released if the collector dies.",
-      "Copy the complete sealed session into an external temporary staging directory before compression.",
-      "On normal game exit run synchronous collection in addition to the detached watcher; the mutex de-duplicates them.",
-      "Keep a manual retry command for the same session; it refuses to restore while the game PID is still alive.",
-      "Create FINALIZED.ok only after non-zero ZIP creation and SHA256 verification.",
-      "Persist COLLECTOR_STATUS.json or COLLECTOR_FAILURE.json."
+    "package_revision": "V6",
+    "v4_observed_failure": "COLLECTOR_FAILURE.txt: System.Management.Automation.SessionStateUnauthorizedAccessException: Cannot overwrite variable Host because it is read-only or constant.",
+    "root_cause": "PowerShell variable names are case-insensitive. The portable collector assigned to $host, which collides with the built-in read-only $Host variable.",
+    "v5_status": "SUPERSEDED_UNTESTED: V5 still contained the same $host assignment, so the user was instructed not to test V5.",
+    "v6_fix": [
+      "Rename collector process variable from $host to $vrHostProcess; static check rejects any remaining assignment to $host.",
+      "Retain named cross-process mutex so crashed collectors do not leave a stale file lock.",
+      "Stage the completed session outside the source tree before Compress-Archive.",
+      "Run both detached watcher and synchronous post-game collection; mutex de-duplicates them.",
+      "Keep COLLECT_DXVK_EX_LOGS_NOW.cmd as a safe retry path for the same session.",
+      "Write COLLECTOR_SELFTEST.txt plus explicit GAME_EXIT_CODE and LOG_COLLECTION status."
     ],
-    "validation": "Static package contract checks passed; Windows/Quest runtime of V5 collector remains untested until the next user run.",
-    "runtime_validation": "UNTESTED_FOR_COLLECTOR_V5"
+    "v6_static_validation": "PASS",
+    "runtime_validation": "UNTESTED_FOR_COLLECTOR_V6"
   }
 }
