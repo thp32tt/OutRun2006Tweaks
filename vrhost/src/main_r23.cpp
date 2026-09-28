@@ -431,10 +431,34 @@ namespace
         {
             if (R23SameDirectIdentity(pending.frame, frame))
                 return true;
-            // A different frame in the same producer slot while an older GPU
-            // reference is unresolved violates the slot-lifetime contract.
-            pending.poisoned = true;
-            return false;
+
+            const bool transportChanged =
+                pending.frame.clientPid != frame.clientPid ||
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex] !=
+                    generation ||
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameRunGenerationIndex] !=
+                    frame.reserved[
+                        OutRunVR::RenderFrameRunGenerationIndex];
+            if (transportChanged)
+            {
+                // A new producer run/generation uses newly opened shared
+                // resources. Never ACK the old identity into the new run, but
+                // it no longer needs to block the replacement slot.
+                ReleaseCom(pending.fence);
+                pending.armed = false;
+                pending.poisoned = false;
+                pending.frame = {};
+            }
+            else
+            {
+                // A different frame in the same live producer slot while an
+                // older GPU reference is unresolved violates the lifetime
+                // contract. Fail closed.
+                pending.poisoned = true;
+                return false;
+            }
         }
 
         if (!pending.fence)
@@ -2832,6 +2856,12 @@ int main(int argc, char** argv)
                     {
                         R23ArmDeferredReferenceAck(
                             compositor, pendingBundleFrame);
+                        // Drop this source frame from future selection. It was
+                        // referenced by D3D11 but never became presentation
+                        // authority; the deferred EVENT owns its slot lifetime
+                        // until it is safe for the producer to recycle.
+                        lastProcessedStereoFrame =
+                            pendingBundleFrame.frameId;
                         candidateRejectReason =
                             "render-failed-deferred-gpu-ack";
                     }
