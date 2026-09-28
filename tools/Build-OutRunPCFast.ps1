@@ -151,24 +151,34 @@ Invoke-Checked cmake '-S' 'vrhost' '-B' $hostBuild '-G' 'Visual Studio 17 2022' 
 Invoke-Checked cmake '--build' $hostBuild '--config' 'Release' '--target' 'outrun-vr-host' '--parallel' "$jobs"
 $hostWatch.Stop()
 
-# DXVK R71 package contract: always produce a self-contained stock-DXVK SAFE
-# payload. An explicit x86 provider may be supplied; otherwise acquire the
-# pinned official release once and reuse the verified cache on later builds.
+# DXVK R71 package contract: always anchor provider identity to the pinned
+# official DXVK release. An explicit provider path is accepted only when its
+# bytes exactly match the provider extracted by Acquire-OutRunDXVK.ps1 from
+# the pinned release archive.
+if (-not (Test-Path $dxvkAcquireScript)) {
+    throw "DXVK acquisition helper missing: $dxvkAcquireScript"
+}
+& $dxvkAcquireScript -Version $dxvkVersion | Out-Null
+if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+    throw "DXVK acquisition failed with exit code $LASTEXITCODE"
+}
+$officialDxvkProvider = (Resolve-Path (Join-Path $repoRoot ("out/dxvk/{0}/x32/d3d9.dll" -f $dxvkVersion))).Path
+if ((Get-PeMachine $officialDxvkProvider) -ne 0x014C) {
+    throw "Pinned DXVK provider is not x86 PE32: $officialDxvkProvider"
+}
+$officialDxvkProviderSha = (Get-FileHash $officialDxvkProvider -Algorithm SHA256).Hash.ToLowerInvariant()
+
 if ([string]::IsNullOrWhiteSpace($DxvkD3D9)) {
-    if (-not (Test-Path $dxvkAcquireScript)) {
-        throw "DXVK acquisition helper missing: $dxvkAcquireScript"
-    }
-    & $dxvkAcquireScript -Version $dxvkVersion | Out-Null
-    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-        throw "DXVK acquisition failed with exit code $LASTEXITCODE"
-    }
-    $DxvkD3D9 = Join-Path $repoRoot ("out/dxvk/{0}/x32/d3d9.dll" -f $dxvkVersion)
+    $DxvkD3D9 = $officialDxvkProvider
 }
 $dxvkProvider = (Resolve-Path $DxvkD3D9).Path
 if ((Get-PeMachine $dxvkProvider) -ne 0x014C) {
     throw "DXVK package requires an x86 PE32 d3d9.dll: $dxvkProvider"
 }
 $dxvkProviderSha = (Get-FileHash $dxvkProvider -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($dxvkProviderSha -ne $officialDxvkProviderSha) {
+    throw "Explicit DXVK provider does not match pinned official DXVK $dxvkVersion bytes: expected=$officialDxvkProviderSha actual=$dxvkProviderSha path=$dxvkProvider"
+}
 
 $packageWatch = [Diagnostics.Stopwatch]::StartNew()
 if (Test-Path $packageDir) {
