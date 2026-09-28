@@ -155,8 +155,12 @@ Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
 Write-Host "Profile: $TestProfile"
 
-if($backend -eq 'd3d9'){
-    $profile=Get-OutRunVRTestProfile -Name $TestProfile
+$profile=Get-OutRunVRTestProfile -Name $TestProfile
+$cleanDxvkPerformance = ($backend -eq 'dxvk-safe' -and $TestProfile -eq 'PERFORMANCE')
+if($backend -eq 'd3d9' -or $cleanDxvkPerformance){
+    # DXVK SAFE PERFORMANCE is the only non-D3D9 path allowed to consume the
+    # profile-equivalent cadence policy. CORRECTNESS and DXVK multiview remain
+    # on the conservative launch path until exact-build HMD parity exists.
     $gameArgs=@($profile.Arguments)
 }else{
     # Non-DX9Ex backends are retained only for explicit legacy comparison.
@@ -183,7 +187,12 @@ if($backend -eq 'd3d9'){
 }
 
 if($backend -ne '2d'){
-    $gameArgs += '-HudInspector=true'
+    if($cleanDxvkPerformance){
+        # A clean benchmark must not inherit an INI-level inspector enable.
+        $gameArgs += '-HudInspector=false'
+    }else{
+        $gameArgs += '-HudInspector=true'
+    }
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
@@ -250,6 +259,9 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "hudCoordMode=$hudCoordMode"
     "hudProbe=$hudProbe"
     "r57Mode=$r57Mode"
+    "cleanDxvkPerformance=$cleanDxvkPerformance"
+    "hudInspectorEnabled=$($backend -ne '2d' -and -not $cleanDxvkPerformance)"
+    "shaderFingerprintEnabled=$($backend -ne '2d' -and -not $cleanDxvkPerformance)"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
 
@@ -293,7 +305,7 @@ if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
 
-if($backend -ne '2d'){
+if($backend -ne '2d' -and -not $cleanDxvkPerformance){
     $env:OUTRUN_VR_SHADER_FINGERPRINT='1'
 }else{
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
