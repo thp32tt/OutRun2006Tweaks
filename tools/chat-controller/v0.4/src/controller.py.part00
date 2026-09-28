@@ -564,7 +564,7 @@ async def retry_surface_text(page: Page) -> str:
             }
             return best;
         }""")
-        return (text || "").lower()
+        return (text or "").lower()
     except Exception:
         return ""
 
