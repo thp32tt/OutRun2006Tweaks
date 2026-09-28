@@ -407,3 +407,12 @@ Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance;
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review cached projection hold telemetry.
+
+
+## Cycle 0018 — projection cache telemetry
+
+Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance; falsification. Cache reuse/refresh counters and pipeline timings exist. Changing projection hold or debounce without HMD logs would be unsupported visual/performance tuning, so behavior remains frozen.
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review cadence serialization.
