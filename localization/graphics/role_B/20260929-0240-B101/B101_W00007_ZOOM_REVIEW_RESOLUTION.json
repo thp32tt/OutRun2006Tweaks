@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00024",
+  "wave_id": "W00007",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T02:40:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK_4_ZOOM_REVIEW_ITEMS_RESOLVED_PRESERVE_ORIGINAL",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_2_ZOOM_REVIEW_RESOLUTION",
+  "initial_head_sha": "bd99a3726927033658a52f6ec6b7c2c808e6dea7",
+  "final_precommit_head_sha": "bd99a3726927033658a52f6ec6b7c2c808e6dea7",
+  "preserved_intervening_peer_head": true,
+  "queue": {
+    "git_blob_sha": "66f0d33c9d363fa23c7fd7e7f0be1426e65d2765",
+    "rows_verified": {
+      "150": "150,textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "174": "174,textures/load/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "180": "180,textures/load/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.dds,zoom_review,blocked_review,needs_zoom_review,",
+      "194": "194,textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds,zoom_review,blocked_review,needs_zoom_review,"
+    },
+    "authoritative_queue_modified": false,
+    "c_reconciliation_required": true,
+    "lane_local_resolved_count": 4,
+    "unresolved_even_zoom_review_before": 22,
+    "expected_unresolved_even_zoom_review_after_c_merge": 18
+  },
+  "source_policy": {
+    "source_repo": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "relation_to_project": "Canonical HD source upstream used by current localization policy; stock original decoded PNG is the semantic/orientation reference when no decoded HD working PNG is exposed through GitHub contents.",
+    "hd_release_identity_checked": true,
+    "preserve_rule": "Product/game logos and brand marks are preserve-original and are not translated."
+  },
+  "assets": [
+    {
+      "queue_index": 150,
+      "asset": "40A4D914",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.png",
+        "git_blob_sha": "1f37aee18ccfa9c5de615e42ac1ba1bdd44dac18"
+      },
+      "original_dds_git_blob_sha": "a8444771135828207914ca43d9f590cc7be6a53b",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds",
+        "git_blob_sha": "cb25645724694958d81cda2c64f45e8ae4fea457"
+      },
+      "observed": "Scenic postcard collage with decorative question-mark cards and one OutRun2SP product logo; no other user-facing word text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 174,
+      "asset": "73F852A4",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.png",
+        "git_blob_sha": "fa56d30c737753ce0a3794861e1c0f05cc78306f"
+      },
+      "original_dds_git_blob_sha": "eef6f375a840cd1acb22f5bcad31bae55aa017f3",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds",
+        "git_blob_sha": "cd547d09bc59b4f5918f156a920a8581a5be2544"
+      },
+      "observed": "Eight scenic/course-card images with repeated OutRun2/OutRun2SP product logos; no other user-facing word text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2 logo",
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 180,
+      "asset": "7ABD5110",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.png",
+        "git_blob_sha": "9b29ed0318460b1e25543ef7736221d6d7ffdada"
+      },
+      "original_dds_git_blob_sha": "1ecb60e349cfcf5789e035520eb841399991ba02",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/7ABD5110_1024x256.dds",
+        "git_blob_sha": "33df59211a8422dd5cb2cb4d1b3c58dca9662209"
+      },
+      "observed": "Vehicle/color-selector artwork plus postcard cards containing an OutRun2SP product logo; no other user-facing word text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    },
+    {
+      "queue_index": 194,
+      "asset": "9AC75730",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds",
+      "original_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.png",
+        "git_blob_sha": "6b7657e3daaadb52de1cde71366ad4713b327720"
+      },
+      "original_dds_git_blob_sha": "79e3aa30cfd9dd8250d9c46dae8b2e040b3f68f8",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds",
+        "git_blob_sha": "5bc6b4b10bf9740eb1944000766d0d87d197df5e"
+      },
+      "observed": "Four scenic/course-card images with repeated OutRun2SP product logos; no other user-facing word text is present in the decoded original reference.",
+      "protected_text": [
+        "OutRun2SP logo"
+      ],
+      "resolution": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+      "candidate_required": false
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY",
+    "work_steal": "NONE",
+    "queue_freshness": "PASS",
+    "direct_github_source_identity": "PASS",
+    "visual_zoom_review": "PASS_4_ASSETS",
+    "preserve_vs_translate_classification": "PASS_4_PRESERVE_ORIGINAL",
+    "mandatory_english_source_comparison_gate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_DDS",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "dds_format_compression_mips_alpha_orientation": "NOT_APPLICABLE_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Resolved four previously blocked even-shard zoom_review rows using direct GitHub source evidence. Each contains only scenic/vehicle/card artwork plus protected OutRun2/OutRun2SP logo text, so no Korean DDS candidate is required. C must reconcile the authoritative queue; runtime remains UNTESTED."
+}
