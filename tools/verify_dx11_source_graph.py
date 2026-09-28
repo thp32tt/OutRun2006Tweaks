@@ -111,6 +111,10 @@ def main() -> None:
         "observe_index_buffer_lock": "IB successful Lock observation API",
         "observe_index_buffer_unlock": "IB successful Unlock observation API",
         "forget_index_buffer_mutation": "IB release cleanup API",
+        "observe_texture_lock_rect": "texture LockRect observation API",
+        "observe_texture_unlock_rect": "texture UnlockRect observation API",
+        "observe_update_texture": "device UpdateTexture observation API",
+        "observe_update_surface": "device UpdateSurface observation API",
     }
     missing_mutation_api = [
         meaning
@@ -135,6 +139,13 @@ def main() -> None:
         "ResourceMutationMapDiscardUnlocks": "D3D11 MAP_WRITE_DISCARD counter",
         "ResourceMutationMapNoOverwriteUnlocks": "D3D11 MAP_WRITE_NO_OVERWRITE counter",
         "ResourceMutationUpdateSubresourceUnlocks": "UpdateSubresource counter",
+        "ResourceTextureMutationWriteUnlocks": "texture successful write LockRect/UnlockRect counter",
+        "ResourceTextureMutationReadOnlyUnlocks": "texture successful READONLY LockRect/UnlockRect counter",
+        "ResourceTextureMutationDescriptorFailures": "texture mutation descriptor failure counter",
+        "ResourceUpdateTextureSuccesses": "UpdateTexture success counter",
+        "ResourceUpdateTextureFailures": "UpdateTexture failure counter",
+        "ResourceUpdateSurfaceSuccesses": "UpdateSurface success counter",
+        "ResourceUpdateSurfaceFailures": "UpdateSurface failure counter",
         "translate_buffer_mutation": "runtime R75 mutation-plan classification",
     }
     missing_mutation_counters = [
@@ -163,6 +174,15 @@ def main() -> None:
             "observe_index_buffer_lock": "IB Lock bridge",
             "observe_index_buffer_unlock": "IB Unlock bridge",
             "forget_index_buffer_mutation": "IB release cleanup bridge",
+            "R30CreateTextureVtableIndex": "CreateTexture hook index",
+            "R30TextureLockRectVtableIndex": "Texture LockRect hook index",
+            "R30TextureUnlockRectVtableIndex": "Texture UnlockRect hook index",
+            "R30UpdateSurfaceVtableIndex": "UpdateSurface hook index",
+            "R30UpdateTextureVtableIndex": "UpdateTexture hook index",
+            "observe_texture_lock_rect": "texture LockRect bridge",
+            "observe_texture_unlock_rect": "texture UnlockRect bridge",
+            "observe_update_texture": "UpdateTexture bridge",
+            "observe_update_surface": "UpdateSurface bridge",
         }
         missing_bridge = [
             meaning
@@ -185,7 +205,7 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
-        "R7[2345] census": "R72/R73/R74/R75 summary compatibility",
+        "R7[23456] census": "R72/R73/R74/R75/R76 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
@@ -197,6 +217,13 @@ def main() -> None:
         "mutationPlanMapDiscard": "R75 MAP_WRITE_DISCARD evidence",
         "mutationPlanMapNoOverwrite": "R75 MAP_WRITE_NO_OVERWRITE evidence",
         "mutationPlanUpdateSubresource": "R75 UpdateSubresource evidence",
+        "textureMutationWriteUnlocks": "R76 texture write LockRect evidence",
+        "textureMutationReadOnlyUnlocks": "R76 texture READONLY LockRect evidence",
+        "textureMutationDescriptorFailures": "R76 texture descriptor failure evidence",
+        "textureUpdateTextureSuccesses": "R76 UpdateTexture success evidence",
+        "textureUpdateTextureFailures": "R76 UpdateTexture failure evidence",
+        "textureUpdateSurfaceSuccesses": "R76 UpdateSurface success evidence",
+        "textureUpdateSurfaceFailures": "R76 UpdateSurface failure evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
