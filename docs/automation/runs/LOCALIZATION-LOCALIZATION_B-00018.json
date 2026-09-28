@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00018",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00005",
+  "recorded_at_kst": "2026-09-29T01:23:27+09:00",
+  "report_commit_sha": "77d75c24ed6bd60c327715d2fe43f556d373b420",
+  "result": "DURABLE_BLOCKER_RUNTIME_ISOLATION_AND_NO_NEW_SAFE_GITHUB_PRODUCTION_INPUT",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane B even-index primary shard refresh, REWORK-first anti-duplication review, post-B00015 source/candidate delta gate, W00005 peer preservation, and self-QA eligibility check.",
+  "report": "localization/graphics/role_B/20260929-0119-B99/B99_W00005_RUNTIME_SOURCE_GATE.json",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "reviewed_rework_indices": [
+    94,
+    102
+  ],
+  "pending_localize_without_new_github_hd_source": 29,
+  "blocked_zoom_review_without_new_github_hd_source": 26,
+  "peer_lane": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00017",
+    "report_commit_sha": "c5eb24a7291e3ed1121294d7e6e7f698212055b8",
+    "task_record_blob_sha": "8225d60623c2dbf3d24062bd9a744bc7024e1f23",
+    "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+    "preserved": true
+  },
+  "source_delta": {
+    "previous_b_terminal_commit": "cb081778f6e0ccaaab255f51d3be13cc0105620b",
+    "commits_ahead_before_B99_report": 3,
+    "new_hd_source_or_candidate_dds_changes": 0
+  },
+  "conclusion": "No safe new B-shard DDS production is justified from current GitHub-only inputs. Index 94 remains an exhausted safe-repair blocker; index 102 remains strict-C validated pending isolated DDS_ONLY in-game reapproval; aggregate graphics failures are still not attributable to an individual even-shard DDS. The W00005 A result was preserved and only lane-local B evidence/task files were committed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-0119-B99/B99_W00005_RUNTIME_SOURCE_GATE.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00017.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00016.json",
+    "localization/graphics/asset_queue.csv",
+    "localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md"
+  ]
+}
