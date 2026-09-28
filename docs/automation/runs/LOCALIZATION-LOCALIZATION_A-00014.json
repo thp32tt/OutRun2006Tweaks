@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00014",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "W00004",
+  "recorded_at_kst": "2026-09-29T00:24:00+09:00",
+  "initial_head_sha": "88c442010246e3a2c7d948d88c4d10de93ecd8dc",
+  "refreshed_head_before_lane_write": "f5291bde9346f3f70f0d125536d3bf5a4ac61eb0",
+  "report_commit_sha": "b900d2e6eb6711fa89cb104e00b2887bed502802",
+  "result": "BLOCKED_NO_ACTION_RUNTIME_ISOLATION_AND_SAFE_SOURCE_REBUILD_REQUIRED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "scope": "GitHub-only lane A odd-index primary shard; REWORK-first review; anti-duplication; current runtime-isolation gate; no work stealing.",
+  "report": "localization/graphics/role_A/20260929-A00014/A00014_W00004_RUNTIME_ISOLATION_GATE.json",
+  "candidate_dds_modified": false,
+  "touched_assets": [],
+  "reviewed_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "No new HD source/candidate DDS changed since W00003. Latest user diagnostic feedback shows no crash under the diagnostic configuration but aggregate 16-DDS visual failures remain unisolated. Safe A production therefore remains blocked pending source-faithful reconstruction and/or per-DDS runtime isolation; no speculative DDS rewrite was made.",
+  "evidence": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/graphics/asset_queue.csv",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00013.json",
+    "localization/validation/CRASH_DIAGNOSTIC_3WAY_PACKAGES_20260928.md",
+    "localization/graphics/role_A/20260929-A00014/A00014_W00004_RUNTIME_ISOLATION_GATE.json"
+  ]
+}
