@@ -31,7 +31,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 ### A. Backend-neutral semantics
 - Shared WVP/address anchors are live and consistent.
 - **F13/F14 closed 2026-09-28:** the reviewed 25-range producer catalog is centralized in `disasm_render_contract.hpp`; runtime `hud_semantics.hpp` delegates to it and `analyze_outrun_exe.py` is mechanically checked against it. Exact-SHA gate `36391517935` passes on `d2d02c774ee85046acd42a453f2cf1f392927a20`.
-- Projected-world/projected-screen classes are still richer than the current shared SpacePolicy (F15 remains open).
+- **F15 closed 2026-09-28:** shared `SpacePolicy` now expresses `ProjectedWorldMarker2D` and `ProjectedScreenEffect2D`, with an explicit constexpr bridge to runtime `RenderScope` and semantic-verifier coverage. Existing producer ranges were intentionally not reclassified without separate exact producer evidence. Exact-SHA gate `36397508347` PASS on `f66e49fb170e685a852960c6bddd481734b34609`.
 
 ### B. One-click payload identity
 - Preflight is strong before mutation.
@@ -67,7 +67,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 ## Evidence-driven implementation order
 
 1. **DONE 2026-09-28:** Reconcile stale gate verifiers and restore the accidentally truncated renderer bodies. Backend Conversion Gate run `36389674398` passes through Win32 build/binary verification/artifact upload on `e46be02786f80aa9e554a24323714194b586d1f6`; no runtime claim is made.
-2. **PARTIAL 2026-09-28:** F13/F14 producer-catalog drift/omissions are closed at `d2d02c774ee85046acd42a453f2cf1f392927a20` with exact-SHA gate `36391517935` PASS. F15 projected semantic expressiveness remains open.
+2. **DONE 2026-09-28:** F13/F14 producer-catalog drift/omissions are closed at `d2d02c774ee85046acd42a453f2cf1f392927a20`, and F15 projected semantic expressiveness is closed at `f66e49fb170e685a852960c6bddd481734b34609` with exact-SHA gate `36397508347` PASS. No existing producer range was reclassified by the F15 type/bridge extension.
 3. **DONE 2026-09-28 for pre-session lifecycle:** F01/F03 payload identity is sealed, F06 transactional rollback is behavior-tested, and F07 pre-session selector/preflight diagnostics are durable. Exact-SHA Backend Conversion Gate `36396768691` PASS on `8f8595d0c2cc6db80afd89f0108b02438dd4e10e`, artifact `10958453229` (`sha256:eb0664bf837afe314b67f32d077626fdeee551988c8c1fccade8efcda5873f76`). Post-launch F31/F32 diagnostics remain separate.
 4. Tighten DX11 census/activation gates and transport parity.
 5. **PROVENANCE/VERSION/LIFECYCLE DONE 2026-09-28:** F24 runtime-version attestation, F08/F09 archive/cache/package-provider provenance, and F12 device-recreation provider/capability re-attestation are enforced and gate-tested. Hardware visual/runtime validation is still required.
