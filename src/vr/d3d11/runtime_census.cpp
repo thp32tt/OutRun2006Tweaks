@@ -35,6 +35,7 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> UnsupportedTextureFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedColorFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedDepthFormatSamples{0};
+        std::atomic<std::uint64_t> ResourceIntrospectionFailureSamples{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
@@ -85,6 +86,8 @@ namespace outrun::vr::dx11
             bool vertexDeclaration{};
             bool indexed{};
             bool textured{};
+            bool depthPresent{};
+            bool resourceIntrospectionComplete{true};
             bool fixedFunction{};
         };
 
@@ -139,7 +142,7 @@ namespace outrun::vr::dx11
             return hash;
         }
 
-        void inspect_texture(
+        bool inspect_texture(
             IDirect3DDevice9* device,
             DWORD stage,
             D3DRESOURCETYPE& type,
@@ -151,11 +154,15 @@ namespace outrun::vr::dx11
             present = false;
 
             IDirect3DBaseTexture9* base = nullptr;
-            if (FAILED(device->GetTexture(stage, &base)) || !base)
-                return;
+            const HRESULT getHr = device->GetTexture(stage, &base);
+            if (FAILED(getHr))
+                return false;
+            if (!base)
+                return true;
 
             present = true;
             type = base->GetType();
+            bool descriptorObserved = false;
             if (type == D3DRTYPE_TEXTURE)
             {
                 IDirect3DTexture9* texture = nullptr;
@@ -165,7 +172,10 @@ namespace outrun::vr::dx11
                 {
                     D3DSURFACE_DESC desc{};
                     if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                    {
                         format = desc.Format;
+                        descriptorObserved = true;
+                    }
                     texture->Release();
                 }
             }
@@ -178,7 +188,10 @@ namespace outrun::vr::dx11
                 {
                     D3DSURFACE_DESC desc{};
                     if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                    {
                         format = desc.Format;
+                        descriptorObserved = true;
+                    }
                     texture->Release();
                 }
             }
@@ -191,11 +204,15 @@ namespace outrun::vr::dx11
                 {
                     D3DVOLUME_DESC desc{};
                     if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+                    {
                         format = desc.Format;
+                        descriptorObserved = true;
+                    }
                     texture->Release();
                 }
             }
             base->Release();
+            return descriptorObserved;
         }
 
         SourceSignature inspect_source_signature(
@@ -244,44 +261,78 @@ namespace outrun::vr::dx11
             }
 
             IDirect3DVertexBuffer9* vb = nullptr;
-            if (SUCCEEDED(device->GetStreamSource(
-                    0, &vb, &sig.streamOffset, &sig.stride)) && vb)
+            const HRESULT streamHr = device->GetStreamSource(
+                0, &vb, &sig.streamOffset, &sig.stride);
+            if (FAILED(streamHr))
+            {
+                sig.resourceIntrospectionComplete = false;
+            }
+            else if (vb)
+            {
+                D3DVERTEXBUFFER_DESC desc{};
+                if (FAILED(vb->GetDesc(&desc)))
+                    sig.resourceIntrospectionComplete = false;
                 vb->Release();
+            }
 
             IDirect3DSurface9* rt0 = nullptr;
-            if (SUCCEEDED(device->GetRenderTarget(0, &rt0)) && rt0)
+            const HRESULT rtHr = device->GetRenderTarget(0, &rt0);
+            if (FAILED(rtHr) || !rt0)
+            {
+                sig.resourceIntrospectionComplete = false;
+            }
+            else
             {
                 D3DSURFACE_DESC desc{};
                 if (SUCCEEDED(rt0->GetDesc(&desc)))
                     sig.renderTargetFormat = desc.Format;
+                else
+                    sig.resourceIntrospectionComplete = false;
                 rt0->Release();
             }
 
             IDirect3DSurface9* depth = nullptr;
-            if (SUCCEEDED(device->GetDepthStencilSurface(&depth)) && depth)
+            const HRESULT depthHr = device->GetDepthStencilSurface(&depth);
+            if (FAILED(depthHr))
             {
+                sig.resourceIntrospectionComplete = false;
+            }
+            else if (depth)
+            {
+                sig.depthPresent = true;
                 D3DSURFACE_DESC desc{};
                 if (SUCCEEDED(depth->GetDesc(&desc)))
                     sig.depthFormat = desc.Format;
+                else
+                    sig.resourceIntrospectionComplete = false;
                 depth->Release();
             }
 
             IDirect3DIndexBuffer9* ib = nullptr;
-            if (SUCCEEDED(device->GetIndices(&ib)) && ib)
+            const HRESULT indexHr = device->GetIndices(&ib);
+            if (FAILED(indexHr))
+            {
+                sig.resourceIntrospectionComplete = false;
+            }
+            else if (ib)
             {
                 D3DINDEXBUFFER_DESC desc{};
                 if (SUCCEEDED(ib->GetDesc(&desc)))
                     sig.indexFormat = desc.Format;
+                else
+                    sig.resourceIntrospectionComplete = false;
                 sig.indexed = true;
                 ib->Release();
             }
 
             bool texture0 = false;
             bool texture1 = false;
-            inspect_texture(
+            const bool texture0Observed = inspect_texture(
                 device, 0, sig.texture0Type, sig.texture0Format, texture0);
-            inspect_texture(
+            const bool texture1Observed = inspect_texture(
                 device, 1, sig.texture1Type, sig.texture1Format, texture1);
+            if (!texture0Observed || !texture1Observed)
+                sig.resourceIntrospectionComplete = false;
             sig.textured = texture0 || texture1;
 
             if (fixedFunction)
@@ -452,7 +503,7 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             spdlog::info(
-                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R72 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -462,6 +513,7 @@ namespace outrun::vr::dx11
                 VertexDeclarationSamples.load(std::memory_order_relaxed),
                 IndexedSamples.load(std::memory_order_relaxed),
                 TexturedSamples.load(std::memory_order_relaxed),
+                ResourceIntrospectionFailureSamples.load(std::memory_order_relaxed),
                 UnsupportedIndexFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedTextureFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedColorFormatSamples.load(std::memory_order_relaxed),
@@ -526,37 +578,50 @@ namespace outrun::vr::dx11
             inspect_source_signature(device, fixedFunction);
         note_signature(signature, primitive);
 
-        bool resourcesExact = true;
-        if (signature.indexFormat != D3DFMT_UNKNOWN &&
-            !translate_resource_format(signature.indexFormat, ResourceRole::Index).exact)
+        bool resourcesExact = signature.resourceIntrospectionComplete;
+        if (!signature.resourceIntrospectionComplete)
+            ResourceIntrospectionFailureSamples.fetch_add(
+                1, std::memory_order_relaxed);
+
+        if (signature.indexed &&
+            !translate_resource_format(
+                signature.indexFormat, ResourceRole::Index).exact)
         {
             UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
             resourcesExact = false;
         }
-        for (const D3DFORMAT format : { signature.texture0Format, signature.texture1Format })
+        if (signature.textured)
         {
-            if (format != D3DFMT_UNKNOWN &&
-                !translate_resource_format(format, ResourceRole::Texture).exact)
+            for (const D3DFORMAT format :
+                 { signature.texture0Format, signature.texture1Format })
             {
-                UnsupportedTextureFormatSamples.fetch_add(1, std::memory_order_relaxed);
-                resourcesExact = false;
+                if (format != D3DFMT_UNKNOWN &&
+                    !translate_resource_format(
+                        format, ResourceRole::Texture).exact)
+                {
+                    UnsupportedTextureFormatSamples.fetch_add(
+                        1, std::memory_order_relaxed);
+                    resourcesExact = false;
+                }
             }
+
+            // A bound texture whose descriptor could not be observed leaves
+            // D3DFMT_UNKNOWN behind; resourceIntrospectionComplete above makes
+            // that sample fail closed rather than silently exact.
         }
-        if (signature.renderTargetFormat != D3DFMT_UNKNOWN &&
-            !translate_resource_format(
+        if (!translate_resource_format(
                 signature.renderTargetFormat, ResourceRole::Color).exact)
         {
             UnsupportedColorFormatSamples.fetch_add(1, std::memory_order_relaxed);
             resourcesExact = false;
         }
-        if (signature.depthFormat != D3DFMT_UNKNOWN &&
+        if (signature.depthPresent &&
             !translate_resource_format(
                 signature.depthFormat, ResourceRole::DepthStencil).exact)
         {
             UnsupportedDepthFormatSamples.fetch_add(1, std::memory_order_relaxed);
             resourcesExact = false;
         }
-
 
         if (unsupported == PipelineUnsupportedNone && topology.exact && resourcesExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
