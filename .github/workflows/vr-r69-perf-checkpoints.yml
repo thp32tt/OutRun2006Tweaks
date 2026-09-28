@@ -34,9 +34,9 @@ jobs:
           - id: PERF_C_P2
             ref: 72408ba589e0440d8ce7876f1689cb83b9e61497
             note: P1 + production HUD diagnostic hot-path cleanup
-          - id: PERF_D_P4
-            ref: 83acbf3a38338b483a91891ddd42fd7179eb676f
-            note: P2 + SkyGlow state batching + DirectGPU descriptor cache
+          - id: PERF_D_P5
+            ref: b3eee3988998aac7cc9f38995ddb5110e4b3255c
+            note: P2 + SkyGlow state batching + DirectGPU descriptor cache + opt-in SkyGlow timing
     steps:
       - uses: actions/checkout@v4
         with:
