@@ -1,4 +1,4 @@
-name: Korean crash diagnostic packages
+name: Korean crash diagnostic graphics payload
 
 on:
   push:
@@ -8,214 +8,32 @@ on:
       - .github/workflows/localization-crash-diagnostic-packages.yml
 
 permissions:
-  actions: read
   contents: read
 
 jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact branch snapshot
+      - name: Checkout localization branch snapshot
         uses: actions/checkout@v4
 
-      - name: Download validated runtime artifact
-        uses: actions/download-artifact@v4
-        with:
-          repository: thp32tt/OutRun2006Tweaks
-          run-id: 36200209935
-          name: outrun2006tweaks-1326f96840bfec7accf2e4016c238b8980b82853
-          path: runtime
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build three crash-diagnostic packages
+      - name: Verify and stage current HD candidates
         shell: bash
         run: |
-          python - <<'PY'
-          import hashlib
-          import pathlib
-          import shutil
-          import zipfile
+          set -euo pipefail
+          SRC="localization/graphics/hd_candidates/textures"
+          COUNT="$(find "$SRC" -type f -name '*.dds' | wc -l)"
+          test "$COUNT" -eq 16
+          mkdir -p dist
+          cp -a "$SRC" dist/textures
+          (
+            cd dist
+            find textures -type f -name '*.dds' -print0 | sort -z | xargs -0 sha256sum > DDS_SHA256SUMS.txt
+          )
+          printf 'head_sha=%s\ndds_count=%s\nRUNTIME_VALIDATION=UNTESTED\n' "$GITHUB_SHA" "$COUNT" > dist/PAYLOAD_INFO.txt
 
-          root = pathlib.Path.cwd()
-          runtime = root / "runtime"
-          out = root / "dist"
-          out.mkdir(exist_ok=True)
-
-          expected = ["dinput8.dll", "OutRun2006Tweaks.ini", "OutRun2006Tweaks.lods.ini"]
-          for name in expected:
-              if not (runtime / name).is_file():
-                  raise SystemExit(f"missing runtime artifact file: {name}")
-          tsv = runtime / "localization" / "text" / "runtime_ko.tsv"
-          if not tsv.is_file():
-              raise SystemExit("missing runtime_ko.tsv")
-
-          gfx_root = root / "localization" / "graphics" / "hd_candidates" / "textures"
-          dds_files = sorted(gfx_root.rglob("*.dds"))
-          if len(dds_files) != 16:
-              raise SystemExit(f"expected 16 current HD candidate DDS, got {len(dds_files)}")
-
-          base_ini = (runtime / "OutRun2006Tweaks.ini").read_text(encoding="utf-8")
-
-          def replace_setting(text, key, value):
-              import re
-              pat = re.compile(rf"(?m)^({re.escape(key)}\s*=\s*).*$")
-              new, n = pat.subn(rf"\g<1>{value}", text)
-              if n != 1:
-                  raise RuntimeError(f"{key}: expected one setting, got {n}")
-              return new
-
-          common_replacements = {
-              "SceneTextureReplacement": "false",
-              "EnableTextureCache": "false",
-              # Crash stack entered D3DXCreateTextureFromFileInMemory_Custom_dest.
-              # This setting selects the Orig_dest path instead of Custom_dest.
-              "UseNewTextureAllocator": "false",
-          }
-
-          packages = [
-              {
-                  "name": "OutRun2_Korean_TEXT_ONLY_CrashDiag_20260928",
-                  "ui": "false",
-                  "text": "true",
-                  "trace": "true",
-                  "include_text": True,
-                  "include_gfx": False,
-                  "purpose": "TEXT_ONLY: zero replacement DDS. Texture replacement hooks disabled; Korean text overlay enabled.",
-              },
-              {
-                  "name": "OutRun2_Korean_GRAPHICS_ONLY_CrashDiag_20260928",
-                  "ui": "true",
-                  "text": "false",
-                  "trace": "false",
-                  "include_text": False,
-                  "include_gfx": True,
-                  "purpose": "GRAPHICS_ONLY: current 16 HD candidate DDS. Korean text overlay disabled. New texture allocator bypassed.",
-              },
-              {
-                  "name": "OutRun2_Korean_COMBINED_CrashDiag_20260928",
-                  "ui": "true",
-                  "text": "true",
-                  "trace": "true",
-                  "include_text": True,
-                  "include_gfx": True,
-                  "purpose": "COMBINED: current 16 HD candidate DDS + Korean text overlay. New texture allocator bypassed.",
-              },
-          ]
-
-          summary = []
-          for spec in packages:
-              stage = out / spec["name"]
-              if stage.exists():
-                  shutil.rmtree(stage)
-              stage.mkdir(parents=True)
-
-              shutil.copy2(runtime / "dinput8.dll", stage / "dinput8.dll")
-              shutil.copy2(runtime / "OutRun2006Tweaks.lods.ini", stage / "OutRun2006Tweaks.lods.ini")
-
-              ini = base_ini
-              for k, v in common_replacements.items():
-                  ini = replace_setting(ini, k, v)
-              ini = replace_setting(ini, "UITextureReplacement", spec["ui"])
-              ini = replace_setting(ini, "KoreanTextOverlayTest", spec["text"])
-              ini = replace_setting(ini, "KoreanTrace", spec["trace"])
-              ini = replace_setting(ini, "KoreanProofTextOverride", "false")
-              ini = replace_setting(ini, "KoreanK3Trace", "false")
-              (stage / "OutRun2006Tweaks.ini").write_text(ini, encoding="utf-8", newline="\n")
-
-              if spec["include_text"]:
-                  dest = stage / "localization" / "text"
-                  dest.mkdir(parents=True, exist_ok=True)
-                  shutil.copy2(tsv, dest / "runtime_ko.tsv")
-
-              if spec["include_gfx"]:
-                  for src in dds_files:
-                      rel = src.relative_to(gfx_root)
-                      dest = stage / "textures" / rel
-                      dest.parent.mkdir(parents=True, exist_ok=True)
-                      shutil.copy2(src, dest)
-
-              readme = f"""OutRun 2006 Korean localization crash diagnostic package
-Package: {spec['name']}
-Branch snapshot: {root.name} / GitHub Actions commit {{"GITHUB_SHA"}}
-Runtime DLL source commit: 1326f96840bfec7accf2e4016c238b8980b82853
-Runtime build run: 36200209935
-Current packaging commit is recorded in PACKAGE_MANIFEST.txt.
-
-{spec['purpose']}
-
-Crash mitigation / isolation settings:
-- UseNewTextureAllocator=false
-- EnableTextureCache=false
-- SceneTextureReplacement=false
-- UITextureReplacement={spec['ui']}
-- KoreanTextOverlayTest={spec['text']}
-- KoreanTrace={spec['trace']}
-
-IMPORTANT:
-- This is a diagnostic TEST package, not a release.
-- GRAPHICS_ONLY and COMBINED contain all 16 current HD candidates and therefore do NOT count as per-DDS isolated approval evidence.
-- Current graphics approval count is 0; isolated DDS_ONLY in-game validation is still required for promotion.
-- No OR2006C2C.exe is included. Copy these files over a backed-up game installation.
-- Keep OutRun2006Tweaks.log and note whether a crash occurs, where it occurs, and which package was used.
-"""
-              (stage / "README_TEST.txt").write_text(readme, encoding="utf-8", newline="\n")
-
-              manifest_lines = [
-                  f"package={spec['name']}",
-                  f"head_sha={pathlib.os.environ.get('GITHUB_SHA','')}",
-                  "runtime_source_sha=1326f96840bfec7accf2e4016c238b8980b82853",
-                  "runtime_run_id=36200209935",
-                  f"dds_count={len(dds_files) if spec['include_gfx'] else 0}",
-                  f"text_rows={sum(1 for _ in tsv.open(encoding='utf-8')) if spec['include_text'] else 0}",
-                  "RUNTIME_VALIDATION=UNTESTED",
-                  "",
-                  "files:",
-              ]
-              for p in sorted(stage.rglob("*")):
-                  if p.is_file() and p.name != "PACKAGE_MANIFEST.txt":
-                      digest = hashlib.sha256(p.read_bytes()).hexdigest()
-                      manifest_lines.append(f"{digest}  {p.relative_to(stage).as_posix()}")
-              (stage / "PACKAGE_MANIFEST.txt").write_text("\n".join(manifest_lines)+"\n", encoding="utf-8")
-
-              zip_path = out / f"{spec['name']}.zip"
-              with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as z:
-                  for p in sorted(stage.rglob("*")):
-                      if p.is_file():
-                          z.write(p, p.relative_to(stage))
-              sha = hashlib.sha256(zip_path.read_bytes()).hexdigest()
-              summary.append(f"{sha}  {zip_path.name}")
-              shutil.rmtree(stage)
-
-          (out / "SHA256SUMS.txt").write_text("\n".join(summary)+"\n", encoding="ascii")
-          print("\n".join(summary))
-
-      - name: Upload text-only package
-        uses: actions/upload-artifact@v4
+      - name: Upload current HD candidate payload
+        uses: actions/upload-artifact@v7.0.1
         with:
-          name: korean-text-only-crashdiag
-          path: dist/OutRun2_Korean_TEXT_ONLY_CrashDiag_20260928.zip
-          compression-level: 0
-          retention-days: 7
-
-      - name: Upload graphics-only package
-        uses: actions/upload-artifact@v4
-        with:
-          name: korean-graphics-only-crashdiag
-          path: dist/OutRun2_Korean_GRAPHICS_ONLY_CrashDiag_20260928.zip
-          compression-level: 0
-          retention-days: 7
-
-      - name: Upload combined package
-        uses: actions/upload-artifact@v4
-        with:
-          name: korean-combined-crashdiag
-          path: dist/OutRun2_Korean_COMBINED_CrashDiag_20260928.zip
-          compression-level: 0
-          retention-days: 7
-
-      - name: Upload checksum manifest
-        uses: actions/upload-artifact@v4
-        with:
-          name: korean-crashdiag-checksums
-          path: dist/SHA256SUMS.txt
-          retention-days: 7
+          name: korean-current-hd-candidates-${{ github.sha }}
+          path: dist/
