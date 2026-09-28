@@ -75,7 +75,8 @@ for r in rows:
 
 changed=diffmask(before,after)
 edit_scope=mk_mask((w,h),[r["localized_bbox"] for r in fails]+[r["target_bbox"] for r in recs])
-allowed_change_scope=ImageChops.lighter(edit_scope,repair)\ncollateral=nz(ImageChops.multiply(changed,ImageOps.invert(allowed_change_scope)))
+allowed_change_scope=ImageChops.lighter(edit_scope,repair)
+collateral=nz(ImageChops.multiply(changed,ImageOps.invert(allowed_change_scope)))
 outside=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allc)))
 outside_original_regions=nz(ImageChops.multiply(diffmask(src,after),ImageOps.invert(allowed)))
 introduced=nz(ImageChops.multiply(ImageChops.subtract(after.getchannel("A"),src.getchannel("A")),ImageOps.invert(allc)))
