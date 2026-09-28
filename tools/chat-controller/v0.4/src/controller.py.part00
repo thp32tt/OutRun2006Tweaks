@@ -52,6 +52,7 @@ QUEUE_CHECK_SECONDS = max(10, int(os.getenv("QUEUE_CHECK_SECONDS", "15")))
 QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
 QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
 GITHUB_POLL_SECONDS = max(60, int(os.getenv("GITHUB_POLL_SECONDS", "180")))
+GITHUB_TASK_COMMIT_CACHE_SECONDS = max(30, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "120")))
 QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "180")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "60")))
@@ -212,6 +213,8 @@ runtime = {
     "queue_check_seconds": QUEUE_CHECK_SECONDS,
     "queue_stable_seconds": QUEUE_STABLE_SECONDS,
     "github_poll_seconds": GITHUB_POLL_SECONDS,
+    "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
+    "github_token_configured": bool(GITHUB_TOKEN),
     "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
     "localization_parallel": LOCALIZATION_PARALLEL,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
@@ -374,7 +377,20 @@ def save_queue_state(state: dict):
     tmp.replace(QUEUE_FILE)
 
 
+_github_rest_block_until_epoch = 0.0
+_github_commit_list_cache: dict[str, tuple[float, list]] = {}
+
+
+def _github_blocked_seconds() -> int:
+    return max(0, int(_github_rest_block_until_epoch - time.time()))
+
+
 def github_api_json(path: str) -> dict:
+    global _github_rest_block_until_epoch
+    now_epoch = time.time()
+    if now_epoch < _github_rest_block_until_epoch:
+        raise RuntimeError(f"github REST temporarily paused for {_github_blocked_seconds()}s after rate limit")
+
     url = "https://api.github.com" + path
     headers = {
         "Accept": "application/vnd.github+json",
@@ -384,8 +400,41 @@ def github_api_json(path: str) -> dict:
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
     req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            reset = resp.headers.get("X-RateLimit-Reset")
+            write_runtime(
+                github_rate_limit_remaining=resp.headers.get("X-RateLimit-Remaining"),
+                github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
+                github_rate_limit_reset=reset,
+                github_api_blocked_until=None,
+            )
+            return data
+    except urllib.error.HTTPError as e:
+        if e.code in {403, 429}:
+            retry_after = e.headers.get("Retry-After")
+            reset = e.headers.get("X-RateLimit-Reset")
+            until = time.time() + 300
+            if retry_after:
+                try:
+                    until = max(until, time.time() + int(retry_after) + 5)
+                except ValueError:
+                    pass
+            if reset:
+                try:
+                    until = max(until, float(reset) + 5)
+                except ValueError:
+                    pass
+            _github_rest_block_until_epoch = until
+            write_runtime(
+                github_rate_limit_remaining=e.headers.get("X-RateLimit-Remaining"),
+                github_rate_limit_limit=e.headers.get("X-RateLimit-Limit"),
+                github_rate_limit_reset=reset,
+                github_api_blocked_until=datetime.fromtimestamp(until, TZ).isoformat(),
+                last_github_error=f"HTTP {e.code} rate limit; REST paused until {datetime.fromtimestamp(until, TZ).isoformat()}",
+            )
+        raise
 
 
 def github_branch_head(branch: str) -> Optional[str]:
@@ -409,10 +458,17 @@ def github_commit_message(sha: str) -> Optional[str]:
 
 
 def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> Optional[dict]:
-    """Find this task's durable commit even when another parallel lane moved branch HEAD."""
+    """Find a task commit using a short shared branch-history cache to protect REST rate limits."""
     try:
-        q = urllib.parse.urlencode({"sha": branch, "per_page": max(1, min(per_page, 100))})
-        data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
+        now_mono = time.monotonic()
+        cached = _github_commit_list_cache.get(branch)
+        if cached and now_mono - cached[0] < GITHUB_TASK_COMMIT_CACHE_SECONDS:
+            data = cached[1]
+        else:
+            q = urllib.parse.urlencode({"sha": branch, "per_page": max(1, min(per_page, 100))})
+            data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
+            if isinstance(data, list):
+                _github_commit_list_cache[branch] = (now_mono, data)
         expected = f"[AUTO:{task_id}]"
         for item in data if isinstance(data, list) else []:
             message = item.get("commit", {}).get("message", "")
