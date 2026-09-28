@@ -33,17 +33,17 @@ def parse_dds(data: bytes):
     masks = struct.unpack_from("<IIII", data, 92)
     if fourcc != b"\0\0\0\0" or bpp != 32:
         raise SystemExit("B93 supports only uncompressed 32-bit DDS")
-    if masks != (0x00FF0000,0x0000FF00,0x000000FF,0xFF000000):
+    if masks != (0x000000FF,0x0000FF00,0x00FF0000,0xFF000000):
         raise SystemExit(f"unexpected DDS masks {masks}")
     if pitch != w * 4 or len(data) != 128 + w*h*4:
         raise SystemExit("unexpected DDS pitch/payload")
     return w,h,mips
 
 def to_rgba(data: bytes, w: int, h: int) -> Image.Image:
-    return Image.frombytes("RGBA",(w,h),data[128:],"raw","BGRA")
+    return Image.frombytes("RGBA",(w,h),data[128:],"raw","RGBA")
 
 def to_dds(header: bytes, img: Image.Image) -> bytes:
-    return header + img.tobytes("raw","BGRA")
+    return header + img.tobytes("raw","RGBA")
 
 def abs_bbox(alpha: Image.Image, cell):
     x0,y0,x1,y1 = cell
