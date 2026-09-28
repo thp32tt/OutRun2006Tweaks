@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72/R73/R74/R75/R76/R77/R78/R79/R80/R81/R82 DX11 census analyzer compatibility."""
+"""Regression tests for R72/R73/R74/R75/R76/R77/R78/R79/R80/R81/R82/R83 DX11 census analyzer compatibility."""
 
 from __future__ import annotations
 
@@ -367,6 +367,59 @@ def main() -> int:
     assert r82["LatestSummary"]["fixedFunctionReadinessPending"] == 1
     assert r82["Signatures"][0]["fixed_function_stages"][0]["stage"] == 2
     assert r82["Signatures"][0]["fixed_function_stages"][0]["samplerAddressV"] == 3
+
+    r83 = run_case(
+        "VR DX11 R83 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4 "
+        "decl=0 declHash=0x0000000000000000 declElems=0 "
+        "inputLayout[exact=1,elements=4,fvfExact=1,fvfPending=0] "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=0,vsBytes=0,"
+        "vsVersion=0x00000000,vsHash=0x0000000000000000,psPresent=0,"
+        "psBytes=0,psVersion=0x00000000,psHash=0x0000000000000000] "
+        "ffpCoverage[exact=1] ffpReadiness[ready=1,mask=0x00000000,"
+        "activeStages=3] texMask[present=0x87,exact=0x87]\n"
+        "VR DX11 R83 texture signature#1 stage#7: observed=1 type=3 pool=1 "
+        "usage=0x00000000 fmt=21 exact=1\n"
+        "VR DX11 R83 ffp signature#1 stage#2: "
+        "color[op=4,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=4,arg1=0x00000002,arg2=0x00000001] "
+        "texCoord=0x00000002 texTransform=0x00000000 "
+        "sampler[min=2,mag=2,mip=2,u=1,v=1]\n"
+        "VR DX11 R83 census: samples=1 exact=0 fixedFn=1 programmable=0 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
+        "texturedSamples=1 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "mutation[writeUnlocks=0,readOnlyUnlocks=0,discardWriteUnlocks=0,"
+        "noOverwriteWriteUnlocks=0] "
+        "mutationPlan[exact=0,unsupported=0,managedShadow=0,mapWrite=0,"
+        "mapDiscard=0,mapNoOverwrite=0,updateSubresource=0] "
+        "textureMutation[writeUnlocks=0,readOnlyUnlocks=0,descriptorFailures=0,"
+        "updateTextureSuccesses=0,updateTextureFailures=0,"
+        "updateSurfaceSuccesses=0,updateSurfaceFailures=0] "
+        "managedLifetime[shadowWrites=0,shadowReads=0,resetSuccesses=0,"
+        "shadowPreserved=0,deviceGeneration=1,shadowVersion=0,"
+        "mirrorGeneration=0,mirrorVersion=0,mirrorReady=0] "
+        "inputLayout[exact=1,unsupported=0,fvfExact=1,fvfPending=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,"
+        "fixedFunctionPending=1,programmablePending=0] "
+        "ffpCoverage[exact=1,queryFailure=0] "
+        "ffpReadiness[ready=1,pending=0] "
+        "textureStageResource[bound=4,exact=4,pending=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r83["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r83["NativeDrawPathActivationAllowed"] is False
+    assert r83["LatestSummary"]["textureStageBound"] == 4
+    assert r83["LatestSummary"]["textureStageExact"] == 4
+    assert r83["LatestSummary"]["textureStagePending"] == 0
+    assert r83["LatestSummary"]["fixedFunctionReadinessReady"] == 1
+    assert r83["Signatures"][0]["texture_stages"][0]["stage"] == 7
+    assert r83["Signatures"][0]["texture_stages"][0]["exact"] == 1
+    assert r83["Signatures"][0]["texture_stages"][0]["format"] == 21
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"

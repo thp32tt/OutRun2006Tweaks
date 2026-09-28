@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R(?:7[23456789]|8[012]) census: "
+    r"VR DX11 R(?:7[23456789]|8[0123]) census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
@@ -62,6 +62,9 @@ SUMMARY_RE = re.compile(
     r"queryFailure=(?P<fixedFunctionQueryFailure>\d+)\] )?"
     r"(?:ffpReadiness\[ready=(?P<fixedFunctionReadinessReady>\d+),"
     r"pending=(?P<fixedFunctionReadinessPending>\d+)\] )?"
+    r"(?:textureStageResource\[bound=(?P<textureStageBound>\d+),"
+    r"exact=(?P<textureStageExact>\d+),"
+    r"pending=(?P<textureStagePending>\d+)\] )?"
     r"unsupported\[incomplete=(?P<incomplete>\d+),"
     r"wbuffer=(?P<wbuffer>\d+),sepAlpha=(?P<sepAlpha>\d+),"
     r"alphaTest=(?P<alphaTest>\d+),stencil=(?P<stencil>\d+),"
@@ -85,14 +88,14 @@ STARTUP_RE = re.compile(
     r"msaa=(?P<msaa>-?\d+) bootstrapCompatible=(?P<bootstrapCompatible>[01])"
 )
 
-SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[012]) signature#(?P<id>\d+): (?P<body>.*)")
+SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[0123]) signature#(?P<id>\d+): (?P<body>.*)")
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
     r"method=(?P<method>\d+) usage=(?P<usage>\d+) usageIndex=(?P<usageIndex>\d+)"
 )
 FFP_RE = re.compile(
-    r"VR DX11 R(?:72|8[12]) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"VR DX11 R(?:72|8[123]) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"color\[op=(?P<colorOp>\d+),arg1=0x(?P<colorArg1>[0-9A-Fa-f]+),"
     r"arg2=0x(?P<colorArg2>[0-9A-Fa-f]+)\] "
     r"alpha\[op=(?P<alphaOp>\d+),arg1=0x(?P<alphaArg1>[0-9A-Fa-f]+),"
@@ -102,6 +105,12 @@ FFP_RE = re.compile(
     r"(?: sampler\[min=(?P<samplerMin>\d+),mag=(?P<samplerMag>\d+),"
     r"mip=(?P<samplerMip>\d+),u=(?P<samplerAddressU>\d+),"
     r"v=(?P<samplerAddressV>\d+)\])?"
+)
+TEXTURE_RE = re.compile(
+    r"VR DX11 R83 texture signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"observed=(?P<observed>[01]) type=(?P<type>-?\d+) "
+    r"pool=(?P<pool>-?\d+) usage=0x(?P<usage>[0-9A-Fa-f]+) "
+    r"fmt=(?P<format>-?\d+) exact=(?P<exact>[01])"
 )
 
 
@@ -128,6 +137,7 @@ def main() -> int:
     signatures: dict[int, dict] = {}
     declarations: dict[int, list[dict]] = {}
     fixed_function: dict[int, list[dict]] = {}
+    texture_stages: dict[int, list[dict]] = {}
     source_logs: list[str] = []
 
     for log_path in log_files:
@@ -141,6 +151,7 @@ def main() -> int:
             and "VR DX11 R80" not in text
             and "VR DX11 R81" not in text
             and "VR DX11 R82" not in text
+            and "VR DX11 R83" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -187,6 +198,21 @@ def main() -> int:
                 declarations.setdefault(signature_id, []).append(data)
                 continue
 
+            match = TEXTURE_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                stage = int(data.pop("stage"))
+                parsed = {"stage": stage}
+                for key, value in data.items():
+                    if key == "usage":
+                        parsed[key] = int(value, 16)
+                        parsed[key + "_hex"] = "0x" + value.upper()
+                    else:
+                        parsed[key] = int(value)
+                texture_stages.setdefault(signature_id, []).append(parsed)
+                continue
+
             match = FFP_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -210,6 +236,9 @@ def main() -> int:
         )
         signature["fixed_function_stages"] = sorted(
             fixed_function.get(signature_id, []), key=lambda item: item["stage"]
+        )
+        signature["texture_stages"] = sorted(
+            texture_stages.get(signature_id, []), key=lambda item: item["stage"]
         )
 
     latest = summaries[-1] if summaries else None

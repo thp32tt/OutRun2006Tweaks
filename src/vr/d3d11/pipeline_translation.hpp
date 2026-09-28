@@ -92,7 +92,9 @@ namespace outrun::vr::dx11
     [[nodiscard]] FixedFunctionTranslationReadiness
     translate_fixed_function_readiness(
         const std::array<FixedFunctionStageState, 8>& source,
-        bool observationComplete) noexcept;
+        bool observationComplete,
+        std::uint8_t textureResourcePresentMask,
+        std::uint8_t textureResourceExactMask) noexcept;
 
     // R79 translates either an explicit D3D9 declaration or a conservative
     // supported FVF subset into canonical D3D11 input-layout descriptors.

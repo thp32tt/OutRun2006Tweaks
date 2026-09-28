@@ -77,6 +77,9 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> FixedFunctionStateCoverageFailureSamples{0};
         std::atomic<std::uint64_t> FixedFunctionTranslationReadySamples{0};
         std::atomic<std::uint64_t> FixedFunctionTranslationPendingSamples{0};
+        std::atomic<std::uint64_t> TextureStageBoundResources{0};
+        std::atomic<std::uint64_t> TextureStageExactResources{0};
+        std::atomic<std::uint64_t> TextureStagePendingResources{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
         std::atomic<std::uint64_t> TexturedSamples{0};
         std::array<std::atomic<std::uint64_t>, UnsupportedBitCount>
@@ -117,6 +120,16 @@ namespace outrun::vr::dx11
                 std::unordered_map<UINT, TextureMutationEvidence>>;
         TextureMutationRegistry TextureMutationEvidenceRegistry;
 
+        struct TextureStageResourceState
+        {
+            D3DRESOURCETYPE type = D3DRTYPE_FORCE_DWORD;
+            DWORD usage{};
+            D3DPOOL pool = D3DPOOL_FORCE_DWORD;
+            D3DFORMAT format = D3DFMT_UNKNOWN;
+            bool present{};
+            bool observed{};
+        };
+
         struct ShaderFunctionSignature
         {
             bool present{};
@@ -145,14 +158,9 @@ namespace outrun::vr::dx11
             DWORD depthUsage{};
             D3DPOOL depthPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT depthFormat = D3DFMT_UNKNOWN;
-            D3DRESOURCETYPE texture0Type = D3DRTYPE_FORCE_DWORD;
-            DWORD texture0Usage{};
-            D3DPOOL texture0Pool = D3DPOOL_FORCE_DWORD;
-            D3DFORMAT texture0Format = D3DFMT_UNKNOWN;
-            D3DRESOURCETYPE texture1Type = D3DRTYPE_FORCE_DWORD;
-            DWORD texture1Usage{};
-            D3DPOOL texture1Pool = D3DPOOL_FORCE_DWORD;
-            D3DFORMAT texture1Format = D3DFMT_UNKNOWN;
+            std::array<TextureStageResourceState, 8> textureStages{};
+            std::uint8_t textureResourcePresentMask{};
+            std::uint8_t textureResourceExactMask{};
             // D3D9 fixed-function texture blending exposes stages 0..7.
             // R81 observes all eight stages and the currently modeled sampler
             // fields for each stage; this remains evidence, not emulation.
@@ -184,8 +192,6 @@ namespace outrun::vr::dx11
             bool renderTargetPresent{};
             bool indexed{};
             bool textured{};
-            bool texture0Present{};
-            bool texture1Present{};
             bool depthPresent{};
             bool resourceIntrospectionComplete{true};
             bool fixedFunction{};
@@ -219,14 +225,17 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.depthUsage);
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthFormat));
-            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Type));
-            hash = hash_mix(hash, sig.texture0Usage);
-            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Pool));
-            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture0Format));
-            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Type));
-            hash = hash_mix(hash, sig.texture1Usage);
-            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Pool));
-            hash = hash_mix(hash, static_cast<std::uint32_t>(sig.texture1Format));
+            for (const auto& texture : sig.textureStages)
+            {
+                hash = hash_mix(hash, texture.present ? 1u : 0u);
+                hash = hash_mix(hash, texture.observed ? 1u : 0u);
+                hash = hash_mix(hash, static_cast<std::uint32_t>(texture.type));
+                hash = hash_mix(hash, texture.usage);
+                hash = hash_mix(hash, static_cast<std::uint32_t>(texture.pool));
+                hash = hash_mix(hash, static_cast<std::uint32_t>(texture.format));
+            }
+            hash = hash_mix(hash, sig.textureResourcePresentMask);
+            hash = hash_mix(hash, sig.textureResourceExactMask);
             hash = hash_mix(hash, sig.colorOp0);
             hash = hash_mix(hash, sig.alphaOp0);
             hash = hash_mix(hash, sig.colorOp1);
@@ -766,15 +775,23 @@ namespace outrun::vr::dx11
                 ib->Release();
             }
 
-            const bool texture0Observed = inspect_texture(
-                device, 0, sig.texture0Type, sig.texture0Usage,
-                sig.texture0Pool, sig.texture0Format, sig.texture0Present);
-            const bool texture1Observed = inspect_texture(
-                device, 1, sig.texture1Type, sig.texture1Usage,
-                sig.texture1Pool, sig.texture1Format, sig.texture1Present);
-            if (!texture0Observed || !texture1Observed)
-                sig.resourceIntrospectionComplete = false;
-            sig.textured = sig.texture0Present || sig.texture1Present;
+            for (DWORD stage = 0;
+                 stage < static_cast<DWORD>(sig.textureStages.size());
+                 ++stage)
+            {
+                auto& texture = sig.textureStages[stage];
+                texture.observed = inspect_texture(
+                    device, stage, texture.type, texture.usage,
+                    texture.pool, texture.format, texture.present);
+                if (!texture.observed)
+                    sig.resourceIntrospectionComplete = false;
+                if (texture.present)
+                {
+                    sig.textured = true;
+                    sig.textureResourcePresentMask |=
+                        static_cast<std::uint8_t>(1u << stage);
+                }
+            }
 
             if (fixedFunction)
             {
@@ -829,13 +846,8 @@ namespace outrun::vr::dx11
                 sig.addressU = sig.fixedFunctionStages[0].addressU;
                 sig.addressV = sig.fixedFunctionStages[0].addressV;
 
-                const auto readiness = translate_fixed_function_readiness(
-                    sig.fixedFunctionStages,
-                    sig.fixedFunctionStateCoverageExact);
-                sig.fixedFunctionTranslationReady = readiness.exact();
-                sig.fixedFunctionTranslationUnsupported =
-                    readiness.unsupported;
-                sig.fixedFunctionActiveStages = readiness.activeStages;
+                // R83 defers translation readiness until resource behavior
+                // and format exactness have been evaluated for all 8 stages.
             }
 
             const auto inputLayout = translate_vertex_input_layout(
@@ -910,11 +922,27 @@ namespace outrun::vr::dx11
                 IndexedSamples.fetch_add(1, std::memory_order_relaxed);
             if (sig.textured)
                 TexturedSamples.fetch_add(1, std::memory_order_relaxed);
+            for (std::size_t stageIndex = 0;
+                 stageIndex < sig.textureStages.size();
+                 ++stageIndex)
+            {
+                const auto& texture = sig.textureStages[stageIndex];
+                if (!texture.present)
+                    continue;
+                TextureStageBoundResources.fetch_add(
+                    1, std::memory_order_relaxed);
+                const auto stageBit = static_cast<std::uint8_t>(
+                    1u << static_cast<unsigned>(stageIndex));
+                ((sig.textureResourceExactMask & stageBit) != 0
+                    ? TextureStageExactResources
+                    : TextureStagePendingResources).fetch_add(
+                        1, std::memory_order_relaxed);
+            }
 
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R82 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R83 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -941,6 +969,8 @@ namespace outrun::vr::dx11
                     sig.fixedFunctionTranslationReady ? 1 : 0,
                     sig.fixedFunctionTranslationUnsupported,
                     sig.fixedFunctionActiveStages,
+                    sig.textureResourcePresentMask,
+                    sig.textureResourceExactMask,
                     sig.streamOffset,
                     sig.stride,
                     sig.vertexBufferPresent ? 1 : 0,
@@ -958,16 +988,16 @@ namespace outrun::vr::dx11
                     static_cast<int>(sig.depthPool),
                     sig.depthUsage,
                     static_cast<int>(sig.depthFormat),
-                    sig.texture0Present ? 1 : 0,
-                    static_cast<int>(sig.texture0Type),
-                    static_cast<int>(sig.texture0Pool),
-                    sig.texture0Usage,
-                    static_cast<int>(sig.texture0Format),
-                    sig.texture1Present ? 1 : 0,
-                    static_cast<int>(sig.texture1Type),
-                    static_cast<int>(sig.texture1Pool),
-                    sig.texture1Usage,
-                    static_cast<int>(sig.texture1Format),
+                    sig.textureStages[0].present ? 1 : 0,
+                    static_cast<int>(sig.textureStages[0].type),
+                    static_cast<int>(sig.textureStages[0].pool),
+                    sig.textureStages[0].usage,
+                    static_cast<int>(sig.textureStages[0].format),
+                    sig.textureStages[1].present ? 1 : 0,
+                    static_cast<int>(sig.textureStages[1].type),
+                    static_cast<int>(sig.textureStages[1].pool),
+                    sig.textureStages[1].usage,
+                    static_cast<int>(sig.textureStages[1].format),
                     sig.colorOp0,
                     sig.alphaOp0,
                     sig.colorOp1,
@@ -977,6 +1007,27 @@ namespace outrun::vr::dx11
                     sig.mipFilter,
                     sig.addressU,
                     sig.addressV);
+
+                for (std::size_t stageIndex = 0;
+                     stageIndex < sig.textureStages.size();
+                     ++stageIndex)
+                {
+                    const auto& texture = sig.textureStages[stageIndex];
+                    if (!texture.present)
+                        continue;
+                    const auto stageBit = static_cast<std::uint8_t>(
+                        1u << static_cast<unsigned>(stageIndex));
+                    spdlog::info(
+                        "VR DX11 R83 texture signature#{} stage#{}: observed={} type={} pool={} usage=0x{:08X} fmt={} exact={}",
+                        unique,
+                        stageIndex,
+                        texture.observed ? 1 : 0,
+                        static_cast<int>(texture.type),
+                        static_cast<int>(texture.pool),
+                        texture.usage,
+                        static_cast<int>(texture.format),
+                        (sig.textureResourceExactMask & stageBit) != 0 ? 1 : 0);
+                }
 
                 if (sig.fixedFunction)
                 {
@@ -990,7 +1041,7 @@ namespace outrun::vr::dx11
                             continue;
 
                         spdlog::info(
-                            "VR DX11 R82 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={}]",
+                            "VR DX11 R83 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={}]",
                             unique,
                             stageIndex,
                             stage.colorOp,
@@ -1044,7 +1095,7 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R82 census ACTIVE: passive 1/{} draw sampling with resource/input-layout/shader gates plus conservative fixed-function translation readiness; native draw routing remains disabled",
+                    "VR DX11 R83 census ACTIVE: passive 1/{} draw sampling with 8-stage texture resource exactness plus conservative fixed-function readiness; native draw routing remains disabled",
                     SampleStride);
             return enabled;
         }
@@ -1067,7 +1118,7 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R82 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R83 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] textureStageResource[bound={},exact={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1128,6 +1179,9 @@ namespace outrun::vr::dx11
                     std::memory_order_relaxed),
                 FixedFunctionTranslationPendingSamples.load(
                     std::memory_order_relaxed),
+                TextureStageBoundResources.load(std::memory_order_relaxed),
+                TextureStageExactResources.load(std::memory_order_relaxed),
+                TextureStagePendingResources.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -1322,12 +1376,11 @@ namespace outrun::vr::dx11
         else if (programmablePair)
             ProgrammableSamples.fetch_add(1, std::memory_order_relaxed);
 
-        const auto signature = inspect_source_signature(
+        auto signature = inspect_source_signature(
             device, fixedFunction, vs, ps, shaderQueryComplete);
         if (vs) vs->Release();
         if (ps) ps->Release();
 
-        note_signature(signature, primitive);
         const bool inputLayoutExact = signature.inputLayoutExact;
         const bool shaderTranslationExact =
             signature.shaderTranslationExact;
@@ -1344,7 +1397,7 @@ namespace outrun::vr::dx11
                                          D3DPOOL pool, DWORD usage) noexcept
         {
             if (!present)
-                return;
+                return true;
             const auto behavior = translate_resource_behavior(role, pool, usage);
             behaviorDescriptorExact =
                 behaviorDescriptorExact && behavior.descriptorExact;
@@ -1352,6 +1405,9 @@ namespace outrun::vr::dx11
                 mutationTelemetryRequired || behavior.requiresMutationTelemetry;
             managedShadowRequired =
                 managedShadowRequired || behavior.requiresCpuShadow;
+            return behavior.descriptorExact &&
+                   !behavior.requiresMutationTelemetry &&
+                   !behavior.requiresCpuShadow;
         };
 
         observeBehavior(
@@ -1360,12 +1416,16 @@ namespace outrun::vr::dx11
         observeBehavior(
             signature.indexed, ResourceRole::Index,
             signature.indexPool, signature.indexUsage);
-        observeBehavior(
-            signature.texture0Present, ResourceRole::Texture,
-            signature.texture0Pool, signature.texture0Usage);
-        observeBehavior(
-            signature.texture1Present, ResourceRole::Texture,
-            signature.texture1Pool, signature.texture1Usage);
+        std::array<bool, 8> textureBehaviorExact{};
+        for (std::size_t stageIndex = 0;
+             stageIndex < signature.textureStages.size();
+             ++stageIndex)
+        {
+            const auto& texture = signature.textureStages[stageIndex];
+            textureBehaviorExact[stageIndex] = observeBehavior(
+                texture.present, ResourceRole::Texture,
+                texture.pool, texture.usage);
+        }
         observeBehavior(
             signature.renderTargetPresent, ResourceRole::Color,
             signature.renderTargetPool, signature.renderTargetUsage);
@@ -1393,21 +1453,31 @@ namespace outrun::vr::dx11
             UnsupportedIndexFormatSamples.fetch_add(1, std::memory_order_relaxed);
             resourcesExact = false;
         }
-        if (signature.texture0Present &&
-            !translate_resource_format(
-                signature.texture0Format, ResourceRole::Texture).exact)
+        for (std::size_t stageIndex = 0;
+             stageIndex < signature.textureStages.size();
+             ++stageIndex)
         {
-            UnsupportedTextureFormatSamples.fetch_add(
-                1, std::memory_order_relaxed);
-            resourcesExact = false;
-        }
-        if (signature.texture1Present &&
-            !translate_resource_format(
-                signature.texture1Format, ResourceRole::Texture).exact)
-        {
-            UnsupportedTextureFormatSamples.fetch_add(
-                1, std::memory_order_relaxed);
-            resourcesExact = false;
+            const auto& texture = signature.textureStages[stageIndex];
+            if (!texture.present)
+                continue;
+
+            const bool formatExact = translate_resource_format(
+                texture.format, ResourceRole::Texture).exact;
+            if (!formatExact)
+            {
+                UnsupportedTextureFormatSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+                resourcesExact = false;
+            }
+
+            if (texture.observed &&
+                textureBehaviorExact[stageIndex] &&
+                formatExact)
+            {
+                signature.textureResourceExactMask |=
+                    static_cast<std::uint8_t>(
+                        1u << static_cast<unsigned>(stageIndex));
+            }
         }
 
         // A bound texture whose descriptor could not be observed leaves
@@ -1426,6 +1496,21 @@ namespace outrun::vr::dx11
             UnsupportedDepthFormatSamples.fetch_add(1, std::memory_order_relaxed);
             resourcesExact = false;
         }
+
+        if (signature.fixedFunction)
+        {
+            const auto readiness = translate_fixed_function_readiness(
+                signature.fixedFunctionStages,
+                signature.fixedFunctionStateCoverageExact,
+                signature.textureResourcePresentMask,
+                signature.textureResourceExactMask);
+            signature.fixedFunctionTranslationReady = readiness.exact();
+            signature.fixedFunctionTranslationUnsupported =
+                readiness.unsupported;
+            signature.fixedFunctionActiveStages = readiness.activeStages;
+        }
+
+        note_signature(signature, primitive);
 
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
             resourcesExact && inputLayoutExact && shaderTranslationExact)

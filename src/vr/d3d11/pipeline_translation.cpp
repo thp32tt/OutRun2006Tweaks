@@ -103,6 +103,28 @@ namespace outrun::vr::dx11
             }
         }
 
+        bool fixed_function_argument_uses_texture(DWORD value) noexcept
+        {
+            return (value & D3DTA_SELECTMASK) == D3DTA_TEXTURE;
+        }
+
+        bool fixed_function_op_uses_texture(
+            DWORD op, DWORD arg1, DWORD arg2) noexcept
+        {
+            switch (op)
+            {
+            case D3DTOP_SELECTARG1:
+                return fixed_function_argument_uses_texture(arg1);
+            case D3DTOP_SELECTARG2:
+                return fixed_function_argument_uses_texture(arg2);
+            case D3DTOP_MODULATE:
+                return fixed_function_argument_uses_texture(arg1) ||
+                       fixed_function_argument_uses_texture(arg2);
+            default:
+                return false;
+            }
+        }
+
         bool fixed_function_filter_supported(
             DWORD value, bool mip) noexcept
         {
@@ -313,7 +335,9 @@ namespace outrun::vr::dx11
 
     FixedFunctionTranslationReadiness translate_fixed_function_readiness(
         const std::array<FixedFunctionStageState, 8>& source,
-        bool observationComplete) noexcept
+        bool observationComplete,
+        std::uint8_t textureResourcePresentMask,
+        std::uint8_t textureResourceExactMask) noexcept
     {
         FixedFunctionTranslationReadiness out{};
         if (!observationComplete)
@@ -339,19 +363,25 @@ namespace outrun::vr::dx11
 
             ++out.activeStages;
 
-            // Resource exactness currently observes source textures only on
-            // stages 0 and 1. Higher active stages therefore remain
-            // deliberately fail-closed even though R81 records their state.
-            if (stageIndex >= 2)
-                out.unsupported |=
-                    FixedFunctionUnsupportedResourceStageCoverage;
-
             validate_fixed_function_op(
                 stage.colorOp, stage.colorArg1, stage.colorArg2,
                 FixedFunctionUnsupportedColorOp, out);
             validate_fixed_function_op(
                 stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
                 FixedFunctionUnsupportedAlphaOp, out);
+
+            const bool usesTexture =
+                fixed_function_op_uses_texture(
+                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                fixed_function_op_uses_texture(
+                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+            const auto stageBit = static_cast<std::uint8_t>(
+                1u << static_cast<unsigned>(stageIndex));
+            if (usesTexture &&
+                (((textureResourcePresentMask & stageBit) == 0) ||
+                 ((textureResourceExactMask & stageBit) == 0)))
+                out.unsupported |=
+                    FixedFunctionUnsupportedResourceStageCoverage;
 
             const DWORD coord = stage.texCoordIndex & 0xFFFFu;
             const DWORD coordFlags = stage.texCoordIndex & 0xFFFF0000u;
