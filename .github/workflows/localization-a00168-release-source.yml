@@ -1,0 +1,40 @@
+name: Localization A00168 Release Source Audit
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00168.dispatch.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-a00168-release-source
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Audit pinned v0.25.10a Release sources
+        run: python tools/localization/a00168_release_source_audit.py
+
+      - name: Commit lane-local A00168 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00168.json \
+                  localization/graphics/role_A/20260930-A00168-P00083/A00168_P00083_PINNED_RELEASE_SOURCE_AUDIT.json
+          git commit -m "localization(A): audit pinned Release sources [AUTO:LOCALIZATION-LOCALIZATION_A-00168]"
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
