@@ -1,0 +1,425 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00070",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "wave_id": "P00011",
+  "wave_id_note": "Reconstructed from producer sequence after committed P00010; rollover payload omitted WAVE_ID.",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:36:00+09:00",
+  "selection_head_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "194fd6c64cafede90b537446fddf96934dc9ea37",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "2752dd3fbc5170c8e2263b2ca1be8e3b27a17182",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "visual_review_blob_sha": "ee71dcd788cbf5260a6671c8f204a8461cf47c12",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "continuous_producer_rules": {
+    "validation_mode": "C_BATCH_GATE",
+    "producer_actions_wait": false,
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2": [
+        137,
+        217,
+        219,
+        241
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00064@641a34826967c615bc29aec55feb1e305513bc3b": [
+        133,
+        135,
+        139,
+        143
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27": [
+        147,
+        159,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0": [
+        173,
+        193,
+        201,
+        225
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00068@96173be6940f1504fb71f48d06561d9888386cb5": [
+        175,
+        205,
+        227,
+        231
+      ]
+    },
+    "peer_lane_files_modified": false,
+    "shared_state_modified": false
+  },
+  "selection": {
+    "selected_indices": [
+      209,
+      237
+    ],
+    "selected_assets": [
+      "B3D9B074",
+      "FF514CEB"
+    ],
+    "selected_state": "localize_text/pending_artwork/transcribed_reviewed",
+    "reason": "Only fresh odd-shard pending_artwork rows remaining after de-duplicating current A producer backlog. Index 209 contains canonical zero-text evidence and is routed as a C reconciliation classification finding; index 237 has six canonical localizable strings and immutable GitHub atlas lineage."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "deliverable_type": "ODD_FINAL_SHARD_CLASSIFICATION_PLUS_EXACT_RELEASE_ATLAS_RECONSTRUCTION_INPUTS",
+    "assets_advanced": 2,
+    "exact_github_objects_pinned": 10,
+    "atlas_regions_verified": 10,
+    "canonical_semantics_total": 6,
+    "stock_to_4x_geometry": "PASS_10_OF_10_EXACT_X4",
+    "candidate_dds_written": false,
+    "description": "Index 209 is fail-closed against unnecessary raster work and flagged for C preserve-original reconciliation because both canonical transcription and artwork plan contain zero text segments. Index 237 pins immutable Release/stock/PNG/atlas objects and exact 4x sprite geometry for a later decoded-pixel semantic mapping pass."
+  },
+  "assets": [
+    {
+      "queue_index": 209,
+      "asset": "B3D9B074",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/B3D9B074_256x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantics": [],
+      "canonical_semantics_count": 0,
+      "canonical_evidence": {
+        "transcriptions_note": "visual transcription pass 10; no localizable text visible; preserve frame artwork",
+        "artwork_plan_note": "visual transcription pass 10; no localizable text visible; preserve frame artwork",
+        "transcript_matches_artwork_plan": true,
+        "visual_review_current_action": "localize_text",
+        "finding": "NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL",
+        "c_reconciliation_required": true
+      },
+      "inventory_source": {
+        "sha256": "03dce917aa6f208821fc156df0169f997b8e2f57d810ba7af32b3429c0e9c124",
+        "dimensions": [
+          1024,
+          2048
+        ],
+        "mode": "RGBA"
+      },
+      "upstream_objects": {
+        "release_dds": {
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/B3D9B074_256x512.dds",
+          "git_blob_sha": "3922185d18db5adaf4c800787db2111835302376"
+        },
+        "stock_dds": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/B3D9B074_256x512.dds",
+          "git_blob_sha": "ad56df7fd4a52eeaf10ddec21095888b063296d1"
+        },
+        "stock_png": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/B3D9B074_256x512.png",
+          "git_blob_sha": "2c8b601719268dd6c9fff870474be1739757360e"
+        },
+        "stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/B3D9B074_256x512_atlas.json",
+          "git_blob_sha": "ccac2681c028e928bf17007e80a77629cbb92684"
+        },
+        "hd4_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_B3D9B074_256x512_atlas.json",
+          "git_blob_sha": "a3e53190842523b0117975d13476e94f312a81bf"
+        }
+      },
+      "atlas_geometry": {
+        "regions_count": 1,
+        "all_regions_exact_4x": true,
+        "regions": [
+          {
+            "sprite": "sprite_17",
+            "stock_cell": [
+              0,
+              250,
+              238,
+              262
+            ],
+            "hd_4x_cell": [
+              0,
+              1000,
+              952,
+              1048
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "production_disposition": "NO_DDS_WRITE__PROPOSE_PRESERVE_ORIGINAL_FOR_C_RECONCILIATION",
+      "candidate_dds_written": false,
+      "qa_status": "PASS_ZERO_CANONICAL_TEXT_FAIL_CLOSED_NO_UNNECESSARY_EDIT"
+    },
+    {
+      "queue_index": 237,
+      "asset": "FF514CEB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantics": [
+        {
+          "source": "CREATE GAME",
+          "korean": "게임 만들기"
+        },
+        {
+          "source": "CUSTOM GAME",
+          "korean": "커스텀 게임"
+        },
+        {
+          "source": "QUICK GAME",
+          "korean": "빠른 게임"
+        },
+        {
+          "source": "Create a game and invite your friends!",
+          "korean": "게임을 만들고 친구를 초대하세요!"
+        },
+        {
+          "source": "Specify what gametype you'd like to play!",
+          "korean": "플레이할 게임 유형을 설정하세요!"
+        },
+        {
+          "source": "Jump into a quick game of OutRun!",
+          "korean": "빠른 아웃런 게임에 참가하세요!"
+        }
+      ],
+      "canonical_semantics_count": 6,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "inventory_source": {
+        "sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "mode": "RGBA"
+      },
+      "upstream_objects": {
+        "release_dds": {
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+          "git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30"
+        },
+        "stock_dds": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+          "git_blob_sha": "ea296987a38763917970e9ccb260cf23d0382b32"
+        },
+        "stock_png": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.png",
+          "git_blob_sha": "e9a2f5be26bad31871c4542af4210368913081d3"
+        },
+        "stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512_atlas.json",
+          "git_blob_sha": "c9fde4a2b4665d00638f2ce2fec3c26fc441079a"
+        },
+        "hd4_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_FF514CEB_512x512_atlas.json",
+          "git_blob_sha": "48a79d0f42728768818e2ad624a5678a375ee2ee"
+        }
+      },
+      "atlas_geometry": {
+        "regions_count": 9,
+        "all_regions_exact_4x": true,
+        "regions": [
+          {
+            "sprite": "sprite_1555",
+            "stock_cell": [
+              0,
+              462,
+              500,
+              50
+            ],
+            "hd_4x_cell": [
+              0,
+              1848,
+              2000,
+              200
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1556",
+            "stock_cell": [
+              0,
+              419,
+              440,
+              43
+            ],
+            "hd_4x_cell": [
+              0,
+              1676,
+              1760,
+              172
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1557",
+            "stock_cell": [
+              0,
+              376,
+              440,
+              43
+            ],
+            "hd_4x_cell": [
+              0,
+              1504,
+              1760,
+              172
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1558",
+            "stock_cell": [
+              0,
+              336,
+              450,
+              40
+            ],
+            "hd_4x_cell": [
+              0,
+              1344,
+              1800,
+              160
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1559",
+            "stock_cell": [
+              0,
+              296,
+              450,
+              40
+            ],
+            "hd_4x_cell": [
+              0,
+              1184,
+              1800,
+              160
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1560",
+            "stock_cell": [
+              0,
+              256,
+              450,
+              40
+            ],
+            "hd_4x_cell": [
+              0,
+              1024,
+              1800,
+              160
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1561",
+            "stock_cell": [
+              0,
+              234,
+              440,
+              22
+            ],
+            "hd_4x_cell": [
+              0,
+              936,
+              1760,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1562",
+            "stock_cell": [
+              0,
+              212,
+              440,
+              22
+            ],
+            "hd_4x_cell": [
+              0,
+              848,
+              1760,
+              88
+            ],
+            "rotated": false
+          },
+          {
+            "sprite": "sprite_1563",
+            "stock_cell": [
+              0,
+              190,
+              440,
+              22
+            ],
+            "hd_4x_cell": [
+              0,
+              760,
+              1760,
+              88
+            ],
+            "rotated": false
+          }
+        ]
+      },
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_209_237",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_A00061_A00064_A00065_A00067_A00068_ASSETS_SKIPPED",
+    "queue_state": "PASS_2_OF_2_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_translation_match": "PASS_6_OF_6_TRANSCRIPTION_EQUALS_ARTWORK_PLAN_PLUS_INDEX209_ZERO_SEGMENT_MATCH",
+    "immutable_git_source_identity": "PASS_10_OF_10_PINNED_GITHUB_OBJECT_IDENTITIES",
+    "atlas_geometry": "PASS_10_OF_10_STOCK_TO_4X_CELLS",
+    "index209_classification": "PROPOSE_PRESERVE_ORIGINAL_FOR_C_SHARED_STATE_RECONCILIATION",
+    "index237_exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "index237_semantic_to_sprite_mapping": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_EXACT_HD_PER_ELEMENT_FOR_INDEX237",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "next_safe_action": [
+    "C should reconcile index 209 from localize_text to preserve-original/not-required if it accepts the zero-segment canonical evidence; A intentionally did not modify shared queue files.",
+    "For index 237, decode/inspect the pinned English Release/HD source pixels and bind each of six canonical semantics to exact source sprites without inferring list order.",
+    "Measure full glyph/effect bboxes, raw orientation/slant and clean-plate masks from exact English source before any Korean raster generation.",
+    "Only after that, render Korean and run zero-pixel containment, DDS header/alpha/mipmap preservation, and ENGLISH SOURCE vs KOREAN CANDIDATE visual QA."
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_ODD_FINAL_SHARD_CLASSIFICATION_PLUS_RECONSTRUCTION_INPUT",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
