@@ -225,13 +225,17 @@ namespace OutRunVRStereo
             const char* phase, const R81FrameSample& f) noexcept
         {
             spdlog::info(
-                "VR R81 FRAME {}: serial={} tick={} stage={} state={} frameUs={} presentUs={} skyGlowUs={} draw[calls={},prims={},indexed={},up={},sceneFx={},worldParticle={}] particles[live={},sources={},peak={}] stream[texCreate={},texMiB={:.2f},texLocks={},uploads={},uploadMiB={:.2f},uploadUs={},vbCreate={},vbKiB={:.1f},ibCreate={},ibKiB={:.1f},bufLocks={},bufKiB={:.1f},discard={},noOverwrite={}]",
+                "VR R81 FRAME {}: serial={} tick={} stage={} state={} frameUs={} presentUs={} skyGlowUs={} draw[calls={},prims={},indexed={},up={},sceneFx={},worldParticle={}] particles[live={},sources={},peak={}] stream[fileLoadCalls={},fileLoadBusy={},fileLoadUs={},fileLoadMaxUs={},texCreate={},texMiB={:.2f},texLocks={},uploads={},uploadMiB={:.2f},uploadUs={},vbCreate={},vbKiB={:.1f},ibCreate={},ibKiB={:.1f},bufLocks={},bufKiB={:.1f},discard={},noOverwrite={}]",
                 phase, f.serial, f.tick, f.stage, f.state,
                 f.frameUs, f.presentUs, f.skyGlowUs,
                 f.draw.draws, f.draw.primitives, f.draw.indexedDraws,
                 f.draw.upDraws, f.draw.sceneEffectDraws,
                 f.draw.worldParticleDraws,
                 f.liveParticles, f.particleSources, f.peakParticleSource,
+                f.resource.fileLoadCalls,
+                f.resource.fileLoadBusyCalls,
+                f.resource.fileLoadUs,
+                f.resource.fileLoadMaxUs,
                 f.resource.managedTextureCreates,
                 static_cast<double>(f.resource.managedTextureCreateBytes) /
                     (1024.0 * 1024.0),
