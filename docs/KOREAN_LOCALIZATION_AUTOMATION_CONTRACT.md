@@ -106,6 +106,42 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - B must not re-QA all of A's output as its default job; C owns independent cross-lane QA. B should maximize new production throughput.
 - C does not use parity sharding and reviews both lanes.
 
+
+
+## Candidate-completion-first production policy
+
+Effective 2026-09-29. This policy overrides preflight-expansion behavior in the generic throughput/fallback rules. The purpose is to turn accepted reconstruction evidence into actual Korean DDS candidates instead of accumulating work-order backlog.
+
+### Readiness tiers
+For each producer shard, classify unfinished graphics work using the newest C-accepted evidence:
+
+1. **RENDER_READY** — exact canonical source is pinned; source-effect/removal mask is known; CLEAN_PLATE has independent machine-readable PASS evidence; final v2 `candidate_safe_bbox` is known; no unresolved semantic binding prevents lettering. Missing baseline/slant/source-style measurements do **not** make the asset preflight-only: measure them and render in the same producer invocation.
+2. **ONE_STAGE_TO_RENDER** — one deterministic reconstruction stage remains before RENDER_READY, such as materializing/validating the clean plate from an already accepted effect envelope, or measuring exact source style/slant after accepted source/mask geometry.
+3. **PREFLIGHT_ONLY** — source identity, semantic binding, effect geometry or other prerequisites still require broader investigation before candidate construction can begin.
+
+### Mandatory producer selection order
+A/B select work in this order inside their parity shard:
+1. C-returned `REWORK_REQUIRED` whose accepted material can be repaired directly without opening unrelated preflight;
+2. `RENDER_READY` assets with no current v2 Korean candidate;
+3. `ONE_STAGE_TO_RENDER` assets, completing the missing stage **and continuing through Korean render in the same invocation whenever deterministic inputs are available**;
+4. existing candidate DDS that needs material rework;
+5. only when tiers 1-4 are exhausted, new `PREFLIGHT_ONLY` work.
+
+When any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane, the producer MUST NOT select a new unrelated preflight/work-order asset merely to satisfy the material-deliverable rule.
+
+### Candidate completion requirement
+- A/B should finish at least one actual new or materially reworked Korean DDS candidate per invocation whenever a RENDER_READY or ONE_STAGE_TO_RENDER asset exists.
+- The required path is: exact canonical HD source -> verified CLEAN_PLATE -> source typography/baseline/slant measurement -> native-resolution Korean render -> measure/refit loop -> exact DDS encode -> decoded-final static self-QA -> English-source-vs-Korean-candidate evidence.
+- If baseline/slant/style is the only missing information, measure it and continue to rendering in the **same task**. Do not emit a separate preflight-only task for those measurements.
+- If the first ready asset becomes fail-closed during rendering, record the exact new blocker and continue to the next ready asset in the same shard before considering new preflight.
+- A producer may finish with zero candidate DDS only when it proves that no RENDER_READY or ONE_STAGE_TO_RENDER asset in its shard can safely advance with currently available GitHub evidence. In that case it may create at most **one** new preflight-only batch before the next candidate-completion attempt.
+- Work-order count, extraction-scope count, mask count, or commit count is not a throughput success metric. The primary graphics-production metric is newly created/materially reworked v2 Korean DDS candidates that reach C candidate QA.
+
+### C readiness reconciliation
+- C must classify newly accepted pre-generation evidence as `RENDER_READY`, `ONE_STAGE_TO_RENDER`, or `PREFLIGHT_ONLY` in its machine-readable report when enough evidence exists to decide.
+- C shared-state `next_actions` must list candidate-completion work before unrelated preflight expansion.
+- C continues to apply the same strict zero-pixel, DDS, alpha, orientation, protected-artwork and exact English-source comparison gates. This policy changes production order only; it does not weaken QA.
+
 ## Throughput rule
 - A/B are batch producers, not single-asset/blocker checkers. Default production goal is up to 4 newly created or materially reworked DDS candidates per lane per invocation. A production invocation MUST NOT terminate with zero material output unless the entire graphics queue is complete.
 - A blocked REWORK item MUST NOT terminate a lane while another independent runnable item exists in that lane. Record/retain the blocker, skip it immediately, and continue to the next runnable REWORK/localize_text/zoom_review item.
