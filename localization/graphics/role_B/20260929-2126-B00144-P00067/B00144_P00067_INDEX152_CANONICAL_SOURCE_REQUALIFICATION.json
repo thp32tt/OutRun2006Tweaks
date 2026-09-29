@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-schema9-canonical-source-requalification-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00144",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00067",
+  "recorded_at_kst": "2026-09-29T21:26:10+09:00",
+  "base_head_sha": "a3c1d65efcfb27a7378977d60c20a2ef6e67c16e",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection_policy": "CANDIDATE_COMPLETION_FIRST__CURRENT_GITHUB_ONLY_SOURCE_ACQUISITION__ONE_MATERIAL_PREFLIGHT_BATCH",
+  "result": "PASS_MATERIAL_INDEX152_EXACT_CANONICAL_SOURCE_REQUALIFIED_AND_C115_GEOMETRY_RECONNECTED_PENDING_MASK_CLEAN_PLATE",
+  "selection": {
+    "selected_indices": [
+      152
+    ],
+    "selected_assets": [
+      "49BB5FE5"
+    ],
+    "basis": "Fresh HEAD has no durable B00144 result. C122 previously accepted B00138 for index 152 as PREFLIGHT_ONLY solely because exact canonical bytes were not proven against the current inventory. The current source-acquisition contract makes branch absence non-blocking. Pinned-tag GitHub bytes for the Release 49BB5FE5 DDS were fetched directly and now hash exactly to the current inventory identity, allowing prior C115 geometry measured from the same immutable blob to be reconnected to the canonical source. No candidate is fabricated because per-pixel removal/protected masks and CLEAN_PLATE remain explicitly unmaterialized."
+  },
+  "source_acquisition": {
+    "transport": "GITHUB_ONLY",
+    "repository": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+    "bytes": 65664,
+    "computed_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "current_inventory_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "exact_inventory_match": true,
+    "dds_header": {
+      "magic": "DDS ",
+      "width": 512,
+      "height": 128,
+      "mip_count": 1,
+      "fourcc": "DXT5",
+      "payload_bytes": 65536
+    },
+    "hash_method": "GitHub contents base64 bytes decoded and SHA-256 computed inside the GitHub-connected task; no local clone/worktree/N100/Drive/Library."
+  },
+  "rejected_direct_tag_candidates": [
+    {
+      "index": 46,
+      "asset": "AA04D779",
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "git_blob_sha": "f85336392afe1dfce4d1db377684687ef53dafa8",
+      "computed_sha256": "0735e1372bf057d871617924cb457928dd0eeac4c8f42639e95e51f3a369dccb",
+      "inventory_sha256": "5a4ca513da3545b7da91e62fd27692f39fc211a93983122a193db79c254f28b0",
+      "disposition": "SOURCE_IDENTITY_MISMATCH_REQUIRES_PINNED_RELEASE_FALLBACK"
+    },
+    {
+      "index": 48,
+      "asset": "B1696633",
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+      "git_blob_sha": "2760426760f92187cd0f7073d9b2e5c7d5ffc602",
+      "computed_sha256": "06b0da476f2ecff49b8429072b1949b06b4b92b30ff6b6b250d042399ee3ec79",
+      "inventory_sha256": "b06b18fe33b53b3af87a9c7ae185febf86dcaa7e6b365ba41f20235fa3526a2b",
+      "disposition": "SOURCE_IDENTITY_MISMATCH_REQUIRES_PINNED_RELEASE_FALLBACK"
+    },
+    {
+      "index": 50,
+      "asset": "CBF8ECBF",
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "git_blob_sha": "f8cafe3808f4b127a0874de867ff8c8ccc0e2421",
+      "computed_sha256": "1c00938efb8e8ff8772e6055ba37a715cd3ecf066eb3a727de7cd74fbe149c0c",
+      "inventory_sha256": "9fa88fb50e7f81d27adac4fddee532b7513ba7e07cfa08e210e0c6e9b8b1bc8e",
+      "disposition": "SOURCE_IDENTITY_MISMATCH_REQUIRES_PINNED_RELEASE_FALLBACK"
+    },
+    {
+      "index": 62,
+      "asset": "33491F83",
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "git_blob_sha": "9a6d2ecfd6a67c2ccb3d61aed7909475f8433dd6",
+      "computed_sha256": "13214612f39c5b86611896a40f54560d89f07784477af99fbd66e83b2347f901",
+      "inventory_sha256": "b7c391e5edfef06dd5dc15d3028ce76edfdda70d8137b32e863e76228e9037ca",
+      "disposition": "SOURCE_IDENTITY_MISMATCH_REQUIRES_PINNED_RELEASE_FALLBACK"
+    },
+    {
+      "index": 140,
+      "asset": "31C58963",
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+      "git_blob_sha": "ad8ab140ef7446948fea13969a76a4920fbd19eb",
+      "computed_sha256": "0b61871edf8b48b0a01cec0fed2a222ed30e54fa25cb2a12147dff218ce9a70e",
+      "inventory_sha256": "03bc159749f4a20168a21c4ad62c5c7d0e1b13dcdfb1bb7b7f7b2f6b6982b0f8",
+      "disposition": "SOURCE_IDENTITY_MISMATCH_REQUIRES_PINNED_RELEASE_FALLBACK"
+    }
+  ],
+  "canonical_geometry_requalification": {
+    "prior_producer_task": "LOCALIZATION-LOCALIZATION_B-00104",
+    "prior_c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00116",
+    "prior_c_batch": "Q00013",
+    "exact_source_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+    "source_text_transform": "flip_y",
+    "semantics": [
+      {
+        "source": "PRO.",
+        "korean": "프로",
+        "raw_effect_bbox_ltrb_exclusive": [
+          18,
+          7,
+          104,
+          41
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          20,
+          9,
+          102,
+          39
+        ]
+      },
+      {
+        "source": "INS.",
+        "korean": "연주",
+        "raw_effect_bbox_ltrb_exclusive": [
+          136,
+          6,
+          214,
+          41
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          138,
+          8,
+          212,
+          39
+        ]
+      },
+      {
+        "source": "G.M.",
+        "korean": "기타",
+        "raw_effect_bbox_ltrb_exclusive": [
+          252,
+          7,
+          333,
+          41
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          254,
+          9,
+          331,
+          39
+        ]
+      },
+      {
+        "source": "E.R.",
+        "korean": "유로",
+        "raw_effect_bbox_ltrb_exclusive": [
+          374,
+          8,
+          444,
+          40
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          376,
+          10,
+          442,
+          38
+        ]
+      }
+    ],
+    "preserve_original": [
+      "'89",
+      "'86"
+    ],
+    "evidence_status": "PRODUCER_REQUALIFICATION_PENDING_C_BATCH_REVIEW",
+    "rationale": "B00104 measured these envelopes from the same Git blob now proven byte-identical to the current canonical inventory. C115 independently reproduced the four effect bboxes/pixel counts and 2px safe-bbox formulas. B00138/C122 demoted them only because exact current canonical identity was then unproven. This task supplies that missing SHA-256 identity bridge; it does not invent new geometry."
+  },
+  "readiness_after": {
+    "classification": "PREFLIGHT_ONLY_NARROWED",
+    "resolved": [
+      "exact canonical source byte identity",
+      "DDS 512x128 DXT5 mip1 header identity",
+      "raw/readable flip_y orientation lineage",
+      "4/4 canonical semantic bindings",
+      "4/4 C-validated source full-effect bboxes",
+      "4/4 C-validated v2 2px candidate-safe bboxes",
+      "2 preserve-original year labels"
+    ],
+    "remaining": [
+      "per-pixel source glyph/effect removal masks",
+      "protected non-text masks",
+      "independently validated CLEAN_PLATE",
+      "source style/signed-slant measurement",
+      "Korean rendering and native-resolution refit",
+      "exact DDS re-encode and decoded-final QA",
+      "English-source-vs-Korean-candidate comparison",
+      "runtime validation"
+    ],
+    "reason": "Effect envelopes are not edit masks. Current C115 evidence explicitly keeps removal/protected masks and CLEAN_PLATE fail-closed, so index152 is not promoted to RENDER_READY or ONE_STAGE_TO_RENDER without a proven deterministic clean-plate stage."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX152_EXACT_CANONICAL_SOURCE_IDENTITY_BRIDGE_AND_PRIOR_C_GEOMETRY_REQUALIFICATION",
+    "exact_canonical_sources_newly_proven": 1,
+    "prior_c_validated_geometry_sets_reconnected": 1,
+    "localizable_elements_reconnected": 4,
+    "preserve_original_elements": 2,
+    "rejected_filename_similarity_sources": 5,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "preflight_only_batch_count": 1,
+    "materially_reduces_unresolved_work": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "692e64e7b22b604c9a242eddcd2611c1b7f6c6ec",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "queue_blob_sha": "2ece875d451368b9128e9f6c62042ade9258384b",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "b00104_task_record_blob_sha": "40b124090dff58dfef748e4381e5ec3fbd946f7d",
+    "b00138_task_record_blob_sha": "ca066a6ae2370cc9f9744dd09e71cd562d66e5f6",
+    "c00116_task_record_blob_sha": "f24eacd1c00a808db4771ea6f7caa5e35892ae50",
+    "c00142_task_record_blob_sha": "247ddebcdfc2c1178a2b2e7ab355ea9e04537d86",
+    "c00145_task_record_blob_sha": "9ac46deaf3140086c1f8079cbaee83064b87eb77"
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_INDEX_152",
+    "exact_source_identity": "PASS_SHA256_EXACT",
+    "filename_similarity_rejected": "PASS_5_MISMATCHED_DIRECT_TAG_FILES_NOT_PROMOTED",
+    "prior_geometry_lineage": "PASS_SAME_GIT_BLOB_0288BABBB9C70E8F092BDD15561DB4CADC19DCB3",
+    "prior_c_independent_validation": "PASS_C115_REPRODUCED_4_OF_4_EFFECT_BBOXES_AND_SAFE_BBOXES",
+    "candidate_gate": "HOLD_NO_REMOVAL_MASK_CLEAN_PLATE_OR_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

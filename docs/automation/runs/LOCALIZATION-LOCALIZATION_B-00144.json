@@ -1,0 +1,52 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00144",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00067",
+  "recorded_at_kst": "2026-09-29T21:26:10+09:00",
+  "base_sha": "a3c1d65efcfb27a7378977d60c20a2ef6e67c16e",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_INDEX152_EXACT_CANONICAL_SOURCE_REQUALIFIED_AND_C115_GEOMETRY_RECONNECTED_PENDING_MASK_CLEAN_PLATE",
+  "summary": "Fresh current-head B-even audit followed the new GitHub-only canonical-source acquisition policy. The pinned v0.25.10a Release 49BB5FE5 DDS was fetched from immutable commit 55f67a8 and independently hashed to the exact current inventory SHA-256 de306cb4..., proving index152's canonical source bytes. Because B00104 and C115 measured the same immutable Git blob 0288babb..., their four exact BC3 full-effect envelopes, four v2 2px safe bboxes and flip_y lineage are reconnected to the current canonical source rather than treated as stale Release-only geometry. Five superficially matching pinned-tag Original-PC files for indices 46/48/50/62/140 were explicitly rejected on SHA mismatch. No Korean DDS is emitted: per-pixel removal/protected masks and CLEAN_PLATE remain fail-closed. No shared state, runtime, build, N100, Drive, local clone or VR/FFB changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-2126-B00144-P00067/B00144_P00067_INDEX152_CANONICAL_SOURCE_REQUALIFICATION.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX152_EXACT_CANONICAL_SOURCE_IDENTITY_BRIDGE_AND_PRIOR_C_GEOMETRY_REQUALIFICATION",
+    "report_path": "localization/graphics/role_B/20260929-2126-B00144-P00067/B00144_P00067_INDEX152_CANONICAL_SOURCE_REQUALIFICATION.json",
+    "indices": [
+      152
+    ],
+    "assets": [
+      "49BB5FE5"
+    ],
+    "exact_canonical_sources_newly_proven": 1,
+    "c_validated_geometry_sets_reconnected": 1,
+    "localizable_elements": 4,
+    "preserve_original_elements": 2,
+    "rejected_direct_tag_identity_mismatches": 5,
+    "readiness_after": "PREFLIGHT_ONLY_NARROWED_MASK_CLEAN_PLATE_PENDING",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "self_qa": "PASS_EVEN_152__PINNED_TAG_RELEASE_BLOB_SHA256_EQUALS_CURRENT_INVENTORY__C115_SAME_BLOB_GEOMETRY_RECONNECTED__5_FILENAME_SIMILARITY_MISMATCHES_REJECTED__NO_SHARED_STATE__NO_CANDIDATE_FALSE_PROMOTION",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_REMOVAL_MASK_CLEAN_PLATE_OR_CURRENT_V2_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact source identity and source-effect/safe-bbox geometry are now proven for index152, but effect envelopes are not per-pixel edit masks. C115 explicitly requires removal/protected masks and an independently passing CLEAN_PLATE before Korean rendering; those artifacts do not yet exist, so no candidate DDS or static candidate PASS is claimed.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
