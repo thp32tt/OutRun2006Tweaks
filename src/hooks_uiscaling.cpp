@@ -153,6 +153,66 @@ class UIScaling : public Hook
 		0x975EE, 0x97727, 0x977FB
 	};
 
+	// R78 diagnostic: canonical Ghidra map has exactly 31 direct callers of
+	// FUN_0042CDD0 (Sumo_Printf). Hook after the 6-byte stack allocation at
+	// RVA 0x2CDD6 so the caller return address lives at ESP+0x104. This does
+	// not alter ownership; it only identifies which real printf edge executes
+	// in OutRun mode, especially the first edge observed after a stage change.
+	static constexpr std::uint32_t R78SumoPrintfCallsites[] = {
+		0x413CE, 0x413E2, 0x465CE,
+		0x56394, 0x563C6, 0x563FE, 0x56430, 0x56495, 0x564E7,
+		0x8E873, 0x8E8EC, 0x8E9E0, 0x8F091, 0x8F18C, 0x8F455,
+		0x975EE, 0x97727, 0x977FB,
+		0xBB60D,
+		0xE39DA, 0xE39EF, 0xE4B1A, 0xE4B2F, 0xE4B44,
+		0xE8E60, 0xE8E95, 0xE8F04, 0xEAD73,
+		0xEDBE2, 0xEDC53, 0xEDC6F
+	};
+	inline static std::array<std::atomic<std::uint64_t>,
+		std::size(R78SumoPrintfCallsites)> R78SumoPrintfHits{};
+	inline static SafetyHookMid R78SumoPrintfCensus_hk{};
+
+	static void R78SumoPrintfCensus(safetyhook::Context& ctx)
+	{
+		if (!Game::game_mode || *Game::game_mode != 32)
+			return;
+
+		const auto* returnAddress =
+			reinterpret_cast<const void*>(
+				*reinterpret_cast<const std::uintptr_t*>(ctx.esp + 0x104));
+		const std::uint32_t callRva = R70ExeCallRva(returnAddress);
+		if (!callRva)
+			return;
+
+		std::size_t index = std::size(R78SumoPrintfCallsites);
+		for (std::size_t i = 0; i < std::size(R78SumoPrintfCallsites); ++i)
+		{
+			if (R78SumoPrintfCallsites[i] == callRva)
+			{
+				index = i;
+				break;
+			}
+		}
+		if (index == std::size(R78SumoPrintfCallsites))
+			return;
+
+		const auto hit = R78SumoPrintfHits[index].fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		static thread_local int lastStage = -1;
+		const int stage = Game::stg_stage_num
+			? static_cast<int>(*Game::stg_stage_num) : -1;
+		const bool stageChanged = lastStage >= 0 && stage != lastStage;
+		lastStage = stage;
+		if (stageChanged || (hit & (hit - 1)) == 0)
+		{
+			spdlog::info(
+				"VR R78 OUTRUN PRINTF CENSUS: callRva=0x{:X} hit={} stage={} state={} stageChanged={}",
+				callRva, hit, stage,
+				Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+				stageChanged ? 1 : 0);
+		}
+	}
+
 	// R74 runtime+Ghidra proof: these two exact calls are the only callers
 	// of FUN_0042D200 inside the final-result producer FUN_004979E0.
 	// R73 hudtrace observed their lower 0x2D26C enqueue path as UNKNOWN while
@@ -1489,6 +1549,9 @@ public:
 		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+
+		R78SumoPrintfCensus_hk = safetyhook::create_mid(
+			Module::exe_ptr(0x2CDD6), R78SumoPrintfCensus);
 
 		// R70 exact producer/edge ownership from the 92ce3403 HMD trace.
 		R70HudTextProducer_hk = safetyhook::create_inline(
