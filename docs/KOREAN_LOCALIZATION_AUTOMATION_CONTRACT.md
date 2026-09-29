@@ -11,7 +11,7 @@ The controller SHOULD inject the following concise context near the start of eve
 
 This context clarifies purpose only; it does not relax any repository, validation, sharding, source-faithfulness, or runtime-evidence rule in this contract.
 
-Progress-path compatibility: `localization/progress/progress.json` is the canonical progress state. `localization/progress.json` exists only as an exact compatibility mirror for legacy project instructions and MUST remain byte-for-byte identical. New automation must use the canonical nested path. C synchronization is responsible for updating the compatibility mirror whenever canonical progress changes; CI rejects drift.
+Progress-path compatibility: `localization/progress/progress.json` is the canonical progress state. `localization/progress.json` exists only as an exact compatibility mirror for legacy project instructions and MUST remain byte-for-byte identical. New automation must use the canonical nested path. The independent C QA consumer updates the compatibility mirror whenever canonical progress changes; CI rejects drift.
 
 ## Isolation and source rules
 - Work only on korean-localization-clean. Never merge VR/FFB source or history.
@@ -67,16 +67,30 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - Any terminal non-success conclusion (`failure`, `cancelled`, `timed_out`, `action_required`, `stale`) immediately enters the normal task retry path if attempts remain. This increments `attempt` but does not increment `chat_rollovers`.
 - Conversation rollover is only for stale/expired/missing ChatGPT conversations or missing assistant generation. GitHub Actions failure/retry and chat rollover are separate recovery domains.
 - A lane that stays in `WAIT_ACTIONS` beyond two normal GitHub poll intervals MUST trigger an uncached exact-run and jobs refresh. The queue watchdog must perform this recovery even when its general mode is observe-only.
-- Once both A and B are durable terminal PASS for the current wave, C must be dispatched promptly; once C is terminal PASS, the next A+B wave must be dispatched. Do not wait for chat expiry to advance an already-completed wave.
+- A and B advance independently: once one producer has a durable terminal PASS, that producer slot may start its next independent task without waiting for the peer lane or C.
+- Each successful producer result is queued for C by immutable TASK_ID + RESULT_SHA. C consumes that backlog independently and must never block A/B production.
 
-## Parallel dual-production dispatch
-- A and B are independent production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
-- A: PRODUCTION LANE A + self-QA on the odd-index shard. Create/rework actual localization assets continuously from A's shard and immediately fix zero-pixel-overflow failures in the same run. Aim for a multi-DDS batch rather than stopping on the first blocked asset.
-- B: PRODUCTION LANE B + self-QA on the even-index shard. Create/rework actual localization assets continuously from B's shard, including positively identified `zoom_review` text assets, and immediately fix zero-pixel-overflow failures in the same run. Aim for a multi-DDS batch rather than stopping on the first blocked asset.
-- C is a synchronization barrier, not a third concurrent modifier. Start C after the current A and B productive batches have each produced a durable Git result, then refresh HEAD and run CROSS-LANE FINAL QA + approval over the whole batch.
-- If both A and B produced no new candidate bytes and no material new QA/runtime evidence, do not spend a full C cycle re-recording the same blocker state; proceed according to the no-action suppression rule.
-- After C records a productive-batch result, dispatch the next A+B production wave.
-- If the controller runtime cannot actually launch two workers concurrently, fall back to sequential queue execution and report that mode accurately; Git configuration alone must not be treated as proof of runtime parallelism.
+## Continuous dual production + independent batch QA
+- A and B are independent continuous production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
+- A: PRODUCTION LANE A + self-QA on the odd-index shard. After its exact task commit and Automation Gate PASS, immediately continue to another independent runnable item in A's shard; do not wait for B or C.
+- B: PRODUCTION LANE B + self-QA on the even-index shard. After its exact task commit and Automation Gate PASS, immediately continue to another independent runnable item in B's shard; do not wait for A or C.
+- Every successful A/B task becomes one immutable QA input identified by `TASK_ID@RESULT_SHA`. The controller persists these in `qa_pending`.
+- C is an independent QA consumer, not a synchronization barrier and not a third candidate producer. It may run while A/B continue producing.
+- C consumes up to 4 producer task results per QA invocation by default, with a short 30-second coalesce window so repeated source/header/atlas/shared-state work is done once for the batch.
+- C MUST review the candidate/evidence as it existed at each exact producer RESULT_SHA. If current HEAD contains a newer candidate SHA for the same asset, the older result is `SUPERSEDED` and must not overwrite newer shared state.
+- C does not rewrite candidate DDS bytes while A/B are active. Candidate defects are returned as `REWORK_REQUIRED` for the appropriate producer lane. C may update shared metadata/progress/QA state after refreshing current HEAD.
+- A/B MUST treat producer results awaiting C as QA-pending and skip those assets until C returns `REWORK_REQUIRED` or a material source/candidate/QA-contract fingerprint changes.
+- C failure or backlog does not stop A/B. A failed C batch may be recorded separately for diagnosis while producers continue.
+- If the controller runtime cannot actually launch A/B concurrently, fall back to sequential producer execution and report that mode accurately; C remains an independent QA backlog consumer.
+
+## One-pass QA and de-duplication
+- Self-QA and C QA remain strict; optimization means removing duplicate checks, not weakening gates.
+- Define the reusable heavy-QA fingerprint from at least: canonical source blob/SHA, candidate blob/SHA, raw/readable orientation contract, relevant transcription/layout input, and QA contract/version.
+- For an unchanged fingerprint, reuse existing machine-readable PASS evidence for DDS header/format/mipmap, alpha/transparency, orientation, source identity, containment and canonical English-source comparison instead of recomputing the same check in another task.
+- Re-run a heavy check only when its dependency fingerprint changed, the previous result was HOLD/FAIL/REWORK, required evidence was missing, or the user supplied new runtime/visual evidence.
+- Within one A/B invocation, perform all deterministic self-QA for the produced batch in one integrated pass and write one coherent machine-readable report rather than separate repeated passes for each identical prerequisite.
+- Within one C invocation, de-duplicate repeated assets/references across all QA_BATCH_INPUTS and reconcile shared state once at the end of the batch.
+- The zero-pixel-overflow rule, English-source-vs-Korean comparison, DDS/alpha/orientation preservation, and protected-artwork rules remain mandatory whenever their fingerprint is new or changed.
 
 ## A/B work sharding and anti-duplication
 - Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
@@ -88,8 +102,8 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - Work stealing is allowed only after the peer lane is confirmed idle/completed, followed by a fresh GitHub HEAD/queue refresh proving the target is unclaimed and has no newer current-cycle production/state change. Record `work_stolen_from_lane` in the role report.
 - A/B concurrent workers MUST NOT modify shared state files in their production commits: `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv`, or equivalent shared queue/progress summaries.
 - A/B may write only their disjoint DDS/candidate assets, lane-local evidence under `localization/graphics/role_A/` or `role_B/`, and their unique `docs/automation/runs/<TASK_ID>` record.
-- C is the only worker that reconciles the current wave into shared resume/worklog/progress/asset_queue state. C must re-fetch latest HEAD after both A/B terminal results and preserve both lane commits.
-- B must not re-QA all of A's output as its default job; C owns cross-lane final QA. B should maximize new production throughput.
+- C is the only worker that reconciles QA-reviewed producer results into shared resume/worklog/progress/asset_queue state. C must re-fetch latest HEAD before the batch merge and must not overwrite newer producer commits.
+- B must not re-QA all of A's output as its default job; C owns independent cross-lane QA. B should maximize new production throughput.
 - C does not use parity sharding and reviews both lanes.
 
 ## Throughput rule
@@ -112,16 +126,18 @@ When the current candidate cannot safely be rewritten, do not end the run. Selec
 A fallback deliverable must materially reduce unresolved work or create new executable/reproducible input for the next production step. Generic prose saying why work is blocked is not a deliverable.
 
 ## No-action suppression and C batching
-- Repeated no-action waves are forbidden. A/B terminal results named `NO_ACTION`, `BLOCKED_NO_ACTION`, or equivalent zero-output states are invalid while any graphics work remains.
+- Repeated no-action producer tasks are forbidden. A/B terminal results named `NO_ACTION`, `BLOCKED_NO_ACTION`, or equivalent zero-output states are invalid while any graphics work remains.
 - If a lane has no immediately runnable DDS after dependency-blocked skips, it MUST execute the mandatory fallback ladder and commit a material deliverable. A unique controller TASK_ID still requires its durable task record, but that record must accompany the material deliverable rather than replace it.
-- C final QA is batch-oriented. C should review all new/changed A+B candidate DDS SHAs from the wave together and reconcile shared state once per productive batch.
-- Do not schedule a C barrier solely for repeated no-change blocker state. Under the minimum progress contract A/B should instead produce fallback deliverables. If C is nevertheless invoked with no new A/B candidate bytes, C must perform at least one material backlog action (for example, finalize a newly produced fallback artifact, create one single-DDS isolation input set, or make a concrete QA/fix change) rather than commit a no-op barrier report.
-- A productive wave is one where at least one lane creates/materially reworks candidate DDS bytes or adds material new QA/runtime evidence that changes an asset's eligibility/state.
+- C is batch-oriented and independent. Default controller target is up to 4 immutable producer results per C task, with a 30-second coalesce window; this batching does not pause producers.
+- C should inspect each unique asset/candidate fingerprint once per batch, reuse unchanged PASS evidence, and update shared state once for the entire batch.
+- A producer result already present in `qa_pending`, `qa_completed`, or an active C batch MUST NOT be enqueued or reviewed again under the same TASK_ID@RESULT_SHA.
+- C invoked on metadata/reconstruction-only producer results should validate only the new material evidence and resulting eligibility change; it must not recreate unchanged full DDS QA merely to restate a previous PASS/HOLD.
+- A productive producer task is one where the lane creates/materially reworks candidate DDS bytes or adds material new QA/runtime/reconstruction evidence that changes an asset's eligibility/state.
 
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state.
-- A/B production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state while the peer lane can still be active.
-- C synchronization-barrier completion reconciles both A/B terminal results into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable.
+- A/B production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state; their PASS releases that producer slot immediately and adds the immutable result to C's QA backlog.
+- C batch completion reconciles only its QA_BATCH_INPUTS into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable. It refreshes HEAD before merge and must preserve any newer producer candidate.
 - A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
 Before static approval inspect raw DDS and readable/game orientation and require the exact English-HD-source vs current-Korean-candidate side-by-side proof. Production runs do not require in-game testing; keep `RUNTIME_VALIDATION=UNTESTED` until the user's final integrated game test supplies runtime evidence.
 Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
@@ -134,6 +150,16 @@ Controller liveness values are defined in `localization/controller_roles.json` s
 - Re-arm an empty scheduler with unfinished graphics work within 90 seconds.
 - Use a 15-second next-task delay and 15-second A/B distinct-slot stagger.
 - Emit a queue heartbeat every 15 seconds and treat >45 seconds without heartbeat as a liveness failure.
-- A/B PASS -> C and C PASS -> next A+B are event-driven, with a <=30-second transition target.
+- A or B PASS -> same producer lane next task is event-driven, with a <=30-second dispatch target.
+- C independently consumes qa_pending; C PASS/FAIL never gates producer dispatch.
 - On controller restart, reconcile all nonterminal lanes from current GitHub HEAD and exact Actions state before new dispatch.
 - `active_by_lane` is the active-state source of truth; a null active summary while a lane is nonterminal is invalid.
+
+
+## Continuous QA backlog controller profile (schema v5)
+- Persistent queue state includes `qa_pending`, `qa_completed`, and `qa_blocked`.
+- Producer-to-QA identity is `TASK_ID@RESULT_SHA`; identical identities are de-duplicated.
+- Default C batch size is 4 producer results; coalesce window is 30 seconds.
+- Localization same-slot next-task send gap is 15 seconds and slot de-dup window is 30 seconds after an authoritative terminal producer result.
+- A/B producer tasks and C QA may coexist in `active_by_lane`; this is expected and is no longer a barrier violation.
+- On restart, completed producer records that were not yet consumed must be recoverable into `qa_pending` without repeating production.

@@ -36,15 +36,16 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - If `WAIT_ACTIONS` remains nonterminal for longer than two normal GitHub poll intervals, force an uncached exact-run refresh and refresh job status before waiting again.
 - The watchdog MUST actively recover stalled `WAIT_ACTIONS` slots by performing the uncached exact-run refresh. `watchdog_observe_only` is not sufficient for an Actions-wait stall.
 - Conversation rollover remains reserved for stale/missing/expired ChatGPT conversations or missing assistant generation. It is independent from GitHub Actions retry handling.
-- After both A and B reach durable terminal PASS states for the same wave, dispatch C without waiting for either chat to expire. After C PASS, start the next A+B wave.
+- A and B are independent continuous producers. A durable PASS releases only that producer slot for its next task and enqueues its exact TASK_ID + result SHA for C.
+- C consumes the persistent QA backlog independently; C completion or failure never gates A/B dispatch.
 
 ## Scope
-- Up to two modifying production tasks may run concurrently only when they are lanes A and B and their claimed queue indices/assets are disjoint.
-- Lane C is serialized behind the A/B production wave: it must not start final cross-lane QA against assets that are still being modified by A or B.
+- Up to two candidate-modifying production tasks may run concurrently only when they are lanes A and B and their claimed queue indices/assets are disjoint.
+- Lane C may run concurrently as an independent QA consumer, but it reviews immutable producer RESULT_SHAs and MUST NOT rewrite candidate DDS bytes while producers are active. Candidate defects return to A/B as REWORK_REQUIRED.
 - A and B must use stable odd/even queue sharding as the primary anti-duplication mechanism and must refresh GitHub HEAD immediately before target selection and immediately before commit.
 - If HEAD changed during a run, re-fetch current state and preserve the other lane's committed work. Never overwrite a newer state/report with a stale snapshot.
 - Work stealing across A/B shards is disabled while both production lanes are active concurrently. It is allowed only when the other production lane is confirmed idle/completed and the target is unclaimed after a fresh GitHub check.
-- A/B must not modify shared state files while running concurrently. Their commits are lane-local only; C alone reconciles `resume_state.json`, worklog, progress/status, asset_queue and shared queue summaries after both production lanes reach terminal durable results.
+- A/B must not modify shared state files. Their commits are lane-local only; C alone reconciles `resume_state.json`, worklog, progress/status, asset_queue and shared queue summaries for the immutable producer results in its current QA batch.
 - Parallel completion is task-commit based, not branch-HEAD based. The controller must find the commit carrying that lane's exact `[AUTO:<TASK_ID>]` marker and validate Actions for that exact SHA even if the peer lane moved branch HEAD later.
 - Keep changes narrowly scoped.
 - Maximum automatic repair attempts: 3 per asset for the same dependency/input fingerprint.
@@ -55,7 +56,7 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - If no safe DDS rewrite is currently possible, create a material fallback deliverable: resolve a zoom-review classification, create a single-DDS isolation manifest/input set with exact hashes, create new per-element reconstruction metrics/specs, or add deterministic asset-specific rebuild/QA tooling plus new machine-readable output.
 - Generic blocker prose, an unchanged task record, timestamps, worklog-only edits, and empty commits do not count as progress.
 - Existing runtime-isolation candidates are a separate validation backlog; they block only themselves, not unrelated graphics production.
-- C must also avoid no-op barrier commits: if invoked without new candidate bytes, perform at least one material backlog action or do not dispatch C.
+- C must avoid duplicate/no-op QA commits: review only new TASK_ID@RESULT_SHA inputs, reuse unchanged PASS fingerprints, and do not dispatch an already-consumed QA identity.
 - Never use N100 local clones/worktrees as a project workspace.
 - GitHub branch HEAD and Actions are the durable source of truth.
 
@@ -68,8 +69,17 @@ The schema-v4 values in `localization/controller_roles.json` are mandatory contr
 - Stale `WAIT_ACTIONS`: force exact run + jobs refresh by 75 seconds.
 - Empty queue with unfinished work: re-arm within 90 seconds; do not wait for the historical 25-minute watchdog.
 - Next-task delay: 15 seconds. A/B independent-slot stagger: 15 seconds.
-- A+B PASS -> C and C PASS -> next A+B target transition: <=30 seconds.
-- The 60-second ordinary send gap does not delay independent A/B slots. Rate-limit backoff 90/180/300/600 seconds begins only after an actual rate-limit signal.
+- A or B PASS -> same producer lane next-task target transition: <=30 seconds; it does not wait for the peer producer or C.
+- C consumes up to 4 producer results per batch with a 30-second coalesce window; this wait applies only to QA batching and never pauses producers.
+- Localization producer same-slot send gap is 15 seconds and localization slot de-dup is 30 seconds after authoritative terminal completion. Rate-limit backoff 90/180/300/600 seconds begins only after an actual rate-limit signal.
 - `active_by_lane` is authoritative. A null top-level active summary is valid only when no lane is nonterminal.
 - Runtime state must expose `queue_loop_heartbeat_at`, `last_scheduler_decision_at`, `last_scheduler_decision`, and `blocked_reason`.
 - Startup/restart must refresh branch HEAD, clear discovery cache, and reconcile every nonterminal lane from exact GitHub state before dispatch.
+
+
+## Independent C QA / one-pass optimization
+- Queue state persists `qa_pending`, `qa_completed`, and `qa_blocked`; the de-dup identity is exact `TASK_ID@RESULT_SHA`.
+- C receives explicit `QA_BATCH_INPUTS` and validates those exact commits even if branch HEAD has advanced.
+- Heavy QA is fingerprinted by source/candidate bytes and applicable QA inputs/contract. Existing PASS evidence for an unchanged fingerprint is reused rather than recomputed.
+- C reconciles shared state once per batch. If a newer candidate supersedes a reviewed result, C records SUPERSEDED and never overwrites the newer state.
+- QA backlog growth is acceptable; producer throughput must not be reduced to zero merely because C is slower.

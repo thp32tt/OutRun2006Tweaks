@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -8,34 +8,42 @@
     "C": "OutRun 한글화 C 실행"
   },
   "execution": {
-    "mode": "parallel_production_with_qa_barrier",
+    "mode": "continuous_parallel_production_with_independent_batched_qa",
     "max_parallel_production": 2,
     "concurrent_group": [
       "A",
       "B"
     ],
-    "barrier_role": "C",
-    "next_wave_after": "C_DURABLE_RESULT",
-    "compatibility_fallback": "sequential_queue"
+    "qa_consumer": "C",
+    "qa_queue": "qa_pending",
+    "qa_batch_size": 4,
+    "qa_coalesce_seconds": 30,
+    "producer_next_after": "OWN_LANE_DURABLE_PASS",
+    "c_gates_production": false,
+    "compatibility_fallback": "sequential_producers_with_independent_qa"
   },
   "lanes": {
     "A": {
-      "mode": "production+self_qa",
+      "mode": "continuous_production+self_qa",
       "primary_index_parity": "odd",
-      "parallel_group": "production"
+      "parallel_group": "production",
+      "next_task_after": "OWN_DURABLE_PASS"
     },
     "B": {
-      "mode": "production+self_qa",
+      "mode": "continuous_production+self_qa",
       "primary_index_parity": "even",
-      "parallel_group": "production"
+      "parallel_group": "production",
+      "next_task_after": "OWN_DURABLE_PASS"
     },
     "C": {
-      "mode": "cross_lane_final_qa+approval",
+      "mode": "independent_batched_cross_lane_qa+shared_state_reconcile",
       "primary_index_parity": "all",
-      "starts_after": [
-        "A_DURABLE_RESULT",
-        "B_DURABLE_RESULT"
-      ]
+      "consumes": "qa_pending",
+      "input_identity": "TASK_ID@RESULT_SHA",
+      "batch_size": 4,
+      "coalesce_seconds": 30,
+      "candidate_write_policy": "RETURN_REWORK_TO_A_OR_B",
+      "blocks_producers": false
     }
   },
   "queue_source": "localization/graphics/asset_queue.csv",
@@ -54,7 +62,10 @@
     "disjoint_primary_shards": true,
     "stale_state_overwrite_forbidden": true,
     "shared_state_reconcile_from_latest_head": true,
-    "c_reads_only_durable_ab_results": true
+    "c_reads_only_durable_ab_results": true,
+    "c_uses_exact_result_sha": true,
+    "c_must_not_overwrite_newer_candidate": true,
+    "producers_skip_qa_pending_assets": true
   },
   "work_steal": {
     "enabled": true,
@@ -105,12 +116,6 @@
       "busy_stall_seconds": 1800,
       "force_stop_active_generation": false
     },
-    "wave_progression": {
-      "ab_pass_to_c_immediately": true,
-      "c_pass_to_next_ab_immediately": true,
-      "wait_for_chat_expiry_after_terminal_result": false,
-      "terminal_transition_target_seconds": 30
-    },
     "startup_reconcile": {
       "enabled": true,
       "refresh_branch_head_first": true,
@@ -122,6 +127,13 @@
       "terminal_failure_with_attempts": "retry_same_task_id",
       "terminal_failure_without_attempts": "BLOCKED",
       "never_wait_for_chat_expiry_after_terminal_action": true
+    },
+    "continuous_progression": {
+      "producer_pass_releases_same_lane": true,
+      "producer_pass_enqueues_qa": true,
+      "c_completion_gates_producers": false,
+      "qa_failure_gates_producers": false,
+      "terminal_transition_target_seconds": 30
     }
   },
   "runtime_tuning": {
@@ -143,7 +155,11 @@
       180,
       300,
       600
-    ]
+    ],
+    "localization_qa_batch_size": 4,
+    "localization_qa_coalesce_seconds": 30,
+    "localization_same_slot_send_gap_seconds": 15,
+    "localization_slot_dedup_seconds": 30
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -155,7 +171,7 @@
       "blocked_reason"
     ],
     "active_state_source_of_truth": "active_by_lane",
-    "queue_active_semantics": "derived_summary",
+    "queue_active_semantics": "derived_summary_with_independent_qa",
     "queue_active_null_allowed_only_when_active_by_lane_empty": true,
     "active_lane_phases": [
       "DISPATCHING",
@@ -164,5 +180,24 @@
       "WAIT_ACTIONS",
       "RETRY_PENDING"
     ]
+  },
+  "qa_deduplication": {
+    "identity": "TASK_ID@RESULT_SHA",
+    "heavy_check_fingerprint": [
+      "canonical_source_sha",
+      "candidate_sha",
+      "orientation_contract",
+      "translation_or_layout_input",
+      "qa_contract_version"
+    ],
+    "reuse_unchanged_pass_evidence": true,
+    "rerun_on": [
+      "fingerprint_change",
+      "prior_hold",
+      "prior_fail",
+      "rework_required",
+      "new_user_runtime_or_visual_evidence"
+    ],
+    "shared_state_merge_frequency": "once_per_c_batch"
   }
 }
