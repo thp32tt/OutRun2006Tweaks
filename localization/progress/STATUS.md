@@ -1342,3 +1342,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Index231 remains **RENDER_READY**; index163 remains **PREFLIGHT_ONLY**; index175 remains **PREFLIGHT_ONLY / SOURCE_IDENTITY_MISMATCH**; index222 remains **STATIC_QA_PASS_RUNTIME_UNTESTED** with DDS_ONLY isolation input ready.
 - Canonical/legacy progress remain byte-identical. Canonical segments **755**, pending production **69**, actionable **93**.
 - This bookkeeping checkpoint is separate from the validation-bearing result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C154 Q00052 — 2026-09-30T07:52:19.920+09:00
+- A00232 `36ec04de...` / index237 FF514CEB and A00234 `8e3b2b58...` / index99 4F68708E: **PASS / PASS**.
+- Both are DDS_ONLY runtime-isolation inputs for unchanged authoritative STATIC_QA candidates. FF514CEB keeps C138/Q00036 candidate `a7f2670c...`; 4F68708E keeps C139/Q00037 candidate `a170fc1e...`. Heavy QA is reused; no candidate bytes changed.
+- Both remain **STATIC_QA_PASS_RUNTIME_UNTESTED**. No runtime approval is granted.
+- Shared order: **RENDER_READY 231 -> ONE_STAGE none -> candidate QA 159/198/201 -> PREFLIGHT_ONLY 163/193/133/232**. Q00052 isolation inputs 99/237 are separate runtime-validation backlog items and do not block production.
+- Pending production **69**, actionable localize_text **93**, canonical segments **755**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

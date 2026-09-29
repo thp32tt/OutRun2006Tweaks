@@ -1,0 +1,186 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-c154-q00052-two-dds-only-isolation-input-batch-dedupe-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00236",
+  "wave_id": "Q00052",
+  "qa_batch_id": "Q00052",
+  "run": "C154",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:52:19.920+09:00",
+  "base_head_sha": "56e296de1f9eba0220cca45790601e6b9109a832",
+  "base_sha": "56e296de1f9eba0220cca45790601e6b9109a832",
+  "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SINGLE_SHARED_STATE_MERGE",
+  "result": "PASS_Q00052_TWO_DDS_ONLY_ISOLATION_INPUTS_RUNTIME_UNTESTED",
+  "summary": "Q00052 independently consumes A00232@index237 and A00234@index99 as immutable DDS_ONLY runtime-isolation inputs. Both PASS their claimed scope. Each producer commit contains only its durable task record plus one lane-local isolation manifest; neither modifies candidate DDS or shared state. Refreshed HEAD retains the exact prior C-approved candidate blobs (FF514CEB a7f2670c... from C138/Q00036; 4F68708E a170fc1e... from C139/Q00037), and automation-contract/orientation/controller fingerprints are unchanged. Heavy candidate/source QA is therefore reused without repetition. No runtime test is performed; no runtime approval is granted. Shared candidate-completion priority remains RENDER_READY index231 first.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00232",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "36ec04de640b93527b15f1923b486be9a718f761",
+      "result_message": "localization(A): add index237 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00232]",
+      "completed_at": "2026-09-30T07:38:04.993553+09:00",
+      "producer_id": "P00125",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00234",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "8e3b2b58c9feaeffa812230b93354a4ba926ac5a",
+      "result_message": "localization(A): add index99 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00234]",
+      "completed_at": "2026-09-30T07:42:19.464804+09:00",
+      "producer_id": "P00126",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00232",
+      "result_sha": "36ec04de640b93527b15f1923b486be9a718f761",
+      "status": "PASS",
+      "reason": "Index237/FF514CEB DDS_ONLY runtime-isolation input PASS. Producer result changes only its durable task record and lane-local isolation manifest. Candidate Git blob a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac is unchanged at producer RESULT_SHA and refreshed HEAD, matching authoritative C138/Q00036 STATIC_QA_PASS_RUNTIME_UNTESTED (Gate 36607542193 success). Source/candidate/contract/orientation fingerprints are unchanged, so DDS/header/mipmap/alpha/orientation/1px containment/CLEAN_PLATE/English-source heavy QA is reused rather than repeated. Runtime UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00234",
+      "result_sha": "8e3b2b58c9feaeffa812230b93354a4ba926ac5a",
+      "status": "PASS",
+      "reason": "Index99/4F68708E DDS_ONLY runtime-isolation input PASS. Producer result changes only its durable task record and lane-local isolation manifest. Candidate Git blob a170fc1e8378e66415cde138b07ab3deb2ca4a2d is unchanged at producer RESULT_SHA and refreshed HEAD, matching authoritative C139/Q00037 STATIC_QA_PASS_RUNTIME_UNTESTED (Gate 36609117374 success). Source/candidate/contract/orientation fingerprints are unchanged, so DXT5/header/mipmap/alpha/orientation/1px containment/CLEAN_PLATE/English-source heavy QA is reused rather than repeated. Runtime UNTESTED."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "index237": {
+      "asset": "FF514CEB",
+      "source_git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30",
+      "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "candidate_git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+      "candidate_sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+      "prior_c_result_sha": "0128225e60b537b325aa047fafbc58e53c604b07",
+      "prior_c_gate_run_id": 36607542193
+    },
+    "index99": {
+      "asset": "4F68708E",
+      "source_git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+      "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "candidate_git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+      "candidate_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+      "prior_c_result_sha": "63cd2ed9068e542d257fca12885ee9a0784ca86b",
+      "prior_c_gate_run_id": 36609117374
+    }
+  },
+  "dedupe": {
+    "candidate_heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "reason": "No candidate/source/contract/orientation dependency fingerprint changed. Q00052 validates only new deterministic DDS_ONLY isolation manifests and exact producer-result lineage."
+  },
+  "reviewed_assets": [
+    {
+      "index": 237,
+      "asset": "FF514CEB",
+      "disposition": "PASS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "isolation_input_ready": true,
+      "runtime_validation": "UNTESTED",
+      "required_next": "Use the accepted FF514CEB DDS_ONLY isolation input only during a real-game test; do not rerender unchanged content."
+    },
+    {
+      "index": 99,
+      "asset": "4F68708E",
+      "disposition": "PASS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "isolation_input_ready": true,
+      "runtime_validation": "UNTESTED",
+      "required_next": "Use the accepted 4F68708E DDS_ONLY isolation input only during a real-game test; do not rerender unchanged content."
+    }
+  ],
+  "readiness_reconciliation": {
+    "render_ready_indices": [
+      231
+    ],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      198,
+      201
+    ],
+    "preflight_only_actionable_indices": [
+      163,
+      193,
+      133,
+      232
+    ],
+    "preflight_only_dependency_blocked_indices": [
+      175,
+      217,
+      135
+    ],
+    "q00052_runtime_isolation_ready_indices": [
+      99,
+      237
+    ],
+    "existing_static_qa_runtime_untested_indices": [
+      99,
+      112,
+      130,
+      152,
+      195,
+      222,
+      226,
+      237
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: index231/EBE401C8 first.",
+      "ONE_STAGE_TO_RENDER: none.",
+      "QA_BACKLOG: candidate-bearing indices159/198/201 before unrelated preflight.",
+      "PREFLIGHT_ONLY: index163, then index193/133/232.",
+      "RUNTIME_ISOLATION: Q00052 accepted DDS_ONLY inputs for indices99/237; runtime testing remains separate and must not block production.",
+      "Dependency-blocked: index175/217 source mismatch and index135 acquisition exhausted."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_TWO_DDS_ONLY_ISOLATION_INPUT_BATCH_QA_AND_SINGLE_SHARED_STATE_MERGE",
+    "reviewed_inputs": 2,
+    "reviewed_assets": 2,
+    "producer_inputs_pass": 2,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "candidate_dds_modified_by_c": false,
+    "new_isolation_inputs_accepted": 2,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 755,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 69,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00236.json",
+    "role_c_report": "localization/graphics/role_C/202609300752-C154/C154_Q00052_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "heavy_qa_repeated": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_gate": null,
+  "bookkeeping_note": "This C result commit is the sole Q00052 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+}
