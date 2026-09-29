@@ -25,6 +25,19 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - Runtime-untested work may continue when the next task is independent.
 - Runtime-dependent follow-up work must be marked BLOCKED_RUNTIME and skipped in favor of another runnable task.
 
+## Controller runtime recovery and WAIT_ACTIONS liveness
+- `WAIT_ACTIONS` is a transient controller state, never a terminal state and never a reason to stop queue progression indefinitely.
+- Once a lane has a concrete `gate_run.id`, the controller MUST poll that exact GitHub Actions run by run ID. Cached workflow-run discovery/list responses are non-authoritative after a run ID is bound.
+- Exact run-by-ID status MUST bypass the generic Actions cache. A cached `queued`/`in_progress` value MUST NOT override a fresh exact-run response.
+- Nonterminal Actions state may be cached only for discovery before a run ID is known. After binding, the effective nonterminal cache TTL is zero.
+- On `completed/success`, finalize the lane as PASS and continue the wave state machine.
+- On `completed` with `failure`, `cancelled`, `timed_out`, `action_required`, or `stale`, capture the exact run URL/conclusion and immediately transition to the next task attempt when `attempt < max_task_attempts`. CI failure increments the task attempt; it MUST NOT consume a conversation rollover.
+- If the task already has a durable result commit but its bound run cannot be resolved, re-discover the workflow run by exact `result_sha` + workflow name without cache, bind the resulting run ID, then resume exact-run polling.
+- If `WAIT_ACTIONS` remains nonterminal for longer than two normal GitHub poll intervals, force an uncached exact-run refresh and refresh job status before waiting again.
+- The watchdog MUST actively recover stalled `WAIT_ACTIONS` slots by performing the uncached exact-run refresh. `watchdog_observe_only` is not sufficient for an Actions-wait stall.
+- Conversation rollover remains reserved for stale/missing/expired ChatGPT conversations or missing assistant generation. It is independent from GitHub Actions retry handling.
+- After both A and B reach durable terminal PASS states for the same wave, dispatch C without waiting for either chat to expire. After C PASS, start the next A+B wave.
+
 ## Scope
 - Up to two modifying production tasks may run concurrently only when they are lanes A and B and their claimed queue indices/assets are disjoint.
 - Lane C is serialized behind the A/B production wave: it must not start final cross-lane QA against assets that are still being modified by A or B.

@@ -31,6 +31,15 @@ Each command means:
 - Work scope comes from `localization/graphics/asset_queue.csv`, never from the count of DDS binaries currently committed.
 - Rules must be changed in Git, not duplicated into Docker prompts.
 
+## WAIT_ACTIONS recovery mapping
+
+- After a task commit is found, bind the exact `Localization Automation Gate` run ID for that commit and poll that run ID directly.
+- Do not use a cached workflow-run list entry as the authoritative status once the run ID is known.
+- If the direct run is terminal failure/cancelled/timed_out/action_required/stale and attempts remain, retry the same TASK_ID immediately with `attempt + 1`; do not spend a chat rollover on CI failure.
+- If a bound run appears nonterminal for more than two GitHub poll intervals, invalidate Actions cache for that run and force an exact run + jobs refresh.
+- A watchdog tick on a lane stuck in `WAIT_ACTIONS` must execute this recovery poll even when the general watchdog mode is observe-only.
+- When A and B are both terminal PASS, advance directly to C. When C is terminal PASS, advance directly to the next A+B wave.
+
 ## Parallel scheduler mapping
 
 Preferred dispatch is event-driven rather than fixed minute slots:

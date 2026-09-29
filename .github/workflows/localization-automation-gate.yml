@@ -24,6 +24,9 @@ jobs:
       - name: Verify queue automation contract
         run: test -f docs/automation/QUEUE_CONTROLLER_CONTRACT.md
 
+      - name: Verify controller WAIT_ACTIONS recovery policy
+        run: python tools/localization/verify_controller_recovery_policy.py
+
       - name: Verify localization state
         run: python tools/localization/verify_state.py
 

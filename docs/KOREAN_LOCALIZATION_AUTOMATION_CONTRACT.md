@@ -51,6 +51,15 @@ The controller prompt may be intentionally minimal. The following commands are s
 
 On any of those commands, first fetch the latest `korean-localization-clean`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
+## Controller liveness and GitHub Actions authority
+- A lane in `WAIT_ACTIONS` MUST be driven by the exact GitHub Actions run bound to that lane's task/result commit. Generic workflow-run list/discovery cache is never authoritative after `gate_run.id` is known.
+- Exact run-by-ID polling MUST bypass the generic Actions cache. This prevents a stale cached `queued` or `in_progress` snapshot from pinning a completed run indefinitely.
+- If the bound run ID is missing after a durable task commit exists, re-discover by exact `result_sha` and workflow name without cache, bind the concrete run ID, and continue exact-run polling.
+- Any terminal non-success conclusion (`failure`, `cancelled`, `timed_out`, `action_required`, `stale`) immediately enters the normal task retry path if attempts remain. This increments `attempt` but does not increment `chat_rollovers`.
+- Conversation rollover is only for stale/expired/missing ChatGPT conversations or missing assistant generation. GitHub Actions failure/retry and chat rollover are separate recovery domains.
+- A lane that stays in `WAIT_ACTIONS` beyond two normal GitHub poll intervals MUST trigger an uncached exact-run and jobs refresh. The queue watchdog must perform this recovery even when its general mode is observe-only.
+- Once both A and B are durable terminal PASS for the current wave, C must be dispatched promptly; once C is terminal PASS, the next A+B wave must be dispatched. Do not wait for chat expiry to advance an already-completed wave.
+
 ## Parallel dual-production dispatch
 - A and B are independent production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
 - A: PRODUCTION LANE A + self-QA on the odd-index shard. Create/rework actual localization assets continuously from A's shard and immediately fix zero-pixel-overflow failures in the same run. Aim for a multi-DDS batch rather than stopping on the first blocked asset.

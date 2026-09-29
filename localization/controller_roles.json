@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -61,5 +61,49 @@
     "disabled_while_peer_lane_active": true,
     "condition": "peer production lane is confirmed idle/completed, latest Git refresh confirms target is unclaimed, and target has no newer current-cycle production/state change",
     "report_field": "work_stolen_from_lane"
+  },
+  "runtime_recovery": {
+    "wait_actions": {
+      "authoritative_lookup": "github_actions_run_by_id",
+      "bypass_generic_actions_cache": true,
+      "generic_actions_cache_scope": "discovery_only_before_run_id_binding",
+      "bound_run_nonterminal_cache_ttl_seconds": 0,
+      "force_uncached_refresh_after_poll_intervals": 2,
+      "refresh_jobs_with_forced_run_refresh": true,
+      "rediscover_missing_bound_run_by": [
+        "result_sha",
+        "workflow_name"
+      ],
+      "retry_terminal_failure_conclusions": [
+        "failure",
+        "cancelled",
+        "timed_out",
+        "action_required",
+        "stale"
+      ],
+      "retry_same_task_id": true,
+      "retry_increments_attempt": true,
+      "ci_failure_consumes_chat_rollover": false
+    },
+    "conversation_rollover": {
+      "enabled": true,
+      "applies_to": [
+        "stale_chat",
+        "expired_chat",
+        "missing_chat",
+        "missing_assistant_generation"
+      ],
+      "applies_to_ci_failure": false
+    },
+    "watchdog": {
+      "wait_actions_recovery": "uncached_exact_run_and_jobs_refresh",
+      "observe_only_allowed_for_wait_actions": false,
+      "force_stop_active_generation": false
+    },
+    "wave_progression": {
+      "ab_pass_to_c_immediately": true,
+      "c_pass_to_next_ab_immediately": true,
+      "wait_for_chat_expiry_after_terminal_result": false
+    }
   }
 }
