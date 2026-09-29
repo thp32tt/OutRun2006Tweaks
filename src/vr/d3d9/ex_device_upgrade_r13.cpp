@@ -80,9 +80,22 @@ namespace OutRunVRD3D9ExUpgradeR13
                 ++ManagedTextureLockFailures;
                 if (!FirstManagedTextureLockFailureLogged.exchange(true))
                 {
+                    D3DSURFACE_DESC desc{};
+                    const HRESULT descHr =
+                        texture->GetLevelDesc(level, &desc);
+                    const UINT levels = texture->GetLevelCount();
+                    const LONG left = rect ? rect->left : -1;
+                    const LONG top = rect ? rect->top : -1;
+                    const LONG right = rect ? rect->right : -1;
+                    const LONG bottom = rect ? rect->bottom : -1;
                     spdlog::error(
-                        "VR D3D9Ex R13: translated MANAGED texture LockRect FAILED hr=0x{:08X}; this resource requires CPU-shadow emulation before D3D9Ex can be considered production-safe",
-                        static_cast<unsigned>(hr));
+                        "VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED hr=0x{:08X} level={} flags=0x{:08X} rect=[{},{},{},{}] descHr=0x{:08X} size={}x{} fmt={} levels={}; compare against selector/car atlas DirectOnly fallback before changing budgets or material state",
+                        static_cast<unsigned>(hr), level,
+                        static_cast<unsigned>(flags),
+                        left, top, right, bottom,
+                        static_cast<unsigned>(descHr),
+                        desc.Width, desc.Height,
+                        static_cast<unsigned>(desc.Format), levels);
                 }
             }
             return hr;
