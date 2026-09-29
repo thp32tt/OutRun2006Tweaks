@@ -259,6 +259,13 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
     if not WATCHDOG_ENABLED or not AUTO_SEND:
         return
     now = datetime.now(TZ)
+    if QUEUE_MODE:
+        recovery = watchdog_rearm_queue_state(now)
+        if recovery:
+            write_runtime(
+                status="watchdog_queue_rearm",
+                last_action=f"Queue watchdog {recovery}; queue engine remains the only task sender",
+            )
     reg = load_registry(now)
     guard = send_guard_reason(reg, None, now)
     if guard and guard.startswith("rate_limit_backoff:"):
@@ -423,22 +430,13 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
             continue
 
         if QUEUE_MODE:
-            recovery = watchdog_rearm_queue_state(now)
+            slot.last_result = "watchdog_queue_observe"
             slot.last_watchdog_at = now.isoformat()
-            if recovery:
-                slot.last_result = "watchdog_queue_rearmed"
-                save_registry(reg)
-                write_runtime(
-                    status="watchdog_queue_rearm",
-                    last_action=f"Queue watchdog {recovery}; queue engine remains the only task sender",
-                )
-            else:
-                slot.last_result = "watchdog_queue_observe"
-                save_registry(reg)
-                write_runtime(
-                    status="watchdog_queue_observe",
-                    last_action=f"Queue watchdog checked slot {slot.name}; no stale queue state required recovery",
-                )
+            save_registry(reg)
+            write_runtime(
+                status="watchdog_queue_observe",
+                last_action=f"Queue watchdog checked slot {slot.name}; queue-state recovery is handled independently of UI stall timing",
+            )
             continue
 
         guard = send_guard_reason(reg, slot, datetime.now(TZ))
