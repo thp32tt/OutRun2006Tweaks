@@ -1,7 +1,7 @@
 // R70 production stereo owner.
-// This file is the only stereo translation unit compiled by the normal target.
-// Historical Rxx files remain implementation layers until they are extracted
-// into role-based modules; selecting a diagnostic path changes only this facade.
+// F04 phase 6 keeps diagnostic comparison paths unchanged while the default
+// production path composes R33 plus the include-free R34 reset/raster overlay
+// directly. Historical R34 remains a compatibility/build-graph wrapper.
 
 #if defined(OUTRUN_VR_SAFE_DRAW_COMPARE)
 #include "stereo_renderer_r26_compare.cpp"
@@ -12,5 +12,13 @@
 #elif defined(OUTRUN_VR_R26_HUD_COMPARE)
 #include "stereo_renderer_r30_r26_safe.cpp"
 #else
-#include "stereo_renderer_r34.cpp"
+#include "stereo_renderer_r33.cpp"
+#include "vr/game/render_semantics.hpp"
+
+namespace OutRunVRD3D9ExUpgradeR13
+{
+    bool LastResetStateReplaySucceeded() noexcept;
+}
+
+#include "stereo_renderer_r34_overlay.inc"
 #endif

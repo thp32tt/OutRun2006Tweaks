@@ -128,7 +128,7 @@ jobs:
               'D3DSBT_ALL',
               'Ex promotion rolled back transactionally'
             )
-            'src/vr/d3d9/stereo_renderer_r34.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r34_overlay.inc' = @(
               'R34ResetReplayBlocked',
               'LastResetStateReplaySucceeded',
               'stereo remains fail-closed'

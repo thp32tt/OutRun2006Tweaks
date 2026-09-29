@@ -254,7 +254,7 @@ if not (query_error < fault_generation < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
 
 r34 = require(
-    "src/vr/d3d9/stereo_renderer_r34.cpp",
+    "src/vr/d3d9/stereo_renderer_r34_overlay.inc",
     "SetExternalSafetyBlock(true)",
     "SetExternalSafetyBlock(!healthy)",
     "Install/state-sync",
