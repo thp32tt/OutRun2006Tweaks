@@ -26,6 +26,15 @@ Each set contains ten distinct review passes and derives the next set's directio
 - Production-source edits made by this campaign: **0**
 - Merge gate: **OPEN**
 
+## Current allocation policy (2026-09-29)
+
+- DX11 Native: primary implementation/performance lane (~50% nominal effort).
+- DXVK: secondary implementation/performance lane (~40% nominal effort).
+- DX9Ex: protected baseline/fallback and regression maintenance only (normally <=10%); no new standalone performance optimization.
+- DX12/D3D9On12: frozen/reference-only unless explicitly reopened by the user.
+- Distribution target: must scale below the RTX 4070 development machine; minimum GPU remains unclaimed until measured on exact builds.
+- Performance acceptance should emphasize stable frame time and lower-tier 72 Hz viability before higher-end 80/90 Hz quality targets.
+
 ## Main unresolved groups
 
 ### A. Backend-neutral semantics
