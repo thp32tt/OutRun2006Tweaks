@@ -970,3 +970,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Actionable queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text **76**. Shared state merged once; reviewed queue notes updated for 16 indices.
 - Report: `localization/graphics/role_C/20260929-1755-C113/C113_Q00011_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 
+
+### C114 Q00012 independent QA batch — 2026-09-29T18:14:21+09:00
+- Consumed exactly four immutable producer results: B00101@476ecf7fb8622866a8a2e258f4bb946060b9a474, B00103@75fbb01f2b372fb5cc8bf538f66b249e2ff85b77, A00102@470c7863c7b7ef92f65bdfab28361dd0f1566da8 and A00105@01cbfde063f258604e383acf78b3478649fee526. All four `qa_dispositions=PASS` for their limited reconstruction/pre-generation deliverables; none is superseded.
+- Independent new-evidence QA: B00101 **37/37** scopes/guards with 38 physical semantics; B00103 **13/13** localize scopes/guards plus 4 preserve regions and one retained source-variant HOLD; A00102 **22/22** region scopes/guards with 8/8 canonical pairs, five reconfirm-required bindings and three unresolved semantics.
+- A00105 F6811E94 exact pinned BC3 source was independently re-decoded by C: header/payload, both alpha bboxes/counts, removal-mask SHA-256, CLEAN_PLATE SHA-256 and final v2 safe bbox **[392,58,1629,199]** reproduce exactly.
+- No Korean candidate DDS bytes were produced or rewritten. All final candidate-only clipping/containment/DDS/alpha/compression/orientation/style/protected-artwork/source-comparison gates remain **HOLD_STRICT_RECHECK**; runtime remains **UNTESTED**.
+- Queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**, pending production localize_text **76**, canonical segments **753**. Report: `localization/graphics/role_C/20260929-1814-C114/C114_Q00012_INDEPENDENT_QA_BATCH.json`.
+- `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
