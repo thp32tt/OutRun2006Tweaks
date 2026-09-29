@@ -19,6 +19,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
       - name: Verify consolidated wheel FFB source
         shell: pwsh
         run: python tools/verify_wheel_ffb_current.py
@@ -38,7 +42,7 @@ jobs:
           Remove-Item Env:CI -ErrorAction SilentlyContinue
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -A ${{matrix.arch}} ..
+          cmake -G "Visual Studio 17 2022" -A ${{matrix.arch}} -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF ..
 
       - name: Add older VC2022 redist workaround to safetyhook
         shell: pwsh
@@ -108,12 +112,24 @@ jobs:
             "Test Left (20%)",
             "VR stereo: D3D9 full-eye renderer installed",
             "VR R13: stereo hardening ACTIVE",
+            "VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay",
+            "VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE",
+            "VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed",
             "VR R13: auxiliary/offscreen c64 WVP kept stock",
             "VR v3 shadow: live dual-protocol diagnostics active",
             "VR GPL SHADER: pair="
+            "VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE"
+            "VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE"
+            "VR R66 OPTION ARROW: exact node pinned"
+            "VR R66 GOAL TIME HUD:"
+            "VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only"
+            "VR R65 SELECTOR: restored base shadow bypassed"
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }
+          }
+          if ($ascii.Contains("VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE")) {
+            throw "generic Build produced forbidden R26-only SAFE-DRAW variant"
           }
 
           $ini = Get-Content "build/bin/OutRun2006Tweaks.ini" -Raw

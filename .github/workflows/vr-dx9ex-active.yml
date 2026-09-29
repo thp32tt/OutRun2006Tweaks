@@ -37,6 +37,7 @@ on:
       - 'tools/verify_vr_r51_runtime_contract.py'
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_nearplane_active_gate.py'
+      - 'tools/verify_vr_proven_baseline.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
       - 'tools/Select-OutRunVRBackend.ps1'
       - 'tools/Test-VRDXVKBackendContract.ps1'
@@ -68,6 +69,10 @@ jobs:
           Invoke-WebRequest -Uri $contract.canonicalExe.sourceUrl -OutFile $exe
           python -m pip install --disable-pip-version-check --quiet capstone
           python tools/verify_vr_binary_contract.py --exe $exe --manifest docs/VR_BINARY_CONTRACT.json --source-root .
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
       - name: Verify reconstructed VR architecture boundaries
         shell: pwsh
         run: |
@@ -150,9 +155,28 @@ jobs:
           New-Item -ItemType Directory -Force stage-game | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (-not $dll) { throw 'dinput8.dll missing' }
+          $bytes = [System.IO.File]::ReadAllBytes($dll.FullName)
+          $ascii = [Text.Encoding]::ASCII.GetString($bytes)
+          foreach ($marker in @(
+            'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+            'VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay',
+            'VR R13: stereo hardening ACTIVE',
+            'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+            'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
+            'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
+            'VR R66 OPTION ARROW: exact node pinned',
+            'VR R66 GOAL TIME HUD:',
+            'VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only',
+            'VR R65 SELECTOR: restored base shadow bypassed'
+          )) {
+            if (-not $ascii.Contains($marker)) { throw "DX9Ex active binary missing proven marker: $marker" }
+          }
+          if ($ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+            throw 'DX9Ex active binary is forbidden R26-only SAFE-DRAW variant'
+          }
           Copy-Item $dll.FullName stage-game/dinput8.dll
           Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
-          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_R26_R43_R44' -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_R26_HUD_R68' -Encoding ascii
           Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
       - uses: actions/upload-artifact@v4
         with:
@@ -186,7 +210,7 @@ jobs:
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd','Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd','Analyze-OutRunVRSession.ps1','OutRunVR-Backend-Selector.ps1','OutRunVR-Backend-Selector.cmd','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','START_HERE_VR_TEST.cmd')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -205,7 +229,7 @@ jobs:
             SchemaVersion = 1
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'ACTIVE_R26_R43_R44'
+            VariantId = 'ACTIVE_R26_HUD_R68'
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','PERFORMANCE')
             UserRuntimeVerified = $false
@@ -225,9 +249,11 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Backend-Selector.cmd','OutRunVR-Backend-Selector.ps1','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
+          foreach ($file in @('START_HERE_VR_TEST.cmd','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
+          $cmds = @(Get-ChildItem verify -Filter '*.cmd' -File)
+          if ($cmds.Count -ne 1 -or $cmds[0].Name -ne 'START_HERE_VR_TEST.cmd') { throw 'package must expose exactly one CMD entry point: START_HERE_VR_TEST.cmd' }
           $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
           foreach ($requiredMarker in @('ANALYSIS_REQUEST.json','AutoAnalyzeOnUpload=$true','RequiresUserDescription=$false','OutRun2_VR_ANALYZE_')) {
             if ($collectorText -notlike "*$requiredMarker*") { throw "collector missing runtime auto-analysis contract marker: $requiredMarker" }

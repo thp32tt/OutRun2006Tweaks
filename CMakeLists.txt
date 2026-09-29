@@ -92,17 +92,16 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY TRUE)
 unset(_vr_source)
 
-# Production-safe stereo draw owner. The user-visible regression reproduced on
-# Quest while the monitor SBS remained individually plausible is tied to the
-# post-e20 R29+ fast L+R/HUD dispatch chain. Default back to the last proven
-# R26/R23/R22/R13/R9 draw + R23 renderer boundary. R29-R34 comparison builds
-# remain available only when this option is explicitly disabled.
-option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use proven R26/R23 safe stereo draw production path" ON)
+# R66 production baseline: the HMD-proven path is R26/R23 world rendering plus
+# the exact R30 HUD/XYZRHW/SkyGlow overlay. The older R26-only safe-draw path is
+# retained strictly as an explicit diagnostic comparison; it must never be the
+# default package again.
+option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use R26-only safe-draw diagnostic path" OFF)
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r26_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
-option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" OFF)
+option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" ON)
 if(OUTRUN_VR_SAFE_DRAW_COMPARE)
     set_source_files_properties(
         src/vr/d3d9/stereo_renderer_r34.cpp

@@ -50,9 +50,9 @@ $gameBuild = Join-Path $root 'game'
 $hostBuild = Join-Path $root 'host'
 $packageDir = Join-Path $root 'package'
 
-# Canonical PC-fast contract for the protected R51 renderer lineage.
-# Keep this single source of truth in sync with the verified R51 build.
-$buildContractVersion = 'R51-PC-FAST-v2-R26HUD-ON'
+# Canonical PC-fast contract for the HMD-proven R66 renderer lineage.
+# Keep this single source of truth in sync with the HMD-proven R66 R26+HUD build.
+$buildContractVersion = 'R66-PROVEN-R26HUD-v1'
 $canonicalGameFlags = @(
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON'
@@ -62,12 +62,12 @@ $canonicalGameFlags = @(
 $canonicalGameFlagString = $canonicalGameFlags -join ' '
 $buildMode = if ($Clean) { 'CLEAN' } else { 'INCREMENTAL' }
 
-function Assert-R51PCBuildContract {
+function Assert-R66ProvenBuildContract {
     param([Parameter(Mandatory = $true)][string]$BuildDir)
 
     $cache = Join-Path $BuildDir 'CMakeCache.txt'
     if (-not (Test-Path $cache)) {
-        throw "R51 PC build contract: CMakeCache missing after configure: $cache"
+        throw "R66 proven build contract: CMakeCache missing after configure: $cache"
     }
 
     $required = @(
@@ -79,7 +79,7 @@ function Assert-R51PCBuildContract {
     $cacheText = Get-Content $cache -Raw
     foreach ($line in $required) {
         if ($cacheText -notmatch [regex]::Escape($line)) {
-            throw "R51 PC build contract mismatch: expected '$line'. Refusing to compile/package a non-R51 renderer configuration."
+            throw "R66 proven build contract mismatch: expected '$line'. Refusing to compile/package a non-R66 proven renderer configuration."
         }
     }
 
@@ -95,9 +95,12 @@ New-Item -ItemType Directory -Force $root | Out-Null
 Remove-Item Env:CI -ErrorAction SilentlyContinue
 $totalWatch = [Diagnostics.Stopwatch]::StartNew()
 
+Write-Host "PC fast build: verify HMD-proven VR baseline before configure"
+Invoke-Checked python 'tools/verify_vr_proven_baseline.py'
+
 Write-Host "PC fast build: configure Win32 game (persistent cache: $gameBuild)"
 Invoke-Checked cmake '-S' '.' '-B' $gameBuild '-G' 'Visual Studio 17 2022' '-A' 'Win32' @canonicalGameFlags
-Assert-R51PCBuildContract -BuildDir $gameBuild
+Assert-R66ProvenBuildContract -BuildDir $gameBuild
 
 Patch-DependencyProject (Join-Path $gameBuild '_deps/safetyhook-build/src/safetyhook.vcxproj')
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/Zydis.vcxproj')
@@ -124,7 +127,7 @@ if ($sdlText -match '#define SDL_JOYSTICK_GAMEINPUT 1') {
 $gameWatch = [Diagnostics.Stopwatch]::StartNew()
 Write-Host "PC fast build: compile game DLL with up to $jobs parallel jobs"
 Invoke-Checked cmake '--build' $gameBuild '--config' 'Release' '--target' 'outrun2006tweaks' '--parallel' "$jobs"
-Assert-R51PCBuildContract -BuildDir $gameBuild
+Assert-R66ProvenBuildContract -BuildDir $gameBuild
 $gameWatch.Stop()
 
 $hostWatch = [Diagnostics.Stopwatch]::StartNew()
@@ -143,14 +146,37 @@ New-Item -ItemType Directory -Force $backendDir | Out-Null
 $dll = Get-ChildItem $gameBuild -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
 if (-not $dll) { throw 'dinput8.dll missing after incremental build.' }
 
+$gameBytes = [System.IO.File]::ReadAllBytes($dll.FullName)
+$gameAscii = [Text.Encoding]::ASCII.GetString($gameBytes)
+foreach ($marker in @(
+    'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+    'VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay',
+    'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
+    'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+    'VR R13: stereo hardening ACTIVE',
+    'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
+    'VR R66 OPTION ARROW: exact node pinned',
+    'VR R66 GOAL TIME HUD:',
+    'VR R67 FLARE FIX: exact projected-screen effect prefers Calc3D2D eye reprojection; FOV-only affine is fallback only',
+    'VR R65 SELECTOR: restored base shadow bypassed'
+)) {
+    if (-not $gameAscii.Contains($marker)) {
+        throw "R66 PC fast binary missing proven-baseline marker: $marker"
+    }
+}
+if ($gameAscii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+    throw 'R66 PC fast binary is the forbidden R26-only SAFE-DRAW variant.'
+}
+Write-Host 'PC fast binary proven-baseline markers PASS.'
+
 $hostExe = Join-Path $hostBuild 'bin/outrun-vr-host.exe'
 if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing after incremental build.' }
 
 Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
-Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_FULL_R34' -Encoding ascii
-Assert-R51PCBuildContract -BuildDir $gameBuild
+Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R68' -Encoding ascii
+Assert-R66ProvenBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
 
@@ -161,14 +187,10 @@ $runtimeFiles = @(
     'OutRunVR-TestProfiles.ps1',
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
-    'Run-OutRunVRTest.cmd',
     'Collect-OutRunVRLogs.ps1',
-    'Collect-OutRunVRLogs.cmd',
     'Analyze-OutRunVRSession.ps1',
-    'OutRunVR-Backend-Selector.ps1',
-    'OutRunVR-Backend-Selector.cmd',
-    'OutRunVR-Slot-Selector.ps1',
-    'OutRunVR-Slot-Selector.cmd'
+    'OutRunVR-Test-Selector.ps1',
+    'START_HERE_VR_TEST.cmd'
 )
 foreach ($file in $runtimeFiles) {
     $src = Join-Path 'tools' $file
@@ -176,6 +198,15 @@ foreach ($file in $runtimeFiles) {
     Copy-Item $src (Join-Path $packageDir $file)
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
+
+@(
+    'USER-FACING LAUNCHER POLICY'
+    ''
+    'Use only START_HERE_VR_TEST.cmd.'
+    'Do not add additional selector CMD/PS1 files to test packages.'
+    'When the active test matrix changes, update OutRunVR-Test-Selector.ps1 in place.'
+    'Helper scripts remain implementation details and are not alternate entry points.'
+) | Set-Content (Join-Path $packageDir 'START_HERE_ONLY.txt') -Encoding UTF8
 
 @(
     'OUTRUN VR TEST / LOG UPLOAD'
@@ -198,7 +229,7 @@ $buildInputs = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrixId
     IntegrationSha = $sourceSha
-    VariantId = 'ACTIVE_FULL_R34'
+    VariantId = 'ACTIVE_R26_HUD_R68'
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
     UserRuntimeVerified = $false
