@@ -1,0 +1,189 @@
+name: VR Evening Unified Test Build
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-focus
+
+concurrency:
+  group: vr-evening-unified-test
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[evening-build]') }}
+    runs-on: windows-2022
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout DX9Ex reference
+        uses: actions/checkout@v4
+        with:
+          ref: vr-d3d9ex-focus
+          path: src-dx9
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Checkout DX11 current branch
+        uses: actions/checkout@v4
+        with:
+          ref: vr-dx11-native-r71
+          path: src-dx11
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Checkout DXVK current branch
+        uses: actions/checkout@v4
+        with:
+          ref: vr-dxvk-r71-disasm
+          path: src-dxvk
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Build DX9Ex package
+        shell: pwsh
+        working-directory: src-dx9
+        run: ./tools/Build-OutRunPCFast.ps1
+
+      - name: Build DX11 current package
+        shell: pwsh
+        working-directory: src-dx11
+        run: ./tools/Build-OutRunPCFast.ps1
+
+      - name: Build DXVK SAFE package
+        shell: pwsh
+        working-directory: src-dxvk
+        run: ./tools/Build-OutRunPCFast.ps1
+
+      - name: Assemble three-backend evening matrix
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $out=Join-Path $PWD 'evening-package'
+          if(Test-Path $out){Remove-Item $out -Recurse -Force}
+          New-Item -ItemType Directory -Force $out|Out-Null
+
+          # Use the DXVK branch package as the richest runtime/logging script base.
+          Copy-Item 'src-dxvk/out/pc-fast/package/*' $out -Recurse -Force
+
+          # Replace reference payload with the exact current protected DX9Ex branch.
+          if(Test-Path (Join-Path $out 'backends/d3d9')){Remove-Item (Join-Path $out 'backends/d3d9') -Recurse -Force}
+          Copy-Item 'src-dx9/out/pc-fast/package/backends/d3d9' (Join-Path $out 'backends/d3d9') -Recurse -Force
+
+          # Add exact current DX11 branch as its own payload. Do not alias it to d3d9.
+          $dx11Dest=Join-Path $out 'backends/dx11'
+          New-Item -ItemType Directory -Force $dx11Dest|Out-Null
+          Copy-Item 'src-dx11/out/pc-fast/package/backends/d3d9/*' $dx11Dest -Recurse -Force
+
+          # Install the dedicated tonight selector.
+          Copy-Item 'src-dx9/tools/Tonight-Unified-Test-Selector.ps1' (Join-Path $out 'Tonight-Unified-Test-Selector.ps1') -Force
+          @(
+            '@echo off'
+            'setlocal'
+            'cd /d "%~dp0"'
+            'title OutRun 2006 VR Tonight Test'
+            'powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Tonight-Unified-Test-Selector.ps1"'
+          )|Set-Content (Join-Path $out 'START_HERE_TONIGHT.cmd') -Encoding ascii
+
+          # The branch-local selector historically aliases DX11 and DXVK SAFE to
+          # backends/d3d9. This unified package owns three exact source payloads.
+          $selectorPath=Join-Path $out 'Select-OutRunVRBackend.ps1'
+          $selector=Get-Content $selectorPath -Raw
+          $old='$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe" -or $Backend -eq "dx11") { "d3d9" } else { $Backend }'
+          $new='$payloadBackend = switch ($Backend) { "2d" { "d3d9" } "d3d9" { "d3d9" } "dx11" { "dx11" } "dxvk-safe" { "dxvk" } "dxvk" { "dxvk" } }'
+          if(-not $selector.Contains($old)){throw 'Unified selector patch anchor not found.'}
+          $selector=$selector.Replace($old,$new)
+          Set-Content $selectorPath $selector -Encoding UTF8
+
+          $dx9Sha=(git -C src-dx9 rev-parse HEAD).Trim()
+          $dx11Sha=(git -C src-dx11 rev-parse HEAD).Trim()
+          $dxvkSha=(git -C src-dxvk rev-parse HEAD).Trim()
+          $stamp=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+          $matrix="EVENING-20260929-$stamp"
+
+          Set-Content (Join-Path $out 'BUILD_MATRIX_ID.txt') $matrix -Encoding ascii
+          [ordered]@{
+            SchemaVersion=2
+            BuildMatrixId=$matrix
+            PackagePurpose='Quest3/VDXR evening runtime test'
+            RuntimeValidation='UNTESTED'
+            DefaultProfile='CORRECTNESS'
+            Backends=[ordered]@{
+              DX9Ex=[ordered]@{ Branch='vr-d3d9ex-focus'; SourceSha=$dx9Sha; Payload='backends/d3d9'; Status='reference/fallback' }
+              DX11=[ordered]@{ Branch='vr-dx11-native-r71'; SourceSha=$dx11Sha; Payload='backends/dx11'; Status='R97 native draw dormant; runtime evidence collection' }
+              DXVK=[ordered]@{ Branch='vr-dxvk-r71-disasm'; SourceSha=$dxvkSha; Payload='backends/dxvk'; Status='DXVK SAFE 3.1.1 two-pass; multiview disabled' }
+            }
+          }|ConvertTo-Json -Depth 8|Set-Content (Join-Path $out 'BUILD_INPUTS.json') -Encoding UTF8
+
+          @(
+            'OUTRUN 2006 VR - TONIGHT TEST'
+            ''
+            '1. Extract the contents of this ZIP directly into the OutRun 2006 game folder.'
+            '2. Confirm OR2006C2C.EXE is in the same folder as START_HERE_TONIGHT.cmd.'
+            '3. Run START_HERE_TONIGHT.cmd and select DX9Ex Reference, DX11 Current, or DXVK SAFE.'
+            '4. CORRECTNESS is the recommended first profile.'
+            '5. Reproduce the issue, then exit the game normally.'
+            '6. The runner closes a leftover VR host if necessary and automatically seals the session logs.'
+            '7. Upload the newest OutRun2_VR_ANALYZE_*.zip to the project chat.'
+            ''
+            'DX11 note: the current R97 branch has dormant native fixed-function pipeline ownership; native draw routing is not active yet.'
+            'DXVK note: SAFE uses pinned DXVK 3.1.1 two-pass; multiview remains disabled.'
+            'RUNTIME_VALIDATION=UNTESTED until Quest3/VDXR testing is performed.'
+          )|Set-Content (Join-Path $out 'README_TONIGHT_TEST.txt') -Encoding UTF8
+
+          # Syntax-check the actual shipped control path.
+          foreach($name in @('Tonight-Unified-Test-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1')){
+            $path=Join-Path $out $name
+            $tokens=$null; $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
+            if($errors -and $errors.Count -gt 0){
+              $detail=($errors|ForEach-Object{"$($_.Extent.StartLineNumber):$($_.Extent.StartColumnNumber) $($_.Message)"}) -join '; '
+              throw "PowerShell syntax error in $name :: $detail"
+            }
+          }
+
+          foreach($pair in @(
+            @('d3d9',$dx9Sha),
+            @('dx11',$dx11Sha),
+            @('dxvk',$dxvkSha)
+          )){
+            $source=(Get-Content (Join-Path $out ("backends/{0}/SOURCE_SHA.txt" -f $pair[0])) -Raw).Trim()
+            if($source -ne $pair[1]){throw "Source identity mismatch for $($pair[0]): $source != $($pair[1])"}
+            foreach($file in @('dinput8.dll','outrun-vr-host.exe')){
+              if(!(Test-Path (Join-Path $out ("backends/{0}/{1}" -f $pair[0],$file)))){throw "Missing $file for $($pair[0])"}
+            }
+          }
+          if(!(Test-Path (Join-Path $out 'backends/dxvk/d3d9.dll'))){throw 'DXVK SAFE provider missing.'}
+          $dxvkVersion=(Get-Content (Join-Path $out 'backends/dxvk/DXVK_VERSION.txt') -Raw).Trim()
+          if($dxvkVersion -ne '3.1.1'){throw "Unexpected DXVK version: $dxvkVersion"}
+
+          Remove-Item (Join-Path $out 'SHA256SUMS.txt') -Force -ErrorAction SilentlyContinue
+          $root=(Resolve-Path $out).Path
+          Get-ChildItem $out -Recurse -File|Get-FileHash -Algorithm SHA256|ForEach-Object{
+            "$($_.Hash)  $($_.Path.Substring($root.Length+1))"
+          }|Set-Content (Join-Path $out 'SHA256SUMS.txt') -Encoding ascii
+
+          $zip=Join-Path $PWD ("OutRun2_VR_TONIGHT_20260929_{0}.zip" -f $stamp)
+          Compress-Archive -Path (Join-Path $out '*') -DestinationPath $zip -Force
+          $zipHash=(Get-FileHash $zip -Algorithm SHA256).Hash
+          "EVENING_ZIP=$zip"|Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "EVENING_ZIP_HASH=$zipHash"|Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+          "### Evening unified VR test build" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- DX9Ex: $dx9Sha" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- DX11: $dx11Sha" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- DXVK: $dxvkSha" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- SHA256: $zipHash" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Runtime validation: UNTESTED" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload evening test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-TONIGHT-20260929
+          path: ${{ env.EVENING_ZIP }}
+          if-no-files-found: error
+          retention-days: 7
