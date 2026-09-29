@@ -827,6 +827,72 @@ NativeManagedTextureRegistry::mirror_readiness(
     return out;
 }
 
+NativeManagedTextureStageReadiness
+NativeManagedTextureRegistry::mirror_readiness_for_stages(
+    const void* const* textureKeys,
+    std::size_t textureCount,
+    std::uint32_t requiredMask,
+    ID3D11Device* expectedDevice) const noexcept {
+    NativeManagedTextureStageReadiness out{};
+    out.requiredMask = requiredMask;
+    out.pendingMask = requiredMask;
+
+    if (textureCount > 32 ||
+        (textureCount != 0 && textureKeys == nullptr))
+        return out;
+
+    const std::uint32_t validMask =
+        textureCount == 32
+        ? 0xffffffffu
+        : (textureCount == 0
+            ? 0u
+            : ((1u << static_cast<std::uint32_t>(textureCount)) - 1u));
+    if ((requiredMask & ~validMask) != 0 ||
+        (requiredMask != 0 && expectedDevice == nullptr))
+        return out;
+
+    out.inputValid = true;
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (std::size_t stage = 0; stage < textureCount; ++stage) {
+        const auto bit = static_cast<std::uint32_t>(1u << stage);
+        if ((requiredMask & bit) == 0)
+            continue;
+
+        const auto* shadow = find_locked(textureKeys[stage]);
+        if (!shadow)
+            continue;
+
+        out.registeredMask |= bit;
+        if (shadow->shadow_valid())
+            out.shadowValidMask |= bit;
+
+        const auto& lifetime = shadow->lifetime_state();
+        const bool resourcesOwned =
+            shadow->mirror_device() != nullptr &&
+            shadow->mirror_texture() != nullptr &&
+            shadow->mirror_srv() != nullptr;
+        const bool lifetimeCurrent = managed_mirror_ready(lifetime);
+        const bool deviceMatches =
+            shadow->mirror_device() == expectedDevice;
+
+        if (resourcesOwned)
+            out.resourcesOwnedMask |= bit;
+        if (lifetimeCurrent)
+            out.lifetimeCurrentMask |= bit;
+        if (deviceMatches)
+            out.deviceMatchesMask |= bit;
+        if (shadow->mirror_ready() &&
+            resourcesOwned &&
+            lifetimeCurrent &&
+            deviceMatches)
+            out.readyMask |= bit;
+    }
+
+    out.pendingMask = out.requiredMask & ~out.readyMask;
+    out.allRequiredReady = out.pendingMask == 0;
+    return out;
+}
+
 void NativeManagedTextureRegistry::observe_device_reset() noexcept {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto& entry : shadows_) {

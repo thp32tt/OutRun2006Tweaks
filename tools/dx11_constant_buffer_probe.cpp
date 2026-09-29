@@ -966,6 +966,77 @@ int main()
         !registryMirrorForeignDevice.ready,
         "R108 foreign D3D11 device cannot claim registered mirror readiness");
 
+    const std::array<const void*, 2> registryStageKeys{
+        &registryTextureA, &registryTextureB};
+    const auto registryStageNullKeys =
+        managedRegistry.mirror_readiness_for_stages(
+            nullptr, 1, 0x1u, d3d.device);
+    require(
+        !registryStageNullKeys.inputValid &&
+        registryStageNullKeys.requiredMask == 0x1u &&
+        registryStageNullKeys.pendingMask == 0x1u &&
+        !registryStageNullKeys.allRequiredReady,
+        "R109 stage aggregate rejects null key array fail-closed");
+    const auto registryStageOutOfRange =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), 1, 0x2u, d3d.device);
+    require(
+        !registryStageOutOfRange.inputValid &&
+        registryStageOutOfRange.pendingMask == 0x2u &&
+        !registryStageOutOfRange.allRequiredReady,
+        "R109 stage aggregate rejects required bits beyond observed stages");
+    const auto registryStageNullDevice =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, nullptr);
+    require(
+        !registryStageNullDevice.inputValid &&
+        registryStageNullDevice.pendingMask == 0x1u &&
+        !registryStageNullDevice.allRequiredReady,
+        "R109 stage aggregate rejects missing expected D3D11 device");
+    const auto registryStageReady =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageReady.inputValid &&
+        registryStageReady.requiredMask == 0x1u &&
+        registryStageReady.registeredMask == 0x1u &&
+        registryStageReady.shadowValidMask == 0x1u &&
+        registryStageReady.resourcesOwnedMask == 0x1u &&
+        registryStageReady.lifetimeCurrentMask == 0x1u &&
+        registryStageReady.deviceMatchesMask == 0x1u &&
+        registryStageReady.readyMask == 0x1u &&
+        registryStageReady.pendingMask == 0 &&
+        registryStageReady.allRequiredReady,
+        "R109 exact required stage aggregates all R108 readiness evidence");
+    const auto registryStageMissingRequired =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x3u, d3d.device);
+    require(
+        registryStageMissingRequired.inputValid &&
+        registryStageMissingRequired.registeredMask == 0x1u &&
+        registryStageMissingRequired.readyMask == 0x1u &&
+        registryStageMissingRequired.pendingMask == 0x2u &&
+        !registryStageMissingRequired.allRequiredReady,
+        "R109 unregistered required stage remains activation-pending");
+    const auto registryStageForeignDevice =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, textureOtherDevice.device);
+    require(
+        registryStageForeignDevice.inputValid &&
+        registryStageForeignDevice.registeredMask == 0x1u &&
+        registryStageForeignDevice.shadowValidMask == 0x1u &&
+        registryStageForeignDevice.resourcesOwnedMask == 0x1u &&
+        registryStageForeignDevice.lifetimeCurrentMask == 0x1u &&
+        registryStageForeignDevice.deviceMatchesMask == 0 &&
+        registryStageForeignDevice.readyMask == 0 &&
+        registryStageForeignDevice.pendingMask == 0x1u &&
+        !registryStageForeignDevice.allRequiredReady,
+        "R109 foreign device keeps required stage activation-pending");
+
     require(
         managedRegistry.invalidate_external_mutation(&registryTextureA) &&
         !managedRegistry.shadow_valid(&registryTextureA) &&
@@ -981,6 +1052,21 @@ int main()
         !registryMirrorAfterExternalMutation.lifetimeCurrent &&
         !registryMirrorAfterExternalMutation.ready,
         "R108 external mutation clears registry mirror ownership readiness");
+    const auto registryStageAfterExternalMutation =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageAfterExternalMutation.inputValid &&
+        registryStageAfterExternalMutation.registeredMask == 0x1u &&
+        registryStageAfterExternalMutation.shadowValidMask == 0 &&
+        registryStageAfterExternalMutation.resourcesOwnedMask == 0 &&
+        registryStageAfterExternalMutation.lifetimeCurrentMask == 0 &&
+        registryStageAfterExternalMutation.deviceMatchesMask == 0 &&
+        registryStageAfterExternalMutation.readyMask == 0 &&
+        registryStageAfterExternalMutation.pendingMask == 0x1u &&
+        !registryStageAfterExternalMutation.allRequiredReady,
+        "R109 external mutation makes required stage activation-pending");
     require(
         !managedRegistry.invalidate_external_mutation(&registryTextureA) &&
         !managedRegistry.shadow_valid(&registryTextureA),
@@ -1011,6 +1097,16 @@ int main()
         registryMirrorBeforeReset.mirrorShadowVersion ==
             registryMirrorBeforeReset.shadowVersion,
         "R108 recaptured mirror is generation-current before Reset");
+    const auto registryStageAfterRecapture =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageAfterRecapture.inputValid &&
+        registryStageAfterRecapture.readyMask == 0x1u &&
+        registryStageAfterRecapture.pendingMask == 0 &&
+        registryStageAfterRecapture.allRequiredReady,
+        "R109 recaptured mirror restores required stage readiness");
 
     const auto registryVersionBeforeReset =
         managedRegistry.shadow_version(&registryTextureA);
@@ -1036,6 +1132,21 @@ int main()
             registryGenerationBeforeReset + 1 &&
         registryMirrorAfterReset.shadowVersion == registryVersionBeforeReset,
         "R108 Reset invalidates generation-bound registry mirror readiness");
+    const auto registryStageAfterReset =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageAfterReset.inputValid &&
+        registryStageAfterReset.registeredMask == 0x1u &&
+        registryStageAfterReset.shadowValidMask == 0x1u &&
+        registryStageAfterReset.resourcesOwnedMask == 0 &&
+        registryStageAfterReset.lifetimeCurrentMask == 0 &&
+        registryStageAfterReset.deviceMatchesMask == 0 &&
+        registryStageAfterReset.readyMask == 0 &&
+        registryStageAfterReset.pendingMask == 0x1u &&
+        !registryStageAfterReset.allRequiredReady,
+        "R109 Reset keeps required stage activation-pending");
     require(
         managedRegistry.recreate_and_upload_mirror_for_observation(
             &registryTextureA, d3d.device),
@@ -1051,6 +1162,16 @@ int main()
         registryMirrorAfterResetRecreate.mirrorShadowVersion ==
             registryVersionBeforeReset,
         "R108 post-Reset mirror readiness uses current device generation");
+    const auto registryStageAfterResetRecreate =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageAfterResetRecreate.inputValid &&
+        registryStageAfterResetRecreate.readyMask == 0x1u &&
+        registryStageAfterResetRecreate.pendingMask == 0 &&
+        registryStageAfterResetRecreate.allRequiredReady,
+        "R109 post-Reset recreation restores required stage readiness");
 
     managedRegistry.forget_texture(&registryTextureA);
     require(
@@ -1274,5 +1395,6 @@ int main()
     std::cout << "DX11 managed Texture2D lifetime registry R105: PASS\n";
     std::cout << "DX11 managed Texture2D mutation-source completeness R107: PASS\n";
     std::cout << "DX11 managed Texture2D registry mirror readiness R108: PASS\n";
+    std::cout << "DX11 managed Texture2D stage mirror readiness R109: PASS\n";
     return 0;
 }

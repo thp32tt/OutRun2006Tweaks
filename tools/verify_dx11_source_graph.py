@@ -1993,12 +1993,90 @@ def main() -> None:
                 "DX11 R108 managed-mirror probe drift: " + meaning
             )
 
+    r109_stage_readiness_header = {
+        "struct NativeManagedTextureStageReadiness":
+            "R109 per-stage readiness aggregate",
+        "bool inputValid{}": "R109 fail-closed input evidence",
+        "std::uint32_t requiredMask{}": "R109 required-stage mask",
+        "std::uint32_t readyMask{}": "R109 ready-stage mask",
+        "std::uint32_t pendingMask{}": "R109 pending-stage mask",
+        "mirror_readiness_for_stages(":
+            "R109 stage aggregation API",
+    }
+    missing_r109_header = [
+        meaning
+        for token, meaning in r109_stage_readiness_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r109_header:
+        raise SystemExit(
+            "DX11 R109 stage-readiness header drift: "
+            + ", ".join(missing_r109_header)
+        )
+
+    for token, meaning in {
+        "textureCount > 32":
+            "R109 bounded stage count",
+        "requiredMask & ~validMask":
+            "R109 out-of-range required-bit rejection",
+        "requiredMask != 0 && expectedDevice == nullptr":
+            "R109 expected-device fail-closed gate",
+        "out.registeredMask |= bit":
+            "R109 registered-stage evidence",
+        "out.shadowValidMask |= bit":
+            "R109 shadow-valid evidence",
+        "out.resourcesOwnedMask |= bit":
+            "R109 concrete mirror resource evidence",
+        "out.lifetimeCurrentMask |= bit":
+            "R109 generation/version evidence",
+        "out.deviceMatchesMask |= bit":
+            "R109 exact-device evidence",
+        "out.pendingMask = out.requiredMask & ~out.readyMask":
+            "R109 activation-pending derivation",
+        "out.allRequiredReady = out.pendingMask == 0":
+            "R109 aggregate readiness gate",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R109 stage-readiness source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R109 stage aggregate rejects null key array fail-closed":
+            "R109 null-array rejection",
+        "R109 stage aggregate rejects required bits beyond observed stages":
+            "R109 stage-mask bounds rejection",
+        "R109 stage aggregate rejects missing expected D3D11 device":
+            "R109 null-device rejection",
+        "R109 exact required stage aggregates all R108 readiness evidence":
+            "R109 positive stage evidence aggregation",
+        "R109 unregistered required stage remains activation-pending":
+            "R109 missing-stage fail-closed proof",
+        "R109 foreign device keeps required stage activation-pending":
+            "R109 foreign-device fail-closed proof",
+        "R109 external mutation makes required stage activation-pending":
+            "R109 mutation invalidation proof",
+        "R109 recaptured mirror restores required stage readiness":
+            "R109 recapture recovery proof",
+        "R109 Reset keeps required stage activation-pending":
+            "R109 Reset invalidation proof",
+        "R109 post-Reset recreation restores required stage readiness":
+            "R109 post-Reset recovery proof",
+        "DX11 managed Texture2D stage mirror readiness R109: PASS":
+            "R109 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R109 stage-readiness probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census
+        or "mirror_readiness_for_stages(" in census
     ):
         raise SystemExit(
-            "DX11 R108 observation-only registry mirror API gained a runtime census caller"
+            "DX11 R108/R109 observation-only registry mirror API gained a runtime census caller"
         )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

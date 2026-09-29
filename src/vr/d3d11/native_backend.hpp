@@ -157,6 +157,7 @@ private:
 // R105 stages bytes before the real D3D9 UnlockRect and commits them only after
 // that UnlockRect succeeds, so no source pointer survives across the COM call.
 // R108 adds registry-level, non-routing mirror ownership/readiness observation.
+// R109 adds fail-closed per-stage aggregation over those readiness snapshots.
 // Native draw/SRV binding remains disabled.
 struct NativeManagedTextureMirrorReadiness {
     bool registered{};
@@ -169,6 +170,19 @@ struct NativeManagedTextureMirrorReadiness {
     std::uint64_t shadowVersion{};
     std::uint64_t mirrorGeneration{};
     std::uint64_t mirrorShadowVersion{};
+};
+
+struct NativeManagedTextureStageReadiness {
+    bool inputValid{};
+    bool allRequiredReady{};
+    std::uint32_t requiredMask{};
+    std::uint32_t registeredMask{};
+    std::uint32_t shadowValidMask{};
+    std::uint32_t resourcesOwnedMask{};
+    std::uint32_t lifetimeCurrentMask{};
+    std::uint32_t deviceMatchesMask{};
+    std::uint32_t readyMask{};
+    std::uint32_t pendingMask{};
 };
 
 class NativeManagedTextureShadow final {
@@ -303,6 +317,12 @@ public:
         ID3D11Device* device) noexcept;
     [[nodiscard]] NativeManagedTextureMirrorReadiness mirror_readiness(
         const void* textureKey,
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] NativeManagedTextureStageReadiness
+    mirror_readiness_for_stages(
+        const void* const* textureKeys,
+        std::size_t textureCount,
+        std::uint32_t requiredMask,
         ID3D11Device* expectedDevice) const noexcept;
     void observe_device_reset() noexcept;
     void forget_texture(const void* textureKey) noexcept;
