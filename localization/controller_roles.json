@@ -1,18 +1,20 @@
 {
-  "schema_version": 12,
+  "schema_version": 13,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
     "A": "OutRun 한글화 A 실행",
     "B": "OutRun 한글화 B 실행",
-    "C": "OutRun 한글화 C 실행"
+    "C": "OutRun 한글화 C 실행",
+    "E": "OutRun 한글화 E 실행"
   },
   "execution": {
-    "mode": "continuous_production_with_c_batch_gate",
-    "max_parallel_production": 2,
+    "mode": "continuous_three_producers_with_c_batch_gate",
+    "max_parallel_production": 3,
     "concurrent_group": [
       "A",
-      "B"
+      "B",
+      "E"
     ],
     "qa_consumer": "C",
     "qa_queue": "qa_pending",
@@ -23,22 +25,27 @@
     "compatibility_fallback": "sequential_producers_with_independent_qa",
     "producer_individual_actions_gate": false,
     "batch_gate_role": "C",
-    "batch_gate_is_only_runner_validation": true
+    "batch_gate_is_only_runner_validation": true,
+    "extra_producer_backlog_throttle": {
+      "lane": "E",
+      "pause_when_qa_pending_at_least": 8,
+      "resume_when_qa_pending_below": 6
+    }
   },
   "lanes": {
     "A": {
       "mode": "continuous_production+self_qa",
-      "primary_index_parity": "odd",
       "parallel_group": "production",
       "next_task_after": "OWN_DURABLE_COMMIT",
-      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE"
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+      "primary_index_modulo_3": 0
     },
     "B": {
       "mode": "continuous_production+self_qa",
-      "primary_index_parity": "even",
       "parallel_group": "production",
       "next_task_after": "OWN_DURABLE_COMMIT",
-      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE"
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+      "primary_index_modulo_3": 1
     },
     "C": {
       "mode": "independent_batched_cross_lane_qa+shared_state_reconcile",
@@ -50,6 +57,14 @@
       "candidate_write_policy": "RETURN_REWORK_TO_A_OR_B",
       "blocks_producers": false,
       "automation_validation": "C_BATCH_GATE"
+    },
+    "E": {
+      "mode": "continuous_production+self_qa",
+      "primary_index_modulo_3": 2,
+      "parallel_group": "production",
+      "next_task_after": "OWN_DURABLE_COMMIT",
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+      "backlog_throttle": true
     }
   },
   "queue_source": "localization/graphics/asset_queue.csv",
@@ -74,7 +89,13 @@
     "c_reads_only_durable_ab_results": true,
     "c_uses_exact_result_sha": true,
     "c_must_not_overwrite_newer_candidate": true,
-    "producers_skip_qa_pending_assets": true
+    "producers_skip_qa_pending_assets": true,
+    "producers": [
+      "A",
+      "B",
+      "E"
+    ],
+    "stable_shard_rule": "asset_queue.index % 3: A=0, B=1, E=2"
   },
   "work_steal": {
     "enabled": true,
@@ -173,7 +194,9 @@
     "localization_qa_batch_size": 4,
     "localization_qa_coalesce_seconds": 30,
     "localization_same_slot_send_gap_seconds": 15,
-    "localization_slot_dedup_seconds": 30
+    "localization_slot_dedup_seconds": 30,
+    "localization_extra_producer_qa_pause_threshold": 8,
+    "localization_extra_producer_qa_resume_threshold": 6
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -326,6 +349,10 @@
       "priority_over_runtime_isolation_fallback": true,
       "qa_pending_does_not_block_same_asset_render_when_latest_evidence_is_producer_self_verified_and_no_c_rejection_exists": false,
       "c_accepted_render_next_must_be_selected_before_unrelated_fallback": true
+    },
+    "source_exhaustion_reselection": {
+      "skip_unchanged_source_acquisition_exhausted": true,
+      "retry_only_on_dependency_fingerprint_change": true
     }
   },
   "source_transport": {
@@ -346,6 +373,6 @@
     ],
     "missing_object_behavior": "FALL_THROUGH_NEXT_TIER",
     "identity_gate": "CANONICAL_INVENTORY_SHA_DIMENSIONS_FORMAT",
-    "producer_requirement": "A/B MUST attempt approved Drive exact-relative-path source acquisition before declaring canonical source unavailable or selecting source-reacquisition-only preflight."
+    "producer_requirement": "A/B/E MUST attempt approved Drive exact-relative-path source acquisition before declaring canonical source unavailable or selecting source-reacquisition-only preflight."
   }
 }
