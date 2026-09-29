@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00080",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T03:50:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "5212fdcc474bdc4900fb6aa7b8f89204c9c01f40",
+  "result_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1",
+  "validation_bearing_result_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F19_F21 R112 fixed-function pipeline translation identity.",
+  "summary": "R112 adds a dormant non-routing translation-identity readiness seal for the R97 native DX11 fixed-function pipeline bundle. Readiness proves the live vertex shader, pixel shader, input layout and transform buffer belong to the expected D3D11 device and still match the exact translated input-layout identity plus R93/R84 shader source identities used at bundle creation. Successful recreation advances a bundle generation and invalidates stale snapshot tokens.",
+  "source_commits": [
+    "37f47cc8827aa870d2582d81ad369dcde71f7bf1"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "production_ia_set_input_layout_added": false,
+    "production_vs_set_shader_added": false,
+    "production_ps_set_shader_added": false,
+    "production_ps_set_shader_resources_added": false,
+    "production_ps_set_samplers_added": false,
+    "native_game_draw_routing": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "Protected D3D9 runtime paths were not modified. R112 is isolated to dormant DX11 ownership/probe/verifier code and does not alter D3D9 CreateDevice/Reset/Present, DirectGPU transport, HUD ownership, selector flow or native game draw routing. Hosted CI does not establish Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36613977813,
+      "conclusion": "success",
+      "validated_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1",
+      "artifact_id": 11054563365,
+      "artifact_digest": "sha256:648b576b0900c99f95963af22f6c6853872115afbd11987674d8b8888baccba8",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; fixed-function shader/input-layout/input-signature smokes PASS; input-layout/shader/linkage probes PASS; constant-buffer probe PASS with hosted marker DX11 fixed-function pipeline translation identity R112: PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36613983597,
+      "conclusion": "success",
+      "validated_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36613983674,
+      "conclusion": "success",
+      "validated_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36613983599,
+      "conclusion": "success",
+      "validated_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1"
+    },
+    "pc_fast": {
+      "run_id": 36613977845,
+      "conclusion": "skipped",
+      "validated_sha": "37f47cc8827aa870d2582d81ad369dcde71f7bf1"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5896431488,
+    "validation_comment_id": 5896548467,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact controller marker [AUTO:CONVERSION-DX11-00080] and no CI-skip directive.",
+    "R112 hashes the exact translated input-layout descriptor set, persists nonzero R93/R84 shader source hashes, verifies all live pipeline child objects against the expected D3D11 device and binds readiness to a monotonically advancing bundle generation.",
+    "Hosted proof verifies positive exact identity, foreign-device rejection, changed-layout rejection, changed-vertex-shader rejection, changed-pixel-shader rejection and stale-token rejection after bundle recreation.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R112 is automation-validated but runtime-untested. The dormant fixed-function pipeline bundle now has stale-safe device/layout/shader provenance evidence without enabling native draw routing.",
+  "next_action": "Continue with the next separate bounded DX11 activation prerequisite or exactness gate. Keep NativeDrawPathActivationAllowed=false and require exact-build Quest3/VDXR runtime evidence before any native draw promotion."
+}
