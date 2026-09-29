@@ -2619,3 +2619,36 @@ Commits:
 
 AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
 RUNTIME_VALIDATION: `UNTESTED / NEED_HMD_LOG`
+
+
+## Cycle 0147 — exact HUD/menu alpha-state diagnostic
+
+Finding: `DX9EX-HUD-TRANSLUCENCY-BLEND-DIAG-001`
+
+Hosted gate:
+- `637ef8431ab66431d2bb57c7b92e41b627151395` Build `36533588856/36533586792`: SUCCESS.
+- OpenXR architecture `36533588703/36533586840`: SUCCESS.
+- HUD Inspector `36533588764/36533586808`: SUCCESS.
+
+Review:
+- Current exact ScreenHud stereo duplication does not explicitly lower alpha.
+- SkyGlow restores the blend state it changes; its prior post-HUD composite bug was already fixed separately.
+- Forcing alpha=1 or disabling blending globally would damage legitimate translucent UI and is not supported by current evidence.
+
+Change:
+- Extend `R63TraceExactScreenHudDraw` only for exact `SCREEN_HUD` queue draws.
+- Log ALPHABLENDENABLE, SRCBLEND, DESTBLEND, BLENDOP, SEPARATEALPHABLENDENABLE, SRCBLENDALPHA, DESTBLENDALPHA, BLENDOPALPHA, ALPHATESTENABLE, ALPHAREF, ALPHAFUNC and COLORWRITEENABLE.
+- Preserve bounded logging: first 128 exact HUD draws, then powers of two.
+- No render state is modified.
+
+Commits:
+- `9723a30d246a323af7d11468f5f3afaec72d6242` — exact HUD blend-state diagnostic.
+- `35753ace42a9113e606c6418968bade01f5ef2a3` — structural regression guard.
+
+AUTOMATION_VALIDATION: `HUD_ALPHA_DIAGNOSTIC_CONTRACT_COMMITTED / EXACT_HEAD_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED / NEED_HMD_LOG`
+
+Next:
+- Consume exact-head `35753ace` CI.
+- In the next Quest3/VDXR log, correlate `VR R71 HUD ALPHA DIAG` with the translucent menu/HUD frame.
+- Use the already-added `VR R71 START SHADOW DIAG` for the start-grid shadow split.
