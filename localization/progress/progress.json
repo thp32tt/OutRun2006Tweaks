@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T08:21:34+09:00",
+  "updated_at_kst": "2026-09-30T08:31:43+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C156/Q00054 result pending Gate: A00235@index231 PASS STATIC_QA on exact Drive candidate ba9e0c73...; canonical source 29b87a5c..., 2048x1024 RGBA32/mip1 exact header, 4/4 canonical semantics, six accepted source masks/CLEAN_PLATE, 4/4 localized 2px safe fit, LAN 2/2 pixel-exact, zero outside-localizable-region RGBA/alpha changes, and independent full-atlas/element visual review PASS. Index231 is no longer candidate-QA pending. Out-of-batch B00237@index163 candidate, A00239@index102 isolation input, and A00241@index111 rework-preflight evidence remain QA_PENDING and are not implicitly approved. Order RENDER_READY none -> ONE_STAGE none -> candidate QA 159/198/201/163 -> PREFLIGHT_ONLY 133/232; unrelated index111 preflight stays behind candidate completion; runtime-isolation 99/237 accepted, 102 pending C. Pending production 67; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C156/Q00054 AUTHORITATIVE GATE PASS: validation-bearing result 43d6c872a66de63d65a70c18dc2c55b91b1ed16c passed Localization Automation Gate 36645535305. A00235@index231 remains PASS / STATIC_QA_PASS_RUNTIME_UNTESTED on candidate ba9e0c73...; no runtime approval. Out-of-batch B00237@index163 candidate, A00239@index102 isolation input, and A00241@index111 rework-preflight evidence remain QA_PENDING and are not implicitly approved. Order RENDER_READY none -> ONE_STAGE none -> candidate QA 159/198/201/163 -> PREFLIGHT_ONLY 133/232; unrelated index111 preflight stays behind candidate completion; runtime-isolation 99/237 accepted, 102 pending C. Pending production 67; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1100,14 +1100,24 @@
       "heavy_qa_repeated": false,
       "heavy_qa_note": "C150 source/mask/CLEAN_PLATE geometry and C153 semantic binding have unchanged fingerprints and are reused as accepted prerequisites. Q00054 cross-checks those exact hashes once and performs the new candidate-bound header/decoded-final/containment/alpha/preserve-source/visual gates once; no duplicate heavy pass.",
       "vr_ffb_dx_changes": false,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "validation_mode": "C_BATCH_GATE",
       "runtime_validation": "UNTESTED",
-      "result_sha": null,
-      "authoritative_result_sha": null,
-      "validation_bearing_result_sha": null,
-      "automation_gate": null,
-      "bookkeeping_note": "This C result commit is the sole Q00054 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+      "result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+      "authoritative_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+      "validation_bearing_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+      "automation_gate": {
+        "workflow": "Localization Automation Gate",
+        "run_id": 36645535305,
+        "run_attempt": 1,
+        "head_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+        "status": "completed",
+        "conclusion": "success",
+        "validated_at_kst": "2026-09-30T08:30:27+09:00"
+      },
+      "bookkeeping_note": "Q00054 authoritative Gate PASS is owned by validation-bearing result 43d6c872a66de63d65a70c18dc2c55b91b1ed16c. This bookkeeping commit is separate and does not replace validation ownership. Out-of-batch B00237@index163, A00239@index102, and A00241@index111 remain QA_PENDING and are not dispositioned by Q00054. Runtime remains UNTESTED.",
+      "bookkeeping_recorded_at_kst": "2026-09-30T08:31:43+09:00",
+      "bookkeeping_base_head_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c"
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -1708,13 +1718,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "C150 source/mask/CLEAN_PLATE geometry and C153 semantic binding have unchanged fingerprints and are reused as accepted prerequisites. Q00054 cross-checks those exact hashes once and performs the new candidate-bound header/decoded-final/containment/alpha/preserve-source/visual gates once; no duplicate heavy pass.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null,
-    "bookkeeping_note": "This C result commit is the sole Q00054 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+    "result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+    "authoritative_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+    "validation_bearing_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36645535305,
+      "run_attempt": 1,
+      "head_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T08:30:27+09:00"
+    },
+    "bookkeeping_note": "Q00054 authoritative Gate PASS is owned by validation-bearing result 43d6c872a66de63d65a70c18dc2c55b91b1ed16c. This bookkeeping commit is separate and does not replace validation ownership. Out-of-batch B00237@index163, A00239@index102, and A00241@index111 remain QA_PENDING and are not dispositioned by Q00054. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-09-30T08:31:43+09:00",
+    "bookkeeping_base_head_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c"
   }
 }
