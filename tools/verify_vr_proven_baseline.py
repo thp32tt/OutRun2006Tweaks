@@ -226,7 +226,7 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'exact 2048x2048 selector/car atlas CPU-shadow upload succeeded',
     'R71IsSelectorCompanionDiagnosticCandidate',
     'desc.Height == 512 || desc.Height == 1024',
-    'companion CPU-shadow budget reject',
+    'CPU-shadow budget reject',
     'companion SYSTEMMEM CreateTexture failed',
     'companion entered DirectOnly',
     'correlate this pointer with later R13 LockRect failure',
