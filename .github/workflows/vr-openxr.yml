@@ -119,7 +119,7 @@ jobs:
               'R14CopyWholeLevelByLock',
               'exact mip CPU-shadow upload failed'
             )
-            'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(
+            'src/vr/d3d9/ex_device_upgrade_r15_overlay.inc' = @(
               'D3DSBT_ALL',
               'Ex promotion rolled back transactionally'
             )
