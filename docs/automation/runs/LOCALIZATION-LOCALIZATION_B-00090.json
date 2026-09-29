@@ -1,0 +1,85 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00090",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00025",
+  "recorded_at_kst": "2026-09-29T16:25:50+09:00",
+  "base_sha": "bff919c4e81af712c8425819205c8b8b474f8e5b",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_EXACT_RELEASE_RGBA32_PAYLOAD_EXTRACTION_SCOPES",
+  "summary": "Advanced C-consumed even indices 130/140/154/164 from immutable HD reconstruction + direct semantic-cell mappings to deterministic exact Release RGBA32 payload extraction scopes for all 24 atlas regions. 18 regions are exact localizable mappings, 5 are preserve-original, and the 31C58963 PRESS START/PRESS ENTER prompt remains one fail-closed source-variant HOLD. Reused unchanged B00054/B00069 heavy source/mapping evidence; all byte ranges are in-canvas/in-file with zero overlap. No Korean DDS or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1625-B125-P00025/B125_P00025_EVEN_RELEASE_RGBA32_PAYLOAD_EXTRACTION_SCOPE.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_EVEN_EXACT_RELEASE_RGBA32_PAYLOAD_EXTRACTION_SCOPES",
+    "indices": [
+      130,
+      140,
+      154,
+      164
+    ],
+    "assets": [
+      "1762489B",
+      "31C58963",
+      "4D38BBB0",
+      "5B65E08C"
+    ],
+    "unique_extraction_regions": 24,
+    "localizable_exact_regions": 18,
+    "source_variant_hold_regions": 1,
+    "preserve_original_regions": 5,
+    "rgba32_regions": 24,
+    "out_of_bounds_ranges": 0,
+    "region_overlap_pairs": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "reconstruction_task": "LOCALIZATION-LOCALIZATION_B-00054",
+    "reconstruction_report_blob_sha": "b748cfbdd3515ae906e5668955d3a7ff709a9152",
+    "semantic_mapping_task": "LOCALIZATION-LOCALIZATION_B-00069",
+    "semantic_mapping_report_blob_sha": "c7cc577fc5f7f238d85a1ce4a7dd123a253f6a40",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "502d879acf3a3a61c49bfad2cd79a1d504f8bf2c",
+    "reason": "Unchanged source/translation/mapping fingerprint; duplicate heavy QA intentionally reused. New work is exact Release RGBA32 payload extraction geometry."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00085": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00087": [
+      86,
+      100,
+      106
+    ]
+  },
+  "strict_hold": {
+    "index_140_prompt_variant": "HOLD_SOURCE_VARIANT_PRESS_START_VS_PRESS_ENTER_UNTIL_EXACT_RELEASE_DECODE",
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_full_effect_bboxes": "HOLD_EXACT_DECODE_REQUIRED",
+    "glyph_effect_masks": "HOLD_EXACT_DECODE_REQUIRED",
+    "clean_plates": "HOLD_EXACT_DECODE_REQUIRED",
+    "generation_v2_safe_bboxes": "HOLD_UNTIL_FULL_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE"
+  },
+  "self_qa": "PASS_EVEN_ONLY_130_140_154_164__4_OF_4_RGBA32_SIZE_EQUATIONS__24_OF_24_RANGES_IN_BOUNDS__0_OVERLAPS__5_PROTECTED_REGIONS_PRESERVED__1_SOURCE_VARIANT_HOLD__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Payload extraction scopes identify exact cell bytes only, not glyph masks. Exact decoded raw/readable orientation, effect-inclusive glyph masks/bboxes, validated clean plates, generation-v2 safe-fit geometry and final English-source-vs-Korean-candidate comparison remain required before any DDS candidate promotion.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
