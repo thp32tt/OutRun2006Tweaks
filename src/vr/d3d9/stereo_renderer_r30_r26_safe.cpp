@@ -210,7 +210,7 @@ namespace OutRunVRStereo
             peak = 0;
             if (!Game::nl_part_src)
                 return;
-            for (int i = 0; i < Game::NLPartSourceCount; ++i)
+            for (int i = 0; i < NLPartSourceCount; ++i)
             {
                 const int live = Game::nl_part_src[i].liveCount;
                 if (live <= 0)
