@@ -20,7 +20,9 @@
 
 #include "../runtime_eligibility.hpp"
 #include "../ipc/recenter_request.hpp"
-#include "outrun_renderer_r13.cpp"
+#include "vr/d3d9/r13_bridge.hpp"
+#include "outrun_renderer.cpp"
+#include "outrun_renderer_r13_overlay.inc"
 
 namespace OutRunVRRenderer
 {
