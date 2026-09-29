@@ -104,6 +104,21 @@ namespace OutRunVRD3D9ExUpgradeR13
                  desc.Format == D3DFMT_X8R8G8B8);
         }
 
+        bool R71IsSelectorCompanionDiagnosticCandidate(
+            const D3DSURFACE_DESC& desc, UINT levels,
+            std::uint64_t estimate) noexcept
+        {
+            // R69/R70 HMD evidence observed 2048x1024 and 2048x512,
+            // single-level A8R8G8B8 translated MANAGED resources immediately
+            // after the exact selector atlas. This is diagnostic-only until
+            // exact pointer/LockRect correlation proves ownership.
+            return levels == 1 && desc.Width == 2048 &&
+                (desc.Height == 512 || desc.Height == 1024) &&
+                estimate > 0 && estimate <= 8ull * 1024ull * 1024ull &&
+                (desc.Format == D3DFMT_A8R8G8B8 ||
+                 desc.Format == D3DFMT_X8R8G8B8);
+        }
+
         // R70: track the 368 MiB general class separately from the exact
         // 2048x2048 selector reserve while retaining the absolute 384 MiB cap.
         std::atomic<std::uint64_t> R14ShadowBytes{0};
@@ -175,6 +190,9 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<bool> R14FirstConcurrentWriteLogged{false};
         std::atomic<bool> R14FirstEmergencyReserveLogged{false};
         std::atomic<bool> R14FirstSelectorUploadLogged{false};
+        std::atomic<bool> R14FirstSelectorCompanionBudgetRejectLogged{false};
+        std::atomic<bool> R14FirstSelectorCompanionSystemMemFailLogged{false};
+        std::atomic<bool> R14FirstSelectorCompanionDirectOnlyLogged{false};
 
         struct R14InternalUploadScope
         {
@@ -601,19 +619,43 @@ namespace OutRunVRD3D9ExUpgradeR13
             const bool emergencyAtlasEligible =
                 R69IsSelectorAtlasReserveCandidate(
                     desc, levels, estimate);
+            const bool selectorCompanion =
+                R71IsSelectorCompanionDiagnosticCandidate(
+                    desc, levels, estimate);
 
-            if (!estimate || estimate > R14ShadowBudgetBytes ||
-                currentTotal > R14ShadowBudgetBytes - estimate ||
-                (emergencyAtlasEligible &&
-                 (estimate > R14EmergencyShadowBudgetBytes ||
-                  currentEmergency >
-                    R14EmergencyShadowBudgetBytes - estimate)) ||
-                (!emergencyAtlasEligible &&
-                 (estimate > R14GeneralShadowBudgetBytes ||
-                  currentGeneral >
-                    R14GeneralShadowBudgetBytes - estimate)))
+            const bool totalBudgetReject =
+                !estimate || estimate > R14ShadowBudgetBytes ||
+                currentTotal > R14ShadowBudgetBytes - estimate;
+            const bool emergencyBudgetReject =
+                emergencyAtlasEligible &&
+                (estimate > R14EmergencyShadowBudgetBytes ||
+                 currentEmergency >
+                    R14EmergencyShadowBudgetBytes - estimate);
+            const bool generalBudgetReject =
+                !emergencyAtlasEligible &&
+                (estimate > R14GeneralShadowBudgetBytes ||
+                 currentGeneral >
+                    R14GeneralShadowBudgetBytes - estimate);
+
+            if (totalBudgetReject || emergencyBudgetReject ||
+                generalBudgetReject)
             {
                 ++R14ShadowBudgetRejects;
+                if (selectorCompanion &&
+                    !R14FirstSelectorCompanionBudgetRejectLogged.exchange(true))
+                {
+                    spdlog::warn(
+                        "VR R71 SELECTOR DIAG: companion CPU-shadow budget reject ptr=0x{:08x} size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f} reject[total={},general={},emergency={}]",
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(gpu)),
+                        desc.Width, desc.Height,
+                        static_cast<unsigned>(desc.Format), estimate,
+                        static_cast<double>(currentTotal) / (1024.0 * 1024.0),
+                        static_cast<double>(currentGeneral) / (1024.0 * 1024.0),
+                        static_cast<double>(currentEmergency) / (1024.0 * 1024.0),
+                        totalBudgetReject, generalBudgetReject,
+                        emergencyBudgetReject);
+                }
                 return D3DERR_OUTOFVIDEOMEMORY;
             }
 
@@ -632,6 +674,16 @@ namespace OutRunVRD3D9ExUpgradeR13
             const HRESULT hr = device->CreateTexture(
                 desc.Width, desc.Height, levels, 0, desc.Format,
                 D3DPOOL_SYSTEMMEM, &shadow, nullptr);
+            if (FAILED(hr) && selectorCompanion &&
+                !R14FirstSelectorCompanionSystemMemFailLogged.exchange(true))
+            {
+                spdlog::error(
+                    "VR R71 SELECTOR DIAG: companion SYSTEMMEM CreateTexture failed ptr=0x{:08x} hr=0x{:08x} size={}x{} fmt={} levels={} after budget admission; failure is allocator/device-path, not shadow-budget policy",
+                    static_cast<unsigned>(
+                        reinterpret_cast<std::uintptr_t>(gpu)),
+                    static_cast<unsigned>(hr), desc.Width, desc.Height,
+                    static_cast<unsigned>(desc.Format), levels);
+            }
             return SUCCEEDED(hr) && shadow ? D3D_OK : hr;
         }
 
@@ -989,15 +1041,33 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14TrackDirectOnly(device, *texture))
             {
                 ++R14ShadowCreateFailed;
+                D3DSURFACE_DESC desc{};
+                (*texture)->GetLevelDesc(0, &desc);
+                const UINT fallbackLevels = (*texture)->GetLevelCount();
+                const std::uint64_t fallbackEstimate =
+                    R14EstimateShadowBytes(*texture);
+                const bool selectorCompanion =
+                    R71IsSelectorCompanionDiagnosticCandidate(
+                        desc, fallbackLevels, fallbackEstimate);
                 if (!R14FirstFallbackLogged.exchange(true))
                 {
-                    D3DSURFACE_DESC desc{};
-                    (*texture)->GetLevelDesc(0, &desc);
                     spdlog::warn(
-                        "VR R14 EX: CPU shadow unavailable hr=0x{:08x} size={}x{} fmt={} levels={}; keeping translated MANAGED texture on tracked DirectOnly compatibility path",
+                        "VR R14 EX: CPU shadow unavailable ptr=0x{:08x} hr=0x{:08x} size={}x{} fmt={} levels={}; keeping translated MANAGED texture on tracked DirectOnly compatibility path",
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(*texture)),
                         static_cast<unsigned>(shadowHr), desc.Width, desc.Height,
-                        static_cast<unsigned>(desc.Format),
-                        (*texture)->GetLevelCount());
+                        static_cast<unsigned>(desc.Format), fallbackLevels);
+                }
+                if (selectorCompanion &&
+                    !R14FirstSelectorCompanionDirectOnlyLogged.exchange(true))
+                {
+                    spdlog::warn(
+                        "VR R71 SELECTOR DIAG: companion entered DirectOnly ptr=0x{:08x} size={}x{} fmt={} levels={} bytes={}; correlate this pointer with later R13 LockRect failure before changing resource policy",
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(*texture)),
+                        desc.Width, desc.Height,
+                        static_cast<unsigned>(desc.Format), fallbackLevels,
+                        fallbackEstimate);
                 }
                 return hr;
             }
