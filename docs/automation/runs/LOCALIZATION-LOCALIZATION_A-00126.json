@@ -1,0 +1,96 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00126",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00054",
+  "recorded_at_kst": "2026-09-29T19:29:20.725+09:00",
+  "base_sha": "ddc704f71c0f898c4b8488903df23505812dbb16",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_REWORK_C00124_A00117_THREE_ODD_CANONICAL_HD_SOURCE_REACQUISITION_MANIFESTS",
+  "summary": "Resolved the runnable Q00015/C00124 source-lineage REWORK for odd indices 205/227/231 by retiring A00117's noncanonical Release pixel geometry/identity and pinning the three current canonical user-HD inventory SHA-256/canvas/mode identities plus deterministic reacquisition gates. Index159 accepted submaterial is preserved unchanged. Current Git tree contains no path matching any of the three asset IDs, so header/orientation/mask/CLEAN_PLATE/candidate gates remain fail-closed. Current 36 source/Korean semantic pairs are reused without repeating C00124 heavy QA. No DDS/shared-state/build/runtime changes.",
+  "evidence": [
+    "localization/graphics/role_A/202609291929-A00126-P00054/A00126_P00054_C00124_A00117_CANONICAL_HD_REACQUISITION.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_ODD_CANONICAL_USER_HD_SOURCE_REACQUISITION_AND_REJECTED_RELEASE_GEOMETRY_RETIREMENT_MANIFESTS",
+    "indices": [
+      205,
+      227,
+      231
+    ],
+    "assets": [
+      "ACF61D7C",
+      "E596B7AC",
+      "EBE401C8"
+    ],
+    "canonical_inventory_identities_pinned": 3,
+    "canonical_inventory_canvases_pinned": 3,
+    "canonical_semantic_pairs_reused": 36,
+    "current_git_asset_id_sources_present": 0,
+    "rejected_release_pixel_geometries_retired": 3,
+    "candidate_dds_modified": false
+  },
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00124",
+    "c_result_sha": "ddc704f71c0f898c4b8488903df23505812dbb16",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00117",
+    "prior_result_sha": "de18acae8067fb4fab4c9a008b54b6a0497bf0f0",
+    "prior_evidence_blob_sha": "7ac03c6604dc2e8f95096a01c3508ed5da214fc9",
+    "accepted_submaterial_preserved": {
+      "index": 159,
+      "asset": "4EDA9DE3",
+      "status": "C00124_ACCEPTED_UNCHANGED_STOCK_PRIOR_DURABLE_REEMIT"
+    },
+    "rework_indices": [
+      205,
+      227,
+      231
+    ],
+    "defect": "NEW_RELEASE_BASED_GEOMETRY_OR_IDENTITY_NOT_VALIDLY_TIED_TO_CURRENT_CANONICAL_USER_HD_INVENTORY",
+    "semantic_qa_repeated": false,
+    "old_release_pixel_geometry_reused": false
+  },
+  "reused_immutable_evidence": {
+    "prior_a00117_report_blob_sha": "7ac03c6604dc2e8f95096a01c3508ed5da214fc9",
+    "c00124_task_record_blob_sha": "558fbc42a55e01c01eb75fee4f9ceaaf1099d050",
+    "contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "reason": "Reuse only C00124-accepted semantics and index159 submaterial. Rejected Release pixel geometry/identity for 205/227/231 is explicitly not reused."
+  },
+  "self_qa": "PASS_ODD_ONLY_205_227_231__3_OF_3_CURRENT_CANONICAL_INVENTORY_IDENTITIES_AND_CANVASES__0_OF_3_CURRENT_GIT_ASSET_ID_PATHS_FAIL_CLOSED__36_SEMANTIC_PAIRS_REUSED__ZERO_REJECTED_RELEASE_PIXEL_GEOMETRY_REUSED__INDEX159_PRESERVED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact canonical user-HD bytes for indices 205/227/231 are absent from current Git HEAD. DDS header/alpha/mips, orientation, semantic-to-sprite mapping, source-effect/removal/protected masks, CLEAN_PLATE, candidate_safe_bbox, Korean rendering, zero-pixel containment and English-source comparison cannot be inferred from the rejected Release geometry.",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_ON_CURRENT_GIT_HEAD",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "semantic_to_sprite_binding": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

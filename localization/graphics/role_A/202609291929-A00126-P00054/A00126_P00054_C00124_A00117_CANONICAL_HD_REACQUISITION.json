@@ -1,0 +1,387 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-canonical-user-hd-reacquisition-manifest-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00126",
+  "lane": "LOCALIZATION_A",
+  "wave_id": "P00054",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T19:29:20.725+09:00",
+  "base_head_sha": "ddc704f71c0f898c4b8488903df23505812dbb16",
+  "purpose": "q00015_c00124_rework_a00117_indices_205_227_231_canonical_user_hd_source_reacquisition",
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00124",
+    "c_result_sha": "ddc704f71c0f898c4b8488903df23505812dbb16",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00117",
+    "prior_result_sha": "de18acae8067fb4fab4c9a008b54b6a0497bf0f0",
+    "prior_evidence_blob_sha": "7ac03c6604dc2e8f95096a01c3508ed5da214fc9",
+    "accepted_submaterial_preserved": {
+      "index": 159,
+      "asset": "4EDA9DE3",
+      "status": "C00124_ACCEPTED_UNCHANGED_STOCK_PRIOR_DURABLE_REEMIT"
+    },
+    "rework_indices": [
+      205,
+      227,
+      231
+    ],
+    "defect": "NEW_RELEASE_BASED_GEOMETRY_OR_IDENTITY_NOT_VALIDLY_TIED_TO_CURRENT_CANONICAL_USER_HD_INVENTORY",
+    "semantic_qa_repeated": false,
+    "old_release_pixel_geometry_reused": false
+  },
+  "immutable_current_inputs": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "queue_blob_sha": "89c4fc7f9c03e9609736909c9b40b9a5685460e1",
+    "current_tree_sha": "48e445514709f6432b6af82dc095094594dcc0de",
+    "recursive_tree_truncated": false
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_ODD_CANONICAL_USER_HD_SOURCE_REACQUISITION_AND_REJECTED_RELEASE_GEOMETRY_RETIREMENT_MANIFESTS",
+    "indices": [
+      205,
+      227,
+      231
+    ],
+    "assets": [
+      "ACF61D7C",
+      "E596B7AC",
+      "EBE401C8"
+    ],
+    "canonical_inventory_identities_pinned": 3,
+    "canonical_inventory_canvases_pinned": 3,
+    "canonical_semantic_pairs_reused": 36,
+    "current_git_asset_id_sources_present": 0,
+    "rejected_release_pixel_geometries_retired": 3,
+    "candidate_dds_modified": false
+  },
+  "assets": [
+    {
+      "index": 205,
+      "asset": "ACF61D7C",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+      "canonical_inventory": {
+        "sha256": "34cadbc0b33b6280978c81614a9347ad667cbe8279cf105dc8623ebd13888f07",
+        "width": 1024,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "rejected_prior_release": {
+        "git_blob_sha": "c9417c1b47b1af93d025cdfcdb08bef64de44341",
+        "width": 4096,
+        "height": 2048,
+        "reason": "Q00015/C117 canonical dimension mismatch"
+      },
+      "semantics": [
+        [
+          "LOCAL MIXED",
+          "로컬 혼합"
+        ],
+        [
+          "LOCAL MT",
+          "로컬 MT"
+        ],
+        [
+          "LOCAL AT",
+          "로컬 AT"
+        ],
+        [
+          "FRIENDS",
+          "친구"
+        ],
+        [
+          "CANCEL",
+          "취소"
+        ],
+        [
+          "LICENSE DETAILS",
+          "라이선스 정보"
+        ],
+        [
+          "YES",
+          "예"
+        ],
+        [
+          "NO",
+          "아니오"
+        ],
+        [
+          "YOUR POSITION OK",
+          "현재 순위 확인"
+        ],
+        [
+          "REVERSE",
+          "반전"
+        ],
+        [
+          "Exchange OutRun miles for this item?",
+          "이 아이템을 아웃런 마일로 교환하시겠습니까?"
+        ],
+        [
+          "Adjust your Game settings",
+          "게임 설정 조정"
+        ],
+        [
+          "View single player and multiplayer rankings",
+          "싱글/멀티플레이 랭킹 보기"
+        ],
+        [
+          "Enjoy the original OutRun2SP",
+          "오리지널 아웃런2 SP 즐기기"
+        ],
+        [
+          "OutRun for 1 player!",
+          "1인 아웃런 플레이!"
+        ],
+        [
+          "RANKINGS",
+          "랭킹"
+        ],
+        [
+          "OPTIONS",
+          "옵션"
+        ],
+        [
+          "CONGRATULATIONS!",
+          "축하합니다!"
+        ],
+        [
+          "You got this item",
+          "이 아이템을 획득했습니다"
+        ],
+        [
+          "SORRY! You need more miles!",
+          "죄송합니다! 마일이 더 필요합니다!"
+        ]
+      ],
+      "preserve": [
+        "song titles",
+        "OutRun2SP logo",
+        "all non-text artwork"
+      ],
+      "current_git_asset_id_matches": 0,
+      "semantic_count": 20,
+      "old_pixel_geometry_reuse": false,
+      "reacquisition_gate": {
+        "required_sha256": "34cadbc0b33b6280978c81614a9347ad667cbe8279cf105dc8623ebd13888f07",
+        "required_canvas": [
+          1024,
+          512
+        ],
+        "required_mode": "RGBA",
+        "accepted_source_condition": "Exact acquired source bytes SHA-256 must equal required_sha256. Filename, Release Git blob, same canvas, atlas x4 relation, or prior QA alone is insufficient.",
+        "after_hash_gate": [
+          "decode exact DDS header/format/channel masks/alpha/mips",
+          "derive raw/readable orientation from exact source",
+          "bind semantics directly from exact source pixels without list-order inference",
+          "measure complete source glyph/effect bbox and protected artwork mask",
+          "build and independently validate CLEAN_PLATE",
+          "derive first-pass-v2 candidate_safe_bbox with default 2px inset",
+          "render Korean deterministically and refit/re-render without flatten-resize",
+          "round-trip final DDS and enforce zero-pixel containment",
+          "retain ENGLISH SOURCE vs KOREAN CANDIDATE full-atlas and per-element proof"
+        ]
+      }
+    },
+    {
+      "index": 227,
+      "asset": "E596B7AC",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+      "canonical_inventory": {
+        "sha256": "3cb1d1558d1e5bc95e455286ece0e32e719aae459202b887671efd20fe01d806",
+        "width": 512,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "rejected_prior_release": {
+        "git_blob_sha": "0947ec4031cb0c84fe0d63fdbee9e5b3173214e5",
+        "width": 2048,
+        "height": 2048,
+        "reason": "Q00015/C117 canonical dimension mismatch"
+      },
+      "semantics": [
+        [
+          "INTERMEDIATE",
+          "중급"
+        ],
+        [
+          "OUTRUN",
+          "아웃런"
+        ],
+        [
+          "PROFESSIONAL",
+          "프로"
+        ],
+        [
+          "ALPINE",
+          "알파인"
+        ],
+        [
+          "ANCIENT RUINS",
+          "고대 유적"
+        ],
+        [
+          "CASTLE WALL",
+          "캐슬 월"
+        ],
+        [
+          "CLOUDY HIGHLAND",
+          "클라우디 하이랜드"
+        ],
+        [
+          "CONIFEROUS FOREST",
+          "침엽수림"
+        ],
+        [
+          "DEEP LAKE",
+          "딥 레이크"
+        ],
+        [
+          "DESERT",
+          "사막"
+        ],
+        [
+          "FLAGMAN 1",
+          "플래그맨 1"
+        ],
+        [
+          "FLAGMAN 2",
+          "플래그맨 2"
+        ],
+        [
+          "FLAGMAN 3",
+          "플래그맨 3"
+        ],
+        [
+          "NOVICE",
+          "초급"
+        ]
+      ],
+      "preserve": [
+        "route/class artwork outside measured source text masks",
+        "all protected icons/logos/non-text pixels"
+      ],
+      "current_git_asset_id_matches": 0,
+      "semantic_count": 14,
+      "old_pixel_geometry_reuse": false,
+      "reacquisition_gate": {
+        "required_sha256": "3cb1d1558d1e5bc95e455286ece0e32e719aae459202b887671efd20fe01d806",
+        "required_canvas": [
+          512,
+          512
+        ],
+        "required_mode": "RGBA",
+        "accepted_source_condition": "Exact acquired source bytes SHA-256 must equal required_sha256. Filename, Release Git blob, same canvas, atlas x4 relation, or prior QA alone is insufficient.",
+        "after_hash_gate": [
+          "decode exact DDS header/format/channel masks/alpha/mips",
+          "derive raw/readable orientation from exact source",
+          "bind semantics directly from exact source pixels without list-order inference",
+          "measure complete source glyph/effect bbox and protected artwork mask",
+          "build and independently validate CLEAN_PLATE",
+          "derive first-pass-v2 candidate_safe_bbox with default 2px inset",
+          "render Korean deterministically and refit/re-render without flatten-resize",
+          "round-trip final DDS and enforce zero-pixel containment",
+          "retain ENGLISH SOURCE vs KOREAN CANDIDATE full-atlas and per-element proof"
+        ]
+      }
+    },
+    {
+      "index": 231,
+      "asset": "EBE401C8",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+      "canonical_inventory": {
+        "sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+        "width": 2048,
+        "height": 1024,
+        "mode": "RGBA"
+      },
+      "rejected_prior_release": {
+        "git_blob_sha": "6b0ed8617cb0dc3e37fbadf61c91bcef08bda944",
+        "width": 2048,
+        "height": 1024,
+        "reason": "Q00015/C117 dimensions match but Release identity is not hash-gated to canonical inventory SHA-256"
+      },
+      "semantics": [
+        [
+          "LAN",
+          "LAN"
+        ],
+        [
+          "ONLINE",
+          "온라인"
+        ]
+      ],
+      "preserve": [
+        "LAN remains Latin per canonical mapping",
+        "all non-text artwork outside exact measured source masks"
+      ],
+      "current_git_asset_id_matches": 0,
+      "semantic_count": 2,
+      "old_pixel_geometry_reuse": false,
+      "reacquisition_gate": {
+        "required_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+        "required_canvas": [
+          2048,
+          1024
+        ],
+        "required_mode": "RGBA",
+        "accepted_source_condition": "Exact acquired source bytes SHA-256 must equal required_sha256. Filename, Release Git blob, same canvas, atlas x4 relation, or prior QA alone is insufficient.",
+        "after_hash_gate": [
+          "decode exact DDS header/format/channel masks/alpha/mips",
+          "derive raw/readable orientation from exact source",
+          "bind semantics directly from exact source pixels without list-order inference",
+          "measure complete source glyph/effect bbox and protected artwork mask",
+          "build and independently validate CLEAN_PLATE",
+          "derive first-pass-v2 candidate_safe_bbox with default 2px inset",
+          "render Korean deterministically and refit/re-render without flatten-resize",
+          "round-trip final DDS and enforce zero-pixel containment",
+          "retain ENGLISH SOURCE vs KOREAN CANDIDATE full-atlas and per-element proof"
+        ]
+      }
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_205_227_231",
+    "c00124_priority": "PASS_RUNNABLE_REWORK_SELECTED_BEFORE_UNFINISHED_PENDING_ARTWORK",
+    "current_queue_state": "PASS_3_OF_3_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED_WITH_Q00015_REWORK_NOTE",
+    "canonical_semantics": "PASS_36_OF_36_TRANSCRIPTIONS_EQUAL_ARTWORK_PLAN_REUSED_FROM_C00124",
+    "canonical_inventory": "PASS_3_OF_3_CURRENT_SHA256_CANVAS_MODE_IDENTITIES",
+    "git_tree_source_presence": "PASS_0_OF_3_ASSET_ID_PATHS_PRESENT_FAIL_CLOSED",
+    "rejected_geometry_reuse": "PASS_ZERO",
+    "index159_preservation": "PASS_ACCEPTED_SUBMATERIAL_NOT_REWORKED",
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_ON_CURRENT_GIT_HEAD",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "semantic_to_sprite_binding": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
