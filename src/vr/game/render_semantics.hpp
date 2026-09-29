@@ -104,6 +104,10 @@ namespace OutRunVR::GameSemantic
     }
 
     static_assert(
+        ClassifyCriticalProducer(0x000B9F3Au) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BA052u) == RenderScope::ScreenHud);
+    static_assert(
         ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud);
     static_assert(
         ClassifyCriticalProducer(0x000BB0FBu) == RenderScope::WorldBillboard);

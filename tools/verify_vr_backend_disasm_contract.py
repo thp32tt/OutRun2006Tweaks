@@ -120,12 +120,19 @@ def main() -> None:
             "TimeRecord_AdjustPositionAndHud<0x000BE5CDu>",
             "TimeRecord_AdjustPositionAndHud<0x000BE9A3u>",
             "VR R119 TIME HUD: shared producer-map handoff",
+            "DispRank_putClipSprite<0x000B9F3Au>",
+            "DispRank_putClipSprite<0x000BA052u>",
+            "VR R120 DIRECT CLIP: shared producer-map",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
     if "TimeRecord_AdjustPositionAndHud);" in hooks_text:
         raise SystemExit(
             "F13 shared producer-map adoption regressed to legacy hardcoded callback"
+        )
+    if "DispRank_putClipSprite, Memory::HookType::Call" in hooks_text:
+        raise SystemExit(
+            "F13 DispRank clip ownership regressed to legacy hardcoded callback"
         )
     require(
         "tools/analyze_outrun_exe.py",

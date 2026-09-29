@@ -594,10 +594,17 @@ class UIScaling : public Hook
 		return result;
 	}
 
+	template<std::uintptr_t CallerRva>
 	static int __cdecl DispRank_putClipSprite(
 		int xstnum, int x, int y, std::uint32_t flags,
 		float priority, std::uint32_t color)
 	{
+		constexpr auto producerScope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispRank clip callsite must remain canonical SCREEN_HUD");
+
 		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
 		AddSpriteSpacing(&x, false);
 
@@ -609,8 +616,7 @@ class UIScaling : public Hook
 		else if (probe == 8)
 			x = 320;
 		else if (probe == 19)
-			OutRunVR::GameSemantic::ArmNextDraw(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::ArmNextDraw(producerScope);
 
 		int prio = int(priority);
 		prio = prio < 0 ? 0 :
@@ -623,7 +629,7 @@ class UIScaling : public Hook
 		if (r57 == 2 || r57 == 3 || r57 == 6)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				producerScope);
 			result = Game::put_clip_sprite(
 				xstnum, x, y, flags, priority, color);
 		}
@@ -633,9 +639,9 @@ class UIScaling : public Hook
 				xstnum, x, y, flags, priority, color);
 		}
 
-		// R57 HMD modes 2/3 proved that the nested put_clip_sprite -> put_sprite_ex
-		// producer scope did not survive as an accepted kind-0 HUD owner. The
-		// canonical helper appends one node, so pin the exact new node directly.
+		// R120/F13: the exact DispRank clip callsite selects ownership from the
+		// shared disassembly producer map. Preserve R57's proven direct node pin,
+		// but do not duplicate SCREEN_HUD classification in this runtime path.
 		if (r57 == 2 || r57 == 3 || r57 == 6)
 		{
 			root = Game::sprite_prio_root[prio];
@@ -644,7 +650,7 @@ class UIScaling : public Hook
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 					node,
-					OutRunVR::GameSemantic::RenderScope::ScreenHud,
+					producerScope,
 					nullptr,
 					OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
 				static std::atomic<std::uint64_t> directPositionTags{ 0 };
@@ -652,8 +658,8 @@ class UIScaling : public Hook
 					1, std::memory_order_relaxed) + 1;
 				if ((hit & (hit - 1)) == 0)
 					spdlog::info(
-						"VR R58 DIRECT CLIP: owner=position prio={} kind={} hits={}",
-						prio, node->kind_C, hit);
+						"VR R120 DIRECT CLIP: shared producer-map rva=0x{:x} prio={} kind={} hits={}",
+						CallerRva, prio, node->kind_C, hit);
 			}
 		}
 		return result;
@@ -1259,10 +1265,22 @@ public:
 		Memory::VP::InjectHook(
 			Module::exe_ptr(DispRank_SpraniCall),
 			DispRank_sprani, Memory::HookType::Call);
-		for (int addr : DispRank_ClipSpriteCalls)
-			Memory::VP::InjectHook(
-				Module::exe_ptr(addr),
-				DispRank_putClipSprite, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F3A),
+			DispRank_putClipSprite<0x000B9F3Au>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F5E),
+			DispRank_putClipSprite<0x000B9F5Eu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F81),
+			DispRank_putClipSprite<0x000B9F81u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9FD0),
+			DispRank_putClipSprite<0x000B9FD0u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9FFC),
+			DispRank_putClipSprite<0x000B9FFCu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA01E),
+			DispRank_putClipSprite<0x000BA01Eu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA035),
+			DispRank_putClipSprite<0x000BA035u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA052),
+			DispRank_putClipSprite<0x000BA052u>, Memory::HookType::Call);
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
