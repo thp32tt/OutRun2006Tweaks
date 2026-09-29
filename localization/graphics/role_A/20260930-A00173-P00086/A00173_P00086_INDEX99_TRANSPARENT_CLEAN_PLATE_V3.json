@@ -1,0 +1,262 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-index99-transparent-cleanplate-v3",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00173",
+  "wave_id": "P00086",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T01:02:35+09:00",
+  "base_head_sha": "111e911cb5a0458c9fde31a6021857c436649d29",
+  "selection": {
+    "priority_tier": "DIRECT_C_REWORK_REQUIRED",
+    "selected_index": 99,
+    "selected_asset": "4F68708E",
+    "c_return_task": "LOCALIZATION-LOCALIZATION_C-00169",
+    "c_batch": "Q00029",
+    "c_disposition": "REWORK_REQUIRED",
+    "failure_addressed": "A00164 opaque rectangular clean plate introduced alpha into 33373 source-transparent pixels and produced two dark-blue cover strips",
+    "unrelated_preflight_deferred": true
+  },
+  "source_lineage": {
+    "repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "bytes": 524416,
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5_BC3",
+    "mip_count": 1,
+    "identity_authority": "REUSED_C127_Q00025_EXACT_CANONICAL_PASS_FINGERPRINT_AND_RECHECKED_BYTES_SHA_HEADER",
+    "drive_exact_name_probe_this_invocation": "SOURCE_TRANSPORT_MISS",
+    "fallback": "PINNED_UPSTREAM_DIRECT_FILE_AFTER_DRIVE_MISS"
+  },
+  "orientation": {
+    "raw_to_readable": "mirror-Y",
+    "authority": "UNCHANGED_C127_ACCEPTED_LINEAGE"
+  },
+  "mask": {
+    "accepted_seed_pixels": 42774,
+    "v3_effect_pixels": 114566,
+    "growth_pixels": 71792,
+    "rle_runs": 1159,
+    "source_alpha_zero_pixels_in_mask": 0,
+    "coverage_of_search_envelopes": 0.729803416952262,
+    "full_width_rows": 0,
+    "max_run_fraction": 0.5170193192272309,
+    "line_reports": [
+      {
+        "line": 1,
+        "box_half_open": [
+          521,
+          46,
+          1608,
+          127
+        ],
+        "accepted_seed_pixels": 24228,
+        "near6_visible_pixels": 53789,
+        "model_residual_closure_pixels": 11047,
+        "final_effect_pixels": 64836,
+        "robust_residual_threshold": 6.0,
+        "background_fit": {
+          "samples_total": 4636,
+          "samples_robust_kept": 4592,
+          "sample_residual_median": 27.149760371443172,
+          "sample_residual_p995": 44.18515083531684,
+          "coefficients_rgb": [
+            [
+              -0.03564932880590364,
+              2.7012487362781847,
+              42.0868241058205
+            ],
+            [
+              0.04300908879967352,
+              -0.09199837134279865,
+              -1.2538668766753176
+            ],
+            [
+              0.008849135888747951,
+              -0.3793212927327074,
+              -1.9344396293700357
+            ],
+            [
+              0.11648516718527935,
+              0.8593481978044293,
+              4.686512230347292
+            ],
+            [
+              0.0872740461870759,
+              -1.2568180578793375,
+              -24.625146790116887
+            ],
+            [
+              -0.04946508642544929,
+              -0.1637239877522384,
+              1.3364723842658581
+            ]
+          ]
+        }
+      },
+      {
+        "line": 2,
+        "box_half_open": [
+          536,
+          130,
+          1347,
+          215
+        ],
+        "accepted_seed_pixels": 18546,
+        "near6_visible_pixels": 40764,
+        "model_residual_closure_pixels": 8966,
+        "final_effect_pixels": 49730,
+        "robust_residual_threshold": 2.5,
+        "background_fit": {
+          "samples_total": 1174,
+          "samples_robust_kept": 811,
+          "sample_residual_median": 0.0,
+          "sample_residual_p995": 0.0,
+          "coefficients_rgb": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        }
+      }
+    ],
+    "artifact": "localization/graphics/role_A/20260930-A00173-P00086/A00173_P00086_INDEX99_EFFECT_MASK_RLE.json"
+  },
+  "clean_plate": {
+    "algorithm": "SOURCE_ALPHA_IMMUTABLE_PIXEL_MASK_HARMONIC_RGB_INPAINT_WITH_ROBUST_LOCAL_BACKGROUND_INITIALIZATION",
+    "decoded_rgba_sha256": "e09969a47d6b458c862c0069bccf315bbf46f27160a788b47fa1bf4f1c49c24f",
+    "source_decoded_rgba_sha256": "7a09046a7b670af74d5f049138837ea6dfd7435422b121f26cc4ff8fedcca1b4",
+    "changed_pixels": 114540,
+    "changed_pixels_outside_effect_mask": 0,
+    "alpha_changed_pixels_global": 0,
+    "source_transparent_pixels_changed": 0,
+    "source_transparent_pixels_introduced_alpha": 0,
+    "hidden_rgb_changes_at_source_alpha_zero": 0,
+    "harmonic_iterations": 320,
+    "harmonic_last_max_delta": 0.07897186279296875,
+    "seed_effect_contrast_reduction": [
+      {
+        "line": 1,
+        "seed_pixels": 24228,
+        "mean_distance_to_background_before": 297.58416748046875,
+        "mean_distance_to_background_after": 2.495410203933716,
+        "p95_after": 7.5310821533203125,
+        "reduction_ratio": 0.008385561406612396
+      },
+      {
+        "line": 2,
+        "seed_pixels": 18546,
+        "mean_distance_to_background_before": 328.3910217285156,
+        "mean_distance_to_background_after": 8.986352920532227,
+        "p95_after": 22.090721130371094,
+        "reduction_ratio": 0.02736479416489601
+      }
+    ],
+    "rectangle_or_opaque_strip_gate": "PASS_ZERO_FULL_WIDTH_ROWS_ALPHA_IMMUTABLE",
+    "visual_acceptance": "HOLD_C_INDEPENDENT_NATIVE_READABLE_REVIEW_REQUIRED"
+  },
+  "layout": {
+    "source": "Drive against the Ghost Car and challenge for the course record!!",
+    "korean_full": "고스트 카와 달리며 코스 기록에 도전하세요!",
+    "line1": "고스트 카와 달리며",
+    "line2": "코스 기록에 도전하세요!"
+  },
+  "safe_fit_reused_as_nonfinal_measurement": {
+    "line1_candidate_safe_bbox_ltrb": [
+      529,
+      54,
+      1599,
+      118
+    ],
+    "line2_candidate_safe_bbox_ltrb": [
+      544,
+      138,
+      1338,
+      206
+    ],
+    "safety_inset_px": 2,
+    "status": "MEASURED_PRIOR_ONLY_NOT_PROMOTED_UNTIL_C_ACCEPTS_V3_CLEAN_PLATE"
+  },
+  "self_qa": {
+    "parity": "PASS_ODD_INDEX_99_ONLY",
+    "source_identity": "PASS_RECHECKED_ACCEPTED_C127_FINGERPRINT",
+    "accepted_seed_inclusion": "PASS_ZERO_OMITTED",
+    "one_pixel_containment": "PASS_CHANGED_PIXELS_ONLY_INSIDE_PIXEL_EFFECT_MASK",
+    "source_transparency": "PASS_ZERO_SOURCE_ALPHA_ZERO_CHANGES",
+    "alpha_preservation": "PASS_ZERO_ALPHA_CHANGES_GLOBAL",
+    "no_cover_rectangle": "PASS_ZERO_FULL_WIDTH_ROWS_MAX_RUN_FRACTION_LT_0_95",
+    "protected_rgba_outside_mask": "PASS_EXACT",
+    "source_effect_reduction": "PASS_LT_0_70_RATIO_BOTH_LINES",
+    "candidate_false_promotion": "PASS_NONE",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "readiness_after": "DIRECT_REWORK_CLEAN_PLATE_V3_MATERIAL_READY_FOR_C_INDEPENDENT_NATIVE_VISUAL__NOT_RENDER_READY_BY_PRODUCER",
+  "candidate_dds_modified": false,
+  "candidate_static_qa": "HOLD_NO_NEW_V2_KOREAN_CANDIDATE__C131_REQUIRES_INDEPENDENT_CLEAN_PLATE_ACCEPTANCE_FIRST",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "queue_blob_sha": "a6fd39dd54e07c007ec5dda46b3075167a89280a",
+    "a00157_task_blob_sha": "3976a453444c6c0aacec5f52c6beefc9355a5253",
+    "c131_task_blob_sha": "193f1f246ad36eb5a2e4a3b72a71dd6268f20816",
+    "source_git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00173-P00086/A00173_P00086_INDEX99_EFFECT_MASK_RLE.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00173/source_native.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00173/clean_plate_native.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00173/source_readable.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00173/clean_plate_readable.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00173/effect_mask_readable.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00173/comparison_readable.png"
+  ]
+}
