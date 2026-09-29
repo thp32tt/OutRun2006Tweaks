@@ -252,17 +252,14 @@ require_all("src/vr/hud_semantics.hpp", [
     'ClassifyCaller(0x097BB7)',
 ], "P8_R70_RUNTIME_SEMANTICS")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    'R71: the R70 HMD run proved the old "dead work"',
-    'R30SkyGlow.reduced[eye];',
-    'compositeSource = R30SkyGlow.temp[eye];',
-], "P8_R71_SKYGLOW_FINAL_BLUR_SOURCE")
-require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    'R30SkyGlowAppliedEpoch',
-    'R30SkyGlowPreHudAttemptEpoch',
-    'R30CompositeSkyGlowBeforeHud',
-    'R30SkyGlowPreHudAttemptEpoch != PresentEpoch',
-    'the additive glow no longer washes over HUD/menu pixels at Present',
-], "P8_R71_SKYGLOW_PRE_HUD_COMPOSITE")
+    'R76SkyGlowBaselineSha',
+    'b6c208bbc9a411b9c035be26f9e1e9c014028738',
+    'CreateStateBlock(',
+    'D3DSBT_ALL',
+    'const float composite[4]{ 0.38f, 0, 0, 0 }',
+    'R30SkyGlow.temp[eye];',
+    'VR R76 SKY GLOW BASELINE RESTORE:',
+], "P8_R76_SKYGLOW_COMMON_BASELINE")
 require_all("src/hooks_uiscaling.cpp", [
     'R71RivalMarkerSpraniCall = 0xBB796',
     'Module::exe_ptr(0xBB6F5)',
@@ -297,10 +294,11 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R73OutRunTransientHudPresents = 360',
     'directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D',
     'VR R73 OUTRUN HUD:',
-    'constexpr bool R73BypassStereoSkyGlow = true',
+    'constexpr bool R73BypassStereoSkyGlow = false',
+    'R76SkyGlowBaselineSha',
     'VR R73 FLARE:',
     'FlareStereoDepth = 0.20f',
-], "P8_R73_RUNTIME_VISUALFIX")
+], "P8_R73_RUNTIME_VISUALFIX_R76_SKYGLOW_RESTORE")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
     'callRva == 0x0975EE || callRva == 0x097727',
