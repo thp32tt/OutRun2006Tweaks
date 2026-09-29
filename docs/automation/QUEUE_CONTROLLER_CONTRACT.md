@@ -61,7 +61,7 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - GitHub branch HEAD and Actions are the durable source of truth.
 
 ## Runtime throughput profile
-The schema-v6 values in `localization/controller_roles.json` are mandatory controller runtime inputs.
+The current-schema values in `localization/controller_roles.json` are mandatory controller runtime inputs; the controller MUST NOT pin or assume an older schema version.
 
 - Scheduler heartbeat: 15 seconds; >45 seconds is a liveness fault.
 - Bound GitHub Actions run polling: 30 seconds, exact run ID, zero nonterminal cache TTL.
