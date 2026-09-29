@@ -75,7 +75,7 @@
     "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
     "producer_record_blobs": {
       "A00221": "2893ea15dd96a64822361997c514b8ca87acec87",
-      "B00223": "6684fb0a449535340ac89ccf8a0ce63e5400a327",
+      "B00223": "ae7eacacc984bdcb39729a404db5f1f5e50b2292",
       "A00225": "135e1287fb4b5e044ffa527f52febe2101e16a4e"
     },
     "candidate": {
@@ -305,12 +305,12 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "ATTEMPT3 does not repeat source/candidate/visual QA. It reuses immutable Q00050 fingerprints and repairs only the executable verifier layering.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": "PENDING_POST_COMMIT",
-  "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-  "bookkeeping_note": "ATTEMPT3 is the replacement validation-bearing AUTO result after two verifier-only Gate failures. It contains no CI-skip. Gate outcome is recorded later in a separate bookkeeping/checkpoint commit.",
+  "result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+  "validation_bearing_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+  "bookkeeping_note": "Q00050 ATTEMPT3 Gate result recorded after the authoritative validation-bearing C result commit. ATTEMPT1/2 failed only because executable parallel-lane verification lagged the current Git automation contract; QA findings were unchanged and heavy QA was not repeated. This bookkeeping commit is separate, uses CI skip, and does not replace validation ownership. RUNTIME_VALIDATION remains UNTESTED.",
   "shared_state_reused_from_prior_failed_attempt": true,
   "prior_failed_attempt": {
     "result_sha": "a5be20d82dbf62226fd5182c81bee95808785897",
@@ -348,5 +348,16 @@
       "root_cause": "After modulo-3 repair, the same verifier still required legacy QA keywords in lane-local evidence filenames. A00221 lane-local production JSON is machine-readable QA evidence but its filename is A00221_P00117_INDEX222_V2_PRODUCTION.json; strict PASS/provenance/zero-pixel checks are already enforced by verify_automation_commit.py.",
       "qa_findings_changed": false
     }
-  ]
+  ],
+  "authoritative_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36639832928,
+    "run_attempt": 1,
+    "head_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T07:29:26+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-09-30T07:29:46+09:00"
 }
