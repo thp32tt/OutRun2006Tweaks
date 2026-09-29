@@ -1,0 +1,105 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00105",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00038",
+  "recorded_at_kst": "2026-09-29T17:36:00+09:00",
+  "base_sha": "3c9e0d38ced3e69186eed939dc83489b7110ee75",
+  "material_commit_sha": "640527517499b4bf1b918a6f5dc2b70fabc0056c",
+  "pre_task_record_head_sha": "640527517499b4bf1b918a6f5dc2b70fabc0056c",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_INDEX119_EXACT_BC3_EFFECT_MASK_CLEAN_PLATE_PREFLIGHT",
+  "summary": "Advanced Q00010/C112-consumed odd index 119 / F6811E94 beyond its A00094 first-pass-v2 work order by directly decoding the exact pinned Release 2048x256 DXT5 mip1 DDS from GitHub. Normalized the full visible source-effect envelope to exclusive LTRB [390,56,1632,202], materialized a deterministic decoded-alpha removal-mask SHA-256 and decoded CLEAN_PLATE SHA-256, and resolved the final v2 candidate-safe bbox [392,58,1629,199]. No Korean DDS or shared state was changed; exact signed style/slant measurement and all candidate-only/static/runtime gates remain HOLD/UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1736-A00105-P00038/A00105_P00038_INDEX119_EXACT_BC3_MASK_CLEAN_PLATE_PREFLIGHT.json"
+  ],
+  "evidence_blob_sha": "67da8f6a831436974742edbb3f189bdcb85187c0",
+  "material_deliverable": {
+    "type": "INDEX119_EXACT_BC3_SOURCE_EFFECT_MASK_AND_CLEAN_PLATE_PREFLIGHT",
+    "indices": [
+      119
+    ],
+    "assets": [
+      "F6811E94"
+    ],
+    "exact_bc3_header_decoded": 1,
+    "localizable_elements": 1,
+    "source_effect_bboxes_resolved": 1,
+    "removal_mask_fingerprints_materialized": 1,
+    "clean_plate_fingerprints_materialized": 1,
+    "candidate_safe_bboxes_resolved": 1,
+    "candidate_safe_bbox_ltrb": [
+      392,
+      58,
+      1629,
+      199
+    ],
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00094",
+    "producer_result_sha": "1a4318f0eeea1b97f0eeb814d3b20a6a251d4240",
+    "producer_report_blob_sha": "74dca6bfbd381506fa29778e07ea5df4d98fd5be",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00099",
+    "c_acceptance_batch": "Q00010/C112",
+    "exact_upstream_source_blob_sha": "c6bcd8b847e0f0a2f34ca9f9ea3b1616512bd1e6",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "skipped_or_deferred": {
+    "qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00096": [
+        147,
+        159,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00098": [
+        173,
+        193,
+        201,
+        225
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00102": [
+        137,
+        217,
+        219,
+        241
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ]
+  },
+  "strict_hold": {
+    "baseline_vector": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+    "signed_slant_style_metrics": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+    "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "decoded_final_bc3_qa": "HOLD_NO_NEW_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_ODD_ONLY_119__EXACT_UPSTREAM_BLOB_C6BCD8B847E0F0A2F34CA9F9EA3B1616512BD1E6__DDS_2048x256_DXT5_MIP1_PAYLOAD_EXACT__ALPHA_GT0_EFFECT_BBOX_390_56_1632_202_EXCLUSIVE__REMOVAL_MASK_SHA256_56B11AF49404FEAA9AA278E406846551821F18C07069AA852006443227D10266__CLEAN_PLATE_SHA256_6408E5E2677759E754CE4142A34AA62570D69F0E31585CD999CFB2622597859D__SAFE_BBOX_392_58_1629_199__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "fail_closed_reason": "This task resolves the exact source effect envelope, deterministic source removal-mask fingerprint, structural CLEAN_PLATE fingerprint and final v2 safe-fit geometry for index 119 only. It does not authorize candidate promotion: exact baseline/signed-slant style measurements, native-resolution Korean render, recompressed BC3 verification, zero-pixel containment, alpha/orientation/style and exact ENGLISH SOURCE vs KOREAN CANDIDATE comparison still must pass. Runtime remains untested.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
