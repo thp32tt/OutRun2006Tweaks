@@ -874,3 +874,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: consume current CI and review exact visual evidence.
+
+
+## Cycle 0040 — visual-first convergence checkpoint
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Cycles 31-39 preserve the visual-first policy: CI contract repaired, no performance-only tuning, no broad HUD heuristic, and no speculative selector/material mutation. Remaining P0s require exact draw/resource or HMD telemetry evidence before source behavior changes.
+- Evidence: state priorities + reviewed exact semantic/state boundaries.
+- No additional production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume latest exact-head CI; instrument selector texture/material ownership if still unproven.
