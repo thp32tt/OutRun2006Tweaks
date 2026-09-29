@@ -460,10 +460,25 @@ require_order(
     '#include "stereo_renderer_r31_overlay.inc"',
     '#include "stereo_renderer_r32_overlay.inc"',
     '#include "stereo_renderer_r33_overlay.inc"',
-    '#include "vr/game/render_semantics.hpp"',
     "namespace OutRunVRD3D9ExUpgradeR13",
     '#include "stereo_renderer_r34_overlay.inc"',
 )
+
+r26_pos = stereo_facade.find('#include "stereo_renderer_r26.cpp"')
+r29_semantics_pos = stereo_facade.find('#include "vr/game/render_semantics.hpp"', r26_pos)
+r29_overlay_pos = stereo_facade.find('#include "stereo_renderer_r29_overlay.inc"')
+r33_overlay_pos = stereo_facade.find('#include "stereo_renderer_r33_overlay.inc"')
+r34_semantics_pos = stereo_facade.rfind('#include "vr/game/render_semantics.hpp"')
+r34_namespace_pos = stereo_facade.find("namespace OutRunVRD3D9ExUpgradeR13")
+if min(r26_pos, r29_semantics_pos, r29_overlay_pos, r33_overlay_pos,
+       r34_semantics_pos, r34_namespace_pos) < 0:
+    raise SystemExit("production stereo facade semantic include boundary missing")
+if not (r26_pos < r29_semantics_pos < r29_overlay_pos):
+    raise SystemExit("R29 semantic prelude moved outside the R26 -> R29 overlay boundary")
+if not (r33_overlay_pos < r34_semantics_pos < r34_namespace_pos):
+    raise SystemExit("R34 render-semantics include moved outside the R33 -> R34 boundary")
+if stereo_facade.count('#include "vr/game/render_semantics.hpp"') < 2:
+    raise SystemExit("production stereo facade lost one of the historical semantic include boundaries")
 
 require(
     facade,
