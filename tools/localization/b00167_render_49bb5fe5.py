@@ -318,12 +318,16 @@ def nearest_background_palette_gate(dds_bytes, global_mask, e):
         block=payload[off:off+16]
         c0,c1=struct.unpack_from("<HH",block,8)
         pal=color_palette(c0,c1)
-        best=int(np.argmin(np.sum((pal-bg[None,:])**2,axis=1)))
+        ds=np.sum((pal-bg[None,:])**2,axis=1)
+        best_dist=int(ds.min())
         cbits=struct.unpack_from("<I",block,12)[0]
         i=(y%4)*4+(x%4)
         actual=(cbits>>(2*i))&3
         checked+=1
-        if actual!=best:
+        # Different 2-bit indices may decode to the same RGB when BC3 palette
+        # interpolation collapses after 565 quantization; compare decoded color
+        # distance rather than the index number itself.
+        if int(ds[actual])!=best_dist:
             mismatches+=1
     return {"checked_pixels":checked,"non_background_palette_index_pixels":mismatches}
 
