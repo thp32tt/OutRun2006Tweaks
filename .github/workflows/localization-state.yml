@@ -1,13 +1,13 @@
 name: Localization State
 on:
-  push:
-    branches: [korean-localization-clean]
   pull_request:
     branches: [korean-localization-clean]
   workflow_dispatch:
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}

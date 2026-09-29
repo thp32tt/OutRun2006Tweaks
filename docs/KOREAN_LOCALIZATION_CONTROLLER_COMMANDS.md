@@ -62,3 +62,21 @@ Preferred dispatch is event-driven rather than fixed minute slots:
 If the runtime cannot launch two conversations/workers concurrently, retain queue mode as a compatibility fallback; do not pretend sequential dispatch is parallel.
 
 This file is a controller entry map only. The automation contract is authoritative.
+
+## Runtime scheduler values
+The controller must load schema-v4 runtime values from `localization/controller_roles.json` before scheduling.
+
+```text
+queue loop              15s
+bound Actions run poll  30s, uncached
+Actions discovery       <=60s, pre-binding only
+WAIT_ACTIONS stale      <=75s -> exact run + jobs refresh
+queue idle with work    <=90s -> re-arm
+next task delay         15s
+A/B slot stagger        15s
+terminal transition     <=30s
+heartbeat               15s; stale after 45s
+busy generation stall   30m; do not force-stop for queue recovery
+```
+
+Startup is a reconciliation event: refresh latest HEAD, clear discovery cache, resolve every nonterminal lane from exact GitHub state, then dispatch. A terminal failed run with retry budget must become a retry immediately rather than remain `WAIT_ACTIONS`.

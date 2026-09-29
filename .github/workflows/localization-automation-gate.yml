@@ -16,6 +16,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,11 +25,23 @@ jobs:
       - name: Verify queue automation contract
         run: test -f docs/automation/QUEUE_CONTROLLER_CONTRACT.md
 
-      - name: Verify controller WAIT_ACTIONS recovery policy
+      - name: Verify controller runtime recovery and throughput policy
         run: python tools/localization/verify_controller_recovery_policy.py
 
       - name: Verify localization state
         run: python tools/localization/verify_state.py
+
+      - name: Verify domain isolation
+        shell: bash
+        env:
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          B="$EVENT_BEFORE"
+          H="$EVENT_HEAD"
+          if [[ -z "$B" || "$B" =~ ^0+$ ]]; then B="$(git rev-parse HEAD^)"; fi
+          python tools/verify_domain_isolation.py --base "$B" --head "$H" --branch "korean-localization-clean"
 
       - name: Verify changed localization payload structure
         env:

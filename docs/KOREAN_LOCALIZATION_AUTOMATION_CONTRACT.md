@@ -125,3 +125,15 @@ Do not repeat completed work. Resume from current Git progress/resume state.
 - A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
 Before static approval inspect raw DDS and readable/game orientation and require the exact English-HD-source vs current-Korean-candidate side-by-side proof. Production runs do not require in-game testing; keep `RUNTIME_VALIDATION=UNTESTED` until the user's final integrated game test supplies runtime evidence.
 Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
+
+## Controller idle-time elimination profile
+Controller liveness values are defined in `localization/controller_roles.json` schema v4 and are mandatory.
+
+- Poll a bound Automation Gate run by exact run ID every 30 seconds with zero cache TTL.
+- Recover non-progressing `WAIT_ACTIONS` by exact run + jobs refresh within 75 seconds.
+- Re-arm an empty scheduler with unfinished graphics work within 90 seconds.
+- Use a 15-second next-task delay and 15-second A/B distinct-slot stagger.
+- Emit a queue heartbeat every 15 seconds and treat >45 seconds without heartbeat as a liveness failure.
+- A/B PASS -> C and C PASS -> next A+B are event-driven, with a <=30-second transition target.
+- On controller restart, reconcile all nonterminal lanes from current GitHub HEAD and exact Actions state before new dispatch.
+- `active_by_lane` is the active-state source of truth; a null active summary while a lane is nonterminal is invalid.

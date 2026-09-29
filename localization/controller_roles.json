@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -83,7 +83,8 @@
       ],
       "retry_same_task_id": true,
       "retry_increments_attempt": true,
-      "ci_failure_consumes_chat_rollover": false
+      "ci_failure_consumes_chat_rollover": false,
+      "force_uncached_refresh_after_seconds": 60
     },
     "conversation_rollover": {
       "enabled": true,
@@ -98,12 +99,70 @@
     "watchdog": {
       "wait_actions_recovery": "uncached_exact_run_and_jobs_refresh",
       "observe_only_allowed_for_wait_actions": false,
+      "queue_idle_rearm_seconds": 90,
+      "queue_idle_requires_unfinished_work": true,
+      "wait_actions_stale_seconds": 75,
+      "busy_stall_seconds": 1800,
       "force_stop_active_generation": false
     },
     "wave_progression": {
       "ab_pass_to_c_immediately": true,
       "c_pass_to_next_ab_immediately": true,
-      "wait_for_chat_expiry_after_terminal_result": false
+      "wait_for_chat_expiry_after_terminal_result": false,
+      "terminal_transition_target_seconds": 30
+    },
+    "startup_reconcile": {
+      "enabled": true,
+      "refresh_branch_head_first": true,
+      "clear_discovery_cache_first": true,
+      "reconcile_all_nonterminal_lanes": true,
+      "exact_run_lookup_for_wait_actions": true,
+      "refresh_jobs_for_stale_wait_actions": true,
+      "refresh_branch_head_before_retry": true,
+      "terminal_failure_with_attempts": "retry_same_task_id",
+      "terminal_failure_without_attempts": "BLOCKED",
+      "never_wait_for_chat_expiry_after_terminal_action": true
     }
+  },
+  "runtime_tuning": {
+    "queue_check_seconds": 15,
+    "queue_stable_seconds": 30,
+    "github_discovery_poll_seconds": 60,
+    "github_bound_run_poll_seconds": 30,
+    "github_task_commit_cache_seconds": 60,
+    "github_actions_discovery_cache_seconds": 60,
+    "bound_run_nonterminal_cache_ttl_seconds": 0,
+    "queue_next_task_delay_seconds": 15,
+    "parallel_lane_stagger_seconds": 15,
+    "min_send_gap_seconds": 60,
+    "parallel_distinct_slot_send_gap_seconds": 15,
+    "slot_dedup_seconds": 120,
+    "retry_button_cooldown_seconds": 45,
+    "rate_limit_backoff_seconds": [
+      90,
+      180,
+      300,
+      600
+    ]
+  },
+  "runtime_observability": {
+    "queue_loop_heartbeat_seconds": 15,
+    "heartbeat_stale_after_seconds": 45,
+    "required_runtime_fields": [
+      "queue_loop_heartbeat_at",
+      "last_scheduler_decision_at",
+      "last_scheduler_decision",
+      "blocked_reason"
+    ],
+    "active_state_source_of_truth": "active_by_lane",
+    "queue_active_semantics": "derived_summary",
+    "queue_active_null_allowed_only_when_active_by_lane_empty": true,
+    "active_lane_phases": [
+      "DISPATCHING",
+      "WAIT_RESPONSE",
+      "WAIT_COMMIT",
+      "WAIT_ACTIONS",
+      "RETRY_PENDING"
+    ]
   }
 }

@@ -1,13 +1,16 @@
 name: Domain Isolation Guard
 on:
   push:
-    branches: [vr-d3d9ex-focus, korean-localization-prototype, korean-localization-clean, ffb-arcade-dd-research]
+    branches: [vr-d3d9ex-focus, korean-localization-prototype, ffb-arcade-dd-research]
   pull_request:
     branches: [vr-d3d9ex-focus, korean-localization-prototype, korean-localization-clean, ffb-arcade-dd-research]
+  workflow_dispatch:
+
 permissions: {contents: read}
 jobs:
   guard:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}

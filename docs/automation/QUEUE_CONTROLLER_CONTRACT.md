@@ -58,3 +58,18 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - C must also avoid no-op barrier commits: if invoked without new candidate bytes, perform at least one material backlog action or do not dispatch C.
 - Never use N100 local clones/worktrees as a project workspace.
 - GitHub branch HEAD and Actions are the durable source of truth.
+
+## Runtime throughput profile
+The schema-v4 values in `localization/controller_roles.json` are mandatory controller runtime inputs.
+
+- Scheduler heartbeat: 15 seconds; >45 seconds is a liveness fault.
+- Bound GitHub Actions run polling: 30 seconds, exact run ID, zero nonterminal cache TTL.
+- Generic Actions discovery/cache: <=60 seconds and only before run-ID binding.
+- Stale `WAIT_ACTIONS`: force exact run + jobs refresh by 75 seconds.
+- Empty queue with unfinished work: re-arm within 90 seconds; do not wait for the historical 25-minute watchdog.
+- Next-task delay: 15 seconds. A/B independent-slot stagger: 15 seconds.
+- A+B PASS -> C and C PASS -> next A+B target transition: <=30 seconds.
+- The 60-second ordinary send gap does not delay independent A/B slots. Rate-limit backoff 90/180/300/600 seconds begins only after an actual rate-limit signal.
+- `active_by_lane` is authoritative. A null top-level active summary is valid only when no lane is nonterminal.
+- Runtime state must expose `queue_loop_heartbeat_at`, `last_scheduler_decision_at`, `last_scheduler_decision`, and `blocked_reason`.
+- Startup/restart must refresh branch HEAD, clear discovery cache, and reconcile every nonterminal lane from exact GitHub state before dispatch.
