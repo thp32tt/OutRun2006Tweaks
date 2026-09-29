@@ -17,6 +17,8 @@ namespace OutRunVR::RecenterIpc
 {
     inline constexpr wchar_t MappingName[] =
         L"Local\\OutRun2006Tweaks.VR.Recenter.v1";
+    inline constexpr wchar_t EventName[] =
+        L"Local\\OutRun2006Tweaks.VR.Recenter.Event.v1";
     inline constexpr std::uint32_t Magic = 0x5243564Fu; // 'OVCR'
     inline constexpr std::uint32_t Version = 1;
 
@@ -83,7 +85,16 @@ namespace OutRunVR::RecenterIpc
             InterlockedExchange(&state_->requesterPid,
                 static_cast<LONG>(GetCurrentProcessId()));
             MemoryBarrier();
-            return InterlockedIncrement(&state_->requestId);
+            const LONG request = InterlockedIncrement(&state_->requestId);
+            if (EnsureEvent())
+                SetEvent(event_);
+            return request;
+        }
+
+        bool ConsumeEventSignal() noexcept
+        {
+            return EnsureEvent() &&
+                WaitForSingleObject(event_, 0) == WAIT_OBJECT_0;
         }
 
         bool Pending(LONG& requestId, DWORD& requesterPid) noexcept
@@ -123,7 +134,16 @@ namespace OutRunVR::RecenterIpc
         }
 
     private:
+        bool EnsureEvent() noexcept
+        {
+            if (event_)
+                return true;
+            event_ = CreateEventW(nullptr, FALSE, FALSE, EventName);
+            return event_ != nullptr;
+        }
+
         HANDLE mapping_ = nullptr;
+        HANDLE event_ = nullptr;
         State* state_ = nullptr;
     };
 
