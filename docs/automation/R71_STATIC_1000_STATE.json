@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 25,
+  "completedCycles": 26,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "306fb258b8cde755ba42ae63391092f9ecb15eac",
+  "currentHead": "7ccdc4921712bc1ab9891cd4ce30ac38363e8de7",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -754,12 +754,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "review projection cache freshness counters"
+    },
+    {
+      "cycle": 26,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Fresh/cached projection counters and pipeline timing windows already distinguish source refresh from XR resubmission; hold/debounce tuning still requires HMD telemetry."
+      ],
+      "evidence": [
+        "R42ProjectionRefreshes/R42SameFrameProjectionReuses/R23PipelineWindow"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "7ccdc4921712bc1ab9891cd4ce30ac38363e8de7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "review candidate rejection diagnostics"
     }
   ],
   "nextCycle": {
-    "cycle": 26,
+    "cycle": 27,
     "priority": [
-      "review projection cache freshness counters"
+      "review candidate rejection diagnostics"
     ],
     "guard": "frozen 34eef500 user-test package immutable; GitHub remains source of truth"
   },
