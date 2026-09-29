@@ -1,0 +1,108 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00114",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00045",
+  "recorded_at_kst": "2026-09-29T18:32:47+09:00",
+  "base_sha": "f613376ff184a6493794475644783250ba703a9d",
+  "material_commit_sha": "b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e",
+  "pre_task_record_head_sha": "b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_SOURCE_GATED_V2_REBUILD_WORK_ORDERS_24_SEGMENTS",
+  "summary": "Advanced odd primary-shard indices 133/135/139/143 (25F697C6, 2B0863D6, 313DB8CB, 34923C8A) from reviewed transcription/layout-pending state into explicit source-gated first-pass-v2 reconstruction work orders. Pinned exact inventory SHA-256 identities, native canvas dimensions and 1x/4x scale equations, retained 24 reviewed Korean mappings and asset-specific preserve constraints, and defined deterministic source-hash/header/orientation/effect-mask/CLEAN_PLATE/2px-safe-bbox/render gates. A recursive current-tree inspection found no paths for these four asset IDs, so no DDS bytes or pixel geometry were fabricated; all pixel/candidate gates remain HOLD_STRICT_RECHECK and runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1831-A00114-P00045/A00114_P00045_FOUR_ODD_SOURCE_GATED_REBUILD_WORK_ORDERS.json"
+  ],
+  "evidence_blob_sha": "4a2805889ff84a0303001f257bf124e7942139fc",
+  "material_deliverable": {
+    "type": "FOUR_ODD_SOURCE_GATED_V2_RECONSTRUCTION_WORK_ORDERS",
+    "indices": [
+      133,
+      135,
+      139,
+      143
+    ],
+    "assets": [
+      "25F697C6",
+      "2B0863D6",
+      "313DB8CB",
+      "34923C8A"
+    ],
+    "reviewed_translation_segments": 24,
+    "exact_inventory_source_fingerprints": 4,
+    "exact_canvas_scale_equations": 4,
+    "asset_specific_preserve_contracts": 4,
+    "current_git_tree_source_matches": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "current_tree_sha": "4541fca0c865f367bb11e08d3f8563110df75d17"
+  },
+  "skipped_or_deferred": {
+    "qa_pending_or_newer_producer": {
+      "LOCALIZATION-LOCALIZATION_A-00107": [
+        55
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00109": [
+        159
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00112": [
+        147,
+        161,
+        163
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "already_static_or_runtime_backlog": [
+      57,
+      61,
+      63,
+      97,
+      195,
+      197
+    ]
+  },
+  "self_qa": "PASS_ODD_ONLY_133_135_139_143__4_OF_4_CURRENT_QUEUE_LOCALIZE_TEXT_PENDING_ARTWORK__4_OF_4_TRANSCRIBED_REVIEWED__24_OF_24_EXISTING_TRANSLATION_SEGMENTS_CARRIED_EXACTLY__4_OF_4_INVENTORY_SHA256_IDENTITIES__4_OF_4_CANVAS_SCALE_EQUATIONS__ZERO_CURRENT_TREE_ASSET_ID_PATHS__NO_PIXEL_GEOMETRY_FABRICATED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "fail_closed_reason": "The current GitHub branch contains metadata/transcription inputs for these assets but no DDS path matching any of the four asset IDs. Exact DDS header/compression/alpha/mips, raw orientation, per-element source full-effect bboxes, source removal/protected masks, independently passing CLEAN_PLATE pixels/QA, measured v2 final candidate_safe_bbox, Korean rendering and exact ENGLISH SOURCE vs KOREAN CANDIDATE comparison cannot be inferred safely. The work orders require an exact source whose SHA-256 matches the pinned inventory fingerprint before any pixel production.",
+  "strict_hold": {
+    "exact_source_bytes": "HOLD_SOURCE_NOT_PRESENT_IN_CURRENT_GIT_TREE",
+    "exact_dds_header_format_alpha_mips": "HOLD_EXACT_SOURCE_REQUIRED",
+    "raw_orientation": "HOLD_EXACT_SOURCE_REQUIRED",
+    "source_effect_masks": "HOLD_EXACT_SOURCE_REQUIRED",
+    "protected_non_text_masks": "HOLD_EXACT_SOURCE_REQUIRED",
+    "clean_plate_pixels": "HOLD_EXACT_SOURCE_REQUIRED",
+    "clean_plate_qa": "HOLD_EXACT_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
