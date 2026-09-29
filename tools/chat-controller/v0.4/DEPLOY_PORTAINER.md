@@ -150,7 +150,7 @@ If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each 
 
 ## Localization continuous production + independent batch QA
 
-When `LOCALIZATION_PARALLEL=true`, localization no longer uses an A+B -> C synchronization barrier.
+When `LOCALIZATION_PARALLEL=true`, localization no longer serializes C behind completion of an A/B production pair.
 
 1. Lane A continuously produces the odd-index shard. After its exact task commit passes Automation Gate, the slot becomes available for the next A task immediately.
 2. Lane B does the same for the even-index shard.
