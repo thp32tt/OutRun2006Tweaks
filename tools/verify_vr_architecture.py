@@ -358,7 +358,8 @@ require(
 # completion, and bind actual texture format/size to committed Frame.v2 metadata.
 require(
     "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
-    "CopyFenceTimeoutMs = 8",
+    "CopyFenceTimeoutUs = 2000",
+    "QueryPerformanceCounter",
     "ExpectedDeclaredFormat",
     "case D3DFMT_A8R8G8B8",
     "DXGI_FORMAT_B8G8R8A8_UNORM",

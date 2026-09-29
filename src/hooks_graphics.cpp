@@ -241,6 +241,23 @@ class RestoreCarBaseShadow : public Hook
 {
 	static void __cdecl CalcPeraShadow(int a1, int a2, int a3, float a4)
 	{
+		// R69 HMD regression result: the restored console-only base-shadow path
+		// can stereo-split during the start grid and never existed in stock PC C2C.
+		// Keep the restoration for normal non-VR play, but VR always uses the
+		// original PC nullsub behavior. This removes a special-case state table
+		// and prevents future menu/start mode transitions from re-enabling it.
+		if (Settings::VREnabled)
+		{
+			static bool logged = false;
+			if (!logged)
+			{
+				logged = true;
+				spdlog::info(
+					"VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE");
+			}
+			return;
+		}
+
 		// These call sites were nullsub_1 calls on PC, so skipping the draw
 		// restores exactly what the game did without the shadow.
 		if (Settings::CarBaseShadowOpacity <= 0.f)
@@ -281,6 +298,38 @@ public:
 	static RestoreCarBaseShadow instance;
 };
 RestoreCarBaseShadow RestoreCarBaseShadow::instance;
+
+// R65: the canonical lens-flare chain projects once through Calc3D2D and then
+// reaches DrawObjectAlpha_Internal through the single callsite EXE+0xCABE.
+// Wrap only that callsite so unrelated alpha objects keep their existing path.
+class VRLensFlareProjected2D : public Hook
+{
+	static void __cdecl DrawObjectAlphaProjected(
+		int objectId, float alpha, void* work, int flags)
+	{
+		OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+			OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
+		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRLensFlareProjected2D";
+	}
+
+	bool apply() override
+	{
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
+			Memory::HookType::Call);
+		spdlog::info("VR R67 FLARE: exact EXE+0xCABE semantic installed; Calc3D2D view anchor will be reprojected per eye");
+		return true;
+	}
+
+	static VRLensFlareProjected2D instance;
+};
+VRLensFlareProjected2D VRLensFlareProjected2D::instance;
 
 // Restores the console's lighting dynamic range, which the PC port didn't make
 // use of, costing roughly a third of the sun on surfaces facing it.

@@ -31,6 +31,7 @@ namespace OutRunVrR26RecenterHardening
     inline bool PendingFocusRecenter = false;
     inline XrSession PendingFocusSession = XR_NULL_HANDLE;
     inline std::atomic<LONG> PendingGameRequestId{ 0 };
+    inline std::atomic<LONG> EventFallbackSerial{ 1 };
     inline std::atomic<bool> PendingApplicationRecenter{ false };
     inline std::atomic<std::uint64_t> ApplicationSpaceGeneration{ 0 };
     inline std::atomic<std::uint64_t> PendingGameTargetGeneration{ 0 };
@@ -226,23 +227,40 @@ namespace OutRunVrR26RecenterHardening
             LONG requestId = 0;
             DWORD requesterPid = 0;
             auto& channel = OutRunVR::RecenterIpc::SharedChannel();
-            if (channel.Pending(requestId, requesterPid))
+            const bool eventSignaled = channel.ConsumeEventSignal();
+            const bool mappingPending = channel.Pending(requestId, requesterPid);
+            if (mappingPending || eventSignaled)
             {
-                // Received means only that the host accepted ownership. Applied
-                // is deliberately deferred until EndFrame succeeds after the
-                // LOCAL anchor invalidation/rebuild cycle.
+                // Positive ids are the shared-memory path. Negative ids are a
+                // named-event fallback used when the host cannot observe the
+                // 32-bit mapping update even though it receives the event.
+                if (!mappingPending)
+                {
+                    LONG serial = EventFallbackSerial.fetch_add(
+                        1, std::memory_order_acq_rel);
+                    if (serial <= 0)
+                    {
+                        EventFallbackSerial.store(2, std::memory_order_release);
+                        serial = 1;
+                    }
+                    requestId = -serial;
+                    requesterPid = 0;
+                }
+
                 const std::uint64_t targetGeneration =
                     ApplicationSpaceGeneration.load(std::memory_order_acquire) + 1;
                 PendingGameTargetGeneration.store(
                     targetGeneration, std::memory_order_release);
                 QueueApplicationRecenter();
                 WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE);
-                channel.MarkReceived(requestId);
+                if (requestId > 0)
+                    channel.MarkReceived(requestId);
                 PendingGameRequestId.store(requestId, std::memory_order_release);
                 ++GameRequestsReceived;
                 std::cerr
-                    << "[R28 recenter] F10 request received requestId="
+                    << "[R54 recenter] request received requestId="
                     << requestId << " pid=" << requesterPid
+                    << " transport=" << (mappingPending ? "mapping" : "event-fallback")
                     << "; pending until visible post-reanchor submission\n";
                 return XR_SUCCESS;
             }
@@ -324,7 +342,8 @@ namespace OutRunVrR26RecenterHardening
             return false;
 
         auto& channel = OutRunVR::RecenterIpc::SharedChannel();
-        channel.MarkApplied(pending);
+        if (pending > 0)
+            channel.MarkApplied(pending);
         LONG expected = pending;
         const bool cleared = PendingGameRequestId.compare_exchange_strong(
             expected, 0, std::memory_order_acq_rel,
@@ -375,7 +394,8 @@ namespace OutRunVrR26RecenterHardening
             (anchoredStartup || (endInfo && endInfo->layerCount > 0)))
         {
             auto& channel = OutRunVR::RecenterIpc::SharedChannel();
-            channel.MarkApplied(pending);
+            if (pending > 0)
+                channel.MarkApplied(pending);
             LONG expected = pending;
             PendingGameRequestId.compare_exchange_strong(
                 expected, 0, std::memory_order_acq_rel,

@@ -35,6 +35,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/ipc/frame_contract.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
 #define OUTRUN_VR_BUILD_SHA "unknown"
@@ -78,44 +79,7 @@ namespace
     bool R23UsableGameplayBootstrapFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        constexpr std::uint32_t required =
-            OutRunVR::RenderFrameStereoComplete |
-            OutRunVR::RenderFrameWorldStereo |
-            OutRunVR::RenderFrameDrawDuplicated |
-            OutRunVR::RenderFrameEffectivePoseValid;
-
-        if (!frame.frameId || !frame.sourcePoseSequence ||
-            frame.presentationMode != OutRunVR::PresentationGameplay ||
-            frame.state != OutRunVR::StereoSbsActive ||
-            frame.failureReason != OutRunVR::StereoFailureNone ||
-            frame.presentQpc <= 0 ||
-            !frame.backbufferWidth || !frame.backbufferHeight ||
-            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-            (frame.flags & required) != required)
-            return false;
-
-        if ((frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
-            return true;
-
-        const std::uint32_t slot =
-            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
-        const std::uint32_t generation =
-            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        const std::uint32_t width =
-            frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
-        const std::uint32_t height =
-            frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
-        const std::uint32_t leftHandle =
-            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
-        const std::uint32_t rightHandle =
-            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
-
-        return slot < OutRunVR::RenderFrameRingSize &&
-            generation != 0 &&
-            leftHandle != 0 && rightHandle != 0 &&
-            width != 0 && height != 0 &&
-            width == frame.backbufferWidth &&
-            height == frame.backbufferHeight;
+        return OutRunVR::FrameContract::IsUsableGameplayStereoFrame(frame);
     }
 
     std::uint64_t R23CachedProjectionSubmits = 0;
@@ -308,6 +272,8 @@ namespace
         UINT arraySize = 0;
         std::uint32_t frameId = 0;
         std::uint32_t generation = 0;
+        std::uint32_t borrowedSlot = OutRunVR::RenderFrameRingSize;
+        bool borrowed = false;
         bool valid = false;
 
         ~R23DirectHoldState()
@@ -320,12 +286,262 @@ namespace
         }
     };
     R23DirectHoldState R23DirectHold{};
+    struct R23DirectDescCacheEntry
+    {
+        ID3D11Texture2D* left = nullptr;   // weak identity only
+        ID3D11Texture2D* right = nullptr;  // weak identity only
+        std::uint32_t leftHandle = 0;
+        std::uint32_t rightHandle = 0;
+        std::uint32_t generation = 0;
+        D3D11_TEXTURE2D_DESC leftDesc{};
+        D3D11_TEXTURE2D_DESC rightDesc{};
+        bool valid = false;
+    };
+
+    std::array<R23DirectDescCacheEntry, OutRunVR::RenderFrameRingSize>
+        R23DirectDescCache{};
+
     bool R23FirstDirectHoldLogged = false;
     bool R36FirstDirectBootstrapLogged = false;
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
         R37BootstrapSubmittedFrame{};
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
         R37BootstrapSubmittedGeneration{};
+
+    struct R23DeferredReferenceAck
+    {
+        ID3D11Query* fence = nullptr;
+        bool armed = false;
+        bool poisoned = false;
+        OutRunVR::SharedRenderFrameState frame{};
+    };
+
+    std::array<R23DeferredReferenceAck, OutRunVR::RenderFrameRingSize>
+        R23DeferredReferenceAcks{};
+    std::uint64_t R23DeferredReferenceAckArmed = 0;
+    std::uint64_t R23DeferredReferenceAckCompleted = 0;
+    std::uint64_t R23DeferredReferenceAckPoisoned = 0;
+    bool R23FirstDeferredReferenceAckLogged = false;
+    bool R23FirstDeferredReferenceAckPoisonLogged = false;
+
+    bool R23SameDirectIdentity(
+        const OutRunVR::SharedRenderFrameState& a,
+        const OutRunVR::SharedRenderFrameState& b) noexcept
+    {
+        return a.frameId != 0 && a.frameId == b.frameId &&
+            a.clientPid == b.clientPid &&
+            a.reserved[OutRunVR::RenderFrameDirectSlotIndex] ==
+                b.reserved[OutRunVR::RenderFrameDirectSlotIndex] &&
+            a.reserved[OutRunVR::RenderFrameDirectGenerationIndex] ==
+                b.reserved[OutRunVR::RenderFrameDirectGenerationIndex] &&
+            a.reserved[OutRunVR::RenderFrameRunGenerationIndex] ==
+                b.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+    }
+
+    bool R23DeferredReferencePending(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        if (slot >= R23DeferredReferenceAcks.size())
+            return false;
+        const auto& pending = R23DeferredReferenceAcks[slot];
+        return pending.armed &&
+            R23SameDirectIdentity(pending.frame, frame);
+    }
+
+    bool R23DeferredSlotBlocked(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        if (slot >= R23DeferredReferenceAcks.size())
+            return false;
+        const auto& pending = R23DeferredReferenceAcks[slot];
+        return pending.armed &&
+            pending.frame.clientPid == frame.clientPid &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex] ==
+                frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex] &&
+            pending.frame.reserved[
+                OutRunVR::RenderFrameRunGenerationIndex] ==
+                frame.reserved[
+                    OutRunVR::RenderFrameRunGenerationIndex];
+    }
+
+    void R23PollDeferredReferenceAcks(StereoCompositor& c) noexcept
+    {
+        if (!c.context_)
+            return;
+
+        for (std::uint32_t slot = 0;
+             slot < R23DeferredReferenceAcks.size(); ++slot)
+        {
+            auto& pending = R23DeferredReferenceAcks[slot];
+            if (!pending.armed || pending.poisoned || !pending.fence)
+                continue;
+
+            const HRESULT hr = c.context_->GetData(
+                pending.fence, nullptr, 0,
+                D3D11_ASYNC_GETDATA_DONOTFLUSH);
+            if (hr == S_FALSE)
+                continue;
+            if (FAILED(hr))
+            {
+                // Completion is unknowable. Keep the producer slot blocked
+                // rather than publishing an unsafe ACK that could allow D3D9
+                // to overwrite a resource still referenced by D3D11. Also
+                // quarantine this DirectGPU generation so no new zero-copy
+                // source from it is sampled while completion is unknowable.
+                const std::uint32_t failedGeneration =
+                    pending.frame.reserved[
+                        OutRunVR::RenderFrameDirectGenerationIndex];
+                OutRunVrR32DirectSubmit::MarkGenerationFault(
+                    failedGeneration);
+                pending.poisoned = true;
+                ++R23DeferredReferenceAckPoisoned;
+                if (!R23FirstDeferredReferenceAckPoisonLogged)
+                {
+                    R23FirstDeferredReferenceAckPoisonLogged = true;
+                    std::cerr
+                        << "[R23 deferred-ack] EVENT query failed; exact producer slot remains fail-closed until transport reset.\n";
+                }
+                continue;
+            }
+
+            if (!OutRunVrD3D9ExDirectPassthrough::
+                    FrameRunIdentityCurrent(pending.frame))
+            {
+                // Producer run changed. No ACK may be written into the new
+                // run's mapping, but the old GPU work is complete and can be
+                // forgotten safely.
+                pending.armed = false;
+                pending.poisoned = false;
+                pending.frame = {};
+                ++R23DeferredReferenceAckCompleted;
+                continue;
+            }
+
+            if (!OutRunVrD3D9ExDirectPassthrough::
+                    PublishCompletedFrame(pending.frame))
+                continue;
+
+            R37BootstrapSubmittedFrame[slot] =
+                pending.frame.frameId;
+            R37BootstrapSubmittedGeneration[slot] =
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex];
+            pending.armed = false;
+            pending.poisoned = false;
+            pending.frame = {};
+            ++R23DeferredReferenceAckCompleted;
+        }
+    }
+
+    void R23ReleaseDeferredReferenceAcks() noexcept
+    {
+        for (auto& pending : R23DeferredReferenceAcks)
+        {
+            ReleaseCom(pending.fence);
+            pending.armed = false;
+            pending.poisoned = false;
+            pending.frame = {};
+        }
+    }
+
+
+    bool R23ArmDeferredReferenceAck(
+        StereoCompositor& c,
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const std::uint32_t slot =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        if (!c.context_ || !c.device_ ||
+            slot >= R23DeferredReferenceAcks.size() ||
+            !frame.frameId || !generation)
+            return false;
+
+        R23PollDeferredReferenceAcks(c);
+        auto& pending = R23DeferredReferenceAcks[slot];
+        if (pending.armed)
+        {
+            if (R23SameDirectIdentity(pending.frame, frame))
+                return true;
+
+            const bool transportChanged =
+                pending.frame.clientPid != frame.clientPid ||
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameDirectGenerationIndex] !=
+                    generation ||
+                pending.frame.reserved[
+                    OutRunVR::RenderFrameRunGenerationIndex] !=
+                    frame.reserved[
+                        OutRunVR::RenderFrameRunGenerationIndex];
+            if (transportChanged)
+            {
+                // A new producer run/generation uses newly opened shared
+                // resources. Never ACK the old identity into the new run, but
+                // it no longer needs to block the replacement slot.
+                ReleaseCom(pending.fence);
+                pending.armed = false;
+                pending.poisoned = false;
+                pending.frame = {};
+            }
+            else
+            {
+                // A different frame in the same live producer slot while an
+                // older GPU reference is unresolved violates the lifetime
+                // contract. Quarantine the whole generation; otherwise the
+                // latest-frame skip path could incorrectly treat the new slot
+                // contents as an unsampled frame and ACK them immediately.
+                OutRunVrR32DirectSubmit::MarkGenerationFault(generation);
+                pending.poisoned = true;
+                return false;
+            }
+        }
+
+        if (!pending.fence)
+        {
+            D3D11_QUERY_DESC desc{};
+            desc.Query = D3D11_QUERY_EVENT;
+            if (FAILED(c.device_->CreateQuery(
+                    &desc, &pending.fence)) ||
+                !pending.fence)
+            {
+                // This exact producer slot was already referenced by D3D11,
+                // but without an EVENT its completion cannot be proven. Never
+                // ACK it. Quarantine the whole generation so future frames
+                // route to cached/classic recovery instead of consuming more
+                // shared slots into the same failure mode.
+                OutRunVrR32DirectSubmit::MarkGenerationFault(
+                    generation);
+                pending.frame = frame;
+                pending.armed = true;
+                pending.poisoned = true;
+                ++R23DeferredReferenceAckPoisoned;
+                return false;
+            }
+        }
+
+        // This EVENT is inserted after every command queued by the failed
+        // fresh-projection attempt. P5 DirectHold copies and V2 zero-copy
+        // partial sampling are therefore both protected before producer reuse.
+        c.context_->End(pending.fence);
+        pending.frame = frame;
+        pending.armed = true;
+        pending.poisoned = false;
+        ++R23DeferredReferenceAckArmed;
+        if (!R23FirstDeferredReferenceAckLogged)
+        {
+            R23FirstDeferredReferenceAckLogged = true;
+            std::cerr
+                << "[R23 deferred-ack] failed fresh projection now holds its producer slot until an asynchronous GPU EVENT completes.\n";
+        }
+        return true;
+    }
 
     bool R37FrameIdBefore(
         std::uint32_t candidate, std::uint32_t reference) noexcept
@@ -348,6 +564,8 @@ namespace
         R23DirectHold.arraySize = 0;
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.borrowedSlot = OutRunVR::RenderFrameRingSize;
+        R23DirectHold.borrowed = false;
         R23DirectHold.valid = false;
     }
 
@@ -355,6 +573,8 @@ namespace
     {
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.borrowedSlot = OutRunVR::RenderFrameRingSize;
+        R23DirectHold.borrowed = false;
         R23DirectHold.valid = false;
     }
 
@@ -372,8 +592,28 @@ namespace
 
         D3D11_TEXTURE2D_DESC left{};
         D3D11_TEXTURE2D_DESC right{};
-        c.directLeft_[slot]->GetDesc(&left);
-        c.directRight_[slot]->GetDesc(&right);
+        auto& descCache = R23DirectDescCache[slot];
+        const std::uint32_t leftHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+        const std::uint32_t rightHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
+        const bool cachedDesc =
+            descCache.valid &&
+            descCache.left == c.directLeft_[slot] &&
+            descCache.right == c.directRight_[slot] &&
+            descCache.leftHandle == leftHandle &&
+            descCache.rightHandle == rightHandle &&
+            descCache.generation == generation;
+        if (cachedDesc)
+        {
+            left = descCache.leftDesc;
+            right = descCache.rightDesc;
+        }
+        else
+        {
+            c.directLeft_[slot]->GetDesc(&left);
+            c.directRight_[slot]->GetDesc(&right);
+        }
         if (!left.Width || !left.Height || left.Width != right.Width ||
             left.Height != right.Height || left.MipLevels != right.MipLevels ||
             left.ArraySize != right.ArraySize || left.Format != right.Format ||
@@ -382,48 +622,31 @@ namespace
             left.Height != frame.backbufferHeight)
             return false;
 
-        const bool recreate =
-            !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
-            !R23DirectHold.srv[0] || !R23DirectHold.srv[1] ||
-            R23DirectHold.width != left.Width ||
-            R23DirectHold.height != left.Height ||
-            R23DirectHold.mipLevels != left.MipLevels ||
-            R23DirectHold.arraySize != left.ArraySize ||
-            R23DirectHold.format != left.Format;
-        if (recreate)
+        if (!cachedDesc)
         {
-            R23ReleaseDirectHoldResources();
-            D3D11_TEXTURE2D_DESC hold = left;
-            hold.Usage = D3D11_USAGE_DEFAULT;
-            hold.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-            hold.CPUAccessFlags = 0;
-            hold.MiscFlags = 0;
-            for (int eye = 0; eye < 2; ++eye)
-            {
-                if (FAILED(c.device_->CreateTexture2D(
-                        &hold, nullptr, &R23DirectHold.eye[eye])) ||
-                    !R23DirectHold.eye[eye] ||
-                    FAILED(c.device_->CreateShaderResourceView(
-                        R23DirectHold.eye[eye], nullptr,
-                        &R23DirectHold.srv[eye])) ||
-                    !R23DirectHold.srv[eye])
-                {
-                    R23ReleaseDirectHoldResources();
-                    return false;
-                }
-            }
-            R23DirectHold.width = left.Width;
-            R23DirectHold.height = left.Height;
-            R23DirectHold.mipLevels = left.MipLevels;
-            R23DirectHold.arraySize = left.ArraySize;
-            R23DirectHold.format = left.Format;
+            descCache.left = c.directLeft_[slot];
+            descCache.right = c.directRight_[slot];
+            descCache.leftHandle = leftHandle;
+            descCache.rightHandle = rightHandle;
+            descCache.generation = generation;
+            descCache.leftDesc = left;
+            descCache.rightDesc = right;
+            descCache.valid = true;
         }
 
-        // Immediate-context ordering guarantees that both copies execute before
-        // the following projection draw samples this host-owned pair. The R32
-        // EVENT fence then covers the copy + projection work before producer ACK.
-        c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
-        c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        // Experimental zero-copy path. PrepareDirectStereoSource already
+        // owns SRVs for the exact shared ring slot. Keep the producer slot
+        // borrowed until R32's asynchronous EVENT reports that projection
+        // sampling completed, then publish the per-slot ACK. No host-owned
+        // full-eye CopyResource is needed on the fresh-frame path.
+        R23ReleaseDirectHoldResources();
+        R23DirectHold.width = left.Width;
+        R23DirectHold.height = left.Height;
+        R23DirectHold.mipLevels = left.MipLevels;
+        R23DirectHold.arraySize = left.ArraySize;
+        R23DirectHold.format = left.Format;
+        R23DirectHold.borrowedSlot = slot;
+        R23DirectHold.borrowed = true;
         R23DirectHold.frameId = frame.frameId;
         R23DirectHold.generation = generation;
         R23DirectHold.valid = true;
@@ -431,7 +654,7 @@ namespace
         {
             R23FirstDirectHoldLogged = true;
             std::cout
-                << "DirectGPU single-copy production path active; legacy private snapshot/fence bypassed and grace projection samples only host-owned hold textures.\n";
+                << "DirectGPU EXP ZERO-COPY: projection samples the validated shared ring SRVs directly; producer slot release remains gated by the R32 asynchronous GPU-completion ACK.\n";
         }
         return true;
     }
@@ -1117,20 +1340,6 @@ namespace
         return found && R23FrameUnchanged(reader, selected);
     }
 
-    bool R23ValidateDirectResourceSize(StereoCompositor& c,
-        const OutRunVR::SharedRenderFrameState& frame)
-    {
-        const std::uint32_t slot = frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
-        const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
-        const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
-        if (slot >= OutRunVR::RenderFrameRingSize || !width || !height ||
-            width != frame.backbufferWidth || height != frame.backbufferHeight ||
-            !c.directLeft_[slot] || !c.directRight_[slot]) return false;
-        D3D11_TEXTURE2D_DESC l{}, r{};
-        c.directLeft_[slot]->GetDesc(&l); c.directRight_[slot]->GetDesc(&r);
-        return l.Width == width && l.Height == height && r.Width == width && r.Height == height &&
-            l.Format == r.Format && l.SampleDesc.Count == 1 && r.SampleDesc.Count == 1;
-    }
 
     void R23InvalidateDirect(StereoCompositor& c)
     {
@@ -1142,8 +1351,17 @@ namespace
     bool R23CommitDirectAfterValidation(StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame)
     {
+        const std::uint32_t generation =
+            frame.reserved[
+                OutRunVR::RenderFrameDirectGenerationIndex];
+        OutRunVrR32DirectSubmit::ObserveGeneration(generation);
+        if (OutRunVrR32DirectSubmit::GenerationFaulted(generation))
+        {
+            R23InvalidateDirect(c);
+            return false;
+        }
+
         if (!c.PrepareDirectStereoSource(frame) ||
-            !R23ValidateDirectResourceSize(c, frame) ||
             !R23StageDirectHold(c, frame))
         {
             R23InvalidateDirect(c);
@@ -1173,11 +1391,14 @@ namespace
         ID3D11ShaderResourceView* srv[2]{};
         DXGI_FORMAT fmt[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
         if (c.directFrameValid_ && R23DirectHold.valid &&
-            R23DirectHold.srv[0] && R23DirectHold.srv[1])
+            R23DirectHold.borrowed &&
+            R23DirectHold.borrowedSlot < OutRunVR::RenderFrameRingSize &&
+            c.directLeftSrv_[R23DirectHold.borrowedSlot] &&
+            c.directRightSrv_[R23DirectHold.borrowedSlot])
         {
             eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
-            srv[0] = R23DirectHold.srv[0];
-            srv[1] = R23DirectHold.srv[1];
+            srv[0] = c.directLeftSrv_[R23DirectHold.borrowedSlot];
+            srv[1] = c.directRightSrv_[R23DirectHold.borrowedSlot];
             fmt[0] = fmt[1] = R23DirectHold.format;
         }
         else
@@ -1895,6 +2116,10 @@ int main(int argc, char** argv)
         const bool directTransportEnabled = DirectTransportEnabled();
         const bool directTransportOnly =
             directTransportEnabled && DirectTransportOnly();
+        const auto directOnlyEffective = [&]() noexcept {
+            return directTransportOnly &&
+                !OutRunVrR32DirectSubmit::ActiveGenerationFaulted();
+        };
         const bool disableDesktopDuplication = DisableDesktopDuplication();
         const float targetRefreshRateHz = RequestedRefreshRateHz();
         const int cadenceMode = std::clamp(
@@ -2320,7 +2545,13 @@ int main(int argc, char** argv)
                     // being sampled by D3D11 are immediately per-slot ACKed so
                     // the producer can recycle them; the selected frame keeps
                     // R32's GPU EVENT completion ACK.
-                    if (directTransportOnly)
+                    // Failed fresh-projection references are independent
+                    // of direct-only policy; poll them in every gameplay frame
+                    // so hybrid/direct-enabled configurations cannot strand a
+                    // producer slot indefinitely.
+                    R23PollDeferredReferenceAcks(compositor);
+
+                    if (directOnlyEffective())
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
                             OutRunVR::RenderFrameRingSize> history{};
@@ -2404,8 +2635,20 @@ int main(int argc, char** argv)
                                         generation != currentGeneration)
                                         continue;
 
-                                    // No D3D11 draw/copy references this skipped
-                                    // frame, so producer reuse is safe immediately.
+                                    // Only frames never referenced by D3D11 may
+                                    // be ACKed immediately. If the producer has
+                                    // already replaced a same-generation slot
+                                    // that still owns a deferred GPU reference,
+                                    // that is a lifetime-contract violation:
+                                    // quarantine the generation and never ACK
+                                    // either identity speculatively.
+                                    if (R23DeferredSlotBlocked(frame))
+                                    {
+                                        if (!R23DeferredReferencePending(frame))
+                                            OutRunVrR32DirectSubmit::
+                                                MarkGenerationFault(generation);
+                                        continue;
+                                    }
                                     if (OutRunVrD3D9ExDirectPassthrough::
                                             PublishCompletedFrame(frame))
                                     {
@@ -2490,7 +2733,7 @@ int main(int argc, char** argv)
 
                         LARGE_INTEGER cs{}, ce{};
                         QueryPerformanceCounter(&cs);
-                        if (!directFrame && directTransportOnly)
+                        if (!directFrame && directOnlyEffective())
                         {
                             candidateReady = false;
                             candidateRejectReason =
@@ -2549,7 +2792,7 @@ int main(int argc, char** argv)
 
                         if (!candidateReady)
                         {
-                            if (!directFrame && directTransportOnly)
+                            if (!directFrame && directOnlyEffective())
                             {
                                 candidateRejectReason =
                                     "direct-only-classic-rejected";
@@ -2676,8 +2919,30 @@ int main(int argc, char** argv)
                     const bool hadCachedProjection = cachedProjectionValid;
                     const bool projectionRefreshNeeded =
                         newStereoCommitted || !cachedProjectionValid;
-                    if (grace && projectionRefreshNeeded &&
-                        R23RenderProjection(compositor, matchedViews, pv))
+                    bool freshProjectionRendered = false;
+                    if (grace && projectionRefreshNeeded)
+                        freshProjectionRendered =
+                            R23RenderProjection(
+                                compositor, matchedViews, pv);
+
+                    if (!freshProjectionRendered &&
+                        pendingBundlePublish &&
+                        pendingBundleSource ==
+                            OutRunVrR23VerifiedBundle::SourceKind::DirectGpu)
+                    {
+                        R23ArmDeferredReferenceAck(
+                            compositor, pendingBundleFrame);
+                        // Drop this source frame from future selection. It was
+                        // referenced by D3D11 but never became presentation
+                        // authority; the deferred EVENT owns its slot lifetime
+                        // until it is safe for the producer to recycle.
+                        lastProcessedStereoFrame =
+                            pendingBundleFrame.frameId;
+                        candidateRejectReason =
+                            "render-failed-deferred-gpu-ack";
+                    }
+
+                    if (freshProjectionRendered)
                     {
                         ++R42ProjectionRefreshes;
                         projection.space = localSpace;
@@ -2782,7 +3047,7 @@ int main(int argc, char** argv)
                     // projection, keep the last LOCAL-fixed menu/loading image
                     // visible in direct-only mode. This is strictly a bootstrap
                     // bridge; the first fresh gameplay projection disables it.
-                    if (!layerReady && directTransportOnly &&
+                    if (!layerReady && directOnlyEffective() &&
                         awaitingFirstGameplayStereo &&
                         cachedMenuProjectionValid)
                     {
@@ -2802,7 +3067,7 @@ int main(int argc, char** argv)
                     // Duplication missed the stereo grace window. VDXR can show a
                     // solid compositor colour / severe HMD stutter even while the
                     // desktop game keeps running normally.
-                    if (!layerReady && directTransportOnly)
+                    if (!layerReady && directOnlyEffective())
                     {
                         finalLayerKind = "direct-only-no-classic-fallback";
                     }
@@ -3005,6 +3270,7 @@ int main(int argc, char** argv)
         }
 
         OutRunVrR23VerifiedBundle::Invalidate();
+        R23ReleaseDeferredReferenceAcks();
         compositor.Shutdown();
         if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);
         if (localSpace != XR_NULL_HANDLE) xrDestroySpace(localSpace);
@@ -3016,6 +3282,7 @@ int main(int argc, char** argv)
     {
         std::cerr << "OutRun VR host error: " << e.what() << "\n";
         OutRunVrR23VerifiedBundle::Invalidate();
+        R23ReleaseDeferredReferenceAcks();
         if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);
         if (localSpace != XR_NULL_HANDLE) xrDestroySpace(localSpace);
         if (session != XR_NULL_HANDLE) xrDestroySession(session);

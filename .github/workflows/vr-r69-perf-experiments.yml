@@ -1,0 +1,196 @@
+name: R69 Remaining Performance Experiments
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-candidate/r69-perf-exp-all
+      - vr-d3d9ex-candidate/r69-perf-exp-all-v2
+      - vr-d3d9ex-candidate/r69-perf-exp-all-v3
+      - vr-d3d9ex-candidate/r69-perf-exp-all-v4
+    paths:
+      - 'src/vr/**'
+      - 'vrhost/**'
+      - 'docs/VR_R69_PERF_EXPERIMENTS.md'
+      - '.github/workflows/vr-r69-perf-experiments.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vr-r69-perf-experiments
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: P5_BASE
+            ref: b3eee3988998aac7cc9f38995ddb5110e4b3255c
+            note: P5 safe performance baseline
+          - id: EXP_STATEBLOCK
+            ref: 7d795e8270dfdbeb5d328a7e104a6bf9dffedcc8
+            note: explicit SkyGlow touched-state restore; no D3DSBT_ALL
+          - id: EXP_ZEROCOPY
+            ref: 35de66e01d08f3e4c1a5102e1cfb7c9a37eb3977
+            note: DirectGPU shared-eye SRV zero-copy fresh projection
+          - id: EXP_FENCE2
+            ref: aa4a6d29a470eea343a9f0f5e1b9a7ec0a3ac09a
+            note: legacy SafeEye synchronous fence capped at 2ms
+          - id: EXP_XYZCACHE
+            ref: e7ca33e06d60a996a09305f729e4397c9f62700b
+            note: XYZRHW shadow registry lookup cache
+          - id: EXP_ALL
+            ref: 14c5b45e790bb691e884010de8886a0def1be865
+            note: original combined experiment before review fixes
+          - id: EXP_ALL_V2
+            ref: 60d1c483d79eb2d883ab9fd4f3d65bcbb693695b
+            note: reviewed V2 with QPC fence, explicit-state hardening, deferred failed-render ACK and shadow reset
+          - id: EXP_ALL_V3
+            ref: f19745bf88bbab6dc765f326148cb557f3984631
+            note: V3 selective XYZRHW shadow gate + relaxed diagnostics + deferred-query cleanup + smoke-tested CI
+          - id: EXP_ALL_V4
+            ref: 670fda17836012d61be399bd03ac3287ab689294
+            note: V4 closes shadow registration races and quarantines DirectGPU generations on unverifiable GPU completion
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Configure and build Win32 game
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+          cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Build x64 D3D11 OpenXR host and deterministic smoke tests
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-shader-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-direct-ack-identity-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+
+      - name: Run deterministic no-HMD host smoke tests
+        shell: pwsh
+        run: |
+          $tests=@(
+            'outrun-vr-shader-smoke.exe',
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe',
+            'outrun-vr-r32-policy-smoke.exe',
+            'outrun-vr-direct-ack-identity-smoke.exe',
+            'outrun-vr-protocol-v3-smoke.exe',
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-host-state-v3-channel-smoke.exe',
+            'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
+            'outrun-vr-host-pose-v3-validation-smoke.exe'
+          )
+          foreach($test in $tests){
+            $testPath=Join-Path 'build-host/bin' $test
+            if(-not (Test-Path $testPath)){ throw "host smoke missing: $test" }
+            & $testPath
+            if($LASTEXITCODE -ne 0){ throw "host smoke failed ($LASTEXITCODE): $test" }
+          }
+
+      - name: Assemble test candidate
+        shell: pwsh
+        run: |
+          $id='${{ matrix.id }}'
+          $ref='${{ matrix.ref }}'
+          $note='${{ matrix.note }}'
+          $dir=Join-Path 'candidate' $id
+          $backend=Join-Path $dir 'backends/d3d9'
+          New-Item -ItemType Directory -Force $backend | Out-Null
+
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll |
+            Where-Object { $_.FullName -match '\\bin\\' } |
+            Select-Object -First 1
+          if(-not $dll){ throw 'dinput8.dll missing' }
+          if(!(Test-Path build-host/bin/outrun-vr-host.exe)){
+            throw 'outrun-vr-host.exe missing'
+          }
+
+          Copy-Item $dll.FullName (Join-Path $backend 'dinput8.dll')
+          Copy-Item build-host/bin/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
+          Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $ref -Encoding ascii
+
+          foreach($file in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')){
+            if(Test-Path $file){ Copy-Item $file (Join-Path $dir $file) }
+          }
+          foreach($file in @(
+            'OutRunVR-TestProfiles.ps1','OutRunVR-BackendContract.ps1',
+            'Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1',
+            'Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1',
+            'START_HERE_VR_TEST.cmd'
+          )){
+            $src=Join-Path 'tools' $file
+            if(Test-Path $src){ Copy-Item $src (Join-Path $dir $file) }
+          }
+
+          @(
+            "CANDIDATE=$id"
+            "SOURCE_REF=$ref"
+            "PURPOSE=$note"
+            "STATUS=TEST_ONLY_NOT_FOR_INTEGRATION"
+            "PROFILE=CORRECTNESS"
+            "UPLOAD=OutRun2_VR_ANALYZE_*.zip"
+          ) | Set-Content (Join-Path $dir 'EXPERIMENT.txt') -Encoding UTF8
+
+          Get-ChildItem $dir -Recurse -File |
+            Get-FileHash -Algorithm SHA256 |
+            ForEach-Object {
+              "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+            } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath "$id.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-${{ matrix.id }}
+          path: ${{ matrix.id }}.zip
+          if-no-files-found: error
+
+  bundle:
+    needs: build
+    runs-on: windows-2022
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: all-candidates
+
+      - name: Create one limited-time HMD test bundle
+        shell: pwsh
+        run: |
+          @(
+            'OUTRUN R69 REMAINING PERFORMANCE EXPERIMENTS'
+            ''
+            'FAST TEST ORDER'
+            '1. EXP_ALL_V4 first.'
+            '2. If EXP_ALL_V4 is visually correct and the bad frame-drop section improves, stop.'
+            '3. If EXP_ALL_V4 shows flicker/black/stale-eye/LR mismatch, test EXP_ZEROCOPY.'
+            '4. If EXP_ALL_V4 shows later-draw corruption/menu/shadow/post-effect errors, test EXP_STATEBLOCK.'
+            '5. If only occasional hitch remains, test EXP_FENCE2.'
+            '6. If HUD/particle-heavy CPU drops remain, test EXP_XYZCACHE.'
+            '7. P5_BASE is only the before/after control.'
+            ''
+            'Use the same route, HMD refresh, Virtual Desktop settings and game settings for every run.'
+            'Exit normally after each run and upload only the newest OutRun2_VR_ANALYZE_*.zip.'
+          ) | Set-Content all-candidates/TEST_ORDER.txt -Encoding UTF8
+
+          Compress-Archive -Path 'all-candidates/*' -DestinationPath 'OutRun2_VR_R69_REMAINING_PERF_TESTS.zip' -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-R69-REMAINING-PERF-TESTS
+          path: OutRun2_VR_R69_REMAINING_PERF_TESTS.zip
+          if-no-files-found: error

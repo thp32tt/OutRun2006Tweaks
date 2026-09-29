@@ -1,0 +1,125 @@
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+$root=Split-Path -Parent $MyInvocation.MyCommand.Path
+$selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
+$runner=Join-Path $root 'Run-OutRunVRTest.ps1'
+$probe=Join-Path $root 'outrun-d3d9on12-probe.exe'
+
+$slots=[ordered]@{
+    'R69_FIXPACK'=@('R69 CLEAN production path','R57 실험 분기 제거. R69 검증 projected-rank/head-inverse + HUD/flare/shadow 정책만 사용.')
+}
+
+function Start-VRTest([string]$backend,[string]$variant){
+    & $selector -Backend $backend -TestProfile CORRECTNESS -VariantId $variant
+    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw "Failed to prepare $backend / $variant"}
+    Start-Process powershell -ArgumentList @(
+        '-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,
+        '-TestProfile','CORRECTNESS'
+    ) -WorkingDirectory $root
+}
+
+$form=New-Object System.Windows.Forms.Form
+$form.Text='OutRun VR 2026-09-26 Nightly Unified Test'
+$form.StartPosition='CenterScreen'
+$form.ClientSize=[System.Drawing.Size]::new(1040,790)
+$form.MinimumSize=[System.Drawing.Size]::new(920,680)
+
+$title=New-Object System.Windows.Forms.Label
+$title.Text='OutRun VR R69 CLEAN - DX9Ex / DX11 Host / DXVK / DX12'
+$title.Font=New-Object System.Drawing.Font('Segoe UI',15,[System.Drawing.FontStyle]::Bold)
+$title.AutoSize=$true
+$title.Location=[System.Drawing.Point]::new(24,16)
+$form.Controls.Add($title)
+
+$guide=New-Object System.Windows.Forms.Label
+$guide.Text='R69 CLEAN 기준: projected rank는 검증된 head-inverse production 경로로 고정됩니다. R57 mode 1~10 선택은 제거되었습니다.'
+$guide.AutoSize=$false
+$guide.Size=[System.Drawing.Size]::new(990,48)
+$guide.Location=[System.Drawing.Point]::new(26,54)
+$form.Controls.Add($guide)
+
+$backendBox=New-Object System.Windows.Forms.GroupBox
+$backendBox.Text='통합 Renderer / Transport 비교'
+$backendBox.Location=[System.Drawing.Point]::new(22,108)
+$backendBox.Size=[System.Drawing.Size]::new(990,150)
+$form.Controls.Add($backendBox)
+
+$backendButtons=@(
+    @('DX9Ex + D3D11 Host','d3d9','R69_FIXPACK','기준. DirectGPU 실패 시 fallback 허용.'),
+    @('DX11 Host DirectGPU','dx11','R69_FIXPACK','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
+    @('DXVK SAFE','dxvk-safe','R69_FIXPACK','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
+    @('DXVK MULTIVIEW','dxvk','R69_FIXPACK','DXVK + multiviewpatcher 실험 경로.'),
+    @('DX12 STRICT','dx12','R69_FIXPACK','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
+)
+$x=14
+foreach($b in $backendButtons){
+    $btn=New-Object System.Windows.Forms.Button
+    $btn.Text=$b[0]
+    $btn.Size=[System.Drawing.Size]::new(184,45)
+    $btn.Location=[System.Drawing.Point]::new($x,28)
+    $backend=$b[1]; $variant=$b[2]
+    $btn.Add_Click({ Start-VRTest $backend $variant }.GetNewClosure())
+    $backendBox.Controls.Add($btn)
+    $tip=New-Object System.Windows.Forms.ToolTip
+    $tip.SetToolTip($btn,$b[3])
+    $x+=192
+}
+
+$probeBtn=New-Object System.Windows.Forms.Button
+$probeBtn.Text='DX12 D3D9On12 PROBE'
+$probeBtn.Size=[System.Drawing.Size]::new(220,38)
+$probeBtn.Location=[System.Drawing.Point]::new(14,86)
+$probeBtn.Add_Click({
+    if(!(Test-Path $probe)){[System.Windows.Forms.MessageBox]::Show('outrun-d3d9on12-probe.exe가 없습니다.','DX12 Probe');return}
+    Start-Process cmd -ArgumentList @('/k',('"' + $probe + '"')) -WorkingDirectory $root
+})
+$backendBox.Controls.Add($probeBtn)
+
+$note=New-Object System.Windows.Forms.Label
+$note.Text='DX12 Probe 결과에서 d3d9on12_bridge / legacy_create_device / resource_interop / legacy_reset / DX12_POC_RESULT 가 모두 PASS여야 합니다.'
+$note.AutoSize=$false
+$note.Size=[System.Drawing.Size]::new(735,40)
+$note.Location=[System.Drawing.Point]::new(248,86)
+$backendBox.Controls.Add($note)
+
+$r57Box=New-Object System.Windows.Forms.GroupBox
+$r57Box.Text='R69 CLEAN 고정 렌더 경로'
+$r57Box.Location=[System.Drawing.Point]::new(22,270)
+$r57Box.Size=[System.Drawing.Size]::new(990,485)
+$r57Box.Anchor='Top,Bottom,Left,Right'
+$form.Controls.Add($r57Box)
+
+$panel=New-Object System.Windows.Forms.Panel
+$panel.Location=[System.Drawing.Point]::new(10,22)
+$panel.Size=[System.Drawing.Size]::new(970,450)
+$panel.Anchor='Top,Bottom,Left,Right'
+$panel.AutoScroll=$true
+$r57Box.Controls.Add($panel)
+
+$y=8
+foreach($id in $slots.Keys){
+    $row=New-Object System.Windows.Forms.Panel
+    $row.Location=[System.Drawing.Point]::new(8,$y)
+    $row.Size=[System.Drawing.Size]::new(925,62)
+
+    $btn=New-Object System.Windows.Forms.Button
+    $btn.Text=$slots[$id][0]
+    $btn.Size=[System.Drawing.Size]::new(260,48)
+    $btn.Location=[System.Drawing.Point]::new(0,4)
+    $variant=$id
+    $btn.Add_Click({ Start-VRTest 'd3d9' $variant }.GetNewClosure())
+    $row.Controls.Add($btn)
+
+    $desc=New-Object System.Windows.Forms.Label
+    $desc.Text=$slots[$id][1]
+    $desc.AutoSize=$false
+    $desc.Size=[System.Drawing.Size]::new(640,48)
+    $desc.Location=[System.Drawing.Point]::new(275,7)
+    $row.Controls.Add($desc)
+
+    $panel.Controls.Add($row)
+    $y+=66
+}
+
+[void]$form.ShowDialog()

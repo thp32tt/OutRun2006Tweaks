@@ -1,7 +1,7 @@
 // R30 screen-space asymmetric-FOV correction overlay.
 //
-// R29 restores conservative world/effect classification and removes the steady-
-// state third mono draw. R30 fixes the remaining HUD convergence problem without
+// The active production owner is the HMD-proven R26/R23 world/effect chain.
+// R30 fixes the remaining HUD convergence problem without
 // moving the world image: only main-backbuffer orthographic/ScreenSpace2D draws
 // receive an eye-specific clip-space X affine. The affine maps one common
 // head-relative tangent-angle interval into each eye's actual asymmetric OpenXR
@@ -9,10 +9,15 @@
 //
 // This is intentionally an interim projection-layer HUD solution. It does not
 // pretend to be XrCompositionLayerQuad: perspective world draws and fragile
-// perspective effects remain entirely owned by R29/R13.
+// perspective effects remain owned by the R26/R23/R13 lower chain.
 
 #include "stereo_renderer_r26.cpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/debug/experiment_modes.hpp"
+#include "vr/d3d9/frame_context.hpp"
+#include "vr/d3d9/render_policy.hpp"
+#include "vr/d3d9/screen_space_policy.hpp"
+#include "vr/d3d9/safety_policy.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -43,9 +48,11 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        // R26-safe comparison owner: R26 remains the world/effect authority;
+        // R26+HUD production owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
+        std::atomic<std::uint64_t> R57ProjectedMarkerDeltaBuilds{ 0 };
+        std::atomic<bool> R57ProjectedMarkerFirstLogged{ false };
 
         void R30ArmSafeFallback(std::uint64_t = 2) noexcept
         {
@@ -56,28 +63,32 @@ namespace OutRunVRStereo
 
         bool R30SafeStereoBase(IDirect3DDevice9* device) noexcept
         {
-            if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
-                return false;
-            if (!OutRunVR::RuntimeEligibility::MayInjectStereo() ||
+            const OutRunVR::SafetyPolicy::StereoReplayState state{
+                IsGameDevice(device),
+                InternalStereoPass,
+                TargetIsBackBuffer(),
+                StereoWanted(),
+                R9StereoSeeded,
+                OutRunVR::RuntimeEligibility::MayInjectStereo(),
                 OutRunVR::RuntimeEligibility::RecoveryPending.load(
-                    std::memory_order_acquire) ||
-                OutRunVR::RuntimeEligibility::PoseWarmupAllowed())
-                return false;
-            if (FrameStereoIncomplete || R9DeferredDepth ||
-                !R9CurrentDepthCanMirror() || AnyAuxRenderTargetActive() ||
-                R13ForceMonoShadow ||
+                    std::memory_order_acquire),
+                OutRunVR::RuntimeEligibility::PoseWarmupAllowed(),
+                FrameStereoIncomplete,
+                R9DeferredDepth,
+                R9CurrentDepthCanMirror(),
+                AnyAuxRenderTargetActive(),
+                R13ForceMonoShadow,
                 OcclusionQueryTrackingUnavailable.load(
-                    std::memory_order_acquire) ||
-                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
-                return false;
-            return true;
+                    std::memory_order_acquire),
+                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0
+            };
+            return OutRunVR::SafetyPolicy::CanReplayStereo(state);
         }
 
-        SafetyHookInline R30DrawPrimitiveR29Hook{};
-        SafetyHookInline R30DrawIndexedPrimitiveR29Hook{};
-        SafetyHookInline R30DrawPrimitiveUPR29Hook{};
-        SafetyHookInline R30DrawIndexedPrimitiveUPR29Hook{};
+        SafetyHookInline R30DrawPrimitiveR26Hook{};
+        SafetyHookInline R30DrawIndexedPrimitiveR26Hook{};
+        SafetyHookInline R30DrawPrimitiveUPR26Hook{};
+        SafetyHookInline R30DrawIndexedPrimitiveUPR26Hook{};
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R30InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -174,13 +185,143 @@ namespace OutRunVRStereo
             R30VertexShadows;
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
             R30IndexShadows;
-        std::uint64_t R30ShadowWrites = 0;
-        std::uint64_t R30ShadowReadHits = 0;
-        std::uint64_t R30ShadowReadMisses = 0;
-        std::uint64_t R30ShadowDiscardInvalidations = 0;
+        std::atomic<std::uint64_t> R30ShadowRegistryGeneration{ 1 };
+        // Lock hooks are vtable-global. A tiny Bloom gate keeps unrelated
+        // VB/IB Lock/Unlock/Release calls out of the shadow registry mutex.
+        // It is rebuilt after tracked releases, so long sessions do not
+        // accumulate stale bits. False positives only cause an extra lookup;
+        // false negatives are impossible because registration sets the bit.
+        std::atomic<std::uint64_t> R30TrackedVertexBloom{ 0 };
+        std::atomic<std::uint64_t> R30TrackedIndexBloom{ 0 };
+        std::array<std::atomic<std::uint32_t>, 64>
+            R30VertexRegistrationsInFlight{};
+        std::array<std::atomic<std::uint32_t>, 64>
+            R30IndexRegistrationsInFlight{};
+
+        struct R30RegistrationFlightGuard
+        {
+            std::atomic<std::uint32_t>& counter;
+            explicit R30RegistrationFlightGuard(
+                std::atomic<std::uint32_t>& value) noexcept
+                : counter(value)
+            {
+                counter.fetch_add(1, std::memory_order_acq_rel);
+            }
+            ~R30RegistrationFlightGuard()
+            {
+                counter.fetch_sub(1, std::memory_order_release);
+            }
+        };
+
+        template <typename T>
+        std::size_t R30ShadowBucket(T* buffer) noexcept
+        {
+            const auto value =
+                reinterpret_cast<std::uintptr_t>(buffer);
+            const auto mixed =
+                (value >> 4) ^ (value >> 13) ^ (value >> 23);
+            return static_cast<std::size_t>(mixed & 63u);
+        }
+
+        template <typename T>
+        std::uint64_t R30ShadowBloomBit(T* buffer) noexcept
+        {
+            return 1ull << R30ShadowBucket(buffer);
+        }
+
+        bool R30MaybeTrackedVertex(
+            IDirect3DVertexBuffer9* buffer) noexcept
+        {
+            return buffer &&
+                (R30TrackedVertexBloom.load(
+                    std::memory_order_relaxed) &
+                 R30ShadowBloomBit(buffer)) != 0;
+        }
+
+        bool R30MaybeTrackedIndex(
+            IDirect3DIndexBuffer9* buffer) noexcept
+        {
+            return buffer &&
+                (R30TrackedIndexBloom.load(
+                    std::memory_order_relaxed) &
+                 R30ShadowBloomBit(buffer)) != 0;
+        }
+
+        bool R30WaitForVertexRegistration(
+            IDirect3DVertexBuffer9* buffer) noexcept
+        {
+            if (!buffer)
+                return false;
+            const auto bucket = R30ShadowBucket(buffer);
+            auto& inFlight = R30VertexRegistrationsInFlight[bucket];
+            if (!R30MaybeTrackedVertex(buffer) &&
+                inFlight.load(std::memory_order_acquire) == 0)
+                return false;
+            while (inFlight.load(std::memory_order_acquire) != 0)
+                SwitchToThread();
+            return R30MaybeTrackedVertex(buffer);
+        }
+
+        bool R30WaitForIndexRegistration(
+            IDirect3DIndexBuffer9* buffer) noexcept
+        {
+            if (!buffer)
+                return false;
+            const auto bucket = R30ShadowBucket(buffer);
+            auto& inFlight = R30IndexRegistrationsInFlight[bucket];
+            if (!R30MaybeTrackedIndex(buffer) &&
+                inFlight.load(std::memory_order_acquire) == 0)
+                return false;
+            while (inFlight.load(std::memory_order_acquire) != 0)
+                SwitchToThread();
+            return R30MaybeTrackedIndex(buffer);
+        }
+
+        void R30RebuildTrackedBloomsLocked() noexcept
+        {
+            std::uint64_t vertexBits = 0;
+            for (const auto& [buffer, entry] : R30VertexShadows)
+            {
+                (void)entry;
+                vertexBits |= R30ShadowBloomBit(buffer);
+            }
+
+            std::uint64_t indexBits = 0;
+            for (const auto& [buffer, entry] : R30IndexShadows)
+            {
+                (void)entry;
+                indexBits |= R30ShadowBloomBit(buffer);
+            }
+
+            R30TrackedVertexBloom.store(
+                vertexBits, std::memory_order_relaxed);
+            R30TrackedIndexBloom.store(
+                indexBits, std::memory_order_relaxed);
+        }
+
+        struct R30VertexShadowLookupCache
+        {
+            IDirect3DVertexBuffer9* key = nullptr;
+            std::uint64_t generation = 0;
+            std::weak_ptr<R30BufferShadow> value;
+            bool knownMiss = false;
+        };
+        struct R30IndexShadowLookupCache
+        {
+            IDirect3DIndexBuffer9* key = nullptr;
+            std::uint64_t generation = 0;
+            std::weak_ptr<R30BufferShadow> value;
+            bool knownMiss = false;
+        };
+        thread_local R30VertexShadowLookupCache R30VertexShadowLookup{};
+        thread_local R30IndexShadowLookupCache R30IndexShadowLookup{};
+        std::atomic<std::uint64_t> R30ShadowWrites{ 0 };
+        std::atomic<std::uint64_t> R30ShadowReadHits{ 0 };
+        std::atomic<std::uint64_t> R30ShadowReadMisses{ 0 };
+        std::atomic<std::uint64_t> R30ShadowDiscardInvalidations{ 0 };
         std::atomic<bool> R30BufferShadowCaptureArmed{ false };
-        bool R30FirstShadowMissLogged = false;
-        bool R30FirstShadowArmLogged = false;
+        std::atomic<bool> R30FirstShadowMissLogged{ false };
+        std::atomic<bool> R30FirstShadowArmLogged{ false };
 
         struct R30ScratchBuffers
         {
@@ -250,57 +391,133 @@ namespace OutRunVRStereo
 
         R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
         {
+            const auto generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_acquire);
+            if (R30VertexShadowLookup.key == buffer &&
+                R30VertexShadowLookup.generation == generation)
+            {
+                if (R30VertexShadowLookup.knownMiss)
+                    return nullptr;
+                if (auto cached = R30VertexShadowLookup.value.lock())
+                    return cached;
+            }
+
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30VertexShadows.find(buffer);
-            return it == R30VertexShadows.end() ? nullptr : it->second;
+            R30ShadowPtr result =
+                it == R30VertexShadows.end() ? nullptr : it->second;
+            R30VertexShadowLookup.key = buffer;
+            R30VertexShadowLookup.generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_relaxed);
+            R30VertexShadowLookup.value = result;
+            R30VertexShadowLookup.knownMiss = !result;
+            return result;
         }
 
         R30ShadowPtr R30FindIndexShadow(IDirect3DIndexBuffer9* buffer)
         {
+            const auto generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_acquire);
+            if (R30IndexShadowLookup.key == buffer &&
+                R30IndexShadowLookup.generation == generation)
+            {
+                if (R30IndexShadowLookup.knownMiss)
+                    return nullptr;
+                if (auto cached = R30IndexShadowLookup.value.lock())
+                    return cached;
+            }
+
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30IndexShadows.find(buffer);
-            return it == R30IndexShadows.end() ? nullptr : it->second;
+            R30ShadowPtr result =
+                it == R30IndexShadows.end() ? nullptr : it->second;
+            R30IndexShadowLookup.key = buffer;
+            R30IndexShadowLookup.generation =
+                R30ShadowRegistryGeneration.load(std::memory_order_relaxed);
+            R30IndexShadowLookup.value = result;
+            R30IndexShadowLookup.knownMiss = !result;
+            return result;
         }
 
         R30ShadowPtr R30EnsureVertexShadow(IDirect3DVertexBuffer9* buffer)
         {
             if (!buffer)
                 return nullptr;
-            if (auto existing = R30FindVertexShadow(buffer))
-                return existing;
-            D3DVERTEXBUFFER_DESC desc{};
-            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
-                desc.Size > R30MaxShadowBytes)
+            try
+            {
+                if (auto existing = R30FindVertexShadow(buffer))
+                    return existing;
+                D3DVERTEXBUFFER_DESC desc{};
+                if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
+                    desc.Size > R30MaxShadowBytes)
+                    return nullptr;
+                auto entry = std::make_shared<R30BufferShadow>();
+                entry->size = desc.Size;
+                entry->usage = desc.Usage;
+                entry->pool = desc.Pool;
+                auto& inFlight =
+                    R30VertexRegistrationsInFlight[
+                        R30ShadowBucket(buffer)];
+                R30RegistrationFlightGuard registration(inFlight);
+                R30TrackedVertexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer), std::memory_order_release);
+                std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+                auto [it, inserted] =
+                    R30VertexShadows.emplace(buffer, entry);
+                R30TrackedVertexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer),
+                    std::memory_order_release);
+                if (inserted)
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                return inserted ? entry : it->second;
+            }
+            catch (...)
+            {
                 return nullptr;
-            auto entry = std::make_shared<R30BufferShadow>();
-            entry->size = desc.Size;
-            entry->usage = desc.Usage;
-            entry->pool = desc.Pool;
-            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-            auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
-            return inserted ? entry : it->second;
+            }
         }
 
         R30ShadowPtr R30EnsureIndexShadow(IDirect3DIndexBuffer9* buffer)
         {
             if (!buffer)
                 return nullptr;
-            if (auto existing = R30FindIndexShadow(buffer))
-                return existing;
-            D3DINDEXBUFFER_DESC desc{};
-            if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
-                desc.Size > R30MaxShadowBytes ||
-                (desc.Format != D3DFMT_INDEX16 &&
-                 desc.Format != D3DFMT_INDEX32))
+            try
+            {
+                if (auto existing = R30FindIndexShadow(buffer))
+                    return existing;
+                D3DINDEXBUFFER_DESC desc{};
+                if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
+                    desc.Size > R30MaxShadowBytes ||
+                    (desc.Format != D3DFMT_INDEX16 &&
+                     desc.Format != D3DFMT_INDEX32))
+                    return nullptr;
+                auto entry = std::make_shared<R30BufferShadow>();
+                entry->size = desc.Size;
+                entry->usage = desc.Usage;
+                entry->pool = desc.Pool;
+                entry->indexFormat = desc.Format;
+                auto& inFlight =
+                    R30IndexRegistrationsInFlight[
+                        R30ShadowBucket(buffer)];
+                R30RegistrationFlightGuard registration(inFlight);
+                R30TrackedIndexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer), std::memory_order_release);
+                std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
+                auto [it, inserted] =
+                    R30IndexShadows.emplace(buffer, entry);
+                R30TrackedIndexBloom.fetch_or(
+                    R30ShadowBloomBit(buffer),
+                    std::memory_order_release);
+                if (inserted)
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                return inserted ? entry : it->second;
+            }
+            catch (...)
+            {
                 return nullptr;
-            auto entry = std::make_shared<R30BufferShadow>();
-            entry->size = desc.Size;
-            entry->usage = desc.Usage;
-            entry->pool = desc.Pool;
-            entry->indexFormat = desc.Format;
-            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-            auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
-            return inserted ? entry : it->second;
+            }
         }
 
         void R30BeginObservedLock(const R30ShadowPtr& entry,
@@ -323,7 +540,7 @@ namespace OutRunVRStereo
             if (entry->writeLock && (flags & D3DLOCK_DISCARD))
             {
                 entry->valid.clear();
-                ++R30ShadowDiscardInvalidations;
+                R30ShadowDiscardInvalidations.fetch_add(1, std::memory_order_relaxed);
             }
         }
 
@@ -345,7 +562,7 @@ namespace OutRunVRStereo
                         entry->lockPtr, entry->lockSize);
                     R30MergeValidRange(entry->valid, entry->lockOffset,
                         entry->lockOffset + entry->lockSize);
-                    ++R30ShadowWrites;
+                    R30ShadowWrites.fetch_add(1, std::memory_order_relaxed);
                 }
                 catch (...)
                 {
@@ -370,7 +587,7 @@ namespace OutRunVRStereo
             const auto entry = R30FindVertexShadow(buffer);
             if (!entry)
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -378,10 +595,10 @@ namespace OutRunVRStereo
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
-                if (!R30FirstShadowMissLogged)
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
+                if (!R30FirstShadowMissLogged.exchange(
+                        true, std::memory_order_acq_rel))
                 {
-                    R30FirstShadowMissLogged = true;
                     spdlog::info(
                         "VR R30.6 BUFFER SHADOW: draw-time GPU Lock removed; an unobserved VB/IB range will fail open until the game's next write Lock/Unlock supplies CPU bytes");
                 }
@@ -396,7 +613,7 @@ namespace OutRunVRStereo
             {
                 return false;
             }
-            ++R30ShadowReadHits;
+            R30ShadowReadHits.fetch_add(1, std::memory_order_relaxed);
             return true;
         }
 
@@ -406,7 +623,7 @@ namespace OutRunVRStereo
             const auto entry = R30FindIndexShadow(buffer);
             if (!entry)
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -414,7 +631,7 @@ namespace OutRunVRStereo
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
-                ++R30ShadowReadMisses;
+                R30ShadowReadMisses.fetch_add(1, std::memory_order_relaxed);
                 return false;
             }
             try
@@ -426,7 +643,7 @@ namespace OutRunVRStereo
             {
                 return false;
             }
-            ++R30ShadowReadHits;
+            R30ShadowReadHits.fetch_add(1, std::memory_order_relaxed);
             return true;
         }
 
@@ -436,18 +653,25 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+            if (SUCCEEDED(hr) && data && *data &&
+                R30WaitForVertexRegistration(buffer))
+            {
+                // The Bloom gate makes unrelated world-buffer locks a
+                // lock-free fast reject. Only draw-proven/explicit-XYZRHW
+                // buffers enter the shadow registry and memcpy path.
+                if (auto entry = R30FindVertexShadow(buffer))
+                    R30BeginObservedLock(
+                        entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
         HRESULT __stdcall R30VertexBufferUnlockDest(
             IDirect3DVertexBuffer9* buffer)
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = R30WaitForVertexRegistration(buffer)
+                ? R30FindVertexShadow(buffer)
+                : R30ShadowPtr{};
             // The pointer returned by Lock is guaranteed valid until Unlock,
             // so snapshot bytes before forwarding the real Unlock.
             if (entry)
@@ -465,12 +689,24 @@ namespace OutRunVRStereo
         ULONG __stdcall R30VertexBufferReleaseDest(
             IDirect3DVertexBuffer9* buffer)
         {
+            const auto expected =
+                R30WaitForVertexRegistration(buffer)
+                    ? R30FindVertexShadow(buffer)
+                    : R30ShadowPtr{};
             const ULONG refs =
                 R30VertexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0)
+            if (refs == 0 && expected)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30VertexShadows.erase(buffer);
+                const auto it = R30VertexShadows.find(buffer);
+                if (it != R30VertexShadows.end() &&
+                    it->second == expected)
+                {
+                    R30VertexShadows.erase(it);
+                    R30RebuildTrackedBloomsLocked();
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                }
             }
             return refs;
         }
@@ -481,18 +717,22 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                SUCCEEDED(hr) && data && *data)
-                R30BeginObservedLock(
-                    R30EnsureIndexShadow(buffer), offset, size, *data, flags);
+            if (SUCCEEDED(hr) && data && *data &&
+                R30WaitForIndexRegistration(buffer))
+            {
+                if (auto entry = R30FindIndexShadow(buffer))
+                    R30BeginObservedLock(
+                        entry, offset, size, *data, flags);
+            }
             return hr;
         }
 
         HRESULT __stdcall R30IndexBufferUnlockDest(
             IDirect3DIndexBuffer9* buffer)
         {
-            const auto entry = R30FindIndexShadow(buffer);
+            const auto entry = R30WaitForIndexRegistration(buffer)
+                ? R30FindIndexShadow(buffer)
+                : R30ShadowPtr{};
             if (entry)
                 R30FinishObservedLock(entry, true);
             const HRESULT hr =
@@ -508,12 +748,24 @@ namespace OutRunVRStereo
         ULONG __stdcall R30IndexBufferReleaseDest(
             IDirect3DIndexBuffer9* buffer)
         {
+            const auto expected =
+                R30WaitForIndexRegistration(buffer)
+                    ? R30FindIndexShadow(buffer)
+                    : R30ShadowPtr{};
             const ULONG refs =
                 R30IndexBufferReleaseHook.stdcall<ULONG>(buffer);
-            if (refs == 0)
+            if (refs == 0 && expected)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30IndexShadows.erase(buffer);
+                const auto it = R30IndexShadows.find(buffer);
+                if (it != R30IndexShadows.end() &&
+                    it->second == expected)
+                {
+                    R30IndexShadows.erase(it);
+                    R30RebuildTrackedBloomsLocked();
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                }
             }
             return refs;
         }
@@ -570,10 +822,25 @@ namespace OutRunVRStereo
                 device, length, usage, fvf, pool, out, shared);
             if (SUCCEEDED(hr) && out && *out)
             {
+                {
+                    std::lock_guard<std::mutex> lock(
+                        R30ShadowRegistryMutex);
+                    if (R30VertexShadows.erase(*out) != 0)
+                    {
+                        R30RebuildTrackedBloomsLocked();
+                        R30ShadowRegistryGeneration.fetch_add(
+                            1, std::memory_order_release);
+                    }
+                }
+            }
+            if (SUCCEEDED(hr) && out && *out &&
+                (fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZRHW)
+            {
+                // Fixed-function XYZRHW is direct semantic evidence at
+                // creation time. Register only this proven class so its first
+                // Lock can be shadowed without reintroducing world-wide copies.
                 R30EnsureVertexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureVertexShadow(*out);
+                R30EnsureVertexShadow(*out);
             }
             return hr;
         }
@@ -587,11 +854,16 @@ namespace OutRunVRStereo
                 device, length, usage, format, pool, out, shared);
             if (SUCCEEDED(hr) && out && *out)
             {
-                R30EnsureIndexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire))
-                    R30EnsureIndexShadow(*out);
+                std::lock_guard<std::mutex> lock(
+                    R30ShadowRegistryMutex);
+                if (R30IndexShadows.erase(*out) != 0)
+                {
+                    R30RebuildTrackedBloomsLocked();
+                    R30ShadowRegistryGeneration.fetch_add(
+                        1, std::memory_order_release);
+                }
             }
+            // Buffer shadow ownership is draw-proven, not creation-wide.
             return hr;
         }
 
@@ -632,6 +904,15 @@ namespace OutRunVRStereo
                     R30ShadowRegistryMutex);
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
+                R30TrackedVertexBloom.store(
+                    0, std::memory_order_relaxed);
+                R30TrackedIndexBloom.store(
+                    0, std::memory_order_relaxed);
+                // Invalidate every thread-local weak lookup immediately. This
+                // also covers reset-time COM address reuse while an old
+                // shared_ptr is still draining on another thread.
+                R30ShadowRegistryGeneration.fetch_add(
+                    1, std::memory_order_release);
             }
         }
 
@@ -643,13 +924,15 @@ namespace OutRunVRStereo
         // original mono post-process disabled and run a completely separate
         // reduced/blurred chain for each completed eye immediately before the
         // renderer composes/publishes the stereo frame.
-        SafetyHookInline R30PresentR29Hook{};
-        SafetyHookInline R30ResetR29Hook{};
+        SafetyHookInline R30PresentR26Hook{};
+        SafetyHookInline R30ResetR26Hook{};
 
         struct R30SkyGlowResources
         {
             IDirect3DTexture9* reduced[2]{};
             IDirect3DTexture9* temp[2]{};
+            IDirect3DSurface9* reducedSurface[2]{};
+            IDirect3DSurface9* tempSurface[2]{};
             IDirect3DPixelShader9* bright = nullptr;
             IDirect3DPixelShader9* blur = nullptr;
             IDirect3DPixelShader9* composite = nullptr;
@@ -662,14 +945,59 @@ namespace OutRunVRStereo
         R30SkyGlowResources R30SkyGlow{};
         std::uint64_t R30SkyGlowFrames = 0;
         std::uint64_t R30SkyGlowFailures = 0;
+        std::uint64_t R30SkyGlowPerfSamples = 0;
+        std::uint64_t R30SkyGlowPerfTotalUs = 0;
+        std::uint64_t R30SkyGlowPerfMaxUs = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
+        OutRunVR::FrameState::FrameContext R69FrameContext{};
+        constexpr int R68StageHoldPresents = 3;
+
+        void R67GuardStageTransitionPresent() noexcept
+        {
+            auto& frame = R69FrameContext;
+            if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
+            {
+                frame.stageHoldRemaining = 0;
+                return;
+            }
+
+            const int stage = static_cast<int>(*Game::stg_stage_num);
+            if (!frame.stageIdentitySeen)
+            {
+                frame.stageIdentitySeen = true;
+                frame.lastStageIdentity = stage;
+                return;
+            }
+
+            if (stage != frame.lastStageIdentity)
+            {
+                const int previous = frame.lastStageIdentity;
+                frame.lastStageIdentity = stage;
+                frame.stageHoldRemaining = R68StageHoldPresents;
+                ++frame.stageTransitionHolds;
+                R30SkyGlowSceneCaptureEpoch = 0;
+                spdlog::info(
+                    "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
+                    previous, stage, R68StageHoldPresents,
+                    frame.stageTransitionHolds);
+            }
+
+            if (frame.stageHoldRemaining > 0)
+            {
+                --frame.stageHoldRemaining;
+                FrameStereoIncomplete = true;
+                R67HoldPreviousProjectionThisPresent = true;
+            }
+        }
 
         void R30ReleaseSkyGlowResources() noexcept
         {
             for (int eye = 0; eye < 2; ++eye)
             {
+                ReleaseCom(R30SkyGlow.reducedSurface[eye]);
+                ReleaseCom(R30SkyGlow.tempSurface[eye]);
                 ReleaseCom(R30SkyGlow.reduced[eye]);
                 ReleaseCom(R30SkyGlow.temp[eye]);
             }
@@ -720,6 +1048,12 @@ namespace OutRunVRStereo
         {
             if (!device || !BackBufferDesc.Width || !BackBufferDesc.Height)
                 return false;
+            // R70: honor the configured SkyGlowFactor exactly as the base
+            // R30 path does. The 92ce3403 HMD run requested factor=1 but this
+            // safe owner silently forced factor=2, which also forced the second
+            // blur pass and contradicted the runtime profile. Keep the stereo
+            // pre-HUD capture/composite path unchanged; only restore the declared
+            // factor semantics (<=0 is still handled by the outer disable gate).
             const int factor =
                 std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
@@ -731,6 +1065,8 @@ namespace OutRunVRStereo
 
             if (R30SkyGlow.reduced[0] && R30SkyGlow.reduced[1] &&
                 R30SkyGlow.temp[0] && R30SkyGlow.temp[1] &&
+                R30SkyGlow.reducedSurface[0] && R30SkyGlow.reducedSurface[1] &&
+                R30SkyGlow.tempSurface[0] && R30SkyGlow.tempSurface[1] &&
                 R30SkyGlow.bright && R30SkyGlow.blur &&
                 R30SkyGlow.composite &&
                 R30SkyGlow.eyeWidth == BackBufferDesc.Width &&
@@ -753,7 +1089,13 @@ namespace OutRunVRStereo
                         glowWidth, glowHeight, 1,
                         D3DUSAGE_RENDERTARGET,
                         D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
-                        &R30SkyGlow.temp[eye], nullptr)))
+                        &R30SkyGlow.temp[eye], nullptr)) ||
+                    FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &R30SkyGlow.reducedSurface[eye])) ||
+                    !R30SkyGlow.reducedSurface[eye] ||
+                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
+                        0, &R30SkyGlow.tempSurface[eye])) ||
+                    !R30SkyGlow.tempSurface[eye])
                 {
                     R30ReleaseSkyGlowResources();
                     return false;
@@ -825,6 +1167,210 @@ namespace OutRunVRStereo
             float u, v;
         };
 
+        struct R30SkyGlowSavedState
+        {
+            IDirect3DSurface9* renderTarget = nullptr;
+            IDirect3DSurface9* depthStencil = nullptr;
+            IDirect3DVertexShader9* vertexShader = nullptr;
+            IDirect3DVertexDeclaration9* vertexDeclaration = nullptr;
+            IDirect3DPixelShader9* pixelShader = nullptr;
+            IDirect3DBaseTexture9* texture0 = nullptr;
+            IDirect3DVertexBuffer9* stream0 = nullptr;
+            D3DVIEWPORT9 viewport{};
+            UINT streamOffset = 0;
+            UINT streamStride = 0;
+            DWORD fvf = 0;
+            DWORD samplerMin = 0;
+            DWORD samplerMag = 0;
+            DWORD samplerMip = 0;
+            DWORD samplerAddressU = 0;
+            DWORD samplerAddressV = 0;
+            DWORD zEnable = 0;
+            DWORD zWrite = 0;
+            DWORD stencilEnable = 0;
+            DWORD alphaTestEnable = 0;
+            DWORD alphaBlendEnable = 0;
+            DWORD srcBlend = 0;
+            DWORD destBlend = 0;
+            DWORD blendOp = 0;
+            DWORD colorWrite = 0;
+            DWORD cullMode = D3DCULL_CCW;
+            DWORD scissorEnable = FALSE;
+            float psConstant0[4]{};
+
+            ~R30SkyGlowSavedState()
+            {
+                ReleaseCom(stream0);
+                ReleaseCom(texture0);
+                ReleaseCom(pixelShader);
+                ReleaseCom(vertexDeclaration);
+                ReleaseCom(vertexShader);
+                ReleaseCom(depthStencil);
+                ReleaseCom(renderTarget);
+            }
+        };
+
+        bool R30CaptureSkyGlowState(
+            IDirect3DDevice9* device,
+            R30SkyGlowSavedState& state) noexcept
+        {
+            if (!device ||
+                FAILED(device->GetRenderTarget(0, &state.renderTarget)) ||
+                !state.renderTarget ||
+                FAILED(device->GetViewport(&state.viewport)) ||
+                FAILED(device->GetVertexShader(&state.vertexShader)) ||
+                FAILED(device->GetPixelShader(&state.pixelShader)) ||
+                FAILED(device->GetTexture(0, &state.texture0)) ||
+                FAILED(device->GetStreamSource(
+                    0, &state.stream0,
+                    &state.streamOffset, &state.streamStride)) ||
+                FAILED(device->GetFVF(&state.fvf)) ||
+                (state.fvf == 0 &&
+                 FAILED(device->GetVertexDeclaration(
+                    &state.vertexDeclaration))) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_MINFILTER, &state.samplerMin)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_MAGFILTER, &state.samplerMag)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_MIPFILTER, &state.samplerMip)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_ADDRESSU, &state.samplerAddressU)) ||
+                FAILED(device->GetSamplerState(
+                    0, D3DSAMP_ADDRESSV, &state.samplerAddressV)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ZENABLE, &state.zEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ZWRITEENABLE, &state.zWrite)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_STENCILENABLE, &state.stencilEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ALPHATESTENABLE, &state.alphaTestEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &state.alphaBlendEnable)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_SRCBLEND, &state.srcBlend)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_DESTBLEND, &state.destBlend)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_BLENDOP, &state.blendOp)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_COLORWRITEENABLE, &state.colorWrite)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_CULLMODE, &state.cullMode)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_SCISSORTESTENABLE, &state.scissorEnable)) ||
+                FAILED(device->GetPixelShaderConstantF(
+                    0, state.psConstant0, 1)))
+                return false;
+
+            const HRESULT depthHr =
+                device->GetDepthStencilSurface(&state.depthStencil);
+            return SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
+        }
+
+        bool R30RestoreSkyGlowState(
+            IDirect3DDevice9* device,
+            const R30SkyGlowSavedState& state) noexcept
+        {
+            if (!device || !state.renderTarget)
+                return false;
+
+            bool ok = true;
+            auto keep = [&](HRESULT hr) noexcept {
+                if (FAILED(hr))
+                    ok = false;
+            };
+
+            keep(device->SetRenderTarget(0, state.renderTarget));
+            keep(device->SetDepthStencilSurface(state.depthStencil));
+            keep(device->SetViewport(&state.viewport));
+            // SetFVF replaces the vertex declaration. Restore exactly the
+            // original declaration mode before restoring the vertex shader.
+            if (state.fvf != 0)
+                keep(device->SetFVF(state.fvf));
+            else
+                keep(device->SetVertexDeclaration(
+                    state.vertexDeclaration));
+            keep(device->SetVertexShader(state.vertexShader));
+            keep(device->SetPixelShader(state.pixelShader));
+            keep(device->SetTexture(0, state.texture0));
+            keep(device->SetStreamSource(
+                0, state.stream0,
+                state.streamOffset, state.streamStride));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_MINFILTER, state.samplerMin));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_MAGFILTER, state.samplerMag));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_MIPFILTER, state.samplerMip));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_ADDRESSU, state.samplerAddressU));
+            keep(device->SetSamplerState(
+                0, D3DSAMP_ADDRESSV, state.samplerAddressV));
+            keep(device->SetRenderState(
+                D3DRS_ZENABLE, state.zEnable));
+            keep(device->SetRenderState(
+                D3DRS_ZWRITEENABLE, state.zWrite));
+            keep(device->SetRenderState(
+                D3DRS_STENCILENABLE, state.stencilEnable));
+            keep(device->SetRenderState(
+                D3DRS_ALPHATESTENABLE, state.alphaTestEnable));
+            keep(device->SetRenderState(
+                D3DRS_ALPHABLENDENABLE, state.alphaBlendEnable));
+            keep(device->SetRenderState(
+                D3DRS_SRCBLEND, state.srcBlend));
+            keep(device->SetRenderState(
+                D3DRS_DESTBLEND, state.destBlend));
+            keep(device->SetRenderState(
+                D3DRS_BLENDOP, state.blendOp));
+            keep(device->SetRenderState(
+                D3DRS_COLORWRITEENABLE, state.colorWrite));
+            keep(device->SetRenderState(
+                D3DRS_CULLMODE, state.cullMode));
+            keep(device->SetRenderState(
+                D3DRS_SCISSORTESTENABLE, state.scissorEnable));
+            keep(device->SetPixelShaderConstantF(
+                0, state.psConstant0, 1));
+            return ok;
+        }
+
+        bool R30PrepareSkyGlowPipeline(
+            IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+
+            // These states are invariant for every SkyGlow pass in the frame.
+            // Set them once instead of repeating the same driver calls for
+            // bright/blur/composite on both eyes.
+            return SUCCEEDED(device->SetDepthStencilSurface(nullptr)) &&
+                SUCCEEDED(device->SetVertexShader(nullptr)) &&
+                SUCCEEDED(device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_MIPFILTER, D3DTEXF_NONE)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP)) &&
+                SUCCEEDED(device->SetSamplerState(
+                    0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_ZENABLE, D3DZB_FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_ZWRITEENABLE, FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_STENCILENABLE, FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_ALPHATESTENABLE, FALSE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_CULLMODE, D3DCULL_NONE)) &&
+                SUCCEEDED(device->SetRenderState(
+                    D3DRS_SCISSORTESTENABLE, FALSE));
+        }
+
         bool R30DrawSkyGlowPass(IDirect3DDevice9* device,
             IDirect3DSurface9* target, UINT width, UINT height,
             IDirect3DTexture9* source,
@@ -836,8 +1382,7 @@ namespace OutRunVRStereo
                 !width || !height)
                 return false;
 
-            if (FAILED(device->SetRenderTarget(0, target)) ||
-                FAILED(device->SetDepthStencilSurface(nullptr)))
+            if (FAILED(device->SetRenderTarget(0, target)))
                 return false;
 
             D3DVIEWPORT9 viewport{};
@@ -859,21 +1404,11 @@ namespace OutRunVRStereo
                     0.0f, 1.0f, 1.0f, 1.0f }
             };
 
-            device->SetVertexShader(nullptr);
-            device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
-            device->SetPixelShader(shader);
-            device->SetTexture(0, source);
-            device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-            device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-            device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-            device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-            device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-            device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-            device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-            device->SetRenderState(D3DRS_ALPHABLENDENABLE,
-                additive ? TRUE : FALSE);
+            if (FAILED(device->SetPixelShader(shader)) ||
+                FAILED(device->SetTexture(0, source)) ||
+                FAILED(device->SetRenderState(
+                    D3DRS_ALPHABLENDENABLE, additive ? TRUE : FALSE)))
+                return false;
             if (additive)
             {
                 device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -892,11 +1427,11 @@ namespace OutRunVRStereo
                     D3DCOLORWRITEENABLE_BLUE |
                     D3DCOLORWRITEENABLE_ALPHA);
             }
-            device->SetPixelShaderConstantF(0, constant, 1);
-            const HRESULT hr = device->DrawPrimitiveUP(
-                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex));
-            device->SetTexture(0, nullptr);
-            return SUCCEEDED(hr);
+            if (FAILED(device->SetPixelShaderConstantF(
+                    0, constant, 1)))
+                return false;
+            return SUCCEEDED(device->DrawPrimitiveUP(
+                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex)));
         }
 
         bool R30CaptureSkyGlowSceneBeforeHud(
@@ -919,17 +1454,10 @@ namespace OutRunVRStereo
             bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced = nullptr;
-                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
-                        0, &reduced)) || !reduced)
-                {
-                    ok = false;
-                    break;
-                }
                 ok = SUCCEEDED(device->StretchRect(
-                    eyeSurface[eye], nullptr, reduced, nullptr,
+                    eyeSurface[eye], nullptr,
+                    R30SkyGlow.reducedSurface[eye], nullptr,
                     D3DTEXF_LINEAR));
-                reduced->Release();
             }
             if (ok)
                 R30SkyGlowSceneCaptureEpoch = PresentEpoch;
@@ -948,50 +1476,20 @@ namespace OutRunVRStereo
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
-            IDirect3DStateBlock9* stateBlock = nullptr;
-            IDirect3DSurface9* savedRt = nullptr;
-            IDirect3DSurface9* savedDepth = nullptr;
-            D3DVIEWPORT9 savedViewport{};
-            if (FAILED(device->CreateStateBlock(
-                    D3DSBT_ALL, &stateBlock)) ||
-                !stateBlock ||
-                FAILED(device->GetRenderTarget(0, &savedRt)) ||
-                !savedRt ||
-                FAILED(device->GetViewport(&savedViewport)))
-            {
-                if (savedRt) savedRt->Release();
-                if (stateBlock) stateBlock->Release();
+            R30SkyGlowSavedState savedState{};
+            if (!R30CaptureSkyGlowState(device, savedState))
                 return false;
-            }
-            const HRESULT depthHr =
-                device->GetDepthStencilSurface(&savedDepth);
-            const bool depthOk =
-                SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
-            if (!depthOk)
-            {
-                savedRt->Release();
-                stateBlock->Release();
-                return false;
-            }
 
-            bool ok = true;
+            bool ok = R30PrepareSkyGlowPipeline(device);
             IDirect3DSurface9* eyeSurface[2]{
                 BackBuffer, RightEyeSurface
             };
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced = nullptr;
-                IDirect3DSurface9* temp = nullptr;
-                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
-                        0, &reduced)) || !reduced ||
-                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
-                        0, &temp)) || !temp)
-                {
-                    if (temp) temp->Release();
-                    if (reduced) reduced->Release();
-                    ok = false;
-                    break;
-                }
+                IDirect3DSurface9* reduced =
+                    R30SkyGlow.reducedSurface[eye];
+                IDirect3DSurface9* temp =
+                    R30SkyGlow.tempSurface[eye];
 
                 if (R30SkyGlowSceneCaptureEpoch != PresentEpoch)
                 {
@@ -1013,43 +1511,31 @@ namespace OutRunVRStereo
                         R30SkyGlow.bright, zero, false);
                 }
 
-                const float horizontal[4]{
-                    1.0f /
-                        static_cast<float>(R30SkyGlow.glowWidth),
-                    0.0f, 0.0f, 0.0f
-                };
-                if (ok)
-                    ok = R30DrawSkyGlowPass(
-                        device, reduced,
-                        R30SkyGlow.glowWidth,
-                        R30SkyGlow.glowHeight,
-                        R30SkyGlow.temp[eye],
-                        R30SkyGlow.blur, horizontal, false);
-
-                // TwoStep exists to reduce aliasing after a downsample.
-                // At factor=1 there is no downsample, so a second full-resolution
-                // blur only doubles bandwidth. Also make sure the vertical pass,
-                // when requested for factor>1, is actually the composite source.
-                const bool effectiveTwoStep =
+                // Preserve the R69 visual result while removing dead work.
+                // R69 always composited TEMP when TwoStep was off, so its
+                // horizontal blur was unused. When TwoStep was on it composited
+                // REDUCED (the horizontal result), so the later vertical pass
+                // was also unused. Execute only the pass that actually feeds
+                // the final composite.
+                const bool useBlur =
                     Settings::SkyGlowTwoStep.get() &&
                     R30SkyGlow.factor > 1;
                 IDirect3DTexture9* compositeSource =
                     R30SkyGlow.temp[eye];
-                if (effectiveTwoStep)
+                if (useBlur)
                 {
-                    const float vertical[4]{
-                        0.0f,
+                    const float horizontal[4]{
                         1.0f /
-                            static_cast<float>(R30SkyGlow.glowHeight),
-                        0.0f, 0.0f
+                            static_cast<float>(R30SkyGlow.glowWidth),
+                        0.0f, 0.0f, 0.0f
                     };
                     if (ok)
                         ok = R30DrawSkyGlowPass(
-                            device, temp,
+                            device, reduced,
                             R30SkyGlow.glowWidth,
                             R30SkyGlow.glowHeight,
-                            R30SkyGlow.reduced[eye],
-                            R30SkyGlow.blur, vertical, false);
+                            R30SkyGlow.temp[eye],
+                            R30SkyGlow.blur, horizontal, false);
                     if (ok)
                         compositeSource = R30SkyGlow.reduced[eye];
                 }
@@ -1063,30 +1549,15 @@ namespace OutRunVRStereo
                         compositeSource,
                         R30SkyGlow.composite, composite, true);
 
-                temp->Release();
-                reduced->Release();
             }
 
-            // Apply the captured pipeline state first, then explicitly restore
-            // RT/depth/viewport last. This guarantees the game bindings win even
-            // if a driver/state-block implementation restores more state than
-            // the code path historically relied on.
-            bool restoreOk = SUCCEEDED(stateBlock->Apply());
-            restoreOk =
-                SUCCEEDED(device->SetRenderTarget(0, savedRt)) &&
-                restoreOk;
-            const HRESULT restoreDepth =
-                device->SetDepthStencilSurface(savedDepth);
-            restoreOk =
-                (SUCCEEDED(restoreDepth) ||
-                 (!savedDepth && restoreDepth == D3D_OK)) &&
-                restoreOk;
-            restoreOk =
-                SUCCEEDED(device->SetViewport(&savedViewport)) &&
-                restoreOk;
-            savedRt->Release();
-            if (savedDepth) savedDepth->Release();
-            stateBlock->Release();
+            // Experimental performance path: restore exactly the state touched
+            // by the stereo SkyGlow pass instead of creating/applying a full
+            // D3DSBT_ALL state block every Present. DrawPrimitiveUP clears
+            // stream 0, so the original stream binding is part of the explicit
+            // snapshot as well.
+            const bool restoreOk =
+                R30RestoreSkyGlowState(device, savedState);
 
             if (ok && restoreOk)
             {
@@ -1095,7 +1566,7 @@ namespace OutRunVRStereo
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW: independent L/R extract + stereo blur + additive composite ACTIVE factor={} requestedTwoStep={} effectiveTwoStep={} buffer={}x{}",
+                        "VR SKY GLOW EXP STATEBLOCK V2: explicit touched-state restore + FVF/cull/scissor hardening ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
@@ -1125,11 +1596,17 @@ namespace OutRunVRStereo
             if (now - R30LastTelemetryMs < 5000)
                 return;
             R30LastTelemetryMs = now;
+            const std::uint64_t skyGlowAvgUs =
+                R30SkyGlowPerfSamples
+                    ? R30SkyGlowPerfTotalUs / R30SkyGlowPerfSamples
+                    : 0;
             spdlog::info(
-                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{},samples={},avgUs={},maxUs={}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
-                R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
-                R30ShadowDiscardInvalidations,
+                R30ShadowWrites.load(std::memory_order_relaxed),
+                R30ShadowReadHits.load(std::memory_order_relaxed),
+                R30ShadowReadMisses.load(std::memory_order_relaxed),
+                R30ShadowDiscardInvalidations.load(std::memory_order_relaxed),
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
                 R30XyzrhwWorldLockedHudDraws,
                 R47SemanticHudAccepted,
@@ -1153,7 +1630,9 @@ namespace OutRunVRStereo
                 R44FlatOverlayClassifications,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
-                R30SkyGlow.glowHeight);
+                R30SkyGlow.glowHeight,
+                R30SkyGlowPerfSamples, skyGlowAvgUs,
+                R30SkyGlowPerfMaxUs);
         }
 
         HRESULT __stdcall PresentDestR30(
@@ -1161,16 +1640,45 @@ namespace OutRunVRStereo
             const RECT* destRect, HWND destWindowOverride,
             const RGNDATA* dirtyRegion)
         {
+            R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
             {
-                InternalPassScope guard;
-                R30ApplyStereoSkyGlow(device);
+                static const LARGE_INTEGER perfFrequency = []() noexcept {
+                    LARGE_INTEGER value{};
+                    QueryPerformanceFrequency(&value);
+                    return value;
+                }();
+                LARGE_INTEGER perfStart{}, perfEnd{};
+                const bool measureSkyGlow =
+                    Settings::VRTelemetry &&
+                    perfFrequency.QuadPart > 0 &&
+                    QueryPerformanceCounter(&perfStart);
+                {
+                    InternalPassScope guard;
+                    R30ApplyStereoSkyGlow(device);
+                }
+                if (measureSkyGlow &&
+                    QueryPerformanceCounter(&perfEnd) &&
+                    perfEnd.QuadPart >= perfStart.QuadPart)
+                {
+                    const auto elapsedUs =
+                        static_cast<std::uint64_t>(
+                            (static_cast<long double>(
+                                perfEnd.QuadPart - perfStart.QuadPart) *
+                                1000000.0L) /
+                            static_cast<long double>(
+                                perfFrequency.QuadPart));
+                    ++R30SkyGlowPerfSamples;
+                    R30SkyGlowPerfTotalUs += elapsedUs;
+                    R30SkyGlowPerfMaxUs =
+                        std::max(R30SkyGlowPerfMaxUs, elapsedUs);
+                }
             }
-            return R30PresentR29Hook.stdcall<HRESULT>(
+            return R30PresentR26Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
         }
@@ -1181,9 +1689,10 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
-            return R30ResetR29Hook.stdcall<HRESULT>(device, params);
+            return R30ResetR26Hook.stdcall<HRESULT>(device, params);
         }
 
         // User-adjustable projection-space HUD scale. The per-eye FOV affine
@@ -1192,6 +1701,155 @@ namespace OutRunVRStereo
         float R30HudScaleValue() noexcept
         {
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
+        }
+
+        int R55HudCoordMode() noexcept
+        {
+            return OutRunVR::DebugModes::HudCoordMode();
+        }
+
+        int R56HudProbeMode() noexcept
+        {
+            return OutRunVR::DebugModes::HudProbeMode();
+        }
+
+        bool R57ProjectViewPoint(
+            const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
+            const D3DMATRIX& transform,
+            float& ndcX, float& ndcY) noexcept
+        {
+            if (!marker.valid ||
+                !std::isfinite(marker.viewX) ||
+                !std::isfinite(marker.viewY) ||
+                !std::isfinite(marker.viewZ) ||
+                !MatrixFinite(transform))
+                return false;
+
+            const float clipX =
+                marker.viewX * transform._11 +
+                marker.viewY * transform._21 +
+                marker.viewZ * transform._31 +
+                transform._41;
+            const float clipY =
+                marker.viewX * transform._12 +
+                marker.viewY * transform._22 +
+                marker.viewZ * transform._32 +
+                transform._42;
+            const float clipW =
+                marker.viewX * transform._14 +
+                marker.viewY * transform._24 +
+                marker.viewZ * transform._34 +
+                transform._44;
+            if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
+                !std::isfinite(clipW) || std::fabs(clipW) <= 1.0e-6f)
+                return false;
+            ndcX = clipX / clipW;
+            ndcY = clipY / clipW;
+            return std::isfinite(ndcX) && std::isfinite(ndcY);
+        }
+
+        bool R57BuildProjectedMarkerDelta(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            const D3DMATRIX& baseProjection,
+            float deltaX[2], float deltaY[2],
+            float* baseXOut = nullptr,
+            float* baseYOut = nullptr,
+            const OutRunVR::GameSemantic::ProjectedMarkerInfo* explicitMarker = nullptr) noexcept
+        {
+            const auto* marker = explicitMarker
+                ? explicitMarker
+                : OutRunVR::GameSemantic::CurrentProjectedMarker();
+            if (!marker || !marker->valid || !MatrixFinite(baseProjection))
+                return false;
+
+            float baseX = 0.0f, baseY = 0.0f;
+            if (!R57ProjectViewPoint(
+                    *marker, baseProjection, baseX, baseY))
+                return false;
+            if (baseXOut) *baseXOut = baseX;
+            if (baseYOut) *baseYOut = baseY;
+
+            const float centerEye[3]{
+                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+            };
+            const float identityOrientation[4]{
+                0.0f, 0.0f, 0.0f, 1.0f
+            };
+
+            // R68: the rival-rank Calc3D2D point is produced from the stock
+            // game camera, so it still needs the latched HMD head inverse to
+            // remain world-locked when the user turns their head. R67 removed
+            // this entirely and HMD testing proved the 1st..5th markers became
+            // head-locked again. Explicit projected-screen anchors (lens flare)
+            // are different: they stay on the R67 eye-only path.
+            const bool applyHeadCorrection =
+                explicitMarker == nullptr;
+            D3DMATRIX headInverse = IdentityMatrix();
+            if (applyHeadCorrection)
+            {
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                if (!MatrixFinite(headInverse))
+                    return false;
+            }
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float relativeEye[3]{
+                    stereo.eyeOffset[eye][0] - centerEye[0],
+                    stereo.eyeOffset[eye][1] - centerEye[1],
+                    stereo.eyeOffset[eye][2] - centerEye[2]
+                };
+                const D3DMATRIX eyePose =
+                    MatrixFromQuaternionTranslation(
+                        identityOrientation, relativeEye,
+                        Settings::VRWorldScale * Settings::VRStereoDepth);
+                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
+                const D3DMATRIX eyeProjection =
+                    ProjectionFromFov(
+                        baseProjection, stereo.eyeFov[eye]);
+                const D3DMATRIX eyeTransform = applyHeadCorrection
+                    ? MultiplyMatrix(
+                        MultiplyMatrix(headInverse, eyeInverse),
+                        eyeProjection)
+                    : MultiplyMatrix(eyeInverse, eyeProjection);
+
+                float eyeX = 0.0f, eyeY = 0.0f;
+                if (!R57ProjectViewPoint(
+                        *marker, eyeTransform, eyeX, eyeY))
+                    return false;
+                deltaX[eye] = eyeX - baseX;
+                deltaY[eye] = eyeY - baseY;
+                if (!std::isfinite(deltaX[eye]) ||
+                    !std::isfinite(deltaY[eye]) ||
+                    std::fabs(deltaX[eye]) > 2.0f ||
+                    std::fabs(deltaY[eye]) > 2.0f)
+                    return false;
+            }
+            if (Settings::VRTelemetry)
+            {
+                const std::uint64_t builds =
+                    R57ProjectedMarkerDeltaBuilds.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                bool expected = false;
+                if (R57ProjectedMarkerFirstLogged.compare_exchange_strong(
+                        expected, true, std::memory_order_acq_rel))
+                {
+                    spdlog::info(
+                        "VR R69 CLEAN PROJECTED MARKER: headCorrection={} view=({:.4f},{:.4f},{:.4f}) deltaL=({:.5f},{:.5f}) deltaR=({:.5f},{:.5f}) builds={}",
+                        applyHeadCorrection ? 1 : 0,
+                        marker->viewX, marker->viewY, marker->viewZ,
+                        deltaX[0], deltaY[0], deltaX[1], deltaY[1], builds);
+                }
+            }
+            return true;
         }
 
         float R30HudAspectCompensation(
@@ -1280,26 +1938,19 @@ namespace OutRunVRStereo
             float& scaleX, float& scaleY) noexcept
         {
             (void)stereo;
-            const float userScale = R30HudScaleValue();
+            float userScale = R30HudScaleValue();
+            const int coordMode = R55HudCoordMode();
+            if (coordMode == 3 || coordMode == 4)
+                userScale = 0.35f;
 
-            // R43: the finite HUD plane is reconstructed through the game's
-            // base projection and then through each OpenXR eye projection.
-            // Applying sourceAspect/eyeAspect again here was a second,
-            // anisotropic aspect correction. On this run sourceOverTarget=2.569,
-            // so HudScale=0.55 became X=0.55/Y=0.214 and visibly squashed the
-            // complete HUD. Keep HUD scale uniform; projection handles aspect.
+            // R55: modes 3/4 intentionally force a visually obvious 35% scale
+            // so HMD testing can prove that this exact final-coordinate path is
+            // presentation-authoritative. Production policy still uses HudScale.
             scaleX = userScale;
             scaleY = userScale;
         }
 
-        enum class R30ScreenSpaceKind : std::uint8_t
-        {
-            None,
-            Hud2D,
-            PerspectiveHud,
-            ScreenOverlay2D,
-            WorldBillboard
-        };
+        using R30ScreenSpaceKind = OutRunVR::ScreenSpacePolicy::Kind;
 
         constexpr std::uint64_t R44OverlayWvpDrawWindow = 12u;
 
@@ -1408,20 +2059,28 @@ namespace OutRunVRStereo
                 return R30ScreenSpaceKind::None;
 
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
+            const auto semanticRoute =
+                OutRunVR::RenderPolicy::RouteFor(semanticScope);
             const bool semanticHud =
-                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud;
             const bool semanticWorld =
-                OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
-            const bool semanticOverlay2D =
-                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
-                    semanticScope);
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::World;
+            const auto directScreenKind =
+                OutRunVR::ScreenSpacePolicy::DirectKind(semanticRoute);
 
-            // R50: canonical queue membership proves generic 2D ownership but
-            // not finite/world-locked HUD ownership. This class receives only
-            // the per-eye asymmetric-FOV affine.
-            if (semanticOverlay2D)
-                return R30ScreenSpaceKind::ScreenOverlay2D;
+            // Exact producer-owned screen routes bypass heuristic projection
+            // classification. Their semantics were established by the canonical
+            // EXE producer/queue mapping before reaching this renderer.
+            if (directScreenKind != R30ScreenSpaceKind::None)
+                return directScreenKind;
+
+            // R65: exact lens-flare producer has already converted its world
+            // anchor to screen coordinates through Calc3D2D. It needs only the
+            // per-eye asymmetric-FOV affine: no HUD scale, no finite HUD plane,
+            // no extra head/IPD world transform.
+            // Direct screen-owned routes were resolved above. HUD/world
+            // continue through the projection/WVP checks below.
 
             // R48 final-test policy: screen/perspective HUD ownership comes only
             // from the canonical EXE sprite queue or exact original-mod semantic
@@ -1573,6 +2232,12 @@ namespace OutRunVRStereo
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
             bool screenOverlay2D = false;
+            bool exactWorldBillboard = false;
+            bool projectedWorldMarker2D = false;
+            float projectedDeltaX[2]{};
+            float projectedDeltaY[2]{};
+            float projectedBaseX = 0.0f;
+            float projectedBaseY = 0.0f;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1863,7 +2528,7 @@ namespace OutRunVRStereo
             // Positive projected-depth evidence remains sufficient for known
             // world effects. Everything else fails closed to the R26/R23 owner.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             const bool semanticHud =
                 OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
             const bool semanticWorld =
@@ -1871,6 +2536,11 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            const bool semanticProjectedWorld =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
+            state.exactWorldBillboard = semanticWorld;
+            state.projectedWorldMarker2D = semanticProjectedWorld;
 
             // R51 ownership precedence is explicit:
             // exact WORLD_BILLBOARD > queue-owned 2D/HUD > geometric evidence.
@@ -1881,6 +2551,21 @@ namespace OutRunVRStereo
             state.screenOverlay2D = semanticOverlay2D;
             if (semanticOverlay2D)
                 ++R50SemanticOverlay2DAccepted;
+
+            if (semanticProjectedWorld)
+            {
+                if (!haveBaseProjection || !MatrixFinite(baseProjection) ||
+                    !R57BuildProjectedMarkerDelta(
+                        state.stereo, baseProjection,
+                        state.projectedDeltaX,
+                        state.projectedDeltaY,
+                        &state.projectedBaseX,
+                        &state.projectedBaseY))
+                    return false;
+                state.baseProjection = baseProjection;
+                state.worldEffect = true;
+                return true;
+            }
 
             if (semanticWorld)
                 state.worldEffect = true;
@@ -2382,29 +3067,76 @@ namespace OutRunVRStereo
 
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;
-                if (state.worldEffect)
+                const int coordMode = R55HudCoordMode();
+                const int probeMode = R56HudProbeMode();
+                // R56-20 is the broadest ownership falsification: every R30
+                // screen-space draw, including exact rank billboards, receives
+                // identical source NDC in both eyes. If a visible element still
+                // ignores this case it is outside the R30 XYZRHW owner.
+                if (probeMode == 20)
                 {
-                    correctedX =
-                        state.worldScaleX[eye] * ndcX +
-                        state.worldOffsetX[eye];
-                    correctedY =
-                        state.worldScaleY[eye] * ndcY +
-                        state.worldOffsetY[eye];
-                    if (rhw > 0.0f && rhw < 1000.0f)
+                    correctedX = ndcX;
+                    correctedY = ndcY;
+                }
+                else if (state.projectedWorldMarker2D)
+                {
+                    // R69 CLEAN: keep only the HMD-proven production path.
+                    // Apply HudScale around the recovered vehicle anchor so
+                    // resizing cannot disturb world tracking.
+                    const float markerScale = R30HudScaleValue();
+                    const float eyeAnchorX =
+                        state.projectedBaseX + state.projectedDeltaX[eye];
+                    const float eyeAnchorY =
+                        state.projectedBaseY + state.projectedDeltaY[eye];
+                    correctedX = eyeAnchorX +
+                        (ndcX - state.projectedBaseX) * markerScale;
+                    correctedY = eyeAnchorY +
+                        (ndcY - state.projectedBaseY) * markerScale;
+                }
+                else if (state.worldEffect)
+                {
+                    // R55-D isolates exact rival rank-marker visibility: keep
+                    // the original 2D position identical in both eyes. If 4th/
+                    // 5th collapse in D, the tagged marker path is confirmed.
+                    if (coordMode == 4 && state.exactWorldBillboard)
                     {
-                        correctedX +=
-                            state.parallaxPerRhwX[eye] * rhw;
-                        correctedY +=
-                            state.parallaxPerRhwY[eye] * rhw;
+                        correctedX = ndcX;
+                        correctedY = ndcY;
                     }
-                    // Fallback keeps the game's original Z/RHW pair intact.
+                    else
+                    {
+                        correctedX =
+                            state.worldScaleX[eye] * ndcX +
+                            state.worldOffsetX[eye];
+                        correctedY =
+                            state.worldScaleY[eye] * ndcY +
+                            state.worldOffsetY[eye];
+                        if (rhw > 0.0f && rhw < 1000.0f)
+                        {
+                            correctedX +=
+                                state.parallaxPerRhwX[eye] * rhw;
+                            correctedY +=
+                                state.parallaxPerRhwY[eye] * rhw;
+                        }
+                    }
+                }
+                else if (coordMode == 1)
+                {
+                    // R55-A: hard zero-disparity proof. Both eye surfaces receive
+                    // exactly the source screen coordinates.
+                    correctedX = ndcX;
+                    correctedY = ndcY;
+                }
+                else if (coordMode == 2)
+                {
+                    // R55-B: deliberately obvious ownership proof. Identical
+                    // zero-disparity HUD, shrunk to 35% around screen centre.
+                    correctedX = ndcX * 0.35f;
+                    correctedY = ndcY * 0.35f;
                 }
                 else
                 {
-                    // R51: both exact SCREEN_HUD and generic canonical
-                    // SCREEN_OVERLAY_2D are queue-owned 2D. Put them on the
-                    // finite recentered world-fixed plane so they no longer
-                    // rotate with the HMD. WORLD_BILLBOARD never enters here.
+                    // R55-C/D: finite recentered world-plane ownership.
                     if (!state.hudWorldLockValid)
                         return false;
 
@@ -2754,11 +3486,12 @@ namespace OutRunVRStereo
             const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
                 true, std::memory_order_acq_rel);
             R30EnsureVertexShadow(vb);
-            if (!wasArmed && !R30FirstShadowArmLogged)
+            if (!wasArmed &&
+                !R30FirstShadowArmLogged.exchange(
+                    true, std::memory_order_acq_rel))
             {
-                R30FirstShadowArmLogged = true;
                 spdlog::info(
-                    "VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW VB draw; ordinary world buffers no longer pay per-Lock shadow memcpy cost");
+                    "VR R30 BUFFER SHADOW V3: draw-proven selective capture armed after real XYZRHW VB draw; untracked world buffers bypass shadow memcpy");
             }
 
             D3DVERTEXBUFFER_DESC desc{};
@@ -2864,11 +3597,12 @@ namespace OutRunVRStereo
                 true, std::memory_order_acq_rel);
             R30EnsureVertexShadow(vb);
             R30EnsureIndexShadow(ib);
-            if (!wasArmed && !R30FirstShadowArmLogged)
+            if (!wasArmed &&
+                !R30FirstShadowArmLogged.exchange(
+                    true, std::memory_order_acq_rel))
             {
-                R30FirstShadowArmLogged = true;
                 spdlog::info(
-                    "VR R30 BUFFER SHADOW: lazy capture armed only after a real XYZRHW VB/IB draw; ordinary world buffers no longer pay per-Lock shadow memcpy cost");
+                    "VR R30 BUFFER SHADOW V3: draw-proven selective capture armed after real XYZRHW VB/IB draw; untracked world buffers bypass shadow memcpy");
             }
 
             D3DINDEXBUFFER_DESC ibDesc{};
@@ -3108,7 +3842,8 @@ namespace OutRunVRStereo
                 return false;
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
-                screenKind == R30ScreenSpaceKind::WorldBillboard)
+                screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
                 // R44: glyph/billboard batches commonly reuse one game c64 for
                 // several consecutive draws. Use the original game upload, not
@@ -3142,6 +3877,47 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
+            const int coordMode = R55HudCoordMode();
+            const int probeMode = R56HudProbeMode();
+            if (probeMode == 20)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
+                coordMode == 4)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind != R30ScreenSpaceKind::WorldBillboard &&
+                screenKind != R30ScreenSpaceKind::ProjectedWorldMarker2D &&
+                coordMode == 1)
+            {
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                return true;
+            }
+            if (screenKind != R30ScreenSpaceKind::WorldBillboard &&
+                screenKind != R30ScreenSpaceKind::ProjectedWorldMarker2D &&
+                coordMode == 2)
+            {
+                D3DMATRIX obviousScale = IdentityMatrix();
+                obviousScale._11 = 0.35f;
+                obviousScale._22 = 0.35f;
+                const D3DMATRIX scaled =
+                    MultiplyMatrix(stockWvp, obviousScale);
+                const D3DMATRIX scaledT = TransposeMatrix(scaled);
+                std::memcpy(eyeConstants[0], &scaledT, sizeof(scaledT));
+                std::memcpy(eyeConstants[1], &scaledT, sizeof(scaledT));
+                return true;
+            }
+
             float baseRaw[16]{};
             D3DMATRIX baseProjection{};
             D3DMATRIX inverseBaseProjection{};
@@ -3151,6 +3927,60 @@ namespace OutRunVRStereo
             if (!MatrixFinite(baseProjection) ||
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
+
+            if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                // R69 HMD evidence: the exact flare producer is a centre-eye
+                // Calc3D2D screen effect. Reprojecting it independently for
+                // left/right creates two visible flares. Preserve the game's
+                // head-tracked centre-eye placement but use the same WVP in
+                // both eyes so the effect fuses into one image.
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                static bool firstFlareMonoFusionLogged = false;
+                if (!firstFlareMonoFusionLogged)
+                {
+                    firstFlareMonoFusionLogged = true;
+                    spdlog::info(
+                        "VR R69 FLARE FUSION: exact Calc3D2D centre-eye WVP copied identically to L/R; per-eye flare reprojection disabled");
+                }
+                return true;
+            }
+            if (screenKind ==
+                R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                float deltaX[2]{}, deltaY[2]{};
+                float baseAnchorX = 0.0f, baseAnchorY = 0.0f;
+                if (!R57BuildProjectedMarkerDelta(
+                        stereo, baseProjection, deltaX, deltaY,
+                        &baseAnchorX, &baseAnchorY))
+                    return false;
+                const float markerScale = R30HudScaleValue();
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    // Row-vector clip-space affine:
+                    // x' = scale*x + (delta + (1-scale)*anchor)*w.
+                    // This shrinks the sprite cluster about the recovered
+                    // vehicle anchor without changing the proven head/eye pose.
+                    D3DMATRIX clipShift = IdentityMatrix();
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 =
+                        deltaX[eye] + (1.0f - markerScale) * baseAnchorX;
+                    clipShift._42 =
+                        deltaY[eye] + (1.0f - markerScale) * baseAnchorY;
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(stockWvp, clipShift);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
 
             // R51: SCREEN_OVERLAY_2D continues below into the same finite,
             // recentered world-fixed plane transform as SCREEN_HUD. R49/R51
@@ -3317,10 +4147,17 @@ namespace OutRunVRStereo
             // D3D state can describe a candidate shape, but it never owns it.
             // Promotion requires the canonical EXE/original-mod semantic scope.
             const auto semanticScope =
-                OutRunVR::GameSemantic::CurrentScope;
+                OutRunVR::GameSemantic::EffectiveScope();
             if (screenKind == R30ScreenSpaceKind::WorldBillboard)
             {
                 if (!OutRunVR::GameSemantic::CorroboratesWorld(
+                        semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (screenKind ==
+                R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                if (!OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
                         semanticScope))
                     return E_NOTIMPL;
             }
@@ -3328,6 +4165,12 @@ namespace OutRunVRStereo
             {
                 if (!OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                         semanticScope))
+                    return E_NOTIMPL;
+            }
+            else if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                if (semanticScope !=
+                    OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D)
                     return E_NOTIMPL;
             }
             else if (!OutRunVR::GameSemantic::CorroboratesHud(
@@ -3471,7 +4314,8 @@ namespace OutRunVRStereo
                 ++R30Hud2DDraws;
             else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
                 ++R30PerspectiveHudDraws;
-            else if (screenKind == R30ScreenSpaceKind::WorldBillboard)
+            else if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                     screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
                 ++R30WorldBillboardDraws;
 
             if (!R30FirstScreenSpaceLogged)
@@ -3481,6 +4325,16 @@ namespace OutRunVRStereo
                     "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
+            }
+            if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                static bool firstProjectedScreenEffectLogged = false;
+                if (!firstProjectedScreenEffectLogged)
+                {
+                    firstProjectedScreenEffectLogged = true;
+                    spdlog::info(
+                        "VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes");
+                }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
                 !R30FirstFlatPerspectiveLogged)
@@ -3513,9 +4367,9 @@ namespace OutRunVRStereo
             return leftHr;
         }
 
-        template <typename ActualDraw, typename R29Draw>
+        template <typename ActualDraw, typename LowerDraw>
         HRESULT R30GuardScreenSpace(IDirect3DDevice9* device,
-            ActualDraw&& actualDraw, R29Draw&& r29Draw,
+            ActualDraw&& actualDraw, LowerDraw&& lowerDraw,
             const char* site)
         {
             const HRESULT hr = R30TryScreenSpaceFovDraw(
@@ -3523,16 +4377,251 @@ namespace OutRunVRStereo
             if (hr != E_NOTIMPL)
                 return hr;
             ++R30ScreenSpaceFallbacks;
-            return r29Draw();
+            return lowerDraw();
+        }
+
+        HRESULT R62TryFixedFunctionSpriteIndexed(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+            UINT startIndex, UINT primitiveCount)
+        {
+            if (!device || type != D3DPT_TRIANGLELIST ||
+                !TargetIsBackBuffer() || !R30SafeStereoBase(device))
+                return E_NOTIMPL;
+
+            const auto semanticScope =
+                OutRunVR::GameSemantic::EffectiveScope();
+            const bool projected =
+                OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    semanticScope);
+            const bool hud =
+                OutRunVR::GameSemantic::CorroboratesHud(semanticScope);
+            if (!projected && !hud)
+                return E_NOTIMPL;
+
+            // R61 HMD trace proved the missing kind-0 path is D3DXSprite's
+            // fixed-function XYZ|DIFFUSE|TEX1 indexed quad:
+            // DrawIndexedPrimitive(TRIANGLELIST), FVF 0x142, no vertex shader.
+            // Do not widen this to arbitrary fixed-function content.
+            if (CurrentVertexShaderIdentity.load(
+                    std::memory_order_acquire) != 0)
+                return E_NOTIMPL;
+            IDirect3DVertexShader9* shader = nullptr;
+            if (FAILED(device->GetVertexShader(&shader)))
+                return E_NOTIMPL;
+            if (shader)
+            {
+                shader->Release();
+                return E_NOTIMPL;
+            }
+
+            DWORD fvf = 0;
+            if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000142u)
+                return E_NOTIMPL;
+
+            R30XyzrhwState state{};
+            if (!EnsureStereoResources(device) ||
+                FAILED(device->GetViewport(&state.viewport)) ||
+                state.viewport.Width == 0 || state.viewport.Height == 0 ||
+                !OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
+                state.stereo.poseSequence == 0 ||
+                (FrameStereoPoseSequence != 0 &&
+                 FrameStereoPoseSequence != state.stereo.poseSequence) ||
+                !R30BuildEyeAffine(
+                    state.stereo, state.eyeScale, state.eyeOffset))
+                return E_NOTIMPL;
+
+            DWORD zEnable = D3DZB_FALSE;
+            if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable))
+                return E_NOTIMPL;
+            state.depthTestEnabled = zEnable != D3DZB_FALSE;
+
+            // For exact HUD / projected-marker ownership this configuration
+            // path depends only on semantic + captured anchor; XYZRHW source
+            // geometry is not required.
+            if (!R30ConfigureXyzrhwWorldEffect(
+                    device, nullptr, 0, 0, state))
+                return E_NOTIMPL;
+
+            D3DMATRIX originalProjection{};
+            if (FAILED(device->GetTransform(
+                    D3DTS_PROJECTION, &originalProjection)) ||
+                !MatrixFinite(originalProjection))
+                return E_NOTIMPL;
+
+            D3DMATRIX eyeProjection[2]{};
+            if (projected)
+            {
+                // Apply the exact same clip-space delta/anchor scale already
+                // proven by mode 6 for kind-1 rank markers. D3DXSprite supplies
+                // XYZ vertices, so post-multiply its fixed-function projection
+                // rather than trying to rewrite a nonexistent XYZRHW/RHW field.
+                const float markerScale = R30HudScaleValue();
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipShift = IdentityMatrix();
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 =
+                        state.projectedDeltaX[eye] +
+                        (1.0f - markerScale) * state.projectedBaseX;
+                    clipShift._42 =
+                        state.projectedDeltaY[eye] +
+                        (1.0f - markerScale) * state.projectedBaseY;
+                    eyeProjection[eye] =
+                        MultiplyMatrix(originalProjection, clipShift);
+                    if (!MatrixFinite(eyeProjection[eye]))
+                        return E_NOTIMPL;
+                }
+            }
+            else
+            {
+                // Exact SCREEN_HUD kind-0 sprites use the same finite,
+                // head-stable HUD plane as the working XYZRHW path. Encode the
+                // already-derived projective NDC mapping as a clip-space matrix
+                // after D3DXSprite's own fixed-function projection.
+                if (!state.hudWorldLockValid)
+                    return E_NOTIMPL;
+                constexpr float HudPlaneViewZ = -2.50f;
+                const float planeClipW =
+                    HudPlaneViewZ * state.baseProjection._34 +
+                    state.baseProjection._44;
+                const float planeClipZ =
+                    HudPlaneViewZ * state.baseProjection._33 +
+                    state.baseProjection._43;
+                if (!std::isfinite(planeClipW) ||
+                    !std::isfinite(planeClipZ) ||
+                    std::fabs(planeClipW) <= 1.0e-6f)
+                    return E_NOTIMPL;
+                const float planeNdcZ = planeClipZ / planeClipW;
+                if (!std::isfinite(planeNdcZ))
+                    return E_NOTIMPL;
+
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipMap{};
+                    clipMap._11 = state.hudClipX[eye][0];
+                    clipMap._21 = state.hudClipX[eye][1];
+                    clipMap._41 = state.hudClipX[eye][2];
+
+                    clipMap._12 = state.hudClipY[eye][0];
+                    clipMap._22 = state.hudClipY[eye][1];
+                    clipMap._42 = state.hudClipY[eye][2];
+
+                    clipMap._14 = state.hudClipW[eye][0];
+                    clipMap._24 = state.hudClipW[eye][1];
+                    clipMap._44 = state.hudClipW[eye][2];
+
+                    clipMap._13 = planeNdcZ * clipMap._14;
+                    clipMap._23 = planeNdcZ * clipMap._24;
+                    clipMap._43 = planeNdcZ * clipMap._44;
+
+                    eyeProjection[eye] =
+                        MultiplyMatrix(originalProjection, clipMap);
+                    if (!MatrixFinite(eyeProjection[eye]))
+                        return E_NOTIMPL;
+                }
+            }
+
+            auto drawEye = [&](int eye) -> HRESULT {
+                InternalPassScope guard;
+                if (FAILED(device->SetTransform(
+                        D3DTS_PROJECTION, &eyeProjection[eye])))
+                    return E_FAIL;
+                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
+            };
+            auto leftDraw = [&]() { return drawEye(0); };
+            auto rightDraw = [&]() { return drawEye(1); };
+
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
+                device, state, leftDraw, rightDraw,
+                projected
+                    ? "R62/D3DXSprite-ProjectedXYZ"
+                    : "R62/D3DXSprite-ScreenHudXYZ");
+
+            bool restored = false;
+            {
+                InternalPassScope guard;
+                restored = SUCCEEDED(device->SetTransform(
+                    D3DTS_PROJECTION, &originalProjection));
+            }
+            if (!restored)
+            {
+                NoteRestoreFailure(
+                    "R62 D3DXSprite fixed-function projection restore");
+                R30ArmSafeFallback();
+            }
+
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> projectedDraws{ 0 };
+                static std::atomic<std::uint64_t> hudDraws{ 0 };
+                auto& counter = projected ? projectedDraws : hudDraws;
+                const auto hit =
+                    counter.fetch_add(1, std::memory_order_relaxed) + 1;
+                if ((hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR R62 FIXEDFN KIND0: owner={} fvf=0x{:08X} prim={} marker={} hits={}",
+                        projected ? "PROJECTED_WORLD_MARKER_2D" : "SCREEN_HUD",
+                        static_cast<unsigned>(fvf),
+                        primitiveCount,
+                        OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                        hit);
+            }
+            return hr;
+        }
+
+        void R63TraceExactScreenHudDraw(
+            IDirect3DDevice9* device, const char* method,
+            D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
+        {
+            if (!Settings::VRTelemetry || !device ||
+                OutRunVR::GameSemantic::CurrentQueueExactScope !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud)
+                return;
+
+            static std::atomic<std::uint64_t> hits{ 0 };
+            const auto hit =
+                hits.fetch_add(1, std::memory_order_relaxed) + 1;
+            if (hit > 128 && (hit & (hit - 1)) != 0)
+                return;
+
+            DWORD fvf = 0;
+            const HRESULT fvfHr = device->GetFVF(&fvf);
+            IDirect3DVertexShader9* vs = nullptr;
+            const HRESULT vsHr = device->GetVertexShader(&vs);
+            const bool hasVs = SUCCEEDED(vsHr) && vs != nullptr;
+            if (vs)
+                vs->Release();
+
+            spdlog::info(
+                "VR R63 EXACT SCREENHUD DRAW: method={} type={} prim={} fvfHr=0x{:08X} fvf=0x{:08X} vsHr=0x{:08X} hasVS={} node={} effective={} hit={}",
+                method,
+                static_cast<unsigned>(type),
+                primitiveCount,
+                static_cast<unsigned>(fvfHr),
+                static_cast<unsigned>(fvf),
+                static_cast<unsigned>(vsHr),
+                hasVs ? 1 : 0,
+                reinterpret_cast<std::uintptr_t>(
+                    OutRunVR::GameSemantic::CurrentQueueNode()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                hit);
         }
 
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawPrimitive", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
@@ -3544,12 +4633,12 @@ namespace OutRunVRStereo
                 return DrawPrimitiveHook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            auto r29 = [&]() {
-                return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+            auto lower = [&]() {
+                return R30DrawPrimitiveR26Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitive");
+                device, actual, lower, "R30/DrawPrimitive");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR30(
@@ -3557,12 +4646,23 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawIndexedPrimitive", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+
+            const HRESULT fixedFnSprite =
+                R62TryFixedFunctionSpriteIndexed(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
+            if (fixedFnSprite != E_NOTIMPL)
+                return fixedFnSprite;
+
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
@@ -3574,23 +4674,26 @@ namespace OutRunVRStereo
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
-            auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device, type,
+            auto lower = [&]() {
+                return R30DrawIndexedPrimitiveR26Hook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitive");
+                device, actual, lower, "R30/DrawIndexedPrimitive");
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR30(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawPrimitiveUP", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
@@ -3602,12 +4705,12 @@ namespace OutRunVRStereo
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            auto r29 = [&]() {
-                return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+            auto lower = [&]() {
+                return R30DrawPrimitiveUPR26Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitiveUP");
+                device, actual, lower, "R30/DrawPrimitiveUP");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
@@ -3616,10 +4719,13 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            if (Settings::VRTelemetry)
+                R63TraceExactScreenHudDraw(
+                    device, "DrawIndexedPrimitiveUP", type, primitiveCount);
             const auto drawSemanticValue =
                 (device && IsGameDevice(device) && !InternalStereoPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
+                : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
@@ -3633,34 +4739,34 @@ namespace OutRunVRStereo
                     minVertexIndex, numVertices, primitiveCount, indexData,
                     indexFormat, vertexData, stride);
             };
-            auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
+            auto lower = [&]() {
+                return R30DrawIndexedPrimitiveUPR26Hook.stdcall<HRESULT>(device,
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
             return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+                device, actual, lower, "R30/DrawIndexedPrimitiveUP");
         }
 
         void R30RollbackHooks() noexcept
         {
-            R30ResetR29Hook = {};
-            R30PresentR29Hook = {};
-            R30DrawIndexedPrimitiveUPR29Hook = {};
-            R30DrawPrimitiveUPR29Hook = {};
-            R30DrawIndexedPrimitiveR29Hook = {};
-            R30DrawPrimitiveR29Hook = {};
+            R30ResetR26Hook = {};
+            R30PresentR26Hook = {};
+            R30DrawIndexedPrimitiveUPR26Hook = {};
+            R30DrawPrimitiveUPR26Hook = {};
+            R30DrawIndexedPrimitiveR26Hook = {};
+            R30DrawPrimitiveR26Hook = {};
         }
 
         bool R30EnableHooks() noexcept
         {
             SafetyHookInline* hooks[]{
-                &R30PresentR29Hook,
-                &R30ResetR29Hook,
-                &R30DrawPrimitiveR29Hook,
-                &R30DrawIndexedPrimitiveR29Hook,
-                &R30DrawPrimitiveUPR29Hook,
-                &R30DrawIndexedPrimitiveUPR29Hook
+                &R30PresentR26Hook,
+                &R30ResetR26Hook,
+                &R30DrawPrimitiveR26Hook,
+                &R30DrawIndexedPrimitiveR26Hook,
+                &R30DrawPrimitiveUPR26Hook,
+                &R30DrawIndexedPrimitiveUPR26Hook
             };
             for (auto* hook : hooks)
             {
@@ -3680,38 +4786,41 @@ namespace OutRunVRStereo
                 if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
                     R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
 
-                const auto r29 = R26InstallState.load(
+                // Creation hooks do not create general shadows: only a VB
+                // whose creation FVF explicitly declares XYZRHW is registered.
+                // Other buffers remain draw-proven and lazy.
+                const auto r26 = R26InstallState.load(
                     std::memory_order_acquire);
-                if (r29 == State::Failed)
+                if (r26 == State::Failed)
                 {
                     R30RollbackBufferShadowHooks();
                     R30InstallState.store(State::Failed,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
                     spdlog::error(
-                        "VR R30 HUD: R29 prerequisite failed; R29 remains active without screen-space FOV correction");
+                        "VR R30 HUD: R26 prerequisite failed; R26 remains active without screen-space FOV correction");
                     return 0;
                 }
 
-                if (r29 == State::Ready)
+                if (r26 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R30PresentR29Hook = safetyhook::create_inline(
+                    R30PresentR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR27),
                         PresentDestR30, disabled);
-                    R30ResetR29Hook = safetyhook::create_inline(
+                    R30ResetR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ResetDestR22),
                         ResetDestR30, disabled);
-                    R30DrawPrimitiveR29Hook = safetyhook::create_inline(
+                    R30DrawPrimitiveR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveDestR26),
                         DrawPrimitiveDestR30, disabled);
-                    R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(
+                    R30DrawIndexedPrimitiveR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR26),
                         DrawIndexedPrimitiveDestR30, disabled);
-                    R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(
+                    R30DrawPrimitiveUPR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawPrimitiveUPDestR26),
                         DrawPrimitiveUPDestR30, disabled);
-                    R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(
+                    R30DrawIndexedPrimitiveUPR26Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR26),
                         DrawIndexedPrimitiveUPDestR30, disabled);
 
@@ -3724,7 +4833,7 @@ namespace OutRunVRStereo
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR30HUD", false);
                         spdlog::error(
-                            "VR R30 HUD: disabled-first hook transaction failed; R29 remains active");
+                            "VR R30 HUD: disabled-first hook transaction failed; R26 remains active");
                         return 0;
                     }
 
@@ -3733,7 +4842,8 @@ namespace OutRunVRStereo
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR30HUD", true);
                     spdlog::info(
-                        "VR R47 HUD: canonical EXE sprite-queue semantics own HUD transforms; unknown draw heuristics are disabled; HudScale={:.2f}; exact original-mod world-billboard tags override queue HUD ownership",
+                        "VR R69 CLEAN HUD: coordMode={} probeMode={} fixed projected-world-marker production path active; configured HudScale={:.2f}",
+                        R55HudCoordMode(), R56HudProbeMode(),
                         R30HudScaleValue());
                     return 0;
                 }
@@ -3744,7 +4854,7 @@ namespace OutRunVRStereo
             R30InstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
             spdlog::error(
-                "VR R30 HUD: timed out waiting for R29; R29 remains active");
+                "VR R30 HUD: timed out waiting for R26; R26 remains active");
             return 0;
         }
 
