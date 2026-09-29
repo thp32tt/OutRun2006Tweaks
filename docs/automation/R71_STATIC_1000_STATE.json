@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 144,
+  "completedCycles": 145,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "069c6f26ec68d50018deda8ba2b52c3452575525",
+  "currentHead": "aef90ff3a1992f1b2fec95d97893f78f56f4e431",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -3947,20 +3947,64 @@
       "automationValidation": "EXACT_PROJECTED_NODE_ANCHOR_CONTRACT_COMMITTED; GitHub Build/OpenXR/HUD CI queued; no PASS claimed",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 145: consume 069c6f26 exact-head CI. Then inspect lens-flare exact projected-screen producer/node lifetime and pre-race shadow corruption. Keep selector resource changes gated on new HMD pointer-correlated evidence."
+    },
+    {
+      "cycle": 145,
+      "lenses": [
+        "exact flare producer ownership",
+        "renderer c64 injection ordering",
+        "R30 mono-fusion ownership",
+        "double-transform falsification",
+        "pre-race base-shadow non-regression"
+      ],
+      "findingKeys": [
+        "DX9EX-FLARE-DOUBLE-TRANSFORM-OWNER-001"
+      ],
+      "findings": [
+        "069c6f26 exact-head Build, OpenXR architecture and HUD Inspector all completed SUCCESS, so cycle-144 rival/stage ownership changes cleared hosted validation.",
+        "The exact flare producer at EXE+0xCABE is classified ProjectedScreenEffect2D and R30 deliberately uses the same stock WVP for both eyes to fuse the flare into one image.",
+        "Renderer c64 ownership bypass omitted ProjectedScreenEffect2D, so the exact flare could receive HMD WVP injection before reaching R30. That creates two transform owners: renderer head injection followed by R30 projected-screen mono fusion.",
+        "Added explicit ProjectedScreenEffect corroboration and included it in renderer semanticOverlay bypass. The flare c64 remains raw until R30, making R30 the single transform owner.",
+        "The known-bad restored console base-shadow remains disabled in VR. No start-grid shadow policy was changed without separate evidence."
+      ],
+      "evidence": [
+        "069c6f26: Build 36524651051/36524651645 SUCCESS",
+        "069c6f26: OpenXR 36524651789/36524651016 SUCCESS",
+        "069c6f26: HUD Inspector 36524651710/36524651012 SUCCESS",
+        "hooks_graphics.cpp EXE+0xCABE -> RenderScope::ProjectedScreenEffect2D",
+        "stereo_renderer_r30_r26_safe.cpp R69 flare mono fusion copies identical stock WVP to L/R",
+        "outrun_renderer.cpp prior semanticOverlay bypass omitted ProjectedScreenEffect2D",
+        "hooks_graphics.cpp VR R69 base shadow keeps stock PC nullsub path"
+      ],
+      "changedFiles": [
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "tools/verify_vr_proven_baseline.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "088a2d223589e1c2fee1ab4598b428dd1966db8d",
+        "c2aaac5fdbd44237bb3adf9464d7709415ca5159",
+        "aef90ff3a1992f1b2fec95d97893f78f56f4e431"
+      ],
+      "automationValidation": "FLARE_SINGLE_TRANSFORM_OWNER_CONTRACT_COMMITTED; exact-head GitHub CI pending",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 146: consume aef90ff3 exact-head CI. Keep console base-shadow disabled; isolate the stock-PC start-grid stencil/projected-shadow draw identity and determine whether R13/R27 effect stereo ownership is causing the remaining split before any behavior change."
     }
   ],
   "nextCycle": {
-    "cycle": 145,
+    "cycle": 146,
     "priority": [
-      "consume 069c6f26 exact-head Build/OpenXR/HUD results",
-      "inspect lens-flare exact Calc3D2D/projected-screen node lifetime and double display",
-      "inspect pre-race start-grid shadow split/corruption exact pass ownership",
-      "inspect remaining HUD/menu alpha state only if independent evidence exists",
-      "return to selector CPU-shadow policy only with HMD pointer-correlated evidence"
+      "consume aef90ff3 exact-head Build/OpenXR/HUD results",
+      "isolate stock-PC start-grid stencil/projected-shadow draw identity",
+      "check R13/R27 effect classification and c64 owner around that exact draw",
+      "add bounded shadow diagnostics if identity is not statically decisive",
+      "keep selector resource fix blocked until new HMD pointer-correlated log"
     ],
-    "guard": "No performance-only work. Do not flatten projected world markers into ScreenHud, widen HUD ranges, force vehicle material/color, or increase global MANAGED shadow budget."
+    "guard": "Do not re-enable restored console base shadow. No performance-only work, no broad shadow/alpha heuristic change, no HUD widening, no global material/color/resource-budget mutation."
   },
-  "updatedKst": "2026-09-29T14:07:00+09:00",
+  "updatedKst": "2026-09-29T15:46:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
