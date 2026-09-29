@@ -708,6 +708,131 @@ int main()
         !unsupportedManagedShadow.ready(),
         "R102 failed managed shadow initialize stays dormant");
 
+    NativeManagedTextureShadow lockBridgeShadow;
+    require(
+        lockBridgeShadow.initialize(D3DFMT_A8R8G8B8, 4, 4),
+        "R104 LockRect bridge shadow initialize");
+
+    std::array<unsigned char, 80> lockBridgeSource{};
+    for (UINT row = 0; row < managedRows; ++row) {
+        for (UINT column = 0; column < managedRowBytes; ++column) {
+            lockBridgeSource[
+                static_cast<std::size_t>(row) * managedSourcePitch + column] =
+                static_cast<unsigned char>(0x90 + row * 16 + column);
+        }
+    }
+
+    D3DLOCKED_RECT sourceLock{};
+    sourceLock.Pitch = static_cast<INT>(managedSourcePitch);
+    sourceLock.pBits = lockBridgeSource.data();
+    RECT partialRect{0, 0, 2, 2};
+
+    require(
+        !lockBridgeShadow.begin_source_lock(
+            1, nullptr, 0, sourceLock),
+        "R104 nonzero mip LockRect must fail closed");
+    require(
+        !lockBridgeShadow.begin_source_lock(
+            0, &partialRect, 0, sourceLock),
+        "R104 partial LockRect must fail closed");
+    require(
+        !lockBridgeShadow.begin_source_lock(
+            0, nullptr, D3DLOCK_READONLY, sourceLock),
+        "R104 read-only LockRect must not arm write capture");
+    require(
+        !lockBridgeShadow.begin_source_lock(
+            0, nullptr, D3DLOCK_DISCARD, sourceLock),
+        "R104 MANAGED discard LockRect must fail closed");
+
+    D3DLOCKED_RECT shortPitchLock = sourceLock;
+    shortPitchLock.Pitch = static_cast<INT>(managedRowBytes - 1);
+    require(
+        !lockBridgeShadow.begin_source_lock(
+            0, nullptr, 0, shortPitchLock),
+        "R104 short-pitch LockRect must fail closed");
+
+    require(
+        lockBridgeShadow.begin_source_lock(
+            0, nullptr, 0, sourceLock) &&
+        lockBridgeShadow.source_lock_active(),
+        "R104 full MANAGED LockRect arms source capture");
+    require(
+        !lockBridgeShadow.begin_source_lock(
+            0, nullptr, 0, sourceLock),
+        "R104 nested LockRect must fail closed");
+    require(
+        !lockBridgeShadow.commit_source_unlock(1) &&
+        lockBridgeShadow.source_lock_active(),
+        "R104 mismatched UnlockRect level must preserve active capture");
+
+    // Prove the bridge observes the final lock contents rather than the bytes
+    // that happened to exist when LockRect first returned.
+    lockBridgeSource[0] ^= 0x5c;
+    require(
+        lockBridgeShadow.commit_source_unlock(0) &&
+        !lockBridgeShadow.source_lock_active(),
+        "R104 matching UnlockRect commits final lock contents");
+    require(
+        lockBridgeShadow.shadow_valid() &&
+        lockBridgeShadow.shadow_version() == 1,
+        "R104 UnlockRect commit advances managed shadow version");
+
+    std::array<unsigned char, 96> lockBridgeReadback{};
+    require(
+        lockBridgeShadow.read_full(
+            lockBridgeReadback.data(), managedReadbackPitch, managedRows),
+        "R104 committed LockRect shadow readback");
+    for (UINT row = 0; row < managedRows; ++row) {
+        require(
+            std::memcmp(
+                lockBridgeReadback.data() +
+                    static_cast<std::size_t>(row) * managedReadbackPitch,
+                lockBridgeSource.data() +
+                    static_cast<std::size_t>(row) * managedSourcePitch,
+                managedRowBytes) == 0,
+            "R104 UnlockRect-captured bytes must match final source rows");
+    }
+
+    require(
+        lockBridgeShadow.recreate_and_upload_mirror(d3d.device),
+        "R104 bridge mirror prerequisite");
+    require(
+        lockBridgeShadow.mirror_ready(),
+        "R104 bridge mirror starts generation-current");
+
+    lockBridgeSource[0] ^= 0x27;
+    require(
+        lockBridgeShadow.begin_source_lock(
+            0, nullptr, 0, sourceLock) &&
+        lockBridgeShadow.source_lock_active() &&
+        !lockBridgeShadow.mirror_ready() &&
+        lockBridgeShadow.mirror_texture() == nullptr,
+        "R104 writable LockRect invalidates stale GPU mirror immediately");
+    require(
+        !lockBridgeShadow.read_full(
+            lockBridgeReadback.data(), managedReadbackPitch, managedRows) &&
+        !lockBridgeShadow.recreate_and_upload_mirror(d3d.device),
+        "R104 active source lock blocks stale shadow read/upload");
+
+    lockBridgeShadow.observe_device_reset();
+    require(
+        !lockBridgeShadow.source_lock_active() &&
+        !lockBridgeShadow.commit_source_unlock(0) &&
+        lockBridgeShadow.shadow_valid() &&
+        lockBridgeShadow.shadow_version() == 1 &&
+        lockBridgeShadow.device_generation() == 2,
+        "R104 Reset clears stale LockRect pointer without committing it");
+
+    require(
+        lockBridgeShadow.begin_source_lock(
+            0, nullptr, 0, sourceLock),
+        "R104 post-Reset LockRect re-arms capture");
+    lockBridgeShadow.cancel_source_lock();
+    require(
+        !lockBridgeShadow.source_lock_active() &&
+        lockBridgeShadow.shadow_version() == 1,
+        "R104 cancelled LockRect clears capture without shadow mutation");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -814,6 +939,14 @@ int main()
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
+    lockBridgeShadow.shutdown();
+    require(
+        !lockBridgeShadow.ready() &&
+        !lockBridgeShadow.source_lock_active() &&
+        !lockBridgeShadow.shadow_valid() &&
+        !lockBridgeShadow.mirror_ready(),
+        "R104 LockRect bridge shutdown clears capture and ownership");
+
     managedShadow.shutdown();
     require(
         !managedShadow.ready() &&
@@ -898,5 +1031,6 @@ int main()
     std::cout << "DX11 fixed-function texture upload R101: PASS\n";
     std::cout << "DX11 managed texture shadow lifetime R102: PASS\n";
     std::cout << "DX11 managed texture mirror reupload R103: PASS\n";
+    std::cout << "DX11 managed Texture2D LockRect bridge R104: PASS\n";
     return 0;
 }

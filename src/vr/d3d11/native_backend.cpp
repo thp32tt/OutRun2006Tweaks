@@ -429,7 +429,7 @@ bool NativeManagedTextureShadow::write_full(
     UINT sourceRowPitch,
     UINT sourceRows) noexcept {
 
-    if (!ready() || !source ||
+    if (!ready() || source_lock_active_ || !source ||
         sourceRows != height_ || sourceRowPitch < row_bytes_)
         return false;
 
@@ -457,7 +457,7 @@ bool NativeManagedTextureShadow::read_full(
     UINT destinationRowPitch,
     UINT destinationRows) const noexcept {
 
-    if (!ready() || !shadow_valid() || !destination ||
+    if (!ready() || source_lock_active_ || !shadow_valid() || !destination ||
         destinationRows != height_ || destinationRowPitch < row_bytes_)
         return false;
 
@@ -480,7 +480,7 @@ bool NativeManagedTextureShadow::read_full(
 bool NativeManagedTextureShadow::recreate_and_upload_mirror(
     ID3D11Device* device) noexcept {
 
-    if (!ready() || !shadow_valid() || !device)
+    if (!ready() || source_lock_active_ || !shadow_valid() || !device)
         return false;
 
     const auto format = translate_resource_format(
@@ -540,6 +540,55 @@ bool NativeManagedTextureShadow::recreate_and_upload_mirror(
     return true;
 }
 
+bool NativeManagedTextureShadow::begin_source_lock(
+    UINT level,
+    const RECT* sourceRect,
+    DWORD lockFlags,
+    const D3DLOCKED_RECT& lockedRect) noexcept {
+
+    if (!ready() || source_lock_active_ ||
+        level != 0 || sourceRect != nullptr ||
+        !lockedRect.pBits || lockedRect.Pitch <= 0)
+        return false;
+
+    const auto mutation = translate_texture_mutation(
+        D3DPOOL_MANAGED, 0, lockFlags, true);
+    if (mutation.kind != TextureMutationUpdateKind::ManagedCpuShadowWrite ||
+        !mutation.requiresCpuShadow || mutation.planExact)
+        return false;
+
+    const UINT pitch = static_cast<UINT>(lockedRect.Pitch);
+    if (pitch < row_bytes_)
+        return false;
+
+    // A successful writable LockRect means the source can diverge before the
+    // matching UnlockRect. Do not expose a previously uploaded mirror while
+    // that source memory is mutable.
+    release_mirror();
+    source_lock_bits_ = lockedRect.pBits;
+    source_lock_pitch_ = pitch;
+    source_lock_level_ = level;
+    source_lock_active_ = true;
+    return true;
+}
+
+bool NativeManagedTextureShadow::commit_source_unlock(UINT level) noexcept {
+    if (!source_lock_active_ || level != source_lock_level_)
+        return false;
+
+    const void* bits = source_lock_bits_;
+    const UINT pitch = source_lock_pitch_;
+    clear_source_lock();
+
+    // This must run before the real IDirect3DTexture9::UnlockRect so pBits
+    // still references the final D3D9 lock contents.
+    return write_full(bits, pitch, height_);
+}
+
+void NativeManagedTextureShadow::cancel_source_lock() noexcept {
+    clear_source_lock();
+}
+
 void NativeManagedTextureShadow::note_mirror_uploaded() noexcept {
     if (!mirror_device_ || !mirror_texture_ || !mirror_srv_)
         return;
@@ -547,6 +596,7 @@ void NativeManagedTextureShadow::note_mirror_uploaded() noexcept {
 }
 
 void NativeManagedTextureShadow::observe_device_reset() noexcept {
+    clear_source_lock();
     release_mirror();
     lifetime_ = advance_managed_device_generation(lifetime_);
 }
@@ -558,7 +608,15 @@ void NativeManagedTextureShadow::release_mirror() noexcept {
     lifetime_.mirrorValid = false;
 }
 
+void NativeManagedTextureShadow::clear_source_lock() noexcept {
+    source_lock_bits_ = nullptr;
+    source_lock_pitch_ = 0;
+    source_lock_level_ = 0;
+    source_lock_active_ = false;
+}
+
 void NativeManagedTextureShadow::shutdown() noexcept {
+    clear_source_lock();
     release_mirror();
     source_format_ = D3DFMT_UNKNOWN;
     width_ = 0;

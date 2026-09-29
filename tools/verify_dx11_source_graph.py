@@ -1519,6 +1519,95 @@ def main() -> None:
                 "DX11 R103 managed-mirror probe drift: " + meaning
             )
 
+    r104_lock_bridge_header = {
+        "begin_source_lock(": "R104 D3D9 LockRect capture entrypoint",
+        "commit_source_unlock(UINT level)":
+            "R104 D3D9 UnlockRect commit entrypoint",
+        "cancel_source_lock()": "R104 abandoned lock cleanup entrypoint",
+        "source_lock_active() const noexcept":
+            "R104 active source-lock visibility",
+        "const void* source_lock_bits_ = nullptr":
+            "R104 locked source pointer storage",
+        "UINT source_lock_pitch_ = 0":
+            "R104 locked source pitch storage",
+        "bool source_lock_active_ = false":
+            "R104 lock transaction state",
+        "void clear_source_lock() noexcept":
+            "R104 stale pointer cleanup helper",
+    }
+    missing_r104_header = [
+        meaning
+        for token, meaning in r104_lock_bridge_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r104_header:
+        raise SystemExit(
+            "DX11 R104 LockRect bridge header drift: "
+            + ", ".join(missing_r104_header)
+        )
+
+    for token, meaning in {
+        "level != 0 || sourceRect != nullptr":
+            "R104 level-zero full-subresource gate",
+        "!lockedRect.pBits || lockedRect.Pitch <= 0":
+            "R104 valid D3DLOCKED_RECT pointer/pitch gate",
+        "mutation.kind != TextureMutationUpdateKind::ManagedCpuShadowWrite":
+            "R104 managed writable-lock translation requirement",
+        "source_lock_bits_ = lockedRect.pBits":
+            "R104 lock source pointer capture",
+        "source_lock_pitch_ = pitch":
+            "R104 source pitch capture",
+        "source_lock_active_ = true":
+            "R104 lock transaction arm",
+        "return write_full(bits, pitch, height_)":
+            "R104 UnlockRect-to-R102 shadow commit",
+        "clear_source_lock();\n    release_mirror();":
+            "R104 Reset stale pointer cleanup",
+        "source_lock_active_ || !shadow_valid()":
+            "R104 active-lock mirror upload rejection",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R104 LockRect bridge source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R104 nonzero mip LockRect must fail closed":
+            "R104 mip-level rejection",
+        "R104 partial LockRect must fail closed":
+            "R104 partial-rect rejection",
+        "R104 read-only LockRect must not arm write capture":
+            "R104 read-only rejection",
+        "R104 MANAGED discard LockRect must fail closed":
+            "R104 discard rejection",
+        "R104 short-pitch LockRect must fail closed":
+            "R104 short-pitch rejection",
+        "R104 nested LockRect must fail closed":
+            "R104 nested-lock rejection",
+        "R104 mismatched UnlockRect level must preserve active capture":
+            "R104 mismatched-unlock rejection",
+        "R104 matching UnlockRect commits final lock contents":
+            "R104 positive UnlockRect commit",
+        "R104 UnlockRect-captured bytes must match final source rows":
+            "R104 final locked-byte content proof",
+        "R104 writable LockRect invalidates stale GPU mirror immediately":
+            "R104 pending-write mirror invalidation",
+        "R104 active source lock blocks stale shadow read/upload":
+            "R104 active-lock stale content gate",
+        "R104 Reset clears stale LockRect pointer without committing it":
+            "R104 Reset pointer lifetime proof",
+        "R104 cancelled LockRect clears capture without shadow mutation":
+            "R104 explicit cancel proof",
+        "R104 LockRect bridge shutdown clears capture and ownership":
+            "R104 shutdown cleanup proof",
+        "DX11 managed Texture2D LockRect bridge R104: PASS":
+            "R104 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R104 LockRect bridge probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

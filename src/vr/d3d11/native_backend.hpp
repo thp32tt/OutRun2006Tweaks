@@ -150,7 +150,9 @@ private:
 
 // R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED
 // Texture2D. R103 adds concrete generation-bound D3D11 DEFAULT mirror/SRV
-// recreation from the shadow. No game draw path constructs or binds it.
+// recreation from the shadow. R104 adds a fail-closed transaction bridge for
+// an eventual D3D9 Texture2D LockRect/UnlockRect hook. No production hook or
+// game draw path constructs or binds it.
 class NativeManagedTextureShadow final {
 public:
     NativeManagedTextureShadow() = default;
@@ -171,6 +173,13 @@ public:
         UINT destinationRowPitch,
         UINT destinationRows) const noexcept;
     bool recreate_and_upload_mirror(ID3D11Device* device) noexcept;
+    bool begin_source_lock(
+        UINT level,
+        const RECT* sourceRect,
+        DWORD lockFlags,
+        const D3DLOCKED_RECT& lockedRect) noexcept;
+    bool commit_source_unlock(UINT level) noexcept;
+    void cancel_source_lock() noexcept;
     void note_mirror_uploaded() noexcept;
     void observe_device_reset() noexcept;
     void shutdown() noexcept;
@@ -193,6 +202,9 @@ public:
     [[nodiscard]] std::uint64_t device_generation() const noexcept {
         return lifetime_.deviceGeneration;
     }
+    [[nodiscard]] bool source_lock_active() const noexcept {
+        return source_lock_active_;
+    }
     [[nodiscard]] ID3D11Device* mirror_device() const noexcept {
         return mirror_device_.Get();
     }
@@ -209,6 +221,7 @@ public:
 
 private:
     void release_mirror() noexcept;
+    void clear_source_lock() noexcept;
 
     D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
     UINT width_ = 0;
@@ -216,6 +229,10 @@ private:
     UINT row_bytes_ = 0;
     std::vector<std::uint8_t> shadow_;
     ManagedMirrorLifetimeState lifetime_{};
+    const void* source_lock_bits_ = nullptr;
+    UINT source_lock_pitch_ = 0;
+    UINT source_lock_level_ = 0;
+    bool source_lock_active_ = false;
     Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mirror_srv_;
