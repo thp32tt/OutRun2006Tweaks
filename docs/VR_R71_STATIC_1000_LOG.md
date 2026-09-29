@@ -765,3 +765,19 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: trace selector white/colorless car resource/material state.
+
+
+## Cycle 0033 — selector white/colorless car fail-closed review
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- The reported DX9Ex-only white/colorless selector car remains a P0 visual regression, but current evidence does not identify a single texture/material state owner. Do not reuse broad HUD/SkyGlow fixes or promote generic selector draws. Next evidence must bind selector draw identity to texture0/material/texture-stage state before behavior change.
+- Evidence: user runtime differential DX9Ex selector car white/colorless vs DXVK normal + exact semantic fail-closed policy.
+- No additional production/runtime behavior changed in this cycle.
+- Frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged; performance-only work remains paused.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect exact selector producer/resource upload path.
