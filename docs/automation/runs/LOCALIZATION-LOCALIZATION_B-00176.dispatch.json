@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00176",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00088",
+  "purpose": "Trigger deterministic index130/1762489B exact-canonical RGBA32 v2 Korean candidate production after candidate-completion-first readiness transition.",
+  "source_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+  "source_git_blob_sha": "ce5158f8f3e78dc328227e4e76c7c71789b53060",
+  "base_head_before_dispatch": "2cc3d5a5230b33cb3c17b0c8a610d2a7bda121b9",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
