@@ -1381,4 +1381,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - A00235@index231 remains **PASS / STATIC_QA_PASS_RUNTIME_UNTESTED** on candidate `ba9e0c73...`; no runtime approval was granted.
 - Candidate-completion order remains **candidate QA 159/198/201/163 -> PREFLIGHT_ONLY 133/232**. Out-of-batch A00239@index102 runtime-isolation input and A00241@index111 rework-preflight evidence remain QA_PENDING and are not implicitly approved.
 - Pending production **67**, actionable localize_text **93**, canonical segments **755**. This bookkeeping checkpoint is separate from the validation-bearing result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
-
+### C157 Q00055 — 2026-09-30T08:45:40+09:00
+- Immutable inputs A00239 `eb621c76...`, A00241 `12ce7988...`, B00237 `b138928b...` — dispositions **PASS / PASS / PASS**.
+- Index102 accepts DDS_ONLY runtime isolation on unchanged C81/D83 fingerprint; index111 accepts pre-generation geometry only and remains **PREFLIGHT_ONLY**; index163 exact Drive candidate `0d9410e5...` passes 24/24 safe-fit, zero outside-source-effect change and independent visual review -> **STATIC_QA_PASS_RUNTIME_UNTESTED**.
+- Candidate-completion order: **159/198/201 -> PREFLIGHT_ONLY 111/133/232**. Out-of-batch A00242@index147, B00243@index226 and A00245@index231 remain QA_PENDING. Runtime isolation accepted: **99/102/237**; 226/231 pending C.
+- Pending production **66**, actionable localize_text **93**, canonical segments **755**. No runtime approval. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

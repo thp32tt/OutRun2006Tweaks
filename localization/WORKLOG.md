@@ -1979,4 +1979,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B00237@index163 candidate, A00239@index102 isolation input, and A00241@index111 rework-preflight evidence remain out-of-batch **QA_PENDING**, not implicitly approved.
 - Current order remains **RENDER_READY none -> ONE_STAGE none -> candidate QA 159/198/201/163 -> PREFLIGHT_ONLY 133/232**; unrelated index111 preflight remains behind candidate completion. Pending production **67**, actionable **93**, canonical segments **755**.
 - This bookkeeping commit is separate from the Gate-owning result commit. No runtime test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
-
+## 2026-09-30 08:45 KST - C157 Q00055 independent batch QA
+- Immutable inputs: A00239 `eb621c76...` index102, A00241 `12ce7988...` index111, B00237 `b138928b...` index163. Dispositions: **PASS / PASS / PASS**; no input is superseded at merge base `6e51744c`.
+- Index102/571E78F3: unchanged C81/D83 2048x256 DXT5/mip1 source/candidate fingerprint; heavy static QA reused. DDS_ONLY runtime-isolation manifest accepted; runtime remains **UNTESTED**.
+- Index111/C075FB49: six remaining failures are narrowed to exact 2px-safe geometry; drift is translation-feasible and five elements require native rerender. This is **PREFLIGHT_ONLY** because exact removal/protected masks, CLEAN_PLATE and source style/slant remain unresolved.
+- Index163/59A79158: exact canonical source `7cf4f4c6...`, Drive ZIP `e79e4f5a...`, candidate `0d9410e5...`; 1024x2048 RGBA32/mip1 header exact, 24/24 semantic + safe-fit PASS, zero outside-source-effect RGBA/alpha changes, independent full-atlas/element visual review PASS. **STATIC_QA_PASS_RUNTIME_UNTESTED**.
+- Out-of-batch A00242@index147, B00243@index226 isolation and A00245@index231 isolation remain **QA_PENDING**. Order: **candidate QA 159/198/201 -> PREFLIGHT_ONLY 111/133/232**. Pending production **66**, actionable **93**, canonical segments **755**.
+- No runtime test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
