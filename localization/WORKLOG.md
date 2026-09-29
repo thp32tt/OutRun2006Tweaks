@@ -1792,3 +1792,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion-first: consume the newer 159/201 candidate result in its own C batch first; then continue exact-source multistage 198/133/222/226/232 before unrelated source preflight.
 - Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS modification by C, no build, N100/local clone/worktree, GPT Library, Drive write, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0410-C144/C144_Q00042_INDEPENDENT_QA_BATCH.json`.
+
+
+## 2026-09-30 04:14 KST - C144 Q00042 AUTHORITATIVE GATE PASS
+
+- Validation-bearing result: `95c616fc8aa1564ba502433e7e2a10c6e3a3f6b2`; Localization Automation Gate `36617669526` — **success**.
+- A00200 disposition remains **SUPERSEDED**. Current HEAD already had newer overlapping 159/201 candidate state from A00196 `1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb`, so Q00042 correctly did not merge stale pre-generation state over it.
+- 159/201 remain candidate-QA-pending outside Q00042; 198/222 retain prior C142 **PREFLIGHT_ONLY** exact-source state. No Q00042 static/runtime approval.
+- Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+- This bookkeeping commit is separate from the validation-bearing result and does not own the Gate.

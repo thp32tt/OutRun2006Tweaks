@@ -1231,3 +1231,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate-completion-first remains active: newer 159/201 candidate C QA precedes exact-source multistage 198/133/222/226/232 and unrelated preflight.
 - Pending production **71**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0410-C144/C144_Q00042_INDEPENDENT_QA_BATCH.json`.
+
+
+### C144 Q00042 AUTHORITATIVE GATE PASS — 2026-09-30T04:14:04+09:00
+- Validation-bearing result `95c616fc8aa1564ba502433e7e2a10c6e3a3f6b2`; Localization Automation Gate `36617669526` — **success**.
+- A00200 remains **SUPERSEDED** by newer overlapping 159/201 candidate state. 198/222 retain prior C142 **PREFLIGHT_ONLY** exact-source status.
+- Newer 159/201 candidates are not approved by this batch and still require their own C QA. No runtime validation was performed.
+- Pending production **71**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
