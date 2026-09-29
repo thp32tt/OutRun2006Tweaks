@@ -1,0 +1,88 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00083",
+  "recorded_at_kst": "2026-09-30T00:17:56+09:00",
+  "commit_mode": "GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_MATERIAL_AND_TASK_RECORD",
+  "base_head_sha": "d3c8bd58096d89c5834137972941f52ca48864be",
+  "result": "PASS_MATERIAL_PINNED_RELEASE_SOURCE_TIER_AUDIT_RUNTIME_UNTESTED",
+  "summary": "Pinned Release identity verified; no exact canonical DDS among the three target paths. 3 asset(s) now have all approved acquisition tiers exhausted and can be skipped without repeating Drive/direct/Release probes.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00168-P00083/A00168_P00083_PINNED_RELEASE_SOURCE_AUDIT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "PINNED_RELEASE_FINAL_SOURCE_TIER_EXHAUSTION",
+    "indices": [
+      65,
+      89,
+      241
+    ],
+    "assets": [
+      "EBEF6D20",
+      "43B07A77",
+      "E1639D2E"
+    ],
+    "verified_release_asset_id": 306630789,
+    "verified_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "release_exact_canonical": 0,
+    "release_identity_mismatch": 3,
+    "release_transport_miss": 0,
+    "source_acquisition_exhausted": 3,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true,
+    "report_path": "localization/graphics/role_A/20260930-A00168-P00083/A00168_P00083_PINNED_RELEASE_SOURCE_AUDIT.json"
+  },
+  "readiness_audit": {
+    "selected_priority": "PREFLIGHT_ONLY_FINAL_APPROVED_SOURCE_ACQUISITION_TIER",
+    "qa_pending_skip": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+      "index": 99,
+      "asset": "4F68708E"
+    },
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "explicit_render_ready_count": 0,
+    "explicit_one_stage_to_render_count": 0,
+    "selected_indices": [
+      65,
+      89,
+      241
+    ],
+    "post_evidence_render_ready_count": 0,
+    "conclusion": "ZERO_NEW_CANDIDATE_EXCEPTION_VALID__PINNED_RELEASE_FINAL_SOURCE_TIER_EXECUTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "a00149_task_blob_sha": "90530a8a36fdd17e674972bfd9df421ce1c7e9db",
+    "a00166_task_blob_sha": "c5acce98b3aeb4f92b9138703a7d932a279da56e",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "self_qa": "PASS_ODD_65_89_241_PINNED_RELEASE_BUNDLE_VERIFIED__EXACT_PATH_AND_INVENTORY_IDENTITY_CHECKED__NO_STALE_SOURCE_RENDER__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_NEW_CANDIDATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

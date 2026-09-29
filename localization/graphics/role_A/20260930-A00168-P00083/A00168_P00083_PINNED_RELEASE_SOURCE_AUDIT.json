@@ -1,0 +1,154 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-a00168-pinned-release-source-audit-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
+  "lane": "LOCALIZATION_A",
+  "wave_id": "P00083",
+  "recorded_at_kst": "2026-09-30T00:17:56+09:00",
+  "status": "PASS",
+  "result": "PASS_PINNED_RELEASE_SOURCE_TIER_AUDIT_FAIL_CLOSED_RUNTIME_UNTESTED",
+  "bundle": {
+    "repository": "envido32/OR2006Sprites",
+    "tag": "v0.25.10a",
+    "release_asset_id": 306630789,
+    "url": "https://github.com/envido32/OR2006Sprites/releases/download/v0.25.10a/OR2-HD-GUI-v0.25.10a.zip",
+    "expected_size": 306223257,
+    "expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "verified_size": 306223257,
+    "verified_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "identity_gate": "PASS"
+  },
+  "prior_tiers": {
+    "google_drive": "A00166_SOURCE_TRANSPORT_MISS_3_OF_3",
+    "pinned_direct_file": "A00149_SOURCE_IDENTITY_MISMATCH_3_OF_3"
+  },
+  "assets": [
+    {
+      "index": 65,
+      "asset": "EBEF6D20",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "canonical_sha256": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e",
+      "canonical_width": 512,
+      "canonical_height": 512,
+      "canonical_mode": "RGBA",
+      "drive_outcome": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct_sha256": "78fdc0d8591689f2743de4700a681b05d08376a391a6f1e2855e186a80c12f23",
+      "release_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "archive_member": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "archive_member_bytes": 16777344,
+      "archive_member_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "dds": {
+        "valid_dds": true,
+        "width": 2048,
+        "height": 2048,
+        "mip_count": 1,
+        "pixel_format_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bit_count": 32,
+        "r_mask": "0x000000ff",
+        "g_mask": "0x0000ff00",
+        "b_mask": "0x00ff0000",
+        "a_mask": "0xff000000",
+        "format_summary": "RGBA32"
+      },
+      "identity_ok": false,
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "next_state": "SOURCE_ACQUISITION_EXHAUSTED__SKIP_AND_CONTINUE_OTHER_RUNNABLE_ASSET"
+    },
+    {
+      "index": 89,
+      "asset": "43B07A77",
+      "queue_path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "canonical_sha256": "0a2c9a32070771338dabc04a7bda67d9b474fd21d6a3456f60d9e1221fc8a96c",
+      "canonical_width": 512,
+      "canonical_height": 64,
+      "canonical_mode": "RGBA",
+      "drive_outcome": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct_sha256": "6db8e65661f76e5ac12e7090c039ced565731765e0cfc5dbe45329b52b5307f2",
+      "release_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "archive_member": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "archive_member_bytes": 2097280,
+      "archive_member_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+      "dds": {
+        "valid_dds": true,
+        "width": 2048,
+        "height": 256,
+        "mip_count": 1,
+        "pixel_format_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bit_count": 32,
+        "r_mask": "0x000000ff",
+        "g_mask": "0x0000ff00",
+        "b_mask": "0x00ff0000",
+        "a_mask": "0xff000000",
+        "format_summary": "RGBA32"
+      },
+      "identity_ok": false,
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "next_state": "SOURCE_ACQUISITION_EXHAUSTED__SKIP_AND_CONTINUE_OTHER_RUNNABLE_ASSET"
+    },
+    {
+      "index": 241,
+      "asset": "E1639D2E",
+      "queue_path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+      "canonical_sha256": "0af7362ff57b2ee9bfa04811838035861e919f5886244994dbede9aca6ed6c63",
+      "canonical_width": 256,
+      "canonical_height": 64,
+      "canonical_mode": "RGBA",
+      "drive_outcome": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct_sha256": "3277d04661e0e348d41d0393df57676ce620bef445ee7cf7d461057547d4ac8b",
+      "release_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "archive_member": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+      "archive_member_bytes": 1048704,
+      "archive_member_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+      "dds": {
+        "valid_dds": true,
+        "width": 1024,
+        "height": 256,
+        "mip_count": 1,
+        "pixel_format_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bit_count": 32,
+        "r_mask": "0x00ff0000",
+        "g_mask": "0x0000ff00",
+        "b_mask": "0x000000ff",
+        "a_mask": "0xff000000",
+        "format_summary": "RGBA32"
+      },
+      "identity_ok": false,
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "next_state": "SOURCE_ACQUISITION_EXHAUSTED__SKIP_AND_CONTINUE_OTHER_RUNNABLE_ASSET"
+    }
+  ],
+  "summary_counts": {
+    "assets": 3,
+    "release_exact_canonical": 0,
+    "release_identity_mismatch": 3,
+    "release_transport_miss": 0,
+    "source_acquisition_exhausted": 3
+  },
+  "candidate_completion_rescan": {
+    "candidate_dds_modified": false,
+    "reason": "No asset becomes RENDER_READY solely from this audit unless the pinned Release member is exact canonical. Any exact source still lacks current-canonical source-effect/removal mask, independently QAed CLEAN_PLATE and final candidate_safe_bbox in the shared C-accepted state.",
+    "qa_pending_skip": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+      "index": 99,
+      "asset": "4F68708E"
+    },
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ]
+  },
+  "self_qa": {
+    "zip_digest": "PASS",
+    "exact_path_binding": "PASS_SUFFIX_BOUND_TO_FULL_QUEUE_RELATIVE_PATH",
+    "inventory_identity": "PASS_CHECKED_SHA256_DIMENSIONS_PER_ASSET",
+    "stale_4x_reuse": "REJECTED",
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
