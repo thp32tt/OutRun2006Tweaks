@@ -1,0 +1,154 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00191",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T03:12:00+09:00",
+  "base_sha": "20c6171d8de3eb2f5f99ff6712210981c82ca41e",
+  "base_head_sha": "20c6171d8de3eb2f5f99ff6712210981c82ca41e",
+  "commit_mode": "GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_SOURCE_AUDIT_RESULT_THEN_BOOKKEEP_RESULT_SHA",
+  "result": "PASS_MATERIAL_A_MOD3_INDICES135_147_159_201_PINNED_RELEASE_SOURCE_AUDIT_RUNTIME_UNTESTED",
+  "summary": "Fresh C139/Q00037-aware A-shard scan has no runnable RENDER_READY or ONE_STAGE_TO_RENDER item. Index99 is already STATIC_QA PASS and is not rerendered. This single legal preflight batch verifies the pinned v0.25.10a bundle and audits A-owned indices135/147/159/201 after approved ezflash557 exact-filename Drive misses. Exact canonical source acquired=2, acquisition exhausted=2, strict hold=0. No candidate DDS/shared state/runtime/build/N100/local-clone change is made.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00191-rollover1/A00191_MOD3_CANONICAL_SOURCE_AUDIT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "A_MOD3_FOUR_ASSET_APPROVED_SOURCE_TIER_AUDIT",
+    "indices": [
+      135,
+      147,
+      159,
+      201
+    ],
+    "assets": [
+      "2B0863D6",
+      "39BCA907",
+      "4EDA9DE3",
+      "A9ABD877"
+    ],
+    "drive_exact_filename_misses": 4,
+    "pinned_release_bundle_verified": true,
+    "exact_canonical_sources_acquired": 2,
+    "source_acquisition_exhausted": 2,
+    "hold_strict_recheck": 0,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true,
+    "report_path": "localization/graphics/role_A/20260930-A00191-rollover1/A00191_MOD3_CANONICAL_SOURCE_AUDIT.json"
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_indices": [
+      135,
+      147,
+      159,
+      201
+    ],
+    "selected_priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "current_c_gate": "C139/Q00037",
+    "static_pass_not_repeated": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "sticky_source_exhausted_not_repeated": [
+      30,
+      36,
+      48,
+      132,
+      228
+    ],
+    "dependency_or_runtime_blocked_existing_candidates_not_rewritten": [
+      12,
+      51,
+      54,
+      57,
+      60,
+      63,
+      102,
+      111,
+      195
+    ],
+    "semantic_binding_fail_closed_not_rendered": [
+      231
+    ],
+    "readiness_after": {
+      "135": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "147": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "159": "PREFLIGHT_ONLY_EXACT_SOURCE_ACQUIRED__DIRECT_DECODED_SEMANTIC_BINDING_SOURCE_EFFECT_MASK_CLEAN_PLATE_AND_V2_SAFE_BBOX_STILL_REQUIRED",
+      "201": "PREFLIGHT_ONLY_EXACT_SOURCE_ACQUIRED__DIRECT_DECODED_SEMANTIC_BINDING_SOURCE_EFFECT_MASK_CLEAN_PLATE_AND_V2_SAFE_BBOX_STILL_REQUIRED"
+    },
+    "post_evidence_render_ready_count": 0,
+    "post_evidence_one_stage_to_render_count": 0
+  },
+  "source_results": [
+    {
+      "index": 135,
+      "asset": "2B0863D6",
+      "drive": "SOURCE_TRANSPORT_MISS_VERIFIED_PRE_DISPATCH",
+      "release": "SOURCE_IDENTITY_MISMATCH",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED",
+      "archive_member_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "canonical_sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521"
+    },
+    {
+      "index": 147,
+      "asset": "39BCA907",
+      "drive": "SOURCE_TRANSPORT_MISS_VERIFIED_PRE_DISPATCH",
+      "release": "SOURCE_IDENTITY_MISMATCH",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED",
+      "archive_member_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "canonical_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72"
+    },
+    {
+      "index": 159,
+      "asset": "4EDA9DE3",
+      "drive": "SOURCE_TRANSPORT_MISS_VERIFIED_PRE_DISPATCH",
+      "release": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "final": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "archive_member_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "canonical_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd"
+    },
+    {
+      "index": 201,
+      "asset": "A9ABD877",
+      "drive": "SOURCE_TRANSPORT_MISS_VERIFIED_PRE_DISPATCH",
+      "release": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "final": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "archive_member_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "canonical_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5"
+    }
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "763808c8d0982677d06b13b3a83e639450aa2000",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "asset_queue_blob_sha": "155d3a64d201b23154590cc3b2079ade989612c6",
+    "c00192_task_blob_sha": "faebf74c4ad619a52c8777aa2bffccf6cf018663",
+    "a00187_task_blob_sha": "a9cb7952b0062ce21702ebcc1f49f5660c04f3b8",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "self_qa": "PASS_A_MOD3_135_147_159_201__C139_ZERO_RUNNABLE_READY_TIER__DRIVE_EXACT_FILENAME_MISS_4_OF_4__PINNED_RELEASE_BUNDLE_SHA256_VERIFIED__PER_ASSET_SHA256_DIMENSIONS_RGBA32_MIP1_IDENTITY_FAIL_CLOSED__NO_PIXEL_CONSTRUCTION_WITHOUT_DIRECT_DECODED_BINDING_CLEAN_PLATE_SAFE_BBOX__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_NEW_CANDIDATE_SOURCE_TIER_AUDIT_ONLY",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
