@@ -72,8 +72,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "PENDING_POST_COMMIT",
-  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "result_sha": "22f5884a0ce4e4613fb9284e142a61401aab770a",
+  "authoritative_result_sha": "22f5884a0ce4e4613fb9284e142a61401aab770a",
   "result_commit_message": "localization(B): close index175 canonical source identity [AUTO:LOCALIZATION-LOCALIZATION_B-00229]",
   "fingerprints": {
     "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
@@ -83,5 +83,7 @@
     "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
     "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
     "c00228_task_record_blob_sha": "6c257bab00ef360e3ecdc5b9374b239bd259878c"
-  }
+  },
+  "bookkeeping_recorded_at_kst": "2026-09-30T07:30:19+09:00",
+  "bookkeeping_note": "Durable producer result SHA recorded after verifying the exact AUTO result commit changes only the B lane-local index175 evidence and this task record; automation_validation remains PENDING for C_BATCH_GATE and runtime_validation remains UNTESTED. This bookkeeping commit is separate and does not replace the producer result commit."
 }
