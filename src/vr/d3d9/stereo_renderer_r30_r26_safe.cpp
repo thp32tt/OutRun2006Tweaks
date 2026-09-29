@@ -950,6 +950,7 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowPerfMaxUs = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
         std::uint64_t R30SkyGlowAppliedEpoch = 0;
+        std::uint64_t R30SkyGlowPreHudAttemptEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
         OutRunVR::FrameState::FrameContext R69FrameContext{};
@@ -980,6 +981,7 @@ namespace OutRunVRStereo
                 ++frame.stageTransitionHolds;
                 R30SkyGlowSceneCaptureEpoch = 0;
                 R30SkyGlowAppliedEpoch = 0;
+                R30SkyGlowPreHudAttemptEpoch = 0;
                 spdlog::info(
                     "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
                     previous, stage, R68StageHoldPresents,
@@ -1613,6 +1615,11 @@ namespace OutRunVRStereo
             // sources.
             if (!device || R30SkyGlowAppliedEpoch == PresentEpoch)
                 return true;
+
+            // Once a HUD draw is about to begin, never fall back to a later
+            // Present-time additive composite for this frame. If the pre-HUD
+            // path fails, omitting glow is safer than washing over UI.
+            R30SkyGlowPreHudAttemptEpoch = PresentEpoch;
             if (!R30CaptureSkyGlowSceneBeforeHud(device))
                 return false;
 
@@ -1678,6 +1685,7 @@ namespace OutRunVRStereo
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
                 R30SkyGlowAppliedEpoch != PresentEpoch &&
+                R30SkyGlowPreHudAttemptEpoch != PresentEpoch &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
@@ -1725,6 +1733,7 @@ namespace OutRunVRStereo
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             R30SkyGlowAppliedEpoch = 0;
+            R30SkyGlowPreHudAttemptEpoch = 0;
             R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
