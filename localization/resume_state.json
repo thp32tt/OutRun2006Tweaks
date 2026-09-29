@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "Use outrun-first-pass-edit-v2 for every new/materially reworked graphics candidate: validate CLEAN_PLATE first, then deterministic Korean lettering where possible, require 2px measured safe inset by default (1px only when explicitly justified), and re-render rather than resize flattened text.",
     "Use Q00005/C107-accepted B00073 exact-HD orientation/layout specs for indices 92/98/112/152. All four prove raw flip_y and measured source fill/effect geometry, but do not promote historical/low-resolution Korean candidates; render only from exact HD English source.",
     "Use Q00005/C107-accepted B00076 direct semantic-cell mappings for indices 86/100/106. Index 106 localizes only For Experts / Music Change / Time remaining :; preserve the OutRun2SP wordmark exactly.",
     "Keep all seven Q00005 assets at HOLD_STRICT_RECHECK for candidate-only gates until a new exact-HD Korean DDS passes decoded-final zero-pixel containment, protected-mask/alpha, post-compression, orientation/slant/style and exact ENGLISH SOURCE vs KOREAN CANDIDATE comparison.",
@@ -921,6 +922,18 @@
       "new_runtime_approvals": 0,
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_C/20260929-1447-C105/C105_Q00003_INDEPENDENT_QA_BATCH.json"
+    },
+    "generation_contract": {
+      "version": "outrun-first-pass-edit-v2",
+      "activated_at_kst": "2026-09-29T15:41:30+09:00",
+      "default_safety_inset_px": 2,
+      "minimum_safety_inset_px": 1,
+      "clean_plate_stage_required": true,
+      "native_effect_bbox_measurement_required": true,
+      "render_measure_refit_required": true,
+      "flattened_raster_resize_forbidden": true,
+      "report": "localization/graphics/GENERATION_V2_SAFE_FIT_20260929.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "runtime_packages": {

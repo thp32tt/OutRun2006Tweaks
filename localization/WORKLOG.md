@@ -1367,3 +1367,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Canonical graphics segments: **754 -> 753**. Actionable queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text remains **76**.
 - No input or C changed Korean DDS candidate bytes. New static artwork passes 0; runtime approvals 0. No N100/local clone, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-1534-C107/C107_Q00005_INDEPENDENT_QA_BATCH.json`.
+
+
+## 2026-09-29 - GENERATION-V2-SAFE-FIT
+
+- Reviewed strict-reset/C85 evidence and identified recurring first-pass failures: bbox overflow, alpha/changed pixels outside region, English/erasure residue, flattened-raster shrink artifacts and collateral edits.
+- Activated `outrun-first-pass-edit-v2` for all new/materially reworked graphics candidates.
+- Split source-text removal from Korean lettering permissions: CLEAN_PLATE uses the source glyph/effect removal mask; Korean uses its permitted lettering region.
+- Added a default 2px candidate safety inset (explicit 1px only for constrained geometry), native-resolution effect-inclusive measurement and render -> measure -> refit/re-render loop.
+- Flattened Korean raster shrinking/resampling is forbidden; resize must re-render font/effect geometry.
+- Added mandatory clean-plate machine QA and candidate-vs-clean stage-isolation checks in `build_clean_graphics_candidate.py`.
+- Added CI verifier `verify_generation_contract_v2.py`.
+- Strict zero-pixel QA remains unchanged; runtime validation remains UNTESTED.
+- Durable policy report: `localization/graphics/GENERATION_V2_SAFE_FIT_20260929.json`.

@@ -717,6 +717,17 @@
       "new_runtime_approvals": 0,
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_C/20260929-1520-C106/C106_Q00004_INDEPENDENT_QA_BATCH.json"
+    },
+    "generation_contract": {
+      "version": "outrun-first-pass-edit-v2",
+      "status": "active",
+      "activated_at_kst": "2026-09-29T15:41:30+09:00",
+      "default_safety_inset_px": 2,
+      "minimum_safety_inset_px": 1,
+      "clean_plate_stage_required": true,
+      "render_measure_refit_required": true,
+      "report": "localization/graphics/GENERATION_V2_SAFE_FIT_20260929.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {

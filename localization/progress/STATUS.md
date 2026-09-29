@@ -894,3 +894,16 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Canonical graphics segments: **754 -> 753**. Actionable queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text remains **76**.
 - No input or C changed Korean DDS candidate bytes. New static artwork passes 0; runtime approvals 0. No N100/local clone, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-1534-C107/C107_Q00005_INDEPENDENT_QA_BATCH.json`.
+
+
+### First-pass generation v2
+
+- Active prompt contract: **outrun-first-pass-edit-v2**
+- Default first-pass safety inset: **2 px per side**; explicit constrained fallback: **1 px**; zero-margin first-pass target forbidden.
+- Source removal mask and Korean lettering region are now separate.
+- CLEAN_PLATE is validated before lettering.
+- Korean/effects are measured at native resolution against the clean plate and refit/re-rendered until inside the safety bbox.
+- Flattened-raster shrink/resample is forbidden.
+- Strict C zero-pixel QA remains unchanged.
+- Runtime validation: **UNTESTED**
+- Policy report: `localization/graphics/GENERATION_V2_SAFE_FIT_20260929.json`
