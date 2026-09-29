@@ -1,0 +1,86 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00166",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "wave_id": "P00081",
+  "recorded_at_kst": "2026-09-29T23:57:00+09:00",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MATERIAL_AND_TASK_RECORD",
+  "base_head_sha": "501ea2bc0f97589796542d885d55b5b0757a0485",
+  "result": "PASS_MATERIAL_FALLBACK4_ODD_DRIVE_SOURCE_TIER_EXHAUSTION_65_89_241_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD A scan skips A00164/index99 because its newer clean-plate-v2 producer material remains pending independent C QA, and retains dependency-blocked direct rework indices 51/53/111/121. No runnable A-shard candidate-completion tier is available. Under the current source-transport contract, this task performs the newly mandatory ezflash557 Google Drive canonical-source lookup for odd indices 65/89/241. Exact-name searches return zero matching DDS files; the configured loading folder also contains 48DEBE77 but not EBEF6D20. The A00149 pinned-upstream mismatches and stale 4x lineages therefore remain rejected, and the three assets advance fail-closed to the pinned v0.25.10a Release acquisition tier. No guessed source, Korean candidate, shared-state, build, runtime, N100/local-clone/Library/VR/FFB/DX change is made.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-2357-A00166-P00081/A00166_P00081_DRIVE_CANONICAL_SOURCE_TIER_AUDIT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_ODD_MANDATORY_GOOGLE_DRIVE_CANONICAL_SOURCE_TIER_AUDITS",
+    "indices": [
+      65,
+      89,
+      241
+    ],
+    "assets": [
+      "EBEF6D20",
+      "43B07A77",
+      "E1639D2E"
+    ],
+    "drive_exact_name_queries": 3,
+    "drive_exact_sources_found": 0,
+    "next_approved_acquisition_tier": "PINNED_V0.25.10A_RELEASE",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true,
+    "report_path": "localization/graphics/role_A/20260929-2357-A00166-P00081/A00166_P00081_DRIVE_CANONICAL_SOURCE_TIER_AUDIT.json"
+  },
+  "readiness_audit": {
+    "selected_priority": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_AFTER_FRESH_CANDIDATE_COMPLETION_SCAN",
+    "qa_pending_skip": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+      "index": 99,
+      "asset": "4F68708E"
+    },
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "explicit_render_ready_count": 0,
+    "explicit_one_stage_to_render_count": 0,
+    "selected_indices": [
+      65,
+      89,
+      241
+    ],
+    "selection_reason": "The current contract newly requires Drive exact-source acquisition before a canonical-source-unavailable/fallback conclusion. These three odd assets were previously guarded only against nonmatching pinned GitHub objects; Drive had not been consumed in A00149.",
+    "conclusion": "ZERO_NEW_CANDIDATE_EXCEPTION_VALID__FALLBACK4_NEW_DRIVE_SOURCE_TIER_EVIDENCE_EXECUTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "a00149_task_blob_sha": "90530a8a36fdd17e674972bfd9df421ce1c7e9db",
+    "drive_canonical_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr"
+  },
+  "self_qa": "PASS_ODD_65_89_241_DRIVE_TIER_LOOKUP__ZERO_EXACT_MATCHES__STALE_AND_MISMATCHED_SOURCES_NOT_RENDERED__NO_SHARED_STATE__NO_FALSE_CANDIDATE_PROMOTION",
+  "candidate_static_qa": "HOLD_NO_NEW_CANDIDATE__EXACT_CANONICAL_SOURCE_BYTES_STILL_REQUIRED",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

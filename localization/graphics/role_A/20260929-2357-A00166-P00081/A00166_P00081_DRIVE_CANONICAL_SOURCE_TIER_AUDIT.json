@@ -1,0 +1,153 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-a00166-drive-canonical-source-tier-audit-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00166",
+  "lane": "LOCALIZATION_A",
+  "wave_id": "P00081",
+  "recorded_at_kst": "2026-09-29T23:57:00+09:00",
+  "status": "PASS",
+  "result": "PASS_ODD_DRIVE_CANONICAL_SOURCE_TIER_EXHAUSTED_FOR_65_89_241_FAIL_CLOSED",
+  "purpose": "Satisfy the current source-transport contract before any further canonical-source-unavailable conclusion or source-reacquisition fallback.",
+  "selection": {
+    "parity": "odd",
+    "qa_pending_skips": [
+      {
+        "index": 99,
+        "asset": "4F68708E",
+        "reason": "A00164 clean-plate-v2 result is newer producer material and remains pending independent C disposition; do not repeat or render it."
+      }
+    ],
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "selected_indices": [
+      65,
+      89,
+      241
+    ],
+    "candidate_completion_scan": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_FOUND_AFTER_EXCLUDING_QA_PENDING_AND_DEPENDENCY_BLOCKED_ITEMS",
+    "fallback_ladder_step": 4
+  },
+  "source_transport": {
+    "state_ssot": "github:korean-localization-clean",
+    "provider": "google_drive",
+    "configured_account": "ezflash557",
+    "configured_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "read_only": true,
+    "exact_name_search_method": "Google Drive metadata exact-name filter across the configured linked account, plus direct configured-folder traversal where available.",
+    "exact_name_searches": [
+      {
+        "index": 65,
+        "asset": "EBEF6D20",
+        "filename": "EBEF6D20_512x512.dds",
+        "result_count": 0,
+        "drive_exact_source": "NOT_FOUND"
+      },
+      {
+        "index": 89,
+        "asset": "43B07A77",
+        "filename": "43B07A77_512x64.dds",
+        "result_count": 0,
+        "drive_exact_source": "NOT_FOUND"
+      },
+      {
+        "index": 241,
+        "asset": "E1639D2E",
+        "filename": "E1639D2E_256x64.dds",
+        "result_count": 0,
+        "drive_exact_source": "NOT_FOUND"
+      }
+    ],
+    "direct_folder_crosscheck": {
+      "folder": "spr_sprani_loading_cvt_Exst",
+      "observed_files": [
+        "48DEBE77_512x512.dds"
+      ],
+      "requested_file": "EBEF6D20_512x512.dds",
+      "requested_file_present": false
+    },
+    "acquisition_order_after_this_task": [
+      "GOOGLE_DRIVE_EXACT_RELATIVE_PATH_EXHAUSTED_FOR_THE_THREE_RECORDED_ASSETS",
+      "PINNED_UPSTREAM_DIRECT_FILE_ALREADY_PROVEN_NONMATCHING_BY_A00149",
+      "PINNED_V0.25.10A_RELEASE_REMAINS_NEXT_APPROVED_TIER"
+    ]
+  },
+  "canonical_inventory": [
+    {
+      "index": 65,
+      "asset": "EBEF6D20",
+      "path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "sha256": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA"
+    },
+    {
+      "index": 89,
+      "asset": "43B07A77",
+      "path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "sha256": "0a2c9a32070771338dabc04a7bda67d9b474fd21d6a3456f60d9e1221fc8a96c",
+      "width": 512,
+      "height": 64,
+      "mode": "RGBA"
+    },
+    {
+      "index": 241,
+      "asset": "E1639D2E",
+      "path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+      "sha256": "0af7362ff57b2ee9bfa04811838035861e919f5886244994dbede9aca6ed6c63",
+      "width": 256,
+      "height": 64,
+      "mode": "RGBA"
+    }
+  ],
+  "prior_a00149_guards": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00149",
+    "disposition": "C126_Q00024_PASS_SOURCE_IDENTITY_GUARDS_ONLY",
+    "pinned_upstream_direct_mismatches": [
+      {
+        "index": 65,
+        "computed_sha256": "78fdc0d8591689f2743de4700a681b05d08376a391a6f1e2855e186a80c12f23",
+        "canonical_sha256": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e"
+      },
+      {
+        "index": 89,
+        "computed_sha256": "6db8e65661f76e5ac12e7090c039ced565731765e0cfc5dbe45329b52b5307f2",
+        "canonical_sha256": "0a2c9a32070771338dabc04a7bda67d9b474fd21d6a3456f60d9e1221fc8a96c"
+      },
+      {
+        "index": 241,
+        "computed_sha256": "3277d04661e0e348d41d0393df57676ce620bef445ee7cf7d461057547d4ac8b",
+        "canonical_sha256": "0af7362ff57b2ee9bfa04811838035861e919f5886244994dbede9aca6ed6c63"
+      }
+    ],
+    "stale_release_geometry_reuse": "REJECTED",
+    "stale_branch_43B07A77_blob": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+    "stale_branch_43B07A77_source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "stale_branch_43B07A77_canvas": [
+      2048,
+      256
+    ],
+    "reason": "The historical 4x source/generation geometry is not current canonical inventory and must not be used to render a new candidate."
+  },
+  "outcome": {
+    "material_advance": "The newly mandatory Google Drive exact-source tier is now explicitly exhausted for indices 65/89/241. These assets may proceed to the next approved acquisition tier without repeating Drive discovery.",
+    "candidate_dds_modified": false,
+    "source_bytes_promoted": false,
+    "korean_render_performed": false,
+    "exact_source_required_before_pixel_work": true,
+    "fail_closed": true
+  },
+  "qa": {
+    "lane_parity": "PASS_ODD_ONLY",
+    "duplicate_work": "PASS_NO_REPEAT_OF_A00164_INDEX99_OR_QA_PENDING_A00161_A00163",
+    "wrong_source_reuse": "PASS_REJECTED_STALE_4X_43B07A77_AND_PINNED_STOCK_MISMATCHES",
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
