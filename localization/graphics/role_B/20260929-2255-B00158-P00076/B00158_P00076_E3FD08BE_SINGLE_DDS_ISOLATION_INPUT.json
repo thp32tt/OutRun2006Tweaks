@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00076",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T22:55:14+09:00",
+  "package_mode": "DDS_ONLY",
+  "expected_dds_count": 1,
+  "include_only_declared_candidate": true,
+  "delete_or_replace_other_dds": false,
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "queue_index": 116,
+  "asset": "E3FD08BE",
+  "source_text": "Heart Attack Mode",
+  "korean_text": "하트 어택 모드",
+  "install_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "candidate_repo_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "candidate_git_blob_sha": "96a9aa5d3d99a97bf4b386102ef8d43ee537f1c1",
+  "candidate_sha256": "51982e41c33b2e95ddbf1039cd65b342b5f54a1c2a5dab0abee6b4c785a0f548",
+  "canonical_source_repo_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "canonical_source_git_blob_sha": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+  "canonical_source_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "format": "DXT5",
+  "mipmaps": 1,
+  "bytes": 524416,
+  "raw_orientation": "mirror_y",
+  "static_qa_reuse": {
+    "b92_report": "localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json",
+    "c86_report": "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
+    "c86_result": "CONTAINMENT_PASS_HOLD_HIGH_ZOOM_AND_DDS_ONLY_INGAME",
+    "original_bbox": [
+      393,
+      54,
+      1628,
+      200
+    ],
+    "localized_bbox": [
+      632,
+      54,
+      1388,
+      199
+    ],
+    "containment": "PASS",
+    "edge_touch_high_risk": true,
+    "header_diff_bytes_vs_canonical": 0,
+    "alpha_changed_outside_declared_cell": 0,
+    "introduced_alpha_outside_declared_cell": 0
+  },
+  "test_intent": "Replace exactly this one DDS and inspect native game presentation for scale, position, alpha/transparency, clipping and readable-orientation defects. Do not infer runtime PASS from this manifest."
+}

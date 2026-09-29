@@ -1,0 +1,98 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00076",
+  "recorded_at_kst": "2026-09-29T22:55:14+09:00",
+  "base_head_sha": "44e89b9b5130bcb320393dd8a29c3d7b761cd1d6",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK3_DUAL_SINGLE_DDS_ISOLATION_INPUTS_INDEX104_INDEX116",
+  "summary": "Fresh B-even scan skipped B00155/index112 because its producer result is still C-QA pending. C127-released index152 is the next candidate-completion target, but under this dispatch's GitHub-only constraint the canonical source is not resident in the branch and the immutable pinned-tag direct-file probe is 404; no source substitution, Drive transport, uploaded archive or N100/local source was used. No other even DIRECT_REWORK_REQUIRED/RENDER_READY/ONE_STAGE_TO_RENDER candidate is runnable from current GitHub-resident exact source inputs. Fallback ladder step 3 therefore materializes two previously missing deterministic single-DDS isolation inputs for current C86 containment-PASS high-risk candidates 62BEBF33/index104 and E3FD08BE/index116. Current source/candidate Git blobs match the C86 fingerprints, so unchanged heavy DDS/header/alpha/containment QA is reused rather than repeated. Runtime remains UNTESTED.",
+  "readiness_audit": {
+    "explicit_qa_pending_skip": [
+      {
+        "index": 112,
+        "asset": "D41D0B1",
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00155",
+        "reason": "QA_PENDING_SKIP_SAME_ASSET_UNTIL_C_DISPOSITION"
+      }
+    ],
+    "c_accepted_next_candidate": {
+      "index": 152,
+      "asset": "49BB5FE5",
+      "status": "PREFLIGHT_ONLY_NARROWED",
+      "next": "CLEAN_PLATE_STYLE_RENDER_DDS",
+      "source_transport": "BLOCKED_THIS_INVOCATION_BY_GITHUB_ONLY_DISPATCH_AND_PINNED_DIRECT_FILE_404",
+      "source_substitution": false
+    },
+    "pinned_direct_probe": {
+      "repository": "envido32/OR2006Sprites",
+      "ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "result": "SOURCE_TRANSPORT_MISS_404"
+    },
+    "github_branch_source_resident_for_index152": false,
+    "google_drive_allowed_by_repository_contract_but_disabled_by_current_user_dispatch": true,
+    "release_fallback_binary_consumed": false,
+    "ready_tier_candidates_runnable_after_transport_gate": 0,
+    "fallback_ladder_step": 3,
+    "zero_candidate_exception": "VALID_NO_RUNNABLE_READY_TIER_AFTER_FRESH_SCAN"
+  },
+  "evidence_reused": {
+    "queue_blob_sha": "6c19030fd235bd4c38603765ce4802c207f754f1",
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "b87_report_blob_sha": "0ea9837eef11e4de41edf9853b395538d051bd87",
+    "b92_report_blob_sha": "e4977181b3fd024dd5756d794afc282c0e29c6d0",
+    "c86_report_blob_sha": "2c686c9413aa8a84babeaf41bbe5d33b4ccb537d",
+    "heavy_qa_repeated": false,
+    "reason": "Source/candidate Git blob fingerprints are unchanged from C86; this task creates only missing deterministic runtime-isolation inputs."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "EVEN_INDEX104_116_DUAL_SINGLE_DDS_RUNTIME_ISOLATION_INPUTS",
+    "indices": [
+      104,
+      116
+    ],
+    "assets": [
+      "62BEBF33",
+      "E3FD08BE"
+    ],
+    "manifests": [
+      "localization/graphics/role_B/20260929-2255-B00158-P00076/B00158_P00076_62BEBF33_SINGLE_DDS_ISOLATION_INPUT.json",
+      "localization/graphics/role_B/20260929-2255-B00158-P00076/B00158_P00076_E3FD08BE_SINGLE_DDS_ISOLATION_INPUT.json"
+    ],
+    "package_mode": "DDS_ONLY_PER_MANIFEST",
+    "expected_dds_count_each": 1,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "self_qa": "PASS_EVEN_104_116_ONLY__CURRENT_GIT_BLOBS_MATCH_C86__NO_DUPLICATE_SINGLE_DDS_MANIFESTS__UNCHANGED_HEAVY_QA_REUSED__NO_SHARED_STATE__NO_CANDIDATE_FALSE_PROMOTION",
+  "candidate_static_qa": "REUSED_C86_CONTAINMENT_PASS_HIGH_RISK_UNCHANGED_FINGERPRINT",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "precommit_head_sha": "789083b3a143fa9d3c3e2d0c76ed75edb94368b1",
+  "preserved_peer_head": true,
+  "preserved_peer_commit": {
+    "sha": "789083b3a143fa9d3c3e2d0c76ed75edb94368b1",
+    "message": "localization(A): materialize index99 clean plate input [AUTO:LOCALIZATION-LOCALIZATION_A-00157]"
+  }
+}

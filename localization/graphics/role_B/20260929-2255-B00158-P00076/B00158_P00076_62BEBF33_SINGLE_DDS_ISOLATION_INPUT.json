@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00076",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T22:55:14+09:00",
+  "package_mode": "DDS_ONLY",
+  "expected_dds_count": 1,
+  "include_only_declared_candidate": true,
+  "delete_or_replace_other_dds": false,
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "queue_index": 104,
+  "asset": "62BEBF33",
+  "source_text": "OutRun Mode",
+  "korean_text": "아웃런 모드",
+  "install_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+  "candidate_repo_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+  "candidate_git_blob_sha": "a5cd9697dec6ea04a1c67fa31619a28e86b5acb2",
+  "candidate_sha256": "503f89fb2f68f5f3e8a86f527edf5aecb6219e31b1aa81c0678c2e54979dbd7e",
+  "canonical_source_repo_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+  "canonical_source_git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+  "canonical_source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "format": "DXT5",
+  "mipmaps": 1,
+  "bytes": 524416,
+  "raw_orientation": "mirror_y",
+  "static_qa_reuse": {
+    "b92_report": "localization/graphics/role_B/20260928-1231-B92/B92_62B_E3_ONE_PIXEL_REWORK_REPORT.json",
+    "c86_report": "localization/graphics/role_C/20260928-1320-C86/C86_B92_DXT5_FINAL_QA.json",
+    "c86_result": "CONTAINMENT_PASS_HOLD_HIGH_ZOOM_AND_DDS_ONLY_INGAME",
+    "original_bbox": [
+      392,
+      52,
+      1357,
+      201
+    ],
+    "localized_bbox": [
+      565,
+      52,
+      1186,
+      200
+    ],
+    "containment": "PASS",
+    "edge_touch_high_risk": true,
+    "header_diff_bytes_vs_canonical": 0,
+    "alpha_changed_outside_declared_cell": 0,
+    "introduced_alpha_outside_declared_cell": 0
+  },
+  "test_intent": "Replace exactly this one DDS and inspect native game presentation for scale, position, alpha/transparency, clipping and readable-orientation defects. Do not infer runtime PASS from this manifest."
+}
