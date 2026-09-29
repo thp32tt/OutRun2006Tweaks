@@ -1,0 +1,259 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00174",
+  "wave_id": "P00087",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T01:05:00+09:00",
+  "selection": {
+    "shard": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+    "selected_indices": [
+      26,
+      28,
+      30,
+      32
+    ],
+    "selected_assets": [
+      "63C91067",
+      "A05BF610",
+      "8215FD25",
+      "DCC7B488"
+    ],
+    "reason": "Fresh B-shard scan found no directly runnable candidate-completion path: C/ingame-pending candidates are skipped, indices 94/102 remain dependency-blocked by exhausted safe-repair/runtime requirements, index112 has a newer producer candidate awaiting exact C QA, and index152/B00167 is already a completed producer result awaiting C. Therefore the contract permits one PREFLIGHT_ONLY batch. The earliest unfinished even localize_text family 26/28/30/32 is processed only to close the newly approved canonical-source acquisition ladder; no rejected pixel geometry is reused."
+  },
+  "base_head": {
+    "sha": "fb686bf12710ef3e02d31427a39fa8e1150fab45",
+    "message": "localization(A): rework index99 transparent clean plate v3 [AUTO:LOCALIZATION-LOCALIZATION_A-00173]"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "asset_queue_blob_sha": "a6fd39dd54e07c007ec5dda46b3075167a89280a",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3"
+  },
+  "reused_accepted_lineage": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00125",
+    "producer_task_record_blob_sha": "6b7b79ec26f0844834928b434098603d5d6c22c8",
+    "producer_report": "localization/graphics/role_B/20260929-1914-B00125-P00053/B00125_P00053_C00120_B00113_CANONICAL_HD_REACQUISITION.json",
+    "c_acceptance": "Q00016/C118",
+    "reuse_scope": "Only canonical inventory identities/canvases and accepted Total Rank -> 종합 랭크 semantics are reused. B00113/Release pixel coordinates, inspection guards, masks and artwork geometry remain retired."
+  },
+  "canonical_bundle": {
+    "release_tag": "v0.25.10a",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "asset_name": "OR2-HD-GUI-v0.25.10a.zip",
+    "release_asset_id": 306630789,
+    "expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "observed_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "expected_size_bytes": 306223257,
+    "bundle_identity": "PASS_EXACT_PINNED_DIGEST",
+    "transport": "EXACT_DIGEST_LOCAL_CACHE_OF_PINNED_RELEASE; used only for read-only member identity audit"
+  },
+  "acquisition_order": [
+    "GOOGLE_DRIVE_EXACT_PER_FILE",
+    "PINNED_TAG_DIRECT_FILE",
+    "PINNED_RELEASE_EXACT_DIGEST"
+  ],
+  "assets": [
+    {
+      "queue_index": 26,
+      "asset": "63C91067",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "canonical": {
+        "sha256": "febbe4ed440bf9780239352efe49da01c15c2ff1d93cc8eb43c65b3ac21e09e5",
+        "dimensions": [
+          2048,
+          2047
+        ],
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "query": "63C91067_512x512.dds",
+        "exact_results": 0
+      },
+      "pinned_direct": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+        "git_blob_sha": "9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9",
+        "outcome": "SOURCE_IDENTITY_MISMATCH",
+        "reason": "Exact immutable direct blob is the previously retired B00113 noncanonical Release identity."
+      },
+      "pinned_release": {
+        "member_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "canonical": {
+        "sha256": "ede0367228e0a97bbbdbc58f71c03ff0e044826e17fd7697b74d852aff7a3e64",
+        "dimensions": [
+          2047,
+          2048
+        ],
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "query": "A05BF610_512x512.dds",
+        "exact_results": 0
+      },
+      "pinned_direct": {
+        "path": "Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+        "git_blob_sha": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+        "outcome": "SOURCE_IDENTITY_MISMATCH",
+        "reason": "Exact immutable direct blob is the previously retired B00113 noncanonical Release identity."
+      },
+      "pinned_release": {
+        "member_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "queue_index": 30,
+      "asset": "8215FD25",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "canonical": {
+        "sha256": "0cd71138fd6811f5466a9c6674a243324d88ecc8dd82ad36df05234d759abc56",
+        "dimensions": [
+          1024,
+          512
+        ],
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "query": "8215FD25_1024x512.dds",
+        "exact_results": 0
+      },
+      "pinned_direct": {
+        "path": "Release/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+        "git_blob_sha": "64a92104d3158614283d0d63baee7ec29ca45316",
+        "outcome": "SOURCE_IDENTITY_MISMATCH",
+        "reason": "Exact immutable direct blob is the previously retired B00113 noncanonical Release identity."
+      },
+      "pinned_release": {
+        "member_sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "queue_index": 32,
+      "asset": "DCC7B488",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "canonical": {
+        "sha256": "f6a4599b452f2b2b4cced33b94f12e92be1a22bf59df6ec0b084c120d30842c2",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "query": "DCC7B488_512x256.dds",
+        "exact_results": 0
+      },
+      "pinned_direct": {
+        "path": "Release/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+        "git_blob_sha": "7f8f0d10f2ac8a19bda1933d6a324a37123b48c0",
+        "outcome": "SOURCE_IDENTITY_MISMATCH",
+        "reason": "Exact immutable direct blob is the previously retired B00113 noncanonical Release identity."
+      },
+      "pinned_release": {
+        "member_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    }
+  ],
+  "fail_closed": {
+    "candidate_dds_modified": false,
+    "source_effect_masks_created": false,
+    "clean_plates_created": false,
+    "candidate_safe_bboxes_created": false,
+    "pixel_geometry_reused_from_rejected_release": false,
+    "korean_render_attempted": false,
+    "reason": "None of the three approved acquisition tiers yields bytes matching the current canonical per-asset inventory identities. Pixel interpretation/rendering against mismatched Release/direct bytes would violate the canonical-source gate.",
+    "repeat_policy": "Do not repeat Drive/direct/Release probes for these four exact source/inventory fingerprints until the source transport or inventory fingerprint changes."
+  },
+  "producer_scan": {
+    "direct_rework_dependency_blocked": [
+      94,
+      102
+    ],
+    "qa_or_runtime_pending_skip": [
+      12,
+      54,
+      60,
+      92,
+      104,
+      112,
+      116,
+      152
+    ],
+    "render_ready_or_one_stage_to_render_runnable": 0,
+    "preflight_batch_permitted": true
+  },
+  "semantic_binding": {
+    "source": "Total Rank",
+    "korean": "종합 랭크",
+    "physical_occurrences": 6,
+    "status": "C_ACCEPTED_REUSED_NO_REPEAT"
+  },
+  "self_qa": "PASS_EVEN_ONLY_26_28_30_32__DRIVE_4_MISS__PINNED_DIRECT_4_EXACT_BLOBS_ALL_NONCANONICAL__PINNED_RELEASE_EXACT_DIGEST__RELEASE_4_IDENTITY_MISMATCH__ZERO_REJECTED_PIXEL_GEOMETRY_REUSE__SOURCE_ACQUISITION_EXHAUSTED_FAIL_CLOSED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANONICAL_SOURCE_NO_KOREAN_CANDIDATE",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "materially_reduces_unresolved_work": true
+}
