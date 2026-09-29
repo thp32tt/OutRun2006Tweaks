@@ -1,0 +1,264 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00237-p00128-index163-v2-production-drive-large-binary-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00237",
+  "wave_id": "P00128",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T08:15:00+09:00",
+  "base_head_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX163_V2_KOREAN_CANDIDATE_STATIC_SELF_QA_RUNTIME_UNTESTED",
+  "summary": "Fresh current-head scan follows the canonical modulo-3 contract (B=index%3==1), overriding the stale even-index wording in the dispatch. C154/Q00052 has no B-shard RENDER_READY or ONE_STAGE_TO_RENDER item, so the single permitted PREFLIGHT_ONLY continuation selects index163/59A79158. Reusing C153-accepted exact canonical source identity/header/orientation and directly inspecting the exact readable HD pixels resolves all 24 semantic rows. The exact source alpha text footprint becomes the removal mask on this transparent text-only atlas; protected non-text mask is empty. A native-resolution transparent CLEAN_PLATE is produced, 24 v2 2px-inset safe bboxes are derived, source style is measured as upright/unslanted left-aligned dark gray text with no outline/shadow/glow, and 24 reviewed Korean strings are rendered without flattened-raster resizing. Exact RGBA32 DDS header is preserved, decoded-final pixels match the pre-encode candidate, and self-QA reports zero 1px overflow, zero outside-edit changes, zero alpha escape and zero protected changes. The 8.0 MiB DDS is persisted in the contract-approved current-pipeline Google Drive bundle with exact SHA-256; GitHub persists the mandatory review set, prompt/spec and machine-readable QA. Runtime remains UNTESTED.",
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_index_rule_overridden_by_current_git_contract": true,
+    "c_accepted_source": "C154/Q00052 shared readiness",
+    "accepted_b_render_ready_indices": [],
+    "accepted_b_one_stage_to_render_indices": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_B_READY_TIERS",
+    "selected_index": 163,
+    "selected_asset": "59A79158",
+    "readiness_before": "PREFLIGHT_ONLY",
+    "readiness_after": "KOREAN_V2_CANDIDATE_SELF_QA_PASS_PENDING_C_BATCH",
+    "candidate_attempted": true,
+    "candidate_dds_modified": true
+  },
+  "source": {
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "git_blob_sha1": "693548c2c4ec53a4b75adbfe2868328896a115de",
+    "bytes": 8388736,
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "alpha_nonzero_pixels": 171748,
+    "source_identity": "PASS_EXACT_CANONICAL_INVENTORY",
+    "source_transport": "verified pinned v0.25.10a uploaded archive; GitHub remains state/progress/QA SSOT"
+  },
+  "semantic_binding": {
+    "result": "PASS_24_OF_24_DIRECT_READABLE_SOURCE_PIXEL_BINDING",
+    "method": "Exact canonical HD source was decoded at native resolution, normalized by proven flip_y, and each visible English row was bound from source pixels; prior C-accepted stock semantic mapping was used only as a cross-check, not as atlas-order authority.",
+    "pairs": [
+      [
+        "Castle Wall",
+        "캐슬 월"
+      ],
+      [
+        "Casino Town",
+        "카지노 타운"
+      ],
+      [
+        "Cloudy Highland",
+        "클라우디 하이랜드"
+      ],
+      [
+        "Coniferous Forest",
+        "침엽수림"
+      ],
+      [
+        "Deep Lake",
+        "딥 레이크"
+      ],
+      [
+        "Desert",
+        "사막"
+      ],
+      [
+        "Floral Village",
+        "플로럴 빌리지"
+      ],
+      [
+        "Ghost Forest",
+        "고스트 포레스트"
+      ],
+      [
+        "Giant Statues",
+        "자이언트 스태추"
+      ],
+      [
+        "Ice Scape",
+        "아이스 스케이프"
+      ],
+      [
+        "Imperial Avenue",
+        "임페리얼 애비뉴"
+      ],
+      [
+        "Industrial Complex",
+        "인더스트리얼 컴플렉스"
+      ],
+      [
+        "Jungle",
+        "정글"
+      ],
+      [
+        "Legend",
+        "레전드"
+      ],
+      [
+        "Lost City",
+        "로스트 시티"
+      ],
+      [
+        "Metropolis",
+        "메트로폴리스"
+      ],
+      [
+        "Milky Way",
+        "밀키 웨이"
+      ],
+      [
+        "National Park",
+        "내셔널 파크"
+      ],
+      [
+        "Palm Beach",
+        "팜 비치"
+      ],
+      [
+        "Skyscrapers",
+        "스카이스크레이퍼"
+      ],
+      [
+        "Snow Mountain",
+        "스노 마운틴"
+      ],
+      [
+        "Sunny Beach",
+        "서니 비치"
+      ],
+      [
+        "Tulip Garden",
+        "튤립 가든"
+      ],
+      [
+        "Waterfalls",
+        "워터폴스"
+      ]
+    ]
+  },
+  "generation": {
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "prompt_sha256": "8079764dba6c8be1e2f9d2fb85c7cf3a5826c3c774d8c49939d233c0db893f29",
+    "font_identifier": "NanumSquare Bold (system font; bytes not redistributed)",
+    "font_bytes_redistributed": false,
+    "removal_mask_rule": "exact source alpha > 0 for the 24 directly bound source text rows",
+    "removal_mask_pixels": 171748,
+    "protected_non_text_pixels": 0,
+    "clean_plate": "transparent only inside exact removal mask",
+    "candidate_safe_bbox_rule": "2px inset from exact source effect bbox for every row",
+    "source_style": "upright/unslanted, left aligned, dark gray fill sampled per row, no outline/shadow/glow",
+    "native_resolution_render": true,
+    "flattened_raster_resize": false
+  },
+  "candidate": {
+    "sha256": "0d9410e5c05d5819cd2c87426e9c4342c7d47d8c4f28ea0c4556ea9e546c0959",
+    "git_blob_sha1": "168645b5d83d743ca5f89b9583f4a5c8ad48ceac",
+    "bytes": 8388736,
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "decoded_final_matches_preencode_pixels": true,
+    "storage_mode": "GOOGLE_DRIVE_LARGE_BINARY_BUNDLE",
+    "bundle": {
+      "account": "ezflash557",
+      "current_pipeline_folder_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
+      "task_folder_id": "1tpmrhaU9E7FrEvd3DrOokJxLOIp23DAu",
+      "drive_file_id": "1XgLXgkewIw4wvtXkSXcQvwlO-yxlh1bC",
+      "drive_url": "https://drive.google.com/file/d/1XgLXgkewIw4wvtXkSXcQvwlO-yxlh1bC/view?usp=drivesdk",
+      "name": "B00237_59A79158_Korean_candidate.zip",
+      "bytes": 79200,
+      "sha256": "e79e4f5a3921f0064ad18df2ef650b1753b3cfc78c5ed99159b3b7e3fd677794",
+      "inner_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds"
+    }
+  },
+  "self_qa": {
+    "status": "PASS_STATIC_SELF_QA_PENDING_C",
+    "source_clean_candidate_visual_review": "PASS",
+    "semantic_rows": "24/24",
+    "clean_plate_alpha_nonzero_pixels": 0,
+    "clean_plate_changed_pixels_outside_removal_mask": 0,
+    "clean_plate_alpha_changes_outside_removal_mask": 0,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "one_pixel_overflow_total": 0,
+    "signed_slant_gate": "PASS",
+    "hangul_clipping": "PASS_NONE",
+    "english_residue": "PASS_NONE",
+    "generic_readability_effects_added": false,
+    "raster_resampling": "NOT_USED",
+    "qa_report": "localization/graphics/KOREAN_PNG_REVIEW/59A79158/qa_report.json",
+    "comparison": "localization/graphics/KOREAN_PNG_REVIEW/59A79158/comparison.png",
+    "element_comparison": "localization/graphics/KOREAN_PNG_REVIEW/59A79158/element_comparison.png"
+  },
+  "review_set": {
+    "base": "localization/graphics/KOREAN_PNG_REVIEW/59A79158",
+    "mandatory": [
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/source_display.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/clean_plate_display.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/candidate_display.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/comparison.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/generation_prompt.json",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/qa_report.json"
+    ],
+    "additional": [
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/element_comparison.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/source_text_mask_display.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/59A79158/protected_mask_display.png"
+    ]
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "asset_queue_blob_sha": "1f55cfdd2167d215f11915baae3a91634cb97a8c",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "prior_b00226_result_sha": "57cfaa82f5cc14db3eb9d0e8456358af4d3a7dce",
+    "c153_q00051_result_sha": "ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX163_ACTUAL_V2_KOREAN_DDS_CANDIDATE_PLUS_GITHUB_REVIEW_SET_AND_MACHINE_QA",
+    "reviewed_indices": [
+      163
+    ],
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "material_reduces_unresolved_work": true
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null
+}
