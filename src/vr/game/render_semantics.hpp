@@ -57,6 +57,18 @@ namespace OutRunVR::GameSemantic
         OutRunVR::DisasmContract::SpacePolicy::ProjectedScreenEffect2D) ==
         RenderScope::ProjectedScreenEffect2D);
 
+    [[nodiscard]] constexpr RenderScope ClassifyCriticalProducer(
+        std::uintptr_t callerRva) noexcept
+    {
+        return RenderScopeFromSpacePolicy(
+            OutRunVR::DisasmContract::ClassifyCriticalProducer(callerRva));
+    }
+
+    static_assert(
+        ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BB0FBu) == RenderScope::WorldBillboard);
+
     struct ProjectedMarkerInfo
     {
         bool valid = false;

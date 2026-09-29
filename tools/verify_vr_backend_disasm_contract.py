@@ -62,8 +62,42 @@ def main() -> None:
             "0x42D734 enters the per-priority SpriteNode walk",
             "0x42D762 begins one node",
             "0x42DCB4 is the common epilogue",
+            "RenderScopeFromSpacePolicy(",
+            "ClassifyCriticalProducer(",
+            "OutRunVR::DisasmContract::ClassifyCriticalProducer(callerRva)",
+            "ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud",
+            "ClassifyCriticalProducer(0x000BB0FBu) == RenderScope::WorldBillboard",
         ],
     )
+    require(
+        "src/hooks_uiscaling.cpp",
+        [
+            "template<std::uintptr_t CallerRva>",
+            "GameSemantic::ClassifyCriticalProducer(CallerRva)",
+            "scope == OutRunVR::GameSemantic::RenderScope::ScreenHud",
+            "TimeRecord_AdjustPositionAndHud<0x000BE5CDu>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE603u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE633u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE66Du>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE690u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE6B5u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE6D5u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE8D8u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE915u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE94Au>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE97Au>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE9A3u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE7E8u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE802u>",
+            "TimeRecord_AdjustPositionAndHud<0x000BE81Cu>",
+            "VR R119 TIME HUD: shared producer-map handoff",
+        ],
+    )
+    hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
+    if "TimeRecord_AdjustPositionAndHud);" in hooks_text:
+        raise SystemExit(
+            "F13 shared producer-map adoption regressed to legacy hardcoded callback"
+        )
     require(
         "tools/analyze_outrun_exe.py",
         [
