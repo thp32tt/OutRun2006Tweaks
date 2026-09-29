@@ -97,6 +97,8 @@ switch($variant){
     'R67_EYE_REPROJECT' { $semanticMode='0'; $hudExperimentMode='2' }
     'R68_FIXPACK' { $semanticMode='0'; $hudExperimentMode='2' }
     'R69_FIXPACK' { $semanticMode='0'; $hudExperimentMode='2' }
+    'R71_HUD_FLARE' { $semanticMode='0'; $hudExperimentMode='2' }
+    'R71_HUD_MENU' { $semanticMode='0'; $hudExperimentMode='2' }
     'R57_07_RANK_PROJECTED_13' { $semanticMode='0'; $hudExperimentMode='2' }
     'R57_08_RANK_PROJECTED_46' { $semanticMode='0'; $hudExperimentMode='2' }
     'R57_09_RANK_PROJECTED_ZERO' { $semanticMode='0'; $hudExperimentMode='2' }
