@@ -1,0 +1,61 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00082",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00019",
+  "recorded_at_kst": "2026-09-29T15:51:00+09:00",
+  "base_sha": "f15bfd172b0f54e96ca93de3f440762e8ea385a9",
+  "result": "PASS_MATERIAL_FALLBACK4_TWO_ODD_V2_BC3_CELL_EXTRACTION_SAFE_BOUND_PREFLIGHT",
+  "summary": "Advanced unfinished odd indices 55/119 under the newly active first-pass-v2 contract by reusing accepted A00041/A00047 exact-HD evidence and adding exact BC3 block-row extraction scopes plus conservative 2px safety-inset preflight bounds. No Korean DDS or shared state changed; exact glyph/effect removal masks, clean plates, candidate containment and English-source comparison remain fail-closed HOLD.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1551-A00082-P00019/A00082_P00019_V2_BC3_PREFLIGHT_REPORT.json",
+    "localization/graphics/role_A/20260929-1551-A00082-P00019/A00082_55_2EA557B4_V2_BC3_PREFLIGHT.json",
+    "localization/graphics/role_A/20260929-1551-A00082-P00019/A00082_119_F6811E94_V2_BC3_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "type": "TWO_ODD_V2_BC3_CELL_EXTRACTION_AND_SAFE_BOUND_PREFLIGHT",
+    "indices": [
+      55,
+      119
+    ],
+    "assets": [
+      "2EA557B4",
+      "F6811E94"
+    ],
+    "exact_bc3_block_extraction_specs": 2,
+    "v2_safe_bound_preflights": 2,
+    "default_safety_inset_px": 2,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "source_metrics_task": "LOCALIZATION-LOCALIZATION_A-00041",
+    "source_metrics_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+    "reconstruction_task": "LOCALIZATION-LOCALIZATION_A-00047",
+    "reconstruction_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+    "queue_acceptance": "current queue records A00047+C100 retained for both assets",
+    "reason": "source/header/alpha/orientation evidence unchanged; only QA-contract fingerprint changed to v2, so duplicate heavy checks were not repeated"
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_ODD_ONLY_55_119__2_OF_2_BC3_SIZE_GEOMETRY__2_OF_2_EXTRACTION_RANGES_IN_BOUNDS__2PX_V2_PREFLIGHT_BOUNDS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "No Korean DDS candidate was written. Exact source glyph/effect removal mask and independent clean-plate QA are still required; zero-pixel containment and ENGLISH SOURCE vs KOREAN CANDIDATE remain candidate-only HOLD gates.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

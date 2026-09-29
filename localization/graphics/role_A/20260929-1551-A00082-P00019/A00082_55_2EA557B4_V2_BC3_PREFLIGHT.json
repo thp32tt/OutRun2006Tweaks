@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-v2-bc3-reconstruction-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00082",
+  "wave_id": "P00019",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-29T15:51:00+09:00",
+  "base_head_sha": "f15bfd172b0f54e96ca93de3f440762e8ea385a9",
+  "queue_index": 55,
+  "asset": "2EA557B4",
+  "queue_path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "current_queue_state": "pending_artwork/transcribed_reviewed; A00047+C100 reconstruction retained; no Korean HD DDS; runtime UNTESTED",
+  "translation": {
+    "source": "NEXT ROUND",
+    "korean": "다음 라운드"
+  },
+  "exact_hd_release": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+    "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+    "bytes": 524416,
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5_BC3",
+    "mip_count": 1,
+    "linear_size": 524288,
+    "size_geometry_check": "PASS_128_PLUS_512x64_BC3_BLOCKS_X16"
+  },
+  "mapped_cell_raw": {
+    "sprite": "sprite_337",
+    "xywh": [
+      0,
+      92,
+      1456,
+      164
+    ],
+    "ltrb": [
+      0,
+      92,
+      1456,
+      256
+    ],
+    "rotated": false
+  },
+  "bc3_cell_payload_extraction": {
+    "header_bytes": 128,
+    "block_width_px": 4,
+    "block_height_px": 4,
+    "block_bytes": 16,
+    "blocks_per_row": 512,
+    "block_row_stride_bytes": 8192,
+    "block_x_range": [
+      0,
+      364
+    ],
+    "block_y_range": [
+      23,
+      64
+    ],
+    "block_rows": 41,
+    "blocks_wide": 364,
+    "row_slice_bytes": 5824,
+    "row_k_byte_offset_formula": "128 + (23 + k) * 8192 + 0, 0 <= k < 41",
+    "first_row_start_byte": 188544,
+    "final_row_start_byte": 516224,
+    "final_row_end_exclusive_byte": 522048,
+    "file_bytes": 524416,
+    "in_file_bounds": true
+  },
+  "reused_source_metrics": {
+    "decoded_visible_alpha_envelope_raw_ltrb": [
+      1,
+      8,
+      1089,
+      150
+    ],
+    "decoded_alpha_ge128_envelope_raw_ltrb": [
+      2,
+      9,
+      1086,
+      149
+    ],
+    "raw_white_core_bbox": [
+      9,
+      22,
+      1077,
+      143
+    ],
+    "raw_orientation": "flip_y_to_readable",
+    "provenance": [
+      "A00041 exact-HD decoded metrics",
+      "A00047 source-faithful reconstruction input"
+    ]
+  },
+  "v2_preflight": {
+    "contract": "outrun-first-pass-edit-v2",
+    "qa_contract_changed_since_a00047": true,
+    "default_safety_inset_px": 2,
+    "permitted_region_raw_ltrb": [
+      0,
+      92,
+      1456,
+      256
+    ],
+    "conservative_effect_overlap_raw_ltrb": [
+      1,
+      92,
+      1089,
+      150
+    ],
+    "candidate_safe_bbox_upper_bound_raw_ltrb": [
+      3,
+      94,
+      1087,
+      148
+    ],
+    "derivation": "intersect(inset(conservative effect overlap,2px), inset(permitted region,2px))",
+    "classification": "PREFLIGHT_BOUND_ONLY_NOT_FINAL_SOURCE_GLYPH_EFFECT_BBOX",
+    "exact_source_glyph_effect_bbox": "HOLD_STRICT_RECHECK",
+    "clean_plate_removal_mask": "REQUIRED_NOT_YET_MATERIALIZED",
+    "clean_plate_qa_schema": "outrun-clean-plate-qa-v1_REQUIRED",
+    "candidate_generation_permitted": false,
+    "next_action": "Decode only the pinned BC3 block-row slices for sprite_337, derive the exact NEXT ROUND glyph+outline+shadow/glow removal mask inside the mapped cell, prove flip-Y display orientation, create and independently QA the CLEAN_PLATE, then build the v2 prompt. Do not clear the whole cell or treat this conservative envelope as a glyph mask."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "reused_a41_metrics_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+    "reused_a47_reconstruction_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f"
+  },
+  "candidate_sha256": null,
+  "candidate_static_qa": "HOLD_NO_CANDIDATE",
+  "runtime_validation": "UNTESTED"
+}

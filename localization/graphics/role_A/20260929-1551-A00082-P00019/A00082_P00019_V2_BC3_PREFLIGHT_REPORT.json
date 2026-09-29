@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00082",
+  "wave_id": "P00019",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T15:51:00+09:00",
+  "precommit_head_sha": "f15bfd172b0f54e96ca93de3f440762e8ea385a9",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK4_TWO_ODD_V2_BC3_CELL_EXTRACTION_SAFE_BOUND_PREFLIGHT",
+  "selection": {
+    "selected_indices": [
+      55,
+      119
+    ],
+    "selected_assets": [
+      "2EA557B4",
+      "F6811E94"
+    ],
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "skipped_current_qa_pending_assets": [
+      35,
+      43,
+      49,
+      95,
+      101
+    ],
+    "reason": "The active first-pass-v2 contract changed the QA fingerprint after A00041/A00047. Reuse accepted exact-HD source metrics instead of repeating heavy QA, and add new v2-safe BC3 extraction/safety-bound reconstruction input for two unfinished odd assets."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "TWO_ODD_V2_BC3_CELL_EXTRACTION_AND_SAFE_BOUND_PREFLIGHT",
+    "assets_advanced": 2,
+    "exact_bc3_source_files": 2,
+    "exact_block_row_extraction_specs": 2,
+    "default_safety_inset_px": 2,
+    "new_v2_preflight_safe_bounds": 2,
+    "candidate_dds_written": false,
+    "shared_state_modified": false,
+    "description": "Pins exact BC3 block-row payload scopes and conservative 2px-inset v2 candidate bounds from previously accepted exact-HD metrics. This narrows the next clean-plate/source-mask pass without decoding unrelated atlas data or inventing candidate pixels."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260929-1551-A00082-P00019/A00082_55_2EA557B4_V2_BC3_PREFLIGHT.json",
+    "localization/graphics/role_A/20260929-1551-A00082-P00019/A00082_119_F6811E94_V2_BC3_PREFLIGHT.json"
+  ],
+  "reused_heavy_qa": {
+    "a41_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+    "a47_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+    "current_queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "rerun_reason": "QA contract fingerprint changed to outrun-first-pass-edit-v2; source/header/alpha/orientation evidence itself is reused, not recomputed."
+  },
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_55_119",
+    "work_steal": "NONE",
+    "bc3_geometry": "PASS_2_OF_2_524416_BYTES_EQUALS_128_PLUS_2048x256_BC3_PAYLOAD",
+    "extraction_bounds": "PASS_2_OF_2_IN_FILE",
+    "safety_inset": "PASS_2_OF_2_NONZERO_2PX_PREFLIGHT_BOUNDS",
+    "source_glyph_effect_bbox": "HOLD_STRICT_RECHECK_EXACT_REMOVAL_MASK_REQUIRED",
+    "clean_plate": "HOLD_STRICT_RECHECK_NOT_YET_MATERIALIZED",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "reused_a41_metrics_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+    "reused_a47_reconstruction_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
