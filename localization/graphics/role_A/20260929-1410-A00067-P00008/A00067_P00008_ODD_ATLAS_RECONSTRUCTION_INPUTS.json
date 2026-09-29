@@ -1,0 +1,1675 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00067",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "wave_id": "P00008",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:10:00+09:00",
+  "precommit_head_sha": "d42f318f331de58253394ac78a00c8a1e3ec5f0c",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "2752dd3fbc5170c8e2263b2ca1be8e3b27a17182",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "continuous_producer_rules": {
+    "validation_mode": "C_BATCH_GATE",
+    "producer_actions_wait": false,
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2": [
+        137,
+        217,
+        219,
+        241
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00064@641a34826967c615bc29aec55feb1e305513bc3b": [
+        133,
+        135,
+        139,
+        143
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27": [
+        147,
+        159,
+        161,
+        163
+      ]
+    },
+    "peer_lane_commits_preserved": true,
+    "heavy_qa_dedup": "No Korean DDS candidate changed; candidate-only header/alpha/orientation/containment/English-vs-Korean checks were not fabricated or repeated."
+  },
+  "selection": {
+    "selected_indices": [
+      173,
+      193,
+      201,
+      225
+    ],
+    "selected_assets": [
+      "6DC89C6E",
+      "97E863AD",
+      "A9ABD877",
+      "E3C455FA"
+    ],
+    "reason": "Fresh odd-shard localize_text/pending_artwork rows with reviewed canonical semantics, disjoint from all currently QA-pending A producer batches. Exact GitHub Release/stock/4x atlas lineage exists for all four."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "deliverable_type": "FOUR_ODD_EXACT_RELEASE_AND_STOCK_TO_4X_ATLAS_RECONSTRUCTION_INPUTS",
+    "assets_advanced": 4,
+    "canonical_semantics_total": 60,
+    "exact_github_objects_pinned": 20,
+    "atlas_regions_verified": 66,
+    "stock_to_4x_geometry": "PASS_ALL_REGIONS_EXACT_X4",
+    "semantic_to_sprite_mapping": "HOLD_STRICT_RECHECK",
+    "candidate_dds_written": false,
+    "description": "Pins exact immutable Release DDS + stock DDS/PNG + stock/4x atlas identities and embeds all exact stock-to-4x sprite cell geometry for four fresh odd assets, creating deterministic inputs for the next source-pixel semantic/bbox pass without guessing."
+  },
+  "assets": [
+    {
+      "queue_index": 173,
+      "asset": "6DC89C6E",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantics": [
+        {
+          "source": "GHOST FOREST",
+          "korean": "고스트 포레스트"
+        },
+        {
+          "source": "IMPERIAL AVENUE",
+          "korean": "임페리얼 애비뉴"
+        },
+        {
+          "source": "INDUSTRIAL COMPLEX",
+          "korean": "인더스트리얼 컴플렉스"
+        },
+        {
+          "source": "METROPOLIS",
+          "korean": "메트로폴리스"
+        },
+        {
+          "source": "PALM BEACH",
+          "korean": "팜 비치"
+        },
+        {
+          "source": "SNOW MOUNTAIN",
+          "korean": "스노 마운틴"
+        },
+        {
+          "source": "TULIP GARDEN",
+          "korean": "튤립 가든"
+        },
+        {
+          "source": "BIG FOREST",
+          "korean": "빅 포레스트"
+        },
+        {
+          "source": "CANYON",
+          "korean": "캐니언"
+        },
+        {
+          "source": "CASINO TOWN",
+          "korean": "카지노 타운"
+        },
+        {
+          "source": "FLORAL VILLAGE",
+          "korean": "플로럴 빌리지"
+        },
+        {
+          "source": "GIANT STATUES",
+          "korean": "자이언트 스태추"
+        },
+        {
+          "source": "ICE SCAPE",
+          "korean": "아이스 스케이프"
+        },
+        {
+          "source": "JUNGLE",
+          "korean": "정글"
+        },
+        {
+          "source": "LEGEND",
+          "korean": "레전드"
+        },
+        {
+          "source": "LOST CITY",
+          "korean": "로스트 시티"
+        },
+        {
+          "source": "MILKY WAY",
+          "korean": "밀키 웨이"
+        },
+        {
+          "source": "NATIONAL PARK",
+          "korean": "내셔널 파크"
+        },
+        {
+          "source": "SKYSCRAPERS",
+          "korean": "스카이스크레이퍼"
+        },
+        {
+          "source": "SUNNY BEACH",
+          "korean": "서니 비치"
+        },
+        {
+          "source": "WATERFALLS",
+          "korean": "워터폴스"
+        }
+      ],
+      "canonical_semantics_count": 21,
+      "inventory_source": {
+        "sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+        "git_blob_sha": "9f6bb6ed5682119fe05d384401561ce97c4faf1a",
+        "bytes": 16777344,
+        "expected_canvas": [
+          2048,
+          2048
+        ],
+        "source_sha256_equivalence_to_inventory": "NOT_ASSERTED_METADATA_ONLY"
+      },
+      "stock_mapping_reference": {
+        "dds_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+        "dds_git_blob_sha": "5efe6d658d001dacdf2c7f398c5469324b624706",
+        "png_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.png",
+        "png_git_blob_sha": "06cf9ab8d95f0ae2445c814bf2ef6f6830e81236",
+        "usage": "semantic/orientation/reconstruction reference only; never Korean artwork input"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512_atlas.json",
+        "git_blob_sha": "5ac856d702f99c12c85fcd188c3153a3fde91cb9",
+        "metadata_width": 512,
+        "metadata_height": 512,
+        "regions": 21
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_6DC89C6E_512x512_atlas.json",
+        "git_blob_sha": "7d7c1093213b4898487c254ab91cde93c174a732",
+        "metadata_width": 2048,
+        "metadata_height": 2048,
+        "regions": 21
+      },
+      "exact_stock_to_4x_geometry": "PASS",
+      "regions": [
+        {
+          "sprite": "sprite_985",
+          "stock_cell": [
+            0,
+            488,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1952,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_986",
+          "stock_cell": [
+            0,
+            464,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1856,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_987",
+          "stock_cell": [
+            0,
+            440,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1760,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_988",
+          "stock_cell": [
+            0,
+            416,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1664,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_989",
+          "stock_cell": [
+            0,
+            392,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1568,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_990",
+          "stock_cell": [
+            0,
+            368,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1472,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_991",
+          "stock_cell": [
+            0,
+            344,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1376,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_992",
+          "stock_cell": [
+            0,
+            320,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1280,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_993",
+          "stock_cell": [
+            0,
+            296,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1184,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_994",
+          "stock_cell": [
+            0,
+            272,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            1088,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_995",
+          "stock_cell": [
+            0,
+            248,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            992,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_996",
+          "stock_cell": [
+            0,
+            224,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            896,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_997",
+          "stock_cell": [
+            0,
+            200,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            800,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_998",
+          "stock_cell": [
+            0,
+            176,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            704,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_999",
+          "stock_cell": [
+            0,
+            152,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            608,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_1000",
+          "stock_cell": [
+            0,
+            128,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            512,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_1001",
+          "stock_cell": [
+            0,
+            104,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            416,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_1002",
+          "stock_cell": [
+            0,
+            80,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            320,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_1003",
+          "stock_cell": [
+            0,
+            56,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            224,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_1004",
+          "stock_cell": [
+            0,
+            32,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            128,
+            1400,
+            96
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_1005",
+          "stock_cell": [
+            0,
+            8,
+            350,
+            24
+          ],
+          "hd_4x_cell": [
+            0,
+            32,
+            1400,
+            96
+          ],
+          "rotated": false
+        }
+      ],
+      "semantic_to_sprite_assignment": "HOLD_STRICT_RECHECK_NOT_INFERRED_FROM_REGION_ORDER",
+      "candidate_dds_sha256": null,
+      "candidate_dds_modified": false,
+      "original_bbox": null,
+      "localized_bbox": null,
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_action": [
+        "Use the pinned exact Release HD DDS and mapped 4x atlas cells as the construction source.",
+        "Resolve each canonical semantic to its actual source sprite from decoded source pixels; do not infer from list order.",
+        "Measure exact full-effect text bbox, raw/readable orientation, signed slant, alpha/style and clean-plate mask per mapped element.",
+        "Only then generate Korean inside the original permitted region and run zero-pixel plus ENGLISH SOURCE vs KOREAN CANDIDATE QA."
+      ]
+    },
+    {
+      "queue_index": 193,
+      "asset": "97E863AD",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantics": [
+        {
+          "source": "WELCOME TO THE",
+          "korean": "환영합니다"
+        },
+        {
+          "source": "MULTIPLAYER",
+          "korean": "멀티플레이"
+        },
+        {
+          "source": "View the online multiplayer rankings!",
+          "korean": "온라인 멀티플레이 랭킹 보기"
+        },
+        {
+          "source": "View OutRun2SP arcade rankings!",
+          "korean": "아웃런2 SP 아케이드 랭킹 보기"
+        },
+        {
+          "source": "View OutRun single player rankings!",
+          "korean": "아웃런 싱글 플레이 랭킹 보기"
+        },
+        {
+          "source": "Goal A",
+          "korean": "골 A"
+        },
+        {
+          "source": "Goal B",
+          "korean": "골 B"
+        },
+        {
+          "source": "Goal C",
+          "korean": "골 C"
+        },
+        {
+          "source": "Goal D",
+          "korean": "골 D"
+        },
+        {
+          "source": "Goal E",
+          "korean": "골 E"
+        },
+        {
+          "source": "15 Cont.",
+          "korean": "15코스"
+        },
+        {
+          "source": "ONLINE",
+          "korean": "온라인"
+        },
+        {
+          "source": "OUTRUN SHOWROOM",
+          "korean": "아웃런 쇼룸"
+        }
+      ],
+      "canonical_semantics_count": 13,
+      "inventory_source": {
+        "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+        "git_blob_sha": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+        "bytes": 8388736,
+        "expected_canvas": [
+          2048,
+          1024
+        ],
+        "source_sha256_equivalence_to_inventory": "NOT_ASSERTED_METADATA_ONLY"
+      },
+      "stock_mapping_reference": {
+        "dds_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+        "dds_git_blob_sha": "5dfd409b960b5f2a3c8020a8f6ad4144bca441e7",
+        "png_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.png",
+        "png_git_blob_sha": "73bea1960e69d41a3c91b8f85c5dd2e841cd7b8f",
+        "usage": "semantic/orientation/reconstruction reference only; never Korean artwork input"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256_atlas.json",
+        "git_blob_sha": "1a027da398d3245c168f46f75f531c0578f0d9c2",
+        "metadata_width": 256,
+        "metadata_height": 256,
+        "regions": 18
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_97E863AD_512x256_atlas.json",
+        "git_blob_sha": "2c826a5eadf4784ec50c26f4a6e269f86209be71",
+        "metadata_width": 2048,
+        "metadata_height": 1024,
+        "regions": 18
+      },
+      "exact_stock_to_4x_geometry": "PASS",
+      "regions": [
+        {
+          "sprite": "sprite_913",
+          "stock_cell": [
+            0,
+            213,
+            300,
+            43
+          ],
+          "hd_4x_cell": [
+            0,
+            852,
+            1200,
+            172
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_914",
+          "stock_cell": [
+            0,
+            173,
+            450,
+            40
+          ],
+          "hd_4x_cell": [
+            0,
+            692,
+            1800,
+            160
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_915",
+          "stock_cell": [
+            0,
+            133,
+            450,
+            40
+          ],
+          "hd_4x_cell": [
+            0,
+            532,
+            1800,
+            160
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_916",
+          "stock_cell": [
+            0,
+            93,
+            450,
+            40
+          ],
+          "hd_4x_cell": [
+            0,
+            372,
+            1800,
+            160
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_917",
+          "stock_cell": [
+            300,
+            219,
+            197,
+            37
+          ],
+          "hd_4x_cell": [
+            1200,
+            876,
+            788,
+            148
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_918",
+          "stock_cell": [
+            0,
+            71,
+            245,
+            22
+          ],
+          "hd_4x_cell": [
+            0,
+            284,
+            980,
+            88
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_919",
+          "stock_cell": [
+            245,
+            74,
+            115,
+            19
+          ],
+          "hd_4x_cell": [
+            980,
+            296,
+            460,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_920",
+          "stock_cell": [
+            360,
+            74,
+            115,
+            19
+          ],
+          "hd_4x_cell": [
+            1440,
+            296,
+            460,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_921",
+          "stock_cell": [
+            0,
+            52,
+            115,
+            19
+          ],
+          "hd_4x_cell": [
+            0,
+            208,
+            460,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_922",
+          "stock_cell": [
+            115,
+            52,
+            115,
+            19
+          ],
+          "hd_4x_cell": [
+            460,
+            208,
+            460,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_923",
+          "stock_cell": [
+            230,
+            52,
+            115,
+            19
+          ],
+          "hd_4x_cell": [
+            920,
+            208,
+            460,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_924",
+          "stock_cell": [
+            345,
+            52,
+            115,
+            19
+          ],
+          "hd_4x_cell": [
+            1380,
+            208,
+            460,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_925",
+          "stock_cell": [
+            450,
+            194,
+            26,
+            19
+          ],
+          "hd_4x_cell": [
+            1800,
+            776,
+            104,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_926",
+          "stock_cell": [
+            476,
+            194,
+            26,
+            19
+          ],
+          "hd_4x_cell": [
+            1904,
+            776,
+            104,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_927",
+          "stock_cell": [
+            0,
+            34,
+            224,
+            18
+          ],
+          "hd_4x_cell": [
+            0,
+            136,
+            896,
+            72
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_928",
+          "stock_cell": [
+            224,
+            36,
+            189,
+            16
+          ],
+          "hd_4x_cell": [
+            896,
+            144,
+            756,
+            64
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_929",
+          "stock_cell": [
+            413,
+            36,
+            97,
+            16
+          ],
+          "hd_4x_cell": [
+            1652,
+            144,
+            388,
+            64
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_930",
+          "stock_cell": [
+            450,
+            162,
+            50,
+            11
+          ],
+          "hd_4x_cell": [
+            1800,
+            648,
+            200,
+            44
+          ],
+          "rotated": false
+        }
+      ],
+      "semantic_to_sprite_assignment": "HOLD_STRICT_RECHECK_NOT_INFERRED_FROM_REGION_ORDER",
+      "candidate_dds_sha256": null,
+      "candidate_dds_modified": false,
+      "original_bbox": null,
+      "localized_bbox": null,
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_action": [
+        "Use the pinned exact Release HD DDS and mapped 4x atlas cells as the construction source.",
+        "Resolve each canonical semantic to its actual source sprite from decoded source pixels; do not infer from list order.",
+        "Measure exact full-effect text bbox, raw/readable orientation, signed slant, alpha/style and clean-plate mask per mapped element.",
+        "Only then generate Korean inside the original permitted region and run zero-pixel plus ENGLISH SOURCE vs KOREAN CANDIDATE QA."
+      ]
+    },
+    {
+      "queue_index": 201,
+      "asset": "A9ABD877",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantics": [
+        {
+          "source": "BAY AREA",
+          "korean": "베이 에어리어"
+        },
+        {
+          "source": "BIG FOREST",
+          "korean": "빅 포레스트"
+        },
+        {
+          "source": "CANYON",
+          "korean": "캐니언"
+        },
+        {
+          "source": "CAPE WAY",
+          "korean": "케이프 웨이"
+        },
+        {
+          "source": "CASINO TOWN",
+          "korean": "카지노 타운"
+        },
+        {
+          "source": "CASTLE WALL",
+          "korean": "캐슬 월"
+        },
+        {
+          "source": "CLOUDY HIGHLAND",
+          "korean": "클라우디 하이랜드"
+        },
+        {
+          "source": "DEEP LAKE",
+          "korean": "딥 레이크"
+        },
+        {
+          "source": "DESERT",
+          "korean": "사막"
+        },
+        {
+          "source": "FLORAL VILLAGE",
+          "korean": "플로럴 빌리지"
+        },
+        {
+          "source": "GHOST FOREST",
+          "korean": "고스트 포레스트"
+        },
+        {
+          "source": "GIANT STATUES",
+          "korean": "자이언트 스태추"
+        },
+        {
+          "source": "ICE SCAPE",
+          "korean": "아이스 스케이프"
+        },
+        {
+          "source": "CONIFEROUS FOREST",
+          "korean": "침엽수림"
+        },
+        {
+          "source": "GOALS",
+          "korean": "골"
+        },
+        {
+          "source": "Special",
+          "korean": "스페셜"
+        },
+        {
+          "source": "STAGES",
+          "korean": "스테이지"
+        }
+      ],
+      "canonical_semantics_count": 17,
+      "inventory_source": {
+        "sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+        "git_blob_sha": "8d4c508477442b5278c3bda3ba4fc5efcbdc1027",
+        "bytes": 16777344,
+        "expected_canvas": [
+          2048,
+          2048
+        ],
+        "source_sha256_equivalence_to_inventory": "NOT_ASSERTED_METADATA_ONLY"
+      },
+      "stock_mapping_reference": {
+        "dds_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+        "dds_git_blob_sha": "cabe895aade6db51d1d246115be730f5f45917c2",
+        "png_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.png",
+        "png_git_blob_sha": "00ab0b240e83b2cfa73173ebf43b98f4255899f0",
+        "usage": "semantic/orientation/reconstruction reference only; never Korean artwork input"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512_atlas.json",
+        "git_blob_sha": "73192185226e2255a511f1a4e1ffa6c2ead04a34",
+        "metadata_width": 512,
+        "metadata_height": 512,
+        "regions": 19
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_A9ABD877_512x512_atlas.json",
+        "git_blob_sha": "805d46d27b32d09f8eecb553095e3f3fc65d7167",
+        "metadata_width": 2048,
+        "metadata_height": 2048,
+        "regions": 19
+      },
+      "exact_stock_to_4x_geometry": "PASS",
+      "regions": [
+        {
+          "sprite": "sprite_563",
+          "stock_cell": [
+            0,
+            477,
+            292,
+            35
+          ],
+          "hd_4x_cell": [
+            0,
+            1908,
+            1168,
+            140
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_564",
+          "stock_cell": [
+            0,
+            449,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1796,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_565",
+          "stock_cell": [
+            0,
+            421,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1684,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_566",
+          "stock_cell": [
+            0,
+            393,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1572,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_567",
+          "stock_cell": [
+            0,
+            365,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1460,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_568",
+          "stock_cell": [
+            0,
+            337,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1348,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_569",
+          "stock_cell": [
+            0,
+            309,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1236,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_570",
+          "stock_cell": [
+            0,
+            281,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1124,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_571",
+          "stock_cell": [
+            0,
+            253,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            1012,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_572",
+          "stock_cell": [
+            0,
+            225,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            900,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_573",
+          "stock_cell": [
+            0,
+            197,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            788,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_574",
+          "stock_cell": [
+            0,
+            169,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            676,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_575",
+          "stock_cell": [
+            0,
+            141,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            564,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_576",
+          "stock_cell": [
+            0,
+            113,
+            268,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            452,
+            1072,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_577",
+          "stock_cell": [
+            268,
+            458,
+            239,
+            19
+          ],
+          "hd_4x_cell": [
+            1072,
+            1832,
+            956,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_578",
+          "stock_cell": [
+            292,
+            493,
+            153,
+            19
+          ],
+          "hd_4x_cell": [
+            1168,
+            1972,
+            612,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_579",
+          "stock_cell": [
+            268,
+            430,
+            153,
+            19
+          ],
+          "hd_4x_cell": [
+            1072,
+            1720,
+            612,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_580",
+          "stock_cell": [
+            268,
+            402,
+            131,
+            19
+          ],
+          "hd_4x_cell": [
+            1072,
+            1608,
+            524,
+            76
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_581",
+          "stock_cell": [
+            399,
+            402,
+            101,
+            19
+          ],
+          "hd_4x_cell": [
+            1596,
+            1608,
+            404,
+            76
+          ],
+          "rotated": false
+        }
+      ],
+      "semantic_to_sprite_assignment": "HOLD_STRICT_RECHECK_NOT_INFERRED_FROM_REGION_ORDER",
+      "candidate_dds_sha256": null,
+      "candidate_dds_modified": false,
+      "original_bbox": null,
+      "localized_bbox": null,
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_action": [
+        "Use the pinned exact Release HD DDS and mapped 4x atlas cells as the construction source.",
+        "Resolve each canonical semantic to its actual source sprite from decoded source pixels; do not infer from list order.",
+        "Measure exact full-effect text bbox, raw/readable orientation, signed slant, alpha/style and clean-plate mask per mapped element.",
+        "Only then generate Korean inside the original permitted region and run zero-pixel plus ENGLISH SOURCE vs KOREAN CANDIDATE QA."
+      ]
+    },
+    {
+      "queue_index": 225,
+      "asset": "E3C455FA",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantics": [
+        {
+          "source": "GAME LOBBY",
+          "korean": "게임 로비"
+        },
+        {
+          "source": "GAME LIST",
+          "korean": "게임 목록"
+        },
+        {
+          "source": "SETUP",
+          "korean": "설정"
+        },
+        {
+          "source": "COURSE TYPE",
+          "korean": "코스 유형"
+        },
+        {
+          "source": "COURSE",
+          "korean": "코스"
+        },
+        {
+          "source": "CAR TYPE",
+          "korean": "차량 유형"
+        },
+        {
+          "source": "CATCH-UP",
+          "korean": "추격 보정"
+        },
+        {
+          "source": "COLLISION",
+          "korean": "충돌"
+        },
+        {
+          "source": "PLAYERS",
+          "korean": "플레이어"
+        }
+      ],
+      "canonical_semantics_count": 9,
+      "inventory_source": {
+        "sha256": "03d29bbabcffa88887dd538b30a35348b28d3a556026c2c63cbb824d70dabc36",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+        "git_blob_sha": "1d485aac9e52ea615366e76b75aef8898c66a64c",
+        "bytes": 8388736,
+        "expected_canvas": [
+          2048,
+          1024
+        ],
+        "source_sha256_equivalence_to_inventory": "NOT_ASSERTED_METADATA_ONLY"
+      },
+      "stock_mapping_reference": {
+        "dds_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+        "dds_git_blob_sha": "24f743d27f0c17c016977d8bbb83ce1ed5768e0f",
+        "png_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.png",
+        "png_git_blob_sha": "d0eeb0d276b37075e0bfcd6ab87e871fce08cdc3",
+        "usage": "semantic/orientation/reconstruction reference only; never Korean artwork input"
+      },
+      "stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256_atlas.json",
+        "git_blob_sha": "8e7613357047dbbef6e05a04b71978b1627bbe93",
+        "metadata_width": 256,
+        "metadata_height": 256,
+        "regions": 8
+      },
+      "hd_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_E3C455FA_512x256_atlas.json",
+        "git_blob_sha": "c46ff2fc117294420c0726601f44e501620afa36",
+        "metadata_width": 2048,
+        "metadata_height": 1024,
+        "regions": 8
+      },
+      "exact_stock_to_4x_geometry": "PASS",
+      "regions": [
+        {
+          "sprite": "sprite_25",
+          "stock_cell": [
+            0,
+            50,
+            240,
+            206
+          ],
+          "hd_4x_cell": [
+            0,
+            200,
+            960,
+            824
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_26",
+          "stock_cell": [
+            240,
+            160,
+            110,
+            96
+          ],
+          "hd_4x_cell": [
+            960,
+            640,
+            440,
+            384
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_27",
+          "stock_cell": [
+            0,
+            22,
+            240,
+            28
+          ],
+          "hd_4x_cell": [
+            0,
+            88,
+            960,
+            112
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_28",
+          "stock_cell": [
+            0,
+            6,
+            360,
+            16
+          ],
+          "hd_4x_cell": [
+            0,
+            24,
+            1440,
+            64
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_29",
+          "stock_cell": [
+            240,
+            34,
+            263,
+            16
+          ],
+          "hd_4x_cell": [
+            960,
+            136,
+            1052,
+            64
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_30",
+          "stock_cell": [
+            240,
+            144,
+            240,
+            16
+          ],
+          "hd_4x_cell": [
+            960,
+            576,
+            960,
+            64
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_31",
+          "stock_cell": [
+            240,
+            128,
+            167,
+            16
+          ],
+          "hd_4x_cell": [
+            960,
+            512,
+            668,
+            64
+          ],
+          "rotated": false
+        },
+        {
+          "sprite": "sprite_32",
+          "stock_cell": [
+            503,
+            46,
+            4,
+            4
+          ],
+          "hd_4x_cell": [
+            2012,
+            184,
+            16,
+            16
+          ],
+          "rotated": false
+        }
+      ],
+      "semantic_to_sprite_assignment": "HOLD_STRICT_RECHECK_NOT_INFERRED_FROM_REGION_ORDER",
+      "candidate_dds_sha256": null,
+      "candidate_dds_modified": false,
+      "original_bbox": null,
+      "localized_bbox": null,
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+      "next_action": [
+        "Use the pinned exact Release HD DDS and mapped 4x atlas cells as the construction source.",
+        "Resolve each canonical semantic to its actual source sprite from decoded source pixels; do not infer from list order.",
+        "Measure exact full-effect text bbox, raw/readable orientation, signed slant, alpha/style and clean-plate mask per mapped element.",
+        "Only then generate Korean inside the original permitted region and run zero-pixel plus ENGLISH SOURCE vs KOREAN CANDIDATE QA."
+      ]
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_173_193_201_225",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_A00061_A00064_A00065_ASSETS_SKIPPED",
+    "queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_translation_match": "PASS_60_OF_60_TRANSCRIPTION_EQUALS_ARTWORK_PLAN",
+    "immutable_git_source_identity": "PASS_20_OF_20_PINNED_GITHUB_OBJECT_IDENTITIES",
+    "atlas_geometry": "PASS_66_OF_66_STOCK_TO_4X_CELLS",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_EXACT_HD_PER_ELEMENT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_RELEASE_ATLAS_RECONSTRUCTION_INPUTS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
