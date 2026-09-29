@@ -169,7 +169,7 @@ require_all("src/hooks_graphics.cpp", [
 ], "P7_FLARE_EXACT_PRODUCER")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
-    'VR R72 FLARE FIX: exact projected-screen effect uses common-angular-FOV zero-disparity fusion',
+    'VR R73 FLARE FIX: exact projected-screen effect uses far-ray eye reprojection with R72 FOV fallback',
 ], "P7_FLARE_R26HUD_PATH")
 require_all("src/vr/game/render_semantics.hpp", [
     'CorroboratesProjectedScreenEffect',
@@ -215,9 +215,9 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'std::uint64_t bytes, bool emergencyReserve',
     'emergency > R14EmergencyShadowBudgetBytes - bytes',
     'currentEmergency >',
-    'emergency class capped at 32 MiB',
+    'emergency class capped at 64 MiB',
     'general at 368 MiB',
-    'total at 400 MiB',
+    'total at 432 MiB',
     'R72IsSelectorReserveCandidate',
     'D3DFMT_DXT1',
     'bool selectorAtlas = false',
@@ -289,13 +289,33 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
 ], "P8_R71_HUD_ALPHA_DIAGNOSTIC")
 
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    'R72OutRunTransientHudPresents',
-    'stage == 14 ? 1200 : 240',
+    'OutRunVR::GameSemantic::TickTransientOutRunHudFrame()',
+    'OutRunVR::GameSemantic::ArmTransientOutRunHudFrames(240)',
+    'R72OutRunTransientHudPresents = 240',
     'directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D',
     'VR R72 OUTRUN HUD WINDOW:',
     'const float composite[4]{ 0.20f, 0, 0, 0 }',
-    'VR R72 FLARE FUSION:',
-], "P8_R72_RUNTIME_QUICKFIX")
+    'FarFlareDepth = 10000.0f',
+    'VR R73 FLARE FAR-RAY:',
+], "P8_R73_RUNTIME_QUICKFIX")
+require_all("src/vr/game/render_semantics.hpp", [
+    'TransientOutRunHudFrames',
+    'ArmTransientOutRunHudFrames',
+    'TickTransientOutRunHudFrame',
+    'TransientOutRunHudActive',
+], "P8_R73_TRANSIENT_HUD_WINDOW")
+require_all("src/hooks_uiscaling.cpp", [
+    'ArmTransientOutRunHudFrames(900)',
+    'VR R73 OUTRUN RESULT HUD:',
+], "P8_R73_RESULT_WINDOW_ARM")
+require_all("src/hooks_textures.cpp", [
+    'returnAddress == Module::exe_ptr(0x28E86)',
+    'returnAddress == Module::exe_ptr(0x2D271)',
+    'VR R73 OUTRUN COMPANION HUD:',
+], "P8_R73_RESULT_COMPANION_EDGES")
+require_all("tools/OutRunVR-TestProfiles.ps1", [
+    "'-SkyGlowFactor=0'",
+], "P8_R73_SKYGLOW_DISABLED_FOR_ISOLATION")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
     'callRva == 0x0975EE || callRva == 0x097727',
@@ -343,8 +363,8 @@ require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
-    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R72'",
-    "VariantId = 'R72_PC_QUICKFIX'",
+    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R73'",
+    "VariantId = 'R73_PC_QUICKFIX'",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
