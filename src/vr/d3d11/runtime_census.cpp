@@ -26,9 +26,15 @@ namespace outrun::vr::dx11
     namespace
     {
         constexpr std::uint32_t SampleStride = 64u;
+        constexpr std::size_t SignatureHashCap = 512u;
+        constexpr std::size_t DetailedSignatureLogCap = 64u;
         constexpr std::size_t UnsupportedBitCount = 12;
+        static_assert(
+            SampleStride != 0u && (SampleStride & (SampleStride - 1u)) == 0u,
+            "DX11 census sample stride must remain a power of two");
 
         std::atomic<int> EnabledCache{-1};
+        std::atomic<std::uint64_t> DrawCallsSeen{0};
         std::atomic<std::uint64_t> Samples{0};
         std::atomic<std::uint64_t> ExactSamples{0};
         std::atomic<std::uint64_t> FixedFunctionSamples{0};
@@ -73,6 +79,8 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> TextureStageManagedShadowReadyResources{0};
         std::atomic<std::uint64_t> TextureStageManagedShadowPendingResources{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
+        std::atomic<std::uint64_t> SignatureHashCapHitSamples{0};
+        std::atomic<std::uint64_t> DetailedSignatureLogSkippedSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
         std::atomic<std::uint64_t> InputLayoutExactSamples{0};
         std::atomic<std::uint64_t> InputLayoutUnsupportedSamples{0};
@@ -231,6 +239,18 @@ namespace outrun::vr::dx11
         {
             hash ^= value + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
             return hash;
+        }
+
+        // R114/F22: hash the per-thread draw ordinal before applying the 1/64
+        // census stride. This preserves bounded diagnostic cost while avoiding
+        // the permanent fixed-phase alias of (++ordinal % 64) against periodic
+        // draw ordering. It is still sampled evidence, never exhaustive proof.
+        std::uint64_t mix_sample_ordinal(std::uint64_t value) noexcept
+        {
+            value += 0x9e3779b97f4a7c15ull;
+            value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ull;
+            value = (value ^ (value >> 27)) * 0x94d049bb133111ebull;
+            return value ^ (value >> 31);
         }
 
         std::uint64_t hash_signature(
@@ -1025,20 +1045,33 @@ namespace outrun::vr::dx11
         {
             const auto hash = hash_signature(sig, primitive);
             bool inserted = false;
+            bool signatureHashCapHit = false;
             std::uint64_t unique = 0;
             {
                 std::lock_guard<std::mutex> lock(SignatureMutex);
-                if (SignatureHashes.size() < 512)
-                    inserted = SignatureHashes.insert(hash).second;
+                const auto existing = SignatureHashes.find(hash);
+                if (existing == SignatureHashes.end())
+                {
+                    if (SignatureHashes.size() < SignatureHashCap)
+                        inserted = SignatureHashes.insert(hash).second;
+                    else
+                        signatureHashCapHit = true;
+                }
                 unique = SignatureHashes.size();
             }
             UniqueDrawSignatures.store(unique, std::memory_order_relaxed);
+            if (signatureHashCapHit)
+                SignatureHashCapHitSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            if (inserted && unique > DetailedSignatureLogCap)
+                DetailedSignatureLogSkippedSignatures.fetch_add(
+                    1, std::memory_order_relaxed);
 
             FixedFunctionPixelShaderCompileProbe compileProbe{};
             if (inserted && sig.fixedFunction &&
                 sig.fixedFunctionShaderPrototypeGenerated)
             {
-                if (unique <= 64)
+                if (unique <= DetailedSignatureLogCap)
                 {
                     std::array<D3DRESOURCETYPE, 8> textureTypes{};
                     for (std::size_t stageIndex = 0;
@@ -1145,7 +1178,7 @@ namespace outrun::vr::dx11
                 }
             }
 
-            if (inserted && unique <= 64)
+            if (inserted && unique <= DetailedSignatureLogCap)
             {
                 spdlog::info(
                     "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
@@ -1340,8 +1373,10 @@ namespace outrun::vr::dx11
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
                 spdlog::info(
-                    "VR DX11 R85 census ACTIVE: passive 1/{} draw sampling with unique-signature-only non-routing D3DCompile probes for R84 fixed-function HLSL; native draw routing remains disabled",
-                    SampleStride);
+                    "VR DX11 R114 census ACTIVE: passive hashed-ordinal 1/{} draw sampling; signatureHashCap={} detailedSignatureLogCap={}; unique-signature-only non-routing D3DCompile probes remain diagnostic and native draw routing remains disabled",
+                    SampleStride,
+                    SignatureHashCap,
+                    DetailedSignatureLogCap);
             return enabled;
         }
 
@@ -1363,13 +1398,20 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R85 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R114 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme=1] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
                 ProgrammableSamples.load(std::memory_order_relaxed),
                 UnsupportedTopologySamples.load(std::memory_order_relaxed),
                 UniqueDrawSignatures.load(std::memory_order_relaxed),
+                DrawCallsSeen.load(std::memory_order_relaxed),
+                SampleStride,
+                SignatureHashCap,
+                SignatureHashCapHitSamples.load(std::memory_order_relaxed),
+                DetailedSignatureLogCap,
+                DetailedSignatureLogSkippedSignatures.load(
+                    std::memory_order_relaxed),
                 VertexDeclarationSamples.load(std::memory_order_relaxed),
                 IndexedSamples.load(std::memory_order_relaxed),
                 TexturedSamples.load(std::memory_order_relaxed),
@@ -1696,8 +1738,12 @@ namespace outrun::vr::dx11
         if (!device || !census_enabled())
             return;
 
-        thread_local std::uint32_t stride = 0;
-        if ((++stride % SampleStride) != 0)
+        thread_local std::uint64_t drawOrdinal = 0;
+        DrawCallsSeen.fetch_add(1, std::memory_order_relaxed);
+        const auto sampleKey = mix_sample_ordinal(
+            ++drawOrdinal ^
+            (static_cast<std::uint64_t>(GetCurrentThreadId()) << 32));
+        if ((sampleKey & (SampleStride - 1u)) != 0u)
             return;
 
         OutRunVR::DrawState::RenderStateSnapshot source{};
