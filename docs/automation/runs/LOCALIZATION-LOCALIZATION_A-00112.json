@@ -1,0 +1,99 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00112",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00043",
+  "recorded_at_kst": "2026-09-29T18:23:55.031+09:00",
+  "base_sha": "a4d2ed257af0503e6e408ade3ea385689922395d",
+  "material_commit_sha": "9214bd9b00df6e4695a5edef27266a22699c1908",
+  "pre_task_record_head_sha": "d9911e71753f454852f9a43213dd158510bda747",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_ODD_EXACT_STOCK_BINDING_ORIENTATION_PRIORS",
+  "summary": "Advanced Q00011/C113-consumed odd indices 147/161/163 beyond A00096 by directly decoding their exact pinned stock DXT5 DDS and stock atlases from GitHub. Resolved 77/77 visible localizable labels to sprite identities, measured 77/77 decoded-alpha stock effect bboxes/counts, classified 2 structural regions as preserve-only, and confirmed readable stock orientation is flip_y with X unchanged. Exact 4x Release bodies remain unavailable through the GitHub connector, so Release source-effect/removal/protected masks, CLEAN_PLATE/final-safe-bbox, Korean candidate and candidate-only gates remain HOLD. No Korean DDS or shared state changed; runtime UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1823-A00112-P00043/A00112_P00043_THREE_ODD_EXACT_STOCK_BINDING_ORIENTATION_PRIOR.json"
+  ],
+  "evidence_blob_sha": "95be09ce529b39e97d18c412a73f7fdbd9f6cb36",
+  "material_deliverable": {
+    "type": "THREE_ODD_EXACT_STOCK_DIRECT_SEMANTIC_BINDING_AND_ORIENTATION_PRIORS",
+    "indices": [
+      147,
+      161,
+      163
+    ],
+    "assets": [
+      "39BCA907",
+      "55B57CDE",
+      "59A79158"
+    ],
+    "exact_stock_dds_decoded": 3,
+    "exact_stock_atlases_bound": 3,
+    "stock_sprite_regions_inspected": 79,
+    "semantic_bindings_resolved": 77,
+    "stock_effect_bboxes_measured": 77,
+    "structural_preserve_regions_classified": 2,
+    "stock_orientation_reconciled": 3,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00096",
+    "producer_result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+    "producer_report_blob_sha": "1add8700513c68255a90e4e84500c9dde32997dd",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00106",
+    "c_acceptance_batch": "Q00011/C113",
+    "c_acceptance_record_blob_sha": "64878729481d9246bd7f000775892e006faad26a",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b"
+  },
+  "skipped_or_deferred": {
+    "qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00107": [
+        55
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00109": [
+        159
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ]
+  },
+  "strict_hold": {
+    "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_REQUIRED",
+    "release_orientation": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+    "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+    "release_removal_masks": "HOLD_NOT_MATERIALIZED",
+    "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+    "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+    "signed_slant_style_metrics": "HOLD_EXACT_RELEASE_MEASUREMENT_REQUIRED",
+    "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_ODD_ONLY_147_161_163__3_OF_3_EXACT_STOCK_DXT5__79_REGIONS_INSPECTED__77_OF_77_VISIBLE_SOURCE_LABELS_BOUND__77_OF_77_STOCK_ALPHA_GT0_EFFECT_BBOXES_MEASURED__2_STRUCTURAL_PRESERVE__FLIP_Y_NO_X_MIRROR_ALL_3__RELEASE_PIXEL_GATES_HELD__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "fail_closed_reason": "This task materially resolves exact stock semantic-to-sprite identity, stock decoded-alpha effect geometry and stock orientation priors for indices 147/161/163. It does not substitute stock pixels for the canonical 4x Release HD sources. Exact Release binary decode, source-effect/removal/protected masks, independently passing CLEAN_PLATE, measured final candidate_safe_bbox, signed style/slant, Korean rendering, DDS round-trip, zero-pixel containment and English-source comparison remain mandatory before candidate promotion.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
