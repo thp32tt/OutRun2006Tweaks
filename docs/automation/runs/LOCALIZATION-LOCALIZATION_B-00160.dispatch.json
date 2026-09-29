@@ -4,10 +4,10 @@
   "lane": "LOCALIZATION_B",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "chat_rollover": 3,
-  "dispatch_reason": "resume C128 REWORK_REQUIRED index112 D41D0B1 candidate completion",
-  "source_transport": "GITHUB_ONLY_PINNED_UPSTREAM",
-  "n100_used": false,
-  "local_clone_used": false,
-  "runtime_validation": "UNTESTED"
+  "chat_rollover": 4,
+  "recovery_target": {
+    "index": 112,
+    "asset": "D41D0B1"
+  },
+  "purpose": "Trigger one-shot GitHub-only render/BC3/decoded-final-QA continuation; final action commit self-removes this dispatch and workflow."
 }
