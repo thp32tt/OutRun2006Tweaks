@@ -21,6 +21,8 @@ def require_before(text: str, first: str, second: str, label: str) -> None:
 recenter = read("vrhost/src/runtime/r26_recenter_hardening.hpp")
 host = read("vrhost/src/main_r23.cpp")
 cmake = read("vrhost/CMakeLists.txt")
+workflow = read(".github/workflows/vr-openxr.yml")
+ipc_smoke = read("vrhost/tests/recenter_ipc_smoke.cpp")
 
 require(
     cmake,
@@ -70,4 +72,25 @@ for marker, label in [
 ]:
     require(recenter, marker, label)
 
-print("PASS: application-space recenter contract is wired and fail-closed")
+for marker, label in [
+    ("add_executable(outrun-vr-recenter-ipc-smoke", "recenter IPC smoke build target"),
+]:
+    require(cmake, marker, label)
+
+for marker, label in [
+    ("Run recenter IPC request/ack round-trip", "recenter IPC CI step"),
+    ("outrun-vr-recenter-ipc-smoke.exe", "recenter IPC CI executable"),
+]:
+    require(workflow, marker, label)
+
+for marker, label in [
+    ("channel.Publish()", "IPC publish"),
+    ("channel.ConsumeEventSignal()", "IPC event signal"),
+    ("channel.Pending(", "IPC pending observation"),
+    ("channel.MarkReceived(", "IPC receive acknowledgement"),
+    ("channel.MarkApplied(", "IPC applied acknowledgement"),
+    ("GetCurrentProcessId()", "IPC requester identity"),
+]:
+    require(ipc_smoke, marker, label)
+
+print("PASS: application-space recenter contract and IPC smoke are wired and fail-closed")

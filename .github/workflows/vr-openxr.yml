@@ -697,6 +697,12 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-host-state-v3-channel-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "HostState v3 channel smoke failed: $LASTEXITCODE" }
 
+      - name: Run recenter IPC request/ack round-trip
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-recenter-ipc-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "recenter IPC smoke failed: $LASTEXITCODE" }
+
       - name: Run v2 to v3 shadow conversion regression
         shell: pwsh
         run: |
