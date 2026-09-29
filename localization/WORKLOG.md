@@ -1605,3 +1605,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - A00166: PASS only for independently reproduced Drive SOURCE_TRANSPORT_MISS x3; production_readiness=PREFLIGHT_ONLY at that result. Newer A00168 Release-tier evidence is preserved without disposition and shared state is not regressed.
 - Counts unchanged: 137 queue = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production 76; canonical segments 753. No candidate DDS/static/runtime approval; no build/N100/local clone/GPT Library/Drive write/VR/FFB/DX. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0033-C131/C131_Q00029_INDEPENDENT_QA_BATCH.json`.
+
+
+## 2026-09-30 00:43 KST - C132 Q00030 INDEPENDENT QA BATCH
+
+- Immutable input: A00168@9792d4abe76555792a93150de8f7d1d46e976339 (indices 65/89/241). Disposition: **PASS**, limited to final canonical-source acquisition exhaustion evidence.
+- Pinned Release identity independently cross-checked: tag v0.25.10a -> 55f67a813dd3603d201d0be0da47c071965f53a4; asset 306630789, 306,223,257 bytes, SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958.
+- Exact bundle/member verification reproduced A00168: EBEF6D20 8d832df2... 2048x2048, 43B07A77 906a17ef... 2048x256, E1639D2E e250a41e... 1024x256. All are RGBA32 and mismatch current inventory SHA/dimensions 1ee491be... 512x512, 0a2c9a32... 512x64, 0af7362f... 256x64.
+- Prior tiers are reused without duplicate heavy checks: C126 accepted A00149 pinned-direct identity mismatches 3/3; C131 accepted A00166 Drive SOURCE_TRANSPORT_MISS 3/3. Thus all approved acquisition tiers are exhausted for the current fingerprints.
+- production_readiness: indices 65/89/241 = **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Do not repeat Drive/direct/Release probes until source/inventory fingerprint changes.
+- Candidate-completion priority remains ahead of unrelated preflight: preserve C131 index99 direct REWORK_REQUIRED and current index112 D41D0B1 newer-candidate C-QA handoff.
+- Counts unchanged: 137 queue = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production 76; canonical segments 753. No candidate DDS/static/runtime approval; no build/N100/local clone/GPT Library/Drive write/VR/FFB/DX. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0043-C132/C132_Q00030_INDEPENDENT_QA_BATCH.json`.

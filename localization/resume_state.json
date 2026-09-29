@@ -7,9 +7,12 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C132/Q00030 accepts A00168 indices65/89/241 only as PASS for final canonical-source acquisition exhaustion. All three are production_readiness=PREFLIGHT_ONLY and must skip repeated Drive/pinned-direct/pinned-Release probes until source/inventory fingerprint changes.",
+    "Keep candidate completion ahead of unrelated preflight: C131 index99/4F68708E remains direct REWORK_REQUIRED for a source-effect-aware transparent CLEAN_PLATE; finish that rework path before expanding preflight.",
+    "Queue the exact newer D41D0B1 producer result carrying current candidate blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1 for independent C QA; do not reuse the superseded 7ec8a1c2 input.",
+    "Q00030 adds no Korean candidate DDS, static artwork approval, or runtime approval. RUNTIME_VALIDATION remains UNTESTED.",
     "C131/Q00029 returns A00164 index99/4F68708E REWORK_REQUIRED. Its rectangular CLEAN_PLATE is fully opaque: 33,373 source-transparent pixels gain alpha and 75,954 alpha values change; readable review shows two dark-blue cover strips. Re-derive a source-effect-aware pixel mask and transparent/source-faithful CLEAN_PLATE, then continue candidate completion before unrelated preflight.",
     "C131/Q00029 marks B00160@7ec8a1c2 index112/D41D0B1 SUPERSEDED. Current HEAD carries newer candidate 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1; enqueue the exact newer producer result for independent C QA.",
-    "C131/Q00029 accepts A00166 indices65/89/241 only as PASS for Google Drive SOURCE_TRANSPORT_MISS (PREFLIGHT_ONLY at that RESULT_SHA). Newer A00168 pinned-Release evidence already exists; preserve it and do not repeat Drive or regress readiness before separate C disposition.",
     "Q00029 adds no new candidate DDS, static artwork approval, or runtime approval. RUNTIME_VALIDATION remains UNTESTED.",
     "C130/Q00028 accepted A00161 index197/9F060EC1 as PASS for a deterministic DDS_ONLY runtime-isolation input on the unchanged C82 strict-QA fingerprint. Run that DDS alone in the real game before any final/runtime approval.",
     "C130/Q00028 accepted A00163 index195/9CE4E175 as PASS for a deterministic DDS_ONLY runtime-isolation input on the unchanged C99 exact-HD static-QA fingerprint. Run that DDS alone in the real game before any final/runtime approval.",
@@ -2372,84 +2375,65 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-30T00:33:15+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00169",
-    "qa_batch_id": "Q00029",
-    "run": "C131",
-    "result": "PASS_Q00029_A00164_REWORK_REQUIRED_B00160_SUPERSEDED_A00166_PASS_DRIVE_TIER_RUNTIME_UNTESTED",
-    "base_head": "47031bd5b9d3aa0646d5419a12e5685eeda2824d",
+    "recorded_at_kst": "2026-09-30T00:43:54+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00172",
+    "qa_batch_id": "Q00030",
+    "run": "C132",
+    "result": "PASS_Q00030_A00168_FINAL_SOURCE_ACQUISITION_EXHAUSTED_65_89_241_RUNTIME_UNTESTED",
+    "base_head": "d6fbe37406b026658b76397d2858d3a0ed184ef7",
     "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
     "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00164@4c54cb6c3122d9899b95639e5231a79735374f18",
-      "LOCALIZATION-LOCALIZATION_B-00160@7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
-      "LOCALIZATION-LOCALIZATION_A-00166@826527bda7b9bc58e6eacdb852f178dc6bcdf783"
+      "LOCALIZATION-LOCALIZATION_A-00168@9792d4abe76555792a93150de8f7d1d46e976339"
     ],
     "reviewed_indices": [
-      99,
-      112,
       65,
       89,
       241
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
-        "result_sha": "4c54cb6c3122d9899b95639e5231a79735374f18",
-        "status": "REWORK_REQUIRED",
-        "reason": "Index99/4F68708E CLEAN_PLATE fails independent C transparency/no-box/native-readable QA. On the unchanged C127 exact source, A00164's 156,982-pixel patch makes all patched pixels alpha=255; 33,373 source-alpha-zero pixels gain alpha and 75,954 pixels change alpha. Readable mirror-Y review shows two sharp opaque dark-blue rectangular cover strips. This violates preserve-alpha/background, no-cover-rectangle, source-effect-aware-mask and artifact-cleanliness rules. Re-derive a pixel-level full source-effect mask, preserve transparency/hidden RGB outside the true effect, independently validate CLEAN_PLATE, then continue candidate completion. No candidate/runtime approval."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
-        "result_sha": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
-        "status": "SUPERSEDED",
-        "reason": "The immutable 7ec8a1c2 D41D0B1 candidate blob 746df92cf51b6d5ba1476ed4b426ed46bc059881 / SHA-256 9da81768a24f8417b1214532e666efb96ae15e6408a373ea5c4fcbe8f66670b9 is no longer current. Merge HEAD carries newer same-asset blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1. The older input is SUPERSEDED and not promoted; the newer exact result needs its own immutable C QA input. Runtime remains UNTESTED."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00166",
-        "result_sha": "826527bda7b9bc58e6eacdb852f178dc6bcdf783",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
+        "result_sha": "9792d4abe76555792a93150de8f7d1d46e976339",
         "status": "PASS",
-        "reason": "PASS is limited to the Google Drive canonical-source transport audit. C independently reproduced 0 exact-name matches for EBEF6D20_512x512.dds, 43B07A77_512x64.dds and E1639D2E_256x64.dds on ezflash557. Approved-root traversal shows loading contains only 48DEBE77_512x512.dds and the requested route/sumo_loading target folders are absent. These are SOURCE_TRANSPORT_MISS outcomes, not identity mismatches. production_readiness=PREFLIGHT_ONLY at A00166. Newer A00168 pinned-Release evidence for the same assets is already at current HEAD and is preserved without disposition; shared state is not regressed to repeat Drive."
+        "reason": "PASS is limited to A00168's final pinned-Release source-acquisition audit for indices 65/89/241; it does not approve any Korean candidate or static artwork. C independently verified the immutable producer record/report at 9792d4ab..., the current contract/inventory fingerprints, and the pinned v0.25.10a tag -> commit 55f67a813dd3603d201d0be0da47c071965f53a4. GitHub Release asset 306630789 is exactly 306,223,257 bytes with SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958. An independently hashed copy of that exact bundle reproduced all three producer member hashes and DDS dimensions: EBEF6D20 8d832df2... 2048x2048 RGBA32, 43B07A77 906a17ef... 2048x256 RGBA32, E1639D2E e250a41e... 1024x256 RGBA32. Each differs from current canonical inventory SHA/dimensions (1ee491be... 512x512, 0a2c9a32... 512x64, 0af7362f... 256x64). C126 already accepted the pinned-direct mismatches and C131 accepted the Drive transport misses. Therefore all approved acquisition tiers are exhausted for these exact inventory fingerprints. production_readiness=PREFLIGHT_ONLY; skip repeated source acquisition until the source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_REUSED_C127_EXACT_EB8C2DDA_INDEX99_SOURCE__B00160_7EC8_SUPERSEDED_BY_NEWER_CURRENT_BLOB__PASS_A00166_DRIVE_TRANSPORT_MISS_3_OF_3_REPRODUCED",
-    "canonical_semantic_validation": "PASS_INDEX99_BINDING_UNCHANGED__INDEX112_OLD_CANDIDATE_NOT_REAPPROVED_DUE_SUPERSESSION__A00166_TRANSPORT_ONLY_NO_SEMANTIC_CHANGE",
-    "geometry_mapping_validation": "FAIL_INDEX99_CLEAN_PLATE_ALPHA_AND_RECTANGULAR_COVER_ARTIFACT__B00160_OLD_GEOMETRY_NOT_RECHECKED_AFTER_SUPERSESSION__A00166_NO_PIXEL_ARTWORK",
-    "current_contract_compatibility": "MIXED_REWORK_A00164__SUPERSEDED_B00160_7EC8__PASS_A00166_DRIVE_TIER_PREFLIGHT_ONLY",
+    "source_identity_validation": "PASS_PINNED_RELEASE_ASSET_306630789_SIZE306223257_SHA76F85ED2__TAG_V0_25_10A_COMMIT55F67A81__MEMBER_HASH_DIMENSIONS_REPRODUCED_3_OF_3__ALL_NE_CURRENT_CANONICAL_INVENTORY",
+    "prior_tier_validation": "REUSE_C126_A00149_PINNED_DIRECT_SOURCE_IDENTITY_MISMATCH_3_OF_3__REUSE_C131_A00166_DRIVE_SOURCE_TRANSPORT_MISS_3_OF_3",
+    "canonical_semantic_validation": "NO_NEW_SEMANTIC_OR_TRANSLATION_CHANGE__SOURCE_ACQUISITION_ONLY",
+    "geometry_mapping_validation": "NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE",
+    "current_contract_compatibility": "PASS_FAIL_CLOSED_SOURCE_ACQUISITION_EXHAUSTION__NO_STALE_4X_SUBSTITUTION__NO_FALSE_CANDIDATE_PROMOTION",
     "readiness_reconciliation": {
-      "classification": "MIXED_REWORK_SUPERSEDED_PREFLIGHT_PASS",
+      "classification": "PREFLIGHT_PASS_SOURCE_ACQUISITION_EXHAUSTED",
       "production_readiness": {
         "65": "PREFLIGHT_ONLY",
         "89": "PREFLIGHT_ONLY",
         "241": "PREFLIGHT_ONLY"
       },
-      "candidate_completion_priority": [
-        "index99/4F68708E direct REWORK_REQUIRED: rebuild transparent source-effect-aware CLEAN_PLATE before unrelated preflight",
-        "index112/D41D0B1 current 30971e83/5bb92bce candidate: enqueue exact newer producer result for independent C QA"
+      "source_acquisition_exhausted": [
+        65,
+        89,
+        241
       ],
-      "note": "A00166 Drive-tier PASS is valid at its immutable RESULT_SHA; newer unconsumed A00168 source-tier evidence is preserved and shared state must not regress."
+      "candidate_completion_priority": [
+        "Preserve C131 direct REWORK_REQUIRED index99/4F68708E as higher-priority candidate-completion work; rebuild source-effect-aware transparent CLEAN_PLATE before unrelated preflight.",
+        "Preserve current D41D0B1 candidate 30971e83bebe619520f27dfece37f8ebdc02ff28 / 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1 for exact newer producer-result C QA.",
+        "Indices65/89/241 remain PREFLIGHT_ONLY but source-acquisition-exhausted; do not repeat Drive/direct/Release probes unless source/inventory fingerprint changes."
+      ]
     },
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
     "actionable_localize_text_after": 93,
     "pending_production_localize_text_after": 76,
-    "superseded_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00160@7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f"
-    ],
-    "newer_same_asset_candidate_or_source_fingerprints": [
-      "D41D0B1:30971e83bebe619520f27dfece37f8ebdc02ff28/5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
-      "A00168 indices65/89/241 pending separate C disposition"
-    ],
+    "superseded_inputs": [],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260930-0033-C131/C131_Q00029_INDEPENDENT_QA_BATCH.json",
-    "rework_required_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00164@4c54cb6c3122d9899b95639e5231a79735374f18"
-    ],
+    "report": "localization/graphics/role_C/20260930-0043-C132/C132_Q00030_INDEPENDENT_QA_BATCH.json",
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00166@826527bda7b9bc58e6eacdb852f178dc6bcdf783"
+      "LOCALIZATION-LOCALIZATION_A-00168@9792d4abe76555792a93150de8f7d1d46e976339"
     ]
   }
 }

@@ -1116,3 +1116,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - index112 immutable 7ec8 candidate is superseded by current blob `30971e83bebe619520f27dfece37f8ebdc02ff28` / SHA-256 `5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1`; old candidate not approved.
 - A00166 Drive tier is accepted only as SOURCE_TRANSPORT_MISS evidence with production_readiness **PREFLIGHT_ONLY**; newer A00168 source-tier work is preserved pending its own C batch.
 - Runtime validation remains **UNTESTED**. Report: `localization/graphics/role_C/20260930-0033-C131/C131_Q00029_INDEPENDENT_QA_BATCH.json`.
+
+
+### C132 Q00030 — 2026-09-30T00:43:54+09:00
+- Immutable input A00168 `9792d4a` (65/89/241): **PASS**, limited to final source-acquisition exhaustion.
+- Exact v0.25.10a Release bundle identity and all three exact-path member hashes/dimensions were independently reproduced; each member mismatches the current canonical inventory after previously accepted Drive miss + pinned-direct mismatch.
+- production_readiness 65/89/241: **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Do not repeat source probes until source/inventory fingerprint changes.
+- Preserve candidate-completion priorities: index99 direct REWORK_REQUIRED; current index112 D41D0B1 newer result requires exact C QA.
+- No candidate DDS/static/runtime approval. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

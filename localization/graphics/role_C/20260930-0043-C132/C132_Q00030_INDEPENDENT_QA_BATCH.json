@@ -1,0 +1,160 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-c132-q00030-independent-qa-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00172",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_RECONCILE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00030",
+  "qa_batch_id": "Q00030",
+  "run": "C132",
+  "recorded_at_kst": "2026-09-30T00:43:54+09:00",
+  "base_head_sha": "d6fbe37406b026658b76397d2858d3a0ed184ef7",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "9792d4abe76555792a93150de8f7d1d46e976339",
+      "result_message": "localization(A): audit pinned Release sources [AUTO:LOCALIZATION-LOCALIZATION_A-00168]",
+      "completed_at": "2026-09-30T00:18:01.696782+09:00",
+      "producer_id": "P00083",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
+      "result_sha": "9792d4abe76555792a93150de8f7d1d46e976339",
+      "status": "PASS",
+      "reason": "PASS is limited to A00168's final pinned-Release source-acquisition audit for indices 65/89/241; it does not approve any Korean candidate or static artwork. C independently verified the immutable producer record/report at 9792d4ab..., the current contract/inventory fingerprints, and the pinned v0.25.10a tag -> commit 55f67a813dd3603d201d0be0da47c071965f53a4. GitHub Release asset 306630789 is exactly 306,223,257 bytes with SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958. An independently hashed copy of that exact bundle reproduced all three producer member hashes and DDS dimensions: EBEF6D20 8d832df2... 2048x2048 RGBA32, 43B07A77 906a17ef... 2048x256 RGBA32, E1639D2E e250a41e... 1024x256 RGBA32. Each differs from current canonical inventory SHA/dimensions (1ee491be... 512x512, 0a2c9a32... 512x64, 0af7362f... 256x64). C126 already accepted the pinned-direct mismatches and C131 accepted the Drive transport misses. Therefore all approved acquisition tiers are exhausted for these exact inventory fingerprints. production_readiness=PREFLIGHT_ONLY; skip repeated source acquisition until the source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "independent_checks": {
+    "immutable_result_commit": {
+      "sha": "9792d4abe76555792a93150de8f7d1d46e976339",
+      "expected_message": "localization(A): audit pinned Release sources [AUTO:LOCALIZATION-LOCALIZATION_A-00168]",
+      "producer_task_blob_sha": "e0aabbb7495d49014a1c1fd46cc6ec8bd00c16b7",
+      "producer_report_blob_sha": "d9499f771664ca3b20524d833faf3420c8c3e64e",
+      "changed_payload_scope": [
+        "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00168.json",
+        "localization/graphics/role_A/20260930-A00168-P00083/A00168_P00083_PINNED_RELEASE_SOURCE_AUDIT.json"
+      ],
+      "lane_isolation": "PASS"
+    },
+    "pinned_release": {
+      "repository": "envido32/OR2006Sprites",
+      "tag": "v0.25.10a",
+      "tag_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "asset_id": 306630789,
+      "asset_name": "OR2-HD-GUI-v0.25.10a.zip",
+      "size": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "metadata_identity": "PASS",
+      "exact_bundle_hash_reproduced": true
+    },
+    "exact_members": [
+      {
+        "index": 65,
+        "asset": "EBEF6D20",
+        "path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+        "release_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+        "release_dimensions": [
+          2048,
+          2048
+        ],
+        "release_format": "RGBA32",
+        "canonical_sha256": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e",
+        "canonical_dimensions": [
+          512,
+          512
+        ],
+        "canonical_mode": "RGBA",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 89,
+        "asset": "43B07A77",
+        "path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+        "release_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+        "release_dimensions": [
+          2048,
+          256
+        ],
+        "release_format": "RGBA32",
+        "canonical_sha256": "0a2c9a32070771338dabc04a7bda67d9b474fd21d6a3456f60d9e1221fc8a96c",
+        "canonical_dimensions": [
+          512,
+          64
+        ],
+        "canonical_mode": "RGBA",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 241,
+        "asset": "E1639D2E",
+        "path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+        "release_sha256": "e250a41e7c59ccd5b8a68a02aace066f6578fbe0d84a365d7a0a27044b353511",
+        "release_dimensions": [
+          1024,
+          256
+        ],
+        "release_format": "RGBA32",
+        "canonical_sha256": "0af7362ff57b2ee9bfa04811838035861e919f5886244994dbede9aca6ed6c63",
+        "canonical_dimensions": [
+          256,
+          64
+        ],
+        "canonical_mode": "RGBA",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      }
+    ],
+    "prior_tiers": {
+      "drive": "C131/Q00029 independently accepted A00166 SOURCE_TRANSPORT_MISS 3/3",
+      "pinned_direct": "C126/Q00024 independently accepted A00149 SOURCE_IDENTITY_MISMATCH 3/3",
+      "heavy_qa_repeated": false
+    }
+  },
+  "production_readiness": {
+    "65": "PREFLIGHT_ONLY",
+    "89": "PREFLIGHT_ONLY",
+    "241": "PREFLIGHT_ONLY"
+  },
+  "source_acquisition_exhausted": [
+    65,
+    89,
+    241
+  ],
+  "shared_next_actions": [
+    "Preserve C131 direct REWORK_REQUIRED index99/4F68708E as higher-priority candidate-completion work; rebuild source-effect-aware transparent CLEAN_PLATE before unrelated preflight.",
+    "Preserve current D41D0B1 candidate 30971e83bebe619520f27dfece37f8ebdc02ff28 / 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1 for exact newer producer-result C QA.",
+    "Indices65/89/241 remain PREFLIGHT_ONLY but source-acquisition-exhausted; do not repeat Drive/direct/Release probes unless source/inventory fingerprint changes."
+  ],
+  "counts_after": {
+    "queue_total": 137,
+    "actionable_localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_only": 3,
+    "pending_production_localize_text": 76,
+    "canonical_transcribed_segments": 753
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
