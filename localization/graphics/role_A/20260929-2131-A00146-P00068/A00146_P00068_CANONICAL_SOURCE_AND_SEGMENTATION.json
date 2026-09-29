@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-schema9-canonical-source-acquisition-and-panel-segmentation-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00146",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00068",
+  "recorded_at_kst": "2026-09-29T21:34:38.282+09:00",
+  "base_head_sha": "8d868fb5b28db204449b79b4976ab10105a889e9",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "direct_rework_dependency_blocked": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_producer_assets_skipped": [
+      35,
+      43,
+      49,
+      57,
+      97,
+      107
+    ],
+    "recent_c_passed_preflight_not_repeated": [
+      95,
+      101,
+      137,
+      217
+    ],
+    "runtime_only_not_material_rework": [
+      61,
+      63,
+      195,
+      197
+    ],
+    "explicit_render_ready_indices": [],
+    "explicit_one_stage_to_render_runnable_indices": [],
+    "selected_indices": [
+      99,
+      215
+    ],
+    "reason": "No runnable candidate-completion tier remained after fresh HEAD scan. Fallback-4 advances index99 with exact canonical bytes and decoded segmentation, and prevents stale clean-plate reuse on index215 after an actual source identity mismatch."
+  },
+  "source_policy": {
+    "canonical_repo": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "release_asset_id": 306630789,
+    "release_asset_size": 306223257,
+    "release_asset_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "acquisition_route": "PINNED_TAG_DIRECT_FILE_FAST_PATH",
+    "google_drive_used": false,
+    "release_zip_downloaded": false
+  },
+  "assets": [
+    {
+      "index": 99,
+      "asset": "4F68708E",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "translation": {
+        "source": "Drive against the Ghost Car and challenge for the course record!!",
+        "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+      },
+      "canonical_source": {
+        "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+        "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+        "bytes": 524416,
+        "computed_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+        "inventory_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+        "identity": "PASS_EXACT_SHA256",
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "reused_unchanged_evidence": {
+        "a00041_report_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+        "same_source_git_blob": true,
+        "raw_to_readable_orientation": "mirror-Y",
+        "panel_visible_alpha_bbox_ltrb": [
+          514,
+          39,
+          1613,
+          218
+        ]
+      },
+      "new_decoded_segmentation": {
+        "panel_roi_ltrb": [
+          514,
+          39,
+          1613,
+          218
+        ],
+        "line_split_y": 130,
+        "seed_rule": "alpha>0 AND Rec.601 luminance>=80; text-core seed only, not final full-effect/removal mask",
+        "line1": {
+          "core_pixels": 18531,
+          "core_bbox_ltrb": [
+            527,
+            53,
+            1600,
+            119
+          ],
+          "bright190_pixels": 15144,
+          "bright190_bbox_ltrb": [
+            528,
+            53,
+            1600,
+            119
+          ],
+          "core_inset2_bbox_ltrb": [
+            529,
+            55,
+            1598,
+            117
+          ]
+        },
+        "line2": {
+          "core_pixels": 14332,
+          "core_bbox_ltrb": [
+            547,
+            139,
+            1340,
+            205
+          ],
+          "bright190_pixels": 11867,
+          "bright190_bbox_ltrb": [
+            548,
+            139,
+            1339,
+            205
+          ],
+          "core_inset2_bbox_ltrb": [
+            549,
+            141,
+            1338,
+            203
+          ]
+        },
+        "dominant_opaque_rgb4_bins": [
+          [
+            "003",
+            52640
+          ],
+          [
+            "fff",
+            25696
+          ],
+          [
+            "014",
+            4576
+          ],
+          [
+            "013",
+            3793
+          ],
+          [
+            "aab",
+            1635
+          ],
+          [
+            "114",
+            1031
+          ],
+          [
+            "557",
+            941
+          ]
+        ],
+        "result": "PASS_TWO_LINE_TEXT_CORE_SEEDS",
+        "remaining_gate": "HOLD_EXACT_EFFECT_MASK_PROTECTED_PANEL_MASK_CLEAN_PLATE_FINAL_SAFE_BBOX_AND_KOREAN_RENDER",
+        "readiness_after": "PREFLIGHT_ONLY_NARROWED"
+      }
+    },
+    {
+      "index": 215,
+      "asset": "C05E67EF",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+      "inventory": {
+        "sha256": "69e5a72b51d6a6a1b2dda1d115713c74dca1792564e703f43d8bb4c39b9cf2ac",
+        "width": 512,
+        "height": 256,
+        "mode": "RGBA"
+      },
+      "acquired_pinned_tag_file": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+        "git_blob_sha": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+        "bytes": 524416,
+        "computed_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+        "width": 512,
+        "height": 256,
+        "mip_count": 1
+      },
+      "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "prior_clean_plate_report_blob_sha": "5af41f797308fbaefb383c18f20a02b6e84ab5a7",
+      "disposition": "RETIRE_A00053_CLEAN_PLATE_AS_CURRENT_CANONICAL_CONSTRUCTION_INPUT",
+      "reason": "Obtained bytes exist and match the old A00053 source lineage, but their SHA-256 does not match current canonical inventory. Dimensions alone do not authorize reuse.",
+      "next_safe_action": "Fall through to another approved canonical acquisition tier for exact bytes matching inventory SHA-256 69e5a7...; do not reuse old masks/CLEAN_PLATE meanwhile.",
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_IDENTITY_BLOCKED"
+    }
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX99_EXACT_CANONICAL_SOURCE_PLUS_NEW_PIXEL_SEGMENTATION__INDEX215_STALE_CLEAN_PLATE_IDENTITY_GUARD",
+    "exact_canonical_sources_proven": 1,
+    "new_decoded_segmentation_assets": 1,
+    "stale_clean_plate_lineages_retired": 1,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_ODD_ONLY_99_215",
+    "work_steal": "NONE",
+    "index99_source_identity": "PASS_SHA256_EXACT",
+    "index99_structure": "PASS_2048x256_DXT5_MIP1",
+    "index99_segmentation": "PASS_CORE_SEEDS_WITHOUT_FALSE_FINAL_MASK_PROMOTION",
+    "index215_identity": "SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_NEW_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "2ece875d451368b9128e9f6c62042ade9258384b",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00041_report_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+    "a00053_report_blob_sha": "5af41f797308fbaefb383c18f20a02b6e84ab5a7",
+    "c00145_task_blob_sha": "9ac46deaf3140086c1f8079cbaee83064b87eb77",
+    "b00144_task_blob_sha": "d8bad62fa5012cd5dc8033d9ab95a544930186dd"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

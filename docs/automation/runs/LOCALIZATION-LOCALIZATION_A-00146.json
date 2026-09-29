@@ -1,0 +1,116 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00146",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00068",
+  "recorded_at_kst": "2026-09-29T21:34:38.282+09:00",
+  "base_sha": "8d868fb5b28db204449b79b4976ab10105a889e9",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_SCHEMA9_INDEX99_EXACT_SOURCE_SEGMENTATION_AND_INDEX215_SOURCE_IDENTITY_GUARD",
+  "summary": "Fresh latest-HEAD candidate-first scan found no runnable A direct rework, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rewrite. A00146 therefore used one fallback-4 batch on odd indices 99/215 without duplicating QA-pending assets. Index99 4F68708E was fetched from immutable v0.25.10a GitHub blob eb8c2d... and independently SHA-256 verified to exactly match current inventory d97206... (2048x256 DXT5 mip1). Reusing unchanged A00041 source/header/orientation evidence, new direct decoded-pixel analysis resolves the former panel/text ambiguity into two deterministic text-core bands [527,53,1600,119] and [547,139,1340,205], while correctly keeping final effect/removal masks, CLEAN_PLATE, safe bbox and Korean DDS on HOLD. Index215 C05E67EF direct pinned-tag bytes were actually obtained and hash to c2bd35..., which mismatches current inventory 69e5a7...; therefore its A00053 clean plate is explicitly retired as current-canonical construction input. No DDS/shared-state/build/runtime/N100/local-clone/Drive/Library/VR/FFB changes.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-2131-A00146-P00068/A00146_P00068_CANONICAL_SOURCE_AND_SEGMENTATION.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX99_EXACT_CANONICAL_SOURCE_AND_TWO_LINE_DECODED_SEGMENTATION_PLUS_INDEX215_IDENTITY_GUARD",
+    "report_path": "localization/graphics/role_A/20260929-2131-A00146-P00068/A00146_P00068_CANONICAL_SOURCE_AND_SEGMENTATION.json",
+    "report_blob_sha": "5558a986d7e2c92fa660f3756b800f51655d785b",
+    "indices": [
+      99,
+      215
+    ],
+    "assets": [
+      "4F68708E",
+      "C05E67EF"
+    ],
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "fresh_scan_head": "8d868fb5b28db204449b79b4976ab10105a889e9",
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_producer_indices": [
+      35,
+      43,
+      49,
+      57,
+      97,
+      107
+    ],
+    "c00145_passed_preflight_indices": [
+      95,
+      101,
+      137,
+      217
+    ],
+    "runtime_only_indices": [
+      61,
+      63,
+      195,
+      197
+    ],
+    "explicit_render_ready_indices": [],
+    "explicit_one_stage_to_render_runnable_indices": [],
+    "conclusion": "ZERO_CANDIDATE_EXCEPTION_VALID__MATERIAL_FALLBACK4_EXECUTED"
+  },
+  "index99": {
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "source_identity": "PASS_EXACT",
+    "line1_core_bbox": [
+      527,
+      53,
+      1600,
+      119
+    ],
+    "line2_core_bbox": [
+      547,
+      139,
+      1340,
+      205
+    ],
+    "readiness_after": "PREFLIGHT_ONLY_NARROWED"
+  },
+  "index215": {
+    "inventory_sha256": "69e5a72b51d6a6a1b2dda1d115713c74dca1792564e703f43d8bb4c39b9cf2ac",
+    "acquired_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+    "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+    "status": "RETIRE_STALE_A00053_CLEAN_PLATE"
+  },
+  "self_qa": "PASS_ODD_ONLY_99_215__INDEX99_EXACT_CANONICAL_SOURCE_AND_TWO_LINE_CORE_SEGMENTATION__INDEX215_ACTUAL_SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_CANDIDATE_DDS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_NEW_OR_REWORKED_CANDIDATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "fingerprints": {
+    "automation_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "2ece875d451368b9128e9f6c62042ade9258384b",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00041_report_blob_sha": "97ebf29aa89b675f2978eec75c8bba8cc2a32e23",
+    "a00053_report_blob_sha": "5af41f797308fbaefb383c18f20a02b6e84ab5a7",
+    "c00145_task_blob_sha": "9ac46deaf3140086c1f8079cbaee83064b87eb77",
+    "b00144_task_blob_sha": "d8bad62fa5012cd5dc8033d9ab95a544930186dd"
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
