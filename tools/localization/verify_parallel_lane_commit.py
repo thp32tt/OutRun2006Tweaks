@@ -2,21 +2,24 @@
 from __future__ import annotations
 
 import csv
+import io
+import os
 import pathlib
 import re
 import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-message = subprocess.check_output(["git", "log", "-1", "--pretty=%B"], cwd=ROOT, text=True)
+head = os.environ.get("VERIFY_HEAD", "").strip() or "HEAD"
+message = subprocess.check_output(["git", "log", "-1", "--pretty=%B", head], cwd=ROOT, text=True)
 m = re.search(r"\[AUTO:(LOCALIZATION-LOCALIZATION_([ABC])-\d+)\]", message)
 if not m:
     print("parallel-lane-gate: commit is not a controller localization task; no lane restriction applied")
     raise SystemExit(0)
 
 task_id, lane = m.group(1), m.group(2)
-before = subprocess.check_output(["git", "rev-parse", "HEAD^"], cwd=ROOT, text=True).strip()
-changed = subprocess.check_output(["git", "diff", "--name-only", before, "HEAD"], cwd=ROOT, text=True).splitlines()
+before = os.environ.get("VERIFY_BEFORE", "").strip() or subprocess.check_output(["git", "rev-parse", f"{head}^"], cwd=ROOT, text=True).strip()
+changed = subprocess.check_output(["git", "diff", "--name-only", before, head], cwd=ROOT, text=True).splitlines()
 
 shared = {
     "localization/resume_state.json",
@@ -46,9 +49,13 @@ if lane in {"A", "B"}:
             print(" -", p)
         raise SystemExit(1)
 
-    queue_path = ROOT / "localization/graphics/asset_queue.csv"
+    queue_csv = subprocess.check_output(
+        ["git", "show", f"{head}:localization/graphics/asset_queue.csv"],
+        cwd=ROOT,
+        text=True,
+    )
     by_basename: dict[str, list[int]] = {}
-    with queue_path.open(encoding="utf-8", newline="") as fh:
+    with io.StringIO(queue_csv, newline="") as fh:
         for row in csv.DictReader(fh):
             try:
                 idx = int(row["index"])
@@ -92,7 +99,7 @@ if lane in {"A", "B"}:
         raise SystemExit(1)
 
 elif lane == "C":
-    # C is the synchronization barrier and is allowed to reconcile shared state.
+    # C is the independent batch QA consumer and may reconcile shared state.
     pass
 
 print(f"PARALLEL_LANE_COMMIT_OK task={task_id} lane={lane} changed={len(changed)}")

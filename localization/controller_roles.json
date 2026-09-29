@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -8,7 +8,7 @@
     "C": "OutRun 한글화 C 실행"
   },
   "execution": {
-    "mode": "continuous_parallel_production_with_independent_batched_qa",
+    "mode": "continuous_production_with_c_batch_gate",
     "max_parallel_production": 2,
     "concurrent_group": [
       "A",
@@ -18,22 +18,27 @@
     "qa_queue": "qa_pending",
     "qa_batch_size": 4,
     "qa_coalesce_seconds": 30,
-    "producer_next_after": "OWN_LANE_DURABLE_PASS",
+    "producer_next_after": "OWN_LANE_DURABLE_COMMIT",
     "c_gates_production": false,
-    "compatibility_fallback": "sequential_producers_with_independent_qa"
+    "compatibility_fallback": "sequential_producers_with_independent_qa",
+    "producer_individual_actions_gate": false,
+    "batch_gate_role": "C",
+    "batch_gate_is_only_runner_validation": true
   },
   "lanes": {
     "A": {
       "mode": "continuous_production+self_qa",
       "primary_index_parity": "odd",
       "parallel_group": "production",
-      "next_task_after": "OWN_DURABLE_PASS"
+      "next_task_after": "OWN_DURABLE_COMMIT",
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE"
     },
     "B": {
       "mode": "continuous_production+self_qa",
       "primary_index_parity": "even",
       "parallel_group": "production",
-      "next_task_after": "OWN_DURABLE_PASS"
+      "next_task_after": "OWN_DURABLE_COMMIT",
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE"
     },
     "C": {
       "mode": "independent_batched_cross_lane_qa+shared_state_reconcile",
@@ -43,7 +48,8 @@
       "batch_size": 4,
       "coalesce_seconds": 30,
       "candidate_write_policy": "RETURN_REWORK_TO_A_OR_B",
-      "blocks_producers": false
+      "blocks_producers": false,
+      "automation_validation": "C_BATCH_GATE"
     }
   },
   "queue_source": "localization/graphics/asset_queue.csv",
@@ -95,7 +101,10 @@
       "retry_same_task_id": true,
       "retry_increments_attempt": true,
       "ci_failure_consumes_chat_rollover": false,
-      "force_uncached_refresh_after_seconds": 60
+      "force_uncached_refresh_after_seconds": 60,
+      "localization_applies_to": [
+        "C"
+      ]
     },
     "conversation_rollover": {
       "enabled": true,
@@ -129,8 +138,10 @@
       "never_wait_for_chat_expiry_after_terminal_action": true
     },
     "continuous_progression": {
-      "producer_pass_releases_same_lane": true,
-      "producer_pass_enqueues_qa": true,
+      "producer_commit_releases_same_lane": true,
+      "producer_commit_enqueues_qa": true,
+      "producer_waits_for_actions": false,
+      "c_batch_waits_for_actions": true,
       "c_completion_gates_producers": false,
       "qa_failure_gates_producers": false,
       "terminal_transition_target_seconds": 30
@@ -199,5 +210,24 @@
       "new_user_runtime_or_visual_evidence"
     ],
     "shared_state_merge_frequency": "once_per_c_batch"
+  },
+  "actions_batching": {
+    "producer_push_workflow_job": "SKIPPED_NO_RUNNER",
+    "producer_task_record_validation": "PENDING",
+    "producer_validation_mode": "C_BATCH_GATE",
+    "batch_gate_role": "C",
+    "max_producer_inputs_per_gate": 4,
+    "exact_input_identity": "TASK_ID@RESULT_SHA",
+    "strict_checks_for_pass_disposition": [
+      "domain_isolation",
+      "changed_localization_payload",
+      "lane_isolation"
+    ],
+    "nonpass_dispositions": [
+      "REWORK_REQUIRED",
+      "HOLD_STRICT_RECHECK",
+      "SUPERSEDED"
+    ],
+    "runtime_validation_separate": true
   }
 }

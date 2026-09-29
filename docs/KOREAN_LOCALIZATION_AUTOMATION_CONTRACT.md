@@ -72,10 +72,10 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 ## Continuous dual production + independent batch QA
 - A and B are independent continuous production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
-- A: PRODUCTION LANE A + self-QA on the odd-index shard. After its exact task commit and Automation Gate PASS, immediately continue to another independent runnable item in A's shard; do not wait for B or C.
-- B: PRODUCTION LANE B + self-QA on the even-index shard. After its exact task commit and Automation Gate PASS, immediately continue to another independent runnable item in B's shard; do not wait for A or C.
-- Every successful A/B task becomes one immutable QA input identified by `TASK_ID@RESULT_SHA`. The controller persists these in `qa_pending`.
-- C is an independent QA consumer, not a synchronization barrier and not a third candidate producer. It may run while A/B continue producing.
+- A: PRODUCTION LANE A + self-QA on the odd-index shard. After its exact durable task commit exists, immediately continue to another independent runnable item; do not wait for an individual Actions Gate, B, or C.
+- B: PRODUCTION LANE B + self-QA on the even-index shard. After its exact durable task commit exists, immediately continue to another independent runnable item; do not wait for an individual Actions Gate, A, or C.
+- Every durable A/B task commit becomes one immutable QA input identified by `TASK_ID@RESULT_SHA`. Producer task records remain `automation_validation=PENDING` with `validation_mode=C_BATCH_GATE` until covered by a passing C batch.
+- C is an independent QA consumer, not a synchronization barrier and not a third candidate producer. It may run while A/B continue producing. Its single commit is the only runner-backed Localization Automation Gate for that batch.
 - C consumes up to 4 producer task results per QA invocation by default, with a short 30-second coalesce window so repeated source/header/atlas/shared-state work is done once for the batch.
 - C MUST review the candidate/evidence as it existed at each exact producer RESULT_SHA. If current HEAD contains a newer candidate SHA for the same asset, the older result is `SUPERSEDED` and must not overwrite newer shared state.
 - C does not rewrite candidate DDS bytes while A/B are active. Candidate defects are returned as `REWORK_REQUIRED` for the appropriate producer lane. C may update shared metadata/progress/QA state after refreshing current HEAD.
@@ -143,15 +143,15 @@ Before static approval inspect raw DDS and readable/game orientation and require
 Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
 
 ## Controller idle-time elimination profile
-Controller liveness values are defined in `localization/controller_roles.json` schema v4 and are mandatory.
+Controller liveness and batch-validation values are defined in `localization/controller_roles.json` schema v6 and are mandatory.
 
 - Poll a bound Automation Gate run by exact run ID every 30 seconds with zero cache TTL.
 - Recover non-progressing `WAIT_ACTIONS` by exact run + jobs refresh within 75 seconds.
 - Re-arm an empty scheduler with unfinished graphics work within 90 seconds.
 - Use a 15-second next-task delay and 15-second A/B distinct-slot stagger.
 - Emit a queue heartbeat every 15 seconds and treat >45 seconds without heartbeat as a liveness failure.
-- A or B PASS -> same producer lane next task is event-driven, with a <=30-second dispatch target.
-- C independently consumes qa_pending; C PASS/FAIL never gates producer dispatch.
+- A or B durable task commit -> same producer lane next task is event-driven, with a <=30-second dispatch target; producer Actions PASS is not required.
+- C independently consumes qa_pending. C waits for the one batch Gate; C PASS/FAIL never gates producer dispatch.
 - On controller restart, reconcile all nonterminal lanes from current GitHub HEAD and exact Actions state before new dispatch.
 - `active_by_lane` is the active-state source of truth; a null active summary while a lane is nonterminal is invalid.
 
@@ -160,6 +160,16 @@ Controller liveness values are defined in `localization/controller_roles.json` s
 - Persistent queue state includes `qa_pending`, `qa_completed`, and `qa_blocked`.
 - Producer-to-QA identity is `TASK_ID@RESULT_SHA`; identical identities are de-duplicated.
 - Default C batch size is 4 producer results; coalesce window is 30 seconds.
-- Localization same-slot next-task send gap is 15 seconds and slot de-dup window is 30 seconds after an authoritative terminal producer result.
+- Localization same-slot next-task send gap is 15 seconds and slot de-dup window is 30 seconds after an authoritative durable producer commit.
 - A/B producer tasks and C QA may coexist in `active_by_lane`; this is expected and is no longer a barrier violation.
 - On restart, completed producer records that were not yet consumed must be recoverable into `qa_pending` without repeating production.
+
+
+## C-batch-only Actions Gate
+- A/B producer commits do not consume runner-backed Localization Automation Gate jobs. The workflow's validate job is skipped for A/B AUTO commits.
+- A/B task records use `automation_validation=PENDING` and `validation_mode=C_BATCH_GATE`; this is expected, not a failure.
+- The controller releases A/B immediately after locating the exact durable `[AUTO:TASK_ID]` commit and appends that immutable TASK_ID@RESULT_SHA to `qa_pending`.
+- C must record `qa_batch_inputs` and a one-to-one `qa_dispositions` array. Each disposition is PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, or SUPERSEDED.
+- A C AUTO commit is the only runner-backed Gate for that batch. For each PASS disposition, CI re-runs domain-isolation, changed-localization-payload, and A/B lane-isolation checks against the exact historical producer SHA, not current HEAD bytes.
+- REWORK_REQUIRED/HOLD_STRICT_RECHECK/SUPERSEDED inputs are not promoted and therefore do not need to pass candidate-promotion checks; their exact task/SHA identity is still verified.
+- A passing C batch Gate is the durable automatic-validation authority covering the listed producer SHAs. Runtime/in-game validation remains separate.

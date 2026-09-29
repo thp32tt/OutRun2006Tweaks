@@ -15,12 +15,15 @@ permissions:
 
 jobs:
   validate:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, '[AUTO:LOCALIZATION-LOCALIZATION_C-')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Verify queue automation contract
         run: test -f docs/automation/QUEUE_CONTROLLER_CONTRACT.md
@@ -50,6 +53,9 @@ jobs:
 
       - name: Verify parallel lane isolation
         run: python tools/localization/verify_parallel_lane_commit.py
+
+      - name: Verify exact producer SHAs in C batch
+        run: python tools/localization/verify_c_batch_inputs.py
 
       - name: Mark candidate semantics
         run: |

@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 5:
-    raise SystemExit("controller_roles schema_version must be >= 5")
+if int(cfg.get("schema_version", 0)) < 6:
+    raise SystemExit("controller_roles schema_version must be >= 6")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -35,8 +35,10 @@ required = {
     "watchdog.wait_actions_stale_seconds": int(wd.get("wait_actions_stale_seconds", 9999)) <= 90,
     "watchdog.busy_stall_seconds": int(wd.get("busy_stall_seconds", 0)) >= 1800,
     "watchdog.force_stop_active_generation": wd.get("force_stop_active_generation") is False,
-    "continuous_progression.producer_pass_releases_same_lane": cp.get("producer_pass_releases_same_lane") is True,
-    "continuous_progression.producer_pass_enqueues_qa": cp.get("producer_pass_enqueues_qa") is True,
+    "continuous_progression.producer_commit_releases_same_lane": cp.get("producer_commit_releases_same_lane") is True,
+    "continuous_progression.producer_commit_enqueues_qa": cp.get("producer_commit_enqueues_qa") is True,
+    "continuous_progression.producer_waits_for_actions": cp.get("producer_waits_for_actions") is False,
+    "continuous_progression.c_batch_waits_for_actions": cp.get("c_batch_waits_for_actions") is True,
     "continuous_progression.c_completion_gates_producers": cp.get("c_completion_gates_producers") is False,
     "continuous_progression.qa_failure_gates_producers": cp.get("qa_failure_gates_producers") is False,
     "continuous_progression.terminal_transition_target_seconds": int(cp.get("terminal_transition_target_seconds", 9999)) <= 30,
@@ -71,8 +73,12 @@ required["runtime_observability.required_runtime_fields"] = runtime_fields.issub
 
 execution = cfg.get("execution") or {}
 qa = cfg.get("qa_deduplication") or {}
-required["execution.mode"] = execution.get("mode") == "continuous_parallel_production_with_independent_batched_qa"
+required["execution.mode"] = execution.get("mode") == "continuous_production_with_c_batch_gate"
 required["execution.qa_consumer"] = execution.get("qa_consumer") == "C"
+required["execution.producer_next_after"] = execution.get("producer_next_after") == "OWN_LANE_DURABLE_COMMIT"
+required["execution.producer_individual_actions_gate"] = execution.get("producer_individual_actions_gate") is False
+required["execution.batch_gate_role"] = execution.get("batch_gate_role") == "C"
+required["execution.batch_gate_is_only_runner_validation"] = execution.get("batch_gate_is_only_runner_validation") is True
 required["execution.c_gates_production"] = execution.get("c_gates_production") is False
 required["execution.qa_batch_size"] = int(execution.get("qa_batch_size", 0)) == 4
 required["execution.qa_coalesce_seconds"] = int(execution.get("qa_coalesce_seconds", 9999)) <= 30
@@ -86,5 +92,5 @@ if bad:
 
 print("controller recovery policy PASS")
 print("bound Actions poll <=30s, WAIT_ACTIONS recovery <=90s, idle rearm <=90s")
-print("A/B continuous producers, C independent batch QA, QA batch=4/coalesce<=30s")
+print("A/B release on durable commit; only C batch consumes runner-backed Actions validation")
 print("same-slot localization gap <=15s, slot dedup <=30s, heartbeat <=15s")

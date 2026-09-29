@@ -3,8 +3,8 @@ from __future__ import annotations
 import hashlib, json, os, pathlib, struct, subprocess
 
 root = pathlib.Path(__file__).resolve().parents[2]
-before = os.environ.get("GITHUB_EVENT_BEFORE", "").strip()
-head = os.environ.get("GITHUB_SHA", "").strip() or "HEAD"
+before = os.environ.get("VERIFY_BEFORE", "").strip() or os.environ.get("GITHUB_EVENT_BEFORE", "").strip()
+head = os.environ.get("VERIFY_HEAD", "").strip() or os.environ.get("GITHUB_SHA", "").strip() or "HEAD"
 if not before or set(before) == {"0"}:
     before = subprocess.check_output(["git","rev-parse",f"{head}^"], cwd=root, text=True).strip()
 
@@ -12,16 +12,21 @@ changed = subprocess.check_output(["git","diff","--name-only",before,head], cwd=
 dds = [root / p for p in changed if p.lower().endswith(".dds")]
 report_paths = [p for p in changed if p.startswith("localization/graphics/") and p.lower().endswith(".json")]
 
-def dds_info(path: pathlib.Path):
-    data = path.read_bytes()
+def git_blob_bytes(revision: str, rel: str) -> bytes:
+    try:
+        return subprocess.check_output(["git","show",f"{revision}:{rel}"], cwd=root)
+    except subprocess.CalledProcessError as exc:
+        raise SystemExit(f"changed file missing from revision {revision}: {rel}") from exc
+
+def dds_info(rel: str, data: bytes):
     if len(data) < 128 or data[:4] != b"DDS ":
-        raise SystemExit(f"invalid DDS header: {path}")
+        raise SystemExit(f"invalid DDS header: {rel}")
     height = struct.unpack_from("<I", data, 12)[0]
     width = struct.unpack_from("<I", data, 16)[0]
     mipmaps = struct.unpack_from("<I", data, 28)[0] or 1
     fourcc = data[84:88]
     if width <= 0 or height <= 0 or mipmaps < 1:
-        raise SystemExit(f"invalid DDS metadata: {path}")
+        raise SystemExit(f"invalid DDS metadata: {rel}")
     return {"width":width,"height":height,"mipmaps":mipmaps,"fourcc":fourcc.hex(),
             "sha256":hashlib.sha256(data).hexdigest()}
 
@@ -35,8 +40,7 @@ def walk(obj):
 def qa_pass_records():
     records=[]
     for rel in report_paths:
-        p=root/rel
-        try: obj=json.loads(p.read_text(encoding="utf-8"))
+        try: obj=json.loads(git_blob_bytes(head, rel).decode("utf-8"))
         except Exception: continue
         for d in walk(obj):
             status=str(d.get("status",d.get("result",""))).upper()
@@ -45,8 +49,8 @@ def qa_pass_records():
     return records
 
 for p in dds:
-    if not p.exists(): raise SystemExit(f"changed DDS missing from checkout: {p}")
-    dds_info(p)
+    rel = p.relative_to(root).as_posix()
+    dds_info(rel, git_blob_bytes(head, rel))
 
 if dds and not report_paths:
     raise SystemExit("DDS changed without localization/graphics JSON QA report in same commit")
