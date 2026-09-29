@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -241,7 +241,8 @@
       "PREFLIGHT_ONLY"
     ],
     "selection_order": [
-      "DIRECT_REWORK_REQUIRED",
+      "DIRECT_REWORK_REQUIRED_RUNNABLE",
+      "EXPLICIT_RENDER_NEXT_FROM_LATEST_PRODUCER_OR_C",
       "RENDER_READY",
       "ONE_STAGE_TO_RENDER",
       "EXISTING_CANDIDATE_REWORK",
@@ -313,6 +314,18 @@
       "primary_success_field": "candidate_dds_modified",
       "zero_candidate_requires_post_evidence_rescan": true,
       "fallback_cannot_replace_newly_runnable_render": true
+    },
+    "render_handoff": {
+      "consume_latest_readiness_after": true,
+      "render_next_tokens": [
+        "KOREAN_RENDER_NEXT",
+        "RENDER_READY",
+        "CLEAN_PLATE_READY_STYLE_SLANT_MEASURED__KOREAN_RENDER_NEXT"
+      ],
+      "priority_over_new_preflight": true,
+      "priority_over_runtime_isolation_fallback": true,
+      "qa_pending_does_not_block_same_asset_render_when_latest_evidence_is_producer_self_verified_and_no_c_rejection_exists": false,
+      "c_accepted_render_next_must_be_selected_before_unrelated_fallback": true
     }
   },
   "source_transport": {
