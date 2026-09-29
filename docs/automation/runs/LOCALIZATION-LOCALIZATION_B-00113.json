@@ -10,10 +10,11 @@
   "material_commit_sha": "b4a5e837880d830adc6bd44cbc1a55693ecd8d80",
   "pre_task_record_head_sha": "b4a5e837880d830adc6bd44cbc1a55693ecd8d80",
   "preserved_peer_head": true,
-  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_TOTAL_RANK_V2_HEADER_GATED_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_6_UNITS",
-  "summary": "Advanced even primary-shard indices 26/28/30/32 (63C91067/A05BF610/8215FD25/DCC7B488), previously classified and C-promoted as Total Rank -> 종합 랭크, into six explicit first-pass-v2 header-gated source-effect-mask/CLEAN_PLATE work orders. Added strict 2px decoded-source inspection guards derived from immutable HD sprite rectangles and exact size equations. GitHub binary blob access failed closed with UnicodeDecodeError, so no source-effect pixels, CLEAN_PLATE pixels, candidate-safe bboxes or Korean DDS were fabricated.",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_TOTAL_RANK_V2_WORK_ORDERS_PLUS_INDEX206_EXACT_STOCK_ORIENTATION_PRIOR",
+  "summary": "P00044 durable work now comprises the original four even Total Rank assets (26/28/30/32) advanced into six first-pass-v2 header-gated source-effect-mask/CLEAN_PLATE work orders, plus a later same-task GitHub-only exact-stock pixel/orientation prior for even index 206 / AEA507A4. The index206 stock decode proves an exact 4x atlas relation, START -> 출발 semantic binding reuse, and flip_y stock-source orientation prior while keeping all Release-HD source-effect/CLEAN_PLATE/candidate gates fail-closed. No Korean DDS or shared state was modified; runtime remains UNTESTED.",
   "evidence": [
-    "localization/graphics/role_B/20260929-1819-B135-P00044/B135_P00044_TOTAL_RANK_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+    "localization/graphics/role_B/20260929-1819-B135-P00044/B135_P00044_TOTAL_RANK_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json",
+    "localization/graphics/role_B/20260929-1824-B135-P00044/B135_P00044_INDEX206_EXACT_STOCK_PIXEL_ORIENTATION_PRIOR.json"
   ],
   "evidence_blob_sha": "944a3c91ec1b2b24ed1e9045890b71edf35eedc9",
   "material_deliverable": {
@@ -94,7 +95,7 @@
       232
     ]
   },
-  "self_qa": "PASS_EVEN_ONLY_26_28_30_32__4_OF_4_CURRENT_QUEUE_LOCALIZE_TEXT_PENDING_ARTWORK__4_OF_4_EXACT_HD_SIZE_EQUATIONS__6_OF_6_PARENT_RECTS_IN_CANVAS__6_OF_6_NONEMPTY_STRICT_2PX_INSPECTION_GUARDS__ZERO_SAME_ASSET_RECT_OVERLAP__6_OF_6_CANONICAL_TOTAL_RANK_TO_종합_랭크__NO_SHARED_STATE",
+  "self_qa": "PASS_EVEN_ONLY_26_28_30_32__4_OF_4_CURRENT_QUEUE_LOCALIZE_TEXT_PENDING_ARTWORK__4_OF_4_EXACT_HD_SIZE_EQUATIONS__6_OF_6_PARENT_RECTS_IN_CANVAS__6_OF_6_NONEMPTY_STRICT_2PX_INSPECTION_GUARDS__ZERO_SAME_ASSET_RECT_OVERLAP__6_OF_6_CANONICAL_TOTAL_RANK_TO_종합_랭크__NO_SHARED_STATE__SUPPLEMENT_INDEX206_EXACT_STOCK_FLIP_Y_PRIOR__NO_SHARED_STATE",
   "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
   "fail_closed_reason": "The new 2px guards are exact decoded-source inspection upper bounds only, not removal masks or candidate_safe_bbox. Exact DDS binary header/channel-mask decode, effect-inclusive English source masks, protected-art masks, independently passing CLEAN_PLATE pixels/QA, per-element raw orientation confirmation, measured v2 final safe bboxes, Korean rendering and final DDS/alpha/zero-pixel/source-vs-candidate gates remain mandatory.",
   "strict_hold": {
@@ -119,5 +120,31 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "supplemental_material_commit_sha": "3c30415fce8f320995e0f8ba29cb26c68b64195c",
+  "supplemental_material": {
+    "type": "INDEX206_EXACT_STOCK_PIXEL_ORIENTATION_AND_TEXT_CORE_PRIOR",
+    "queue_index": 206,
+    "asset": "AEA507A4",
+    "source_semantic": "START",
+    "korean": "출발",
+    "stock_dds_blob_sha": "451beb7b8bc53c6e2c16725726192d9ee87b5ec6",
+    "stock_dds": "512x256 DXT5 base-only",
+    "stock_to_4x_atlas_relation": "PASS_EXACT_4X",
+    "stock_source_text_transform": "flip_y",
+    "release_hd_blob_sha": "63a29db6e8eaaface8036a03f87e9de2ad750184",
+    "release_hd_dimensions": [
+      2048,
+      1024
+    ],
+    "release_hd_pixel_decode": "HOLD_BINARY_BODY_UNAVAILABLE_TO_TEXT_CONNECTOR",
+    "candidate_dds_modified": false
+  },
+  "rollover_reconciliation": {
+    "reconciled_at_kst": "2026-09-29T18:28:00+09:00",
+    "observed_head_sha": "cd7a36bed82bc23f9eec6fec60a8b5b7bfa54dc9",
+    "reason": "CHAT_ROLLOVER=1 found a same-task supplemental material commit created after the first durable task record. Reconciled that immutable evidence into the task record instead of repeating completed production work.",
+    "repeated_completed_work": false,
+    "preserved_peer_head": true
+  }
 }
