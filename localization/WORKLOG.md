@@ -1946,3 +1946,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate blobs remain unchanged: FF514CEB `a7f2670c...`, 4F68708E `a170fc1e...`. Heavy QA was not repeated and no runtime test was performed.
 - Order remains **RENDER_READY 231 -> ONE_STAGE none -> candidate QA 159/198/201 -> PREFLIGHT_ONLY 163/193/133/232**; runtime isolation 99/237 remains separate/non-blocking. Pending production **69**, actionable **93**, canonical segments **755**.
 - This bookkeeping checkpoint is separate from the validation-bearing result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 08:11 KST - C155 Q00053 INDEPENDENT QA BATCH
+- Consumed immutable B00231 `29c0f8f3...` / index193 `97E863AD`; disposition **PASS**.
+- C independently downloaded the Git-registered Drive candidate/review artifacts and replayed exact pinned source: candidate ZIP `e05a6037...`, DDS `3646e6b6...`, source `d308bf05...`; 2048x1024 RGBA32 mip1 with byte-identical 128-byte header `2195f6a7...`.
+- Independent decoded replay matches source/candidate review PNGs exactly. CLEAN_PLATE removal mask **152,967 px** / `ad5a9c60...`; Korean letter mask **84,738 px** / `915ae725...`; clean pixels outside removal mask unchanged and removal region fully transparent.
+- Canonical semantics **13/13** current. All 13 Korean letter masks fit their candidate-safe bboxes with positive margin; changed RGBA/alpha and introduced alpha outside the exact source-effect bbox union are **0**. Full-atlas and element comparison show no clipping, broken Hangul, English residue, wrong image, resolution loss, background box, or TESTAROSSA/OUTRUN2SP/SP OR/structural-art damage.
+- Index193 promoted to **STATIC_QA_PASS_RUNTIME_UNTESTED**. Concurrent A00235@index231 is newer out-of-batch candidate evidence and remains **QA_PENDING**, not implicitly approved.
+- Order: **RENDER_READY none -> ONE_STAGE none -> candidate QA 159/198/201/231 -> PREFLIGHT_ONLY 163/133/232**; runtime isolation 99/237 remains separate. Pending production **68**, actionable **93**, canonical segments **755**.
+- No runtime test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
