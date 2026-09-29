@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T19:41:08+09:00",
+  "updated_at_kst": "2026-09-29T19:54:10+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "Q00014 C116 consumed immutable B00110@705ecdb282f48c594a6347aa1837bc320b7254e3, A00112@9214bd9b00df6e4695a5edef27266a22699c1908, B00113@b4a5e837880d830adc6bd44cbc1a55693ecd8d80 and A00114@b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e. All four inputs are REWORK_REQUIRED: B00110 uses noncanonical Release DXT5 geometry instead of current user-HD inventory; A00112 material stock-prior QA passes 77/77 but exact RESULT_SHA lacks its durable task record; B00113 lacks the exact-SHA record and its 26/28/30 source dimensions disagree with canonical inventory; A00114 matches 4/4 inventory identities and 24/24 canonical translations but exact RESULT_SHA lacks its durable task record. No Korean candidate DDS was produced. Canonical segments remain 753; actionable queue remains 137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production localize_text 76; runtime UNTESTED.",
+  "next_checkpoint": "Q00017 C119 consumed immutable A00126@97151db9a41e34c417cf355ad8f5e88056d3b78d, B00127@c5495ee17aee1a6030191a9e75fef3c571b50d51 and A00128@aec73fc98cb8e7f6de792e8d113a68a3f9971035. All three PASS for limited canonical-source reacquisition/fingerprint-repair evidence under the current candidate-first contract. Exact canonical source bytes remain absent; no candidate DDS/static approval/runtime approval was added. Canonical segments remain 753; queue remains 137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production localize_text 76; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -841,88 +841,73 @@
     ]
   },
   "latest_c_batch_qa": {
-    "recorded_at_kst": "2026-09-29T19:41:08+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00130",
-    "qa_batch_id": "Q00016",
-    "run": "C118",
-    "result": "PASS_Q00016_THREE_INPUTS_PASS_ONE_REWORK_REQUIRED_NO_DDS_RUNTIME_UNTESTED",
-    "base_head": "f00fd5ada49ffc121a23b584ee5b925471e83a8c",
+    "recorded_at_kst": "2026-09-29T19:54:10+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00132",
+    "qa_batch_id": "Q00017",
+    "run": "C119",
+    "result": "PASS_Q00017_THREE_INPUTS_PASS_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "aec73fc98cb8e7f6de792e8d113a68a3f9971035",
     "current_qa_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00121@2b879eaa22e033f120728f0ec3849bcc78b04290",
-      "LOCALIZATION-LOCALIZATION_B-00122@9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
-      "LOCALIZATION-LOCALIZATION_A-00123@910cf76e9df41ff2549fabbd1f34c4409ab69985",
-      "LOCALIZATION-LOCALIZATION_B-00125@e6c3159520d26b085bd8f28fda049320aabab511"
+      "LOCALIZATION-LOCALIZATION_A-00126@97151db9a41e34c417cf355ad8f5e88056d3b78d",
+      "LOCALIZATION-LOCALIZATION_B-00127@c5495ee17aee1a6030191a9e75fef3c571b50d51",
+      "LOCALIZATION-LOCALIZATION_A-00128@aec73fc98cb8e7f6de792e8d113a68a3f9971035"
     ],
     "reviewed_indices": [
-      26,
-      28,
-      30,
-      32,
+      36,
+      38,
+      128,
       133,
       135,
       139,
       143,
-      147,
-      161,
-      163,
-      198,
-      214,
-      230,
-      236
+      205,
+      206,
+      227,
+      231
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00121",
-        "result_sha": "2b879eaa22e033f120728f0ec3849bcc78b04290",
-        "status": "REWORK_REQUIRED",
-        "reason": "Material content remains valid: exact copies of C00120-accepted A00114 work orders; 4/4 inventory SHA-256+canvas identities and 24/24 current translations recheck. But A00121 records automation_contract_blob_sha=194fd6c64cafede90b537446fddf96934dc9ea37 while the actual docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md blob at this exact RESULT_SHA is d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b. The recorded 194fd6 blob is a different queue-controller contract, so the machine-readable QA-contract fingerprint is false and unsafe for de-duplication. Re-emit unchanged accepted material with the accurate latest localization-contract fingerprint."
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00126",
+        "result_sha": "97151db9a41e34c417cf355ad8f5e88056d3b78d",
+        "status": "PASS",
+        "reason": "Durable repaired exact result. The corrected queue fingerprint equals the actual queue blob at RESULT_SHA, and the exact localization contract at that result is d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b. Under the current e6feafaf candidate-first contract, C independently rechecked the limited source-reacquisition claim against current canonical metadata: 3/3 inventory SHA-256/canvas/RGBA identities and 36/36 source/Korean pairs remain exact; all three canonical queue-path sources are absent at the immutable result, and rejected Release geometry is not reused. PASS is PREFLIGHT_ONLY evidence; no candidate/static approval."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00122",
-        "result_sha": "9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00127",
+        "result_sha": "c5495ee17aee1a6030191a9e75fef3c571b50d51",
         "status": "PASS",
-        "reason": "Durable exact result. 4/4 inventory SHA-256 identities, canvases and RGBA modes match current inventory; all four canonical queue-path sources are absent at the exact result SHA; 38/38 translations match current metadata. Prior Release geometry is retired and zero header/orientation/mask/CLEAN_PLATE/candidate geometry is fabricated while canonical bytes are unavailable. PASS is limited PREFLIGHT_ONLY evidence under candidate-completion-first; no candidate/static approval."
+        "reason": "Durable exact result with fingerprints matching its immutable files. C rechecked 4/4 canonical inventory SHA-256/canvas/RGBA identities, 10/10 semantic entries and 14 expected physical occurrences. Indices 36 and 38 are correctly treated as distinct canonical sources and the invalid de-duplication is retired. All four exact canonical queue-path sources are absent at RESULT_SHA; no Release pixel geometry, header/orientation/mask/CLEAN_PLATE or candidate geometry is promoted. PASS is source-reacquisition PREFLIGHT_ONLY evidence under the current candidate-first contract."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00123",
-        "result_sha": "910cf76e9df41ff2549fabbd1f34c4409ab69985",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00128",
+        "result_sha": "aec73fc98cb8e7f6de792e8d113a68a3f9971035",
         "status": "PASS",
-        "reason": "Durable exact result and unchanged re-emission of C00120-accepted A00112 material. Because the current QA contract changed, C re-ran the stock-heavy check: 3/3 pinned stock DXT5 blobs and 3/3 atlases match exact Git identities/headers; round-nearest BC3 alpha decode reproduces 77/77 alpha>0 bboxes/counts and 77/77 alpha>=128 counts. 77/77 source/Korean pairs match current metadata and 2 structural regions remain preserve-only. PASS is stock reconstruction-prior only; canonical-HD/CLEAN_PLATE/candidate gates remain HOLD_STRICT_RECHECK."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00125",
-        "result_sha": "e6c3159520d26b085bd8f28fda049320aabab511",
-        "status": "PASS",
-        "reason": "Durable exact result. 4/4 canonical SHA-256 identities, native/irregular canvases, RGBA modes and decoded RGBA byte equations match current inventory; all four canonical queue-path sources are absent at the exact result SHA; all 6 physical Total Rank -> 종합 랭크 occurrences match current metadata. Rejected Release geometry is retired with no replacement coordinates fabricated. PASS is source-reacquisition PREFLIGHT_ONLY evidence under candidate-completion-first."
+        "reason": "Durable exact current-contract repair. The evidence/task record now pins the actual current localization automation contract e6feafaf6c0719e59c1bae4dc7b92610e5beb411 and exact current queue blob 46f5ece498f2a0dabff2b32678935a8dc57e9e82; the false A00121 contract fingerprint is not reused. C rechecked unchanged accepted content: 4/4 canonical inventory identities/canvases and 24/24 current translations. All four canonical source paths are absent, so pixel/header/orientation/CLEAN_PLATE/candidate gates remain fail-closed. PASS is PREFLIGHT_ONLY; no candidate/static approval."
       }
     ],
-    "source_identity_validation": "REWORK_A00121_FALSE_QA_CONTRACT_FINGERPRINT_CONTENT_IDENTITIES_STILL_4_OF_4__PASS_B00122_4_OF_4_CANONICAL_INVENTORY_GATES_38_OF_38_SEMANTICS__PASS_A00123_CURRENT_CONTRACT_REDECODE_3_OF_3_STOCK_77_OF_77_METRICS_77_OF_77_SEMANTICS__PASS_B00125_4_OF_4_CANONICAL_REACQUISITION_GATES_6_PHYSICAL_SEMANTICS",
-    "canonical_semantic_validation": "PASS_A00121_24_OF_24_CONTENT__B00122_38_OF_38__A00123_77_OF_77_PLUS_2_PRESERVE__B00125_6_OF_6_PHYSICAL",
-    "geometry_mapping_validation": "A00121_NO_PIXEL_GEOMETRY_FABRICATED_CONTENT_UNCHANGED_BUT_FINGERPRINT_REWORK__B00122_ZERO_PRIOR_RELEASE_GEOMETRY_REUSED_ZERO_PIXEL_GEOMETRY_FABRICATED__A00123_77_OF_77_STOCK_ALPHA_BBOX_COUNTS_REPRODUCED_ROUND_NEAREST__B00125_4_OF_4_REJECTED_RELEASE_GEOMETRIES_RETIRED_ZERO_REPLACEMENT_COORDINATES",
-    "current_contract_compatibility": "LATEST_CANDIDATE_FIRST_POLICY_REVIEWED__PASS_B00122_A00123_B00125_AS_LIMITED_PREFLIGHT_ONLY_EVIDENCE_NO_CANDIDATE_PROMOTION__REWORK_A00121_MACHINE_READABLE_QA_CONTRACT_FINGERPRINT_INCORRECT",
+    "source_identity_validation": "PASS_A00126_3_OF_3_CANONICAL_INVENTORY_IDENTITIES_36_OF_36_SEMANTICS_QUEUE_FINGERPRINT_REPAIRED__PASS_B00127_4_OF_4_CANONICAL_IDENTITIES_36_38_DISTINCT_10_SEMANTICS_14_PHYSICAL__PASS_A00128_CURRENT_CONTRACT_FINGERPRINT_4_OF_4_IDENTITIES_24_OF_24_TRANSLATIONS",
+    "canonical_semantic_validation": "PASS_A00126_36_OF_36__B00127_10_OF_10_SEMANTIC_ENTRIES_14_PHYSICAL__A00128_24_OF_24",
+    "geometry_mapping_validation": "A00126_ZERO_REJECTED_RELEASE_GEOMETRY_REUSED_ZERO_PIXEL_GEOMETRY_FABRICATED__B00127_INVALID_DEDUP_RETIRED_ZERO_RELEASE_GEOMETRY_REUSED__A00128_ACCEPTED_WORK_ORDERS_UNCHANGED_ZERO_PIXEL_GEOMETRY_ADDED",
+    "current_contract_compatibility": "PASS_ALL_THREE_AS_LIMITED_PREFLIGHT_SOURCE_REACQUISITION_OR_FINGERPRINT_REPAIR_EVIDENCE__CURRENT_CANDIDATE_FIRST_POLICY_DOES_NOT_GRANT_CANDIDATE_STATIC_APPROVAL__EXACT_SOURCE_AND_CANDIDATE_GATES_REMAIN_HOLD",
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
     "actionable_localize_text_after": 93,
     "pending_production_localize_text_after": 76,
     "superseded_inputs": [],
     "newer_disjoint_producers": [
-      "LOCALIZATION-LOCALIZATION_A-00126",
-      "LOCALIZATION-LOCALIZATION_B-00127",
       "LOCALIZATION-LOCALIZATION_B-00129"
     ],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-1941-C118/C118_Q00016_INDEPENDENT_QA_BATCH.json",
-    "rework_required_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00121@2b879eaa22e033f120728f0ec3849bcc78b04290"
-    ],
+    "report": "localization/graphics/role_C/20260929-1954-C119/C119_Q00017_INDEPENDENT_QA_BATCH.json",
+    "rework_required_inputs": [],
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00122@9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
-      "LOCALIZATION-LOCALIZATION_A-00123@910cf76e9df41ff2549fabbd1f34c4409ab69985",
-      "LOCALIZATION-LOCALIZATION_B-00125@e6c3159520d26b085bd8f28fda049320aabab511"
+      "LOCALIZATION-LOCALIZATION_A-00126@97151db9a41e34c417cf355ad8f5e88056d3b78d",
+      "LOCALIZATION-LOCALIZATION_B-00127@c5495ee17aee1a6030191a9e75fef3c571b50d51",
+      "LOCALIZATION-LOCALIZATION_A-00128@aec73fc98cb8e7f6de792e8d113a68a3f9971035"
     ]
   }
 }
