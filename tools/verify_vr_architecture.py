@@ -32,6 +32,7 @@ required = [
     "src/vr/game/outrun_renderer_r29.cpp",
     "src/vr/d3d9/stereo_renderer.cpp",
     "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "src/vr/d3d9/stereo_renderer_r20_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
@@ -247,8 +248,26 @@ if installer_start >= 0 and installer_end > installer_start:
     if "RestoreCullingCamera()" in worker:
         raise SystemExit("R23 installer thread must not mutate live camera/projection memory")
 
-# R20-R23 installation must fail fast and publish READY only after disabled-first
+# R13/R20-R23 installation must fail fast and publish READY only after disabled-first
 # hook transactions are enabled.
+require(
+    "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "#include \"r13_bridge.hpp\"",
+    "#include \"stereo_renderer.cpp\"",
+    "#include \"stereo_renderer_r13_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc",
+    "R13InstallState",
+    "R13OverlayReady",
+    "R13EnsureAckState",
+    "R13ReadGpuCompletedFrame",
+    "R13ForceMonoShadow",
+    "R13CaptureDrawTimeEffect",
+    "R13UnsafeTransitionFrames",
+    "InlineHook::StartDisabled",
+    "single-execution MRT/occlusion fallback",
+)
 require(
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "#include \"stereo_renderer_r13.cpp\"",

@@ -4,7 +4,7 @@
 Set 01 F04 records that stable facades still hide historical .cpp include chains.
 Phase 1 extracted renderer R13 into an include-free overlay. Phase 2 did the same
 for renderer R23/R27/R28. Phases 3-5 flattened the production D3D9Ex R15/R14/R13
-wrapper edges. Phases 6-16 flatten the default stereo R34/R33/R32/R31/R30/R29/R26/R23/R22/R21/R20 wrapper edges
+wrapper edges. Phases 6-17 flatten the default stereo R34/R33/R32/R31/R30/R29/R26/R23/R22/R21/R20/R13 wrapper edges
 into include-free overlays while preserving the historical translation-unit
 wrappers for compatibility/build-graph ownership. These steps change source
 ownership only; runtime policy must remain unchanged.
@@ -58,6 +58,8 @@ ex_r14_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc"
 ex_r15_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r15.cpp"
 ex_r15_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc"
 ex_facade_rel = "src/vr/d3d9/ex_device_pipeline.cpp"
+stereo_r13_wrapper_rel = "src/vr/d3d9/stereo_renderer_r13.cpp"
+stereo_r13_overlay_rel = "src/vr/d3d9/stereo_renderer_r13_overlay.inc"
 stereo_r20_wrapper_rel = "src/vr/d3d9/stereo_renderer_r20.cpp"
 stereo_r20_overlay_rel = "src/vr/d3d9/stereo_renderer_r20_overlay.inc"
 stereo_r21_wrapper_rel = "src/vr/d3d9/stereo_renderer_r21.cpp"
@@ -95,6 +97,8 @@ ex_r14_overlay = read(ex_r14_overlay_rel)
 ex_r15_wrapper = read(ex_r15_wrapper_rel)
 ex_r15_overlay = read(ex_r15_overlay_rel)
 ex_facade = read(ex_facade_rel)
+stereo_r13_wrapper = read(stereo_r13_wrapper_rel)
+stereo_r13_overlay = read(stereo_r13_overlay_rel)
 stereo_r20_wrapper = read(stereo_r20_wrapper_rel)
 stereo_r20_overlay = read(stereo_r20_overlay_rel)
 stereo_r21_wrapper = read(stereo_r21_wrapper_rel)
@@ -300,6 +304,33 @@ require_order(
     '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
+)
+
+require_order(
+    stereo_r13_wrapper,
+    stereo_r13_wrapper_rel,
+    '#include "r13_bridge.hpp"',
+    '#include "stereo_renderer.cpp"',
+    '#include "stereo_renderer_r13_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in stereo_r13_wrapper:
+    raise SystemExit("Stereo R13 compatibility wrapper regained implementation body")
+if "#include" in stereo_r13_overlay:
+    raise SystemExit("Stereo R13 overlay must remain include-free")
+require(
+    stereo_r13_overlay,
+    stereo_r13_overlay_rel,
+    "namespace OutRunVRStereo",
+    "R13InstallState",
+    "R13OverlayReady",
+    "R13EnsureAckState",
+    "R13ReadGpuCompletedFrame",
+    "R13ForceMonoShadow",
+    "R13CaptureDrawTimeEffect",
+    "R13UnsafeTransitionFrames",
+    "InlineHook::StartDisabled",
+    "VR R13: stereo hardening ACTIVE",
+    "single-execution MRT/occlusion fallback",
 )
 
 require_order(
@@ -580,6 +611,7 @@ require(
     "stereo remains fail-closed",
 )
 for stale_stereo_owner in (
+    '#include "stereo_renderer_r13.cpp"',
     '#include "stereo_renderer_r20.cpp"',
     '#include "stereo_renderer_r21.cpp"',
     '#include "stereo_renderer_r22.cpp"',
@@ -604,7 +636,9 @@ require_order(
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "stereo_renderer_r30_r26_safe.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r13.cpp"',
+    '#include "r13_bridge.hpp"',
+    '#include "stereo_renderer.cpp"',
+    '#include "stereo_renderer_r13_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "stereo_renderer_r20_overlay.inc"',
     '#include "stereo_renderer_r21_overlay.inc"',
@@ -629,8 +663,10 @@ require_order(
     '#include "stereo_renderer_r34_overlay.inc"',
 )
 
-r13_pos = stereo_facade.find('#include "stereo_renderer_r13.cpp"')
-r20_runtime_pos = stereo_facade.find('#include "../runtime_eligibility.hpp"', r13_pos)
+r13_bridge_pos = stereo_facade.find('#include "r13_bridge.hpp"')
+r9_base_pos = stereo_facade.find('#include "stereo_renderer.cpp"')
+r13_overlay_pos = stereo_facade.find('#include "stereo_renderer_r13_overlay.inc"')
+r20_runtime_pos = stereo_facade.find('#include "../runtime_eligibility.hpp"', r13_overlay_pos)
 r20_overlay_pos = stereo_facade.find('#include "stereo_renderer_r20_overlay.inc"')
 r21_overlay_pos = stereo_facade.find('#include "stereo_renderer_r21_overlay.inc"')
 r22_overlay_pos = stereo_facade.find('#include "stereo_renderer_r22_overlay.inc"')
@@ -642,12 +678,13 @@ r29_overlay_pos = stereo_facade.find('#include "stereo_renderer_r29_overlay.inc"
 r33_overlay_pos = stereo_facade.find('#include "stereo_renderer_r33_overlay.inc"')
 r34_semantics_pos = stereo_facade.rfind('#include "vr/game/render_semantics.hpp"')
 r34_namespace_pos = stereo_facade.find("namespace OutRunVRD3D9ExUpgradeR13")
-if min(r13_pos, r20_runtime_pos, r20_overlay_pos, r21_overlay_pos, r22_overlay_pos,
-       r23_overlay_pos, r26_semantics_pos, r26_overlay_pos, r29_semantics_pos,
-       r29_overlay_pos, r33_overlay_pos, r34_semantics_pos, r34_namespace_pos) < 0:
+if min(r13_bridge_pos, r9_base_pos, r13_overlay_pos, r20_runtime_pos, r20_overlay_pos,
+       r21_overlay_pos, r22_overlay_pos, r23_overlay_pos, r26_semantics_pos,
+       r26_overlay_pos, r29_semantics_pos, r29_overlay_pos, r33_overlay_pos,
+       r34_semantics_pos, r34_namespace_pos) < 0:
     raise SystemExit("production stereo facade semantic include boundary missing")
-if not (r13_pos < r20_runtime_pos < r20_overlay_pos < r21_overlay_pos < r22_overlay_pos < r23_overlay_pos < r26_semantics_pos < r26_overlay_pos):
-    raise SystemExit("R20/R21/R22/R23/R26 production ownership boundary moved outside R13 -> runtime eligibility -> R20 -> R21 -> R22 -> R23 -> R26 order")
+if not (r13_bridge_pos < r9_base_pos < r13_overlay_pos < r20_runtime_pos < r20_overlay_pos < r21_overlay_pos < r22_overlay_pos < r23_overlay_pos < r26_semantics_pos < r26_overlay_pos):
+    raise SystemExit("R13/R20/R21/R22/R23/R26 production ownership boundary moved outside r13_bridge -> R9 base -> R13 -> runtime eligibility -> R20 -> R21 -> R22 -> R23 -> R26 order")
 if not (r26_overlay_pos < r29_semantics_pos < r29_overlay_pos):
     raise SystemExit("R29 semantic prelude moved outside the R26 -> R29 overlay boundary")
 if not (r33_overlay_pos < r34_semantics_pos < r34_namespace_pos):
@@ -697,6 +734,12 @@ require(
     "'src/vr/d3d9/ex_device_upgrade_r15_overlay.inc' = @(",
     "D3DSBT_ALL",
     "Ex promotion rolled back transactionally",
+    "'src/vr/d3d9/stereo_renderer_r13_overlay.inc' = @(",
+    "R13InstallState",
+    "R13OverlayReady",
+    "R13EnsureAckState",
+    "R13ForceMonoShadow",
+    "single-execution MRT/occlusion fallback",
     "'src/vr/d3d9/stereo_renderer_r20_overlay.inc' = @(",
     "R20InstallState",
     "R20StereoEligibilityGate",
@@ -751,6 +794,7 @@ for stale_guard in (
     "'src/vr/d3d9/ex_device_upgrade_r13.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(",
+    "'src/vr/d3d9/stereo_renderer_r13.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r20.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r21.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r22.cpp' = @(",
@@ -768,4 +812,4 @@ for stale_guard in (
             f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
         )
 
-print("VR facade modularization F04 phase 16: PASS")
+print("VR facade modularization F04 phase 17: PASS")

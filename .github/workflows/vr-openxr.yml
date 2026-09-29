@@ -64,6 +64,14 @@ jobs:
               'SafetyOverlayReady',
               'BaselineVerified'
             )
+            'src/vr/d3d9/stereo_renderer_r13_overlay.inc' = @(
+              'R13InstallState',
+              'R13OverlayReady',
+              'R13EnsureAckState',
+              'R13ForceMonoShadow',
+              'single-execution MRT/occlusion fallback',
+              'StartDisabled'
+            )
             'src/vr/d3d9/stereo_renderer_r20_overlay.inc' = @(
               'R20InstallState',
               'R20StereoEligibilityGate',
