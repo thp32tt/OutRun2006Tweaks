@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T20:59:10+09:00",
+  "updated_at_kst": "2026-09-29T21:14:34.313+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -841,99 +841,86 @@
     ]
   },
   "latest_c_batch_qa": {
-    "recorded_at_kst": "2026-09-29T20:59:10+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00142",
-    "qa_batch_id": "Q00020",
-    "run": "C122",
-    "result": "PASS_Q00020_FOUR_INPUTS_PASS_ONE_PRIOR_PASS_REUSED_NO_DDS_RUNTIME_UNTESTED",
-    "base_head": "02ca6a8092928f8183c380c4f47f866fd9986208",
-    "current_qa_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "recorded_at_kst": "2026-09-29T21:14:34.313+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00145",
+    "qa_batch_id": "Q00021",
+    "run": "C123",
+    "result": "PASS_Q00021_TWO_INPUTS_PASS_CURRENT_SOURCE_ACQUISITION_POLICY_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "4883a0706adbfdfee090d96a0edb43cdef6730e1",
+    "current_qa_contract_blob_sha": "7d8a39b52f54c34b3305f54b86c43979bd7f6952",
     "current_controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00136@9e66a8c5d7589c7dd0e06584b9f225f3769dc54d",
-      "LOCALIZATION-LOCALIZATION_A-00131@23af3e8e08a360303c36e81c655a20b79bd209d9",
-      "LOCALIZATION-LOCALIZATION_A-00139@a950e147519d79c526c5d9e66e99d7ced4f9e8da",
-      "LOCALIZATION-LOCALIZATION_B-00138@0f03eaaa98e7016024ad4ff88fa1acb57d6cde84"
+      "LOCALIZATION-LOCALIZATION_A-00140@4202064ee1b45656ace1d98f6d9f844e65840a51",
+      "LOCALIZATION-LOCALIZATION_B-00141@02ca6a8092928f8183c380c4f47f866fd9986208"
     ],
     "reviewed_indices": [
-      34,
-      44,
-      52,
-      55,
-      119,
-      140,
-      152,
-      154,
-      159,
-      163,
-      164,
-      172,
-      173,
-      201
+      46,
+      48,
+      50,
+      62,
+      95,
+      101,
+      137,
+      217
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00136",
-        "result_sha": "9e66a8c5d7589c7dd0e06584b9f225f3769dc54d",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00140",
+        "result_sha": "4202064ee1b45656ace1d98f6d9f844e65840a51",
         "status": "PASS",
-        "reason": "Exact producer result already received independent PASS in Q00019/C121 under the same current schema9 contract, inventory and transcription fingerprints. Q00020 reuses that machine-readable PASS and does not repeat heavy QA. The four canonical sources/candidates remain absent and no newer candidate/source fingerprint exists for indices 34/44/52/172, so the limited PREFLIGHT_ONLY PASS remains valid and is not superseded."
+        "reason": "Durable exact producer result. C independently matched 4/4 current canonical inventory SHA-256/canvas/RGBA identities for indices 95/101/137/217 and all 37/37 current semantic entries. The START context collision is real in current canonical transcriptions (시작 at 51/52/53/57/172; 출발 at 63/206/214/217), so global source-string de-dup is correctly forbidden. Exact queue-path sources and canonical-v2 candidates were absent at RESULT_SHA and remain absent at merge HEAD, with no newer same-asset candidate/source fingerprint. PASS is limited PREFLIGHT_ONLY semantic/source-lineage evidence, not candidate/static approval. Current contract 7d8a39b... makes branch absence non-blocking; future production must acquire an exact canonical source rather than repeat absence-only preflight. This C dispatch remained GitHub-only as explicitly required by the task."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00131",
-        "result_sha": "23af3e8e08a360303c36e81c655a20b79bd209d9",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00141",
+        "result_sha": "02ca6a8092928f8183c380c4f47f866fd9986208",
         "status": "PASS",
-        "reason": "Durable exact producer result. C independently matched 2/2 current canonical inventory SHA-256/canvas/RGBA identities for indices 55/119 and 2/2 current source/Korean semantic pairs. Exact canonical queue-path DDS sources are absent both at RESULT_SHA and merge HEAD. The old 2048x256 DXT5 Release mask/CLEAN_PLATE/safe-bbox lineage is explicitly retired as canonical authority; current schema9 routing changes future production only. PASS is limited PREFLIGHT_ONLY source-reacquisition evidence, not candidate/static approval."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00139",
-        "result_sha": "a950e147519d79c526c5d9e66e99d7ced4f9e8da",
-        "status": "PASS",
-        "reason": "Durable exact producer result. C independently matched 4/4 canonical inventory SHA-256/canvas/RGBA identities for indices 159/163/173/201 and all 77/77 current semantic pairs. Exact canonical queue-path sources are absent at RESULT_SHA and merge HEAD. Semantic family reuse is translation-only; asset-specific style/geometry, masks, CLEAN_PLATE, safe bboxes, DDS candidate containment and English-source comparison remain fail-closed. PASS is limited PREFLIGHT_ONLY evidence."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00138",
-        "result_sha": "0f03eaaa98e7016024ad4ff88fa1acb57d6cde84",
-        "status": "PASS",
-        "reason": "Durable exact producer result. C independently matched 4/4 canonical inventory SHA-256/canvas/RGBA identities for indices 140/152/154/164 and 16/16 current semantic pairs. Exact canonical queue-path sources are absent at RESULT_SHA and merge HEAD. SHOWROOM/SELECT LICENSE reuse is semantic-only; style/geometry template reuse, source masks, CLEAN_PLATE, candidate-safe bboxes and final DDS gates remain held. PASS is limited PREFLIGHT_ONLY evidence."
+        "reason": "Durable exact producer result. C independently matched 4/4 current canonical inventory SHA-256/canvas/RGBA identities for indices 46/48/50/62 and all 42/42 current semantic entries. Index 50 still has four unresolved semantic-to-pixel bindings (PLEASE WAIT, PLAYERS, YOUR FRIENDS, FRIEND REQUEST); the producer correctly retained those holds. Its Release canvases are 4x the current canonical inventory canvases and remain nonauthoritative for current masks/geometry. Exact queue-path sources and canonical-v2 candidates were absent at RESULT_SHA and remain absent at merge HEAD, with no newer same-asset candidate/source fingerprint. PASS is limited PREFLIGHT_ONLY evidence. Current contract 7d8a39b... makes branch absence non-blocking; future work must acquire exact canonical source bytes rather than emit another absence-only preflight. This C dispatch used GitHub only."
       }
     ],
-    "source_identity_validation": "PASS_14_OF_14_CANONICAL_INVENTORY_IDENTITIES__B00136_4_REUSED_FROM_Q00019__A00131_2_OF_2__A00139_4_OF_4__B00138_4_OF_4",
-    "canonical_semantic_validation": "PASS_B00136_18_LOCALIZABLE_PLUS_1_PRESERVE_REUSED__A00131_2_OF_2__A00139_77_OF_77__B00138_16_OF_16",
-    "geometry_mapping_validation": "ZERO_CANONICAL_PIXEL_GEOMETRY_PROMOTED__RELEASE_STOCK_GEOMETRY_RETIRED_OR_CONDITIONAL_ONLY__FAMILY_FAST_PATH_SEMANTIC_REUSE_ONLY",
-    "current_contract_compatibility": "PASS_ALL_FOUR_AS_LIMITED_PREFLIGHT_SOURCE_REACQUISITION_EVIDENCE__SCHEMA9_FAST_PATH_DOES_NOT_RELAX_CANONICAL_SOURCE_OR_CANDIDATE_QA",
+    "source_identity_validation": "PASS_8_OF_8_CURRENT_CANONICAL_INVENTORY_SHA256_CANVAS_RGBA_IDENTITIES",
+    "canonical_semantic_validation": "PASS_A00140_37_OF_37_CURRENT_SEMANTICS_WITH_START_CONTEXT_COLLISION_CONFIRMED__B00141_42_OF_42_CURRENT_SEMANTICS_WITH_INDEX50_FOUR_BINDINGS_HELD",
+    "geometry_mapping_validation": "ZERO_CANONICAL_PIXEL_GEOMETRY_PROMOTED__NO_CURRENT_CANONICAL_V2_CANDIDATE__RELEASE_4X_GEOMETRY_NONAUTHORITATIVE",
+    "current_contract_compatibility": "PASS_LIMITED_PREFLIGHT_EVIDENCE__CURRENT_7D8A39B_SOURCE_ACQUISITION_POLICY_SUPERSEDES_BRANCH_ABSENCE_AS_PRODUCTION_BLOCKER__Q00021_EXECUTION_GITHUB_ONLY",
     "readiness_reconciliation": {
       "classification": "PREFLIGHT_ONLY",
       "indices": [
-        34,
-        44,
-        52,
-        55,
-        119,
-        140,
-        152,
-        154,
-        159,
-        163,
-        164,
-        172,
-        173,
-        201
+        46,
+        48,
+        50,
+        62,
+        95,
+        101,
+        137,
+        217
       ],
-      "reason": "Exact canonical user-HD DDS bytes are absent from Git at the queue paths; no reviewed asset can legally advance to RENDER_READY or ONE_STAGE_TO_RENDER from the evidence in this batch."
+      "reason": "No current candidate exists and asset-specific canonical source-effect/removal/protected masks, verified CLEAN_PLATE and safe-bbox evidence are not yet materialized. Branch absence itself is no longer a valid blocker; a future producer must acquire exact canonical source bytes and continue. Index50 also retains four unresolved semantic-to-pixel bindings."
+    },
+    "source_acquisition_policy": {
+      "contract_blob_sha": "7d8a39b52f54c34b3305f54b86c43979bd7f6952",
+      "contract_default_order": [
+        "APPROVED_GOOGLE_DRIVE_PER_FILE",
+        "PINNED_GITHUB_TAG_DIRECT_FILE",
+        "PINNED_GITHUB_RELEASE_FALLBACK"
+      ],
+      "q00021_execution_override": "GITHUB_ONLY_PER_USER_DISPATCH__GOOGLE_DRIVE_NOT_USED",
+      "pinned_repository": "envido32/OR2006Sprites",
+      "pinned_tag": "v0.25.10a",
+      "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "pinned_release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "pinned_release_asset_id": 306630789,
+      "pinned_zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "q00021_required_behavior": "WHEN_FOLLOWING_THIS_GITHUB_ONLY_DISPATCH_USE_PINNED_TAG_DIRECT_FILE_IF_EXACT_INVENTORY_MATCH_ELSE_PINNED_RELEASE_FALLBACK__VERIFY_PER_ASSET_CANONICAL_IDENTITY__DO_NOT_REPEAT_BRANCH_ABSENCE_ONLY_PREFLIGHT"
     },
     "heavy_qa_reuse": {
       "repeated_heavy_pixel_qa": false,
-      "reused_prior_pass": [
-        "LOCALIZATION-LOCALIZATION_B-00136@9e66a8c5d7589c7dd0e06584b9f225f3769dc54d from Q00019/C121"
-      ],
-      "newly_rechecked_inventory_identities": 10,
-      "newly_rechecked_semantic_pairs": 95,
-      "intentionally_not_reused_as_canonical": [
-        "Release/stock DDS identity without exact canonical SHA-256 equality",
-        "Release/stock header/orientation/effect/removal-mask/CLEAN_PLATE/safe-bbox geometry",
-        "Family/template style or geometry without asset-specific canonical proof",
-        "Absent-source candidate containment or English-source comparison"
-      ]
+      "reason": "Neither producer result contains a new/current Korean DDS candidate. Candidate-only DDS header/mipmap/alpha/orientation, zero-pixel containment and English-source-vs-Korean-candidate checks remain inapplicable/fail-closed rather than being repeated or falsely passed.",
+      "newly_rechecked_inventory_identities": 8,
+      "newly_rechecked_semantic_entries": 79,
+      "start_context_collision_rechecked": true,
+      "exact_result_sha_source_presence_checks": 8,
+      "exact_result_sha_candidate_presence_checks": 8,
+      "merge_head_source_presence_checks": 8,
+      "merge_head_candidate_presence_checks": 8
     },
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
@@ -941,20 +928,17 @@
     "pending_production_localize_text_after": 76,
     "superseded_inputs": [],
     "newer_disjoint_producers": [
-      "LOCALIZATION-LOCALIZATION_A-00140",
-      "LOCALIZATION-LOCALIZATION_B-00141"
+      "LOCALIZATION-LOCALIZATION_A-00143"
     ],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-2059-C122/C122_Q00020_INDEPENDENT_QA_BATCH.json",
+    "report": "localization/graphics/role_C/20260929-2114-C123/C123_Q00021_INDEPENDENT_QA_BATCH.json",
     "rework_required_inputs": [],
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00136@9e66a8c5d7589c7dd0e06584b9f225f3769dc54d",
-      "LOCALIZATION-LOCALIZATION_A-00131@23af3e8e08a360303c36e81c655a20b79bd209d9",
-      "LOCALIZATION-LOCALIZATION_A-00139@a950e147519d79c526c5d9e66e99d7ced4f9e8da",
-      "LOCALIZATION-LOCALIZATION_B-00138@0f03eaaa98e7016024ad4ff88fa1acb57d6cde84"
+      "LOCALIZATION-LOCALIZATION_A-00140@4202064ee1b45656ace1d98f6d9f844e65840a51",
+      "LOCALIZATION-LOCALIZATION_B-00141@02ca6a8092928f8183c380c4f47f866fd9986208"
     ]
   }
 }

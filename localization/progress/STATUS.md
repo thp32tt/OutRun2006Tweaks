@@ -1055,3 +1055,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Exact canonical queue-path DDS sources remain absent for the reviewed assets. Release/stock header/orientation/mask/CLEAN_PLATE/safe-bbox geometry is not promoted; family/template fast path authorizes semantic reuse only, never asset-specific style/geometry without canonical proof.
 - All reviewed assets classify **PREFLIGHT_ONLY**. Candidate DDS changes 0, new static approvals 0, runtime approvals 0. Queue remains **137 = 93 + 31 + 9 + 1 + 3**; pending production localize_text **76**; canonical segments **753**.
 - Newer producer results A00140/B00141 are disjoint and preserved. Report: `localization/graphics/role_C/20260929-2059-C122/C122_Q00020_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C123 Q00021 — 2026-09-29T21:14:34.313+09:00
+- QA inputs: A00140 `4202064` (95/101/137/217), B00141 `02ca6a8` (46/48/50/62).
+- Result: **PASS / PASS**, limited **PREFLIGHT_ONLY** evidence. **8/8** current canonical identities and **79/79** semantic entries rechecked; A00140 START context collision confirmed; B00141 index50 four unresolved bindings retained.
+- No Korean candidate DDS exists for these assets, so candidate-only DDS/alpha/orientation/1px/source-comparison gates remain **HOLD_STRICT_RECHECK**.
+- Current contract `7d8a39b52f54c34b3305f54b86c43979bd7f6952`: branch source absence is no longer a blocker. Q00021 remained GitHub-only per dispatch; pinned `v0.25.10a` GitHub source acquisition should be used before further production on these assets.
+- Queue counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2114-C123/C123_Q00021_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
