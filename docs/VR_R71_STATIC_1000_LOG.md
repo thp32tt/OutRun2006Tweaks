@@ -611,3 +611,42 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: design pure sampled-identity history helper only if it can be LEVEL0 proven.
+
+
+## Cycle 0029 — positive sampled-identity history contract
+
+Review lenses:
+1. architecture/control-flow — positive sampled-identity evidence;
+2. lifetime/reset/sync — sampled EVENT ownership separation;
+3. stereo/HUD/visual correctness — no renderer/HUD behavior change;
+4. hot path/frame pacing/copies/waits — pure metadata helper only;
+5. adversarial/falsification — partial RenderTo failure can still mean D3D11 sampling.
+
+Changes:
+- Added `SampleEvidence` and bounded `SampledHistory<SlotCount>` to `r41_skipped_release.hpp`.
+- The helper records only full exact identities: `clientPid + runGeneration + transportGeneration + slot + frameId`.
+- `Query()` returns `ExactSampled` only for that exact identity. Missing history, same producer/new frame, new transport generation, new run or another slot all remain `Unknown`. Absence is deliberately not proof of never-sampled ownership.
+- Extended the existing R41 LEVEL0 smoke with exact-match, slot-reuse, identity-mismatch, invalid-input and clear cases.
+- Extended `verify_vr_r32_review.py` so the positive-evidence contract is durable.
+- Runtime `main_r23.cpp` was not wired in this cycle.
+
+Important falsification:
+- `R23RenderProjection` submits eye 0 `RenderTo` before eye 1. A final `false` can therefore follow partial D3D11 sampling.
+- The future runtime hook must positively report whether direct-SRV sampling commands were issued; it cannot equate `freshProjectionRendered == false` with never-sampled.
+
+Commits:
+- `d3b5e5a316aa528d6eb88debb1d90524bfed9ab1`
+- `1b55a1e089fa7df6046008f43464c6aaeba01cae`
+- `de7a00820b11076148a7f8c00d9bc108004e39ed`
+
+Validation:
+- Exact-head GitHub Actions are queued behind the repository backlog:
+  - Build `36508474321 / 36508475118`
+  - OpenXR architecture `36508474271 / 36508475169`
+  - HUD Inspector `36508474268 / 36508475158`
+- AUTOMATION_VALIDATION: `LEVEL0_POSITIVE_SAMPLED_HISTORY_ADDED / EXACT_HEAD_CI_QUEUED`
+- RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+- Consume exact-head CI.
+- If green, design and test an explicit sampling-issued result at the `R23RenderProjection` boundary, including partial eye failure, before any transition release wiring.
