@@ -267,6 +267,8 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'NLPartSourceCount',
     'liveParticles',
     'managedTextureCreates',
+    'fileLoadCalls',
+    'fileLoadMaxUs',
     'vertexBufferCreates',
     'bufferDiscardLocks',
     'skyGlowUs',
@@ -276,6 +278,7 @@ require_all("src/vr/debug/perf_hitch_trace.hpp", [
     'struct ResourceSnapshot',
     'NoteManagedTextureCreate',
     'NoteTextureUpload',
+    'NoteFileLoad',
     'NoteVertexBufferCreate',
     'NoteIndexBufferCreate',
     'NoteBufferLock',
@@ -287,6 +290,12 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'OutRunVR::PerfHitch::NoteTextureUpload',
     'R81EstimateLevelBytes',
 ], "P8_R81_TEXTURE_STREAM_TIMING")
+require_all("src/hooks_framerate.cpp", [
+    'R81FileLoadPerfHook',
+    'R81FileLoadPerfDest',
+    'OutRunVR::PerfHitch::NoteFileLoad',
+    'Module::exe_ptr(0x4FBA0)',
+], "P8_R81_FILELOAD_STREAM_TIMING")
 require_all("src/hooks_uiscaling.cpp", [
     'R71RivalMarkerSpraniCall = 0xBB796',
     'Module::exe_ptr(0xBB6F5)',
