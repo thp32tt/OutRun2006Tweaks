@@ -488,3 +488,27 @@ Changed files:
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review presentation bootstrap/theater boundary.
+
+
+## Cycle 0022 — presentation bootstrap / theater boundary
+
+Review lenses:
+1. architecture/control flow;
+2. lifetime/reset/sync;
+3. stereo/HUD/visual correctness;
+4. hot path/frame pacing/copies/waits;
+5. adversarial/falsification.
+
+Finding/evidence:
+- Gameplay transition remains gated by IsUsableGameplayStereoFrame; removing Theater fallback would risk stale/partial stereo and is unsupported.
+- Evidence: R23UsableGameplayBootstrapFrame + PresentationTheater fallback.
+- No production/runtime, HUD classification, GPU wait/copy, or synchronization behavior changed.
+- Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+
+Changed files:
+- `docs/VR_R71_STATIC_1000_LOG.md`
+- `docs/automation/R71_STATIC_1000_STATE.json`
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review DirectGPU producer identity.
