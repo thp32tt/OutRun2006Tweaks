@@ -124,6 +124,8 @@ def main() -> int:
             "R71 renderer c64 guard lost generic-overlay non-promotion rationale"
         )
 
+    r30_source = R30_RENDERER.read_text(encoding="utf-8")
+
     # L1-VIS-002 / SkyGlow: the stereo world glow must be composited before
     # recognized HUD/non-world overlay draws. Present is only a fallback when
     # no pre-HUD attempt occurred; a failed pre-HUD attempt must not retry over UI.
@@ -155,7 +157,6 @@ def main() -> int:
     # DX9EX-FINGERPRINT-001: diagnostics may fingerprint exact queue owners,
     # projected screen effects, and generic queue overlays only while the queue
     # renderer is active. Fingerprints are bounded and never grant ownership.
-    r30_source = R30_RENDERER.read_text(encoding="utf-8")
     for marker in (
         "R30DrawFingerprintCapacity = 64",
         "R30FingerprintEligible(",
