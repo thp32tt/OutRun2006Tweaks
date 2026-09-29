@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vr/game/disasm_render_contract.hpp"
+
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -79,6 +81,32 @@ namespace OutRunVR::GameSemantic
             return RenderScope::ScreenHud;
         return CurrentScope;
     }
+
+    [[nodiscard]] constexpr RenderScope ScopeFromDisasmPolicy(
+        OutRunVR::DisasmContract::SpacePolicy policy) noexcept
+    {
+        switch (policy)
+        {
+        case OutRunVR::DisasmContract::SpacePolicy::ScreenHud:
+            return RenderScope::ScreenHud;
+        case OutRunVR::DisasmContract::SpacePolicy::WorldBillboard:
+            return RenderScope::WorldBillboard;
+        default:
+            return RenderScope::None;
+        }
+    }
+
+    [[nodiscard]] constexpr RenderScope ClassifyCriticalProducer(
+        std::uintptr_t callerRva) noexcept
+    {
+        return ScopeFromDisasmPolicy(
+            OutRunVR::DisasmContract::ClassifyCriticalProducer(callerRva));
+    }
+
+    static_assert(
+        ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud);
+    static_assert(
+        ClassifyCriticalProducer(0x000BB0FBu) == RenderScope::WorldBillboard);
 
     inline const char* Name(RenderScope scope) noexcept
     {
