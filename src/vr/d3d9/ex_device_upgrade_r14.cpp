@@ -129,6 +129,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             std::uint64_t shadowBytes = 0;
             bool countsAgainstGeneralBudget = false;
             bool countsAgainstEmergencyBudget = false;
+            bool selectorAtlas = false;
 
             ~R14ShadowEntry()
             {
@@ -173,6 +174,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<bool> R14FirstRetireLogged{false};
         std::atomic<bool> R14FirstConcurrentWriteLogged{false};
         std::atomic<bool> R14FirstEmergencyReserveLogged{false};
+        std::atomic<bool> R14FirstSelectorUploadLogged{false};
 
         struct R14InternalUploadScope
         {
@@ -514,6 +516,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 }
                 entry->countsAgainstGeneralBudget = !emergencyReserve;
                 entry->countsAgainstEmergencyBudget = emergencyReserve;
+                entry->selectorAtlas = emergencyReserve;
                 entry->validMask = levels >= R14MaxTrackedLevels
                     ? 0xFFFFFFFFu : ((1u << levels) - 1u);
                 device->AddRef();
@@ -1267,6 +1270,13 @@ namespace OutRunVRD3D9ExUpgradeR13
                     {
                         entry->dirtyMask &= ~bit;
                         ++R14ShadowUploads;
+                        if (entry->selectorAtlas &&
+                            !R14FirstSelectorUploadLogged.exchange(true))
+                        {
+                            spdlog::info(
+                                "VR R71 SELECTOR DIAG: exact 2048x2048 selector/car atlas CPU-shadow upload succeeded level={} bytes={}; if vehicle remains white, inspect other DirectOnly MANAGED textures and draw-time material/stage state",
+                                level, entry->shadowBytes);
+                        }
                     }
                     else
                     {
