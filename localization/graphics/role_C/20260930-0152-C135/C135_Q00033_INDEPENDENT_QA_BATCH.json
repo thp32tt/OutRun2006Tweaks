@@ -5,7 +5,7 @@
   "qa_batch_id": "Q00033",
   "lane": "LOCALIZATION_C",
   "target_branch": "korean-localization-clean",
-  "recorded_at_kst": "2026-09-30T01:52:18+09:00",
+  "recorded_at_kst": "2026-09-30T01:55:49+09:00",
   "base_head_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
   "qa_batch_inputs": [
     {
@@ -59,20 +59,20 @@
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
       "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
-      "status": "PASS",
-      "reason": "Current HEAD retains exact candidate blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17. Exact canonical 512x128 DXT5 source, mip/header structure, 8,646-pixel residue-closed removal envelope, zero decoded change outside edit blocks/safe bboxes, zero alpha change, exact '89/'86 preservation and flip-Y orientation are consistent. Independent C review of ENGLISH SOURCE / CLEAN PLATE / KOREAN CANDIDATE shows no English ghost residue, clipping, overlap, opaque box or protected-year damage. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+      "status": "REWORK_REQUIRED",
+      "reason": "Content precheck is visually/static-consistent on current blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614..., with no visible English residue, clipping, year damage or containment escape. However the immutable producer result B00167@1d0c05d29118192c5c10f40ee857fb26ae366622 fails the current C-batch exact-SHA validator: verify_automation_commit.py reports 'DDS changed but PASS reports contain no post-reset zero-pixel/protected-mask metrics'. C cannot promote a PASS disposition that the hosted Gate cannot validate. Re-emit current candidate lineage with a same-result machine-readable PASS report satisfying the current post-reset zero-pixel/protected-mask contract and durable task record. No static promotion is made by Q00033. RUNTIME_VALIDATION=UNTESTED."
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
       "result_sha": "bf650709edf84d1923544a497be2267f93578197",
-      "status": "PASS",
-      "reason": "Current HEAD retains exact candidate blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1. Exact canonical 2048x256 DXT5 source, mip/header structure, decoded allowed-region containment, zero alpha introduction outside permitted region and zero English-only residual alpha are consistent. Independent readable crop review shows the two Korean lines fully contained, source-direction slant preserved and no visible source-language ghosting or clipping. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+      "status": "REWORK_REQUIRED",
+      "reason": "Content precheck is visually/static-consistent on current blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce..., with no visible English residue, clipping or containment escape. However the immutable producer result B00160@bf650709edf84d1923544a497be2267f93578197 fails the current C-batch exact-SHA validator: verify_automation_commit.py reports 'DDS changed but no machine-readable PASS record exists in changed QA JSON'. C cannot promote a PASS disposition that the hosted Gate cannot validate. Re-emit the unchanged current candidate lineage with a current-contract machine-readable PASS QA JSON and durable task record. No static promotion is made by Q00033. RUNTIME_VALIDATION=UNTESTED."
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00176",
       "result_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
-      "status": "PASS",
-      "reason": "Current HEAD retains the exact e57374e3 candidate blob 905f0d05db3f094aeb93448548df1091238109cf / SHA-256 823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8. Exact canonical 2048x512 RGBA32 source/header/mip identity, five per-element safe-bbox containments, zero change/alpha change outside allowed regions and exact protected numeric marker are consistent. Independent C review of full and 2x text comparisons finds Korean MIX/OUTRUN/AVERAGE RANK labels legible with no English residue, clipping, overlap, seam or opaque box. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+      "status": "REWORK_REQUIRED",
+      "reason": "Content precheck is visually/static-consistent on current blob 905f0d05db3f094aeb93448548df1091238109cf / SHA-256 823c7691..., with 5/5 containment, protected numeric marker and no visible English residue/clipping. However the immutable producer result B00176@e57374e3735c3568b5e9f584d59a189fef58f356 fails the current C-batch exact-SHA validator: verify_automation_commit.py reports 'DDS changed but PASS reports contain no post-reset zero-pixel/protected-mask metrics'. C cannot promote a PASS disposition that the hosted Gate cannot validate. Re-emit the unchanged current candidate lineage with a same-result machine-readable PASS report satisfying the current post-reset zero-pixel/protected-mask contract and durable task record. No static promotion is made by Q00033. RUNTIME_VALIDATION=UNTESTED."
     }
   ],
   "reviewed_assets": [
@@ -95,7 +95,9 @@
       "containment": "PASS",
       "english_residue": "PASS_NONE_VISIBLE",
       "visual": "PASS",
-      "disposition": "PASS_STATIC_RUNTIME_UNTESTED"
+      "disposition": "REWORK_REQUIRED_IMMUTABLE_RESULT_AUTOMATION_CONTRACT",
+      "content_precheck": "PASS",
+      "static_promotion": false
     },
     {
       "index": 130,
@@ -108,7 +110,9 @@
       "protected_numeric_marker": "PASS_EXACT",
       "english_residue": "PASS_NONE_VISIBLE",
       "visual": "PASS",
-      "disposition": "PASS_STATIC_RUNTIME_UNTESTED"
+      "disposition": "REWORK_REQUIRED_IMMUTABLE_RESULT_AUTOMATION_CONTRACT",
+      "content_precheck": "PASS",
+      "static_promotion": false
     },
     {
       "index": 152,
@@ -121,15 +125,17 @@
       "protected_years": "PASS_EXACT",
       "english_residue": "PASS_NONE_VISIBLE",
       "visual": "PASS",
-      "disposition": "PASS_STATIC_RUNTIME_UNTESTED"
+      "disposition": "REWORK_REQUIRED_IMMUTABLE_RESULT_AUTOMATION_CONTRACT",
+      "content_precheck": "PASS",
+      "static_promotion": false
     }
   ],
   "shared_state": {
     "metadata_segments_changed": 0,
     "canonical_segments": 753,
     "actionable_localize_text": 93,
-    "pending_production_localize_text": 73,
-    "static_pass_added": 3,
+    "pending_production_localize_text": 76,
+    "static_pass_added": 0,
     "runtime_approvals_added": 0,
     "candidate_dds_modified_by_c": false
   },
@@ -138,13 +144,14 @@
     "LOCALIZATION-LOCALIZATION_B-00180@2af61fc8fd41e5ee6d8e4524914107682c591149"
   ],
   "validation": {
-    "mandatory_english_source_comparison": "RUN_FOR_ALL_VISUAL_MATERIAL__A00173_FAIL__THREE_CANDIDATES_PASS",
+    "mandatory_english_source_comparison": "RUN__A00173_VISUAL_FAIL__B00160_B00167_B00176_CONTENT_PRECHECK_PASS_NOT_PROMOTED",
     "zero_pixel_overflow": "PASS_THREE_CANDIDATES__A00173_NOT_PROMOTED",
     "dds_header_format_mip": "PASS_THREE_CANDIDATES_FROM_EXACT_RESULT_EVIDENCE",
     "alpha_transparency": "PASS_THREE_CANDIDATES__A00173_ALPHA_NUMERIC_PASS_BUT_VISUAL_RESIDUE_FAIL",
     "protected_artwork": "PASS_THREE_CANDIDATES",
     "orientation": "PASS_THREE_CANDIDATES",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "hosted_exact_producer_result_gate": "FIRST_RUN_FAILED_B00160_B00167_B00176_CURRENT_VERIFY_AUTOMATION_COMMIT_REQUIREMENTS__REPAIRED_TO_REWORK_REQUIRED"
   },
   "environment": {
     "n100_used": false,
@@ -159,5 +166,12 @@
   },
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "supersedes_failed_c_result_sha": "09aa0d54a2e82c71cf0532748c795fa127bde1d6",
+  "failed_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36601136283,
+    "conclusion": "failure",
+    "failed_step": "Verify exact producer SHAs in C batch"
+  }
 }

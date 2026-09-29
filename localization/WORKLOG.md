@@ -1643,3 +1643,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Queue reconciliation: actionable localize_text **93**, pending_artwork production **73**, canonical segments **753**. C modifies no DDS candidate bytes; new static passes **3**, runtime approvals **0**.
 - Newer disjoint A00179@7548b44b and B00180@2af61fc8 are preserved for later C consumption and receive no Q00033 disposition. No N100/local clone/worktree, GPT Library, Google Drive write, build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json`.
+
+## 2026-09-30 01:55 KST - C135 Q00033 GATE REPAIR
+
+- Validation-bearing result `09aa0d54a2e82c71cf0532748c795fa127bde1d6` failed `Localization Automation Gate` run **36601136283** only at **Verify exact producer SHAs in C batch**. All queue/controller/state/domain/C-lane structure checks passed.
+- Exact-SHA validator findings: B00167@1d0c05d and B00176@e57374e fail current post-reset zero-pixel/protected-mask machine-readable PASS-report requirements; B00160@bf65070 fails because its changed QA JSON does not expose a current-contract machine-readable PASS record.
+- Q00033 therefore fail-closes all three candidate dispositions from static PASS to **REWORK_REQUIRED (immutable result-SHA contract)**. Their content-level source-vs-Korean visual/static prechecks remain useful evidence but are **not promoted**. The three asset_queue static statuses from the failed C result are reverted to `pending_artwork`; pending production returns to **76**.
+- A00173/index99 remains independently **REWORK_REQUIRED** for visible English ghost silhouettes in CLEAN PLATE v3.
+- No candidate DDS bytes are changed. Producers must re-emit current candidate lineage with current-contract machine-readable QA + durable task record; no stale candidate substitution is permitted. `RUNTIME_VALIDATION=UNTESTED`.
