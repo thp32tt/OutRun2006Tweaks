@@ -73,8 +73,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "12ce7988c2330a526476d83e0079a3b81df7d45a",
+  "authoritative_result_sha": "12ce7988c2330a526476d83e0079a3b81df7d45a",
   "result_commit_message": "localization(A): narrow index111 rework geometry [AUTO:LOCALIZATION-LOCALIZATION_A-00241]",
-  "bookkeeping_note": "RESULT_SHA is filled only after verifying the immutable AUTO result commit. Producer automation_validation remains PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
+  "bookkeeping_note": "Verified immutable producer result 12ce7988c2330a526476d83e0079a3b81df7d45a contains only the A lane-local index111 rework-geometry evidence and durable task record. This bookkeeping commit is separate and does not replace C-batch validation authority. automation_validation remains PENDING/C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:27:35+09:00",
+  "bookkeeping_base_head_sha": "12ce7988c2330a526476d83e0079a3b81df7d45a"
 }
