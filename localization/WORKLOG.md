@@ -1661,3 +1661,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion work remains ahead of unrelated preflight. Newer B00183@8b7842b4 index112 current-contract QA re-emission is preserved for a later independent C batch; index99 direct CLEAN_PLATE rework and indices130/152 result-contract completion remain active priorities.
 - Counts unchanged: **137** queue rows, **93** actionable localize_text, **76** pending production, **753** canonical segments. C changes no candidate DDS bytes; new static approvals **0**; runtime approvals **0**. No N100/local clone/worktree, GPT Library, build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0208-C136/C136_Q00034_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING` before the single C batch Gate.
+
+## 2026-09-30 02:24 KST - C137 Q00035 INDEPENDENT CANDIDATE QA BATCH
+
+- Immutable input: B00183 `8b7842b4d6903e3ad6b518a95daff9bc37893e0e` (index112/D41D0B1). Disposition: **PASS**.
+- Exact candidate blob `30971e83...` equals current HEAD and C135's independently reviewed candidate; pinned source blob `278a518f...` and 1/1 semantic binding are unchanged. B00183 adds the current-contract machine-readable PASS record missing from the earlier B00160 exact-result Gate.
+- Heavy pixel/visual/DDS QA is reused for the unchanged fingerprint: DXT5 2048x256 mip1/header exact, zero outside-edit/source/protected changes, zero outside alpha change/introduction, readable flip-Y/slant PASS, no visible English residue/clipping, containment PASS.
+- Index112 is **STATIC_QA PASS / RUNTIME_UNTESTED**. Pending production **76 -> 75**; actionable localize_text **93**, canonical segments **753**. C changes no DDS bytes and adds no runtime approval.
+- A00182@e78b9160 index237 is preserved without Q00035 disposition. Candidate completion remains ahead of unrelated PREFLIGHT_ONLY work.
+- Report: `localization/graphics/role_C/20260930-0224-C137/C137_Q00035_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
