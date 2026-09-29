@@ -9,6 +9,7 @@ known regression fixes from being silently omitted by later builds.
 
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 import sys
@@ -175,13 +176,25 @@ require_all("vrhost/src/main_r23.cpp", [
     'dedicated per-slot GPU-completion ACK only when',
 ], "P8_DIRECTGPU_COPY_ACK_ORDER")
 
-# PASS 9 — canonical package builders explicitly pin R26+HUD.
+# PASS 9 — canonical package builders explicitly pin R26+HUD and bind run
+# identity to VR_ONE_CLICK_TARGET.json rather than duplicating a stale literal.
+one_click_target = json.loads(read("tools/VR_ONE_CLICK_TARGET.json"))
+canonical_variant_id = str(one_click_target.get("VariantId", "")).strip()
+if canonical_variant_id != "R69_FIXPACK":
+    errors.append(
+        "P9_PC_FAST_TARGET_VARIANT: expected canonical one-click VariantId "
+        f"R69_FIXPACK, got {canonical_variant_id!r}"
+    )
+else:
+    passes.append("P9_PC_FAST_TARGET_VARIANT")
 require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
-    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69'",
-    "VariantId = 'ACTIVE_R26_HUD_R69'",
+    "$canonicalVariantId = [string]$oneClickTarget.VariantId",
+    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') $canonicalVariantId",
+    "Set-Content (Join-Path $dxvkBackendDir 'VARIANT_ID.txt') $canonicalVariantId",
+    "VariantId = $canonicalVariantId",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
@@ -227,7 +240,6 @@ forbid(".github/workflows/vr-openxr.yml",
 
 # PASS 10 — the binary contract must cover every new exact production edge.
 contract = read("docs/VR_BINARY_CONTRACT.json")
-import json
 contract_json = json.loads(contract)
 bad_sig_lengths = [
     item.get("id", "<unknown>")
