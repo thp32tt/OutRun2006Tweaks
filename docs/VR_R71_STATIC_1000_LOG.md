@@ -581,3 +581,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review candidate rejection diagnostics.
+
+
+## Cycle 0027 — candidate rejection diagnostics
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- candidateRejectReason and final-layer counters provide bounded evidence for selection failures without changing renderer semantics; no additional broad HUD heuristic is justified.
+- Evidence: candidateRejectReason + R23FinalCounters/R23PipelineWindow.
+- Production/runtime behavior unchanged; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review release-owner interaction at generation changes.
