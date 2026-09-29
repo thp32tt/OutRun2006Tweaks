@@ -566,3 +566,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review projection cache freshness counters.
+
+
+## Cycle 0026 — projection cache freshness telemetry
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Fresh/cached projection counters and pipeline timing windows already distinguish source refresh from XR resubmission; hold/debounce tuning still requires HMD telemetry.
+- Evidence: R42ProjectionRefreshes/R42SameFrameProjectionReuses/R23PipelineWindow.
+- Production/runtime behavior unchanged; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review candidate rejection diagnostics.
