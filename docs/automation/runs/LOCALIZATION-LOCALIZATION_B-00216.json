@@ -1,0 +1,66 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
+  "wave_id": "P00114",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:56:06+09:00",
+  "base_head_sha": "9e6fcc1d565c913e7b0417be3a97b7ba05c1fa23",
+  "base_sha": "9e6fcc1d565c913e7b0417be3a97b7ba05c1fa23",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX226_VERIFIER_PASS_QA_REEMISSION_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX226_VERIFIER_PASS_QA_REEMISSION_RUNTIME_UNTESTED",
+  "summary": "C147/Q00045 authoritative Gate returned immutable B00209 as REWORK_REQUIRED only because its changed QA JSON lacked a verifier-recognized machine-readable PASS object. Candidate E3F4BA07 content is unchanged and independently validated: exact canonical source, corrected 84,629-pixel removal mask, clean plate, deterministic candidate SHA-256 8ab49a70..., 8/8 >=2px containment, zero outside/protected/alpha escape, and clean source-vs-candidate review. This result does not rerender or alter DDS/review PNG bytes; it re-emits the unchanged candidate/review tree with a schema-compliant PASS QA record and durable task record for a fresh C batch disposition.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00216-P00114/B00216_P00114_INDEX226_VERIFIER_PASS_REEMISSION.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json",
+    "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+    "localization/graphics/role_C/20260930-0545-C147-A2/C147_Q00045_ATTEMPT2_GATE_REPAIR.json@5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527"
+  ],
+  "material_deliverable": {
+    "type": "INDEX226_VERIFIER_RECOGNIZED_MACHINE_READABLE_PASS_QA_REEMISSION",
+    "reviewed_indices": [
+      226
+    ],
+    "reviewed_assets": [
+      "E3F4BA07"
+    ],
+    "candidate_dds_modified": false,
+    "candidate_bytes_in_fresh_result_tree_unchanged": true,
+    "mandatory_review_set_in_fresh_result_tree_unchanged": true,
+    "qa_report_modified": true,
+    "durable_task_record_same_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "DIRECT_REWORK_REQUIRED_PRODUCER_RESULT_CONTRACT_REPAIR",
+    "selected_indices": [
+      226
+    ],
+    "readiness_after": {
+      "226": "FRESH_PRODUCER_RESULT_WITH_VERIFIER_RECOGNIZED_PASS_QA_PENDING_C_BATCH_GATE"
+    }
+  },
+  "self_qa": "PASS_INDEX226_DIRECT_REWORK__VERIFIER_REQUIRED_PASS_FIELDS_PRESENT__V2_PROMPT_HASH_PRESENT__SIGNED_SLANT_PASS__ZERO_OUTSIDE_EDIT__ZERO_PROTECTED__ZERO_ALPHA_ESCAPE__C147_CONTENT_QA_REUSED__NO_RERENDER",
+  "candidate_static_qa": "CONTENT_PASS_REUSED_PENDING_INDEPENDENT_C_REPROMOTION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT",
+  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "bookkeeping_note": "Producer result intentionally does not wait for an individual Actions Gate. Final automatic validation authority belongs to a later C batch Gate. Runtime remains UNTESTED."
+}

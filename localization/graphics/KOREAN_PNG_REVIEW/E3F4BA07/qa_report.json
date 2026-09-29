@@ -1,12 +1,12 @@
 {
   "schema_version": 14,
   "schema": "outrun-b00209-index226-corrected-geometry-production-v1",
-  "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
-  "wave_id": "P00108",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
+  "wave_id": "P00114",
   "lane": "LOCALIZATION_B",
   "queue_index": 226,
   "asset": "E3F4BA07",
-  "recorded_at_kst": "2026-09-30T05:18:54+09:00",
+  "recorded_at_kst": "2026-09-30T05:56:06+09:00",
   "source": {
     "transport": "pinned_tag_direct_exact_canonical_source",
     "repository": "Sonic-TV/OR2006Sprites",
@@ -45,11 +45,11 @@
     ],
     "source_style": "upright condensed heavy sans; flat gray; no outline/shadow/glow",
     "source_signed_slant": {
-      "angle_deg": 0.0,
+      "angle_deg": 0,
       "direction": "none"
     },
     "candidate_signed_slant": {
-      "angle_deg": 0.0,
+      "angle_deg": 0,
       "direction": "none"
     },
     "metrics": [
@@ -80,7 +80,7 @@
           213,
           57
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_299",
@@ -109,7 +109,7 @@
           111,
           59
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_300",
@@ -138,7 +138,7 @@
           118,
           59
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_301",
@@ -167,7 +167,7 @@
           116,
           59
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_302",
@@ -196,7 +196,7 @@
           117,
           59
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_303",
@@ -225,7 +225,7 @@
           117,
           59
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_304",
@@ -254,7 +254,7 @@
           56,
           59
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       },
       {
         "sprite": "sprite_305",
@@ -283,7 +283,7 @@
           314,
           60
         ],
-        "horizontal_scale": 1.0
+        "horizontal_scale": 1
       }
     ]
   },
@@ -314,7 +314,7 @@
     "status": "PRODUCER_VISUAL_REVIEW_EQUIVALENT_TO_PINNED_DETERMINISTIC_LOCAL_PROOF_PENDING_INDEPENDENT_C"
   },
   "static_qa": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
-  "candidate_dds_modified": true,
+  "candidate_dds_modified": false,
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "runtime_test_performed": false,
@@ -328,5 +328,28 @@
   "google_drive_write_performed": false,
   "gpt_library_used": false,
   "uploaded_archive_used": false,
-  "vr_ffb_dx_changes": false
+  "vr_ffb_dx_changes": false,
+  "status": "PASS",
+  "asset_id": "E3F4BA07",
+  "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+  "candidate_dds_sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_sha256": "440810f70e4d9fd07d7df9d0c0e3ee1e635361959b15031021ff603555c718cb",
+  "prompt_json_sha256": "440810f70e4d9fd07d7df9d0c0e3ee1e635361959b15031021ff603555c718cb",
+  "prompt_hash_basis": "exact UTF-8 bytes of KOREAN_PNG_REVIEW/E3F4BA07/generation_prompt.json; structured prompt JSON is the production prompt",
+  "signed_slant_gate": "PASS",
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "introduced_alpha_outside_source_region": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "reemission_reason": "C147/Q00045 authoritative Gate requires verifier-recognized machine-readable PASS evidence under a fresh producer result; candidate/review bytes are unchanged and heavy content QA is reused.",
+  "reused_content_validation": {
+    "authoritative_c_result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+    "prior_producer_result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+    "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+    "source_candidate_fingerprint_changed": false,
+    "heavy_qa_repeated": false,
+    "content_validation": "PASS_REUSED_FROM_C147_Q00045_ATTEMPT1_CONTENT_REPLAY",
+    "static_promotion": "PENDING_FRESH_C_BATCH_REPROMOTION"
+  }
 }
