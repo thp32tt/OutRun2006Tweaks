@@ -1,0 +1,27 @@
+name: R64 text UI reverse
+on:
+  push:
+    branches:
+      - vr-nightly-r63-rank-batch-isolate-trace-20260927
+    paths:
+      - 'tools/reverse/r64_text_ui_reverse.py'
+      - '.github/workflows/vr-r64-text-ui-reverse.yml'
+permissions:
+  contents: read
+jobs:
+  reverse:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m pip install --disable-pip-version-check capstone==5.0.6
+      - shell: pwsh
+        run: Invoke-WebRequest -Uri 'https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE' -OutFile OR2006C2C.EXE
+      - shell: pwsh
+        run: |
+          $h=(Get-FileHash OR2006C2C.EXE -Algorithm SHA256).Hash.ToLowerInvariant()
+          if($h -ne '68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3'){throw $h}
+          python tools/reverse/r64_text_ui_reverse.py --exe OR2006C2C.EXE --out analysis/R64_TEXT_UI_REVERSE.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: R64-text-ui-reverse
+          path: analysis/R64_TEXT_UI_REVERSE.md

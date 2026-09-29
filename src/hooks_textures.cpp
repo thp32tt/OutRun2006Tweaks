@@ -9,6 +9,7 @@
 #include <array>
 #include <new>
 #include <intrin.h>
+#include "vr/game/render_semantics.hpp"
 
 namespace OutRunVRHudInspector
 {
@@ -17,6 +18,8 @@ namespace OutRunVRHudInspector
     void TracePutSprite2(SPRARGS2* sprargs, float priority,
         const void* returnAddress);
     void TraceXstSet(int xstsetIndex, const char* filename);
+    OutRunVR::GameSemantic::RenderScope ResolveRenderScope(
+        const void* returnAddress) noexcept;
 }
 
 namespace Settings
@@ -616,10 +619,51 @@ class TextureReplacement : public Hook
 		a1->top_9C = a1->top_9C * scaleY;
 	}
 
+	static int VrSpritePriorityIndex(float priority) noexcept
+	{
+		int prio = static_cast<int>(priority);
+		if (prio < 0) prio = 0;
+		if (prio >= Game::SpritePriorityCount)
+			prio = Game::SpritePriorityCount - 1;
+		return prio;
+	}
+
+	static SpriteNode* VrSpriteTail(int prio) noexcept
+	{
+		if (prio < 0 || prio >= Game::SpritePriorityCount)
+			return nullptr;
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		return root ? root->tail_4 : nullptr;
+	}
+
+	static void VrRegisterQueuedSemantic(
+		SpriteNode* tailBefore, int prio,
+		OutRunVR::GameSemantic::RenderScope scope,
+		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
+	{
+		if (scope == OutRunVR::GameSemantic::RenderScope::None)
+			return;
+		SpriteNode* node = VrSpriteTail(prio);
+		if (node && node != tailBefore)
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, scope, projectedMarker);
+	}
+
 	inline static SafetyHookInline put_sprite_ex2 = {};
 	static int __cdecl put_sprite_ex2_dest(SPRARGS2* a1, float a2)
 	{
-		OutRunVRHudInspector::TracePutSprite2(a1, a2, _ReturnAddress());
+		const void* returnAddress = _ReturnAddress();
+		const auto producerScope =
+			OutRunVR::GameSemantic::ProducerScope();
+		const auto semanticScope =
+			producerScope != OutRunVR::GameSemantic::RenderScope::None
+			? producerScope
+			: OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+		const auto* producerMarker =
+			OutRunVR::GameSemantic::ProducerProjectedMarker();
+		const int semanticPrio = VrSpritePriorityIndex(a2);
+		SpriteNode* semanticTailBefore = VrSpriteTail(semanticPrio);
+		OutRunVRHudInspector::TracePutSprite2(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 
 		if (a1->d3dtexture_ptr_C == prevTexture && sprite_scales.contains(prevTextureId))
@@ -647,13 +691,28 @@ class TextureReplacement : public Hook
 			}
 		}
 
-		return put_sprite_ex2.call<int>(a1, a2);
+		const int result = put_sprite_ex2.call<int>(a1, a2);
+		VrRegisterQueuedSemantic(
+			semanticTailBefore, semanticPrio, semanticScope,
+			producerMarker);
+		return result;
 	}
 
 	inline static SafetyHookInline put_sprite_ex = {};
 	static int __cdecl put_sprite_ex_dest(SPRARGS* a1, float a2)
 	{
-		OutRunVRHudInspector::TracePutSprite(a1, a2, _ReturnAddress());
+		const void* returnAddress = _ReturnAddress();
+		const auto producerScope =
+			OutRunVR::GameSemantic::ProducerScope();
+		const auto semanticScope =
+			producerScope != OutRunVR::GameSemantic::RenderScope::None
+			? producerScope
+			: OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+		const auto* producerMarker =
+			OutRunVR::GameSemantic::ProducerProjectedMarker();
+		const int semanticPrio = VrSpritePriorityIndex(a2);
+		SpriteNode* semanticTailBefore = VrSpriteTail(semanticPrio);
+		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 		if (sprite_scales.contains(xstnum))
 		{
@@ -666,7 +725,11 @@ class TextureReplacement : public Hook
 			a1->scaleX = a1->scaleX / scaleX;
 			a1->scaleY = a1->scaleY / scaleY;
 		}
-		return put_sprite_ex.call<int>(a1, a2);
+		const int result = put_sprite_ex.call<int>(a1, a2);
+		VrRegisterQueuedSemantic(
+			semanticTailBefore, semanticPrio, semanticScope,
+			producerMarker);
+		return result;
 	}
 
 	inline static SafetyHookMid LoadXstsetSprite_hook = {};
@@ -945,7 +1008,7 @@ public:
 	{
 		return (Settings::SceneTextureReplacement || Settings::SceneTextureExtract) ||
 			(Settings::UITextureReplacement || Settings::UITextureExtract) ||
-			(Settings::VREnabled && Settings::VRHudInspector);
+			Settings::VREnabled;
 	}
 
 	void declare_settings() override
@@ -1009,6 +1072,7 @@ public:
 		bool ApplySceneHooks = Settings::SceneTextureReplacement || Settings::SceneTextureExtract;
 		const bool ApplyHudInspectorFeeds =
 			Settings::VREnabled && Settings::VRHudInspector;
+		const bool ApplyVrSemanticFeeds = Settings::VREnabled;
 
 		// Scene hooks are applied through D3DXCreateTextureFromFileInMemoryEx
 		// But our UI code also calls D3DXCreateTextureFromFileInMemoryEx to allow loading textures slightly faster
@@ -1021,7 +1085,7 @@ public:
 				D3DXCreateTextureFromFileInMemoryEx = safetyhook::create_inline(Module::exe_ptr(D3DXCreateTextureFromFileInMemoryEx_Addr), D3DXCreateTextureFromFileInMemoryEx_Orig_dest);
 		}
 
-		if (ApplyUIHooks || ApplyHudInspectorFeeds)
+		if (ApplyUIHooks || ApplyHudInspectorFeeds || ApplyVrSemanticFeeds)
 		{
 			// The HUD inspector owns only observation feeds. Do not enable
 			// replacement/extraction behavior just because diagnostics are on.
@@ -1038,7 +1102,7 @@ public:
 			if (Settings::UITextureReplacement)
 				get_texture = safetyhook::create_inline(Module::exe_ptr(get_texture_Addr), get_texture_dest);
 
-			if (Settings::UITextureReplacement || ApplyHudInspectorFeeds)
+			if (Settings::UITextureReplacement || ApplyHudInspectorFeeds || ApplyVrSemanticFeeds)
 			{
 				put_sprite_ex = safetyhook::create_inline(Module::exe_ptr(put_sprite_ex_Addr), put_sprite_ex_dest);
 				put_sprite_ex2 = safetyhook::create_inline(Module::exe_ptr(put_sprite_ex2_Addr), put_sprite_ex2_dest);
