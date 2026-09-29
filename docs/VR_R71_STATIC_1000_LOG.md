@@ -464,3 +464,27 @@ Changed files:
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review view-history pose matching.
+
+
+## Cycle 0021 — view-history pose matching
+
+Review lenses:
+1. architecture/control flow;
+2. lifetime/reset/sync;
+3. stereo/HUD/visual correctness;
+4. hot path/frame pacing/copies/waits;
+5. adversarial/falsification.
+
+Finding/evidence:
+- View history stores only valid stereo view states keyed by hostSequence before cadence release; no stale-pose bypass was found in the reviewed boundary.
+- Evidence: viewHistory.Store(hostSequence, views) guarded by valid orientation+position.
+- No production/runtime, HUD classification, GPU wait/copy, or synchronization behavior changed.
+- Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+
+Changed files:
+- `docs/VR_R71_STATIC_1000_LOG.md`
+- `docs/automation/R71_STATIC_1000_STATE.json`
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review presentation bootstrap/theater boundary.
