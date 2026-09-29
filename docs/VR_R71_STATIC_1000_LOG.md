@@ -859,3 +859,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review SkyGlow failure fallback ordering.
+
+
+## Cycle 0039 — SkyGlow pre-HUD failure containment
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Cycle 30's pre-HUD composite marks an attempt before capture/apply; if it fails, Present must not retry additive glow over HUD. This fail-safe trades missing glow for avoiding UI washout and should remain until HMD evidence says otherwise.
+- Evidence: R30CompositeSkyGlowBeforeHud preHudAttempt epoch and failure comment.
+- No additional production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume current CI and review exact visual evidence.
