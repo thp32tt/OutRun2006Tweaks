@@ -168,8 +168,9 @@ def build_removal_masks(src):
     for e in ELEMENTS:
         x0,y0,x1,y1 = e["effect_raw"]
         sub = src[y0:y1, x0:x1]
-        bg = np.array(e["bg"], dtype=np.int16)
-        dist = np.sqrt(np.sum((sub[:,:,:3].astype(np.int16)-bg[None,None,:])**2, axis=2))
+        bg = np.array(e["bg"], dtype=np.int32)
+        delta = sub[:,:,:3].astype(np.int32) - bg[None,None,:]
+        dist = np.sqrt(np.sum(delta * delta, axis=2))
         local = (sub[:,:,3] > 16) & (dist >= 10.0)
         m = np.zeros((H,W), dtype=bool)
         m[y0:y1,x0:x1] = local
@@ -285,9 +286,10 @@ def patch_bc3_color_indices(source_bytes, src_dec, target_raw, allowed_change):
 
 def residue_count(arr, e, exclude=None):
     x0,y0,x1,y1=e["effect_raw"]
-    sub=arr[y0:y1,x0:x1,:3].astype(np.int16)
-    bg=np.array(e["bg"],dtype=np.int16)
-    dist=np.sqrt(np.sum((sub-bg[None,None,:])**2,axis=2))
+    sub=arr[y0:y1,x0:x1,:3].astype(np.int32)
+    bg=np.array(e["bg"],dtype=np.int32)
+    delta=sub-bg[None,None,:]
+    dist=np.sqrt(np.sum(delta*delta,axis=2))
     m=dist>=10.0
     if exclude is not None:
         m &= ~exclude[y0:y1,x0:x1]
