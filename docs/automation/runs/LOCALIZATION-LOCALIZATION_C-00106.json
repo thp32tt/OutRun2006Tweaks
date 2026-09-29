@@ -1,0 +1,132 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00106",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00011",
+  "qa_batch_id": "Q00011",
+  "recorded_at_kst": "2026-09-29T17:55:13+09:00",
+  "base_head_sha": "47aed8322b065cde9d108f746ebc18a0db9ef5bf",
+  "result": "PASS_Q00011_FOUR_INPUTS_16_ASSETS_243_PREGEN_WORK_UNITS_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Independent Q00011 batch accepted A00096/B00097/A00098/B00100 limited first-pass-v2 pre-generation work-order deliverables across 16 assets. Independent arithmetic/canonical checks pass A96 94/94 scopes, B97 46 localize + 2 preserve scopes from C111-accepted lineage, A98 66/66 scopes and B100 37/37 scopes with 40 mapped physical semantic occurrences; all required 2px upper-bound guards pass. Index 50 retains four unresolved semantic bindings. No Korean candidate DDS or new CLEAN_PLATE was produced by these inputs; all candidate-only zero-pixel/DDS/alpha/compression/orientation/style/English-source comparison gates remain HOLD_STRICT_RECHECK. Runtime remains untested.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00096",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+      "producer_id": "P00030"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00097",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "305fff091643850953cf01a8e192f45932a06835",
+      "producer_id": "P00031"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "b7ce5c1ae43b238846d6f1f44e6a8dca0139630f",
+      "producer_id": "P00032"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00100",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "efe9956a68faa091fd4f24de51319233158924f1",
+      "producer_id": "P00033"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00096",
+      "result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+      "status": "PASS",
+      "reason": "A00096 first-pass-v2 direct-source inspection/source-mask/CLEAN_PLATE work orders accepted for indices 147/159/161/163. A00065/C00071 immutable Release/atlas lineage is unchanged; current transcription/artwork-plan semantics match all 92 canonical pairs. Independent arithmetic recheck passes 4/4 source size equations, 94/94 atlas regions, 94/94 in-file payload scope templates and 94/94 exact nonempty 2px guards (56 RGBA32 + 38 BC3). These are execution bounds only: exact header decode, semantic-to-sprite binding, source-effect masks, protected masks, CLEAN_PLATE and measured final candidate_safe_bbox remain HOLD_STRICT_RECHECK; no Korean DDS exists."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00097",
+      "result_sha": "305fff091643850953cf01a8e192f45932a06835",
+      "status": "PASS",
+      "reason": "B00097 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 86/100/106/130. Q00009/C111 already accepted the immutable B00087/B00090 exact Release payload lineage; current canonical translations remain unchanged. The deterministic selector accounts for all 48 accepted scopes as 46 localize work units plus 2 preserve-original regions, split 31 BC3 + 15 RGBA32; all selected regions use the required 2px upper-bound guard contract. The OutRun2SP wordmark and numeric rank marker remain preserve-original. Exact source-effect/removal/protected masks, CLEAN_PLATE, final safe bboxes and Korean candidate gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+      "result_sha": "b7ce5c1ae43b238846d6f1f44e6a8dca0139630f",
+      "status": "PASS",
+      "reason": "A00098 first-pass-v2 direct-source inspection/source-mask/CLEAN_PLATE work orders accepted for indices 173/193/201/225. A00067/C00071 immutable Release/atlas lineage is unchanged; current transcription/artwork-plan semantics match all 60 canonical pairs. Independent arithmetic recheck passes 4/4 source size equations, 66/66 atlas regions, 66/66 in-file RGBA32 payload scope templates and 66/66 exact nonempty 2px guards. Semantic binding must still be proven from exact decoded source before editing, and source-effect masks/CLEAN_PLATE/final candidate-safe geometry plus all Korean-candidate gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00100",
+      "result_sha": "efe9956a68faa091fd4f24de51319233158924f1",
+      "status": "PASS",
+      "reason": "B00100 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 46/48/50/62. Q00008/C110 immutable B00085 exact Release RGBA32 payload acceptance is unchanged. Independent arithmetic recheck passes 4/4 source size equations, 37/37 in-canvas/in-file work scopes and 37/37 exact nonempty 2px guards with zero selected-cell overlap; 40 mapped physical semantic occurrences match current canonical metadata. Index 50 retains PLEASE WAIT/PLAYERS/YOUR FRIENDS/FRIEND REQUEST as four explicit unresolved semantic bindings rather than guessing. No source-effect masks, CLEAN_PLATE, final safe bboxes or Korean DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      46,
+      48,
+      50,
+      62,
+      86,
+      100,
+      106,
+      130,
+      147,
+      159,
+      161,
+      163,
+      173,
+      193,
+      201,
+      225
+    ],
+    "reviewed_assets": 16,
+    "total_pregeneration_work_units_validated": 243,
+    "a00096_region_scopes_validated": 94,
+    "b00097_localize_work_units_validated": 46,
+    "b00097_preserve_regions_retained": 2,
+    "a00098_region_scopes_validated": 66,
+    "b00100_work_units_validated": 37,
+    "b00100_mapped_physical_semantics": 40,
+    "b00100_unresolved_semantic_bindings_retained": 4,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "input_candidate_dds_modified": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-1755-C113/C113_Q00011_INDEPENDENT_QA_BATCH.json"
+  },
+  "source_identity_validation": "PASS_REUSED_UNCHANGED_FINGERPRINTS__A65_C71__B87_B90_C111__A67_C71__B85_C110__CURRENT_CONTRACT_GENERATION_V2_ORIENTATION_EXACT",
+  "canonical_semantic_validation": "PASS_A96_92_OF_92__B97_CURRENT_39_LOCALIZABLE_PAIRS_WITH_2_PRESERVE_REGIONS__A98_60_OF_60__B100_40_MAPPED_PHYSICAL_PLUS_4_UNRESOLVED_BINDINGS_RETAINED",
+  "geometry_mapping_validation": "PASS_A96_4_OF_4_SIZE_94_OF_94_SCOPES_GUARDS__B97_48_ACCEPTED_SCOPES_46_LOCALIZE_2_PRESERVE_31_BC3_15_RGBA__A98_4_OF_4_SIZE_66_OF_66_SCOPES_GUARDS__B100_4_OF_4_SIZE_37_OF_37_SCOPES_GUARDS_ZERO_OVERLAP",
+  "current_contract_compatibility": "PASS_PREGEN_ONLY__NO_CANDIDATE_PROMOTION__CELL_GUARDS_ARE_UPPER_BOUNDS_NOT_FINAL_SAFE_BBOX__INDEX50_FOUR_SEMANTICS_HOLD",
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00101",
+      "LOCALIZATION-LOCALIZATION_A-00102",
+      "LOCALIZATION-LOCALIZATION_B-00103",
+      "LOCALIZATION-LOCALIZATION_B-00104",
+      "LOCALIZATION-LOCALIZATION_A-00105",
+      "LOCALIZATION-LOCALIZATION_A-00107"
+    ],
+    "result": "NONE_AT_BASE_HEAD"
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

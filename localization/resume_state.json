@@ -7,13 +7,13 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Use Q00010/C112-accepted A00091 first-pass-v2 work orders for indices 59/65/107. Exact payload geometry and 2px cell guards pass; derive exact source-effect masks, independently QAed CLEAN_PLATEs and measured final candidate_safe_bbox before any Korean render.",
-    "For index 175 from A00091, decode the five accepted direct-inspection cells and bind each rendered source label to the current canonical semantics only when unambiguous. Keep semantic-to-sprite binding HOLD_STRICT_RECHECK until direct evidence resolves it.",
-    "Use Q00010/C112-accepted B00092 exact Release 32bpp extraction scopes for indices 198/214/230/236. All 37 regions are arithmetically verified; binary DDS header/channel-mask/mip interpretation, raw orientation and source-effect masks remain required before generation.",
-    "Use Q00010/C112-accepted A00094 work orders for indices 55/101/119 and B00095 work orders for indices 34/44/52/172. Keep all cell guards as upper bounds only, preserve index44 TOP, and require source-effect-mask/CLEAN_PLATE QA before rendering.",
-    "Keep all 15 Q00010 assets at HOLD_STRICT_RECHECK for candidate-only gates until new exact-HD Korean DDS candidates pass decoded-final zero-pixel containment, Hangul clipping, protected-mask/alpha, format/mipmap/compression, orientation/slant/style and exact ENGLISH SOURCE vs KOREAN CANDIDATE comparison.",
-    "Continue production independently; A00096, B00097, A00098 and B00100 are newer disjoint producer evidence and are not a barrier for Q00010.",
-    "Runtime remains UNTESTED. Do not promote static extraction/work-order evidence to runtime approval without a real in-game test."
+    "Use Q00011/C113-accepted A00096 direct-inspection work orders for indices 147/159/161/163. Confirm exact DDS headers and decoded per-sprite semantic binding, then derive exact source-effect/removal/protected masks, independently QAed CLEAN_PLATEs and measured final candidate_safe_bbox before any Korean render.",
+    "Use Q00011/C113-accepted B00097 work orders for indices 86/100/106/130. Reuse the C111-accepted exact payload scopes, preserve the OutRun2SP wordmark and numeric rank marker, and materialize exact source-effect masks/CLEAN_PLATE/final safe bboxes before rendering.",
+    "Use Q00011/C113-accepted A00098 direct-inspection work orders for indices 173/193/201/225. The 66 scope/guard formulas are accepted, but semantic-to-sprite binding and source-effect geometry must be proven from exact decoded source before generation.",
+    "Use Q00011/C113-accepted B00100 work orders for indices 46/48/50/62. Keep PLEASE WAIT/PLAYERS/YOUR FRIENDS/FRIEND REQUEST on index 50 as HOLD_STRICT_RECHECK until exact decoded source deterministically binds them; do not guess from list order.",
+    "Keep all 16 Q00011 assets at HOLD_STRICT_RECHECK for candidate-only gates until exact-HD Korean DDS candidates pass decoded-final zero-pixel containment, Hangul clipping, protected-mask/alpha, format/mipmap/compression, orientation/slant/style and exact ENGLISH SOURCE vs KOREAN CANDIDATE comparison.",
+    "Continue production independently; B00101, A00102, B00103, B00104, A00105 and A00107 are newer disjoint producer evidence and are not overwritten by this reconciliation.",
+    "Runtime remains UNTESTED. Do not promote static work-order evidence to runtime approval without a real in-game test."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2367,80 +2367,83 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-29T17:11:00+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00099",
-    "qa_batch_id": "Q00010",
-    "run": "C112",
-    "result": "PASS_Q00010_FOUR_INPUTS_15_ASSETS_82_PREGEN_SCOPES_NO_DDS_RUNTIME_UNTESTED",
-    "base_head": "efe9956a68faa091fd4f24de51319233158924f1",
+    "recorded_at_kst": "2026-09-29T17:55:13+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00106",
+    "qa_batch_id": "Q00011",
+    "run": "C113",
+    "result": "PASS_Q00011_FOUR_INPUTS_16_ASSETS_243_PREGEN_WORK_UNITS_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "47aed8322b065cde9d108f746ebc18a0db9ef5bf",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00091@962e0a9fcb9ce5c25b29467b557237f24567c6fb",
-      "LOCALIZATION-LOCALIZATION_B-00092@2d415b6efc192c28ce2b3d28b2d5f8a3ef70edf4",
-      "LOCALIZATION-LOCALIZATION_A-00094@1a4318f0eeea1b97f0eeb814d3b20a6a251d4240",
-      "LOCALIZATION-LOCALIZATION_B-00095@718c1abdacd279131e62e7a8b665e209790866cc"
+      "LOCALIZATION-LOCALIZATION_A-00096@e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+      "LOCALIZATION-LOCALIZATION_B-00097@305fff091643850953cf01a8e192f45932a06835",
+      "LOCALIZATION-LOCALIZATION_A-00098@b7ce5c1ae43b238846d6f1f44e6a8dca0139630f",
+      "LOCALIZATION-LOCALIZATION_B-00100@efe9956a68faa091fd4f24de51319233158924f1"
     ],
     "reviewed_indices": [
-      34,
-      44,
-      52,
-      55,
-      59,
-      65,
-      101,
-      107,
-      119,
-      172,
-      175,
-      198,
-      214,
-      230,
-      236
+      46,
+      48,
+      50,
+      62,
+      86,
+      100,
+      106,
+      130,
+      147,
+      159,
+      161,
+      163,
+      173,
+      193,
+      201,
+      225
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00091",
-        "result_sha": "962e0a9fcb9ce5c25b29467b557237f24567c6fb",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00096",
+        "result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
         "status": "PASS",
-        "reason": "A00091 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 59/65/107/175. Q00008/C110 already accepted the unchanged A00084 exact Release source/payload lineage; current automation, generation-v2 and orientation-policy fingerprints still match. Current transcription/artwork-plan semantics match 11/11 canonical pairs. Independent arithmetic recheck passes 4/4 source size equations plus 12/12 payload formulas and exact 2px cell guards. Index 175 remains direct-inspection-only with semantic-to-sprite binding unresolved; no Korean candidate DDS or CLEAN_PLATE exists, so final candidate_safe_bbox and all candidate-only clipping/1px/DDS/alpha/orientation/style/source-comparison gates remain HOLD_STRICT_RECHECK."
+        "reason": "A00096 first-pass-v2 direct-source inspection/source-mask/CLEAN_PLATE work orders accepted for indices 147/159/161/163. A00065/C00071 immutable Release/atlas lineage is unchanged; current transcription/artwork-plan semantics match all 92 canonical pairs. Independent arithmetic recheck passes 4/4 source size equations, 94/94 atlas regions, 94/94 in-file payload scope templates and 94/94 exact nonempty 2px guards (56 RGBA32 + 38 BC3). These are execution bounds only: exact header decode, semantic-to-sprite binding, source-effect masks, protected masks, CLEAN_PLATE and measured final candidate_safe_bbox remain HOLD_STRICT_RECHECK; no Korean DDS exists."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00092",
-        "result_sha": "2d415b6efc192c28ce2b3d28b2d5f8a3ef70edf4",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00097",
+        "result_sha": "305fff091643850953cf01a8e192f45932a06835",
         "status": "PASS",
-        "reason": "B00092 exact Release 32bpp extraction scopes accepted for indices 198/214/230/236. Reused B00066/C00071 source/mapping evidence and current canonical transcription/artwork-plan blobs are unchanged. Current semantics match 38/38 physical occurrences. Independent arithmetic recheck passes 4/4 linear-32 source size equations and 37/37 raw-coordinate/row-slice/file/canvas extraction formulas with zero overlap. Exact DDS header channel masks/mips, raw orientation, source full-effect masks/CLEAN_PLATE and all Korean-candidate gates remain HOLD_STRICT_RECHECK because no candidate bytes were produced."
+        "reason": "B00097 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 86/100/106/130. Q00009/C111 already accepted the immutable B00087/B00090 exact Release payload lineage; current canonical translations remain unchanged. The deterministic selector accounts for all 48 accepted scopes as 46 localize work units plus 2 preserve-original regions, split 31 BC3 + 15 RGBA32; all selected regions use the required 2px upper-bound guard contract. The OutRun2SP wordmark and numeric rank marker remain preserve-original. Exact source-effect/removal/protected masks, CLEAN_PLATE, final safe bboxes and Korean candidate gates remain HOLD_STRICT_RECHECK."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00094",
-        "result_sha": "1a4318f0eeea1b97f0eeb814d3b20a6a251d4240",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+        "result_sha": "b7ce5c1ae43b238846d6f1f44e6a8dca0139630f",
         "status": "PASS",
-        "reason": "A00094 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 55/101/119. The result record immutably pins material commit 58986ea6c4f040c6e988fec470ec060ea354b633; reused A00079/A00082/Q00007-C109 fingerprints are unchanged and current contract/generation-v2/orientation policy matches. Current canonical semantics match 14/14 unique pairs across 15 physical work units. Independent arithmetic recheck passes 3/3 source size equations and 15/15 payload scopes; the 13 index-101 guards are exact nonempty 2px insets, while the two BC3 bounds remain previously accepted upper bounds only. No source-effect masks, validated CLEAN_PLATE or Korean DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+        "reason": "A00098 first-pass-v2 direct-source inspection/source-mask/CLEAN_PLATE work orders accepted for indices 173/193/201/225. A00067/C00071 immutable Release/atlas lineage is unchanged; current transcription/artwork-plan semantics match all 60 canonical pairs. Independent arithmetic recheck passes 4/4 source size equations, 66/66 atlas regions, 66/66 in-file RGBA32 payload scope templates and 66/66 exact nonempty 2px guards. Semantic binding must still be proven from exact decoded source before editing, and source-effect masks/CLEAN_PLATE/final candidate-safe geometry plus all Korean-candidate gates remain HOLD_STRICT_RECHECK."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00095",
-        "result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00100",
+        "result_sha": "efe9956a68faa091fd4f24de51319233158924f1",
         "status": "PASS",
-        "reason": "B00095 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 34/44/52/172. Reused B00080/Q00007-C109 source/payload acceptance fingerprints are unchanged and current contract/orientation policy matches. Current canonical data matches 18 localizable pairs plus preserved TOP; producer records 20 localizable physical semantic occurrences. Independent arithmetic recheck passes 4/4 source size equations, 17/17 localize work-order payload formulas, 17/17 exact 2px cell guards and 3/3 BC3 block-aligned scopes; the TOP preserve-original region remains excluded from editing. No Korean candidate DDS/CLEAN_PLATE exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+        "reason": "B00100 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 46/48/50/62. Q00008/C110 immutable B00085 exact Release RGBA32 payload acceptance is unchanged. Independent arithmetic recheck passes 4/4 source size equations, 37/37 in-canvas/in-file work scopes and 37/37 exact nonempty 2px guards with zero selected-cell overlap; 40 mapped physical semantic occurrences match current canonical metadata. Index 50 retains PLEASE WAIT/PLAYERS/YOUR FRIENDS/FRIEND REQUEST as four explicit unresolved semantic bindings rather than guessing. No source-effect masks, CLEAN_PLATE, final safe bboxes or Korean DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
       }
     ],
-    "source_identity_validation": "PASS_REUSED_UNCHANGED_FINGERPRINTS__A84_C110__B66_C71__A79_A82_C109__B80_C109__CURRENT_CONTRACT_GENERATION_V2_ORIENTATION_EXACT",
-    "canonical_semantic_validation": "PASS_A91_11_OF_11__B92_38_OF_38_PHYSICAL__A94_14_OF_14_UNIQUE_15_PHYSICAL__B95_18_LOCALIZE_PLUS_1_PRESERVE_TOP",
-    "geometry_mapping_validation": "PASS_A91_4_OF_4_SIZE__12_OF_12_PAYLOAD_AND_2PX_GUARDS__B92_4_OF_4_SIZE__37_OF_37_EXTRACTIONS_ZERO_OVERLAP__A94_3_OF_3_SIZE__15_OF_15_PAYLOAD__13_OF_13_NEW_2PX_GUARDS__B95_4_OF_4_SIZE__17_OF_17_WORK_PAYLOADS__17_OF_17_2PX_GUARDS__3_OF_3_BC3_ALIGNED",
-    "current_contract_compatibility": "PASS_PREGEN_ONLY__NO_CANDIDATE_PROMOTION__A91_INDEX175_SEMANTIC_BINDING_HOLD__B92_BINARY_HEADER_ORIENTATION_HOLD__B95_TOP_PRESERVE_ORIGINAL__CELL_GUARDS_ARE_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+    "source_identity_validation": "PASS_REUSED_UNCHANGED_FINGERPRINTS__A65_C71__B87_B90_C111__A67_C71__B85_C110__CURRENT_CONTRACT_GENERATION_V2_ORIENTATION_EXACT",
+    "canonical_semantic_validation": "PASS_A96_92_OF_92__B97_CURRENT_39_LOCALIZABLE_PAIRS_WITH_2_PRESERVE_REGIONS__A98_60_OF_60__B100_40_MAPPED_PHYSICAL_PLUS_4_UNRESOLVED_BINDINGS_RETAINED",
+    "geometry_mapping_validation": "PASS_A96_4_OF_4_SIZE_94_OF_94_SCOPES_GUARDS__B97_48_ACCEPTED_SCOPES_46_LOCALIZE_2_PRESERVE_31_BC3_15_RGBA__A98_4_OF_4_SIZE_66_OF_66_SCOPES_GUARDS__B100_4_OF_4_SIZE_37_OF_37_SCOPES_GUARDS_ZERO_OVERLAP",
+    "current_contract_compatibility": "PASS_PREGEN_ONLY__NO_CANDIDATE_PROMOTION__CELL_GUARDS_ARE_UPPER_BOUNDS_NOT_FINAL_SAFE_BBOX__INDEX50_FOUR_SEMANTICS_HOLD",
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
     "actionable_localize_text_after": 93,
     "pending_production_localize_text_after": 76,
     "superseded_inputs": [],
     "newer_disjoint_producers": [
-      "LOCALIZATION-LOCALIZATION_A-00096",
-      "LOCALIZATION-LOCALIZATION_B-00097",
-      "LOCALIZATION-LOCALIZATION_A-00098",
-      "LOCALIZATION-LOCALIZATION_B-00100"
+      "LOCALIZATION-LOCALIZATION_B-00101",
+      "LOCALIZATION-LOCALIZATION_A-00102",
+      "LOCALIZATION-LOCALIZATION_B-00103",
+      "LOCALIZATION-LOCALIZATION_B-00104",
+      "LOCALIZATION-LOCALIZATION_A-00105",
+      "LOCALIZATION-LOCALIZATION_A-00107"
     ],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-1711-C112/C112_Q00010_INDEPENDENT_QA_BATCH.json"
+    "report": "localization/graphics/role_C/20260929-1755-C113/C113_Q00011_INDEPENDENT_QA_BATCH.json"
   }
 }
