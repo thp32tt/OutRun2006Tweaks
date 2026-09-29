@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "asset_id": "43B07A77",
+  "queue_index": 89,
+  "source": "Game Over",
+  "korean": "게임 오버",
+  "evidence_source_run_id": 36508994738,
+  "evidence_source_job_id": 109216743993,
+  "source_git_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+  "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+  "exact_hd_dds": {
+    "width": 2048,
+    "height": 256,
+    "format": "RGBA32/BGRA storage",
+    "mips": 1
+  },
+  "raw_to_display_transform": "flip_y",
+  "historical_mirror_x_record": "SUPERSEDED_BY_EXACT_HD_VISUAL_EVIDENCE",
+  "signed_slant": {
+    "method": "alpha_vertical_edge_projection_v1",
+    "slant_dx_per_dy": 0.35,
+    "slant_angle_deg": 19.29,
+    "slant_direction": "right",
+    "edge_samples": 8294,
+    "score": 32.780805
+  },
+  "source_full_effect_bbox_display": [
+    1,
+    13,
+    1494,
+    251
+  ],
+  "candidate_permitted_region_display": [
+    1,
+    13,
+    1494,
+    248
+  ],
+  "source_fringe_outside_cell_px": 3,
+  "containment_policy": "Korean candidate must remain inside [1,13,1494,248]; English fringe y=248..250 may be erased but not replaced by Korean pixels.",
+  "next_stage": "Generate exact alpha-mask clean plate, edit/protected masks and strict generation prompt; then create Korean candidate and enforce zero-pixel containment.",
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED"
+}

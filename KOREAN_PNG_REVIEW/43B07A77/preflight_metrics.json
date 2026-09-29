@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "asset_id": "43B07A77",
   "source_dds": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
   "source_git_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
@@ -18,35 +18,53 @@
     }
   },
   "cell": {
-    "rect": [
+    "raw_rect": [
       0,
       8,
       1496,
       248
     ],
-    "alpha_gt0_bbox_canvas": [
+    "display_rect": [
+      0,
+      0,
+      1496,
+      248
+    ],
+    "alpha_gt0_bbox_canvas_raw": [
       1,
       5,
       1494,
       243
     ],
-    "alpha_ge128_bbox_canvas": [
+    "alpha_ge128_bbox_canvas_raw": [
       1,
       15,
       1483,
       242
     ],
-    "alpha_gt0_bbox_cell_local": [
+    "alpha_gt0_bbox_cell_local_raw": [
       1,
       0,
       1494,
       235
     ],
-    "alpha_ge128_bbox_cell_local": [
+    "alpha_ge128_bbox_cell_local_raw": [
       1,
       7,
       1483,
       234
+    ],
+    "alpha_gt0_bbox_cell_local_display": [
+      1,
+      13,
+      1494,
+      248
+    ],
+    "alpha_ge128_bbox_cell_local_display": [
+      1,
+      14,
+      1483,
+      241
     ]
   },
   "variants": {
@@ -55,7 +73,18 @@
     "flip_y": "KOREAN_PNG_REVIEW/43B07A77/preflight_flip_y.png",
     "rotate_180": "KOREAN_PNG_REVIEW/43B07A77/preflight_rotate_180.png"
   },
-  "orientation_status": "VISUAL_SELECTION_REQUIRED",
-  "signed_slant_status": "MEASURE_AFTER_DISPLAY_TRANSFORM_SELECTION",
+  "source_display": "KOREAN_PNG_REVIEW/43B07A77/source_display.png",
+  "display_transform": "flip_y",
+  "orientation_status": "PASS_EXPLICIT_DISPLAY_TRANSFORM",
+  "orientation_decision_basis": "Exact HD source visually readable only under flip_y; raw/flip_x/rotate_180 are not readable Game Over.",
+  "signed_slant": {
+    "method": "alpha_vertical_edge_projection_v1",
+    "slant_dx_per_dy": 0.35,
+    "slant_angle_deg": 19.29,
+    "slant_direction": "right",
+    "edge_samples": 8294,
+    "score": 32.780805
+  },
+  "signed_slant_status": "PASS_MEASURED_IN_READABLE_DISPLAY_COORDINATES",
   "runtime_validation": "UNTESTED"
 }
