@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "asset_id": "43B07A77",
+  "source_dds": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+  "source_git_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+  "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+  "dds": {
+    "width": 2048,
+    "height": 256,
+    "mips": 1,
+    "fourcc": "00000000",
+    "rgb_bits": 32,
+    "masks": {
+      "r": 255,
+      "g": 65280,
+      "b": 16711680,
+      "a": 4278190080
+    }
+  },
+  "cell": {
+    "rect": [
+      0,
+      8,
+      1496,
+      248
+    ],
+    "alpha_gt0_bbox_canvas": [
+      1,
+      5,
+      1494,
+      243
+    ],
+    "alpha_ge128_bbox_canvas": [
+      1,
+      15,
+      1483,
+      242
+    ],
+    "alpha_gt0_bbox_cell_local": [
+      1,
+      0,
+      1494,
+      235
+    ],
+    "alpha_ge128_bbox_cell_local": [
+      1,
+      7,
+      1483,
+      234
+    ]
+  },
+  "variants": {
+    "raw": "KOREAN_PNG_REVIEW/43B07A77/preflight_raw.png",
+    "flip_x": "KOREAN_PNG_REVIEW/43B07A77/preflight_flip_x.png",
+    "flip_y": "KOREAN_PNG_REVIEW/43B07A77/preflight_flip_y.png",
+    "rotate_180": "KOREAN_PNG_REVIEW/43B07A77/preflight_rotate_180.png"
+  },
+  "orientation_status": "VISUAL_SELECTION_REQUIRED",
+  "signed_slant_status": "MEASURE_AFTER_DISPLAY_TRANSFORM_SELECTION",
+  "runtime_validation": "UNTESTED"
+}
