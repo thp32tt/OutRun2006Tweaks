@@ -1,0 +1,78 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00091",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00026",
+  "recorded_at_kst": "2026-09-29T16:36:00+09:00",
+  "base_sha": "dc882da2856b1f338e738ee8fa4d03332587e33c",
+  "material_commit_sha": "962e0a9fcb9ce5c25b29467b557237f24567c6fb",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_12_SCOPES",
+  "summary": "Advanced Q00008/C110-consumed odd indices 59/65/107/175 by converting 12 accepted exact Release payload scopes into deterministic first-pass-v2 source inspection/effect-mask/CLEAN_PLATE work orders. Seven scopes already have exact semantic bindings; five index-175 cells remain fail-closed until direct decoded source inspection resolves semantic-to-sprite binding. Current A00088 QA-pending indices 35/43/49/95 were skipped. No Korean DDS or shared state changed; final source-effect bbox, clean plate, candidate_safe_bbox, containment and English-source comparison remain HOLD_STRICT_RECHECK.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1635-A00091-P00026/A00091_P00026_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_ODD_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      59,
+      65,
+      107,
+      175
+    ],
+    "assets": [
+      "7CE1CFC5",
+      "EBEF6D20",
+      "841E796B",
+      "754F0599"
+    ],
+    "exact_payload_scopes_reused": 12,
+    "semantic_occurrence_work_units": 7,
+    "direct_inspection_work_units": 5,
+    "deterministic_work_units": 12,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "a00084_report_blob_sha": "65ba0844bd1a4fe07a0ee0a8f3e8c97e567c33ef",
+    "a00084_result_sha": "d3f775d7a6f3ce2cb1247d25d0c7789828a26890",
+    "a00084_c_acceptance": "LOCALIZATION-LOCALIZATION_C-00089/Q00008 PASS",
+    "c00089_acceptance_blob_sha": "d081bdc2cc7f618ba80dbf004ea2df90f1dc3169",
+    "current_queue_blob_sha": "6fb584e6f0a11ed74fa76e2ba6389c6576c3f54f",
+    "reason": "Q00008 independently accepted all 12 A00084 payload scopes and 2px cell guards. This task adds the next executable v2 source inspection/effect-mask/CLEAN_PLATE contract instead of repeating immutable source/payload QA."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_A-00088": [
+      35,
+      43,
+      49,
+      95
+    ]
+  },
+  "other_c_consumed_runnable_not_touched": [
+    55,
+    101,
+    119
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_ODD_ONLY_59_65_107_175__12_OF_12_C_ACCEPTED_PAYLOAD_SCOPES__12_OF_12_ACCEPTED_2PX_CELL_GUARDS__7_BOUND_PLUS_5_FAIL_CLOSED_INSPECTION_WORK_UNITS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "The recorded 2px cell inner guards are upper bounds only. Final candidate_safe_bbox must be derived from the measured source-effect bbox; an exact source removal mask and independently passing CLEAN_PLATE QA are required before Korean lettering. Index 175 additionally requires exact decoded semantic-to-sprite binding before any removal mask or render can be authorized.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
