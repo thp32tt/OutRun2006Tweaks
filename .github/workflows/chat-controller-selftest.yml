@@ -114,7 +114,8 @@ jobs:
           assert 'for lane_key in ("A", "B", "C")' in body
           assert 'enqueue_producer_result_for_qa' in body
           assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
-          assert 'terminal") not in {"PRODUCED", "PASS"}' in body
+          qa_helpers = src[src.index("def _qa_item_key"):src.index("async def localization_parallel_cycle")]
+          assert 'task.get("terminal") not in {"PRODUCED", "PASS"}' in qa_helpers
           proc = src[src.index("async def localization_process_lane"):src.index("def _qa_item_key")]
           assert 'if lane_key in {"A", "B"}:' in proc
           assert 'finalize_localization_producer_commit' in proc
