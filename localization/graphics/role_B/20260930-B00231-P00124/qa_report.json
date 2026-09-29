@@ -1,0 +1,690 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00231-index193-v2-candidate-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00231",
+  "wave_id": "P00124",
+  "lane": "LOCALIZATION_B",
+  "status": "PASS",
+  "queue_index": 193,
+  "asset": "97E863AD",
+  "asset_id": "97E863AD",
+  "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+  "source_git_blob_sha1": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+  "source_dimensions": [
+    2048,
+    1024
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_to_readable": "flip_y",
+  "source_decoded_raw_rgba_sha256": "201761d1360a14cee6acb9ef560a519a3557ce5290583616117ed8aba990f76b",
+  "source_decoded_display_rgba_sha256": "20b369027f602f4226ef27984bf174f8b8cae6bee6ea0affd2e54764ff7ca4bf",
+  "header_128_sha256": "2195f6a7c276e34259dcfa3a2af6b7424780c19478a08dc6ad597ba2753b3456",
+  "header_128_exact": true,
+  "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+  "clean_plate_status": "PASS",
+  "removal_mask_pixels": 152967,
+  "removal_mask_sha256": "ad5a9c602ee44f6553b166cc8569cec916fd629cc019a80c24fc4da6f3f6e020",
+  "protected_mask_pixels": 99117,
+  "protected_mask_sha256": "eab9b7774140b85b642e5d5613615231c7028e0162f66c9f5e48ccb5567f4200",
+  "clean_plate_display_rgba_sha256": "225df36d8c14ed3d35322fce6c08db27d09d53d43a764bb99757c276042768bf",
+  "clean_changed_pixels_outside_removal_mask": 0,
+  "clean_alpha_changed_pixels_outside_removal_mask": 0,
+  "clean_residual_alpha_inside_removal_mask": 0,
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_sha256": "9f7bbf519b1dc4ed29e0cd10481d42e086567d1d8d2d285e32b52814bead7c89",
+  "prompt_json_sha256": "396004063220dde05f01ff6362d8c5caab02bab4943c015e3c537ca4facdc858",
+  "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "source_baseline_vector_readable": [
+    1,
+    0
+  ],
+  "candidate_baseline_vector_readable": [
+    1,
+    0
+  ],
+  "source_signed_slant_angle_deg": 0,
+  "candidate_signed_slant_angle_deg": 0,
+  "source_slant_direction": "none",
+  "candidate_slant_direction": "none",
+  "signed_slant_gate": "PASS",
+  "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow; transparent atlas",
+  "raster_resampling": "NOT_USED",
+  "candidate_dds_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+  "candidate_bytes": 8388736,
+  "candidate_decoded_display_rgba_sha256": "944567fa0ffe1182ac76ac2002143658bc1edb337bab46f86b96ce49cfd24ce9",
+  "candidate_status": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
+  "letter_pixels": 84738,
+  "letter_mask_sha256": "915ae7253a2ae24f13d9c66495428e162d7f3b5ac2b01aed8d1b5c16f3555467",
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_outside_source_region": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "introduced_alpha_outside_source_region": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "one_pixel_overflow": 0,
+  "containment": "PASS_2PX_INSET_ALL_13",
+  "elements": [
+    {
+      "element_index": 0,
+      "source": "WELCOME TO THE",
+      "korean": "환영합니다",
+      "original_bbox": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "candidate_safe_bbox": [
+        5,
+        150,
+        474,
+        193
+      ],
+      "localized_bbox": [
+        7,
+        151,
+        199,
+        192
+      ],
+      "delta_left": 4,
+      "delta_right": -277,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        275,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 42,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 1,
+      "source": "ONLINE",
+      "korean": "온라인",
+      "original_bbox": [
+        1660,
+        156,
+        1832,
+        194
+      ],
+      "candidate_safe_bbox": [
+        1662,
+        158,
+        1830,
+        192
+      ],
+      "localized_bbox": [
+        1664,
+        159,
+        1749,
+        191
+      ],
+      "delta_left": 4,
+      "delta_right": -83,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        81,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 32,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 2,
+      "source": "Goal C",
+      "korean": "골 C",
+      "original_bbox": [
+        30,
+        221,
+        188,
+        268
+      ],
+      "candidate_safe_bbox": [
+        32,
+        223,
+        186,
+        266
+      ],
+      "localized_bbox": [
+        34,
+        224,
+        114,
+        265
+      ],
+      "delta_left": 4,
+      "delta_right": -74,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        72,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 3,
+      "source": "Goal B",
+      "korean": "골 B",
+      "original_bbox": [
+        492,
+        221,
+        648,
+        268
+      ],
+      "candidate_safe_bbox": [
+        494,
+        223,
+        646,
+        266
+      ],
+      "localized_bbox": [
+        496,
+        224,
+        576,
+        265
+      ],
+      "delta_left": 4,
+      "delta_right": -72,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        70,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 4,
+      "source": "Goal A",
+      "korean": "골 A",
+      "original_bbox": [
+        950,
+        221,
+        1115,
+        268
+      ],
+      "candidate_safe_bbox": [
+        952,
+        223,
+        1113,
+        266
+      ],
+      "localized_bbox": [
+        954,
+        224,
+        1034,
+        265
+      ],
+      "delta_left": 4,
+      "delta_right": -81,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        79,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 5,
+      "source": "15 Cont.",
+      "korean": "15코스",
+      "original_bbox": [
+        1413,
+        221,
+        1622,
+        268
+      ],
+      "candidate_safe_bbox": [
+        1415,
+        223,
+        1620,
+        266
+      ],
+      "localized_bbox": [
+        1420,
+        224,
+        1565,
+        265
+      ],
+      "delta_left": 7,
+      "delta_right": -57,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        5,
+        1,
+        55,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 50,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 6,
+      "source": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "original_bbox": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "candidate_safe_bbox": [
+        10,
+        299,
+        538,
+        357
+      ],
+      "localized_bbox": [
+        15,
+        300,
+        271,
+        356
+      ],
+      "delta_left": 7,
+      "delta_right": -269,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        5,
+        1,
+        267,
+        1
+      ],
+      "fill_rgb": [
+        78,
+        96,
+        100
+      ],
+      "font_size_px": 58,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 7,
+      "source": "Goal E",
+      "korean": "골 E",
+      "original_bbox": [
+        1011,
+        308,
+        1171,
+        355
+      ],
+      "candidate_safe_bbox": [
+        1013,
+        310,
+        1169,
+        353
+      ],
+      "localized_bbox": [
+        1015,
+        311,
+        1092,
+        352
+      ],
+      "delta_left": 4,
+      "delta_right": -79,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        77,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 8,
+      "source": "Goal D",
+      "korean": "골 D",
+      "original_bbox": [
+        1473,
+        308,
+        1629,
+        355
+      ],
+      "candidate_safe_bbox": [
+        1475,
+        310,
+        1627,
+        353
+      ],
+      "localized_bbox": [
+        1477,
+        311,
+        1558,
+        352
+      ],
+      "delta_left": 4,
+      "delta_right": -71,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        2,
+        1,
+        69,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 9,
+      "source": "View the online multiplayer rankings!",
+      "korean": "온라인 멀티플레이 랭킹 보기",
+      "original_bbox": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "candidate_safe_bbox": [
+        9,
+        386,
+        1135,
+        448
+      ],
+      "localized_bbox": [
+        12,
+        387,
+        742,
+        447
+      ],
+      "delta_left": 5,
+      "delta_right": -395,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        3,
+        1,
+        393,
+        1
+      ],
+      "fill_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_size_px": 63,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 10,
+      "source": "View OutRun2SP arcade rankings!",
+      "korean": "아웃런2 SP 아케이드 랭킹 보기",
+      "original_bbox": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "candidate_safe_bbox": [
+        9,
+        546,
+        1057,
+        608
+      ],
+      "localized_bbox": [
+        12,
+        547,
+        817,
+        607
+      ],
+      "delta_left": 5,
+      "delta_right": -242,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        3,
+        1,
+        240,
+        1
+      ],
+      "fill_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_size_px": 63,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 11,
+      "source": "View OutRun single player rankings!",
+      "korean": "아웃런 싱글 플레이 랭킹 보기",
+      "original_bbox": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "candidate_safe_bbox": [
+        9,
+        706,
+        1074,
+        768
+      ],
+      "localized_bbox": [
+        12,
+        707,
+        757,
+        767
+      ],
+      "delta_left": 5,
+      "delta_right": -319,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        3,
+        1,
+        317,
+        1
+      ],
+      "fill_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_size_px": 63,
+      "multiline": false,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    },
+    {
+      "element_index": 12,
+      "source": "OUTRUN SHOWROOM",
+      "korean": "아웃런\n쇼룸",
+      "original_bbox": [
+        1205,
+        890,
+        1594,
+        1011
+      ],
+      "candidate_safe_bbox": [
+        1207,
+        892,
+        1592,
+        1009
+      ],
+      "localized_bbox": [
+        1210,
+        893,
+        1345,
+        1008
+      ],
+      "delta_left": 5,
+      "delta_right": -249,
+      "delta_top": 3,
+      "delta_bottom": -3,
+      "safe_margins_ltrb": [
+        3,
+        1,
+        247,
+        1
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 51,
+      "multiline": true,
+      "containment": "PASS",
+      "rework_status": "NOT_REQUIRED"
+    }
+  ],
+  "protected_visible_source": [
+    "TESTAROSSA",
+    "OUTRUN2SP logo",
+    "SP OR",
+    "opaque structural rectangle/non-semantic art"
+  ],
+  "manual_visual_review": {
+    "status": "PASS_PRODUCER_VISUAL_REVIEW_PENDING_INDEPENDENT_C",
+    "full_atlas_comparison": "PASS_ALL_13_TRANSLATIONS_VISIBLE_NO_CLIPPING_OR_OVERLAP",
+    "english_residue_in_localized_regions": "NONE_OBSERVED",
+    "protected_artwork": "PASS_TESTAROSSA_OUTRUN2SP_SP_OR_UNCHANGED",
+    "wrong_image_replacement": "NONE_OBSERVED",
+    "broken_hangul": "NONE_OBSERVED",
+    "resolution_loss": "NONE_OBSERVED",
+    "raw_orientation": "PASS_FLIP_Y_MATCHES_SOURCE_STORAGE",
+    "source_style": "PASS_UPRIGHT_HEAVY_CONDENSED_SANS_APPROXIMATION_FLAT_DARK_GRAY_NO_ADDED_EFFECTS"
+  },
+  "drive_artifacts": {
+    "root_policy": "OutRun2006_Korean_Artifacts/CURRENT_PIPELINE (outside historical snapshot)",
+    "folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "candidate_zip": {
+      "file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+      "name": "B00231_INDEX193_CANDIDATE.zip",
+      "sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+      "bytes": 68578,
+      "inner_member": "97E863AD_512x256.dds",
+      "inner_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+      "inner_bytes": 8388736
+    },
+    "source_display": {
+      "file_id": "1EKOTvUXG3TamFNf88Ifld3yFqzXUlkrY",
+      "name": "source_display.png",
+      "sha256": "fbde29923459de0a5ea0d30bd21b49bbff1fb24fd3b243ff8e008e91fbf7eb52",
+      "bytes": 126606
+    },
+    "clean_plate_display": {
+      "file_id": "1HJBa7pK4GsTf7qoLQ7eofYgthcQiwp3-",
+      "name": "clean_plate_display.png",
+      "sha256": "63080b4a4b21e1de5adee27c980e7f3c277c3df6f5c67c374fc235a621940b96",
+      "bytes": 34626
+    },
+    "candidate_display": {
+      "file_id": "1VicTPFBUA9eSpaOATfsreWGeENulYg0U",
+      "name": "candidate_display.png",
+      "sha256": "b4ad1db4ed2511cf6c317651f2ece41334e77bc7b03bbc75b8424c24e5ddda2f",
+      "bytes": 82626
+    },
+    "comparison": {
+      "file_id": "11n0dxJ4f2Ch6OtDwuQFwywHM1Eaqtz4J",
+      "name": "comparison.png",
+      "sha256": "befa655b499da126241ac8ceda19aa412bc34552b7f05608b355f3c0c99d1b38",
+      "bytes": 208970
+    },
+    "element_comparison": {
+      "file_id": "1kDY-lDCdKorKF3AhHnnSo05jCncEeGi_",
+      "name": "element_comparison.png",
+      "sha256": "ab00325785b8c142aa34c148690c36974702cb1a37aed025597505d252ded93e",
+      "bytes": 225977
+    }
+  },
+  "candidate_storage": {
+    "kind": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "drive_folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "drive_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+    "archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+    "archive_bytes": 68578,
+    "inner_member": "97E863AD_512x256.dds",
+    "inner_member_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+    "inner_member_bytes": 8388736,
+    "producer_task_id": "LOCALIZATION-LOCALIZATION_B-00231",
+    "producer_result_sha": "PENDING_POST_COMMIT",
+    "validation_state": "PENDING_C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_validation": "UNTESTED"
+}

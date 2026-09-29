@@ -1,0 +1,156 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00231-p00124-index193-v2-production-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00231",
+  "wave_id": "P00124",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T07:48:30+09:00",
+  "base_head_sha": "4ba6c98c32f1a119f5b65985d2d7dcbef82ab25c",
+  "queue_index": 193,
+  "asset": "97E863AD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX193_V2_KOREAN_RGBA32_CANDIDATE_STATIC_QA_RUNTIME_UNTESTED",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_index_rule_overridden_by_current_git_contract": true,
+    "ready_scan_at_start": "Q00050: B RENDER_READY=[]; ONE_STAGE_TO_RENDER=[]",
+    "later_head_change": "Q00051 promoted index231 only; index231%3=0 A shard, so no new B ready-tier preemption",
+    "selected_priority": "PREFLIGHT_ONLY_INDEX193_THEN_SAME_INVOCATION_CANDIDATE_COMPLETION",
+    "new_preflight_batches": 1,
+    "policy_reason": "Index193 was the highest current B actionable PREFLIGHT_ONLY. Full-canvas exact segmentation completed the last deterministic prerequisites; contract then required continuing through CLEAN_PLATE, render, encode and decoded-final QA in this same invocation."
+  },
+  "source": {
+    "transport": "approved Drive exact path SOURCE_TRANSPORT_MISS -> verified pinned v0.25.10a Release fallback",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "git_blob_sha1": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "canonical_inventory_match": true
+  },
+  "accepted_precandidate_lineage": {
+    "b00223_result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663",
+    "c152_q00050_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "production_readiness_before": "PREFLIGHT_ONLY"
+  },
+  "production": {
+    "semantic_bindings": 13,
+    "removal_mask_pixels": 152967,
+    "protected_mask_pixels": 99117,
+    "clean_plate_qa": "PASS",
+    "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow; transparent atlas",
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "source_slant_direction": "none",
+    "candidate_slant_direction": "none",
+    "signed_slant_gate": "PASS",
+    "raster_resampling": "NOT_USED",
+    "safe_fit": "PASS_2PX_INSET_ALL_13"
+  },
+  "candidate": {
+    "sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+    "bytes": 8388736,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "one_pixel_overflow": 0,
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "drive_folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "drive_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+    "storage_archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+    "storage_archive_bytes": 68578,
+    "storage_inner_member": "97E863AD_512x256.dds"
+  },
+  "drive_artifacts": {
+    "root_policy": "OutRun2006_Korean_Artifacts/CURRENT_PIPELINE (outside historical snapshot)",
+    "folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "candidate_zip": {
+      "file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+      "name": "B00231_INDEX193_CANDIDATE.zip",
+      "sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+      "bytes": 68578,
+      "inner_member": "97E863AD_512x256.dds",
+      "inner_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+      "inner_bytes": 8388736
+    },
+    "source_display": {
+      "file_id": "1EKOTvUXG3TamFNf88Ifld3yFqzXUlkrY",
+      "name": "source_display.png",
+      "sha256": "fbde29923459de0a5ea0d30bd21b49bbff1fb24fd3b243ff8e008e91fbf7eb52",
+      "bytes": 126606
+    },
+    "clean_plate_display": {
+      "file_id": "1HJBa7pK4GsTf7qoLQ7eofYgthcQiwp3-",
+      "name": "clean_plate_display.png",
+      "sha256": "63080b4a4b21e1de5adee27c980e7f3c277c3df6f5c67c374fc235a621940b96",
+      "bytes": 34626
+    },
+    "candidate_display": {
+      "file_id": "1VicTPFBUA9eSpaOATfsreWGeENulYg0U",
+      "name": "candidate_display.png",
+      "sha256": "b4ad1db4ed2511cf6c317651f2ece41334e77bc7b03bbc75b8424c24e5ddda2f",
+      "bytes": 82626
+    },
+    "comparison": {
+      "file_id": "11n0dxJ4f2Ch6OtDwuQFwywHM1Eaqtz4J",
+      "name": "comparison.png",
+      "sha256": "befa655b499da126241ac8ceda19aa412bc34552b7f05608b355f3c0c99d1b38",
+      "bytes": 208970
+    },
+    "element_comparison": {
+      "file_id": "1kDY-lDCdKorKF3AhHnnSo05jCncEeGi_",
+      "name": "element_comparison.png",
+      "sha256": "ab00325785b8c142aa34c148690c36974702cb1a37aed025597505d252ded93e",
+      "bytes": 225977
+    }
+  },
+  "review_proof": {
+    "english_source_vs_korean_candidate": "PASS",
+    "whole_atlas_and_13_elements_reviewed": true,
+    "source_display_sha256": "fbde29923459de0a5ea0d30bd21b49bbff1fb24fd3b243ff8e008e91fbf7eb52",
+    "clean_plate_display_sha256": "63080b4a4b21e1de5adee27c980e7f3c277c3df6f5c67c374fc235a621940b96",
+    "candidate_display_sha256": "b4ad1db4ed2511cf6c317651f2ece41334e77bc7b03bbc75b8424c24e5ddda2f",
+    "comparison_sha256": "befa655b499da126241ac8ceda19aa412bc34552b7f05608b355f3c0c99d1b38",
+    "element_comparison_sha256": "ab00325785b8c142aa34c148690c36974702cb1a37aed025597505d252ded93e"
+  },
+  "readiness_after": "CANDIDATE_PERSISTED_PRODUCER_STATIC_PASS_PENDING_INDEPENDENT_C",
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_source_transport_miss": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "bcb9c3b5f7968feaf8931f688ba7bbb33e9accb0",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "c00228_blob_sha": "166cee891bf8fb636d664c46c6eb7ec7fc39a19e",
+    "c00233_blob_sha": "82dd33fcc9e8ee5f053637822b74fd1aefae89e6",
+    "b00223_blob_sha": "faedc7b53a3c89dde49d9e09fd63eab88b788c9d"
+  }
+}

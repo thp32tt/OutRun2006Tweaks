@@ -1,0 +1,338 @@
+{
+  "schema_version": 14,
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00231",
+  "wave_id": "P00124",
+  "queue_index": 193,
+  "asset_id": "97E863AD",
+  "source": {
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y"
+  },
+  "font": {
+    "identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb"
+  },
+  "rules": [
+    "Use only exact canonical index193 source SHA-256 d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451.",
+    "Treat source as transparent text/logo atlas; remove only the 13 bound localizable English text effects and preserve every other source pixel exactly.",
+    "Preserve TESTAROSSA, OUTRUN2SP logo, SP OR and structural/non-localizable pixels unchanged.",
+    "Build deterministic transparent CLEAN_PLATE by zeroing exact source localizable effect pixels only; require zero changes outside removal mask and zero protected changes.",
+    "Render approved Korean strings natively with Noto Sans CJK KR Bold, upright horizontal baseline, zero slant, source-sampled flat dark-gray fill, no added outline/shadow/glow.",
+    "For OUTRUN SHOWROOM use two readable lines: 아웃런 / 쇼룸 to preserve source layout.",
+    "Candidate effect-inclusive bbox must stay at least 2 px inside each measured source effect bbox; render-measure-refit, never resample a flattened text raster.",
+    "Construct in readable coordinates then flip vertically back to raw DDS storage.",
+    "Preserve exact 128-byte source DDS header and RGBA32 mip1 format; replace payload only.",
+    "Decoded-final self-QA must prove zero outside-edit changes, zero protected changes, zero alpha escape, zero 1px overflow and exact English-source comparison."
+  ],
+  "elements": [
+    {
+      "source": "WELCOME TO THE",
+      "approved_korean": "환영합니다",
+      "source_effect_bbox_readable": [
+        3,
+        148,
+        476,
+        195
+      ],
+      "candidate_safe_bbox_readable": [
+        5,
+        150,
+        474,
+        193
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 42,
+      "multiline": false
+    },
+    {
+      "source": "ONLINE",
+      "approved_korean": "온라인",
+      "source_effect_bbox_readable": [
+        1660,
+        156,
+        1832,
+        194
+      ],
+      "candidate_safe_bbox_readable": [
+        1662,
+        158,
+        1830,
+        192
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 32,
+      "multiline": false
+    },
+    {
+      "source": "Goal C",
+      "approved_korean": "골 C",
+      "source_effect_bbox_readable": [
+        30,
+        221,
+        188,
+        268
+      ],
+      "candidate_safe_bbox_readable": [
+        32,
+        223,
+        186,
+        266
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false
+    },
+    {
+      "source": "Goal B",
+      "approved_korean": "골 B",
+      "source_effect_bbox_readable": [
+        492,
+        221,
+        648,
+        268
+      ],
+      "candidate_safe_bbox_readable": [
+        494,
+        223,
+        646,
+        266
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false
+    },
+    {
+      "source": "Goal A",
+      "approved_korean": "골 A",
+      "source_effect_bbox_readable": [
+        950,
+        221,
+        1115,
+        268
+      ],
+      "candidate_safe_bbox_readable": [
+        952,
+        223,
+        1113,
+        266
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false
+    },
+    {
+      "source": "15 Cont.",
+      "approved_korean": "15코스",
+      "source_effect_bbox_readable": [
+        1413,
+        221,
+        1622,
+        268
+      ],
+      "candidate_safe_bbox_readable": [
+        1415,
+        223,
+        1620,
+        266
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 50,
+      "multiline": false
+    },
+    {
+      "source": "MULTIPLAYER",
+      "approved_korean": "멀티플레이",
+      "source_effect_bbox_readable": [
+        8,
+        297,
+        540,
+        359
+      ],
+      "candidate_safe_bbox_readable": [
+        10,
+        299,
+        538,
+        357
+      ],
+      "fill_rgb": [
+        78,
+        96,
+        100
+      ],
+      "font_size_px": 58,
+      "multiline": false
+    },
+    {
+      "source": "Goal E",
+      "approved_korean": "골 E",
+      "source_effect_bbox_readable": [
+        1011,
+        308,
+        1171,
+        355
+      ],
+      "candidate_safe_bbox_readable": [
+        1013,
+        310,
+        1169,
+        353
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false
+    },
+    {
+      "source": "Goal D",
+      "approved_korean": "골 D",
+      "source_effect_bbox_readable": [
+        1473,
+        308,
+        1629,
+        355
+      ],
+      "candidate_safe_bbox_readable": [
+        1475,
+        310,
+        1627,
+        353
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 45,
+      "multiline": false
+    },
+    {
+      "source": "View the online multiplayer rankings!",
+      "approved_korean": "온라인 멀티플레이 랭킹 보기",
+      "source_effect_bbox_readable": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "candidate_safe_bbox_readable": [
+        9,
+        386,
+        1135,
+        448
+      ],
+      "fill_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_size_px": 63,
+      "multiline": false
+    },
+    {
+      "source": "View OutRun2SP arcade rankings!",
+      "approved_korean": "아웃런2 SP 아케이드 랭킹 보기",
+      "source_effect_bbox_readable": [
+        7,
+        544,
+        1059,
+        610
+      ],
+      "candidate_safe_bbox_readable": [
+        9,
+        546,
+        1057,
+        608
+      ],
+      "fill_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_size_px": 63,
+      "multiline": false
+    },
+    {
+      "source": "View OutRun single player rankings!",
+      "approved_korean": "아웃런 싱글 플레이 랭킹 보기",
+      "source_effect_bbox_readable": [
+        7,
+        704,
+        1076,
+        770
+      ],
+      "candidate_safe_bbox_readable": [
+        9,
+        706,
+        1074,
+        768
+      ],
+      "fill_rgb": [
+        63,
+        71,
+        74
+      ],
+      "font_size_px": 63,
+      "multiline": false
+    },
+    {
+      "source": "OUTRUN SHOWROOM",
+      "approved_korean": "아웃런\n쇼룸",
+      "source_effect_bbox_readable": [
+        1205,
+        890,
+        1594,
+        1011
+      ],
+      "candidate_safe_bbox_readable": [
+        1207,
+        892,
+        1592,
+        1009
+      ],
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "font_size_px": 51,
+      "multiline": true
+    }
+  ],
+  "raster_resampling": "NOT_USED",
+  "prompt_sha256": "9f7bbf519b1dc4ed29e0cd10481d42e086567d1d8d2d285e32b52814bead7c89"
+}

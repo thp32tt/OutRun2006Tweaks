@@ -1,0 +1,148 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00231-p00124-index193-v2-production-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00231",
+  "wave_id": "P00124",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:48:30+09:00",
+  "base_head_sha": "4ba6c98c32f1a119f5b65985d2d7dcbef82ab25c",
+  "base_sha": "4ba6c98c32f1a119f5b65985d2d7dcbef82ab25c",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX193_V2_CANDIDATE_METADATA_REVIEW_EVIDENCE_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX193_V2_KOREAN_RGBA32_CANDIDATE_STATIC_QA_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD policy uses modulo-3, so B owns index%3==1. At task selection Q00050 had no B RENDER_READY/ONE_STAGE_TO_RENDER. Index193/97E863AD was the highest current B actionable PREFLIGHT_ONLY with exact canonical source already C-accepted. Approved Drive source fast path missed, so the verified pinned v0.25.10a Release member was replayed and exactly matched canonical SHA d308bf05..., RGBA32 2048x1024 mip1 FLIP_Y. Full-canvas readable inspection resolved all 13 semantic effect regions while preserving TESTAROSSA, OUTRUN2SP, SP OR and structural pixels. Because this completed readiness during the invocation, production continued without an artificial boundary: exact removal/protected masks -> deterministic transparent CLEAN_PLATE -> source baseline/slant/style measurement -> native Noto Sans CJK KR Bold render -> measure/refit -> exact-header RGBA32 DDS encode -> decoded-final self-QA -> English-source comparison. All 13 Korean bboxes are inside 2px-inset source envelopes; outside-edit, alpha-escape, protected changes and one-pixel overflow are zero. Exact 8,388,736-byte DDS SHA 3646e6b6... plus review PNGs are persisted under approved Drive CURRENT_PIPELINE, with IDs/hashes recorded in Git. Q00051 arrived before commit but its sole new RENDER_READY index231 belongs A (231%3=0), so it does not preempt this B result. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_index_rule_overridden_by_current_git_contract": true,
+    "ready_scan_at_start": "Q00050: B RENDER_READY=[]; ONE_STAGE_TO_RENDER=[]",
+    "later_head_change": "Q00051 promoted index231 only; index231%3=0 A shard, so no new B ready-tier preemption",
+    "selected_priority": "PREFLIGHT_ONLY_INDEX193_THEN_SAME_INVOCATION_CANDIDATE_COMPLETION",
+    "new_preflight_batches": 1,
+    "policy_reason": "Index193 was the highest current B actionable PREFLIGHT_ONLY. Full-canvas exact segmentation completed the last deterministic prerequisites; contract then required continuing through CLEAN_PLATE, render, encode and decoded-final QA in this same invocation."
+  },
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00231-P00124/B00231_P00124_INDEX193_V2_PRODUCTION.json",
+    "localization/graphics/role_B/20260930-B00231-P00124/generation_prompt.json",
+    "localization/graphics/role_B/20260930-B00231-P00124/qa_report.json"
+  ],
+  "external_material_evidence": {
+    "root_policy": "OutRun2006_Korean_Artifacts/CURRENT_PIPELINE (outside historical snapshot)",
+    "folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "candidate_zip": {
+      "file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+      "name": "B00231_INDEX193_CANDIDATE.zip",
+      "sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+      "bytes": 68578,
+      "inner_member": "97E863AD_512x256.dds",
+      "inner_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+      "inner_bytes": 8388736
+    },
+    "source_display": {
+      "file_id": "1EKOTvUXG3TamFNf88Ifld3yFqzXUlkrY",
+      "name": "source_display.png",
+      "sha256": "fbde29923459de0a5ea0d30bd21b49bbff1fb24fd3b243ff8e008e91fbf7eb52",
+      "bytes": 126606
+    },
+    "clean_plate_display": {
+      "file_id": "1HJBa7pK4GsTf7qoLQ7eofYgthcQiwp3-",
+      "name": "clean_plate_display.png",
+      "sha256": "63080b4a4b21e1de5adee27c980e7f3c277c3df6f5c67c374fc235a621940b96",
+      "bytes": 34626
+    },
+    "candidate_display": {
+      "file_id": "1VicTPFBUA9eSpaOATfsreWGeENulYg0U",
+      "name": "candidate_display.png",
+      "sha256": "b4ad1db4ed2511cf6c317651f2ece41334e77bc7b03bbc75b8424c24e5ddda2f",
+      "bytes": 82626
+    },
+    "comparison": {
+      "file_id": "11n0dxJ4f2Ch6OtDwuQFwywHM1Eaqtz4J",
+      "name": "comparison.png",
+      "sha256": "befa655b499da126241ac8ceda19aa412bc34552b7f05608b355f3c0c99d1b38",
+      "bytes": 208970
+    },
+    "element_comparison": {
+      "file_id": "1kDY-lDCdKorKF3AhHnnSo05jCncEeGi_",
+      "name": "element_comparison.png",
+      "sha256": "ab00325785b8c142aa34c148690c36974702cb1a37aed025597505d252ded93e",
+      "bytes": 225977
+    }
+  },
+  "material_deliverable": {
+    "type": "INDEX193_97E863AD_V2_KOREAN_RGBA32_DDS_CANDIDATE_WITH_DECODED_FINAL_QA_AND_ENGLISH_COMPARISON",
+    "reviewed_indices": [
+      193
+    ],
+    "reviewed_assets": [
+      "97E863AD"
+    ],
+    "candidate_dds_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+    "candidate_dds_bytes": 8388736,
+    "candidate_dds_modified": true,
+    "translated_regions": 13,
+    "protected_original_groups": 4,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "one_pixel_overflow": 0,
+    "drive_candidate_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+    "drive_candidate_archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+    "material_payload_persisted": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "PREFLIGHT_ONLY_TO_SAME_INVOCATION_CANDIDATE_COMPLETION",
+    "selected_indices": [
+      193
+    ],
+    "render_ready_at_start": [],
+    "one_stage_to_render_at_start": [],
+    "c_passed_b00226_index163": "PREFLIGHT_ONLY_NOT_READY",
+    "c_passed_b00229_index175": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_STICKY",
+    "q00051_new_ready_index231": "A_SHARD_NOT_B",
+    "readiness_before": {
+      "193": "PREFLIGHT_ONLY"
+    },
+    "readiness_after": {
+      "193": "CANDIDATE_PERSISTED_PRODUCER_STATIC_PASS_PENDING_INDEPENDENT_C"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX193__EXACT_CANONICAL_SOURCE_D308BF05_RGBA32_2048X1024_MIP1_FLIP_Y__13_OF_13_SEMANTIC_BINDINGS__REMOVAL_MASK_152967__PROTECTED_MASK_99117__CLEAN_PLATE_ZERO_OUTSIDE_ZERO_ALPHA_ESCAPE_ZERO_RESIDUE__NATIVE_RENDER_NO_FLATTEN_RESIZE__13_OF_13_2PX_SAFE_FIT__EXACT_HEADER__CANDIDATE_3646E6B6__ZERO_OUTSIDE_EDIT_ZERO_PROTECTED_ZERO_ALPHA_ESCAPE_ZERO_1PX_OVERFLOW__ENGLISH_COMPARISON_VISUAL_PASS__RUNTIME_UNTESTED",
+  "candidate_static_qa": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Verified exact pinned v0.25.10a source fallback only; newly generated candidate/review binaries stored outside historical snapshot under CURRENT_PIPELINE.",
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT",
+  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "result_commit_message": "localization(B): persist index193 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00231]",
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "bcb9c3b5f7968feaf8931f688ba7bbb33e9accb0",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "c00228_blob_sha": "166cee891bf8fb636d664c46c6eb7ec7fc39a19e",
+    "c00233_blob_sha": "82dd33fcc9e8ee5f053637822b74fd1aefae89e6",
+    "b00223_blob_sha": "faedc7b53a3c89dde49d9e09fd63eab88b788c9d"
+  }
+}
