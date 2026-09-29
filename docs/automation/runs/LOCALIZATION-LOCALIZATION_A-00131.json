@@ -1,0 +1,127 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00131",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00058",
+  "recorded_at_kst": "2026-09-29T20:24:30+09:00",
+  "base_sha": "a45fb07b70af23ddad693145926abd821b685502",
+  "material_commit_sha": "6c025d24427400e98174518bc49bd0f062e14b68",
+  "pre_task_record_head_sha": "6c025d24427400e98174518bc49bd0f062e14b68",
+  "commit_mode": "MATERIAL_REPORT_THEN_DURABLE_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_SCHEMA8_ZERO_CANDIDATE_EXCEPTION_TWO_ODD_CANONICAL_SOURCE_REACQUISITION",
+  "summary": "Resumed A00131 after rollover without repeating completed work. The prior rollover path had selected odd indices 55/119 because old Release-based evidence appeared one style-measurement stage from rendering. Fresh current-HEAD validation proves both canonical user-HD inventory sources are instead 512x64 RGBA, while the old A00107/A00105 mask/CLEAN_PLATE/safe-bbox evidence was measured from 2048x256 DXT5 Release DDS. Under the current candidate-first/source-faithfulness contract, that Release pixel geometry is nonauthoritative. Exact canonical queue-path source bytes are absent, so no safe baseline/slant/style measurement or Korean DDS render is legal. This task materially advances 55/119 by pinning their canonical SHA-256/canvas/RGBA identities, preserving only the two current translation semantics, and explicitly retiring the stale Release header/orientation/mask/CLEAN_PLATE/safe-bbox lineage as canonical construction input. No DDS/shared-state/build/runtime changes.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-2021-A00131-P00058/A00131_P00058_ODD_CANONICAL_HD_REACQUISITION.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "TWO_ODD_CANONICAL_USER_HD_SOURCE_REACQUISITION_AND_RELEASE_GEOMETRY_RETIREMENT_MANIFESTS",
+    "indices": [55, 119],
+    "assets": ["2EA557B4", "F6811E94"],
+    "canonical_inventory_identities_pinned": 2,
+    "canonical_inventory_canvases_pinned": 2,
+    "canonical_modes_pinned_rgba": 2,
+    "current_semantic_entries_reused": 2,
+    "release_geometry_sets_retired_as_canonical_authority": 2,
+    "exact_hash_gated_acquisition_pipelines_created": 2,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_candidate_dds_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "schema8_zero_candidate_exception_proven": true
+  },
+  "selection_reconciliation": {
+    "prior_rollover_selected_indices": [55, 119],
+    "prior_apparent_missing_stage": "baseline/signed-slant/source-style measurement before Korean rendering",
+    "current_authoritative_correction": "CANONICAL_INVENTORY_SOURCE_IDENTITY_OVERRIDES_RELEASE_DERIVED_PIXEL_GEOMETRY",
+    "index55": {
+      "canonical": {
+        "sha256": "8a39e88bf0d60654b4460c06b18f3c3639c3790375ae0557a337fa75a9b3de6a",
+        "dimensions": [512, 64],
+        "mode": "RGBA"
+      },
+      "retired_release": {
+        "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+        "dimensions": [2048, 256],
+        "format": "DXT5/BC3",
+        "source_effect_bbox_ltrb_exclusive": [26, 92, 1090, 151],
+        "candidate_safe_bbox_ltrb": [28, 94, 1088, 149]
+      },
+      "translation": ["NEXT ROUND", "다음 라운드"]
+    },
+    "index119": {
+      "canonical": {
+        "sha256": "18534e553acdaf37816d193cf951ffb47f2f98223697964a724cad74fab0364a",
+        "dimensions": [512, 64],
+        "mode": "RGBA"
+      },
+      "retired_release": {
+        "git_blob_sha": "c6bcd8b847e0f0a2f34ca9f9ea3b1616512bd1e6",
+        "dimensions": [2048, 256],
+        "format": "DXT5/BC3",
+        "source_effect_bbox_ltrb_exclusive": [390, 56, 1632, 202],
+        "candidate_safe_bbox_ltrb": [392, 58, 1629, 199]
+      },
+      "translation": ["Time Attack Mode", "타임 어택 모드"]
+    }
+  },
+  "readiness_audit": {
+    "fresh_scan_head": "a45fb07b70af23ddad693145926abd821b685502",
+    "odd_localize_text_rows": 46,
+    "pending_artwork_rows": 36,
+    "dependency_blocked_direct_rework_rows": [51, 53, 111, 121],
+    "qa_pending_candidate_rows_skipped": [57, 97],
+    "candidate_or_runtime_validation_backlog_rows_not_material_rework": [61, 63, 195, 197],
+    "selected_assets_current_canonical_source_backed_render_ready": false,
+    "selected_assets_current_canonical_one_stage_to_render": false,
+    "zero_candidate_exception": "VALID_FOR_ONE_PREFLIGHT_ONLY_BATCH"
+  },
+  "reused_immutable_evidence": {
+    "automation_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+    "controller_roles_blob_sha": "fea2e41c3000905d479e43b923d0f0f42126523b",
+    "queue_blob_sha": "f88386e1484054f2f6efb39e59d556ee6809067e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "a206e5f0c6364ca6d55dc50cb860da0847253b06",
+    "resume_state_blob_sha": "18ee8946b19e47b3cec3709520594c035eca4cb5",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00107_task_record_blob_sha": "b5387d49a8fd9ad31faf814c1d3b759d5f918604",
+    "a00107_material_report_blob_sha": "ee1a2c850b3fc744d7fc40183fdbf502f79dd19f",
+    "a00105_task_record_blob_sha": "83a77dcc6e6fdb2f295b979dbeab6b937e167c82",
+    "a00105_material_report_blob_sha": "67da8f6a831436974742edbb3f189bdcb85187c0"
+  },
+  "self_qa": "PASS_ODD_ONLY_55_119__CURRENT_CANONICAL_2_OF_2_SHA256_512x64_RGBA_IDENTITIES__2_OF_2_CURRENT_SEMANTICS__2_OF_2_QUEUE_PATH_SOURCES_ABSENT_FAIL_CLOSED__TWO_RELEASE_2048x256_DXT5_GEOMETRY_SETS_RETIRED_AS_CANONICAL_AUTHORITY__ONE_SCHEMA8_PREFLIGHT_ONLY_BATCH__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CURRENT_CANONICAL_V2_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact canonical user-HD DDS bytes matching current inventory identities are absent from Git HEAD for indices 55/119. Prior A00107/A00105 evidence was measured from 4x 2048x256 DXT5 Release sources while canonical inventory is 512x64 RGBA. Therefore the old header/orientation/source-effect/removal-mask/CLEAN_PLATE/safe-bbox lineage cannot authorize baseline/slant/style measurement or Korean pixel construction. Candidate/header/alpha/orientation/containment/source-comparison gates remain HOLD.",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_EXACT_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "baseline_vector_signed_slant_style": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
