@@ -769,6 +769,193 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    FixedFunctionVertexShaderPrototype
+    generate_fixed_function_vertex_shader_prototype(
+        DWORD fvf,
+        UINT stream0Stride)
+    {
+        FixedFunctionVertexShaderPrototype out{};
+
+        const auto layout = translate_vertex_input_layout(
+            nullptr, 0, fvf, stream0Stride);
+        if (!layout.exact || !layout.fvfPath)
+        {
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedInputLayout;
+            return out;
+        }
+        out.inputElements = layout.elementCount;
+
+        const DWORD position = fvf & D3DFVF_POSITION_MASK;
+        switch (position)
+        {
+        case D3DFVF_XYZ:
+            break;
+        case D3DFVF_XYZB1:
+        case D3DFVF_XYZB2:
+        case D3DFVF_XYZB3:
+        case D3DFVF_XYZB4:
+        case D3DFVF_XYZB5:
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedBlend;
+            break;
+        default:
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedPosition;
+            break;
+        }
+
+        if ((fvf & (D3DFVF_LASTBETA_UBYTE4 |
+                    D3DFVF_LASTBETA_D3DCOLOR)) != 0)
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedBlend;
+        if ((fvf & D3DFVF_NORMAL) != 0)
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedNormal;
+        if ((fvf & D3DFVF_PSIZE) != 0)
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedPointSize;
+        if ((fvf & D3DFVF_SPECULAR) != 0)
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedSpecular;
+
+        out.hasDiffuse = (fvf & D3DFVF_DIFFUSE) != 0;
+        out.texCoordCount = static_cast<UINT>(
+            (fvf & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
+        if (out.texCoordCount > 8)
+            out.unsupported |=
+                FixedFunctionVertexShaderPrototypeUnsupportedTexCoord;
+
+        if (out.unsupported !=
+            FixedFunctionVertexShaderPrototypeUnsupportedNone)
+            return out;
+
+        const auto tex_coord_type = [&](UINT index) -> const char*
+        {
+            const DWORD mask = 0x3u << (16u + index * 2u);
+            const DWORD sizeBits = fvf & mask;
+            if (sizeBits == D3DFVF_TEXCOORDSIZE1(index))
+                return "float";
+            if (sizeBits == D3DFVF_TEXCOORDSIZE2(index))
+                return "float2";
+            if (sizeBits == D3DFVF_TEXCOORDSIZE3(index))
+                return "float3";
+            if (sizeBits == D3DFVF_TEXCOORDSIZE4(index))
+                return "float4";
+            return nullptr;
+        };
+
+        auto& shader = out.source;
+        shader.reserve(4096);
+        shader +=
+            "// R93 diagnostic-only fixed-function vertex-shader prototype\n"
+            "cbuffer FixedFunctionTransform : register(b0)\n"
+            "{\n"
+            "    row_major float4x4 worldViewProjection;\n"
+            "};\n"
+            "struct VSInput\n"
+            "{\n"
+            "    float3 position : POSITION0;\n";
+        if (out.hasDiffuse)
+            shader += "    float4 diffuse : COLOR0;\n";
+
+        for (UINT index = 0; index < out.texCoordCount; ++index)
+        {
+            const char* type = tex_coord_type(index);
+            if (!type)
+            {
+                out.unsupported |=
+                    FixedFunctionVertexShaderPrototypeUnsupportedTexCoord;
+                out.source.clear();
+                out.sourceHash = 0;
+                return out;
+            }
+            shader += "    ";
+            shader += type;
+            shader += " tex";
+            shader += std::to_string(index);
+            shader += " : TEXCOORD";
+            shader += std::to_string(index);
+            shader += ";\n";
+        }
+
+        shader +=
+            "};\n"
+            "struct VSOutput\n"
+            "{\n"
+            "    float4 position : SV_Position;\n"
+            "    float4 diffuse : COLOR0;\n";
+        for (UINT index = 0; index < 8; ++index)
+        {
+            shader += "    float4 tex";
+            shader += std::to_string(index);
+            shader += " : TEXCOORD";
+            shader += std::to_string(index);
+            shader += ";\n";
+        }
+        shader +=
+            "};\n"
+            "VSOutput main(VSInput input)\n"
+            "{\n"
+            "    VSOutput output;\n"
+            "    output.position = mul(float4(input.position, 1.0f), "
+            "worldViewProjection);\n";
+        shader += out.hasDiffuse
+            ? "    output.diffuse = input.diffuse;\n"
+            : "    output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);\n";
+
+        for (UINT index = 0; index < 8; ++index)
+        {
+            shader += "    output.tex";
+            shader += std::to_string(index);
+            shader += " = ";
+            if (index >= out.texCoordCount)
+            {
+                shader += "0.0f;\n";
+                continue;
+            }
+
+            const DWORD mask = 0x3u << (16u + index * 2u);
+            const DWORD sizeBits = fvf & mask;
+            if (sizeBits == D3DFVF_TEXCOORDSIZE1(index))
+            {
+                shader += "float4(input.tex";
+                shader += std::to_string(index);
+                shader += ", 0.0f, 0.0f, 0.0f);\n";
+            }
+            else if (sizeBits == D3DFVF_TEXCOORDSIZE2(index))
+            {
+                shader += "float4(input.tex";
+                shader += std::to_string(index);
+                shader += ", 0.0f, 0.0f);\n";
+            }
+            else if (sizeBits == D3DFVF_TEXCOORDSIZE3(index))
+            {
+                shader += "float4(input.tex";
+                shader += std::to_string(index);
+                shader += ", 0.0f);\n";
+            }
+            else if (sizeBits == D3DFVF_TEXCOORDSIZE4(index))
+            {
+                shader += "input.tex";
+                shader += std::to_string(index);
+                shader += ";\n";
+            }
+            else
+            {
+                out.unsupported |=
+                    FixedFunctionVertexShaderPrototypeUnsupportedTexCoord;
+                out.source.clear();
+                out.sourceHash = 0;
+                return out;
+            }
+        }
+
+        shader += "    return output;\n}\n";
+        out.sourceHash = hash_shader_source(shader);
+        return out;
+    }
+
     PipelineTranslation translate_pipeline(
         const OutRunVR::DrawState::RenderStateSnapshot& source) noexcept
     {

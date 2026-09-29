@@ -149,6 +149,45 @@ namespace outrun::vr::dx11
     compile_fixed_function_pixel_shader_prototype(
         const FixedFunctionPixelShaderPrototype& prototype) noexcept;
 
+    // R93 emits a diagnostic-only vertex-shader source for the narrow
+    // untransformed fixed-function FVF subset that can feed the R84 pixel
+    // prototype. It models a future b0 WVP constant-buffer contract but never
+    // binds a shader or changes native-draw activation.
+    enum FixedFunctionVertexShaderPrototypeUnsupported : std::uint32_t
+    {
+        FixedFunctionVertexShaderPrototypeUnsupportedNone = 0,
+        FixedFunctionVertexShaderPrototypeUnsupportedInputLayout = 1u << 0,
+        FixedFunctionVertexShaderPrototypeUnsupportedPosition = 1u << 1,
+        FixedFunctionVertexShaderPrototypeUnsupportedBlend = 1u << 2,
+        FixedFunctionVertexShaderPrototypeUnsupportedNormal = 1u << 3,
+        FixedFunctionVertexShaderPrototypeUnsupportedPointSize = 1u << 4,
+        FixedFunctionVertexShaderPrototypeUnsupportedSpecular = 1u << 5,
+        FixedFunctionVertexShaderPrototypeUnsupportedTexCoord = 1u << 6,
+    };
+
+    struct FixedFunctionVertexShaderPrototype
+    {
+        std::uint32_t unsupported =
+            FixedFunctionVertexShaderPrototypeUnsupportedNone;
+        UINT inputElements = 0;
+        UINT texCoordCount = 0;
+        bool hasDiffuse = false;
+        std::uint64_t sourceHash = 0;
+        std::string source;
+
+        [[nodiscard]] bool generated() const noexcept
+        {
+            return unsupported ==
+                       FixedFunctionVertexShaderPrototypeUnsupportedNone &&
+                   !source.empty();
+        }
+    };
+
+    [[nodiscard]] FixedFunctionVertexShaderPrototype
+    generate_fixed_function_vertex_shader_prototype(
+        DWORD fvf,
+        UINT stream0Stride);
+
     // R79/R88 translates either an explicit D3D9 declaration or a
     // conservative FVF subset into canonical D3D11 input-layout descriptors.
     // R88 models XYZB1..XYZB5 blend weights plus LASTBETA_UBYTE4 and

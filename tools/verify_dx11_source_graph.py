@@ -28,6 +28,12 @@ SHADER_OBJECT_PROBE = (
 SHADER_LINKAGE_PROBE = (
     ROOT / "tools" / "dx11_shader_linkage_probe.cpp"
 ).read_text(encoding="utf-8")
+PIPELINE_TRANSLATION_HPP = (
+    ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.hpp"
+).read_text(encoding="utf-8")
+PIPELINE_TRANSLATION_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -739,6 +745,49 @@ def main() -> None:
             raise SystemExit(
                 "DX11 R92 shader-linkage probe missing from Backend Conversion Gate: "
                 + token
+            )
+
+    r93_vertex_prototype_contract = {
+        "FixedFunctionVertexShaderPrototype": "R93 reusable diagnostic vertex-shader prototype type",
+        "generate_fixed_function_vertex_shader_prototype": "R93 vertex-shader generator declaration",
+        "FixedFunctionVertexShaderPrototypeUnsupportedBlend": "R93 blend-weight fail-closed contract",
+        "FixedFunctionVertexShaderPrototypeUnsupportedNormal": "R93 normal/lighting fail-closed contract",
+        "FixedFunctionVertexShaderPrototypeUnsupportedPosition": "R93 transformed/unsupported position fail-closed contract",
+    }
+    missing_r93_header = [
+        meaning
+        for token, meaning in r93_vertex_prototype_contract.items()
+        if token not in PIPELINE_TRANSLATION_HPP
+    ]
+    if missing_r93_header:
+        raise SystemExit(
+            "DX11 R93 vertex prototype header drift: "
+            + ", ".join(missing_r93_header)
+        )
+
+    for token, meaning in {
+        "worldViewProjection": "R93 WVP constant-buffer contract",
+        "register(b0)": "R93 D3D11 constant-buffer slot",
+        "mul(float4(input.position, 1.0f)": "R93 position transform",
+        "output.diffuse = input.diffuse": "R93 diffuse propagation",
+        "D3DFVF_TEXCOORDSIZE4": "R93 1D-4D texture-coordinate handling",
+        "hash_shader_source(shader)": "R93 deterministic source identity",
+    }.items():
+        if token not in PIPELINE_TRANSLATION_CPP:
+            raise SystemExit(
+                "DX11 R93 vertex prototype source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "generate_fixed_function_vertex_shader_prototype": "R92/R93 linkage consumes generated VS",
+        "R93 fixed-function vertex shader prototype generation": "R93 positive generation case",
+        "R93 XYZRHW must fail closed": "R93 transformed-position negative case",
+        "R93 blend-weight FVF must fail closed": "R93 blend negative case",
+        "R93 normal/lighting path must fail closed": "R93 normal/lighting negative case",
+    }.items():
+        if token not in SHADER_LINKAGE_PROBE:
+            raise SystemExit(
+                "DX11 R93 linkage regression drift: " + meaning
             )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

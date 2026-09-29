@@ -11,7 +11,11 @@
 namespace
 {
     using outrun::vr::dx11::FixedFunctionStageState;
+    using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedBlend;
+    using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedNormal;
+    using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedPosition;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
 
     void require(bool condition, const char* message)
     {
@@ -160,37 +164,6 @@ namespace
 
 int main()
 {
-    constexpr const char* compatibleVertexShader = R"(
-struct VSOutput
-{
-    float4 position : SV_Position;
-    float4 diffuse : COLOR0;
-    float4 tex0 : TEXCOORD0;
-    float4 tex1 : TEXCOORD1;
-    float4 tex2 : TEXCOORD2;
-    float4 tex3 : TEXCOORD3;
-    float4 tex4 : TEXCOORD4;
-    float4 tex5 : TEXCOORD5;
-    float4 tex6 : TEXCOORD6;
-    float4 tex7 : TEXCOORD7;
-};
-VSOutput main(float3 position : POSITION0)
-{
-    VSOutput output;
-    output.position = float4(position, 1.0f);
-    output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    output.tex0 = float4(position.xy, 0.0f, 0.0f);
-    output.tex1 = 0.0f;
-    output.tex2 = 0.0f;
-    output.tex3 = 0.0f;
-    output.tex4 = 0.0f;
-    output.tex5 = 0.0f;
-    output.tex6 = 0.0f;
-    output.tex7 = 0.0f;
-    return output;
-}
-)";
-
     constexpr const char* mismatchedVertexShader = R"(
 struct VSOutput
 {
@@ -207,6 +180,52 @@ VSOutput main(float3 position : POSITION0)
     return output;
 }
 )";
+
+    const DWORD fixedFunctionFvf =
+        D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+    const auto vertexPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            fixedFunctionFvf, 24);
+    require(vertexPrototype.generated(),
+            "R93 fixed-function vertex shader prototype generation");
+    require(vertexPrototype.inputElements == 3,
+            "R93 input element count");
+    require(vertexPrototype.texCoordCount == 1,
+            "R93 texture-coordinate count");
+    require(vertexPrototype.hasDiffuse,
+            "R93 diffuse semantic");
+    require(vertexPrototype.source.find("worldViewProjection") !=
+                std::string::npos,
+            "R93 WVP constant-buffer contract");
+    require(vertexPrototype.sourceHash != 0,
+            "R93 vertex shader source hash");
+
+    const auto rhwPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            D3DFVF_XYZRHW | D3DFVF_DIFFUSE, 20);
+    require(
+        !rhwPrototype.generated() &&
+        (rhwPrototype.unsupported &
+         FixedFunctionVertexShaderPrototypeUnsupportedPosition) != 0,
+        "R93 XYZRHW must fail closed");
+
+    const auto blendedPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            D3DFVF_XYZB1, 16);
+    require(
+        !blendedPrototype.generated() &&
+        (blendedPrototype.unsupported &
+         FixedFunctionVertexShaderPrototypeUnsupportedBlend) != 0,
+        "R93 blend-weight FVF must fail closed");
+
+    const auto normalPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            D3DFVF_XYZ | D3DFVF_NORMAL, 24);
+    require(
+        !normalPrototype.generated() &&
+        (normalPrototype.unsupported &
+         FixedFunctionVertexShaderPrototypeUnsupportedNormal) != 0,
+        "R93 normal/lighting path must fail closed");
 
     std::array<FixedFunctionStageState, 8> stages{};
     stages[0] = active_stage();
@@ -229,9 +248,9 @@ VSOutput main(float3 position : POSITION0)
         "OutRunR92PixelShader",
         "ps_4_0");
     ID3DBlob* compatibleVertexBytecode = compile_shader(
-        compatibleVertexShader,
-        std::strlen(compatibleVertexShader),
-        "OutRunR92CompatibleVertexShader",
+        vertexPrototype.source.data(),
+        vertexPrototype.source.size(),
+        "OutRunR93FixedFunctionVertexShader",
         "vs_4_0");
     ID3DBlob* mismatchedVertexBytecode = compile_shader(
         mismatchedVertexShader,
