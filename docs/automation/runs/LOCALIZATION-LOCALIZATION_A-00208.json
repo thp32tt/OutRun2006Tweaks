@@ -81,5 +81,15 @@
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE"
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+  "authoritative_result_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+  "producer_persistence_run": {
+    "workflow": "Localization A00208 9FC88069 V2 Candidate",
+    "run_id": 36628009821,
+    "run_attempt": 1,
+    "conclusion": "success",
+    "dispatch_sha": "d02c90356d1704034f3b2a061b04a8ad19325987"
+  },
+  "bookkeeping_note": "Tagged producer result SHA recorded after the atomic candidate/review/task commit. Exact result-SHA per-element review PNG was re-opened after persistence and remains visually clean/unclipped; machine QA retains zero changed/alpha pixels outside allowed edit geometry and zero protected-region changes. This producer record remains automation_validation=PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
 }
