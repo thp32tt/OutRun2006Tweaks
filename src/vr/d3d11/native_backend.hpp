@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <d3d9.h>
 #include <d3d11.h>
 #include <wrl/client.h>
 
@@ -85,6 +86,45 @@ public:
 private:
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler_;
+};
+
+// R99 dormant owner for a translated D3D11 Texture2D mirror and its SRV.
+// The mirror must already exist with an exact R73 descriptor. This class does
+// not copy D3D9 texture contents and never binds the SRV to a game context.
+class NativeFixedFunctionTextureView final {
+public:
+    NativeFixedFunctionTextureView() = default;
+    ~NativeFixedFunctionTextureView() = default;
+    NativeFixedFunctionTextureView(
+        const NativeFixedFunctionTextureView&) = delete;
+    NativeFixedFunctionTextureView& operator=(
+        const NativeFixedFunctionTextureView&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        ID3D11Texture2D* texture,
+        D3DFORMAT sourceFormat,
+        D3DPOOL sourcePool,
+        DWORD sourceUsage) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && texture_ && srv_;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11Texture2D* texture() const noexcept {
+        return texture_.Get();
+    }
+    [[nodiscard]] ID3D11ShaderResourceView* srv() const noexcept {
+        return srv_.Get();
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv_;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

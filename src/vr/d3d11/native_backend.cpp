@@ -1,6 +1,7 @@
 #include "native_backend.hpp"
 
 #include "pipeline_translation.hpp"
+#include "resource_translation.hpp"
 
 #include <array>
 #include <cstddef>
@@ -215,6 +216,65 @@ bool NativeFixedFunctionSamplerState::initialize(
 
 void NativeFixedFunctionSamplerState::shutdown() noexcept {
     sampler_.Reset();
+    device_.Reset();
+}
+
+bool NativeFixedFunctionTextureView::initialize(
+    ID3D11Device* device,
+    ID3D11Texture2D* texture,
+    D3DFORMAT sourceFormat,
+    D3DPOOL sourcePool,
+    DWORD sourceUsage) noexcept {
+
+    shutdown();
+    if (!device || !texture)
+        return false;
+
+    const auto format = translate_resource_format(
+        sourceFormat, ResourceRole::Texture);
+    const auto behavior = translate_resource_behavior(
+        ResourceRole::Texture, sourcePool, sourceUsage);
+    if (!format.exact || !behavior.descriptorExact ||
+        behavior.requiresCpuShadow ||
+        (behavior.bindFlags & D3D11_BIND_SHADER_RESOURCE) == 0)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> textureDevice;
+    texture->GetDevice(textureDevice.ReleaseAndGetAddressOf());
+    if (!textureDevice || textureDevice.Get() != device)
+        return false;
+
+    D3D11_TEXTURE2D_DESC desc{};
+    texture->GetDesc(&desc);
+    if (desc.Width == 0 || desc.Height == 0 || desc.MipLevels == 0 ||
+        desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
+        desc.Format != format.format || desc.Usage != behavior.usage ||
+        (desc.BindFlags & behavior.bindFlags) != behavior.bindFlags ||
+        desc.CPUAccessFlags != behavior.cpuAccessFlags ||
+        (desc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) != 0)
+        return false;
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = desc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+    if (FAILED(device->CreateShaderResourceView(
+            texture, &srvDesc, srv.ReleaseAndGetAddressOf())) ||
+        !srv)
+        return false;
+
+    device_ = device;
+    texture_ = texture;
+    srv_ = std::move(srv);
+    return true;
+}
+
+void NativeFixedFunctionTextureView::shutdown() noexcept {
+    srv_.Reset();
+    texture_.Reset();
     device_.Reset();
 }
 

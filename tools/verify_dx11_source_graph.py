@@ -1136,6 +1136,92 @@ def main() -> None:
                 "DX11 R98 sampler-owner probe drift: " + meaning
             )
 
+    r99_texture_view_header = {
+        "NativeFixedFunctionTextureView": "R99 dormant fixed-function texture/SRV owner",
+        "Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_":
+            "R99 owned translated texture mirror",
+        "Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv_":
+            "R99 owned Texture2D SRV",
+    }
+    missing_r99_texture_view = [
+        meaning
+        for token, meaning in r99_texture_view_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r99_texture_view:
+        raise SystemExit(
+            "DX11 R99 texture-view header drift: "
+            + ", ".join(missing_r99_texture_view)
+        )
+
+    for token, meaning in {
+        "translate_resource_format(": "R99 exact D3D9-to-DXGI format gate",
+        "translate_resource_behavior(": "R99 source pool/usage descriptor gate",
+        "behavior.requiresCpuShadow": "R99 unimplemented managed CPU-shadow rejection",
+        "texture->GetDevice": "R99 same-device ownership gate",
+        "desc.ArraySize != 1": "R99 Texture2D array fail-closed gate",
+        "desc.SampleDesc.Count != 1": "R99 multisample fail-closed gate",
+        "device->CreateShaderResourceView(": "R99 Texture2D SRV object creation",
+        "srv_.Reset()": "R99 SRV release",
+        "texture_.Reset()": "R99 texture mirror release",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R99 texture-view source drift: " + meaning
+            )
+
+    if "PSSetShaderResources(" in NATIVE_BACKEND_CPP:
+        raise SystemExit(
+            "DX11 R99 texture view must remain non-routing; "
+            "found PSSetShaderResources binding"
+        )
+
+    runtime_texture_view_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "native_backend.cpp":
+            continue
+        if "NativeFixedFunctionTextureView" in source_path.read_text(
+            encoding="utf-8"
+        ):
+            runtime_texture_view_users.append(
+                source_path.relative_to(ROOT).as_posix()
+            )
+    if runtime_texture_view_users:
+        raise SystemExit(
+            "DX11 R99 texture view gained a production caller before activation gate: "
+            + ", ".join(runtime_texture_view_users)
+        )
+
+    constant_probe_source_block = CMAKE.split(
+        "set(dx11_constant_buffer_probe_SOURCES", 1
+    )[-1].split(")", 1)[0]
+    if '"src/vr/d3d11/resource_translation.cpp"' not in constant_probe_source_block:
+        raise SystemExit(
+            "DX11 R99 constant-buffer probe must link resource_translation.cpp"
+        )
+
+    for token, meaning in {
+        "R99 texture view must start dormant": "R99 dormant initial state",
+        "R99 texture/SRV owner readiness": "R99 owned object readiness",
+        "R99 created Texture2D SRV descriptor": "R99 concrete SRV descriptor evidence",
+        "R99 mismatched translated format must fail closed":
+            "R99 translated format mismatch negative case",
+        "R99 managed source without CPU shadow must fail closed":
+            "R99 managed-lifetime negative case",
+        "R99 texture without shader-resource bind must fail closed":
+            "R99 missing SRV bind negative case",
+        "R99 texture view recovery after fail-closed reset":
+            "R99 recreate lifecycle",
+        "R99 texture view shutdown must clear owned objects":
+            "R99 shutdown lifecycle",
+        "DX11 fixed-function texture view ownership R99: PASS":
+            "R99 probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R99 texture-view probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

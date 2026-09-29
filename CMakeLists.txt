@@ -925,6 +925,7 @@ set(dx11_constant_buffer_probe_SOURCES
     "tools/dx11_constant_buffer_probe.cpp"
     "src/vr/d3d11/native_backend.cpp"
     "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
     "src/vr/d3d11/state_translation.cpp"
 )
 

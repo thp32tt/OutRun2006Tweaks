@@ -14,6 +14,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::NativeFixedFunctionPipelineBundle;
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
+    using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
@@ -271,6 +272,85 @@ int main()
         samplerOwner.initialize(d3d.device, stages[0]),
         "R98 sampler owner recovery after fail-closed reset");
 
+    D3D11_TEXTURE2D_DESC textureDesc{};
+    textureDesc.Width = 4;
+    textureDesc.Height = 4;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    ID3D11Texture2D* fixedFunctionTexture = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateTexture2D(
+            &textureDesc, nullptr, &fixedFunctionTexture)) &&
+        fixedFunctionTexture != nullptr,
+        "R99 translated texture prerequisite");
+
+    NativeFixedFunctionTextureView textureView;
+    require(!textureView.ready(),
+            "R99 texture view must start dormant");
+    require(
+        textureView.initialize(
+            d3d.device, fixedFunctionTexture,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
+        "R99 texture view initialize");
+    require(
+        textureView.ready() &&
+        textureView.device() == d3d.device &&
+        textureView.texture() == fixedFunctionTexture &&
+        textureView.srv() != nullptr,
+        "R99 texture/SRV owner readiness");
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC observedTextureSrv{};
+    textureView.srv()->GetDesc(&observedTextureSrv);
+    require(
+        observedTextureSrv.Format == DXGI_FORMAT_B8G8R8A8_UNORM &&
+        observedTextureSrv.ViewDimension == D3D11_SRV_DIMENSION_TEXTURE2D &&
+        observedTextureSrv.Texture2D.MostDetailedMip == 0 &&
+        observedTextureSrv.Texture2D.MipLevels == 1,
+        "R99 created Texture2D SRV descriptor");
+
+    require(
+        !textureView.initialize(
+            d3d.device, fixedFunctionTexture,
+            D3DFMT_A8B8G8R8, D3DPOOL_DEFAULT, 0),
+        "R99 mismatched translated format must fail closed");
+    require(!textureView.ready(),
+            "R99 format failure must leave owner dormant");
+
+    require(
+        !textureView.initialize(
+            d3d.device, fixedFunctionTexture,
+            D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, 0),
+        "R99 managed source without CPU shadow must fail closed");
+    require(!textureView.ready(),
+            "R99 managed-source failure must leave owner dormant");
+
+    D3D11_TEXTURE2D_DESC noSrvDesc = textureDesc;
+    noSrvDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+    ID3D11Texture2D* noSrvTexture = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateTexture2D(
+            &noSrvDesc, nullptr, &noSrvTexture)) &&
+        noSrvTexture != nullptr,
+        "R99 no-SRV negative texture prerequisite");
+    require(
+        !textureView.initialize(
+            d3d.device, noSrvTexture,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
+        "R99 texture without shader-resource bind must fail closed");
+    require(!textureView.ready(),
+            "R99 bind failure must leave owner dormant");
+
+    require(
+        textureView.initialize(
+            d3d.device, fixedFunctionTexture,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
+        "R99 texture view recovery after fail-closed reset");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -377,6 +457,15 @@ int main()
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
+    textureView.shutdown();
+    require(!textureView.ready(),
+            "R99 texture view shutdown must release owner resources");
+    require(
+        textureView.device() == nullptr &&
+        textureView.texture() == nullptr &&
+        textureView.srv() == nullptr,
+        "R99 texture view shutdown must clear owned objects");
+
     samplerOwner.shutdown();
     require(!samplerOwner.ready(),
             "R98 sampler shutdown must release owner resources");
@@ -408,6 +497,8 @@ int main()
     require(owner.ready(), "R96 owner must be ready after reinitialize");
     owner.shutdown();
 
+    noSrvTexture->Release();
+    fixedFunctionTexture->Release();
     otherDevice.context->Release();
     otherDevice.device->Release();
     vertexShader->Release();
@@ -420,5 +511,6 @@ int main()
     std::cout << "DX11 constant buffer lifetime R96: PASS\n";
     std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
+    std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     return 0;
 }
