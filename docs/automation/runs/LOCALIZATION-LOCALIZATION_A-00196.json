@@ -17,8 +17,14 @@
   ],
   "material_deliverable": {
     "type": "TWO_CANONICAL_HD_KOREAN_DDS_CANDIDATES_WITH_STATIC_SELF_QA_AND_DRIVE_MANIFEST",
-    "indices": [159,201],
-    "assets": ["4EDA9DE3","A9ABD877"],
+    "indices": [
+      159,
+      201
+    ],
+    "assets": [
+      "4EDA9DE3",
+      "A9ABD877"
+    ],
     "candidate_dds_modified": true,
     "candidate_count": 2,
     "candidate_sha256": {
@@ -60,5 +66,8 @@
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE"
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+  "authoritative_result_sha": "1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+  "bookkeeping_note": "Result SHA recorded after the tagged producer result commit. Producer result remains automation_validation=PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
 }
