@@ -76,7 +76,9 @@ foreach($name in $parseTargets) {
 }
 
 Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector must persist TestProfile'
-Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'Get-OutRunVRBackendContract') 'selector must consume the canonical backend contract'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match '\$backendProvider') 'selector must persist backend provider identity'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'SchemaVersion\s*=\s*4') 'selector must emit schema4 session identity'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'dxvkD3D9Sha256') 'selector must persist DXVK provider hash identity'
 Assert-True ($text['OutRunVR-BackendContract.ps1'] -match "SemanticContract='R69_CLEAN'") 'VR backends must advertise the R69 CLEAN semantic contract'
 Assert-True ($text['OutRunVR-BackendContract.ps1'] -notmatch 'R57_05_RANK_PROJECTED_IPD') 'backend defaults must not reintroduce R57 experiment variants'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'runner must consume profile definitions'
