@@ -1,0 +1,111 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00101",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00034",
+  "recorded_at_kst": "2026-09-29T17:16:00+09:00",
+  "base_sha": "4eafa68bb540251ac7b75ce384fe0a5d4226f74c",
+  "material_commit_sha": "476ecf7fb8622866a8a2e258f4bb946060b9a474",
+  "pre_task_record_head_sha": "476ecf7fb8622866a8a2e258f4bb946060b9a474",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_V2_32BPP_HEADER_GATED_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_37_UNITS",
+  "summary": "Advanced Q00010/C112-consumed even indices 198/214/230/236 from 37 independently accepted exact Release 32bpp extraction scopes into 37 deterministic first-pass-v2 header-gated source-effect-mask/CLEAN_PLATE work units covering 38 physical semantic occurrences. Added strict 2px cell inner guards as upper bounds only, required exact DDS header channel-mask/mip confirmation before pixel interpretation, and retained BF229CF4 START/GOAL as independent masks inside one shared route-map cell. No source-effect bbox, removal mask, CLEAN_PLATE, candidate-safe bbox, Korean DDS or shared state was fabricated.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1716-B130-P00034/B130_P00034_V2_32BPP_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "evidence_blob_sha": "3ee3566382b4e4612b8c541498b83a54ff17dc0c",
+  "material_deliverable": {
+    "type": "FOUR_EVEN_V2_32BPP_HEADER_GATED_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      198,
+      214,
+      230,
+      236
+    ],
+    "assets": [
+      "9FC88069",
+      "BF229CF4",
+      "E95DA5",
+      "FEF70E85"
+    ],
+    "deterministic_localize_work_units": 37,
+    "localizable_physical_semantic_occurrences": 38,
+    "shared_multi_semantic_cells": 1,
+    "accepted_32bpp_payload_scopes_reused": 37,
+    "new_two_px_inner_guards": 37,
+    "exact_header_confirmation_preconditions": 37,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00092",
+    "producer_result_sha": "2d415b6efc192c28ce2b3d28b2d5f8a3ef70edf4",
+    "producer_report_blob_sha": "ffb229fe0fc9c014987ca4c1f8c281b8b727d03b",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00099",
+    "c_acceptance_result_sha": "4eafa68bb540251ac7b75ce384fe0a5d4226f74c",
+    "c_acceptance_record_blob_sha": "69ac83cb995e2db69563eacbc657fe2d5b6a0d24",
+    "c_qa_report_blob_sha": "617c45f32de9b9102bd3693a6c3d7b22769583b6",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reason": "C112 independently rechecked B00092 as PASS: 4/4 source size equations, 37/37 raw-coordinate/row-slice/file/canvas extraction formulas, zero overlap and 38/38 physical semantics. P00034 advances only the changed v2 header-gated source-mask/CLEAN_PLATE execution contract."
+  },
+  "skipped_or_deferred": {
+    "qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00097": [
+        86,
+        100,
+        106,
+        130
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00100": [
+        46,
+        48,
+        50,
+        62
+      ]
+    },
+    "already_v2_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00095": [
+        34,
+        44,
+        52,
+        172
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ]
+  },
+  "strict_hold": {
+    "dds_header_channel_masks_mips": "HOLD_EXACT_BINARY_HEADER_DECODE_REQUIRED_BEFORE_PIXEL_INTERPRETATION",
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "signed_text_slant": "HOLD_EXACT_DECODE_REQUIRED_WHEN_STYLIZED",
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "glyph_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_UNTIL_MEASURED_SOURCE_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_EVEN_ONLY_198_214_230_236__4_OF_4_SOURCE_SIZE_EQUATIONS__37_OF_37_C112_ACCEPTED_32BPP_SCOPES__38_PHYSICAL_SEMANTIC_OCCURRENCES__37_OF_37_IN_CANVAS_IN_FILE__ZERO_REGION_OVERLAP__37_OF_37_NONEMPTY_2PX_GUARDS__BF229CF4_SHARED_START_GOAL_INDEPENDENT_MASKS_REQUIRED__HEADER_INTERPRETATION_HOLD__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "The work orders define decode/source-inspection boundaries, not edit masks. Exact pinned DDS header channel masks/mip semantics must be decoded before pixel interpretation. Per-semantic source-effect bboxes, removal masks, raw/readable orientation, signed slant where applicable, protected-art masks, independently passing CLEAN_PLATE and measured candidate_safe_bbox remain required before Korean rendering. Final DDS/alpha/zero-pixel containment and English-source comparison cannot pass without candidate bytes.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
