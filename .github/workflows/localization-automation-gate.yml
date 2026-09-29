@@ -37,6 +37,9 @@ jobs:
       - name: Verify localization state
         run: python tools/localization/verify_state.py
 
+      - name: Verify graphics generation v2 contract
+        run: python tools/localization/verify_generation_contract_v2.py
+
       - name: Verify domain isolation
         shell: bash
         env:
