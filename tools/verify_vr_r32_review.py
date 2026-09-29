@@ -169,7 +169,7 @@ if resetex < 0 or restore < resetex:
     raise SystemExit("authoritative R13 ResetEx path must replay classic state after successful ResetEx")
 
 ex_r15 = require(
-    "src/vr/d3d9/ex_device_upgrade_r15.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc",
     "SetFinalCompatOverlayReady(false)",
     "SetExternalSafetyBlock(true)",
     "SetExternalSafetyBlock(!healthy)",

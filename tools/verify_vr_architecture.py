@@ -26,7 +26,9 @@ required = [
     "src/vr/runtime_eligibility.hpp",
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/outrun_renderer_r13.cpp",
+    "src/vr/game/outrun_renderer_r13_overlay.inc",
     "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r23_overlay.inc",
     "src/vr/game/outrun_renderer_r29.cpp",
     "src/vr/d3d9/stereo_renderer.cpp",
     "src/vr/d3d9/stereo_renderer_r13.cpp",
@@ -142,7 +144,7 @@ require(
     "UnsafeSingleExecution",
 )
 require(
-    "src/vr/game/outrun_renderer_r13.cpp",
+    "src/vr/game/outrun_renderer_r13_overlay.inc",
     "R13FragileEffectNeedsZeroDisparity",
     "D3DRS_ALPHABLENDENABLE",
     "D3DRS_ZWRITEENABLE",
@@ -218,7 +220,7 @@ settings = require(
 # writes are serviced from D3D render callbacks; recovery pose warmup keeps the
 # stock camera/WVP visible until the next-frame authoritative seed is accepted.
 renderer_r23 = require(
-    "src/vr/game/outrun_renderer_r23.cpp",
+    "src/vr/game/outrun_renderer_r23_overlay.inc",
     "R23RenderThreadCleanupRequested",
     "R23RequestFailClosedCleanup",
     "R23ServiceRenderThreadCleanup",
