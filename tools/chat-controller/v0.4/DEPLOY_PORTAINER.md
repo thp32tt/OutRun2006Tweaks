@@ -204,3 +204,18 @@ Localization producer A/B commits do not wait for individual GitHub Actions jobs
 
 The localization workflow skips its runner-backed validate job for A/B AUTO commits. A C AUTO commit runs the one real batch Gate. That Gate validates the C reconciliation and the exact producer SHAs declared in the C batch. This reduces hosted-runner demand while keeping producer commits immutable and traceable.
 
+
+
+### Candidate-completion-first production
+
+Localization A/B no longer use preflight/work-order count as the main throughput target.
+
+- C-accepted `RENDER_READY` assets are completed to an actual Korean DDS candidate before unrelated preflight expansion.
+- `ONE_STAGE_TO_RENDER` assets are advanced through the missing deterministic stage and, when inputs remain safe, rendered in the same producer invocation.
+- Baseline/slant/style measurement alone is not a reason to split another preflight-only task; measure and render in the same task.
+- If a ready asset becomes fail-closed, producers try the next ready asset in their shard before opening new preflight.
+- New preflight-only expansion is permitted only when the shard has no runnable RENDER_READY/ONE_STAGE_TO_RENDER asset, and is limited to one batch before the next completion attempt.
+- C classifies accepted pre-generation work by readiness when possible and orders shared next-actions candidate-first.
+- QA strictness is unchanged.
+
+This policy is also enforced by the live Git localization contract, so it takes effect for newly dispatched work even before the N100 stack is redeployed. Pull/redeploy the localization Portainer stack to bake the updated controller prompts into the running image.
