@@ -1,0 +1,3224 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00108",
+  "wave_id": "P00040",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T17:45:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "selection_head_sha": "01cbfde063f258604e383acf78b3478649fee526",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_policy": "GITHUB_ONLY_NO_N100_LOCAL_CLONE_GPT_LIBRARY",
+  "policy_fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "selection": {
+    "indices": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "assets": [
+      "1F5FE6E9",
+      "75C3586A",
+      "D657C2EB",
+      "DDF0392A"
+    ],
+    "state": "localize_text/pending_artwork",
+    "reason": "B00077 exact Release payload-region extraction evidence was independently consumed by C00081 and is no longer producer-QA-pending. This task adds new first-pass-v2 per-region inspection guards/work orders without repeating source identity or extraction QA."
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00077",
+    "producer_result_evidence_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00081",
+    "c_acceptance_record_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+    "reuse_scope": "Exact upstream source identity, 106/106 payload extraction ranges, 0 overlap pairs, and block-alignment checks are unchanged and reused."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "type": "FOUR_EVEN_V2_REGION_GUARD_AND_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS",
+    "assets": 4,
+    "canonical_semantics": 20,
+    "exact_regions_reused": 106,
+    "new_two_px_source_inspection_guards": 106,
+    "invalid_guards": 0,
+    "candidate_safe_bboxes_created": 0,
+    "source_effect_masks_created": 0,
+    "clean_plates_created": 0,
+    "candidate_dds_written": false,
+    "significance": "Adds deterministic 2px-inset decoded-source inspection bounds and a v2 source-effect-mask/CLEAN_PLATE execution contract for every exact Release atlas region. Guards are explicitly not candidate_safe_bbox; exact semantic binding and effect-inclusive source bbox remain required before any Korean pixels are rendered."
+  },
+  "assets": [
+    {
+      "queue_index": 132,
+      "asset": "1F5FE6E9",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+      "canonical_segments": [
+        {
+          "source": "REQUEST",
+          "korean": "요청"
+        },
+        {
+          "source": "SPECIAL REQUEST 1",
+          "korean": "스페셜 요청 1"
+        },
+        {
+          "source": "SPECIAL REQUEST 2",
+          "korean": "스페셜 요청 2"
+        },
+        {
+          "source": "SPECIAL REQUEST 3",
+          "korean": "스페셜 요청 3"
+        }
+      ],
+      "canonical_segment_count": 4,
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+        "git_blob_sha": "a89e403c92d335f83c808e5f10dcc9e584d4ff7c",
+        "file_size": 33554560,
+        "atlas_canvas": [
+          4096,
+          2048
+        ],
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_1F5FE6E9_1024x512_atlas.json",
+        "git_blob_sha": "f7bb4e1f974afc0719311f8bbbf36e82303961f6",
+        "width": 4096,
+        "height": 2048,
+        "regions_count": 21,
+        "rotations": false
+      },
+      "inherited_extraction_qa": {
+        "source_task": "LOCALIZATION-LOCALIZATION_B-00077",
+        "source_report_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00081",
+        "c_acceptance_record_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+        "region_count": 21,
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0
+      },
+      "v2_work_order": {
+        "prompt_contract": "outrun-first-pass-edit-v2",
+        "clean_plate_contract": "outrun-clean-plate-qa-v1",
+        "semantic_binding_status": "HOLD_EXACT_REGION_TO_TEXT_BINDING_REQUIRED_BEFORE_EDIT",
+        "source_language_removal_permission": "ONLY_AFTER_EXACT_EFFECT_MASK_EXISTS",
+        "korean_lettering_permission": "ONLY_INSIDE_MEASURED_CANDIDATE_SAFE_BBOX_AFTER_CLEAN_PLATE_PASS",
+        "work_orders": [
+          {
+            "region_index": 0,
+            "sprite": "sprite_1453",
+            "exact_region_rect_xywh": [
+              0,
+              128,
+              2048,
+              1920
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              130,
+              2046,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 1,
+            "sprite": "sprite_1454",
+            "exact_region_rect_xywh": [
+              2048,
+              128,
+              512,
+              1920
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2050,
+              130,
+              2558,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 2,
+            "sprite": "sprite_1455",
+            "exact_region_rect_xywh": [
+              2560,
+              1844,
+              1024,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              1846,
+              3582,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 3,
+            "sprite": "sprite_1456",
+            "exact_region_rect_xywh": [
+              2560,
+              1640,
+              1024,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              1642,
+              3582,
+              1842
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 4,
+            "sprite": "sprite_1457",
+            "exact_region_rect_xywh": [
+              2560,
+              1436,
+              1024,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              1438,
+              3582,
+              1638
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 5,
+            "sprite": "sprite_1458",
+            "exact_region_rect_xywh": [
+              2560,
+              1232,
+              1024,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              1234,
+              3582,
+              1434
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 6,
+            "sprite": "sprite_1459",
+            "exact_region_rect_xywh": [
+              2560,
+              1028,
+              1024,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              1030,
+              3582,
+              1230
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 7,
+            "sprite": "sprite_1460",
+            "exact_region_rect_xywh": [
+              3584,
+              1844,
+              124,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              3586,
+              1846,
+              3706,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 8,
+            "sprite": "sprite_1461",
+            "exact_region_rect_xywh": [
+              3708,
+              1844,
+              124,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              3710,
+              1846,
+              3830,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 9,
+            "sprite": "sprite_1462",
+            "exact_region_rect_xywh": [
+              3832,
+              1844,
+              124,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              3834,
+              1846,
+              3954,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 10,
+            "sprite": "sprite_1463",
+            "exact_region_rect_xywh": [
+              3956,
+              1844,
+              124,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              3958,
+              1846,
+              4078,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 11,
+            "sprite": "sprite_1464",
+            "exact_region_rect_xywh": [
+              3584,
+              1640,
+              124,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              3586,
+              1642,
+              3706,
+              1842
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 12,
+            "sprite": "sprite_1465",
+            "exact_region_rect_xywh": [
+              0,
+              28,
+              960,
+              100
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              30,
+              958,
+              126
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 13,
+            "sprite": "sprite_1466",
+            "exact_region_rect_xywh": [
+              960,
+              28,
+              960,
+              100
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              962,
+              30,
+              1918,
+              126
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 14,
+            "sprite": "sprite_1467",
+            "exact_region_rect_xywh": [
+              1920,
+              28,
+              960,
+              100
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1922,
+              30,
+              2878,
+              126
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 15,
+            "sprite": "sprite_1468",
+            "exact_region_rect_xywh": [
+              2880,
+              28,
+              960,
+              100
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2882,
+              30,
+              3838,
+              126
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 16,
+            "sprite": "sprite_1469",
+            "exact_region_rect_xywh": [
+              2560,
+              928,
+              960,
+              100
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              930,
+              3518,
+              1026
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 17,
+            "sprite": "sprite_1470",
+            "exact_region_rect_xywh": [
+              2560,
+              832,
+              1264,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              834,
+              3822,
+              926
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 18,
+            "sprite": "sprite_1471",
+            "exact_region_rect_xywh": [
+              2560,
+              736,
+              1264,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              738,
+              3822,
+              830
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 19,
+            "sprite": "sprite_1472",
+            "exact_region_rect_xywh": [
+              2560,
+              640,
+              1264,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              642,
+              3822,
+              734
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 20,
+            "sprite": "sprite_1473",
+            "exact_region_rect_xywh": [
+              2560,
+              544,
+              1264,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2562,
+              546,
+              3822,
+              638
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          }
+        ]
+      }
+    },
+    {
+      "queue_index": 176,
+      "asset": "75C3586A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+      "canonical_segments": [
+        {
+          "source": "FLAGMAN 4",
+          "korean": "플래그맨 4"
+        },
+        {
+          "source": "HOLLY",
+          "korean": "홀리"
+        },
+        {
+          "source": "JENNIFER",
+          "korean": "제니퍼"
+        },
+        {
+          "source": "CLARISSA",
+          "korean": "클라리사"
+        }
+      ],
+      "canonical_segment_count": 4,
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+        "git_blob_sha": "9d21e4fb47d3b17dab89a05b9552cfeaa913eac9",
+        "file_size": 16777344,
+        "atlas_canvas": [
+          2048,
+          2048
+        ],
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_75C3586A_512x512_atlas.json",
+        "git_blob_sha": "07620598cd03cc6d62455b57d3537158cabfc21a",
+        "width": 2048,
+        "height": 2048,
+        "regions_count": 53,
+        "rotations": false
+      },
+      "inherited_extraction_qa": {
+        "source_task": "LOCALIZATION-LOCALIZATION_B-00077",
+        "source_report_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00081",
+        "c_acceptance_record_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+        "region_count": 53,
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0
+      },
+      "v2_work_order": {
+        "prompt_contract": "outrun-first-pass-edit-v2",
+        "clean_plate_contract": "outrun-clean-plate-qa-v1",
+        "semantic_binding_status": "HOLD_EXACT_REGION_TO_TEXT_BINDING_REQUIRED_BEFORE_EDIT",
+        "source_language_removal_permission": "ONLY_AFTER_EXACT_EFFECT_MASK_EXISTS",
+        "korean_lettering_permission": "ONLY_INSIDE_MEASURED_CANDIDATE_SAFE_BBOX_AFTER_CLEAN_PLATE_PASS",
+        "work_orders": [
+          {
+            "region_index": 0,
+            "sprite": "sprite_932",
+            "exact_region_rect_xywh": [
+              0,
+              1680,
+              688,
+              368
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1682,
+              686,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 1,
+            "sprite": "sprite_933",
+            "exact_region_rect_xywh": [
+              688,
+              1680,
+              688,
+              368
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              690,
+              1682,
+              1374,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 2,
+            "sprite": "sprite_934",
+            "exact_region_rect_xywh": [
+              0,
+              1372,
+              860,
+              308
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1374,
+              858,
+              1678
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 3,
+            "sprite": "sprite_935",
+            "exact_region_rect_xywh": [
+              860,
+              1372,
+              860,
+              308
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              862,
+              1374,
+              1718,
+              1678
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 4,
+            "sprite": "sprite_936",
+            "exact_region_rect_xywh": [
+              1720,
+              1416,
+              288,
+              264
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1722,
+              1418,
+              2006,
+              1678
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 5,
+            "sprite": "sprite_937",
+            "exact_region_rect_xywh": [
+              1376,
+              1812,
+              176,
+              236
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1378,
+              1814,
+              1550,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 6,
+            "sprite": "sprite_938",
+            "exact_region_rect_xywh": [
+              1552,
+              1824,
+              220,
+              224
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1554,
+              1826,
+              1770,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 7,
+            "sprite": "sprite_939",
+            "exact_region_rect_xywh": [
+              0,
+              1156,
+              844,
+              216
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1158,
+              842,
+              1370
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 8,
+            "sprite": "sprite_940",
+            "exact_region_rect_xywh": [
+              844,
+              1156,
+              844,
+              216
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              846,
+              1158,
+              1686,
+              1370
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 9,
+            "sprite": "sprite_941",
+            "exact_region_rect_xywh": [
+              1688,
+              1164,
+              244,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1690,
+              1166,
+              1930,
+              1370
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 10,
+            "sprite": "sprite_942",
+            "exact_region_rect_xywh": [
+              1772,
+              1840,
+              152,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1774,
+              1842,
+              1922,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 11,
+            "sprite": "sprite_943",
+            "exact_region_rect_xywh": [
+              0,
+              948,
+              152,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              950,
+              150,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 12,
+            "sprite": "sprite_944",
+            "exact_region_rect_xywh": [
+              152,
+              948,
+              152,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              154,
+              950,
+              302,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 13,
+            "sprite": "sprite_945",
+            "exact_region_rect_xywh": [
+              304,
+              948,
+              152,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              306,
+              950,
+              454,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 14,
+            "sprite": "sprite_946",
+            "exact_region_rect_xywh": [
+              456,
+              948,
+              152,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              458,
+              950,
+              606,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 15,
+            "sprite": "sprite_947",
+            "exact_region_rect_xywh": [
+              608,
+              948,
+              152,
+              208
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              610,
+              950,
+              758,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 16,
+            "sprite": "sprite_948",
+            "exact_region_rect_xywh": [
+              760,
+              952,
+              620,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              762,
+              954,
+              1378,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 17,
+            "sprite": "sprite_949",
+            "exact_region_rect_xywh": [
+              1380,
+              952,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1382,
+              954,
+              1582,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 18,
+            "sprite": "sprite_950",
+            "exact_region_rect_xywh": [
+              1584,
+              952,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1586,
+              954,
+              1786,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 19,
+            "sprite": "sprite_951",
+            "exact_region_rect_xywh": [
+              1788,
+              952,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1790,
+              954,
+              1990,
+              1154
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 20,
+            "sprite": "sprite_952",
+            "exact_region_rect_xywh": [
+              0,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              746,
+              202,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 21,
+            "sprite": "sprite_953",
+            "exact_region_rect_xywh": [
+              204,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              206,
+              746,
+              406,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 22,
+            "sprite": "sprite_954",
+            "exact_region_rect_xywh": [
+              408,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              410,
+              746,
+              610,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 23,
+            "sprite": "sprite_955",
+            "exact_region_rect_xywh": [
+              612,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              614,
+              746,
+              814,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 24,
+            "sprite": "sprite_956",
+            "exact_region_rect_xywh": [
+              816,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              818,
+              746,
+              1018,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 25,
+            "sprite": "sprite_957",
+            "exact_region_rect_xywh": [
+              1020,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1022,
+              746,
+              1222,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 26,
+            "sprite": "sprite_958",
+            "exact_region_rect_xywh": [
+              1224,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1226,
+              746,
+              1426,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 27,
+            "sprite": "sprite_959",
+            "exact_region_rect_xywh": [
+              1428,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1430,
+              746,
+              1630,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 28,
+            "sprite": "sprite_960",
+            "exact_region_rect_xywh": [
+              1632,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1634,
+              746,
+              1834,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 29,
+            "sprite": "sprite_961",
+            "exact_region_rect_xywh": [
+              1836,
+              744,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1838,
+              746,
+              2038,
+              946
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 30,
+            "sprite": "sprite_962",
+            "exact_region_rect_xywh": [
+              0,
+              540,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              542,
+              202,
+              742
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 31,
+            "sprite": "sprite_963",
+            "exact_region_rect_xywh": [
+              204,
+              540,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              206,
+              542,
+              406,
+              742
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 32,
+            "sprite": "sprite_964",
+            "exact_region_rect_xywh": [
+              408,
+              540,
+              204,
+              204
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              410,
+              542,
+              610,
+              742
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 33,
+            "sprite": "sprite_965",
+            "exact_region_rect_xywh": [
+              612,
+              560,
+              436,
+              184
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              614,
+              562,
+              1046,
+              742
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 34,
+            "sprite": "sprite_966",
+            "exact_region_rect_xywh": [
+              1048,
+              572,
+              792,
+              172
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1050,
+              574,
+              1838,
+              742
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 35,
+            "sprite": "sprite_967",
+            "exact_region_rect_xywh": [
+              0,
+              372,
+              892,
+              168
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              374,
+              890,
+              538
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 36,
+            "sprite": "sprite_968",
+            "exact_region_rect_xywh": [
+              892,
+              372,
+              880,
+              168
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              894,
+              374,
+              1770,
+              538
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 37,
+            "sprite": "sprite_969",
+            "exact_region_rect_xywh": [
+              0,
+              204,
+              580,
+              168
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              206,
+              578,
+              370
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 38,
+            "sprite": "sprite_970",
+            "exact_region_rect_xywh": [
+              580,
+              204,
+              460,
+              168
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              582,
+              206,
+              1038,
+              370
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 39,
+            "sprite": "sprite_971",
+            "exact_region_rect_xywh": [
+              0,
+              40,
+              1036,
+              164
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              42,
+              1034,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 40,
+            "sprite": "sprite_972",
+            "exact_region_rect_xywh": [
+              1036,
+              92,
+              276,
+              112
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1038,
+              94,
+              1310,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 41,
+            "sprite": "sprite_973",
+            "exact_region_rect_xywh": [
+              1312,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1314,
+              110,
+              1378,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 42,
+            "sprite": "sprite_974",
+            "exact_region_rect_xywh": [
+              1380,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1382,
+              110,
+              1446,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 43,
+            "sprite": "sprite_975",
+            "exact_region_rect_xywh": [
+              1448,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1450,
+              110,
+              1514,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 44,
+            "sprite": "sprite_976",
+            "exact_region_rect_xywh": [
+              1516,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1518,
+              110,
+              1582,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 45,
+            "sprite": "sprite_977",
+            "exact_region_rect_xywh": [
+              1584,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1586,
+              110,
+              1650,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 46,
+            "sprite": "sprite_978",
+            "exact_region_rect_xywh": [
+              1652,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1654,
+              110,
+              1718,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 47,
+            "sprite": "sprite_979",
+            "exact_region_rect_xywh": [
+              1720,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1722,
+              110,
+              1786,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 48,
+            "sprite": "sprite_980",
+            "exact_region_rect_xywh": [
+              1788,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1790,
+              110,
+              1854,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 49,
+            "sprite": "sprite_981",
+            "exact_region_rect_xywh": [
+              1856,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1858,
+              110,
+              1922,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 50,
+            "sprite": "sprite_982",
+            "exact_region_rect_xywh": [
+              1924,
+              108,
+              68,
+              96
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1926,
+              110,
+              1990,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 51,
+            "sprite": "sprite_983",
+            "exact_region_rect_xywh": [
+              1040,
+              300,
+              200,
+              72
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1042,
+              302,
+              1238,
+              370
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 52,
+            "sprite": "sprite_984",
+            "exact_region_rect_xywh": [
+              1992,
+              180,
+              24,
+              24
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1994,
+              182,
+              2014,
+              202
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          }
+        ]
+      }
+    },
+    {
+      "queue_index": 220,
+      "asset": "D657C2EB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "canonical_segments": [
+        {
+          "source": "REMOVE FRIEND",
+          "korean": "친구 삭제"
+        },
+        {
+          "source": "SEND GAME INVITE",
+          "korean": "게임 초대 보내기"
+        },
+        {
+          "source": "TIME ATTACK",
+          "korean": "타임 어택"
+        },
+        {
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런"
+        },
+        {
+          "source": "HEART ATTACK",
+          "korean": "하트 어택"
+        }
+      ],
+      "canonical_segment_count": 6,
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+        "git_blob_sha": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+        "file_size": 4194432,
+        "atlas_canvas": [
+          2048,
+          512
+        ],
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_D657C2EB_512x128_atlas.json",
+        "git_blob_sha": "4c6af70c683fb6c298e32c289d762a1f7e6a56b5",
+        "width": 2048,
+        "height": 512,
+        "regions_count": 7,
+        "rotations": false
+      },
+      "inherited_extraction_qa": {
+        "source_task": "LOCALIZATION-LOCALIZATION_B-00077",
+        "source_report_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00081",
+        "c_acceptance_record_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+        "region_count": 7,
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0
+      },
+      "v2_work_order": {
+        "prompt_contract": "outrun-first-pass-edit-v2",
+        "clean_plate_contract": "outrun-clean-plate-qa-v1",
+        "semantic_binding_status": "HOLD_EXACT_REGION_TO_TEXT_BINDING_REQUIRED_BEFORE_EDIT",
+        "source_language_removal_permission": "ONLY_AFTER_EXACT_EFFECT_MASK_EXISTS",
+        "korean_lettering_permission": "ONLY_INSIDE_MEASURED_CANDIDATE_SAFE_BBOX_AFTER_CLEAN_PLATE_PASS",
+        "work_orders": [
+          {
+            "region_index": 0,
+            "sprite": "sprite_131",
+            "exact_region_rect_xywh": [
+              0,
+              340,
+              1780,
+              172
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              342,
+              1778,
+              510
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 1,
+            "sprite": "sprite_132",
+            "exact_region_rect_xywh": [
+              0,
+              252,
+              1004,
+              88
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              254,
+              1002,
+              338
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 2,
+            "sprite": "sprite_133",
+            "exact_region_rect_xywh": [
+              1004,
+              252,
+              800,
+              88
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              1006,
+              254,
+              1802,
+              338
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 3,
+            "sprite": "sprite_134",
+            "exact_region_rect_xywh": [
+              0,
+              164,
+              788,
+              88
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              166,
+              786,
+              250
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 4,
+            "sprite": "sprite_135",
+            "exact_region_rect_xywh": [
+              788,
+              164,
+              668,
+              88
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              790,
+              166,
+              1454,
+              250
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 5,
+            "sprite": "sprite_136",
+            "exact_region_rect_xywh": [
+              0,
+              100,
+              1116,
+              64
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              102,
+              1114,
+              162
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 6,
+            "sprite": "sprite_137",
+            "exact_region_rect_xywh": [
+              0,
+              36,
+              1116,
+              64
+            ],
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              38,
+              1114,
+              98
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          }
+        ]
+      }
+    },
+    {
+      "queue_index": 222,
+      "asset": "DDF0392A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "canonical_segments": [
+        {
+          "source": "Rush A Difficulty",
+          "korean": "난이도에 도전"
+        },
+        {
+          "source": "Shake The Street",
+          "korean": "거리를 뒤흔들어라"
+        },
+        {
+          "source": "Who Are You?",
+          "korean": "당신은 누구?"
+        },
+        {
+          "source": "Journey Mode / Random",
+          "korean": "저니 모드 / 무작위"
+        },
+        {
+          "source": "OutRun 1986",
+          "korean": "아웃런 1986"
+        },
+        {
+          "source": "OutRun Mode / 15 C.",
+          "korean": "아웃런 모드 / 15코스"
+        }
+      ],
+      "canonical_segment_count": 6,
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+        "git_blob_sha": "1ff7680eb71750d884b0e69fe058aef3a5cf5fa2",
+        "file_size": 2097280,
+        "atlas_canvas": [
+          1024,
+          2048
+        ],
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_16BYTE_4X4_BLOCK_TOP_LEVEL"
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_DDF0392A_256x512_atlas.json",
+        "git_blob_sha": "819d31b1cd9c59fb6d011f3f0361d6ed7114c286",
+        "width": 1024,
+        "height": 2048,
+        "regions_count": 25,
+        "rotations": false
+      },
+      "inherited_extraction_qa": {
+        "source_task": "LOCALIZATION-LOCALIZATION_B-00077",
+        "source_report_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00081",
+        "c_acceptance_record_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+        "region_count": 25,
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0
+      },
+      "v2_work_order": {
+        "prompt_contract": "outrun-first-pass-edit-v2",
+        "clean_plate_contract": "outrun-clean-plate-qa-v1",
+        "semantic_binding_status": "HOLD_EXACT_REGION_TO_TEXT_BINDING_REQUIRED_BEFORE_EDIT",
+        "source_language_removal_permission": "ONLY_AFTER_EXACT_EFFECT_MASK_EXISTS",
+        "korean_lettering_permission": "ONLY_INSIDE_MEASURED_CANDIDATE_SAFE_BBOX_AFTER_CLEAN_PLATE_PASS",
+        "work_orders": [
+          {
+            "region_index": 0,
+            "sprite": "sprite_401",
+            "exact_region_rect_xywh": [
+              0,
+              1972,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1974,
+              958,
+              2046
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 1,
+            "sprite": "sprite_402",
+            "exact_region_rect_xywh": [
+              0,
+              1896,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1898,
+              958,
+              1970
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 2,
+            "sprite": "sprite_403",
+            "exact_region_rect_xywh": [
+              0,
+              1820,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1822,
+              958,
+              1894
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 3,
+            "sprite": "sprite_404",
+            "exact_region_rect_xywh": [
+              0,
+              1744,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1746,
+              958,
+              1818
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 4,
+            "sprite": "sprite_405",
+            "exact_region_rect_xywh": [
+              0,
+              1668,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1670,
+              958,
+              1742
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 5,
+            "sprite": "sprite_406",
+            "exact_region_rect_xywh": [
+              0,
+              1592,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1594,
+              958,
+              1666
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 6,
+            "sprite": "sprite_407",
+            "exact_region_rect_xywh": [
+              0,
+              1516,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1518,
+              958,
+              1590
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 7,
+            "sprite": "sprite_408",
+            "exact_region_rect_xywh": [
+              0,
+              1440,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1442,
+              958,
+              1514
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 8,
+            "sprite": "sprite_409",
+            "exact_region_rect_xywh": [
+              0,
+              1364,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1366,
+              958,
+              1438
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 9,
+            "sprite": "sprite_410",
+            "exact_region_rect_xywh": [
+              0,
+              1288,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1290,
+              958,
+              1362
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 10,
+            "sprite": "sprite_411",
+            "exact_region_rect_xywh": [
+              0,
+              1212,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1214,
+              958,
+              1286
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 11,
+            "sprite": "sprite_412",
+            "exact_region_rect_xywh": [
+              0,
+              1136,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1138,
+              958,
+              1210
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 12,
+            "sprite": "sprite_413",
+            "exact_region_rect_xywh": [
+              0,
+              1060,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              1062,
+              958,
+              1134
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 13,
+            "sprite": "sprite_414",
+            "exact_region_rect_xywh": [
+              0,
+              984,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              986,
+              958,
+              1058
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 14,
+            "sprite": "sprite_415",
+            "exact_region_rect_xywh": [
+              0,
+              908,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              910,
+              958,
+              982
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 15,
+            "sprite": "sprite_416",
+            "exact_region_rect_xywh": [
+              0,
+              832,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              834,
+              958,
+              906
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 16,
+            "sprite": "sprite_417",
+            "exact_region_rect_xywh": [
+              0,
+              756,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              758,
+              958,
+              830
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 17,
+            "sprite": "sprite_418",
+            "exact_region_rect_xywh": [
+              0,
+              680,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              682,
+              958,
+              754
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 18,
+            "sprite": "sprite_419",
+            "exact_region_rect_xywh": [
+              0,
+              604,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              606,
+              958,
+              678
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 19,
+            "sprite": "sprite_420",
+            "exact_region_rect_xywh": [
+              0,
+              528,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              530,
+              958,
+              602
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 20,
+            "sprite": "sprite_421",
+            "exact_region_rect_xywh": [
+              0,
+              452,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              454,
+              958,
+              526
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 21,
+            "sprite": "sprite_422",
+            "exact_region_rect_xywh": [
+              0,
+              376,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              378,
+              958,
+              450
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 22,
+            "sprite": "sprite_423",
+            "exact_region_rect_xywh": [
+              0,
+              300,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              302,
+              958,
+              374
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 23,
+            "sprite": "sprite_424",
+            "exact_region_rect_xywh": [
+              0,
+              224,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              226,
+              958,
+              298
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          },
+          {
+            "region_index": 24,
+            "sprite": "sprite_425",
+            "exact_region_rect_xywh": [
+              0,
+              148,
+              960,
+              76
+            ],
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "guard_inset_px": 2,
+            "source_inspection_guard_ltrb": [
+              2,
+              150,
+              958,
+              222
+            ],
+            "guard_validation": "PASS",
+            "guard_semantics": "UPPER_BOUND_FOR_DECODED_SOURCE_INSPECTION_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+            "semantic_binding": "HOLD_EXACT_DECODE_AND_TEXT_ID_REQUIRED",
+            "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+            "source_effect_removal_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "protected_art_mask": "HOLD_NOT_YET_MATERIALIZED",
+            "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+            "candidate_safe_bbox": "HOLD_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_PER_V2",
+            "korean_render": "FORBIDDEN_UNTIL_CLEAN_PLATE_AND_SAFE_BBOX_PASS"
+          }
+        ]
+      }
+    }
+  ],
+  "strict_holds": {
+    "exact_dds_header_fields": "HOLD_REUSE_SIZE_EQUATION_ONLY_HEADER_FIELDS_NOT_DIRECTLY_DECODED_IN_THIS_TASK",
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "semantic_to_region_binding": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_effect_bbox": "HOLD_NOT_YET_MEASURED",
+    "source_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "protected_art_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bbox": "HOLD_MUST_DERIVE_FROM_SOURCE_EFFECT_BBOX_WITH_2PX_INSET",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_132_176_220_222",
+    "work_steal": "NONE",
+    "canonical_semantics": "PASS_20_CURRENT_CANONICAL_SEGMENTS_REUSED_FROM_C_ACCEPTED_B00077_LINEAGE",
+    "region_geometry": "REUSED_C00081_PASS_106_OF_106_EXACT_RELEASE_EXTRACTION_REGIONS",
+    "two_px_guard_geometry": "PASS_106_OF_106_NONEMPTY_INSIDE_PARENT_REGION",
+    "candidate_safe_bbox_claim": "PASS_NONE_FABRICATED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Four C-consumed unfinished even-shard assets advanced from exact payload extraction to deterministic first-pass-v2 decoded-source inspection guards and source-mask/CLEAN_PLATE work orders. No candidate-safe bbox or Korean DDS was fabricated; runtime remains UNTESTED."
+}
