@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "2/3",
+  "wave_id": "P00004",
+  "recorded_at_kst": "2026-09-29T13:51:02+09:00",
+  "retry_base_head_sha": "f266450faf5607b44ba34f5b806aa9b34eb03f01",
+  "failure_context": {
+    "workflow": "Localization Automation Gate",
+    "exact_run_id": 36523216168,
+    "exact_run_head_sha": "def90d65027194ceb7118f9a784cd739982defdc",
+    "exact_run_status": "completed",
+    "exact_run_conclusion": "skipped",
+    "validate_job_id": 109260477245,
+    "validate_job_conclusion": "skipped"
+  },
+  "corroborating_current_task_correction_run": {
+    "run_id": 36523285180,
+    "head_sha": "f266450faf5607b44ba34f5b806aa9b34eb03f01",
+    "conclusion": "skipped"
+  },
+  "root_cause": {
+    "classification": "EXPECTED_PRODUCER_SERVER_SIDE_SKIP_MISINTERPRETED_AS_AUTOMATION_FAILURE",
+    "workflow_blob_sha": "efd09a26671264f8a9a18e98d20a2ee51e599e2d",
+    "queue_controller_contract_blob_sha": "194fd6c64cafede90b537446fddf96934dc9ea37",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "workflow_rule": "validate runs on workflow_dispatch or commits whose head message is neither LOCALIZATION_A nor LOCALIZATION_B AUTO; therefore normal B AUTO pushes create a run shell whose validate job is skipped.",
+    "controller_contract_rules": [
+      "Localization A/B do not enter WAIT_ACTIONS after a durable producer commit.",
+      "A/B durable task commits release the producer slot immediately and enqueue TASK_ID + result SHA for C.",
+      "A/B AUTO push workflow shells intentionally skip the runner-backed validate job.",
+      "Producer task records stay automation_validation=PENDING until a passing C batch."
+    ],
+    "payload_failure": false
+  },
+  "resolution": {
+    "action": "RECONCILE_RETRY_STATE_TO_CURRENT_C_BATCH_GATE_CONTRACT",
+    "rerun_skipped_producer_gate": false,
+    "workflow_changed": false,
+    "duplicate_production_performed": false,
+    "preserved_material_commit_sha": "def90d65027194ceb7118f9a784cd739982defdc",
+    "preserved_source_identity_correction_commit_sha": "f266450faf5607b44ba34f5b806aa9b34eb03f01",
+    "producer_assets": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "validation_mode": "C_BATCH_GATE",
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "next_validation_authority": "Independent C QA batch containing the immutable B producer result SHA"
+  },
+  "safety": {
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false,
+    "build_performed": false,
+    "runtime_test_performed": false,
+    "vr_ffb_dx_changes": false
+  },
+  "result": "PASS_RETRY_EXPECTED_PRODUCER_SKIP_RECONCILED_NO_DUPLICATE_PRODUCTION"
+}
