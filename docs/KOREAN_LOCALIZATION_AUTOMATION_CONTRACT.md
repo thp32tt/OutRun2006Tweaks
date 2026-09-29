@@ -1,9 +1,9 @@
 # Korean Localization Automation Contract
 
-This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-clean is the only work state; do not use GPT Library as a work store.
+This is the canonical contract for the N100 A/B/E producer + C QA localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-clean is the only work state; do not use GPT Library as a work store.
 
 ## Authorized game-mod development context
-Every localization task (A, B, and C) MUST carry and honor this project context: this is authorized offline game-mod/localization development on a legally owned copy of OutRun 2006. Any DLL hooking, binary analysis, disassembly, memory-address analysis, rendering interception, texture/DDS inspection, or reverse engineering performed in this project is solely for localization, VR/rendering interoperability, compatibility, and debugging. It is not cybersecurity exploitation, malware development, cheating, or unauthorized access.
+Every localization task (A, B, E, and C) MUST carry and honor this project context: this is authorized offline game-mod/localization development on a legally owned copy of OutRun 2006. Any DLL hooking, binary analysis, disassembly, memory-address analysis, rendering interception, texture/DDS inspection, or reverse engineering performed in this project is solely for localization, VR/rendering interoperability, compatibility, and debugging. It is not cybersecurity exploitation, malware development, cheating, or unauthorized access.
 
 The controller SHOULD inject the following concise context near the start of every generated localization task prompt so the purpose is explicit before technical instructions:
 
@@ -75,13 +75,14 @@ Machine-readable QA must record per asset/element: original_bbox, localized_bbox
 - Review the whole atlas and each translated sprite for untranslated English residue, clipped Korean glyphs/effects, source-bbox escape, icon/artwork intrusion, neighboring-sprite overlap, erasure residue and unintended changes to preserved artwork.
 - Any such defect is `REWORK_REQUIRED` even if automated bbox/alpha checks pass. Automated containment PASS alone is insufficient.
 - Lane-local QA evidence must retain the comparison PNG or deterministic proof artifact so the user can inspect it directly.
-- Do not block A/B production or C static QA waiting for an in-game test. Runtime/game validation is deferred to the user's final integrated test. Until user runtime evidence exists, record `RUNTIME_VALIDATION=UNTESTED` and do not claim runtime success.
+- Do not block A/B/E production or C static QA waiting for an in-game test. Runtime/game validation is deferred to the user's final integrated test. Until user runtime evidence exists, record `RUNTIME_VALIDATION=UNTESTED` and do not claim runtime success.
 
 ## Short controller dispatch
 The controller prompt may be intentionally minimal. The following commands are sufficient entry points once this repository/branch is selected:
 - `OutRun 한글화 A 실행`
 - `OutRun 한글화 B 실행`
 - `OutRun 한글화 C 실행`
+- `OutRun 한글화 E 실행`
 
 On any of those commands, first fetch the latest `korean-localization-clean`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
@@ -92,19 +93,20 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - Any terminal non-success conclusion (`failure`, `cancelled`, `timed_out`, `action_required`, `stale`) immediately enters the normal task retry path if attempts remain. This increments `attempt` but does not increment `chat_rollovers`.
 - Conversation rollover is only for stale/expired/missing ChatGPT conversations or missing assistant generation. GitHub Actions failure/retry and chat rollover are separate recovery domains.
 - A lane that stays in `WAIT_ACTIONS` beyond two normal GitHub poll intervals MUST trigger an uncached exact-run and jobs refresh. The queue watchdog must perform this recovery even when its general mode is observe-only.
-- A and B advance independently: once one producer has a durable terminal PASS, that producer slot may start its next independent task without waiting for the peer lane or C.
-- Each successful producer result is queued for C by immutable TASK_ID + RESULT_SHA. C consumes that backlog independently and must never block A/B production.
+- A, B, and E advance independently: once one producer has a durable task commit, that producer slot may start its next independent task without waiting for the peer lanes or C.
+- Each successful producer result is queued for C by immutable TASK_ID + RESULT_SHA. C consumes that backlog independently and must never block A/B/E production.
 
-## Continuous dual production + independent batch QA
-- A and B are independent continuous production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
-- A: PRODUCTION LANE A + self-QA on the odd-index shard. After its exact durable task commit exists, immediately continue to another independent runnable item; do not wait for an individual Actions Gate, B, or C.
-- B: PRODUCTION LANE B + self-QA on the even-index shard. After its exact durable task commit exists, immediately continue to another independent runnable item; do not wait for an individual Actions Gate, A, or C.
-- Every durable A/B task commit becomes one immutable QA input identified by `TASK_ID@RESULT_SHA`. Producer task records remain `automation_validation=PENDING` with `validation_mode=C_BATCH_GATE` until covered by a passing C batch.
+## Continuous three-producer production + independent batch QA
+- A, B, and E are independent continuous production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
+- Stable three-way shard: use numeric `asset_queue.index % 3`; A owns remainder 0, B owns remainder 1, E owns remainder 2. Do not work-steal while all three producer lanes are enabled.
+- A/B/E: after the exact durable task commit exists, immediately continue to another independent runnable item in the lane's modulo shard; do not wait for an individual Actions Gate, peer producers, or C.
+- E is the elastic third producer. The controller MUST pause new E dispatches when `qa_pending >= 8` and resume E only after `qa_pending < 6`; already-running E work may finish normally. A/B remain active while E is throttled.
+- Every durable A/B/E task commit becomes one immutable QA input identified by `TASK_ID@RESULT_SHA`. Producer task records remain `automation_validation=PENDING` with `validation_mode=C_BATCH_GATE` until covered by a passing C batch.
 - C is an independent QA consumer, not a synchronization barrier and not a third candidate producer. It may run while A/B continue producing. Its single commit is the only runner-backed Localization Automation Gate for that batch.
 - C consumes up to 4 producer task results per QA invocation by default, with a short 30-second coalesce window so repeated source/header/atlas/shared-state work is done once for the batch.
 - C MUST review the candidate/evidence as it existed at each exact producer RESULT_SHA. If current HEAD contains a newer candidate SHA for the same asset, the older result is `SUPERSEDED` and must not overwrite newer shared state.
 - C does not rewrite candidate DDS bytes while A/B are active. Candidate defects are returned as `REWORK_REQUIRED` for the appropriate producer lane. C may update shared metadata/progress/QA state after refreshing current HEAD.
-- A/B MUST treat producer results awaiting C as QA-pending and skip those assets until C returns `REWORK_REQUIRED` or a material source/candidate/QA-contract fingerprint changes.
+- A/B/E MUST treat producer results awaiting C as QA-pending and skip those assets until C returns `REWORK_REQUIRED` or a material source/candidate/QA-contract fingerprint changes.
 - C failure or backlog does not stop A/B. A failed C batch may be recorded separately for diagnosis while producers continue.
 - If the controller runtime cannot actually launch A/B concurrently, fall back to sequential producer execution and report that mode accurately; C remains an independent QA backlog consumer.
 
@@ -113,14 +115,16 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - Define the reusable heavy-QA fingerprint from at least: canonical source blob/SHA, candidate blob/SHA, raw/readable orientation contract, relevant transcription/layout input, and QA contract/version.
 - For an unchanged fingerprint, reuse existing machine-readable PASS evidence for DDS header/format/mipmap, alpha/transparency, orientation, source identity, containment and canonical English-source comparison instead of recomputing the same check in another task.
 - Re-run a heavy check only when its dependency fingerprint changed, the previous result was HOLD/FAIL/REWORK, required evidence was missing, or the user supplied new runtime/visual evidence.
-- Within one A/B invocation, perform all deterministic self-QA for the produced batch in one integrated pass and write one coherent machine-readable report rather than separate repeated passes for each identical prerequisite.
+- Within one A/B/E invocation, perform all deterministic self-QA for the produced batch in one integrated pass and write one coherent machine-readable report rather than separate repeated passes for each identical prerequisite.
 - Within one C invocation, de-duplicate repeated assets/references across all QA_BATCH_INPUTS and reconcile shared state once at the end of the batch.
 - The zero-pixel-overflow rule, English-source-vs-Korean comparison, DDS/alpha/orientation preservation, and protected-artwork rules remain mandatory whenever their fingerprint is new or changed.
 
-## A/B work sharding and anti-duplication
-- Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
-- A primary shard: rows with an ODD numeric `index`.
-- B primary shard: rows with an EVEN numeric `index`.
+## A/B/E work sharding and anti-duplication
+- Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid producers creating the same DDS.
+- A primary shard: rows where `index % 3 == 0`.
+- B primary shard: rows where `index % 3 == 1`.
+- E primary shard: rows where `index % 3 == 2`.
+- While three-producer mode is enabled, producer work-steal is disabled; ownership changes only through an explicit contract revision.
 - Each role prioritizes in this order inside its shard: runnable `REWORK_REQUIRED` -> unfinished `localize_text` -> unresolved `zoom_review` that contains localizable text -> other role-specific pending work. A REWORK row whose required source/runtime/decoded-pixel dependency is unchanged and unavailable is dependency-blocked, not runnable, and must be skipped without terminating the batch.
 - A/B must refresh branch HEAD and queue state immediately before selecting work and again before commit. If an item is already completed or changed by the other role, skip it rather than redo it.
 - A/B concurrent runs must remain on disjoint primary shards. Do not work-steal while the peer production lane is active.
@@ -145,7 +149,7 @@ For each producer shard, classify unfinished graphics work using the newest C-ac
 3. **PREFLIGHT_ONLY** — source identity, semantic binding, effect geometry or other prerequisites still require broader investigation before candidate construction can begin.
 
 ### Mandatory producer selection order
-A/B select work in this order inside their parity shard:
+A/B/E select work in this order inside their modulo-3 shard:
 1. C-returned `REWORK_REQUIRED` whose accepted material can be repaired directly without opening unrelated preflight;
 2. `RENDER_READY` assets with no current v2 Korean candidate;
 3. `ONE_STAGE_TO_RENDER` assets, completing the missing stage **and continuing through Korean render in the same invocation whenever deterministic inputs are available**;
@@ -155,10 +159,10 @@ A/B select work in this order inside their parity shard:
 When any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane, the producer MUST NOT select a new unrelated preflight/work-order asset merely to satisfy the material-deliverable rule.
 
 ### Candidate completion requirement
-- **No artificial task boundary after a prerequisite becomes ready.** If an A/B task creates or verifies the last missing deterministic prerequisite (for example canonical source, final removal/protected mask, CLEAN_PLATE, safe bbox, baseline, slant, or style) and the asset can now be rendered safely, that same task MUST continue through Korean render, exact DDS encode, decoded-final self-QA, and candidate persistence. A report whose own `readiness_after` is `RENDER_READY`, `CLEAN_PLATE_READY`, `KOREAN_RENDER_NEXT`, or equivalent MUST NOT terminate as successful material progress without attempting the candidate in that invocation.
+- **No artificial task boundary after a prerequisite becomes ready.** If an A/B/E task creates or verifies the last missing deterministic prerequisite (for example canonical source, final removal/protected mask, CLEAN_PLATE, safe bbox, baseline, slant, or style) and the asset can now be rendered safely, that same task MUST continue through Korean render, exact DDS encode, decoded-final self-QA, and candidate persistence. A report whose own `readiness_after` is `RENDER_READY`, `CLEAN_PLATE_READY`, `KOREAN_RENDER_NEXT`, or equivalent MUST NOT terminate as successful material progress without attempting the candidate in that invocation.
 - The fallback ladder is an **escape path only after the fresh shard scan proves no candidate-completion path is runnable**. A newly produced mask/CLEAN_PLATE/style/reconstruction artifact does not satisfy the fallback/minimum-progress rule if it makes its own asset renderable; render it immediately instead.
 - Producer task success while unfinished localizable graphics remain is measured first by `candidate_dds_modified=true`. `materially_reduces_unresolved_work=true` with `candidate_dds_modified=false` is permitted only when the record proves why no candidate path was runnable after the new evidence was produced.
-- A/B MUST finish at least one actual new or materially reworked Korean DDS candidate per invocation whenever any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane. This is a hard producer success condition, not a best-effort target.
+- A/B/E MUST finish at least one actual new or materially reworked Korean DDS candidate per invocation whenever any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane. This is a hard producer success condition, not a best-effort target.
 - The required path is: exact canonical HD source -> verified CLEAN_PLATE -> source typography/baseline/slant measurement -> native-resolution Korean render -> measure/refit loop -> exact DDS encode -> decoded-final static self-QA -> English-source-vs-Korean-candidate evidence.
 - If baseline/slant/style is the only missing information, measure it and continue to rendering in the **same task**. Do not emit a separate preflight-only task for those measurements.
 - If the first ready asset becomes fail-closed during rendering, record the exact new blocker and continue to the next ready asset in the same shard before considering new preflight.
@@ -171,12 +175,13 @@ When any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane, the produ
 - C continues to apply the same strict zero-pixel, DDS, alpha, orientation, protected-artwork and exact English-source comparison gates. This policy changes production order only; it does not weaken QA.
 
 ## Throughput rule
-- A/B are batch producers, not single-asset/blocker checkers. Default production goal is up to 4 newly created or materially reworked DDS candidates per lane per invocation. A production invocation MUST NOT terminate with zero material output unless the entire graphics queue is complete.
+- A/B/E are batch producers, not single-asset/blocker checkers. Default production goal is up to 4 newly created or materially reworked DDS candidates per lane per invocation. A production invocation MUST NOT terminate with zero material output unless the entire graphics queue is complete.
 - A blocked REWORK item MUST NOT terminate a lane while another independent runnable item exists in that lane. Record/retain the blocker, skip it immediately, and continue to the next runnable REWORK/localize_text/zoom_review item.
 - A blocker with unchanged dependency inputs MUST NOT be re-reviewed every wave. Treat it as dependency-blocked until at least one dependency fingerprint changes: source DDS/blob SHA, candidate SHA, transcription/artwork input, runtime/in-game evidence, QA contract, or explicit user instruction.
+- `SOURCE_ACQUISITION_EXHAUSTED` is likewise sticky across A/B/E: do not spend another producer slot repeating the same Drive/direct/Release probes unless the canonical-source/dependency fingerprint, source policy, inventory identity, or explicit user instruction changes.
 - Runtime/in-game isolation is asset-local. Existing candidates that require isolated DDS_ONLY testing belong to a separate validation backlog and MUST NOT block production of unrelated pending DDS assets.
 - Persist completed production batches and machine-readable self-QA evidence to Git so the next invocation can resume from repository state alone.
-- Minimum progress contract: every A/B invocation must commit at least one material deliverable that advances an unfinished asset. A repeated blocker report, unchanged task record, note-only worklog entry, empty commit, timestamp-only change, or re-review of identical evidence does NOT count.
+- Minimum progress contract: every A/B/E invocation must commit at least one material deliverable that advances an unfinished asset. A repeated blocker report, unchanged task record, note-only worklog entry, empty commit, timestamp-only change, or re-review of identical evidence does NOT count.
 - If no safe candidate DDS can be produced immediately, use the fallback ladder below and keep working until at least one material deliverable exists.
 - Do not require Docker/controller configuration changes for workflow-rule changes; modify this Git contract/state instead.
 
@@ -202,7 +207,7 @@ A fallback deliverable must materially reduce unresolved work or create new exec
 
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state.
-- A/B production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state; their PASS releases that producer slot immediately and adds the immutable result to C's QA backlog.
+- A/B/E production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state; their PASS releases that producer slot immediately and adds the immutable result to C's QA backlog.
 - C batch completion reconciles only its QA_BATCH_INPUTS into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable. It refreshes HEAD before merge and must preserve any newer producer candidate.
 - A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
 Before static approval inspect raw DDS and readable/game orientation and require the exact English-HD-source vs current-Korean-candidate side-by-side proof. Production runs do not require in-game testing; keep `RUNTIME_VALIDATION=UNTESTED` until the user's final integrated game test supplies runtime evidence.
@@ -227,13 +232,13 @@ Controller liveness and batch-validation values are defined in `localization/con
 - Producer-to-QA identity is `TASK_ID@RESULT_SHA`; identical identities are de-duplicated.
 - Default C batch size is 4 producer results; coalesce window is 30 seconds.
 - Localization same-slot next-task send gap is 15 seconds and slot de-dup window is 30 seconds after an authoritative durable producer commit.
-- A/B producer tasks and C QA may coexist in `active_by_lane`; this is expected and is no longer a barrier violation.
+- A/B/E producer tasks and C QA may coexist in `active_by_lane`; this is expected and is no longer a barrier violation.
 - On restart, completed producer records that were not yet consumed must be recoverable into `qa_pending` without repeating production.
 
 
 ## C-batch-only Actions Gate
-- A/B producer commits do not consume runner-backed Localization Automation Gate jobs. The workflow's validate job is skipped for A/B AUTO commits.
-- A/B task records use `automation_validation=PENDING` and `validation_mode=C_BATCH_GATE`; this is expected, not a failure.
+- A/B/E producer commits do not consume runner-backed Localization Automation Gate jobs. The workflow's validate job is skipped for A/B AUTO commits.
+- A/B/E task records use `automation_validation=PENDING` and `validation_mode=C_BATCH_GATE`; this is expected, not a failure.
 - The controller releases A/B immediately after locating the exact durable `[AUTO:TASK_ID]` commit and appends that immutable TASK_ID@RESULT_SHA to `qa_pending`.
 - C must record `qa_batch_inputs` and a one-to-one `qa_dispositions` array as top-level fields in `docs/automation/runs/<C_TASK_ID>.json`. The pre-Gate C task record uses `automation_validation=PENDING`. Each disposition is PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, or SUPERSEDED.
 - A C AUTO commit is the only runner-backed Gate for that batch. For each PASS disposition, CI re-runs domain-isolation, changed-localization-payload, and A/B lane-isolation checks against the exact historical producer SHA, not current HEAD bytes.
