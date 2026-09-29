@@ -1139,3 +1139,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Existing `53088f23` is the contract-compliant B00174 material+task producer result candidate. Q00032 does not substitute it for the immutable controller input.
 - Candidate-completion priorities remain index99 clean-plate v3, newer index152 candidate, newer index112 handoff before unrelated preflight. Concurrent A00178/B00176 work is preserved without disposition. No candidate/static/runtime approval. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0126-C134/C134_Q00032_INDEPENDENT_QA_BATCH.json`.
+
+### C136 Q00034 — 2026-09-30T02:08:20+09:00
+- QA inputs: A00179 `7548b44b` (30/36/48/132), B00180 `2af61fc8` (154/164/172/228). Dispositions: **PASS / PASS**, limited source-acquisition exhaustion evidence.
+- Independent source recheck: current inventory unchanged; Drive exact-name **8/8 miss**; pinned-direct **7 exact legacy blobs + 1 exact miss**; verified v0.25.10a release **7 exact members + 1 miss**, with all available members mismatching canonical inventory.
+- production_readiness: **PREFLIGHT_ONLY** for all eight. No candidate DDS/static/runtime approval; candidate-only pixel/alpha/orientation/containment/source-comparison gates remain unpromoted.
+- Candidate-completion first: preserve newer B00183 index112 re-emission for separate C QA, continue index99 CLEAN_PLATE direct rework and indices130/152 result-contract completion before unrelated preflight expansion.
+- Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260930-0208-C136/C136_Q00034_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

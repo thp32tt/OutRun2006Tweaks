@@ -1,5 +1,5 @@
 {
-  "schema_version": 89,
+  "schema_version": 90,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "C135/Q00033 index99/4F68708E DIRECT_REWORK_REQUIRED: A00173 CLEAN PLATE v3 still contains visible English ghost silhouettes. Rebuild source-effect removal/reconstruction while preserving transparency; no Korean render until independent C visual PASS.",
-    "C135/Q00033 indices112/D41D0B1, 130/1762489B and 152/49BB5FE5 content prechecks are visually/static-consistent but NOT C-approved: immutable B00160@bf65070, B00176@e57374e and B00167@1d0c05d fail current verify_automation_commit.py machine-readable PASS requirements. Re-emit current candidate lineages with current-contract QA JSON + durable task record, then requeue exact new result SHAs.",
-    "Preserve A00179@7548b44b and B00180@2af61fc8 as unconsumed preflight QA backlog for a later C batch.",
-    "B00174@48e4ab76 remains REWORK_REQUIRED for immutable result-SHA structure; reconsider only a structurally valid result identity.",
-    "Q00033 changes no DDS bytes, grants no static promotion after Gate repair, and grants no runtime approval. RUNTIME_VALIDATION=UNTESTED."
+    "Candidate completion / direct rework remains ahead of unrelated preflight: index99/4F68708E CLEAN_PLATE still requires source-effect residue repair; no Korean render until independent C visual PASS.",
+    "RENDER_READY / current-candidate contract path: preserve newer B00183@8b7842b4 index112/D41D0B1 current-contract QA re-emission for its own independent C batch; preserve any newer A/B/E producer result present after the Q00034 merge.",
+    "ONE_STAGE_TO_RENDER: Q00034 promotes none of indices30/36/48/132/154/164/172/228; exact canonical source is still unavailable, so no deterministic one-stage reconstruction path is claimed.",
+    "PREFLIGHT_ONLY: indices30/36/48/132/154/164/172/228 are SOURCE_ACQUISITION_EXHAUSTED on unchanged current inventory and pinned-source fingerprints. Do not repeat Drive/direct/release probes until an approved source or inventory fingerprint changes.",
+    "Indices130/1762489B and 152/49BB5FE5 remain candidate-completion/result-contract work from C135 until structurally valid current-contract producer results are independently consumed. RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2365,107 +2365,147 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-30T01:55:49+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00181",
-    "qa_batch_id": "Q00033",
-    "run": "C135",
-    "result": "PASS_Q00033_FOUR_REWORK_REQUIRED_A00173_VISUAL_B00160_B00167_B00176_EXACT_RESULT_CONTRACT_RUNTIME_UNTESTED",
-    "base_head": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+    "recorded_at_kst": "2026-09-30T02:08:20+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00184",
+    "qa_batch_id": "Q00034",
+    "run": "C136",
+    "result": "PASS_Q00034_A00179_B00180_SOURCE_ACQUISITION_EXHAUSTED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+    "base_head": "8b7842b4d6903e3ad6b518a95daff9bc37893e0e",
     "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
     "current_controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00173@fb686bf12710ef3e02d31427a39fa8e1150fab45",
-      "LOCALIZATION-LOCALIZATION_B-00167@1d0c05d29118192c5c10f40ee857fb26ae366622",
-      "LOCALIZATION-LOCALIZATION_B-00160@bf650709edf84d1923544a497be2267f93578197",
-      "LOCALIZATION-LOCALIZATION_B-00176@e57374e3735c3568b5e9f584d59a189fef58f356"
-    ],
-    "reviewed_indices": [
-      99,
-      112,
-      130,
-      152
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00179",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "7548b44b7364504c248341cce0771969f0793160",
+        "result_message": "localization(A): exhaust mod3 source tiers for A batch [AUTO:LOCALIZATION-LOCALIZATION_A-00179]",
+        "completed_at": "2026-09-30T01:41:54.500019+09:00",
+        "producer_id": "P00090",
+        "automation_validation": "PENDING",
+        "validation_mode": "C_BATCH_GATE"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00180",
+        "lane": "LOCALIZATION_B",
+        "result_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+        "result_message": "localization(B): exhaust P00091 source tiers [AUTO:LOCALIZATION-LOCALIZATION_B-00180]",
+        "completed_at": "2026-09-30T01:47:39.621975+09:00",
+        "producer_id": "P00091",
+        "automation_validation": "PENDING",
+        "validation_mode": "C_BATCH_GATE"
+      }
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00173",
-        "result_sha": "fb686bf12710ef3e02d31427a39fa8e1150fab45",
-        "status": "REWORK_REQUIRED",
-        "reason": "Exact-result numeric gates preserve alpha/transparency and confine all 114,540 changed pixels to the 114,566-pixel effect mask, but independent C native/readable comparison of A00173 CLEAN PLATE v3 still shows clearly recognizable dark-blue English letter silhouettes across both lines. This fails the mandatory no-source-language-residue / source-faithful CLEAN_PLATE visual gate. Do not render Korean from this plate; expand/reconstruct the full source effect envelope without introducing opaque rectangles or changing source-transparent pixels. RUNTIME_VALIDATION=UNTESTED."
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00179",
+        "result_sha": "7548b44b7364504c248341cce0771969f0793160",
+        "status": "PASS",
+        "reason": "PASS is limited to A00179's source-acquisition exhaustion evidence for indices30/36/48/132; it does not approve Korean artwork. Current canonical inventory blob 5a3d3b09d97063c65e2b2e356a20878e4c0a83df is unchanged from the producer fingerprint. Independent C rechecked ezflash557 Drive exact-name discovery as 4/4 misses; pinned commit 55f67a813dd3603d201d0be0da47c071965f53a4 resolves exact direct blobs for 8215FD25/B1696633/1F5FE6E9 exactly as recorded and has no exact 06AB5CEE path. The verified v0.25.10a bundle is 306223257 bytes with SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958; its exact members reproduce producer SHA-256/dimensions for 8215FD25/B1696633/1F5FE6E9 and omit 06AB5CEE. Existing members mismatch current canonical inventory. production_readiness=PREFLIGHT_ONLY for all four; do not repeat source probes until source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
-        "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
-        "status": "REWORK_REQUIRED",
-        "reason": "Content precheck is visually/static-consistent on current blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614..., with no visible English residue, clipping, year damage or containment escape. However the immutable producer result B00167@1d0c05d29118192c5c10f40ee857fb26ae366622 fails the current C-batch exact-SHA validator: verify_automation_commit.py reports 'DDS changed but PASS reports contain no post-reset zero-pixel/protected-mask metrics'. C cannot promote a PASS disposition that the hosted Gate cannot validate. Re-emit current candidate lineage with a same-result machine-readable PASS report satisfying the current post-reset zero-pixel/protected-mask contract and durable task record. No static promotion is made by Q00033. RUNTIME_VALIDATION=UNTESTED."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
-        "result_sha": "bf650709edf84d1923544a497be2267f93578197",
-        "status": "REWORK_REQUIRED",
-        "reason": "Content precheck is visually/static-consistent on current blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce..., with no visible English residue, clipping or containment escape. However the immutable producer result B00160@bf650709edf84d1923544a497be2267f93578197 fails the current C-batch exact-SHA validator: verify_automation_commit.py reports 'DDS changed but no machine-readable PASS record exists in changed QA JSON'. C cannot promote a PASS disposition that the hosted Gate cannot validate. Re-emit the unchanged current candidate lineage with a current-contract machine-readable PASS QA JSON and durable task record. No static promotion is made by Q00033. RUNTIME_VALIDATION=UNTESTED."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00176",
-        "result_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
-        "status": "REWORK_REQUIRED",
-        "reason": "Content precheck is visually/static-consistent on current blob 905f0d05db3f094aeb93448548df1091238109cf / SHA-256 823c7691..., with 5/5 containment, protected numeric marker and no visible English residue/clipping. However the immutable producer result B00176@e57374e3735c3568b5e9f584d59a189fef58f356 fails the current C-batch exact-SHA validator: verify_automation_commit.py reports 'DDS changed but PASS reports contain no post-reset zero-pixel/protected-mask metrics'. C cannot promote a PASS disposition that the hosted Gate cannot validate. Re-emit the unchanged current candidate lineage with a same-result machine-readable PASS report satisfying the current post-reset zero-pixel/protected-mask contract and durable task record. No static promotion is made by Q00033. RUNTIME_VALIDATION=UNTESTED."
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00180",
+        "result_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+        "status": "PASS",
+        "reason": "PASS is limited to B00180's source-acquisition exhaustion evidence for indices154/164/172/228; it does not approve Korean artwork. Current canonical inventory blob 5a3d3b09d97063c65e2b2e356a20878e4c0a83df is unchanged from the producer fingerprint. Independent C rechecked ezflash557 Drive exact-name discovery as 4/4 misses. At pinned commit 55f67a813dd3603d201d0be0da47c071965f53a4, exact direct blobs d06a7ea1/d730c69c/56a60db0/87ff6635 match producer evidence, and the verified v0.25.10a bundle SHA-256 76f85ed2... reproduces exact member SHA-256/dimensions 15a10e6b.../5ca485fc.../d5f4a36d.../3f98c940.... Each member differs from current canonical inventory; index228 also differs in geometry. production_readiness=PREFLIGHT_ONLY for all four; do not repeat source probes until source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_B00160_B00167_B00176_EXACT_CURRENT_CANDIDATE_BLOBS_AND_CANONICAL_SOURCE_LINEAGES__A00173_EXACT_CANONICAL_SOURCE_LINEAGE",
-    "canonical_semantic_validation": "PASS_CURRENT_TRANSLATIONS_4F68708E_PLAN_PLUS_D41D0B1_49BB5FE5_1762489B_BINDINGS__NO_METADATA_CHANGE",
-    "geometry_mapping_validation": "B00160_PASS_DXT5_SAFE_BBOX__B00167_PASS_DXT5_PER_ELEMENT_SAFE_BBOX__B00176_PASS_RGBA32_FIVE_ELEMENT_SAFE_BBOX__A00173_REWORK_VISUAL_ENGLISH_RESIDUE",
-    "current_contract_compatibility": "PASS_C_BATCH_FAIL_CLOSED__A00173_VISUAL_REWORK__B00160_B00167_B00176_EXACT_RESULT_AUTOMATION_CONTRACT_REWORK__NO_STATIC_PROMOTION",
+    "source_identity_validation": "PASS_8_OF_8_CURRENT_CANONICAL_INVENTORY_IDENTITIES__DRIVE_EXACT_NAME_MISS_8_OF_8__PINNED_DIRECT_7_RESOLVED_1_MISS__PINNED_RELEASE_7_EXACT_MEMBERS_1_MISS__ALL_AVAILABLE_MEMBERS_CANONICAL_SHA_MISMATCH",
+    "canonical_semantic_validation": "PASS_37_CURRENT_TRANSCRIBED_REVIEWED_SEMANTIC_ENTRIES_UNCHANGED__NO_TRANSLATION_METADATA_CHANGE",
+    "geometry_mapping_validation": "NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE__CANDIDATE_ONLY_DDS_ALPHA_ORIENTATION_CONTAINMENT_AND_ENGLISH_VS_KOREAN_GATES_REMAIN_HOLD_STRICT_RECHECK",
+    "current_contract_compatibility": "PASS_PREGENERATION_SOURCE_ACQUISITION_EVIDENCE_ONLY__NO_FALSE_CANDIDATE_PROMOTION__SOURCE_PROBE_DEDUP_ON_UNCHANGED_FINGERPRINTS",
     "readiness_reconciliation": {
-      "classification": "FOUR_REWORK_REQUIRED_ONE_VISUAL_THREE_IMMUTABLE_RESULT_CONTRACT",
-      "static_qa_pass_indices": [],
-      "content_precheck_pass_not_promoted_indices": [
-        112,
-        130,
-        152
+      "classification": "TWO_PRODUCER_INPUTS_PASS_LIMITED_SOURCE_ACQUISITION_EXHAUSTION",
+      "production_readiness": {
+        "30": "PREFLIGHT_ONLY",
+        "36": "PREFLIGHT_ONLY",
+        "48": "PREFLIGHT_ONLY",
+        "132": "PREFLIGHT_ONLY",
+        "154": "PREFLIGHT_ONLY",
+        "164": "PREFLIGHT_ONLY",
+        "172": "PREFLIGHT_ONLY",
+        "228": "PREFLIGHT_ONLY"
+      },
+      "source_acquisition_exhausted": [
+        30,
+        36,
+        48,
+        132,
+        154,
+        164,
+        172,
+        228
       ],
-      "rework_required_indices": [
-        99,
-        112,
-        130,
-        152
+      "render_ready_indices": [],
+      "one_stage_to_render_indices": [],
+      "preflight_only_indices": [
+        30,
+        36,
+        48,
+        132,
+        154,
+        164,
+        172,
+        228
       ],
       "candidate_completion_priority": [
-        "Index99/4F68708E: rebuild CLEAN PLATE; current v3 still has visible English ghost silhouettes. Do not render Korean until independent C visual residue gate passes.",
-        "Indices112/D41D0B1, 130/1762489B and 152/49BB5FE5: candidate content precheck is visually/static-consistent, but exact producer result SHAs fail the current hosted automation-commit contract. Re-emit unchanged current candidate lineage with current-contract machine-readable PASS QA fields plus durable task record before C can promote static PASS.",
-        "Preserve A00179@7548b44b and B00180@2af61fc8 for later C consumption; Q00033 makes no disposition on them.",
-        "B00174 cleanup-only 48e4ab76 remains rejected; only a structurally valid result identity may be reconsidered."
-      ],
-      "failed_gate_result_sha": "09aa0d54a2e82c71cf0532748c795fa127bde1d6",
-      "failed_gate_run_id": 36601136283,
-      "failed_gate_step": "Verify exact producer SHAs in C batch"
+        "Candidate completion / direct rework remains ahead of unrelated preflight: index99/4F68708E CLEAN_PLATE still requires source-effect residue repair; no Korean render until independent C visual PASS.",
+        "RENDER_READY / current-candidate contract path: preserve newer B00183@8b7842b4 index112/D41D0B1 current-contract QA re-emission for its own independent C batch; preserve any newer A/B/E producer result present after the Q00034 merge.",
+        "ONE_STAGE_TO_RENDER: Q00034 promotes none of indices30/36/48/132/154/164/172/228; exact canonical source is still unavailable, so no deterministic one-stage reconstruction path is claimed.",
+        "PREFLIGHT_ONLY: indices30/36/48/132/154/164/172/228 are SOURCE_ACQUISITION_EXHAUSTED on unchanged current inventory and pinned-source fingerprints. Do not repeat Drive/direct/release probes until an approved source or inventory fingerprint changes.",
+        "Indices130/1762489B and 152/49BB5FE5 remain candidate-completion/result-contract work from C135 until structurally valid current-contract producer results are independently consumed. RUNTIME_VALIDATION=UNTESTED."
+      ]
     },
     "heavy_qa_reuse": {
-      "a00173": "C_VISUAL_GATE_RUN__FAIL_VISIBLE_ENGLISH_GHOST",
-      "b00167": "CONTENT_PRECHECK_PASS_BUT_IMMUTABLE_RESULT_FAIL_CURRENT_VERIFY_AUTOMATION_COMMIT_POST_RESET_METRICS",
-      "b00160": "CONTENT_PRECHECK_PASS_BUT_IMMUTABLE_RESULT_FAIL_CURRENT_VERIFY_AUTOMATION_COMMIT_MACHINE_READABLE_PASS_JSON",
-      "b00176": "CONTENT_PRECHECK_PASS_BUT_IMMUTABLE_RESULT_FAIL_CURRENT_VERIFY_AUTOMATION_COMMIT_POST_RESET_METRICS",
-      "repeated_candidate_pixel_rewrite": false
+      "pinned_release_bundle_identity": "REUSED_C132_C133_SAME_SHA256_AND_SIZE_AND_REHASHED_CURRENT_ATTACHMENT_EXACT",
+      "repeated_candidate_pixel_qa": false,
+      "repeated_dds_candidate_header_alpha_orientation_qa": false,
+      "reason": "No reviewed producer input changes or creates a Korean candidate. Heavy candidate-only checks are not applicable; identical pinned-release bundle identity was reused while exact members for this batch were independently rehashed once."
     },
-    "metadata_reconciled_segments": 0,
-    "canonical_transcribed_segments_after_merge": 753,
-    "actionable_localize_text_after": 93,
-    "pending_production_localize_text_after": 76,
-    "newer_disjoint_producers_preserved": [
-      "LOCALIZATION-LOCALIZATION_A-00179@7548b44b7364504c248341cce0771969f0793160",
-      "LOCALIZATION-LOCALIZATION_B-00180@2af61fc8fd41e5ee6d8e4524914107682c591149"
-    ],
-    "rework_required_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00173@fb686bf12710ef3e02d31427a39fa8e1150fab45",
-      "LOCALIZATION-LOCALIZATION_B-00167@1d0c05d29118192c5c10f40ee857fb26ae366622",
-      "LOCALIZATION-LOCALIZATION_B-00160@bf650709edf84d1923544a497be2267f93578197",
-      "LOCALIZATION-LOCALIZATION_B-00176@e57374e3735c3568b5e9f584d59a189fef58f356"
-    ],
-    "passed_inputs": [],
+    "material_deliverable": {
+      "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+      "reviewed_indices": [
+        30,
+        36,
+        48,
+        132,
+        154,
+        164,
+        172,
+        228
+      ],
+      "reviewed_assets": 8,
+      "producer_inputs_pass": 2,
+      "producer_inputs_rework_required": 0,
+      "producer_inputs_hold_strict_recheck": 0,
+      "producer_inputs_superseded": 0,
+      "source_acquisition_exhausted": 8,
+      "metadata_segments_changed": 0,
+      "canonical_segments_after_merge": 753,
+      "actionable_localize_text_after": 93,
+      "pending_production_localize_text_after": 76,
+      "candidate_dds_modified_by_c": false,
+      "new_static_artwork_passes": 0,
+      "new_runtime_approvals": 0,
+      "report": "localization/graphics/role_C/20260930-0208-C136/C136_Q00034_INDEPENDENT_QA_BATCH.json"
+    },
+    "report": "localization/graphics/role_C/20260930-0208-C136/C136_Q00034_INDEPENDENT_QA_BATCH.json",
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
-    "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json",
-    "superseded_inputs": []
+    "shared_state_modified": true,
+    "peer_candidate_files_modified": false,
+    "runtime_test_performed": false,
+    "build_performed": false,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false,
+    "google_drive_used": true,
+    "google_drive_write_performed": false,
+    "uploaded_archive_used": true,
+    "uploaded_archive_identity_verified": true,
+    "vr_ffb_dx_changes": false,
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
   }
 }

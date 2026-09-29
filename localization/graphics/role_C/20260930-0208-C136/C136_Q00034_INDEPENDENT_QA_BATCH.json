@@ -1,0 +1,305 @@
+{
+  "schema_version": 10,
+  "schema": "outrun-c136-q00034-independent-qa-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00184",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_RECONCILE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00034",
+  "qa_batch_id": "Q00034",
+  "run": "C136",
+  "recorded_at_kst": "2026-09-30T02:08:20+09:00",
+  "base_head_sha": "8b7842b4d6903e3ad6b518a95daff9bc37893e0e",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00179",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "7548b44b7364504c248341cce0771969f0793160",
+      "result_message": "localization(A): exhaust mod3 source tiers for A batch [AUTO:LOCALIZATION-LOCALIZATION_A-00179]",
+      "completed_at": "2026-09-30T01:41:54.500019+09:00",
+      "producer_id": "P00090",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00180",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+      "result_message": "localization(B): exhaust P00091 source tiers [AUTO:LOCALIZATION-LOCALIZATION_B-00180]",
+      "completed_at": "2026-09-30T01:47:39.621975+09:00",
+      "producer_id": "P00091",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00179",
+      "result_sha": "7548b44b7364504c248341cce0771969f0793160",
+      "status": "PASS",
+      "reason": "PASS is limited to A00179's source-acquisition exhaustion evidence for indices30/36/48/132; it does not approve Korean artwork. Current canonical inventory blob 5a3d3b09d97063c65e2b2e356a20878e4c0a83df is unchanged from the producer fingerprint. Independent C rechecked ezflash557 Drive exact-name discovery as 4/4 misses; pinned commit 55f67a813dd3603d201d0be0da47c071965f53a4 resolves exact direct blobs for 8215FD25/B1696633/1F5FE6E9 exactly as recorded and has no exact 06AB5CEE path. The verified v0.25.10a bundle is 306223257 bytes with SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958; its exact members reproduce producer SHA-256/dimensions for 8215FD25/B1696633/1F5FE6E9 and omit 06AB5CEE. Existing members mismatch current canonical inventory. production_readiness=PREFLIGHT_ONLY for all four; do not repeat source probes until source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00180",
+      "result_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+      "status": "PASS",
+      "reason": "PASS is limited to B00180's source-acquisition exhaustion evidence for indices154/164/172/228; it does not approve Korean artwork. Current canonical inventory blob 5a3d3b09d97063c65e2b2e356a20878e4c0a83df is unchanged from the producer fingerprint. Independent C rechecked ezflash557 Drive exact-name discovery as 4/4 misses. At pinned commit 55f67a813dd3603d201d0be0da47c071965f53a4, exact direct blobs d06a7ea1/d730c69c/56a60db0/87ff6635 match producer evidence, and the verified v0.25.10a bundle SHA-256 76f85ed2... reproduces exact member SHA-256/dimensions 15a10e6b.../5ca485fc.../d5f4a36d.../3f98c940.... Each member differs from current canonical inventory; index228 also differs in geometry. production_readiness=PREFLIGHT_ONLY for all four; do not repeat source probes until source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "independent_checks": {
+    "immutable_results": {
+      "a00179": {
+        "result_sha": "7548b44b7364504c248341cce0771969f0793160",
+        "changed_payload_scope": [
+          "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00179.json",
+          "localization/graphics/role_A/20260930-0138-A00179-P00090/A00179_P00090_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json"
+        ],
+        "lane_isolation": "PASS"
+      },
+      "b00180": {
+        "result_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+        "changed_payload_scope": [
+          "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00180.json",
+          "localization/graphics/role_B/20260930-B00180-P00091/B00180_P00091_FOUR_EVEN_SOURCE_TIER_EXHAUSTION.json"
+        ],
+        "lane_isolation": "PASS"
+      }
+    },
+    "fingerprints": {
+      "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+      "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+      "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+      "current_asset_queue_blob_sha": "1ed52f18de701c6c7968cfe8560b9f688de13bdb",
+      "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+      "pinned_release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "pinned_release_bundle_size": 306223257
+    },
+    "drive_exact_name_recheck": {
+      "account": "ezflash557",
+      "result": "PASS_8_OF_8_SEARCH_MISS",
+      "assets": [
+        "8215FD25",
+        "06AB5CEE",
+        "B1696633",
+        "1F5FE6E9",
+        "4D38BBB0",
+        "5B65E08C",
+        "6C9B3611",
+        "E7F6E9B7"
+      ]
+    },
+    "pinned_direct": [
+      {
+        "index": 30,
+        "asset": "8215FD25",
+        "blob": "64a92104d3158614283d0d63baee7ec29ca45316",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 36,
+        "asset": "06AB5CEE",
+        "blob": null,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      {
+        "index": 48,
+        "asset": "B1696633",
+        "blob": "cf1c92d295191bf955b9bb1614860614965529f2",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 132,
+        "asset": "1F5FE6E9",
+        "blob": "a89e403c92d335f83c808e5f10dcc9e584d4ff7c",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 154,
+        "asset": "4D38BBB0",
+        "blob": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 164,
+        "asset": "5B65E08C",
+        "blob": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 172,
+        "asset": "6C9B3611",
+        "blob": "56a60db00d93f2371ba480510e9086d20c5b5800",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 228,
+        "asset": "E7F6E9B7",
+        "blob": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      }
+    ],
+    "pinned_release_members": [
+      {
+        "index": 30,
+        "asset": "8215FD25",
+        "sha256": "e8125cb52c6a135dcde0dade0dcf447ea5d806b8a9b2438d7d6732be84c9b66e",
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "0cd71138fd6811f5466a9c6674a243324d88ecc8dd82ad36df05234d759abc56",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 36,
+        "asset": "06AB5CEE",
+        "sha256": null,
+        "dimensions": null,
+        "format": null,
+        "canonical_sha256": "e02db9b4e04747e2a74295e8f5a01e07f0ed88d31832f4169b1e5996bc30f1eb",
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      {
+        "index": 48,
+        "asset": "B1696633",
+        "sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "b06b18fe33b53b3af87a9c7ae185febf86dcaa7e6b365ba41f20235fa3526a2b",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 132,
+        "asset": "1F5FE6E9",
+        "sha256": "2a02471fe95e0c4253cf72ec58423cb9d16ae074e3012418716e88e75e2a2a80",
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 154,
+        "asset": "4D38BBB0",
+        "sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+        "dimensions": [
+          4096,
+          1024
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "666511c591d3b15f400934c43c089ff4636942918d6fc9554171675d0d6cea00",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 164,
+        "asset": "5B65E08C",
+        "sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "08f6dbf599bca9f3df6f92015d88917d06565b5d476b39b961865701445931d6",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 172,
+        "asset": "6C9B3611",
+        "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+        "dimensions": [
+          1024,
+          1024
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "fe650e676c8bda421c353158044792ba566f97524e7de8f7ff6a86d0df60e572",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      {
+        "index": 228,
+        "asset": "E7F6E9B7",
+        "sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "canonical_sha256": "bbbc44543042527a1c4f80156ddbf4f0f26b9130d8eca0a78012fb79ee3f38b2",
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      }
+    ],
+    "semantic_recheck": {
+      "transcriptions_status": "PASS_8_OF_8_TRANSCRIBED_REVIEWED",
+      "semantic_entries": 37,
+      "metadata_changed": false
+    },
+    "supersession_check": {
+      "result": "PASS_NOT_SUPERSEDED",
+      "note": "Current HEAD preserves A00179/B00180 as unconsumed preflight QA backlog; newer B00183 is disjoint index112 result-contract work and does not replace any reviewed source-acquisition evidence."
+    },
+    "heavy_qa_deduplication": {
+      "same_bundle_fingerprint_reused": true,
+      "exact_member_hashes_rechecked_once": true,
+      "repeated_candidate_pixel_qa": false
+    }
+  },
+  "production_readiness": {
+    "30": "PREFLIGHT_ONLY",
+    "36": "PREFLIGHT_ONLY",
+    "48": "PREFLIGHT_ONLY",
+    "132": "PREFLIGHT_ONLY",
+    "154": "PREFLIGHT_ONLY",
+    "164": "PREFLIGHT_ONLY",
+    "172": "PREFLIGHT_ONLY",
+    "228": "PREFLIGHT_ONLY"
+  },
+  "source_acquisition_exhausted": [
+    30,
+    36,
+    48,
+    132,
+    154,
+    164,
+    172,
+    228
+  ],
+  "shared_next_actions": [
+    "Candidate completion / direct rework remains ahead of unrelated preflight: index99/4F68708E CLEAN_PLATE still requires source-effect residue repair; no Korean render until independent C visual PASS.",
+    "RENDER_READY / current-candidate contract path: preserve newer B00183@8b7842b4 index112/D41D0B1 current-contract QA re-emission for its own independent C batch; preserve any newer A/B/E producer result present after the Q00034 merge.",
+    "ONE_STAGE_TO_RENDER: Q00034 promotes none of indices30/36/48/132/154/164/172/228; exact canonical source is still unavailable, so no deterministic one-stage reconstruction path is claimed.",
+    "PREFLIGHT_ONLY: indices30/36/48/132/154/164/172/228 are SOURCE_ACQUISITION_EXHAUSTED on unchanged current inventory and pinned-source fingerprints. Do not repeat Drive/direct/release probes until an approved source or inventory fingerprint changes.",
+    "Indices130/1762489B and 152/49BB5FE5 remain candidate-completion/result-contract work from C135 until structurally valid current-contract producer results are independently consumed. RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "counts_after": {
+    "queue_total": 137,
+    "actionable_localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_only": 3,
+    "pending_production_localize_text": 76,
+    "canonical_transcribed_segments": 753
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
