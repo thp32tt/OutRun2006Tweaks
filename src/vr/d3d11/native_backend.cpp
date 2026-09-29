@@ -5,6 +5,7 @@
 #include <array>
 #include <cstddef>
 #include <cstring>
+#include <d3dcompiler.h>
 #include <dxgi1_2.h>
 #include <utility>
 
@@ -64,6 +65,26 @@ bool read_device_luid(
 
     luid = desc.AdapterLuid;
     return true;
+}
+
+bool compile_shader_source(
+    const std::string& source,
+    const char* source_name,
+    const char* target,
+    Microsoft::WRL::ComPtr<ID3DBlob>& bytecode) noexcept {
+
+    bytecode.Reset();
+    if (source.empty() || !source_name || !target)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3DBlob> diagnostics;
+    const HRESULT hr = D3DCompile(
+        source.data(), source.size(), source_name,
+        nullptr, nullptr, "main", target,
+        D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+        0, bytecode.ReleaseAndGetAddressOf(),
+        diagnostics.ReleaseAndGetAddressOf());
+    return SUCCEEDED(hr) && bytecode;
 }
 
 HRESULT create_device(
@@ -167,6 +188,75 @@ void NativeFixedFunctionTransformBuffer::shutdown() noexcept {
     buffer_.Reset();
     device_.Reset();
     upload_generation_ = 0;
+}
+
+bool NativeFixedFunctionPipelineBundle::initialize(
+    ID3D11Device* device,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype) noexcept {
+
+    shutdown();
+    if (!device || !layout.exact || layout.elementCount == 0 ||
+        layout.elementCount > layout.elements.size() ||
+        !vertexPrototype.generated() || !pixelPrototype.generated())
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3DBlob> vertexBytecode;
+    Microsoft::WRL::ComPtr<ID3DBlob> pixelBytecode;
+    if (!compile_shader_source(
+            vertexPrototype.source,
+            "OutRunR97FixedFunctionVertexShader",
+            "vs_4_0", vertexBytecode) ||
+        !compile_shader_source(
+            pixelPrototype.source,
+            "OutRunR97FixedFunctionPixelShader",
+            "ps_4_0", pixelBytecode))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+    if (FAILED(device->CreateVertexShader(
+            vertexBytecode->GetBufferPointer(),
+            vertexBytecode->GetBufferSize(), nullptr,
+            vertexShader.ReleaseAndGetAddressOf())) ||
+        !vertexShader)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+    if (FAILED(device->CreateInputLayout(
+            layout.elements.data(), layout.elementCount,
+            vertexBytecode->GetBufferPointer(),
+            vertexBytecode->GetBufferSize(),
+            inputLayout.ReleaseAndGetAddressOf())) ||
+        !inputLayout)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+    if (FAILED(device->CreatePixelShader(
+            pixelBytecode->GetBufferPointer(),
+            pixelBytecode->GetBufferSize(), nullptr,
+            pixelShader.ReleaseAndGetAddressOf())) ||
+        !pixelShader)
+        return false;
+
+    if (!transform_buffer_.initialize(device)) {
+        shutdown();
+        return false;
+    }
+
+    device_ = device;
+    vertex_shader_ = std::move(vertexShader);
+    pixel_shader_ = std::move(pixelShader);
+    input_layout_ = std::move(inputLayout);
+    return true;
+}
+
+void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
+    transform_buffer_.shutdown();
+    input_layout_.Reset();
+    pixel_shader_.Reset();
+    vertex_shader_.Reset();
+    device_.Reset();
 }
 
 bool NativeBackend::initialize(const NativeBackendConfig& config) noexcept {

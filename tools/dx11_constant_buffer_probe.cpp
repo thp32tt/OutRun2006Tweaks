@@ -11,9 +11,13 @@
 
 namespace
 {
+    using outrun::vr::dx11::FixedFunctionStageState;
+    using outrun::vr::dx11::NativeFixedFunctionPipelineBundle;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
+    using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
+    using outrun::vr::dx11::translate_vertex_input_layout;
 
     void require(bool condition, const char* message)
     {
@@ -60,6 +64,25 @@ namespace
             createdLevel >= D3D_FEATURE_LEVEL_10_0,
             "D3D11 WARP feature level");
         return out;
+    }
+
+    FixedFunctionStageState active_stage()
+    {
+        FixedFunctionStageState stage{};
+        stage.colorOp = D3DTOP_MODULATE;
+        stage.colorArg1 = D3DTA_TEXTURE;
+        stage.colorArg2 = D3DTA_DIFFUSE;
+        stage.alphaOp = D3DTOP_SELECTARG1;
+        stage.alphaArg1 = D3DTA_TEXTURE;
+        stage.alphaArg2 = D3DTA_CURRENT;
+        stage.texCoordIndex = 0;
+        stage.textureTransformFlags = D3DTTFF_DISABLE;
+        stage.minFilter = D3DTEXF_POINT;
+        stage.magFilter = D3DTEXF_POINT;
+        stage.mipFilter = D3DTEXF_NONE;
+        stage.addressU = D3DTADDRESS_WRAP;
+        stage.addressV = D3DTADDRESS_WRAP;
+        return stage;
     }
 
     ID3DBlob* compile_vertex_shader(const std::string& source)
@@ -113,13 +136,32 @@ int main()
         sizeof(transform.worldViewProjection) == expectedConstantBytes,
         "R94 WVP payload must remain 64 bytes");
 
+    constexpr DWORD fixedFunctionFvf =
+        D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
     const auto vertexPrototype =
         generate_fixed_function_vertex_shader_prototype(
-            D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1,
-            24);
+            fixedFunctionFvf, 24);
     require(
         vertexPrototype.generated(),
         "R93 vertex prototype prerequisite");
+
+    const auto inputLayout =
+        translate_vertex_input_layout(
+            nullptr, 0, fixedFunctionFvf, 24);
+    require(
+        inputLayout.exact && inputLayout.elementCount > 0,
+        "R97 input-layout prerequisite");
+
+    std::array<FixedFunctionStageState, 8> stages{};
+    stages[0] = active_stage();
+    std::array<D3DRESOURCETYPE, 8> textureTypes{};
+    textureTypes.fill(D3DRTYPE_TEXTURE);
+    const auto pixelPrototype =
+        generate_fixed_function_pixel_shader_prototype(
+            stages, true, 0x01, 0x01, textureTypes);
+    require(
+        pixelPrototype.generated(),
+        "R97 pixel prototype prerequisite");
 
     ID3DBlob* vertexBytecode =
         compile_vertex_shader(vertexPrototype.source);
@@ -180,6 +222,39 @@ int main()
     require(owner.initialize(d3d.device),
             "R96 owner initialize");
 
+    NativeFixedFunctionPipelineBundle pipelineBundle;
+    require(!pipelineBundle.ready(),
+            "R97 bundle must start dormant");
+    require(
+        pipelineBundle.initialize(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype),
+        "R97 bundle initialize");
+    require(
+        pipelineBundle.ready() &&
+        pipelineBundle.device() == d3d.device &&
+        pipelineBundle.vertex_shader() != nullptr &&
+        pipelineBundle.pixel_shader() != nullptr &&
+        pipelineBundle.input_layout() != nullptr &&
+        pipelineBundle.transform_buffer().ready(),
+        "R97 bundle owned-object readiness");
+
+    auto inexactLayout = inputLayout;
+    inexactLayout.exact = false;
+    require(
+        !pipelineBundle.initialize(
+            d3d.device, inexactLayout, vertexPrototype, pixelPrototype),
+        "R97 inexact input layout must fail closed");
+    require(
+        !pipelineBundle.ready(),
+        "R97 failed reinitialize must leave bundle dormant");
+    require(
+        pipelineBundle.initialize(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype),
+        "R97 bundle reinitialize after fail-closed reset");
+    require(
+        pipelineBundle.ready(),
+        "R97 bundle must recover after exact reinitialize");
+
     D3D11_BUFFER_DESC observedDesc{};
     owner.buffer()->GetDesc(&observedDesc);
     require(
@@ -235,6 +310,17 @@ int main()
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
+    pipelineBundle.shutdown();
+    require(!pipelineBundle.ready(),
+            "R97 shutdown must release bundle resources");
+    require(
+        pipelineBundle.device() == nullptr &&
+        pipelineBundle.vertex_shader() == nullptr &&
+        pipelineBundle.pixel_shader() == nullptr &&
+        pipelineBundle.input_layout() == nullptr &&
+        !pipelineBundle.transform_buffer().ready(),
+        "R97 shutdown must clear owned objects");
+
     owner.shutdown();
     require(!owner.ready(), "R96 shutdown must release owner resources");
     require(owner.buffer() == nullptr,
@@ -257,5 +343,6 @@ int main()
 
     std::cout << "DX11 constant buffer probe R95: PASS\n";
     std::cout << "DX11 constant buffer lifetime R96: PASS\n";
+    std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
     return 0;
 }

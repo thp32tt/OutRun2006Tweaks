@@ -969,6 +969,83 @@ def main() -> None:
                 f"DX11 R96 native backend link contract missing from {graph_name}"
             )
 
+    r97_pipeline_bundle_header = {
+        "NativeFixedFunctionPipelineBundle": "R97 dormant per-device pipeline bundle",
+        "FixedFunctionVertexShaderPrototype": "R97 generated vertex prototype input",
+        "FixedFunctionPixelShaderPrototype": "R97 generated pixel prototype input",
+        "VertexInputLayoutTranslation": "R97 exact input-layout input",
+        "Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader_": "R97 owned vertex shader",
+        "Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader_": "R97 owned pixel shader",
+        "Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_": "R97 owned input layout",
+        "NativeFixedFunctionTransformBuffer transform_buffer_": "R97 owned R96 transform buffer",
+    }
+    missing_r97_header = [
+        meaning
+        for token, meaning in r97_pipeline_bundle_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r97_header:
+        raise SystemExit(
+            "DX11 R97 pipeline-bundle header drift: "
+            + ", ".join(missing_r97_header)
+        )
+
+    for token, meaning in {
+        "OutRunR97FixedFunctionVertexShader": "R97 vertex compile identity",
+        "OutRunR97FixedFunctionPixelShader": "R97 pixel compile identity",
+        '"vs_4_0"': "R97 vertex shader target",
+        '"ps_4_0"': "R97 pixel shader target",
+        "CreateVertexShader": "R97 vertex shader object creation",
+        "CreateInputLayout": "R97 input-layout object creation",
+        "CreatePixelShader": "R97 pixel shader object creation",
+        "transform_buffer_.initialize(device)": "R97 transform-buffer ownership",
+        "input_layout_.Reset()": "R97 input-layout release",
+        "pixel_shader_.Reset()": "R97 pixel-shader release",
+        "vertex_shader_.Reset()": "R97 vertex-shader release",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R97 pipeline-bundle source drift: " + meaning
+            )
+
+    for forbidden, meaning in {
+        "IASetInputLayout": "input-layout binding",
+        "VSSetShader(": "vertex-shader binding",
+        "PSSetShader(": "pixel-shader binding",
+    }.items():
+        if forbidden in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R97 bundle must remain non-routing; found " + meaning
+            )
+
+    runtime_bundle_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "native_backend.cpp":
+            continue
+        if "NativeFixedFunctionPipelineBundle" in source_path.read_text(
+            encoding="utf-8"
+        ):
+            runtime_bundle_users.append(source_path.relative_to(ROOT).as_posix())
+    if runtime_bundle_users:
+        raise SystemExit(
+            "DX11 R97 bundle gained a runtime production caller before activation gate: "
+            + ", ".join(runtime_bundle_users)
+        )
+
+    for token, meaning in {
+        "R97 bundle must start dormant": "R97 dormant initial state",
+        "R97 bundle owned-object readiness": "R97 owned object readiness",
+        "R97 inexact input layout must fail closed": "R97 fail-closed input-layout gate",
+        "R97 failed reinitialize must leave bundle dormant": "R97 failure cleanup",
+        "R97 bundle reinitialize after fail-closed reset": "R97 recreate lifecycle",
+        "R97 shutdown must clear owned objects": "R97 shutdown lifecycle",
+        "DX11 fixed-function pipeline bundle R97: PASS": "R97 probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R97 pipeline-bundle probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

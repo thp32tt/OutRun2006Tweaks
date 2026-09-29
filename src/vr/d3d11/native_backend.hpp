@@ -8,6 +8,9 @@
 namespace outrun::vr::dx11 {
 
 struct FixedFunctionTransformConstants;
+struct FixedFunctionVertexShaderPrototype;
+struct FixedFunctionPixelShaderPrototype;
+struct VertexInputLayoutTranslation;
 
 struct NativeBackendConfig {
     std::uint32_t width = 0;
@@ -50,6 +53,54 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_;
     std::uint64_t upload_generation_ = 0;
+};
+
+// R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
+// input layout, and R96 transform buffer. No game draw path constructs or
+// binds this bundle yet.
+class NativeFixedFunctionPipelineBundle final {
+public:
+    NativeFixedFunctionPipelineBundle() = default;
+    ~NativeFixedFunctionPipelineBundle() = default;
+    NativeFixedFunctionPipelineBundle(
+        const NativeFixedFunctionPipelineBundle&) = delete;
+    NativeFixedFunctionPipelineBundle& operator=(
+        const NativeFixedFunctionPipelineBundle&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && vertex_shader_ && pixel_shader_ && input_layout_ &&
+            transform_buffer_.ready();
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11VertexShader* vertex_shader() const noexcept {
+        return vertex_shader_.Get();
+    }
+    [[nodiscard]] ID3D11PixelShader* pixel_shader() const noexcept {
+        return pixel_shader_.Get();
+    }
+    [[nodiscard]] ID3D11InputLayout* input_layout() const noexcept {
+        return input_layout_.Get();
+    }
+    [[nodiscard]] const NativeFixedFunctionTransformBuffer&
+    transform_buffer() const noexcept {
+        return transform_buffer_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader_;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader_;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_;
+    NativeFixedFunctionTransformBuffer transform_buffer_;
 };
 
 class NativeBackend final {
