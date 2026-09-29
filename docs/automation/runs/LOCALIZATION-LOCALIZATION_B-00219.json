@@ -1,0 +1,79 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00219",
+  "wave_id": "P00116",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T06:23:05+09:00",
+  "base_head_sha": "27f62ff96ef3a9b2adff836d79940f154b028771",
+  "base_sha": "27f62ff96ef3a9b2adff836d79940f154b028771",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX217_PINNED_SOURCE_LOCATOR_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX217_PINNED_SOURCE_LOCATOR_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Fresh C148/Q00046 state has no B-owned RENDER_READY, ONE_STAGE_TO_RENDER, or direct candidate rework. Index226 is STATIC_QA PASS and B00211@index232, B00213@index133, B00214@index220 remain QA-pending, so they are not repeated. Under the single legal PREFLIGHT_ONLY expansion, index217 D1039D6F is advanced: approved Drive exact path is a typed SOURCE_TRANSPORT_MISS; immutable pinned tag 55f67a8 contains exact Release-path blob 544b638f... at 16,777,344 bytes, exactly the expected byte size for the current 2048x2048 RGBA32 canonical inventory; the low-resolution stock blob is explicitly rejected; and live v0.25.10a release metadata re-verifies ZIP size/digest. Raw bytes could not be obtained in this execution, so SHA-256 identity/header/orientation remain HOLD and no candidate is rendered. The new immutable source locator plus exact next verification step is durable source/reconstruction input for the next download-capable pass.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00219-P00116/B00219_P00116_INDEX217_PINNED_SOURCE_LOCATOR_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX217_IMMUTABLE_PINNED_SOURCE_LOCATOR_AND_TYPED_TRANSPORT_HANDOFF",
+    "reviewed_indices": [
+      217
+    ],
+    "reviewed_assets": [
+      "D1039D6F"
+    ],
+    "exact_drive_tier_closed_as_transport_miss": true,
+    "immutable_pinned_tag_blob_locator_added": true,
+    "live_release_asset_digest_reverified": true,
+    "noncanonical_stock_blob_rejected": true,
+    "canonical_sha256_verification_still_pending": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      217
+    ],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00211": [
+        232
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00213": [
+        133
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00214": [
+        220
+      ]
+    },
+    "static_pass_not_repeated": [
+      226
+    ],
+    "readiness_after": {
+      "217": "PREFLIGHT_ONLY_IMMUTABLE_PINNED_SOURCE_LOCATOR_RESOLVED__SHA256_IDENTITY_ONE_TRANSPORT_STEP_PENDING"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX217__NO_READY_TIER_SKIPPED__DRIVE_EXACT_MISS__PINNED_TAG_IMMUTABLE_BLOB_LOCATOR_544B638F__SIZE_MATCH_CANONICAL_RGBA32_EXPECTATION__LIVE_RELEASE_DIGEST_76F85ED2_REVERIFIED__LOWRES_STOCK_REJECTED__START_CONTEXT_GUARD_PRESERVED__FAIL_CLOSED_NO_SOURCE_SHA_NO_DDS",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_EXACT_CANONICAL_SOURCE_SHA256_UNVERIFIED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT",
+  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "bookkeeping_note": "Producer does not wait for an individual Actions Gate. Final automatic validation authority belongs to a later C batch Gate. Runtime remains UNTESTED."
+}

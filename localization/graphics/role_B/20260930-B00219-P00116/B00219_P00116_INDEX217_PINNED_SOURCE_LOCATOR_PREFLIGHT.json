@@ -1,0 +1,184 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00219-p00116-index217-pinned-source-locator-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00219",
+  "wave_id": "P00116",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T06:23:05+09:00",
+  "base_head_sha": "27f62ff96ef3a9b2adff836d79940f154b028771",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_shard_overridden_by_current_git_contract": true,
+    "selected_index": 217,
+    "asset": "D1039D6F",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+    "priority": "PREFLIGHT_ONLY_AFTER_FRESH_SCAN_PROVES_NO_B_RENDER_READY_ONE_STAGE_DIRECT_REWORK",
+    "latest_c_authority": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00217",
+      "result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
+      "q": "Q00046",
+      "b_render_ready_indices": [],
+      "b_one_stage_to_render_indices": [],
+      "b_direct_rework_indices": [],
+      "index226": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "qa_pending_b_indices": [
+        133,
+        220,
+        232
+      ]
+    },
+    "skipped_qa_pending": [
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+        "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6"
+      },
+      {
+        "index": 220,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
+        "result_sha": "e607e79b45c5c5cbdad4469f0eb6b1ce19d4f639"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837"
+      }
+    ],
+    "skipped_static_pass": [
+      226
+    ],
+    "skipped_unchanged_dependency_blocked_rework": [
+      94,
+      121
+    ]
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "asset_queue_blob_sha": "587ba6ee4c954c679d059838b2a8a80766a61a3c",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "latest_c_task_record_blob_sha": "863c6ddb3caab675d44a9ec5c61491c4e6cd3a6e"
+  },
+  "canonical_inventory": {
+    "sha256": "035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mode": "RGBA",
+    "expected_uncompressed_rgba32_dds_bytes": 16777344,
+    "expected_size_formula": "128-byte DDS header + 2048*2048*4 RGBA bytes"
+  },
+  "semantics": {
+    "status": "PASS_CURRENT_REVIEWED_BINDINGS_REUSED",
+    "entries": [
+      {
+        "source": "START",
+        "korean": "출발",
+        "context_guard": "ROUTE_MAP_LABEL__DO_NOT_GLOBAL_REUSE_START_TO_시작"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "semantic_count": 2
+  },
+  "source_acquisition": {
+    "policy_order": [
+      "GOOGLE_DRIVE_EXACT_PATH",
+      "PINNED_TAG_DIRECT_FILE",
+      "PINNED_RELEASE_FALLBACK"
+    ],
+    "google_drive": {
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_filename": "D1039D6F_512x512.dds",
+      "result": "SOURCE_TRANSPORT_MISS",
+      "parent_listing_count": 1,
+      "only_file_seen": "9F060EC1_512x512.dds",
+      "historical_noncanonical_folders_searched": false
+    },
+    "pinned_tag_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "git_blob_sha": "544b638f755c2c1615ff1882853635bfd438e4c2",
+      "git_blob_size_bytes": 16777344,
+      "size_matches_canonical_rgba32_expectation": true,
+      "sha256_identity": "HOLD_RAW_BYTES_NOT_OBTAINED",
+      "identity_rule": "Size/path/blob locator agreement is not SHA-256 identity proof."
+    },
+    "rejected_stock_original": {
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "git_blob_sha": "c50991fad6d75c6bf193d249a0480e6542ea0ccb",
+      "size_bytes": 262272,
+      "canonical_use": "REJECT_NONCANONICAL_LOW_RESOLUTION"
+    },
+    "pinned_release": {
+      "repository": "envido32/OR2006Sprites",
+      "tag": "v0.25.10a",
+      "release_asset_id": 306630789,
+      "asset_name": "OR2-HD-GUI-v0.25.10a.zip",
+      "size_bytes": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "digest_verified_against_live_release_metadata": true,
+      "required_member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "member_extraction_status": "HOLD_CURRENT_BINARY_TRANSPORT_UNAVAILABLE"
+    },
+    "binary_transport_blocker": {
+      "classification": "RAW_BINARY_HASH_VERIFICATION_BLOCKED_NOT_SOURCE_ABSENT",
+      "github_contents_base64_for_large_file": "EMPTY_CONTENT_RETURNED",
+      "github_binary_blob_fetch": "UTF8_DECODE_UNSUPPORTED_FOR_BINARY",
+      "attached_release_archive_materialization": "BLOCKED_306223257_BYTES_EXCEEDS_104857600_LIMIT",
+      "source_acquisition_exhausted": false,
+      "next_exact_step": "On a download-capable execution, fetch the immutable pinned-tag blob or verified release member, require SHA-256 035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf and DDS 2048x2048 RGBA/header/orientation before any pixel interpretation."
+    }
+  },
+  "readiness": {
+    "before": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_BYTES_ABSENT",
+    "after": "PREFLIGHT_ONLY_IMMUTABLE_PINNED_SOURCE_LOCATOR_RESOLVED__SHA256_IDENTITY_ONE_TRANSPORT_STEP_PENDING",
+    "render_ready": false,
+    "one_stage_to_render": false,
+    "candidate_attempted": false,
+    "candidate_attempt_reason": "Forbidden until exact canonical source SHA-256/header/orientation is proven from raw bytes."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX217_IMMUTABLE_PINNED_SOURCE_LOCATOR_AND_TYPED_TRANSPORT_HANDOFF",
+    "reviewed_indices": [
+      217
+    ],
+    "reviewed_assets": [
+      "D1039D6F"
+    ],
+    "exact_drive_tier_closed_as_transport_miss": true,
+    "immutable_pinned_tag_blob_locator_added": true,
+    "live_release_asset_digest_reverified": true,
+    "noncanonical_stock_blob_rejected": true,
+    "canonical_sha256_verification_still_pending": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX217__NO_READY_TIER_SKIPPED__DRIVE_EXACT_MISS__PINNED_TAG_IMMUTABLE_BLOB_LOCATOR_544B638F__SIZE_MATCH_CANONICAL_RGBA32_EXPECTATION__LIVE_RELEASE_DIGEST_76F85ED2_REVERIFIED__LOWRES_STOCK_REJECTED__START_CONTEXT_GUARD_PRESERVED__FAIL_CLOSED_NO_SOURCE_SHA_NO_DDS",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_EXACT_CANONICAL_SOURCE_SHA256_UNVERIFIED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
