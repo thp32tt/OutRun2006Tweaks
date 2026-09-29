@@ -1,0 +1,1784 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-v2-source-mask-work-order-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00088",
+  "wave_id": "P00024",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-09-29T16:18:00+09:00",
+  "base_head_sha": "986f49c9ce52879b8cf1976ba0a783716b848fef",
+  "queue_index": 95,
+  "asset": "37759842",
+  "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "exact_release_dds": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "git_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+    "file_size": 67108992,
+    "atlas_canvas": [
+      4096,
+      4096
+    ],
+    "legacy_header_bytes_used_for_size_equation": 128,
+    "payload_bytes_after_128": 67108864,
+    "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL",
+    "expected_file_size_from_equation": 67108992,
+    "size_equation_match": true,
+    "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_TEXT_CONNECTOR",
+    "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+  },
+  "immutable_source_refs": {
+    "canonical_source_png_blob_sha": null,
+    "stock_atlas_blob_sha": null,
+    "hd_atlas_blob_sha": null
+  },
+  "reused_acceptance": {
+    "task": "LOCALIZATION-LOCALIZATION_C-00086",
+    "batch": "Q00007/C109",
+    "disposition": "PASS"
+  },
+  "qa_contract": {
+    "generation_contract": "outrun-first-pass-edit-v2",
+    "default_safety_inset_px": 2,
+    "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+    "exact_source_effect_bbox_required": true,
+    "cell_inner_guard_is_upper_bound_only": true,
+    "flattened_raster_resize_forbidden": true,
+    "max_refit_iterations_default": 8
+  },
+  "occurrences": [
+    {
+      "source": "For Expert Drivers : The car is difficult to control.",
+      "korean": "상급자용: 조작이 어려운 차량입니다.",
+      "sprite": "sprite_465",
+      "hd_cell_xywh": [
+        0,
+        40,
+        1624,
+        120
+      ],
+      "hd_cell_ltrb": [
+        0,
+        40,
+        1624,
+        160
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2,
+        42,
+        1622,
+        158
+      ],
+      "inner_guard_area_px": 187920,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 655488,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 6496,
+        "row_count": 120,
+        "file_offset_last_row_exclusive": 2611680,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "For Experts : Gear changes are required.",
+      "korean": "상급자용: 기어 변속이 필요합니다.",
+      "sprite": "sprite_466",
+      "hd_cell_xywh": [
+        1624,
+        40,
+        1352,
+        120
+      ],
+      "hd_cell_ltrb": [
+        1624,
+        40,
+        2976,
+        160
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1626,
+        42,
+        2974,
+        158
+      ],
+      "inner_guard_area_px": 156368,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 661984,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 5408,
+        "row_count": 120,
+        "file_offset_last_row_exclusive": 2617088,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Tuned",
+      "korean": "튜닝",
+      "sprite": "sprite_467",
+      "hd_cell_xywh": [
+        2976,
+        40,
+        392,
+        120
+      ],
+      "hd_cell_ltrb": [
+        2976,
+        40,
+        3368,
+        160
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2978,
+        42,
+        3366,
+        158
+      ],
+      "inner_guard_area_px": 45008,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 667392,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1568,
+        "row_count": 120,
+        "file_offset_last_row_exclusive": 2618656,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Manual",
+      "korean": "수동",
+      "sprite": "sprite_464",
+      "hd_cell_xywh": [
+        2800,
+        208,
+        552,
+        136
+      ],
+      "hd_cell_ltrb": [
+        2800,
+        208,
+        3352,
+        344
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2802,
+        210,
+        3350,
+        342
+      ],
+      "inner_guard_area_px": 72336,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 3419200,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2208,
+        "row_count": 136,
+        "file_offset_last_row_exclusive": 5633248,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Please stand by.",
+      "korean": "잠시 기다려 주세요.",
+      "sprite": "sprite_445",
+      "hd_cell_xywh": [
+        0,
+        528,
+        1544,
+        200
+      ],
+      "hd_cell_ltrb": [
+        0,
+        528,
+        1544,
+        728
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2,
+        530,
+        1542,
+        726
+      ],
+      "inner_guard_area_px": 301840,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 8650880,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 6176,
+        "row_count": 200,
+        "file_offset_last_row_exclusive": 11917472,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Waiting for entries.",
+      "korean": "참가자를 기다리는 중입니다.",
+      "sprite": "sprite_443",
+      "hd_cell_xywh": [
+        0,
+        728,
+        1560,
+        216
+      ],
+      "hd_cell_ltrb": [
+        0,
+        728,
+        1560,
+        944
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2,
+        730,
+        1558,
+        942
+      ],
+      "inner_guard_area_px": 329872,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 11927680,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 6240,
+        "row_count": 216,
+        "file_offset_last_row_exclusive": 15456480,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Entry has been closed.",
+      "korean": "참가 접수가 종료되었습니다.",
+      "sprite": "sprite_444",
+      "hd_cell_xywh": [
+        1560,
+        744,
+        1840,
+        200
+      ],
+      "hd_cell_ltrb": [
+        1560,
+        744,
+        3400,
+        944
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1562,
+        746,
+        3398,
+        942
+      ],
+      "inner_guard_area_px": 359856,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 12196064,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 7360,
+        "row_count": 200,
+        "file_offset_last_row_exclusive": 15463840,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Manual Transmission",
+      "korean": "수동 변속",
+      "sprite": "sprite_446",
+      "hd_cell_xywh": [
+        1544,
+        528,
+        360,
+        200
+      ],
+      "hd_cell_ltrb": [
+        1544,
+        528,
+        1904,
+        728
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1546,
+        530,
+        1902,
+        726
+      ],
+      "inner_guard_area_px": 69776,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 8657056,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1440,
+        "row_count": 200,
+        "file_offset_last_row_exclusive": 11918912,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Automatic Transmission",
+      "korean": "자동 변속",
+      "sprite": "sprite_447",
+      "hd_cell_xywh": [
+        1904,
+        528,
+        360,
+        200
+      ],
+      "hd_cell_ltrb": [
+        1904,
+        528,
+        2264,
+        728
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1906,
+        530,
+        2262,
+        726
+      ],
+      "inner_guard_area_px": 69776,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 8658496,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1440,
+        "row_count": 200,
+        "file_offset_last_row_exclusive": 11920352,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Real Player Only",
+      "korean": "실제 플레이어 전용",
+      "sprite": "sprite_448",
+      "hd_cell_xywh": [
+        2264,
+        528,
+        360,
+        200
+      ],
+      "hd_cell_ltrb": [
+        2264,
+        528,
+        2624,
+        728
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2266,
+        530,
+        2622,
+        726
+      ],
+      "inner_guard_area_px": 69776,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 8659936,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1440,
+        "row_count": 200,
+        "file_offset_last_row_exclusive": 11921792,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "操作が難しい車です。",
+      "korean": "조작이 어려운 차량입니다.",
+      "sprite": "sprite_441",
+      "hd_cell_xywh": [
+        1048,
+        968,
+        1024,
+        256
+      ],
+      "hd_cell_ltrb": [
+        1048,
+        968,
+        2072,
+        1224
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1050,
+        970,
+        2070,
+        1222
+      ],
+      "inner_guard_area_px": 257040,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 15864032,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 4096,
+        "row_count": 256,
+        "file_offset_last_row_exclusive": 20046048,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "上級者向け",
+      "korean": "상급자용",
+      "sprite": "sprite_442",
+      "hd_cell_xywh": [
+        2072,
+        968,
+        1024,
+        256
+      ],
+      "hd_cell_ltrb": [
+        2072,
+        968,
+        3096,
+        1224
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2074,
+        970,
+        3094,
+        1222
+      ],
+      "inner_guard_area_px": 257040,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 15868128,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 4096,
+        "row_count": 256,
+        "file_offset_last_row_exclusive": 20050144,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Heart Attack Mode",
+      "korean": "하트 어택 모드",
+      "sprite": "sprite_389",
+      "hd_cell_xywh": [
+        2336,
+        3216,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        2336,
+        3216,
+        2920,
+        3656
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2338,
+        3218,
+        2918,
+        3654
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 52700416,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 59895328,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Heart Attack Mode",
+      "korean": "하트 어택 모드",
+      "sprite": "sprite_392",
+      "hd_cell_xywh": [
+        1752,
+        3656,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        1752,
+        3656,
+        2336,
+        4096
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1754,
+        3658,
+        2334,
+        4094
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 59907040,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 67101952,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "OutRun Mode",
+      "korean": "아웃런 모드",
+      "sprite": "sprite_390",
+      "hd_cell_xywh": [
+        584,
+        3656,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        584,
+        3656,
+        1168,
+        4096
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        586,
+        3658,
+        1166,
+        4094
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 59902368,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 67097280,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "OutRun Mode",
+      "korean": "아웃런 모드",
+      "sprite": "sprite_393",
+      "hd_cell_xywh": [
+        2336,
+        3656,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        2336,
+        3656,
+        2920,
+        4096
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2338,
+        3658,
+        2918,
+        4094
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 59909376,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 67104288,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Time Attack Mode",
+      "korean": "타임 어택 모드",
+      "sprite": "sprite_429",
+      "hd_cell_xywh": [
+        3640,
+        2496,
+        392,
+        280
+      ],
+      "hd_cell_ltrb": [
+        3640,
+        2496,
+        4032,
+        2776
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        3642,
+        2498,
+        4030,
+        2774
+      ],
+      "inner_guard_area_px": 107088,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 40909152,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1568,
+        "row_count": 280,
+        "file_offset_last_row_exclusive": 45481856,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Time Attack Mode",
+      "korean": "타임 어택 모드",
+      "sprite": "sprite_388",
+      "hd_cell_xywh": [
+        1752,
+        3216,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        1752,
+        3216,
+        2336,
+        3656
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1754,
+        3218,
+        2334,
+        3654
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 52698080,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 59892992,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Time Attack Mode",
+      "korean": "타임 어택 모드",
+      "sprite": "sprite_391",
+      "hd_cell_xywh": [
+        1168,
+        3656,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        1168,
+        3656,
+        1752,
+        4096
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1170,
+        3658,
+        1750,
+        4094
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 59904704,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 67099616,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "YES",
+      "korean": "예",
+      "sprite": "sprite_425",
+      "hd_cell_xywh": [
+        2664,
+        1648,
+        392,
+        280
+      ],
+      "hd_cell_ltrb": [
+        2664,
+        1648,
+        3056,
+        1928
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2666,
+        1650,
+        3054,
+        1926
+      ],
+      "inner_guard_area_px": 107088,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 27011616,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1568,
+        "row_count": 280,
+        "file_offset_last_row_exclusive": 31584320,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "YES",
+      "korean": "예",
+      "sprite": "sprite_384",
+      "hd_cell_xywh": [
+        3504,
+        3656,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        3504,
+        3656,
+        4088,
+        4096
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        3506,
+        3658,
+        4086,
+        4094
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 59914048,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 67108960,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "NO",
+      "korean": "아니오",
+      "sprite": "sprite_426",
+      "hd_cell_xywh": [
+        3056,
+        1648,
+        392,
+        280
+      ],
+      "hd_cell_ltrb": [
+        3056,
+        1648,
+        3448,
+        1928
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        3058,
+        1650,
+        3446,
+        1926
+      ],
+      "inner_guard_area_px": 107088,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 27013184,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1568,
+        "row_count": 280,
+        "file_offset_last_row_exclusive": 31585888,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "NO",
+      "korean": "아니오",
+      "sprite": "sprite_385",
+      "hd_cell_xywh": [
+        0,
+        3216,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        0,
+        3216,
+        584,
+        3656
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2,
+        3218,
+        582,
+        3654
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 52691072,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 59885984,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "RANDOM",
+      "korean": "무작위",
+      "sprite": "sprite_411",
+      "hd_cell_xywh": [
+        2080,
+        2352,
+        520,
+        424
+      ],
+      "hd_cell_ltrb": [
+        2080,
+        2352,
+        2600,
+        2776
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        2082,
+        2354,
+        2598,
+        2774
+      ],
+      "inner_guard_area_px": 216720,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 38543616,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2080,
+        "row_count": 424,
+        "file_offset_last_row_exclusive": 45476128,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Time Attack Mode 15 continuous course",
+      "korean": "타임 어택 모드 15코스 연속",
+      "sprite": "sprite_427",
+      "hd_cell_xywh": [
+        3448,
+        1648,
+        392,
+        280
+      ],
+      "hd_cell_ltrb": [
+        3448,
+        1648,
+        3840,
+        1928
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        3450,
+        1650,
+        3838,
+        1926
+      ],
+      "inner_guard_area_px": 107088,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 27014752,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1568,
+        "row_count": 280,
+        "file_offset_last_row_exclusive": 31587456,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "Time Attack Mode 15 continuous course",
+      "korean": "타임 어택 모드 15코스 연속",
+      "sprite": "sprite_386",
+      "hd_cell_xywh": [
+        584,
+        3216,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        584,
+        3216,
+        1168,
+        3656
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        586,
+        3218,
+        1166,
+        3654
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 52693408,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 59888320,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "OutRun Mode 15 continuous course",
+      "korean": "아웃런 모드 15코스 연속",
+      "sprite": "sprite_428",
+      "hd_cell_xywh": [
+        3640,
+        2072,
+        392,
+        280
+      ],
+      "hd_cell_ltrb": [
+        3640,
+        2072,
+        4032,
+        2352
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        3642,
+        2074,
+        4030,
+        2350
+      ],
+      "inner_guard_area_px": 107088,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 33962336,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 1568,
+        "row_count": 280,
+        "file_offset_last_row_exclusive": 38535040,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    },
+    {
+      "source": "OutRun Mode 15 continuous course",
+      "korean": "아웃런 모드 15코스 연속",
+      "sprite": "sprite_387",
+      "hd_cell_xywh": [
+        1168,
+        3216,
+        584,
+        440
+      ],
+      "hd_cell_ltrb": [
+        1168,
+        3216,
+        1752,
+        3656
+      ],
+      "cell_inner_guard_ltrb_2px": [
+        1170,
+        3218,
+        1750,
+        3654
+      ],
+      "inner_guard_area_px": 252880,
+      "payload_scope": {
+        "profile": "LINEAR32_SIZE_EQUATION",
+        "file_offset_first_row": 52695744,
+        "row_pitch_bytes": 16384,
+        "row_bytes": 2336,
+        "row_count": 440,
+        "file_offset_last_row_exclusive": 59890656,
+        "in_file_bounds": true
+      },
+      "source_mask_work_order": {
+        "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+        "read_scope": "ONLY_THE_RECORDED_EXACT_RELEASE_PAYLOAD_ROWS_FOR_THIS_CELL",
+        "whole_cell_clear_forbidden": true,
+        "derive": [
+          "exact effect-inclusive English/source text bbox including fill, outline, shadow, glow and alpha fringe",
+          "exact source glyph/effect removal mask; no non-text pixels may be included",
+          "raw-to-readable orientation and display transform",
+          "baseline vector and signed slant measurements",
+          "protected non-text mask inside the cell"
+        ],
+        "required_outputs": {
+          "source_effect_bbox_ltrb": "REQUIRED",
+          "removal_mask_sha256": "REQUIRED",
+          "raw_to_readable_transform": "REQUIRED",
+          "baseline_vector": "REQUIRED",
+          "slant_dx_per_dy": "REQUIRED",
+          "slant_angle_deg": "REQUIRED",
+          "slant_direction": "REQUIRED",
+          "clean_plate_sha256": "REQUIRED",
+          "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+          "candidate_safe_bbox_formula": "intersection(inset(source_effect_bbox,2px), cell_inner_guard_ltrb_2px)"
+        },
+        "candidate_render_permitted": false,
+        "unblock_condition": "All required outputs exist; clean plate independently passes; computed candidate_safe_bbox is non-empty.",
+        "fail_closed": "HOLD_STRICT_RECHECK"
+      },
+      "source_kind": "A00079_C109_ACCEPTED_MAPPING"
+    }
+  ],
+  "occurrence_count": 28,
+  "material_advance": "Transforms previously C-accepted mapped-cell payload evidence into deterministic v2 source-effect-mask/CLEAN_PLATE work units. Each unit is constrained to the existing exact Release row-slice and a 2px cell inner guard, while final candidate_safe_bbox remains blocked on measured source-effect bbox.",
+  "self_qa": {
+    "all_indices_odd": true,
+    "payload_ranges_in_file": true,
+    "cell_inner_guards_nonempty": true,
+    "candidate_safe_bbox_not_fabricated": true,
+    "candidate_dds_modified": false,
+    "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "502d879acf3a3a61c49bfad2cd79a1d504f8bf2c",
+    "a00074_evidence_blob_sha": "d9570d6a74e037636257ec941ca1f5fa0541901e",
+    "a00079_evidence_blob_sha": "3b2263deedcaa2b4a565b37ce28419a41c368751",
+    "c00081_acceptance_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+    "c00086_acceptance_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00088",
+  "wave_id": "P00024",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T16:18:00+09:00",
+  "precommit_head_sha": "986f49c9ce52879b8cf1976ba0a783716b848fef",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_V2_SOURCE_MASK_WORK_ORDERS_46_OCCURRENCES",
+  "selection": {
+    "selected_indices": [
+      35,
+      43,
+      49,
+      95
+    ],
+    "selected_assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6",
+      "37759842"
+    ],
+    "skipped_current_qa_pending_indices": [
+      59,
+      65,
+      107,
+      175
+    ],
+    "intentionally_left_for_next_slot": [
+      101
+    ],
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "basis": "A00074 was consumed PASS by C00081 and A00079 was consumed PASS by C00086. Current A00084 payload work remains QA-pending and is skipped. The active v2 contract requires source-effect-mask and independently QAed clean-plate stages before any new Korean render."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "assets_advanced": 4,
+    "mapped_occurrences_advanced": 46,
+    "exact_release_payload_scopes_reused": 46,
+    "new_2px_cell_inner_guards": 46,
+    "new_deterministic_source_mask_output_contracts": 46,
+    "candidate_dds_written": false,
+    "description": "Creates executable per-occurrence v2 work orders tied to C-accepted exact Release row slices. The next producer can derive only the English/source effect pixels, orientation/slant and clean plate inside each listed cell, then compute candidate_safe_bbox by formula without inventing geometry."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_35_E989E3B7_V2_SOURCE_MASK_WORK_ORDER.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_43_455717B2_V2_SOURCE_MASK_WORK_ORDER.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_49_BF3EE5C6_V2_SOURCE_MASK_WORK_ORDER.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_95_37759842_V2_SOURCE_MASK_WORK_ORDER.json"
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_35_43_49_95",
+    "qa_pending_dedup": "PASS_SKIPPED_A00084_59_65_107_175",
+    "c_acceptance": "PASS_A00074_C108_AND_A00079_C109",
+    "occurrence_count": "PASS_46",
+    "exact_payload_ranges": "PASS_REUSED_46_OF_46_C_ACCEPTED_IN_FILE",
+    "cell_inner_guards": "PASS_46_OF_46_NONEMPTY_AND_STRICTLY_INSIDE_MAPPED_CELL",
+    "candidate_safe_bbox": "HOLD_NOT_FABRICATED_EXACT_SOURCE_EFFECT_BBOX_REQUIRED",
+    "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "502d879acf3a3a61c49bfad2cd79a1d504f8bf2c",
+    "a00074_evidence_blob_sha": "d9570d6a74e037636257ec941ca1f5fa0541901e",
+    "a00079_evidence_blob_sha": "3b2263deedcaa2b4a565b37ce28419a41c368751",
+    "c00081_acceptance_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+    "c00086_acceptance_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

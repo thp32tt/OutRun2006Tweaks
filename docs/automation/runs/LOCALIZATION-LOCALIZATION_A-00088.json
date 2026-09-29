@@ -1,0 +1,78 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00088",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00024",
+  "recorded_at_kst": "2026-09-29T16:18:00+09:00",
+  "base_sha": "986f49c9ce52879b8cf1976ba0a783716b848fef",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_V2_SOURCE_MASK_WORK_ORDERS_46_OCCURRENCES",
+  "summary": "Advanced C-consumed odd indices 35/43/49/95 by converting 46 accepted exact Release mapped-cell payload scopes into deterministic first-pass-v2 source-effect-mask/CLEAN_PLATE work orders with 2px cell inner guards and explicit required outputs. Current A00084 QA-pending indices 59/65/107/175 were skipped. No Korean DDS or shared state changed; final source-effect bbox, clean plate, candidate_safe_bbox, containment and English-source comparison remain fail-closed HOLD.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_P00024_V2_SOURCE_MASK_WORK_ORDER_REPORT.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_35_E989E3B7_V2_SOURCE_MASK_WORK_ORDER.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_43_455717B2_V2_SOURCE_MASK_WORK_ORDER.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_49_BF3EE5C6_V2_SOURCE_MASK_WORK_ORDER.json",
+    "localization/graphics/role_A/20260929-1618-A00088-P00024/A00088_95_37759842_V2_SOURCE_MASK_WORK_ORDER.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_ODD_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      35,
+      43,
+      49,
+      95
+    ],
+    "assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6",
+      "37759842"
+    ],
+    "mapped_occurrences": 46,
+    "exact_payload_scopes_reused": 46,
+    "new_2px_cell_inner_guards": 46,
+    "deterministic_output_contracts": 46,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "a00074_evidence_blob_sha": "d9570d6a74e037636257ec941ca1f5fa0541901e",
+    "a00074_c_acceptance": "LOCALIZATION-LOCALIZATION_C-00081/Q00006 PASS",
+    "a00079_evidence_blob_sha": "3b2263deedcaa2b4a565b37ce28419a41c368751",
+    "a00079_c_acceptance": "LOCALIZATION-LOCALIZATION_C-00086/Q00007 PASS",
+    "reason": "Source/cell/payload evidence is unchanged and already independently accepted; this task adds the new v2 source-mask/CLEAN_PLATE execution contract instead of re-running heavy checks."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_A-00084": [
+      59,
+      65,
+      107,
+      175
+    ]
+  },
+  "intentionally_left_for_next_slot": [
+    101
+  ],
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_ODD_ONLY_35_43_49_95__46_OF_46_ACCEPTED_PAYLOAD_SCOPES__46_OF_46_NONEMPTY_2PX_CELL_GUARDS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "The 2px cell inner guard is only an upper bound. Under first-pass-v2 the final candidate_safe_bbox must be intersection(inset(measured source-effect bbox,2px), cell inner guard), and the exact source removal mask plus independently passing CLEAN_PLATE QA must exist before Korean lettering.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
