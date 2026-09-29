@@ -292,5 +292,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null
+  "result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663",
+  "result_commit_message": "localization(B): exact source replay and index193 preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00223]",
+  "bookkeeping_recorded_at_kst": "2026-09-30T06:59:14+09:00",
+  "bookkeeping_note": "Result SHA recorded after verifying the exact result commit contains this durable task record, the required AUTO marker, embedded material evidence, runtime_validation=UNTESTED and automation_validation=PENDING/C_BATCH_GATE. This bookkeeping commit does not replace the producer result commit."
 }
