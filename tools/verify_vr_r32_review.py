@@ -255,6 +255,19 @@ if min(query_error, fault_generation, can_fast_submit, fast_gate) < 0:
 if not (query_error < fault_generation < can_fast_submit < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
 
+destroy_session = host_direct.find("inline XrResult XRAPI_CALL DestroySession")
+destroy_poll = host_direct.find("PollCompletedAcks();", destroy_session)
+destroy_return = host_direct.find(
+    "return OutRunVrR24BlackScreenGuard::DestroySession", destroy_session)
+destroy_release = host_direct.find("ReleasePending();", destroy_session)
+if min(destroy_session, destroy_poll, destroy_return) < 0 or not (
+        destroy_session < destroy_poll < destroy_return):
+    raise SystemExit(
+        "R32 xrDestroySession must poll completed ACKs while preserving incomplete D3D11 EVENT owners")
+if destroy_release >= 0 and destroy_release < destroy_return:
+    raise SystemExit(
+        "R32 xrDestroySession must not release incomplete GPU ACK owners")
+
 ensure_fence_failure = host_direct.find("if (!EnsureFence(slot))")
 ensure_fence_fault = host_direct.find(
     "MarkGenerationFault(generation)", ensure_fence_failure)
@@ -306,6 +319,39 @@ host_r23 = require(
 if "c.CommitDirectStereoSource(frame)" in host_r23:
     raise SystemExit(
         "R23 production DirectGPU path must bypass legacy snapshot/fence commit")
+
+for marker in (
+    '#include "runtime/r41_skipped_release.hpp"',
+    "R41SkippedReleaseQueue",
+    "R41ReleaseNeverSampled(frame)",
+    "R41RetrySkippedReleases();",
+    "R23DeferredSlotBlocked(frame)",
+):
+    if marker not in host_r23:
+        raise SystemExit(
+            f"R41 skipped DirectGPU durable-release invariant missing: {marker}")
+
+# Do not make this structural guard whitespace-sensitive. The source formats
+# MarkGenerationFault and identity.transportGeneration across lines.
+release_fn_start = host_r23.find("bool R41ReleaseNeverSampled")
+release_fn_end = host_r23.find("bool R23SameDirectIdentity", release_fn_start)
+if min(release_fn_start, release_fn_end) < 0:
+    raise SystemExit("could not bound R41ReleaseNeverSampled")
+release_fn = host_r23[release_fn_start:release_fn_end]
+for marker in (
+    "StageResult::LiveSlotConflict",
+    "MarkGenerationFault(",
+    "identity.transportGeneration",
+):
+    if marker not in release_fn:
+        raise SystemExit(
+            f"R41 live-slot conflict fail-close invariant missing: {marker}")
+
+skip_guard = host_r23.find("if (R23DeferredSlotBlocked(frame))")
+stage_release = host_r23.find("R41ReleaseNeverSampled(frame)", skip_guard)
+if min(skip_guard, stage_release) < 0 or skip_guard > stage_release:
+    raise SystemExit(
+        "R41 never-sampled retry ownership must be reached only after deferred EVENT ownership is excluded")
 
 r14 = require(
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
@@ -482,5 +528,40 @@ if host_cmake.find("d3d9ex_direct_passthrough_r32.hpp") > \
 if host_cmake.find("r32_direct_submit.hpp") < \
         host_cmake.find("r26_recenter_hardening.hpp"):
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
+
+skipped_release = require(
+    "vrhost/src/runtime/r41_skipped_release.hpp",
+    "struct Identity",
+    "SameProducer",
+    "SameIdentity",
+    "StageResult::LiveSlotConflict",
+    "ReplacedStaleProducer",
+    "void Retry",
+    "SlotBlocked",
+    "enum class SampleEvidence",
+    "class SampledHistory",
+    "ObserveSampled",
+    "SampleEvidence::ExactSampled",
+    "return SampleEvidence::Unknown",
+)
+skipped_release_test = require(
+    "vrhost/tests/r41_skipped_release_smoke.cpp",
+    "StageResult::AlreadyPending",
+    "StageResult::LiveSlotConflict",
+    "StageResult::ReplacedStaleProducer",
+    "stalePublishAttempts != 0",
+    "SampledHistory<4>",
+    "sampledHistory.ObserveSampled",
+    "SampleEvidence::ExactSampled",
+    "sameProducerNewFrame",
+    "nextTransportSameSlot",
+    "nextRunSameSlot",
+)
+require(
+    "vrhost/CMakeLists.txt",
+    "outrun-vr-r41-skipped-release-smoke",
+    "Run R41 skipped-release LEVEL0 smoke",
+    "add_dependencies(outrun-vr-host outrun-vr-r41-skipped-release-smoke)",
+)
 
 print("R32-R34 + R15 D3D9Ex compatibility/Present verification passed")

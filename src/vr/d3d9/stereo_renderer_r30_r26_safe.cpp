@@ -949,6 +949,8 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowPerfTotalUs = 0;
         std::uint64_t R30SkyGlowPerfMaxUs = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
+        std::uint64_t R30SkyGlowAppliedEpoch = 0;
+        std::uint64_t R30SkyGlowPreHudAttemptEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
         OutRunVR::FrameState::FrameContext R69FrameContext{};
@@ -978,6 +980,8 @@ namespace OutRunVRStereo
                 frame.stageHoldRemaining = R68StageHoldPresents;
                 ++frame.stageTransitionHolds;
                 R30SkyGlowSceneCaptureEpoch = 0;
+                R30SkyGlowAppliedEpoch = 0;
+                R30SkyGlowPreHudAttemptEpoch = 0;
                 spdlog::info(
                     "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
                     previous, stage, R68StageHoldPresents,
@@ -1575,6 +1579,7 @@ namespace OutRunVRStereo
 
             if (ok && restoreOk)
             {
+                R30SkyGlowAppliedEpoch = PresentEpoch;
                 ++R30SkyGlowFrames;
                 if (!R30FirstSkyGlowLogged)
                 {
@@ -1598,6 +1603,28 @@ namespace OutRunVRStereo
                     "VR SKY GLOW: stereo eye post-process failed; frame continues without enabling the stock mono glow chain");
             }
             return false;
+        }
+
+        bool R30CompositeSkyGlowBeforeHud(
+            IDirect3DDevice9* device) noexcept
+        {
+            // Preserve the stock ordering: glow belongs to the completed world
+            // image and must be composited before HUD/menu draws. Capturing the
+            // world before HUD but delaying the additive composite until Present
+            // washes the already-drawn UI even though UI pixels are not bloom
+            // sources.
+            if (!device || R30SkyGlowAppliedEpoch == PresentEpoch)
+                return true;
+
+            // Once a HUD draw is about to begin, never fall back to a later
+            // Present-time additive composite for this frame. If the pre-HUD
+            // path fails, omitting glow is safer than washing over UI.
+            R30SkyGlowPreHudAttemptEpoch = PresentEpoch;
+            if (!R30CaptureSkyGlowSceneBeforeHud(device))
+                return false;
+
+            InternalPassScope guard;
+            return R30ApplyStereoSkyGlow(device);
         }
 
         ULONGLONG R30LastTelemetryMs = 0;
@@ -1657,6 +1684,8 @@ namespace OutRunVRStereo
             R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
+                R30SkyGlowAppliedEpoch != PresentEpoch &&
+                R30SkyGlowPreHudAttemptEpoch != PresentEpoch &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
@@ -1703,6 +1732,8 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R30SkyGlowAppliedEpoch = 0;
+            R30SkyGlowPreHudAttemptEpoch = 0;
             R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
@@ -3232,7 +3263,7 @@ namespace OutRunVRStereo
             const char* site)
         {
             if (!state.worldEffect)
-                R30CaptureSkyGlowSceneBeforeHud(device);
+                R30CompositeSkyGlowBeforeHud(device);
 
             ++R9DrawCalls;
             R9MonoBackupGap = true;
@@ -4233,10 +4264,10 @@ namespace OutRunVRStereo
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
-            // Capture the completed world eyes before the first recognized HUD
-            // draw. Present then extracts glow from this snapshot, so bright HUD
-            // text/icons are never themselves bloom sources.
-            R30CaptureSkyGlowSceneBeforeHud(device);
+            // Composite the completed world glow before the first recognized
+            // HUD draw. The scene snapshot excludes HUD pixels and, critically,
+            // the additive glow no longer washes over HUD/menu pixels at Present.
+            R30CompositeSkyGlowBeforeHud(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
@@ -4610,8 +4641,52 @@ namespace OutRunVRStereo
             if (vs)
                 vs->Release();
 
+            // R71 visual diagnostic: the user reported HUD/menu content looking
+            // globally translucent. Do not force alpha or blend values here:
+            // several legitimate OutRun UI elements intentionally use alpha.
+            // Instead record the exact live blend contract only for proven
+            // SCREEN_HUD queue draws so the next HMD log can distinguish
+            // additive/dual-source state leakage from intended sprite alpha.
+            DWORD alphaBlend = FALSE;
+            DWORD srcBlend = D3DBLEND_ONE;
+            DWORD destBlend = D3DBLEND_ZERO;
+            DWORD blendOp = D3DBLENDOP_ADD;
+            DWORD separateAlpha = FALSE;
+            DWORD srcBlendAlpha = D3DBLEND_ONE;
+            DWORD destBlendAlpha = D3DBLEND_ZERO;
+            DWORD blendOpAlpha = D3DBLENDOP_ADD;
+            DWORD alphaTest = FALSE;
+            DWORD alphaRef = 0;
+            DWORD alphaFunc = D3DCMP_ALWAYS;
+            DWORD colorWrite = 0xFFFFFFFFu;
+            const bool blendStateOk =
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &alphaBlend)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SRCBLEND, &srcBlend)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_DESTBLEND, &destBlend)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_BLENDOP, &blendOp)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SRCBLENDALPHA, &srcBlendAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_DESTBLENDALPHA, &destBlendAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_BLENDOPALPHA, &blendOpAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHATESTENABLE, &alphaTest)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHAREF, &alphaRef)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHAFUNC, &alphaFunc)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_COLORWRITEENABLE, &colorWrite));
+
             spdlog::info(
-                "VR R63 EXACT SCREENHUD DRAW: method={} type={} prim={} fvfHr=0x{:08X} fvf=0x{:08X} vsHr=0x{:08X} hasVS={} node={} effective={} hit={}",
+                "VR R71 HUD ALPHA DIAG: method={} type={} prim={} fvfHr=0x{:08X} fvf=0x{:08X} vsHr=0x{:08X} hasVS={} node={} effective={} blendOk={} ab={} src={} dst={} op={} sepA={} srcA={} dstA={} opA={} at={} ref={} func={} colorWrite=0x{:08X} hit={}",
                 method,
                 static_cast<unsigned>(type),
                 primitiveCount,
@@ -4623,6 +4698,19 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::CurrentQueueNode()),
                 OutRunVR::GameSemantic::Name(
                     OutRunVR::GameSemantic::EffectiveScope()),
+                blendStateOk ? 1 : 0,
+                static_cast<unsigned>(alphaBlend),
+                static_cast<unsigned>(srcBlend),
+                static_cast<unsigned>(destBlend),
+                static_cast<unsigned>(blendOp),
+                static_cast<unsigned>(separateAlpha),
+                static_cast<unsigned>(srcBlendAlpha),
+                static_cast<unsigned>(destBlendAlpha),
+                static_cast<unsigned>(blendOpAlpha),
+                static_cast<unsigned>(alphaTest),
+                static_cast<unsigned>(alphaRef),
+                static_cast<unsigned>(alphaFunc),
+                static_cast<unsigned>(colorWrite),
                 hit);
         }
 
