@@ -919,3 +919,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-1556-C108/C108_Q00006_INDEPENDENT_QA_BATCH.json`.
 
+
+### C109 Q00007 independent QA batch — 2026-09-29T16:10:17+09:00
+- Immutable inputs: A00079 `bad79d413b6d07aa034efb06fc7c358b099ee3dd`, B00080 `64001b4c93b115537df2fc21fa9f2d3f0010b2bd`, A00082 `43c90861c97d6d0a974dfd328988498ad7c79a8b`, B00083 `20d9271a96f9000a024ada8ecde4c9b5cf7a56e5`. All four dispositions **PASS** for their immutable extraction/preflight deliverables; none is superseded at merge base `7dca0c99022e0938102b8fc9e7bc27ccd0a301fd`.
+- Canonical semantic QA: A79 **32/32**, B80 **18/18 LOCALIZE + 1 preserve-original TOP**, A82 **2/2**, B83 **4/4**. Canonical graphics segments remain **753**; no transcription/artwork-plan metadata changed.
+- New-evidence QA: A79 **41/41** RGBA32 extraction formulas PASS; B80 **18/18** region formulas PASS including **3/3** BC3 block-aligned regions; A82 **2/2** BC3 extraction/size equations plus 2px v2 preflight bounds PASS; B83 **4/4** exact 2px safe bboxes and raw flip_y mappings PASS. Reported overlap is zero.
+- Heavy source/header/orientation QA for unchanged fingerprints was reused from A72/C75, B33/C34, A41/A47 and B73/C78. A79/B80 remain pre-generation evidence only; A82/B83 satisfy v2 preflight geometry but still lack exact removal masks/validated clean plates.
+- No producer input or C changed Korean DDS candidate bytes. Decoded-final 1px containment, candidate DDS format/mipmap/alpha/compression, signed style/slant, protected-artwork final comparison and ENGLISH SOURCE vs KOREAN CANDIDATE remain **HOLD_STRICT_RECHECK**. New static passes 0; runtime approvals 0.
+- Actionable queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text **76**. Newer disjoint producers preserved: A00084 and B00085.
+- Shared state merged once. Report: `localization/graphics/role_C/20260929-1610-C109/C109_Q00007_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

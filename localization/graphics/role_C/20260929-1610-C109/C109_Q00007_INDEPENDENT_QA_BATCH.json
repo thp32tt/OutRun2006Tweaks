@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00086",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00007",
+  "qa_batch_id": "Q00007",
+  "run": "C109",
+  "recorded_at_kst": "2026-09-29T16:10:17+09:00",
+  "base_head_sha": "7dca0c99022e0938102b8fc9e7bc27ccd0a301fd",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00079",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "bad79d413b6d07aa034efb06fc7c358b099ee3dd",
+      "producer_id": "P00017"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00080",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "64001b4c93b115537df2fc21fa9f2d3f0010b2bd",
+      "producer_id": "P00018"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00082",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "43c90861c97d6d0a974dfd328988498ad7c79a8b",
+      "producer_id": "P00019"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00083",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+      "producer_id": "P00020"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00079",
+      "result_sha": "bad79d413b6d07aa034efb06fc7c358b099ee3dd",
+      "status": "PASS",
+      "reason": "A00079 mapped-cell payload extraction evidence accepted. Exact immutable A00072/C00075 source/mapping fingerprints are reused unchanged; current transcription/artwork-plan pairs match 32/32. Independent arithmetic recheck passes 41/41 4096x4096 RGBA32 mapped-cell row-slice formulas and file bounds with zero selected-cell overlap. No Korean candidate DDS exists; exact source effect masks/orientation/slant/clean plate and decoded-final containment/source-vs-candidate gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00080",
+      "result_sha": "64001b4c93b115537df2fc21fa9f2d3f0010b2bd",
+      "status": "PASS",
+      "reason": "B00080 exact Release payload-region extraction evidence accepted. Unchanged B00033/C00034 source/atlas/semantic fingerprints are reused. Current canonical metadata matches all 18 LOCALIZE pairs and retains the single TOP preserve-original occurrence. Independent arithmetic recheck passes 18/18 region extraction formulas and file/canvas bounds, including 3/3 BC3 4x4-block-aligned regions, with zero region overlap. No Korean candidate DDS exists; glyph/effect masks, clean plates, orientation/slant and candidate-only DDS/containment/comparison gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00082",
+      "result_sha": "43c90861c97d6d0a974dfd328988498ad7c79a8b",
+      "status": "PASS",
+      "reason": "A00082 generation-v2 BC3 preflight evidence accepted for indices 55/119. Unchanged A00041/A00047 exact-HD source/header/alpha/orientation metrics are reused under the new contract. Both canonical translations match current metadata; 2/2 BC3 size equations and block-row extraction ranges pass, and both conservative candidate-safe upper bounds are exact 2px insets inside the permitted/source-overlap geometry. These are preflight bounds, not final glyph masks: source removal masks and clean-plate QA are still missing, candidate generation remains prohibited, and decoded-final candidate gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00083",
+      "result_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+      "status": "PASS",
+      "reason": "B00083 generation-v2 safe-fit preflight evidence accepted for indices 92/98/112. Reused B00073/C00078 exact-HD source, flip_y and effect-bbox fingerprints are unchanged. Current canonical pairs match 4/4; all 4 readable candidate-safe bboxes are exact 2px insets from accepted source-effect bboxes, all 4 raw bboxes map exactly through flip_y at the recorded source heights, and index 92's two safe regions do not overlap. Clean-plate removal masks and Korean candidate bytes do not yet exist, so candidate DDS/header/alpha/compression, zero-pixel containment, style/slant and source-vs-candidate gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "reviewed_indices": [
+    34,
+    44,
+    52,
+    55,
+    92,
+    95,
+    98,
+    101,
+    112,
+    119,
+    172
+  ],
+  "reviewed_assets": 11,
+  "exact_result_sha_evidence": {
+    "A00079": {
+      "record_blob_sha": "09ce9151a94729f01975ce4db152f77ec4a54ef7",
+      "report_blob_sha": "3b2263deedcaa2b4a565b37ce28419a41c368751"
+    },
+    "B00080": {
+      "record_blob_sha": "d818d0fd6a362592e4caa58fa970e4da31645dcf",
+      "report_blob_sha": "f69be8e252cf0d1240db6e701ed770cde5f2d6f7"
+    },
+    "A00082": {
+      "record_blob_sha": "41ace7a2945451580de09ce257b6716d9da198ef",
+      "evidence_count": 3
+    },
+    "B00083": {
+      "record_blob_sha": "3ec04bd7e208fcbf403479a889f3c87f52802988",
+      "evidence_count": 1
+    }
+  },
+  "canonical_inputs": {
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "heavy_qa_reuse": {
+    "A00079": [
+      "A00072",
+      "C00075"
+    ],
+    "B00080": [
+      "B00033",
+      "C00034"
+    ],
+    "A00082": [
+      "A00041",
+      "A00047"
+    ],
+    "B00083": [
+      "B00073",
+      "C00078"
+    ]
+  },
+  "independent_checks": {
+    "A00079": {
+      "canonical_pairs": "32/32 PASS",
+      "mapped_cells": "41/41 PASS",
+      "extraction_formula": "41/41 PASS",
+      "overlap_pairs": 0
+    },
+    "B00080": {
+      "canonical_localize_pairs": "18/18 PASS",
+      "preserve_original": "TOP x1 PASS",
+      "regions": "18/18 PASS",
+      "bc3_alignment": "3/3 PASS",
+      "overlap_pairs": 0
+    },
+    "A00082": {
+      "canonical_pairs": "2/2 PASS",
+      "bc3_size": "2/2 PASS",
+      "bc3_extraction": "2/2 PASS",
+      "v2_2px_preflight": "2/2 PASS",
+      "clean_plate": "HOLD_NOT_PRODUCED"
+    },
+    "B00083": {
+      "canonical_pairs": "4/4 PASS",
+      "v2_2px_safe_bbox": "4/4 PASS",
+      "raw_flip_y": "4/4 PASS",
+      "index92_overlap": 0,
+      "clean_plate": "HOLD_NOT_PRODUCED"
+    }
+  },
+  "source_identity_validation": "PASS_REUSED_UNCHANGED_FINGERPRINTS__A72_C75_B33_C34_A41_A47_B73_C78__EXACT_INPUT_RECORD_AND_EVIDENCE_FETCHED_AT_ALL_4_RESULT_SHAS",
+  "canonical_semantic_validation": "PASS_A79_32_OF_32__B80_18_OF_18_LOCALIZE_PLUS_1_PRESERVE_ORIGINAL__A82_2_OF_2__B83_4_OF_4",
+  "geometry_mapping_validation": "PASS_A79_41_OF_41_LINEAR32_CELL_EXTRACTIONS_ZERO_OVERLAP__B80_18_OF_18_REGION_EXTRACTIONS_3_OF_3_BC3_ALIGNED_ZERO_OVERLAP__A82_2_OF_2_BC3_EXTRACTIONS_AND_2PX_PREFLIGHT_BOUNDS__B83_4_OF_4_2PX_SAFE_BBOX_AND_FLIP_Y_MAPS",
+  "current_contract_compatibility": "PASS_A79_B80_PREGEN_EXTRACTION_EVIDENCE_ONLY__A82_B83_OUTRUN_FIRST_PASS_EDIT_V2_PREFLIGHT__CANDIDATE_PROMOTION_NOT_GRANTED",
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00084",
+      "LOCALIZATION-LOCALIZATION_B-00085"
+    ],
+    "result": "NONE_AT_BASE_HEAD"
+  },
+  "shared_state_reconciliation": {
+    "canonical_segments": 753,
+    "queue_total": 137,
+    "actionable_localize_text": 93,
+    "pending_production_localize_text": 76,
+    "queue_notes_updated_indices": [
+      34,
+      44,
+      52,
+      55,
+      92,
+      95,
+      98,
+      101,
+      112,
+      119,
+      172
+    ],
+    "metadata_segments_changed": 0
+  },
+  "strict_holds": [
+    "exact source glyph/effect removal masks missing for A82/B83",
+    "validated CLEAN_PLATE artifacts missing for A82/B83",
+    "no reviewed input contains a new Korean candidate DDS",
+    "decoded-final zero-pixel containment and ENGLISH SOURCE vs KOREAN CANDIDATE remain candidate-only gates"
+  ],
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00007_FOUR_INPUTS_11_ASSETS_57_SEMANTICS_PAYLOAD_AND_V2_PREFLIGHT_NO_DDS_RUNTIME_UNTESTED"
+}
