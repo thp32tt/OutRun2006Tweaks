@@ -22,6 +22,7 @@ jobs:
       - name: Checkout exact source
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
           fetch-depth: 1
 
@@ -40,7 +41,7 @@ jobs:
       - name: Upload runtime test ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-TONIGHT-${{ github.sha }}
+          name: OutRun2-VR-TONIGHT-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           path: ${{ env.OUTRUN_TEST_ZIP }}
           if-no-files-found: error
           retention-days: 7
