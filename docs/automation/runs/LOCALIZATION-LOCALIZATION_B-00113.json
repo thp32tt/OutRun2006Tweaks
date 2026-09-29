@@ -121,7 +121,7 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "supplemental_material_commit_sha": "3c30415fce8f320995e0f8ba29cb26c68b64195c",
+  "supplemental_material_commit_sha": "cd7a36bed82bc23f9eec6fec60a8b5b7bfa54dc9",
   "supplemental_material": {
     "type": "INDEX206_EXACT_STOCK_PIXEL_ORIENTATION_AND_TEXT_CORE_PRIOR",
     "queue_index": 206,
@@ -145,6 +145,17 @@
     "observed_head_sha": "cd7a36bed82bc23f9eec6fec60a8b5b7bfa54dc9",
     "reason": "CHAT_ROLLOVER=1 found a same-task supplemental material commit created after the first durable task record. Reconciled that immutable evidence into the task record instead of repeating completed production work.",
     "repeated_completed_work": false,
-    "preserved_peer_head": true
+    "preserved_peer_head": true,
+    "chat_rollover": 3,
+    "corrected_material_ref_reconciled": true,
+    "supplemental_evidence_blob_sha": "9c836ffe84f4fcba14f1f9fa21b81267d6da5b0a"
+  },
+  "supplemental_material_initial_commit_sha": "3c30415fce8f320995e0f8ba29cb26c68b64195c",
+  "supplemental_evidence_blob_sha": "9c836ffe84f4fcba14f1f9fa21b81267d6da5b0a",
+  "supplemental_material_correction": {
+    "corrected_commit_sha": "cd7a36bed82bc23f9eec6fec60a8b5b7bfa54dc9",
+    "corrected_field": "reused_immutable_evidence.b00039_report_blob_sha",
+    "corrected_value": "a71c5d8bb0da2ace8028a7fd68b0894f49978ffe",
+    "reason": "The initial supplemental commit referenced an unrelated B00030 blob; cd7a36be corrected the B00039 report identity before final durable reconciliation."
   }
 }
