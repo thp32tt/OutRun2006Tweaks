@@ -132,6 +132,13 @@
           "Quest3/VDXR CORRECTNESS: road, background and vehicles remain true stereo without new doubling or head-lock",
           "compare world/classification/right-eye/restore/pose-mismatch telemetry with the protected runtime baseline"
         ]
+      },
+      "pendingRevalidation": {
+        "task_id": "CONVERSION-DXVK-00035",
+        "source_sha": "82029d12159fbaf2a386a0c66da288beeba678a9",
+        "reason": "outrun_renderer.cpp c64 semantic bypass boundary changed for exact queue scopes; generic world path is intended unchanged but protected HMD world-stereo invariant must be rechecked.",
+        "automation_validation": "PASS",
+        "runtime_validation": "UNTESTED"
       }
     },
     {
@@ -268,7 +275,7 @@
     {
       "key": "VR-R51-WHITE-HUD-DIPLOPIA-001",
       "title": "White HUD/text remains doubled and head-following on R51",
-      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "status": "CANDIDATE_AUTOMATION_VERIFIED_NEED_HMD_TEST",
       "severity": "visual-correctness",
       "lastObservedKst": "2026-09-24",
       "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
@@ -283,7 +290,7 @@
         "preserve improved frame stability",
         "do not restore blanket queue-to-HUD ownership"
       ],
-      "nextAction": "Trace producer -> node tag -> queue SelectSpriteQueueNode -> renderer SetVertexShaderConstantF(c64) -> R30 draw ordering. Make exact semantic ownership visible at c64 time or move the renderer bypass to an equally exact producer-safe boundary; no blanket queue-to-HUD promotion.",
+      "nextAction": "Quest3/VDXR exact-build test of 82029d12159fbaf2a386a0c66da288beeba678a9. Require semanticOverlayBypass>0 for exact queue HUD, verify white/6th/6/menu/YES-NO convergence and head-lock removal, preserve R50 road/background/vehicle stereo, and separately evaluate rival-rank anchoring. Do not widen generic queue HUD ownership if the runtime result fails.",
       "recurrenceCount": 1,
       "testLevel": 1,
       "riskPaths": [
@@ -318,6 +325,21 @@
         "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
         "result": "white HUD/position rank HUD still doubled and headset-following; R51 world stereo preserved",
         "telemetry": "semanticHudAccepted=93681; semanticOverlayBypass=0"
+      },
+      "candidate": {
+        "task_id": "CONVERSION-DXVK-00035",
+        "source_sha": "82029d12159fbaf2a386a0c66da288beeba678a9",
+        "automation_validation": "PASS",
+        "runtime_validation": "UNTESTED",
+        "backend_gate_run_id": 36506475246,
+        "bounded_static_cause": "Production mode 2 used CurrentQueueExactScope at ConsumeForDraw but EffectiveScope exposed exact queue ownership only from mode 3, allowing helper scope overwrite to hide exact HUD ownership at the earlier c64/WVP boundary. This explains semanticHudAccepted>0 with semanticOverlayBypass=0; HMD validation is still required to prove it caused the visible HUD defect.",
+        "change": "Dedicated EffectiveWvpUploadScope exposes only exact ScreenHud/WorldBillboard/ProjectedWorldMarker2D queue ownership from mode 2 at c64. Generic ScreenOverlay2D is not promoted.",
+        "runtime_acceptance": [
+          "semanticOverlayBypass becomes non-zero on exact HUD content",
+          "white HUD / 6th-of-6 / menu / YES-NO no longer doubled or head-locked",
+          "road/background/vehicle stereo remains correct",
+          "no startup/recenter regression"
+        ]
       }
     },
     {
@@ -369,6 +391,13 @@
         "sessionId": "20260923T164207853Z-2202b186",
         "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
         "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
+      },
+      "c64OwnershipCandidate": {
+        "task_id": "CONVERSION-DXVK-00035",
+        "source_sha": "82029d12159fbaf2a386a0c66da288beeba678a9",
+        "automation_validation": "PASS",
+        "runtime_validation": "UNTESTED",
+        "note": "Exact WorldBillboard/ProjectedWorldMarker2D queue scope is now visible at c64 in mode 2, preventing renderer head injection before later semantic draw ownership. This may remove a stacked transform but does not reconstruct missing Calc3D2D vehicle/world anchor metadata; rank anchoring remains OPEN until runtime evidence and anchor preservation are proven."
       }
     },
     {
