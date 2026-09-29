@@ -330,7 +330,7 @@ require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
     "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69'",
-    "VariantId = 'ACTIVE_R26_HUD_R69'",
+    "VariantId = 'R71_HUD_FLARE_EVENING'",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
@@ -373,6 +373,25 @@ require(".github/workflows/vr-openxr.yml",
 forbid(".github/workflows/vr-openxr.yml",
        'name: outrun2006-vr-x86\n          path: build-vr-game/bin/dinput8.dll',
        "P9_NO_AMBIGUOUS_SAFE_ARTIFACT")
+
+require_all("tools/OutRunVR-Test-Selector.ps1", [
+    "R71_HUD_FLARE",
+    "R71_HUD_MENU",
+    "DX9Ex R71 HUD + FLARE",
+    "OutRun2_VR_ANALYZE_*.zip",
+], "P9_R71_EVENING_SELECTOR")
+require_all("tools/START_HERE_VR_TEST.cmd", [
+    "R71 - HUD / LENS FLARE EVENING TEST",
+    "OutRunVR-Test-Selector.ps1",
+    "OutRun2_VR_ANALYZE_*.zip",
+], "P9_R71_ONE_CLICK_SELECTOR")
+require_all("tools/Collect-OutRunVRLogs.ps1", [
+    "'HUD_OPACITY='",
+    "'OUTRUN_STAGE_TEXT='",
+    "'RIVAL_MARKER='",
+    "'LENS_FLARE='",
+    "ANALYSIS_REQUEST.json",
+], "P9_R71_RESULT_AND_ANALYSIS_CONTRACT")
 
 # PASS 10 — the binary contract must cover every new exact production edge.
 contract = read("docs/VR_BINARY_CONTRACT.json")
