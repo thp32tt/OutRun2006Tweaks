@@ -166,7 +166,7 @@ require(
     "S_FALSE stays quarantined",
 )
 r13 = require(
-    "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc",
     "R13ReadGpuCompletedFrame",
     "DirectGpuAckIdentityMatches",
     "SharedState->hostPid",
@@ -188,7 +188,7 @@ if min(ack_read_start, resolve_start) < 0:
 ack_body = r13[ack_read_start:resolve_start]
 ordered(
     ack_body,
-    "src/vr/d3d9/stereo_renderer_r13.cpp::R13ReadGpuCompletedFrame",
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc::R13ReadGpuCompletedFrame",
     "const std::uint32_t before = R13AckState->sequence;",
     "std::memcpy(&snapshot, R13AckState, sizeof(snapshot));",
     "const std::uint32_t after = R13AckState->sequence;",
