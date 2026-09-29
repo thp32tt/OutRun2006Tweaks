@@ -1,0 +1,113 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00103",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00036",
+  "recorded_at_kst": "2026-09-29T17:23:06+09:00",
+  "base_sha": "6c1ee7ea313baaa0826aaa80ae5c9f4b4c2eb575",
+  "material_commit_sha": "bd6dfdea9ffaa2a06f6ba13a368fc42523fc0a18",
+  "pre_task_record_head_sha": "bd6dfdea9ffaa2a06f6ba13a368fc42523fc0a18",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_EVEN_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_13_UNITS_PLUS_VARIANT_HOLD",
+  "summary": "Advanced Q00009/C111-consumed even indices 140/154/164, the three remaining B00090 assets not already advanced by B00097, from accepted exact Release RGBA32 payload scopes into 13 deterministic first-pass-v2 source-effect-mask/CLEAN_PLATE work units. Preserved four non-target regions as edit-forbidden and retained the 31C58963 PRESS START/PRESS ENTER discrepancy as one explicit exact-source decode HOLD rather than guessing. Added 13 strict 2px inner guards; no source-effect bbox, removal mask, CLEAN_PLATE, candidate-safe bbox, Korean DDS or shared state was fabricated.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1723-B131-P00036/B131_P00036_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "evidence_blob_sha": "145b2328fcd0c15fce96ac3b0aa4479c42c66ad5",
+  "material_deliverable": {
+    "type": "THREE_EVEN_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_PLUS_VARIANT_RESOLUTION",
+    "indices": [
+      140,
+      154,
+      164
+    ],
+    "assets": [
+      "31C58963",
+      "4D38BBB0",
+      "5B65E08C"
+    ],
+    "deterministic_localize_work_units": 13,
+    "localizable_physical_semantic_occurrences": 13,
+    "preserve_original_regions": 4,
+    "source_variant_resolution_holds": 1,
+    "c111_accepted_rgba32_payload_regions_reused": 18,
+    "new_two_px_inner_guards": 13,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00090",
+    "producer_result_sha": "d7a3cb3200bdc658423745a55701f5e00ac05d4d",
+    "producer_report_blob_sha": "aac64cf281aeb4bbd9c1fbec412a4a8b815d8698",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00093",
+    "c_acceptance_record_blob_sha": "ff61539273f7e1e467e2d71fa6ed6429c7aca6ab",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reason": "C111 independently accepted B00090 exact Release payload geometry and current canonical mappings. P00036 advances only the remaining indices 140/154/164 because index 130 was already advanced by B00097 and is QA-pending."
+  },
+  "skipped_or_deferred": {
+    "qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00097": [
+        86,
+        100,
+        106,
+        130
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00100": [
+        46,
+        48,
+        50,
+        62
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00101": [
+        198,
+        214,
+        230,
+        236
+      ]
+    },
+    "already_v2_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00095": [
+        34,
+        44,
+        52,
+        172
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ]
+  },
+  "strict_hold": {
+    "index140_prompt_variant": "HOLD_SOURCE_VARIANT_PRESS_START_VS_PRESS_ENTER_UNTIL_EXACT_RELEASE_DECODE",
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED_PER_ELEMENT",
+    "signed_text_slant": "HOLD_EXACT_DECODE_REQUIRED_WHEN_STYLIZED",
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "glyph_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_UNTIL_MEASURED_SOURCE_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_EVEN_ONLY_140_154_164__3_OF_3_RGBA32_SOURCE_SIZE_EQUATIONS__18_C111_ACCEPTED_REGIONS_ACCOUNTED_AS_13_LOCALIZE_4_PRESERVE_1_SOURCE_VARIANT_HOLD__13_OF_13_LOCALIZE_SCOPES_IN_CANVAS_IN_FILE__ZERO_REGION_OVERLAP__13_OF_13_NONEMPTY_2PX_GUARDS__4_PRESERVE_EDIT_FORBIDDEN__PRESS_START_VS_PRESS_ENTER_NOT_GUESSED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "The v2 work orders are source-inspection boundaries, not edit masks. Exact decoded per-element orientation, source-effect bboxes, glyph/effect removal masks, protected-art masks, independently passing CLEAN_PLATE and measured candidate_safe_bbox remain required before Korean rendering. For 31C58963 the exact Release pixels must first resolve PRESS START versus PRESS ENTER. Final DDS/alpha/zero-pixel containment and English-source comparison cannot pass without candidate bytes.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
