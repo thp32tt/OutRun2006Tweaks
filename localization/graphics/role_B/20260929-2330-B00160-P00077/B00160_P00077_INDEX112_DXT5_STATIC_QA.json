@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00077",
+  "target": {
+    "index": 112,
+    "asset": "D41D0B1",
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds"
+  },
+  "reason": "Direct C-returned rework from C00159; B00158 isolation work was not repeated.",
+  "metrics": {
+    "source_repository": "envido32/OR2006Sprites",
+    "source_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "source_path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "source_git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "source_bytes": 524416,
+    "canvas": [
+      2048,
+      256
+    ],
+    "fourcc": "DXT5",
+    "mip_count": 1,
+    "source_alpha_pixels": 132035,
+    "source_bbox_readable": [
+      435,
+      19,
+      1357,
+      238
+    ],
+    "approved_korean": "여자친구와 함께 골에 도착하세요.",
+    "line_breaks": [
+      "여자친구와 함께",
+      "골에 도착하세요."
+    ],
+    "transform": "flip_y",
+    "slant_dx_per_dy": 0.2753623188405797,
+    "slant_angle_deg": 15.39554925399509,
+    "core_pixels": 24073,
+    "core_bbox_readable": [
+      626,
+      42,
+      1164,
+      213
+    ],
+    "effect_pixels": 76445,
+    "effect_bbox_readable": [
+      617,
+      33,
+      1173,
+      222
+    ],
+    "safe_bbox_readable": [
+      437,
+      21,
+      1354,
+      235
+    ],
+    "permitted_block_aligned_region_readable": [
+      612,
+      28,
+      1180,
+      228
+    ],
+    "changed_blocks": 9559,
+    "korean_color_blocks": 5255,
+    "english_removal_alpha_only_blocks": 4304,
+    "candidate_alpha_pixels": 76445,
+    "candidate_bbox_readable": [
+      617,
+      33,
+      1173,
+      222
+    ],
+    "candidate_sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
+    "candidate_git_blob_sha": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+    "dds_header_128_exact": true,
+    "changed_decoded_pixels": 139619,
+    "changed_decoded_pixels_outside_allowed": 0,
+    "alpha_introduced_outside_permitted": 0,
+    "english_only_residual_alpha_pixels": 0,
+    "containment_pass": true
+  },
+  "visual_qa": {
+    "full_compare": "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_SOURCE_VS_KOREAN_FULL_READABLE.png",
+    "crop_compare": "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_SOURCE_VS_KOREAN_CROP_READABLE.png",
+    "compare_layout": "left = exact pinned English HD source decoded and flip_y to readable; right = decoded-final Korean DXT5 candidate under the identical crop/scale; gray matte only for visibility",
+    "manual_review": "PASS: two-line Korean is readable, right-slanted in the source direction, white core/dark-navy effect hierarchy is preserved, no clipping or source-language ghosting is visible.",
+    "source_language_visible": false,
+    "clipping": false,
+    "overflow": false,
+    "wrong_orientation": false
+  },
+  "dds_static_qa": {
+    "source_bytes": 524416,
+    "candidate_bytes": 524416,
+    "source_fourcc": "DXT5",
+    "candidate_fourcc": "DXT5",
+    "source_mip_count": 1,
+    "candidate_mip_count": 1,
+    "header_128_exact": true,
+    "candidate_bbox_inside_safe_bbox": true,
+    "changed_decoded_pixels_outside_allowed": 0,
+    "alpha_introduced_outside_permitted": 0,
+    "english_only_residual_alpha_pixels": 0
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

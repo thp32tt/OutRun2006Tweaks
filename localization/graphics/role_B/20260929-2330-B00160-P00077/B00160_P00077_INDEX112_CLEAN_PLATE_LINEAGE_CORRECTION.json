@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+  "index": 112,
+  "asset": "D41D0B1",
+  "predecessor": "localization/graphics/role_B/20260929-2223-B00155-P00074/B00155_P00074_INDEX112_CLEAN_PLATE_STYLE_QA.json",
+  "c_disposition": "LOCALIZATION-LOCALIZATION_C-00159 REWORK_REQUIRED",
+  "correction": {
+    "incorrect_prior_label": "synchronous 8-neighbor arithmetic mean",
+    "corrected_topology": "synchronous 4-neighbor frontier diffusion from immutable original alpha==0 pixels",
+    "observed_convergence_iterations": 49,
+    "independent_recheck": "Exact pinned DXT5 source was decoded again. Both floor-channel and nearest-channel 4-neighbor frontier variants converge in 49 iterations, independently confirming the topology signal called out by C00159.",
+    "exact_prior_png_regeneration_claimed": false,
+    "prior_clean_plate_png_blob": "800a071cc3cd335a3904a31cbb9b5e4b28ea870d",
+    "prior_clean_plate_rgba_sha256_recorded": "cc1f1f22862338f3b601ab5b552d48814a4d5f00b937ca6ca4fc05a03376d48c",
+    "rationale": "The rework defect was the recorded neighbor topology. Candidate construction does not depend on hidden RGB under zero alpha: source-English-only BC3 blocks preserve the canonical source color bytes while alpha is cleared; Korean blocks receive new visible style colors. Decoded-final QA is therefore authoritative for the produced DDS."
+  },
+  "candidate_completion": "Completed in the same resumed producer task through Korean render, DXT5 encode, decoded-final QA, and persisted source-vs-candidate proof."
+}

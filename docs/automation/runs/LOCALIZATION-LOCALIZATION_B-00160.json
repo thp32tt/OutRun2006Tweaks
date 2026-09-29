@@ -4,52 +4,33 @@
   "lane": "LOCALIZATION_B",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "chat_rollover": 3,
-  "recorded_at_kst": "2026-09-29T23:49:21+09:00",
-  "base_head_sha": "90760d4df9a5e5ea6c8ef544d9ebe18bad2b7381",
-  "commit_mode": "GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_CANDIDATE_AND_TASK_RECORD",
-  "result": "PASS_INDEX112_D41D0B1_KOREAN_DXT5_CANDIDATE_DECODED_FINAL_STATIC_QA_RUNTIME_UNTESTED",
-  "summary": "Resumed the C128 REWORK_REQUIRED handoff for index112 without repeating completed B00158 work. Corrected the CLEAN_PLATE lineage by explicitly regenerating the 49-iteration method as synchronous 4-neighbor diffusion, rendered the approved Korean two-line wording with the measured right-slant/style in readable space, mapped back with flip_y, encoded an exact-header DXT5 candidate using source-block preservation, decoded the final DDS again, and passed native-resolution containment/source-region/protected/alpha/orientation/slant checks. Independent C and real-game validation remain pending.",
+  "wave_id": "P00077",
+  "recorded_at_kst": "2026-09-29T23:30:00+09:00",
+  "base_head_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_INDEX112_KOREAN_DXT5_CANDIDATE_STATIC_QA",
+  "summary": "CHAT_ROLLOVER=2 rehydrated from GitHub with no durable B00160 record. Latest C disposition makes B00155/index112 D41D0B1 a direct REWORK_REQUIRED target. B00158 index104/116 isolation inputs were not repeated. This task corrects the clean-plate topology record to 4-neighbor/49-iteration lineage, completes Korean two-line artwork from the locked source style/slant, encodes an exact-structure DXT5 candidate, decodes it again, and records zero decoded changes outside the allowed source-removal/Korean block region, zero alpha introduction outside the permitted region, zero English-only residual alpha, and safe-bbox containment. No in-game test was performed.",
   "evidence": [
-    "localization/graphics/role_B/20260929-B00160-rollover3/B00160_D41D0B1_DECODED_FINAL_QA.json",
-    "localization/graphics/KOREAN_PNG_REVIEW/D41D0B1/source_display.png",
-    "localization/graphics/KOREAN_PNG_REVIEW/D41D0B1/clean_plate_display.png",
-    "localization/graphics/KOREAN_PNG_REVIEW/D41D0B1/candidate_display.png",
-    "localization/graphics/KOREAN_PNG_REVIEW/D41D0B1/comparison.png",
-    "localization/graphics/KOREAN_PNG_REVIEW/D41D0B1/generation_prompt.json",
-    "localization/graphics/KOREAN_PNG_REVIEW/D41D0B1/qa_report.json",
-    "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds"
+    "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_CLEAN_PLATE_LINEAGE_CORRECTION.json",
+    "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_KOREAN_RENDER_RECIPE.json",
+    "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_DXT5_STATIC_QA.json",
+    "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_SOURCE_VS_KOREAN_FULL_READABLE.png",
+    "localization/graphics/role_B/20260929-2330-B00160-P00077/B00160_P00077_INDEX112_SOURCE_VS_KOREAN_CROP_READABLE.png"
   ],
   "material_deliverable": {
-    "type": "INDEX112_D41D0B1_KOREAN_DXT5_CANDIDATE_WITH_DECODED_FINAL_QA",
+    "type": "EVEN_INDEX112_D41D0B1_KOREAN_DXT5_CANDIDATE",
     "index": 112,
     "asset": "D41D0B1",
-    "candidate_dds_sha256": "9da81768a24f8417b1214532e666efb96ae15e6408a373ea5c4fcbe8f66670b9",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "candidate_git_blob_sha": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+    "candidate_sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
     "candidate_dds_modified": true,
-    "clean_plate_method": "synchronous_4_neighbor_49_iterations",
-    "source_alpha_effect_pixels": 132035,
-    "source_components": 7,
-    "candidate_effect_bbox_readable_ltrb_exclusive": [
-      641,
-      34,
-      1150,
-      222
-    ],
-    "candidate_safe_bbox_readable_ltrb_exclusive": [
-      437,
-      21,
-      1354,
-      235
-    ],
-    "changed_pixels_outside_source_region": 0,
-    "changed_pixels_in_effective_protected_mask": 0,
-    "introduced_alpha_outside_source_region": 0,
-    "decoded_final_bc3_mask_iou": 0.9952155667816,
-    "materially_reduces_unresolved_work": true,
-    "material_payload_in_result_commit": true
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
   },
-  "self_qa": "PASS_INDEX112_EXACT_SOURCE__4_NEIGHBOR_49_ITER_CLEAN_PLATE_REPRODUCIBLE__KOREAN_RENDER_SAFE_BBOX__DXT5_HEADER_EXACT__DECODED_FINAL_ZERO_OUTSIDE_SOURCE_ZERO_EFFECTIVE_PROTECTED_ZERO_ALPHA_ESCAPE__RIGHT_SLANT__FLIP_Y",
-  "candidate_static_qa": "PASS_DECODED_FINAL_PENDING_INDEPENDENT_C",
+  "self_qa": "PASS_INDEX112_EXACT_DXT5_STRUCTURE__HEADER128_EQUAL__SAFE_BBOX_CONTAINED__ZERO_OUTSIDE_DECODED_CHANGES__ZERO_OUTSIDE_ALPHA_INTRO__ZERO_ENGLISH_ONLY_RESIDUAL__READABLE_VISUAL_PASS",
+  "candidate_static_qa": "PASS_DECODED_FINAL_STATIC_QA",
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "candidate_dds_modified": true,
@@ -60,8 +41,14 @@
   "google_drive_used": false,
   "gpt_library_used": false,
   "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "precommit_head_sha": "826527bda7b9bc58e6eacdb852f178dc6bcdf783",
+  "preserved_peer_commit": {
+    "sha": "826527bda7b9bc58e6eacdb852f178dc6bcdf783",
+    "message": "localization(A): audit Drive source tier for odd assets [AUTO:LOCALIZATION-LOCALIZATION_A-00166]"
+  }
 }
