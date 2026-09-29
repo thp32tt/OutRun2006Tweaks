@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-c-batch-independent-qa-v1",
+  "recorded_at_kst": "2026-09-29T19:24:32+09:00",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00124",
+  "qa_batch_id": "Q00015",
+  "run": "C117",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00015",
+  "base_head": "e6c3159520d26b085bd8f28fda049320aabab511",
+  "source_policy": "GITHUB_SSOT_ONLY_NO_N100_CLONE_WORKTREE_GPT_LIBRARY",
+  "qa_batch_inputs": [
+    "LOCALIZATION-LOCALIZATION_A-00117@de18acae8067fb4fab4c9a008b54b6a0497bf0f0",
+    "LOCALIZATION-LOCALIZATION_B-00115@31992c1ff6d0f7b900752b60fd3b5d353911a8bc",
+    "LOCALIZATION-LOCALIZATION_A-00118@2a6e9fcadf478ca1bdb915d3a7326299f5667fd0",
+    "LOCALIZATION-LOCALIZATION_B-00119@5f2bf20c43babd88a5abca9b2fb8430a6a97cdb4"
+  ],
+  "reviewed_indices": [
+    36,
+    38,
+    128,
+    159,
+    173,
+    188,
+    193,
+    201,
+    205,
+    206,
+    225,
+    226,
+    227,
+    231,
+    232
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00117",
+      "result_sha": "de18acae8067fb4fab4c9a008b54b6a0497bf0f0",
+      "status": "REWORK_REQUIRED",
+      "reason": "Exact RESULT_SHA is durable. Index159 repair is valid: its re-emitted A00109 payload is exact JSON-equivalent to accepted evidence blob 3a4d8cbd19937332271730c2230a33c9bc77621f, so unchanged C115 15/15 stock QA is reused. All 51/51 task source/Korean pairs match current transcription/artwork-plan data and 205/227/231 upstream atlas metadata is internally consistent (118 regions). But new work orders are not based on current canonical user-HD inventory: 205 uses 4096x2048 Release geometry vs canonical 1024x512; 227 uses 2048x2048 vs canonical 512x512; 231 dimensions match 2048x1024 but Release identity is not hash-gated to canonical inventory SHA-256. Retain index159 accepted submaterial; rebuild 205/227/231 from exact canonical HD sources."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00115",
+      "result_sha": "31992c1ff6d0f7b900752b60fd3b5d353911a8bc",
+      "status": "REWORK_REQUIRED",
+      "reason": "Exact RESULT_SHA is durable; 10/10 canonical semantic pairs and 11/11 2px inspection-guard formulas are internally valid. Canonical source gate fails: index38 is de-duplicated onto index36's 4096x4096 Release source although canonical inventory records a distinct 1024x1024 RGBA source; index206 uses 2048x1024 BC3/DXT5 Release while canonical inventory is 2048x1024 RGBA. Indices36/128 dimensions and format class match but their Release blobs are not hash-gated to canonical inventory SHA-256 identities. Rebuild all four work orders from exact canonical inventory and only de-duplicate 36/38 if exact source identity is proven."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00118",
+      "result_sha": "2a6e9fcadf478ca1bdb915d3a7326299f5667fd0",
+      "status": "PASS",
+      "reason": "Exact RESULT_SHA is durable and the limited stock-prior claim independently reproduces. C re-fetched all four pinned stock DDS files and four stock atlases at Sonic-TV/OR2006Sprites@a95efe01; Git blob identities, DXT5 headers/dimensions/base payload sizes and atlas identities match. Direct BC3 alpha re-decode reproduces all 66/66 reported alpha>0 and alpha>=128 region counts/bboxes with integer-floor interpolation in direct atlas coordinates. All 60/60 source/Korean pairs equal current transcriptions and artwork plan. PASS is limited to reconstruction-prior evidence; exact canonical-HD pixels, semantic binding, masks/CLEAN_PLATE/safe bbox/Korean candidate/containment/source comparison remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00119",
+      "result_sha": "5f2bf20c43babd88a5abca9b2fb8430a6a97cdb4",
+      "status": "REWORK_REQUIRED",
+      "reason": "Exact RESULT_SHA is durable and internally consistent: 16/16 canonical pairs match current metadata; all three pinned 4x atlases re-fetch with exact blob identities and 22/22 regions in bounds; all 22 strict 2px guards and linear-RGBA payload-scope formulas reproduce. Release dimensions/format class match current inventory for 188/226/232, but the producer proves only Sonic-TV Release Git blobs, not equality to the exact canonical user-HD inventory SHA-256 sources. Same canvas/format is insufficient under the canonical-HD rule. Rebuild or re-emit with exact canonical inventory source identity proof."
+    }
+  ],
+  "source_identity_validation": "REWORK_A00117_205_227_CANONICAL_DIMENSIONS_DIVERGE_231_IDENTITY_UNPROVEN__REWORK_B00115_INDEX38_ALIAS_DIMENSION_DIVERGENCE_INDEX206_FORMAT_DIVERGENCE_AND_36_128_IDENTITY_UNPROVEN__PASS_A00118_EXACT_STOCK_PRIOR_4_DDS_4_ATLAS_66_ALPHA_METRICS__REWORK_B00119_RELEASE_NOT_HASH_GATED_TO_CANONICAL_USER_HD",
+  "canonical_semantic_validation": "PASS_A00117_51_OF_51__B00115_10_OF_10__A00118_60_OF_60__B00119_16_OF_16",
+  "geometry_mapping_validation": "A00117_INDEX159_REEMIT_EXACT_REUSED_C115__118_ATLAS_REGIONS_INTERNAL_PASS_CANONICAL_SOURCE_REWORK__B00115_11_OF_11_GUARDS_INTERNAL_PASS_CANONICAL_SOURCE_REWORK__A00118_66_OF_66_STOCK_ALPHA_METRICS_REPRODUCED__B00119_22_OF_22_ATLAS_GUARD_PAYLOAD_INTERNAL_PASS_CANONICAL_IDENTITY_REWORK",
+  "current_contract_compatibility": "PASS_A00118_LIMITED_STOCK_PRIOR_ONLY__REWORK_A00117_B00115_B00119_CANONICAL_USER_HD_SOURCE_RULE__NO_CANDIDATE_PROMOTION",
+  "material_content_qa": {
+    "A00117": {
+      "durable_task_record": true,
+      "index159_reemit_exact": true,
+      "index159_heavy_qa": "REUSED_C115_15_OF_15",
+      "canonical_pairs": "51/51",
+      "new_atlas_regions": "118/118 internal",
+      "canonical_source_result": "REWORK_205_227_DIMENSION_DIVERGENCE_231_IDENTITY_UNPROVEN"
+    },
+    "B00115": {
+      "durable_task_record": true,
+      "canonical_pairs": "10/10",
+      "inspection_guards": "11/11",
+      "canonical_source_result": "REWORK_38_ALIAS_DIMENSION_206_FORMAT_36_128_IDENTITY"
+    },
+    "A00118": {
+      "durable_task_record": true,
+      "exact_stock_dds": "4/4",
+      "exact_stock_atlases": "4/4",
+      "decoded_alpha_region_metrics": "66/66",
+      "canonical_pairs": "60/60",
+      "content_result": "PASS_LIMITED_STOCK_PRIOR_ONLY"
+    },
+    "B00119": {
+      "durable_task_record": true,
+      "canonical_pairs": "16/16",
+      "atlases": "3/3 exact; 22 regions",
+      "inspection_guards_and_payloads": "22/22",
+      "canonical_source_result": "REWORK_RELEASE_IDENTITY_NOT_PROVEN_EQUAL_CANONICAL_SHA256"
+    }
+  },
+  "metadata_reconciled_segments": 0,
+  "canonical_transcribed_segments_after_merge": 753,
+  "actionable_localize_text_after": 93,
+  "pending_production_localize_text_after": 76,
+  "superseded_inputs": [],
+  "newer_disjoint_producers": [
+    "LOCALIZATION-LOCALIZATION_A-00121",
+    "LOCALIZATION-LOCALIZATION_B-00122",
+    "LOCALIZATION-LOCALIZATION_A-00123",
+    "LOCALIZATION-LOCALIZATION_B-00125"
+  ],
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00015_ONE_INPUT_PASS_THREE_REWORK_REQUIRED_NO_DDS_RUNTIME_UNTESTED",
+  "report": "localization/graphics/role_C/20260929-1924-C117/C117_Q00015_INDEPENDENT_QA_BATCH.json",
+  "rework_required_inputs": [
+    "LOCALIZATION-LOCALIZATION_A-00117@de18acae8067fb4fab4c9a008b54b6a0497bf0f0",
+    "LOCALIZATION-LOCALIZATION_B-00115@31992c1ff6d0f7b900752b60fd3b5d353911a8bc",
+    "LOCALIZATION-LOCALIZATION_B-00119@5f2bf20c43babd88a5abca9b2fb8430a6a97cdb4"
+  ],
+  "passed_inputs": [
+    "LOCALIZATION-LOCALIZATION_A-00118@2a6e9fcadf478ca1bdb915d3a7326299f5667fd0"
+  ],
+  "shared_state_modified": true,
+  "candidate_dds_modified_by_c": false,
+  "input_candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
