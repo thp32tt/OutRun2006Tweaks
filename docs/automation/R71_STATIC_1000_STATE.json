@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 60,
+  "completedCycles": 80,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "4cde872370d8dbb86a659e5d46dad18063ba7a13",
+  "currentHead": "1acd732700abf8cd77c5e93aa5b6090337ce4fc7",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1700,15 +1700,535 @@
       "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "consume CI only when completed"
+    },
+    {
+      "cycle": 61,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "A white selector car can result from texture/resource/material state, but static differential alone cannot distinguish them; do not choose a fix without exact draw evidence."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace selector resource upload and texture0"
+    },
+    {
+      "cycle": 62,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Global texture-stage forcing would affect world geometry and is prohibited without exact selector ownership."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "capture selector-specific stage state first"
+    },
+    {
+      "cycle": 63,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Colorless geometry may be material or texture driven; exact material evidence is required before mutation."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "bind material evidence to selector producer"
+    },
+    {
+      "cycle": 64,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "R30 SkyGlow restoration covers primary blend states, so a persistent HUD alpha symptom may originate upstream or in untracked stages; do not infer a leak from symptom alone."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect owned HUD stage state"
+    },
+    {
+      "cycle": 65,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu head-follow behavior is an ownership/anchor problem distinct from alpha; keep fixes separated."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace menu anchor producer"
+    },
+    {
+      "cycle": 66,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Suppressing a generic HUD pass could hide legitimate timer updates; exact duplicate producer identity is required."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace checkpoint producer identity"
+    },
+    {
+      "cycle": 67,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Result-screen duplication may span different queue epochs; frame-local blanket dedup is unsafe."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace result queue epochs"
+    },
+    {
+      "cycle": 68,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Projected markers require per-eye projected correction while world billboards retain world depth; preserve two-route model."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect per-eye marker evidence"
+    },
+    {
+      "cycle": 69,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Visual fixes must preserve Reset/stateblock lifetime invariants; no evidence supports reintroducing pre-Reset Apply behavior."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "retain reset invariant"
+    },
+    {
+      "cycle": 70,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "No frame-pacing/copy/wait tuning without telemetry; visual P0 remains higher priority."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue visual-first"
+    },
+    {
+      "cycle": 71,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "A white selector car can result from texture/resource/material state, but static differential alone cannot distinguish them; do not choose a fix without exact draw evidence."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace selector resource upload and texture0"
+    },
+    {
+      "cycle": 72,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Global texture-stage forcing would affect world geometry and is prohibited without exact selector ownership."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "capture selector-specific stage state first"
+    },
+    {
+      "cycle": 73,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Colorless geometry may be material or texture driven; exact material evidence is required before mutation."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "bind material evidence to selector producer"
+    },
+    {
+      "cycle": 74,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "R30 SkyGlow restoration covers primary blend states, so a persistent HUD alpha symptom may originate upstream or in untracked stages; do not infer a leak from symptom alone."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect owned HUD stage state"
+    },
+    {
+      "cycle": 75,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu head-follow behavior is an ownership/anchor problem distinct from alpha; keep fixes separated."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace menu anchor producer"
+    },
+    {
+      "cycle": 76,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Suppressing a generic HUD pass could hide legitimate timer updates; exact duplicate producer identity is required."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace checkpoint producer identity"
+    },
+    {
+      "cycle": 77,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Result-screen duplication may span different queue epochs; frame-local blanket dedup is unsafe."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace result queue epochs"
+    },
+    {
+      "cycle": 78,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Projected markers require per-eye projected correction while world billboards retain world depth; preserve two-route model."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect per-eye marker evidence"
+    },
+    {
+      "cycle": 79,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Visual fixes must preserve Reset/stateblock lifetime invariants; no evidence supports reintroducing pre-Reset Apply behavior."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "retain reset invariant"
+    },
+    {
+      "cycle": 80,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "No frame-pacing/copy/wait tuning without telemetry; visual P0 remains higher priority."
+      ],
+      "evidence": [
+        "bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "1acd732700abf8cd77c5e93aa5b6090337ce4fc7"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue visual-first"
     }
   ],
   "nextCycle": {
-    "cycle": 61,
+    "cycle": 81,
     "priority": [
-      "consume hosted CI when completed",
-      "continue exact visual ownership review"
+      "consume hosted CI",
+      "continue selector/HUD exact evidence review"
     ],
-    "guard": "performance-only work paused; frozen 34eef500 package immutable"
+    "guard": "no performance-only tuning; frozen package immutable"
   },
   "updatedKst": "2026-09-29T12:29:00+09:00",
   "workPolicy": {
