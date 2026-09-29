@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-schema9-independent-c-batch-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00150",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_AND_SHARED_STATE_MERGER",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00023",
+  "qa_batch_id": "Q00023",
+  "recorded_at_kst": "2026-09-29T21:58:00+09:00",
+  "base_head_sha": "40ddc5bece0c62c1973e5297e7831d958c45bb3b",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00144",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "8b4f5ce719ef813b9efe2d786067149e2452fccd",
+      "result_message": "localization(B): requalify canonical source for index152 [AUTO:LOCALIZATION-LOCALIZATION_B-00144]",
+      "completed_at": "2026-09-29T21:35:41.619233+09:00",
+      "producer_id": "P00067",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00146",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "b1d6aa128d62094b08bbeb08158d667b4332d4da",
+      "result_message": "localization(A): verify source and narrow panel segmentation [AUTO:LOCALIZATION-LOCALIZATION_A-00146]",
+      "completed_at": "2026-09-29T21:39:41.655544+09:00",
+      "producer_id": "P00068",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00144",
+      "result_sha": "8b4f5ce719ef813b9efe2d786067149e2452fccd",
+      "status": "PASS",
+      "reason": "Durable exact producer result and lane-local report exist at the immutable RESULT_SHA. C independently re-fetched envido32/OR2006Sprites@55f67a813dd3603d201d0be0da47c071965f53a4 Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds and reproduced Git blob 0288babbb9c70e8f092bdd15561db4cadc19dcb3, 65,664 bytes, SHA-256 de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77, DDS 512x128 DXT5 mip1, exactly matching current canonical inventory. The same immutable source blob underlies B00104 and its independent C115/Q00013 PASS, so the previously reproduced 4/4 full-effect bboxes and 4/4 v2 2px safe-bbox formulas may be reused without repeating unchanged heavy geometry QA. Current contract changes since B00144 only clarify typed source-transport misses and do not invalidate that geometry evidence. PRO./INS./G.M./E.R. translations and '89/'86 preserve-original semantics match the current canonical transcription. PASS is limited PREFLIGHT_ONLY_NARROWED: per-pixel removal/protected masks, independently validated CLEAN_PLATE, source typography/slant, Korean render, exact candidate DDS, zero-pixel containment and English-source-vs-Korean-candidate gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00146",
+      "result_sha": "b1d6aa128d62094b08bbeb08158d667b4332d4da",
+      "status": "PASS",
+      "reason": "Durable exact producer result and lane-local report exist at the immutable RESULT_SHA. For index99/4F68708E, C independently re-fetched pinned Git blob eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8, 524,416 bytes, SHA-256 d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2, DDS 2048x256 DXT5 mip1, exactly matching current inventory; direct BC3 decode independently reproduced line1 core 18,531 px bbox [527,53,1600,119], line2 core 14,332 px bbox [547,139,1340,205], bright190 line1 15,144 px bbox [528,53,1600,119], and line2 11,867 px bbox [548,139,1339,205]. These are text-core segmentation seeds only and are not promoted to final effect/removal masks or safe bboxes. For index215/C05E67EF, C independently re-fetched pinned Git blob 6109bf8757aff5aeb11654e94356e303ed2179d4 and reproduced SHA-256 c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff, 512x256 RGBA32 mip1, which does not match current canonical inventory SHA-256 69e5a72b51d6a6a1b2dda1d115713c74dca1792564e703f43d8bb4c39b9cf2ac. A00053 used that same stale 6109bf... lineage, so retiring its old CLEAN_PLATE as current-canonical construction input is correct. Current translations for index99 and index215 match canonical transcription. No new Korean DDS exists, so candidate-only DDS/alpha/orientation/zero-pixel/source-comparison gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "canonical_inventory_fingerprint": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+  "transcription_fingerprint": "60f66aefae9a2454e9ae795f9570405ac742883e",
+  "orientation_policy_fingerprint": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+  "qa_contract_fingerprint": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+  "immutable_result_records": {
+    "b00144_task_blob_sha": "d8bad62fa5012cd5dc8033d9ab95a544930186dd",
+    "b00144_report_blob_sha": "9745e926af6dbe7d34f810d03e17bf1e21da1468",
+    "a00146_task_blob_sha": "2f48d9b85a9cf268191cddd3d58fdd5d1cb69a18",
+    "a00146_report_blob_sha": "5558a986d7e2c92fa660f3756b800f51655d785b"
+  },
+  "independent_github_source_checks": {
+    "index152": {
+      "asset": "49BB5FE5",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+      "bytes": 65664,
+      "sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+      "inventory_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+      "identity": "PASS_EXACT",
+      "dds": {
+        "width": 512,
+        "height": 128,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "payload_bytes": 65536
+      },
+      "reused_prior_independent_c_evidence": {
+        "task_id": "LOCALIZATION-LOCALIZATION_C-00116",
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00104",
+        "source_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+        "effect_bboxes_reproduced_previously": 4,
+        "candidate_safe_bboxes_reproduced_previously": 4,
+        "reuse_status": "PASS_UNCHANGED_HEAVY_FINGERPRINT"
+      }
+    },
+    "index99": {
+      "asset": "4F68708E",
+      "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+      "bytes": 524416,
+      "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "inventory_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "identity": "PASS_EXACT",
+      "dds": {
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1,
+        "payload_bytes": 524288
+      },
+      "raw_to_readable_orientation_evidence": "mirror-Y_FROM_UNCHANGED_A00041_SOURCE_FINGERPRINT__FINAL_GENERATION_ORIENTATION_STILL_MUST_FOLLOW_CURRENT_POLICY_PIXEL_PROOF",
+      "independently_reproduced_segmentation": {
+        "roi_ltrb": [
+          514,
+          39,
+          1613,
+          218
+        ],
+        "line_split_y": 130,
+        "seed_rule": "alpha>0 AND Rec.601 luminance>=80; text-core seed only, not final full-effect/removal mask",
+        "line1_core": {
+          "pixels": 18531,
+          "bbox_ltrb": [
+            527,
+            53,
+            1600,
+            119
+          ]
+        },
+        "line2_core": {
+          "pixels": 14332,
+          "bbox_ltrb": [
+            547,
+            139,
+            1340,
+            205
+          ]
+        },
+        "line1_bright190": {
+          "pixels": 15144,
+          "bbox_ltrb": [
+            528,
+            53,
+            1600,
+            119
+          ]
+        },
+        "line2_bright190": {
+          "pixels": 11867,
+          "bbox_ltrb": [
+            548,
+            139,
+            1339,
+            205
+          ]
+        },
+        "result": "PASS_EXACT_REPRODUCTION"
+      }
+    },
+    "index215": {
+      "asset": "C05E67EF",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64.dds",
+      "obtained_git_blob_sha": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+      "bytes": 524416,
+      "obtained_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+      "inventory_sha256": "69e5a72b51d6a6a1b2dda1d115713c74dca1792564e703f43d8bb4c39b9cf2ac",
+      "identity": "SOURCE_IDENTITY_MISMATCH",
+      "dds": {
+        "width": 512,
+        "height": 256,
+        "format": "RGBA32_MASKS",
+        "mip_count": 1,
+        "pitch": 2048,
+        "channel_masks": [
+          "0x000000FF",
+          "0x0000FF00",
+          "0x00FF0000",
+          "0xFF000000"
+        ]
+      },
+      "stale_lineage": {
+        "prior_task": "LOCALIZATION-LOCALIZATION_A-00053",
+        "prior_report_blob_sha": "5af41f797308fbaefb383c18f20a02b6e84ab5a7",
+        "prior_source_git_blob_sha": "6109bf8757aff5aeb11654e94356e303ed2179d4",
+        "prior_source_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+        "prior_clean_plate_status": "RETIRED_AS_CURRENT_CANONICAL_CONSTRUCTION_INPUT"
+      }
+    }
+  },
+  "semantic_checks": {
+    "total_current_entries": 13,
+    "localizable_entries": 11,
+    "preserve_original_entries": 2,
+    "index99": [
+      {
+        "source": "Drive against the Ghost Car and challenge for the course record!!",
+        "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+      }
+    ],
+    "index152": [
+      {
+        "source": "'89",
+        "korean": "'89",
+        "policy": "preserve_original"
+      },
+      {
+        "source": "'86",
+        "korean": "'86",
+        "policy": "preserve_original"
+      },
+      {
+        "source": "PRO.",
+        "korean": "프로"
+      },
+      {
+        "source": "INS.",
+        "korean": "연주"
+      },
+      {
+        "source": "G.M.",
+        "korean": "기타"
+      },
+      {
+        "source": "E.R.",
+        "korean": "유로"
+      }
+    ],
+    "index215": [
+      {
+        "source": "GOAL A",
+        "korean": "골 A"
+      },
+      {
+        "source": "GOAL B",
+        "korean": "골 B"
+      },
+      {
+        "source": "GOAL C",
+        "korean": "골 C"
+      },
+      {
+        "source": "GOAL D",
+        "korean": "골 D"
+      },
+      {
+        "source": "GOAL E",
+        "korean": "골 E"
+      },
+      {
+        "source": "15con.",
+        "korean": "15코스"
+      }
+    ],
+    "result": "PASS_CURRENT_CANONICAL"
+  },
+  "candidate_qa": {
+    "current_new_candidates_in_batch": 0,
+    "dds_header_format_mipmap_candidate_gate": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "alpha_transparency_candidate_gate": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "raw_readable_orientation_candidate_gate": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "one_pixel_containment_gate": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate_gate": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "protected_artwork_candidate_gate": "HOLD_STRICT_RECHECK_NO_NEW_CANDIDATE",
+    "clipping_or_overflow_approval_granted": false
+  },
+  "supersession_check": {
+    "merge_head": "40ddc5bece0c62c1973e5297e7831d958c45bb3b",
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00149",
+      "LOCALIZATION-LOCALIZATION_B-00148"
+    ],
+    "a00149_explicitly_skipped_qa_pending_indices": [
+      99,
+      215
+    ],
+    "b00148_explicitly_skipped_qa_pending_indices": [
+      152
+    ],
+    "newer_same_asset_candidate_or_source_fingerprints": [],
+    "superseded_inputs": []
+  },
+  "shared_state_merge": {
+    "performed_once": true,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "queue_rows_updated": [
+      99,
+      152,
+      215
+    ],
+    "canonical_progress_mirror_required": true
+  },
+  "execution_constraints": {
+    "n100_used": false,
+    "local_clone_used": false,
+    "google_drive_used": false,
+    "gpt_library_used": false,
+    "build_performed": false,
+    "vr_ffb_dx_changes": false,
+    "runtime_test_performed": false
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00023_TWO_INPUTS_PASS_INDEX152_SOURCE_GEOMETRY_REQUALIFIED_INDEX99_SEGMENTATION_REPRODUCED_INDEX215_STALE_CLEAN_PLATE_RETIRED_NO_DDS_RUNTIME_UNTESTED"
+}
