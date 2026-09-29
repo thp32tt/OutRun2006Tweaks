@@ -1,0 +1,180 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00113",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00044",
+  "recorded_at_kst": "2026-09-29T18:24:52+09:00",
+  "target_branch": "korean-localization-clean",
+  "material_type": "INDEX206_EXACT_STOCK_PIXEL_ORIENTATION_AND_TEXT_CORE_PRIOR",
+  "selection": {
+    "queue_index": 206,
+    "asset": "AEA507A4",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+    "parity": "EVEN_PRIMARY_B",
+    "current_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "current_queue_state": "localize_text/pending_artwork/transcribed_reviewed",
+    "reason": "B00039+C97 confirmed START -> 출발 and sprite_1448 but left exact HD decoded full-effect bbox/raw orientation unresolved; no newer B candidate for index 206 is pending C."
+  },
+  "reused_immutable_evidence": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "b00039_report_blob_sha": "250dc735b808b837177e4046d678190489b446d1",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "stock_dds_blob_sha": "451beb7b8bc53c6e2c16725726192d9ee87b5ec6",
+    "stock_png_blob_sha": "180edf5fe572ebedc83c02c4fa3569b2cf5e6d81",
+    "stock_atlas_blob_sha": "b19bf753802e12d014b3e1a4a60f2c2ed7dd7c02",
+    "atlas_4x_blob_sha": "d013da136524d480b87f06e900e8ee9dfd12c50d",
+    "release_hd_blob_sha": "63a29db6e8eaaface8036a03f87e9de2ad750184",
+    "release_hd_bytes": 2796368,
+    "release_hd_dimensions": [
+      2048,
+      1024
+    ]
+  },
+  "exact_stock_decode": {
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "DXT5",
+    "effective_mipmaps": 1,
+    "dds_bytes": 131200,
+    "sprite": "sprite_1448",
+    "stock_atlas_rect_xywh": [
+      0,
+      87,
+      290,
+      169
+    ],
+    "atlas_4x_rect_xywh": [
+      0,
+      348,
+      1160,
+      676
+    ],
+    "x4_geometry_relation": "PASS_EXACT_4X",
+    "source_semantic": "START",
+    "korean": "출발",
+    "stock_source_text_transform": "flip_y",
+    "raw_sprite_region_inclusive": [
+      0,
+      0,
+      289,
+      168
+    ],
+    "readable_sprite_region_inclusive": [
+      0,
+      87,
+      289,
+      255
+    ],
+    "red_fill_detection_rule": "alpha>20 && R>=120 && R>1.35*G && R>1.15*B",
+    "raw_red_fill_bbox_inclusive": [
+      84,
+      4,
+      131,
+      19
+    ],
+    "readable_red_fill_bbox_inclusive": [
+      84,
+      236,
+      131,
+      251
+    ],
+    "red_fill_pixels": 417,
+    "red_components_8_connected": [
+      {
+        "pixels": 356,
+        "bbox": [
+          85,
+          6,
+          131,
+          16
+        ]
+      },
+      {
+        "pixels": 44,
+        "bbox": [
+          84,
+          4,
+          127,
+          4
+        ]
+      },
+      {
+        "pixels": 8,
+        "bbox": [
+          116,
+          12,
+          119,
+          13
+        ]
+      },
+      {
+        "pixels": 7,
+        "bbox": [
+          114,
+          18,
+          117,
+          19
+        ]
+      },
+      {
+        "pixels": 2,
+        "bbox": [
+          102,
+          18,
+          102,
+          19
+        ]
+      }
+    ],
+    "readable_red_fill_margins_to_sprite_px": {
+      "left": 84,
+      "top": 149,
+      "right": 158,
+      "bottom": 4
+    },
+    "mapped_4x_red_fill_support_inclusive": [
+      336,
+      944,
+      527,
+      1007
+    ],
+    "mapped_4x_red_fill_bottom_margin_to_sprite_px": 16,
+    "finding": "The exact stock DDS places all detected START red-fill pixels inside sprite_1448 only after vertical flip reconciliation. This proves a flip_y stock-source orientation prior and a narrow bottom-edge search envelope for the exact HD decode."
+  },
+  "strict_hold": {
+    "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_UNAVAILABLE_TO_TEXT_CONNECTOR",
+    "release_source_full_effect_bbox": "HOLD_EXACT_HD_PIXEL_DECODE_REQUIRED",
+    "release_removal_mask": "HOLD_NOT_MATERIALIZED",
+    "protected_route_art_mask": "HOLD_NOT_MATERIALIZED",
+    "clean_plate": "HOLD_NOT_MATERIALIZED",
+    "candidate_safe_bbox": "HOLD_SOURCE_FULL_EFFECT_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_INDEX206",
+    "stock_blob_identity": "PASS_451beb7b8bc53c6e2c16725726192d9ee87b5ec6",
+    "stock_dds_header": "PASS_512x256_DXT5_BASE_ONLY",
+    "atlas_geometry": "PASS_STOCK_TO_4X_EXACT",
+    "orientation_prior": "PASS_STOCK_FLIP_Y_FROM_EXACT_PIXELS",
+    "semantic_binding": "PASS_REUSES_B00039_ACCEPTED_START_TO_SPRITE_1448",
+    "full_effect_claim": "NOT_CLAIMED",
+    "candidate_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false
+  },
+  "next_safe_step": "Decode the exact immutable Release blob 63a29db6... at 2048x1024, confirm its header/orientation, derive the effect-inclusive START bbox and protected route-art mask inside sprite_1448, then run clean-plate QA before any Korean lettering.",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "runtime_validation": "UNTESTED"
+}
