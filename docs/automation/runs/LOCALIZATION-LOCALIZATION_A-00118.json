@@ -1,0 +1,149 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00118",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00048",
+  "recorded_at_kst": "2026-09-29T18:48:00+09:00",
+  "base_sha": "fae19edb04d365fe269cc6817cae62c8bd2eff00",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_STOCK_DXT5_ALPHA_REGION_PRIORS_66_REGIONS",
+  "summary": "Advanced odd indices 173/193/201/225 beyond the already C-consumed A00098 v2 direct-inspection work orders by directly fetching and decoding the four exact pinned stock DXT5 sources from GitHub and measuring alpha>0 plus alpha>=128 occupancy/bboxes for all 66 atlas regions. The 60 current canonical semantics remain matched between transcription and artwork plan, but semantic-to-sprite binding is not inferred from atlas order. These stock metrics are reconstruction priors only; canonical Release-HD direct pixel decode, per-element source-effect/removal/protected masks, CLEAN_PLATE, candidate_safe_bbox, Korean candidate, containment and English-source comparison remain HOLD_STRICT_RECHECK. No DDS/shared-state/build/runtime changes were made.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1848-A00118-P00048/A00118_P00048_FOUR_ODD_STOCK_DXT5_ALPHA_PRIORS.json"
+  ],
+  "evidence_blob_sha": "c1347c03ef43967412d24a371b67e603af14d039",
+  "material_deliverable": {
+    "type": "FOUR_ODD_EXACT_STOCK_DXT5_DECODED_ALPHA_REGION_PRIORS",
+    "indices": [
+      173,
+      193,
+      201,
+      225
+    ],
+    "assets": [
+      "6DC89C6E",
+      "97E863AD",
+      "A9ABD877",
+      "E3C455FA"
+    ],
+    "exact_stock_dds_decoded": 4,
+    "exact_stock_atlases_read": 4,
+    "decoded_alpha_region_metrics": 66,
+    "canonical_semantics_verified": 60,
+    "alpha_gt0_pixels_in_regions": 124823,
+    "alpha_ge128_pixels_in_regions": 109560,
+    "alpha_gt0_edge_touch_regions": 52,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00098",
+    "producer_report_blob_sha": "4d732c7f42e99dec7efa5c7e9d325d9bf09a1da8",
+    "current_queue_blob_sha": "8316cb2f563d7064d931591369620d538e5e16c7",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "reason": "A00098's current-v2 inspection scopes/2px guards were already consumed by C. This task adds new direct stock DXT5 decoded-alpha occupancy evidence instead of repeating that work."
+  },
+  "exact_stock_sources": [
+    {
+      "index": 173,
+      "asset": "6DC89C6E",
+      "blob_sha": "5efe6d658d001dacdf2c7f398c5469324b624706",
+      "format": "DXT5",
+      "width": 512,
+      "height": 512,
+      "bytes": 262272,
+      "regions": 21
+    },
+    {
+      "index": 193,
+      "asset": "97E863AD",
+      "blob_sha": "5dfd409b960b5f2a3c8020a8f6ad4144bca441e7",
+      "format": "DXT5",
+      "width": 512,
+      "height": 256,
+      "bytes": 131200,
+      "regions": 18
+    },
+    {
+      "index": 201,
+      "asset": "A9ABD877",
+      "blob_sha": "cabe895aade6db51d1d246115be730f5f45917c2",
+      "format": "DXT5",
+      "width": 512,
+      "height": 512,
+      "bytes": 262272,
+      "regions": 19
+    },
+    {
+      "index": 225,
+      "asset": "E3C455FA",
+      "blob_sha": "24f743d27f0c17c016977d8bbb83ce1ed5768e0f",
+      "format": "DXT5",
+      "width": 512,
+      "height": 256,
+      "bytes": 131200,
+      "regions": 8
+    }
+  ],
+  "skipped_or_deferred": {
+    "qa_pending_or_newer_disjoint": {
+      "LOCALIZATION-LOCALIZATION_A-00112": [
+        147,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00114": [
+        133,
+        135,
+        139,
+        143
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00117": [
+        159,
+        205,
+        227,
+        231
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_173_193_201_225",
+    "current_queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED_AT_COMMIT_REFRESH",
+    "stock_dds": "PASS_4_OF_4_EXACT_PINNED_DXT5_BASE_LEVEL_SIZE_AND_DIMENSIONS",
+    "stock_regions": "PASS_66_OF_66_ALPHA_GT0_AND_ALPHA_GE128_METRICS_MATERIALIZED",
+    "canonical_semantics": "PASS_60_OF_60_TRANSCRIPTION_EQUALS_ARTWORK_PLAN",
+    "semantic_binding": "HOLD_NOT_GUESSED_FROM_ATLAS_ORDER",
+    "release_hd_direct_decode": "HOLD_NOT_PERFORMED",
+    "release_hd_source_effect_masks": "HOLD_NOT_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_MATERIALIZED",
+    "candidate_safe_bbox": "HOLD_NOT_MATERIALIZED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Decoded stock DXT5 alpha metrics materially reduce reconstruction uncertainty but stock pixels are not the canonical HD construction source. Exact Release-HD pixels must still be decoded and each localizable semantic must be proven from source pixels before source-effect/removal/protected masks, CLEAN_PLATE, measured v2 candidate_safe_bbox, Korean lettering, DDS round-trip, zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE comparison can be promoted.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

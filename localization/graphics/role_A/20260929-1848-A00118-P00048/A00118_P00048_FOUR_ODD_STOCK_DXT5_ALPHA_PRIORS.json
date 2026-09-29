@@ -1,0 +1,3196 @@
+{
+  "schema_version": 8,
+  "schema": "outrun-lane-a-stock-dxt5-alpha-prior-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00118",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00048",
+  "recorded_at_kst": "2026-09-29T18:48:00+09:00",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "indices": [
+      173,
+      193,
+      201,
+      225
+    ],
+    "assets": [
+      "6DC89C6E",
+      "97E863AD",
+      "A9ABD877",
+      "E3C455FA"
+    ],
+    "reason": "A00098 v2 work orders were already consumed by C and these four odd rows remain pending_artwork; recent A00112/A00114/A00117 QA-pending indices are excluded."
+  },
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "queue_blob_sha": "8316cb2f563d7064d931591369620d538e5e16c7",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_EXACT_STOCK_DXT5_DECODED_ALPHA_REGION_PRIORS",
+    "exact_stock_dds_decoded": 4,
+    "exact_stock_atlases_read": 4,
+    "region_metrics": 66,
+    "alpha_gt0_pixels_in_regions": 124823,
+    "alpha_ge128_pixels_in_regions": 109560,
+    "regions_touching_cell_edge_at_alpha_gt0": 52,
+    "candidate_dds_modified": false,
+    "description": "Directly decoded the four exact pinned stock DXT5 sources and measured alpha>0 and alpha>=128 occupancy/counts for every atlas region. These are new reconstruction priors only and do not substitute for canonical Release-HD source-effect masks."
+  },
+  "assets": [
+    {
+      "queue_index": 173,
+      "asset": "6DC89C6E",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+      "current_queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantic_count": 21,
+      "canonical_semantics": [
+        {
+          "source": "GHOST FOREST",
+          "korean": "고스트 포레스트"
+        },
+        {
+          "source": "IMPERIAL AVENUE",
+          "korean": "임페리얼 애비뉴"
+        },
+        {
+          "source": "INDUSTRIAL COMPLEX",
+          "korean": "인더스트리얼 컴플렉스"
+        },
+        {
+          "source": "METROPOLIS",
+          "korean": "메트로폴리스"
+        },
+        {
+          "source": "PALM BEACH",
+          "korean": "팜 비치"
+        },
+        {
+          "source": "SNOW MOUNTAIN",
+          "korean": "스노 마운틴"
+        },
+        {
+          "source": "TULIP GARDEN",
+          "korean": "튤립 가든"
+        },
+        {
+          "source": "BIG FOREST",
+          "korean": "빅 포레스트"
+        },
+        {
+          "source": "CANYON",
+          "korean": "캐니언"
+        },
+        {
+          "source": "CASINO TOWN",
+          "korean": "카지노 타운"
+        },
+        {
+          "source": "FLORAL VILLAGE",
+          "korean": "플로럴 빌리지"
+        },
+        {
+          "source": "GIANT STATUES",
+          "korean": "자이언트 스태추"
+        },
+        {
+          "source": "ICE SCAPE",
+          "korean": "아이스 스케이프"
+        },
+        {
+          "source": "JUNGLE",
+          "korean": "정글"
+        },
+        {
+          "source": "LEGEND",
+          "korean": "레전드"
+        },
+        {
+          "source": "LOST CITY",
+          "korean": "로스트 시티"
+        },
+        {
+          "source": "MILKY WAY",
+          "korean": "밀키 웨이"
+        },
+        {
+          "source": "NATIONAL PARK",
+          "korean": "내셔널 파크"
+        },
+        {
+          "source": "SKYSCRAPERS",
+          "korean": "스카이스크레이퍼"
+        },
+        {
+          "source": "SUNNY BEACH",
+          "korean": "서니 비치"
+        },
+        {
+          "source": "WATERFALLS",
+          "korean": "워터폴스"
+        }
+      ],
+      "prior_v2_work_order": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+        "report_blob_sha": "4d732c7f42e99dec7efa5c7e9d325d9bf09a1da8",
+        "region_count": 21,
+        "semantic_binding_status": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_DO_NOT_INFER_BY_LIST_ORDER"
+      },
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+        "git_blob_sha": "5efe6d658d001dacdf2c7f398c5469324b624706",
+        "bytes": 262272,
+        "width": 512,
+        "height": 512,
+        "format": "DXT5/BC3",
+        "mip_header_value": 0,
+        "size_equation": "128 + ceil(512/4) * ceil(512/4) * 16 = 262272"
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512_atlas.json",
+        "git_blob_sha": "5ac856d702f99c12c85fcd188c3153a3fde91cb9",
+        "regions": 21
+      },
+      "decoded_alpha_region_metrics": [
+        {
+          "sprite": "sprite_985",
+          "stock_cell_xywh": [
+            0,
+            488,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1283,
+            "bbox_ltrb": [
+              2,
+              488,
+              167,
+              501
+            ],
+            "bbox_xywh": [
+              2,
+              488,
+              165,
+              13
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1021,
+            "bbox_ltrb": [
+              2,
+              488,
+              166,
+              501
+            ],
+            "bbox_xywh": [
+              2,
+              488,
+              164,
+              13
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_986",
+          "stock_cell_xywh": [
+            0,
+            464,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2201,
+            "bbox_ltrb": [
+              0,
+              464,
+              206,
+              488
+            ],
+            "bbox_xywh": [
+              0,
+              464,
+              206,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1743,
+            "bbox_ltrb": [
+              0,
+              464,
+              206,
+              488
+            ],
+            "bbox_xywh": [
+              0,
+              464,
+              206,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_987",
+          "stock_cell_xywh": [
+            0,
+            440,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2687,
+            "bbox_ltrb": [
+              0,
+              440,
+              252,
+              464
+            ],
+            "bbox_xywh": [
+              0,
+              440,
+              252,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2093,
+            "bbox_ltrb": [
+              0,
+              440,
+              251,
+              464
+            ],
+            "bbox_xywh": [
+              0,
+              440,
+              251,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_988",
+          "stock_cell_xywh": [
+            0,
+            416,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2118,
+            "bbox_ltrb": [
+              0,
+              416,
+              252,
+              440
+            ],
+            "bbox_xywh": [
+              0,
+              416,
+              252,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1638,
+            "bbox_ltrb": [
+              1,
+              416,
+              251,
+              440
+            ],
+            "bbox_xywh": [
+              1,
+              416,
+              250,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_989",
+          "stock_cell_xywh": [
+            0,
+            392,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1664,
+            "bbox_ltrb": [
+              0,
+              392,
+              143,
+              416
+            ],
+            "bbox_xywh": [
+              0,
+              392,
+              143,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1299,
+            "bbox_ltrb": [
+              1,
+              392,
+              142,
+              416
+            ],
+            "bbox_xywh": [
+              1,
+              392,
+              141,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_990",
+          "stock_cell_xywh": [
+            0,
+            368,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2155,
+            "bbox_ltrb": [
+              0,
+              368,
+              192,
+              392
+            ],
+            "bbox_xywh": [
+              0,
+              368,
+              192,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1663,
+            "bbox_ltrb": [
+              1,
+              368,
+              192,
+              392
+            ],
+            "bbox_xywh": [
+              1,
+              368,
+              191,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_991",
+          "stock_cell_xywh": [
+            0,
+            344,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1927,
+            "bbox_ltrb": [
+              0,
+              344,
+              192,
+              368
+            ],
+            "bbox_xywh": [
+              0,
+              344,
+              192,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1532,
+            "bbox_ltrb": [
+              0,
+              344,
+              192,
+              368
+            ],
+            "bbox_xywh": [
+              0,
+              344,
+              192,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_992",
+          "stock_cell_xywh": [
+            0,
+            320,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1622,
+            "bbox_ltrb": [
+              1,
+              320,
+              163,
+              344
+            ],
+            "bbox_xywh": [
+              1,
+              320,
+              162,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1304,
+            "bbox_ltrb": [
+              1,
+              320,
+              163,
+              344
+            ],
+            "bbox_xywh": [
+              1,
+              320,
+              162,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_993",
+          "stock_cell_xywh": [
+            0,
+            296,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1176,
+            "bbox_ltrb": [
+              1,
+              296,
+              126,
+              320
+            ],
+            "bbox_xywh": [
+              1,
+              296,
+              125,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 961,
+            "bbox_ltrb": [
+              1,
+              296,
+              125,
+              320
+            ],
+            "bbox_xywh": [
+              1,
+              296,
+              124,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_994",
+          "stock_cell_xywh": [
+            0,
+            272,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1409,
+            "bbox_ltrb": [
+              1,
+              272,
+              151,
+              296
+            ],
+            "bbox_xywh": [
+              1,
+              272,
+              150,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1160,
+            "bbox_ltrb": [
+              1,
+              272,
+              150,
+              296
+            ],
+            "bbox_xywh": [
+              1,
+              272,
+              149,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_995",
+          "stock_cell_xywh": [
+            0,
+            248,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1781,
+            "bbox_ltrb": [
+              0,
+              248,
+              185,
+              272
+            ],
+            "bbox_xywh": [
+              0,
+              248,
+              185,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1466,
+            "bbox_ltrb": [
+              1,
+              248,
+              185,
+              272
+            ],
+            "bbox_xywh": [
+              1,
+              248,
+              184,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_996",
+          "stock_cell_xywh": [
+            0,
+            224,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2113,
+            "bbox_ltrb": [
+              0,
+              224,
+              185,
+              248
+            ],
+            "bbox_xywh": [
+              0,
+              224,
+              185,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1728,
+            "bbox_ltrb": [
+              1,
+              224,
+              185,
+              248
+            ],
+            "bbox_xywh": [
+              1,
+              224,
+              184,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_997",
+          "stock_cell_xywh": [
+            0,
+            200,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1442,
+            "bbox_ltrb": [
+              0,
+              200,
+              174,
+              224
+            ],
+            "bbox_xywh": [
+              0,
+              200,
+              174,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1184,
+            "bbox_ltrb": [
+              1,
+              200,
+              173,
+              224
+            ],
+            "bbox_xywh": [
+              1,
+              200,
+              172,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_998",
+          "stock_cell_xywh": [
+            0,
+            176,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1057,
+            "bbox_ltrb": [
+              0,
+              176,
+              117,
+              200
+            ],
+            "bbox_xywh": [
+              0,
+              176,
+              117,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 881,
+            "bbox_ltrb": [
+              0,
+              176,
+              117,
+              200
+            ],
+            "bbox_xywh": [
+              0,
+              176,
+              117,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_999",
+          "stock_cell_xywh": [
+            0,
+            152,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1055,
+            "bbox_ltrb": [
+              0,
+              152,
+              89,
+              176
+            ],
+            "bbox_xywh": [
+              0,
+              152,
+              89,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 873,
+            "bbox_ltrb": [
+              0,
+              152,
+              89,
+              176
+            ],
+            "bbox_xywh": [
+              0,
+              152,
+              89,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_1000",
+          "stock_cell_xywh": [
+            0,
+            128,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1125,
+            "bbox_ltrb": [
+              0,
+              128,
+              114,
+              152
+            ],
+            "bbox_xywh": [
+              0,
+              128,
+              114,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 925,
+            "bbox_ltrb": [
+              1,
+              128,
+              113,
+              152
+            ],
+            "bbox_xywh": [
+              1,
+              128,
+              112,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_1001",
+          "stock_cell_xywh": [
+            0,
+            104,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1268,
+            "bbox_ltrb": [
+              0,
+              104,
+              126,
+              128
+            ],
+            "bbox_xywh": [
+              0,
+              104,
+              126,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1002,
+            "bbox_ltrb": [
+              0,
+              104,
+              125,
+              128
+            ],
+            "bbox_xywh": [
+              0,
+              104,
+              125,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_1002",
+          "stock_cell_xywh": [
+            0,
+            80,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1730,
+            "bbox_ltrb": [
+              0,
+              80,
+              176,
+              104
+            ],
+            "bbox_xywh": [
+              0,
+              80,
+              176,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1458,
+            "bbox_ltrb": [
+              0,
+              80,
+              175,
+              104
+            ],
+            "bbox_xywh": [
+              0,
+              80,
+              175,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_1003",
+          "stock_cell_xywh": [
+            0,
+            56,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1975,
+            "bbox_ltrb": [
+              0,
+              56,
+              176,
+              80
+            ],
+            "bbox_xywh": [
+              0,
+              56,
+              176,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1640,
+            "bbox_ltrb": [
+              0,
+              56,
+              176,
+              80
+            ],
+            "bbox_xywh": [
+              0,
+              56,
+              176,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_1004",
+          "stock_cell_xywh": [
+            0,
+            32,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1781,
+            "bbox_ltrb": [
+              0,
+              32,
+              162,
+              56
+            ],
+            "bbox_xywh": [
+              0,
+              32,
+              162,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1481,
+            "bbox_ltrb": [
+              0,
+              32,
+              162,
+              56
+            ],
+            "bbox_xywh": [
+              0,
+              32,
+              162,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_1005",
+          "stock_cell_xywh": [
+            0,
+            8,
+            350,
+            24
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1555,
+            "bbox_ltrb": [
+              0,
+              8,
+              158,
+              32
+            ],
+            "bbox_xywh": [
+              0,
+              8,
+              158,
+              24
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1270,
+            "bbox_ltrb": [
+              0,
+              8,
+              158,
+              32
+            ],
+            "bbox_xywh": [
+              0,
+              8,
+              158,
+              24
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        }
+      ],
+      "reconstruction_use": "STOCK_EFFECT_OCCUPANCY_PRIOR_ONLY_NOT_RELEASE_HD_EDIT_MASK",
+      "semantic_binding": "HOLD_DIRECT_RELEASE_OR_PROVEN_SOURCE_TEXT_IDENTITY_DO_NOT_INFER_BY_LIST_ORDER",
+      "release_hd_source_effect_mask": "HOLD_NOT_MATERIALIZED",
+      "clean_plate": "HOLD_NOT_MATERIALIZED",
+      "candidate_safe_bbox": "HOLD_NOT_MATERIALIZED",
+      "korean_candidate": "HOLD_NO_CANDIDATE"
+    },
+    {
+      "queue_index": 193,
+      "asset": "97E863AD",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+      "current_queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantic_count": 13,
+      "canonical_semantics": [
+        {
+          "source": "WELCOME TO THE",
+          "korean": "환영합니다"
+        },
+        {
+          "source": "MULTIPLAYER",
+          "korean": "멀티플레이"
+        },
+        {
+          "source": "View the online multiplayer rankings!",
+          "korean": "온라인 멀티플레이 랭킹 보기"
+        },
+        {
+          "source": "View OutRun2SP arcade rankings!",
+          "korean": "아웃런2 SP 아케이드 랭킹 보기"
+        },
+        {
+          "source": "View OutRun single player rankings!",
+          "korean": "아웃런 싱글 플레이 랭킹 보기"
+        },
+        {
+          "source": "Goal A",
+          "korean": "골 A"
+        },
+        {
+          "source": "Goal B",
+          "korean": "골 B"
+        },
+        {
+          "source": "Goal C",
+          "korean": "골 C"
+        },
+        {
+          "source": "Goal D",
+          "korean": "골 D"
+        },
+        {
+          "source": "Goal E",
+          "korean": "골 E"
+        },
+        {
+          "source": "15 Cont.",
+          "korean": "15코스"
+        },
+        {
+          "source": "ONLINE",
+          "korean": "온라인"
+        },
+        {
+          "source": "OUTRUN SHOWROOM",
+          "korean": "아웃런 쇼룸"
+        }
+      ],
+      "prior_v2_work_order": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+        "report_blob_sha": "4d732c7f42e99dec7efa5c7e9d325d9bf09a1da8",
+        "region_count": 18,
+        "semantic_binding_status": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_DO_NOT_INFER_BY_LIST_ORDER"
+      },
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+        "git_blob_sha": "5dfd409b960b5f2a3c8020a8f6ad4144bca441e7",
+        "bytes": 131200,
+        "width": 512,
+        "height": 256,
+        "format": "DXT5/BC3",
+        "mip_header_value": 0,
+        "size_equation": "128 + ceil(512/4) * ceil(256/4) * 16 = 131200"
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256_atlas.json",
+        "git_blob_sha": "1a027da398d3245c168f46f75f531c0578f0d9c2",
+        "regions": 18
+      },
+      "decoded_alpha_region_metrics": [
+        {
+          "sprite": "sprite_913",
+          "stock_cell_xywh": [
+            0,
+            213,
+            300,
+            43
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 551,
+            "bbox_ltrb": [
+              1,
+              213,
+              296,
+              218
+            ],
+            "bbox_xywh": [
+              1,
+              213,
+              295,
+              5
+            ]
+          },
+          "alpha_ge128": {
+            "count": 380,
+            "bbox_ltrb": [
+              1,
+              213,
+              296,
+              218
+            ],
+            "bbox_xywh": [
+              1,
+              213,
+              295,
+              5
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_914",
+          "stock_cell_xywh": [
+            0,
+            173,
+            450,
+            40
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 3166,
+            "bbox_ltrb": [
+              1,
+              173,
+              450,
+              213
+            ],
+            "bbox_xywh": [
+              1,
+              173,
+              449,
+              40
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2281,
+            "bbox_ltrb": [
+              1,
+              173,
+              449,
+              213
+            ],
+            "bbox_xywh": [
+              1,
+              173,
+              448,
+              40
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": true,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_915",
+          "stock_cell_xywh": [
+            0,
+            133,
+            450,
+            40
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 3127,
+            "bbox_ltrb": [
+              0,
+              143,
+              407,
+              173
+            ],
+            "bbox_xywh": [
+              0,
+              143,
+              407,
+              30
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2189,
+            "bbox_ltrb": [
+              1,
+              143,
+              407,
+              173
+            ],
+            "bbox_xywh": [
+              1,
+              143,
+              406,
+              30
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": false,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_916",
+          "stock_cell_xywh": [
+            0,
+            93,
+            450,
+            40
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2019,
+            "bbox_ltrb": [
+              0,
+              103,
+              266,
+              120
+            ],
+            "bbox_xywh": [
+              0,
+              103,
+              266,
+              17
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1399,
+            "bbox_ltrb": [
+              1,
+              103,
+              265,
+              119
+            ],
+            "bbox_xywh": [
+              1,
+              103,
+              264,
+              16
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": false,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_917",
+          "stock_cell_xywh": [
+            300,
+            219,
+            197,
+            37
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_918",
+          "stock_cell_xywh": [
+            0,
+            71,
+            245,
+            22
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1044,
+            "bbox_ltrb": [
+              0,
+              71,
+              245,
+              80
+            ],
+            "bbox_xywh": [
+              0,
+              71,
+              245,
+              9
+            ]
+          },
+          "alpha_ge128": {
+            "count": 814,
+            "bbox_ltrb": [
+              1,
+              71,
+              245,
+              79
+            ],
+            "bbox_xywh": [
+              1,
+              71,
+              244,
+              8
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": true,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_919",
+          "stock_cell_xywh": [
+            245,
+            74,
+            115,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 45,
+            "bbox_ltrb": [
+              246,
+              74,
+              266,
+              80
+            ],
+            "bbox_xywh": [
+              246,
+              74,
+              20,
+              6
+            ]
+          },
+          "alpha_ge128": {
+            "count": 37,
+            "bbox_ltrb": [
+              247,
+              74,
+              266,
+              79
+            ],
+            "bbox_xywh": [
+              247,
+              74,
+              19,
+              5
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_920",
+          "stock_cell_xywh": [
+            360,
+            74,
+            115,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 250,
+            "bbox_ltrb": [
+              450,
+              83,
+              475,
+              93
+            ],
+            "bbox_xywh": [
+              450,
+              83,
+              25,
+              10
+            ]
+          },
+          "alpha_ge128": {
+            "count": 250,
+            "bbox_ltrb": [
+              450,
+              83,
+              475,
+              93
+            ],
+            "bbox_xywh": [
+              450,
+              83,
+              25,
+              10
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": false,
+            "right": true,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_921",
+          "stock_cell_xywh": [
+            0,
+            52,
+            115,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 375,
+            "bbox_ltrb": [
+              3,
+              66,
+              114,
+              71
+            ],
+            "bbox_xywh": [
+              3,
+              66,
+              111,
+              5
+            ]
+          },
+          "alpha_ge128": {
+            "count": 280,
+            "bbox_ltrb": [
+              4,
+              66,
+              113,
+              71
+            ],
+            "bbox_xywh": [
+              4,
+              66,
+              109,
+              5
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": false,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_922",
+          "stock_cell_xywh": [
+            115,
+            52,
+            115,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 457,
+            "bbox_ltrb": [
+              115,
+              63,
+              230,
+              71
+            ],
+            "bbox_xywh": [
+              115,
+              63,
+              115,
+              8
+            ]
+          },
+          "alpha_ge128": {
+            "count": 331,
+            "bbox_ltrb": [
+              115,
+              63,
+              230,
+              71
+            ],
+            "bbox_xywh": [
+              115,
+              63,
+              115,
+              8
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": false,
+            "right": true,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_923",
+          "stock_cell_xywh": [
+            230,
+            52,
+            115,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 149,
+            "bbox_ltrb": [
+              230,
+              63,
+              266,
+              71
+            ],
+            "bbox_xywh": [
+              230,
+              63,
+              36,
+              8
+            ]
+          },
+          "alpha_ge128": {
+            "count": 117,
+            "bbox_ltrb": [
+              230,
+              64,
+              266,
+              71
+            ],
+            "bbox_xywh": [
+              230,
+              64,
+              36,
+              7
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": false,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_924",
+          "stock_cell_xywh": [
+            345,
+            52,
+            115,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 39,
+            "bbox_ltrb": [
+              453,
+              52,
+              460,
+              59
+            ],
+            "bbox_xywh": [
+              453,
+              52,
+              7,
+              7
+            ]
+          },
+          "alpha_ge128": {
+            "count": 28,
+            "bbox_ltrb": [
+              453,
+              52,
+              460,
+              58
+            ],
+            "bbox_xywh": [
+              453,
+              52,
+              7,
+              6
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": true,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_925",
+          "stock_cell_xywh": [
+            450,
+            194,
+            26,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 36,
+            "bbox_ltrb": [
+              450,
+              207,
+              458,
+              213
+            ],
+            "bbox_xywh": [
+              450,
+              207,
+              8,
+              6
+            ]
+          },
+          "alpha_ge128": {
+            "count": 26,
+            "bbox_ltrb": [
+              451,
+              207,
+              457,
+              213
+            ],
+            "bbox_xywh": [
+              451,
+              207,
+              6,
+              6
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": false,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_926",
+          "stock_cell_xywh": [
+            476,
+            194,
+            26,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_927",
+          "stock_cell_xywh": [
+            0,
+            34,
+            224,
+            18
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 723,
+            "bbox_ltrb": [
+              6,
+              34,
+              224,
+              40
+            ],
+            "bbox_xywh": [
+              6,
+              34,
+              218,
+              6
+            ]
+          },
+          "alpha_ge128": {
+            "count": 643,
+            "bbox_ltrb": [
+              7,
+              34,
+              224,
+              40
+            ],
+            "bbox_xywh": [
+              7,
+              34,
+              217,
+              6
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": true,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_928",
+          "stock_cell_xywh": [
+            224,
+            36,
+            189,
+            16
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 88,
+            "bbox_ltrb": [
+              224,
+              36,
+              261,
+              40
+            ],
+            "bbox_xywh": [
+              224,
+              36,
+              37,
+              4
+            ]
+          },
+          "alpha_ge128": {
+            "count": 67,
+            "bbox_ltrb": [
+              224,
+              36,
+              260,
+              39
+            ],
+            "bbox_xywh": [
+              224,
+              36,
+              36,
+              3
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_929",
+          "stock_cell_xywh": [
+            413,
+            36,
+            97,
+            16
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 140,
+            "bbox_ltrb": [
+              452,
+              46,
+              497,
+              52
+            ],
+            "bbox_xywh": [
+              452,
+              46,
+              45,
+              6
+            ]
+          },
+          "alpha_ge128": {
+            "count": 95,
+            "bbox_ltrb": [
+              453,
+              46,
+              496,
+              52
+            ],
+            "bbox_xywh": [
+              453,
+              46,
+              43,
+              6
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": false,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_930",
+          "stock_cell_xywh": [
+            450,
+            162,
+            50,
+            11
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        }
+      ],
+      "reconstruction_use": "STOCK_EFFECT_OCCUPANCY_PRIOR_ONLY_NOT_RELEASE_HD_EDIT_MASK",
+      "semantic_binding": "HOLD_DIRECT_RELEASE_OR_PROVEN_SOURCE_TEXT_IDENTITY_DO_NOT_INFER_BY_LIST_ORDER",
+      "release_hd_source_effect_mask": "HOLD_NOT_MATERIALIZED",
+      "clean_plate": "HOLD_NOT_MATERIALIZED",
+      "candidate_safe_bbox": "HOLD_NOT_MATERIALIZED",
+      "korean_candidate": "HOLD_NO_CANDIDATE"
+    },
+    {
+      "queue_index": 201,
+      "asset": "A9ABD877",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "current_queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantic_count": 17,
+      "canonical_semantics": [
+        {
+          "source": "BAY AREA",
+          "korean": "베이 에어리어"
+        },
+        {
+          "source": "BIG FOREST",
+          "korean": "빅 포레스트"
+        },
+        {
+          "source": "CANYON",
+          "korean": "캐니언"
+        },
+        {
+          "source": "CAPE WAY",
+          "korean": "케이프 웨이"
+        },
+        {
+          "source": "CASINO TOWN",
+          "korean": "카지노 타운"
+        },
+        {
+          "source": "CASTLE WALL",
+          "korean": "캐슬 월"
+        },
+        {
+          "source": "CLOUDY HIGHLAND",
+          "korean": "클라우디 하이랜드"
+        },
+        {
+          "source": "DEEP LAKE",
+          "korean": "딥 레이크"
+        },
+        {
+          "source": "DESERT",
+          "korean": "사막"
+        },
+        {
+          "source": "FLORAL VILLAGE",
+          "korean": "플로럴 빌리지"
+        },
+        {
+          "source": "GHOST FOREST",
+          "korean": "고스트 포레스트"
+        },
+        {
+          "source": "GIANT STATUES",
+          "korean": "자이언트 스태추"
+        },
+        {
+          "source": "ICE SCAPE",
+          "korean": "아이스 스케이프"
+        },
+        {
+          "source": "CONIFEROUS FOREST",
+          "korean": "침엽수림"
+        },
+        {
+          "source": "GOALS",
+          "korean": "골"
+        },
+        {
+          "source": "Special",
+          "korean": "스페셜"
+        },
+        {
+          "source": "STAGES",
+          "korean": "스테이지"
+        }
+      ],
+      "prior_v2_work_order": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+        "report_blob_sha": "4d732c7f42e99dec7efa5c7e9d325d9bf09a1da8",
+        "region_count": 19,
+        "semantic_binding_status": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_DO_NOT_INFER_BY_LIST_ORDER"
+      },
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+        "git_blob_sha": "cabe895aade6db51d1d246115be730f5f45917c2",
+        "bytes": 262272,
+        "width": 512,
+        "height": 512,
+        "format": "DXT5/BC3",
+        "mip_header_value": 0,
+        "size_equation": "128 + ceil(512/4) * ceil(512/4) * 16 = 262272"
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512_atlas.json",
+        "git_blob_sha": "73192185226e2255a511f1a4e1ffa6c2ead04a34",
+        "regions": 19
+      },
+      "decoded_alpha_region_metrics": [
+        {
+          "sprite": "sprite_563",
+          "stock_cell_xywh": [
+            0,
+            477,
+            292,
+            35
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_564",
+          "stock_cell_xywh": [
+            0,
+            449,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_565",
+          "stock_cell_xywh": [
+            0,
+            421,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_566",
+          "stock_cell_xywh": [
+            0,
+            393,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 152,
+            "bbox_ltrb": [
+              128,
+              393,
+              262,
+              395
+            ],
+            "bbox_xywh": [
+              128,
+              393,
+              134,
+              2
+            ]
+          },
+          "alpha_ge128": {
+            "count": 133,
+            "bbox_ltrb": [
+              129,
+              393,
+              262,
+              395
+            ],
+            "bbox_xywh": [
+              129,
+              393,
+              133,
+              2
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_567",
+          "stock_cell_xywh": [
+            0,
+            365,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2053,
+            "bbox_ltrb": [
+              109,
+              365,
+              268,
+              393
+            ],
+            "bbox_xywh": [
+              109,
+              365,
+              159,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1716,
+            "bbox_ltrb": [
+              110,
+              365,
+              267,
+              393
+            ],
+            "bbox_xywh": [
+              110,
+              365,
+              157,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": true,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_568",
+          "stock_cell_xywh": [
+            0,
+            337,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1898,
+            "bbox_ltrb": [
+              109,
+              337,
+              266,
+              365
+            ],
+            "bbox_xywh": [
+              109,
+              337,
+              157,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1488,
+            "bbox_ltrb": [
+              110,
+              337,
+              265,
+              365
+            ],
+            "bbox_xywh": [
+              110,
+              337,
+              155,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_569",
+          "stock_cell_xywh": [
+            0,
+            309,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1470,
+            "bbox_ltrb": [
+              121,
+              309,
+              266,
+              337
+            ],
+            "bbox_xywh": [
+              121,
+              309,
+              145,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1207,
+            "bbox_ltrb": [
+              122,
+              309,
+              265,
+              337
+            ],
+            "bbox_xywh": [
+              122,
+              309,
+              143,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_570",
+          "stock_cell_xywh": [
+            0,
+            281,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1829,
+            "bbox_ltrb": [
+              77,
+              281,
+              266,
+              309
+            ],
+            "bbox_xywh": [
+              77,
+              281,
+              189,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1524,
+            "bbox_ltrb": [
+              78,
+              281,
+              265,
+              309
+            ],
+            "bbox_xywh": [
+              78,
+              281,
+              187,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_571",
+          "stock_cell_xywh": [
+            0,
+            253,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2572,
+            "bbox_ltrb": [
+              76,
+              253,
+              266,
+              281
+            ],
+            "bbox_xywh": [
+              76,
+              253,
+              190,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2091,
+            "bbox_ltrb": [
+              77,
+              253,
+              265,
+              281
+            ],
+            "bbox_xywh": [
+              77,
+              253,
+              188,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_572",
+          "stock_cell_xywh": [
+            0,
+            225,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2386,
+            "bbox_ltrb": [
+              11,
+              225,
+              268,
+              253
+            ],
+            "bbox_xywh": [
+              11,
+              225,
+              257,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1966,
+            "bbox_ltrb": [
+              12,
+              225,
+              267,
+              253
+            ],
+            "bbox_xywh": [
+              12,
+              225,
+              255,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": true,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_573",
+          "stock_cell_xywh": [
+            0,
+            197,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 3131,
+            "bbox_ltrb": [
+              11,
+              197,
+              266,
+              225
+            ],
+            "bbox_xywh": [
+              11,
+              197,
+              255,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2497,
+            "bbox_ltrb": [
+              11,
+              197,
+              265,
+              225
+            ],
+            "bbox_xywh": [
+              11,
+              197,
+              254,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_574",
+          "stock_cell_xywh": [
+            0,
+            169,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1742,
+            "bbox_ltrb": [
+              119,
+              169,
+              266,
+              197
+            ],
+            "bbox_xywh": [
+              119,
+              169,
+              147,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1460,
+            "bbox_ltrb": [
+              119,
+              169,
+              266,
+              197
+            ],
+            "bbox_xywh": [
+              119,
+              169,
+              147,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_575",
+          "stock_cell_xywh": [
+            0,
+            141,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 1572,
+            "bbox_ltrb": [
+              42,
+              141,
+              267,
+              169
+            ],
+            "bbox_xywh": [
+              42,
+              141,
+              225,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 1321,
+            "bbox_ltrb": [
+              42,
+              141,
+              266,
+              169
+            ],
+            "bbox_xywh": [
+              42,
+              141,
+              224,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_576",
+          "stock_cell_xywh": [
+            0,
+            113,
+            268,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2787,
+            "bbox_ltrb": [
+              42,
+              113,
+              267,
+              141
+            ],
+            "bbox_xywh": [
+              42,
+              113,
+              225,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2323,
+            "bbox_ltrb": [
+              42,
+              113,
+              267,
+              141
+            ],
+            "bbox_xywh": [
+              42,
+              113,
+              225,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": false,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_577",
+          "stock_cell_xywh": [
+            268,
+            458,
+            239,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_578",
+          "stock_cell_xywh": [
+            292,
+            493,
+            153,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_579",
+          "stock_cell_xywh": [
+            268,
+            430,
+            153,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_580",
+          "stock_cell_xywh": [
+            268,
+            402,
+            131,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_581",
+          "stock_cell_xywh": [
+            399,
+            402,
+            101,
+            19
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        }
+      ],
+      "reconstruction_use": "STOCK_EFFECT_OCCUPANCY_PRIOR_ONLY_NOT_RELEASE_HD_EDIT_MASK",
+      "semantic_binding": "HOLD_DIRECT_RELEASE_OR_PROVEN_SOURCE_TEXT_IDENTITY_DO_NOT_INFER_BY_LIST_ORDER",
+      "release_hd_source_effect_mask": "HOLD_NOT_MATERIALIZED",
+      "clean_plate": "HOLD_NOT_MATERIALIZED",
+      "candidate_safe_bbox": "HOLD_NOT_MATERIALIZED",
+      "korean_candidate": "HOLD_NO_CANDIDATE"
+    },
+    {
+      "queue_index": 225,
+      "asset": "E3C455FA",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+      "current_queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "canonical_semantic_count": 9,
+      "canonical_semantics": [
+        {
+          "source": "GAME LOBBY",
+          "korean": "게임 로비"
+        },
+        {
+          "source": "GAME LIST",
+          "korean": "게임 목록"
+        },
+        {
+          "source": "SETUP",
+          "korean": "설정"
+        },
+        {
+          "source": "COURSE TYPE",
+          "korean": "코스 유형"
+        },
+        {
+          "source": "COURSE",
+          "korean": "코스"
+        },
+        {
+          "source": "CAR TYPE",
+          "korean": "차량 유형"
+        },
+        {
+          "source": "CATCH-UP",
+          "korean": "추격 보정"
+        },
+        {
+          "source": "COLLISION",
+          "korean": "충돌"
+        },
+        {
+          "source": "PLAYERS",
+          "korean": "플레이어"
+        }
+      ],
+      "prior_v2_work_order": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00098",
+        "report_blob_sha": "4d732c7f42e99dec7efa5c7e9d325d9bf09a1da8",
+        "region_count": 8,
+        "semantic_binding_status": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_DO_NOT_INFER_BY_LIST_ORDER"
+      },
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+        "git_blob_sha": "24f743d27f0c17c016977d8bbb83ce1ed5768e0f",
+        "bytes": 131200,
+        "width": 512,
+        "height": 256,
+        "format": "DXT5/BC3",
+        "mip_header_value": 0,
+        "size_equation": "128 + ceil(512/4) * ceil(256/4) * 16 = 131200"
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256_atlas.json",
+        "git_blob_sha": "8e7613357047dbbef6e05a04b71978b1627bbe93",
+        "regions": 8
+      },
+      "decoded_alpha_region_metrics": [
+        {
+          "sprite": "sprite_25",
+          "stock_cell_xywh": [
+            0,
+            50,
+            240,
+            206
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 45255,
+            "bbox_ltrb": [
+              0,
+              50,
+              240,
+              250
+            ],
+            "bbox_xywh": [
+              0,
+              50,
+              240,
+              200
+            ]
+          },
+          "alpha_ge128": {
+            "count": 44558,
+            "bbox_ltrb": [
+              0,
+              50,
+              238,
+              250
+            ],
+            "bbox_xywh": [
+              0,
+              50,
+              238,
+              200
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": true,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_26",
+          "stock_cell_xywh": [
+            240,
+            160,
+            110,
+            96
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 897,
+            "bbox_ltrb": [
+              240,
+              206,
+              336,
+              222
+            ],
+            "bbox_xywh": [
+              240,
+              206,
+              96,
+              16
+            ]
+          },
+          "alpha_ge128": {
+            "count": 615,
+            "bbox_ltrb": [
+              240,
+              207,
+              335,
+              222
+            ],
+            "bbox_xywh": [
+              240,
+              207,
+              95,
+              15
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": false,
+            "right": false,
+            "bottom": false
+          }
+        },
+        {
+          "sprite": "sprite_27",
+          "stock_cell_xywh": [
+            0,
+            22,
+            240,
+            28
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 6720,
+            "bbox_ltrb": [
+              0,
+              22,
+              240,
+              50
+            ],
+            "bbox_xywh": [
+              0,
+              22,
+              240,
+              28
+            ]
+          },
+          "alpha_ge128": {
+            "count": 6664,
+            "bbox_ltrb": [
+              0,
+              22,
+              238,
+              50
+            ],
+            "bbox_xywh": [
+              0,
+              22,
+              238,
+              28
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": true,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_28",
+          "stock_cell_xywh": [
+            0,
+            6,
+            360,
+            16
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 2602,
+            "bbox_ltrb": [
+              0,
+              6,
+              298,
+              22
+            ],
+            "bbox_xywh": [
+              0,
+              6,
+              298,
+              16
+            ]
+          },
+          "alpha_ge128": {
+            "count": 2469,
+            "bbox_ltrb": [
+              0,
+              6,
+              298,
+              22
+            ],
+            "bbox_xywh": [
+              0,
+              6,
+              298,
+              16
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_29",
+          "stock_cell_xywh": [
+            240,
+            34,
+            263,
+            16
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 424,
+            "bbox_ltrb": [
+              240,
+              34,
+              295,
+              50
+            ],
+            "bbox_xywh": [
+              240,
+              34,
+              55,
+              16
+            ]
+          },
+          "alpha_ge128": {
+            "count": 269,
+            "bbox_ltrb": [
+              240,
+              34,
+              294,
+              50
+            ],
+            "bbox_xywh": [
+              240,
+              34,
+              54,
+              16
+            ]
+          },
+          "alpha_gt0_touches_cell_edge": {
+            "left": true,
+            "top": true,
+            "right": false,
+            "bottom": true
+          }
+        },
+        {
+          "sprite": "sprite_30",
+          "stock_cell_xywh": [
+            240,
+            144,
+            240,
+            16
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_31",
+          "stock_cell_xywh": [
+            240,
+            128,
+            167,
+            16
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        },
+        {
+          "sprite": "sprite_32",
+          "stock_cell_xywh": [
+            503,
+            46,
+            4,
+            4
+          ],
+          "rotated": false,
+          "alpha_gt0": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_ge128": {
+            "count": 0,
+            "bbox_ltrb": null,
+            "bbox_xywh": null
+          },
+          "alpha_gt0_touches_cell_edge": null
+        }
+      ],
+      "reconstruction_use": "STOCK_EFFECT_OCCUPANCY_PRIOR_ONLY_NOT_RELEASE_HD_EDIT_MASK",
+      "semantic_binding": "HOLD_DIRECT_RELEASE_OR_PROVEN_SOURCE_TEXT_IDENTITY_DO_NOT_INFER_BY_LIST_ORDER",
+      "release_hd_source_effect_mask": "HOLD_NOT_MATERIALIZED",
+      "clean_plate": "HOLD_NOT_MATERIALIZED",
+      "candidate_safe_bbox": "HOLD_NOT_MATERIALIZED",
+      "korean_candidate": "HOLD_NO_CANDIDATE"
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_173_193_201_225",
+    "queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "recent_pending_dedup": "PASS_EXCLUDES_A00112_147_161_163__A00114_133_135_139_143__A00117_159_205_227_231",
+    "exact_stock_dds_headers": "PASS_4_OF_4_DXT5_NATIVE_DIMENSIONS_AND_EXACT_BLOCK_SIZE",
+    "stock_atlas_regions": "PASS_66_OF_66_REGIONS_MEASURED",
+    "canonical_semantics": "PASS_60_OF_60_TRANSCRIPTION_EQUALS_ARTWORK_PLAN",
+    "semantic_binding": "HOLD_NOT_GUESSED_FROM_ATLAS_ORDER",
+    "release_hd_header_decode": "HOLD_LARGE_RELEASE_BODY_NOT_DECODED_IN_THIS_TASK",
+    "release_hd_source_effect_masks": "HOLD_NOT_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_MATERIALIZED",
+    "candidate_safe_bbox": "HOLD_NOT_MATERIALIZED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_WRITE",
+    "runtime_validation": "UNTESTED"
+  },
+  "strict_hold": {
+    "stock_metrics_scope": "RECONSTRUCTION_PRIOR_ONLY",
+    "exact_release_hd_pixel_decode": "REQUIRED_BEFORE_EDIT",
+    "per_element_semantic_binding": "REQUIRED_BEFORE_EDIT",
+    "source_effect_removal_and_protected_masks": "REQUIRED_BEFORE_CLEAN_PLATE",
+    "clean_plate_schema": "outrun-clean-plate-qa-v1",
+    "korean_generation_contract": "outrun-first-pass-edit-v2",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
