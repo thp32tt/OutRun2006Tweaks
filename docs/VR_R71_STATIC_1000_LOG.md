@@ -2593,3 +2593,29 @@ Additional commits:
 - `a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f`
 
 Final cycle-145 hosted validation target: `a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f`.
+
+
+## Cycle 0146 — start-grid shadow exact-identity diagnostic
+
+Finding: `DX9EX-START-GRID-SHADOW-IDENTITY-001`
+
+Falsification:
+- The restored console `CalcPeraShadow` path is not the remaining VR defect. With VR enabled it returns before drawing at the common car, O2SP selector and C2C selector callsites, preserving stock PC nullsub behavior.
+- Re-enabling that path is explicitly prohibited because HMD evidence already showed it stereo-splits at the start grid.
+
+Why no shadow policy change yet:
+- Stock-PC depth-tested alpha/stencil/projected effects share R13/R27 infrastructure with smoke, skid and decal draws.
+- A broad zero-disparity or world-stereo change would fix one symptom by risking several already-working effects.
+
+Diagnostic:
+- Added `R71TraceStartGridShadowCandidate` in the existing effect observation boundary.
+- It records only gameplay, stereo-active, depth-tested fragile candidates and reports Present/draw serial, semantic scope, VS/PS identity, alpha blend/test, Z write/test, stencil, cull and color-write state.
+- It logs the first 32 matches, then powers of two only.
+- It changes no render state or draw ownership.
+
+Commits:
+- `f19cf11fecef28ae065749b22e62b7af59fe75e1`
+- `637ef8431ab66431d2bb57c7b92e41b627151395`
+
+AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED / NEED_HMD_LOG`
