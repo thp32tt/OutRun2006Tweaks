@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-29T13:50:47+09:00
+Updated: 2026-09-29T18:34:47+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -984,3 +984,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - The B00101 material report arithmetic/canonical review is unchanged and was not repeated, but the exact producer result cannot receive PASS under the controller contract. Its Q00012 disposition is corrected **PASS → REWORK_REQUIRED**. B00103/A00102/A00105 remain **PASS** and all three passed their exact-SHA automation/parallel-lane checks in the failed Gate.
 - This retry is bookkeeping/Gate repair only: no second semantic merge, no candidate DDS changes, no translation/queue classification changes. Queue counts remain 137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending localize_text 76; canonical segments 753.
 - B00101 must be re-emitted as a durable producer result whose exact RESULT_SHA contains its task record, then submitted under that new immutable SHA. `AUTOMATION_VALIDATION=PENDING` for the retry commit; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C115 Q00013 independent QA batch — 2026-09-29T18:34:47+09:00
+- Immutable inputs: B00104 `3c9e0d38ced3e69186eed939dc83489b7110ee75`, A00107 `47aed8322b065cde9d108f746ebc18a0db9ef5bf`, B00108 `6e8a205c0c9fdb5aed4c55527466aa2ca637e95f`, A00109 `5c42c0da1237d1a9a662c759cc107bb7de6dfa33`. B00104/A00107/B00108 dispositions **PASS** for their limited reconstruction/pre-generation deliverables; A00109 is **REWORK_REQUIRED** only because its exact RESULT_SHA lacks the durable task record, although its material content QA passes.
+- B00104: direct GitHub re-decode of exact 65,664-byte Release BC3 source reproduces **4/4** effect bboxes and pixel counts; **4/4** v2 safe-bbox formulas pass; `'89/'86` remain preserve-original.
+- A00107: direct GitHub re-decode of exact 524,416-byte Release BC3 reproduces full and mapped alpha geometry/counts, removal-mask SHA-256 `8ff40aaf9ab9155f21c9e3401fe82ae1898c508b54a5a62caa8f680ecc16551c`, decoded-source RGBA SHA-256 `513947133b711e719cc98dde16fec8e54a80c57455949a0d68a868a8435e95d3`, CLEAN_PLATE SHA-256 `6c7ad46e47891a4b2824ab0a8c81782ae55bbfb7b4e292e7035e6be771e29595`, and final safe bbox **[28,94,1088,149]** exactly.
+- B00108: current canonical semantics **20/20**; **106/106** first-pass-v2 2px source-inspection guard formulas independently rechecked. C108 exact Release extraction lineage is unchanged and reused. Guards remain upper bounds, not final candidate-safe bboxes.
+- A00109 material content: direct GitHub re-decode of exact 131,200-byte stock BC3 source reproduces **15/15** alpha bboxes/counts and current canonical semantics **15/15**. However `5c42c0d...` has no durable task record; the record first appears in child `0d0ab35...`, so the immutable producer result must be re-emitted under one durable SHA before a later C PASS.
+- No input or C changed Korean candidate DDS bytes. Candidate Hangul clipping, 1px containment, final DDS format/mipmap/alpha/compression, exact Release orientation/slant/style, protected artwork/background and ENGLISH SOURCE vs KOREAN CANDIDATE remain **HOLD_STRICT_RECHECK**. New static artwork passes 0; runtime approvals 0.
+- Queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text **76**; canonical segments **753**. Newer A00112/B00113/A00114/B00115 producer work is disjoint and preserved.
+- Shared state merged once. Report: `localization/graphics/role_C/20260929-1834-C115/C115_Q00013_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+

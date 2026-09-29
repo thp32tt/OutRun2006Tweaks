@@ -1,0 +1,120 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00116",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00013",
+  "qa_batch_id": "Q00013",
+  "recorded_at_kst": "2026-09-29T18:34:47+09:00",
+  "base_head_sha": "31992c1ff6d0f7b900752b60fd3b5d353911a8bc",
+  "result": "PASS_Q00013_THREE_INPUTS_STRICT_VALIDATED_ONE_PRODUCER_REWORK_REQUIRED_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Q00013 independently validates B00104/A00107/B00108 limited reconstruction/pre-generation deliverables and the material content of A00109. B00104 exact BC3 effect geometry, A00107 exact BC3 mask/CLEAN_PLATE fingerprints, and B00108 106 v2 guards pass. A00109 content evidence also reproduces, but its immutable RESULT_SHA lacks the durable task record and is therefore REWORK_REQUIRED under the exact producer contract. No candidate DDS bytes were produced or modified; runtime remains untested.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00104",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "3c9e0d38ced3e69186eed939dc83489b7110ee75",
+      "producer_id": "P00037"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00107",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "47aed8322b065cde9d108f746ebc18a0db9ef5bf",
+      "producer_id": "P00039"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00108",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "6e8a205c0c9fdb5aed4c55527466aa2ca637e95f",
+      "producer_id": "P00040"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "5c42c0da1237d1a9a662c759cc107bb7de6dfa33",
+      "producer_id": "P00041"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00104",
+      "result_sha": "3c9e0d38ced3e69186eed939dc83489b7110ee75",
+      "status": "PASS",
+      "reason": "Accepted the limited index152/49BB5FE5 exact-BC3 full-effect-envelope and v2 safe-bbox preflight. C re-fetched the pinned 65,664-byte Release DXT5/BC3 source from GitHub and independently decoded all four localizable cells: 4/4 effect bboxes and threshold-10 pixel counts reproduce exactly, 4/4 reported 2px safe-bbox intersection formulas are nonempty and exact, and '89/'86 remain preserve-original. Removal/protected masks, CLEAN_PLATE, style/slant, Korean candidate and candidate-only gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00107",
+      "result_sha": "47aed8322b065cde9d108f746ebc18a0db9ef5bf",
+      "status": "PASS",
+      "reason": "Accepted the limited index55/2EA557B4 exact BC3 source-effect-mask/CLEAN_PLATE preflight. C independently re-fetched and decoded the pinned 524,416-byte Release DXT5/BC3 source: full alpha>0 bbox/count [1,8,1090,151]/116444, alpha>=128 [2,9,1087,150]/107196, mapped sprite_337 alpha>0 [26,92,1090,151]/48292 and alpha>=128 [27,92,1087,150]/45061 all reproduce exactly. Removal-mask SHA-256 8ff40aaf9ab9155f21c9e3401fe82ae1898c508b54a5a62caa8f680ecc16551c, decoded-source RGBA SHA-256 513947133b711e719cc98dde16fec8e54a80c57455949a0d68a868a8435e95d3 and CLEAN_PLATE SHA-256 6c7ad46e47891a4b2824ab0a8c81782ae55bbfb7b4e292e7035e6be771e29595 reproduce exactly; final safe bbox [28,94,1088,149] matches the v2 formula. Baseline/slant/style and all Korean-candidate gates remain HOLD."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00108",
+      "result_sha": "6e8a205c0c9fdb5aed4c55527466aa2ca637e95f",
+      "status": "PASS",
+      "reason": "Accepted the limited first-pass-v2 source-inspection/source-mask/CLEAN_PLATE work orders for indices 132/176/220/222. Q00006/C108 already accepted the unchanged B00077 exact Release extraction lineage. Current transcriptions/artwork plan match all 20/20 canonical semantic pairs. C independently rechecked all 106/106 new 2px guard formulas as exact inset(rect,2px), nonempty and reported PASS. These guards are inspection upper bounds only: exact semantic-to-region binding, effect-inclusive source bboxes, removal/protected masks, CLEAN_PLATE, final candidate-safe bboxes and candidate-only DDS/containment/source-comparison gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+      "result_sha": "5c42c0da1237d1a9a662c759cc107bb7de6dfa33",
+      "status": "REWORK_REQUIRED",
+      "reason": "The index159/4EDA9DE3 material evidence itself passed C content QA: C re-fetched the pinned 131,200-byte stock DXT5/BC3 source and independently reproduced all 15/15 reported alpha>0 bboxes plus alpha>0/alpha>=128 pixel counts, and all 15/15 source/Korean pairs match current canonical metadata. However immutable producer RESULT_SHA 5c42c0da1237d1a9a662c759cc107bb7de6dfa33 does not contain docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00109.json; that durable task record first appears in the child commit 0d0ab35e25192ae0da8a174d7f00c5c1cbb1cd91. The exact producer result therefore cannot receive PASS under verify_parallel_lane_commit.py. Re-emit the accepted material result under one durable RESULT_SHA containing its task record, then submit that new SHA to a later C batch."
+    }
+  ],
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      55,
+      132,
+      152,
+      159,
+      176,
+      220,
+      222
+    ],
+    "reviewed_assets": 7,
+    "b00104_effect_envelopes_validated": 4,
+    "b00104_safe_bboxes_validated": 4,
+    "a00107_exact_bc3_preflights_validated": 1,
+    "b00108_guard_work_orders_validated": 106,
+    "a00109_stock_bindings_content_validated": 15,
+    "producer_inputs_strict_pass": 3,
+    "producer_inputs_rework_required": 1,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "input_candidate_dds_modified": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-1834-C115/C115_Q00013_INDEPENDENT_QA_BATCH.json"
+  },
+  "source_identity_validation": "PASS_B104_DIRECT_RELEASE_BC3_65664_BYTES__A107_DIRECT_RELEASE_BC3_524416_BYTES__B108_REUSED_C108_EXACT_RELEASE_LINEAGE__A109_DIRECT_STOCK_BC3_131200_BYTES__CURRENT_CONTRACT_GENERATION_V2_ORIENTATION_EXACT",
+  "canonical_semantic_validation": "PASS_B104_6_OF_6_INCLUDING_2_PRESERVE__A107_1_OF_1__B108_20_OF_20__A109_15_OF_15_CONTENT_VALID_BUT_PRODUCER_CONTRACT_REWORK",
+  "geometry_mapping_validation": "PASS_B104_4_OF_4_EFFECT_BBOX_COUNTS_AND_SAFE_BBOX_FORMULAS__A107_ALPHA_MASK_CLEAN_PLATE_HASHES_AND_SAFE_BBOX_REPRODUCED__B108_106_OF_106_2PX_GUARD_FORMULAS__A109_15_OF_15_STOCK_ALPHA_BBOX_COUNTS_REPRODUCED",
+  "current_contract_compatibility": "PASS_RECONSTRUCTION_PREGEN_ONLY__NO_CANDIDATE_PROMOTION__ALL_CANDIDATE_ONLY_GATES_HELD",
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00112",
+      "LOCALIZATION-LOCALIZATION_B-00113",
+      "LOCALIZATION-LOCALIZATION_A-00114",
+      "LOCALIZATION-LOCALIZATION_B-00115"
+    ],
+    "result": "NONE_AT_MERGE_HEAD"
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-independent-c-qa-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00116",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00013",
+  "qa_batch_id": "Q00013",
+  "recorded_at_kst": "2026-09-29T18:34:47+09:00",
+  "base_head_sha": "31992c1ff6d0f7b900752b60fd3b5d353911a8bc",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00104",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "3c9e0d38ced3e69186eed939dc83489b7110ee75",
+      "producer_id": "P00037"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00107",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "47aed8322b065cde9d108f746ebc18a0db9ef5bf",
+      "producer_id": "P00039"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00108",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "6e8a205c0c9fdb5aed4c55527466aa2ca637e95f",
+      "producer_id": "P00040"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "5c42c0da1237d1a9a662c759cc107bb7de6dfa33",
+      "producer_id": "P00041"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00104",
+      "result_sha": "3c9e0d38ced3e69186eed939dc83489b7110ee75",
+      "status": "PASS",
+      "reason": "Accepted the limited index152/49BB5FE5 exact-BC3 full-effect-envelope and v2 safe-bbox preflight. C re-fetched the pinned 65,664-byte Release DXT5/BC3 source from GitHub and independently decoded all four localizable cells: 4/4 effect bboxes and threshold-10 pixel counts reproduce exactly, 4/4 reported 2px safe-bbox intersection formulas are nonempty and exact, and '89/'86 remain preserve-original. Removal/protected masks, CLEAN_PLATE, style/slant, Korean candidate and candidate-only gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00107",
+      "result_sha": "47aed8322b065cde9d108f746ebc18a0db9ef5bf",
+      "status": "PASS",
+      "reason": "Accepted the limited index55/2EA557B4 exact BC3 source-effect-mask/CLEAN_PLATE preflight. C independently re-fetched and decoded the pinned 524,416-byte Release DXT5/BC3 source: full alpha>0 bbox/count [1,8,1090,151]/116444, alpha>=128 [2,9,1087,150]/107196, mapped sprite_337 alpha>0 [26,92,1090,151]/48292 and alpha>=128 [27,92,1087,150]/45061 all reproduce exactly. Removal-mask SHA-256 8ff40aaf9ab9155f21c9e3401fe82ae1898c508b54a5a62caa8f680ecc16551c, decoded-source RGBA SHA-256 513947133b711e719cc98dde16fec8e54a80c57455949a0d68a868a8435e95d3 and CLEAN_PLATE SHA-256 6c7ad46e47891a4b2824ab0a8c81782ae55bbfb7b4e292e7035e6be771e29595 reproduce exactly; final safe bbox [28,94,1088,149] matches the v2 formula. Baseline/slant/style and all Korean-candidate gates remain HOLD."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00108",
+      "result_sha": "6e8a205c0c9fdb5aed4c55527466aa2ca637e95f",
+      "status": "PASS",
+      "reason": "Accepted the limited first-pass-v2 source-inspection/source-mask/CLEAN_PLATE work orders for indices 132/176/220/222. Q00006/C108 already accepted the unchanged B00077 exact Release extraction lineage. Current transcriptions/artwork plan match all 20/20 canonical semantic pairs. C independently rechecked all 106/106 new 2px guard formulas as exact inset(rect,2px), nonempty and reported PASS. These guards are inspection upper bounds only: exact semantic-to-region binding, effect-inclusive source bboxes, removal/protected masks, CLEAN_PLATE, final candidate-safe bboxes and candidate-only DDS/containment/source-comparison gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+      "result_sha": "5c42c0da1237d1a9a662c759cc107bb7de6dfa33",
+      "status": "REWORK_REQUIRED",
+      "reason": "The index159/4EDA9DE3 material evidence itself passed C content QA: C re-fetched the pinned 131,200-byte stock DXT5/BC3 source and independently reproduced all 15/15 reported alpha>0 bboxes plus alpha>0/alpha>=128 pixel counts, and all 15/15 source/Korean pairs match current canonical metadata. However immutable producer RESULT_SHA 5c42c0da1237d1a9a662c759cc107bb7de6dfa33 does not contain docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00109.json; that durable task record first appears in the child commit 0d0ab35e25192ae0da8a174d7f00c5c1cbb1cd91. The exact producer result therefore cannot receive PASS under verify_parallel_lane_commit.py. Re-emit the accepted material result under one durable RESULT_SHA containing its task record, then submit that new SHA to a later C batch."
+    }
+  ],
+  "independent_checks": {
+    "b00104": {
+      "source_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+      "bytes": 65664,
+      "dds": "512x128 DXT5/BC3 mip1",
+      "effect_bbox_count_reproduced": "4/4",
+      "effect_pixel_counts_reproduced": "4/4",
+      "safe_bbox_formulas_rechecked": "4/4",
+      "preserve_original": [
+        "'89",
+        "'86"
+      ]
+    },
+    "a00107": {
+      "source_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+      "bytes": 524416,
+      "dds": "2048x256 DXT5/BC3 mip1",
+      "alpha_gt0": {
+        "bbox": [
+          1,
+          8,
+          1090,
+          151
+        ],
+        "pixels": 116444
+      },
+      "alpha_ge128": {
+        "bbox": [
+          2,
+          9,
+          1087,
+          150
+        ],
+        "pixels": 107196
+      },
+      "mapped_effect_alpha_gt0": {
+        "bbox": [
+          26,
+          92,
+          1090,
+          151
+        ],
+        "pixels": 48292
+      },
+      "mapped_effect_alpha_ge128": {
+        "bbox": [
+          27,
+          92,
+          1087,
+          150
+        ],
+        "pixels": 45061
+      },
+      "removal_mask_sha256": "8ff40aaf9ab9155f21c9e3401fe82ae1898c508b54a5a62caa8f680ecc16551c",
+      "decoded_source_rgba_sha256": "513947133b711e719cc98dde16fec8e54a80c57455949a0d68a868a8435e95d3",
+      "clean_plate_sha256": "6c7ad46e47891a4b2824ab0a8c81782ae55bbfb7b4e292e7035e6be771e29595",
+      "final_safe_bbox": [
+        28,
+        94,
+        1088,
+        149
+      ],
+      "result": "PASS_EXACT_REPRODUCTION"
+    },
+    "b00108": {
+      "reused_c_acceptance": "Q00006/C108",
+      "canonical_semantics": "20/20",
+      "region_guards": "106/106 exact inset-2 formulas nonempty",
+      "guards_are_candidate_safe_bbox": false,
+      "result": "PASS_LIMITED_WORK_ORDER_INPUT"
+    },
+    "a00109": {
+      "source_blob_sha": "00f40e8b7b2c1e8c77442bb2a2e50270fff388dd",
+      "bytes": 131200,
+      "dds": "512x256 stock DXT5/BC3 base",
+      "canonical_semantics": "15/15",
+      "stock_effect_bboxes_and_counts": "15/15 reproduced",
+      "material_content_qa": "PASS",
+      "exact_result_sha_task_record": "MISSING",
+      "first_child_with_task_record": "0d0ab35e25192ae0da8a174d7f00c5c1cbb1cd91",
+      "producer_contract": "REWORK_REQUIRED"
+    }
+  },
+  "fingerprint_reuse": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "shared_state_merge": {
+    "performed_once": true,
+    "reviewed_indices": [
+      55,
+      132,
+      152,
+      159,
+      176,
+      220,
+      222
+    ],
+    "metadata_segments_changed": 0,
+    "canonical_segments": 753,
+    "actionable_queue": 137,
+    "localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_only": 3,
+    "pending_production_localize_text": 76
+  },
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
