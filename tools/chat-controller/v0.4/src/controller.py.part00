@@ -545,12 +545,15 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> O
         expected = f"[AUTO:{task_id}]"
         for item in data if isinstance(data, list) else []:
             message = item.get("commit", {}).get("message", "")
-            if expected in message:
-                return {
-                    "sha": item.get("sha"),
-                    "message": message,
-                    "html_url": item.get("html_url"),
-                }
+            if expected not in message:
+                continue
+            if github_actions_skip_directive(message):
+                continue
+            return {
+                "sha": item.get("sha"),
+                "message": message,
+                "html_url": item.get("html_url"),
+            }
         return None
     except Exception as e:
         log.warning("github task commit lookup failed branch=%s task=%s error=%r", branch, task_id, e)
