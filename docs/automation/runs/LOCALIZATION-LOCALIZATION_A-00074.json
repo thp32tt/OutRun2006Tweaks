@@ -1,0 +1,97 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00074",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00014",
+  "recorded_at_kst": "2026-09-29T15:00:00+09:00",
+  "base_sha": "3cd418a9cc5e9f200b96fc734875a2957384cbae",
+  "material_commit_sha": "3cd418a9cc5e9f200b96fc734875a2957384cbae",
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_ODD_RAW_DDS_CELL_BYTE_EXTRACTION_SPECS",
+  "summary": "Advanced C-consumed odd indices 35/43/49 by pinning byte-accurate row-slice extraction for all 18 already-mapped HD target cells in their exact Release DDS sources. All 18 ranges are in-file, mapped target cells are non-overlapping, and unchanged A00058 source/semantic heavy-QA evidence was reused. No Korean DDS or shared state changed; exact source effect bbox/orientation/slant/clean-plate and candidate-only containment/comparison gates remain fail-closed HOLD.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1500-A00074-P00014/A00074_P00014_ODD_RAW_DDS_CELL_BYTE_EXTRACTION_SPEC.json"
+  ],
+  "evidence_blob_sha": "d9570d6a74e037636257ec941ca1f5fa0541901e",
+  "material_deliverable": {
+    "type": "THREE_ODD_EXACT_RELEASE_DDS_CELL_BYTE_EXTRACTION_SPEC",
+    "indices": [
+      35,
+      43,
+      49
+    ],
+    "assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6"
+    ],
+    "physical_occurrences": 18,
+    "exact_row_slice_specs": 18,
+    "in_file_range_checks_passed": 18,
+    "mapped_cell_overlap_pairs": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00058",
+    "producer_mapping_blob_sha": "9c2a5f2eafcdbec525d98dab13de094fb3a2c0dc",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00063",
+    "c_acceptance_blob_sha": "6d86b4de8be989e948678f13bce5b5e6412feb3b",
+    "reason": "same source/cell/translation fingerprint; no duplicate heavy QA"
+  },
+  "skipped_qa_pending": {
+    "A00064": {
+      "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+      "assets": [
+        133,
+        135,
+        139,
+        143
+      ]
+    },
+    "A00068": {
+      "result_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
+      "assets": [
+        175,
+        205,
+        227,
+        231
+      ]
+    },
+    "A00070": {
+      "result_sha": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
+      "assets": [
+        209,
+        237
+      ]
+    },
+    "A00072": {
+      "result_sha": "52578815228c4114fd656a0fdf93b5c1b78ad888",
+      "assets": [
+        95,
+        101
+      ]
+    }
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_ODD_ONLY_35_43_49__3_OF_3_RELEASE_SIZE_GEOMETRY__18_OF_18_BYTE_RANGES_IN_BOUNDS__0_TARGET_CELL_OVERLAPS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "No Korean DDS candidate was written. Exact English glyph/effect bbox, raw/readable orientation, signed slant and text-only clean plate remain mandatory before rendering; zero-pixel containment and ENGLISH SOURCE vs KOREAN CANDIDATE are candidate-only gates and remain HOLD.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
