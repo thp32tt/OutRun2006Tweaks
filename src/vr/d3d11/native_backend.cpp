@@ -3,6 +3,7 @@
 #include "pipeline_translation.hpp"
 
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <dxgi1_2.h>
 #include <utility>

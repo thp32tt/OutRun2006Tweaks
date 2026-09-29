@@ -43,6 +43,9 @@ NATIVE_BACKEND_HPP = (
 NATIVE_BACKEND_CPP = (
     ROOT / "src" / "vr" / "d3d11" / "native_backend.cpp"
 ).read_text(encoding="utf-8")
+CONSTANT_BUFFER_CONTRACT_TEXT = (
+    CONSTANT_BUFFER_PROBE + "\n" + NATIVE_BACKEND_CPP
+)
 
 
 def main() -> None:
@@ -867,12 +870,17 @@ def main() -> None:
     missing_r95_probe = [
         meaning
         for token, meaning in r95_constant_buffer_contract.items()
-        if token not in CONSTANT_BUFFER_PROBE
+        if token not in CONSTANT_BUFFER_CONTRACT_TEXT
     ]
     if missing_r95_probe:
         raise SystemExit(
             "DX11 R95 constant-buffer probe drift: "
             + ", ".join(missing_r95_probe)
+        )
+
+    if "DX11 constant buffer probe R95: PASS" not in CONSTANT_BUFFER_PROBE:
+        raise SystemExit(
+            "DX11 R95 completion marker must remain in hosted probe"
         )
 
     for graph_name, graph in (
