@@ -1410,6 +1410,11 @@ def main() -> None:
                 "DX11 R102 managed-shadow source drift: " + meaning
             )
 
+    if "using outrun::vr::dx11::NativeManagedTextureShadow;" not in CONSTANT_BUFFER_PROBE:
+        raise SystemExit(
+            "DX11 R102 managed-shadow probe must import NativeManagedTextureShadow directly"
+        )
+
     for token, meaning in {
         "R102 managed shadow starts allocated but content-invalid":
             "R102 initial invalid-content state",
