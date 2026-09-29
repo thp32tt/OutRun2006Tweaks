@@ -107,3 +107,20 @@ Current autonomous pipeline contract supersedes all older role descriptions:
 - Next checkpoint: trace exact producer -> node-tag -> queue-select -> c64 upload -> draw semantic lifetime, plus Calc3D2D/vehicle-anchor propagation for rival rank markers. Do not broaden generic queue-to-HUD ownership.
 - **PC runner is disabled until explicit user re-authorization.** Overnight scheduled work is review/static analysis/EXE-map/documentation and normal cloud CI only.
 
+
+
+## R71 evening HUD / lens-flare test build — 2026-09-29 21:05 KST
+
+- User-authorized one-session evening test build.
+- Frozen runtime/build source SHA: `0b0dcbb9968ea6dfe0a4cfd4813c4ee511c8ce2d`.
+- Candidate branch: `vr-d3d9ex-candidate/R71-EVENING-HUD-FLARE-20260929`.
+- Inherited R71 fixes under test: exact OutRun checkpoint/result SCREEN_HUD node lifetime, rival projected-anchor lifetime, lens-flare ProjectedScreenEffect2D single-transform ownership + R28 world-rebind veto, SkyGlow final-blur source + pre-HUD composite ordering, bounded exact-HUD alpha/blend diagnostics.
+- No new broad HUD heuristic or forced alpha/blend mutation was introduced for this evening build.
+- Test UI: `START_HERE_VR_TEST.cmd` -> R71 selector -> CORRECTNESS or HUD_MENU -> game -> automatic host shutdown -> log collection -> automatic analysis ZIP.
+- Runtime result template now records `HUD_OPACITY`, `OUTRUN_STAGE_TEXT`, `RIVAL_MARKER`, and `LENS_FLARE` separately.
+- Hosted validation run: `36565139089`.
+- Validation result: policy=SUCCESS, game=SUCCESS, host=SUCCESS, package=SUCCESS.
+- Hosted artifact ID: `11031144066` (`OutRun2-VR-DX9EX-ACTIVE-0b0dcbb9968ea6dfe0a4cfd4813c4ee511c8ce2d`).
+- Extracted inner test ZIP SHA256: `428a0460572b39218b4a2a863c99a3924095f83648c9cc6939745af10246191c`.
+- `RUNTIME_VALIDATION=UNTESTED` until Quest 3 / VDXR user testing is uploaded.
+- The PC-fast self-hosted run was also requested for the same SHA, but the hosted Windows artifact above is the completed test deliverable and does not depend on the self-hosted runner.
