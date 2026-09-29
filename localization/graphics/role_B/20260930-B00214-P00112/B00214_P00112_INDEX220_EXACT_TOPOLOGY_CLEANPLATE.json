@@ -1,0 +1,414 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00214-p00112-index220-exact-source-topology-cleanplate-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
+  "wave_id": "P00112",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:45:00+09:00",
+  "base_head_sha": "a40885d301be8711066c7b39dc1ee262f087ca84",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_shard_overridden_by_current_git_contract": true,
+    "selected_index": 220,
+    "asset": "D657C2EB",
+    "priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_RUNNABLE_B_DIRECT_REWORK_RENDER_READY_ONE_STAGE",
+    "qa_pending_not_repeated": [
+      {
+        "index": 226,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
+        "result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837"
+      },
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+        "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6"
+      }
+    ],
+    "skipped_sticky_source_exhausted": true,
+    "skipped_attempt_exhausted_rework": [
+      94,
+      121
+    ]
+  },
+  "source_transport": {
+    "drive_account": "ezflash557",
+    "drive_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "exact_filename": "D657C2EB_512x128.dds",
+    "drive_exact_outcome": "SOURCE_TRANSPORT_MISS",
+    "pinned_direct_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_direct_path": "Release/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+    "pinned_direct_outcome": "BINARY_TRANSPORT_UNAVAILABLE_IN_CURRENT_CONNECTOR_RUNTIME__FALL_THROUGH",
+    "release_fallback": {
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_bytes": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_identity": "PASS_EXACT",
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "member_bytes": 4194432,
+      "member_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "canonical_inventory_match": true
+    }
+  },
+  "exact_source": {
+    "width": 2048,
+    "height": 512,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "pitch": 8192,
+    "header_128_sha256": "db8b5f3df045aa54a0a573d78a44ba811308d9cb09a700ff7abe6147c5593eb4",
+    "pixel_masks": {
+      "r": "0x00ff0000",
+      "g": "0x0000ff00",
+      "b": "0x000000ff",
+      "a": "0xff000000"
+    },
+    "raw_to_readable": "flip_y",
+    "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc"
+  },
+  "semantic_binding": {
+    "canonical_unique_segments": 6,
+    "exact_physical_occurrences": 7,
+    "correction": "TIME ATTACK exists twice: normal grey state and alternate red state. Previous expected_physical_occurrences=6 undercounted this alternate-state occurrence.",
+    "occurrences": [
+      {
+        "source": "REMOVE FRIEND",
+        "korean": "친구 삭제",
+        "state": "NORMAL_GREY",
+        "source_bbox_readable_xyxy": [
+          3,
+          51,
+          395,
+          89
+        ],
+        "source_bbox_raw_xyxy": [
+          3,
+          423,
+          395,
+          461
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          5,
+          53,
+          393,
+          87
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          5,
+          425,
+          393,
+          459
+        ],
+        "mask_pixels": 8195,
+        "alpha_pixels": 8195,
+        "median_rgba": [
+          63,
+          71,
+          74,
+          255
+        ],
+        "mask_u8_raw_sha256": "cbf2186c051bb101742f438deb06fe0fc2934923226fa9394a3da017d23cb540"
+      },
+      {
+        "source": "SEND GAME INVITE",
+        "korean": "게임 초대 보내기",
+        "state": "NORMAL_GREY",
+        "source_bbox_readable_xyxy": [
+          3,
+          115,
+          462,
+          153
+        ],
+        "source_bbox_raw_xyxy": [
+          3,
+          359,
+          462,
+          397
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          5,
+          117,
+          460,
+          151
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          5,
+          361,
+          460,
+          395
+        ],
+        "mask_pixels": 9088,
+        "alpha_pixels": 9088,
+        "median_rgba": [
+          63,
+          71,
+          74,
+          255
+        ],
+        "mask_u8_raw_sha256": "2f189ec416c6cbccaa239af7d7ad51d3667aa7d1331beb025cf74b9e9685617d"
+      },
+      {
+        "source": "TIME ATTACK",
+        "korean": "타임 어택",
+        "state": "NORMAL_GREY",
+        "source_bbox_readable_xyxy": [
+          17,
+          180,
+          509,
+          242
+        ],
+        "source_bbox_raw_xyxy": [
+          17,
+          270,
+          509,
+          332
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          19,
+          182,
+          507,
+          240
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          19,
+          272,
+          507,
+          330
+        ],
+        "mask_pixels": 15105,
+        "alpha_pixels": 15105,
+        "median_rgba": [
+          78,
+          96,
+          100,
+          255
+        ],
+        "mask_u8_raw_sha256": "cb3a9080869a6cf14200a71a333f97cdf4adc56bf8333459b5dad6791a9a79d5"
+      },
+      {
+        "source": "OUTRUN",
+        "korean": "아웃런",
+        "state": "NORMAL_GREY",
+        "source_bbox_readable_xyxy": [
+          808,
+          180,
+          1097,
+          242
+        ],
+        "source_bbox_raw_xyxy": [
+          808,
+          270,
+          1097,
+          332
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          810,
+          182,
+          1095,
+          240
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          810,
+          272,
+          1095,
+          330
+        ],
+        "mask_pixels": 10273,
+        "alpha_pixels": 10273,
+        "median_rgba": [
+          78,
+          96,
+          100,
+          255
+        ],
+        "mask_u8_raw_sha256": "867726ca49c54e1c0bb540070ba7ff95d0ac66d31b3d636e4945a8f79531ddbd"
+      },
+      {
+        "source": "COAST 2 COAST",
+        "korean": "코스트 2 코스트",
+        "state": "NORMAL_GREY",
+        "source_bbox_readable_xyxy": [
+          20,
+          266,
+          626,
+          330
+        ],
+        "source_bbox_raw_xyxy": [
+          20,
+          182,
+          626,
+          246
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          22,
+          268,
+          624,
+          328
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          22,
+          184,
+          624,
+          244
+        ],
+        "mask_pixels": 17021,
+        "alpha_pixels": 17021,
+        "median_rgba": [
+          78,
+          96,
+          100,
+          255
+        ],
+        "mask_u8_raw_sha256": "441e9e7fffd8c6febcde93050a2dbdb7c11fe65efa15e609b49634f67aa127af"
+      },
+      {
+        "source": "HEART ATTACK",
+        "korean": "하트 어택",
+        "state": "NORMAL_GREY",
+        "source_bbox_readable_xyxy": [
+          1022,
+          268,
+          1567,
+          330
+        ],
+        "source_bbox_raw_xyxy": [
+          1022,
+          182,
+          1567,
+          244
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          1024,
+          270,
+          1565,
+          328
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          1024,
+          184,
+          1565,
+          242
+        ],
+        "mask_pixels": 18290,
+        "alpha_pixels": 16968,
+        "median_rgba": [
+          78,
+          96,
+          100,
+          255
+        ],
+        "mask_u8_raw_sha256": "c308cdcdb09f9359fae6b1c6a56aa5ef3639621feb94b182b41fd17f80bb8004"
+      },
+      {
+        "source": "TIME ATTACK",
+        "korean": "타임 어택",
+        "state": "ALTERNATE_RED",
+        "source_bbox_readable_xyxy": [
+          14,
+          352,
+          1361,
+          512
+        ],
+        "source_bbox_raw_xyxy": [
+          14,
+          0,
+          1361,
+          160
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          16,
+          354,
+          1359,
+          510
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy": [
+          16,
+          2,
+          1359,
+          158
+        ],
+        "mask_pixels": 103960,
+        "alpha_pixels": 100007,
+        "median_rgba": [
+          186,
+          0,
+          0,
+          255
+        ],
+        "mask_u8_raw_sha256": "8d6d5e509007327bb24d54c76d5c2e08649a05709dc74ce2ebeddff09047a1e9"
+      }
+    ]
+  },
+  "historical_atlas_region_audit": {
+    "region_count": 7,
+    "regions_union_nonzero_pixels": 144224,
+    "exact_source_nonzero_pixels": 181932,
+    "nonzero_pixels_outside_historical_region_union": 37708,
+    "exact_source_alpha_nonzero_pixels": 176657,
+    "alpha_nonzero_pixels_outside_historical_region_union": 35262,
+    "outside_nonzero_raw_bbox_xyxy": [
+      17,
+      0,
+      1567,
+      244
+    ],
+    "outside_nonzero_readable_bbox_xyxy": [
+      17,
+      268,
+      1567,
+      512
+    ],
+    "conclusion": "Historical atlas rectangles remain useful lineage evidence but are not a safe source-language removal boundary for this exact canonical DDS. Full exact-source semantic occurrence masks are required to avoid English residue."
+  },
+  "clean_plate": {
+    "method": "Source is text-only/transparent outside seven positively bound text occurrences. Clear every nonzero RGBA source-effect pixel inside the seven exact semantic occurrence bboxes; leave all zero RGBA pixels unchanged.",
+    "removal_mask_pixels": 181932,
+    "alpha_nonzero_pixels_removed": 176657,
+    "removal_mask_u8_raw_sha256": "fbffcb1c075421cfb28879fb43e32cd1c6dfc3f64e72eaaaf32bd579028bbd9a",
+    "clean_plate_raw_rgba_sha256": "bb9f8df61474d25e71fa00722318cd387396ca1736605e1248821cc0de3d3af8",
+    "clean_plate_display_rgba_sha256": "bb9f8df61474d25e71fa00722318cd387396ca1736605e1248821cc0de3d3af8",
+    "result_all_zero_rgba": true,
+    "changed_pixels": 181932,
+    "changed_pixels_outside_removal_mask": 0,
+    "alpha_changed_pixels": 176657,
+    "alpha_changed_pixels_outside_removal_mask": 0,
+    "uncovered_nonzero_source_pixels": 0,
+    "producer_machine_qa": "PASS",
+    "c_independent_qa_required": true
+  },
+  "readiness_after": {
+    "index220": "PRE_CANDIDATE_GATES_PRODUCED__EXACT_SOURCE_6_UNIQUE_SEMANTICS_7_OCCURRENCES__FULL_MASK_CLEAN_PLATE_SAFE_BBOX__C_INDEPENDENT_QA_REQUIRED",
+    "candidate_rendered": false,
+    "candidate_dds_modified": false,
+    "render_blocker": "Current render-ready definition requires independent C acceptance of the exact-source topology correction and CLEAN_PLATE. B does not self-promote its own clean plate to RENDER_READY."
+  },
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00108.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00134.json",
+    "localization/graphics/role_B/20260929-0830-B113/B113_W00018_EVEN_EXACT_HD_RECONSTRUCTION_INPUT.json",
+    "localization/graphics/role_B/20260929-1745-B133-P00040/B133_P00040_V2_REGION_GUARD_CLEAN_PLATE_WORK_ORDER_REPORT.json",
+    "localization/graphics/transcriptions.jsonl#index220"
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

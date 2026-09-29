@@ -1,0 +1,77 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
+  "wave_id": "P00112",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:45:00+09:00",
+  "base_head_sha": "a40885d301be8711066c7b39dc1ee262f087ca84",
+  "base_sha": "a40885d301be8711066c7b39dc1ee262f087ca84",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX220_EXACT_SOURCE_TOPOLOGY_CLEANPLATE_SAFE_BBOX_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX220_EXACT_SOURCE_7_OCCURRENCE_TOPOLOGY_CLEAN_PLATE_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Latest Git contract owns B shard index%3==1, overriding the stale even-index prompt. B00209/211/213 assets 226/232/133 are C-QA-pending and skipped; sticky source-exhausted and attempt-exhausted rework are not repeated. With no runnable B-owned DIRECT_REWORK/RENDER_READY/ONE_STAGE item, this single candidate-completion preflight advances index220 D657C2EB. Approved Drive exact path misses, then the verified pinned v0.25.10a Release member matches canonical SHA-256 439a09cd... exactly at 2048x512 RGBA32 mip1. Exact decoded pixels prove six unique semantics but seven physical occurrences because TIME ATTACK has normal-grey and alternate-red states. They also prove 37,708 nonzero source pixels lie outside the historical 7-region atlas union, so those historical regions are not safe removal boundaries. B derives 7/7 exact effect bboxes, 2px safe bboxes and a complete 181,932-pixel clean plate with zero uncovered source pixels or outside-mask/alpha changes. Independent C topology/CLEAN_PLATE QA is still required before render; no Korean DDS is self-promoted.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00214-P00112/B00214_P00112_INDEX220_EXACT_TOPOLOGY_CLEANPLATE.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX220_EXACT_CANONICAL_SOURCE_TOPOLOGY_CORRECTION_PLUS_FULL_MASK_CLEAN_PLATE_SAFE_BBOX_HANDOFF",
+    "reviewed_indices": [
+      220
+    ],
+    "reviewed_assets": [
+      "D657C2EB"
+    ],
+    "exact_source_acquired": 1,
+    "unique_semantics": 6,
+    "physical_occurrences": 7,
+    "corrected_occurrence_count": true,
+    "historical_region_union_outside_nonzero_pixels": 37708,
+    "source_effect_masks": 7,
+    "candidate_safe_bboxes": 7,
+    "removal_mask_pixels": 181932,
+    "uncovered_nonzero_source_pixels": 0,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      220
+    ],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00209": [
+        226
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00211": [
+        232
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00213": [
+        133
+      ]
+    },
+    "readiness_after": {
+      "220": "PRE_CANDIDATE_GATES_PRODUCED__C_INDEPENDENT_TOPOLOGY_AND_CLEAN_PLATE_QA_REQUIRED"
+    }
+  },
+  "self_qa": "PASS_INDEX220_MOD3_EQ_1__DRIVE_EXACT_MISS_FALLTHROUGH__PINNED_RELEASE_EXACT_CANONICAL_SHA__RGBA32_2048X512_MIP1_FLIP_Y__6_UNIQUE_SEMANTICS_7_PHYSICAL_OCCURRENCES__TIME_ATTACK_NORMAL_PLUS_ALTERNATE_RED__37708_NONZERO_OUTSIDE_HISTORICAL_ATLAS_UNION_PROVEN__7_OF_7_EFFECT_BBOX__7_OF_7_2PX_SAFE_BBOX__181932_PIXEL_CLEAN_PLATE__ZERO_UNCOVERED_SOURCE__ZERO_OUTSIDE_MASK__ZERO_ALPHA_ESCAPE__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_C_INDEPENDENT_TOPOLOGY_AND_CLEAN_PLATE_QA_REQUIRED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT"
+}
