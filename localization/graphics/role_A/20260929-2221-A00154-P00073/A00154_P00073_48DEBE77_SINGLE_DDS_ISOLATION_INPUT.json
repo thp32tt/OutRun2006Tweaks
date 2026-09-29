@@ -1,0 +1,150 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-single-dds-isolation-input-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00154",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00073",
+  "recorded_at_kst": "2026-09-29T22:21:30+09:00",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "base_head_sha": "e6121711fa1ecf28ef47155796485183e88f0292",
+  "selection": {
+    "selected_index": 63,
+    "selected_asset": "48DEBE77",
+    "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "artwork_status": "c85_pixel_visual_pass_pending_ingame",
+    "reason": "No explicit RENDER_READY or ONE_STAGE_TO_RENDER marker exists in the current A shard; direct rework indices 51/53/111/121 remain dependency-blocked, and A00151/index99 is producer-QA pending. Fallback ladder step 3 therefore advances an existing odd-shard static PASS candidate that lacks a single-DDS runtime-isolation manifest.",
+    "existing_isolation_manifests_checked": [
+      "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+      "localization/validation/single_dds/W00006_C00022_C4A2937B.json"
+    ],
+    "prior_48DEBE77_isolation_manifest_found": false
+  },
+  "asset": {
+    "id": "48DEBE77",
+    "queue_index": 63,
+    "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "translations": [
+      {
+        "source": "START",
+        "korean": "출발",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "GOAL",
+        "korean": "골",
+        "physical_occurrences": 1
+      }
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "git_blob_sha": "3eb59ab402a87a4a38787d37eaaff6e263f1ffe0",
+    "sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+    "bytes": 1048704,
+    "dds": {
+      "width": 512,
+      "height": 512,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 2048
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
+    "sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192
+    },
+    "dimension_policy": "CREATE_NEW_HD_DIMENSION_CHANGE"
+  },
+  "qa_evidence": {
+    "c83_report": "localization/graphics/role_C/20260928-0030-C83/C83_D6DC1380_48DEBE77_STRICT_QA_REPORT.json",
+    "c85_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "c85_status": "C85_PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "text_elements": 3,
+    "containment_pass_count": 3,
+    "containment_fail_count": 0,
+    "outside_declared_cells_changed_nontransparent_pixels": 0,
+    "current_candidate_heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "fingerprint_basis": {
+      "source_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+      "raw_orientation": "mirror_y",
+      "semantic_layout": "START x2 -> 출발; GOAL x1 -> 골",
+      "qa_authority": "C85 exact current candidate pixel/visual PASS"
+    },
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "candidate_git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
+    "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "expected_dds_count": 1,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Test 48DEBE77 as the only replacement DDS.",
+    "Reproduce the route/loading path that displays both START markers and the GOAL marker.",
+    "Capture readable/game-orientation evidence and confirm mirror_y storage renders correctly.",
+    "Verify runtime size/scaling, route-art alignment, alpha/transparency, sprite position, clipping and zero-pixel overflow.",
+    "Do not promote or approve the DDS unless isolated runtime behavior is correct."
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 3,
+    "type": "SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_ODD_INDEX_63_ONLY",
+    "work_steal": "NONE",
+    "source_blob_current": "PASS_3EB59AB4",
+    "candidate_blob_current": "PASS_9C571113",
+    "c85_heavy_qa_reuse": "PASS_UNCHANGED_SOURCE_CANDIDATE_FINGERPRINT",
+    "duplicate_isolation_manifest": "PASS_NONE_FOUND_FOR_48DEBE77",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
