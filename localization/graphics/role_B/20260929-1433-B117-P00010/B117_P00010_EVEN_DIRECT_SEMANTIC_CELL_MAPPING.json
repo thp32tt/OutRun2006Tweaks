@@ -1,0 +1,694 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00069",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "attempt": "1/3",
+  "wave_id": "P00010",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:33:41+09:00",
+  "selection_head_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
+  "precommit_head_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "2752dd3fbc5170c8e2263b2ca1be8e3b27a17182",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "dedup_and_reuse": {
+    "prior_task": "LOCALIZATION-LOCALIZATION_B-00054",
+    "prior_report": "localization/graphics/role_B/20260929-0801-B112/B112_W00017_EXACT_HD_RECONSTRUCTION_INPUT.json",
+    "prior_report_blob_sha": "b748cfbdd3515ae906e5668955d3a7ff709a9152",
+    "reuse_reason": "Source/translation/QA-contract fingerprints are unchanged. Reuse B00054 immutable Release/4x-atlas/working-source identity PASS; this run adds direct stock-source semantic-to-sprite evidence and stock-to-4x geometry without repeating candidate-only heavy QA.",
+    "skipped_current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00062": [
+        "188",
+        "212",
+        "226",
+        "232"
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00066": [
+        "198",
+        "214",
+        "230",
+        "236"
+      ]
+    }
+  },
+  "selection": {
+    "selected_indices": [
+      130,
+      140,
+      154,
+      164
+    ],
+    "selected_assets": [
+      "1762489B",
+      "31C58963",
+      "4D38BBB0",
+      "5B65E08C"
+    ],
+    "selected_state": "C-consumed reconstruction-only rows; semantic-to-sprite mapping still HOLD",
+    "reason": "Advance previously accepted immutable reconstruction inputs to direct semantic cell mappings. No current B producer QA-pending asset is revisited."
+  },
+  "evidence_policy": {
+    "evidence_images": [
+      {
+        "index": 130,
+        "asset": "1762489B",
+        "path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_130_1762489B_STOCK_ALPHA_SEMANTIC_EVIDENCE.png",
+        "source_png_sha": "9b960abbd475bb157d9dfdaf4c73caea891a4a79",
+        "blob_sha": "c4b77ca8fa8b6f6235210d206bfa23065c0b41e8"
+      },
+      {
+        "index": 140,
+        "asset": "31C58963",
+        "path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_140_31C58963_STOCK_ALPHA_SEMANTIC_EVIDENCE.png",
+        "source_png_sha": "1864f6abe58ababe303c0bf61b3808951e5d8584",
+        "blob_sha": "35b22a15eb5489a3eb2342dbad9f778468208693"
+      },
+      {
+        "index": 154,
+        "asset": "4D38BBB0",
+        "path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_154_4D38BBB0_STOCK_ALPHA_SEMANTIC_EVIDENCE.png",
+        "source_png_sha": "092d13a6d5f909f2aaf071116001a9278ec6dcc3",
+        "blob_sha": "92739d4024ae5bc8d9d549d85be6e15fdfc05fd3"
+      },
+      {
+        "index": 164,
+        "asset": "5B65E08C",
+        "path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_164_5B65E08C_STOCK_ALPHA_SEMANTIC_EVIDENCE.png",
+        "source_png_sha": "ed299b6da90aa91fc95f19652183ef793ce98655",
+        "blob_sha": "87041d225a7b2a2743f54176ec4c2074328a71e1"
+      }
+    ],
+    "transform": "For human-readable semantic evidence only, derived in-memory from exact immutable stock PNG by displaying 255-alpha as grayscale; no local filesystem, N100, clone, or Library input.",
+    "authority": "Stock PNG/atlas is semantic-mapping evidence only. Exact Release HD DDS remains construction/pixel authority for future bbox/orientation/slant/clean-plate work."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "deliverable_type": "FOUR_EVEN_DIRECT_SEMANTIC_CELL_MAPPING_INPUTS",
+    "assets_advanced": 4,
+    "canonical_semantics_total": 16,
+    "canonical_semantics_exact_source_match": 15,
+    "canonical_intent_cells_located": 16,
+    "exact_canonical_physical_occurrences_mapped": 17,
+    "source_variant_cells": 1,
+    "new_source_text_omissions_detected": 1,
+    "stock_atlas_regions_verified": 24,
+    "stock_to_4x_geometry": "PASS_24_OF_24_EXACT_X4",
+    "candidate_dds_written": false,
+    "description": "Binds the old B00054 reconstruction set to directly observed source sprite cells, including duplicate physical occurrences; fail-closes one PRESS ENTER/PRESS START source variant and one extra SHOWROOM source string rather than inventing canonical state."
+  },
+  "assets": [
+    {
+      "queue_index": 130,
+      "asset": "1762489B",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+      "reused_hd_release": {
+        "git_blob_sha": "ce5158f8f3e78dc328227e4e76c7c71789b53060",
+        "expected_canvas": [
+          2048,
+          512
+        ]
+      },
+      "stock_png": {
+        "git_blob_sha": "9b960abbd475bb157d9dfdaf4c73caea891a4a79",
+        "evidence_path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_130_1762489B_STOCK_ALPHA_SEMANTIC_EVIDENCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "32df589bfe7e43ab095dc7598a70d68eef6e89ce",
+        "regions": 6
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "d9de1e9ff9e91ecfe3a87e9d03a27f6c6cb50ec5",
+        "regions": 6
+      },
+      "physical_mapping_status": "PASS_5_OF_5_CANONICAL_SEMANTICS_PLUS_PRESERVED_NUMERIC_MARKER",
+      "mappings": [
+        {
+          "source": "MIX 1 COURSE",
+          "korean": "믹스 1 코스",
+          "sprite": "sprite_1083",
+          "stock_cell": [
+            0,
+            32,
+            316,
+            24
+          ],
+          "hd_cell": [
+            0,
+            128,
+            1264,
+            96
+          ]
+        },
+        {
+          "source": "MIX 2 COURSE",
+          "korean": "믹스 2 코스",
+          "sprite": "sprite_1082",
+          "stock_cell": [
+            0,
+            56,
+            316,
+            24
+          ],
+          "hd_cell": [
+            0,
+            224,
+            1264,
+            96
+          ]
+        },
+        {
+          "source": "OUTRUN2 COURSE",
+          "korean": "아웃런2 코스",
+          "sprite": "sprite_1081",
+          "stock_cell": [
+            0,
+            80,
+            316,
+            24
+          ],
+          "hd_cell": [
+            0,
+            320,
+            1264,
+            96
+          ]
+        },
+        {
+          "source": "OUTRUN2SP COURSE",
+          "korean": "아웃런2 SP 코스",
+          "sprite": "sprite_1080",
+          "stock_cell": [
+            0,
+            104,
+            316,
+            24
+          ],
+          "hd_cell": [
+            0,
+            416,
+            1264,
+            96
+          ]
+        },
+        {
+          "source": "AVERAGE RANK:",
+          "korean": "평균 랭크:",
+          "sprite": "sprite_1084",
+          "stock_cell": [
+            316,
+            112,
+            150,
+            16
+          ],
+          "hd_cell": [
+            1264,
+            448,
+            600,
+            64
+          ]
+        }
+      ],
+      "preserve_cells": [
+        {
+          "sprite": "sprite_1085",
+          "stock_cell": [
+            466,
+            114,
+            32,
+            14
+          ],
+          "hd_cell": [
+            1864,
+            456,
+            128,
+            56
+          ],
+          "reason": "numeric rank marker"
+        }
+      ],
+      "next_action": "Measure exact Release HD full-effect bbox/raw orientation/slant for the five target cells; preserve sprite_1085; generate clean plates only after those measurements."
+    },
+    {
+      "queue_index": 140,
+      "asset": "31C58963",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+      "reused_hd_release": {
+        "git_blob_sha": "b0079384796e645d2a7b759a017d071f041457b9",
+        "expected_canvas": [
+          2048,
+          1024
+        ]
+      },
+      "stock_png": {
+        "git_blob_sha": "1864f6abe58ababe303c0bf61b3808951e5d8584",
+        "evidence_path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_140_31C58963_STOCK_ALPHA_SEMANTIC_EVIDENCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "ad6631b1323290ee05c4216b8d7606d61c7f7707",
+        "regions": 5
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "7829c90426d563960440dd70b9b7ae74b3b76c0d",
+        "regions": 5
+      },
+      "physical_mapping_status": "PASS_4_EXACT_CANONICAL_PLUS_1_PROMPT_VARIANT_CELL_HOLD",
+      "mappings": [
+        {
+          "source": "SHOWROOM",
+          "korean": "쇼룸",
+          "sprite": "sprite_460",
+          "stock_cell": [
+            0,
+            96,
+            440,
+            40
+          ],
+          "hd_cell": [
+            0,
+            384,
+            1760,
+            160
+          ],
+          "status": "PASS_DIRECT_SOURCE"
+        },
+        {
+          "source": "SELECT MODE",
+          "korean": "모드 선택",
+          "sprite": "sprite_459",
+          "stock_cell": [
+            0,
+            136,
+            440,
+            40
+          ],
+          "hd_cell": [
+            0,
+            544,
+            1760,
+            160
+          ],
+          "status": "PASS_DIRECT_SOURCE"
+        },
+        {
+          "source": "SELECT RACE",
+          "korean": "레이스 선택",
+          "sprite": "sprite_458",
+          "stock_cell": [
+            0,
+            176,
+            440,
+            40
+          ],
+          "hd_cell": [
+            0,
+            704,
+            1760,
+            160
+          ],
+          "status": "PASS_DIRECT_SOURCE"
+        },
+        {
+          "source": "SELECT STAGE",
+          "korean": "스테이지 선택",
+          "sprite": "sprite_457",
+          "stock_cell": [
+            0,
+            216,
+            440,
+            40
+          ],
+          "hd_cell": [
+            0,
+            864,
+            1760,
+            160
+          ],
+          "status": "PASS_DIRECT_SOURCE"
+        },
+        {
+          "canonical_source": "PRESS START",
+          "korean": "START 버튼",
+          "observed_stock_source": "PRESS ENTER",
+          "sprite": "sprite_461",
+          "stock_cell": [
+            0,
+            77,
+            186,
+            19
+          ],
+          "hd_cell": [
+            0,
+            308,
+            744,
+            76
+          ],
+          "status": "HOLD_SOURCE_VARIANT_RECONCILIATION"
+        }
+      ],
+      "variant_note": "Direct immutable stock-source evidence says PRESS ENTER while canonical transcription/artwork plan says PRESS START. Existing B00054 working-source references explicitly cover prompt variants. Do not render until exact Release HD prompt text is decoded or C reconciles the canonical source variant.",
+      "next_action": "Decode exact Release HD sprite_461 before choosing START/ENTER wording; other four mapped cells can proceed to exact HD bbox/orientation/slant measurement independently."
+    },
+    {
+      "queue_index": 154,
+      "asset": "4D38BBB0",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "reused_hd_release": {
+        "git_blob_sha": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "expected_canvas": [
+          4096,
+          1024
+        ]
+      },
+      "stock_png": {
+        "git_blob_sha": "092d13a6d5f909f2aaf071116001a9278ec6dcc3",
+        "evidence_path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_154_4D38BBB0_STOCK_ALPHA_SEMANTIC_EVIDENCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "2ccda9fdd45801aa502a8b9a0ac738b022acfb3e",
+        "regions": 10
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "11f58c46008eb6ca355cd9b0d64f1fe268695838",
+        "regions": 10
+      },
+      "physical_mapping_status": "PASS_5_OF_5_CANONICAL_SEMANTICS_7_PHYSICAL_OCCURRENCES_PLUS_1_SOURCE_OMISSION",
+      "mappings": [
+        {
+          "source": "MULTIPLAYER",
+          "korean": "멀티플레이",
+          "sprites": [
+            {
+              "sprite": "sprite_10",
+              "stock_cell": [
+                0,
+                47,
+                401,
+                43
+              ],
+              "hd_cell": [
+                0,
+                188,
+                1604,
+                172
+              ]
+            },
+            {
+              "sprite": "sprite_13",
+              "stock_cell": [
+                640,
+                234,
+                203,
+                22
+              ],
+              "hd_cell": [
+                2560,
+                936,
+                812,
+                88
+              ]
+            }
+          ]
+        },
+        {
+          "source": "SINGLE PLAYER",
+          "korean": "싱글 플레이",
+          "sprites": [
+            {
+              "sprite": "sprite_8",
+              "stock_cell": [
+                0,
+                90,
+                440,
+                43
+              ],
+              "hd_cell": [
+                0,
+                360,
+                1760,
+                172
+              ]
+            },
+            {
+              "sprite": "sprite_11",
+              "stock_cell": [
+                401,
+                68,
+                264,
+                22
+              ],
+              "hd_cell": [
+                1604,
+                272,
+                1056,
+                88
+              ]
+            }
+          ]
+        },
+        {
+          "source": "DEFAULT LICENSE",
+          "korean": "기본 라이선스",
+          "sprites": [
+            {
+              "sprite": "sprite_9",
+              "stock_cell": [
+                440,
+                90,
+                422,
+                43
+              ],
+              "hd_cell": [
+                1760,
+                360,
+                1688,
+                172
+              ]
+            }
+          ]
+        },
+        {
+          "source": "CREATE NEW LICENSE",
+          "korean": "새 라이선스 만들기",
+          "sprites": [
+            {
+              "sprite": "sprite_6",
+              "stock_cell": [
+                0,
+                133,
+                500,
+                43
+              ],
+              "hd_cell": [
+                0,
+                532,
+                2000,
+                172
+              ]
+            }
+          ]
+        },
+        {
+          "source": "SELECT LICENSE",
+          "korean": "라이선스 선택",
+          "sprites": [
+            {
+              "sprite": "sprite_7",
+              "stock_cell": [
+                500,
+                133,
+                486,
+                43
+              ],
+              "hd_cell": [
+                2000,
+                532,
+                1944,
+                172
+              ]
+            }
+          ]
+        }
+      ],
+      "transcription_omissions": [
+        {
+          "source": "SHOWROOM",
+          "sprite": "sprite_12",
+          "stock_cell": [
+            665,
+            68,
+            203,
+            22
+          ],
+          "hd_cell": [
+            2660,
+            272,
+            812,
+            88
+          ],
+          "status": "MISSING_CANONICAL_TRANSLATION_C_RECONCILIATION_REQUIRED"
+        }
+      ],
+      "preserve_cells": [
+        {
+          "sprite": "sprite_4",
+          "stock_cell": [
+            0,
+            176,
+            511,
+            80
+          ],
+          "hd_cell": [
+            0,
+            704,
+            2044,
+            320
+          ],
+          "reason": "no canonical text observed in alpha semantic evidence"
+        },
+        {
+          "sprite": "sprite_5",
+          "stock_cell": [
+            511,
+            176,
+            129,
+            80
+          ],
+          "hd_cell": [
+            2044,
+            704,
+            516,
+            320
+          ],
+          "reason": "no canonical text observed in alpha semantic evidence"
+        }
+      ],
+      "next_action": "C must reconcile the observed SHOWROOM omission. For the seven canonical physical occurrences, measure exact Release HD bboxes/orientation/slant and protected header masks before Korean render."
+    },
+    {
+      "queue_index": 164,
+      "asset": "5B65E08C",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+      "reused_hd_release": {
+        "git_blob_sha": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "expected_canvas": [
+          2048,
+          1024
+        ]
+      },
+      "stock_png": {
+        "git_blob_sha": "ed299b6da90aa91fc95f19652183ef793ce98655",
+        "evidence_path": "localization/graphics/role_B/20260929-1433-B117-P00010/B117_164_5B65E08C_STOCK_ALPHA_SEMANTIC_EVIDENCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "e76881eed2857dd33b70172997a78b4975073020",
+        "regions": 3
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "baf21ea53d31d9de0d153ccad9132e4af89a3c90",
+        "regions": 3
+      },
+      "physical_mapping_status": "PASS_1_OF_1_CANONICAL_SEMANTIC",
+      "mappings": [
+        {
+          "source": "SELECT LICENSE",
+          "korean": "라이선스 선택",
+          "sprite": "sprite_16",
+          "stock_cell": [
+            140,
+            133,
+            292,
+            41
+          ],
+          "hd_cell": [
+            560,
+            532,
+            1168,
+            164
+          ]
+        }
+      ],
+      "preserve_cells": [
+        {
+          "sprite": "sprite_14",
+          "stock_cell": [
+            0,
+            174,
+            500,
+            82
+          ],
+          "hd_cell": [
+            0,
+            696,
+            2000,
+            328
+          ],
+          "reason": "non-text header/background region"
+        },
+        {
+          "sprite": "sprite_15",
+          "stock_cell": [
+            0,
+            92,
+            140,
+            82
+          ],
+          "hd_cell": [
+            0,
+            368,
+            560,
+            328
+          ],
+          "reason": "non-text header/background region"
+        }
+      ],
+      "next_action": "Measure exact Release HD sprite_16 glyph/effect bbox/raw orientation/slant and build protected clean plate before rendering 라이선스 선택."
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_130_140_154_164",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_B00062_AND_B00066_CURRENT_PENDING_ASSETS_SKIPPED",
+    "prior_heavy_qa_reuse": "PASS_B00054_UNCHANGED_FINGERPRINT_REUSED_NO_DUPLICATE_HEADER_ALPHA_ORIENTATION_CANDIDATE_QA",
+    "canonical_translation_match": "PASS_CURRENT_TRANSCRIPTIONS_EQUALS_ARTWORK_PLAN_16_OF_16",
+    "stock_to_4x_geometry": "PASS_24_OF_24_EXACT_X4",
+    "direct_semantic_mapping": "PASS_15_OF_16_EXACT_CANONICAL_SOURCE_STRINGS__17_PHYSICAL_OCCURRENCES",
+    "prompt_variant_detection": "HOLD_31C58963_PRESS_ENTER_STOCK_VS_PRESS_START_CANONICAL",
+    "omission_detection": "PASS_4D38BBB0_SHOWROOM_FLAGGED_WITHOUT_GUESSED_KOREAN",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK_NEXT_STAGE",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_EXACT_RELEASE_HD_PER_ELEMENT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_EVEN_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_DIRECT_SEMANTIC_CELL_MAPPINGS_WITH_VARIANT_AND_OMISSION_HOLDS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
