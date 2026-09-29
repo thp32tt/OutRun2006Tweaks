@@ -1,0 +1,153 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00169",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00029",
+  "qa_batch_id": "Q00029",
+  "recorded_at_kst": "2026-09-30T00:33:15+09:00",
+  "base_head_sha": "47031bd5b9d3aa0646d5419a12e5685eeda2824d",
+  "result": "PASS_Q00029_A00164_REWORK_REQUIRED_B00160_SUPERSEDED_A00166_PASS_DRIVE_TIER_RUNTIME_UNTESTED",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "4c54cb6c3122d9899b95639e5231a79735374f18",
+      "result_message": "localization(A): rework index99 clean plate ghost envelope [AUTO:LOCALIZATION-LOCALIZATION_A-00164]",
+      "completed_at": "2026-09-29T23:38:39.299857+09:00",
+      "producer_id": "P00080",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
+      "result_message": "localization(B): render index112 D41D0B1 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00160]",
+      "completed_at": "2026-09-29T23:49:43.071557+09:00",
+      "producer_id": "P00077",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00166",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "826527bda7b9bc58e6eacdb852f178dc6bcdf783",
+      "result_message": "localization(A): audit Drive source tier for odd assets [AUTO:LOCALIZATION-LOCALIZATION_A-00166]",
+      "completed_at": "2026-09-30T00:06:57.664643+09:00",
+      "producer_id": "P00081",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+      "result_sha": "4c54cb6c3122d9899b95639e5231a79735374f18",
+      "status": "REWORK_REQUIRED",
+      "reason": "Index99/4F68708E CLEAN_PLATE fails independent C transparency/no-box/native-readable QA. On the unchanged C127 exact source, A00164's 156,982-pixel patch makes all patched pixels alpha=255; 33,373 source-alpha-zero pixels gain alpha and 75,954 pixels change alpha. Readable mirror-Y review shows two sharp opaque dark-blue rectangular cover strips. This violates preserve-alpha/background, no-cover-rectangle, source-effect-aware-mask and artifact-cleanliness rules. Re-derive a pixel-level full source-effect mask, preserve transparency/hidden RGB outside the true effect, independently validate CLEAN_PLATE, then continue candidate completion. No candidate/runtime approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+      "result_sha": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
+      "status": "SUPERSEDED",
+      "reason": "The immutable 7ec8a1c2 D41D0B1 candidate blob 746df92cf51b6d5ba1476ed4b426ed46bc059881 / SHA-256 9da81768a24f8417b1214532e666efb96ae15e6408a373ea5c4fcbe8f66670b9 is no longer current. Merge HEAD carries newer same-asset blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1. The older input is SUPERSEDED and not promoted; the newer exact result needs its own immutable C QA input. Runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00166",
+      "result_sha": "826527bda7b9bc58e6eacdb852f178dc6bcdf783",
+      "status": "PASS",
+      "reason": "PASS is limited to the Google Drive canonical-source transport audit. C independently reproduced 0 exact-name matches for EBEF6D20_512x512.dds, 43B07A77_512x64.dds and E1639D2E_256x64.dds on ezflash557. Approved-root traversal shows loading contains only 48DEBE77_512x512.dds and the requested route/sumo_loading target folders are absent. These are SOURCE_TRANSPORT_MISS outcomes, not identity mismatches. production_readiness=PREFLIGHT_ONLY at A00166. Newer A00168 pinned-Release evidence for the same assets is already at current HEAD and is preserved without disposition; shared state is not regressed to repeat Drive."
+    }
+  ],
+  "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+  "source_identity_validation": "PASS_REUSED_C127_EXACT_EB8C2DDA_INDEX99_SOURCE__B00160_7EC8_SUPERSEDED_BY_NEWER_CURRENT_BLOB__PASS_A00166_DRIVE_TRANSPORT_MISS_3_OF_3_REPRODUCED",
+  "canonical_semantic_validation": "PASS_INDEX99_BINDING_UNCHANGED__INDEX112_OLD_CANDIDATE_NOT_REAPPROVED_DUE_SUPERSESSION__A00166_TRANSPORT_ONLY_NO_SEMANTIC_CHANGE",
+  "geometry_mapping_validation": "FAIL_INDEX99_CLEAN_PLATE_ALPHA_AND_RECTANGULAR_COVER_ARTIFACT__B00160_OLD_GEOMETRY_NOT_RECHECKED_AFTER_SUPERSESSION__A00166_NO_PIXEL_ARTWORK",
+  "current_contract_compatibility": "MIXED_REWORK_A00164__SUPERSEDED_B00160_7EC8__PASS_A00166_DRIVE_TIER_PREFLIGHT_ONLY",
+  "readiness_reconciliation": {
+    "classification": "MIXED_REWORK_SUPERSEDED_PREFLIGHT_PASS",
+    "production_readiness": {
+      "65": "PREFLIGHT_ONLY",
+      "89": "PREFLIGHT_ONLY",
+      "241": "PREFLIGHT_ONLY"
+    },
+    "candidate_completion_priority": [
+      "index99/4F68708E direct REWORK_REQUIRED: rebuild transparent source-effect-aware CLEAN_PLATE before unrelated preflight",
+      "index112/D41D0B1 current 30971e83/5bb92bce candidate: enqueue exact newer producer result for independent C QA"
+    ],
+    "note": "A00166 Drive-tier PASS is valid at its immutable RESULT_SHA; newer unconsumed A00168 source-tier evidence is preserved and shared state must not regress."
+  },
+  "heavy_qa_reuse": {
+    "repeated_unchanged_fingerprint_heavy_qa": false,
+    "index99_source_identity": "REUSED_C127 exact source fingerprint; only new patch/alpha/visual evidence independently evaluated",
+    "index112": "SUPERSEDED before expensive QA",
+    "a00166": "Drive lookup/path checks independently reproduced"
+  },
+  "supersession": {
+    "superseded_inputs": [
+      "LOCALIZATION-LOCALIZATION_B-00160@7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f"
+    ],
+    "b00160_old_candidate_git_blob_sha": "746df92cf51b6d5ba1476ed4b426ed46bc059881",
+    "b00160_old_candidate_sha256": "9da81768a24f8417b1214532e666efb96ae15e6408a373ea5c4fcbe8f66670b9",
+    "b00160_current_candidate_git_blob_sha": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+    "b00160_current_candidate_sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
+    "merge_head": "47031bd5b9d3aa0646d5419a12e5685eeda2824d",
+    "newer_unconsumed_source_tier": [
+      "LOCALIZATION-LOCALIZATION_A-00168@9792d4abe76555792a93150de8f7d1d46e976339"
+    ]
+  },
+  "counts_after": {
+    "queue_total": 137,
+    "actionable_localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_only": 3,
+    "pending_production_localize_text": 76,
+    "canonical_transcribed_segments": 753
+  },
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "commit_mode": "ATOMIC_EMBEDDED_C_BATCH_TASK_RECORD_AND_SHARED_STATE",
+  "summary": "Q00029 consumed all three fixed inputs once. A00164/index99 is REWORK_REQUIRED for a fully opaque rectangular CLEAN_PLATE patch that introduces alpha into 33,373 source-transparent pixels. B00160@7ec8a1c2 is SUPERSEDED by current D41D0B1 30971e83/5bb92bce and is not approved. A00166 PASSes only as a reproduced Drive SOURCE_TRANSPORT_MISS audit with PREFLIGHT_ONLY readiness at its result; newer A00168 is preserved without disposition. No candidate/static/runtime approval; RUNTIME_VALIDATION=UNTESTED.",
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      99,
+      112,
+      65,
+      89,
+      241
+    ],
+    "reviewed_assets": 5,
+    "producer_inputs_pass": 1,
+    "producer_inputs_rework_required": 1,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 1,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260930-0033-C131/C131_Q00029_INDEPENDENT_QA_BATCH.json"
+  }
+}

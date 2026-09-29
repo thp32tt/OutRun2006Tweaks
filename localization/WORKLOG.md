@@ -1596,3 +1596,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Newer disjoint A00164/index99 and B00160/index112 producer work at merge HEAD was preserved and not consumed by Q00028.
 - Queue counts unchanged: 93 actionable localize_text, 76 pending production localize_text, 753 canonical graphics segments. No candidate DDS, static artwork approval, or runtime approval changed.
 - Report: `localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 00:33 KST - C131 Q00029 INDEPENDENT QA BATCH
+
+- Immutable inputs: A00164@4c54cb6 (index99), B00160@7ec8a1c (index112), A00166@826527b (indices65/89/241). Dispositions: **REWORK_REQUIRED / SUPERSEDED / PASS**.
+- A00164 index99: exact-source patch replay gives 156,982 alpha255 patch pixels, 33,373 introduced-alpha pixels from source-zero and 75,954 alpha changes; readable mirror-Y view shows two opaque dark-blue rectangular strips. Fails transparency/no-box/source-effect-aware CLEAN_PLATE gates.
+- B00160@7ec8 index112: old 746df92c/9da81768 candidate is superseded by current 30971e83/5bb92bce; old immutable input is not approved and newer exact result needs separate C QA.
+- A00166: PASS only for independently reproduced Drive SOURCE_TRANSPORT_MISS x3; production_readiness=PREFLIGHT_ONLY at that result. Newer A00168 Release-tier evidence is preserved without disposition and shared state is not regressed.
+- Counts unchanged: 137 queue = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production 76; canonical segments 753. No candidate DDS/static/runtime approval; no build/N100/local clone/GPT Library/Drive write/VR/FFB/DX. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0033-C131/C131_Q00029_INDEPENDENT_QA_BATCH.json`.

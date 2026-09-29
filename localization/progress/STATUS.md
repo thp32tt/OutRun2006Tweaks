@@ -1107,3 +1107,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. New static approvals **0**; runtime approvals **0**.
 - Newer disjoint A00164/index99 and B00160/index112 work preserved. `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json`.
+
+## 2026-09-30 00:33 KST - C131 / Q00029
+
+- QA inputs: A00164@4c54cb6 (index99), B00160@7ec8a1c (index112), A00166@826527b (indices65/89/241).
+- Dispositions: **REWORK_REQUIRED / SUPERSEDED / PASS**.
+- index99 CLEAN_PLATE fails alpha/transparency + no-cover-box visual gate: 33,373 introduced-alpha pixels from source-zero, 75,954 alpha changes, and two opaque dark-blue rectangular strips. Rework source-effect mask/clean plate before rendering.
+- index112 immutable 7ec8 candidate is superseded by current blob `30971e83bebe619520f27dfece37f8ebdc02ff28` / SHA-256 `5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1`; old candidate not approved.
+- A00166 Drive tier is accepted only as SOURCE_TRANSPORT_MISS evidence with production_readiness **PREFLIGHT_ONLY**; newer A00168 source-tier work is preserved pending its own C batch.
+- Runtime validation remains **UNTESTED**. Report: `localization/graphics/role_C/20260930-0033-C131/C131_Q00029_INDEPENDENT_QA_BATCH.json`.
