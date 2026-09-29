@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -265,6 +265,34 @@
     "hard_candidate_success_condition": true,
     "preflight_fallback_requires_no_runnable_ready_tier": true,
     "preflight_evidence_not_success_when_ready_exists": true,
-    "zero_candidate_exception": "ONLY_WHEN_NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_AFTER_FRESH_SCAN"
+    "zero_candidate_exception": "ONLY_WHEN_NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_AFTER_FRESH_SCAN",
+    "acceleration": {
+      "mode": "QUALITY_PRESERVING_FAMILY_TEMPLATE_FAST_PATH",
+      "routes": [
+        "FAST_PATH",
+        "QUALITY_PATH",
+        "EXCEPTION_QUEUE"
+      ],
+      "fast_path_requires_evidence_backed_family": true,
+      "fast_path_quality_threshold_same_as_quality_path": true,
+      "semantic_translation_reuse": true,
+      "style_family_reuse": true,
+      "asset_specific_geometry_required": true,
+      "deterministic_render_preferred": true,
+      "background_reconstruction_order": [
+        "TRANSPARENT_OR_TEXT_ONLY",
+        "FLAT_COLOR",
+        "ANALYTIC_GRADIENT",
+        "REPEATABLE_TEXTURE_OR_PATCH",
+        "CONSTRAINED_INPAINTING"
+      ],
+      "generative_reconstruction_fallback_only": true,
+      "render_measure_refit_same_invocation": true,
+      "batch_compatible_family_members": true,
+      "exception_does_not_block_independent_assets": true,
+      "template_is_not_approval_evidence": true,
+      "c_independent_final_candidate_validation": true,
+      "throughput_counts_candidate_dds_only": true
+    }
   }
 }
