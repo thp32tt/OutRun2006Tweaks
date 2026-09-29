@@ -116,5 +116,7 @@
     "independent_c_validation": "PENDING",
     "runtime_validation": "UNTESTED",
     "note": "Bookkeeping only. e78b9160064c3b60f55f0a336be7448482836da0 remains the authoritative producer RESULT_SHA."
-  }
+  },
+  "base_sha": "84af92e596117b6db2217ac0c2f23b57d483aec5",
+  "result_sha": "e78b9160064c3b60f55f0a336be7448482836da0"
 }
