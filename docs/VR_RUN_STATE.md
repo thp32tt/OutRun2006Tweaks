@@ -107,3 +107,18 @@ Current autonomous pipeline contract supersedes all older role descriptions:
 - Next checkpoint: trace exact producer -> node-tag -> queue-select -> c64 upload -> draw semantic lifetime, plus Calc3D2D/vehicle-anchor propagation for rival rank markers. Do not broaden generic queue-to-HUD ownership.
 - **PC runner is disabled until explicit user re-authorization.** Overnight scheduled work is review/static analysis/EXE-map/documentation and normal cloud CI only.
 
+
+
+## R73 PC visual-fix test — 2026-09-30 00:06 KST
+
+- Source/result SHA: `f437807922d7b9b32f9a7c7ced0442a5edab7c69`.
+- Branch: `vr-d3d9ex-candidate/R73-PC-VISUALFIX-20260929`.
+- Input evidence: user R72 PC-fast HMD log ZIP from source `00155c35c824...`.
+- OutRun HUD: game_mode=32 draw-time stage-change window; GOAL/RESULT states keep generic ScreenOverlay2D on finite HUD route. R72 Present-late window removed.
+- SkyGlow: stereo additive chain bypassed for this diagnostic/correction build to recover raw sky/cloud detail and isolate overexposure.
+- Lens flare: exact Calc3D2D anchor restored with 20% binocular disparity (full R67 depth was too separated; R69/R72 zero-disparity variants did not fuse).
+- Selector textures: 2048x2048 atlas now keeps dedicated headroom; auxiliary 2048x1024/DXT1 mip compatibility has a separate 16 MiB class inside the existing 32 MiB emergency / 400 MiB total ceiling.
+- PC-fast run `36587371264`: SUCCESS.
+- Artifact `11041973286`: `OutRun2-VR-PC-FAST-f437807922d7b9b32f9a7c7ced0442a5edab7c69`.
+- Downloaded artifact SHA256: `291eb3530d26df077533f400bb546a9d18b1a94b4a838279010ee0a9f2937d84`.
+- RUNTIME_VALIDATION=UNTESTED pending user Quest 3/VDXR run.
