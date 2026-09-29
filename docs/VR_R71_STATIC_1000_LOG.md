@@ -2424,3 +2424,12 @@ Validation:
 Next:
 - If the next log proves the exact 2048x2048 upload succeeds while the failing LockRect is the 2048x1024 single-level texture, fix that proven resource class with bounded CPU backing/direct upload semantics.
 - Do not increase global budgets or force material/color values.
+
+
+### WRITE-RECOVERY 2026-09-29 13:21 KST — Cycle 142 not advanced
+- Recovered durable state directly from GitHub: completedCycles=141; currentHead=9e43c84d9b066578d2381581a1bc621302832a00.
+- Finding remains DX9EX-SELECTOR-WHITE-CAR-001. Cycle 141 bounded diagnostics are already committed and Issue #13/#14 records exist.
+- Exact-head GitHub-hosted CI is still queued: Build 36520937261 / 36520936853; OpenXR architecture 36520937270 / 36520936857; HUD Inspector 36520937302 / 36520936795.
+- No source/runtime behavior change in this recovery write. Frozen user-test source 34eef500b2f79e7e68477d7ffe675f803e809e01 and standalone package remain untouched.
+- RUNTIME_VALIDATION=NEED_HMD_LOG. Compile/CI status is not represented as visual PASS.
+- Cycle 142 is intentionally not counted until it produces new evidence, a proven minimal fix, or regression-verifier strengthening.
