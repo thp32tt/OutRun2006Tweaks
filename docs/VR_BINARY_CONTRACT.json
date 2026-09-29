@@ -351,6 +351,20 @@
           "needle": "0xED7A3"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-R79-FLARE-HELPER-PARENT-CENSUS",
+      "rva": "0x0000C9A6",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "83ec58a168b589008b0d6cb58900403b",
+      "purpose": "Diagnostic-only hook after FUN_0040C9A0 frame setup to recover the parent flare-component callsite from [EBP+4].",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "Module::exe_ptr(0xC9A6)"
+        }
+      ]
     }
   ]
 }
