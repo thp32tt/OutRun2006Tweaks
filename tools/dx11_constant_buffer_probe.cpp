@@ -677,7 +677,13 @@ int main()
         "R103 post-Reset mirror recreation");
     require(
         managedShadow.mirror_ready() &&
-        managedShadow.lifetime_state().mirrorGeneration == 2 &&
+        managedShadow.lifetime_state().mirrorGeneration == 2,
+        "R102 post-Reset mirror acknowledgment uses new device generation");
+    require(
+        managedShadow.mirror_ready() &&
+        managedShadow.mirror_device() == d3d.device &&
+        managedShadow.mirror_texture() != nullptr &&
+        managedShadow.mirror_srv() != nullptr &&
         managedShadow.lifetime_state().mirrorShadowVersion == 1,
         "R103 post-Reset mirror upload uses new device generation");
 
