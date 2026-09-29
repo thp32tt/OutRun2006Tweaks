@@ -2089,3 +2089,303 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: RUNTIME_VALIDATION stays UNTESTED.
+
+
+## Cycle 0121 — repair-head Build evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Repair-head Build run 36516730663 completed success; this supports compile/build integrity but does not substitute for OpenXR architecture completion.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `PARTIAL_HOSTED_GATE_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: keep OpenXR pending.
+
+
+## Cycle 0122 — repair-head HUD evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Repair-head HUD Inspector run 36516730697 completed success; canonical HUD inspection remains green.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `PARTIAL_HOSTED_GATE_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: keep runtime untested.
+
+
+## Cycle 0123 — OpenXR pending evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Both repair-head OpenXR runs remain in progress; architecture validation cannot yet be promoted to PASS.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue static review.
+
+
+## Cycle 0124 — selector exact diagnostic
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Selector regression still needs exact world-draw texture/material/stage evidence; no speculative mutation.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: instrument only after owner proof.
+
+
+## Cycle 0125 — HUD exact diagnostic
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- HUD translucency diagnosis remains owner-first and state-second; alpha must never become an ownership heuristic.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `PARTIAL_HOSTED_GATE_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: preserve canonical HUD contract.
+
+
+## Cycle 0126 — menu exact diagnostic
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu head-lock and alpha remain independent; collect exact anchor and blend evidence separately.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: avoid coupled fix.
+
+
+## Cycle 0127 — checkpoint/result temporal contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Mode-specific duplicate UI requires producer+epoch evidence; generic dedup remains unsafe.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace temporal identity.
+
+
+## Cycle 0128 — marker semantic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- WorldBillboard and ProjectedWorldMarker2D remain separate; no broad promotion or flattening.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: preserve per-eye/world semantics.
+
+
+## Cycle 0129 — SkyGlow HMD gate
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Ordering fix is statically contained, but glow factor/intensity tuning remains blocked on HMD evidence.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: do not tune 0.38.
+
+
+## Cycle 0130 — 100-cycle convergence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Across the requested batch no evidence justified performance-only or broad visual behavior changes; next work should turn the narrowed selector hypothesis into bounded diagnostics once CI architecture is green.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume OpenXR then diagnostics.
+
+
+## Cycle 0131 — repair-head Build evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Repair-head Build run 36516730663 completed success; this supports compile/build integrity but does not substitute for OpenXR architecture completion.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `PARTIAL_HOSTED_GATE_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: keep OpenXR pending.
+
+
+## Cycle 0132 — repair-head HUD evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Repair-head HUD Inspector run 36516730697 completed success; canonical HUD inspection remains green.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `PARTIAL_HOSTED_GATE_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: keep runtime untested.
+
+
+## Cycle 0133 — OpenXR pending evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Both repair-head OpenXR runs remain in progress; architecture validation cannot yet be promoted to PASS.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue static review.
+
+
+## Cycle 0134 — selector exact diagnostic
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Selector regression still needs exact world-draw texture/material/stage evidence; no speculative mutation.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: instrument only after owner proof.
+
+
+## Cycle 0135 — HUD exact diagnostic
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- HUD translucency diagnosis remains owner-first and state-second; alpha must never become an ownership heuristic.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `PARTIAL_HOSTED_GATE_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: preserve canonical HUD contract.
+
+
+## Cycle 0136 — menu exact diagnostic
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu head-lock and alpha remain independent; collect exact anchor and blend evidence separately.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: avoid coupled fix.
+
+
+## Cycle 0137 — checkpoint/result temporal contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Mode-specific duplicate UI requires producer+epoch evidence; generic dedup remains unsafe.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace temporal identity.
+
+
+## Cycle 0138 — marker semantic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- WorldBillboard and ProjectedWorldMarker2D remain separate; no broad promotion or flattening.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: preserve per-eye/world semantics.
+
+
+## Cycle 0139 — SkyGlow HMD gate
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Ordering fix is statically contained, but glow factor/intensity tuning remains blocked on HMD evidence.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: do not tune 0.38.
+
+
+## Cycle 0140 — 100-cycle convergence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Across the requested batch no evidence justified performance-only or broad visual behavior changes; next work should turn the narrowed selector hypothesis into bounded diagnostics once CI architecture is green.
+- Evidence: repair-head hosted CI observation and bounded current-R71 static review.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume OpenXR then diagnostics.
