@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72-R85 compatibility plus R106 managed-shadow readiness evidence."""
+"""Regression tests for R72-R85 compatibility plus R106/R107 managed-shadow evidence."""
 
 from __future__ import annotations
 
@@ -579,6 +579,30 @@ def main() -> int:
     assert r106["ActivationEvidence"]["ManagedTextureShadow"]["ObservedReady"] is True
     assert r106["Signatures"][0]["texture_stages"][0]["managedShadowRequired"] == 1
     assert r106["Signatures"][0]["texture_stages"][0]["managedShadowReady"] == 1
+
+    r107 = run_case(
+        "VR DX11 R85 census: samples=1 exact=0 fixedFn=1 programmable=0 "
+        "topologyUnsupported=0 signatures=0 declSamples=0 indexedSamples=0 "
+        "texturedSamples=1 "
+        "resourceExact[indexUnsupported=0,textureUnsupported=0,"
+        "colorUnsupported=0,depthUnsupported=0] "
+        "managedTextureShadow[requiredSamples=1,readySamples=0,pendingSamples=1] "
+        "managedTextureMutationSource[updateTextureInvalidations=1,"
+        "updateSurfaceInvalidations=1] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r107["NativeDrawPathActivationAllowed"] is False
+    assert r107["LatestSummary"]["managedTextureUpdateTextureInvalidations"] == 1
+    assert r107["LatestSummary"]["managedTextureUpdateSurfaceInvalidations"] == 1
+    assert (
+        r107["ActivationEvidence"]["ManagedTextureShadow"][
+            "ExternalMutationInvalidations"
+        ]
+        == 2
+    )
+    assert r107["ActivationEvidence"]["ManagedTextureShadow"]["ObservedReady"] is False
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"

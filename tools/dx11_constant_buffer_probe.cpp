@@ -924,6 +924,31 @@ int main()
         managedRegistry.shadow_version(&registryTextureA) == 2,
         "R105 later successful Unlock recovers invalidated shadow");
 
+    const auto registryVersionBeforeExternalMutation =
+        managedRegistry.shadow_version(&registryTextureA);
+    require(
+        managedRegistry.invalidate_external_mutation(&registryTextureA) &&
+        !managedRegistry.shadow_valid(&registryTextureA) &&
+        managedRegistry.shadow_version(&registryTextureA) ==
+            registryVersionBeforeExternalMutation,
+        "R107 external update invalidates current MANAGED texture shadow");
+    require(
+        !managedRegistry.invalidate_external_mutation(&registryTextureA) &&
+        !managedRegistry.shadow_valid(&registryTextureA),
+        "R107 repeated external update remains fail-closed while shadow is stale");
+
+    registrySource[0] ^= 0x31;
+    require(
+        managedRegistry.begin_source_lock(
+            &registryTextureA, 0, nullptr, 0, registryLock) &&
+        managedRegistry.stage_source_unlock(&registryTextureA, 0) &&
+        managedRegistry.finish_source_unlock(
+            &registryTextureA, 0, S_OK) &&
+        managedRegistry.shadow_valid(&registryTextureA) &&
+        managedRegistry.shadow_version(&registryTextureA) ==
+            registryVersionBeforeExternalMutation + 1,
+        "R107 LockRect recapture restores readiness after external update");
+
     const auto registryVersionBeforeReset =
         managedRegistry.shadow_version(&registryTextureA);
     const auto registryGenerationBeforeReset =
@@ -1157,5 +1182,6 @@ int main()
     std::cout << "DX11 managed texture mirror reupload R103: PASS\n";
     std::cout << "DX11 managed Texture2D LockRect bridge R104: PASS\n";
     std::cout << "DX11 managed Texture2D lifetime registry R105: PASS\n";
+    std::cout << "DX11 managed Texture2D mutation-source completeness R107: PASS\n";
     return 0;
 }

@@ -189,6 +189,7 @@ public:
     void cancel_source_lock() noexcept;
     void note_mirror_uploaded() noexcept;
     void observe_device_reset() noexcept;
+    bool invalidate_external_mutation() noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -283,6 +284,7 @@ public:
         const void* textureKey,
         UINT level,
         HRESULT unlockResult) noexcept;
+    bool invalidate_external_mutation(const void* textureKey) noexcept;
     void observe_device_reset() noexcept;
     void forget_texture(const void* textureKey) noexcept;
     void clear() noexcept;

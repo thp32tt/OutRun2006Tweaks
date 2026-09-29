@@ -53,6 +53,8 @@ SUMMARY_RE = re.compile(
     r"(?:managedTextureShadow\[requiredSamples=(?P<managedTextureShadowRequiredSamples>\d+),"
     r"readySamples=(?P<managedTextureShadowReadySamples>\d+),"
     r"pendingSamples=(?P<managedTextureShadowPendingSamples>\d+)\] )?"
+    r"(?:managedTextureMutationSource\[updateTextureInvalidations=(?P<managedTextureUpdateTextureInvalidations>\d+),"
+    r"updateSurfaceInvalidations=(?P<managedTextureUpdateSurfaceInvalidations>\d+)\] )?"
     r"(?:inputLayout\[exact=(?P<inputLayoutExact>\d+),"
     r"unsupported=(?P<inputLayoutUnsupported>\d+),"
     r"(?:fvfExact=(?P<inputLayoutFvfExact>\d+),)?"
@@ -384,7 +386,17 @@ def main() -> int:
         "PendingStages": (
             latest["textureStageManagedShadowPending"] if latest else 0
         ),
+        "UpdateTextureInvalidations": (
+            latest["managedTextureUpdateTextureInvalidations"] if latest else 0
+        ),
+        "UpdateSurfaceInvalidations": (
+            latest["managedTextureUpdateSurfaceInvalidations"] if latest else 0
+        ),
     }
+    managed_texture_shadow_evidence["ExternalMutationInvalidations"] = (
+        managed_texture_shadow_evidence["UpdateTextureInvalidations"]
+        + managed_texture_shadow_evidence["UpdateSurfaceInvalidations"]
+    )
     managed_texture_shadow_evidence["ObservedReady"] = bool(
         managed_texture_shadow_evidence["RequiredSamples"] > 0
         and managed_texture_shadow_evidence["PendingSamples"] == 0
@@ -400,8 +412,9 @@ def main() -> int:
             "ManagedTextureShadow": managed_texture_shadow_evidence,
         },
         "ActivationNote": (
-            "Census exactness and managed-texture shadow readiness are evidence only. "
-            "Native D3D11 draw routing remains disabled until resource mutation "
+            "Census exactness, managed-texture shadow readiness and external-mutation "
+            "invalidation evidence are observation only. Native D3D11 draw routing "
+            "remains disabled until resource mutation "
             "classification/lifetime mirrors, shader/input translation and HMD "
             "graphics parity gates pass."
         ),

@@ -1867,6 +1867,70 @@ def main() -> None:
                 "DX11 R106 analyzer readiness drift: " + meaning
             )
 
+    r107_mutation_source_contract = {
+        "invalidate_external_mutation() noexcept":
+            "R107 per-shadow external mutation invalidation API",
+        "invalidate_external_mutation(const void* textureKey) noexcept":
+            "R107 registry invalidation API",
+        "shadow->invalidate_external_mutation()":
+            "R107 registry-to-shadow invalidation bridge",
+        "invalidate_managed_texture_update_target(":
+            "R107 D3D9 update target identity bridge",
+        "ManagedTextureUpdateTextureInvalidations":
+            "R107 UpdateTexture invalidation counter",
+        "ManagedTextureUpdateSurfaceInvalidations":
+            "R107 UpdateSurface invalidation counter",
+        "ManagedTextureShadowRegistry.invalidate_external_mutation(texture)":
+            "R107 live managed registry invalidation",
+        "managedTextureMutationSource[updateTextureInvalidations=":
+            "R107 periodic mutation-source evidence",
+    }
+    combined_r107_source = (
+        NATIVE_BACKEND_HPP + "\n" + NATIVE_BACKEND_CPP + "\n" + census
+    )
+    missing_r107 = [
+        meaning
+        for token, meaning in r107_mutation_source_contract.items()
+        if token not in combined_r107_source
+    ]
+    if missing_r107:
+        raise SystemExit(
+            "DX11 R107 managed-texture mutation-source drift: "
+            + ", ".join(missing_r107)
+        )
+
+    for token, meaning in {
+        "R107 external update invalidates current MANAGED texture shadow":
+            "R107 hosted invalidation proof",
+        "R107 repeated external update remains fail-closed while shadow is stale":
+            "R107 repeated-update fail-closed proof",
+        "R107 LockRect recapture restores readiness after external update":
+            "R107 post-update recapture proof",
+        "DX11 managed Texture2D mutation-source completeness R107: PASS":
+            "R107 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R107 hosted probe drift: " + meaning
+            )
+
+    for token, meaning in {
+        "managedTextureMutationSource\\[updateTextureInvalidations=":
+            "R107 analyzer mutation-source parser",
+        "managedTextureUpdateTextureInvalidations":
+            "R107 analyzer UpdateTexture evidence",
+        "managedTextureUpdateSurfaceInvalidations":
+            "R107 analyzer UpdateSurface evidence",
+        '"ExternalMutationInvalidations"':
+            "R107 analyzer aggregate invalidation evidence",
+        '"NativeDrawPathActivationAllowed": False':
+            "R107 non-activation invariant",
+    }.items():
+        if token not in analyzer:
+            raise SystemExit(
+                "DX11 R107 analyzer mutation-source drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

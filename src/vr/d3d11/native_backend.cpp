@@ -651,6 +651,14 @@ void NativeManagedTextureShadow::observe_device_reset() noexcept {
     lifetime_ = advance_managed_device_generation(lifetime_);
 }
 
+bool NativeManagedTextureShadow::invalidate_external_mutation() noexcept {
+    const bool wasValid = lifetime_.cpuShadowValid;
+    clear_source_lock();
+    clear_unlock_stage();
+    invalidate_shadow();
+    return wasValid;
+}
+
 void NativeManagedTextureShadow::release_mirror() noexcept {
     mirror_srv_.Reset();
     mirror_texture_.Reset();
@@ -762,6 +770,15 @@ bool NativeManagedTextureRegistry::finish_source_unlock(
     auto* shadow = find_locked(textureKey);
     return shadow &&
         shadow->finish_source_unlock(level, unlockResult);
+}
+
+bool NativeManagedTextureRegistry::invalidate_external_mutation(
+    const void* textureKey) noexcept {
+    if (!textureKey)
+        return false;
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto* shadow = find_locked(textureKey);
+    return shadow && shadow->invalidate_external_mutation();
 }
 
 void NativeManagedTextureRegistry::observe_device_reset() noexcept {

@@ -59,6 +59,8 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceUpdateTextureFailures{0};
         std::atomic<std::uint64_t> ResourceUpdateSurfaceSuccesses{0};
         std::atomic<std::uint64_t> ResourceUpdateSurfaceFailures{0};
+        std::atomic<std::uint64_t> ManagedTextureUpdateTextureInvalidations{0};
+        std::atomic<std::uint64_t> ManagedTextureUpdateSurfaceInvalidations{0};
         std::atomic<std::uint64_t> ResourceManagedShadowWrites{0};
         std::atomic<std::uint64_t> ResourceManagedShadowReads{0};
         std::atomic<std::uint64_t> ResourceManagedResetSuccesses{0};
@@ -558,6 +560,42 @@ namespace outrun::vr::dx11
             if (evidence.descriptorObserved &&
                 evidence.pool == D3DPOOL_MANAGED)
                 note_managed_lifetime_access(!readOnly);
+        }
+
+        bool invalidate_managed_texture_update_target(
+            IDirect3DBaseTexture9* destination) noexcept
+        {
+            if (!destination || destination->GetType() != D3DRTYPE_TEXTURE)
+                return false;
+
+            IDirect3DTexture9* texture = nullptr;
+            if (FAILED(destination->QueryInterface(
+                    __uuidof(IDirect3DTexture9),
+                    reinterpret_cast<void**>(&texture))) || !texture)
+                return false;
+
+            const bool invalidated =
+                ManagedTextureShadowRegistry.invalidate_external_mutation(texture);
+            texture->Release();
+            return invalidated;
+        }
+
+        bool invalidate_managed_texture_update_target(
+            IDirect3DSurface9* destination) noexcept
+        {
+            if (!destination)
+                return false;
+
+            IDirect3DTexture9* texture = nullptr;
+            if (FAILED(destination->GetContainer(
+                    __uuidof(IDirect3DTexture9),
+                    reinterpret_cast<void**>(&texture))) || !texture)
+                return false;
+
+            const bool invalidated =
+                ManagedTextureShadowRegistry.invalidate_external_mutation(texture);
+            texture->Release();
+            return invalidated;
         }
 
         bool inspect_texture(
@@ -1325,7 +1363,7 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R85 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R85 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1373,6 +1411,10 @@ namespace outrun::vr::dx11
                 ManagedTextureShadowRequiredSamples.load(std::memory_order_relaxed),
                 ManagedTextureShadowReadySamples.load(std::memory_order_relaxed),
                 ManagedTextureShadowPendingSamples.load(std::memory_order_relaxed),
+                ManagedTextureUpdateTextureInvalidations.load(
+                    std::memory_order_relaxed),
+                ManagedTextureUpdateSurfaceInvalidations.load(
+                    std::memory_order_relaxed),
                 InputLayoutExactSamples.load(std::memory_order_relaxed),
                 InputLayoutUnsupportedSamples.load(std::memory_order_relaxed),
                 InputLayoutFvfExactSamples.load(std::memory_order_relaxed),
@@ -1585,10 +1627,19 @@ namespace outrun::vr::dx11
     {
         if (!source || !destination || !census_enabled())
             return;
-        (SUCCEEDED(result)
-            ? ResourceUpdateTextureSuccesses
-            : ResourceUpdateTextureFailures).fetch_add(
+        if (SUCCEEDED(result))
+        {
+            ResourceUpdateTextureSuccesses.fetch_add(
                 1, std::memory_order_relaxed);
+            if (invalidate_managed_texture_update_target(destination))
+                ManagedTextureUpdateTextureInvalidations.fetch_add(
+                    1, std::memory_order_relaxed);
+        }
+        else
+        {
+            ResourceUpdateTextureFailures.fetch_add(
+                1, std::memory_order_relaxed);
+        }
     }
 
     void observe_update_surface(
@@ -1598,10 +1649,19 @@ namespace outrun::vr::dx11
     {
         if (!source || !destination || !census_enabled())
             return;
-        (SUCCEEDED(result)
-            ? ResourceUpdateSurfaceSuccesses
-            : ResourceUpdateSurfaceFailures).fetch_add(
+        if (SUCCEEDED(result))
+        {
+            ResourceUpdateSurfaceSuccesses.fetch_add(
                 1, std::memory_order_relaxed);
+            if (invalidate_managed_texture_update_target(destination))
+                ManagedTextureUpdateSurfaceInvalidations.fetch_add(
+                    1, std::memory_order_relaxed);
+        }
+        else
+        {
+            ResourceUpdateSurfaceFailures.fetch_add(
+                1, std::memory_order_relaxed);
+        }
     }
 
     void observe_device_reset_generation(HRESULT result) noexcept
