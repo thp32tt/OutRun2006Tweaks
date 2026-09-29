@@ -194,7 +194,15 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'emergency class is cumulatively capped at 16 MiB',
     'general stays capped at 368 MiB',
     'total at 384 MiB',
+    'bool selectorAtlas = false',
+    'R14FirstSelectorUploadLogged',
+    'exact 2048x2048 selector/car atlas CPU-shadow upload succeeded',
 ], "P8_SELECTOR_ATLAS_RESERVE")
+require_all("src/vr/d3d9/ex_device_upgrade_r13.cpp", [
+    'VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED',
+    'rect=[{},{},{},{}]',
+    'size={}x{} fmt={} levels={}',
+], "P8_SELECTOR_LOCK_DIAG")
 require_all("src/hooks_uiscaling.cpp", [
     'Module::exe_ptr(0xBA9D0)',
     'Module::exe_ptr(0xBAAA0)',
