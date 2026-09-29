@@ -343,7 +343,7 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
                 continue
             if await click_retry_generation(page):
                 request_now = datetime.now(TZ)
-                note_successful_request(reg, request_now)
+                note_successful_request(reg, request_now, slot.name)
                 slot.watchdog_resumes_since_schedule += 1
                 slot.last_watchdog_at = request_now.isoformat()
                 slot.last_sent_at = request_now.isoformat()
@@ -375,7 +375,7 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
             if await detect_rate_limit(page):
                 mark_rate_limit(reg, request_now, f"watchdog-continue:{slot.name}")
                 return
-            note_successful_request(reg, request_now)
+            note_successful_request(reg, request_now, slot.name)
             slot.last_watchdog_at = request_now.isoformat()
             slot.last_result = "watchdog_continue_clicked"
             save_registry(reg)
@@ -423,13 +423,22 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
             continue
 
         if QUEUE_MODE:
-            slot.last_result = "watchdog_queue_observe_only"
+            recovery = watchdog_rearm_queue_state(now)
             slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            write_runtime(
-                status="watchdog_observe_only",
-                last_action=f"Queue mode: watchdog observed slot {slot.name}; task selection remains owned by queue engine",
-            )
+            if recovery:
+                slot.last_result = "watchdog_queue_rearmed"
+                save_registry(reg)
+                write_runtime(
+                    status="watchdog_queue_rearm",
+                    last_action=f"Queue watchdog {recovery}; queue engine remains the only task sender",
+                )
+            else:
+                slot.last_result = "watchdog_queue_observe"
+                save_registry(reg)
+                write_runtime(
+                    status="watchdog_queue_observe",
+                    last_action=f"Queue watchdog checked slot {slot.name}; no stale queue state required recovery",
+                )
             continue
 
         guard = send_guard_reason(reg, slot, datetime.now(TZ))
@@ -466,7 +475,7 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
             mark_rate_limit(reg, request_now, f"watchdog-send:{slot.name}")
             return
 
-        note_successful_request(reg, request_now)
+        note_successful_request(reg, request_now, slot.name)
         slot.watchdog_resumes_since_schedule += 1
         slot.last_watchdog_at = request_now.isoformat()
         slot.last_sent_at = request_now.isoformat()
@@ -647,7 +656,7 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
         mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
         return
 
-    note_successful_request(reg, request_now)
+    note_successful_request(reg, request_now, slot.name)
     slot.runs += 1
     slot.watchdog_resumes_since_schedule = 0
     slot.last_assistant_hash = None
