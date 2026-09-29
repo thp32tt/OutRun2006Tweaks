@@ -12,7 +12,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 head = os.environ.get("VERIFY_HEAD", "").strip() or "HEAD"
 message = subprocess.check_output(["git", "log", "-1", "--pretty=%B", head], cwd=ROOT, text=True)
-m = re.search(r"\[AUTO:(LOCALIZATION-LOCALIZATION_([ABC])-\d+)\]", message)
+m = re.search(r"\[AUTO:(LOCALIZATION-LOCALIZATION_([ABCE])-\d+)\]", message)
 if not m:
     print("parallel-lane-gate: commit is not a controller localization task; no lane restriction applied")
     raise SystemExit(0)
@@ -25,11 +25,12 @@ shared = {
     "localization/resume_state.json",
     "localization/WORKLOG.md",
     "localization/progress.json",
+    "localization/progress/progress.json",
     "localization/progress/STATUS.md",
     "localization/graphics/asset_queue.csv",
 }
 
-if lane in {"A", "B"}:
+if lane in {"A", "B", "E"}:
     bad_shared = sorted(set(changed) & shared)
     if bad_shared:
         print(f"{task_id}: A/B parallel production may not modify shared state:")
@@ -65,18 +66,18 @@ if lane in {"A", "B"}:
             if name:
                 by_basename.setdefault(name, []).append(idx)
 
-    expected_parity = 1 if lane == "A" else 0
-    parity_errors = []
+    expected_remainder = {"A": 0, "B": 1, "E": 2}[lane]
+    shard_errors = []
     for p in changed:
         if not p.lower().endswith(".dds"):
             continue
         name = pathlib.PurePosixPath(p).name.lower()
         indices = by_basename.get(name, [])
-        if len(indices) == 1 and indices[0] % 2 != expected_parity:
-            parity_errors.append((p, indices[0]))
-    if parity_errors:
-        print(f"{task_id}: DDS changed outside lane {lane} parity shard:")
-        for p, idx in parity_errors:
+        if len(indices) == 1 and indices[0] % 3 != expected_remainder:
+            shard_errors.append((p, indices[0]))
+    if shard_errors:
+        print(f"{task_id}: DDS changed outside lane {lane} modulo-3 shard:")
+        for p, idx in shard_errors:
             print(f" - index={idx} {p}")
         raise SystemExit(1)
 
