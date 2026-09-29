@@ -1,0 +1,126 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00108",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00040",
+  "recorded_at_kst": "2026-09-29T17:45:00+09:00",
+  "base_sha": "01cbfde063f258604e383acf78b3478649fee526",
+  "material_commit_sha": "e05c43d81983a70d89d49988920cfcc268bde852",
+  "pre_task_record_head_sha": "e05c43d81983a70d89d49988920cfcc268bde852",
+  "preserved_peer_head": true,
+  "peer_commits_after_material": 0,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_V2_REGION_GUARDS_AND_CLEAN_PLATE_WORK_ORDERS",
+  "summary": "Advanced even indices 132/176/220/222 using already C-consumed B00077 exact Release extraction evidence. Added 106 deterministic first-pass-v2 2px decoded-source inspection guards plus source-effect-mask/CLEAN_PLATE work orders without repeating heavy source/header-region QA or fabricating candidate_safe_bbox. No Korean DDS or shared state was modified.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1745-B133-P00040/B133_P00040_V2_REGION_GUARD_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "evidence_blob_sha": "714b9dacbb097ea0cd3ba26dbb1b5014b3113538",
+  "material_deliverable": {
+    "type": "FOUR_EVEN_V2_REGION_GUARD_AND_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "assets": [
+      "1F5FE6E9",
+      "75C3586A",
+      "D657C2EB",
+      "DDF0392A"
+    ],
+    "canonical_semantics": 20,
+    "exact_release_regions_reused": 106,
+    "new_two_px_source_inspection_guards": 106,
+    "invalid_guards": 0,
+    "candidate_safe_bboxes_created": 0,
+    "source_effect_masks_created": 0,
+    "clean_plates_created": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00077",
+    "producer_report_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00081",
+    "c_acceptance_record_blob_sha": "145090328088ef36d6a1a321eaa99cf81b5193be",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reason": "C00081 independently accepted B00077 source identities, 106/106 exact Release extraction ranges, zero overlaps and block alignment. P00040 adds only new v2 inspection-guard/work-order input."
+  },
+  "skipped_or_deferred": {
+    "qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00097": [
+        86,
+        100,
+        106,
+        130
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00100": [
+        46,
+        48,
+        50,
+        62
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00101": [
+        198,
+        214,
+        230,
+        236
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00103": [
+        140,
+        154,
+        164
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00104": [
+        152
+      ]
+    },
+    "uncertain_c_consumption_not_selected": {
+      "LOCALIZATION-LOCALIZATION_B-00062": [
+        188,
+        212,
+        226,
+        232
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ]
+  },
+  "strict_hold": {
+    "exact_dds_header_fields": "HOLD_UNCHANGED_NOT_REPEATED",
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "semantic_to_region_binding": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_effect_bboxes": "HOLD_NOT_YET_MEASURED",
+    "source_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "protected_art_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_MUST_DERIVE_FROM_MEASURED_SOURCE_EFFECT_BBOX_WITH_2PX_INSET",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_EVEN_ONLY_132_176_220_222__REUSED_C00081_106_OF_106_EXTRACTION_REGIONS__106_OF_106_NEW_2PX_GUARDS_NONEMPTY_INSIDE_PARENT_REGION__20_CANONICAL_SEGMENTS__ZERO_CANDIDATE_SAFE_BBOX_FABRICATION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "The 2px guards are decoded-source inspection upper bounds only, not candidate_safe_bbox. Exact semantic-to-region binding, effect-inclusive source bboxes, removal/protected-art masks, independently passing CLEAN_PLATE and measured v2 candidate_safe_bbox remain mandatory before Korean rendering. Final DDS/alpha/orientation/containment and English-source comparison remain HOLD because no candidate bytes exist.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
