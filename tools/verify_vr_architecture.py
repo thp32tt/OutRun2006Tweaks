@@ -34,6 +34,7 @@ required = [
     "src/vr/d3d9/stereo_renderer_r13.cpp",
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
     "src/vr/d3d9/stereo_renderer_r22_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r23.cpp",
@@ -257,7 +258,16 @@ require(
 )
 require(
     "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "#include \"stereo_renderer_r20.cpp\"",
+    "#include \"stereo_renderer_r21_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "R21InstallState",
+    "R21HostStatus::SoftSuspend",
+    "R21ReadHostFreshness",
+    "R21ApplyHostFailClosedAtPresent",
+    "R21HostFailClosed",
     "IsFailed(R20InstallState)",
     "InlineHook::StartDisabled",
 )

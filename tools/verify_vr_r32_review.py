@@ -396,7 +396,7 @@ require(
 )
 
 require(
-    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "R21HostStatus::SoftSuspend",
     "VR R21 SOFT-SUSPEND",
     "without baseline reset",

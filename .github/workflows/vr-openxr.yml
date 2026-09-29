@@ -69,10 +69,13 @@ jobs:
               'StartDisabled',
               'InstallState::Failed'
             )
-            'src/vr/d3d9/stereo_renderer_r21.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r21_overlay.inc' = @(
               'R21InstallState',
+              'R21HostStatus::SoftSuspend',
+              'R21ApplyHostFailClosedAtPresent',
               'IsFailed(R20InstallState)',
-              'StartDisabled'
+              'StartDisabled',
+              'without baseline reset'
             )
             'src/vr/d3d9/stereo_renderer_r22_overlay.inc' = @(
               'R22InstallState',
