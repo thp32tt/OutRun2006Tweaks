@@ -889,3 +889,303 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: consume latest exact-head CI; instrument selector texture/material ownership if still unproven.
+
+
+## Cycle 0041 — selector texture ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- DX9Ex selector white/colorless regression still lacks an exact texture/material owner; broad HUD or SkyGlow state changes are not evidence-backed.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: selector draw must be bound to exact texture/material evidence.
+
+
+## Cycle 0042 — selector material state
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Material/texture-stage mutation without exact selector draw identity risks changing world geometry globally; keep fail-closed.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: instrument exact selector draw state before mutation.
+
+
+## Cycle 0043 — HUD alpha ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- HUD ownership must remain canonical producer based; alpha/blend values are evidence to log, not classification inputs.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: collect owned-draw alpha/blend evidence.
+
+
+## Cycle 0044 — menu alpha ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu translucency cannot justify global ALPHABLEND override because intentional translucent UI exists.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: separate menu producer evidence from global state.
+
+
+## Cycle 0045 — checkpoint producer lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Checkpoint remaining-time duplication is mode-specific and should be traced to exact producer lifetime, not generic sprite suppression.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact checkpoint queue lifetime.
+
+
+## Cycle 0046 — result producer lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Final-result split/double image needs exact queue/producer evidence before suppression.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace result-screen producer lifetime.
+
+
+## Cycle 0047 — stage marker scope
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- ProjectedWorldMarker2D must remain distinct from ScreenHud to preserve projected world anchoring.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact stage marker producer.
+
+
+## Cycle 0048 — rival marker depth
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- WorldBillboard must remain depth/world aware; do not flatten rival markers into HUD.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace rival marker depth evidence.
+
+
+## Cycle 0049 — SkyGlow state restore
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- SkyGlow save/restore covers blend, alpha, shaders, texture, sampler, viewport and targets; no static leak is proven.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: retain pre-HUD fail-safe pending HMD.
+
+
+## Cycle 0050 — CI wait falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Hosted validation is in progress; absence of a result is not PASS and does not justify runtime changes.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume CI only when completed.
+
+
+## Cycle 0051 — selector texture ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- DX9Ex selector white/colorless regression still lacks an exact texture/material owner; broad HUD or SkyGlow state changes are not evidence-backed.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: selector draw must be bound to exact texture/material evidence.
+
+
+## Cycle 0052 — selector material state
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Material/texture-stage mutation without exact selector draw identity risks changing world geometry globally; keep fail-closed.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: instrument exact selector draw state before mutation.
+
+
+## Cycle 0053 — HUD alpha ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- HUD ownership must remain canonical producer based; alpha/blend values are evidence to log, not classification inputs.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: collect owned-draw alpha/blend evidence.
+
+
+## Cycle 0054 — menu alpha ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu translucency cannot justify global ALPHABLEND override because intentional translucent UI exists.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: separate menu producer evidence from global state.
+
+
+## Cycle 0055 — checkpoint producer lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Checkpoint remaining-time duplication is mode-specific and should be traced to exact producer lifetime, not generic sprite suppression.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact checkpoint queue lifetime.
+
+
+## Cycle 0056 — result producer lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Final-result split/double image needs exact queue/producer evidence before suppression.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace result-screen producer lifetime.
+
+
+## Cycle 0057 — stage marker scope
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- ProjectedWorldMarker2D must remain distinct from ScreenHud to preserve projected world anchoring.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact stage marker producer.
+
+
+## Cycle 0058 — rival marker depth
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- WorldBillboard must remain depth/world aware; do not flatten rival markers into HUD.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace rival marker depth evidence.
+
+
+## Cycle 0059 — SkyGlow state restore
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- SkyGlow save/restore covers blend, alpha, shaders, texture, sampler, viewport and targets; no static leak is proven.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: retain pre-HUD fail-safe pending HMD.
+
+
+## Cycle 0060 — CI wait falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Hosted validation is in progress; absence of a result is not PASS and does not justify runtime changes.
+- Evidence: exact semantic/state boundaries reviewed on current R71 branch; no contradictory positive evidence found.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume CI only when completed.
