@@ -50,6 +50,9 @@ def main() -> None:
             "try_acquire_slot",
             "signal_producer_fence",
             "publish_if_fence_complete",
+            "NativeSharedEyePublication",
+            "snapshot_published_frame",
+            "validate_publication_snapshot",
             "retire_acknowledged",
             "synchronization_faulted",
         ],
@@ -63,6 +66,9 @@ def main() -> None:
             "context->End(entry.producer_fence.Get())",
             "entry.state = SharedEyeSlotState::ProducerPending",
             "entry.state = SharedEyeSlotState::Published",
+            "NativeSharedEyeRing::snapshot_published_frame",
+            "publication.identity != identity_",
+            "current.left_handle == publication.left_handle",
             "TransportAckReleasesFrame",
             "A query error does not prove GPU completion",
             "synchronization_faulted_ = true",
@@ -92,6 +98,12 @@ def main() -> None:
             "in-flight allocation must reject generation retag",
             "signal_producer_fence",
             "publish_bounded",
+            "published frame must produce exact handoff snapshot",
+            "fresh published handoff snapshot validates",
+            "wrong frame cannot snapshot published handles",
+            "ACK retirement invalidates published handoff snapshot",
+            "lifetime invalidation rejects stale handoff snapshot",
+            "DX11 native shared-eye publication handoff R118: PASS",
             "stale generation ACK cannot retire published slot",
             "older frame ACK cannot retire newer publication",
             "exact identity/frame ACK retires publication",
@@ -158,6 +170,38 @@ def main() -> None:
     publish_error = publish_body[publish_body.find("if (status != S_OK)"):]
     if "reset_slot_lifetime(entry)" in publish_error:
         raise SystemExit("DX11 publish query-error path must preserve ProducerPending")
+
+    snapshot_start = ring_cpp.find(
+        "bool NativeSharedEyeRing::snapshot_published_frame", publish_start
+    )
+    validate_start = ring_cpp.find(
+        "bool NativeSharedEyeRing::validate_publication_snapshot", snapshot_start
+    )
+    if min(snapshot_start, validate_start) < 0:
+        raise SystemExit("DX11 R118 publication snapshot functions not found")
+    snapshot_body = ring_cpp[snapshot_start:validate_start]
+    validate_body = ring_cpp[validate_start:retire_start]
+    for needle in [
+        "SharedEyeSlotState::Published",
+        "entry.frame_id != frame_id",
+        "out.identity = identity_",
+        "out.left_handle = entry.shared_handle[0]",
+        "out.right_handle = entry.shared_handle[1]",
+    ]:
+        if needle not in snapshot_body:
+            raise SystemExit(
+                f"DX11 R118 publication snapshot missing fail-closed evidence: {needle}"
+            )
+    for needle in [
+        "publication.identity != identity_",
+        "snapshot_published_frame(",
+        "current.left_handle == publication.left_handle",
+        "current.right_handle == publication.right_handle",
+    ]:
+        if needle not in validate_body:
+            raise SystemExit(
+                f"DX11 R118 publication validation missing stale-snapshot evidence: {needle}"
+            )
     print("DX11 native transport lifetime contract: OK")
 
 
