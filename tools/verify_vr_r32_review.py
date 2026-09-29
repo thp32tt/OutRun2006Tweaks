@@ -42,6 +42,34 @@ policy = require(
     "ClassifyPendingFence",
 )
 
+r30_wrapper = require(
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    '#include "stereo_renderer_r29.cpp"',
+    "#include <d3dcompiler.h>",
+    "#include <algorithm>",
+    "#include <array>",
+    "#include <memory>",
+    "#include <mutex>",
+    "#include <unordered_map>",
+    "#include <vector>",
+    '#include "stereo_renderer_r30_overlay.inc"',
+)
+if "namespace Settings" in r30_wrapper or "namespace OutRunVRStereo" in r30_wrapper:
+    raise SystemExit("R30 compatibility wrapper regained implementation body")
+r30 = require(
+    "src/vr/d3d9/stereo_renderer_r30_overlay.inc",
+    "namespace Settings",
+    "VRHudScale",
+    "namespace OutRunVRStereo",
+    "R30DrawPrimitiveR29Hook",
+    "state.depthTestEnabled &&",
+    "state.rhwDepthEvidence",
+    "R30CompositeSkyGlowBeforeHud",
+    "VR R30 HUD: ScreenSpace2D correction READY",
+)
+if "#include" in r30:
+    raise SystemExit("R30 overlay must remain include-free")
+
 r31_wrapper = require(
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     '#include "stereo_renderer_r30.cpp"',

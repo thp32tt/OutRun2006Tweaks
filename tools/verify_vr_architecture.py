@@ -38,6 +38,7 @@ required = [
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "src/vr/d3d9/stereo_renderer_r29.cpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
     "src/vr/d3d9/ex_device_upgrade.cpp",
@@ -440,7 +441,7 @@ require(
     "VR R26+HUD SAFE TEST",
 )
 require(
-    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_overlay.inc",
     "state.depthTestEnabled &&",
     "state.rhwDepthEvidence",
 )

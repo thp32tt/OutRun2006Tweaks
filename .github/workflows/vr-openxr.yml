@@ -90,6 +90,11 @@ jobs:
               'passive original Clear only',
               'authoritative first seed'
             )
+            'src/vr/d3d9/stereo_renderer_r30_overlay.inc' = @(
+              'R30DrawPrimitiveR29Hook',
+              'state.depthTestEnabled &&',
+              'state.rhwDepthEvidence'
+            )
             'src/vr/d3d9/stereo_renderer_r31_overlay.inc' = @(
               'R31StateBlockTrackingReliable',
               'GetR28VerifiedProjection',
