@@ -1,0 +1,115 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00165",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00028",
+  "qa_batch_id": "Q00028",
+  "recorded_at_kst": "2026-09-29T23:53:32.581+09:00",
+  "base_head_sha": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
+  "commit_mode": "ATOMIC_EMBEDDED_C_BATCH_TASK_RECORD_AND_SHARED_STATE",
+  "result": "PASS_Q00028_A00161_A00163_SINGLE_DDS_ISOLATION_INPUTS_RUNTIME_UNTESTED",
+  "summary": "Q00028 independently consumed immutable A00161 index197/9F060EC1 and A00163 index195/9CE4E175 single-DDS runtime-isolation inputs. Both PASS only for the deterministic DDS_ONLY isolation deliverable: the exact producer task/evidence exists at each fixed RESULT_SHA, current candidate Git blobs remain identical to their C82/C99 independently QAed fingerprints, and current canonical semantics remain 6/6. The current QA contract fingerprint is unchanged, so heavy DDS/header/alpha/orientation/containment/English-source visual QA is reused rather than duplicated. No new static artwork approval or runtime approval is created. Newer disjoint A00164/index99 and B00160/index112 work already present at merge HEAD is preserved. No candidate DDS bytes, build, runtime, N100/local clone, Drive, Library, VR/FFB/DX changes are made; RUNTIME_VALIDATION=UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "result_message": "localization(A): add 9F060EC1 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00161]",
+      "completed_at": "2026-09-29T23:12:38.262290+09:00",
+      "producer_id": "P00078",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00163",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+      "result_message": "localization(A): add 9CE4E175 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00163]",
+      "completed_at": "2026-09-29T23:21:03.612152+09:00",
+      "producer_id": "P00079",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+      "result_sha": "3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "status": "PASS",
+      "reason": "PASS is limited to A00161's DDS_ONLY runtime-isolation input for index197/9F060EC1; it is not a new static or runtime approval. The immutable task/evidence exists at the exact producer RESULT_SHA. Current candidate Git blob 9101e1b286a56dcad4bd34b88ea3aeee32ca2769 is unchanged from C82. C82 independently recorded canonical source SHA-256 177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05, candidate SHA-256 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60, 2048x2048 RGBA32/mip1, exact 128-byte header, 0 changed pixels/alpha changes/introduced alpha outside the five approved cells, mirror-Y readable orientation, minimum bbox margin 4, no visible source residue/Hangul breakage/clipping/cell escape/resolution degradation/alpha halo/protected watermark or legal-art damage. Current canonical transcription still matches all 5 semantic pairs. Because source/candidate/orientation/semantic/QA-contract fingerprints are unchanged, the existing heavy C82 PASS is reused rather than recomputed. Isolated real-game testing remains required; RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00163",
+      "result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+      "status": "PASS",
+      "reason": "PASS is limited to A00163's DDS_ONLY runtime-isolation input for index195/9CE4E175; it is not a new static or runtime approval. The immutable task/evidence exists at the exact producer RESULT_SHA. Current candidate Git blob e40af638fe836185d25f2b500531f15729d663f2 is unchanged from C99, and the accepted exact-HD English source at Sonic-TV/OR2006Sprites a95efe01d1f136514cef94b0d9e9fd61df021754 remains Git blob b70d3aa184d8d00a561ab72133cd3f830943fb41. C99 independently recorded source/candidate 524416 bytes, 1024x128 BGRA32 ARGB masks, mip1, pitch4096, byte-identical 128-byte DDS header, source bbox [95,7,489,46] containing Korean bbox [215,8,369,45], 8776 changed pixels with 0 outside the source region, 0 introduced alpha outside, 0 alpha changes, flip-Y readable orientation, no clipping/Hangul breakage/source residue/background damage/wrong replacement. Current canonical transcription still matches NOT AVAILABLE -> 이용 불가. Unchanged heavy C99 PASS is reused. Isolated real-game testing remains required; RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      197,
+      195
+    ],
+    "reviewed_assets": 2,
+    "producer_inputs_pass": 2,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json"
+  },
+  "source_identity_validation": "PASS_A00161_IMMUTABLE_RESULT_AND_CURRENT_9F060EC1_CANDIDATE_BLOB_EQUALS_C82__PASS_A00163_IMMUTABLE_RESULT_CURRENT_9CE4E175_CANDIDATE_BLOB_EQUALS_C99_AND_ACCEPTED_SOURCE_BLOB_B70D3AA1",
+  "canonical_semantic_validation": "PASS_6_OF_6__INDEX197_5_OF_5__INDEX195_1_OF_1",
+  "geometry_mapping_validation": "PASS_REUSED_UNCHANGED_C82_INDEX197_ZERO_OUTSIDE_CELLS_MIRROR_Y_MIN_MARGIN4__PASS_REUSED_UNCHANGED_C99_INDEX195_ZERO_OUTSIDE_SOURCE_REGION_FLIP_Y",
+  "current_contract_compatibility": "PASS_BOTH_FALLBACK3_RUNTIME_ISOLATION_INPUTS__HEAVY_QA_REUSED_ONLY_FOR_UNCHANGED_SOURCE_CANDIDATE_ORIENTATION_SEMANTIC_AND_CONTRACT_FINGERPRINTS",
+  "readiness_reconciliation": {
+    "classification": "PASS_RUNTIME_ISOLATION_INPUTS_ONLY",
+    "indices": [
+      197,
+      195
+    ],
+    "per_index": {
+      "195": "A00163 DDS_ONLY isolation input PASS; C99 static QA remains valid for unchanged fingerprint. Run isolated real-game test before any final/runtime approval.",
+      "197": "A00161 DDS_ONLY isolation input PASS; C82 strict static QA remains valid for unchanged fingerprint. Run isolated real-game test before any final/runtime approval."
+    }
+  },
+  "heavy_qa_reuse": {
+    "repeated_unchanged_fingerprint_heavy_qa": false,
+    "a00161_authority": "C82 exact static strict QA PASS; current candidate blob/source SHA/orientation/semantics/contract unchanged",
+    "a00163_authority": "C99 exact-HD static QA PASS; current candidate blob/accepted source blob/source SHA/orientation/semantics/contract unchanged",
+    "reason": "Contract requires reuse of machine-readable PASS evidence when the heavy-QA fingerprint is unchanged. Q00028 verifies immutable producer identity/current blob identity/canonical semantics and does not recompute identical raster checks."
+  },
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_same_asset_candidate_or_source_fingerprints": [],
+    "merge_head": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
+    "preserved_newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00164@index99",
+      "LOCALIZATION-LOCALIZATION_B-00160@index112"
+    ]
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

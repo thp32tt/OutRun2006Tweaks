@@ -1100,3 +1100,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - A00157/index99 **REWORK_REQUIRED**: the exact canonical source and embedded 42,774px / 3,450-run mask are internally consistent, and the committed patch has zero out-of-mask changes. But native readable review of the CLEAN_PLATE shows clearly legible dark-blue English ghost/shadow text on both lines, so the no-source-language-residue gate fails. Rebuild the full-effect mask/CLEAN_PLATE before rendering Korean text.
 - No new candidate/static/runtime approval. Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2323-C129/C129_Q00027_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 
+### 2026-09-29 23:53 KST — C130 / Q00028
+
+- Immutable QA inputs: A00161 `3375e795594152ae2d99b3fa0da215fd8ff1b97c` (index197/9F060EC1) and A00163 `52a71e466a4074db1e96d4e4e6e4fcf605fc40d6` (index195/9CE4E175).
+- Both dispositions **PASS** for single-DDS runtime-isolation inputs only. C82/C99 heavy static QA reused because source/candidate/orientation/semantic/contract fingerprints are unchanged; canonical semantics **6/6**.
+- Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. New static approvals **0**; runtime approvals **0**.
+- Newer disjoint A00164/index99 and B00160/index112 work preserved. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json`.

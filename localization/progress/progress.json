@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T23:23:46+09:00",
+  "updated_at_kst": "2026-09-29T23:53:32.581+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "Q00026 C128 consumed immutable A00154@0091b5e and B00155@8cd826c. A00154 PASSes as a deterministic non-duplicate single-DDS runtime-isolation input for unchanged C85-passed 48DEBE77 source/candidate fingerprints; runtime remains UNTESTED. B00155 is REWORK_REQUIRED: canonical index112 full-alpha source mask independently reproduces 132035 pixels and exact 1291-run RLE with 29 pixels beyond the old hard limit, but its CLEAN_PLATE record says 8-neighbor diffusion while 49 convergence iterations reproduce only under 4-neighbor (8-neighbor=42), and current contract 8b7a840f requires same-task continuation from CLEAN_PLATE_READY/KOREAN_RENDER_NEXT through Korean render, DDS encode and decoded-final QA. No new Korean candidate/static/runtime approval added. Queue remains 93 actionable localize_text, pending production 76, canonical segments 753; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C130/Q00028 accepted A00161 index197/9F060EC1 and A00163 index195/9CE4E175 as PASS only for deterministic single-DDS runtime-isolation inputs on unchanged C82/C99 static-QA fingerprints. No new candidate/static/runtime approval; actionable localize_text 93, pending production 76, canonical segments 753; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -841,52 +841,49 @@
     ]
   },
   "latest_c_batch_qa": {
-    "recorded_at_kst": "2026-09-29T23:23:46+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00162",
-    "qa_batch_id": "Q00027",
-    "run": "C129",
-    "result": "PASS_Q00027_B00158_PASS_A00157_REWORK_REQUIRED_CLEAN_PLATE_VISUAL_RESIDUE_RUNTIME_UNTESTED",
-    "base_head": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+    "recorded_at_kst": "2026-09-29T23:53:32.581+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00165",
+    "qa_batch_id": "Q00028",
+    "run": "C130",
+    "result": "PASS_Q00028_A00161_A00163_SINGLE_DDS_ISOLATION_INPUTS_RUNTIME_UNTESTED",
+    "base_head": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
     "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
     "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00158@2a209832432936a6026ecae12c21b9253c7c4b0b",
-      "LOCALIZATION-LOCALIZATION_A-00157@789083b3a143fa9d3c3e2d0c76ed75edb94368b1"
+      "LOCALIZATION-LOCALIZATION_A-00161@3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "LOCALIZATION-LOCALIZATION_A-00163@52a71e466a4074db1e96d4e4e6e4fcf605fc40d6"
     ],
     "reviewed_indices": [
-      104,
-      116,
-      99
+      197,
+      195
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
-        "result_sha": "2a209832432936a6026ecae12c21b9253c7c4b0b",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+        "result_sha": "3375e795594152ae2d99b3fa0da215fd8ff1b97c",
         "status": "PASS",
-        "reason": "PASS limited to B00158's dual DDS_ONLY runtime-isolation deliverable for index104/62BEBF33 and index116/E3FD08BE; no runtime promotion. C independently re-fetched and decoded current/result DXT5 source/candidate bytes under the current contract. 62BEBF33 remains source/candidate blobs 1cc92c914687546fbef9b47dd1134659c2f1f0f6 / a5cd9697dec6ea04a1c67fa31619a28e86b5acb2, 2048x256 DXT5 mip1, header-128 diff 0; readable source/candidate alpha bboxes [392,52,1356,200] / [565,52,1185,199] lie inside declared [392,52,1357,201], with 0 outside alpha changes/introductions. E3FD08BE remains 9cd996ed8f5e8c059492893617e4ff2006c525a2 / 96a9aa5d3d99a97bf4b386102ef8d43ee537f1c1, same DDS structure/header equality; bboxes [393,54,1627,199] / [632,54,1387,198] lie inside [393,54,1628,200], again with 0 outside alpha changes/introductions. Readable mirror-Y visual review shows correctly oriented '아웃런 모드' and '하트 어택 모드' without visible clipping. Both remain edge-touch/high-risk and require isolated real-game testing; RUNTIME_VALIDATION=UNTESTED."
+        "reason": "PASS is limited to A00161's DDS_ONLY runtime-isolation input for index197/9F060EC1; it is not a new static or runtime approval. The immutable task/evidence exists at the exact producer RESULT_SHA. Current candidate Git blob 9101e1b286a56dcad4bd34b88ea3aeee32ca2769 is unchanged from C82. C82 independently recorded canonical source SHA-256 177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05, candidate SHA-256 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60, 2048x2048 RGBA32/mip1, exact 128-byte header, 0 changed pixels/alpha changes/introduced alpha outside the five approved cells, mirror-Y readable orientation, minimum bbox margin 4, no visible source residue/Hangul breakage/clipping/cell escape/resolution degradation/alpha halo/protected watermark or legal-art damage. Current canonical transcription still matches all 5 semantic pairs. Because source/candidate/orientation/semantic/QA-contract fingerprints are unchanged, the existing heavy C82 PASS is reused rather than recomputed. Isolated real-game testing remains required; RUNTIME_VALIDATION=UNTESTED."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00157",
-        "result_sha": "789083b3a143fa9d3c3e2d0c76ed75edb94368b1",
-        "status": "REWORK_REQUIRED",
-        "reason": "REWORK_REQUIRED for index99/4F68708E CLEAN_PLATE. Exact pinned canonical source blob eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8 re-fetch matches 2048x256 DXT5 mip1 / 524416 bytes. Embedded removal mask is internally consistent at 42,774 pixels / 3,450 RLE runs and patch payload is exactly 171,096 RGBA bytes. Applying the patch changes 0 pixels/alpha outside the mask and leaves 0 alpha-positive pixels at luminance>=18 inside the mask. But independent native/readable mirror-Y visual review fails the contract's no-source-language-residue rule: both English lines remain clearly legible as dark-blue ghost/shadow silhouettes. Rework must expand/rederive the full effect mask, rebuild a visually clean plate with protected artwork unchanged, and only then continue style/render/DXT5 work. No Korean candidate/runtime approval; RUNTIME_VALIDATION=UNTESTED."
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00163",
+        "result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+        "status": "PASS",
+        "reason": "PASS is limited to A00163's DDS_ONLY runtime-isolation input for index195/9CE4E175; it is not a new static or runtime approval. The immutable task/evidence exists at the exact producer RESULT_SHA. Current candidate Git blob e40af638fe836185d25f2b500531f15729d663f2 is unchanged from C99, and the accepted exact-HD English source at Sonic-TV/OR2006Sprites a95efe01d1f136514cef94b0d9e9fd61df021754 remains Git blob b70d3aa184d8d00a561ab72133cd3f830943fb41. C99 independently recorded source/candidate 524416 bytes, 1024x128 BGRA32 ARGB masks, mip1, pitch4096, byte-identical 128-byte DDS header, source bbox [95,7,489,46] containing Korean bbox [215,8,369,45], 8776 changed pixels with 0 outside the source region, 0 introduced alpha outside, 0 alpha changes, flip-Y readable orientation, no clipping/Hangul breakage/source residue/background damage/wrong replacement. Current canonical transcription still matches NOT AVAILABLE -> 이용 불가. Unchanged heavy C99 PASS is reused. Isolated real-game testing remains required; RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_B00158_EXACT_CURRENT_AND_RESULT_SOURCE_CANDIDATE_BLOBS_UNCHANGED__PASS_A00157_PINNED_EB8C2DDA_DXT5_SOURCE_IDENTITY",
-    "canonical_semantic_validation": "PASS_INDEX104_OutRun_Mode_TO_아웃런_모드__PASS_INDEX116_Heart_Attack_Mode_TO_하트_어택_모드__PASS_INDEX99_GHOST_CAR_TWO_LINE_KOREAN_LAYOUT_SEMANTICS_BUT_NO_CANDIDATE",
-    "geometry_mapping_validation": "PASS_B00158_CURRENT_CONTRACT_DECODED_DXT5_HEADER_ALPHA_ORIENTATION_AND_DECLARED_BBOX_CONTAINMENT__FAIL_A00157_CLEAN_PLATE_NATIVE_VISUAL_ENGLISH_GHOST_RESIDUE",
-    "current_contract_compatibility": "MIXED_PASS_B00158_FALLBACK3_RUNTIME_ISOLATION__REWORK_A00157_CLEAN_PLATE_NO_SOURCE_LANGUAGE_RESIDUE_GATE",
+    "source_identity_validation": "PASS_A00161_IMMUTABLE_RESULT_AND_CURRENT_9F060EC1_CANDIDATE_BLOB_EQUALS_C82__PASS_A00163_IMMUTABLE_RESULT_CURRENT_9CE4E175_CANDIDATE_BLOB_EQUALS_C99_AND_ACCEPTED_SOURCE_BLOB_B70D3AA1",
+    "canonical_semantic_validation": "PASS_6_OF_6__INDEX197_5_OF_5__INDEX195_1_OF_1",
+    "geometry_mapping_validation": "PASS_REUSED_UNCHANGED_C82_INDEX197_ZERO_OUTSIDE_CELLS_MIRROR_Y_MIN_MARGIN4__PASS_REUSED_UNCHANGED_C99_INDEX195_ZERO_OUTSIDE_SOURCE_REGION_FLIP_Y",
+    "current_contract_compatibility": "PASS_BOTH_FALLBACK3_RUNTIME_ISOLATION_INPUTS__HEAVY_QA_REUSED_ONLY_FOR_UNCHANGED_SOURCE_CANDIDATE_ORIENTATION_SEMANTIC_AND_CONTRACT_FINGERPRINTS",
     "readiness_reconciliation": {
-      "classification": "MIXED_PASS_AND_REWORK",
+      "classification": "PASS_RUNTIME_ISOLATION_INPUTS_ONLY",
       "indices": [
-        104,
-        116,
-        99
+        197,
+        195
       ],
       "per_index": {
-        "99": "A00157 CLEAN_PLATE REWORK_REQUIRED because readable native review shows dark-blue English ghost text on both lines; rebuild full-effect removal mask/CLEAN_PLATE before Korean render.",
-        "104": "B00158 isolation input PASS only; edge-touch/high-risk isolated runtime test remains required.",
-        "116": "B00158 isolation input PASS only; edge-touch/high-risk isolated runtime test remains required."
+        "195": "A00163 DDS_ONLY isolation input PASS; C99 static QA remains valid for unchanged fingerprint. Run isolated real-game test before any final/runtime approval.",
+        "197": "A00161 DDS_ONLY isolation input PASS; C82 strict static QA remains valid for unchanged fingerprint. Run isolated real-game test before any final/runtime approval."
       }
     },
     "metadata_reconciled_segments": 0,
@@ -899,12 +896,11 @@
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-2323-C129/C129_Q00027_INDEPENDENT_QA_BATCH.json",
-    "rework_required_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00157@789083b3a143fa9d3c3e2d0c76ed75edb94368b1"
-    ],
+    "report": "localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json",
+    "rework_required_inputs": [],
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00158@2a209832432936a6026ecae12c21b9253c7c4b0b"
+      "LOCALIZATION-LOCALIZATION_A-00161@3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "LOCALIZATION-LOCALIZATION_A-00163@52a71e466a4074db1e96d4e4e6e4fcf605fc40d6"
     ]
   }
 }

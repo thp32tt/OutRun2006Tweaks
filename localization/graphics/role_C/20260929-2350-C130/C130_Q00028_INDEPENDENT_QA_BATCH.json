@@ -1,0 +1,120 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-independent-c-batch-qa-v1",
+  "role": "C",
+  "run": "C130",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00165",
+  "qa_batch_id": "Q00028",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T23:53:32.581+09:00",
+  "base_head_sha": "7ec8a1c2dcfac1cff5d5421710b6dfd759e0490f",
+  "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "result_message": "localization(A): add 9F060EC1 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00161]",
+      "completed_at": "2026-09-29T23:12:38.262290+09:00",
+      "producer_id": "P00078",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00163",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+      "result_message": "localization(A): add 9CE4E175 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00163]",
+      "completed_at": "2026-09-29T23:21:03.612152+09:00",
+      "producer_id": "P00079",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+      "result_sha": "3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "status": "PASS",
+      "reason": "PASS is limited to A00161's DDS_ONLY runtime-isolation input for index197/9F060EC1; it is not a new static or runtime approval. The immutable task/evidence exists at the exact producer RESULT_SHA. Current candidate Git blob 9101e1b286a56dcad4bd34b88ea3aeee32ca2769 is unchanged from C82. C82 independently recorded canonical source SHA-256 177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05, candidate SHA-256 39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60, 2048x2048 RGBA32/mip1, exact 128-byte header, 0 changed pixels/alpha changes/introduced alpha outside the five approved cells, mirror-Y readable orientation, minimum bbox margin 4, no visible source residue/Hangul breakage/clipping/cell escape/resolution degradation/alpha halo/protected watermark or legal-art damage. Current canonical transcription still matches all 5 semantic pairs. Because source/candidate/orientation/semantic/QA-contract fingerprints are unchanged, the existing heavy C82 PASS is reused rather than recomputed. Isolated real-game testing remains required; RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00163",
+      "result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+      "status": "PASS",
+      "reason": "PASS is limited to A00163's DDS_ONLY runtime-isolation input for index195/9CE4E175; it is not a new static or runtime approval. The immutable task/evidence exists at the exact producer RESULT_SHA. Current candidate Git blob e40af638fe836185d25f2b500531f15729d663f2 is unchanged from C99, and the accepted exact-HD English source at Sonic-TV/OR2006Sprites a95efe01d1f136514cef94b0d9e9fd61df021754 remains Git blob b70d3aa184d8d00a561ab72133cd3f830943fb41. C99 independently recorded source/candidate 524416 bytes, 1024x128 BGRA32 ARGB masks, mip1, pitch4096, byte-identical 128-byte DDS header, source bbox [95,7,489,46] containing Korean bbox [215,8,369,45], 8776 changed pixels with 0 outside the source region, 0 introduced alpha outside, 0 alpha changes, flip-Y readable orientation, no clipping/Hangul breakage/source residue/background damage/wrong replacement. Current canonical transcription still matches NOT AVAILABLE -> 이용 불가. Unchanged heavy C99 PASS is reused. Isolated real-game testing remains required; RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "reviewed_assets": [
+    {
+      "index": 197,
+      "asset": "9F060EC1",
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00161",
+      "producer_result_sha": "3375e795594152ae2d99b3fa0da215fd8ff1b97c",
+      "candidate_git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "canonical_source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "qa_authority": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+      "qa_authority_blob_sha": "faa87da296f30131e8151d2966fd5dffd11a9873",
+      "heavy_qa_reused": true,
+      "heavy_qa_rerun": false,
+      "canonical_semantics": 5,
+      "status": "PASS_RUNTIME_ISOLATION_INPUT_ONLY"
+    },
+    {
+      "index": 195,
+      "asset": "9CE4E175",
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00163",
+      "producer_result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+      "candidate_git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+      "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+      "accepted_source_git_blob_sha": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+      "canonical_source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+      "qa_authority": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json",
+      "qa_authority_blob_sha": "f2635e537c6cceeeec50f78f08c12b54210b713c",
+      "heavy_qa_reused": true,
+      "heavy_qa_rerun": false,
+      "canonical_semantics": 1,
+      "status": "PASS_RUNTIME_ISOLATION_INPUT_ONLY"
+    }
+  ],
+  "current_head_disjoint_work_preserved": [
+    "LOCALIZATION-LOCALIZATION_A-00164 / index99 4F68708E clean-plate rework",
+    "LOCALIZATION-LOCALIZATION_B-00160 / index112 D41D0B1 candidate"
+  ],
+  "source_identity_validation": "PASS_A00161_IMMUTABLE_RESULT_AND_CURRENT_9F060EC1_CANDIDATE_BLOB_EQUALS_C82__PASS_A00163_IMMUTABLE_RESULT_CURRENT_9CE4E175_CANDIDATE_BLOB_EQUALS_C99_AND_ACCEPTED_SOURCE_BLOB_B70D3AA1",
+  "canonical_semantic_validation": "PASS_6_OF_6__INDEX197_5_OF_5__INDEX195_1_OF_1",
+  "geometry_mapping_validation": "PASS_REUSED_UNCHANGED_C82_INDEX197_ZERO_OUTSIDE_CELLS_MIRROR_Y_MIN_MARGIN4__PASS_REUSED_UNCHANGED_C99_INDEX195_ZERO_OUTSIDE_SOURCE_REGION_FLIP_Y",
+  "current_contract_compatibility": "PASS_BOTH_FALLBACK3_RUNTIME_ISOLATION_INPUTS__HEAVY_QA_REUSED_ONLY_FOR_UNCHANGED_SOURCE_CANDIDATE_ORIENTATION_SEMANTIC_AND_CONTRACT_FINGERPRINTS",
+  "readiness_reconciliation": {
+    "classification": "PASS_RUNTIME_ISOLATION_INPUTS_ONLY",
+    "indices": [
+      197,
+      195
+    ],
+    "per_index": {
+      "195": "A00163 DDS_ONLY isolation input PASS; C99 static QA remains valid for unchanged fingerprint. Run isolated real-game test before any final/runtime approval.",
+      "197": "A00161 DDS_ONLY isolation input PASS; C82 strict static QA remains valid for unchanged fingerprint. Run isolated real-game test before any final/runtime approval."
+    }
+  },
+  "shared_state_merge": "ONCE_AT_END_OF_BATCH",
+  "counts_after": {
+    "actionable_localize_text": 93,
+    "pending_production_localize_text": 76,
+    "canonical_transcribed_segments": 753
+  },
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

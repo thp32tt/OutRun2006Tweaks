@@ -1588,3 +1588,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Counts remain **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**, pending production **76**, canonical segments **753**. Shared state merged once. No N100/local clone/worktree, GPT Library, Google Drive, build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-2323-C129/C129_Q00027_INDEPENDENT_QA_BATCH.json`.
 
+## 2026-09-29 23:53 KST - C130 Q00028 INDEPENDENT QA BATCH
+
+- Consumed immutable A00161@3375e795594152ae2d99b3fa0da215fd8ff1b97c (index197/9F060EC1) and A00163@52a71e466a4074db1e96d4e4e6e4fcf605fc40d6 (index195/9CE4E175).
+- Both producer dispositions: PASS limited to deterministic DDS_ONLY runtime-isolation inputs. Current candidate blobs remain identical to C82/C99 independently QAed fingerprints; current canonical semantics match 6/6.
+- Heavy DDS/header/alpha/orientation/containment/source-comparison QA was not duplicated because the complete reusable fingerprint and current QA contract are unchanged.
+- Newer disjoint A00164/index99 and B00160/index112 producer work at merge HEAD was preserved and not consumed by Q00028.
+- Queue counts unchanged: 93 actionable localize_text, 76 pending production localize_text, 753 canonical graphics segments. No candidate DDS, static artwork approval, or runtime approval changed.
+- Report: `localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
