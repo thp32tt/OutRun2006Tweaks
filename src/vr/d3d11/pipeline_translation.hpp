@@ -188,6 +188,36 @@ namespace outrun::vr::dx11
         DWORD fvf,
         UINT stream0Stride);
 
+    // R94 translates passively observed D3D9 WORLD/VIEW/PROJECTION state
+    // into the row-major b0 payload consumed by the R93 diagnostic vertex
+    // prototype. This is binding-readiness evidence only; no runtime D3D11
+    // constant buffer is allocated or bound here.
+    enum FixedFunctionTransformUnsupported : std::uint32_t
+    {
+        FixedFunctionTransformUnsupportedNone = 0,
+        FixedFunctionTransformUnsupportedIncompleteObservation = 1u << 0,
+        FixedFunctionTransformUnsupportedNonFinite = 1u << 1,
+    };
+
+    struct FixedFunctionTransformConstants
+    {
+        std::uint32_t unsupported = FixedFunctionTransformUnsupportedNone;
+        std::array<float, 16> worldViewProjection{};
+        std::uint64_t payloadHash = 0;
+
+        [[nodiscard]] bool exact() const noexcept
+        {
+            return unsupported == FixedFunctionTransformUnsupportedNone;
+        }
+    };
+
+    [[nodiscard]] FixedFunctionTransformConstants
+    generate_fixed_function_transform_constants(
+        const D3DMATRIX& world,
+        const D3DMATRIX& view,
+        const D3DMATRIX& projection,
+        bool observationComplete) noexcept;
+
     // R79/R88 translates either an explicit D3D9 declaration or a
     // conservative FVF subset into canonical D3D11 input-layout descriptors.
     // R88 models XYZB1..XYZB5 blend weights plus LASTBETA_UBYTE4 and

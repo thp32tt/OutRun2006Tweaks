@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <limits>
 
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
@@ -14,7 +15,10 @@ namespace
     using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedBlend;
     using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedNormal;
     using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedPosition;
+    using outrun::vr::dx11::FixedFunctionTransformUnsupportedIncompleteObservation;
+    using outrun::vr::dx11::FixedFunctionTransformUnsupportedNonFinite;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
 
     void require(bool condition, const char* message)
@@ -180,6 +184,51 @@ VSOutput main(float3 position : POSITION0)
     return output;
 }
 )";
+
+    D3DMATRIX identity{};
+    identity._11 = 1.0f;
+    identity._22 = 1.0f;
+    identity._33 = 1.0f;
+    identity._44 = 1.0f;
+
+    D3DMATRIX world = identity;
+    world._41 = 2.0f;
+    D3DMATRIX view = identity;
+    view._11 = 3.0f;
+
+    const auto transformConstants =
+        generate_fixed_function_transform_constants(
+            world, view, identity, true);
+    require(transformConstants.exact(),
+            "R94 transform constants should be exact");
+    require(transformConstants.worldViewProjection[0] == 3.0f,
+            "R94 WORLD*VIEW scale order");
+    require(transformConstants.worldViewProjection[12] == 6.0f,
+            "R94 WORLD*VIEW translation order");
+    require(transformConstants.worldViewProjection[15] == 1.0f,
+            "R94 homogeneous transform");
+    require(transformConstants.payloadHash != 0,
+            "R94 transform payload hash");
+
+    const auto incompleteTransform =
+        generate_fixed_function_transform_constants(
+            identity, identity, identity, false);
+    require(
+        !incompleteTransform.exact() &&
+        (incompleteTransform.unsupported &
+         FixedFunctionTransformUnsupportedIncompleteObservation) != 0,
+        "R94 incomplete transform observation must fail closed");
+
+    D3DMATRIX nonFinite = identity;
+    nonFinite._11 = std::numeric_limits<float>::infinity();
+    const auto nonFiniteTransform =
+        generate_fixed_function_transform_constants(
+            nonFinite, identity, identity, true);
+    require(
+        !nonFiniteTransform.exact() &&
+        (nonFiniteTransform.unsupported &
+         FixedFunctionTransformUnsupportedNonFinite) != 0,
+        "R94 non-finite transform must fail closed");
 
     const DWORD fixedFunctionFvf =
         D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;

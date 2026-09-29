@@ -790,6 +790,58 @@ def main() -> None:
                 "DX11 R93 linkage regression drift: " + meaning
             )
 
+    r94_transform_contract = {
+        "FixedFunctionTransformConstants": "R94 transform payload type",
+        "FixedFunctionTransformUnsupportedIncompleteObservation": "R94 observation fail-closed reason",
+        "FixedFunctionTransformUnsupportedNonFinite": "R94 non-finite fail-closed reason",
+        "generate_fixed_function_transform_constants": "R94 transform generator declaration",
+    }
+    missing_r94_header = [
+        meaning
+        for token, meaning in r94_transform_contract.items()
+        if token not in PIPELINE_TRANSLATION_HPP
+    ]
+    if missing_r94_header:
+        raise SystemExit(
+            "DX11 R94 transform header drift: "
+            + ", ".join(missing_r94_header)
+        )
+
+    for token, meaning in {
+        "std::isfinite": "R94 finite-matrix guard",
+        "worldViewProjection[row * 4u + column]": "R94 row-major b0 payload",
+        "multiply(world, view)": "R94 WORLD*VIEW order",
+        "multiply(worldView, projection)": "R94 WORLD*VIEW*PROJECTION order",
+        "payloadHash = hash_bytes": "R94 deterministic payload identity",
+    }.items():
+        if token not in PIPELINE_TRANSLATION_CPP:
+            raise SystemExit(
+                "DX11 R94 transform source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "GetTransform(D3DTS_WORLD": "R94 passive WORLD observation",
+        "GetTransform(D3DTS_VIEW": "R94 passive VIEW observation",
+        "GetTransform(D3DTS_PROJECTION": "R94 passive PROJECTION observation",
+        "VR DX11 R94 ffp vertex readiness#{}": "R94 passive readiness log",
+        "sig.fixedFunctionTransformExact = transform.exact()": "R94 fail-closed census readiness",
+    }.items():
+        if token not in (ROOT / "src" / "vr" / "d3d11" / "runtime_census.cpp").read_text(encoding="utf-8"):
+            raise SystemExit(
+                "DX11 R94 census transform drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R94 transform constants should be exact": "R94 positive transform case",
+        "R94 WORLD*VIEW translation order": "R94 matrix-order regression",
+        "R94 incomplete transform observation must fail closed": "R94 incomplete observation negative case",
+        "R94 non-finite transform must fail closed": "R94 non-finite negative case",
+    }.items():
+        if token not in SHADER_LINKAGE_PROBE:
+            raise SystemExit(
+                "DX11 R94 transform regression drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

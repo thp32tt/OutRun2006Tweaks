@@ -197,6 +197,13 @@ namespace outrun::vr::dx11
             std::uint32_t fixedFunctionShaderPrototypeUnsupported{};
             std::uint64_t fixedFunctionShaderPrototypeHash{};
             UINT fixedFunctionShaderPrototypeBytes{};
+            bool fixedFunctionVertexShaderPrototypeGenerated{};
+            std::uint32_t fixedFunctionVertexShaderPrototypeUnsupported{};
+            std::uint64_t fixedFunctionVertexShaderPrototypeHash{};
+            UINT fixedFunctionVertexShaderPrototypeBytes{};
+            bool fixedFunctionTransformExact{};
+            std::uint32_t fixedFunctionTransformUnsupported{};
+            std::uint64_t fixedFunctionTransformHash{};
             bool vertexBufferPresent{};
             bool renderTargetPresent{};
             bool indexed{};
@@ -303,6 +310,19 @@ namespace outrun::vr::dx11
                 hash, sig.fixedFunctionShaderPrototypeHash);
             hash = hash_mix(
                 hash, sig.fixedFunctionShaderPrototypeBytes);
+            hash = hash_mix(
+                hash,
+                sig.fixedFunctionVertexShaderPrototypeGenerated ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.fixedFunctionVertexShaderPrototypeUnsupported);
+            hash = hash_mix(
+                hash, sig.fixedFunctionVertexShaderPrototypeHash);
+            hash = hash_mix(
+                hash, sig.fixedFunctionVertexShaderPrototypeBytes);
+            hash = hash_mix(
+                hash, sig.fixedFunctionTransformExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.fixedFunctionTransformUnsupported);
             hash = hash_mix(hash, sig.vertexBufferPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.renderTargetPresent ? 1u : 0u);
             hash = hash_mix(hash, sig.indexed ? 1u : 0u);
@@ -865,6 +885,43 @@ namespace outrun::vr::dx11
 
                 // R83 defers translation readiness until resource behavior
                 // and format exactness have been evaluated for all 8 stages.
+
+                const auto vertexPrototype =
+                    generate_fixed_function_vertex_shader_prototype(
+                        sig.fvf, sig.stride);
+                sig.fixedFunctionVertexShaderPrototypeGenerated =
+                    vertexPrototype.generated();
+                sig.fixedFunctionVertexShaderPrototypeUnsupported =
+                    vertexPrototype.unsupported;
+                sig.fixedFunctionVertexShaderPrototypeHash =
+                    vertexPrototype.sourceHash;
+                sig.fixedFunctionVertexShaderPrototypeBytes =
+                    static_cast<UINT>(vertexPrototype.source.size());
+
+                // R94 observes WORLD/VIEW/PROJECTION only on the already
+                // sampled diagnostic path. It does not hook SetTransform or
+                // bind native D3D11 constants.
+                D3DMATRIX world{};
+                D3DMATRIX view{};
+                D3DMATRIX projection{};
+                const HRESULT worldHr =
+                    device->GetTransform(D3DTS_WORLD, &world);
+                const HRESULT viewHr =
+                    device->GetTransform(D3DTS_VIEW, &view);
+                const HRESULT projectionHr =
+                    device->GetTransform(D3DTS_PROJECTION, &projection);
+                const auto transform =
+                    generate_fixed_function_transform_constants(
+                        world,
+                        view,
+                        projection,
+                        SUCCEEDED(worldHr) &&
+                        SUCCEEDED(viewHr) &&
+                        SUCCEEDED(projectionHr));
+                sig.fixedFunctionTransformExact = transform.exact();
+                sig.fixedFunctionTransformUnsupported =
+                    transform.unsupported;
+                sig.fixedFunctionTransformHash = transform.payloadHash;
             }
 
             const auto inputLayout = translate_vertex_input_layout(
@@ -1087,6 +1144,17 @@ namespace outrun::vr::dx11
 
                 if (sig.fixedFunction)
                 {
+                    spdlog::info(
+                        "VR DX11 R94 ffp vertex readiness#{}: generated={} mask=0x{:08X} sourceHash=0x{:016X} sourceBytes={} transform[exact={},mask=0x{:08X},payloadHash=0x{:016X}]",
+                        unique,
+                        sig.fixedFunctionVertexShaderPrototypeGenerated ? 1 : 0,
+                        sig.fixedFunctionVertexShaderPrototypeUnsupported,
+                        sig.fixedFunctionVertexShaderPrototypeHash,
+                        sig.fixedFunctionVertexShaderPrototypeBytes,
+                        sig.fixedFunctionTransformExact ? 1 : 0,
+                        sig.fixedFunctionTransformUnsupported,
+                        sig.fixedFunctionTransformHash);
+
                     spdlog::info(
                         "VR DX11 R85 ffp shader prototype#{}: generated={} mask=0x{:08X} hash=0x{:016X} bytes={} activeStages={}",
                         unique,

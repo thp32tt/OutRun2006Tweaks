@@ -1,6 +1,7 @@
 #include "pipeline_translation.hpp"
 
 #include <d3dcompiler.h>
+#include <cmath>
 
 #include "state_translation.hpp"
 
@@ -766,6 +767,82 @@ namespace outrun::vr::dx11
             diagnostics->Release();
         if (bytecode)
             bytecode->Release();
+        return out;
+    }
+
+    FixedFunctionTransformConstants
+    generate_fixed_function_transform_constants(
+        const D3DMATRIX& world,
+        const D3DMATRIX& view,
+        const D3DMATRIX& projection,
+        bool observationComplete) noexcept
+    {
+        FixedFunctionTransformConstants out{};
+        if (!observationComplete)
+        {
+            out.unsupported |=
+                FixedFunctionTransformUnsupportedIncompleteObservation;
+            return out;
+        }
+
+        const auto matrix_finite = [](const D3DMATRIX& matrix) noexcept
+        {
+            for (UINT row = 0; row < 4; ++row)
+            {
+                for (UINT column = 0; column < 4; ++column)
+                {
+                    if (!std::isfinite(matrix.m[row][column]))
+                        return false;
+                }
+            }
+            return true;
+        };
+
+        if (!matrix_finite(world) ||
+            !matrix_finite(view) ||
+            !matrix_finite(projection))
+        {
+            out.unsupported |= FixedFunctionTransformUnsupportedNonFinite;
+            return out;
+        }
+
+        const auto multiply = [](const D3DMATRIX& a,
+                                 const D3DMATRIX& b) noexcept
+        {
+            D3DMATRIX result{};
+            for (UINT row = 0; row < 4; ++row)
+            {
+                for (UINT column = 0; column < 4; ++column)
+                {
+                    float value = 0.0f;
+                    for (UINT inner = 0; inner < 4; ++inner)
+                        value += a.m[row][inner] * b.m[inner][column];
+                    result.m[row][column] = value;
+                }
+            }
+            return result;
+        };
+
+        const D3DMATRIX worldView = multiply(world, view);
+        const D3DMATRIX worldViewProjection =
+            multiply(worldView, projection);
+        if (!matrix_finite(worldViewProjection))
+        {
+            out.unsupported |= FixedFunctionTransformUnsupportedNonFinite;
+            return out;
+        }
+
+        for (UINT row = 0; row < 4; ++row)
+        {
+            for (UINT column = 0; column < 4; ++column)
+            {
+                out.worldViewProjection[row * 4u + column] =
+                    worldViewProjection.m[row][column];
+            }
+        }
+        out.payloadHash = hash_bytes(
+            out.worldViewProjection.data(),
+            sizeof(float) * out.worldViewProjection.size());
         return out;
     }
 
