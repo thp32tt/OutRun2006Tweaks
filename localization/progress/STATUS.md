@@ -1190,3 +1190,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Exact-source indices133/159/201 still require binding/masks/CLEAN_PLATE/final safe bbox. No candidate/static/runtime promotion.
 - Counts unchanged: pending production **71**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 - A00196/B00197 remain outside Q00039 for later independent C QA.
+
+
+### C142 Q00040 — 2026-09-30T03:45:00+09:00
+- B00197 `ac24b30` and A00196 `86a5583` — **PASS / PASS**, pre-generation evidence only.
+- Approved Drive exact miss **8/8**, pinned direct 404 **8/8**, pinned ZIP digest/size exact. Exact canonical source: **198/222/226/232**. SOURCE_ACQUISITION_EXHAUSTED: **205/214/219/225**.
+- Current semantics **55/55** match. All eight remain **PREFLIGHT_ONLY**; no RENDER_READY/ONE_STAGE_TO_RENDER, candidate/static/runtime approval.
+- Candidate-completion-first: exact-source multistage 133/159/198/201/222/226/232 stays ahead of unrelated new source preflight. Source-exhausted fingerprints are sticky.
+- Pending production **71**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0345-C142/C142_Q00040_INDEPENDENT_QA_BATCH.json`.

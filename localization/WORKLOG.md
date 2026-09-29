@@ -1739,3 +1739,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Q00039 dispositions remain **PASS / PASS / PASS** for B00193, A00191 and B00195, limited to pre-generation source/readiness evidence. All nine reviewed assets remain **PREFLIGHT_ONLY**; exact canonical sources for indices133/159/201 do not imply candidate/static approval.
 - Counts remain actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS candidate change or real-game test. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 - Newer A00196/B00197 producer results remain outside immutable Q00039 and stay in the later C QA backlog.
+
+
+## 2026-09-30 03:45 KST - C142 Q00040 INDEPENDENT QA BATCH
+
+- Immutable inputs: B00197 `ac24b30ca1ce60407855ddceda705b18cc825e59` (205/214/226/232) and A00196 `86a5583fd9ae02f7c23744ae709da2da82ae501e` (198/219/222/225). Dispositions: **PASS / PASS**.
+- One de-duplicated source pass re-lists the approved ezflash557 Drive parent (only `9F060EC1_512x512.dds`; selected exact misses **8/8**), reproduces pinned-tag direct 404 **8/8**, and verifies `OR2-HD-GUI-v0.25.10a.zip` at **306,223,257 bytes / SHA-256 76f85ed2...** once.
+- Release member identity: exact canonical source **198/222/226/232**; fail-closed mismatch/source exhaustion **205/214/219/225**. Index222 exact raw bytes are DXT5 mip1; exact SHA equality resolves source identity while inventory `mode=RGBA` remains decoded-image metadata.
+- Current transcriptions match **55/55** localizable pairs. No Korean candidate exists in either input, so one-pixel containment, candidate DDS/alpha, Hangul/clipping, protected-artwork and ENGLISH SOURCE vs KOREAN CANDIDATE gates are not promoted.
+- production_readiness is **PREFLIGHT_ONLY 8/8**. Exact-source 198/222/226/232 still require multiple binding/mask/CLEAN_PLATE/safe-bbox stages; no RENDER_READY or ONE_STAGE_TO_RENDER item is claimed.
+- Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. Newer producer results outside Q00040 are preserved for later C QA. No DDS modification, build, N100/local clone/worktree, GPT Library, Drive write, VR/FFB/DX work or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0345-C142/C142_Q00040_INDEPENDENT_QA_BATCH.json`.
