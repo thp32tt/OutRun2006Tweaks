@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00064",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_kst": "2026-09-29T23:46:00+09:00",
+  "checkpoint": "ROLLOVER_RECONSTRUCTED",
+  "status": "IN_PROGRESS",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "reconstructed_from": {
+    "prior_validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+    "prior_run_record": "docs/automation/runs/CONVERSION-DX11-00062.json",
+    "prior_resume_cursor": "Continue Set 05 F18 with a bounded non-routing D3D9 Texture2D LockRect/UnlockRect content bridge into R102 storage."
+  },
+  "observed_current_work": "R104 LockRect/UnlockRect transaction bridge code and hosted probe/source-graph guards are already present on the target branch after rollover; exact commit identity and validation are being reconstructed before any duplicate implementation.",
+  "runtime_note": "No Quest3/VDXR or in-game runtime test has been performed for this task."
+}
