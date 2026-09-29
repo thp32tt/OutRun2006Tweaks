@@ -1903,3 +1903,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B00219 correctly stayed fail-closed and produced no Korean DDS. No duplicate candidate/header/alpha/orientation/containment/English-source comparison work was run. Index217 receives no new readiness promotion in Q00049 and retains prior PREFLIGHT_ONLY only.
 - Shared state merged once. Index222 is now candidate-QA pending after A00221; candidate QA 159/198/201/222 stays ahead of unrelated preflight, while B00223 indices193/217 await their own C batch. Pending production 70, actionable localize_text 93, canonical segments 753.
 - `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`. No runtime test, build, N100/local clone/GPT Library/Drive write, VR/FFB/DX changes.
+
+## 2026-09-30 07:21 KST - C152 Q00050 INDEPENDENT QA BATCH
+- Consumed immutable A00221 `adcd9f5a6a7373a1b31184cb6b1e889b64b28dcf`, B00223 `37b579a9f850ccb4f5f1a347133851d875fac663`, A00225 `06627778c8b433cf37820831f21be157777a0352` once; dispositions **PASS / PASS / PASS**.
+- Index222/DDF0392A: exact pinned source replay and 6 semantics pass; unchanged candidate `c2938974...` / blob `e3f4488f...`; exact-lineage review set passes independent C visual review and candidate-bound v2 QA has zero 1px overflow/outside-edit/alpha/protected change. **STATIC_QA_PASS_RUNTIME_UNTESTED**.
+- B00223: index193 exact canonical `d308bf05...` RGBA32 source and 13 semantics pass but inherited guards remain inspection-only, so **PREFLIGHT_ONLY**; index217 pinned `d3d2d155...` mismatches canonical `035714f9...`, so **PREFLIGHT_ONLY / SOURCE_IDENTITY_MISMATCH**.
+- A00225@index135: Release `dafe21ec...` mismatches canonical `7cb768c6...` after earlier transport misses; **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED** remains sticky.
+- Shared state merged once after HEAD refresh. A00227@index231 and B00226@index163 are newer out-of-batch producer QA inputs and were not implicitly approved. Pending production localize_text **69**, actionable **93**, canonical segments **753**.
+- `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`. No runtime test/build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work.

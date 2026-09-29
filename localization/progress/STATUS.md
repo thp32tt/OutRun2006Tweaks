@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-29T19:01:20+09:00
+Updated: 2026-09-30T07:21:51+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -1314,3 +1314,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00219 had correctly failed closed and emitted no Korean DDS. Candidate-only DDS/alpha/orientation/1px/source-comparison gates are not rerun for the superseded input. Index217 keeps only its prior accepted **PREFLIGHT_ONLY** state; B00223 requires a later C disposition.
 - Shared order now has **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate QA 159/198/201/222 -> PREFLIGHT_ONLY 133/231/232**. Newer B00223 indices193/217 are out-of-batch QA-pending and must not be duplicated.
 - No DDS/build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C152 Q00050 — 2026-09-30T07:21:51+09:00
+- A00221 `adcd9f5a...`, B00223 `37b579a9...`, A00225 `06627778...`: **PASS / PASS / PASS**.
+- Index222 `DDF0392A`: **STATIC_QA_PASS_RUNTIME_UNTESTED**. Candidate `c2938974...` / Git blob `e3f4488f...` unchanged; exact canonical source + 6/6 semantics + mandatory visual set pass, with 1px overflow/outside-edit/alpha/protected violations all **0**.
+- B00223: index193 **PREFLIGHT_ONLY** exact source/header/orientation + 13 semantics pass, but 14/15 nonempty inherited scopes touch source alpha and are not final masks. Index217 **PREFLIGHT_ONLY** fail-closed `SOURCE_IDENTITY_MISMATCH` (`d3d2d155...` vs canonical `035714f9...`).
+- A00225 index135: **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**; verified Release `dafe21ec...` mismatches canonical `7cb768c6...`, no substitution.
+- Order: **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate QA 159/198/201 -> out-of-batch pending A00227@index231, B00226@index163 -> PREFLIGHT_ONLY 193/133/232 -> blocked 217/135**. Pending production **69**, actionable **93**, canonical segments **753**.
+- `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
