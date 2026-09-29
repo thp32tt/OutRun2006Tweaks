@@ -30,6 +30,7 @@ on:
       - 'docs/VR_AUTODEV_STATE.json'
       - 'tools/Test-OutRunVRTestPolicy.ps1'
       - 'tools/OutRunVR-BackendContract.ps1'
+      - 'tools/Test-VRDXVKBackendContract.ps1'
       - 'docs/VR_PROBLEM_HISTORY.md'
       - 'docs/VR_R69_CLEANUP_HISTORY.md'
       - 'docs/VR_BINARY_CONTRACT.json'
@@ -58,6 +59,9 @@ jobs:
       - name: Verify durable regression knowledge
         shell: pwsh
         run: ./tools/Test-VRRegressionKnowledge.ps1
+      - name: Verify DXVK selector/backend identity contract
+        shell: pwsh
+        run: ./tools/Test-VRDXVKBackendContract.ps1
       - name: Verify canonical original-mod EXE binary contract
         shell: pwsh
         run: |

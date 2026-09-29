@@ -168,6 +168,19 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
     'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
 ], "P7_FLARE_R26HUD_PATH")
+require_all("src/vr/game/render_semantics.hpp", [
+    'CorroboratesProjectedScreenEffect',
+    'scope == RenderScope::ProjectedScreenEffect2D',
+], "P7_FLARE_PROJECTED_SCREEN_OWNER")
+require_all("src/vr/game/outrun_renderer.cpp", [
+    'CorroboratesProjectedScreenEffect(',
+    'PROJECTED_SCREEN_EFFECT_2D',
+    'R30 owns exactly one HUD/flare/world-billboard transform',
+], "P7_FLARE_SINGLE_TRANSFORM_OWNER")
+require_all("src/vr/d3d9/stereo_renderer_r26.cpp", [
+    'RenderScope::ProjectedScreenEffect2D',
+    'PROJECTED_SCREEN_EFFECT_2D stay exclusively owned by R30',
+], "P7_FLARE_R28_WORLD_REBIND_VETO")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'std::clamp(Settings::SkyGlowFactor.get(), 1, 16)',
     'Keep the stereo',
@@ -182,14 +195,42 @@ require_all("src/hooks_graphics.cpp", [
     'if (Settings::VREnabled)',
     'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE',
 ], "P8_SELECTOR_SHADOW")
+require_all("src/vr/d3d9/stereo_renderer_r26.cpp", [
+    'R71TraceStartGridShadowCandidate',
+    'Game::is_vr_gameplay_presentation()',
+    'D3DRS_STENCILENABLE',
+    'R71StartShadowDiagHits',
+    'hit > 32 && (hit & (hit - 1)) != 0',
+    'VR R71 START SHADOW DIAG:',
+], "P8_R71_START_SHADOW_BOUNDED_DIAG")
 require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'R69IsSelectorAtlasReserveCandidate',
     'desc.Width == 2048 && desc.Height == 2048',
     'R14GeneralShadowBytes',
+    'R14EmergencyShadowBytes',
+    'R14EmergencyShadowBudgetBytes',
     'std::uint64_t bytes, bool emergencyReserve',
-    'later general textures retain the 368 MiB class budget',
-    'total remains capped at 384 MiB',
+    'emergency > R14EmergencyShadowBudgetBytes - bytes',
+    'currentEmergency >',
+    'emergency class is cumulatively capped at 16 MiB',
+    'general stays capped at 368 MiB',
+    'total at 384 MiB',
+    'bool selectorAtlas = false',
+    'R14FirstSelectorUploadLogged',
+    'exact 2048x2048 selector/car atlas CPU-shadow upload succeeded',
+    'R71IsSelectorCompanionDiagnosticCandidate',
+    'desc.Height == 512 || desc.Height == 1024',
+    'companion CPU-shadow budget reject',
+    'companion SYSTEMMEM CreateTexture failed',
+    'companion entered DirectOnly',
+    'correlate this pointer with later R13 LockRect failure',
 ], "P8_SELECTOR_ATLAS_RESERVE")
+require_all("src/vr/d3d9/ex_device_upgrade_r13.cpp", [
+    'VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED ptr=0x{:08X}',
+    'rect=[{},{},{},{}]',
+    'size={}x{} fmt={} levels={}',
+    'correlate exact pointer with R14 companion DirectOnly fallback',
+], "P8_SELECTOR_LOCK_DIAG")
 require_all("src/hooks_uiscaling.cpp", [
     'Module::exe_ptr(0xBA9D0)',
     'Module::exe_ptr(0xBAAA0)',
@@ -209,19 +250,50 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30SkyGlow.reduced[eye];',
     'compositeSource = R30SkyGlow.temp[eye];',
 ], "P8_R71_SKYGLOW_FINAL_BLUR_SOURCE")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'R30SkyGlowAppliedEpoch',
+    'R30SkyGlowPreHudAttemptEpoch',
+    'R30CompositeSkyGlowBeforeHud',
+    'R30SkyGlowPreHudAttemptEpoch != PresentEpoch',
+    'the additive glow no longer washes over HUD/menu pixels at Present',
+], "P8_R71_SKYGLOW_PRE_HUD_COMPOSITE")
 require_all("src/hooks_uiscaling.cpp", [
     'R71RivalMarkerSpraniCall = 0xBB796',
     'Module::exe_ptr(0xBB6F5)',
     'R71RivalMarker_sprani',
+    'R71RivalMarkerTaggedNodes',
+    'RenderScope::ProjectedWorldMarker2D',
+    '&markerSnapshot',
+    'exact 0xBB796 nodes pinned PROJECTED_WORLD_MARKER_2D',
     '0x975EE, 0x97727, 0x977FB',
     'R71OutRunPrintEnter',
     'R71OutRunPrintLeave',
+    'R71OutRunPrintTailsBefore',
+    'R70TagAppendedSpriteNodes(',
+    'R71OutRunStageTaggedNodes',
+    'exact Sumo_Printf queue nodes pinned SCREEN_HUD',
 ], "P8_R71_RIVAL_AND_OUTRUN_STAGE_TEXT")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'VR R71 HUD ALPHA DIAG:',
+    'D3DRS_SEPARATEALPHABLENDENABLE',
+    'D3DRS_SRCBLENDALPHA',
+    'D3DRS_DESTBLENDALPHA',
+    'D3DRS_BLENDOPALPHA',
+    'D3DRS_ALPHAREF',
+    'D3DRS_ALPHAFUNC',
+], "P8_R71_HUD_ALPHA_DIAGNOSTIC")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
-    'InRange(callRva, 0x097300, 0x097F00)',
+    'callRva == 0x0975EE || callRva == 0x097727',
+    'callRva == 0x0977FB',
+    '"WORLD_RIVAL_PROJECTED"',
+    'callRva == 0x0BB6F0 || callRva == 0x0BB796',
     'ClassifyCaller(0x0975EE)',
+    'ClassifyCaller(0x0BB6F0)',
 ], "P8_R71_OUTRUN_STAGE_SEMANTICS")
+forbid("src/vr/hud_semantics.hpp",
+       "InRange(callRva, 0x097300, 0x097F00)",
+       "P8_NO_BROAD_R71_OUTRUN_RANGE")
 require_all("src/game_addrs.hpp", [
     'is_vr_gameplay_presentation()',
     'GameState::STATE_START',

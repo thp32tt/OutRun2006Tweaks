@@ -34,6 +34,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
+#include "runtime/r41_skipped_release.hpp"
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/frame_contract.hpp"
 
@@ -323,6 +324,80 @@ namespace
     std::uint64_t R23DeferredReferenceAckPoisoned = 0;
     bool R23FirstDeferredReferenceAckLogged = false;
     bool R23FirstDeferredReferenceAckPoisonLogged = false;
+
+    OutRunVrR41SkippedRelease::Queue<OutRunVR::RenderFrameRingSize>
+        R41SkippedReleaseQueue{};
+    std::uint64_t R41SkippedReleaseStaged = 0;
+    std::uint64_t R41SkippedReleaseRetried = 0;
+    std::uint64_t R41SkippedReleaseConflicts = 0;
+
+    OutRunVrR41SkippedRelease::Identity R41SkippedIdentity(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return {
+            frame.clientPid,
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex],
+            frame.frameId
+        };
+    }
+
+    OutRunVR::SharedRenderFrameState R41SkippedFrame(
+        const OutRunVrR41SkippedRelease::Identity& identity) noexcept
+    {
+        OutRunVR::SharedRenderFrameState frame{};
+        frame.clientPid = identity.clientPid;
+        frame.frameId = identity.frameId;
+        frame.reserved[OutRunVR::RenderFrameRunGenerationIndex] =
+            identity.runGeneration;
+        frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] =
+            identity.transportGeneration;
+        frame.reserved[OutRunVR::RenderFrameDirectSlotIndex] = identity.slot;
+        return frame;
+    }
+
+    void R41RetrySkippedReleases() noexcept
+    {
+        R41SkippedReleaseQueue.Retry(
+            [](const OutRunVrR41SkippedRelease::Identity& identity) {
+                const auto frame = R41SkippedFrame(identity);
+                return OutRunVrD3D9ExDirectPassthrough::
+                    FrameRunIdentityCurrent(frame);
+            },
+            [](const OutRunVrR41SkippedRelease::Identity& identity) {
+                const auto frame = R41SkippedFrame(identity);
+                const bool published =
+                    OutRunVrD3D9ExDirectPassthrough::
+                        PublishCompletedFrame(frame);
+                if (published)
+                    ++R41SkippedReleaseRetried;
+                return published;
+            });
+    }
+
+    bool R41ReleaseNeverSampled(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        const auto identity = R41SkippedIdentity(frame);
+        const auto staged = R41SkippedReleaseQueue.Stage(identity);
+        if (staged ==
+            OutRunVrR41SkippedRelease::StageResult::LiveSlotConflict)
+        {
+            ++R41SkippedReleaseConflicts;
+            OutRunVrR32DirectSubmit::MarkGenerationFault(
+                identity.transportGeneration);
+            return false;
+        }
+        if (staged == OutRunVrR41SkippedRelease::StageResult::Invalid)
+            return false;
+        if (staged == OutRunVrR41SkippedRelease::StageResult::Staged ||
+            staged == OutRunVrR41SkippedRelease::StageResult::ReplacedStaleProducer)
+            ++R41SkippedReleaseStaged;
+
+        R41RetrySkippedReleases();
+        return !R41SkippedReleaseQueue.Pending(identity);
+    }
 
     bool R23SameDirectIdentity(
         const OutRunVR::SharedRenderFrameState& a,
@@ -2550,6 +2625,7 @@ int main(int argc, char** argv)
                     // so hybrid/direct-enabled configurations cannot strand a
                     // producer slot indefinitely.
                     R23PollDeferredReferenceAcks(compositor);
+                    R41RetrySkippedReleases();
 
                     if (directOnlyEffective())
                     {
@@ -2649,8 +2725,14 @@ int main(int argc, char** argv)
                                                 MarkGenerationFault(generation);
                                         continue;
                                     }
-                                    if (OutRunVrD3D9ExDirectPassthrough::
-                                            PublishCompletedFrame(frame))
+                                    // This path is reached only for an older
+                                    // DirectGPU frame that was never selected
+                                    // for D3D11 sampling and has no deferred
+                                    // EVENT owner. Stage ownership before the
+                                    // ACK attempt so a transient publication
+                                    // failure remains retryable after the
+                                    // latest-frame watermark advances.
+                                    if (R41ReleaseNeverSampled(frame))
                                     {
                                         R37BootstrapSubmittedFrame[slot] =
                                             frame.frameId;
