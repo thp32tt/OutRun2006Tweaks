@@ -122,3 +122,18 @@ Current autonomous pipeline contract supersedes all older role descriptions:
 - Artifact `11041973286`: `OutRun2-VR-PC-FAST-f437807922d7b9b32f9a7c7ced0442a5edab7c69`.
 - Downloaded artifact SHA256: `291eb3530d26df077533f400bb546a9d18b1a94b4a838279010ee0a9f2937d84`.
 - RUNTIME_VALIDATION=UNTESTED pending user Quest 3/VDXR run.
+
+
+## R73 user HMD result + disassembly-first gate — 2026-09-30
+
+- Tested source: `f437807922d7b9b32f9a7c7ced0442a5edab7c69`.
+- User log ZIP SHA256: `ec9578bd04748f23547e5b0a95bcf0799fa9418ce10cf9fe736b0c8b152d2fc7`.
+- HMD result: Sky overexposure/cloud washout **IMPROVED/STABLE** with stereo SkyGlow bypass. Treat base sky as protected; stereo SkyGlow extraction/blur/additive composite is now the primary overexposure suspect.
+- HMD result: OutRun +TIME and final time/progress remain doubled/head-following. Lens flare remains doubled. These are **NOT FIXED**.
+- Runtime HUD evidence: `0x97BB7` and `0x97DA7` are actually observed as `HUD_OUTRUN_RESULT / SCREEN_HUD` in state/mode 20, stage 14 (summary counts 64 and 128 respectively). Therefore the final-result defect is no longer a simple missing-callsite classification hypothesis; trace producer -> generated SpriteNode(s) -> registration/consume -> finite HUD transform and stereo draw ownership.
+- Runtime +TIME evidence: no `VR R71 OUTRUN STAGE HUD` event was emitted in this session. The static `0x975EE / 0x97727 / 0x977FB -> Sumo_Printf` anchors exist in the canonical EXE report but are not yet proven to be the visible +TIME producer for this runtime session. Do not patch them further without caller-of-caller runtime evidence.
+- Runtime flare evidence: exact `EXE+0xCABE` semantic hook is installed and R73 reduced-disparity path executes; log shows projected anchor delta L=(-0.55300,-1.92743), R=(-1.04930,-1.92743). Since HMD still shows two flares, stop scalar disparity tuning and disassemble the full `sub_40CAE0` / `0xCABE` / `0xCF4E` producer loop and count logical queue/draw submissions per frame/eye.
+- Selector evidence: `2048x2048 fmt=21` still falls to CPU-shadow unavailable/DirectOnly; a `2048x1024 fmt=21` companion is budget rejected at emergency=32 MiB/aux=16 MiB and enters DirectOnly. The actual translated MANAGED LockRect failure is `size=64x32 fmt=DXT1 levels=4 level=1`, invalidating the prior 128x64 assumption. Four selector replacement `1024x1024.dds` files are also skipped as exceeding the 64 MiB texture-cache budget; separate cache-accounting failure from D3D9Ex MANAGED compatibility.
+- New strict rule for HUD/flare: runtime source changes require both matching runtime evidence and canonical EXE disassembly/call/XREF evidence. Required record fields: USER_SYMPTOM, RUNTIME_EVIDENCE, DISASM_EVIDENCE, OWNERSHIP_HYPOTHESIS, FALSIFICATION_SIGNAL, MINIMAL_PATCH_POINT, REGRESSION_BOUNDARY. Missing any field => ANALYSIS_ONLY / NOT_PROVEN.
+- Forbidden until proven: broad HUD ranges, frame-count-only owner windows, blanket SpriteNode->HUD, lens-flare IPD/disparity scalar retuning, and reserve/cache increases without exact resource-owner evidence.
+- RUNTIME_VALIDATION: `PARTIAL_FAIL` (sky PASS/protected; +TIME FAIL; result HUD FAIL; lens flare FAIL; selector texture PARTIAL_IMPROVEMENT).
