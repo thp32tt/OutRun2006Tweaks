@@ -5,54 +5,88 @@
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
   "wave_id": "P00102",
-  "recorded_at_kst": "2026-09-30T03:30:00+09:00",
-  "base_head_sha": "70afe71affeb2067a8cd369a55ad1fab1614e874",
-  "base_sha": "70afe71affeb2067a8cd369a55ad1fab1614e874",
-  "commit_mode": "ATOMIC_LANE_LOCAL_B00190_CONTRACT_REEMISSION_REPORT_AND_TASK_RECORD",
-  "result": "PASS_MATERIAL_B00190_CONTRACT_REEMISSION_INDICES46_100_106_SOURCE_ACQUISITION_EXHAUSTED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
-  "summary": "C140/Q00038 authoritative Gate PASS returned B00190 as REWORK_REQUIRED solely because its immutable material result commit omitted the durable task record from the same commit. B00197 re-emits the unchanged source-exhaustion/semantic evidence for indices46/100/106 under the current producer contract and atomically includes this B00197 durable task record. No source fingerprints changed, so C140-authorized heavy source probes are reused rather than repeated. No exact canonical source exists, no Korean DDS is rendered, shared state is untouched, and runtime remains UNTESTED.",
+  "recorded_at_kst": "2026-09-30T03:33:04+09:00",
+  "base_head_sha": "46f83e9449c178bc7d6b74b5cb28630ca6b699ab",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MOD3_SOURCE_LADDER_BATCH_REPORT_AND_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDICES205_214_226_232_SOURCE_LADDER__226_232_EXACT_CANONICAL_SOURCE_ACQUIRED__205_214_SOURCE_EXHAUSTED__NO_CANDIDATE_RUNTIME_UNTESTED",
+  "summary": "Current Git schema13 overrides the stale even-index prompt: B owns asset_queue.index % 3 == 1. Current C140/Q00038 provides no B-owned RENDER_READY or ONE_STAGE_TO_RENDER item, and B00193/B00195 producer results are QA-pending and skipped. Exactly one new preflight batch was expanded for indices205/214/226/232. The approved ezflash557 Drive exact parent contains only 9F060EC1_512x512.dds, so all four exact names miss. Immutable v0.25.10a direct probes return 404 and correctly fall through. The verified pinned Release bundle matches its contract size/SHA. Indices205/214 fail canonical inventory identity and become SOURCE_ACQUISITION_EXHAUSTED. Indices226/232 exactly match canonical source SHA/canvas/RGBA, removing their source blocker, but semantic-to-region binding, source-effect/removal masks, independently QA-passed CLEAN_PLATE, and final v2 safe bbox remain unresolved; post-evidence rescan therefore remains PREFLIGHT_ONLY and no guessed Korean DDS is emitted.",
   "evidence": [
-    "localization/graphics/role_B/20260930-0330-B00197-P00102/B00197_P00102_B00190_ATOMIC_CONTRACT_REEMISSION.json",
-    "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
-    "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
-    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00194.json"
+    "localization/graphics/role_B/20260930-B00197-P00102/B00197_P00102_MOD3_SOURCE_LADDER_BATCH.json"
   ],
   "material_deliverable": {
-    "type": "B_CURRENT_CONTRACT_ATOMIC_REEMISSION_OF_B00190_SOURCE_EXHAUSTION_EVIDENCE",
+    "type": "B_MOD3_FOUR_ASSET_APPROVED_SOURCE_LADDER_BATCH",
     "reviewed_indices": [
-      46,
-      100,
-      106
+      205,
+      214,
+      226,
+      232
     ],
-    "reviewed_assets": [
-      "AA04D779",
-      "53CE39D5",
-      "788CE557"
+    "drive_exact_path_misses": 4,
+    "pinned_direct_transport_misses": 4,
+    "pinned_release_members_verified": 4,
+    "source_acquisition_exhausted": 2,
+    "exact_canonical_sources_acquired": 2,
+    "newly_removed_source_blocker_indices": [
+      226,
+      232
     ],
-    "source_fingerprint_changed": false,
-    "heavy_source_probes_repeated": false,
-    "source_acquisition_exhausted": 3,
+    "post_source_binding_hold_indices": [
+      226,
+      232
+    ],
     "candidate_dds_modified": false,
-    "materially_reduces_unresolved_work": true,
-    "contract_defect_repaired": "MATERIAL_REPORT_AND_DURABLE_TASK_RECORD_ATOMIC_IN_RESULT_COMMIT"
+    "materially_reduces_unresolved_work": true
   },
   "readiness_audit": {
     "shard_rule": "asset_queue.index % 3 == 1",
     "selected_indices": [
-      46,
-      100,
-      106
+      205,
+      214,
+      226,
+      232
     ],
-    "selected_priority": "DIRECT_REWORK_REQUIRED_CONTRACT_REEMISSION",
-    "current_c_gate": "C140/Q00038 authoritative result eb395208c34498da655106ea5d9f4f6ebc72c167 / Gate 36612087138 PASS",
+    "selected_priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "current_c_gate": "C140/Q00038",
+    "qa_pending_not_repeated": [
+      "LOCALIZATION-LOCALIZATION_B-00193 index28",
+      "LOCALIZATION-LOCALIZATION_B-00195 indices55/103/133/139"
+    ],
+    "static_pass_not_repeated": [
+      112,
+      130
+    ],
+    "other_lane_static_pass_not_stolen": [
+      99,
+      152,
+      237
+    ],
+    "unchanged_blocked_existing_reworks": [
+      94,
+      121
+    ],
+    "sticky_source_exhausted_not_repeated": [
+      34,
+      43,
+      46,
+      49,
+      52,
+      100,
+      106,
+      154,
+      172,
+      241
+    ],
     "readiness_after": {
-      "46": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
-      "100": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
-      "106": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
-    }
+      "205": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "214": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "226": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__MULTI_STAGE_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD",
+      "232": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__MULTI_STAGE_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD"
+    },
+    "post_evidence_render_ready_count": 0,
+    "post_evidence_one_stage_to_render_count": 0
   },
-  "self_qa": "PASS_B00197_ATOMIC_REPORT_PLUS_DURABLE_RECORD__REUSES_UNCHANGED_C140_ACCEPTED_SOURCE_SEMANTIC_FINGERPRINT__INDICES46_100_106_MOD3_EQ_1__NO_GUESSED_PIXEL_CONSTRUCTION__NO_SHARED_STATE",
-  "candidate_static_qa": "HOLD_NO_CANDIDATE_EXACT_CANONICAL_SOURCE_UNAVAILABLE",
+  "self_qa": "PASS_B_MOD3_205_214_226_232__FRESH_C140_ZERO_RUNNABLE_B_CANDIDATE_SCAN__ONE_PREFLIGHT_BATCH__APPROVED_DRIVE_EXACT_PARENT_MISS_4_OF_4__PINNED_DIRECT_404_FALLTHROUGH_4_OF_4__PINNED_RELEASE_BUNDLE_SHA256_SIZE_VERIFIED__226_232_CANONICAL_SHA_CANVAS_RGBA_EXACT__205_214_IDENTITY_MISMATCH_FAIL_CLOSED__POST_SOURCE_RESCAN_226_232_STILL_MULTISTAGE_PREFLIGHT__NO_GUESSED_PIXEL_CONSTRUCTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE__226_232_EXACT_SOURCE_READY_BUT_SEMANTIC_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_INCOMPLETE__205_214_SOURCE_EXHAUSTED",
   "candidate_dds_modified": false,
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
@@ -60,9 +94,9 @@
   "build_performed": false,
   "n100_used": false,
   "local_clone_used": false,
-  "google_drive_used": false,
+  "google_drive_used": true,
   "google_drive_write_performed": false,
-  "uploaded_archive_used": false,
+  "uploaded_archive_used": true,
   "gpt_library_used": false,
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,

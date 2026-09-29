@@ -1,0 +1,241 @@
+{
+  "schema_version": 3,
+  "schema": "outrun-v2-mod3-source-ladder-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00197",
+  "wave_id": "P00102",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T03:33:04+09:00",
+  "precommit_head_sha": "46f83e9449c178bc7d6b74b5cb28630ca6b699ab",
+  "shard_rule": "asset_queue.index % 3 == 1",
+  "selection": {
+    "indices": [
+      205,
+      214,
+      226,
+      232
+    ],
+    "reason": "Fresh current-contract scan found no C-accepted runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate rewrite in B shard after excluding QA-pending B00193/B00195. Exactly one new PREFLIGHT_ONLY batch was expanded."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "asset_queue_blob_sha": "0f4518f636dc1c0b1d4b226ee5d99a191e446bca",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_release_bytes": 306223257
+  },
+  "source_transport": {
+    "approved_drive_account": "ezflash557",
+    "approved_drive_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "exact_parent_observed_files": [
+      "9F060EC1_512x512.dds"
+    ],
+    "selected_exact_filename_misses": 4,
+    "pinned_direct_404_misses": 4,
+    "pinned_release_bundle_verified": true
+  },
+  "assets": [
+    {
+      "queue_index": 205,
+      "asset": "ACF61D7C",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+      "canonical_inventory": {
+        "sha256": "34cadbc0b33b6280978c81614a9347ad667cbe8279cf105dc8623ebd13888f07",
+        "width": 1024,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_present": false
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "http_status": 404
+      },
+      "pinned_release": {
+        "member_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+        "bytes": 33554560,
+        "width": 4096,
+        "height": 2048,
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "identity": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "candidate_dds_written": false
+    },
+    {
+      "queue_index": 214,
+      "asset": "BF229CF4",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "canonical_inventory": {
+        "sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_present": false
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "http_status": 404
+      },
+      "pinned_release": {
+        "member_sha256": "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "identity": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "candidate_dds_written": false
+    },
+    {
+      "queue_index": 226,
+      "asset": "E3F4BA07",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+      "canonical_inventory": {
+        "sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+        "width": 2048,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_present": false
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "http_status": 404
+      },
+      "pinned_release": {
+        "member_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+        "bytes": 4194432,
+        "width": 2048,
+        "height": 512,
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "identity": "SOURCE_ACQUIRED_EXACT_CANONICAL"
+      },
+      "final_source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "canonical_semantics": [
+        "GOAL -> 골",
+        "GOAL A -> 골 A",
+        "GOAL B -> 골 B",
+        "GOAL C -> 골 C",
+        "GOAL D -> 골 D",
+        "GOAL E -> 골 E",
+        "15 STAGE CONTINUOUS -> 15코스 연속",
+        "STAGE -> 스테이지"
+      ],
+      "prior_c_accepted_state": "Q00018/C120 PREFLIGHT_ONLY; canonical identity/semantics current; earlier atlas arithmetic conditional",
+      "unresolved_after_source": [
+        "semantic-to-region binding for 10 atlas regions",
+        "effect-inclusive source text bboxes",
+        "source-effect/removal and protected masks",
+        "independently QA-passed CLEAN_PLATE",
+        "final v2 candidate_safe_bbox"
+      ],
+      "readiness_after": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__MULTI_STAGE_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD",
+      "candidate_dds_written": false
+    },
+    {
+      "queue_index": 232,
+      "asset": "EBFC709F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "canonical_inventory": {
+        "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+        "width": 2048,
+        "height": 1024,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_present": false
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "http_status": 404
+      },
+      "pinned_release": {
+        "member_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+        "bytes": 8388736,
+        "width": 2048,
+        "height": 1024,
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "identity": "SOURCE_ACQUIRED_EXACT_CANONICAL"
+      },
+      "final_source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "canonical_semantics": [
+        "JOIN GAME -> 게임 참가",
+        "CREATE GAME -> 게임 만들기"
+      ],
+      "prior_c_accepted_state": "Q00018/C120 PREFLIGHT_ONLY; canonical identity/semantics current; earlier Release identity retired as canonical proof",
+      "unresolved_after_source": [
+        "semantic-to-region binding for 6 atlas regions",
+        "effect-inclusive source text bboxes",
+        "source-effect/removal and protected masks",
+        "independently QA-passed CLEAN_PLATE",
+        "final v2 candidate_safe_bbox"
+      ],
+      "readiness_after": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__MULTI_STAGE_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD",
+      "candidate_dds_written": false
+    }
+  ],
+  "post_evidence_rescan": {
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "preflight_only_indices": [
+      205,
+      214,
+      226,
+      232
+    ],
+    "exact_canonical_sources_newly_acquired": [
+      226,
+      232
+    ],
+    "source_acquisition_exhausted": [
+      205,
+      214
+    ],
+    "candidate_dds_modified": false,
+    "reason": "226/232 still require multiple mandatory pixel-construction stages after source acquisition; candidate generation would guess unresolved semantic/effect geometry. 205/214 have no exact canonical source after all approved tiers."
+  },
+  "self_qa": {
+    "source_ladder_order": "PASS_DRIVE_THEN_IMMUTABLE_DIRECT_THEN_PINNED_RELEASE",
+    "drive_exact_parent_scope": "PASS_APPROVED_SUBTREE_ONLY",
+    "release_bundle_identity": "PASS_SIZE_AND_SHA256",
+    "inventory_identity_gate": "PASS_FAIL_CLOSED_PER_ASSET",
+    "candidate_completion_policy": "PASS_POST_EVIDENCE_RESCAN_ZERO_RUNNABLE_READY_TIERS",
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false
+  },
+  "runtime_validation": "UNTESTED"
+}
