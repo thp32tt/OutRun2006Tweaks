@@ -1688,3 +1688,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Pending production **72 -> 71**; actionable localize_text **93**; canonical segments **753**. C changes no DDS candidate bytes; new static passes **1**, runtime approvals **0**.
 - Candidate-completion-first order is preserved: no new RENDER_READY/ONE_STAGE_TO_RENDER item is introduced by Q00037; newer B00190 indices46/100/106 is outside this batch and remains QA-pending. Existing PREFLIGHT_ONLY/source-exhausted work stays behind candidate-bearing/direct-rework work.
 - Report: `localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, Drive write, build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 03:09 KST - C140 Q00038 INDEPENDENT QA BATCH
+
+- Immutable input: B00190 `5969fd310d7d1311977effb967d24c31354d6811` (indices46/AA04D779,100/53CE39D5,106/788CE557). Disposition: **PASS**, limited to source-acquisition exhaustion pre-generation evidence.
+- C independently re-listed the approved ezflash557 Drive exact parents and confirmed requested exact files are absent **3/3**. Current inventory remains `5a3d3b09...`; pinned v0.25.10a direct blobs `7779ac9b...`, `d891aca5...`, `42a0d3f1...` remain 4x RGBA32 canvas lineages versus canonical 1x RGBA identities. C136 verified bundle identity 306223257 bytes / SHA-256 `76f85ed2...` is reused on unchanged fingerprints.
+- Current semantics remain index46 **21/21**, index100 **7/7**, index106 **3 localizable + OutRun2SP preserve-original**. No exact canonical source or Korean candidate exists; candidate-only static gates are not promoted.
+- Indices46/100/106 are **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. C changes no DDS bytes; new static passes **0**, runtime approvals **0**.
+- Candidate-completion-first order remains; producer results outside Q00038 receive no disposition and stay in later C backlog. No N100/local clone/worktree, GPT Library, Drive write, build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING` before the single C batch Gate.

@@ -1162,3 +1162,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00188 `0278c04c` indices34/52 — **PASS**, limited to **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Approved Drive exact parents are independently absent; pinned direct blobs reproduce unchanged C-accepted legacy lineages and still mismatch current canonical canvas/mode.
 - A00187 `047972fb` index99/4F68708E — **PASS**. Exact current DXT5 candidate blob is unchanged; 2/2 containment, zero-pixel/alpha overflow, mirror-Y/header/mip and independent source-clean-candidate visual gates pass. **STATIC_QA PASS / RUNTIME_UNTESTED**.
 - Pending production **71**, actionable localize_text **93**, canonical segments **753**. No C DDS modification/runtime approval. Newer B00190 is outside Q00037 and preserved for later C consumption. Report: `localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json`.
+
+### C140 Q00038 — 2026-09-30T03:09:00+09:00
+- B00190 `5969fd31` indices46/100/106 — **PASS**, limited to **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**.
+- Independent source recheck: approved Drive exact-parent **3/3 miss**; pinned v0.25.10a blobs `7779ac9b` / `d891aca5` / `42a0d3f1` remain 4x RGBA32 canvas lineages versus current 1x RGBA inventory. C136 bundle fingerprint is unchanged and reused.
+- Semantics unchanged: 46=21/21, 100=7/7, 106=3 localize + OutRun2SP protected original. No candidate DDS/static/runtime approval; pending production **71**, actionable localize_text **93**, canonical segments **753**.
+- Candidate-completion-first remains active; producer results outside Q00038 remain separate QA backlog. Report: `localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
