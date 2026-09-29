@@ -1,0 +1,353 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00195-p00100-mod3-source-ladder-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00195",
+  "wave_id": "P00100",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T03:14:58+09:00",
+  "base_head_sha": "9d7e6d8f0e444bcbd0c52753d5583719b8a28c43",
+  "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+  "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+  "current_queue_blob_sha": "155d3a64d201b23154590cc3b2079ade989612c6",
+  "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+  "shard_rule": "asset_queue.index % 3 == 1",
+  "prompt_shard_override": "Current Git schema13 is authoritative; stale prompt text saying B owns even indices is not used.",
+  "selection": {
+    "selected_indices": [
+      55,
+      103,
+      133,
+      139
+    ],
+    "selected_assets": [
+      "2EA557B4",
+      "590A4724",
+      "25F697C6",
+      "313DB8CB"
+    ],
+    "priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "current_c_gate": "C139/Q00037",
+    "reason": "Latest C shared state exposes no B-owned RENDER_READY or ONE_STAGE_TO_RENDER asset. B00193 already exhausted index28; B00190 indices46/100/106 are producer QA-pending and are not repeated; B00188 indices34/52 are C-accepted source-exhausted; indices112/130 are STATIC_QA PASS; direct reworks94/121 retain unchanged blockers. This invocation therefore expands exactly one new B-shard preflight batch."
+  },
+  "drive_source_transport": {
+    "account": "ezflash557",
+    "root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "allowed_subtree": "OutRun2006_Korean_Artifacts/90_ARCHIVE/LOCALIZATION_SNAPSHOT_20260927_0302/03_ORIGINAL_REFERENCE/hd_source/OR2-HD-GUI-v0.25.10a/textures/load",
+    "parent_folder_observations": {
+      "spr_sprani_game_cvt_Exst": {
+        "folder_id": "1lcRfuzfY-tDtaiQuXhjdGbOjxENeDB4L",
+        "observed_children": [
+          "C4A2937B_1024x1024.dds",
+          "A064FDFC_1024x512.dds",
+          "39229D64_1024x1024.dds"
+        ]
+      },
+      "spr_sprani_selector_cvt_Exst": {
+        "folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
+        "observed_children": [
+          "FD90AA9_1024x1024.dds",
+          "C075FB49_512x512.dds",
+          "411827E_512x512.dds",
+          "2DA43E41_1024x1024.dds"
+        ]
+      },
+      "spr_sprani_sumo_fe_cvt_Exst": {
+        "folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "observed_children": [
+          "9F060EC1_512x512.dds"
+        ]
+      }
+    },
+    "exact_path_misses": 4,
+    "read_only": true,
+    "write_performed": false
+  },
+  "pinned_upstream": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "direct_paths_resolved": 4,
+    "files": [
+      {
+        "index": 55,
+        "asset": "2EA557B4",
+        "path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+        "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79"
+      },
+      {
+        "index": 103,
+        "asset": "590A4724",
+        "path": "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+        "git_blob_sha": "66c88580fbd4a73f6e10b5e9066a6c996346578c"
+      },
+      {
+        "index": 133,
+        "asset": "25F697C6",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+        "git_blob_sha": "5263429e689933e1ebb5923773e5adc1a2e2b7e5"
+      },
+      {
+        "index": 139,
+        "asset": "313DB8CB",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+        "git_blob_sha": "616eecec37dd04de4ee25f174e7453f6d2209f98"
+      }
+    ]
+  },
+  "pinned_release": {
+    "tag": "v0.25.10a",
+    "archive_name": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_size": 306223257,
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "expected_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "archive_identity": "PASS_EXACT",
+    "member_git_blob_matches_pinned_direct": 4,
+    "members": [
+      {
+        "index": 55,
+        "asset": "2EA557B4",
+        "sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+        "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5",
+        "mipmaps": 1
+      },
+      {
+        "index": 103,
+        "asset": "590A4724",
+        "sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+        "git_blob_sha": "66c88580fbd4a73f6e10b5e9066a6c996346578c",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1
+      },
+      {
+        "index": 133,
+        "asset": "25F697C6",
+        "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+        "git_blob_sha": "5263429e689933e1ebb5923773e5adc1a2e2b7e5",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1
+      },
+      {
+        "index": 139,
+        "asset": "313DB8CB",
+        "sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+        "git_blob_sha": "616eecec37dd04de4ee25f174e7453f6d2209f98",
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32",
+        "mipmaps": 1
+      }
+    ]
+  },
+  "canonical_identity_gate": [
+    {
+      "index": 55,
+      "asset": "2EA557B4",
+      "path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "drive_parent_folder_id": "1lcRfuzfY-tDtaiQuXhjdGbOjxENeDB4L",
+      "drive_exact_file_present": false,
+      "pinned_direct_path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "pinned_direct_git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+      "release_member_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+      "release_width": 2048,
+      "release_height": 256,
+      "release_format": "DXT5",
+      "release_mipmaps": 1,
+      "canonical_sha256": "8a39e88bf0d60654b4460c06b18f3c3639c3790375ae0557a337fa75a9b3de6a",
+      "canonical_width": 512,
+      "canonical_height": 64,
+      "canonical_format": "RGBA",
+      "identity_match": false,
+      "mismatch": [
+        "sha256",
+        "width",
+        "height",
+        "format"
+      ],
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 103,
+      "asset": "590A4724",
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+      "drive_parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
+      "drive_exact_file_present": false,
+      "pinned_direct_path": "Release/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+      "pinned_direct_git_blob_sha": "66c88580fbd4a73f6e10b5e9066a6c996346578c",
+      "release_member_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+      "release_width": 2048,
+      "release_height": 2048,
+      "release_format": "RGBA32",
+      "release_mipmaps": 1,
+      "canonical_sha256": "b3ef4a34649ac699bd4c23d1d311b9850e0928f6cb5b98c1835f84de31561222",
+      "canonical_width": 2048,
+      "canonical_height": 2048,
+      "canonical_format": "RGBA",
+      "identity_match": false,
+      "mismatch": [
+        "sha256"
+      ],
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 133,
+      "asset": "25F697C6",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "drive_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "drive_exact_file_present": false,
+      "pinned_direct_path": "Release/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "pinned_direct_git_blob_sha": "5263429e689933e1ebb5923773e5adc1a2e2b7e5",
+      "release_member_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "release_width": 2048,
+      "release_height": 2048,
+      "release_format": "RGBA32",
+      "release_mipmaps": 1,
+      "canonical_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "canonical_width": 2048,
+      "canonical_height": 2048,
+      "canonical_format": "RGBA",
+      "identity_match": true,
+      "mismatch": [],
+      "readiness_after": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__SEMANTIC_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD"
+    },
+    {
+      "index": 139,
+      "asset": "313DB8CB",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "drive_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "drive_exact_file_present": false,
+      "pinned_direct_path": "Release/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "pinned_direct_git_blob_sha": "616eecec37dd04de4ee25f174e7453f6d2209f98",
+      "release_member_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+      "release_width": 2048,
+      "release_height": 1024,
+      "release_format": "RGBA32",
+      "release_mipmaps": 1,
+      "canonical_sha256": "45cd9acffa98e79079774c4af41f90471627f7531fa33c12ff16dc4ed9292209",
+      "canonical_width": 512,
+      "canonical_height": 256,
+      "canonical_format": "RGBA",
+      "identity_match": false,
+      "mismatch": [
+        "sha256",
+        "width",
+        "height"
+      ],
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  ],
+  "index133_continuation": {
+    "exact_canonical_source_acquired": true,
+    "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "raw_orientation": "VERTICAL_MIRROR_RELATIVE_TO_READABLE_VIEW",
+    "accepted_work_order_lineage": "A00114 -> A00121 -> A00128; C content/fingerprint repairs accepted 9 reviewed mappings but explicitly required positive raw-region binding from exact source before pixel work.",
+    "reviewed_translations": [
+      [
+        "ALPINE",
+        "알파인"
+      ],
+      [
+        "ANCIENT RUINS",
+        "고대 유적"
+      ],
+      [
+        "BLU MIRABEAU",
+        "블루 미라보"
+      ],
+      [
+        "ARGENTO NURBURGRING",
+        "아르젠토 뉘르부르크링"
+      ],
+      [
+        "BIANCO AVUS",
+        "비앙코 아부스"
+      ],
+      [
+        "NERO",
+        "네로"
+      ],
+      [
+        "ROSSO SCUDERIA",
+        "로쏘 스쿠데리아"
+      ],
+      [
+        "GRIGIO ALLOY",
+        "그리지오 알로이"
+      ],
+      [
+        "GIALLO MODENA",
+        "지알로 모데나"
+      ]
+    ],
+    "full_atlas_visual_review": {
+      "readable_orientation_checked": true,
+      "positively_identified_localizable_source_text": [
+        "ANCIENT RUINS"
+      ],
+      "remaining_reviewed_strings_not_positively_bound": 8,
+      "result": "HOLD_SEMANTIC_TO_RAW_SPRITE_BINDING_INCOMPLETE__NO_LIST_ORDER_INFERENCE"
+    },
+    "remaining_gates": [
+      "positive binding of all intended localizable source labels to exact raw sprite regions",
+      "per-element source-effect/removal masks and protected-art masks",
+      "independently passing CLEAN_PLATE",
+      "measured final candidate_safe_bbox per translated element",
+      "source-style/baseline/slant measurement and Korean render/refit",
+      "exact DDS encode plus decoded-final zero-pixel/alpha/orientation/source-vs-candidate QA"
+    ],
+    "post_evidence_rescan": "NOT_RENDER_READY_AND_NOT_ONE_STAGE_TO_RENDER; multiple deterministic geometry/reconstruction gates remain. Same-invocation candidate emission would require guessing semantic bindings and is forbidden.",
+    "candidate_dds_modified": false
+  },
+  "readiness_after": {
+    "55": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "103": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "133": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__SEMANTIC_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD",
+    "139": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "retry_condition_for_exhausted": "Retry only if approved source transport, canonical inventory identity, or pinned source fingerprint changes."
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_55_103_133_139_ALL_MOD3_EQ_1",
+    "anti_duplication": "PASS_B00193_INDEX28_NOT_REPEATED__B00190_46_100_106_QA_PENDING_NOT_REPEATED__B00188_34_52_NOT_REPEATED__STATIC_PASS_112_130_NOT_REPEATED",
+    "drive_first_gate": "PASS_MISS_4_OF_4",
+    "pinned_direct_gate": "PASS_RESOLVES_4_OF_4",
+    "release_archive_identity": "PASS_SHA256_EXACT",
+    "release_member_to_direct_identity": "PASS_GIT_BLOB_MATCH_4_OF_4",
+    "canonical_identity": "PASS_EXACT_INDEX133_1_OF_4__FAIL_CLOSED_MISMATCH_55_103_139_3_OF_4",
+    "index133_post_source_rescan": "PASS_FAIL_CLOSED_BINDING_AND_MASK_GATES_INCOMPLETE",
+    "candidate_generation": "NONE_SAFE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "conclusion": "One approved preflight batch was completed. Indices55/103/139 exhaust all approved exact-source tiers on current fingerprints. Index133 newly resolves to the exact canonical DDS, materially removing its source blocker, but the C-accepted work order still lacks positive binding for all intended labels plus masks/CLEAN_PLATE/safe bboxes; candidate construction therefore fails closed rather than guessing."
+}

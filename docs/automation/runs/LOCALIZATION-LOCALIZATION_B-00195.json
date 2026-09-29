@@ -1,0 +1,98 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00195",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00100",
+  "recorded_at_kst": "2026-09-30T03:14:58+09:00",
+  "base_head_sha": "9d7e6d8f0e444bcbd0c52753d5583719b8a28c43",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MOD3_SOURCE_LADDER_BATCH_REPORT_AND_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDICES55_103_133_139_SOURCE_LADDER__INDEX133_EXACT_CANONICAL_SOURCE_ACQUIRED__THREE_SOURCE_EXHAUSTED__NO_CANDIDATE_RUNTIME_UNTESTED",
+  "summary": "Current Git schema13 overrides the stale even-index prompt: B owns asset_queue.index % 3 == 1. C139/Q00037 and B00193 leave no runnable B-owned direct REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or unblocked existing-candidate rewrite, so this invocation expands exactly one new preflight batch: indices55/2EA557B4,103/590A4724,133/25F697C6,139/313DB8CB. Approved Drive exact paths are absent for all four. Pinned direct files are byte-identical to the exact v0.25.10a release members. Indices55/103/139 mismatch current canonical inventory and become source-acquisition-exhausted. Index133 exactly matches current canonical SHA-256/canvas/format, closing its source blocker; however the accepted work order requires positive mapping of nine reviewed labels before pixel work, and current full-atlas review positively binds only ANCIENT RUINS while eight mappings remain unresolved. Multiple mask/CLEAN_PLATE/safe-bbox gates therefore remain, so index133 is not RENDER_READY/ONE_STAGE_TO_RENDER and no Korean DDS is guessed or emitted.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00195-P00100/B00195_P00100_MOD3_SOURCE_LADDER_BATCH.json"
+  ],
+  "material_deliverable": {
+    "type": "B_MOD3_FOUR_ASSET_APPROVED_SOURCE_LADDER_BATCH",
+    "reviewed_indices": [
+      55,
+      103,
+      133,
+      139
+    ],
+    "reviewed_assets": [
+      "2EA557B4",
+      "590A4724",
+      "25F697C6",
+      "313DB8CB"
+    ],
+    "drive_exact_path_misses": 4,
+    "pinned_direct_exact_paths_resolved": 4,
+    "pinned_release_members_verified": 4,
+    "source_acquisition_exhausted": 3,
+    "exact_canonical_sources_acquired": 1,
+    "newly_removed_source_blocker_indices": [
+      133
+    ],
+    "post_source_binding_hold_indices": [
+      133
+    ],
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_indices": [
+      55,
+      103,
+      133,
+      139
+    ],
+    "selected_priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "current_c_gate": "C139/Q00037",
+    "previous_b_work_not_repeated": [
+      28,
+      34,
+      46,
+      52,
+      100,
+      106
+    ],
+    "qa_pending_not_repeated": [
+      "B00190 indices46/100/106"
+    ],
+    "static_pass_not_repeated": [
+      112,
+      130
+    ],
+    "unchanged_blocked_existing_reworks": [
+      94,
+      121
+    ],
+    "readiness_after": {
+      "55": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "103": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "133": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ACQUIRED__SEMANTIC_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD",
+      "139": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_55_103_133_139__FRESH_ZERO_RUNNABLE_B_CANDIDATE_SCAN__ONE_PREFLIGHT_BATCH__DRIVE_MISS_4_OF_4__PINNED_DIRECT_RELEASE_MEMBER_IDENTITY_4_OF_4__INDEX133_CANONICAL_SHA_EXACT__55_103_139_CANONICAL_MISMATCH_FAIL_CLOSED__INDEX133_POST_SOURCE_RESCAN_BINDING_INCOMPLETE__NO_GUESSED_PIXEL_CONSTRUCTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE__INDEX133_EXACT_SOURCE_READY_BUT_SEMANTIC_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_INCOMPLETE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
