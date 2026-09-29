@@ -1,0 +1,206 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00230-index222-single-dds-isolation-input-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00230",
+  "wave_id": "P00123",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:31:48+09:00",
+  "base_head_sha": "b81a721b86e831dc19d93bda995fad4fe47edd6a",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "selected_index": 222,
+    "selected_asset": "DDF0392A",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "accepted_c_authority": "LOCALIZATION-LOCALIZATION_C-00228@648cfaab4a7bd5c01ca2a6aa21d775291235a942 / C152 Q00050 / Gate 36639832928 success",
+    "readiness_scan": {
+      "render_ready_indices": [],
+      "one_stage_to_render_indices": [],
+      "candidate_qa_pending_skipped": [
+        159,
+        198,
+        201
+      ],
+      "producer_qa_pending_skipped": [
+        231
+      ],
+      "dependency_blocked_not_repeated": [
+        135
+      ],
+      "static_qa_pass_candidates_in_a_shard": [
+        99,
+        195,
+        222,
+        237
+      ],
+      "prior_isolation_inputs_known": {
+        "195": "A00163 single-DDS isolation input exists",
+        "222": "none found at current HEAD"
+      }
+    },
+    "reason": "Q00050 accepts no A-shard RENDER_READY/ONE_STAGE_TO_RENDER work. Candidate-bearing 159/198/201 and A00227 index231 are QA-pending and cannot be repeated. Index135 source exhaustion is sticky. DDF0392A is an unchanged C152 STATIC_QA_PASS_RUNTIME_UNTESTED candidate with no existing single-DDS isolation input, so fallback step 3 materially advances the separate runtime-validation backlog without rerendering or repeating heavy QA."
+  },
+  "asset": {
+    "id": "DDF0392A",
+    "queue_index": 222,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "translations": [
+      {
+        "source": "OutRun Mode / 15 C.",
+        "korean": "아웃런 모드 / 15코스"
+      },
+      {
+        "source": "OutRun 1986",
+        "korean": "아웃런 1986"
+      },
+      {
+        "source": "Journey Mode / Random",
+        "korean": "저니 모드 / 무작위"
+      },
+      {
+        "source": "Who Are You?",
+        "korean": "당신은 누구?"
+      },
+      {
+        "source": "Shake The Street",
+        "korean": "거리를 뒤흔들어라"
+      },
+      {
+        "source": "Rush A Difficulty",
+        "korean": "난이도에 도전"
+      }
+    ],
+    "raw_orientation": "flip_y"
+  },
+  "source": {
+    "authority": "A00221 exact pinned v0.25.10a source lineage independently accepted by C152/Q00050; no source reacquisition or reconstruction is performed in A00230.",
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "bytes": 2097280,
+    "dds": {
+      "width": 1024,
+      "height": 2048,
+      "format": "DXT5",
+      "mipmaps": 1
+    },
+    "raw_to_readable": "flip_y",
+    "heavy_source_qa_reused": true,
+    "heavy_source_qa_rerun": false
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "bytes": 2097280,
+    "dds": {
+      "width": 1024,
+      "height": 2048,
+      "format": "DXT5",
+      "mipmaps": 1
+    },
+    "header_128_exact": true,
+    "decoded_raw_rgba_sha256": "5f287e411947d84a86e7412f2d688f90a9a32fbedd5b13c787f079d089a4aa37",
+    "decoded_display_rgba_sha256": "58d12077c2b50bb094f35ae5eb673d53ecebe6e2b2a26201f8f81930680f8ca7",
+    "candidate_blob_current": true
+  },
+  "qa_evidence": {
+    "producer_qa_report": "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/qa_report.json",
+    "producer_qa_report_blob_sha": "8b43868fd9e3da991b59f520ee72388ecbfadac9",
+    "c_batch_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00228.json",
+    "c_batch_record_blob_sha": "166cee891bf8fb636d664c46c6eb7ec7fc39a19e",
+    "c_static_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "c_validation_bearing_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "c_gate_run_id": 36639832928,
+    "c_gate_conclusion": "success",
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_regions": 0,
+    "one_pixel_overflow": 0,
+    "safe_bbox_containment": "PASS_2PX_INSET_ALL_6",
+    "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "mandatory_english_source_comparison": "PASS_C152_REUSED_UNCHANGED_FINGERPRINT",
+    "current_candidate_heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "candidate_git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "candidate_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "expected_dds_count": 1,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Install DDF0392A as the only replacement DDS.",
+    "Open the front-end/menu states that expose the six translated DDF0392A labels.",
+    "Capture readable/game-orientation evidence and verify FLIP_Y raw storage renders with the expected orientation.",
+    "Verify native runtime scale, alpha/transparency, sprite alignment, clipping, preserved rows and zero-pixel overflow.",
+    "Do not promote runtime validation unless this isolated real-game test is actually performed."
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 3,
+    "type": "SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "one_pass_self_qa": {
+    "shard": "PASS_INDEX222_MOD3_EQ_0",
+    "work_steal": "NONE",
+    "q00050_ready_scan": "PASS_ZERO_RENDER_READY_ZERO_ONE_STAGE",
+    "qa_pending_skip": "PASS_159_198_201_231_NOT_REPEATED",
+    "sticky_blocker_skip": "PASS_INDEX135_NOT_REPEATED",
+    "candidate_blob_current": "PASS_E3F4488F",
+    "c152_heavy_qa_reuse": "PASS_UNCHANGED_SOURCE_CANDIDATE_QA_FINGERPRINT",
+    "duplicate_isolation_manifest": "PASS_NONE_FOUND_FOR_DDF0392A",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "asset_queue_blob_sha": "406362826e2d6cd1857e93e1309ba2a44deb3190",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "candidate_git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "candidate_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "c00228_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
