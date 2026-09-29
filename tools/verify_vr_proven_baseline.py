@@ -157,7 +157,7 @@ require("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
 require("src/vr/game/outrun_renderer.cpp",
         'Game::is_vr_gameplay_presentation()',
         "P8_RENDERER_SHARED_PREDICATE")
-require_all("src/vr/d3d9/ex_device_upgrade_r15.cpp", [
+require_all("src/vr/d3d9/ex_device_upgrade_r15_overlay.inc", [
     'no pre-Reset state-block replay',
     'D3D9 state blocks are device-reset-sensitive COM objects. Never',
 ], "P8_RESET_STATEBLOCK_REGRESSION")
@@ -273,9 +273,11 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
 ], "P11_R70_STEREO_FACADE")
-require("src/vr/d3d9/ex_device_pipeline.cpp",
-        '#include "ex_device_upgrade_r15.cpp"',
-        "P11_R70_EX_DEVICE_FACADE")
+require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
+    '#include "ex_device_upgrade_r14.cpp"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "ex_device_upgrade_r15_overlay.inc"',
+], "P11_R70_EX_DEVICE_FACADE")
 require_all("src/vr/d3d9/renderer_pipeline.cpp", [
     '#include "../game/outrun_renderer_r23.cpp"',
     '#include "../game/outrun_renderer_r29.cpp"',
@@ -312,9 +314,11 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
 ], "P11_R70_STEREO_FACADE")
-require("src/vr/d3d9/ex_device_pipeline.cpp",
-        '#include "ex_device_upgrade_r15.cpp"',
-        "P11_R70_EX_DEVICE_FACADE")
+require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
+    '#include "ex_device_upgrade_r14.cpp"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "ex_device_upgrade_r15_overlay.inc"',
+], "P11_R70_EX_DEVICE_FACADE")
 require_all("src/vr/d3d9/renderer_pipeline.cpp", [
     '#include "../game/outrun_renderer_r23.cpp"',
     '#include "../game/outrun_renderer_r29.cpp"',
