@@ -2,8 +2,8 @@
   "task_id": "CONVERSION-DXVK-00077",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 3,
-  "chat_rollover": 1,
+  "attempt": 1,
+  "chat_rollover": 0,
   "base_sha": "f54eb3a9170df703469b7fa7a9daaded509b29a0",
   "initial_result_sha": "22954ec7c21f7ca2e75ac351f8b4927df9912164",
   "result_sha": "59c1e3795c28e110a3dc503481b3b04b71abe9ba",
@@ -78,7 +78,7 @@
   "durable_ledger": {
     "issue_14_implementation_comment_id": 5895733064,
     "issue_14_repair_comment_id": 5895786638,
-    "issue_14_validation_comment_id": 5895877633
+    "issue_14_validation_comment_id": 5895883763
   },
   "regression_scope": {
     "related": [
@@ -90,7 +90,7 @@
     "note": "Source-graph and verifier ownership changed only. Exact-source equivalence and hosted compile/architecture guards passed. No runtime-visible correctness or performance claim is advanced without HMD evidence."
   },
   "completed_checkpoints": [
-    "C0_RECOVER_CHAT_ROLLOVER",
+    "C0_RECOVER",
     "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
     "C1_CONFIRM_F04_PHASE10_FROM_PRIOR_NEXT_ACTION",
     "C2_EXTRACT_R30_OVERLAY_AND_FLATTEN_STEREO_FACADE",
@@ -103,5 +103,7 @@
     "C6_STATE"
   ],
   "blocker": "No software blocker remains for F04 phase 10. Runtime correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
-  "next_action": "Treat the next deeper stereo historical include edge R29 -> R26 as a separate bounded F04 task. Preserve diagnostic comparison paths and dependencies, require exact-SHA automated validation, and do not claim runtime correctness without Quest3/VDXR evidence."
+  "next_action": "Treat the next deeper stereo historical include edge R29 -> R26 as a separate bounded F04 task. Preserve diagnostic comparison paths and dependencies, require exact-SHA automated validation, and do not claim runtime correctness without Quest3/VDXR evidence.",
+  "controller_attempt": "1/3",
+  "automatic_repairs_used": 1
 }
