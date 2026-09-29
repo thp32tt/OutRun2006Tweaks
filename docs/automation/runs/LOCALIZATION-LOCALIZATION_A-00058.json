@@ -1,0 +1,62 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00001",
+  "recorded_at_kst": "2026-09-29T13:04:00+09:00",
+  "precommit_head_sha": "4eff2de879840e6e96ceca782ac440dec413dc80",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_ODD_ASSET_SEMANTIC_CELL_MAPS",
+  "material_deliverable": {
+    "type": "THREE_ODD_ASSET_SEMANTIC_TO_CELL_MAPPING",
+    "indices": [
+      35,
+      43,
+      49
+    ],
+    "assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6"
+    ],
+    "physical_occurrences_mapped": 18,
+    "canonical_semantics_mapped": 17,
+    "report": "localization/graphics/role_A/20260929-1304-A00058-P00001/A00058_P00001_ODD_SEMANTIC_CELL_MAPPING.json",
+    "evidence_pngs": [
+      "localization/graphics/role_A/20260929-1304-A00058-P00001/A00058_35_E989E3B7_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-1304-A00058-P00001/A00058_43_455717B2_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-1304-A00058-P00001/A00058_49_BF3EE5C6_ENGLISH_SOURCE.png"
+    ],
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "task_result": "LOCALIZATION-LOCALIZATION_A-00056@f6f1646a9369ebab33691b45a5df496993758b8f",
+    "assets": [
+      65,
+      89,
+      95,
+      101,
+      107
+    ]
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "fail_closed_reason": "Semantic target cells are resolved, but exact HD per-text full-effect bboxes/orientation/slant remain required before any Korean raster or DDS write. No containment PASS is claimed without those decoded-pixel measurements.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
