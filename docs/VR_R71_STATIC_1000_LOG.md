@@ -2578,3 +2578,18 @@ Shadow falsification:
 
 AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
 RUNTIME_VALIDATION: `UNTESTED`
+
+
+### Cycle 0145 addendum — close lower R28 flare rebind
+
+A second transform-owner leak remained below the renderer c64 bypass:
+
+- `R28RunWithVerifiedWorldEpoch` rejected `ScreenOverlay2D` and `ScreenHud`, but did not reject `ProjectedScreenEffect2D`.
+- A previously verified perspective-world epoch could therefore rebind the exact flare to per-eye world stereo after the upper renderer correctly left c64 raw.
+- `ProjectedScreenEffect2D` is now an explicit R28 rebind veto and remains exclusively owned by R30's centre-eye mono-fusion path.
+
+Additional commits:
+- `c4dee043c0a0e1d1380052b96ccc0c38603bf173`
+- `a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f`
+
+Final cycle-145 hosted validation target: `a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f`.
