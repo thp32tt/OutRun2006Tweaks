@@ -1,0 +1,2332 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00077",
+  "wave_id": "P00016",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T15:30:49+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "e992119c3149b6a3b15a4c62c85b7d9d7900580e",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "identity_policy": "Immutable GitHub Release DDS metadata + decoded stock PNG identity + exact 4x atlas geometry only. No N100/local clone/GPT Library.",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "transcriptions_blob_sha": "0bac319cb03724f2b170a219bc5f09d7faab8fba",
+    "artwork_plan_blob_sha": "2b9a9e0f7dd5f6d8eb0d71b0082713899d8d6bca"
+  },
+  "queue_snapshot": {
+    "authoritative_file": "localization/graphics/asset_queue.csv",
+    "queue_blob_sha": "bb1700b275d017f820af82c34a42bfa2b539dd43",
+    "selected_even_indices": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "selected_assets": [
+      "1F5FE6E9",
+      "75C3586A",
+      "D657C2EB",
+      "DDF0392A"
+    ],
+    "selected_state": "localize_text/pending_artwork",
+    "selection_reason": "B00057 reconstruction identities were already consumed by independent C Q00001, so these assets are no longer producer-QA-pending. B00073/B00076 assets remain QA-pending and were skipped."
+  },
+  "reused_heavy_qa": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00057",
+    "producer_record_blob_sha": "8461a19ef2549a98bdfa2407e269aa18ec13d341",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00060",
+    "c_acceptance_record_blob_sha": "9b7a34a3d4cb3e396e988663c89c3e7da43042c4",
+    "reused_checks": "27/27 upstream source identities and 55/55 batch canonical semantics; this task adds only new byte-layout/region extraction evidence for the four B assets."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "type": "FOUR_EVEN_EXACT_RELEASE_PAYLOAD_REGION_EXTRACTION_SPECS",
+    "assets": 4,
+    "canonical_semantics": 20,
+    "atlas_regions_with_extraction_specs": 106,
+    "exact_size_equation_linear32_regions": 81,
+    "exact_size_equation_16byte_4x4_regions": 25,
+    "region_overlap_pairs": 0,
+    "out_of_file_or_canvas_failures": 0,
+    "block_unaligned_regions": 0,
+    "candidate_dds_written": false,
+    "significance": "Adds deterministic per-region file offsets/row pitches/range checks that did not exist in B00057/C00060. This narrows exact-HD reconstruction from whole-file identity to executable region extraction while failing closed on unobserved DDS header fields/orientation."
+  },
+  "assets": [
+    {
+      "queue_index": 132,
+      "asset": "1F5FE6E9",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+      "canonical_segments": [
+        {
+          "source": "REQUEST",
+          "korean": "요청"
+        },
+        {
+          "source": "SPECIAL REQUEST 1",
+          "korean": "스페셜 요청 1"
+        },
+        {
+          "source": "SPECIAL REQUEST 2",
+          "korean": "스페셜 요청 2"
+        },
+        {
+          "source": "SPECIAL REQUEST 3",
+          "korean": "스페셜 요청 3"
+        }
+      ],
+      "canonical_notes": "visual transcription pass 7; colored menu panels preserved",
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+        "git_blob_sha": "a89e403c92d335f83c808e5f10dcc9e584d4ff7c",
+        "file_size": 33554560,
+        "atlas_canvas": [
+          4096,
+          2048
+        ],
+        "legacy_header_bytes_used_for_size_equation": 128,
+        "payload_bytes_after_128": 33554432,
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL",
+        "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_UTF8_CONNECTOR",
+        "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+      },
+      "stock_reference_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.png",
+        "git_blob_sha": "e72ae022ad8b1bff7657237beb056680ab47dbc1",
+        "file_size": 170469
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_1F5FE6E9_1024x512_atlas.json",
+        "git_blob_sha": "f7bb4e1f974afc0719311f8bbbf36e82303961f6",
+        "width": 4096,
+        "height": 2048,
+        "regions_count": 21,
+        "rotations": false
+      },
+      "derived_region_extraction": {
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_1453",
+            "rect": [
+              0,
+              128,
+              2048,
+              1920
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 2097280,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 8192,
+            "row_count": 1920,
+            "file_offset_last_row_exclusive": 33546368
+          },
+          {
+            "idx": 1,
+            "name": "sprite_1454",
+            "rect": [
+              2048,
+              128,
+              512,
+              1920
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 2105472,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2048,
+            "row_count": 1920,
+            "file_offset_last_row_exclusive": 33548416
+          },
+          {
+            "idx": 2,
+            "name": "sprite_1455",
+            "rect": [
+              2560,
+              1844,
+              1024,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 30222464,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 33552512
+          },
+          {
+            "idx": 3,
+            "name": "sprite_1456",
+            "rect": [
+              2560,
+              1640,
+              1024,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 26880128,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 30210176
+          },
+          {
+            "idx": 4,
+            "name": "sprite_1457",
+            "rect": [
+              2560,
+              1436,
+              1024,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 23537792,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 26867840
+          },
+          {
+            "idx": 5,
+            "name": "sprite_1458",
+            "rect": [
+              2560,
+              1232,
+              1024,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 20195456,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 23525504
+          },
+          {
+            "idx": 6,
+            "name": "sprite_1459",
+            "rect": [
+              2560,
+              1028,
+              1024,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 16853120,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 20183168
+          },
+          {
+            "idx": 7,
+            "name": "sprite_1460",
+            "rect": [
+              3584,
+              1844,
+              124,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 30226560,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 496,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 33553008
+          },
+          {
+            "idx": 8,
+            "name": "sprite_1461",
+            "rect": [
+              3708,
+              1844,
+              124,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 30227056,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 496,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 33553504
+          },
+          {
+            "idx": 9,
+            "name": "sprite_1462",
+            "rect": [
+              3832,
+              1844,
+              124,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 30227552,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 496,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 33554000
+          },
+          {
+            "idx": 10,
+            "name": "sprite_1463",
+            "rect": [
+              3956,
+              1844,
+              124,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 30228048,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 496,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 33554496
+          },
+          {
+            "idx": 11,
+            "name": "sprite_1464",
+            "rect": [
+              3584,
+              1640,
+              124,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 26884224,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 496,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 30210672
+          },
+          {
+            "idx": 12,
+            "name": "sprite_1465",
+            "rect": [
+              0,
+              28,
+              960,
+              100
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 458880,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3840,
+            "row_count": 100,
+            "file_offset_last_row_exclusive": 2084736
+          },
+          {
+            "idx": 13,
+            "name": "sprite_1466",
+            "rect": [
+              960,
+              28,
+              960,
+              100
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 462720,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3840,
+            "row_count": 100,
+            "file_offset_last_row_exclusive": 2088576
+          },
+          {
+            "idx": 14,
+            "name": "sprite_1467",
+            "rect": [
+              1920,
+              28,
+              960,
+              100
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 466560,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3840,
+            "row_count": 100,
+            "file_offset_last_row_exclusive": 2092416
+          },
+          {
+            "idx": 15,
+            "name": "sprite_1468",
+            "rect": [
+              2880,
+              28,
+              960,
+              100
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 470400,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3840,
+            "row_count": 100,
+            "file_offset_last_row_exclusive": 2096256
+          },
+          {
+            "idx": 16,
+            "name": "sprite_1469",
+            "rect": [
+              2560,
+              928,
+              960,
+              100
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 15214720,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3840,
+            "row_count": 100,
+            "file_offset_last_row_exclusive": 16840576
+          },
+          {
+            "idx": 17,
+            "name": "sprite_1470",
+            "rect": [
+              2560,
+              832,
+              1264,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 13641856,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 5056,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 15203392
+          },
+          {
+            "idx": 18,
+            "name": "sprite_1471",
+            "rect": [
+              2560,
+              736,
+              1264,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 12068992,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 5056,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 13630528
+          },
+          {
+            "idx": 19,
+            "name": "sprite_1472",
+            "rect": [
+              2560,
+              640,
+              1264,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 10496128,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 5056,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 12057664
+          },
+          {
+            "idx": 20,
+            "name": "sprite_1473",
+            "rect": [
+              2560,
+              544,
+              1264,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 8923264,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 5056,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 10484800
+          }
+        ]
+      },
+      "candidate_dds_modified": false,
+      "next_gate": "USE_EXACT_REGION_EXTRACTION_WITH_BINARY_HEADER_CONFIRMATION_THEN_DERIVE_SOURCE_GLYPH_EFFECT_MASK_RAW_TRANSFORM_CLEAN_PLATE_AND_SIGNED_SLANT; DO_NOT_RENDER_KOREAN_BEFORE_THOSE FACTS_EXIST"
+    },
+    {
+      "queue_index": 176,
+      "asset": "75C3586A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+      "canonical_segments": [
+        {
+          "source": "FLAGMAN 4",
+          "korean": "플래그맨 4"
+        },
+        {
+          "source": "HOLLY",
+          "korean": "홀리"
+        },
+        {
+          "source": "JENNIFER",
+          "korean": "제니퍼"
+        },
+        {
+          "source": "CLARISSA",
+          "korean": "클라리사"
+        }
+      ],
+      "canonical_notes": "visual transcription pass 9; route/map artwork and other character portraits preserved",
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds",
+        "git_blob_sha": "9d21e4fb47d3b17dab89a05b9552cfeaa913eac9",
+        "file_size": 16777344,
+        "atlas_canvas": [
+          2048,
+          2048
+        ],
+        "legacy_header_bytes_used_for_size_equation": 128,
+        "payload_bytes_after_128": 16777216,
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL",
+        "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_UTF8_CONNECTOR",
+        "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+      },
+      "stock_reference_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.png",
+        "git_blob_sha": "8979db22c2fd2669f50581c8cf50b1f2edc8bb37",
+        "file_size": 73238
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_75C3586A_512x512_atlas.json",
+        "git_blob_sha": "07620598cd03cc6d62455b57d3537158cabfc21a",
+        "width": 2048,
+        "height": 2048,
+        "regions_count": 53,
+        "rotations": false
+      },
+      "derived_region_extraction": {
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_932",
+            "rect": [
+              0,
+              1680,
+              688,
+              368
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 13762688,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 2752,
+            "row_count": 368,
+            "file_offset_last_row_exclusive": 16771904
+          },
+          {
+            "idx": 1,
+            "name": "sprite_933",
+            "rect": [
+              688,
+              1680,
+              688,
+              368
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 13765440,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 2752,
+            "row_count": 368,
+            "file_offset_last_row_exclusive": 16774656
+          },
+          {
+            "idx": 2,
+            "name": "sprite_934",
+            "rect": [
+              0,
+              1372,
+              860,
+              308
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 11239552,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3440,
+            "row_count": 308,
+            "file_offset_last_row_exclusive": 13757936
+          },
+          {
+            "idx": 3,
+            "name": "sprite_935",
+            "rect": [
+              860,
+              1372,
+              860,
+              308
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 11242992,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3440,
+            "row_count": 308,
+            "file_offset_last_row_exclusive": 13761376
+          },
+          {
+            "idx": 4,
+            "name": "sprite_936",
+            "rect": [
+              1720,
+              1416,
+              288,
+              264
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 11606880,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 1152,
+            "row_count": 264,
+            "file_offset_last_row_exclusive": 13762528
+          },
+          {
+            "idx": 5,
+            "name": "sprite_937",
+            "rect": [
+              1376,
+              1812,
+              176,
+              236
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 14849536,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 704,
+            "row_count": 236,
+            "file_offset_last_row_exclusive": 16775360
+          },
+          {
+            "idx": 6,
+            "name": "sprite_938",
+            "rect": [
+              1552,
+              1824,
+              220,
+              224
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 14948544,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 880,
+            "row_count": 224,
+            "file_offset_last_row_exclusive": 16776240
+          },
+          {
+            "idx": 7,
+            "name": "sprite_939",
+            "rect": [
+              0,
+              1156,
+              844,
+              216
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 9470080,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3376,
+            "row_count": 216,
+            "file_offset_last_row_exclusive": 11234736
+          },
+          {
+            "idx": 8,
+            "name": "sprite_940",
+            "rect": [
+              844,
+              1156,
+              844,
+              216
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 9473456,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3376,
+            "row_count": 216,
+            "file_offset_last_row_exclusive": 11238112
+          },
+          {
+            "idx": 9,
+            "name": "sprite_941",
+            "rect": [
+              1688,
+              1164,
+              244,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 9542368,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 976,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 11239088
+          },
+          {
+            "idx": 10,
+            "name": "sprite_942",
+            "rect": [
+              1772,
+              1840,
+              152,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 15080496,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 608,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 16776848
+          },
+          {
+            "idx": 11,
+            "name": "sprite_943",
+            "rect": [
+              0,
+              948,
+              152,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7766144,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 608,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 9462496
+          },
+          {
+            "idx": 12,
+            "name": "sprite_944",
+            "rect": [
+              152,
+              948,
+              152,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7766752,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 608,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 9463104
+          },
+          {
+            "idx": 13,
+            "name": "sprite_945",
+            "rect": [
+              304,
+              948,
+              152,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7767360,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 608,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 9463712
+          },
+          {
+            "idx": 14,
+            "name": "sprite_946",
+            "rect": [
+              456,
+              948,
+              152,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7767968,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 608,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 9464320
+          },
+          {
+            "idx": 15,
+            "name": "sprite_947",
+            "rect": [
+              608,
+              948,
+              152,
+              208
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7768576,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 608,
+            "row_count": 208,
+            "file_offset_last_row_exclusive": 9464928
+          },
+          {
+            "idx": 16,
+            "name": "sprite_948",
+            "rect": [
+              760,
+              952,
+              620,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7801952,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 2480,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 9467408
+          },
+          {
+            "idx": 17,
+            "name": "sprite_949",
+            "rect": [
+              1380,
+              952,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7804432,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 9468224
+          },
+          {
+            "idx": 18,
+            "name": "sprite_950",
+            "rect": [
+              1584,
+              952,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7805248,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 9469040
+          },
+          {
+            "idx": 19,
+            "name": "sprite_951",
+            "rect": [
+              1788,
+              952,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 7806064,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 9469856
+          },
+          {
+            "idx": 20,
+            "name": "sprite_952",
+            "rect": [
+              0,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6094976,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7758768
+          },
+          {
+            "idx": 21,
+            "name": "sprite_953",
+            "rect": [
+              204,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6095792,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7759584
+          },
+          {
+            "idx": 22,
+            "name": "sprite_954",
+            "rect": [
+              408,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6096608,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7760400
+          },
+          {
+            "idx": 23,
+            "name": "sprite_955",
+            "rect": [
+              612,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6097424,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7761216
+          },
+          {
+            "idx": 24,
+            "name": "sprite_956",
+            "rect": [
+              816,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6098240,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7762032
+          },
+          {
+            "idx": 25,
+            "name": "sprite_957",
+            "rect": [
+              1020,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6099056,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7762848
+          },
+          {
+            "idx": 26,
+            "name": "sprite_958",
+            "rect": [
+              1224,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6099872,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7763664
+          },
+          {
+            "idx": 27,
+            "name": "sprite_959",
+            "rect": [
+              1428,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6100688,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7764480
+          },
+          {
+            "idx": 28,
+            "name": "sprite_960",
+            "rect": [
+              1632,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6101504,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7765296
+          },
+          {
+            "idx": 29,
+            "name": "sprite_961",
+            "rect": [
+              1836,
+              744,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6102320,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 7766112
+          },
+          {
+            "idx": 30,
+            "name": "sprite_962",
+            "rect": [
+              0,
+              540,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 4423808,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 6087600
+          },
+          {
+            "idx": 31,
+            "name": "sprite_963",
+            "rect": [
+              204,
+              540,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 4424624,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 6088416
+          },
+          {
+            "idx": 32,
+            "name": "sprite_964",
+            "rect": [
+              408,
+              540,
+              204,
+              204
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 4425440,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 816,
+            "row_count": 204,
+            "file_offset_last_row_exclusive": 6089232
+          },
+          {
+            "idx": 33,
+            "name": "sprite_965",
+            "rect": [
+              612,
+              560,
+              436,
+              184
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 4590096,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 1744,
+            "row_count": 184,
+            "file_offset_last_row_exclusive": 6090976
+          },
+          {
+            "idx": 34,
+            "name": "sprite_966",
+            "rect": [
+              1048,
+              572,
+              792,
+              172
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 4690144,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3168,
+            "row_count": 172,
+            "file_offset_last_row_exclusive": 6094144
+          },
+          {
+            "idx": 35,
+            "name": "sprite_967",
+            "rect": [
+              0,
+              372,
+              892,
+              168
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 3047552,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3568,
+            "row_count": 168,
+            "file_offset_last_row_exclusive": 4419184
+          },
+          {
+            "idx": 36,
+            "name": "sprite_968",
+            "rect": [
+              892,
+              372,
+              880,
+              168
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 3051120,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3520,
+            "row_count": 168,
+            "file_offset_last_row_exclusive": 4422704
+          },
+          {
+            "idx": 37,
+            "name": "sprite_969",
+            "rect": [
+              0,
+              204,
+              580,
+              168
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 1671296,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 2320,
+            "row_count": 168,
+            "file_offset_last_row_exclusive": 3041680
+          },
+          {
+            "idx": 38,
+            "name": "sprite_970",
+            "rect": [
+              580,
+              204,
+              460,
+              168
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 1673616,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 1840,
+            "row_count": 168,
+            "file_offset_last_row_exclusive": 3043520
+          },
+          {
+            "idx": 39,
+            "name": "sprite_971",
+            "rect": [
+              0,
+              40,
+              1036,
+              164
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 327808,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 4144,
+            "row_count": 164,
+            "file_offset_last_row_exclusive": 1667248
+          },
+          {
+            "idx": 40,
+            "name": "sprite_972",
+            "rect": [
+              1036,
+              92,
+              276,
+              112
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 757936,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 1104,
+            "row_count": 112,
+            "file_offset_last_row_exclusive": 1668352
+          },
+          {
+            "idx": 41,
+            "name": "sprite_973",
+            "rect": [
+              1312,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 890112,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1668624
+          },
+          {
+            "idx": 42,
+            "name": "sprite_974",
+            "rect": [
+              1380,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 890384,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1668896
+          },
+          {
+            "idx": 43,
+            "name": "sprite_975",
+            "rect": [
+              1448,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 890656,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1669168
+          },
+          {
+            "idx": 44,
+            "name": "sprite_976",
+            "rect": [
+              1516,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 890928,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1669440
+          },
+          {
+            "idx": 45,
+            "name": "sprite_977",
+            "rect": [
+              1584,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 891200,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1669712
+          },
+          {
+            "idx": 46,
+            "name": "sprite_978",
+            "rect": [
+              1652,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 891472,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1669984
+          },
+          {
+            "idx": 47,
+            "name": "sprite_979",
+            "rect": [
+              1720,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 891744,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1670256
+          },
+          {
+            "idx": 48,
+            "name": "sprite_980",
+            "rect": [
+              1788,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 892016,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1670528
+          },
+          {
+            "idx": 49,
+            "name": "sprite_981",
+            "rect": [
+              1856,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 892288,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1670800
+          },
+          {
+            "idx": 50,
+            "name": "sprite_982",
+            "rect": [
+              1924,
+              108,
+              68,
+              96
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 892560,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 272,
+            "row_count": 96,
+            "file_offset_last_row_exclusive": 1671072
+          },
+          {
+            "idx": 51,
+            "name": "sprite_983",
+            "rect": [
+              1040,
+              300,
+              200,
+              72
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 2461888,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 800,
+            "row_count": 72,
+            "file_offset_last_row_exclusive": 3044320
+          },
+          {
+            "idx": 52,
+            "name": "sprite_984",
+            "rect": [
+              1992,
+              180,
+              24,
+              24
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 1482656,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 96,
+            "row_count": 24,
+            "file_offset_last_row_exclusive": 1671168
+          }
+        ]
+      },
+      "candidate_dds_modified": false,
+      "next_gate": "USE_EXACT_REGION_EXTRACTION_WITH_BINARY_HEADER_CONFIRMATION_THEN_DERIVE_SOURCE_GLYPH_EFFECT_MASK_RAW_TRANSFORM_CLEAN_PLATE_AND_SIGNED_SLANT; DO_NOT_RENDER_KOREAN_BEFORE_THOSE FACTS_EXIST"
+    },
+    {
+      "queue_index": 220,
+      "asset": "D657C2EB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "canonical_segments": [
+        {
+          "source": "REMOVE FRIEND",
+          "korean": "친구 삭제"
+        },
+        {
+          "source": "SEND GAME INVITE",
+          "korean": "게임 초대 보내기"
+        },
+        {
+          "source": "TIME ATTACK",
+          "korean": "타임 어택"
+        },
+        {
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런"
+        },
+        {
+          "source": "HEART ATTACK",
+          "korean": "하트 어택"
+        }
+      ],
+      "canonical_notes": "visual transcription pass 10; front-end menu headings",
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+        "git_blob_sha": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+        "file_size": 4194432,
+        "atlas_canvas": [
+          2048,
+          512
+        ],
+        "legacy_header_bytes_used_for_size_equation": 128,
+        "payload_bytes_after_128": 4194304,
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL",
+        "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_UTF8_CONNECTOR",
+        "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+      },
+      "stock_reference_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.png",
+        "git_blob_sha": "9cbd3400096e4f9282a43d9fc61bdd67f5f671e7",
+        "file_size": 10823
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_D657C2EB_512x128_atlas.json",
+        "git_blob_sha": "4c6af70c683fb6c298e32c289d762a1f7e6a56b5",
+        "width": 2048,
+        "height": 512,
+        "regions_count": 7,
+        "rotations": false
+      },
+      "derived_region_extraction": {
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_131",
+            "rect": [
+              0,
+              340,
+              1780,
+              172
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 2785408,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 7120,
+            "row_count": 172,
+            "file_offset_last_row_exclusive": 4193360
+          },
+          {
+            "idx": 1,
+            "name": "sprite_132",
+            "rect": [
+              0,
+              252,
+              1004,
+              88
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 2064512,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 4016,
+            "row_count": 88,
+            "file_offset_last_row_exclusive": 2781232
+          },
+          {
+            "idx": 2,
+            "name": "sprite_133",
+            "rect": [
+              1004,
+              252,
+              800,
+              88
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 2068528,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3200,
+            "row_count": 88,
+            "file_offset_last_row_exclusive": 2784432
+          },
+          {
+            "idx": 3,
+            "name": "sprite_134",
+            "rect": [
+              0,
+              164,
+              788,
+              88
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 1343616,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 3152,
+            "row_count": 88,
+            "file_offset_last_row_exclusive": 2059472
+          },
+          {
+            "idx": 4,
+            "name": "sprite_135",
+            "rect": [
+              788,
+              164,
+              668,
+              88
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 1346768,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 2672,
+            "row_count": 88,
+            "file_offset_last_row_exclusive": 2062144
+          },
+          {
+            "idx": 5,
+            "name": "sprite_136",
+            "rect": [
+              0,
+              100,
+              1116,
+              64
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 819328,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 4464,
+            "row_count": 64,
+            "file_offset_last_row_exclusive": 1339888
+          },
+          {
+            "idx": 6,
+            "name": "sprite_137",
+            "rect": [
+              0,
+              36,
+              1116,
+              64
+            ],
+            "rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 295040,
+            "row_pitch_bytes": 8192,
+            "row_bytes": 4464,
+            "row_count": 64,
+            "file_offset_last_row_exclusive": 815600
+          }
+        ]
+      },
+      "candidate_dds_modified": false,
+      "next_gate": "USE_EXACT_REGION_EXTRACTION_WITH_BINARY_HEADER_CONFIRMATION_THEN_DERIVE_SOURCE_GLYPH_EFFECT_MASK_RAW_TRANSFORM_CLEAN_PLATE_AND_SIGNED_SLANT; DO_NOT_RENDER_KOREAN_BEFORE_THOSE FACTS_EXIST"
+    },
+    {
+      "queue_index": 222,
+      "asset": "DDF0392A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "canonical_segments": [
+        {
+          "source": "Rush A Difficulty",
+          "korean": "난이도에 도전"
+        },
+        {
+          "source": "Shake The Street",
+          "korean": "거리를 뒤흔들어라"
+        },
+        {
+          "source": "Who Are You?",
+          "korean": "당신은 누구?"
+        },
+        {
+          "source": "Journey Mode / Random",
+          "korean": "저니 모드 / 무작위"
+        },
+        {
+          "source": "OutRun 1986",
+          "korean": "아웃런 1986"
+        },
+        {
+          "source": "OutRun Mode / 15 C.",
+          "korean": "아웃런 모드 / 15코스"
+        }
+      ],
+      "canonical_notes": "visual transcription pass 11; Ferrari model names and song titles Passing Breeze/Risky Ride/Shiny World/Splash Wave preserved",
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+        "git_blob_sha": "1ff7680eb71750d884b0e69fe058aef3a5cf5fa2",
+        "file_size": 2097280,
+        "atlas_canvas": [
+          1024,
+          2048
+        ],
+        "legacy_header_bytes_used_for_size_equation": 128,
+        "payload_bytes_after_128": 2097152,
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_16BYTE_4X4_BLOCK_TOP_LEVEL",
+        "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_UTF8_CONNECTOR",
+        "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+      },
+      "stock_reference_png": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.png",
+        "git_blob_sha": "30705f99267e355badf706ed67fccf2135dcfe43",
+        "file_size": 28698
+      },
+      "atlas4x": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_DDF0392A_256x512_atlas.json",
+        "git_blob_sha": "819d31b1cd9c59fb6d011f3f0361d6ed7114c286",
+        "width": 1024,
+        "height": 2048,
+        "regions_count": 25,
+        "rotations": false
+      },
+      "derived_region_extraction": {
+        "overlap_pairs": 0,
+        "out_of_bounds_checks_failed": 0,
+        "block_unaligned_regions": 0,
+        "regions": [
+          {
+            "idx": 0,
+            "name": "sprite_401",
+            "rect": [
+              0,
+              1972,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              493,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 2019456,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 2097024
+          },
+          {
+            "idx": 1,
+            "name": "sprite_402",
+            "rect": [
+              0,
+              1896,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              474,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1941632,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 2019200
+          },
+          {
+            "idx": 2,
+            "name": "sprite_403",
+            "rect": [
+              0,
+              1820,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              455,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1863808,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1941376
+          },
+          {
+            "idx": 3,
+            "name": "sprite_404",
+            "rect": [
+              0,
+              1744,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              436,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1785984,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1863552
+          },
+          {
+            "idx": 4,
+            "name": "sprite_405",
+            "rect": [
+              0,
+              1668,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              417,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1708160,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1785728
+          },
+          {
+            "idx": 5,
+            "name": "sprite_406",
+            "rect": [
+              0,
+              1592,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              398,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1630336,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1707904
+          },
+          {
+            "idx": 6,
+            "name": "sprite_407",
+            "rect": [
+              0,
+              1516,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              379,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1552512,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1630080
+          },
+          {
+            "idx": 7,
+            "name": "sprite_408",
+            "rect": [
+              0,
+              1440,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              360,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1474688,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1552256
+          },
+          {
+            "idx": 8,
+            "name": "sprite_409",
+            "rect": [
+              0,
+              1364,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              341,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1396864,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1474432
+          },
+          {
+            "idx": 9,
+            "name": "sprite_410",
+            "rect": [
+              0,
+              1288,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              322,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1319040,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1396608
+          },
+          {
+            "idx": 10,
+            "name": "sprite_411",
+            "rect": [
+              0,
+              1212,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              303,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1241216,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1318784
+          },
+          {
+            "idx": 11,
+            "name": "sprite_412",
+            "rect": [
+              0,
+              1136,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              284,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1163392,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1240960
+          },
+          {
+            "idx": 12,
+            "name": "sprite_413",
+            "rect": [
+              0,
+              1060,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              265,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1085568,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1163136
+          },
+          {
+            "idx": 13,
+            "name": "sprite_414",
+            "rect": [
+              0,
+              984,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              246,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 1007744,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1085312
+          },
+          {
+            "idx": 14,
+            "name": "sprite_415",
+            "rect": [
+              0,
+              908,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              227,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 929920,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 1007488
+          },
+          {
+            "idx": 15,
+            "name": "sprite_416",
+            "rect": [
+              0,
+              832,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              208,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 852096,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 929664
+          },
+          {
+            "idx": 16,
+            "name": "sprite_417",
+            "rect": [
+              0,
+              756,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              189,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 774272,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 851840
+          },
+          {
+            "idx": 17,
+            "name": "sprite_418",
+            "rect": [
+              0,
+              680,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              170,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 696448,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 774016
+          },
+          {
+            "idx": 18,
+            "name": "sprite_419",
+            "rect": [
+              0,
+              604,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              151,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 618624,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 696192
+          },
+          {
+            "idx": 19,
+            "name": "sprite_420",
+            "rect": [
+              0,
+              528,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              132,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 540800,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 618368
+          },
+          {
+            "idx": 20,
+            "name": "sprite_421",
+            "rect": [
+              0,
+              452,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              113,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 462976,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 540544
+          },
+          {
+            "idx": 21,
+            "name": "sprite_422",
+            "rect": [
+              0,
+              376,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              94,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 385152,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 462720
+          },
+          {
+            "idx": 22,
+            "name": "sprite_423",
+            "rect": [
+              0,
+              300,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              75,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 307328,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 384896
+          },
+          {
+            "idx": 23,
+            "name": "sprite_424",
+            "rect": [
+              0,
+              224,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              56,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 229504,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 307072
+          },
+          {
+            "idx": 24,
+            "name": "sprite_425",
+            "rect": [
+              0,
+              148,
+              960,
+              76
+            ],
+            "rotated": false,
+            "extraction_profile": "16BYTE_4X4_BLOCK_SIZE_EQUATION",
+            "block_aligned": true,
+            "block_rect": [
+              0,
+              37,
+              240,
+              19
+            ],
+            "file_offset_first_block_row": 151680,
+            "block_row_pitch_bytes": 4096,
+            "row_bytes": 3840,
+            "row_count": 19,
+            "file_offset_last_block_row_exclusive": 229248
+          }
+        ]
+      },
+      "candidate_dds_modified": false,
+      "next_gate": "USE_EXACT_REGION_EXTRACTION_WITH_BINARY_HEADER_CONFIRMATION_THEN_DERIVE_SOURCE_GLYPH_EFFECT_MASK_RAW_TRANSFORM_CLEAN_PLATE_AND_SIGNED_SLANT; DO_NOT_RENDER_KOREAN_BEFORE_THOSE FACTS_EXIST"
+    }
+  ],
+  "strict_holds": {
+    "dds_header_fields": "HOLD: file-size equations are exact but do not substitute for direct DDS header FourCC/channel-mask/mipmap validation.",
+    "raw_orientation": "HOLD: per-element raw transform must be proven from exact HD pixels before generation.",
+    "semantic_to_pixel_binding": "HOLD where source lettering is alpha/effect encoded and not yet bound to exact region pixels.",
+    "source_effect_bbox_clean_plate_slant": "HOLD until exact extracted pixels are inspected.",
+    "candidate_gates": "HOLD_NO_KOREAN_CANDIDATE; zero-pixel containment, alpha preservation, compression round-trip and English-source-vs-Korean comparison are candidate-stage checks."
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_132_176_220_222",
+    "work_steal": "NONE",
+    "canonical_translation_match": "PASS_20_OF_20_CURRENT_TRANSCRIPTIONS_EQUALS_ARTWORK_PLAN",
+    "immutable_source_identity": "REUSED_C103_Q00001_PASS_FROM_B00057_UNCHANGED_FINGERPRINT",
+    "region_geometry": "PASS_106_OF_106_REGIONS_IN_CANVAS_AND_FILE_RANGE",
+    "pairwise_region_overlap": "PASS_0_OVERLAP_PAIRS",
+    "block_alignment": "PASS_25_OF_25_DDF0392A_REGIONS_4X4_ALIGNED",
+    "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Four C-consumed unfinished even-shard assets advanced from whole-file/atlas identity to deterministic exact-Release payload region extraction specs for all 106 atlas cells. No header/orientation/semantic pixel fact was guessed; those remain fail-closed HOLD. Runtime remains UNTESTED."
+}

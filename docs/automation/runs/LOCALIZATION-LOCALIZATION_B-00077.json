@@ -1,0 +1,80 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00077",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00016",
+  "recorded_at_kst": "2026-09-29T15:30:49+09:00",
+  "base_sha": "e992119c3149b6a3b15a4c62c85b7d9d7900580e",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_EXACT_RELEASE_PAYLOAD_REGION_EXTRACTION_SPECS",
+  "summary": "Advanced C-consumed even indices 132/176/220/222 with deterministic exact-Release payload extraction specs for all 106 4x-atlas regions while reusing unchanged B00057/C00060 heavy source-identity QA. Exact file-size equations yield 81 linear-32 region profiles and 25 aligned 16-byte/4x4-block profiles; all ranges are in-file/in-canvas with zero atlas overlap pairs. DDS header fields, raw orientation, source-effect masks and Korean candidate gates remain fail-closed HOLD. No Korean DDS or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1530-B120-P00016/B120_P00016_EVEN_RELEASE_PAYLOAD_REGION_EXTRACTION_SPEC.json"
+  ],
+  "evidence_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+  "material_deliverable": {
+    "type": "FOUR_EVEN_EXACT_RELEASE_PAYLOAD_REGION_EXTRACTION_SPECS",
+    "indices": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "assets": [
+      "1F5FE6E9",
+      "75C3586A",
+      "D657C2EB",
+      "DDF0392A"
+    ],
+    "canonical_semantics": 20,
+    "exact_region_extraction_specs": 106,
+    "linear32_size_equation_regions": 81,
+    "block16_4x4_size_equation_regions": 25,
+    "region_overlap_pairs": 0,
+    "out_of_bounds_ranges": 0,
+    "block_unaligned_regions": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00057",
+    "producer_record_blob_sha": "8461a19ef2549a98bdfa2407e269aa18ec13d341",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00060",
+    "c_acceptance_record_blob_sha": "9b7a34a3d4cb3e396e988663c89c3e7da43042c4",
+    "reason": "Same upstream source/atlas/translation fingerprint; duplicate heavy QA intentionally not repeated."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00062": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00073": [
+      92,
+      98,
+      112,
+      152
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00076": [
+      86,
+      100,
+      106
+    ]
+  },
+  "self_qa": "PASS_EVEN_ONLY_132_176_220_222__20_OF_20_CANONICAL__106_OF_106_REGION_RANGES_IN_BOUNDS__0_OVERLAPS__25_OF_25_BLOCK_ALIGNED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact GitHub file-size/atlas geometry is sufficient to add deterministic region extraction ranges, but direct DDS header FourCC/channel masks/mips, exact raw orientation, glyph/effect masks, clean plates and signed slant are still required before rendering or static candidate promotion.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
