@@ -2,8 +2,8 @@
   "task_id": "CONVERSION-DXVK-00063",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 1,
-  "chat_rollover": 1,
+  "attempt": 3,
+  "chat_rollover": 2,
   "base_sha": "e6e8a29dfbe1c9e69588846639e4741da216eb0c",
   "result_sha": "d3cdeb3b8e53c7a9cb6359137e1db128e4ff1692",
   "automation_validation": "PASS",
@@ -21,7 +21,8 @@
     "OutRun EXE HUD Inspector CI 36583762665 PASS for static EXE analysis and inspector build.",
     "VR Hosted Test Package 36583762629 (PR) PASS and 36583753778 (push) PASS on exact result SHA.",
     "VR PC Fast Test Build 36583753744 SKIPPED by policy.",
-    "No Quest3/VDXR or in-game execution was performed."
+    "No Quest3/VDXR or in-game execution was performed.",
+    "The R15 implementation body from the pre-extraction parent matches the final overlay implementation body exactly after newline normalization from namespace OutRunVRStereo onward."
   ],
   "changed_paths": [
     ".github/workflows/vr-openxr.yml",
@@ -73,7 +74,8 @@
   "durable_ledger": {
     "issue_14_implementation_comment_id": 5892333447,
     "issue_14_repair_comment_id": 5892426691,
-    "issue_14_validation_comment_id": 5892636215
+    "issue_14_validation_comment_id": 5892640086,
+    "issue_14_prior_validation_comment_id": 5892636215
   },
   "regression_scope": {
     "related": [
@@ -94,5 +96,6 @@
     "C6_STATE"
   ],
   "blocker": "No software blocker remains for F04 phase 3. Full F04 remains open because deeper D3D9Ex R14/R13/base and stereo versioned include chains are still physically nested.",
-  "next_action": "Continue F04 only as another bounded, independently build-verified structural step; prefer the least runtime-sensitive remaining D3D9Ex or stereo include edge. Do not combine whole-chain rewrites or claim runtime correctness without Quest3/VDXR evidence."
+  "next_action": "Continue F04 only as another bounded, independently build-verified structural step; prefer the least runtime-sensitive remaining D3D9Ex or stereo include edge. Do not combine whole-chain rewrites or claim runtime correctness without Quest3/VDXR evidence.",
+  "initial_result_sha": "0a14589f7aeea5f7484b519041908492532f86d0"
 }
