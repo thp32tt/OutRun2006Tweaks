@@ -1,0 +1,221 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00232-index237-single-dds-isolation-input-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00232",
+  "wave_id": "P00125",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:34:17+09:00",
+  "base_head_sha": "fa60221a9d7c3f38bd40b032f258e6df8fc440f7",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "selected_index": 237,
+    "selected_asset": "FF514CEB",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "accepted_c_authority": "LOCALIZATION-LOCALIZATION_C-00189@0128225e60b537b325aa047fafbc58e53c604b07 / C138 Q00036 / Gate 36607542193 success",
+    "latest_readiness_authority": "LOCALIZATION-LOCALIZATION_C-00228@648cfaab4a7bd5c01ca2a6aa21d775291235a942 / C152 Q00050 / Gate 36639832928 success",
+    "readiness_scan": {
+      "render_ready_indices": [],
+      "one_stage_to_render_indices": [],
+      "candidate_qa_pending_skipped": [
+        159,
+        198,
+        201
+      ],
+      "producer_qa_pending_skipped": [
+        231
+      ],
+      "dependency_blocked_not_repeated": [
+        135
+      ],
+      "already_rendered_static_qa_pass_a_shard": [
+        99,
+        195,
+        222,
+        237
+      ],
+      "prior_isolation_inputs_known": {
+        "195": "A00163 single-DDS isolation input exists",
+        "222": "A00230 single-DDS isolation input exists",
+        "237": "none found at selection HEAD"
+      }
+    },
+    "reason": "Current Q00050 has no C-accepted A-shard RENDER_READY/ONE_STAGE_TO_RENDER item. Candidate QA-pending and sticky blockers are skipped. FF514CEB is an unchanged C138 STATIC_QA_PASS_RUNTIME_UNTESTED A-shard candidate retained as already-rendered by Q00050, and no FF514CEB single-DDS isolation input exists, so fallback step 3 advances runtime validation without rerendering or heavy-QA repetition."
+  },
+  "asset": {
+    "id": "FF514CEB",
+    "queue_index": 237,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "translations": [
+      {
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "CUSTOM GAME",
+        "korean": "커스텀 게임",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "QUICK GAME",
+        "korean": "빠른 게임",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "physical_occurrences": 1
+      },
+      {
+        "source": "Specify what gametype you'd like to play!",
+        "korean": "플레이할 게임 유형을 설정하세요!",
+        "physical_occurrences": 1
+      },
+      {
+        "source": "Jump into a quick game of OutRun!",
+        "korean": "빠른 아웃런 게임에 참가하세요!",
+        "physical_occurrences": 1
+      }
+    ],
+    "physical_occurrences": 9,
+    "raw_orientation": "flip_y"
+  },
+  "source": {
+    "authority": "A00182 pinned v0.25.10a exact canonical source independently accepted by C138/Q00036; A00232 performs no source reacquisition or reconstruction.",
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30",
+    "sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192
+    },
+    "raw_to_readable": "flip_y",
+    "heavy_source_qa_reused": true,
+    "heavy_source_qa_rerun": false
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+    "sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192
+    },
+    "header_128_exact": true,
+    "candidate_blob_current": true
+  },
+  "qa_evidence": {
+    "producer_qa_report": "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/qa_report.json",
+    "producer_qa_report_blob_sha": "58bbcb1a60c30ebafaa784f488cae3e179c6309e",
+    "c_report": "localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json",
+    "c_task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00189.json",
+    "c_validation_bearing_result_sha": "0128225e60b537b325aa047fafbc58e53c604b07",
+    "c_gate_run_id": 36607542193,
+    "c_gate_conclusion": "success",
+    "static_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "semantic_binding": "PASS_6_OF_6_CURRENT_TRANSCRIPTION",
+    "physical_occurrences": "PASS_9_OF_9_POSITIVE_MARGIN",
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "orientation": "PASS_FLIP_Y_READABLE",
+    "clean_plate": "PASS_NO_VISIBLE_SOURCE_RESIDUE_OR_PATCH_ARTIFACT",
+    "mandatory_english_source_comparison": "PASS_C_INDEPENDENT_EXACT_COMMITTED_SOURCE_CLEAN_CANDIDATE_REVIEW",
+    "current_candidate_heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "candidate_git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+    "candidate_sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+    "expected_dds_count": 1,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Install FF514CEB as the only replacement DDS.",
+    "Open the online game-selection UI exposing CREATE GAME / CUSTOM GAME / QUICK GAME and the three related descriptions.",
+    "Capture readable/game-orientation evidence and verify FLIP_Y raw storage renders with the expected orientation.",
+    "Verify all nine localized occurrences for native scale, alpha/transparency, sprite alignment, clipping, preserved background/artwork and zero-pixel overflow.",
+    "Do not promote runtime validation unless this isolated real-game test is actually performed."
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 3,
+    "type": "SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "one_pass_self_qa": {
+    "shard": "PASS_INDEX237_MOD3_EQ_0",
+    "work_steal": "NONE",
+    "q00050_ready_scan": "PASS_ZERO_RENDER_READY_ZERO_ONE_STAGE",
+    "qa_pending_skip": "PASS_159_198_201_231_NOT_REPEATED",
+    "sticky_blocker_skip": "PASS_INDEX135_NOT_REPEATED",
+    "candidate_blob_current": "PASS_A7F2670C",
+    "c138_heavy_qa_reuse": "PASS_UNCHANGED_SOURCE_CANDIDATE_QA_FINGERPRINT",
+    "duplicate_isolation_manifest": "PASS_NONE_FOUND_FOR_FF514CEB",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "candidate_git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+    "candidate_sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+    "source_git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "c00189_result_sha": "0128225e60b537b325aa047fafbc58e53c604b07",
+    "c00228_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
