@@ -379,6 +379,20 @@
           "needle": "R74OutRunResultProgressCallB = 0x97DEC"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-R78-OUTRUN-SUMO-PRINTF-CENSUS",
+      "rva": "0x0002CDD6",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "a1005a73008b8c240801000056898424",
+      "purpose": "Diagnostic-only post-stack-allocation hook in FUN_0042CDD0 to identify the exact direct caller active in OutRun mode without changing HUD ownership.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "Module::exe_ptr(0x2CDD6)"
+        }
+      ]
     }
   ]
 }
