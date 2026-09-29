@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-a-producer-current-policy-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00242",
+  "wave_id": "P00131",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-30T08:36:49+09:00",
+  "base_head_sha": "5e136e66d4bcf66328bbc5a7a88e3da6b223519d",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+  "selection_reason": "Latest C156/Q00054 authoritative Gate state has no C-accepted RENDER_READY or ONE_STAGE_TO_RENDER A-shard asset. Candidate-bearing indices159/198/201 and B00237@index163 are QA backlog and A00241@index111 is QA_PENDING, so none are repeated. Current contract therefore permits at most one new PREFLIGHT_ONLY batch; index147 is unfinished A-shard work without a current-policy three-tier source-acquisition closure.",
+  "asset": {
+    "index": 147,
+    "asset_id": "39BCA907",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+    "action": "localize_text",
+    "canonical_inventory": {
+      "sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+      "width": 2048,
+      "height": 1024,
+      "mode": "RGBA"
+    },
+    "canonical_semantics": {
+      "status": "PASS_15_OF_15_REVIEWED_CURRENT_METADATA",
+      "count": 15
+    }
+  },
+  "prior_c_state": {
+    "latest_relevant": "Q00016/C118 A00123 PASS stock prior under then-current contract",
+    "production_readiness": "PREFLIGHT_ONLY",
+    "source_state": "stock semantic/bbox prior accepted; canonical-HD source/effect-mask/CLEAN_PLATE/final-safe-bbox/candidate gates unresolved"
+  },
+  "acquisition_tiers": [
+    {
+      "tier": 1,
+      "transport": "GOOGLE_DRIVE_APPROVED_PER_FILE_FAST_PATH",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "resolved_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_name_results": 0,
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "note": "No similarity fallback and no historical localized-output folders searched."
+    },
+    {
+      "tier": 2,
+      "transport": "PINNED_TAG_DIRECT_FILE",
+      "repository": "envido32/OR2006Sprites",
+      "ref": "v0.25.10a",
+      "immutable_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "http_status": 404,
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "note": "Missing immutable direct file is a transport miss, not identity evidence."
+    },
+    {
+      "tier": 3,
+      "transport": "PINNED_RELEASE_BUNDLE",
+      "release_tag": "v0.25.10a",
+      "release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "release_asset_id": 306630789,
+      "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "bundle_size": 306223257,
+      "bundle_identity": "PASS_EXACT",
+      "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "member_bytes": 8388736,
+      "member_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "member_dds": {
+        "width": 2048,
+        "height": 1024,
+        "mipmaps": 1,
+        "format": "RGBA32",
+        "pitch": 8192,
+        "channel_masks": {
+          "r": "0x000000ff",
+          "g": "0x0000ff00",
+          "b": "0x00ff0000",
+          "a": "0xff000000"
+        }
+      },
+      "canonical_expected_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+      "canvas_match": true,
+      "format_match": true,
+      "outcome": "SOURCE_IDENTITY_MISMATCH",
+      "note": "Verified pinned Release bytes cannot substitute for the current canonical inventory despite matching canvas and RGBA32 structure."
+    }
+  ],
+  "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+  "sticky_dependency_rule": "Do not repeat Drive/direct/Release probes for index147 until canonical-source/inventory fingerprint, source policy, approved transport contents, or explicit user instruction changes.",
+  "readiness_before": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_UNRESOLVED",
+  "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+  "candidate_dds_modified": false,
+  "candidate_generated": false,
+  "self_qa": {
+    "acquisition_order": "PASS_1_TO_2_TO_3",
+    "canonical_identity_gate": "FAIL_CLOSED_NO_SUBSTITUTION",
+    "shard_isolation": "PASS_INDEX147_MOD3_EQ_0",
+    "qa_pending_not_repeated": "PASS_159_198_201_163_AND_A00241_INDEX111",
+    "shared_state_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "asset_queue_blob_sha": "36ff22f398905cb9f0a2dc7126d321e021f4fc8a",
+    "canonical_source_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "release_member_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5"
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

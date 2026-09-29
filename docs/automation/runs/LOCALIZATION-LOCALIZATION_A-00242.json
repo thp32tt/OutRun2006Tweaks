@@ -1,0 +1,80 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00242-p00131-index147-source-acquisition-exhausted-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00242",
+  "wave_id": "P00131",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T08:36:49+09:00",
+  "base_head_sha": "5e136e66d4bcf66328bbc5a7a88e3da6b223519d",
+  "base_sha": "5e136e66d4bcf66328bbc5a7a88e3da6b223519d",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX147_CURRENT_POLICY_SOURCE_ACQUISITION_EXHAUSTION_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX147_PREFLIGHT_SOURCE_ACQUISITION_EXHAUSTED_RUNTIME_UNTESTED",
+  "summary": "Fresh C156/Q00054-aware A modulo-3 scan found no C-accepted RENDER_READY/ONE_STAGE_TO_RENDER A asset after excluding candidate QA backlog and A00241@index111 QA_PENDING evidence. Expanded exactly one new PREFLIGHT_ONLY batch at index147/39BCA907. Current-policy acquisition is closed deterministically: approved Drive exact-path miss, immutable pinned-tag direct-file 404, and exact verified v0.25.10a Release member SHA-256 b913c967... mismatches canonical inventory SHA-256 c52f48b1... despite matching 2048x1024 RGBA32 mip1 structure. Release bytes are rejected rather than substituted. This typed SOURCE_ACQUISITION_EXHAUSTED fingerprint is sticky; no candidate is authorized and runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00242-P00131/A00242_P00131_INDEX147_SOURCE_ACQUISITION_EXHAUSTED.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX147_CURRENT_POLICY_THREE_TIER_SOURCE_ACQUISITION_CLOSURE",
+    "reviewed_indices": [
+      147
+    ],
+    "reviewed_assets": [
+      "39BCA907"
+    ],
+    "candidate_dds_modified": false,
+    "source_transport_tiers_attempted": 3,
+    "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+    "canonical_source_substituted": false,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "latest_c_gate": "C156/Q00054 result 43d6c872a66de63d65a70c18dc2c55b91b1ed16c / Gate 36645535305 success",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "selected_priority": "PREFLIGHT_ONLY_SINGLE_BATCH_AFTER_NO_READY_PATH",
+    "selected_indices": [
+      147
+    ],
+    "qa_pending_not_repeated": {
+      "111": "A00241 rework-preflight QA_PENDING",
+      "159": "candidate QA backlog",
+      "163": "B00237 candidate QA backlog",
+      "198": "candidate QA backlog",
+      "201": "candidate QA backlog"
+    },
+    "readiness_before": {
+      "147": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_UNRESOLVED"
+    },
+    "readiness_after": {
+      "147": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_PENDING_C"
+    }
+  },
+  "self_qa": "PASS_A_MOD3_INDEX147__C156_ZERO_READY_TIERS__QA_PENDING_NOT_REPEATED__DRIVE_EXACT_MISS__PINNED_TAG_404__PINNED_RELEASE_BUNDLE_SHA_SIZE_PASS__MEMBER_SHA_IDENTITY_MISMATCH_FAIL_CLOSED__NO_CANONICAL_SUBSTITUTION__SINGLE_PREFLIGHT_BATCH_ONLY__RUNTIME_UNTESTED",
+  "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "bookkeeping_note": "Producer record is intentionally PENDING/C_BATCH_GATE. RESULT_SHA is filled only by a later lane-local bookkeeping commit after the immutable AUTO result commit exists. Runtime remains UNTESTED."
+}
