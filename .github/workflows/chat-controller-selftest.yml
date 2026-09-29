@@ -102,6 +102,12 @@ jobs:
           grep -Fq 'QA_BATCH_INPUTS' tools/chat-controller/v0.4/localization_C.md
           grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_A.md
           grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_A.md
+          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'Candidate-completion-first' tools/chat-controller/v0.4/localization_C.md
+          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/src/controller.py.part00
+          grep -Fq 'ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.' tools/chat-controller/v0.4/src/controller.py.part00
+          echo "candidate-completion-first producer policy verified"
           if grep -Fq 'A+B -> C synchronization barrier' tools/chat-controller/v0.4/DEPLOY_PORTAINER.md; then
             echo "legacy localization QA barrier remains in deployment docs"
             exit 1
