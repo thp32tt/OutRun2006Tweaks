@@ -596,3 +596,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review release-owner interaction at generation changes.
+
+
+## Cycle 0028 — release-owner generation-change falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Never-sampled retry drops stale producer mappings while deferred sampled ownership waits for EVENT or poisons generation; no cross-owner shortcut is safe without a positive sampled-history contract.
+- Evidence: R41 FrameRunIdentityCurrent + R23 deferred EVENT owner separation.
+- Production/runtime behavior unchanged; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: design pure sampled-identity history helper only if it can be LEVEL0 proven.
