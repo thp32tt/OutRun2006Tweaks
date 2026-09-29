@@ -31,6 +31,8 @@ function Invoke-AnalyzerCase {
         [string[]]$ExpectedDirectEvidenceBlockers=@(),
         [bool]$ExpectedPerformanceEvidenceReady=$false,
         [string[]]$ExpectedPerformanceEvidenceBlockers=@(),
+        [string]$ExpectedHostDominantBudgetStage='',
+        [Nullable[double]]$ExpectedHostDominantBudgetP95Ms=$null,
         [int]$ExpectedHostPipelineWindows=0,
         [int]$ExpectedProducerPerfWindows=0,
         [int64]$ExpectedProducerFenceOk=0,
@@ -137,6 +139,17 @@ function Invoke-AnalyzerCase {
         if($actualPerformanceBlockers -notcontains $blocker){
             throw "${Name}: missing performance-evidence blocker $blocker; actual=$($actualPerformanceBlockers -join ',')"
         }
+    }
+    if([string]$summary.DxvkHostDominantBudgetStage -ne $ExpectedHostDominantBudgetStage){
+        throw "${Name}: DxvkHostDominantBudgetStage=$($summary.DxvkHostDominantBudgetStage), expected $ExpectedHostDominantBudgetStage"
+    }
+    if($null -ne $ExpectedHostDominantBudgetP95Ms){
+        if($null -eq $summary.DxvkHostDominantBudgetP95Ms -or
+           [math]::Abs([double]$summary.DxvkHostDominantBudgetP95Ms-[double]$ExpectedHostDominantBudgetP95Ms) -gt 0.0001){
+            throw "${Name}: DxvkHostDominantBudgetP95Ms=$($summary.DxvkHostDominantBudgetP95Ms), expected $ExpectedHostDominantBudgetP95Ms"
+        }
+    } elseif($null -ne $summary.DxvkHostDominantBudgetP95Ms){
+        throw "${Name}: unexpected DxvkHostDominantBudgetP95Ms=$($summary.DxvkHostDominantBudgetP95Ms)"
     }
     if([int]$summary.FrameBudget.HostPipelineWindowCount -ne $ExpectedHostPipelineWindows){
         throw "${Name}: HostPipelineWindowCount=$($summary.FrameBudget.HostPipelineWindowCount), expected $ExpectedHostPipelineWindows"
@@ -283,6 +296,7 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedBridgeReady $true -ExpectedImportReady $true -ExpectedDirectPathActive $true `
         -ExpectedGenerationMatches $true -ExpectedDirectEvidenceTrusted $true `
         -ExpectedPerformanceEvidenceReady $true `
+        -ExpectedHostDominantBudgetStage 'XR_END_FRAME' -ExpectedHostDominantBudgetP95Ms 7.0 `
         -ExpectedHostPipelineWindows 1 -ExpectedProducerPerfWindows 1 `
         -ExpectedProducerFenceOk 7 -ExpectedProducerBudgetFallback 1 `
         -ExpectedCaptureMaxMs 3.0 -ExpectedEndFrameP95MaxMs 7.0
@@ -394,6 +408,22 @@ D3D9: Failed to write shared resource info for a texture
     }
     if([string]$perfItem.runtimeValidation -ne 'UNTESTED'){
         throw "VR-PERF-COMMON-001 runtimeValidation=$($perfItem.runtimeValidation), expected UNTESTED"
+    }
+
+    $l2Items = @($workQueue.items | Where-Object { $_.id -eq 'L2-PERF-001' })
+    if($l2Items.Count -ne 1){ throw "L2-PERF-001 queue item must be unique" }
+    $l2Item = $l2Items[0]
+    if([string]$l2Item.status -ne 'NEED_HMD_TEST'){
+        throw "L2-PERF-001 status=$($l2Item.status), expected NEED_HMD_TEST"
+    }
+    if([string]$l2Item.dxvkPerformanceEvidenceGate -ne 'DxvkPerformanceEvidenceReady'){
+        throw "L2-PERF-001 must retain DxvkPerformanceEvidenceReady as the optimization evidence gate"
+    }
+    if([string]$l2Item.dxvkHostDominantBudgetField -ne 'DxvkHostDominantBudgetStage'){
+        throw "L2-PERF-001 must name DxvkHostDominantBudgetStage as its host ranking field"
+    }
+    if([string]$l2Item.runtimeValidation -ne 'UNTESTED'){
+        throw "L2-PERF-001 runtimeValidation=$($l2Item.runtimeValidation), expected UNTESTED"
     }
 
     Write-Host 'OutRun VR session analyzer shared-probe/performance-evidence regression tests: PASS'

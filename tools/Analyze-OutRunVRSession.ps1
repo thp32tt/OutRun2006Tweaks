@@ -291,6 +291,23 @@ if($backend -match 'dxvk'){
 }
 $dxvkPerformanceEvidenceReady=($backend -match 'dxvk' -and $dxvkPerformanceEvidenceBlockers.Count -eq 0)
 
+$dxvkHostDominantBudgetStage=''
+$dxvkHostDominantBudgetP95Ms=$null
+if($dxvkPerformanceEvidenceReady){
+    $hostStageBudgets=@(
+        [pscustomobject]@{Stage='CAPTURE';P95=[double]$hostCaptureBudget.MaxP95Observed},
+        [pscustomobject]@{Stage='COMMIT_COPY';P95=[double]$hostCommitBudget.MaxP95Observed},
+        [pscustomobject]@{Stage='RENDER';P95=[double]$hostRenderBudget.MaxP95Observed},
+        [pscustomobject]@{Stage='XR_END_FRAME';P95=[double]$hostEndFrameBudget.MaxP95Observed}
+    )
+    foreach($candidate in $hostStageBudgets){
+        if($null -eq $dxvkHostDominantBudgetP95Ms -or $candidate.P95 -gt $dxvkHostDominantBudgetP95Ms){
+            $dxvkHostDominantBudgetStage=$candidate.Stage
+            $dxvkHostDominantBudgetP95Ms=$candidate.P95
+        }
+    }
+}
+
 $flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
@@ -354,6 +371,8 @@ $result=[ordered]@{
     DxvkDirectEvidenceBlockers=@($dxvkDirectEvidenceBlockers)
     DxvkPerformanceEvidenceReady=$dxvkPerformanceEvidenceReady
     DxvkPerformanceEvidenceBlockers=@($dxvkPerformanceEvidenceBlockers)
+    DxvkHostDominantBudgetStage=$dxvkHostDominantBudgetStage
+    DxvkHostDominantBudgetP95Ms=$dxvkHostDominantBudgetP95Ms
     DxvkHostGenerationMismatch=$dxvkHostGenerationMismatch
     Provider=$provider
     SBSDesktopDupFallback=$sbsFallback
@@ -474,6 +493,8 @@ $lines=@(
     "frameBudgetEvidenceAvailable=$frameBudgetEvidenceAvailable"
     "dxvkPerformanceEvidenceReady=$dxvkPerformanceEvidenceReady"
     "dxvkPerformanceEvidenceBlockers=$($dxvkPerformanceEvidenceBlockers -join ',')"
+    "dxvkHostDominantBudgetStage=$dxvkHostDominantBudgetStage"
+    ("dxvkHostDominantBudgetP95Ms="+$(if($null -ne $dxvkHostDominantBudgetP95Ms){'{0:F3}' -f $dxvkHostDominantBudgetP95Ms}else{'n/a'}))
     "hostPipelineWindowCount=$hostPipelineWindowCount"
     ("hostCaptureAvgMs="+$(if($null -ne $hostCaptureBudget.AverageOfWindowAverages){'{0:F3}' -f $hostCaptureBudget.AverageOfWindowAverages}else{'n/a'}))
     ("hostCaptureMaxMs="+$(if($null -ne $hostCaptureBudget.MaxObserved){'{0:F3}' -f $hostCaptureBudget.MaxObserved}else{'n/a'}))
@@ -514,7 +535,7 @@ elseif($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
 }
 if($backend -match 'dxvk' -and $profile -eq 'PERFORMANCE'){
     if($dxvkPerformanceEvidenceReady){
-        $lines+='interpretation_performance=DXVK PERFORMANCE evidence is decision-ready for bottleneck attribution: exact-build/package/direct-path trust plus host capture/commit/render/xrEndFrame and game producer budget windows are present. This is evidence readiness, not a performance PASS.'
+        $lines+="interpretation_performance=DXVK PERFORMANCE evidence is decision-ready for bottleneck attribution: exact-build/package/direct-path trust plus host capture/commit/render/xrEndFrame and game producer budget windows are present. Largest host P95 stage=$dxvkHostDominantBudgetStage ($dxvkHostDominantBudgetP95Ms ms). This is diagnostic ranking only, not a performance PASS or an instruction to change that stage."
     } else {
         $lines+="interpretation_performance=DXVK PERFORMANCE evidence is incomplete; do not change waits/copies/draw policy from this bundle. Blockers=$($dxvkPerformanceEvidenceBlockers -join ',')"
     }
