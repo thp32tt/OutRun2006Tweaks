@@ -1,0 +1,263 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00208",
+  "wave_id": "P00108",
+  "queue_index": 198,
+  "asset": "9FC88069",
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+    "sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+    "git_blob_sha": "e97d852a905aa8a219b786b843089e0998037f52",
+    "bytes": 33554560,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "accepted_precandidate_lineage": {
+    "a00204_result_sha": "e064952137805d785ee71675babe75e22982a83a",
+    "c146_q00044_result_sha": "07952efd569649598034692745c745d71cc1c5fc",
+    "removal_mask_pixels": 77975,
+    "clean_plate_raw_rgba_sha256": "c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7",
+    "clean_plate_display_rgba_sha256": "d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320"
+  },
+  "elements": [
+    {
+      "sprite": "sprite_789",
+      "source": "RANDOM",
+      "approved_korean": "무작위",
+      "source_effect_bbox_readable_local": [
+        116,
+        378,
+        434,
+        440
+      ],
+      "candidate_safe_bbox_readable_local": [
+        118,
+        380,
+        432,
+        438
+      ],
+      "source_style": "upright condensed heavy sans; white flat fill; no outline/shadow/glow",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        255,
+        255,
+        255
+      ]
+    },
+    {
+      "sprite": "sprite_790",
+      "source": "- RANDOM PLAY -",
+      "approved_korean": "- 무작위 재생 -",
+      "source_effect_bbox_readable_local": [
+        4,
+        16,
+        584,
+        68
+      ],
+      "candidate_safe_bbox_readable_local": [
+        6,
+        18,
+        582,
+        66
+      ],
+      "source_style": "upright block/bitmap-like mono lettering; blue/cyan source palette; no added outline/shadow/glow",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        54,
+        127,
+        170
+      ]
+    },
+    {
+      "sprite": "sprite_791",
+      "source": "(GUITAR MIX)",
+      "approved_korean": "(기타 믹스)",
+      "source_effect_bbox_readable_local": [
+        8,
+        16,
+        456,
+        68
+      ],
+      "candidate_safe_bbox_readable_local": [
+        10,
+        18,
+        454,
+        66
+      ],
+      "source_style": "upright block/bitmap-like mono lettering; RGB 76/179/241 with alpha antialias; no added effects",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        76,
+        179,
+        241
+      ]
+    },
+    {
+      "sprite": "sprite_799",
+      "source": "(INSTRUMENTAL)",
+      "approved_korean": "(연주곡)",
+      "source_effect_bbox_readable_local": [
+        8,
+        16,
+        536,
+        68
+      ],
+      "candidate_safe_bbox_readable_local": [
+        10,
+        18,
+        534,
+        66
+      ],
+      "source_style": "upright block/bitmap-like mono lettering; RGB 76/179/241 with alpha antialias; no added effects",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        76,
+        179,
+        241
+      ]
+    },
+    {
+      "sprite": "sprite_828",
+      "source": "(PROTOTYPE)",
+      "approved_korean": "(프로토타입)",
+      "source_effect_bbox_readable_local": [
+        4,
+        16,
+        416,
+        68
+      ],
+      "candidate_safe_bbox_readable_local": [
+        6,
+        18,
+        414,
+        66
+      ],
+      "source_style": "upright block/bitmap-like mono lettering; RGB 76/179/241 with alpha antialias; no added effects",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        76,
+        179,
+        241
+      ]
+    },
+    {
+      "sprite": "sprite_829",
+      "source": "INTERMEDIATE B",
+      "approved_korean": "중급 B",
+      "source_effect_bbox_readable_local": [
+        189,
+        19,
+        612,
+        60
+      ],
+      "candidate_safe_bbox_readable_local": [
+        191,
+        21,
+        610,
+        58
+      ],
+      "source_style": "upright heavy condensed sans; cyan flat fill; no outline/shadow/glow",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        0,
+        147,
+        203
+      ]
+    },
+    {
+      "sprite": "sprite_830",
+      "source": "INTERMEDIATE A",
+      "approved_korean": "중급 A",
+      "source_effect_bbox_readable_local": [
+        186,
+        19,
+        612,
+        60
+      ],
+      "candidate_safe_bbox_readable_local": [
+        188,
+        21,
+        610,
+        58
+      ],
+      "source_style": "upright heavy condensed sans; cyan flat fill; no outline/shadow/glow",
+      "source_transform": "flip_y raw storage / upright readable display",
+      "source_baseline_vector_readable": [
+        1,
+        0
+      ],
+      "source_signed_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_fill_rgb": [
+        0,
+        147,
+        203
+      ]
+    }
+  ],
+  "instructions": {
+    "positive": [
+      "EDIT, DO NOT REDESIGN. The exact supplied HD source is authoritative.",
+      "Reuse only the independently accepted A00204/C146 removal masks and clean plate on this exact source lineage.",
+      "Render only the seven approved Korean strings fully inside their final 2px candidate_safe_bbox regions.",
+      "Keep readable baselines horizontal and signed slant at zero, matching the exact English source.",
+      "Preserve canvas, RGBA32 DDS header, mip policy, FLIP_Y raw storage transform, transparency and all unrelated artwork byte-exact.",
+      "For the four block/bitmap source rows, use native-HD 4px coverage quantization without resizing a flattened lettering raster.",
+      "The result must look as though the Korean text was part of the original game artwork, not pasted on later."
+    ],
+    "negative": [
+      "No visible English/source residue in the seven localized regions.",
+      "No cover boxes, new panels, backing shapes, blur/smudge patches, seams or invented decoration.",
+      "No crop, pad, resize, aspect-ratio change, low-resolution reconstruction or post-render flattened-raster scaling.",
+      "No change to icons, card art, borders, neighboring sprites or unrelated/preserve-original pixels.",
+      "No generic outline, shadow or glow absent from the exact source element.",
+      "No Korean pixel may escape the accepted candidate_safe_bbox by even one pixel."
+    ],
+    "pre_output_check": "Verify no source-language text/effect remains in localized regions; no patch/seam/panel exists; all protected artwork is unchanged; every Korean glyph/effect is fully inside its permitted 2px-safe region and unclipped; canvas/orientation/transparency are unchanged. If any condition fails, do not emit a production candidate."
+  },
+  "prompt_sha256": "14ec737d806ab347d57c8b87b8f3ce7da13f6e1f88799b6d751b160fa0f20f1b"
+}
