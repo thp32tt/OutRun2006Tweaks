@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-exact-canonical-source-activation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00200",
+  "wave_id": "P00104",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-09-30T04:01:30+09:00",
+  "base_head_sha": "219fe3d37e7f998858ce2425ad5f4709f342f961",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_indices": [
+      159,
+      198,
+      201,
+      222
+    ],
+    "selected_assets": [
+      "4EDA9DE3",
+      "9FC88069",
+      "A9ABD877",
+      "DDF0392A"
+    ],
+    "basis": "Latest C203/Q00041 still prioritizes exact-source-acquired multistage indices 133/159/198/201/222/226/232. A owns 159/198/201/222. No RENDER_READY or ONE_STAGE_TO_RENDER item exists, and already-rendered STATIC_QA PASS indices 99/112/130/152/237 are not repeated.",
+    "source_probe_repeated": false
+  },
+  "authoritative_inputs": {
+    "latest_reconciliation": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00203",
+      "batch": "Q00041",
+      "head_sha": "ab26af8ca5e33afd2d207f1e4a38c3764314cdd6",
+      "readiness": "EXACT_SOURCE_ACQUIRED_MULTISTAGE_159_198_201_222_REMAIN_PRIORITY"
+    },
+    "exact_source_acceptance": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_C-00198",
+        "batch": "Q00039",
+        "result_sha": "b39df3617d3dd39f7dc3b8f71c42722e24b590d0",
+        "indices": [
+          159,
+          201
+        ],
+        "disposition": "PASS_EXACT_CANONICAL_SOURCE_ACQUIRED_MULTI_STAGE_INCOMPLETE"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_C-00201",
+        "batch": "Q00040",
+        "result_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
+        "indices": [
+          198,
+          222
+        ],
+        "disposition": "PASS_EXACT_CANONICAL_SOURCE_ACQUIRED_MULTI_STAGE_INCOMPLETE"
+      }
+    ],
+    "pinned_release_bundle": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "validation": "REUSED_C142_PASS_FINGERPRINT_NO_REHASH_THIS_INVOCATION"
+    },
+    "google_drive_transport": {
+      "account": "ezflash557",
+      "folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "selected_exact_files_present": 0,
+      "note": "Current approved Drive parent contains only 9F060EC1_512x512.dds; C141/C142 exact Release-member identity is reused instead of repeating the source ladder."
+    }
+  },
+  "assets": [
+    {
+      "queue_index": 159,
+      "asset": "4EDA9DE3",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "canonical_source": {
+        "sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+        "canvas": [
+          2048,
+          1024
+        ],
+        "decoded_mode": "RGBA",
+        "identity_gate": "PASS_C141_EXACT_CANONICAL"
+      },
+      "prior_evidence": {
+        "exact_stock_binding_report": "localization/graphics/role_A/20260929-1806-A00109-P00041/A00109_P00041_INDEX159_EXACT_STOCK_BINDING_ORIENTATION_PRIOR.json",
+        "stock_semantic_bindings": 15,
+        "stock_transform_prior": "flip_y_no_x_mirror",
+        "status": "REFERENCE_PRIOR_ONLY_NOT_HD_PIXEL_AUTHORITY"
+      },
+      "gate_activation": {
+        "canonical_source_identity": "PASS",
+        "canonical_canvas_and_decoded_mode": "PASS",
+        "exact_hd_source_available_by_immutable_release_identity": "PASS",
+        "prior_region_work_order_source_identity_precondition": "PASS_REBOUND_TO_C141_EXACT_SOURCE",
+        "exact_hd_semantic_to_pixel_binding": "HOLD_DIRECT_DECODE_REQUIRED",
+        "exact_hd_orientation_and_signed_slant": "HOLD_DIRECT_DECODE_REQUIRED",
+        "source_effect_removal_protected_masks": "HOLD",
+        "clean_plate": "HOLD",
+        "candidate_safe_bbox": "HOLD",
+        "korean_candidate": "HOLD_NO_CANDIDATE"
+      }
+    },
+    {
+      "queue_index": 198,
+      "asset": "9FC88069",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "canonical_source": {
+        "sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+        "canvas": [
+          4096,
+          2048
+        ],
+        "decoded_mode": "RGBA",
+        "identity_gate": "PASS_C142_EXACT_RELEASE_MEMBER_EQUALS_CANONICAL"
+      },
+      "reused_exact_lineage_mapping": {
+        "source_report": "localization/graphics/role_B/20260929-1635-B126-P00027/B126_P00027_EVEN_RELEASE_32BPP_PAYLOAD_EXTRACTION_SCOPE.json",
+        "c142_authorization": "PRIOR_B00092_EXTRACTION_SCOPES_MAY_BE_REUSED_ON_THIS_EXACT_LINEAGE",
+        "mapped_semantics": [
+          {
+            "sprite": "sprite_789",
+            "raw_top_left_rect": [
+              0,
+              0,
+              544,
+              504
+            ],
+            "source": "RANDOM",
+            "korean": "무작위"
+          },
+          {
+            "sprite": "sprite_790",
+            "raw_top_left_rect": [
+              544,
+              0,
+              1604,
+              80
+            ],
+            "source": "- RANDOM PLAY -",
+            "korean": "- 무작위 재생 -"
+          },
+          {
+            "sprite": "sprite_791",
+            "raw_top_left_rect": [
+              2148,
+              0,
+              1376,
+              80
+            ],
+            "source": "(GUITAR MIX)",
+            "korean": "(기타 믹스)"
+          },
+          {
+            "sprite": "sprite_799",
+            "raw_top_left_rect": [
+              1376,
+              744,
+              1376,
+              80
+            ],
+            "source": "(INSTRUMENTAL)",
+            "korean": "(연주곡)"
+          },
+          {
+            "sprite": "sprite_828",
+            "raw_top_left_rect": [
+              0,
+              1944,
+              1372,
+              80
+            ],
+            "source": "(PROTOTYPE)",
+            "korean": "(프로토타입)"
+          },
+          {
+            "sprite": "sprite_829",
+            "raw_top_left_rect": [
+              1372,
+              1944,
+              640,
+              80
+            ],
+            "source": "INTERMEDIATE B",
+            "korean": "중급 B"
+          },
+          {
+            "sprite": "sprite_830",
+            "raw_top_left_rect": [
+              2012,
+              1944,
+              640,
+              80
+            ],
+            "source": "INTERMEDIATE A",
+            "korean": "중급 A"
+          }
+        ]
+      },
+      "gate_activation": {
+        "canonical_source_identity": "PASS",
+        "canonical_canvas_and_32bpp_lineage": "PASS",
+        "semantic_to_cell_binding": "PASS_REUSED_EXACT_LINEAGE_7_OF_7",
+        "extraction_scopes": "PASS_REUSED_EXACT_LINEAGE_7_OF_7",
+        "source_effect_removal_protected_masks": "HOLD_DIRECT_PIXEL_DERIVATION_REQUIRED",
+        "clean_plate": "HOLD",
+        "candidate_safe_bbox": "HOLD",
+        "korean_candidate": "HOLD_NO_CANDIDATE"
+      }
+    },
+    {
+      "queue_index": 201,
+      "asset": "A9ABD877",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "canonical_source": {
+        "sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+        "canvas": [
+          2048,
+          2048
+        ],
+        "decoded_mode": "RGBA",
+        "identity_gate": "PASS_C141_EXACT_CANONICAL"
+      },
+      "reused_work_order": {
+        "source_report": "localization/graphics/role_A/20260929-1649-A00098-P00032/A00098_P00032_V2_DIRECT_INSPECTION_WORK_ORDER_REPORT.json",
+        "regions": 19,
+        "canonical_semantics": 17,
+        "guard_inset_px": 2,
+        "guard_status": "INSPECTION_UPPER_BOUNDS_ONLY"
+      },
+      "gate_activation": {
+        "canonical_source_identity": "PASS",
+        "canonical_canvas_and_rgba_lineage": "PASS",
+        "existing_19_region_work_order_source_identity_precondition": "PASS_REBOUND_TO_C141_EXACT_SOURCE",
+        "semantic_to_pixel_binding": "HOLD_DIRECT_DECODE_REQUIRED",
+        "source_effect_removal_protected_masks": "HOLD",
+        "clean_plate": "HOLD",
+        "candidate_safe_bbox": "HOLD",
+        "korean_candidate": "HOLD_NO_CANDIDATE"
+      }
+    },
+    {
+      "queue_index": 222,
+      "asset": "DDF0392A",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "canonical_source": {
+        "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+        "canvas": [
+          1024,
+          2048
+        ],
+        "raw_format": "DXT5",
+        "mip_count": 1,
+        "identity_gate": "PASS_C142_EXACT_RELEASE_MEMBER_EQUALS_CANONICAL_RAW_DDS"
+      },
+      "reused_work_order": {
+        "source_report": "localization/graphics/role_B/20260929-1745-B133-P00040/B133_P00040_V2_REGION_GUARD_CLEAN_PLATE_WORK_ORDER_REPORT.json",
+        "regions": 25,
+        "canonical_semantics": 6,
+        "guard_inset_px": 2,
+        "guard_status": "INSPECTION_UPPER_BOUNDS_ONLY_NOT_SAFE_BBOX"
+      },
+      "gate_activation": {
+        "canonical_source_identity": "PASS",
+        "raw_dds_format_mip_canvas": "PASS",
+        "existing_25_region_work_order_source_identity_precondition": "PASS_REBOUND_TO_C142_EXACT_SOURCE",
+        "semantic_to_pixel_binding": "HOLD_DIRECT_DECODE_REQUIRED",
+        "source_effect_removal_protected_masks": "HOLD",
+        "clean_plate": "HOLD",
+        "candidate_safe_bbox": "HOLD",
+        "korean_candidate": "HOLD_NO_CANDIDATE",
+        "post_compression_roundtrip_qa": "HOLD_NO_CANDIDATE"
+      }
+    }
+  ],
+  "material_deliverable": {
+    "type": "A_MOD3_FOUR_ASSET_EXACT_CANONICAL_SOURCE_ACTIVATION_AND_WORK_ORDER_REBIND",
+    "reviewed_indices": [
+      159,
+      198,
+      201,
+      222
+    ],
+    "exact_source_identity_gates_closed": 4,
+    "existing_work_order_sets_rebound_to_exact_current_source": 4,
+    "exact_lineage_semantic_cell_mappings_reactivated": 7,
+    "source_ladder_repeated": false,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "next_pixel_gate": "DIRECT_EXACT_SOURCE_DECODE_FOR_EFFECT_REMOVAL_PROTECTED_MASKS_CLEAN_PLATE_AND_FINAL_SAFE_BBOX"
+  },
+  "self_qa": {
+    "shard": "PASS_4_OF_4_INDEX_MOD_3_EQ_0",
+    "latest_c_readiness": "PASS_C203_STILL_PRIORITIZES_159_198_201_222",
+    "exact_source_evidence": "PASS_C141_C142_REUSED_WITH_UNCHANGED_C203_FINGERPRINT",
+    "source_transport_reprobe": "PASS_NOT_REPEATED",
+    "semantic_mapping_198": "PASS_7_OF_7_REACTIVATED_ONLY_BECAUSE_C142_PROVED_EXACT_RELEASE_MEMBER_EQUALS_CURRENT_CANONICAL_SOURCE",
+    "semantic_binding_159_201_222": "HOLD_NOT_GUESSED",
+    "source_effect_masks": "HOLD_NOT_FABRICATED",
+    "clean_plate": "HOLD_NOT_FABRICATED",
+    "candidate_safe_bbox": "HOLD_NOT_FABRICATED",
+    "candidate_dds": "HOLD_NO_CANDIDATE",
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "n100_used": false,
+    "local_clone_used": false,
+    "vr_ffb_dx_changes": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,93 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00200",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00104",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-09-30T04:01:30+09:00",
+  "base_head_sha": "219fe3d37e7f998858ce2425ad5f4709f342f961",
+  "base_sha": "219fe3d37e7f998858ce2425ad5f4709f342f961",
+  "commit_mode": "ATOMIC_LANE_LOCAL_EXACT_SOURCE_ACTIVATION_REPORT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_EXACT_SOURCE_ACTIVATION_159_198_201_222_RUNTIME_UNTESTED",
+  "summary": "Latest C203/Q00041 leaves A-owned indices159/198/201/222 in the exact-source-acquired multistage priority set with no RENDER_READY or ONE_STAGE_TO_RENDER item. This invocation reuses authoritative C141/C142 exact-source identity instead of repeating the source ladder. It binds the existing source/header/canvas work-order preconditions to the exact current canonical source for all four assets, and reactivates B00092's seven index198 semantic-to-cell mappings only because C142 explicitly proved that Release member to be byte-identical to current canonical source. Indices159/201/222 retain fail-closed direct-decode semantic binding; all source-effect/removal/protected masks, CLEAN_PLATE, candidate_safe_bbox and Korean DDS gates remain HOLD. No shared state, peer candidate, build or runtime test changed.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00200-rollover3/A00200_P00104_MOD3_EXACT_SOURCE_ACTIVATION.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00198.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00201.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00203.json",
+    "localization/graphics/role_A/20260929-1806-A00109-P00041/A00109_P00041_INDEX159_EXACT_STOCK_BINDING_ORIENTATION_PRIOR.json",
+    "localization/graphics/role_A/20260929-1649-A00098-P00032/A00098_P00032_V2_DIRECT_INSPECTION_WORK_ORDER_REPORT.json",
+    "localization/graphics/role_B/20260929-1635-B126-P00027/B126_P00027_EVEN_RELEASE_32BPP_PAYLOAD_EXTRACTION_SCOPE.json",
+    "localization/graphics/role_B/20260929-1745-B133-P00040/B133_P00040_V2_REGION_GUARD_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "A_MOD3_FOUR_ASSET_EXACT_CANONICAL_SOURCE_ACTIVATION_AND_WORK_ORDER_REBIND",
+    "reviewed_indices": [
+      159,
+      198,
+      201,
+      222
+    ],
+    "reviewed_assets": [
+      "4EDA9DE3",
+      "9FC88069",
+      "A9ABD877",
+      "DDF0392A"
+    ],
+    "exact_source_identity_gates_closed": 4,
+    "existing_work_order_sets_rebound_to_exact_current_source": 4,
+    "exact_lineage_semantic_cell_mappings_reactivated": 7,
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_indices": [
+      159,
+      198,
+      201,
+      222
+    ],
+    "selected_priority": "EXACT_SOURCE_ACQUIRED_MULTISTAGE_CANDIDATE_COMPLETION_BEFORE_UNRELATED_PREFLIGHT",
+    "current_c_gate": "C203/Q00041",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "already_rendered_static_qa_pass_not_repeated": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "readiness_after": {
+      "159": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE__DIRECT_HD_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED",
+      "198": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE__7_OF_7_SEMANTIC_CELL_BINDINGS_REACTIVATED__MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED",
+      "201": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE__19_REGION_WORK_ORDER_REBOUND__DIRECT_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED",
+      "222": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE_DXT5_MIP1__25_REGION_WORK_ORDER_REBOUND__DIRECT_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED"
+    },
+    "post_evidence_render_ready_count": 0,
+    "post_evidence_one_stage_to_render_count": 0
+  },
+  "self_qa": "PASS_A_MOD3_159_198_201_222__C203_PRIORITY_CONFIRMED__C141_C142_EXACT_SOURCE_IDENTITY_REUSED__NO_REPEAT_SOURCE_LADDER__198_EXACT_LINEAGE_MAPPING_7_OF_7_ONLY__159_201_222_BINDING_FAIL_CLOSED__NO_MASK_CLEAN_PLATE_SAFE_BBOX_OR_DDS_FABRICATION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_PREGENERATION_GATES_REMAIN",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
