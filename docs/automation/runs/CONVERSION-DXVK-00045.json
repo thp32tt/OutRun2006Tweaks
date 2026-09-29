@@ -1,0 +1,60 @@
+{
+  "task_id": "CONVERSION-DXVK-00045",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "a3064c34e9725b1f44ca47b500c85369ca0edef3",
+  "result_sha": "e2460467b1e68dde49cd658ef88a25f0a083af38",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR-PERF-COMMON-001-DXVK-PERFORMANCE-EVIDENCE-READINESS",
+  "summary": "Added a fail-closed machine-readable DXVK performance evidence readiness gate and reconciled the DXVK performance queue to hardware evidence pending.",
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "docs/VR_WORK_QUEUE.json"
+  ],
+  "source_commit": {
+    "sha": "e2460467b1e68dde49cd658ef88a25f0a083af38",
+    "message": "Gate DXVK performance evidence readiness [AUTO:CONVERSION-DXVK-00045]",
+    "validation_bearing": true,
+    "ci_skip": false
+  },
+  "behavior_verified": [
+    "DxvkPerformanceEvidenceReady requires TestProfile=PERFORMANCE.",
+    "DxvkPerformanceEvidenceReady requires DxvkDirectEvidenceTrusted=true, which already covers exact-build identity, package integrity, host/import generation, active host-owned direct path, and DirectFrames>0.",
+    "DxvkPerformanceEvidenceReady requires host capture, commit-copy, render, and xrEndFrame budget windows.",
+    "DxvkPerformanceEvidenceReady requires at least one R32 game-producer performance window.",
+    "Incomplete evidence is fail-closed through DxvkPerformanceEvidenceBlockers.",
+    "Hosted regression fixture proves a complete synthetic DXVK PERFORMANCE bundle becomes decision-ready without claiming a performance PASS.",
+    "VR-PERF-COMMON-001 remains runtime UNTESTED and is now NEED_HMD_TEST."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36551551741,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36551556454,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36551556460,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36551556508,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36551551729,
+    "pc_fast_result": "SKIPPED"
+  },
+  "scope": "Analyzer/test/queue only; no renderer, DXVK provider, DirectGPU synchronization/resource lifetime, OpenXR submission, cadence, copy count, wait policy, or draw behavior changed.",
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5887773670,
+    "issue_14_validation_comment_id": 5887863794
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_REVIEW_PERFORMANCE_EVIDENCE_BOUNDARY",
+    "C2_IMPLEMENT_EVIDENCE_READINESS_GATE",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C6_STATE"
+  ],
+  "blocker": "A real DXVK performance bottleneck cannot be selected until Quest3/VDXR exact-build PERFORMANCE evidence satisfies DxvkPerformanceEvidenceReady=true.",
+  "next_action": "Run an exact-build Quest3/VDXR DXVK PERFORMANCE session. If DxvkPerformanceEvidenceReady=true, use FrameBudget to choose the measured dominant stage; otherwise resolve DxvkPerformanceEvidenceBlockers without speculative wait/copy/draw tuning.",
+  "recorded_at_kst": "2026-09-29T18:55:00+09:00"
+}

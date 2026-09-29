@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T18:45:00+09:00",
+  "updatedKst": "2026-09-29T18:55:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -362,10 +362,15 @@
       "dxvkAnalyzerValidation": "AUTOMATION_VALIDATION_PASS",
       "dxvkRuntimeEvidenceStatus": "NEED_HMD_TEST",
       "nextAction": "Run an exact-build Quest3/VDXR DXVK PERFORMANCE session and require DxvkPerformanceEvidenceReady=true. Then use FrameBudget host capture/commit/render/xrEndFrame plus producer fence/backpressure counters to identify the measured dominant budget before any wait/copy/draw optimization. If the gate is false, use DxvkPerformanceEvidenceBlockers and do not tune runtime policy.",
-      "automationValidation": "PENDING",
+      "automationValidation": "PASS",
       "runtimeValidation": "UNTESTED",
       "lastAutomationTaskId": "CONVERSION-DXVK-00045",
-      "dxvkPerformanceEvidenceGate": "DxvkPerformanceEvidenceReady"
+      "dxvkPerformanceEvidenceGate": "DxvkPerformanceEvidenceReady",
+      "dxvkPerformanceEvidenceResultSha": "e2460467b1e68dde49cd658ef88a25f0a083af38",
+      "dxvkPerformanceEvidenceValidationRunId": 36551551741,
+      "dxvkPerformanceEvidenceValidation": "AUTOMATION_VALIDATION_PASS",
+      "reconciliationTaskId": "CONVERSION-DXVK-00045",
+      "reconciliationCompletedAtKst": "2026-09-29T18:55:00+09:00"
     },
     {
       "id": "L1-VIS-002",
