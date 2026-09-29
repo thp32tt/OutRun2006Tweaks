@@ -674,7 +674,7 @@ def queue_dynamic_prefix() -> str:
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
         "반드시 GitHub만 직접 사용하고 N100 로컬 저장소로 우회하지 마.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
-        "필수 GitHub Actions Gate가 exact result SHA에 생성되어야 하므로 커밋에 [skip ci], [ci skip], [no ci], [skip actions], [actions skip], skip-checks:true 같은 CI-skip 지시어를 넣지 마.",
+        "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
