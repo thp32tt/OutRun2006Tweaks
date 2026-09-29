@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T04:42:00+09:00",
+  "updated_at_kst": "2026-09-30T04:52:31+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C146/Q00044 independent QA result: A00204@e064952 PASS promotes index198 to RENDER_READY after C independently reproduces exact source, seven masks, 77,975-pixel CLEAN_PLATE and 2px safe bboxes. B00206@d95e296 PASS confirms index133 semantic conflict and remains PREFLIGHT_ONLY: only ANCIENT RUINS is bound, eight assigned strings are absent and must be re-bound before rendering. Counts unchanged: pending production 71; actionable localize_text 93; canonical segments 753. This result commit is pending its sole Localization Automation Gate; runtime remains UNTESTED.",
+  "next_checkpoint": "C146/Q00044 authoritative Gate PASS on 07952efd569649598034692745c745d71cc1c5fc. A00204@e064952 PASS promotes index198 to RENDER_READY after independent exact-source CLEAN_PLATE replay; B00206@d95e296 PASS leaves index133 PREFLIGHT_ONLY with eight absent assigned strings requiring semantic re-binding. Shared order remains RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY index133/222/232, with candidate-QA 159/201 and direct rework 226 ahead of unrelated preflight. Counts unchanged: pending production 71; actionable localize_text 93; canonical segments 753. Runtime remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1207,10 +1207,21 @@
     "google_drive_write_performed": false,
     "uploaded_archive_used": true,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
     "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SHARED_STATE",
-    "bookkeeping_note": "Pre-Gate C task record. This C AUTO result commit is the sole Localization Automation Gate owner for Q00044; result_sha/automation gate fields are added only after validation completes."
+    "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner.",
+    "result_sha": "07952efd569649598034692745c745d71cc1c5fc",
+    "validation_bearing_result_sha": "07952efd569649598034692745c745d71cc1c5fc",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36622258041,
+      "run_attempt": 1,
+      "head_sha": "07952efd569649598034692745c745d71cc1c5fc",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T04:52:31+09:00"
+    }
   }
 }

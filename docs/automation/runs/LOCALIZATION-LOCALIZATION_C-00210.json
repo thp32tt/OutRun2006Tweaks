@@ -225,9 +225,20 @@
   "google_drive_write_performed": false,
   "uploaded_archive_used": true,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SHARED_STATE",
-  "bookkeeping_note": "Pre-Gate C task record. This C AUTO result commit is the sole Localization Automation Gate owner for Q00044; result_sha/automation gate fields are added only after validation completes."
+  "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner.",
+  "result_sha": "07952efd569649598034692745c745d71cc1c5fc",
+  "validation_bearing_result_sha": "07952efd569649598034692745c745d71cc1c5fc",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36622258041,
+    "run_attempt": 1,
+    "head_sha": "07952efd569649598034692745c745d71cc1c5fc",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T04:52:31+09:00"
+  }
 }
