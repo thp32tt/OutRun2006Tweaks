@@ -23,6 +23,7 @@ Each command means:
    - for A/B, approved `ezflash557` Google Drive canonical HD source transport is explicitly allowed and preferred; `GitHub-only` means GitHub is the state/output SSOT and N100 is forbidden, **not** that Drive source reads are forbidden;
 3. read all state/policy files required by that contract;
 4. execute the selected role as a production batch until the available run budget is exhausted or the lane reaches its default 4-DDS candidate goal; dependency-blocked items are skipped rather than ending the batch, and zero material output is not a valid terminal state while graphics work remains;
+   - A/B must consume any C-accepted `KOREAN_RENDER_NEXT`/`RENDER_READY` handoff before unrelated preflight/fallback; if the current task creates the final prerequisite, continue through Korean DDS creation in the same task instead of stopping at a readiness report;
 5. if no safe DDS can be produced, execute the contract's mandatory fallback ladder and create at least one new material production-enabling artifact; blocker prose/task records alone do not satisfy completion;
 6. persist reports/state/worklog and actual localization files to the same branch;
 7. commit/push only real localization changes and verify HEAD SHA.
