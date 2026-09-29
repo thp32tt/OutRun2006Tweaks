@@ -160,13 +160,16 @@ private:
 // R109 adds fail-closed per-stage aggregation over those readiness snapshots.
 // R110 adds a stale-snapshot token that changes on every successful mirror
 // recreation and on every generation/shadow-version transition represented by
-// the aggregate. Native draw/SRV binding remains disabled.
+// the aggregate. R111 additionally verifies the concrete D3D11 Texture2D/SRV
+// descriptor and view identity before readiness can become true.
+// Native draw/SRV binding remains disabled.
 struct NativeManagedTextureMirrorReadiness {
     bool registered{};
     bool shadowValid{};
     bool resourcesOwned{};
     bool lifetimeCurrent{};
     bool deviceMatches{};
+    bool descriptorExact{};
     bool ready{};
     std::uint64_t deviceGeneration{};
     std::uint64_t shadowVersion{};
@@ -183,6 +186,7 @@ struct NativeManagedTextureStageReadiness {
     std::uint32_t resourcesOwnedMask{};
     std::uint32_t lifetimeCurrentMask{};
     std::uint32_t deviceMatchesMask{};
+    std::uint32_t descriptorExactMask{};
     std::uint32_t readyMask{};
     std::uint32_t pendingMask{};
     std::uint64_t snapshotToken{};
@@ -258,6 +262,8 @@ public:
     [[nodiscard]] std::uint64_t mirror_instance_generation() const noexcept {
         return mirror_instance_generation_;
     }
+    [[nodiscard]] bool mirror_descriptor_exact(
+        ID3D11Device* expectedDevice) const noexcept;
     [[nodiscard]] const ManagedMirrorLifetimeState&
     lifetime_state() const noexcept {
         return lifetime_;
