@@ -340,12 +340,22 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "A00239@index102 unchanged C81/D83 source/candidate/orientation fingerprint reuses authoritative static QA; A00241@index111 unchanged source/candidate fingerprint receives only new geometry-scope review. B00237@index163 has a new candidate fingerprint, so source/candidate bytes, DDS header/orientation, 24-row safe containment, outside-region alpha/RGBA preservation and English-source visual comparison are executed once for this batch.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_gate": null,
-  "bookkeeping_note": "This C result commit is the sole Q00055 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+  "result_sha": "ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61",
+  "authoritative_result_sha": "ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61",
+  "validation_bearing_result_sha": "ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36647301188,
+    "head_sha": "ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T08:50:56+09:00"
+  },
+  "bookkeeping_note": "Q00055 authoritative Gate PASS is owned by validation-bearing result ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61. This bookkeeping commit is separate and does not replace validation ownership. Out-of-batch A00242@index147, B00243@index226 isolation, and A00245@index231 isolation remain QA_PENDING and are not dispositioned by Q00055. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:51:17+09:00",
+  "bookkeeping_base_head_sha": "ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61"
 }
