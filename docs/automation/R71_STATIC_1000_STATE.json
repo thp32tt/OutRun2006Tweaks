@@ -921,14 +921,15 @@
     "cycle": 31,
     "priority": [
       "consume 56135e92 exact-head Build/OpenXR/HUD results",
+      "P0 visual: DX9Ex vehicle-selection 3D car renders white/colorless while DXVK is normal; trace selector MANAGED texture/resource upload plus material/texture-stage state before changing behavior",
       "inspect HUD/menu alpha and blend/render-state contamination independently from SkyGlow",
       "inspect OutRun checkpoint/result/stage-mark double/head-follow exact producer lifetime",
       "inspect rival marker vehicle/world anchor and per-eye depth",
       "do not start performance-only work"
     ],
-    "guard": "Performance optimization remains paused. Frozen 34eef500 HMD package remains immutable. SkyGlow intensity 0.38 is not tuned until HMD evidence after ordering fix."
+    "guard": "Performance optimization remains paused. Frozen 34eef500 HMD package remains immutable. Selector white/colorless car is now a top visual regression; do not treat 2048x2048 reserve activation alone as proof of a fix."
   },
-  "updatedKst": "2026-09-29T10:42:00+09:00",
+  "updatedKst": "2026-09-29T11:30:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
