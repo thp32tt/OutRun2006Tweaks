@@ -1,0 +1,1950 @@
+{
+  "schema_version": 8,
+  "schema": "outrun-v2-direct-source-inspection-clean-plate-work-order-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00102",
+  "wave_id": "P00035",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T17:19:35+09:00",
+  "selection_head_sha": "75fbb01f2b372fb5cc8bf538f66b249e2ff85b77",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      137,
+      217,
+      219,
+      241
+    ],
+    "selected_assets": [
+      "30CF0D",
+      "D1039D6F",
+      "D263B3F1",
+      "E1639D2E"
+    ],
+    "basis": "A00061 was independently consumed PASS by C00071/Q00003 and has not yet been converted to the active first-pass-v2 direct decoded-source/source-mask/CLEAN_PLATE contract. Current A00096/A00098 assets remain QA-pending and are skipped.",
+    "skipped_current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00096": [
+        147,
+        159,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00098": [
+        173,
+        193,
+        201,
+        225
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ]
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_V2_DIRECT_SOURCE_INSPECTION_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "assets_advanced": 4,
+    "region_work_units": 22,
+    "canonical_semantics_total": 8,
+    "known_semantic_bindings": 5,
+    "unresolved_semantics": 3,
+    "rgba32_region_scope_templates": 22,
+    "new_two_px_inner_guards": 22,
+    "exact_upstream_release_and_atlas_identities_reused": true,
+    "candidate_dds_written": false,
+    "description": "Converts C-accepted A00061 reconstruction/mapping evidence into 22 exact-HD first-pass-v2 direct inspection work units. Known bindings are retained only as hypotheses to reconfirm from decoded source; three unresolved semantics remain fail-closed. Every region has a strict 2px upper-bound guard and deterministic RGBA32 row-scope template."
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00061",
+    "producer_report_blob_sha": "b347423401f7a8aee418fb6db05c1f244d3bc844",
+    "producer_result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00071",
+    "c_acceptance_record_blob_sha": "fbdf336d6234c702d6cc429c255785faadd9d4f8",
+    "c_disposition": "PASS",
+    "reason": "Q00003 accepted 8/8 current canonical semantics, 4/4 ENGLISH_SOURCE identities and 5/5 confirmed x4 mapped targets; those heavy checks are reused rather than repeated."
+  },
+  "connector_binary_limit": {
+    "exact_dds_binary_body_exposed": false,
+    "reason": "GitHub text connector exposes repository metadata/blob identities but rejects or omits non-UTF8 DDS binary bodies; no header or decoded-pixel PASS is fabricated.",
+    "effect": "Header confirmation and decoded source-effect masks remain required outputs of these executable work orders."
+  },
+  "qa_contract": {
+    "generation_contract": "outrun-first-pass-edit-v2",
+    "default_safety_inset_px": 2,
+    "minimum_safety_inset_px": 1,
+    "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+    "flattened_raster_resize_forbidden": true,
+    "max_refit_iterations_default": 8,
+    "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+  },
+  "assets": [
+    {
+      "queue_index": 137,
+      "asset": "30CF0D",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+      "queue_snapshot": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+        "git_blob_sha": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+        "bytes": 8388736,
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32_EXPECTED_FROM_EXACT_SIZE_EQUATION",
+        "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+        "mip_count_expected": 1,
+        "size_equation": "128 + 2048 * 1024 * 4 = 8388736",
+        "header_confirmation_required": true
+      },
+      "immutable_refs": {
+        "stock_dds_git_blob_sha": "59768c0aafdff36359f88b688947e584c7b81e9e",
+        "stock_png_git_blob_sha": "0147a73750378f37d89863d3f479c1bbd906035b",
+        "source_evidence_path": "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_137_30CF0D_ENGLISH_SOURCE.png",
+        "stock_atlas_git_blob_sha": "eedc58bd96447a58d4c76aec6c34acc3c137c79d",
+        "hd4_atlas_git_blob_sha": "05aef390b13b39d3c9cd74d5c50f8291273fb0d9"
+      },
+      "canonical_semantics": [
+        {
+          "source": "SELECT TRANSMISSION",
+          "korean": "변속 방식 선택"
+        },
+        {
+          "source": "MANUAL",
+          "korean": "수동"
+        },
+        {
+          "source": "AUTOMATIC",
+          "korean": "자동"
+        }
+      ],
+      "canonical_semantic_count": 3,
+      "known_confirmed_semantic_bindings": [
+        {
+          "source": "MANUAL",
+          "korean": "수동"
+        }
+      ],
+      "unresolved_semantics": [
+        "SELECT TRANSMISSION",
+        "AUTOMATIC"
+      ],
+      "region_count": 9,
+      "region_work_units": [
+        {
+          "work_unit": 1,
+          "sprite": "sprite_59",
+          "atlas_region_xywh": [
+            0,
+            316,
+            1548,
+            708
+          ],
+          "atlas_region_ltrb": [
+            0,
+            316,
+            1548,
+            1024
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            318,
+            1546,
+            1022
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 6192,
+            "rows": 708,
+            "first_row_start_byte": 2588800,
+            "final_row_start_byte": 8380544,
+            "final_row_end_exclusive_byte": 8386736,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (316 + k) * 8192 + 0, 0 <= k < 708"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 2,
+          "sprite": "sprite_60",
+          "atlas_region_xywh": [
+            1548,
+            860,
+            348,
+            164
+          ],
+          "atlas_region_ltrb": [
+            1548,
+            860,
+            1896,
+            1024
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1550,
+            862,
+            1894,
+            1022
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 1392,
+            "rows": 164,
+            "first_row_start_byte": 7051440,
+            "final_row_start_byte": 8386736,
+            "final_row_end_exclusive_byte": 8388128,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (860 + k) * 8192 + 6192, 0 <= k < 164"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 3,
+          "sprite": "sprite_61",
+          "atlas_region_xywh": [
+            0,
+            220,
+            888,
+            96
+          ],
+          "atlas_region_ltrb": [
+            0,
+            220,
+            888,
+            316
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            222,
+            886,
+            314
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3552,
+            "rows": 96,
+            "first_row_start_byte": 1802368,
+            "final_row_start_byte": 2580608,
+            "final_row_end_exclusive_byte": 2584160,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (220 + k) * 8192 + 0, 0 <= k < 96"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 4,
+          "sprite": "sprite_62",
+          "atlas_region_xywh": [
+            888,
+            220,
+            888,
+            96
+          ],
+          "atlas_region_ltrb": [
+            888,
+            220,
+            1776,
+            316
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            890,
+            222,
+            1774,
+            314
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3552,
+            "rows": 96,
+            "first_row_start_byte": 1805920,
+            "final_row_start_byte": 2584160,
+            "final_row_end_exclusive_byte": 2587712,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (220 + k) * 8192 + 3552, 0 <= k < 96"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 5,
+          "sprite": "sprite_63",
+          "atlas_region_xywh": [
+            0,
+            136,
+            808,
+            84
+          ],
+          "atlas_region_ltrb": [
+            0,
+            136,
+            808,
+            220
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            138,
+            806,
+            218
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [
+            {
+              "source": "MANUAL",
+              "korean": "수동"
+            }
+          ],
+          "region_semantic_status": "KNOWN_BINDING_RECONFIRM_FROM_EXACT_DECODED_HD_PIXELS",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3232,
+            "rows": 84,
+            "first_row_start_byte": 1114240,
+            "final_row_start_byte": 1794176,
+            "final_row_end_exclusive_byte": 1797408,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (136 + k) * 8192 + 0, 0 <= k < 84"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 6,
+          "sprite": "sprite_64",
+          "atlas_region_xywh": [
+            808,
+            136,
+            808,
+            84
+          ],
+          "atlas_region_ltrb": [
+            808,
+            136,
+            1616,
+            220
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            810,
+            138,
+            1614,
+            218
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3232,
+            "rows": 84,
+            "first_row_start_byte": 1117472,
+            "final_row_start_byte": 1797408,
+            "final_row_end_exclusive_byte": 1800640,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (136 + k) * 8192 + 3232, 0 <= k < 84"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 7,
+          "sprite": "sprite_65",
+          "atlas_region_xywh": [
+            0,
+            56,
+            1276,
+            80
+          ],
+          "atlas_region_ltrb": [
+            0,
+            56,
+            1276,
+            136
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            58,
+            1274,
+            134
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 5104,
+            "rows": 80,
+            "first_row_start_byte": 458880,
+            "final_row_start_byte": 1106048,
+            "final_row_end_exclusive_byte": 1111152,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (56 + k) * 8192 + 0, 0 <= k < 80"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 8,
+          "sprite": "sprite_66",
+          "atlas_region_xywh": [
+            1276,
+            88,
+            508,
+            48
+          ],
+          "atlas_region_ltrb": [
+            1276,
+            88,
+            1784,
+            136
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1278,
+            90,
+            1782,
+            134
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2032,
+            "rows": 48,
+            "first_row_start_byte": 726128,
+            "final_row_start_byte": 1111152,
+            "final_row_end_exclusive_byte": 1113184,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (88 + k) * 8192 + 5104, 0 <= k < 48"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 9,
+          "sprite": "sprite_67",
+          "atlas_region_xywh": [
+            1784,
+            88,
+            64,
+            48
+          ],
+          "atlas_region_ltrb": [
+            1784,
+            88,
+            1848,
+            136
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1786,
+            90,
+            1846,
+            134
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 8388736,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 256,
+            "rows": 48,
+            "first_row_start_byte": 728160,
+            "final_row_start_byte": 1113184,
+            "final_row_end_exclusive_byte": 1113440,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (88 + k) * 8192 + 7136, 0 <= k < 48"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        }
+      ]
+    },
+    {
+      "queue_index": 217,
+      "asset": "D1039D6F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "queue_snapshot": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+        "git_blob_sha": "544b638f755c2c1615ff1882853635bfd438e4c2",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32_EXPECTED_FROM_EXACT_SIZE_EQUATION",
+        "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+        "mip_count_expected": 1,
+        "size_equation": "128 + 2048 * 2048 * 4 = 16777344",
+        "header_confirmation_required": true
+      },
+      "immutable_refs": {
+        "stock_dds_git_blob_sha": "c50991fad6d75c6bf193d249a0480e6542ea0ccb",
+        "stock_png_git_blob_sha": "442354c65a73c17f915c553522b4f76d8634c2de",
+        "source_evidence_path": "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_217_D1039D6F_ENGLISH_SOURCE.png",
+        "stock_atlas_git_blob_sha": "193e8dcba7743c807f1ec1be6a107a89eecffefa",
+        "hd4_atlas_git_blob_sha": "f3afcf197fdc50346f942d14d83589c31caf707f"
+      },
+      "canonical_semantics": [
+        {
+          "source": "START",
+          "korean": "출발"
+        },
+        {
+          "source": "GOAL",
+          "korean": "골"
+        }
+      ],
+      "canonical_semantic_count": 2,
+      "known_confirmed_semantic_bindings": [
+        {
+          "source": "START",
+          "korean": "출발"
+        },
+        {
+          "source": "GOAL",
+          "korean": "골"
+        }
+      ],
+      "unresolved_semantics": [],
+      "region_count": 4,
+      "region_work_units": [
+        {
+          "work_unit": 1,
+          "sprite": "sprite_763",
+          "atlas_region_xywh": [
+            0,
+            1160,
+            748,
+            888
+          ],
+          "atlas_region_ltrb": [
+            0,
+            1160,
+            748,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1162,
+            746,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2992,
+            "rows": 888,
+            "first_row_start_byte": 9502848,
+            "final_row_start_byte": 16769152,
+            "final_row_end_exclusive_byte": 16772144,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1160 + k) * 8192 + 0, 0 <= k < 888"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 2,
+          "sprite": "sprite_764",
+          "atlas_region_xywh": [
+            748,
+            1160,
+            748,
+            888
+          ],
+          "atlas_region_ltrb": [
+            748,
+            1160,
+            1496,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            750,
+            1162,
+            1494,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2992,
+            "rows": 888,
+            "first_row_start_byte": 9505840,
+            "final_row_start_byte": 16772144,
+            "final_row_end_exclusive_byte": 16775136,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1160 + k) * 8192 + 2992, 0 <= k < 888"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 3,
+          "sprite": "sprite_765",
+          "atlas_region_xywh": [
+            0,
+            272,
+            748,
+            888
+          ],
+          "atlas_region_ltrb": [
+            0,
+            272,
+            748,
+            1160
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            274,
+            746,
+            1158
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2992,
+            "rows": 888,
+            "first_row_start_byte": 2228352,
+            "final_row_start_byte": 9494656,
+            "final_row_end_exclusive_byte": 9497648,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (272 + k) * 8192 + 0, 0 <= k < 888"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 4,
+          "sprite": "sprite_766",
+          "atlas_region_xywh": [
+            748,
+            272,
+            748,
+            888
+          ],
+          "atlas_region_ltrb": [
+            748,
+            272,
+            1496,
+            1160
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            750,
+            274,
+            1494,
+            1158
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [
+            {
+              "source": "START",
+              "korean": "출발"
+            },
+            {
+              "source": "GOAL",
+              "korean": "골"
+            }
+          ],
+          "region_semantic_status": "KNOWN_BINDING_RECONFIRM_FROM_EXACT_DECODED_HD_PIXELS",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2992,
+            "rows": 888,
+            "first_row_start_byte": 2231344,
+            "final_row_start_byte": 9497648,
+            "final_row_end_exclusive_byte": 9500640,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (272 + k) * 8192 + 2992, 0 <= k < 888"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        }
+      ]
+    },
+    {
+      "queue_index": 219,
+      "asset": "D263B3F1",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+      "queue_snapshot": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+        "git_blob_sha": "00c67f46fc7e402ce2341a13356abb09db9a8a1d",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32_EXPECTED_FROM_EXACT_SIZE_EQUATION",
+        "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+        "mip_count_expected": 1,
+        "size_equation": "128 + 2048 * 2048 * 4 = 16777344",
+        "header_confirmation_required": true
+      },
+      "immutable_refs": {
+        "stock_dds_git_blob_sha": "978fb6bd924be9db751f4945d380ad08b523246b",
+        "stock_png_git_blob_sha": "77eec8d773925b0a728bdcd24d34be188d85678e",
+        "source_evidence_path": "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_219_D263B3F1_ENGLISH_SOURCE.png",
+        "stock_atlas_git_blob_sha": "e4f49a4e1d9ce073b49da2c562710e46d0de012c",
+        "hd4_atlas_git_blob_sha": "4ba291f379f68de7eae54ee0426cd7ce6663c78a"
+      },
+      "canonical_semantics": [
+        {
+          "source": "COURSE SELECT",
+          "korean": "코스 선택"
+        }
+      ],
+      "canonical_semantic_count": 1,
+      "known_confirmed_semantic_bindings": [
+        {
+          "source": "COURSE SELECT",
+          "korean": "코스 선택"
+        }
+      ],
+      "unresolved_semantics": [],
+      "region_count": 7,
+      "region_work_units": [
+        {
+          "work_unit": 1,
+          "sprite": "sprite_482",
+          "atlas_region_xywh": [
+            0,
+            1160,
+            748,
+            888
+          ],
+          "atlas_region_ltrb": [
+            0,
+            1160,
+            748,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1162,
+            746,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2992,
+            "rows": 888,
+            "first_row_start_byte": 9502848,
+            "final_row_start_byte": 16769152,
+            "final_row_end_exclusive_byte": 16772144,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1160 + k) * 8192 + 0, 0 <= k < 888"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 2,
+          "sprite": "sprite_483",
+          "atlas_region_xywh": [
+            748,
+            1160,
+            748,
+            888
+          ],
+          "atlas_region_ltrb": [
+            748,
+            1160,
+            1496,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            750,
+            1162,
+            1494,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2992,
+            "rows": 888,
+            "first_row_start_byte": 9505840,
+            "final_row_start_byte": 16772144,
+            "final_row_end_exclusive_byte": 16775136,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1160 + k) * 8192 + 2992, 0 <= k < 888"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 3,
+          "sprite": "sprite_484",
+          "atlas_region_xywh": [
+            0,
+            1004,
+            2048,
+            156
+          ],
+          "atlas_region_ltrb": [
+            0,
+            1004,
+            2048,
+            1160
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1006,
+            2046,
+            1158
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [
+            {
+              "source": "COURSE SELECT",
+              "korean": "코스 선택"
+            }
+          ],
+          "region_semantic_status": "KNOWN_BINDING_RECONFIRM_FROM_EXACT_DECODED_HD_PIXELS",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 8192,
+            "rows": 156,
+            "first_row_start_byte": 8224896,
+            "final_row_start_byte": 9494656,
+            "final_row_end_exclusive_byte": 9502848,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1004 + k) * 8192 + 0, 0 <= k < 156"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 4,
+          "sprite": "sprite_485",
+          "atlas_region_xywh": [
+            1496,
+            1948,
+            92,
+            100
+          ],
+          "atlas_region_ltrb": [
+            1496,
+            1948,
+            1588,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1498,
+            1950,
+            1586,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 368,
+            "rows": 100,
+            "first_row_start_byte": 15964128,
+            "final_row_start_byte": 16775136,
+            "final_row_end_exclusive_byte": 16775504,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1948 + k) * 8192 + 5984, 0 <= k < 100"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 5,
+          "sprite": "sprite_486",
+          "atlas_region_xywh": [
+            1588,
+            1972,
+            200,
+            76
+          ],
+          "atlas_region_ltrb": [
+            1588,
+            1972,
+            1788,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1590,
+            1974,
+            1786,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 800,
+            "rows": 76,
+            "first_row_start_byte": 16161104,
+            "final_row_start_byte": 16775504,
+            "final_row_end_exclusive_byte": 16776304,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1972 + k) * 8192 + 6352, 0 <= k < 76"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 6,
+          "sprite": "sprite_487",
+          "atlas_region_xywh": [
+            1788,
+            1972,
+            200,
+            76
+          ],
+          "atlas_region_ltrb": [
+            1788,
+            1972,
+            1988,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1790,
+            1974,
+            1986,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 800,
+            "rows": 76,
+            "first_row_start_byte": 16161904,
+            "final_row_start_byte": 16776304,
+            "final_row_end_exclusive_byte": 16777104,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1972 + k) * 8192 + 7152, 0 <= k < 76"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 7,
+          "sprite": "sprite_488",
+          "atlas_region_xywh": [
+            1988,
+            1988,
+            60,
+            60
+          ],
+          "atlas_region_ltrb": [
+            1988,
+            1988,
+            2048,
+            2048
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1990,
+            1990,
+            2046,
+            2046
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 16777344,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 240,
+            "rows": 60,
+            "first_row_start_byte": 16293776,
+            "final_row_start_byte": 16777104,
+            "final_row_end_exclusive_byte": 16777344,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (1988 + k) * 8192 + 7952, 0 <= k < 60"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        }
+      ]
+    },
+    {
+      "queue_index": 241,
+      "asset": "E1639D2E",
+      "queue_path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+      "queue_snapshot": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+        "git_blob_sha": "1a119356bf20b0116d408ffe510e62ec90fc0c53",
+        "bytes": 1048704,
+        "width": 1024,
+        "height": 256,
+        "format": "RGBA32_EXPECTED_FROM_EXACT_SIZE_EQUATION",
+        "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+        "mip_count_expected": 1,
+        "size_equation": "128 + 1024 * 256 * 4 = 1048704",
+        "header_confirmation_required": true
+      },
+      "immutable_refs": {
+        "stock_dds_git_blob_sha": "91f2a3f3621f6d5d67b6c11eadd3c4ceab76933e",
+        "stock_png_git_blob_sha": "7dea136122a164eeb72a53f060308410facd3fd9",
+        "source_evidence_path": "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_241_E1639D2E_ENGLISH_SOURCE.png",
+        "stock_atlas_git_blob_sha": "1ddeb8813ca7c084d520a7b2c69f7ded3989b26f",
+        "hd4_atlas_git_blob_sha": "2f72b399264f3f7326ec2bc00fff77afd9525031"
+      },
+      "canonical_semantics": [
+        {
+          "source": "PLEASE WAIT",
+          "korean": "잠시만요"
+        },
+        {
+          "source": "Loading",
+          "korean": "로딩"
+        }
+      ],
+      "canonical_semantic_count": 2,
+      "known_confirmed_semantic_bindings": [
+        {
+          "source": "Loading",
+          "korean": "로딩"
+        }
+      ],
+      "unresolved_semantics": [
+        "PLEASE WAIT"
+      ],
+      "region_count": 2,
+      "region_work_units": [
+        {
+          "work_unit": 1,
+          "sprite": "sprite_3",
+          "atlas_region_xywh": [
+            0,
+            104,
+            904,
+            152
+          ],
+          "atlas_region_ltrb": [
+            0,
+            104,
+            904,
+            256
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            106,
+            902,
+            254
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [
+            {
+              "source": "Loading",
+              "korean": "로딩"
+            }
+          ],
+          "region_semantic_status": "KNOWN_BINDING_RECONFIRM_FROM_EXACT_DECODED_HD_PIXELS",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 1048704,
+            "row_stride_bytes": 4096,
+            "row_slice_bytes": 3616,
+            "rows": 152,
+            "first_row_start_byte": 426112,
+            "final_row_start_byte": 1044608,
+            "final_row_end_exclusive_byte": 1048224,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (104 + k) * 4096 + 0, 0 <= k < 152"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        },
+        {
+          "work_unit": 2,
+          "sprite": "sprite_4",
+          "atlas_region_xywh": [
+            0,
+            44,
+            512,
+            60
+          ],
+          "atlas_region_ltrb": [
+            0,
+            44,
+            512,
+            104
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            46,
+            510,
+            102
+          ],
+          "guard_classification": "V2_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "known_semantic_bindings": [],
+          "region_semantic_status": "DIRECT_DECODED_SOURCE_CLASSIFICATION_REQUIRED",
+          "payload_scope_template": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED_TEMPLATE",
+            "header_confirmation_required_before_decode": true,
+            "file_bytes": 1048704,
+            "row_stride_bytes": 4096,
+            "row_slice_bytes": 2048,
+            "rows": 60,
+            "first_row_start_byte": 180352,
+            "final_row_start_byte": 422016,
+            "final_row_end_exclusive_byte": 424064,
+            "in_file_bounds": true,
+            "row_k_byte_offset_formula": "128 + (44 + k) * 4096 + 0, 0 <= k < 60"
+          },
+          "source_inspection_work_order": {
+            "stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "confirm exact DDS header format/channel masks/compression/mip/alpha before decoding this scope",
+              "decode this exact HD atlas cell and classify every visible source text/effect cluster versus protected artwork/non-text",
+              "reconfirm any known semantic binding from decoded pixels; never trust region order alone",
+              "bind unresolved canonical semantics only when exact decoded source pixels make the match unambiguous",
+              "for each localizable text cluster measure effect-inclusive source bbox including fill, outline, shadow, glow and alpha fringe",
+              "derive exact source glyph/effect removal mask with zero protected non-text pixels",
+              "derive raw-to-readable transform, baseline vector and signed slant per localizable cluster",
+              "derive protected non-text mask and reconstruct CLEAN_PLATE only inside the measured removal mask"
+            ],
+            "required_outputs": {
+              "dds_header_confirmation": "REQUIRED",
+              "region_classification": "REQUIRED",
+              "observed_source_text_clusters": "REQUIRED",
+              "canonical_semantic_binding_or_preserve_reason": "REQUIRED",
+              "source_effect_bbox_ltrb": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "removal_mask_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_dx_per_dy": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_angle_deg": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "slant_direction": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED_PER_LOCALIZABLE_CLUSTER",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "fail_closed": "HOLD_STRICT_RECHECK"
+          }
+        }
+      ]
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_137_217_219_241",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_SKIPPED_A00096_A00098_ASSETS",
+    "c_acceptance": "PASS_A00061_CONSUMED_BY_C00071_Q00003",
+    "queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_translation_match": "PASS_8_OF_8_TRANSCRIPTIONS_VS_ARTWORK_PLAN",
+    "exact_release_size_equations": "PASS_4_OF_4_RGBA32_SIZE_EQUATIONS",
+    "region_geometry": "PASS_22_OF_22_C_ACCEPTED_HD_ATLAS_REGIONS_REUSED",
+    "two_px_inner_guards": "PASS_22_OF_22_NONEMPTY_AND_STRICTLY_INSIDE_REGION",
+    "payload_scope_templates": "PASS_22_OF_22_RGBA32_SIZE_DERIVED_ROW_TEMPLATES__HEADER_CONFIRMATION_REQUIRED_BEFORE_DECODE",
+    "known_semantic_bindings": "5_PHYSICAL_SEMANTICS_RETAINED_AS_RECONFIRM_REQUIRED",
+    "unresolved_semantics": "3_REMAIN_FAIL_CLOSED_DIRECT_DECODE_REQUIRED",
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "source_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bbox": "HOLD_NOT_FABRICATED",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "HOLD_EXACT_BINARY_BODY_NOT_EXPOSED_BY_CONNECTOR__UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "a00061_evidence_blob_sha": "b347423401f7a8aee418fb6db05c1f244d3bc844",
+    "c00071_acceptance_blob_sha": "fbdf336d6234c702d6cc429c255785faadd9d4f8",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "strict_hold": {
+    "exact_dds_header": "HOLD_BINARY_BODY_NOT_EXPOSED_BY_CONNECTOR",
+    "semantic_binding": "HOLD_3_UNRESOLVED_AND_5_RECONFIRM_REQUIRED_FROM_EXACT_DECODED_HD_PIXELS",
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "glyph_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "generation_v2_candidate_safe_bboxes": "HOLD_UNTIL_MEASURED_SOURCE_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_V2_DIRECT_INSPECTION_WORK_ORDERS_22_REGIONS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
