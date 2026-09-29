@@ -195,6 +195,14 @@ require_all("src/hooks_graphics.cpp", [
     'if (Settings::VREnabled)',
     'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE',
 ], "P8_SELECTOR_SHADOW")
+require_all("src/vr/d3d9/stereo_renderer_r26.cpp", [
+    'R71TraceStartGridShadowCandidate',
+    'Game::is_vr_gameplay_presentation()',
+    'D3DRS_STENCILENABLE',
+    'R71StartShadowDiagHits',
+    'hit > 32 && (hit & (hit - 1)) != 0',
+    'VR R71 START SHADOW DIAG:',
+], "P8_R71_START_SHADOW_BOUNDED_DIAG")
 require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'R69IsSelectorAtlasReserveCandidate',
     'desc.Width == 2048 && desc.Height == 2048',
