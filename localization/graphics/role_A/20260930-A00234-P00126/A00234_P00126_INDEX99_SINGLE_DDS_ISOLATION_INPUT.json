@@ -1,0 +1,207 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00234-index99-single-dds-isolation-input-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00234",
+  "wave_id": "P00126",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:38:20+09:00",
+  "base_head_sha": "638744171c9a32580c1366a453ab6cc69b19b5be",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "selected_index": 99,
+    "selected_asset": "4F68708E",
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "accepted_c_authority": "LOCALIZATION-LOCALIZATION_C-00192@63cd2ed9068e542d257fca12885ee9a0784ca86b / C139 Q00037 / Gate 36609117374 success",
+    "latest_readiness_authority": "LOCALIZATION-LOCALIZATION_C-00228@648cfaab4a7bd5c01ca2a6aa21d775291235a942 / C152 Q00050 / Gate 36639832928 success",
+    "readiness_scan": {
+      "render_ready_indices": [],
+      "one_stage_to_render_indices": [],
+      "candidate_qa_pending_skipped": [
+        159,
+        198,
+        201
+      ],
+      "producer_qa_pending_skipped": [
+        231
+      ],
+      "dependency_blocked_not_repeated": [
+        135
+      ],
+      "already_rendered_static_qa_pass_a_shard": [
+        99,
+        195,
+        222,
+        237
+      ],
+      "prior_isolation_inputs_known": {
+        "99": "none found at selection HEAD",
+        "195": "A00163 single-DDS isolation input exists",
+        "222": "A00230 single-DDS isolation input exists",
+        "237": "A00232 single-DDS isolation input exists"
+      }
+    },
+    "reason": "Current Q00050 has no C-accepted A-shard RENDER_READY/ONE_STAGE_TO_RENDER item. Candidate QA-pending and sticky blockers are skipped. 4F68708E is an unchanged C139 STATIC_QA_PASS_RUNTIME_UNTESTED candidate retained as already rendered by Q00050, and no index99 single-DDS isolation input exists, so fallback step 3 advances the separate runtime-validation backlog without rerendering or heavy-QA repetition."
+  },
+  "asset": {
+    "id": "4F68708E",
+    "queue_index": 99,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "canonical_sentence": {
+      "source": "Drive against the Ghost Car and challenge for the course record!!",
+      "korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+      "rendered_lines": [
+        {
+          "source": "Drive against the Ghost Car",
+          "korean": "고스트 카와 달리며"
+        },
+        {
+          "source": "and challenge for the course record!!",
+          "korean": "코스 기록에 도전하세요!"
+        }
+      ]
+    },
+    "physical_occurrences": 2,
+    "raw_orientation": "mirror_y"
+  },
+  "source": {
+    "authority": "A00187 exact canonical DXT5 source lineage independently accepted by C139/Q00037; A00234 performs no source reacquisition or reconstruction.",
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5_BC3",
+      "mipmaps": 1
+    },
+    "raw_to_readable": "mirror_y",
+    "heavy_source_qa_reused": true,
+    "heavy_source_qa_rerun": false
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+    "sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+    "bytes": 524416,
+    "decoded_rgba_sha256": "fbdd0050b882d9e20f95834b2f56a57dc4b19ac316560f8f0b4ec627636aa23b",
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5_BC3",
+      "mipmaps": 1
+    },
+    "header_128_exact": true,
+    "candidate_blob_current": true
+  },
+  "qa_evidence": {
+    "producer_qa_report": "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00187/qa_report.json",
+    "c_report": "localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json",
+    "c_task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00192.json",
+    "c_validation_bearing_result_sha": "63cd2ed9068e542d257fca12885ee9a0784ca86b",
+    "c_gate_run_id": 36609117374,
+    "c_gate_conclusion": "success",
+    "static_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "semantic_binding": "PASS_1_OF_1_CANONICAL_SENTENCE_SPLIT_TO_TWO_RENDER_LINES",
+    "clean_plate": "PASS_EXACT_VISIBLE_EFFECT_CLEAR_TO_TRANSPARENT__NO_VISIBLE_RESIDUE",
+    "containment": "PASS_2_OF_2_POSITIVE_MARGIN_ZERO_OUTSIDE",
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "orientation": "PASS_MIRROR_Y_RAW_READABLE_DISPLAY",
+    "signed_slant_source_estimate_deg": 12,
+    "signed_slant_candidate_deg": 12.407,
+    "signed_slant_gate": "PASS",
+    "source_language_residue": "PASS_NONE_VISIBLE",
+    "mandatory_english_source_comparison": "PASS_C_INDEPENDENT_EXACT_RESULT_EVIDENCE",
+    "current_candidate_heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "candidate_git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+    "candidate_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+    "expected_dds_count": 1,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Install 4F68708E as the only replacement DDS.",
+    "Open the selector/help state that displays the Ghost Car course-record description.",
+    "Capture readable/game-orientation evidence and verify raw mirror-Y storage renders with the expected readable orientation and right-slant direction.",
+    "Verify both Korean lines at native runtime scale for alpha/transparency, clipping, overlap, text residue, background preservation and zero-pixel overflow.",
+    "Do not promote runtime validation unless this isolated real-game test is actually performed."
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 3,
+    "type": "SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "one_pass_self_qa": {
+    "shard": "PASS_INDEX99_MOD3_EQ_0",
+    "work_steal": "NONE",
+    "q00050_ready_scan": "PASS_ZERO_RENDER_READY_ZERO_ONE_STAGE",
+    "qa_pending_skip": "PASS_159_198_201_231_NOT_REPEATED",
+    "sticky_blocker_skip": "PASS_INDEX135_NOT_REPEATED",
+    "prior_isolation_skip": "PASS_195_222_237_NOT_REPEATED",
+    "candidate_blob_current": "PASS_A170FC1E",
+    "c139_heavy_qa_reuse": "PASS_UNCHANGED_SOURCE_CANDIDATE_QA_FINGERPRINT",
+    "duplicate_isolation_manifest": "PASS_NONE_FOUND_FOR_4F68708E",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "candidate_git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+    "candidate_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+    "source_git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "c00192_result_sha": "63cd2ed9068e542d257fca12885ee9a0784ca86b",
+    "c00228_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
