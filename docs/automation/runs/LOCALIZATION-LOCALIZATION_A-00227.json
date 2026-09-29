@@ -1,0 +1,115 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00227-p00121-index231-reviewed-semantic-binding-handoff-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00227",
+  "wave_id": "P00121",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T07:16:30+09:00",
+  "base_head_sha": "489c27149c84c4bca6e81dba3f5920c401ffc276",
+  "base_sha": "489c27149c84c4bca6e81dba3f5920c401ffc276",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX231_REVIEWED_SEMANTIC_BINDING_HANDOFF_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX231_REVIEWED_SEMANTIC_BINDING_HANDOFF_PENDING_C_CANONICAL_RECONCILIATION_RUNTIME_UNTESTED",
+  "summary": "Fresh Q00049-aware lane-A scan has no accepted RENDER_READY or ONE_STAGE_TO_RENDER item; QA-pending candidates 159/198/201/222 are not repeated. Q00048 already accepted index231/EBE401C8 exact source, all six effect masks, deterministic CLEAN_PLATE and six final 2px safe bboxes, leaving exactly two untranscribed source descriptions as the blocker. This result resolves that blocker at the producer-evidence layer with reviewed Korean translations and exact physical bindings: 'Play OutRun Online with Friends or other players!' -> '친구나 다른 플레이어와 온라인 아웃런을 즐기세요!' bound to desc_online, and 'Join or Create a LAN game of OutRun!' -> 'LAN 아웃런 게임에 참가하거나 만들어 보세요!' bound to desc_lan. Shared canonical transcription/artwork files are intentionally not modified because A/B producer commits are forbidden from reconciling shared state. No Korean DDS is emitted until C independently accepts these semantics into canonical state; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00227-P00121/A00227_P00121_INDEX231_SEMANTIC_BINDING_HANDOFF.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX231_REVIEWED_KOREAN_DESCRIPTION_TRANSLATIONS_AND_EXACT_PHYSICAL_BINDINGS_FOR_C_RECONCILIATION",
+    "reviewed_indices": [
+      231
+    ],
+    "reviewed_assets": [
+      "EBE401C8"
+    ],
+    "new_semantic_pairs": 2,
+    "exact_physical_bindings": 2,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_SEMANTIC_GAP_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      231
+    ],
+    "accepted_c_gate": "C150/Q00048 bd354484bd976ec11a67036a66bd102ba797107d",
+    "qa_pending_not_repeated": {
+      "159": "A00196 candidate",
+      "198": "A00208 candidate",
+      "201": "A00196 candidate",
+      "222": "A00221 candidate"
+    },
+    "readiness_before": {
+      "231": "PREFLIGHT_ONLY_EXACT_SOURCE_MASK_CLEANPLATE_SAFE_BBOX_COMPLETE__BLOCKED_2_UNTRANSCRIBED_DESCRIPTIONS"
+    },
+    "readiness_after": {
+      "231": "PREFLIGHT_ONLY_SEMANTIC_HANDOFF_COMPLETE_PENDING_C_CANONICAL_RECONCILIATION"
+    }
+  },
+  "semantic_handoff": {
+    "source": "A00218 physical inventory + C150/Q00048 independent replay",
+    "pairs": [
+      {
+        "element_id": "desc_online",
+        "source": "Play OutRun Online with Friends or other players!",
+        "korean": "친구나 다른 플레이어와 온라인 아웃런을 즐기세요!",
+        "source_effect_bbox_readable_xyxy": [
+          7,
+          371,
+          1446,
+          437
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          9,
+          373,
+          1444,
+          435
+        ],
+        "binding": "EXACT_PHYSICAL_SOURCE_STRING_TO_DESC_ONLINE"
+      },
+      {
+        "element_id": "desc_lan",
+        "source": "Join or Create a LAN game of OutRun!",
+        "korean": "LAN 아웃런 게임에 참가하거나 만들어 보세요!",
+        "source_effect_bbox_readable_xyxy": [
+          2,
+          531,
+          1122,
+          597
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          4,
+          533,
+          1120,
+          595
+        ],
+        "binding": "EXACT_PHYSICAL_SOURCE_STRING_TO_DESC_LAN"
+      }
+    ],
+    "expected_c_effect_if_accepted": "Reconcile both pairs into canonical transcription/artwork metadata and classify index231 RENDER_READY; producer A can then measure source typography/slant and render/refit/encode/persist the v2 candidate in one invocation."
+  },
+  "self_qa": "PASS_A_MOD3_INDEX231__Q00048_ACCEPTED_SOURCE_MASK_CLEANPLATE_SAFE_BBOX_REUSED__2_OF_2_MISSING_DESCRIPTIONS_TRANSLATED__2_OF_2_EXACT_PHYSICAL_BINDINGS__NO_SHARED_STATE_WRITE__NO_SPECULATIVE_DDS__RUNTIME_UNTESTED",
+  "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_PENDING_C_CANONICAL_SEMANTIC_RECONCILIATION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "bookkeeping_note": "Immutable producer result commit must atomically contain the reviewed semantic handoff and durable task record. RESULT_SHA is filled only in a later bookkeeping commit. Producer automation_validation remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION=UNTESTED."
+}

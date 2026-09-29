@@ -1,0 +1,170 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00227-index231-reviewed-semantic-binding-handoff-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00227",
+  "wave_id": "P00121",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SEMANTIC_COMPLETION_HANDOFF",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T07:16:30+09:00",
+  "base_head_sha": "489c27149c84c4bca6e81dba3f5920c401ffc276",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_index": 231,
+    "asset": "EBE401C8",
+    "priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_SEMANTIC_GAP",
+    "accepted_preflight_result": "LOCALIZATION-LOCALIZATION_A-00218@f0e94bd55b8b3a3c94f8b442934277a95b764f40",
+    "accepted_c_disposition": "LOCALIZATION-LOCALIZATION_C-00222@bd354484bd976ec11a67036a66bd102ba797107d / C150 Q00048",
+    "reason": "Q00048 independently accepted exact source identity, six physical masks, deterministic CLEAN_PLATE and six final 2px safe bboxes. The only accepted blocker is the absence of reviewed canonical Korean semantics for two exact description strings."
+  },
+  "input_fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "asset_queue_blob_sha": "a7d72949b0167bc6c69bbf96489b2bc1ff78d7de",
+    "a00218_evidence_blob_sha": "260b0f8288a4dc59afd6041a73136861c3d065ff",
+    "c00222_q00048_record_blob_sha": "28fa948b7570d4d7c1ee66e2b087dbcadd0618c5"
+  },
+  "source_identity": {
+    "index": 231,
+    "asset": "EBE401C8",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "canonical_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "dds_format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "source_identity_reused_from_q00048": true,
+    "heavy_source_qa_repeated": false
+  },
+  "accepted_existing_semantics": [
+    {
+      "element_ids": [
+        "lan_large",
+        "lan_small"
+      ],
+      "source": "LAN",
+      "korean": "LAN",
+      "status": "CANONICAL_PRESERVE_LATIN"
+    },
+    {
+      "element_ids": [
+        "online_large",
+        "online_small"
+      ],
+      "source": "ONLINE",
+      "korean": "온라인",
+      "status": "CANONICAL_LOCALIZE"
+    }
+  ],
+  "reviewed_semantic_completion": {
+    "status": "PASS_2_OF_2_EXACT_SOURCE_DESCRIPTION_TRANSLATIONS_AND_PHYSICAL_BINDINGS",
+    "pairs": [
+      {
+        "element_id": "desc_online",
+        "source": "Play OutRun Online with Friends or other players!",
+        "korean": "친구나 다른 플레이어와 온라인 아웃런을 즐기세요!",
+        "source_effect_bbox_readable_xyxy": [
+          7,
+          371,
+          1446,
+          437
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          9,
+          373,
+          1444,
+          435
+        ],
+        "binding": "EXACT_PHYSICAL_SOURCE_STRING_TO_DESC_ONLINE"
+      },
+      {
+        "element_id": "desc_lan",
+        "source": "Join or Create a LAN game of OutRun!",
+        "korean": "LAN 아웃런 게임에 참가하거나 만들어 보세요!",
+        "source_effect_bbox_readable_xyxy": [
+          2,
+          531,
+          1122,
+          597
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          4,
+          533,
+          1120,
+          595
+        ],
+        "binding": "EXACT_PHYSICAL_SOURCE_STRING_TO_DESC_LAN"
+      }
+    ],
+    "review_basis": [
+      "Exact source strings and physical element IDs come from A00218 and were independently reproduced by C150/Q00048.",
+      "Wording follows current graphics corpus conventions: online/LAN terminology is preserved, '참가' matches existing JOIN/quick-game translations, and polite UI imperative style matches current reviewed description strings.",
+      "Translations are concise enough for the already accepted native-resolution safe regions; typography fitting remains a producer render-stage measurement after C canonical reconciliation."
+    ],
+    "invented_source_text": false,
+    "unbound_source_descriptions_after": 0
+  },
+  "shared_state_policy": {
+    "canonical_files_modified": false,
+    "reason": "A/B producer commits may not modify shared canonical transcription/artwork/progress state. C must reconcile this reviewed handoff into canonical metadata before producer rendering.",
+    "files_not_modified": [
+      "localization/graphics/transcriptions.jsonl",
+      "localization/graphics/artwork_plan.jsonl",
+      "localization/resume_state.json",
+      "localization/WORKLOG.md",
+      "localization/progress/progress.json",
+      "localization/progress.json",
+      "localization/graphics/asset_queue.csv"
+    ]
+  },
+  "readiness_after": {
+    "classification": "PREFLIGHT_ONLY_SEMANTIC_HANDOFF_COMPLETE_PENDING_C_CANONICAL_RECONCILIATION",
+    "newly_resolved": [
+      "Korean translation for desc_online",
+      "Korean translation for desc_lan",
+      "exact physical binding desc_online",
+      "exact physical binding desc_lan"
+    ],
+    "still_required": "C independent semantic review/reconciliation into current canonical transcription/artwork state. If accepted, index231 should become RENDER_READY because Q00048 already accepted source/masks/CLEAN_PLATE/safe bboxes.",
+    "candidate_render_attempted": false,
+    "reason_candidate_not_attempted": "Q00048 explicitly requires reviewed canonical translations/bindings before candidate rendering, while producer A is forbidden from modifying the shared canonical files."
+  },
+  "material_deliverable": {
+    "type": "INDEX231_REVIEWED_KOREAN_DESCRIPTION_TRANSLATIONS_AND_EXACT_PHYSICAL_BINDINGS_FOR_C_RECONCILIATION",
+    "reviewed_indices": [
+      231
+    ],
+    "reviewed_assets": [
+      "EBE401C8"
+    ],
+    "new_semantic_pairs": 2,
+    "exact_physical_bindings": 2,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX231__Q00048_ACCEPTED_SOURCE_MASK_CLEANPLATE_SAFE_BBOX_REUSED__2_OF_2_MISSING_DESCRIPTIONS_TRANSLATED__2_OF_2_EXACT_PHYSICAL_BINDINGS__NO_SHARED_STATE_WRITE__NO_SPECULATIVE_DDS__RUNTIME_UNTESTED",
+  "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_PENDING_C_CANONICAL_SEMANTIC_RECONCILIATION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
