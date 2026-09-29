@@ -949,6 +949,7 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowPerfTotalUs = 0;
         std::uint64_t R30SkyGlowPerfMaxUs = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
+        std::uint64_t R30SkyGlowAppliedEpoch = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
         OutRunVR::FrameState::FrameContext R69FrameContext{};
@@ -978,6 +979,7 @@ namespace OutRunVRStereo
                 frame.stageHoldRemaining = R68StageHoldPresents;
                 ++frame.stageTransitionHolds;
                 R30SkyGlowSceneCaptureEpoch = 0;
+                R30SkyGlowAppliedEpoch = 0;
                 spdlog::info(
                     "VR R68 STAGE HOLD: stage {} -> {}; hold last good HMD projection for {} presents transitions={}",
                     previous, stage, R68StageHoldPresents,
@@ -1575,6 +1577,7 @@ namespace OutRunVRStereo
 
             if (ok && restoreOk)
             {
+                R30SkyGlowAppliedEpoch = PresentEpoch;
                 ++R30SkyGlowFrames;
                 if (!R30FirstSkyGlowLogged)
                 {
@@ -1598,6 +1601,23 @@ namespace OutRunVRStereo
                     "VR SKY GLOW: stereo eye post-process failed; frame continues without enabling the stock mono glow chain");
             }
             return false;
+        }
+
+        bool R30CompositeSkyGlowBeforeHud(
+            IDirect3DDevice9* device) noexcept
+        {
+            // Preserve the stock ordering: glow belongs to the completed world
+            // image and must be composited before HUD/menu draws. Capturing the
+            // world before HUD but delaying the additive composite until Present
+            // washes the already-drawn UI even though UI pixels are not bloom
+            // sources.
+            if (!device || R30SkyGlowAppliedEpoch == PresentEpoch)
+                return true;
+            if (!R30CaptureSkyGlowSceneBeforeHud(device))
+                return false;
+
+            InternalPassScope guard;
+            return R30ApplyStereoSkyGlow(device);
         }
 
         ULONGLONG R30LastTelemetryMs = 0;
@@ -1657,6 +1677,7 @@ namespace OutRunVRStereo
             R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
+                R30SkyGlowAppliedEpoch != PresentEpoch &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
@@ -1703,6 +1724,7 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R30SkyGlowAppliedEpoch = 0;
             R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
@@ -3232,7 +3254,7 @@ namespace OutRunVRStereo
             const char* site)
         {
             if (!state.worldEffect)
-                R30CaptureSkyGlowSceneBeforeHud(device);
+                R30CompositeSkyGlowBeforeHud(device);
 
             ++R9DrawCalls;
             R9MonoBackupGap = true;
@@ -4233,10 +4255,10 @@ namespace OutRunVRStereo
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
-            // Capture the completed world eyes before the first recognized HUD
-            // draw. Present then extracts glow from this snapshot, so bright HUD
-            // text/icons are never themselves bloom sources.
-            R30CaptureSkyGlowSceneBeforeHud(device);
+            // Composite the completed world glow before the first recognized
+            // HUD draw. The scene snapshot excludes HUD pixels and, critically,
+            // the additive glow no longer washes over HUD/menu pixels at Present.
+            R30CompositeSkyGlowBeforeHud(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
