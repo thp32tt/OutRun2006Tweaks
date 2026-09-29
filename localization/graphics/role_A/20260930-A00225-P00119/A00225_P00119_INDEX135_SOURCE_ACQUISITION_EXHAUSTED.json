@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-a-producer-current-policy-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00225",
+  "wave_id": "P00119",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-30T07:05:35+09:00",
+  "base_head_sha": "3181e10327c74dff29bc540ad609cb0e2e300dcd",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "selection_reason": "No C-accepted RENDER_READY/ONE_STAGE_TO_RENDER A-shard asset remained after excluding immutable candidate-QA-pending indices 159/198/201/222; current contract therefore permits at most one new PREFLIGHT_ONLY batch.",
+  "asset": {
+    "index": 135,
+    "asset_id": "2B0863D6",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "action": "localize_text",
+    "canonical_inventory": {
+      "sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521",
+      "width": 2048,
+      "height": 256,
+      "mode": "RGBA"
+    },
+    "canonical_semantics": {
+      "status": "PASS_10_OF_10_REVIEWED_CURRENT_METADATA",
+      "count": 10,
+      "pairs": [
+        [
+          "INTERMEDIATE A",
+          "중급 A"
+        ],
+        [
+          "OUTRUN",
+          "아웃런"
+        ],
+        [
+          "PROFESSIONAL",
+          "프로"
+        ],
+        [
+          "CHANGE CLASS",
+          "클래스 변경"
+        ],
+        [
+          "CLASS",
+          "클래스"
+        ],
+        [
+          "ACCELERATION",
+          "가속"
+        ],
+        [
+          "MAX SPEED",
+          "최고 속도"
+        ],
+        [
+          "INTERMEDIATE B",
+          "중급 B"
+        ],
+        [
+          "HANDLING",
+          "핸들링"
+        ],
+        [
+          "NOVICE",
+          "초급"
+        ]
+      ]
+    }
+  },
+  "prior_c_state": {
+    "latest_relevant": "Q00017/C119 A00128 PASS contract-fingerprint repair",
+    "production_readiness": "PREFLIGHT_ONLY",
+    "source_state": "canonical identity/semantics accepted; exact source bytes absent; older Release geometry not authorized as canonical"
+  },
+  "acquisition_tiers": [
+    {
+      "tier": 1,
+      "transport": "GOOGLE_DRIVE_APPROVED_PER_FILE_FAST_PATH",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "resolved_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_name_results": 0,
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "note": "No similarity fallback and no historical localized-output folders searched."
+    },
+    {
+      "tier": 2,
+      "transport": "PINNED_TAG_DIRECT_FILE",
+      "repository": "envido32/OR2006Sprites",
+      "ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "http_status": 404,
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "note": "Missing immutable direct file is a transport miss, not identity evidence."
+    },
+    {
+      "tier": 3,
+      "transport": "PINNED_RELEASE_BUNDLE",
+      "release_tag": "v0.25.10a",
+      "release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "release_asset_id": 306630789,
+      "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "bundle_size": 306223257,
+      "bundle_identity": "PASS_EXACT",
+      "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "member_bytes": 2097280,
+      "member_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "member_dds": {
+        "width": 2048,
+        "height": 256,
+        "mipmaps": 1,
+        "format": "RGBA32",
+        "pitch": 8192,
+        "channel_masks": {
+          "r": "0x000000ff",
+          "g": "0x0000ff00",
+          "b": "0x00ff0000",
+          "a": "0xff000000"
+        }
+      },
+      "canonical_expected_sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521",
+      "canvas_match": true,
+      "outcome": "SOURCE_IDENTITY_MISMATCH",
+      "note": "Verified release bytes cannot substitute for the current canonical inventory despite matching canvas."
+    }
+  ],
+  "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+  "sticky_dependency_rule": "Do not repeat Drive/direct/Release probes for index135 until canonical-source/inventory fingerprint, source policy, approved transport contents, or explicit user instruction changes.",
+  "readiness_before": "PREFLIGHT_ONLY_EXACT_SOURCE_ABSENT",
+  "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+  "candidate_dds_modified": false,
+  "candidate_generated": false,
+  "self_qa": {
+    "acquisition_order": "PASS_1_TO_2_TO_3",
+    "canonical_identity_gate": "FAIL_CLOSED_NO_SUBSTITUTION",
+    "shard_isolation": "PASS_INDEX135_MOD3_EQ_0",
+    "shared_state_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "asset_queue_blob_sha": "a7d72949b0167bc6c69bbf96489b2bc1ff78d7de",
+    "canonical_source_sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521",
+    "release_member_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06"
+  },
+  "runtime_validation": "UNTESTED"
+}

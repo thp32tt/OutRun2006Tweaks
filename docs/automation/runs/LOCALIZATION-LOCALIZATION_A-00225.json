@@ -1,0 +1,74 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00225",
+  "wave_id": "P00119",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:05:35+09:00",
+  "base_head_sha": "3181e10327c74dff29bc540ad609cb0e2e300dcd",
+  "base_sha": "3181e10327c74dff29bc540ad609cb0e2e300dcd",
+  "commit_mode": "GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_INDEX135_CURRENT_POLICY_SOURCE_ACQUISITION_EXHAUSTION_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX135_PREFLIGHT_SOURCE_ACQUISITION_EXHAUSTED_RUNTIME_UNTESTED",
+  "summary": "Fresh Q00049-aware shard scan found no C-accepted RENDER_READY/ONE_STAGE_TO_RENDER A asset after skipping immutable QA-pending candidates 159/198/201/222. Expanded exactly one new PREFLIGHT_ONLY batch at index135/2B0863D6. Current-policy acquisition is now closed deterministically: approved Drive exact-path miss, immutable pinned-tag direct-file 404, and exact verified v0.25.10a Release bundle member SHA-256 dafe21ec... mismatches canonical inventory SHA-256 7cb768c6... despite matching 2048x256 canvas. The Release bytes are rejected rather than substituted. This typed SOURCE_ACQUISITION_EXHAUSTED fingerprint is sticky and prevents repeated probes until a dependency changes. No candidate is authorized; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00225-P00119/A00225_P00119_INDEX135_SOURCE_ACQUISITION_EXHAUSTED.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX135_CURRENT_POLICY_THREE_TIER_SOURCE_ACQUISITION_CLOSURE",
+    "reviewed_indices": [
+      135
+    ],
+    "reviewed_assets": [
+      "2B0863D6"
+    ],
+    "candidate_dds_modified": false,
+    "source_transport_tiers_attempted": 3,
+    "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+    "canonical_source_substituted": false,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_priority": "PREFLIGHT_ONLY_SINGLE_BATCH_AFTER_NO_READY_PATH",
+    "selected_indices": [
+      135
+    ],
+    "c_state_basis": "Q00049/C151 current merge-head readiness",
+    "qa_pending_not_repeated": {
+      "159": "A00196 candidate",
+      "198": "A00208 candidate",
+      "201": "A00196 candidate",
+      "222": "A00221 candidate"
+    },
+    "readiness_before": {
+      "135": "PREFLIGHT_ONLY_EXACT_SOURCE_ABSENT"
+    },
+    "readiness_after": {
+      "135": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_PENDING_C"
+    }
+  },
+  "self_qa": "PASS_INDEX135_MOD3_EQ_0__NO_READY_PATH_AT_Q00049_HEAD__DRIVE_EXACT_MISS__PINNED_TAG_404__PINNED_RELEASE_BUNDLE_SHA_SIZE_PASS__MEMBER_SHA_IDENTITY_MISMATCH_FAIL_CLOSED__NO_CANONICAL_SUBSTITUTION__SINGLE_PREFLIGHT_BATCH_ONLY__RUNTIME_UNTESTED",
+  "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "bookkeeping_note": "Immutable producer result commit atomically contains the lane-local source-acquisition evidence and durable task record. RESULT_SHA is filled only in a later bookkeeping commit. Producer automation_validation remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION=UNTESTED."
+}
