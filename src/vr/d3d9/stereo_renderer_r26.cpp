@@ -266,18 +266,20 @@ namespace OutRunVRStereo
         HRESULT R28RunWithVerifiedWorldEpoch(IDirect3DDevice9* device,
             R9Draw&& r9Draw)
         {
-            // R51: restore the runtime-proven R28 shader-epoch world continuation,
-            // but never let it steal queue HUD. SCREEN_OVERLAY_2D and SCREEN_HUD
-            // stay exclusively owned by R30. An exact WORLD_BILLBOARD is allowed
-            // through this gate only when the strict c64..c67 + projection +
-            // pose-generation proof succeeds; in that case normal per-eye world
-            // stereo is exactly the desired ownership for a car-attached marker.
+            // R51/R71: restore the runtime-proven R28 shader-epoch world
+            // continuation, but never let it steal queue HUD or the exact
+            // projected-screen flare. SCREEN_OVERLAY_2D, SCREEN_HUD and
+            // PROJECTED_SCREEN_EFFECT_2D stay exclusively owned by R30. An exact
+            // WORLD_BILLBOARD is allowed through this gate only when the strict
+            // c64..c67 + projection + pose-generation proof succeeds.
             const auto semanticScope =
                 OutRunVR::GameSemantic::CurrentScope;
             if (semanticScope ==
                     OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
                 semanticScope ==
-                    OutRunVR::GameSemantic::RenderScope::ScreenHud)
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud ||
+                semanticScope ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D)
             {
                 ++R28RebindSemanticReject;
                 return E_NOTIMPL;
