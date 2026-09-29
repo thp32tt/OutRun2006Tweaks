@@ -1,0 +1,138 @@
+{
+  "schema": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00176",
+  "queue_index": 130,
+  "asset": "1762489B",
+  "source_dimensions": [
+    2048,
+    512
+  ],
+  "raw_orientation": "flip_y_to_readable",
+  "elements": [
+    {
+      "sprite": "sprite_1080",
+      "source": "OUTRUN2SP COURSE",
+      "korean": "아웃런2 SP 코스",
+      "source_effect_bbox_readable": [
+        7,
+        429,
+        899,
+        506
+      ],
+      "candidate_safe_bbox_readable": [
+        9,
+        431,
+        897,
+        504
+      ]
+    },
+    {
+      "sprite": "sprite_1081",
+      "source": "OUTRUN2 COURSE",
+      "korean": "아웃런2 코스",
+      "source_effect_bbox_readable": [
+        7,
+        333,
+        785,
+        410
+      ],
+      "candidate_safe_bbox_readable": [
+        9,
+        335,
+        783,
+        408
+      ]
+    },
+    {
+      "sprite": "sprite_1082",
+      "source": "MIX 2 COURSE",
+      "korean": "믹스 2 코스",
+      "source_effect_bbox_readable": [
+        9,
+        241,
+        612,
+        314
+      ],
+      "candidate_safe_bbox_readable": [
+        11,
+        243,
+        610,
+        312
+      ]
+    },
+    {
+      "sprite": "sprite_1083",
+      "source": "MIX 1 COURSE",
+      "korean": "믹스 1 코스",
+      "source_effect_bbox_readable": [
+        9,
+        145,
+        614,
+        218
+      ],
+      "candidate_safe_bbox_readable": [
+        11,
+        147,
+        612,
+        216
+      ]
+    },
+    {
+      "sprite": "sprite_1084",
+      "source": "AVERAGE RANK:",
+      "korean": "평균 랭크:",
+      "source_effect_bbox_readable": [
+        1435,
+        466,
+        1850,
+        510
+      ],
+      "candidate_safe_bbox_readable": [
+        1437,
+        468,
+        1848,
+        508
+      ]
+    }
+  ],
+  "protected_regions": [
+    {
+      "sprite": "sprite_1085",
+      "description": "numeric rank marker ???; preserve exact RGBA"
+    }
+  ],
+  "source_style": {
+    "course_fill_rgb": [
+      79,
+      97,
+      101
+    ],
+    "average_fill_rgb": [
+      63,
+      71,
+      74
+    ],
+    "outline": "none",
+    "shadow": "none",
+    "glow": "none",
+    "slant_direction": "none",
+    "slant_angle_deg": 0.0,
+    "stroke_weight": "bold",
+    "width_character": "monospaced/condensed block sans"
+  },
+  "render": {
+    "font_identifier": "NotoSansCJK-Bold.ttc#6 Noto Sans Mono CJK KR Bold",
+    "alignment": "course left; average rank right",
+    "background": "transparent text-only; clear exact source full-effect footprint including alpha-zero hidden RGB fringe",
+    "safe_inset_px": 2
+  },
+  "negative": [
+    "no source text or hidden RGB fringe",
+    "no cover rectangle",
+    "no neighboring sprite changes",
+    "no resize/crop",
+    "no invented outline/shadow/glow",
+    "no font fallback boxes"
+  ],
+  "self_check": "Verify no source-language text/effect remains; protected numeric marker is unchanged; Korean is fully inside 2px safe regions and unclipped; canvas, orientation and transparency contract remain unchanged."
+}
