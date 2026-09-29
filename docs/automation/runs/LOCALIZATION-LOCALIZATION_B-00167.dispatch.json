@@ -15,5 +15,10 @@
     "drive_outcome": "SOURCE_TRANSPORT_MISS",
     "fallback": "PINNED_UPSTREAM_DIRECT_FILE"
   },
-  "purpose": "One-shot GitHub-hosted deterministic index152 clean-plate/render/BC3-index-patch/decoded-final-QA producer; result commit self-removes helper files."
+  "purpose": "One-shot GitHub-hosted deterministic index152 clean-plate/render/BC3-index-patch/decoded-final-QA producer; result commit self-removes helper files.",
+  "retrigger": {
+    "requested_by_task": "LOCALIZATION-LOCALIZATION_B-00171",
+    "reason": "BC3 decoded-final palette rounding was corrected at HEAD 05a38f62f749829dc6fc1ef9c1606b5bb1ac8497 after the original dispatch push; retrigger the existing unfinished producer without duplicating asset work.",
+    "requested_at_kst": "2026-09-30T00:33:49+09:00"
+  }
 }
