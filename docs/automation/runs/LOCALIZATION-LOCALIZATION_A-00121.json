@@ -1,0 +1,90 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00121",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00050",
+  "recorded_at_kst": "2026-09-29T19:07:52+09:00",
+  "base_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+  "commit_mode": "ATOMIC_C_ACCEPTED_MATERIAL_REEMIT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_REWORK_A00114_DURABLE_REEMIT_4_ODD_24_SEGMENTS",
+  "summary": "Resolved the Q00014/C00120 producer-contract REWORK for A00114 by re-emitting the C-content-QA-accepted four odd source-gated v2 reconstruction work orders for indices 133/135/139/143 in the same atomic result commit as this A00121 task record. The accepted 4/4 canonical inventory identities, 24/24 current Korean mappings, canvas equations and preserve contracts are unchanged; current inventory/transcriptions/artwork-plan blobs remain identical to the accepted A00114 inputs. No DDS, shared-state, build or runtime changes were made.",
+  "evidence": [
+    "localization/graphics/role_A/202609291907-A00121-P00050/A00121_P00050_C00120_A00114_DURABLE_REEMIT.json"
+  ],
+  "material_deliverable": {
+    "type": "C_ACCEPTED_A00114_FOUR_ODD_SOURCE_GATED_V2_WORK_ORDERS_DURABLE_REEMIT",
+    "indices": [
+      133,
+      135,
+      139,
+      143
+    ],
+    "assets": [
+      "25F697C6",
+      "2B0863D6",
+      "313DB8CB",
+      "34923C8A"
+    ],
+    "reviewed_translation_segments": 24,
+    "exact_inventory_source_fingerprints": 4,
+    "exact_canvas_scale_equations": 4,
+    "asset_specific_preserve_contracts": 4,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "c_result_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+    "c_disposition": "REWORK_REQUIRED_ONLY_FOR_MISSING_DURABLE_TASK_RECORD_IN_IMMUTABLE_A00114_RESULT_SHA",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00114",
+    "prior_result_sha": "b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e",
+    "prior_evidence_path": "localization/graphics/role_A/20260929-1831-A00114-P00045/A00114_P00045_FOUR_ODD_SOURCE_GATED_REBUILD_WORK_ORDERS.json",
+    "prior_evidence_blob_sha": "4a2805889ff84a0303001f257bf124e7942139fc",
+    "accepted_material_changed": false,
+    "content_qa_repeated": false,
+    "c_content_acceptance": "4_OF_4_CANONICAL_INVENTORY_IDENTITIES_AND_24_OF_24_CURRENT_TRANSLATIONS_ACCEPTED"
+  },
+  "reused_immutable_evidence": {
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00114",
+    "prior_result_sha": "b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e",
+    "prior_evidence_blob_sha": "4a2805889ff84a0303001f257bf124e7942139fc",
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "c_result_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+    "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "current_queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "current_contract_blob_sha": "194fd6c64cafede90b537446fddf96934dc9ea37",
+    "reason": "C00120 accepted A00114 material content and requested only same-immutable-SHA durable re-emission with its task record."
+  },
+  "self_qa": "PASS_ODD_ONLY_133_135_139_143__C00120_CONTENT_ACCEPTED__4_OF_4_CANONICAL_INVENTORY_IDENTITIES__24_OF_24_CURRENT_TRANSLATIONS__MATERIAL_UNCHANGED__REPORT_AND_TASK_RECORD_ATOMIC__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "strict_hold": {
+    "exact_source_bytes": "HOLD_AS_C00120_ACCEPTED_WORK_ORDER_ONLY",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_SOURCE_REQUIRED",
+    "raw_orientation": "HOLD_EXACT_SOURCE_REQUIRED",
+    "per_element_source_effect_bboxes": "HOLD_EXACT_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
