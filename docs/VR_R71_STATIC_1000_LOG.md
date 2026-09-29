@@ -1789,3 +1789,303 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: continue P0 visuals.
+
+
+## Cycle 0101 — selector diagnostic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- A useful selector diagnostic must be bounded to exact producer/draw identity and log texture0/material/stage state without changing rendering.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: prefer diagnostics before behavior.
+
+
+## Cycle 0102 — selector state falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- White output does not uniquely imply missing texture; null texture, stage select, material diffuse, shader constants and resource lifetime remain competing hypotheses.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: keep hypotheses separate.
+
+
+## Cycle 0103 — HUD alpha diagnostic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- HUD alpha diagnostics must sample exact ScreenHud owner only; using alpha to discover HUD would recreate a prohibited heuristic.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: owner first, state second.
+
+
+## Cycle 0104 — menu diagnostic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu anchor diagnostics must identify producer/queue ownership before applying head-lock policy.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: avoid generic menu heuristics.
+
+
+## Cycle 0105 — checkpoint identity contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Checkpoint dedup requires a stable producer/queue key plus temporal epoch; draw-shape equality alone is insufficient.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: design exact diagnostic only.
+
+
+## Cycle 0106 — result identity contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Result-screen dedup must distinguish split intended surfaces from duplicated ownership.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: collect exact producer evidence.
+
+
+## Cycle 0107 — marker route invariant
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- ProjectedWorldMarker2D and WorldBillboard remain separate semantic contracts; preserve route invariants during diagnostics.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: no scope collapse.
+
+
+## Cycle 0108 — reset visual invariant
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Any future selector resource fix must remain valid across Reset and must not retain stale D3D9 resources/stateblocks.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: include reset lifetime evidence.
+
+
+## Cycle 0109 — CI truthfulness
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Only completed hosted runs can promote automation validation; pending status remains pending.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume results when complete.
+
+
+## Cycle 0110 — runtime truthfulness
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- No HMD run occurred in this cycle; visual correctness and performance remain unconfirmed.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: RUNTIME_VALIDATION stays UNTESTED.
+
+
+## Cycle 0111 — selector diagnostic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- A useful selector diagnostic must be bounded to exact producer/draw identity and log texture0/material/stage state without changing rendering.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: prefer diagnostics before behavior.
+
+
+## Cycle 0112 — selector state falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- White output does not uniquely imply missing texture; null texture, stage select, material diffuse, shader constants and resource lifetime remain competing hypotheses.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: keep hypotheses separate.
+
+
+## Cycle 0113 — HUD alpha diagnostic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- HUD alpha diagnostics must sample exact ScreenHud owner only; using alpha to discover HUD would recreate a prohibited heuristic.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: owner first, state second.
+
+
+## Cycle 0114 — menu diagnostic contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu anchor diagnostics must identify producer/queue ownership before applying head-lock policy.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: avoid generic menu heuristics.
+
+
+## Cycle 0115 — checkpoint identity contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Checkpoint dedup requires a stable producer/queue key plus temporal epoch; draw-shape equality alone is insufficient.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: design exact diagnostic only.
+
+
+## Cycle 0116 — result identity contract
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Result-screen dedup must distinguish split intended surfaces from duplicated ownership.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: collect exact producer evidence.
+
+
+## Cycle 0117 — marker route invariant
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- ProjectedWorldMarker2D and WorldBillboard remain separate semantic contracts; preserve route invariants during diagnostics.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: no scope collapse.
+
+
+## Cycle 0118 — reset visual invariant
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Any future selector resource fix must remain valid across Reset and must not retain stale D3D9 resources/stateblocks.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: include reset lifetime evidence.
+
+
+## Cycle 0119 — CI truthfulness
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Only completed hosted runs can promote automation validation; pending status remains pending.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume results when complete.
+
+
+## Cycle 0120 — runtime truthfulness
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- No HMD run occurred in this cycle; visual correctness and performance remain unconfirmed.
+- Evidence: bounded exact-owner/static contract review on current R71.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: RUNTIME_VALIDATION stays UNTESTED.
