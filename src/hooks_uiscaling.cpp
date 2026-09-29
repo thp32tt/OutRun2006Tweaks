@@ -964,8 +964,15 @@ class UIScaling : public Hook
 	// caller edges and tag every SpriteNode they append as SCREEN_HUD.
 	using GoalTimeHelperFn = void(__cdecl*)();
 
-	static void GoalTime_TagHelper(int helperRva, const char* label)
+	template<std::uintptr_t CallerRva, int HelperRva>
+	static void GoalTime_TagHelper(const char* label)
 	{
+		constexpr auto producerScope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"TimeAttackGoal callsite must remain canonical SCREEN_HUD");
+
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -975,9 +982,9 @@ class UIScaling : public Hook
 
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				producerScope);
 			auto original = reinterpret_cast<GoalTimeHelperFn>(
-				Module::exe_ptr(helperRva));
+				Module::exe_ptr(HelperRva));
 			original();
 		}
 
@@ -994,7 +1001,7 @@ class UIScaling : public Hook
 			for (unsigned guard = 0; node && guard < 0x230; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+					node, producerScope);
 				++tagged;
 				if (node == tailAfter)
 					break;
@@ -1008,18 +1015,18 @@ class UIScaling : public Hook
 		const auto total = nodes.fetch_add(tagged, std::memory_order_relaxed) + tagged;
 		if ((call & (call - 1)) == 0)
 			spdlog::info(
-				"VR R66 GOAL TIME HUD: helper={} calls={} tagged={} totalTags={}",
-				label, call, tagged, total);
+				"VR R121 GOAL TIME HUD: shared producer-map rva=0x{:x} helper={} calls={} tagged={} totalTags={}",
+				CallerRva, label, call, tagged, total);
 	}
 
 	static void __cdecl GoalTime_Help020()
 	{
-		GoalTime_TagHelper(0xBE020, "BE020");
+		GoalTime_TagHelper<0x000BEA5Au, 0xBE020>("BE020");
 	}
 
 	static void __cdecl GoalTime_Help150()
 	{
-		GoalTime_TagHelper(0xBE150, "BE150");
+		GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>("BE150");
 	}
 
 	// R56 05-08/19: exact DispRank producer probe. The eight original-mod

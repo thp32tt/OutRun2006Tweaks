@@ -94,6 +94,10 @@ def main() -> None:
             "DispRank_putClipSprite<0x000B9F3Au>",
             "DispRank_putClipSprite<0x000BA052u>",
             "VR R120 DIRECT CLIP: shared producer-map",
+            "template<std::uintptr_t CallerRva, int HelperRva>",
+            "GoalTime_TagHelper<0x000BEA5Au, 0xBE020>",
+            "GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>",
+            "VR R121 GOAL TIME HUD: shared producer-map",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -105,6 +109,23 @@ def main() -> None:
         raise SystemExit(
             "F13 DispRank clip ownership regressed to legacy hardcoded callback"
         )
+    goal_start = hooks_text.find(
+        "template<std::uintptr_t CallerRva, int HelperRva>\n"
+        "\tstatic void GoalTime_TagHelper(const char* label)"
+    )
+    goal_end = hooks_text.find(
+        "static void __cdecl GoalTime_Help020", goal_start
+    )
+    if goal_start < 0 or goal_end < 0:
+        raise SystemExit("F13 GoalTime shared producer-map helper missing")
+    goal_body = hooks_text[goal_start:goal_end]
+    if "GameSemantic::ClassifyCriticalProducer(CallerRva)" not in goal_body:
+        raise SystemExit("F13 GoalTime helper no longer consumes shared producer map")
+    if "node, producerScope" not in goal_body:
+        raise SystemExit("F13 GoalTime node ownership no longer uses shared producer scope")
+    if 'GoalTime_TagHelper(0xBE020, "BE020")' in hooks_text or \
+       'GoalTime_TagHelper(0xBE150, "BE150")' in hooks_text:
+        raise SystemExit("F13 GoalTime ownership regressed to legacy unclassified helper")
     require(
         "tools/analyze_outrun_exe.py",
         [
