@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-a00245-p00133-index231-single-dds-isolation-v1",
+  "case_id": "P00133_A00245_EBE401C8",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00245",
+  "wave_id": "P00133",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-09-30T08:43:09+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "3310237189d2a78ccd5c40667bdf2e1fd28b6345",
+  "active": true,
+  "purpose": "Provide an exact single-DDS runtime-isolation input for the unchanged C156/Q00054 static-QA-passed EBE401C8 candidate without rerendering or repeating heavy QA. Runtime remains untested until a real game test.",
+  "asset": {
+    "id": "EBE401C8",
+    "queue_index": 231,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 4,
+    "preserve_source_physical_regions": 2
+  },
+  "source": {
+    "canonical_transport": "PINNED_V0.25.10A_RELEASE_OR_APPROVED_DRIVE_EXACT_PATH",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "bytes": 8388736,
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192
+    }
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "drive_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+    "archive_name": "A00235_INDEX231_CANDIDATE.zip",
+    "archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "archive_bytes": 45594,
+    "member": "EBE401C8_512x256.dds",
+    "sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+    "bytes": 8388736,
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_result_sha": "9bfd30c5e5ffd813962b96037ad19373fa116513",
+      "c_static_qa_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+      "c_gate_run_id": 36645535305,
+      "candidate_sha256_at_c156": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00235.json",
+    "independent_c_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00240.json",
+    "c156_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "header_128_exact": true,
+    "raw_orientation": "flip_y",
+    "changed_rgba_outside_localizable_source_regions": 0,
+    "alpha_changed_outside_localizable_source_regions": 0,
+    "introduced_alpha_outside_all_source_effect_regions": 0,
+    "one_pixel_overflow": 0,
+    "source_language_residue": "NONE_OBSERVED_IN_LOCALIZED_REGIONS",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping_overlap_box_escape": "NONE_OBSERVED",
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "source_candidate_from_drive_zip": {
+      "file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+      "archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+      "member": "EBE401C8_512x256.dds",
+      "member_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594"
+    },
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the EBE401C8 replacement DDS and confirm the affected online/LAN selector screen renders without a crash.",
+    "Capture readable/game-orientation evidence for all four localized regions and both preserved LAN occurrences.",
+    "Check FLIP_Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling and any 1-pixel overflow.",
+    "Confirm both LAN occurrences remain visually unchanged from the source behavior.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

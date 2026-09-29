@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-a-producer-single-dds-runtime-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00245",
+  "wave_id": "P00133",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-30T08:43:09+09:00",
+  "base_head_sha": "3310237189d2a78ccd5c40667bdf2e1fd28b6345",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+  "selection_reason": "Latest authoritative C156/Q00054 has no A-shard RENDER_READY or ONE_STAGE_TO_RENDER item. Existing candidate/rework evidence awaiting C is skipped. Index231 is already C156 STATIC_QA_PASS_RUNTIME_UNTESTED and lacks a single-DDS isolation manifest, so fallback step 3 is the highest material action that does not duplicate candidate production or heavy QA.",
+  "asset": {
+    "index": 231,
+    "asset_id": "EBE401C8",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "action": "localize_text",
+    "raw_orientation": "flip_y",
+    "semantics": [
+      "LAN -> LAN (preserve source; 2 physical occurrences)",
+      "ONLINE -> 온라인",
+      "Play OutRun Online with Friends or other players! -> 친구나 다른 플레이어와 온라인 아웃런을 즐기세요!",
+      "Join or Create a LAN game of OutRun! -> LAN 아웃런 게임에 참가하거나 만들어 보세요!"
+    ]
+  },
+  "authoritative_static_qa": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00240",
+    "result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+    "gate_run_id": 36645535305,
+    "disposition": "PASS",
+    "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "source_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "candidate_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+    "candidate_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "candidate_drive_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+    "candidate_member": "EBE401C8_512x256.dds",
+    "candidate_bytes": 8388736,
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "pitch": 8192,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "header_128_exact": true,
+      "raw_to_readable": "flip_y"
+    },
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "zero_pixel_summary": {
+      "changed_rgba_outside_localizable_source_regions": 0,
+      "alpha_changed_outside_localizable_source_regions": 0,
+      "changed_rgba_outside_all_source_effect_regions": 0,
+      "introduced_alpha_outside_all_source_effect_regions": 0,
+      "one_pixel_overflow": 0,
+      "preserve_lan_pixel_exact": "PASS_2_OF_2"
+    },
+    "visual_review": "PASS_FULL_ATLAS_AND_SIX_ELEMENT_COMPARISON"
+  },
+  "isolation_input": {
+    "manifest": "localization/validation/single_dds/P00133_A00245_EBE401C8.json",
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "candidate_drive_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+    "candidate_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "candidate_member_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594"
+  },
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "build_performed": false,
+  "vr_ffb_dx_changes": false
+}
