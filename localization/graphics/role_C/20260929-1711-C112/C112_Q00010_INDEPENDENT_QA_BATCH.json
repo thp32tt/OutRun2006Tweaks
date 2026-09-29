@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00099",
+  "wave_id": "Q00010",
+  "qa_batch_id": "Q00010",
+  "run": "C112",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T17:11:00+09:00",
+  "base_head_sha": "efe9956a68faa091fd4f24de51319233158924f1",
+  "result": "PASS_Q00010_FOUR_INPUTS_15_ASSETS_82_PREGEN_SCOPES_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Independent Q00010 batch accepted A00091/B00092/A00094/B00095 limited pre-generation extraction/work-order deliverables across 15 assets. Current canonical metadata matches 81 localizable pairs plus one preserved TOP semantic; arithmetic QA passes A91 12/12, B92 37/37, A94 15/15 and B95 17/17 localize scope formulas with required guards/block alignment. No Korean candidate DDS or CLEAN_PLATE was produced; index175 semantic binding and all decoded-final candidate gates remain fail-closed HOLD_STRICT_RECHECK. Runtime remains untested.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00091",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "962e0a9fcb9ce5c25b29467b557237f24567c6fb",
+      "producer_id": "P00026"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00092",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "2d415b6efc192c28ce2b3d28b2d5f8a3ef70edf4",
+      "producer_id": "P00027"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00094",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "1a4318f0eeea1b97f0eeb814d3b20a6a251d4240",
+      "producer_id": "P00028"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00095",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+      "producer_id": "P00029"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00091",
+      "result_sha": "962e0a9fcb9ce5c25b29467b557237f24567c6fb",
+      "status": "PASS",
+      "reason": "A00091 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 59/65/107/175. Q00008/C110 already accepted the unchanged A00084 exact Release source/payload lineage; current automation, generation-v2 and orientation-policy fingerprints still match. Current transcription/artwork-plan semantics match 11/11 canonical pairs. Independent arithmetic recheck passes 4/4 source size equations plus 12/12 payload formulas and exact 2px cell guards. Index 175 remains direct-inspection-only with semantic-to-sprite binding unresolved; no Korean candidate DDS or CLEAN_PLATE exists, so final candidate_safe_bbox and all candidate-only clipping/1px/DDS/alpha/orientation/style/source-comparison gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00092",
+      "result_sha": "2d415b6efc192c28ce2b3d28b2d5f8a3ef70edf4",
+      "status": "PASS",
+      "reason": "B00092 exact Release 32bpp extraction scopes accepted for indices 198/214/230/236. Reused B00066/C00071 source/mapping evidence and current canonical transcription/artwork-plan blobs are unchanged. Current semantics match 38/38 physical occurrences. Independent arithmetic recheck passes 4/4 linear-32 source size equations and 37/37 raw-coordinate/row-slice/file/canvas extraction formulas with zero overlap. Exact DDS header channel masks/mips, raw orientation, source full-effect masks/CLEAN_PLATE and all Korean-candidate gates remain HOLD_STRICT_RECHECK because no candidate bytes were produced."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00094",
+      "result_sha": "1a4318f0eeea1b97f0eeb814d3b20a6a251d4240",
+      "status": "PASS",
+      "reason": "A00094 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 55/101/119. The result record immutably pins material commit 58986ea6c4f040c6e988fec470ec060ea354b633; reused A00079/A00082/Q00007-C109 fingerprints are unchanged and current contract/generation-v2/orientation policy matches. Current canonical semantics match 14/14 unique pairs across 15 physical work units. Independent arithmetic recheck passes 3/3 source size equations and 15/15 payload scopes; the 13 index-101 guards are exact nonempty 2px insets, while the two BC3 bounds remain previously accepted upper bounds only. No source-effect masks, validated CLEAN_PLATE or Korean DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00095",
+      "result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+      "status": "PASS",
+      "reason": "B00095 first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 34/44/52/172. Reused B00080/Q00007-C109 source/payload acceptance fingerprints are unchanged and current contract/orientation policy matches. Current canonical data matches 18 localizable pairs plus preserved TOP; producer records 20 localizable physical semantic occurrences. Independent arithmetic recheck passes 4/4 source size equations, 17/17 localize work-order payload formulas, 17/17 exact 2px cell guards and 3/3 BC3 block-aligned scopes; the TOP preserve-original region remains excluded from editing. No Korean candidate DDS/CLEAN_PLATE exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "immutable_input_resolution": {
+    "A00091": {
+      "result_sha": "962e0a9fcb9ce5c25b29467b557237f24567c6fb",
+      "task_record_at_result_sha": false,
+      "evidence_at_result_sha": "localization/graphics/role_A/20260929-1635-A00091-P00026/A00091_P00026_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json",
+      "evidence_blob_sha": "81585293ceb17801b2b1f66fd6dbb6876adcda93"
+    },
+    "B00092": {
+      "result_sha": "2d415b6efc192c28ce2b3d28b2d5f8a3ef70edf4",
+      "task_record_at_result_sha": true,
+      "evidence_blob_sha": "ffb229fe0fc9c014987ca4c1f8c281b8b727d03b"
+    },
+    "A00094": {
+      "result_sha": "1a4318f0eeea1b97f0eeb814d3b20a6a251d4240",
+      "task_record_at_result_sha": true,
+      "material_commit_sha": "58986ea6c4f040c6e988fec470ec060ea354b633",
+      "evidence_blob_sha": "74dca6bfbd381506fa29778e07ea5df4d98fd5be"
+    },
+    "B00095": {
+      "result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+      "task_record_at_result_sha": true,
+      "evidence_blob_sha": "9f1157671946c4cf08ee95cb71998403287b5c96"
+    }
+  },
+  "heavy_qa_deduplication": {
+    "rule": "REUSE_IDENTICAL_SOURCE_CANDIDATE_CONTRACT_FINGERPRINTS",
+    "reused_acceptance": [
+      "Q00008/C110 A00084 exact Release payload/source acceptance",
+      "B00066/C00071 exact source/mapping acceptance",
+      "Q00007/C109 A00079+A00082 extraction/preflight acceptance",
+      "Q00007/C109 B00080 extraction acceptance"
+    ],
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "independent_checks": {
+    "A00091": {
+      "source_size_equations": "PASS_4_OF_4",
+      "payload_formulas": "PASS_12_OF_12",
+      "exact_two_px_cell_guards": "PASS_12_OF_12",
+      "canonical_pairs": "PASS_11_OF_11",
+      "index175_semantic_binding": "HOLD_STRICT_RECHECK"
+    },
+    "B00092": {
+      "source_size_equations": "PASS_4_OF_4",
+      "extraction_formulas": "PASS_37_OF_37",
+      "region_overlap_pairs": 0,
+      "canonical_physical_semantics": "PASS_38_OF_38",
+      "binary_header_orientation": "HOLD_STRICT_RECHECK"
+    },
+    "A00094": {
+      "source_size_equations": "PASS_3_OF_3",
+      "payload_scopes": "PASS_15_OF_15",
+      "index101_new_two_px_guards": "PASS_13_OF_13",
+      "canonical_unique_pairs": "PASS_14_OF_14",
+      "physical_work_units": 15
+    },
+    "B00095": {
+      "source_size_equations": "PASS_4_OF_4",
+      "localize_payload_formulas": "PASS_17_OF_17",
+      "exact_two_px_cell_guards": "PASS_17_OF_17",
+      "bc3_block_aligned": "PASS_3_OF_3",
+      "preserve_original_regions": 1,
+      "canonical_localize_pairs": "PASS_18_OF_18",
+      "physical_localizable_semantics": 20
+    }
+  },
+  "candidate_only_gates": {
+    "korean_candidate_dds": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "hangul_breakage_and_clipping": "HOLD_STRICT_RECHECK_NO_CANDIDATE_PIXELS",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "resolution_and_upscale": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "dds_format_mipmap_alpha_transparency": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "background_and_protected_artwork": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+    "clean_plate": "HOLD_STRICT_RECHECK_NOT_YET_MATERIALIZED"
+  },
+  "source_identity_validation": "PASS_REUSED_UNCHANGED_FINGERPRINTS__A84_C110__B66_C71__A79_A82_C109__B80_C109__CURRENT_CONTRACT_GENERATION_V2_ORIENTATION_EXACT",
+  "canonical_semantic_validation": "PASS_A91_11_OF_11__B92_38_OF_38_PHYSICAL__A94_14_OF_14_UNIQUE_15_PHYSICAL__B95_18_LOCALIZE_PLUS_1_PRESERVE_TOP",
+  "geometry_mapping_validation": "PASS_A91_4_OF_4_SIZE__12_OF_12_PAYLOAD_AND_2PX_GUARDS__B92_4_OF_4_SIZE__37_OF_37_EXTRACTIONS_ZERO_OVERLAP__A94_3_OF_3_SIZE__15_OF_15_PAYLOAD__13_OF_13_NEW_2PX_GUARDS__B95_4_OF_4_SIZE__17_OF_17_WORK_PAYLOADS__17_OF_17_2PX_GUARDS__3_OF_3_BC3_ALIGNED",
+  "current_contract_compatibility": "PASS_PREGEN_ONLY__NO_CANDIDATE_PROMOTION__A91_INDEX175_SEMANTIC_BINDING_HOLD__B92_BINARY_HEADER_ORIENTATION_HOLD__B95_TOP_PRESERVE_ORIGINAL__CELL_GUARDS_ARE_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00096",
+      "LOCALIZATION-LOCALIZATION_B-00097",
+      "LOCALIZATION-LOCALIZATION_A-00098",
+      "LOCALIZATION-LOCALIZATION_B-00100"
+    ],
+    "result": "NONE_AT_BASE_HEAD"
+  },
+  "shared_state_merge": {
+    "mode": "ONCE_AFTER_LATEST_HEAD_REFRESH",
+    "reviewed_indices": [
+      34,
+      44,
+      52,
+      55,
+      59,
+      65,
+      101,
+      107,
+      119,
+      172,
+      175,
+      198,
+      214,
+      230,
+      236
+    ],
+    "metadata_segments_changed": 0,
+    "queue_classification_changed": false,
+    "canonical_segments_after_merge": 753,
+    "actionable_queue_total": 137,
+    "localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 3,
+    "pending_production_localize_text": 76
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
