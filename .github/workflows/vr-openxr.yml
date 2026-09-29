@@ -751,6 +751,12 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-direct-ack-identity-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "DirectGPU ACK identity regression failed: $LASTEXITCODE" }
 
+      - name: Run SpriteNode semantic overflow regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-semantic-tag-overflow-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "semantic tag overflow regression failed: $LASTEXITCODE" }
+
       - name: Verify x64 R32 host binary
         shell: pwsh
         run: |

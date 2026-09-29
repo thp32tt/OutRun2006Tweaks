@@ -323,6 +323,10 @@ namespace OutRunVR::GameSemantic
     inline std::atomic<std::uint64_t> SpriteNodeSemanticRegistered{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticConsumed{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticStaleCleared{ 0 };
+    // F16: table pressure must never evict an already-published exact owner.
+    // Reject only the newest unique registration and expose the event so an
+    // abnormal producer burst is diagnosable without corrupting queued nodes.
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticOverflowRejected{ 0 };
     inline thread_local std::uint64_t SpriteQueueSemanticCutoff = 0;
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     inline thread_local unsigned SpriteQueueDepth = 0;
@@ -402,20 +406,15 @@ namespace OutRunVR::GameSemantic
             return;
         }
 
-        // This should never be hot: exact semantic producers are sparse.
-        // If a broken frame fills the table, replace the oldest entry rather
-        // than silently disabling semantic ownership for the rest of the run.
-        std::size_t oldest = 0;
-        for (std::size_t i = 1; i < SpriteNodeSemanticCount; ++i)
-            if (SpriteNodeSemanticTags[i].serial <
-                SpriteNodeSemanticTags[oldest].serial)
-                oldest = i;
-        SpriteNodeSemanticTags[oldest] =
-            { node, scope, serial,
-              projectedMarker ? *projectedMarker : ProjectedMarkerInfo{},
-              owner };
-        SpriteNodeSemanticRegistered.fetch_add(1, std::memory_order_relaxed);
-        SpriteNodeSemanticStaleCleared.fetch_add(1, std::memory_order_relaxed);
+        // F16 fail-closed overflow policy. Existing entries may describe
+        // SpriteNodes that are already queued for this render walk; evicting
+        // the oldest live entry can silently turn an exact HUD/world marker
+        // into generic overlay ownership. Preserve every published tag and
+        // reject only this newest unique registration. A later freed slot can
+        // accept the producer normally.
+        SpriteNodeSemanticOverflowRejected.fetch_add(
+            1, std::memory_order_relaxed);
+        return;
     }
 
     inline RenderScope ConsumeSpriteNodeScope(

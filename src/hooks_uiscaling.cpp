@@ -1476,6 +1476,7 @@ class VRHudQueueSemanticBridge : public Hook
 	inline static std::uint64_t LastRegistered = 0;
 	inline static std::uint64_t LastConsumed = 0;
 	inline static std::uint64_t LastStaleCleared = 0;
+	inline static std::uint64_t LastOverflowRejected = 0;
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
@@ -1499,17 +1500,24 @@ class VRHudQueueSemanticBridge : public Hook
 		const auto staleCleared =
 			OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
 				std::memory_order_relaxed);
+		const auto overflowRejected =
+			OutRunVR::GameSemantic::SpriteNodeSemanticOverflowRejected.load(
+				std::memory_order_relaxed);
 		if (registered != LastRegistered ||
 			consumed != LastConsumed ||
-			staleCleared != LastStaleCleared)
+			staleCleared != LastStaleCleared ||
+			overflowRejected != LastOverflowRejected)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} deltaRegistered={} deltaConsumed={}",
+				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} overflowRejected={} deltaRegistered={} deltaConsumed={} deltaOverflowRejected={}",
 				QueuePasses, registered, consumed, staleCleared,
-				registered - LastRegistered, consumed - LastConsumed);
+				overflowRejected,
+				registered - LastRegistered, consumed - LastConsumed,
+				overflowRejected - LastOverflowRejected);
 			LastRegistered = registered;
 			LastConsumed = consumed;
 			LastStaleCleared = staleCleared;
+			LastOverflowRejected = overflowRejected;
 		}
 	}
 

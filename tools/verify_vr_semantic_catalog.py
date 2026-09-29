@@ -114,6 +114,50 @@ def main() -> int:
                 f"R71 c64 exact-queue ownership contract missing marker: {marker}"
             )
 
+    # Set 04 F16: exact SpriteNode ownership must fail closed under abnormal
+    # table pressure. Never evict an already-published live tag to admit a
+    # newer producer; expose rejection telemetry and behavior-test recovery
+    # once capacity becomes available again.
+    for marker in (
+        "SpriteNodeSemanticOverflowRejected",
+        "Preserve every published tag",
+        "reject only this newest unique registration",
+    ):
+        if marker not in runtime_source:
+            raise AssertionError(
+                f"F16 fail-closed semantic overflow contract missing marker: {marker}"
+            )
+    if "std::size_t oldest = 0" in runtime_source:
+        raise AssertionError(
+            "F16 regression: full semantic table still replaces the oldest live tag"
+        )
+
+    cmake_source = (ROOT / "vrhost" / "CMakeLists.txt").read_text(encoding="utf-8")
+    workflow_source = (
+        ROOT / ".github" / "workflows" / "vr-openxr.yml"
+    ).read_text(encoding="utf-8")
+    overflow_smoke_source = (
+        ROOT / "vrhost" / "tests" / "semantic_tag_overflow_smoke.cpp"
+    ).read_text(encoding="utf-8")
+    for marker in (
+        "SpriteNodeSemanticCapacity",
+        "SpriteNodeSemanticOverflowRejected",
+        "ConsumeSpriteNodeScope(Node(0))",
+        "RenderScope::ScreenOverlay2D",
+        "RenderScope::ProjectedWorldMarker2D",
+    ):
+        if marker not in overflow_smoke_source:
+            raise AssertionError(
+                f"F16 semantic overflow behavior smoke missing marker: {marker}"
+            )
+    if "outrun-vr-semantic-tag-overflow-smoke" not in cmake_source:
+        raise AssertionError("F16 semantic overflow smoke is not in the host build graph")
+    if (
+        "Run SpriteNode semantic overflow regression" not in workflow_source
+        or "outrun-vr-semantic-tag-overflow-smoke.exe" not in workflow_source
+    ):
+        raise AssertionError("F16 semantic overflow smoke is not executed by OpenXR CI")
+
     renderer_source = OUTRUN_RENDERER.read_text(encoding="utf-8")
     if "OutRunVR::GameSemantic::EffectiveWvpUploadScope()" not in renderer_source:
         raise AssertionError(
