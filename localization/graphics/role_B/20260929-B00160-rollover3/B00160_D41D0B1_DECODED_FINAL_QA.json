@@ -1,0 +1,221 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-b00160-index112-dxt5-decoded-final-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+  "lane": "LOCALIZATION_B",
+  "asset_id": "D41D0B1",
+  "index": 112,
+  "recorded_at_kst": "2026-09-29T23:46:50+09:00",
+  "status": "PASS",
+  "result": "PASS_INDEX112_KOREAN_DXT5_CANDIDATE_DECODED_FINAL_STATIC_QA_RUNTIME_UNTESTED",
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "bytes": 524416,
+    "sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "width": 2048,
+    "height": 256,
+    "fourcc": "DXT5",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y"
+  },
+  "translation": {
+    "source": "Try to reach the goal with your girlfriend.",
+    "korean": "여자친구와 함께 골에 도착하세요.",
+    "lines": [
+      "여자친구와 함께",
+      "골에 도착하세요."
+    ]
+  },
+  "source_effect": {
+    "alpha_positive_pixels": 132035,
+    "bbox_readable_ltrb_exclusive": [
+      435,
+      19,
+      1357,
+      238
+    ],
+    "components_8": 7,
+    "component_summaries": [
+      {
+        "pixels": 50313,
+        "bbox": [
+          937,
+          19,
+          1357,
+          238
+        ]
+      },
+      {
+        "pixels": 19260,
+        "bbox": [
+          694,
+          19,
+          961,
+          117
+        ]
+      },
+      {
+        "pixels": 15424,
+        "bbox": [
+          530,
+          123,
+          726,
+          221
+        ]
+      },
+      {
+        "pixels": 15300,
+        "bbox": [
+          719,
+          142,
+          949,
+          238
+        ]
+      },
+      {
+        "pixels": 12123,
+        "bbox": [
+          435,
+          19,
+          591,
+          134
+        ]
+      },
+      {
+        "pixels": 11990,
+        "bbox": [
+          966,
+          19,
+          1126,
+          117
+        ]
+      },
+      {
+        "pixels": 7625,
+        "bbox": [
+          587,
+          24,
+          695,
+          117
+        ]
+      }
+    ]
+  },
+  "clean_plate": {
+    "method": "synchronous_4_neighbor_hidden_rgb_diffusion_round_nearest_from_immutable_alpha0",
+    "iterations_to_converge": 49,
+    "alpha_positive_after": 0,
+    "changed_pixels_outside_removal_mask": 0,
+    "lineage_correction": "B00155 mislabeled this 49-iteration lineage as 8-neighbor; B00160 explicitly locks and regenerates it as 4-neighbor, matching C128's independent 49-iteration reproduction."
+  },
+  "render": {
+    "font_identifier": "NotoSansCJK-Black.ttc#1",
+    "font_size_px": 71,
+    "source_slant_dx_per_dy": 0.2753623188405797,
+    "source_slant_angle_deg": 15.39554925399509,
+    "source_slant_direction": "right",
+    "candidate_slant_dx_per_dy": 0.2753623188405797,
+    "candidate_slant_angle_deg": 15.39554925399509,
+    "candidate_slant_direction": "right",
+    "signed_slant_gate": "PASS",
+    "precompression_bbox": [
+      641,
+      34,
+      1151,
+      222
+    ],
+    "decoded_final_bbox": [
+      641,
+      34,
+      1150,
+      222
+    ],
+    "candidate_safe_bbox": [
+      437,
+      21,
+      1354,
+      235
+    ],
+    "block_safe_bbox": [
+      440,
+      24,
+      1352,
+      232
+    ],
+    "line_records": [
+      {
+        "text": "여자친구와 함께",
+        "bbox": [
+          648,
+          34,
+          1144,
+          123
+        ],
+        "font_size": 71
+      },
+      {
+        "text": "골에 도착하세요.",
+        "bbox": [
+          641,
+          133,
+          1151,
+          222
+        ],
+        "font_size": 71
+      }
+    ]
+  },
+  "dds": {
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "candidate_dds_sha256": "9da81768a24f8417b1214532e666efb96ae15e6408a373ea5c4fcbe8f66670b9",
+    "bytes": 524416,
+    "header_128_exact": true,
+    "fourcc": "DXT5",
+    "mip_count": 1,
+    "block_strategy": "copy untouched blocks; alpha-zero source-only text blocks while preserving original color bytes; encode only Korean blocks",
+    "block_stats": {
+      "candidate_blocks": 5018,
+      "source_clear_blocks": 4487,
+      "copied_blocks": 23263
+    },
+    "decoded_final_bc3_mask_iou_vs_precompression": 0.9952155667816,
+    "precompression_alpha_positive_pixels": 74826,
+    "decoded_final_alpha_positive_pixels": 74468
+  },
+  "qa": {
+    "english_residue_pixels_outside_korean_block_safe_region": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_outside_source_region": 0,
+    "changed_pixels_in_effective_protected_mask": 0,
+    "decoded_final_containment": "PASS",
+    "source_vs_candidate_comparison": "PASS",
+    "orientation_gate": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "signed_slant_gate": "PASS"
+  },
+  "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+  "candidate_dds_sha256": "9da81768a24f8417b1214532e666efb96ae15e6408a373ea5c4fcbe8f66670b9",
+  "runtime_validation": "UNTESTED",
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_sha256": "1dac79987de347918d520aedb29923150c2c638d7d91cb966aac9bd6f3e11cc0",
+  "prompt_json_sha256": "cdaf5e811f3e7027d7a232e7bf08cd3bee194ddf95eeddece3cdbe6b06182331",
+  "signed_slant_gate": "PASS",
+  "changed_pixels_outside_source_region": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "introduced_alpha_outside_source_region": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "candidate_static_qa": "PASS_DECODED_FINAL_DXT5_PENDING_INDEPENDENT_C",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false
+}

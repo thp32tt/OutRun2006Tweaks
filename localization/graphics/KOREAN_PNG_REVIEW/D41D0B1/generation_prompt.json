@@ -1,0 +1,118 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "asset": {
+    "id": "D41D0B1",
+    "index": 112,
+    "canvas": [
+      2048,
+      256
+    ],
+    "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "source_git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "dds_format": "DXT5",
+    "mip_count": 1,
+    "source_text_transform": "flip_y"
+  },
+  "elements": [
+    {
+      "element_id": "index112_girlfriend_goal",
+      "source_text": "Try to reach the goal with your girlfriend.",
+      "approved_korean": "여자친구와 함께 골에 도착하세요.",
+      "line_breaks": [
+        "여자친구와 함께",
+        "골에 도착하세요."
+      ],
+      "source_bbox": [
+        435,
+        19,
+        1357,
+        238
+      ],
+      "permitted_region": [
+        437,
+        21,
+        1354,
+        235
+      ],
+      "candidate_safe_bbox": [
+        437,
+        21,
+        1354,
+        235
+      ],
+      "block_safe_bbox": [
+        440,
+        24,
+        1352,
+        232
+      ],
+      "safety_inset_px": 2,
+      "source_text_transform": "flip_y",
+      "display_transform": "raw_flip_y_to_readable",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_dx_per_dy": 0.2753623188405797,
+      "slant_angle_deg": 15.39554925399509,
+      "slant_direction": "right",
+      "style_traits": {
+        "fill": "opaque white",
+        "outline_shadow": "dark navy family",
+        "dominant_dark_rgba_examples": [
+          [
+            5,
+            15,
+            61,
+            255
+          ],
+          [
+            0,
+            12,
+            58,
+            255
+          ],
+          [
+            3,
+            13,
+            61,
+            255
+          ]
+        ],
+        "line_structure": "two centered lines",
+        "font_identifier": "NotoSansCJK-Black.ttc#1",
+        "font_size_px": 71,
+        "outline_px": 7,
+        "shadow_offset_px": [
+          4,
+          4
+        ],
+        "shadow_outer_px": 9
+      }
+    }
+  ],
+  "reconstruction": {
+    "source_effect_mask": "all exact canonical decoded alpha>0 pixels; 132035 pixels, seven text-owned components",
+    "method": "synchronous 4-neighbor hidden-RGB diffusion from immutable source alpha==0 pixels; round-nearest arithmetic mean; output alpha zero",
+    "iterations_to_converge": 49
+  },
+  "instructions": {
+    "positive": [
+      "EDIT, DO NOT REDESIGN. Exact HD source is authoritative.",
+      "Remove the complete English source text plus its own outline/shadow only.",
+      "Render only the approved Korean wording in the cleared region.",
+      "Match the measured right slant, white fill, dark navy effect hierarchy, two-line centered layout, raw flip_y orientation and transparency.",
+      "Keep all Korean effect pixels inside the conservative 2px-inset candidate_safe_bbox.",
+      "The result must look as though the Korean text was part of the original game artwork, not pasted on later."
+    ],
+    "negative": [
+      "No visible English residue; no cover rectangle, panel, blur patch or seam.",
+      "No crop, padding, resizing or aspect-ratio change.",
+      "No generic readability effect or invented decoration.",
+      "No modification outside the source effect region or effective protected mask.",
+      "No low-resolution reconstruction followed by upscale."
+    ],
+    "pre_output_check": "Verify no source-language text or effect remains; no cover box, patch, seam or invented panel exists; protected artwork is unchanged; Korean text is fully inside the permitted region and unclipped; canvas, orientation and transparency are unchanged."
+  },
+  "prompt_sha256": "1dac79987de347918d520aedb29923150c2c638d7d91cb966aac9bd6f3e11cc0"
+}
