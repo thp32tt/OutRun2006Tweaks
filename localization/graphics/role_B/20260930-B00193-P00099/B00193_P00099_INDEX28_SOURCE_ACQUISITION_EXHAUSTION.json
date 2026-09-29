@@ -1,0 +1,159 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00193",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00099",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T03:04:53+09:00",
+  "base_head_sha": "e2d69bfa1b17fa63bfdf6298dfe5f0cf90c1ec74",
+  "contract_precedence": "CURRENT_HEAD_SCHEMA13_OVERRIDES_STALE_EVEN_SHARD_PROMPT",
+  "shard_rule": "asset_queue.index % 3 == 1",
+  "latest_c_handoff": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00192",
+    "qa_batch_id": "Q00037",
+    "run": "C139",
+    "result_sha": "63cd2ed9068e542d257fca12885ee9a0784ca86b",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "already_rendered_static_qa_pass_indices": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "qa_pending_not_repeated": [
+      "LOCALIZATION-LOCALIZATION_B-00190 indices46/100/106"
+    ]
+  },
+  "readiness_audit": {
+    "direct_rework_required_runnable_indices": [],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "blocked_existing_rework_indices": [
+      94,
+      121
+    ],
+    "static_qa_pass_not_repeated": [
+      112,
+      130
+    ],
+    "other_lane_static_pass_not_stolen": [
+      99,
+      152,
+      237
+    ],
+    "prior_b_source_exhausted_not_repeated": [
+      34,
+      52,
+      46,
+      100,
+      106
+    ],
+    "selected_index": 28,
+    "selected_priority": "ONE_NEW_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN"
+  },
+  "asset": {
+    "index": 28,
+    "asset": "A05BF610",
+    "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+    "action": "localize_text",
+    "semantic_binding": [
+      {
+        "source": "Total Rank",
+        "korean": "종합 랭크",
+        "physical_occurrences": 1
+      }
+    ],
+    "raw_orientation_prior": "mirror-Y / flip_y from C-accepted preflight; exact canonical pixel work remains unavailable"
+  },
+  "canonical_inventory": {
+    "sha256": "ede0367228e0a97bbbdbc58f71c03ff0e044826e17fd7697b74d852aff7a3e64",
+    "width": 2047,
+    "height": 2048,
+    "mode": "RGBA",
+    "identity_source": "localization/graphics/inventory.csv",
+    "canonical_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "queue_blob_sha": "155d3a64d201b23154590cc3b2079ade989612c6",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df"
+  },
+  "source_acquisition": {
+    "policy_order": [
+      "GOOGLE_DRIVE_PER_FILE",
+      "PINNED_TAG_DIRECT_FILE",
+      "PINNED_RELEASE_BUNDLE"
+    ],
+    "google_drive": {
+      "link_name": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "load_folder_id": "1M_zaCiIOP1S7khgRynMLxc_iLCAMKfib",
+      "exact_parent": "spr_sprani_CLAR_RANK_Exst",
+      "result": "SOURCE_TRANSPORT_MISS",
+      "evidence": "Approved Drive textures/load direct children do not contain the exact parent folder; no historical-output search or filename guessing performed."
+    },
+    "pinned_tag_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "git_blob_sha": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+      "size_bytes": 16777344,
+      "decoded_header": {
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "pitch": 8192
+      },
+      "file_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+      "result": "SOURCE_IDENTITY_MISMATCH",
+      "mismatch": "Pinned direct source is 2048x2048 RGBA32 and SHA-256 52cb2a56..., while canonical inventory requires 2047x2048 RGBA SHA-256 ede03672...."
+    },
+    "pinned_release_bundle": {
+      "tag": "v0.25.10a",
+      "asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "asset_id": 306630789,
+      "verified_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "verified_member_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "verified_member_size_bytes": 16777344,
+      "verified_member_sha256": "52cb2a5697e9efc81de4c74fcb669b44e70503c4ea54e913023f10c424371129",
+      "verified_member_git_blob_sha": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+      "result": "SOURCE_IDENTITY_MISMATCH",
+      "reuse": "Bundle member is byte-identical to the immutable pinned-direct Release blob; no second pixel lineage is promoted."
+    },
+    "final_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+    "sticky_until": "canonical-source/inventory/source-policy fingerprint changes or explicit user instruction"
+  },
+  "production_readiness_before": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_REQUIRED",
+  "production_readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+  "candidate_dds_modified": false,
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_EXACT_CANONICAL_SOURCE_UNAVAILABLE",
+  "material_deliverable": {
+    "type": "B_MOD3_INDEX28_APPROVED_SOURCE_TIER_EXHAUSTION_MANIFEST",
+    "reviewed_indices": [
+      28
+    ],
+    "drive_exact_parent_misses": 1,
+    "pinned_direct_resolved": 1,
+    "pinned_release_bundle_verified": 1,
+    "canonical_identity_mismatches": 2,
+    "source_acquisition_exhausted": 1,
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false
+  },
+  "self_qa": "PASS_B_MOD3_INDEX28__FRESH_C139_ZERO_RUNNABLE_B_CANDIDATE_SCAN__ONE_PREFLIGHT_BATCH__DRIVE_EXACT_PARENT_MISS__PINNED_DIRECT_AND_RELEASE_MEMBER_BYTE_IDENTICAL__CANONICAL_2047x2048_VS_RELEASE_2048x2048_MISMATCH__NO_PIXEL_CONSTRUCTION_WITHOUT_EXACT_CANONICAL_SOURCE__NO_SHARED_STATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

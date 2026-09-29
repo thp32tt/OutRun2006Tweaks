@@ -1,0 +1,81 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00193",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00099",
+  "recorded_at_kst": "2026-09-30T03:04:53+09:00",
+  "base_head_sha": "e2d69bfa1b17fa63bfdf6298dfe5f0cf90c1ec74",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MOD3_INDEX28_SOURCE_TIER_EXHAUSTION_REPORT_AND_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX28_SOURCE_ACQUISITION_EXHAUSTED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Current HEAD schema13 overrides the stale even-shard prompt: B owns asset_queue.index % 3 == 1. Q00037/C139 proves no B-owned RENDER_READY or ONE_STAGE_TO_RENDER item; rendered STATIC_QA PASS candidates are not rerendered, unchanged reworks94/121 remain dependency-blocked, and B00190 indices46/100/106 are QA-pending and not repeated. The single allowed new preflight batch advances B-owned index28/A05BF610 through the approved source ladder. The approved ezflash557 Drive exact parent is absent. Immutable v0.25.10a direct and pinned Release bundle resolve to the same 2048x2048 RGBA32 bytes, while current canonical inventory requires 2047x2048 RGBA with a different SHA-256. Exact canonical source is therefore unavailable; candidate construction fails closed and the source-acquisition-exhausted outcome is sticky until its dependency fingerprint changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00193-P00099/B00193_P00099_INDEX28_SOURCE_ACQUISITION_EXHAUSTION.json"
+  ],
+  "material_deliverable": {
+    "type": "B_MOD3_INDEX28_APPROVED_SOURCE_TIER_EXHAUSTION_MANIFEST",
+    "reviewed_indices": [
+      28
+    ],
+    "drive_exact_parent_misses": 1,
+    "pinned_direct_resolved": 1,
+    "pinned_release_bundle_verified": 1,
+    "canonical_identity_mismatches": 2,
+    "source_acquisition_exhausted": 1,
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_indices": [
+      28
+    ],
+    "selected_priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "current_c_gate": "C139/Q00037",
+    "static_pass_not_repeated": [
+      112,
+      130
+    ],
+    "other_lane_static_pass_not_stolen": [
+      99,
+      152,
+      237
+    ],
+    "unchanged_blocked_existing_reworks": [
+      94,
+      121
+    ],
+    "prior_b_preflight_not_repeated": [
+      34,
+      52,
+      46,
+      100,
+      106
+    ],
+    "qa_pending_not_repeated": [
+      "B00190 indices46/100/106"
+    ],
+    "readiness_after": {
+      "28": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX28__FRESH_C139_ZERO_RUNNABLE_B_CANDIDATE_SCAN__ONE_PREFLIGHT_BATCH__DRIVE_EXACT_PARENT_MISS__PINNED_DIRECT_AND_RELEASE_MEMBER_BYTE_IDENTICAL__CANONICAL_2047x2048_VS_RELEASE_2048x2048_MISMATCH__NO_PIXEL_CONSTRUCTION_WITHOUT_EXACT_CANONICAL_SOURCE__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_EXACT_CANONICAL_SOURCE_UNAVAILABLE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
