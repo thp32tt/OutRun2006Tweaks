@@ -879,3 +879,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Heavy QA was not repeated because producer/source/candidate/evidence fingerprints did not change. No DDS bytes were modified.
 - Attempt 2 task record remains `AUTOMATION_VALIDATION=PENDING` until this C repair commit's single batch Gate completes. `RUNTIME_VALIDATION=UNTESTED`.
 
+
+### C105 Q00003 independent QA batch — 2026-09-29T14:47:33+09:00
+- Consumed exactly four immutable producer results: A00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2, A00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27, A00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0, B00066@380f4e237c9ceeb12923044f9192f4d9a5c96b8c. All four qa_dispositions = PASS for their reconstruction/mapping deliverables; none is superseded.
+- Validation: 195/195 existing canonical producer semantic pairs match; 200/200 reported x4 region/mapped-cell relations pass; 60/60 independently re-fetched upstream objects pass for A65/A67/B66; A61 4/4 lane source PNG blobs match and visual source checks are consistent.
+- Metadata reconciliation: E95DA5 gains two availability-message translations and FEF70E85 gains `REVERSED → 역방향`; canonical segments are now **753**. Queue classification counts do not change.
+- No Korean candidate DDS bytes were produced or rewritten. Candidate raster/DDS/alpha/compression/orientation/slant/protected-artwork and exact English-source-vs-Korean checks remain HOLD_STRICT_RECHECK; runtime remains UNTESTED.
+- Report: `localization/graphics/role_C/20260929-1447-C105/C105_Q00003_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

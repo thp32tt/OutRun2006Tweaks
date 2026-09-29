@@ -1340,3 +1340,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Heavy QA was not repeated because producer/source/candidate/evidence fingerprints did not change. No DDS bytes were modified.
 - Attempt 2 task record remains `AUTOMATION_VALIDATION=PENDING` until this C repair commit's single batch Gate completes. `RUNTIME_VALIDATION=UNTESTED`.
 
+
+### C105 Q00003 independent QA batch — 2026-09-29T14:47:33+09:00
+- Immutable inputs: A00061 `e989cdc5cafa9146054dc9fe6c8bd13efe08fab2`, A00065 `144838b1bf57c52f18cb924f1f8e7e5db1548a27`, A00067 `e2be75d74860d3794f02fc56f0d94d7e93f307e0`, B00066 `380f4e237c9ceeb12923044f9192f4d9a5c96b8c`.
+- qa_dispositions: all four producer inputs **PASS** as reconstruction/mapping deliverables. Current canonical pairs match **195/195**; reported exact-x4 region/mapped-cell relations pass **200/200**. A65/A67/B66 upstream object identities independently rechecked **60/60**; A61 lane ENGLISH_SOURCE blobs **4/4** match pinned originals and were visually inspected.
+- B00066 omission reconciliation: index 230 adds `You cannot buy this item yet → 아직 이 아이템을 구매할 수 없습니다` and `You already own this item → 이미 보유한 아이템입니다`; index 236 adds `REVERSED → 역방향`. Canonical transcription/artwork-plan segments **750 → 753** with asset count unchanged at 95.
+- No input or C changed Korean DDS bytes. Candidate-only Hangul/clipping/1px containment/DDS/mipmap/alpha/compression/orientation/slant/protected-artwork/source-vs-candidate gates remain **HOLD_STRICT_RECHECK**; new static artwork passes 0.
+- Supersession: none. Newer A00068/B00069/A00070 producer outputs are disjoint and were preserved. Actionable queue remains **137 = 94 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 2 preserve-only**, pending production localize_text 77. Canonical classification remains 95 localize_text / 33 preserve-brand-song-credit.
+- Shared state merged once. Report: `localization/graphics/role_C/20260929-1447-C105/C105_Q00003_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING` for this C batch Gate; `RUNTIME_VALIDATION=UNTESTED`. No N100/local clone, GPT Library, build, VR/FFB/DX work, or real-game test.

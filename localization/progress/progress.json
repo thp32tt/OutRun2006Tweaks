@@ -105,7 +105,7 @@
       "percent": 100,
       "transcribed_assets": 95,
       "localize_text_targets": 95,
-      "transcribed_segments": 750,
+      "transcribed_segments": 753,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -131,15 +131,15 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 95,
-      "translated_segments": 750,
+      "translated_segments": 753,
       "plan_file": "localization/graphics/artwork_plan.jsonl",
       "localize_text_targets": 95,
-      "transcribed_segments": 750,
+      "transcribed_segments": 753,
       "pending_plan_assets": 0,
       "pending_indices": []
     }
   },
-  "next_checkpoint": "Q00002 C104 consumed A00058@6e2d340cf2707382573bdff69a6c6d154f5fba65 and B00059@785a08e4a90e3345610bb850e6c486e17bf43553 independently. Exact upstream source identities pass 28/28; lane ENGLISH_SOURCE evidence blobs pass 7/7; current canonical translation/artwork-plan semantics pass 49/49. Accepted mapping evidence covers 35 physical occurrences: A 18 on indices 35/43/49 and B 17 on 198/228/230. Index 182 has 0 localizable segments and is reconciled to preserve-original. Neither input contains Korean candidate DDS bytes, so Hangul integrity, clipping, zero-pixel containment, candidate DDS format/mipmap/alpha/transparency, localized orientation, compression round-trip, protected-artwork comparison, and ENGLISH SOURCE vs KOREAN CANDIDATE remain HOLD_STRICT_RECHECK. No input is superseded at merge base 2579efe87a6f20d7a9c12c930dec122d125d04d8. Queue is 137 rows = 94 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 2 preserve-only; pending production localize_text 77; runtime UNTESTED.",
+  "next_checkpoint": "Q00003 C105 consumed immutable A00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2, A00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27, A00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0, and B00066@380f4e237c9ceeb12923044f9192f4d9a5c96b8c. Producer reconstruction/mapping evidence passes as metadata: 195/195 existing canonical semantic pairs match, 200/200 reported x4 geometry/mapped-cell relations pass, and B00066's three visually confirmed English omissions were reconciled to canonical Korean metadata. No input contains Korean candidate DDS bytes; Hangul raster/clipping, 1-pixel containment, candidate DDS format/mipmap/alpha/transparency, compression round-trip, final orientation/slant, protected-artwork/background, and ENGLISH SOURCE vs KOREAN CANDIDATE remain HOLD_STRICT_RECHECK. Current later producers A00068/B00069/A00070 are disjoint, so no input is superseded. Canonical assets remain 95 with 753 segments; actionable queue remains 137 rows = 94 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 2 preserve-only; pending production localize_text 77; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -169,7 +169,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 95,
-    "transcribed_segments": 750,
+    "transcribed_segments": 753,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -186,7 +186,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 95,
-    "artwork_plan_segments": 750,
+    "artwork_plan_segments": 753,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -644,29 +644,78 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_c_batch_qa": {
-      "run": "C104",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00063",
-      "wave_id": "Q00002",
-      "result": "PASS_Q00002_RECONSTRUCTION_MAPPING_EVIDENCE_7_ASSETS_49_SEGMENTS_35_OCCURRENCES_1_PRESERVE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
-      "reviewed_indices": [
-        35,
-        43,
-        49,
-        182,
-        198,
-        228,
-        230
+      "recorded_at_kst": "2026-09-29T14:47:33+09:00",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00071",
+      "qa_batch_id": "Q00003",
+      "run": "C105",
+      "result": "PASS_Q00003_RECONSTRUCTION_MAPPING_BATCH_16_ASSETS_195_PRODUCER_SEMANTICS_3_OMISSIONS_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
+      "base_head": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
+      "qa_batch_inputs": [
+        "LOCALIZATION-LOCALIZATION_A-00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+        "LOCALIZATION-LOCALIZATION_A-00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+        "LOCALIZATION-LOCALIZATION_A-00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+        "LOCALIZATION-LOCALIZATION_B-00066@380f4e237c9ceeb12923044f9192f4d9a5c96b8c"
       ],
-      "source_identity_validation": "PASS_28_OF_28_PLUS_7_OF_7_EVIDENCE",
-      "canonical_semantic_translation_match": "PASS_49_OF_49",
-      "physical_mapping_occurrences": 35,
-      "preserve_original_reclassified_indices": [
-        182
+      "reviewed_indices": [
+        137,
+        147,
+        159,
+        161,
+        163,
+        173,
+        193,
+        198,
+        201,
+        214,
+        217,
+        219,
+        225,
+        230,
+        236,
+        241
+      ],
+      "qa_dispositions": [
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00061",
+          "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+          "status": "PASS",
+          "reason": "A00061 reconstruction evidence accepted: current canonical semantics 8/8 match; 4/4 lane ENGLISH_SOURCE blobs match the pinned original PNG identities and were visually checked; 5/5 confirmed mapped cells preserve exact x4 geometry. Three unresolved labels remain fail-closed HOLD. No Korean candidate DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00065",
+          "result_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+          "status": "PASS",
+          "reason": "A00065 reconstruction input accepted: 20/20 immutable upstream Release/stock DDS/PNG/stock-atlas/4x-atlas identities independently match Sonic-TV/OR2006Sprites@a95efe01; 94/94 atlas regions are exact x4; 92 canonical semantic pairs match current transcription/artwork-plan state. Semantic-to-sprite and candidate-only gates remain HOLD."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00067",
+          "result_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+          "status": "PASS",
+          "reason": "A00067 reconstruction input accepted: 20/20 immutable upstream source objects independently match; 66/66 stock-to-4x region relations pass; 60/60 semantic pairs match current transcription/artwork-plan state. Semantic-to-sprite and exact source-effect/candidate gates remain HOLD."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00066",
+          "result_sha": "380f4e237c9ceeb12923044f9192f4d9a5c96b8c",
+          "status": "PASS",
+          "reason": "B00066 mapping input accepted: 20/20 immutable upstream source objects match, 35/35 existing canonical semantic-to-cell mappings and 35/35 mapped x4 cell relations pass. Three additional English source strings were correctly detected fail-closed; C reconciled them into canonical metadata only. No Korean candidate DDS exists, so candidate-only gates remain HOLD."
+        }
+      ],
+      "source_identity_validation": "PASS_A61_4_OF_4_LANE_ENGLISH_SOURCE_BLOBS_VISUAL_PLUS_A65_A67_B66_60_OF_60_EXACT_UPSTREAM_OBJECTS",
+      "canonical_semantic_validation": "PASS_195_OF_195_PRODUCER_CANONICAL_PAIRS_PLUS_3_SOURCE_OMISSIONS_RECONCILED",
+      "geometry_mapping_validation": "PASS_200_OF_200_REPORTED_X4_REGION_OR_MAPPED_CELL_RELATIONS",
+      "metadata_reconciled_segments": 3,
+      "canonical_transcribed_segments_after_merge": 753,
+      "superseded_inputs": [],
+      "newer_disjoint_producers": [
+        "LOCALIZATION-LOCALIZATION_A-00068",
+        "LOCALIZATION-LOCALIZATION_B-00069",
+        "LOCALIZATION-LOCALIZATION_A-00070"
       ],
       "candidate_dds_modified": false,
       "new_static_artwork_passes": 0,
-      "report": "localization/graphics/role_C/20260929-1350-C104/C104_Q00002_INDEPENDENT_QA_BATCH.json",
-      "runtime_validation": "UNTESTED"
+      "new_runtime_approvals": 0,
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_C/20260929-1447-C105/C105_Q00003_INDEPENDENT_QA_BATCH.json"
     }
   },
   "data_build": {
@@ -773,7 +822,7 @@
     "elements_total": 202,
     "elements_fail": 93,
     "direct_queue_scope": 126,
-    "pending_production_localize_text": 78,
+    "pending_production_localize_text": 77,
     "hold_strict_recheck_zoom_review": 0,
     "isolated_ingame_required": 4,
     "approved_lock_count": 0,

@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00071",
+  "lane": "LOCALIZATION_C",
+  "wave_id": "Q00003",
+  "run": "C105",
+  "attempt": "1/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:47:33+09:00",
+  "base_head_sha": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
+  "contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00061",
+      "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00065",
+      "result_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00067",
+      "result_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00066",
+      "result_sha": "380f4e237c9ceeb12923044f9192f4d9a5c96b8c"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00061",
+      "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+      "status": "PASS",
+      "reason": "A00061 reconstruction evidence accepted: current canonical semantics 8/8 match; 4/4 lane ENGLISH_SOURCE blobs match the pinned original PNG identities and were visually checked; 5/5 confirmed mapped cells preserve exact x4 geometry. Three unresolved labels remain fail-closed HOLD. No Korean candidate DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00065",
+      "result_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+      "status": "PASS",
+      "reason": "A00065 reconstruction input accepted: 20/20 immutable upstream Release/stock DDS/PNG/stock-atlas/4x-atlas identities independently match Sonic-TV/OR2006Sprites@a95efe01; 94/94 atlas regions are exact x4; 92 canonical semantic pairs match current transcription/artwork-plan state. Semantic-to-sprite and candidate-only gates remain HOLD."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00067",
+      "result_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+      "status": "PASS",
+      "reason": "A00067 reconstruction input accepted: 20/20 immutable upstream source objects independently match; 66/66 stock-to-4x region relations pass; 60/60 semantic pairs match current transcription/artwork-plan state. Semantic-to-sprite and exact source-effect/candidate gates remain HOLD."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00066",
+      "result_sha": "380f4e237c9ceeb12923044f9192f4d9a5c96b8c",
+      "status": "PASS",
+      "reason": "B00066 mapping input accepted: 20/20 immutable upstream source objects match, 35/35 existing canonical semantic-to-cell mappings and 35/35 mapped x4 cell relations pass. Three additional English source strings were correctly detected fail-closed; C reconciled them into canonical metadata only. No Korean candidate DDS exists, so candidate-only gates remain HOLD."
+    }
+  ],
+  "de_duplication": {
+    "unique_assets": 16,
+    "repeated_heavy_fingerprints_recomputed": 0,
+    "unchanged_candidate_heavy_qa_skipped": true,
+    "reason": "All four producer results contain reconstruction/mapping evidence only and modify no Korean DDS candidate bytes. Candidate-only checks were not redundantly rerun; unchanged/missing candidate gates remain HOLD_STRICT_RECHECK."
+  },
+  "independent_qa": {
+    "producer_existing_semantic_pairs": 195,
+    "producer_existing_semantic_pairs_matching_current_canonical": 195,
+    "reported_geometry_or_mapped_cell_x4_pairs_checked": 200,
+    "reported_geometry_or_mapped_cell_x4_pairs_pass": 200,
+    "exact_upstream_objects_independently_rechecked": {
+      "A00065": 20,
+      "A00067": 20,
+      "B00066": 20,
+      "total": 60
+    },
+    "A00061_lane_english_source_blobs": {
+      "checked": 4,
+      "pass": 4,
+      "visually_reviewed": true
+    },
+    "B00066_visual_source_omissions": {
+      "checked": 3,
+      "pass": 3
+    },
+    "superseded_inputs": [],
+    "later_disjoint_producers": [
+      "A00068 indices 175/205/227/231",
+      "B00069 indices 130/140/154/164",
+      "A00070 indices 209/237"
+    ]
+  },
+  "canonical_metadata_reconciliation": {
+    "transcribed_assets": 95,
+    "segments_before": 750,
+    "segments_after": 753,
+    "additions": [
+      {
+        "index": 230,
+        "asset": "E95DA5",
+        "source": "You cannot buy this item yet",
+        "korean": "아직 이 아이템을 구매할 수 없습니다",
+        "source_sprite": "sprite_394"
+      },
+      {
+        "index": 230,
+        "asset": "E95DA5",
+        "source": "You already own this item",
+        "korean": "이미 보유한 아이템입니다",
+        "source_sprite": "sprite_395"
+      },
+      {
+        "index": 236,
+        "asset": "FEF70E85",
+        "source": "REVERSED",
+        "korean": "역방향",
+        "source_sprite": "sprite_626"
+      }
+    ],
+    "actionable_queue_counts_unchanged": {
+      "rows": 137,
+      "localize_text": 94,
+      "zoom_review": 31,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_only": 2,
+      "pending_production_localize_text": 77
+    },
+    "canonical_classification_counts_preserved": {
+      "localize_text": 95,
+      "preserve_brand_song_credit": 33
+    },
+    "progress_compatibility_mirror_identical": true
+  },
+  "candidate_gate": {
+    "candidate_dds_modified_by_inputs": false,
+    "candidate_dds_modified_by_c": false,
+    "hangul_glyph_integrity": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "clipping_and_one_pixel_containment": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "dds_format_mipmap_alpha_transparency": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "compression_roundtrip": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "raw_readable_orientation_signed_slant": "HOLD_STRICT_RECHECK_EXACT_HD_PER_ELEMENT",
+    "protected_artwork_background": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "new_static_artwork_passes": 0
+  },
+  "shared_state_merge_once": true,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_Q00003_RECONSTRUCTION_MAPPING_BATCH_16_ASSETS_195_PRODUCER_SEMANTICS_3_OMISSIONS_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
