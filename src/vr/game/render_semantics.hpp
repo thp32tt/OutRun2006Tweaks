@@ -213,6 +213,11 @@ namespace OutRunVR::GameSemantic
         return scope == RenderScope::ScreenOverlay2D;
     }
 
+    inline bool CorroboratesProjectedScreenEffect(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ProjectedScreenEffect2D;
+    }
+
     inline bool CorroboratesHud(RenderScope scope) noexcept
     {
         // ScreenOverlay2D is intentionally NOT a finite/world-locked HUD.
