@@ -53,7 +53,7 @@
     "unrelated_preflight_stopped_after_ready_discovery": true
   },
   "self_qa": "PASS_EVEN_INDEX130__EXACT_CANONICAL_SOURCE__FULL_RGBA_EFFECT_MASK_INCLUDING_HIDDEN_RGB__TRANSPARENT_CLEAN_PLATE__2PX_SAFE_BBOX__FIVE_KOREAN_ELEMENTS__ZERO_OUTSIDE_ALLOWED__ZERO_ALPHA_OUTSIDE_ALLOWED__HEADER_EXACT__NUMERIC_MARKER_EXACT__FLIP_Y",
-  "candidate_static_qa": "PASS_MACHINE_DECODED_FINAL_PENDING_EXACT_GITHUB_VISUAL_AND_INDEPENDENT_C",
+  "candidate_static_qa": "PASS_MACHINE_AND_EXACT_GITHUB_VISUAL_PENDING_INDEPENDENT_C",
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "candidate_dds_modified": true,
@@ -70,5 +70,33 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "chat_rollover": 1,
+  "rollover1_visual_review": {
+    "reviewed_at_kst": "2026-09-30T01:29:00+09:00",
+    "reviewed_exact_git_result_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
+    "status": "PASS",
+    "evidence": [
+      "localization/graphics/KOREAN_PNG_REVIEW/1762489B/comparison.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/1762489B/text_region_nn2x.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/1762489B/candidate_display.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/1762489B/alpha_comparison.png"
+    ],
+    "checks": {
+      "exact_english_source_vs_korean_candidate": "PASS",
+      "clean_plate_visible_english_residue": "PASS_NONE_VISIBLE",
+      "korean_legibility": "PASS_MIX1_MIX2_OUTRUN2_OUTRUN2SP_AVERAGE_RANK",
+      "source_fill_and_weight_consistency": "PASS_VISUAL",
+      "clipping_overlap_or_box_escape": "PASS_NONE_VISIBLE",
+      "seam_black_line_or_opaque_box": "PASS_NONE_VISIBLE",
+      "protected_numeric_rank_marker": "PASS_UNCHANGED_VISIBLE",
+      "alpha_transparency_visual": "PASS_NO_VISIBLE_HALO_OR_BACKGROUND_DAMAGE",
+      "orientation": "PASS_FLIP_Y_READABLE"
+    },
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "independent_c_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "note": "Exact PNG blobs were fetched from the immutable producer result commit and reviewed at native/2x readable scale. This rollover adds review bookkeeping only; e57374e3 remains the authoritative producer result SHA."
+  }
 }
