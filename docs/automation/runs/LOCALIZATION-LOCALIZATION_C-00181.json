@@ -153,7 +153,7 @@
   "google_drive_write_performed": false,
   "uploaded_archive_used": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "failed_gate_repair": {
@@ -163,5 +163,16 @@
     "failed_step": "Verify exact producer SHAs in C batch",
     "cause": "Three PASS dispositions referenced immutable producer SHAs that fail the current verify_automation_commit.py PASS-report contract; dispositions changed to REWORK_REQUIRED without changing candidate bytes.",
     "repair_mode": "FAIL_CLOSED_EXACT_RESULT_SHA_NO_SUBSTITUTION"
-  }
+  },
+  "validation_bearing_result_sha": "9bedc8756d9e1842d4882352c4160dce8d00ed2f",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36601503931,
+    "run_attempt": 1,
+    "head_sha": "9bedc8756d9e1842d4882352c4160dce8d00ed2f",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T01:58:19+09:00"
+  },
+  "bookkeeping_note": "Gate result recorded after the validation-bearing repaired C result commit; this checkpoint is not the batch validation owner. Earlier result 09aa0d54... failed exact-producer-SHA validation and is superseded by 9bedc875...."
 }
