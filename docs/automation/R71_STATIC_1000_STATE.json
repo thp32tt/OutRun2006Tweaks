@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 34,
+  "completedCycles": 35,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "098061f0752181586d4a20cf01fe346b6dc8bca8",
+  "currentHead": "6967e7b81b337da982d3c8c862a8028f1039d3cf",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1024,12 +1024,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "inspect HUD/menu translucency without semantic widening"
+    },
+    {
+      "cycle": 35,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Current R30 screen-space classifier explicitly refuses alpha/Z/cull/shader-shape heuristics for HUD ownership. The reported translucent HUD/menu therefore cannot justify restoring those removed heuristics. Preserve exact producer semantics and collect blend/material evidence at the owned draw boundary."
+      ],
+      "evidence": [
+        "R30ClassifyScreenSpacePass R48 policy comment and exact semantic gates"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "6967e7b81b337da982d3c8c862a8028f1039d3cf"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect checkpoint/result double producer lifetime"
     }
   ],
   "nextCycle": {
-    "cycle": 35,
+    "cycle": 36,
     "priority": [
-      "inspect HUD/menu translucency without semantic widening"
+      "inspect checkpoint/result double producer lifetime"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
