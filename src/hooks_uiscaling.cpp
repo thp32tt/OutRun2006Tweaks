@@ -608,6 +608,20 @@ class UIScaling : public Hook
 		int xstnum, int x, int y, std::uint32_t flags,
 		float priority, std::uint32_t color)
 	{
+		const std::uint32_t callRva = R70ExeCallRva(_ReturnAddress());
+		if (callRva == 0x97BB7 || callRva == 0x97DA7)
+		{
+			// R73 runtime evidence: the exact result clip edge is followed by
+			// generic 0x28E81 / 0x2D26C time/progress sprites that otherwise
+			// remain UNKNOWN and head-locked. Keep a bounded result-only window.
+			OutRunVR::GameSemantic::ArmTransientOutRunHudFrames(900);
+			static std::atomic<bool> firstResultWindowLogged{ false };
+			if (!firstResultWindowLogged.exchange(true))
+				spdlog::info(
+					"VR R73 OUTRUN RESULT HUD: exact 0x{:X} armed 900-frame companion window",
+					callRva);
+		}
+
 		int prio = int(priority);
 		prio = prio < 0 ? 0 :
 			(prio >= Game::SpritePriorityCount
