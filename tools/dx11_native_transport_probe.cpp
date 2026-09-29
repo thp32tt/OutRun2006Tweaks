@@ -11,6 +11,7 @@
 
 namespace
 {
+    using outrun::vr::dx11::NativeSharedEyePublication;
     using outrun::vr::dx11::NativeSharedEyeRing;
     using outrun::vr::dx11::SharedEyeSlotState;
     using OutRunVR::Core::FrameAck;
@@ -170,6 +171,24 @@ int main()
     require(ring.slot_state(slot) == SharedEyeSlotState::Published,
             "completed EVENT publishes slot");
 
+    NativeSharedEyePublication publication{};
+    require(ring.snapshot_published_frame(slot, 5, publication),
+            "published frame must produce exact handoff snapshot");
+    require(publication.identity == generationB &&
+            publication.slot == slot &&
+            publication.frame_id == 5 &&
+            publication.left_handle == ring.shared_handle(slot, 0) &&
+            publication.right_handle == ring.shared_handle(slot, 1) &&
+            publication.width == 64 &&
+            publication.height == 64 &&
+            publication.format == DXGI_FORMAT_R8G8B8A8_UNORM,
+            "published handoff snapshot identity and resources");
+    require(ring.validate_publication_snapshot(publication),
+            "fresh published handoff snapshot validates");
+    NativeSharedEyePublication wrongFramePublication{};
+    require(!ring.snapshot_published_frame(slot, 4, wrongFramePublication),
+            "wrong frame cannot snapshot published handles");
+
     auto staleGenerationAck = make_ack(generationA, slot, 5);
     require(!ring.retire_acknowledged(staleGenerationAck) &&
             ring.slot_state(slot) == SharedEyeSlotState::Published,
@@ -191,6 +210,8 @@ int main()
             ring.slot_state(slot) == SharedEyeSlotState::Free &&
             ring.slot_frame_id(slot) == 0,
             "exact identity/frame ACK retires publication");
+    require(!ring.validate_publication_snapshot(publication),
+            "ACK retirement invalidates published handoff snapshot");
 
     slot = 99;
     require(ring.try_acquire_slot(d3d.context, 9, nullptr, slot),
@@ -209,10 +230,17 @@ int main()
     require(ring.signal_producer_fence(d3d.context, slot, 12),
             "signal invalidation candidate EVENT");
     publish_bounded(ring, d3d.context, slot, 12);
+    NativeSharedEyePublication invalidationPublication{};
+    require(ring.snapshot_published_frame(
+                slot, 12, invalidationPublication) &&
+            ring.validate_publication_snapshot(invalidationPublication),
+            "pre-invalidation published snapshot must validate");
     auto generationBAck = make_ack(generationB, slot, 12);
     ring.invalidate_lifetime();
     require(!ring.activation_ready(),
             "lifetime invalidation disables activation");
+    require(!ring.validate_publication_snapshot(invalidationPublication),
+            "lifetime invalidation rejects stale handoff snapshot");
     require(!ring.retire_acknowledged(generationBAck) &&
             ring.slot_state(slot) == SharedEyeSlotState::Published,
             "invalidated lifetime cannot manufacture retirement");
@@ -237,5 +265,6 @@ int main()
     d3d.device->Release();
 
     std::cout << "DX11 native shared-eye transport behavior R116: PASS\n";
+    std::cout << "DX11 native shared-eye publication handoff R118: PASS\n";
     return 0;
 }
