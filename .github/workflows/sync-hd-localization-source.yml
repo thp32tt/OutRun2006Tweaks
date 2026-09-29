@@ -56,6 +56,23 @@ jobs:
             printf '%s  %s\n' "$expected" "$dest" | sha256sum --check --strict
           done < /tmp/hd_sources.txt
 
+          # Exact-HD preflight source for pending queue index 89 (Game Over).
+          PRE_REL="spr_sprani_route_cvt_Exst/43B07A77_512x64.dds"
+          PRE_DEST="$DEST_ROOT/$PRE_REL"
+          PRE_BLOB="ca95f45529f841405c89bf0c00be25abcc0b5802"
+          mkdir -p "$(dirname "$PRE_DEST")"
+          curl --fail --location --retry 4 --retry-delay 2 \
+            "https://raw.githubusercontent.com/$SOURCE_REPO/$SOURCE_COMMIT/Release/$PRE_REL" -o "$PRE_DEST"
+          test "$(git hash-object "$PRE_DEST")" = "$PRE_BLOB"
+
+          python -m pip install --disable-pip-version-check pillow
+          python tools/localization/extract_hd_source_preflight.py \
+            --source-dds "$PRE_DEST" \
+            --output-dir "KOREAN_PNG_REVIEW/43B07A77" \
+            --asset-id "43B07A77" \
+            --git-blob-sha "$PRE_BLOB" \
+            --cell 0 8 1496 248
+
           mkdir -p "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
           printf '%s\n' \
             '{' \
@@ -75,7 +92,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
+          git add localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a KOREAN_PNG_REVIEW/43B07A77
           if git diff --cached --quiet; then
             echo "HD source already synchronized."
             exit 0
