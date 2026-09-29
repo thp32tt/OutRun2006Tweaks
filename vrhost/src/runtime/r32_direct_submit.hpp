@@ -188,6 +188,18 @@ namespace OutRunVrR32DirectSubmit
                 ++AckCompleted;
                 continue;
             }
+            if (!OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    pending.frame))
+            {
+                // A new game process has claimed Frame.v2. This completed fence
+                // belongs to an old producer run and must not rewrite the ACK
+                // mapping or remain as an infinite retry owner.
+                pending.armed = false;
+                pending.flushIssued = false;
+                pending.frame = {};
+                ++AckCompleted;
+                continue;
+            }
             if (!OutRunVrD3D9ExDirectPassthrough::PublishCompletedFrame(
                     pending.frame))
             {
