@@ -261,12 +261,21 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "Candidate is new and therefore receives one full independent C heavy QA. Previously accepted B00223 source identity is cross-checked against the same exact source fingerprint rather than redundantly reacquired from another transport.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_gate": null,
-  "bookkeeping_note": "This C result commit is the sole Q00053 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+  "result_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+  "authoritative_result_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+  "validation_bearing_result_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36643892797,
+    "run_attempt": 1,
+    "head_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T08:12:18+09:00"
+  },
+  "bookkeeping_note": "Q00053 authoritative Gate PASS is owned by validation-bearing result cf375f6695e2d933c420002a6476f1c081b29b75. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:13:59.714+09:00"
 }
