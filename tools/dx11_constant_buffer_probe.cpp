@@ -820,7 +820,9 @@ int main()
         !managedShadow.shadow_valid() &&
         !managedShadow.mirror_ready() &&
         managedShadow.shadow_version() == 0 &&
-        managedShadow.device_generation() == 1 &&
+        managedShadow.device_generation() == 1,
+        "R102 managed shadow shutdown resets storage and lifetime");
+    require(
         managedShadow.mirror_device() == nullptr &&
         managedShadow.mirror_texture() == nullptr &&
         managedShadow.mirror_srv() == nullptr,
