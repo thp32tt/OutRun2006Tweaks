@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "asset_id": "43B07A77",
+  "queue_index": 89,
+  "queue_path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+  "source_text": "Game Over",
+  "korean": "게임 오버",
+  "exact_hd_source": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+    "git_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+    "sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "width": 2048,
+    "height": 256,
+    "fourcc": "00000000",
+    "rgb_bits": 32,
+    "mips": 1,
+    "masks": {
+      "r": 255,
+      "g": 65280,
+      "b": 16711680,
+      "a": 4278190080
+    }
+  },
+  "display_geometry": {
+    "raw_to_display": "flip_y",
+    "source_full_effect_bbox": [
+      1,
+      13,
+      1494,
+      251
+    ],
+    "sprite_cell": [
+      0,
+      0,
+      1496,
+      248
+    ],
+    "candidate_permitted_region": [
+      1,
+      13,
+      1494,
+      248
+    ],
+    "source_fringe_below_cell_px": 3,
+    "baseline_vector": [
+      1,
+      0
+    ],
+    "slant_dx_per_dy": 0.35,
+    "slant_angle_deg": 19.29,
+    "slant_direction": "right"
+  },
+  "render_recipe": {
+    "coordinate_space": "readable display space first; flip_y once after lettering/effects are complete",
+    "clean_plate": "clear exact nonzero-alpha Game Over/effect pixels to transparent only; preserve every unmasked pixel and hidden padding",
+    "fill": "source-matched pale cyan/white upper to saturated blue lower vertical gradient",
+    "layers": [
+      "gradient fill",
+      "thin white inner highlight",
+      "dark charcoal/black outline",
+      "muted mauve/pink outer outline/shadow"
+    ],
+    "alignment": "one line centered within original source visual span",
+    "fit_order": [
+      "source-faithful spacing",
+      "source-faithful one-line layout",
+      "modest font reduction",
+      "horizontal scale reduction preserving right-slant sign"
+    ],
+    "reject": [
+      "English/effect residue",
+      "cover panel/box",
+      "opposite slant sign",
+      "candidate pixel below y=247",
+      "pixel outside source edit mask",
+      "DDS header/format/mip/orientation change"
+    ]
+  },
+  "final_qa_requirements": {
+    "localized_bbox_must_be_within": [
+      1,
+      13,
+      1494,
+      248
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "raw_orientation": "flip_y round-trip required",
+    "signed_slant_direction": "right",
+    "english_source_vs_korean_candidate_same_crop": true,
+    "runtime_validation": "UNTESTED until user final integrated game test"
+  },
+  "source_evidence": {
+    "source_display_path": "KOREAN_PNG_REVIEW/43B07A77/source_display.png",
+    "source_display_blob_sha": "4722f8e55830ce807caa1e2ce8cca2e83ae2c2fd",
+    "preflight_metrics_path": "KOREAN_PNG_REVIEW/43B07A77/preflight_metrics.json",
+    "preflight_metrics_blob_sha": "0d55eb9d47b96433b65b10c700e74ebe99057537"
+  }
+}

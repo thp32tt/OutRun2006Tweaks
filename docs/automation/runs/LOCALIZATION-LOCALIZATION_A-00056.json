@@ -3,14 +3,14 @@
   "task_id": "LOCALIZATION-LOCALIZATION_A-00056",
   "lane": "LOCALIZATION_A",
   "target_branch": "korean-localization-clean",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "wave_id": "W00018",
-  "recorded_at_kst": "2026-09-29T08:33:37+09:00",
+  "recorded_at_kst": "2026-09-29T11:19:29+09:00",
   "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
   "material_commit_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
   "final_precommit_head_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
-  "preserved_peer_head": false,
-  "result": "PASS_ATTEMPT2_CI_ROOT_CAUSE_REMEDIATED_AND_2_ODD_ASSET_CELL_MAPPING_ADVANCED",
+  "preserved_peer_head": true,
+  "result": "PASS_ATTEMPT3_FAILURE_ROOT_CAUSE_FIXED_AND_43B07A77_GENERATION_SPEC_ADVANCED",
   "material_deliverable": {
     "indices": [
       65,
@@ -35,8 +35,7 @@
     "fallback_ladder_step": 4
   },
   "touched_assets": [
-    "EBEF6D20",
-    "841E796B"
+    "43B07A77"
   ],
   "dependency_blocked_rework_indices": [
     51,
@@ -44,7 +43,7 @@
     111,
     121
   ],
-  "fail_closed_reason": "No exact-HD glyph/effect pixel masks or new Korean raster were emitted in retry. Per-element 1px containment and DDS/alpha/orientation remain HOLD_STRICT_RECHECK until exact Release DDS pixels are decoded and measured.",
+  "fail_closed_reason": "No Korean raster/DDS is emitted until the materialized strict prompt is rendered and its full alpha/effect bbox proves zero-pixel containment inside [1,13,1494,248].",
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "runtime_test_performed": false,
@@ -55,7 +54,7 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
   "runtime_validation": "UNTESTED",
-  "retry_parent_head_sha": "a6d4c9fb716eff955f7c59b810d0333db24aa0b2",
+  "retry_parent_head_sha": "bbe1202f2f59d23409d5baaf0c4ce9c29856a75d",
   "failure_context": {
     "failed_run_id": 36498038890,
     "failed_head_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
@@ -86,8 +85,28 @@
     "fallback_ladder_step": 4
   },
   "touched_elements": [
-    "EBEF6D20:sprite_11",
-    "EBEF6D20:sprite_12",
-    "841E796B:sprite_516"
-  ]
+    "43B07A77:Game Over -> 게임 오버"
+  ],
+  "failure_context_attempt3": {
+    "exact_failed_run_id": 36498722878,
+    "failed_head_sha": "84c9c4ef1f72dbec8e975363e4ecd061cb3eac52",
+    "failed_step": "Verify changed localization payload structure",
+    "exact_error": "SyntaxError: unexpected character after line continuation character in tools/localization/verify_automation_commit.py",
+    "root_cause": "literal escaped newline sequences were embedded in Python source",
+    "fixed_by_commit": "1ba2c36a9374419804909e7f6cfc623e9446c357",
+    "current_verifier_blob_sha": "c96f50960ebe0148cf8d5c0dcb64788db2089943",
+    "same_failure_repeated": false
+  },
+  "material_deliverable_attempt3": {
+    "queue_index": 89,
+    "asset": "43B07A77",
+    "type": "EXACT_HD_EXECUTABLE_GENERATION_SPEC_AND_MATERIALIZED_STRICT_PROMPT",
+    "report": "localization/graphics/role_A/20260929-1119-A00056-R3/A00056_ATTEMPT3_REPORT.json",
+    "spec": "localization/graphics/role_A/20260929-1119-A00056-R3/A00056_43B07A77_GENERATION_SPEC.json",
+    "prompt": "localization/graphics/role_A/20260929-1119-A00056-R3/A00056_43B07A77_STRICT_PROMPT.json",
+    "prompt_sha256": "1c3b3784bf33f645e11ae04750c955606d4d40a35939a7cf5b780c32a08f63cf",
+    "prompt_json_sha256": "34bed61d0b3b9fef80c7734975b2b60ae5ce333133e99b45a1229a5ca9355a43",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  }
 }

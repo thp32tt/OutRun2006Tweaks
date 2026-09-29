@@ -1,0 +1,96 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00056",
+  "wave_id": "W00018",
+  "lane": "LOCALIZATION_A",
+  "attempt": "3/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T11:19:29+09:00",
+  "precommit_head_sha": "bbe1202f2f59d23409d5baaf0c4ce9c29856a75d",
+  "precommit_head_message": "localization(B): repair W00018 automation retry [AUTO:LOCALIZATION-LOCALIZATION_B-00057]",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "queue_blob_sha": "fdce9105501da896cf97a4dfdc09c3fa009b75c9",
+  "selected_queue_row": "89,textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,W00015 A00047+C100 reconstruction input: Game Over -> 게임 오버; exact HD 2048x256 blob/4x atlas pinned; exact decoded HD bbox plus raw-orientation reconciliation required because stock-readable vs historical mirror-X evidence conflicts; no Korean HD DDS bytes; HOLD_STRICT_RECHECK; runtime UNTESTED",
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "failure_context": {
+    "exact_failed_run_id": 36498722878,
+    "failed_head_sha": "84c9c4ef1f72dbec8e975363e4ecd061cb3eac52",
+    "failed_step": "Verify changed localization payload structure",
+    "exact_error": "SyntaxError: unexpected character after line continuation character in tools/localization/verify_automation_commit.py",
+    "root_cause": "literal escaped newline sequences were embedded in Python source",
+    "fixed_by_commit": "1ba2c36a9374419804909e7f6cfc623e9446c357",
+    "current_verifier_blob_sha": "c96f50960ebe0148cf8d5c0dcb64788db2089943",
+    "same_failure_repeated": false
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "asset_id": "43B07A77",
+    "queue_index": 89,
+    "type": "EXACT_HD_EXECUTABLE_GENERATION_SPEC_AND_MATERIALIZED_STRICT_PROMPT",
+    "spec": "localization/graphics/role_A/20260929-1119-A00056-R3/A00056_43B07A77_GENERATION_SPEC.json",
+    "prompt": "localization/graphics/role_A/20260929-1119-A00056-R3/A00056_43B07A77_STRICT_PROMPT.json",
+    "prompt_contract": "outrun-first-pass-edit-v1",
+    "prompt_sha256": "1c3b3784bf33f645e11ae04750c955606d4d40a35939a7cf5b780c32a08f63cf",
+    "prompt_json_sha256": "34bed61d0b3b9fef80c7734975b2b60ae5ce333133e99b45a1229a5ca9355a43",
+    "improvement": "Prior state stopped at exact-HD orientation/slant resolution. This attempt adds an executable text-only clean-generation recipe with source/intersection bounds, signed slant, DDS metadata, preservation rules and deterministic zero-pixel QA targets."
+  },
+  "touched_elements": [
+    {
+      "source_text": "Game Over",
+      "korean": "게임 오버",
+      "original_bbox": [
+        1,
+        13,
+        1494,
+        251
+      ],
+      "permitted_region": [
+        1,
+        13,
+        1494,
+        248
+      ],
+      "localized_bbox": null,
+      "delta_left": null,
+      "delta_right": null,
+      "delta_top": null,
+      "delta_bottom": null,
+      "containment": "HOLD_STRICT_RECHECK_NO_KOREAN_RASTER_YET",
+      "rework_status": "GENERATION_SPEC_READY_CANDIDATE_REQUIRED",
+      "source_orientation": "PASS_FLIP_Y_EXACT_HD",
+      "source_signed_slant": "PASS_RIGHT_0.35_19.29DEG",
+      "dds_alpha_candidate_qa": "HOLD_NO_CANDIDATE_DDS"
+    }
+  ],
+  "self_qa": {
+    "parity_shard": "PASS_ODD_INDEX_89_ONLY",
+    "peer_work_steal": "NONE",
+    "source_identity": "PASS_GITHUB_EXACT_HD",
+    "source_dimensions_format_mips": "PASS_2048x256_RGBA32_MIP1",
+    "source_orientation": "PASS_FLIP_Y",
+    "signed_slant_source": "PASS_RIGHT_0.35_19.29DEG",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_KOREAN_RASTER",
+    "candidate_dds_format_alpha_roundtrip": "HOLD_NO_CANDIDATE_DDS",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_WRITES",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_43B07A77_EXECUTABLE_GENERATION_SPEC_READY",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

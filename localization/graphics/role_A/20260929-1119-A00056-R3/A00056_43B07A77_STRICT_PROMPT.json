@@ -1,0 +1,133 @@
+{
+  "contract": "outrun-first-pass-edit-v1",
+  "priority": [
+    "EDIT, DO NOT REDESIGN. Treat the exact HD source as authoritative.",
+    "Preserve everything outside the specified source-text/effect footprint.",
+    "Remove Game Over and its own outline/shadow/antialias fringe completely.",
+    "This is a transparent text-only atlas; cleared source pixels become transparent. Do not invent a backing panel.",
+    "Render only 게임 오버 inside the permitted display-space region.",
+    "Match the source gradient, outline, shadow, proportions, spacing and measured right slant.",
+    "Construct in readable coordinates, then apply flip_y exactly once for raw DDS storage.",
+    "If any 1px containment/style/orientation requirement cannot be proven, emit no production DDS."
+  ],
+  "asset": {
+    "id": "43B07A77",
+    "queue_index": 89,
+    "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+    "source_git_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+    "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "canvas": [
+      2048,
+      256
+    ],
+    "dds_format": {
+      "fourcc": "00000000",
+      "rgb_bits": 32,
+      "mips": 1,
+      "masks": {
+        "r": 255,
+        "g": 65280,
+        "b": 16711680,
+        "a": 4278190080
+      }
+    },
+    "raw_orientation": "flip_y to readable/game display",
+    "display_transform": "flip_y",
+    "background_class": "transparent text-only atlas",
+    "alpha_behavior": "Preserve source outside exact English/effect edit mask; Korean alpha only inside permitted_region."
+  },
+  "elements": [
+    {
+      "source_text": "Game Over",
+      "approved_korean": "게임 오버",
+      "source_bbox": [
+        1,
+        13,
+        1494,
+        251
+      ],
+      "permitted_region": [
+        1,
+        13,
+        1494,
+        248
+      ],
+      "sprite_cell_display": [
+        0,
+        0,
+        1496,
+        248
+      ],
+      "alignment": "center within original visual span; no localized pixel may cross permitted_region",
+      "text_height_px": 235,
+      "line_count": 1,
+      "colors": {
+        "fill": "source-matched pale cyan/white upper to saturated blue lower",
+        "inner_highlight": "thin white",
+        "outline": "dark charcoal/black",
+        "outer_effect": "muted mauve/pink outer outline/shadow"
+      },
+      "effects": {
+        "layer_order": [
+          "gradient fill",
+          "thin white inner highlight",
+          "dark outline",
+          "mauve outer outline/shadow"
+        ],
+        "residue_rule": "zero source-language residue",
+        "no_extra_effects": true
+      },
+      "source_text_transform": "flip_y",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "style_traits": {
+        "weight": "heavy bold",
+        "width": "wide",
+        "corners": "rounded",
+        "spacing": "tight source-like",
+        "italic_geometry": "strong right slant",
+        "source_effect_fringe_below_cell_px": 3,
+        "candidate_fringe_policy": "erase source fringe y=248..250 but do not place Korean there"
+      },
+      "slant_dx_per_dy": 0.35,
+      "slant_angle_deg": 19.29,
+      "slant_direction": "right",
+      "display_transform": "flip_y"
+    }
+  ],
+  "protected_regions": [
+    "all pixels outside exact Game Over/effect edit mask",
+    "all pixels outside display sprite cell [0,0,1496,248]",
+    "hidden RGB/alpha padding outside edit mask"
+  ],
+  "fit_order": [
+    "source-faithful spacing",
+    "source-faithful one-line layout",
+    "modest font-size reduction",
+    "horizontal scale reduction while preserving slant sign"
+  ],
+  "forbidden": [
+    "English/source residue",
+    "cover boxes or invented panels",
+    "blur/smudge concealment",
+    "changes outside edit mask",
+    "resize/crop/upscale",
+    "opposite slant sign",
+    "Korean effects below y=247",
+    "DDS header/format/mip/orientation changes"
+  ],
+  "pre_output_check": [
+    "localized bbox inside [1,13,1494,248]",
+    "outside-edit changed pixels = 0",
+    "protected-mask changed pixels = 0",
+    "outside-edit alpha changes = 0",
+    "flip_y readable round-trip",
+    "right signed slant retained",
+    "DDS metadata unchanged",
+    "English-vs-Korean comparison uses identical crop/scale"
+  ],
+  "failure_behavior": "Do not produce a production DDS; record HOLD_STRICT_RECHECK.",
+  "prompt_sha256": "1c3b3784bf33f645e11ae04750c955606d4d40a35939a7cf5b780c32a08f63cf"
+}
