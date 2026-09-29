@@ -652,7 +652,9 @@ int main()
         managedShadow.device_generation() == 2 &&
         managedShadow.shadow_valid() &&
         managedShadow.shadow_version() == 1 &&
-        !managedShadow.mirror_ready() &&
+        !managedShadow.mirror_ready(),
+        "R102 Reset preserves CPU shadow and invalidates GPU mirror");
+    require(
         managedShadow.mirror_device() == nullptr &&
         managedShadow.mirror_texture() == nullptr &&
         managedShadow.mirror_srv() == nullptr,
