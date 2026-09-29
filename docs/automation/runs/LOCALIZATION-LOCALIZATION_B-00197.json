@@ -1,0 +1,72 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00197",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00102",
+  "recorded_at_kst": "2026-09-30T03:30:00+09:00",
+  "base_head_sha": "70afe71affeb2067a8cd369a55ad1fab1614e874",
+  "base_sha": "70afe71affeb2067a8cd369a55ad1fab1614e874",
+  "commit_mode": "ATOMIC_LANE_LOCAL_B00190_CONTRACT_REEMISSION_REPORT_AND_TASK_RECORD",
+  "result": "PASS_MATERIAL_B00190_CONTRACT_REEMISSION_INDICES46_100_106_SOURCE_ACQUISITION_EXHAUSTED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "C140/Q00038 authoritative Gate PASS returned B00190 as REWORK_REQUIRED solely because its immutable material result commit omitted the durable task record from the same commit. B00197 re-emits the unchanged source-exhaustion/semantic evidence for indices46/100/106 under the current producer contract and atomically includes this B00197 durable task record. No source fingerprints changed, so C140-authorized heavy source probes are reused rather than repeated. No exact canonical source exists, no Korean DDS is rendered, shared state is untouched, and runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-0330-B00197-P00102/B00197_P00102_B00190_ATOMIC_CONTRACT_REEMISSION.json",
+    "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
+    "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00194.json"
+  ],
+  "material_deliverable": {
+    "type": "B_CURRENT_CONTRACT_ATOMIC_REEMISSION_OF_B00190_SOURCE_EXHAUSTION_EVIDENCE",
+    "reviewed_indices": [
+      46,
+      100,
+      106
+    ],
+    "reviewed_assets": [
+      "AA04D779",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "source_fingerprint_changed": false,
+    "heavy_source_probes_repeated": false,
+    "source_acquisition_exhausted": 3,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "contract_defect_repaired": "MATERIAL_REPORT_AND_DURABLE_TASK_RECORD_ATOMIC_IN_RESULT_COMMIT"
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_indices": [
+      46,
+      100,
+      106
+    ],
+    "selected_priority": "DIRECT_REWORK_REQUIRED_CONTRACT_REEMISSION",
+    "current_c_gate": "C140/Q00038 authoritative result eb395208c34498da655106ea5d9f4f6ebc72c167 / Gate 36612087138 PASS",
+    "readiness_after": {
+      "46": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "100": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "106": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  },
+  "self_qa": "PASS_B00197_ATOMIC_REPORT_PLUS_DURABLE_RECORD__REUSES_UNCHANGED_C140_ACCEPTED_SOURCE_SEMANTIC_FINGERPRINT__INDICES46_100_106_MOD3_EQ_1__NO_GUESSED_PIXEL_CONSTRUCTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_EXACT_CANONICAL_SOURCE_UNAVAILABLE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

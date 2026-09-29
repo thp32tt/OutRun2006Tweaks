@@ -1,0 +1,157 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00197-p00102-b00190-atomic-contract-reemission-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00197",
+  "wave_id": "P00102",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T03:30:00+09:00",
+  "base_head_sha": "70afe71affeb2067a8cd369a55ad1fab1614e874",
+  "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+  "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+  "rework_source": {
+    "producer_task_id": "LOCALIZATION-LOCALIZATION_B-00190",
+    "malformed_result_sha": "5969fd310d7d1311977effb967d24c31354d6811",
+    "malformed_result_report": "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
+    "c_reviewer_task_id": "LOCALIZATION-LOCALIZATION_C-00194",
+    "authoritative_c_result_sha": "eb395208c34498da655106ea5d9f4f6ebc72c167",
+    "authoritative_gate_run_id": 36612087138,
+    "authoritative_gate_conclusion": "success",
+    "c_disposition": "REWORK_REQUIRED",
+    "defect": "B00190 material payload and its durable task record were split across different commits; exact producer RESULT_SHA therefore failed same-commit durable-record validation.",
+    "required_repair": "Re-emit equivalent material evidence and the current task durable record atomically in one producer result commit."
+  },
+  "selection": {
+    "selected_indices": [
+      46,
+      100,
+      106
+    ],
+    "selected_assets": [
+      "AA04D779",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "priority": "DIRECT_REWORK_REQUIRED_CONTRACT_REEMISSION",
+    "reason": "C140/Q00038 authoritative PASS explicitly returned B00190 as REWORK_REQUIRED and requested atomic producer re-emission before unrelated B preflight. Heavy source/semantic fingerprints are unchanged and are reused rather than repeated."
+  },
+  "immutable_evidence_reused": {
+    "source_fingerprint_changed": false,
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "drive_direct_release_probes_repeated": false,
+    "reason": "C140 explicitly authorizes reuse after atomic re-emission because the source/semantic fingerprints are unchanged.",
+    "canonical_identity_gate": [
+      {
+        "index": 46,
+        "asset": "AA04D779",
+        "canonical_sha256": "5a4ca513da3545b7da91e62fd27692f39fc211a93983122a193db79c254f28b0",
+        "canonical_canvas": [
+          512,
+          512
+        ],
+        "canonical_format": "RGBA",
+        "pinned_release_git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "pinned_release_canvas": [
+          2048,
+          2048
+        ],
+        "pinned_release_format": "RGBA32",
+        "identity_match": false,
+        "final": "SOURCE_ACQUISITION_EXHAUSTED"
+      },
+      {
+        "index": 100,
+        "asset": "53CE39D5",
+        "canonical_sha256": "3bfea3882b73ec133cd8badca8f9be67c130d4f4b277c52bbc6d2b1c4014efa5",
+        "canonical_canvas": [
+          512,
+          512
+        ],
+        "canonical_format": "RGBA",
+        "pinned_release_git_blob_sha": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
+        "pinned_release_canvas": [
+          2048,
+          2048
+        ],
+        "pinned_release_format": "RGBA32",
+        "identity_match": false,
+        "final": "SOURCE_ACQUISITION_EXHAUSTED"
+      },
+      {
+        "index": 106,
+        "asset": "788CE557",
+        "canonical_sha256": "b9e7d15a4561bac2267f8dea1bc5561825acadddd3632763a5fd67ddfab7814a",
+        "canonical_canvas": [
+          512,
+          256
+        ],
+        "canonical_format": "RGBA",
+        "pinned_release_git_blob_sha": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
+        "pinned_release_canvas": [
+          2048,
+          1024
+        ],
+        "pinned_release_format": "RGBA32",
+        "identity_match": false,
+        "protected_original": [
+          "OutRun2SP"
+        ],
+        "final": "SOURCE_ACQUISITION_EXHAUSTED"
+      }
+    ],
+    "semantic_validation": {
+      "46": "21/21 canonical semantic segments",
+      "100": "7/7 canonical semantic segments",
+      "106": "3 localizable canonical labels + OutRun2SP preserve-original"
+    }
+  },
+  "fail_closed_candidate_gate": {
+    "exact_canonical_source_available": false,
+    "source_effect_mask_authorized_for_current_canonical": false,
+    "clean_plate_authorized_for_current_canonical": false,
+    "candidate_safe_bbox_authorized_for_current_canonical": false,
+    "korean_candidate_rendered": false,
+    "candidate_dds_modified": false,
+    "candidate_static_qa": "NOT_APPLICABLE_NO_CANDIDATE",
+    "status": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_AFTER_ATOMIC_CONTRACT_REEMISSION"
+  },
+  "readiness_after": {
+    "46": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "100": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "106": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "retry_condition": "Retry source acquisition only if approved source transport, canonical inventory identity, or source fingerprint changes."
+  },
+  "integrated_self_qa": {
+    "same_commit_task_record_required": true,
+    "same_commit_material_report_required": true,
+    "atomic_commit_plan": "PASS_B00197_REPORT_AND_DURABLE_TASK_RECORD_IN_SAME_RESULT_COMMIT",
+    "shard_ownership": "PASS_46_100_106_ALL_MOD3_EQ_1",
+    "c140_required_repair_addressed": true,
+    "heavy_source_semantic_checks": "REUSED_UNCHANGED_NOT_REPEATED",
+    "no_guessed_pixel_construction": true,
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "candidate_dds_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "conclusion": "B00197 repairs the C140 producer-result contract defect by atomically re-emitting the unchanged B00190 source-exhaustion evidence with a durable B00197 task record. No DDS bytes or shared state are changed; indices46/100/106 remain preflight-only until C independently consumes this exact result commit."
+}
