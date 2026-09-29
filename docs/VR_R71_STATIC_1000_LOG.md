@@ -416,3 +416,27 @@ Five lenses: architecture; lifetime/reset/sync; stereo correctness; performance;
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review cadence serialization.
+
+
+## Cycle 0019 — cadence serialization boundary
+
+Review lenses:
+1. architecture/control flow;
+2. lifetime/reset/sync;
+3. stereo/HUD/visual correctness;
+4. hot path/frame pacing/copies/waits;
+5. adversarial/falsification.
+
+Finding/evidence:
+- IssueIfDue/WaitForPresented execute after xrBeginFrame and pose publication; no wait-budget change is justified without cadenceSerialWaitMs/HMD evidence.
+- Evidence: main_r23.cpp cadence IssueIfDue -> WaitForPresented ordering.
+- No production/runtime, HUD classification, GPU wait/copy, or synchronization behavior changed.
+- Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+
+Changed files:
+- `docs/VR_R71_STATIC_1000_LOG.md`
+- `docs/automation/R71_STATIC_1000_STATE.json`
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review process binding and restart identity.
