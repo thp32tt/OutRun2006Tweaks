@@ -650,3 +650,29 @@ Validation:
 Next:
 - Consume exact-head CI.
 - If green, design and test an explicit sampling-issued result at the `R23RenderProjection` boundary, including partial eye failure, before any transition release wiring.
+
+
+## Policy change — 2026-09-29 10:38 KST — visual/functional correctness first
+
+User direction:
+- Stop new performance optimization work.
+- Continue with screen/display defects first, then other functional and stability defects.
+- Existing performance telemetry/safety guards remain as regression evidence only.
+
+Priority order:
+1. SkyGlow / overbright sky / lost cloud detail / overall white haze and washed color.
+2. HUD/menu transparency vs blend/alpha/render-state contamination.
+3. OutRun checkpoint added time, stage-clear time, stage marks, GOAL/result double rendering and head-follow.
+4. Rival/rank marker vehicle/world anchor, depth/IPD and per-eye projection.
+5. Lens flare double rendering.
+6. Vehicle selector 3D/color/translated MANAGED texture corruption.
+7. Pre-race lineup shadow split/corruption.
+8. Remaining exact HUD semantic-lifetime defects.
+9. Stage-transition sky regression.
+10. Other actual functional/stability defects: recenter, menu/game transition, startup/white-screen, ResetEx/device-lost, OpenXR lifecycle/reference-space, DirectGPU ownership/generation, stale frame/run, crashes/resource lifetime.
+
+Rules:
+- Do not create or advance performance-only findings.
+- Do not tune waits/fences/copies/cadence/resource budgets unless a proven visual/functional/stability defect directly requires it.
+- Preserve frozen user-test source `34eef500b2f79e7e68477d7ffe675f803e809e01` and user-confirmed menu `< >` fix.
+- Build/static success remains `UNTESTED/NEED_HMD_TEST` for visible defects.
