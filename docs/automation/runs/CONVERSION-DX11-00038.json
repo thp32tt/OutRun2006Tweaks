@@ -6,12 +6,12 @@
   "attempt": "1/3",
   "chat_rollover": 1,
   "recorded_kst": "2026-09-29T11:34:00+09:00",
-  "checkpoint": "C3_VALIDATE",
-  "status": "CI_PENDING",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
   "base_sha": "66a54e7ff38cf3400e992347593ceaa277609ac6",
   "code_result_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500",
   "result_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
@@ -58,26 +58,26 @@
   "validation_runs": {
     "backend_conversion_gate": {
       "run_id": 36512991322,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
     },
     "build": {
       "run_id": 36512995624,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
     },
     "openxr_vr_architecture": {
       "run_id": 36512995616,
-      "status": "pending",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
     },
     "hud_inspector": {
       "run_id": 36512995611,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500"
     },
     "pc_fast": {
@@ -91,7 +91,15 @@
     "status": "WRITTEN",
     "implementation_comment_id": 5882526467
   },
-  "blocker": "Hosted GitHub Actions runner backlog: exact-SHA validation runs are queued/pending.",
-  "resume_cursor": "Re-read exact-SHA runs 36512991322, 36512995624, 36512995616 and 36512995611. If Backend Conversion Gate fails, inspect its failed job/step and repair without weakening the R90 gate. If all exact-SHA hosted validation passes, update this record to AUTOMATION_VALIDATION=PASS and append Issue #14 validation event. Do not perform or claim runtime/HMD validation.",
-  "next_action": "Consume exact-SHA hosted CI results for 74386631dd63e04ad5084fe90cbe00e60d8bb500; preserve NativeDrawPathActivationAllowed=false and RUNTIME_VALIDATION=UNTESTED."
+  "blocker": null,
+  "resume_cursor": "R90 exact-SHA hosted validation is complete. Preserve NativeDrawPathActivationAllowed=false; continue with the next independent F19/F21 prerequisite without treating hosted object creation as runtime parity.",
+  "next_action": "R90 is automation-verified. Continue the next bounded DX11 shader/input prerequisite; Quest3/VDXR remains required before native runtime promotion.",
+  "finalized_kst": "2026-09-29T13:02:00+09:00",
+  "evidence": [
+    "Backend Conversion Gate 36512991322 PASS on exact code SHA 74386631dd63e04ad5084fe90cbe00e60d8bb500, including Build/Run DX11 input-layout object probe.",
+    "Build 36512995624 PASS on exact code SHA.",
+    "OpenXR VR architecture 36512995616 PASS across all six jobs on exact code SHA.",
+    "HUD Inspector 36512995611 PASS on exact code SHA.",
+    "PC Fast 36512991329 skipped; no HMD/game runtime validation was performed."
+  ]
 }

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00040",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T13:02:00+09:00",
+  "checkpoint": "C3_VALIDATE",
+  "status": "CI_QUEUED",
+  "base_sha": "799ac1853286920ec292ccea2d679906231a6a46",
+  "code_result_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2",
+  "result_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R91 hosted D3D11 shader-object readiness probe for F19/F21 without native runtime routing.",
+  "summary": "Added a hosted Windows probe that creates a WARP D3D11 device, compiles an XYZB5 vertex shader, requires CreateVertexShader plus matching CreateInputLayout success, then generates the existing R84 fixed-function pixel-shader prototype and requires CreatePixelShader success. No production native draw routing or runtime shader binding was enabled.",
+  "prerequisite": {
+    "task_id": "CONVERSION-DX11-00038",
+    "code_sha": "74386631dd63e04ad5084fe90cbe00e60d8bb500",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "changes": [
+    {
+      "path": "tools/dx11_shader_object_probe.cpp",
+      "result": "Added R91 WARP D3D11 CreateVertexShader/CreateInputLayout/CreatePixelShader object probe."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Added dx11_shader_object_probe executable target."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added checked-in generated-equivalent dx11_shader_object_probe target."
+    },
+    {
+      "path": ".github/workflows/backend-conversion-gate.yml",
+      "result": "Added Build/Run DX11 shader object probe steps."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R91 source/build/workflow contract guards."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "Hosted shader object creation is a prerequisite only. It neither binds these objects in the game runtime nor proves programmable-shader translation or Quest3/VDXR parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36519623989,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
+    },
+    "build": {
+      "run_id": 36519629883,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36519629884,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
+    },
+    "hud_inspector": {
+      "run_id": 36519629906,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
+    },
+    "pc_fast": {
+      "run_id": 36519623979,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "evidence": [
+    "Implementation commit contains exact marker [AUTO:CONVERSION-DX11-00040].",
+    "Manual diff review confirms only hosted probe/build graph/workflow/verifier paths changed; native_backend/runtime renderer/transport/OpenXR source was not modified.",
+    "GitHub Actions runs were created for the exact implementation SHA.",
+    "Repository Actions inspection shows multiple older R71 candidate Windows jobs ahead of these runs; all four required 00040 hosted validation runs remain queued rather than failed."
+  ],
+  "blocker": "GitHub Actions Windows runner backlog. Required exact-SHA hosted runs are queued behind older repository jobs; no unrelated jobs were cancelled.",
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5883381700
+  },
+  "resume_cursor": "Read runs 36519623989, 36519629883, 36519629884 and 36519629906. If Backend Conversion Gate starts and R91 fails, inspect the exact failed step and repair within ATTEMPT 2 without weakening the gate. If all exact-SHA runs pass, set AUTOMATION_VALIDATION=PASS, keep RUNTIME_VALIDATION=UNTESTED, and append Issue #14 validation evidence.",
+  "next_action": "Consume exact-SHA hosted CI when runners execute it. Do not enable NativeDrawPathActivationAllowed or claim HMD/game runtime correctness from R91."
+}
