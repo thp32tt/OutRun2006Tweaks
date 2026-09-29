@@ -241,7 +241,10 @@ Set-Content (Join-Path $dxvkBackendDir 'DXVK_VERSION.txt') $dxvkVersion -Encodin
 Set-Content (Join-Path $dxvkBackendDir 'DXVK_D3D9_SHA256.txt') $dxvkProviderSha -Encoding ascii
 Set-Content (Join-Path $dxvkBackendDir 'VARIANT_ID.txt') $canonicalVariantId -Encoding ascii
 
+$packageBaselineDir = Join-Path $packageDir 'package-baseline'
+New-Item -ItemType Directory -Force $packageBaselineDir | Out-Null
 Copy-Item 'OutRun2006Tweaks.ini' (Join-Path $packageDir 'OutRun2006Tweaks.ini')
+Copy-Item 'OutRun2006Tweaks.ini' (Join-Path $packageBaselineDir 'OutRun2006Tweaks.ini')
 Copy-Item 'OutRun2006Tweaks.lods.ini' (Join-Path $packageDir 'OutRun2006Tweaks.lods.ini')
 
 $runtimeFiles = @(
