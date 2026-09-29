@@ -22,6 +22,9 @@ INPUT_SIGNATURE_SMOKE = (
 INPUT_LAYOUT_OBJECT_PROBE = (
     ROOT / "tools" / "dx11_input_layout_object_probe.cpp"
 ).read_text(encoding="utf-8")
+SHADER_OBJECT_PROBE = (
+    ROOT / "tools" / "dx11_shader_object_probe.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -640,6 +643,49 @@ def main() -> None:
         if token not in BACKEND_GATE:
             raise SystemExit(
                 "DX11 R90 input-layout object probe missing from Backend Conversion Gate: "
+                + token
+            )
+
+    r91_smoke_contract = {
+        "D3D11CreateDevice": "R91 hosted D3D11 device creation",
+        "CreateVertexShader": "R91 D3D11 vertex-shader object creation",
+        "CreateInputLayout": "R91 input-layout pairing with vertex shader bytecode",
+        "generate_fixed_function_pixel_shader_prototype": "R91 R84 pixel-shader generator consumption",
+        "CreatePixelShader": "R91 D3D11 pixel-shader object creation",
+        "DX11 shader object probe R91: PASS": "R91 probe completion marker",
+    }
+    missing_r91_smoke = [
+        meaning
+        for token, meaning in r91_smoke_contract.items()
+        if token not in SHADER_OBJECT_PROBE
+    ]
+    if missing_r91_smoke:
+        raise SystemExit(
+            "DX11 R91 shader-object probe drift: "
+            + ", ".join(missing_r91_smoke)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_shader_object_probe" not in graph:
+            raise SystemExit(
+                f"DX11 R91 shader-object target missing from {graph_name}"
+            )
+        if "tools/dx11_shader_object_probe.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R91 shader-object source missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 shader object probe",
+        "Run DX11 shader object probe",
+        "dx11_shader_object_probe",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R91 shader-object probe missing from Backend Conversion Gate: "
                 + token
             )
 

@@ -115,6 +115,17 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 input-layout object probe failed with exit code $LASTEXITCODE" }
 
+      - name: Build DX11 shader object probe
+        run: cmake --build build-auto --config Release --target dx11_shader_object_probe
+
+      - name: Run DX11 shader object probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_shader_object_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 shader object probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 shader object probe failed with exit code $LASTEXITCODE" }
+
       - name: Verify binary exists
         shell: pwsh
         run: |
