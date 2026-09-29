@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 80,
+  "completedCycles": 100,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "1acd732700abf8cd77c5e93aa5b6090337ce4fc7",
+  "currentHead": "121828122ac0db2a2129308c8d1192e605aa4a48",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -2220,15 +2220,535 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "continue visual-first"
+    },
+    {
+      "cycle": 81,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Exact repair-head hosted workflows remain in progress; do not convert pending into PASS."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue independent static review"
+    },
+    {
+      "cycle": 82,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Selector car texture0 must be observed at the exact world draw boundary before deciding texture loss."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact draw resource"
+    },
+    {
+      "cycle": 83,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Shader/material state can mimic missing texture; distinguish before changing upload or stage state."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "collect exact selector shader/material evidence"
+    },
+    {
+      "cycle": 84,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Primary blend restoration does not prove texture-stage alpha is correct; inspect exact HUD stage only, not global state."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace owned HUD stage"
+    },
+    {
+      "cycle": 85,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu head-lock and menu translucency are separate dimensions; one fix must not be used as evidence for the other."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact menu anchor"
+    },
+    {
+      "cycle": 86,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Timer update duplication needs producer identity across queue/frame epochs, not only draw count."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace temporal producer"
+    },
+    {
+      "cycle": 87,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Final results split may involve two legitimate surfaces; identify producer/epoch before dedup."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact result surfaces"
+    },
+    {
+      "cycle": 88,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Rival marker world anchor requires positive depth evidence; projected marker path must not absorb it."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "retain route separation"
+    },
+    {
+      "cycle": 89,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Do not tune 0.38 glow strength until HMD confirms ordering fix; static brightness guesses are insufficient."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "await HMD evidence"
+    },
+    {
+      "cycle": 90,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "No copy/wait/frame pacing behavior changes while visual correctness remains unresolved and telemetry is absent."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue P0 visuals"
+    },
+    {
+      "cycle": 91,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Exact repair-head hosted workflows remain in progress; do not convert pending into PASS."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue independent static review"
+    },
+    {
+      "cycle": 92,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Selector car texture0 must be observed at the exact world draw boundary before deciding texture loss."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact draw resource"
+    },
+    {
+      "cycle": 93,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Shader/material state can mimic missing texture; distinguish before changing upload or stage state."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "collect exact selector shader/material evidence"
+    },
+    {
+      "cycle": 94,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Primary blend restoration does not prove texture-stage alpha is correct; inspect exact HUD stage only, not global state."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace owned HUD stage"
+    },
+    {
+      "cycle": 95,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu head-lock and menu translucency are separate dimensions; one fix must not be used as evidence for the other."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact menu anchor"
+    },
+    {
+      "cycle": 96,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Timer update duplication needs producer identity across queue/frame epochs, not only draw count."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace temporal producer"
+    },
+    {
+      "cycle": 97,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Final results split may involve two legitimate surfaces; identify producer/epoch before dedup."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact result surfaces"
+    },
+    {
+      "cycle": 98,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Rival marker world anchor requires positive depth evidence; projected marker path must not absorb it."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "retain route separation"
+    },
+    {
+      "cycle": 99,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Do not tune 0.38 glow strength until HMD confirms ordering fix; static brightness guesses are insufficient."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "await HMD evidence"
+    },
+    {
+      "cycle": 100,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "No copy/wait/frame pacing behavior changes while visual correctness remains unresolved and telemetry is absent."
+      ],
+      "evidence": [
+        "current R71 static boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "121828122ac0db2a2129308c8d1192e605aa4a48"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue P0 visuals"
     }
   ],
   "nextCycle": {
-    "cycle": 81,
+    "cycle": 101,
     "priority": [
       "consume hosted CI",
-      "continue selector/HUD exact evidence review"
+      "selector exact resource/material diagnostics"
     ],
-    "guard": "no performance-only tuning; frozen package immutable"
+    "guard": "visual-first; frozen package immutable"
   },
   "updatedKst": "2026-09-29T12:29:00+09:00",
   "workPolicy": {
