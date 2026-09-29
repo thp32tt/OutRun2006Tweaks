@@ -164,7 +164,7 @@ require_all("src/vr/d3d9/ex_device_upgrade_r15_overlay.inc", [
 require("src/vr/d3d9/stereo_renderer_r23_overlay.inc",
         'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
         "P8_AUTHORITATIVE_SEED")
-require("src/vr/d3d9/stereo_renderer_r22.cpp",
+require("src/vr/d3d9/stereo_renderer_r22_overlay.inc",
         'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
         "P8_R22_VIEWPORT_DEPTH")
 require("src/vr/d3d9/stereo_renderer_r13.cpp",
@@ -273,7 +273,8 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r22.cpp"',
+    '#include "stereo_renderer_r21.cpp"',
+    '#include "stereo_renderer_r22_overlay.inc"',
     '#include "stereo_renderer_r23_overlay.inc"',
     '#include "shader_fingerprint_gpl.hpp"',
     '#include "../game/render_semantics.hpp"',
@@ -287,6 +288,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r22.cpp"',
+       "P11_R70_STEREO_NO_R22_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r23.cpp"',
        "P11_R70_STEREO_NO_R23_NESTING")
@@ -361,7 +365,8 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r22.cpp"',
+    '#include "stereo_renderer_r21.cpp"',
+    '#include "stereo_renderer_r22_overlay.inc"',
     '#include "stereo_renderer_r23_overlay.inc"',
     '#include "shader_fingerprint_gpl.hpp"',
     '#include "../game/render_semantics.hpp"',
@@ -375,6 +380,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r22.cpp"',
+       "P11_R70_STEREO_NO_R22_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r23.cpp"',
        "P11_R70_STEREO_NO_R23_NESTING")

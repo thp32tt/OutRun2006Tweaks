@@ -35,6 +35,7 @@ required = [
     "src/vr/d3d9/stereo_renderer_r20.cpp",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "src/vr/d3d9/stereo_renderer_r22_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r26.cpp",
@@ -262,11 +263,18 @@ require(
 )
 require(
     "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "#include \"stereo_renderer_r21.cpp\"",
+    "#include \"stereo_renderer_r22_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r22_overlay.inc",
     "R22InstallState",
     "R22ShadowState",
+    "R22StateBlockTrackingReliable",
     "R22SetScissorRectHook",
     "R22SetRenderStateHook",
     "R22PrimeShadowState",
+    "R22ResetBaselineTracking",
     "InlineHook::StartDisabled",
     "per-draw GetViewport/GetScissorRect/GetRenderState eliminated",
 )

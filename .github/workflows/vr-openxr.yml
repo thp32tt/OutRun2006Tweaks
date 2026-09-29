@@ -74,11 +74,13 @@ jobs:
               'IsFailed(R20InstallState)',
               'StartDisabled'
             )
-            'src/vr/d3d9/stereo_renderer_r22.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r22_overlay.inc' = @(
               'R22InstallState',
               'R22ShadowState',
+              'R22StateBlockTrackingReliable',
               'R22SetScissorRectHook',
               'R22SetRenderStateHook',
+              'R22PrimeShadowState',
               'StartDisabled',
               'per-draw GetViewport/GetScissorRect/GetRenderState eliminated'
             )
