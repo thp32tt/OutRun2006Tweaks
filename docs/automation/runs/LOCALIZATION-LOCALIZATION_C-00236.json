@@ -175,12 +175,21 @@
   "uploaded_archive_used": false,
   "heavy_qa_repeated": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_gate": null,
-  "bookkeeping_note": "This C result commit is the sole Q00052 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+  "result_sha": "fb585c580e37476ed77ae3734b7f511e56852c06",
+  "authoritative_result_sha": "fb585c580e37476ed77ae3734b7f511e56852c06",
+  "validation_bearing_result_sha": "fb585c580e37476ed77ae3734b7f511e56852c06",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36642122523,
+    "run_attempt": 1,
+    "head_sha": "fb585c580e37476ed77ae3734b7f511e56852c06",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T07:53:12+09:00"
+  },
+  "bookkeeping_note": "Q00052 authoritative Gate PASS is owned by validation-bearing result fb585c580e37476ed77ae3734b7f511e56852c06. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T07:53:47.370+09:00"
 }
