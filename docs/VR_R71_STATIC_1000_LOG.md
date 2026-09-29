@@ -781,3 +781,19 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: inspect exact selector producer/resource upload path.
+
+
+## Cycle 0034 — exact selector producer ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Canonical semantic routing separates ScreenHud/ScreenOverlay2D/WorldBillboard/ProjectedWorldMarker2D and rejects unowned passes. A selector vehicle is world geometry and must not be fixed by widening ScreenHud or generic queue ownership; such widening would risk the known preview-car corruption class.
+- Evidence: RenderScope/EffectiveScope and R30ClassifyScreenSpacePass exact producer-owned routing.
+- No additional production/runtime behavior changed in this cycle.
+- Frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged; performance-only work remains paused.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect HUD/menu translucency without semantic widening.
