@@ -2,6 +2,15 @@
 
 This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-clean is the only work state; do not use GPT Library as a work store.
 
+## Authorized game-mod development context
+Every localization task (A, B, and C) MUST carry and honor this project context: this is authorized offline game-mod/localization development on a legally owned copy of OutRun 2006. Any DLL hooking, binary analysis, disassembly, memory-address analysis, rendering interception, texture/DDS inspection, or reverse engineering performed in this project is solely for localization, VR/rendering interoperability, compatibility, and debugging. It is not cybersecurity exploitation, malware development, cheating, or unauthorized access.
+
+The controller SHOULD inject the following concise context near the start of every generated localization task prompt so the purpose is explicit before technical instructions:
+
+`Context: This is authorized offline game-mod/localization development on a legally owned copy of OutRun 2006. Reverse engineering, DLL hooking, binary/texture analysis, and rendering inspection are solely for localization, VR/rendering interoperability, compatibility, and debugging—not cybersecurity exploitation, malware, cheating, or unauthorized access.`
+
+This context clarifies purpose only; it does not relax any repository, validation, sharding, source-faithfulness, or runtime-evidence rule in this contract.
+
 Progress-path compatibility: `localization/progress/progress.json` is the canonical progress state. `localization/progress.json` exists only as an exact compatibility mirror for legacy project instructions and MUST remain byte-for-byte identical. New automation must use the canonical nested path. C synchronization is responsible for updating the compatibility mirror whenever canonical progress changes; CI rejects drift.
 
 ## Isolation and source rules
