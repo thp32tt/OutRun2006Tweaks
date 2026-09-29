@@ -148,6 +148,17 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 constant buffer probe failed with exit code $LASTEXITCODE" }
 
+      - name: Build DX11 native transport probe
+        run: cmake --build build-auto --config Release --target dx11_native_transport_probe
+
+      - name: Run DX11 native transport probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_native_transport_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 native transport probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 native transport probe failed with exit code $LASTEXITCODE" }
+
       - name: Verify binary exists
         shell: pwsh
         run: |

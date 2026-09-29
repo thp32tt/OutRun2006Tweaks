@@ -954,3 +954,34 @@ target_link_libraries(dx11_constant_buffer_probe PUBLIC
     dxgi.lib
     dxguid.lib
 )
+
+# Target: dx11_native_transport_probe
+set(dx11_native_transport_probe_SOURCES
+    "tools/dx11_native_transport_probe.cpp"
+    "src/vr/d3d11/native_shared_eye_ring.cpp"
+)
+
+add_executable(dx11_native_transport_probe)
+
+target_sources(dx11_native_transport_probe PRIVATE ${dx11_native_transport_probe_SOURCES})
+
+target_compile_features(dx11_native_transport_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_native_transport_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_native_transport_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_native_transport_probe PUBLIC
+    d3d11.lib
+    dxgi.lib
+    dxguid.lib
+)

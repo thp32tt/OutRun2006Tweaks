@@ -75,6 +75,49 @@ def main() -> None:
             '"NativeDrawPathActivationAllowed": False',
         ],
     )
+    require(
+        "tools/dx11_native_transport_probe.cpp",
+        [
+            "D3D_DRIVER_TYPE_WARP",
+            "ring.initialize(",
+            "ring.bind_lifetime(",
+            "in-flight allocation must reject generation retag",
+            "signal_producer_fence",
+            "publish_bounded",
+            "stale generation ACK cannot retire published slot",
+            "older frame ACK cannot retire newer publication",
+            "exact identity/frame ACK retires publication",
+            "invalidated lifetime cannot manufacture retirement",
+            "fresh allocation accepts next generation",
+            "DX11 native shared-eye transport behavior R116: PASS",
+        ],
+    )
+    require(
+        "cmake.toml",
+        [
+            "[target.dx11_native_transport_probe]",
+            '"tools/dx11_native_transport_probe.cpp"',
+            '"src/vr/d3d11/native_shared_eye_ring.cpp"',
+        ],
+    )
+    require(
+        "CMakeLists.txt",
+        [
+            "# Target: dx11_native_transport_probe",
+            "add_executable(dx11_native_transport_probe)",
+            '"tools/dx11_native_transport_probe.cpp"',
+            '"src/vr/d3d11/native_shared_eye_ring.cpp"',
+        ],
+    )
+    require(
+        ".github/workflows/backend-conversion-gate.yml",
+        [
+            "Build DX11 native transport probe",
+            "--target dx11_native_transport_probe",
+            "Run DX11 native transport probe",
+            "dx11_native_transport_probe.exe",
+        ],
+    )
 
     ring_cpp = (ROOT / "src/vr/d3d11/native_shared_eye_ring.cpp").read_text(
         encoding="utf-8"
