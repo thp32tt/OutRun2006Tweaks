@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "wave_id": "P00082",
+  "target": {
+    "index": 152,
+    "asset": "49BB5FE5"
+  },
+  "supersedes_result_sha": "d6fbe37406b026658b76397d2858d3a0ed184ef7",
+  "supersedes_candidate_sha256": "f1f1d28eb56445bcaa5d93ff38703c7a3b9963720f528a766dd2dbf8c897575f",
+  "reason": "Exact Git review still shows visible PRO./INS./G.M./E.R. ghosts on CLEAN_PLATE. Rebuild with source-effect-aware 2px residue closure, native DXT5 re-encode, block-splice isolation, mandatory v2 review artifacts, and zero-tolerance decoded QA.",
+  "source_transport": {
+    "google_drive_outcome": "SOURCE_TRANSPORT_MISS",
+    "fallback": "PINNED_UPSTREAM_DIRECT_FILE"
+  }
+}
