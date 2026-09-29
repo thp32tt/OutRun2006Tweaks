@@ -1,0 +1,70 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00083",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00020",
+  "recorded_at_kst": "2026-09-29T16:00:35+09:00",
+  "base_sha": "e276a54450e59d024e0463e1e9d6e337ec13dfa9",
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_EVEN_GENERATION_V2_SAFE_FIT_PREFLIGHT_SPECS",
+  "summary": "Advanced C-consumed even indices 92/98/112 under the current generation-v2 contract by deriving four explicit 2px-inset candidate-safe bboxes in readable and raw flip_y coordinates from previously C-accepted exact-HD source effect envelopes. Reused unchanged B00073/C00078 source/orientation/heavy-QA evidence; no Korean DDS or shared state changed. Clean-plate and decoded-final candidate gates remain fail-closed HOLD.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1600-B122-P00020/B122_P00020_EVEN_GENERATION_V2_SAFE_FIT_PREFLIGHT.json"
+  ],
+  "evidence_blob_sha": "c87cad81e700ae557dd815058e7d82e6997faa89",
+  "material_deliverable": {
+    "type": "THREE_EVEN_GENERATION_V2_SAFE_FIT_PREFLIGHT_SPECS",
+    "indices": [
+      92,
+      98,
+      112
+    ],
+    "assets": [
+      "1A43E9D9",
+      "42E618FD",
+      "D41D0B1"
+    ],
+    "physical_text_elements": 4,
+    "candidate_safe_bboxes": 4,
+    "safety_inset_px": 2,
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00073",
+    "producer_result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+    "producer_report_blob_sha": "f4ec7539abe10664101feb8d1f6fbdf88d40dc4f",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00078",
+    "c_acceptance_record_blob_sha": "218e6c1c60d91e9598a124da33049c68d96a1f36",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "reason": "The generation/QA contract fingerprint changed to v2 after B00073/C00078. Exact source blobs, translations, flip_y transforms and source effect bboxes are unchanged, so heavy QA is reused and only the newly required safe-fit geometry is derived."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00080": [
+      34,
+      44,
+      52,
+      172
+    ]
+  },
+  "skipped_dependency_blocked": {
+    "152": "No C-accepted full-effect bbox exists for localizable labels; v2 forbids using fill bbox/cell rectangle as candidate_safe_bbox."
+  },
+  "self_qa": "PASS_EVEN_ONLY_92_98_112__4_OF_4_2PX_SAFE_BBOXES_IN_SOURCE_EFFECT__4_OF_4_FLIP_Y_RAW_MAP__INDEX92_ZERO_PAIRWISE_OVERLAP__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "clean_plate_qa": "HOLD_NOT_YET_PRODUCED",
+  "fail_closed_reason": "V2 lettering permission is now explicit, but source glyph/effect removal masks and validated clean plates do not yet exist. Korean candidate generation, BC3 round-trip, zero-pixel containment, protected-artwork, signed-slant/style and English-source-vs-candidate gates remain pending.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

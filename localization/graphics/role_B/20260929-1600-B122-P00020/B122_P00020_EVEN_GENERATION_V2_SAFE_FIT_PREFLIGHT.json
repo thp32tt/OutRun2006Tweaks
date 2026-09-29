@@ -1,0 +1,323 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00083",
+  "wave_id": "P00020",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T16:00:35+09:00",
+  "target_branch": "korean-localization-clean",
+  "selection_head_sha": "e276a54450e59d024e0463e1e9d6e337ec13dfa9",
+  "final_precommit_head_sha": "e276a54450e59d024e0463e1e9d6e337ec13dfa9",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "contract_fallback": "MANDATORY_FALLBACK_LADDER_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+  "material_advance": {
+    "type": "THREE_EVEN_GENERATION_V2_SAFE_FIT_PREFLIGHT_SPECS",
+    "indices": [
+      92,
+      98,
+      112
+    ],
+    "assets": [
+      "1A43E9D9",
+      "42E618FD",
+      "D41D0B1"
+    ],
+    "physical_text_elements": 4,
+    "safety_inset_px": 2,
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "fingerprint": {
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "transcription_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reused_producer_task": "LOCALIZATION-LOCALIZATION_B-00073",
+    "reused_producer_result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+    "reused_producer_report_blob_sha": "f4ec7539abe10664101feb8d1f6fbdf88d40dc4f",
+    "reused_c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00078",
+    "reused_c_acceptance_record_blob_sha": "218e6c1c60d91e9598a124da33049c68d96a1f36",
+    "reason_for_revisit": "QA/generation contract fingerprint changed to generation-v2 after C accepted B00073. Exact source blobs, translations, orientation and source effect bboxes are unchanged, so heavy source/header/orientation QA is reused and only the new v2 safe-fit geometry is derived."
+  },
+  "generation_v2_policy": {
+    "rule": "candidate_safe_bbox = conservative permitted region intersect source full-effect bbox, then inset 2 px on all sides",
+    "permitted_region_basis": "For these text-only selector elements, the already C-accepted source full-effect bbox is used as the conservative lettering permission; no pixels outside it are permitted.",
+    "coordinate_system": "readable display coordinates first; raw DDS coordinates derived by exact flip_y mapping",
+    "bbox_convention": "inclusive x0,y0,x1,y1",
+    "clean_plate_permission": "SEPARATE_SOURCE_GLYPH_EFFECT_REMOVAL_MASK_REQUIRED",
+    "lettering_permission": "ONLY_CANDIDATE_SAFE_BBOX",
+    "flattened_raster_rescale_forbidden": true,
+    "max_render_fit_iterations": 8
+  },
+  "assets": [
+    {
+      "queue_index": 92,
+      "asset": "1A43E9D9",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+        "git_blob_sha": "2a2019d5af833424e72c0cc6b0169f1b0699d897",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "elements": [
+        {
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "source_effect_bbox_readable": [
+            391,
+            17,
+            1062,
+            128
+          ],
+          "source_fill_bbox_readable": [
+            410,
+            36,
+            1043,
+            109
+          ],
+          "candidate_safe_bbox_readable": [
+            393,
+            19,
+            1060,
+            126
+          ],
+          "candidate_safe_bbox_raw": [
+            393,
+            129,
+            1060,
+            236
+          ],
+          "safety_margins_from_source_effect_px": {
+            "left": 2,
+            "right": 2,
+            "top": 2,
+            "bottom": 2
+          },
+          "safe_bbox_size_px": [
+            668,
+            108
+          ],
+          "clean_plate_status": "HOLD_SOURCE_GLYPH_EFFECT_REMOVAL_MASK_NOT_YET_MATERIALIZED",
+          "candidate_status": "READY_FOR_V2_FIT_AFTER_CLEAN_PLATE"
+        },
+        {
+          "source": "15 continuous course",
+          "korean": "15코스 연속",
+          "source_effect_bbox_readable": [
+            522,
+            130,
+            1584,
+            241
+          ],
+          "source_fill_bbox_readable": [
+            541,
+            149,
+            1565,
+            222
+          ],
+          "candidate_safe_bbox_readable": [
+            524,
+            132,
+            1582,
+            239
+          ],
+          "candidate_safe_bbox_raw": [
+            524,
+            16,
+            1582,
+            123
+          ],
+          "safety_margins_from_source_effect_px": {
+            "left": 2,
+            "right": 2,
+            "top": 2,
+            "bottom": 2
+          },
+          "safe_bbox_size_px": [
+            1059,
+            108
+          ],
+          "clean_plate_status": "HOLD_SOURCE_GLYPH_EFFECT_REMOVAL_MASK_NOT_YET_MATERIALIZED",
+          "candidate_status": "READY_FOR_V2_FIT_AFTER_CLEAN_PLATE"
+        }
+      ],
+      "pairwise_safe_bbox_overlap": 0,
+      "next_safe_action": "Derive exact source glyph/effect removal masks from the accepted HD source, build and independently validate CLEAN_PLATE, then fresh-render Korean inside the recorded 2px-inset safe bboxes; map with flip_y before BC3 encode."
+    },
+    {
+      "queue_index": 98,
+      "asset": "42E618FD",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+        "git_blob_sha": "04af6f19533c54e84f6bca3cd29e53aa1abf98d6",
+        "dimensions": [
+          2048,
+          128
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "elements": [
+        {
+          "source": "Challenge the course record.",
+          "korean": "코스 기록에 도전하세요.",
+          "source_effect_bbox_readable": [
+            431,
+            6,
+            1673,
+            122
+          ],
+          "source_fill_bbox_readable": [
+            445,
+            19,
+            1659,
+            107
+          ],
+          "candidate_safe_bbox_readable": [
+            433,
+            8,
+            1671,
+            120
+          ],
+          "candidate_safe_bbox_raw": [
+            433,
+            7,
+            1671,
+            119
+          ],
+          "safety_margins_from_source_effect_px": {
+            "left": 2,
+            "right": 2,
+            "top": 2,
+            "bottom": 2
+          },
+          "safe_bbox_size_px": [
+            1239,
+            113
+          ],
+          "clean_plate_status": "HOLD_SOURCE_GLYPH_EFFECT_REMOVAL_MASK_NOT_YET_MATERIALIZED",
+          "candidate_status": "READY_FOR_V2_FIT_AFTER_CLEAN_PLATE"
+        }
+      ],
+      "next_safe_action": "Build exact clean plate from source-constrained removal mask, fresh-render white/navy italic Korean wholly inside the 2px safe bbox, flip_y to raw storage, BC3 encode, then decoded-final containment/comparison QA."
+    },
+    {
+      "queue_index": 112,
+      "asset": "D41D0B1",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+        "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "elements": [
+        {
+          "source": "Try to reach the goal with your girlfriend.",
+          "korean": "여자친구와 함께 골에 도착하세요.",
+          "source_effect_bbox_readable": [
+            435,
+            19,
+            1356,
+            237
+          ],
+          "source_fill_bbox_readable": [
+            448,
+            33,
+            1341,
+            223
+          ],
+          "candidate_safe_bbox_readable": [
+            437,
+            21,
+            1354,
+            235
+          ],
+          "candidate_safe_bbox_raw": [
+            437,
+            20,
+            1354,
+            234
+          ],
+          "safety_margins_from_source_effect_px": {
+            "left": 2,
+            "right": 2,
+            "top": 2,
+            "bottom": 2
+          },
+          "safe_bbox_size_px": [
+            918,
+            215
+          ],
+          "clean_plate_status": "HOLD_SOURCE_GLYPH_EFFECT_REMOVAL_MASK_NOT_YET_MATERIALIZED",
+          "candidate_status": "READY_FOR_V2_FIT_AFTER_CLEAN_PLATE"
+        }
+      ],
+      "next_safe_action": "Derive the exact source removal mask and validated clean plate, reconstruct the Korean two-line layout by fresh render inside the 2px safe bbox, flip_y to raw storage, BC3 encode, and run decoded-final zero-pixel QA."
+    }
+  ],
+  "skipped": {
+    "current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00080": [
+        34,
+        44,
+        52,
+        172
+      ]
+    },
+    "unchanged_dependency_blocked": [
+      {
+        "index": 152,
+        "asset": "49BB5FE5",
+        "reason": "B00073/C00078 prove fill metrics and cells but not a source full-effect bbox for the four localizable labels; generation-v2 forbids deriving candidate_safe_bbox from fill bbox or cell rectangle alone."
+      }
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_92_98_112",
+    "anti_duplication": "PASS_B73_ALREADY_CONSUMED_BY_C78; NEW_WORK_EXISTS_ONLY_BECAUSE_CURRENT_GENERATION_V2_CONTRACT_FINGERPRINT_CHANGED",
+    "heavy_qa_dedup": "PASS_REUSED_C_ACCEPTED_SOURCE_IDENTITY_ORIENTATION_EFFECT_BBOX_METRICS",
+    "v2_safe_bbox_inset": "PASS_4_OF_4_ELEMENTS_EXACT_2PX_ON_ALL_SIDES",
+    "safe_bbox_inside_source_effect": "PASS_4_OF_4",
+    "flip_y_raw_mapping": "PASS_4_OF_4_WITH_SOURCE_HEIGHT",
+    "pairwise_overlap": "PASS_INDEX92_TWO_SAFE_BBOXES_ZERO_OVERLAP",
+    "clean_plate_qa": "HOLD_NOT_YET_PRODUCED",
+    "candidate_dds_header_alpha_compression": "NOT_APPLICABLE_NO_CANDIDATE_BYTES_TOUCHED",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00020 materially advances three C-consumed even-shard selector assets under the new generation-v2 contract by converting four already accepted exact-HD source effect envelopes into explicit 2px-inset readable/raw candidate-safe bboxes. No source/candidate heavy QA is repeated, no Korean DDS is guessed, clean-plate and decoded-final candidate gates remain fail-closed, and runtime remains UNTESTED."
+}
