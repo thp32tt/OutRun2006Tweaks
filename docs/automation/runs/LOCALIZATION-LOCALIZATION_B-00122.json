@@ -1,0 +1,113 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00122",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00051",
+  "recorded_at_kst": "2026-09-29T19:01:00+09:00",
+  "base_sha": "2b879eaa22e033f120728f0ec3849bcc78b04290",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_REWORK_B00101_FOUR_EVEN_CANONICAL_HD_SOURCE_GATED_V2_WORK_ORDERS",
+  "summary": "Resolved the runnable B00101/C00111 producer-contract rework for even indices 198/214/230/236 without repeating accepted semantic QA. Current Q00014 canonical-source policy is applied: prior Sonic-TV Release pixel geometry is not re-emitted. Instead this result pins 4 canonical inventory SHA-256 identities, native canvases and 38 current translations, proves the exact queue source paths are absent on current GitHub HEAD, and defines fail-closed v2 source/hash/header/orientation/mask/CLEAN_PLATE/render gates. Material report and task record are in the same immutable commit; no DDS/shared-state/build/runtime changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1901-B00122-P00051/B00122_P00051_FOUR_EVEN_CANONICAL_HD_SOURCE_GATED_REWORK.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_EVEN_CANONICAL_HD_SOURCE_GATED_V2_RECONSTRUCTION_WORK_ORDERS",
+    "indices": [
+      198,
+      214,
+      230,
+      236
+    ],
+    "assets": [
+      "9FC88069",
+      "BF229CF4",
+      "E95DA5",
+      "FEF70E85"
+    ],
+    "reviewed_translation_segments": 38,
+    "exact_inventory_source_fingerprints": 4,
+    "exact_canvas_scale_equations": 4,
+    "current_git_queue_path_source_matches": 0,
+    "prior_release_geometry_reused": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "prior_b00101_content_semantics_accepted_by_c00111": true,
+    "prior_b00101_evidence_blob_sha": "3ee3566382b4e4612b8c541498b83a54ff17dc0c",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "reason": "Reuse only C-accepted current semantics; pixel geometry from the prior noncanonical Release basis is intentionally not reused."
+  },
+  "skipped_or_deferred": {
+    "current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00115": [
+        36,
+        38,
+        128,
+        206
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00119": [
+        188,
+        226,
+        232
+      ]
+    },
+    "q00014_source_rework_dependency_blocked": {
+      "LOCALIZATION-LOCALIZATION_B-00110": [
+        92,
+        98,
+        112
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00113": [
+        26,
+        28,
+        30,
+        32
+      ]
+    },
+    "separate_runtime_validation_backlog": [
+      12,
+      54,
+      60,
+      104,
+      116
+    ]
+  },
+  "self_qa": "PASS_EVEN_ONLY_198_214_230_236__4_OF_4_CURRENT_PENDING_LOCALIZE_TEXT__38_OF_38_CANONICAL_TRANSLATIONS_CARRIED__4_OF_4_INVENTORY_SHA256_AND_CANVAS_IDENTITIES__4_OF_4_SCALE_EQUATIONS__ZERO_PRIOR_RELEASE_PIXEL_GEOMETRY_REUSED__ZERO_PIXEL_GEOMETRY_FABRICATED__ATOMIC_TASK_RECORD_INCLUDED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Canonical HD inventory identities are now authoritative for these four assets, but exact matching source bytes are not present at their GitHub queue paths. Header/alpha/mips, orientation, effect bboxes, removal/protected masks, CLEAN_PLATE, final safe bboxes and candidate-only gates cannot be inferred from the superseded Release geometry.",
+  "strict_hold": {
+    "exact_source_bytes": "HOLD_CANONICAL_HD_SOURCE_NOT_PRESENT_AT_CURRENT_GIT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "per_element_source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

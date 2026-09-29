@@ -1,0 +1,389 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00122",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00051",
+  "recorded_at_kst": "2026-09-29T19:01:00+09:00",
+  "base_head_sha": "2b879eaa22e033f120728f0ec3849bcc78b04290",
+  "purpose": "fallback4_canonical_hd_source_gated_rework",
+  "policy": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "generation_contract": "outrun-first-pass-edit-v2",
+    "clean_plate_contract": "outrun-clean-plate-qa-v1",
+    "default_safety_inset_px": 2,
+    "max_render_refit_iterations": 8
+  },
+  "immutable_inputs": {
+    "asset_queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "current_head_sha": "2b879eaa22e033f120728f0ec3849bcc78b04290"
+  },
+  "selection": {
+    "parity": "EVEN_ONLY",
+    "indices": [
+      198,
+      214,
+      230,
+      236
+    ],
+    "selection_reason": "Runnable REWORK returned by Q00012/C00111 for B00101. This task also applies Q00014/C00120's newly explicit canonical-user-HD source rule, superseding prior Sonic-TV Release pixel geometry rather than re-emitting it.",
+    "shared_state_modified": false
+  },
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00111",
+    "c_result_sha": "a4d2ed257af0503e6e408ade3ea385689922395d",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_B-00101",
+    "prior_material_sha": "476ecf7fb8622866a8a2e258f4bb946060b9a474",
+    "prior_evidence_blob_sha": "3ee3566382b4e4612b8c541498b83a54ff17dc0c",
+    "prior_defect": "IMMUTABLE_RESULT_SHA_MISSING_DURABLE_TASK_RECORD",
+    "current_canonical_source_rule": "Q00014/C00120 requires current user-HD inventory source when present; Release-derived pixel geometry is not canonical solely because dimensions match.",
+    "resolution": "Emit this canonical-inventory reconstruction payload and task record atomically under one new RESULT_SHA. Do not re-emit prior Release pixel geometry."
+  },
+  "github_binary_availability": {
+    "checked_paths": [
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+      "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds"
+    ],
+    "exact_queue_path_matches": 0,
+    "result": "CANONICAL_HD_BYTES_NOT_PRESENT_AT_QUEUE_PATHS_ON_CURRENT_BRANCH",
+    "rule": "No pixel geometry, DDS candidate, source mask or CLEAN_PLATE may be synthesized until a GitHub-visible source hashes exactly to inventory_sha256."
+  },
+  "assets": [
+    {
+      "index": 198,
+      "asset": "9FC88069",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "inventory_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+      "inventory_canvas": [
+        4096,
+        2048
+      ],
+      "filename_nominal_canvas": [
+        1024,
+        512
+      ],
+      "exact_scale_equation": "4096x2048 = 4x(1024x512)",
+      "inventory_mode": "RGBA",
+      "translations": [
+        [
+          "(PROTOTYPE)",
+          "(프로토타입)"
+        ],
+        [
+          "INTERMEDIATE B",
+          "중급 B"
+        ],
+        [
+          "INTERMEDIATE A",
+          "중급 A"
+        ],
+        [
+          "RANDOM",
+          "무작위"
+        ],
+        [
+          "- RANDOM PLAY -",
+          "- 무작위 재생 -"
+        ],
+        [
+          "(GUITAR MIX)",
+          "(기타 믹스)"
+        ],
+        [
+          "(INSTRUMENTAL)",
+          "(연주곡)"
+        ]
+      ],
+      "preserve": [
+        "song titles and numbered TBD labels not listed as localizable semantics",
+        "all branding/non-text artwork and pixels outside measured removal masks"
+      ],
+      "segment_count": 7,
+      "canonical_source_git_path_status": "NOT_FOUND_AT_QUEUE_PATH_ON_CURRENT_BRANCH",
+      "next_executable_steps": [
+        "obtain GitHub-visible exact canonical HD source bytes whose SHA-256 equals inventory_sha256",
+        "hash-gate source before any geometry reuse; do not reuse Sonic-TV Release pixel geometry as canonical",
+        "decode DDS header/format/alpha/mips at native inventory canvas 4096x2048",
+        "bind all 7 reviewed localizable semantics to exact decoded raw sprite regions without list-order inference",
+        "measure effect-inclusive source text bboxes and per-element raw/readable orientation; identify protected non-text pixels",
+        "derive source-effect removal masks and independently PASS CLEAN_PLATE with zero outside-mask/protected-art/alpha changes",
+        "derive candidate_safe_bbox as intersection of source permitted region and 2px inset measured source-effect bbox",
+        "fresh-render Korean at native resolution; never resize flattened text raster; enforce zero-pixel containment and exact ENGLISH SOURCE comparison"
+      ]
+    },
+    {
+      "index": 214,
+      "asset": "BF229CF4",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+      "inventory_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
+      "inventory_canvas": [
+        2048,
+        2048
+      ],
+      "filename_nominal_canvas": [
+        512,
+        512
+      ],
+      "exact_scale_equation": "2048x2048 = 4x(512x512)",
+      "inventory_mode": "RGBA",
+      "translations": [
+        [
+          "START",
+          "출발"
+        ],
+        [
+          "GOAL",
+          "골"
+        ]
+      ],
+      "preserve": [
+        "OutRun2 logos",
+        "course/route artwork outside independently measured text masks"
+      ],
+      "segment_count": 2,
+      "canonical_source_git_path_status": "NOT_FOUND_AT_QUEUE_PATH_ON_CURRENT_BRANCH",
+      "next_executable_steps": [
+        "obtain GitHub-visible exact canonical HD source bytes whose SHA-256 equals inventory_sha256",
+        "hash-gate source before any geometry reuse; do not reuse Sonic-TV Release pixel geometry as canonical",
+        "decode DDS header/format/alpha/mips at native inventory canvas 2048x2048",
+        "bind all 2 reviewed localizable semantics to exact decoded raw sprite regions without list-order inference",
+        "measure effect-inclusive source text bboxes and per-element raw/readable orientation; identify protected non-text pixels",
+        "derive source-effect removal masks and independently PASS CLEAN_PLATE with zero outside-mask/protected-art/alpha changes",
+        "derive candidate_safe_bbox as intersection of source permitted region and 2px inset measured source-effect bbox",
+        "fresh-render Korean at native resolution; never resize flattened text raster; enforce zero-pixel containment and exact ENGLISH SOURCE comparison"
+      ]
+    },
+    {
+      "index": 230,
+      "asset": "E95DA5",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+      "inventory_sha256": "4da4871fc494de71520e0299f4cb26eb8c9f6f7ce30ecd78f8b1d8dcd4b0f85a",
+      "inventory_canvas": [
+        2048,
+        1024
+      ],
+      "filename_nominal_canvas": [
+        512,
+        256
+      ],
+      "exact_scale_equation": "2048x1024 = 4x(512x256)",
+      "inventory_mode": "RGBA",
+      "translations": [
+        [
+          "UNAVAILABLE",
+          "이용 불가"
+        ],
+        [
+          "SOLD",
+          "판매 완료"
+        ],
+        [
+          "BONUS MATERIAL",
+          "보너스 자료"
+        ],
+        [
+          "COURSES",
+          "코스"
+        ],
+        [
+          "GAME MODES",
+          "게임 모드"
+        ],
+        [
+          "BGMUSIC",
+          "BGM"
+        ],
+        [
+          "CAR COLOURS",
+          "차량 색상"
+        ],
+        [
+          "FERRARI'S",
+          "페라리"
+        ],
+        [
+          "SHOWROOM ITEMS",
+          "쇼룸 아이템"
+        ],
+        [
+          "CAR COLORS",
+          "차량 색상"
+        ],
+        [
+          "BGM",
+          "BGM"
+        ],
+        [
+          "FERRARI CARS",
+          "페라리 차량"
+        ],
+        [
+          "You cannot buy this item yet",
+          "아직 이 아이템을 구매할 수 없습니다"
+        ],
+        [
+          "You already own this item",
+          "이미 보유한 아이템입니다"
+        ]
+      ],
+      "preserve": [
+        "named unlock/item titles not represented by the canonical localizable list",
+        "logos/icons/non-text showroom artwork outside measured masks"
+      ],
+      "segment_count": 14,
+      "canonical_source_git_path_status": "NOT_FOUND_AT_QUEUE_PATH_ON_CURRENT_BRANCH",
+      "next_executable_steps": [
+        "obtain GitHub-visible exact canonical HD source bytes whose SHA-256 equals inventory_sha256",
+        "hash-gate source before any geometry reuse; do not reuse Sonic-TV Release pixel geometry as canonical",
+        "decode DDS header/format/alpha/mips at native inventory canvas 2048x1024",
+        "bind all 14 reviewed localizable semantics to exact decoded raw sprite regions without list-order inference",
+        "measure effect-inclusive source text bboxes and per-element raw/readable orientation; identify protected non-text pixels",
+        "derive source-effect removal masks and independently PASS CLEAN_PLATE with zero outside-mask/protected-art/alpha changes",
+        "derive candidate_safe_bbox as intersection of source permitted region and 2px inset measured source-effect bbox",
+        "fresh-render Korean at native resolution; never resize flattened text raster; enforce zero-pixel containment and exact ENGLISH SOURCE comparison"
+      ]
+    },
+    {
+      "index": 236,
+      "asset": "FEF70E85",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+      "inventory_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "inventory_canvas": [
+        2048,
+        2048
+      ],
+      "filename_nominal_canvas": [
+        512,
+        512
+      ],
+      "exact_scale_equation": "2048x2048 = 4x(512x512)",
+      "inventory_mode": "RGBA",
+      "translations": [
+        [
+          "IMPERIAL AVENUE",
+          "임페리얼 애비뉴"
+        ],
+        [
+          "JUNGLE",
+          "정글"
+        ],
+        [
+          "LEGEND",
+          "레전드"
+        ],
+        [
+          "LOST CITY",
+          "로스트 시티"
+        ],
+        [
+          "METROPOLIS",
+          "메트로폴리스"
+        ],
+        [
+          "MILKY WAY",
+          "밀키 웨이"
+        ],
+        [
+          "NATIONAL PARK",
+          "내셔널 파크"
+        ],
+        [
+          "PALM BEACH",
+          "팜 비치"
+        ],
+        [
+          "SKYSCRAPERS",
+          "스카이스크레이퍼"
+        ],
+        [
+          "SNOW MOUNTAIN",
+          "스노 마운틴"
+        ],
+        [
+          "SUNNY BEACH",
+          "서니 비치"
+        ],
+        [
+          "TULIP GARDEN",
+          "튤립 가든"
+        ],
+        [
+          "WATERFALLS",
+          "워터폴스"
+        ],
+        [
+          "INDUSTRIAL COMPLEX",
+          "인더스트리얼 컴플렉스"
+        ],
+        [
+          "REVERSED",
+          "역방향"
+        ]
+      ],
+      "preserve": [
+        "course-card/background artwork",
+        "logos/icons and all non-text pixels outside measured masks"
+      ],
+      "segment_count": 15,
+      "canonical_source_git_path_status": "NOT_FOUND_AT_QUEUE_PATH_ON_CURRENT_BRANCH",
+      "next_executable_steps": [
+        "obtain GitHub-visible exact canonical HD source bytes whose SHA-256 equals inventory_sha256",
+        "hash-gate source before any geometry reuse; do not reuse Sonic-TV Release pixel geometry as canonical",
+        "decode DDS header/format/alpha/mips at native inventory canvas 2048x2048",
+        "bind all 15 reviewed localizable semantics to exact decoded raw sprite regions without list-order inference",
+        "measure effect-inclusive source text bboxes and per-element raw/readable orientation; identify protected non-text pixels",
+        "derive source-effect removal masks and independently PASS CLEAN_PLATE with zero outside-mask/protected-art/alpha changes",
+        "derive candidate_safe_bbox as intersection of source permitted region and 2px inset measured source-effect bbox",
+        "fresh-render Korean at native resolution; never resize flattened text raster; enforce zero-pixel containment and exact ENGLISH SOURCE comparison"
+      ]
+    }
+  ],
+  "integrated_self_qa": {
+    "even_indices_only": true,
+    "queue_rows_verified": 4,
+    "queue_action_all_localize_text": true,
+    "queue_artwork_status_all_pending_artwork": true,
+    "transcription_status_all_transcribed_reviewed": true,
+    "inventory_fingerprints_verified": 4,
+    "artwork_plan_translation_ready_verified": 4,
+    "total_localizable_segments": 38,
+    "exact_scale_equations_verified": 4,
+    "current_git_queue_path_source_matches": 0,
+    "prior_release_geometry_reused": 0,
+    "candidate_dds_created": 0,
+    "fabricated_pixel_geometry": 0,
+    "shared_state_modified": false,
+    "result": "PASS_MATERIAL_CANONICAL_HD_SOURCE_GATED_REWORK_INPUT_ONLY"
+  },
+  "strict_hold": {
+    "exact_source_bytes": "HOLD_CANONICAL_HD_SOURCE_NOT_PRESENT_AT_CURRENT_GIT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "per_element_source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
