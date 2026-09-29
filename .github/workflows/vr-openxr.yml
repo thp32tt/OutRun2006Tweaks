@@ -106,7 +106,7 @@ jobs:
               'draw is forced to stock-WVP zero disparity',
               'VR R32 REVIEW2'
             )
-            'src/vr/d3d9/stereo_renderer_r33.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r33_overlay.inc' = @(
               'R31OwnedResult R33TryFastWorld',
               'R31OwnedResult R33TryHud',
               'R32LowerFailClosed',

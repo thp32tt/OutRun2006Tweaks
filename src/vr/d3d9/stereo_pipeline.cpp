@@ -12,7 +12,8 @@
 #elif defined(OUTRUN_VR_R26_HUD_COMPARE)
 #include "stereo_renderer_r30_r26_safe.cpp"
 #else
-#include "stereo_renderer_r33.cpp"
+#include "stereo_renderer_r32.cpp"
+#include "stereo_renderer_r33_overlay.inc"
 #include "vr/game/render_semantics.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13

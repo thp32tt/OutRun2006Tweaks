@@ -58,6 +58,8 @@ ex_r14_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc"
 ex_r15_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r15.cpp"
 ex_r15_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc"
 ex_facade_rel = "src/vr/d3d9/ex_device_pipeline.cpp"
+stereo_r33_wrapper_rel = "src/vr/d3d9/stereo_renderer_r33.cpp"
+stereo_r33_overlay_rel = "src/vr/d3d9/stereo_renderer_r33_overlay.inc"
 stereo_r34_wrapper_rel = "src/vr/d3d9/stereo_renderer_r34.cpp"
 stereo_r34_overlay_rel = "src/vr/d3d9/stereo_renderer_r34_overlay.inc"
 stereo_facade_rel = "src/vr/d3d9/stereo_pipeline.cpp"
@@ -75,6 +77,8 @@ ex_r14_overlay = read(ex_r14_overlay_rel)
 ex_r15_wrapper = read(ex_r15_wrapper_rel)
 ex_r15_overlay = read(ex_r15_overlay_rel)
 ex_facade = read(ex_facade_rel)
+stereo_r33_wrapper = read(stereo_r33_wrapper_rel)
+stereo_r33_overlay = read(stereo_r33_overlay_rel)
 stereo_r34_wrapper = read(stereo_r34_wrapper_rel)
 stereo_r34_overlay = read(stereo_r34_overlay_rel)
 stereo_facade = read(stereo_facade_rel)
@@ -263,6 +267,28 @@ require_order(
 )
 
 require_order(
+    stereo_r33_wrapper,
+    stereo_r33_wrapper_rel,
+    '#include "stereo_renderer_r32.cpp"',
+    '#include "stereo_renderer_r33_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in stereo_r33_wrapper:
+    raise SystemExit("R33 compatibility wrapper regained implementation body")
+if "#include" in stereo_r33_overlay:
+    raise SystemExit("R33 overlay must remain include-free")
+require(
+    stereo_r33_overlay,
+    stereo_r33_overlay_rel,
+    "namespace OutRunVRStereo",
+    "R31OwnedResult R33TryFastWorld",
+    "R31OwnedResult R33TryHud",
+    "R32LowerFailClosed",
+    "R30DrawPrimitiveR29Hook",
+    "R33ResetR32Hook.stdcall<HRESULT>",
+    "top-level telemetry counted once",
+)
+
+require_order(
     stereo_r34_wrapper,
     stereo_r34_wrapper_rel,
     '#include "stereo_renderer_r33.cpp"',
@@ -284,8 +310,14 @@ require(
     "R34PresentR33Hook.stdcall<HRESULT>",
     "stereo remains fail-closed",
 )
-if '#include "stereo_renderer_r34.cpp"' in stereo_facade:
-    raise SystemExit("production stereo facade regressed to historical R34 wrapper inclusion")
+for stale_stereo_owner in (
+    '#include "stereo_renderer_r33.cpp"',
+    '#include "stereo_renderer_r34.cpp"',
+):
+    if stale_stereo_owner in stereo_facade:
+        raise SystemExit(
+            f"production stereo facade regressed to historical wrapper inclusion: {stale_stereo_owner}"
+        )
 require_order(
     stereo_facade,
     stereo_facade_rel,
@@ -293,7 +325,8 @@ require_order(
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "stereo_renderer_r30_r26_safe.cpp"',
-    '#include "stereo_renderer_r33.cpp"',
+    '#include "stereo_renderer_r32.cpp"',
+    '#include "stereo_renderer_r33_overlay.inc"',
     '#include "vr/game/render_semantics.hpp"',
     "namespace OutRunVRD3D9ExUpgradeR13",
     '#include "stereo_renderer_r34_overlay.inc"',
@@ -341,6 +374,9 @@ require(
     "'src/vr/d3d9/ex_device_upgrade_r15_overlay.inc' = @(",
     "D3DSBT_ALL",
     "Ex promotion rolled back transactionally",
+    "'src/vr/d3d9/stereo_renderer_r33_overlay.inc' = @(",
+    "R31OwnedResult R33TryFastWorld",
+    "R33ResetR32Hook.stdcall<HRESULT>",
     "'src/vr/d3d9/stereo_renderer_r34_overlay.inc' = @(",
     "R34ResetReplayBlocked",
     "LastResetStateReplaySucceeded",
@@ -352,6 +388,7 @@ for stale_guard in (
     "'src/vr/d3d9/ex_device_upgrade_r13.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(",
+    "'src/vr/d3d9/stereo_renderer_r33.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r34.cpp' = @(",
 ):
     if stale_guard in openxr_workflow:
@@ -359,4 +396,4 @@ for stale_guard in (
             f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
         )
 
-print("VR facade modularization F04 phase 6: PASS")
+print("VR facade modularization F04 phase 7: PASS")

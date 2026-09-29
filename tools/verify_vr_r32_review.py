@@ -96,9 +96,15 @@ if min(issue_marker, issue_reject) < 0 or issue_reject < issue_marker:
     raise SystemExit(
         "R32 EVENT Issue failure must quarantine DirectGPU after queued eye copies")
 
-r33 = require(
+r33_wrapper = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     '#include "stereo_renderer_r32.cpp"',
+    '#include "stereo_renderer_r33_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in r33_wrapper:
+    raise SystemExit("R33 compatibility wrapper regained implementation body")
+r33 = require(
+    "src/vr/d3d9/stereo_renderer_r33_overlay.inc",
     "R31OwnedResult R33TryFastWorld",
     "R31OwnedResult R33TryHud",
     "R31ObserveDraw(device)",
@@ -110,6 +116,8 @@ r33 = require(
     "R33 -> R32 -> R22",
     "top-level telemetry counted once",
 )
+if "#include" in r33:
+    raise SystemExit("R33 overlay must remain include-free")
 if "const HRESULT hr = ResetDestR22" in r33:
     raise SystemExit("R33 must not bypass the corrected R32 Reset lifecycle")
 
@@ -369,7 +377,7 @@ r31_lazy = require(
     "lazily re-primed at the next actual draw",
 )
 r33_lazy = require(
-    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/stereo_renderer_r33_overlay.inc",
     "R31FlushPendingStateBlockResync(device);",
 )
 
