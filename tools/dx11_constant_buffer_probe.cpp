@@ -687,6 +687,10 @@ int main()
         managedShadow.mirror_srv() != nullptr &&
         managedShadow.lifetime_state().mirrorShadowVersion == 1,
         "R103 post-Reset mirror upload uses new device generation");
+    require(
+        managedShadow.mirror_descriptor_exact(d3d.device) &&
+        !managedShadow.mirror_descriptor_exact(textureOtherDevice.device),
+        "R111 managed mirror descriptor and SRV view identity are exact-device bound");
 
     managedSource[0] ^= 0x33;
     require(
@@ -698,7 +702,8 @@ int main()
         !managedShadow.mirror_ready() &&
         managedShadow.mirror_device() == nullptr &&
         managedShadow.mirror_texture() == nullptr &&
-        managedShadow.mirror_srv() == nullptr,
+        managedShadow.mirror_srv() == nullptr &&
+        !managedShadow.mirror_descriptor_exact(d3d.device),
         "R103 shadow mutation invalidates and releases uploaded mirror");
 
     NativeManagedTextureShadow unsupportedManagedShadow;
@@ -944,6 +949,7 @@ int main()
         registryMirrorReady.resourcesOwned &&
         registryMirrorReady.lifetimeCurrent &&
         registryMirrorReady.deviceMatches &&
+        registryMirrorReady.descriptorExact &&
         registryMirrorReady.ready &&
         registryMirrorReady.deviceGeneration ==
             managedRegistry.device_generation(&registryTextureA) &&
@@ -963,6 +969,7 @@ int main()
         registryMirrorForeignDevice.resourcesOwned &&
         registryMirrorForeignDevice.lifetimeCurrent &&
         !registryMirrorForeignDevice.deviceMatches &&
+        !registryMirrorForeignDevice.descriptorExact &&
         !registryMirrorForeignDevice.ready,
         "R108 foreign D3D11 device cannot claim registered mirror readiness");
 
@@ -1006,6 +1013,7 @@ int main()
         registryStageReady.resourcesOwnedMask == 0x1u &&
         registryStageReady.lifetimeCurrentMask == 0x1u &&
         registryStageReady.deviceMatchesMask == 0x1u &&
+        registryStageReady.descriptorExactMask == 0x1u &&
         registryStageReady.readyMask == 0x1u &&
         registryStageReady.pendingMask == 0 &&
         registryStageReady.allRequiredReady,
@@ -1100,6 +1108,7 @@ int main()
         registryStageForeignDevice.resourcesOwnedMask == 0x1u &&
         registryStageForeignDevice.lifetimeCurrentMask == 0x1u &&
         registryStageForeignDevice.deviceMatchesMask == 0 &&
+        registryStageForeignDevice.descriptorExactMask == 0 &&
         registryStageForeignDevice.readyMask == 0 &&
         registryStageForeignDevice.pendingMask == 0x1u &&
         !registryStageForeignDevice.allRequiredReady,
@@ -1131,6 +1140,7 @@ int main()
         registryStageAfterExternalMutation.resourcesOwnedMask == 0 &&
         registryStageAfterExternalMutation.lifetimeCurrentMask == 0 &&
         registryStageAfterExternalMutation.deviceMatchesMask == 0 &&
+        registryStageAfterExternalMutation.descriptorExactMask == 0 &&
         registryStageAfterExternalMutation.readyMask == 0 &&
         registryStageAfterExternalMutation.pendingMask == 0x1u &&
         !registryStageAfterExternalMutation.allRequiredReady,
@@ -1227,6 +1237,7 @@ int main()
         registryStageAfterReset.resourcesOwnedMask == 0 &&
         registryStageAfterReset.lifetimeCurrentMask == 0 &&
         registryStageAfterReset.deviceMatchesMask == 0 &&
+        registryStageAfterReset.descriptorExactMask == 0 &&
         registryStageAfterReset.readyMask == 0 &&
         registryStageAfterReset.pendingMask == 0x1u &&
         !registryStageAfterReset.allRequiredReady,
@@ -1496,5 +1507,6 @@ int main()
     std::cout << "DX11 managed Texture2D registry mirror readiness R108: PASS\n";
     std::cout << "DX11 managed Texture2D stage mirror readiness R109: PASS\n";
     std::cout << "DX11 managed Texture2D readiness snapshot token R110: PASS\n";
+    std::cout << "DX11 managed Texture2D mirror descriptor exactness R111: PASS\n";
     return 0;
 }
