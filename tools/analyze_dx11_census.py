@@ -358,14 +358,31 @@ def main() -> int:
         ]
         unsupported_total = sum(latest[key] for key in unsupported_keys)
 
+    sampled_exactness = {
+        "Samples": latest["samples"] if latest else 0,
+        "ExactSamples": latest["exact"] if latest else 0,
+        "UnsupportedTotal": unsupported_total,
+        "AllSampledExact": bool(
+            latest
+            and latest["samples"] > 0
+            and latest["exact"] == latest["samples"]
+            and unsupported_total == 0
+        ),
+        "DiagnosticOnly": True,
+        "ExhaustiveDrawCoverage": False,
+        "ActivationProof": False,
+    }
+
     if not source_logs:
         status = "NO_DX11_CENSUS_LOG"
     elif not summaries:
         status = "CENSUS_ACTIVE_NO_PERIODIC_SUMMARY"
-    elif unsupported_total == 0:
-        status = "OBSERVED_SAMPLE_TRANSLATION_EXACT"
-    else:
+    elif unsupported_total != 0:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    elif sampled_exactness["AllSampledExact"]:
+        status = "OBSERVED_SAMPLED_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
+    else:
+        status = "TRANSLATION_EXACTNESS_PENDING"
 
     managed_texture_shadow_evidence = {
         "RequiredSamples": (
@@ -409,14 +426,16 @@ def main() -> int:
         "Status": status,
         "NativeDrawPathActivationAllowed": False,
         "ActivationEvidence": {
+            "CensusExactness": sampled_exactness,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
         },
         "ActivationNote": (
-            "Census exactness, managed-texture shadow readiness and external-mutation "
-            "invalidation evidence are observation only. Native D3D11 draw routing "
-            "remains disabled until resource mutation "
-            "classification/lifetime mirrors, shader/input translation and HMD "
-            "graphics parity gates pass."
+            "R113 sampled census exactness is diagnostic-only and never an activation "
+            "proof: the 1/64 sampler is not exhaustive, signature capture is bounded, "
+            "and native D3D11 draw routing remains disabled. Managed-texture shadow "
+            "readiness and external-mutation invalidation are also observation-only "
+            "until the remaining translation/lifetime gates and exact-build HMD "
+            "graphics parity pass."
         ),
         "SourceLogs": source_logs,
         "Startup": startup,

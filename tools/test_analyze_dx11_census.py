@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72-R85 compatibility plus R106/R107 managed-shadow evidence."""
+"""Regression tests for R72-R85 compatibility, R106/R107 evidence and R113 status semantics."""
 
 from __future__ import annotations
 
@@ -604,6 +604,26 @@ def main() -> int:
     )
     assert r107["ActivationEvidence"]["ManagedTextureShadow"]["ObservedReady"] is False
 
+    r113_pending = run_case(
+        "VR DX11 R72 census: samples=64 exact=0 fixedFn=64 programmable=0 "
+        "topologyUnsupported=0 signatures=0 declSamples=0 indexedSamples=0 "
+        "texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,indexUnsupported=0,"
+        "textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r113_pending["Status"] == "TRANSLATION_EXACTNESS_PENDING"
+    assert r113_pending["UnsupportedTotalLatest"] == 0
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["Samples"] == 64
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["ExactSamples"] == 0
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["AllSampledExact"] is False
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["DiagnosticOnly"] is True
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["ExhaustiveDrawCoverage"] is False
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["ActivationProof"] is False
+    assert r113_pending["NativeDrawPathActivationAllowed"] is False
+
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R72 census: samples=64 exact=64 fixedFn=64 programmable=0 "
@@ -615,12 +635,17 @@ def main() -> int:
         "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
         "depthCmp=0,cull=0]\n"
     )
-    assert r72["Status"] == "OBSERVED_SAMPLE_TRANSLATION_EXACT"
+    assert r72["Status"] == "OBSERVED_SAMPLED_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
+    assert r72["ActivationEvidence"]["CensusExactness"]["AllSampledExact"] is True
+    assert r72["ActivationEvidence"]["CensusExactness"]["DiagnosticOnly"] is True
+    assert r72["ActivationEvidence"]["CensusExactness"]["ExhaustiveDrawCoverage"] is False
+    assert r72["ActivationEvidence"]["CensusExactness"]["ActivationProof"] is False
+    assert r72["NativeDrawPathActivationAllowed"] is False
     assert r72["LatestSummary"]["behaviorUnsupported"] == 0
     assert r72["LatestSummary"]["mutationTelemetryRequired"] == 0
     assert r72["LatestSummary"]["managedShadowRequired"] == 0
 
-    print("DX11 census analyzer regression: PASS")
+    print("DX11 census analyzer regression R113: PASS")
     return 0
 
 

@@ -436,7 +436,25 @@ def main() -> None:
     )
     if '"NativeDrawPathActivationAllowed": False' not in analyzer:
         raise SystemExit("DX11 census must remain observation-only")
+    if '"OBSERVED_SAMPLE_TRANSLATION_EXACT"' in analyzer:
+        raise SystemExit(
+            "DX11 R113 ambiguous exact census status must not reappear"
+        )
     analyzer_contract = {
+        '"CensusExactness": sampled_exactness':
+            "R113 sampled census exactness evidence object",
+        '"DiagnosticOnly": True':
+            "R113 census evidence is diagnostic-only",
+        '"ExhaustiveDrawCoverage": False':
+            "R113 sampled census is explicitly non-exhaustive",
+        '"ActivationProof": False':
+            "R113 census exactness cannot be an activation proof",
+        '"OBSERVED_SAMPLED_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"':
+            "R113 exact sampled status is explicitly diagnostic-only",
+        '"TRANSLATION_EXACTNESS_PENDING"':
+            "R113 zero-unsupported but non-exact sampled status",
+        'latest["exact"] == latest["samples"]':
+            "R113 exact status requires every sampled draw to be exact",
         "introspectionFailure": "resource introspection failure evidence",
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
