@@ -1,0 +1,588 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00068",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "wave_id": "P00009",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:27:13+09:00",
+  "selection_head_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "2752dd3fbc5170c8e2263b2ca1be8e3b27a17182",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "continuous_producer_rules": {
+    "validation_mode": "C_BATCH_GATE",
+    "producer_actions_wait": false,
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2": [
+        137,
+        217,
+        219,
+        241
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00064@641a34826967c615bc29aec55feb1e305513bc3b": [
+        133,
+        135,
+        139,
+        143
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27": [
+        147,
+        159,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0": [
+        173,
+        193,
+        201,
+        225
+      ]
+    },
+    "peer_lane_files_modified": false,
+    "shared_state_modified": false
+  },
+  "selection": {
+    "selected_indices": [
+      175,
+      205,
+      227,
+      231
+    ],
+    "selected_assets": [
+      "754F0599",
+      "ACF61D7C",
+      "E596B7AC",
+      "EBE401C8"
+    ],
+    "selected_state": "localize_text/pending_artwork/transcribed_reviewed",
+    "reason": "Fresh odd-shard unfinished assets not present in current A QA-pending producer batches and with immutable GitHub Release/stock/atlas lineage available."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "deliverable_type": "FOUR_ODD_EXACT_RELEASE_AND_STOCK_TO_4X_ATLAS_RECONSTRUCTION_INPUTS",
+    "assets_advanced": 4,
+    "exact_github_objects_pinned": 20,
+    "atlas_regions_verified": 123,
+    "canonical_semantics_total": 41,
+    "stock_to_4x_geometry": "PASS_123_OF_123_EXACT_X4",
+    "semantic_to_sprite_mapping": "HOLD_STRICT_RECHECK",
+    "candidate_dds_written": false,
+    "description": "Pins immutable Release DDS, stock DDS/PNG, stock atlas and 4x atlas objects plus verified exact stock-to-4x geometry and canonical Korean semantic inputs. This creates deterministic inputs for the next decoded source-pixel mapping/bbox pass without guessing."
+  },
+  "assets": [
+    {
+      "queue_index": 175,
+      "asset": "754F0599",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+      "inventory_source": {
+        "sha256": "e6965d056d31f2d0378a9a4fb9d009cf7bad997246737a45ea0691a3339e67b9",
+        "width": 512,
+        "height": 256,
+        "mode": "RGBA"
+      },
+      "canonical_semantics": [
+        {
+          "source": "stage select",
+          "korean": "스테이지 선택"
+        },
+        {
+          "source": "showroom",
+          "korean": "쇼룸"
+        },
+        {
+          "source": "single player",
+          "korean": "싱글 플레이"
+        },
+        {
+          "source": "system link",
+          "korean": "시스템 링크"
+        },
+        {
+          "source": "xbox live",
+          "korean": "Xbox Live"
+        }
+      ],
+      "canonical_semantics_count": 5,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "upstream_objects": {
+        "release_dds": {
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+          "git_blob_sha": "60cbe90be5765b4ade3ce80916d9b2c7ed23e589"
+        },
+        "stock_dds": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+          "git_blob_sha": "4ef035120b23448ae429ff42d38d2b1c7d632eb2"
+        },
+        "stock_png": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.png",
+          "git_blob_sha": "8f0254212c93b117ba15a8177738098982a01beb"
+        },
+        "stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256_atlas.json",
+          "git_blob_sha": "f73abc49cec5b17f4912e97846d7bfe2fe0c48d9"
+        },
+        "hd4_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_754F0599_512x256_atlas.json",
+          "git_blob_sha": "01228b8c8d50564b77f980773d99a5741b135a5a"
+        }
+      },
+      "atlas_geometry": {
+        "regions_count": 5,
+        "all_regions_exact_4x": true,
+        "first": {
+          "sprite": "sprite_489",
+          "stock_cell": [
+            0,
+            217,
+            512,
+            39
+          ],
+          "hd_4x_cell": [
+            0,
+            868,
+            2048,
+            156
+          ]
+        },
+        "last": {
+          "sprite": "sprite_493",
+          "stock_cell": [
+            0,
+            61,
+            512,
+            39
+          ],
+          "hd_4x_cell": [
+            0,
+            244,
+            2048,
+            156
+          ]
+        }
+      },
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "queue_index": 205,
+      "asset": "ACF61D7C",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+      "inventory_source": {
+        "sha256": "34cadbc0b33b6280978c81614a9347ad667cbe8279cf105dc8623ebd13888f07",
+        "width": 1024,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "canonical_semantics": [
+        {
+          "source": "LOCAL MIXED",
+          "korean": "로컬 혼합"
+        },
+        {
+          "source": "LOCAL MT",
+          "korean": "로컬 MT"
+        },
+        {
+          "source": "LOCAL AT",
+          "korean": "로컬 AT"
+        },
+        {
+          "source": "FRIENDS",
+          "korean": "친구"
+        },
+        {
+          "source": "CANCEL",
+          "korean": "취소"
+        },
+        {
+          "source": "LICENSE DETAILS",
+          "korean": "라이선스 정보"
+        },
+        {
+          "source": "YES",
+          "korean": "예"
+        },
+        {
+          "source": "NO",
+          "korean": "아니오"
+        },
+        {
+          "source": "YOUR POSITION OK",
+          "korean": "현재 순위 확인"
+        },
+        {
+          "source": "REVERSE",
+          "korean": "반전"
+        },
+        {
+          "source": "Exchange OutRun miles for this item?",
+          "korean": "이 아이템을 아웃런 마일로 교환하시겠습니까?"
+        },
+        {
+          "source": "Adjust your Game settings",
+          "korean": "게임 설정 조정"
+        },
+        {
+          "source": "View single player and multiplayer rankings",
+          "korean": "싱글/멀티플레이 랭킹 보기"
+        },
+        {
+          "source": "Enjoy the original OutRun2SP",
+          "korean": "오리지널 아웃런2 SP 즐기기"
+        },
+        {
+          "source": "OutRun for 1 player!",
+          "korean": "1인 아웃런 플레이!"
+        },
+        {
+          "source": "RANKINGS",
+          "korean": "랭킹"
+        },
+        {
+          "source": "OPTIONS",
+          "korean": "옵션"
+        },
+        {
+          "source": "CONGRATULATIONS!",
+          "korean": "축하합니다!"
+        },
+        {
+          "source": "You got this item",
+          "korean": "이 아이템을 획득했습니다"
+        },
+        {
+          "source": "SORRY! You need more miles!",
+          "korean": "죄송합니다! 마일이 더 필요합니다!"
+        }
+      ],
+      "canonical_semantics_count": 20,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "preserve_policy_note": "Song titles and OutRun2SP logo remain preserve-original per canonical transcription/policy.",
+      "upstream_objects": {
+        "release_dds": {
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+          "git_blob_sha": "c9417c1b47b1af93d025cdfcdb08bef64de44341"
+        },
+        "stock_dds": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+          "git_blob_sha": "82e9aa45a921d12391aa7c240532d7b07a0e6b77"
+        },
+        "stock_png": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.png",
+          "git_blob_sha": "36d1cd674b5b0a1e60b75124a492e305742bec5e"
+        },
+        "stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512_atlas.json",
+          "git_blob_sha": "1ff7b7a2c3328a0a7653ff25151b1185ff22ac7d"
+        },
+        "hd4_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_ACF61D7C_1024x512_atlas.json",
+          "git_blob_sha": "d41e6e15758c64086e0f6d3e93e6b4add7105951"
+        }
+      },
+      "atlas_geometry": {
+        "regions_count": 75,
+        "all_regions_exact_4x": true,
+        "first": {
+          "sprite": "sprite_1474",
+          "stock_cell": [
+            0,
+            394,
+            238,
+            118
+          ],
+          "hd_4x_cell": [
+            0,
+            1576,
+            952,
+            472
+          ]
+        },
+        "last": {
+          "sprite": "sprite_1548",
+          "stock_cell": [
+            563,
+            75,
+            30,
+            12
+          ],
+          "hd_4x_cell": [
+            2252,
+            300,
+            120,
+            48
+          ]
+        }
+      },
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "queue_index": 227,
+      "asset": "E596B7AC",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+      "inventory_source": {
+        "sha256": "3cb1d1558d1e5bc95e455286ece0e32e719aae459202b887671efd20fe01d806",
+        "width": 512,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "canonical_semantics": [
+        {
+          "source": "INTERMEDIATE",
+          "korean": "중급"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런"
+        },
+        {
+          "source": "PROFESSIONAL",
+          "korean": "프로"
+        },
+        {
+          "source": "ALPINE",
+          "korean": "알파인"
+        },
+        {
+          "source": "ANCIENT RUINS",
+          "korean": "고대 유적"
+        },
+        {
+          "source": "CASTLE WALL",
+          "korean": "캐슬 월"
+        },
+        {
+          "source": "CLOUDY HIGHLAND",
+          "korean": "클라우디 하이랜드"
+        },
+        {
+          "source": "CONIFEROUS FOREST",
+          "korean": "침엽수림"
+        },
+        {
+          "source": "DEEP LAKE",
+          "korean": "딥 레이크"
+        },
+        {
+          "source": "DESERT",
+          "korean": "사막"
+        },
+        {
+          "source": "FLAGMAN 1",
+          "korean": "플래그맨 1"
+        },
+        {
+          "source": "FLAGMAN 2",
+          "korean": "플래그맨 2"
+        },
+        {
+          "source": "FLAGMAN 3",
+          "korean": "플래그맨 3"
+        },
+        {
+          "source": "NOVICE",
+          "korean": "초급"
+        }
+      ],
+      "canonical_semantics_count": 14,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "upstream_objects": {
+        "release_dds": {
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+          "git_blob_sha": "0947ec4031cb0c84fe0d63fdbee9e5b3173214e5"
+        },
+        "stock_dds": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+          "git_blob_sha": "500cb0b106733302033a6925d87151df82ffcb49"
+        },
+        "stock_png": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.png",
+          "git_blob_sha": "2d6cc8a4cbb500176931fe16499fdcc483f832c6"
+        },
+        "stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512_atlas.json",
+          "git_blob_sha": "05594901dbb84221a0ae6248e043df40bd10d32d"
+        },
+        "hd4_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_E596B7AC_512x512_atlas.json",
+          "git_blob_sha": "78466c9877d45db40c0a976ab3b24f34c61184e6"
+        }
+      },
+      "atlas_geometry": {
+        "regions_count": 37,
+        "all_regions_exact_4x": true,
+        "first": {
+          "sprite": "sprite_1006",
+          "stock_cell": [
+            0,
+            471,
+            259,
+            41
+          ],
+          "hd_4x_cell": [
+            0,
+            1884,
+            1036,
+            164
+          ]
+        },
+        "last": {
+          "sprite": "sprite_1042",
+          "stock_cell": [
+            259,
+            474,
+            218,
+            2
+          ],
+          "hd_4x_cell": [
+            1036,
+            1896,
+            872,
+            8
+          ]
+        }
+      },
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "queue_index": 231,
+      "asset": "EBE401C8",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+      "inventory_source": {
+        "sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+        "width": 2048,
+        "height": 1024,
+        "mode": "RGBA"
+      },
+      "canonical_semantics": [
+        {
+          "source": "LAN",
+          "korean": "LAN"
+        },
+        {
+          "source": "ONLINE",
+          "korean": "온라인"
+        }
+      ],
+      "canonical_semantics_count": 2,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "upstream_objects": {
+        "release_dds": {
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+          "git_blob_sha": "6b0ed8617cb0dc3e37fbadf61c91bcef08bda944"
+        },
+        "stock_dds": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+          "git_blob_sha": "8a4596e2ebe2ce7115aad60bff75de09f0d4f121"
+        },
+        "stock_png": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.png",
+          "git_blob_sha": "e7ba9f6dfe3ed98786f869ed78e18529ce896e1a"
+        },
+        "stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256_atlas.json",
+          "git_blob_sha": "77eed13accb3cddc6a120a8c2a9ae2516d42d60d"
+        },
+        "hd4_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_EBE401C8_512x256_atlas.json",
+          "git_blob_sha": "ef277877fe50dbafae9ed8ba1a4635f6e0d25b63"
+        }
+      },
+      "atlas_geometry": {
+        "regions_count": 6,
+        "all_regions_exact_4x": true,
+        "first": {
+          "sprite": "sprite_1549",
+          "stock_cell": [
+            0,
+            213,
+            320,
+            43
+          ],
+          "hd_4x_cell": [
+            0,
+            852,
+            1280,
+            172
+          ]
+        },
+        "last": {
+          "sprite": "sprite_1554",
+          "stock_cell": [
+            320,
+            191,
+            103,
+            22
+          ],
+          "hd_4x_cell": [
+            1280,
+            764,
+            412,
+            88
+          ]
+        }
+      },
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_175_205_227_231",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_A00061_A00064_A00065_A00067_ASSETS_SKIPPED",
+    "queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_translation_match": "PASS_41_OF_41_TRANSCRIPTION_EQUALS_ARTWORK_PLAN",
+    "immutable_git_source_identity": "PASS_20_OF_20_PINNED_GITHUB_OBJECT_IDENTITIES",
+    "atlas_geometry": "PASS_123_OF_123_STOCK_TO_4X_CELLS",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "semantic_to_sprite_mapping": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_EXACT_HD_PER_ELEMENT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "protected_artwork": "HOLD_UNTIL_PIXEL_MAPPING",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "next_safe_action": [
+    "Decode/inspect the exact pinned English Release/HD source pixels for each selected asset.",
+    "Bind each canonical semantic to an exact source sprite by direct visual/source evidence; never infer by list order.",
+    "Measure full glyph/effect bboxes including outline, shadow, glow and alpha fringe and record raw orientation/slant.",
+    "Reconstruct English glyph footprints from the exact source before Korean typesetting; no overlay or box patches.",
+    "Only then render Korean and run zero-pixel containment, DDS header/alpha/mipmap preservation, and English-source comparison."
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_RELEASE_ATLAS_RECONSTRUCTION_INPUTS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
