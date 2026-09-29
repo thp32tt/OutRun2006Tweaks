@@ -1189,3 +1189,303 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / HOSTED_CI_PENDING`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: consume CI only when completed.
+
+
+## Cycle 0061 — selector resource upload boundary
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- A white selector car can result from texture/resource/material state, but static differential alone cannot distinguish them; do not choose a fix without exact draw evidence.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace selector resource upload and texture0.
+
+
+## Cycle 0062 — texture-stage contamination
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Global texture-stage forcing would affect world geometry and is prohibited without exact selector ownership.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: capture selector-specific stage state first.
+
+
+## Cycle 0063 — material diffuse/specular boundary
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Colorless geometry may be material or texture driven; exact material evidence is required before mutation.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: bind material evidence to selector producer.
+
+
+## Cycle 0064 — HUD blend contamination falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- R30 SkyGlow restoration covers primary blend states, so a persistent HUD alpha symptom may originate upstream or in untracked stages; do not infer a leak from symptom alone.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect owned HUD stage state.
+
+
+## Cycle 0065 — menu head-lock ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu head-follow behavior is an ownership/anchor problem distinct from alpha; keep fixes separated.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace menu anchor producer.
+
+
+## Cycle 0066 — checkpoint duplicate falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Suppressing a generic HUD pass could hide legitimate timer updates; exact duplicate producer identity is required.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace checkpoint producer identity.
+
+
+## Cycle 0067 — result duplicate falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Result-screen duplication may span different queue epochs; frame-local blanket dedup is unsafe.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace result queue epochs.
+
+
+## Cycle 0068 — marker per-eye transform
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Projected markers require per-eye projected correction while world billboards retain world depth; preserve two-route model.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect per-eye marker evidence.
+
+
+## Cycle 0069 — reset/stateblock lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Visual fixes must preserve Reset/stateblock lifetime invariants; no evidence supports reintroducing pre-Reset Apply behavior.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: retain reset invariant.
+
+
+## Cycle 0070 — performance guard
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- No frame-pacing/copy/wait tuning without telemetry; visual P0 remains higher priority.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue visual-first.
+
+
+## Cycle 0071 — selector resource upload boundary
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- A white selector car can result from texture/resource/material state, but static differential alone cannot distinguish them; do not choose a fix without exact draw evidence.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace selector resource upload and texture0.
+
+
+## Cycle 0072 — texture-stage contamination
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Global texture-stage forcing would affect world geometry and is prohibited without exact selector ownership.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: capture selector-specific stage state first.
+
+
+## Cycle 0073 — material diffuse/specular boundary
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Colorless geometry may be material or texture driven; exact material evidence is required before mutation.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: bind material evidence to selector producer.
+
+
+## Cycle 0074 — HUD blend contamination falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- R30 SkyGlow restoration covers primary blend states, so a persistent HUD alpha symptom may originate upstream or in untracked stages; do not infer a leak from symptom alone.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect owned HUD stage state.
+
+
+## Cycle 0075 — menu head-lock ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu head-follow behavior is an ownership/anchor problem distinct from alpha; keep fixes separated.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace menu anchor producer.
+
+
+## Cycle 0076 — checkpoint duplicate falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Suppressing a generic HUD pass could hide legitimate timer updates; exact duplicate producer identity is required.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace checkpoint producer identity.
+
+
+## Cycle 0077 — result duplicate falsification
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Result-screen duplication may span different queue epochs; frame-local blanket dedup is unsafe.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace result queue epochs.
+
+
+## Cycle 0078 — marker per-eye transform
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Projected markers require per-eye projected correction while world billboards retain world depth; preserve two-route model.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect per-eye marker evidence.
+
+
+## Cycle 0079 — reset/stateblock lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Visual fixes must preserve Reset/stateblock lifetime invariants; no evidence supports reintroducing pre-Reset Apply behavior.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: retain reset invariant.
+
+
+## Cycle 0080 — performance guard
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- No frame-pacing/copy/wait tuning without telemetry; visual P0 remains higher priority.
+- Evidence: bounded current-R71 static review; uncertain behavior remains fail-closed.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue visual-first.
