@@ -1,0 +1,156 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-a00196-mod3-two-tier-source-audit-release-fallback-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00196",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00101",
+  "recorded_at_kst": "2026-09-30T03:34:28+09:00",
+  "base_head_sha": "46f83e9449c178bc7d6b74b5cb28630ca6b699ab",
+  "status": "PASS_MATERIAL_PREFLIGHT_ONLY_NARROWED",
+  "contract_resolution": {
+    "prompt_shard_text": "odd index primary shard",
+    "authoritative_head_rule": "asset_queue.index % 3 == 0",
+    "applied_shard": "A_MOD3_REMAINDER_0",
+    "work_steal": false
+  },
+  "candidate_completion_fresh_scan": {
+    "latest_c_task": "LOCALIZATION-LOCALIZATION_C-00194",
+    "latest_c_result": "REWORK_REQUIRED_Q00038_B00190_IMMUTABLE_RESULT_MISSING_DURABLE_TASK_RECORD_RUNTIME_UNTESTED",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "already_rendered_static_qa_pass_indices": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "a00191_qa_pending_not_repeated": [
+      135,
+      147,
+      159,
+      201
+    ],
+    "unchanged_post_reset_dependency_blocked_existing_reworks": [
+      51,
+      102,
+      111
+    ],
+    "selected_priority": "ONE_NEW_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_READY_TIER"
+  },
+  "approved_drive": {
+    "account_label": "ezflash557",
+    "root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "exact_parent_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst",
+    "observed_children": [
+      "9F060EC1_512x512.dds"
+    ],
+    "exact_path_misses": 4,
+    "write_performed": false
+  },
+  "pinned_direct": {
+    "repository": "envido32/OR2006Sprites",
+    "tag": "v0.25.10a",
+    "tag_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "exact_path_404": 4
+  },
+  "pinned_release": {
+    "asset_id": 306630789,
+    "name": "OR2-HD-GUI-v0.25.10a.zip",
+    "size": 306223257,
+    "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "metadata_identity_gate": "PASS_CURRENT_GITHUB_RELEASE_API",
+    "consumed_in_this_task": false,
+    "remaining_action": "Extract only the four exact member paths from the verified pinned ZIP, then compare member SHA-256 + DDS header dimensions/format/mips against current inventory before any pixel work.",
+    "not_exhausted_reason": "Release fallback remains an approved unconsumed tier; therefore SOURCE_ACQUISITION_EXHAUSTED is not claimed."
+  },
+  "assets": [
+    {
+      "index": 198,
+      "asset": "9FC88069",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "canonical_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+      "canonical_width": 4096,
+      "canonical_height": 2048,
+      "canonical_mode": "RGBA",
+      "drive": "SOURCE_TRANSPORT_MISS_EXACT_PARENT",
+      "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+      "release": "RELEASE_FALLBACK_REQUIRED",
+      "readiness_after": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    },
+    {
+      "index": 219,
+      "asset": "D263B3F1",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512.dds",
+      "canonical_sha256": "489fec388b636cd681e3d691ef9b5026a9036e1fbfd2948845d327a184050084",
+      "canonical_width": 512,
+      "canonical_height": 512,
+      "canonical_mode": "RGBA",
+      "drive": "SOURCE_TRANSPORT_MISS_EXACT_PARENT",
+      "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+      "release": "RELEASE_FALLBACK_REQUIRED",
+      "readiness_after": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    },
+    {
+      "index": 222,
+      "asset": "DDF0392A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "canonical_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "canonical_width": 1024,
+      "canonical_height": 2048,
+      "canonical_mode": "RGBA",
+      "drive": "SOURCE_TRANSPORT_MISS_EXACT_PARENT",
+      "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+      "release": "RELEASE_FALLBACK_REQUIRED",
+      "readiness_after": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    },
+    {
+      "index": 225,
+      "asset": "E3C455FA",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3C455FA_512x256.dds",
+      "canonical_sha256": "03d29bbabcffa88887dd538b30a35348b28d3a556026c2c63cbb824d70dabc36",
+      "canonical_width": 2048,
+      "canonical_height": 1024,
+      "canonical_mode": "RGBA",
+      "drive": "SOURCE_TRANSPORT_MISS_EXACT_PARENT",
+      "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+      "release": "RELEASE_FALLBACK_REQUIRED",
+      "readiness_after": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    }
+  ],
+  "summary_counts": {
+    "assets": 4,
+    "drive_exact_path_misses": 4,
+    "pinned_direct_404": 4,
+    "release_fallback_required": 4,
+    "exact_canonical_sources_acquired": 0,
+    "source_acquisition_exhausted": 0
+  },
+  "materially_reduces_unresolved_work": true,
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "asset_queue_blob_sha": "0f4518f636dc1c0b1d4b226ee5d99a191e446bca",
+    "a00191_task_blob_sha": "3512563cd2434ac445d2dc27237b6290fe8f7e10",
+    "c00194_task_blob_sha": "aa5a33c79ad07c384514593c5ec1132a47b61894"
+  },
+  "commit_refresh_head_sha": "ac24b30ca1ce60407855ddceda705b18cc825e59",
+  "preserved_peer_head": true
+}

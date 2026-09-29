@@ -1,0 +1,91 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00196",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00101",
+  "recorded_at_kst": "2026-09-30T03:34:28+09:00",
+  "base_head_sha": "46f83e9449c178bc7d6b74b5cb28630ca6b699ab",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MOD3_TWO_TIER_SOURCE_AUDIT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDICES198_219_222_225_PREFLIGHT_NARROWED_RELEASE_FALLBACK_REQUIRED_RUNTIME_UNTESTED",
+  "summary": "Current Git HEAD contract overrides the stale prompt shard wording: A owns asset_queue.index % 3 == 0. Fresh C140-aware scan has no C-accepted RENDER_READY or ONE_STAGE_TO_RENDER asset; A00191 indices135/147/159/201 are QA-pending and are not repeated, and unchanged legacy reworks51/102/111 still lack post-reset v2 deterministic reconstruction prerequisites. This invocation uses the single permitted new preflight batch on indices198/219/222/225. Approved ezflash557 Drive exact parent misses all four files; immutable v0.25.10a tag commit exact paths are 404 for all four. Current GitHub release metadata re-verifies asset306630789, 306223257 bytes, SHA-256 76f85ed2.... The Release member tier remains unconsumed, so source exhaustion is not falsely claimed. The material deliverable narrows each asset to one exact remaining acquisition step and pins canonical inventory identities for the next producer.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00196-P00101/A00196_P00101_MOD3_RELEASE_FALLBACK_MANIFEST.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "A_MOD3_FOUR_ASSET_TWO_TIER_SOURCE_AUDIT_PLUS_DETERMINISTIC_RELEASE_EXTRACTION_MANIFEST",
+    "reviewed_indices": [
+      198,
+      219,
+      222,
+      225
+    ],
+    "drive_exact_path_misses": 4,
+    "pinned_direct_exact_path_404": 4,
+    "pinned_release_metadata_verified": true,
+    "release_member_checks_remaining": 4,
+    "exact_canonical_sources_acquired": 0,
+    "source_acquisition_exhausted": 0,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_indices": [
+      198,
+      219,
+      222,
+      225
+    ],
+    "selected_priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "latest_c_gate": "C140/Q00038 authoritative Gate PASS; Q00038 itself returns only B00190 producer-contract REWORK and promotes no ready asset",
+    "static_pass_not_repeated": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "qa_pending_not_repeated": [
+      "A00191 indices135/147/159/201",
+      "B00195",
+      "B00197"
+    ],
+    "unchanged_dependency_blocked_existing_reworks": [
+      51,
+      102,
+      111
+    ],
+    "readiness_after": {
+      "198": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING",
+      "219": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING",
+      "222": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING",
+      "225": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    },
+    "post_evidence_render_ready_count": 0,
+    "post_evidence_one_stage_to_render_count": 0
+  },
+  "self_qa": "PASS_A_MOD3_198_219_222_225__ZERO_C_ACCEPTED_READY_TIER__A00191_QA_PENDING_NOT_REPEATED__DRIVE_EXACT_PARENT_MISS_4_OF_4__PINNED_TAG_DIRECT_404_4_OF_4__PINNED_RELEASE_ASSET_METADATA_REVERIFIED__NO_FALSE_SOURCE_EXHAUSTION__NO_PIXEL_CONSTRUCTION_WITHOUT_EXACT_MEMBER_IDENTITY__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_RELEASE_MEMBER_IDENTITY_PENDING",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "commit_refresh_head_sha": "ac24b30ca1ce60407855ddceda705b18cc825e59",
+  "preserved_peer_head": true
+}
