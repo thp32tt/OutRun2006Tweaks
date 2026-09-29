@@ -14,12 +14,15 @@
 #include "stereo_renderer_r26.cpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/debug/experiment_modes.hpp"
+#include "vr/debug/perf_hitch_trace.hpp"
 #include "vr/d3d9/frame_context.hpp"
 #include "vr/d3d9/render_policy.hpp"
 #include "vr/d3d9/screen_space_policy.hpp"
 #include "vr/d3d9/safety_policy.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
+#include <array>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -131,6 +134,224 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwAtomicFallbackLogged = false;
         std::uint64_t R30XyzrhwBilateralFallbacks = 0;
         bool R30FirstXyzrhwBilateralFallbackLogged = false;
+
+        // R81 performance-hitch telemetry. This is intentionally diagnostic
+        // only: no pacing, render-state, resource-policy or quality behavior is
+        // changed. Logical game draws are counted before stereo replay, while
+        // resource churn is supplied by the shared PerfHitch counters.
+        struct R81DrawFrame
+        {
+            std::uint64_t draws = 0;
+            std::uint64_t primitives = 0;
+            std::uint64_t indexedDraws = 0;
+            std::uint64_t upDraws = 0;
+            std::uint64_t sceneEffectDraws = 0;
+            std::uint64_t worldParticleDraws = 0;
+        };
+
+        struct R81FrameSample
+        {
+            std::uint64_t serial = 0;
+            std::uint64_t tick = 0;
+            std::uint64_t frameUs = 0;
+            std::uint64_t presentUs = 0;
+            std::uint64_t skyGlowUs = 0;
+            R81DrawFrame draw{};
+            OutRunVR::PerfHitch::ResourceSnapshot resource{};
+            int stage = -1;
+            int state = -1;
+            int liveParticles = 0;
+            int particleSources = 0;
+            int peakParticleSource = 0;
+        };
+
+        R81DrawFrame R81CurrentDraw{};
+        std::array<R81FrameSample, 4> R81FrameHistory{};
+        std::size_t R81FrameHistoryCount = 0;
+        std::size_t R81FrameHistoryNext = 0;
+        std::uint64_t R81FrameSerial = 0;
+        std::uint64_t R81LastPresentEndUs = 0;
+        std::uint64_t R81LastHitchLogUs = 0;
+        std::uint64_t R81SkyGlowUs = 0;
+        double R81FrameEmaUs = 0.0;
+        int R81PostHitchFrames = 0;
+        std::uint64_t R81HitchCount = 0;
+
+        std::uint64_t R81NowUs() noexcept
+        {
+            return static_cast<std::uint64_t>(
+                std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::steady_clock::now().time_since_epoch()).count());
+        }
+
+        void R81NoteDraw(
+            OutRunVR::GameSemantic::RenderScope scope,
+            UINT primitiveCount, bool indexed, bool up) noexcept
+        {
+            if (!Settings::VRTelemetry)
+                return;
+            ++R81CurrentDraw.draws;
+            R81CurrentDraw.primitives += primitiveCount;
+            if (indexed)
+                ++R81CurrentDraw.indexedDraws;
+            if (up)
+                ++R81CurrentDraw.upDraws;
+            if (scope == OutRunVR::GameSemantic::RenderScope::SceneEffect)
+                ++R81CurrentDraw.sceneEffectDraws;
+            if (scope == OutRunVR::GameSemantic::RenderScope::WorldParticle)
+                ++R81CurrentDraw.worldParticleDraws;
+        }
+
+        void R81ReadParticleLoad(
+            int& liveParticles, int& sources, int& peak) noexcept
+        {
+            liveParticles = 0;
+            sources = 0;
+            peak = 0;
+            if (!Game::nl_part_src)
+                return;
+            for (int i = 0; i < Game::NLPartSourceCount; ++i)
+            {
+                const int live = Game::nl_part_src[i].liveCount;
+                if (live <= 0)
+                    continue;
+                liveParticles += live;
+                ++sources;
+                peak = std::max(peak, live);
+            }
+        }
+
+        void R81LogFrameSample(
+            const char* phase, const R81FrameSample& f) noexcept
+        {
+            spdlog::info(
+                "VR R81 FRAME {}: serial={} tick={} stage={} state={} frameUs={} presentUs={} skyGlowUs={} draw[calls={},prims={},indexed={},up={},sceneFx={},worldParticle={}] particles[live={},sources={},peak={}] stream[texCreate={},texMiB={:.2f},texLocks={},uploads={},uploadMiB={:.2f},uploadUs={},vbCreate={},vbKiB={:.1f},ibCreate={},ibKiB={:.1f},bufLocks={},bufKiB={:.1f},discard={},noOverwrite={}]",
+                phase, f.serial, f.tick, f.stage, f.state,
+                f.frameUs, f.presentUs, f.skyGlowUs,
+                f.draw.draws, f.draw.primitives, f.draw.indexedDraws,
+                f.draw.upDraws, f.draw.sceneEffectDraws,
+                f.draw.worldParticleDraws,
+                f.liveParticles, f.particleSources, f.peakParticleSource,
+                f.resource.managedTextureCreates,
+                static_cast<double>(f.resource.managedTextureCreateBytes) /
+                    (1024.0 * 1024.0),
+                f.resource.textureLocks, f.resource.textureUploads,
+                static_cast<double>(f.resource.textureUploadBytes) /
+                    (1024.0 * 1024.0),
+                f.resource.textureUploadUs,
+                f.resource.vertexBufferCreates,
+                static_cast<double>(f.resource.vertexBufferCreateBytes) / 1024.0,
+                f.resource.indexBufferCreates,
+                static_cast<double>(f.resource.indexBufferCreateBytes) / 1024.0,
+                f.resource.bufferLocks,
+                static_cast<double>(f.resource.bufferLockBytes) / 1024.0,
+                f.resource.bufferDiscardLocks,
+                f.resource.bufferNoOverwriteLocks);
+        }
+
+        void R81PushHistory(const R81FrameSample& sample) noexcept
+        {
+            R81FrameHistory[R81FrameHistoryNext] = sample;
+            R81FrameHistoryNext =
+                (R81FrameHistoryNext + 1) % R81FrameHistory.size();
+            R81FrameHistoryCount = std::min<std::size_t>(
+                R81FrameHistoryCount + 1, R81FrameHistory.size());
+        }
+
+        void R81LogHistory() noexcept
+        {
+            const std::size_t start =
+                (R81FrameHistoryNext + R81FrameHistory.size() -
+                    R81FrameHistoryCount) % R81FrameHistory.size();
+            for (std::size_t i = 0; i < R81FrameHistoryCount; ++i)
+            {
+                R81LogFrameSample(
+                    "PRE",
+                    R81FrameHistory[
+                        (start + i) % R81FrameHistory.size()]);
+            }
+        }
+
+        void R81FinishFrame(
+            std::uint64_t presentUs, std::uint64_t frameEndUs) noexcept
+        {
+            if (!Settings::VRTelemetry)
+            {
+                R81CurrentDraw = {};
+                R81SkyGlowUs = 0;
+                (void)OutRunVR::PerfHitch::Consume();
+                R81LastPresentEndUs = frameEndUs;
+                return;
+            }
+
+            R81FrameSample sample{};
+            sample.serial = ++R81FrameSerial;
+            sample.tick = Game::power_on_timer
+                ? static_cast<std::uint64_t>(*Game::power_on_timer) : 0;
+            sample.frameUs = R81LastPresentEndUs
+                ? frameEndUs - R81LastPresentEndUs : 0;
+            sample.presentUs = presentUs;
+            sample.skyGlowUs = R81SkyGlowUs;
+            sample.draw = R81CurrentDraw;
+            sample.resource = OutRunVR::PerfHitch::Consume();
+            sample.stage = Game::stg_stage_num
+                ? static_cast<int>(*Game::stg_stage_num) : -1;
+            sample.state = Game::current_mode
+                ? static_cast<int>(*Game::current_mode) : -1;
+            R81ReadParticleLoad(
+                sample.liveParticles,
+                sample.particleSources,
+                sample.peakParticleSource);
+
+            R81CurrentDraw = {};
+            R81SkyGlowUs = 0;
+            R81LastPresentEndUs = frameEndUs;
+
+            if (sample.frameUs == 0)
+            {
+                R81PushHistory(sample);
+                return;
+            }
+
+            const double baseline = R81FrameEmaUs > 0.0
+                ? R81FrameEmaUs
+                : static_cast<double>(sample.frameUs);
+            const double hitchThreshold =
+                std::max(18000.0, baseline * 1.35);
+            const bool hitch =
+                sample.serial > 120 &&
+                static_cast<double>(sample.frameUs) > hitchThreshold &&
+                static_cast<double>(sample.frameUs) > baseline + 2500.0;
+            const bool cooldown =
+                R81LastHitchLogUs == 0 ||
+                frameEndUs - R81LastHitchLogUs >= 500000;
+
+            if (hitch && cooldown)
+            {
+                ++R81HitchCount;
+                R81LastHitchLogUs = frameEndUs;
+                spdlog::warn(
+                    "VR R81 FRAME HITCH: event={} serial={} frameUs={} emaUs={:.0f} thresholdUs={:.0f}; dumping 4 pre + hit + 4 post frames",
+                    R81HitchCount, sample.serial, sample.frameUs,
+                    baseline, hitchThreshold);
+                R81LogHistory();
+                R81LogFrameSample("HIT", sample);
+                R81PostHitchFrames = 4;
+            }
+            else if (R81PostHitchFrames > 0)
+            {
+                R81LogFrameSample("POST", sample);
+                --R81PostHitchFrames;
+            }
+
+            R81PushHistory(sample);
+            const double capped = std::min(
+                static_cast<double>(sample.frameUs),
+                baseline * 1.50);
+            R81FrameEmaUs = R81FrameEmaUs <= 0.0
+                ? capped
+                : (R81FrameEmaUs * 0.95 + capped * 0.05);
+        }
 
 
         // R30.6 CPU shadows for XYZRHW vertex/index buffers.
@@ -653,6 +874,8 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
+            if (SUCCEEDED(hr) && Settings::VRTelemetry)
+                OutRunVR::PerfHitch::NoteBufferLock(size, flags);
             if (SUCCEEDED(hr) && data && *data &&
                 R30WaitForVertexRegistration(buffer))
             {
@@ -717,6 +940,8 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
+            if (SUCCEEDED(hr) && Settings::VRTelemetry)
+                OutRunVR::PerfHitch::NoteBufferLock(size, flags);
             if (SUCCEEDED(hr) && data && *data &&
                 R30WaitForIndexRegistration(buffer))
             {
@@ -822,6 +1047,8 @@ namespace OutRunVRStereo
                 device, length, usage, fvf, pool, out, shared);
             if (SUCCEEDED(hr) && out && *out)
             {
+                if (Settings::VRTelemetry)
+                    OutRunVR::PerfHitch::NoteVertexBufferCreate(length);
                 {
                     std::lock_guard<std::mutex> lock(
                         R30ShadowRegistryMutex);
@@ -854,6 +1081,8 @@ namespace OutRunVRStereo
                 device, length, usage, format, pool, out, shared);
             if (SUCCEEDED(hr) && out && *out)
             {
+                if (Settings::VRTelemetry)
+                    OutRunVR::PerfHitch::NoteIndexBufferCreate(length);
                 std::lock_guard<std::mutex> lock(
                     R30ShadowRegistryMutex);
                 if (R30IndexShadows.erase(*out) != 0)
@@ -1764,12 +1993,21 @@ namespace OutRunVRStereo
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
             {
-                InternalPassScope guard;
-                R30ApplyStereoSkyGlow(device);
+                const auto glowStart = R81NowUs();
+                {
+                    InternalPassScope guard;
+                    R30ApplyStereoSkyGlow(device);
+                }
+                R81SkyGlowUs += R81NowUs() - glowStart;
             }
-            return R30PresentR26Hook.stdcall<HRESULT>(
+
+            const auto presentStart = R81NowUs();
+            const HRESULT hr = R30PresentR26Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
+            const auto frameEnd = R81NowUs();
+            R81FinishFrame(frameEnd - presentStart, frameEnd);
+            return hr;
         }
 
         HRESULT __stdcall ResetDestR30(
@@ -1783,6 +2021,14 @@ namespace OutRunVRStereo
             R69FrameContext.ResetStageTransition();
             R30BufferShadowCaptureArmed.store(
                 false, std::memory_order_release);
+            R81CurrentDraw = {};
+            R81FrameHistoryCount = 0;
+            R81FrameHistoryNext = 0;
+            R81LastPresentEndUs = 0;
+            R81FrameEmaUs = 0.0;
+            R81PostHitchFrames = 0;
+            R81SkyGlowUs = 0;
+            (void)OutRunVR::PerfHitch::Consume();
             return R30ResetR26Hook.stdcall<HRESULT>(device, params);
         }
 
@@ -4860,6 +5106,8 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            if (device && IsGameDevice(device) && !InternalStereoPass)
+                R81NoteDraw(drawSemanticValue, primitiveCount, false, false);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -4891,6 +5139,8 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            if (device && IsGameDevice(device) && !InternalStereoPass)
+                R81NoteDraw(drawSemanticValue, primitiveCount, true, false);
 
             const HRESULT fixedFnSprite =
                 R62TryFixedFunctionSpriteIndexed(
@@ -4932,6 +5182,8 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            if (device && IsGameDevice(device) && !InternalStereoPass)
+                R81NoteDraw(drawSemanticValue, primitiveCount, false, true);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -4964,6 +5216,8 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            if (device && IsGameDevice(device) && !InternalStereoPass)
+                R81NoteDraw(drawSemanticValue, primitiveCount, true, true);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
