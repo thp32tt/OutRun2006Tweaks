@@ -1780,3 +1780,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion-first remains exact-source multistage **133/159/198/201/222/226/232** before unrelated source-preflight expansion.
 - Counts remain actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS change or real-game test. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 - This bookkeeping commit is separate from the validation-bearing result and does not own the Gate.
+
+
+## 2026-09-30 04:10 KST - C144 Q00042 INDEPENDENT QA BATCH
+
+- Immutable input: A00200 `1623d022d5ffcdfe54130cec3b39e69d1387eed2` — **SUPERSEDED**.
+- A00200's exact-source activation evidence is structurally valid and consistent with unchanged C141/C142 source identities, current inventory and current transcriptions. It contains no candidate DDS and does not fabricate masks/CLEAN_PLATE/safe bbox.
+- Before shared-state merge, latest HEAD advanced to newer candidate-bearing A00196 `1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb`, which consumes A00200 and creates actual Korean candidates for overlapping indices **159/201** with SHA-256 `7724fb92...` / `cf079946...`.
+- Per the supersession rule, Q00042 does not PASS/merge stale A00200 pre-generation state over those newer candidates. The entire immutable producer input is dispositioned **SUPERSEDED**. The newer candidate result is outside Q00042 and receives no static approval here.
+- Indices **198/222** keep their prior C142 **PREFLIGHT_ONLY** exact-source state; A00200's batch-level supersession does not roll them back or promote them.
+- Candidate-completion-first: consume the newer 159/201 candidate result in its own C batch first; then continue exact-source multistage 198/133/222/226/232 before unrelated source preflight.
+- Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS modification by C, no build, N100/local clone/worktree, GPT Library, Drive write, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0410-C144/C144_Q00042_INDEPENDENT_QA_BATCH.json`.

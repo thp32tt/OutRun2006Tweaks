@@ -1222,3 +1222,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00199 disposition remains **PASS**; 46/100/106 remain **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**.
 - No RENDER_READY/ONE_STAGE_TO_RENDER, candidate/static/runtime approval. Counts unchanged: pending production **71**, actionable localize_text **93**, canonical segments **753**.
 - `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### C144 Q00042 — 2026-09-30T04:10:38+09:00
+- A00200 `1623d022` — **SUPERSEDED** because current HEAD contains newer overlapping 159/201 Korean candidates from A00196 `1efd8de0`.
+- A00200 source/work-order evidence itself is consistent, but stale pre-generation state is not merged over newer candidate SHA state.
+- 159/201 are **candidate QA pending** outside this batch; 198/222 retain prior C142 **PREFLIGHT_ONLY** exact-source state. No Q00042 static/runtime approval.
+- Candidate-completion-first remains active: newer 159/201 candidate C QA precedes exact-source multistage 198/133/222/226/232 and unrelated preflight.
+- Pending production **71**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0410-C144/C144_Q00042_INDEPENDENT_QA_BATCH.json`.
