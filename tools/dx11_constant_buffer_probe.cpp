@@ -19,6 +19,9 @@ namespace
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
     using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
+    using outrun::vr::dx11::NativeManagedTextureStageReadiness;
+    using outrun::vr::dx11::compose_fixed_function_activation_readiness;
+    using outrun::vr::dx11::validate_fixed_function_activation_snapshot;
     using outrun::vr::dx11::TextureMutationUpdateKind;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
