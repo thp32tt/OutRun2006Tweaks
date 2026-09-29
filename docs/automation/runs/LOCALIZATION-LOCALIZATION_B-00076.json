@@ -1,0 +1,74 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00015",
+  "recorded_at_kst": "2026-09-29T15:18:00+09:00",
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_EVEN_DIRECT_SEMANTIC_CELL_MAPPINGS_35_CANONICAL_42_PHYSICAL_WITH_LOGO_PRESERVE_EVIDENCE",
+  "summary": "Advanced C-consumed even indices 86/100/106 with direct immutable stock-source-to-4x-atlas semantic mapping while reusing B00051/C101 heavy source identity evidence. Mapped 35 canonical semantics to 42 physical cells and fail-closed the 788CE557 OutRun2SP wordmark as preserve-original evidence for C reconciliation. Index 128 remains dependency-blocked and was not guessed. No Korean DDS or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1518-B119-P00015/B119_P00015_EVEN_DIRECT_SEMANTIC_CELL_MAPPING.json",
+    "localization/graphics/role_B/20260929-1518-B119-P00015/B119_86_C598919A_STOCK_READABLE_MAPPING_REFERENCE.png",
+    "localization/graphics/role_B/20260929-1518-B119-P00015/B119_100_53CE39D5_STOCK_READABLE_MAPPING_REFERENCE.png",
+    "localization/graphics/role_B/20260929-1518-B119-P00015/B119_106_788CE557_STOCK_READABLE_MAPPING_REFERENCE.png"
+  ],
+  "material_deliverable": {
+    "type": "THREE_EVEN_DIRECT_SEMANTIC_CELL_MAPPINGS_PLUS_ONE_PROTECTED_LOGO_RECLASS_EVIDENCE",
+    "indices": [
+      86,
+      100,
+      106
+    ],
+    "assets": [
+      "C598919A",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "canonical_semantics_mapped": 35,
+    "physical_occurrences_mapped": 42,
+    "localizable_physical_occurrences": 41,
+    "preserve_original_reclassification_recommendations": 1,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00062": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00069": [
+      130,
+      140,
+      154,
+      164
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00073": [
+      92,
+      98,
+      112,
+      152
+    ]
+  },
+  "dependency_blocked": {
+    "128": "B00051/C101 already pinned seven strips but the immutable stock composite does not expose readable English strip text in the normal PNG view; exact semantic order is not guessed. No new exact-HD pixel body became available through the connector, so 128 is skipped rather than repeated."
+  },
+  "self_qa": "PASS_EVEN_ONLY__35_OF_35_CANONICAL__42_PHYSICAL_CELLS__1_LOGO_PRESERVE_RECOMMENDATION__HEAVY_QA_REUSED",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+  "precommit_queue_blob_sha": "79a97c8ed6aa5fedee71f1f405483fa737e77306"
+}
