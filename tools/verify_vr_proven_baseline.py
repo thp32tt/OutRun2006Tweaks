@@ -214,6 +214,13 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30SkyGlow.reduced[eye];',
     'compositeSource = R30SkyGlow.temp[eye];',
 ], "P8_R71_SKYGLOW_FINAL_BLUR_SOURCE")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'R30SkyGlowAppliedEpoch',
+    'R30SkyGlowPreHudAttemptEpoch',
+    'R30CompositeSkyGlowBeforeHud',
+    'R30SkyGlowPreHudAttemptEpoch != PresentEpoch',
+    'the additive glow no longer washes over HUD/menu pixels at Present',
+], "P8_R71_SKYGLOW_PRE_HUD_COMPOSITE")
 require_all("src/hooks_uiscaling.cpp", [
     'R71RivalMarkerSpraniCall = 0xBB796',
     'Module::exe_ptr(0xBB6F5)',
