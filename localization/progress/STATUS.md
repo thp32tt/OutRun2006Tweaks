@@ -1268,3 +1268,7 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 8/8 Korean elements pass zero-pixel containment with ≥2 px original-envelope margin. Changed outside allowed geometry **0**, alpha escape **0**, protected OUTRUN2/OUTRUN2SP changes **0**. Mandatory GitHub PNG review lineage reproduced exactly; native/NN2x review shows no residue, clipping, broken Hangul, box/seam/halo or resolution loss.
 - Pending production **71 -> 70**. Shared next-action order remains **RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY 133/222/232**; B00211@index232 and B00213@index133 are newer out-of-batch QA-pending evidence and are not implicitly promoted by Q00045.
 - Report: `localization/graphics/role_C/20260930-0540-C147/C147_Q00045_INDEPENDENT_QA_BATCH.json`.
+## 2026-09-30 05:45 KST - C147 Q00045 ATTEMPT2 GATE REPAIR
+- Prior C result `57d5d423...` Gate `36628278526` failed at exact producer replay. B00209 `a7c5725b...` is **REWORK_REQUIRED** because its result changed DDS but changed QA JSON lacks verifier-recognized machine-readable PASS.
+- Candidate content remains independently verified/reusable (`8ab49a70...` / blob `11260e86...`, 8/8 containment, zero outside/protected/alpha escape), but no STATIC_QA promotion is accepted from this immutable result. Pending production restored to **71**.
+- Re-emit unchanged index226 candidate + compliant PASS QA + durable task record under a fresh producer SHA. A00208@index198 and B00211/B00213/B00214 remain out-of-batch QA-pending. Runtime remains **UNTESTED**.
