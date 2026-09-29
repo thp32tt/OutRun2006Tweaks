@@ -133,7 +133,7 @@ jobs:
               'ZeroDisparity',
               'ClassifyEffectStereo'
             )
-            'src/vr/game/outrun_renderer_r13.cpp' = @(
+            'src/vr/game/outrun_renderer_r13_overlay.inc' = @(
               'R13FragileEffectNeedsZeroDisparity',
               'shadow/billboard/panel pass kept stock',
               'InvalidateVerifiedWvp'

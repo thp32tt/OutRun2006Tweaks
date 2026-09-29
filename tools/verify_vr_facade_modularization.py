@@ -55,6 +55,7 @@ r29 = read(r29_rel)
 facade = read(facade_rel)
 cmake_toml = read("cmake.toml")
 cmake_generated = read("CMakeLists.txt")
+openxr_workflow = read(".github/workflows/vr-openxr.yml")
 
 require_order(
     wrapper,
@@ -107,5 +108,15 @@ for rel, data in (("cmake.toml", cmake_toml), ("CMakeLists.txt", cmake_generated
         "src/vr/d3d9/renderer_pipeline.cpp",
         "OUTRUN_VR_R70_PRODUCTION_TUS",
     )
+
+require(
+    openxr_workflow,
+    ".github/workflows/vr-openxr.yml",
+    "'src/vr/game/outrun_renderer_r13_overlay.inc' = @(",
+    "R13FragileEffectNeedsZeroDisparity",
+    "shadow/billboard/panel pass kept stock",
+)
+if "'src/vr/game/outrun_renderer_r13.cpp' = @(" in openxr_workflow:
+    raise SystemExit("OpenXR hardening guard regressed to the compatibility wrapper")
 
 print("VR renderer facade modularization F04 phase 1: PASS")
