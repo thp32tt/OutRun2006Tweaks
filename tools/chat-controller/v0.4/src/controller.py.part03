@@ -290,6 +290,9 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     active["result_sha"] = None
     active["phase"] = "WAIT_CHAT"
     active["last_gate_poll_at"] = None
+    active.pop("wait_actions_started_at", None)
+    active.pop("missing_gate_run_detected_at", None)
+    active.pop("missing_gate_run_reason", None)
     active["last_gate_status"] = None
     active["last_gate_status_changed_at"] = None
     active["last_jobs_refresh_at"] = None
@@ -302,6 +305,64 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     slot.last_result = "queue_retry_sent"
     save_registry(reg)
     return True
+
+
+async def recover_missing_gate_run(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    now: datetime,
+) -> Optional[tuple[str, str]]:
+    """Turn a missing required Actions run into a bounded repair instead of an infinite wait."""
+    result_sha = str(active.get("result_sha") or "").strip()
+    message = str(active.get("result_message") or "")
+    if not message and result_sha:
+        message = github_commit_message(result_sha) or ""
+        if message:
+            active["result_message"] = message
+
+    directive = github_actions_skip_directive(message)
+    wait_started = (
+        _parse_iso(active.get("wait_actions_started_at"))
+        or _parse_iso(active.get("task_commit_rebound_at"))
+        or _parse_iso(active.get("last_hash_changed_at"))
+        or _parse_iso(active.get("sent_at"))
+        or now
+    )
+    active.setdefault("wait_actions_started_at", wait_started.isoformat())
+    age_seconds = max(0, int((now - wait_started).total_seconds()))
+
+    if not directive and age_seconds < WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS:
+        return None
+
+    if directive:
+        reason = (
+            f"Result commit {result_sha} contains GitHub Actions skip directive {directive!r}; "
+            f"required workflow {active['workflow']} cannot validate that exact SHA. "
+            "Create a follow-up task commit without any CI-skip directive."
+        )
+    else:
+        reason = (
+            f"No authoritative {active['workflow']} run was created for result SHA {result_sha} "
+            f"after {age_seconds}s (timeout={WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS}s). "
+            "Treating the missing run as a repairable automation failure instead of waiting forever."
+        )
+
+    active["missing_gate_run_detected_at"] = now.isoformat()
+    active["missing_gate_run_reason"] = reason
+    if active["attempt"] < MAX_TASK_ATTEMPTS:
+        previous_attempt = active["attempt"]
+        active["attempt"] = previous_attempt + 1
+        if await queue_send_retry(context, pages, active, reason):
+            return ("retry_sent", reason)
+        active["attempt"] = previous_attempt
+        active["failure_context"] = reason
+        return ("retry_deferred", reason)
+
+    active["failure_context"] = reason
+    active["phase"] = "BLOCKED"
+    return ("blocked", reason)
+
 
 async def localization_send_lane_task(
     context: BrowserContext,
@@ -551,7 +612,19 @@ async def localization_process_lane(
                     active["result_sha"] = task_commit["sha"]
                     active["result_message"] = task_commit["message"]
                     active["phase"] = "WAIT_ACTIONS"
+                    active["wait_actions_started_at"] = now.isoformat()
                     active["last_gate_poll_at"] = None
+                    if github_actions_skip_directive(active["result_message"]):
+                        recovery = await recover_missing_gate_run(context, pages, active, now)
+                        save_queue_state(q)
+                        if recovery:
+                            action, reason = recovery
+                            write_runtime(
+                                status="qa_missing_gate_recovery",
+                                last_action=f"{active['task_id']} {action}: {reason}",
+                                queue=active,
+                            )
+                        return
                     save_queue_state(q)
                     write_runtime(
                         status="qa_wait_actions",
@@ -616,6 +689,17 @@ async def localization_process_lane(
             )
             save_queue_state(q)
             if run is None:
+                recovery = await recover_missing_gate_run(context, pages, active, now)
+                if recovery:
+                    action, reason = recovery
+                    save_queue_state(q)
+                    write_runtime(
+                        status="parallel_missing_gate_recovery",
+                        last_action=f"{active['task_id']} {action}: {reason}",
+                        queue=active,
+                    )
+                    return
+                save_queue_state(q)
                 write_runtime(
                     status="parallel_validation_pending",
                     last_action=f"No authoritative {active['workflow']} run yet for {active['task_id']} SHA {active['result_sha']}",
@@ -1088,7 +1172,19 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             active["result_sha"] = task_commit["sha"]
             active["result_message"] = task_commit["message"]
             active["phase"] = "WAIT_ACTIONS"
+            active["wait_actions_started_at"] = now.isoformat()
             active["last_gate_poll_at"] = None
+            if github_actions_skip_directive(active["result_message"]):
+                recovery = await recover_missing_gate_run(context, pages, active, now)
+                save_queue_state(q)
+                if recovery:
+                    action, reason = recovery
+                    write_runtime(
+                        status="queue_missing_gate_recovery",
+                        last_action=f"{active['task_id']} {action}: {reason}",
+                        queue=active,
+                    )
+                return
             save_queue_state(q)
             write_runtime(
                 status="queue_wait_actions",
@@ -1113,6 +1209,17 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         )
         save_queue_state(q)
         if run is None:
+            recovery = await recover_missing_gate_run(context, pages, active, now)
+            if recovery:
+                action, reason = recovery
+                save_queue_state(q)
+                write_runtime(
+                    status="queue_missing_gate_recovery",
+                    last_action=f"{active['task_id']} {action}: {reason}",
+                    queue=active,
+                )
+                return
+            save_queue_state(q)
             write_runtime(status="queue_validation_pending", last_action=f"No authoritative {active['workflow']} run yet for {active['result_sha']}", queue=active)
             return
 
@@ -1205,6 +1312,9 @@ def refresh_wait_actions_task_binding(task: dict, force_refresh: bool = False) -
     task["failure_context"] = ""
     task["last_gate_poll_at"] = None
     task["task_commit_rebound_at"] = datetime.now(TZ).isoformat()
+    task["wait_actions_started_at"] = task["task_commit_rebound_at"]
+    task.pop("missing_gate_run_detected_at", None)
+    task.pop("missing_gate_run_reason", None)
     for key in (
         "gate_run",
         "last_gate_status",
