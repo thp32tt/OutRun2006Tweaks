@@ -153,6 +153,12 @@ target_include_directories(outrun-vr-r32-policy-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-r32-policy-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
+add_executable(outrun-vr-direct-ack-identity-smoke tests/direct_ack_identity_smoke.cpp)
+target_include_directories(outrun-vr-direct-ack-identity-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+)
+target_compile_definitions(outrun-vr-direct-ack-identity-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+
 foreach(target
     outrun-vr-host
     outrun-vr-diagnostic
@@ -164,7 +170,8 @@ foreach(target
     outrun-vr-host-pose-v3-validation-smoke
     outrun-vr-runtime-eligibility-smoke
     outrun-vr-r23-verified-bundle-smoke
-    outrun-vr-r32-policy-smoke)
+    outrun-vr-r32-policy-smoke
+    outrun-vr-direct-ack-identity-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"

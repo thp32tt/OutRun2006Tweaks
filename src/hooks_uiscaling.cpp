@@ -2,8 +2,11 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/hud_semantics.hpp"
 
 #include <array>
+#include <atomic>
+#include <intrin.h>
 
 namespace Settings
 {
@@ -57,11 +60,98 @@ class UIScaling : public Hook
 	const static int RankMarker_StackX = 0x40;
 	const static int RankMarker_StackY = 0x44;
 
+	// R56 runtime-only HMD probe selector. A single DLL carries all 20 cases so
+	// every comparison uses identical codegen except for the selected probe.
+	static int VRHudProbeMode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_PROBE", text,
+				static_cast<DWORD>(sizeof(text)));
+			if (len == 0 || len >= sizeof(text))
+				return 0;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 0;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 1 && value <= 20) ? value : 0;
+		}();
+		return mode;
+	}
+
+	inline static std::atomic<std::uint64_t> VRProbeDispRankHits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank13Hits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank46Hits{ 0 };
+
+	static void VRHudProbeTrace(
+		const char* site, std::atomic<std::uint64_t>& counter) noexcept
+	{
+		const int probe = VRHudProbeMode();
+		if (!probe)
+			return;
+		const std::uint64_t hit =
+			counter.fetch_add(1, std::memory_order_relaxed) + 1;
+		// Power-of-two logging proves the producer was reached without flooding
+		// long race logs.
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R56 PROBE: mode={} producer={} hits={}",
+				probe, site, hit);
+	}
+
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
+	// R71 runtime evidence: the gameplay rival indicator has its own
+	// Calc3D2D projection at 0xBB6F0 and sprani draw at 0xBB796.
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RivalMarkerProjectedInfo{};
+
+	static OutRunVR::GameSemantic::RenderScope
+	R57RankProducerScope(bool) noexcept
+	{
+		return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+	}
+
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
 	// and put_clip_sprite are both used throughout the game, so each call site
 	// is redirected on its own rather than hooking either function.
 	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
 	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	static constexpr int DispRank_SpraniCall = 0xB9DA6;
+	static constexpr int DispRank_ClipSpriteCalls[] = {
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
+	};
+
+	// R65 full-EXE map: these four sprite IDs (0x2C0251..0x2C0254)
+	// occur only in the two option/menu arrow producers below.
+	static constexpr int OptionArrow_ClipSpriteCalls[] = {
+		0xE358B, 0xE35A3, 0xE35CC, 0xE35F7,
+		0xE481B, 0xE4833, 0xE485C, 0xE4887,
+		// R69 candidate: generic menu/list boundary arrows. Canonical EXE
+		// disassembly shows sprite 0x3004A/0x3004B emitted only at list
+		// previous/next boundaries; keep these exact instead of widening HUD rules.
+		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
+	};
+
+	// R70 exact HMD-trace owners: three menu/list arrow edges and two
+	// OutRun final-result edges. Keep these exact; do not widen queue ownership.
+	static constexpr int R70ExactScreenHudClipSpriteCalls[] = {
+		0x460F1, 0x463D6, 0x46410,
+		0x97BB7, 0x97DA7
+	};
+	static constexpr int R71RivalMarkerSpraniCall = 0xBB796;
+
+	// Canonical EXE static map: these three direct Sumo_Printf calls live in
+	// the OutRun stage/checkpoint/result UI cluster. Bracket only the call
+	// duration so their generated glyph SpriteNodes inherit SCREEN_HUD.
+	static constexpr int R71OutRunStagePrintfCalls[] = {
+		0x975EE, 0x97727, 0x977FB
+	};
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -206,6 +296,51 @@ class UIScaling : public Hook
 	{
 		Calc3D2D_hk.call(a1, a2, in, out);
 
+		// R57: sub_4BAD20 callsite RVA 0xBAEE2 returns at 0xBAEE7.
+		// Calc3D2D projects a stock-view point as:
+		//   sx = viewX / -viewZ * a1
+		//   sy = viewY / -viewZ * a2
+		// Preserve the recovered view point so the final queued sprite can be
+		// translated to the real left/right OpenXR projections instead of
+		// guessing depth from an already-flattened SpriteNode.
+		const void* returnAddress = _ReturnAddress();
+		auto recoverViewPoint = [&](OutRunVR::GameSemantic::ProjectedMarkerInfo& info) {
+			info = {};
+			if (!out || !std::isfinite(out->x) || !std::isfinite(out->y) ||
+				!std::isfinite(out->z) || !std::isfinite(a1) ||
+				!std::isfinite(a2) || std::fabs(a1) <= 1.0e-6f ||
+				std::fabs(a2) <= 1.0e-6f || std::fabs(out->z) <= 1.0e-6f)
+				return;
+			info.valid = true;
+			info.viewZ = out->z;
+			info.viewX = out->x * (-out->z) / a1;
+			info.viewY = out->y * (-out->z) / a2;
+		};
+
+		if (returnAddress == Module::exe_ptr(0xBAEE7))
+		{
+			recoverViewPoint(RankMarkerProjectedInfo);
+		}
+		else if (returnAddress == Module::exe_ptr(0xBB6F5))
+		{
+			// R71: preserve the rival-car projected view anchor separately
+			// from the ordinal 1st/2nd/3rd marker path.
+			recoverViewPoint(RivalMarkerProjectedInfo);
+		}
+		else if (returnAddress == Module::exe_ptr(0xCF53))
+		{
+			// R67: FUN_0040CBC0 projects the flare anchor exactly once here,
+			// before the twelve 0x40C9A0 alpha-object draws. Preserve the
+			// already head-synchronised game-view point for eye-relative
+			// reprojection instead of trying to repair the flattened result.
+			OutRunVR::GameSemantic::ProjectedMarkerInfo flareAnchor{};
+			recoverViewPoint(flareAnchor);
+			if (flareAnchor.valid)
+				OutRunVR::GameSemantic::SetLatestProjectedScreenAnchor(flareAnchor);
+			else
+				OutRunVR::GameSemantic::ClearLatestProjectedScreenAnchor();
+		}
+
 		// TODO: OnlineArcade mode needs to add position here
 
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
@@ -236,6 +371,7 @@ class UIScaling : public Hook
 	// position as floats, so the discarded fraction goes straight back on.
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+		VRHudProbeTrace("rank13_sprani", VRProbeRank13Hits);
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -243,49 +379,526 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
-		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, x + RankMarkerFracX, y + RankMarkerFracY, a4, a5, alpha);
+		const int probe = VRHudProbeMode();
+		float probeX = x + RankMarkerFracX;
+		float probeY = y + RankMarkerFracY;
+		// R56 09-12: directly perturb only the known 1st/2nd/3rd producer.
+		// A visible movement proves the final image still contains this producer.
+		if (probe == 9) probeX += 96.0f;
+		else if (probe == 10) probeX -= 96.0f;
+		else if (probe == 11) probeY -= 72.0f;
+		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
 
-		// These four call sites are explicitly identified by the original mod as
-		// rival-car rank markers. Preserve that ownership on the queued node so
-		// the VR sprite renderer does not flatten the marker into the fixed HUD.
-		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-		{
-			SpriteNode* root = Game::sprite_prio_root[prio];
-			SpriteNode* node = root ? root->tail_4 : nullptr;
-			if (node && node != tailsBefore[prio])
-				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
-		}
-		return result;
+		const auto scope = R57RankProducerScope(true);
+		const auto* marker =
+			scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				? &RankMarkerProjectedInfo : nullptr;
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			scope, marker);
+		return Game::sprani_play_ae_auth_alpha(
+			spriteId, probeX, probeY, a4, a5, alpha);
 	}
 
+	// R58 HMD evidence: mode 6 proved head-inverse projected tracking for 1st-3rd;
+	// mode 8 proved 4th+ kind-0 ownership never reached the final projected path.
 	// 4th place onward is spelled out from digit sprites drawn by
 	// put_clip_sprite, which takes its position as int. It converts that to
 	// float when filling in the sprite it queues, so the fraction goes back on
 	// there instead.
 	static int __cdecl RankMarker_putClipSprite(int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
 	{
+		VRHudProbeTrace("rank46_clip", VRProbeRank46Hits);
 		int prio = int(priority);
 		prio = prio < 0 ? 0 : (prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
 
 		SpriteNode* root = Game::sprite_prio_root[prio];
 		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
 
-		int result = Game::put_clip_sprite(xstnum, x, y, flags, priority, color);
+		const int probe = VRHudProbeMode();
+		int probeX = x;
+		int probeY = y;
+		// R56 13-15: directly perturb only the 4th+ digit-sprite producer.
+		if (probe == 13) probeX += 96;
+		else if (probe == 14) probeY -= 72;
+		else if (probe == 15) { probeX = 320; probeY = 208; }
+		const auto r57Scope = R57RankProducerScope(false);
+		const auto* r57Marker =
+			r57Scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+			? &RankMarkerProjectedInfo : nullptr;
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				r57Scope, r57Marker);
+			result = Game::put_clip_sprite(
+				xstnum, probeX, probeY, flags, priority, color);
+		}
 
-		// tail_4 is the last sprite queued at that priority. If it has not
-		// changed then the sprite pool was full and nothing was queued.
+		// Canonical put_clip_sprite (RVA 0x2D280) performs exactly one
+		// put_sprite_ex call (RVA 0x2D2EC). Register the actual appended node
+		// here as the presentation-authoritative owner instead of relying only on
+		// nested producer-scope propagation. R57 HMD mode 8 proved that the
+		// indirect path could lose 4th+ PROJECTED_WORLD_MARKER_2D ownership.
 		root = Game::sprite_prio_root[prio];
 		SpriteNode* node = root ? root->tail_4 : nullptr;
 		if (node && node != tailBefore)
 		{
 			node->args_10.float24 += RankMarkerFracX;
 			node->args_10.float28 += RankMarkerFracY;
-			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-				node, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, r57Scope, r57Marker);
+				static std::atomic<std::uint64_t> directRank46Tags{ 0 };
+				const auto hit = directRank46Tags.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((hit & (hit - 1)) == 0)
+					spdlog::info(
+						"VR R58 DIRECT CLIP: owner=rank46 prio={} kind={} projected={} hits={}",
+						prio, node->kind_C,
+						r57Marker && r57Marker->valid ? 1 : 0, hit);
+			}
+			// R56-18 deliberately tests whether a one-shot semantic survives from
+			// this exact producer to the eventual D3D draw. Cross-thread loss is a
+			// useful negative result, not a production policy.
+			if (probe == 18)
+				OutRunVR::GameSemantic::ArmNextDraw(
+					OutRunVR::GameSemantic::RenderScope::WorldBillboard);
 		}
 
+		return result;
+	}
+
+
+	// R70 restores the exact R51 EXE-map producer bridge lost from the later
+	// R69 lineage. FUN_004BA9D0 is the shared numeric/text producer; its
+	// internal 0xBAAA0 put_clip_sprite and 0xBAAEA sprani edges otherwise lose
+	// the higher-level caller identity before queued SpriteNode presentation.
+	static inline SafetyHookInline R70HudTextProducer_hk{};
+	inline static thread_local bool R70HudTextProducerScreenHud = false;
+	inline static std::atomic<std::uint64_t> R70HudTextTaggedNodes{ 0 };
+
+	static std::uint32_t R70ExeCallRva(const void* returnAddress) noexcept
+	{
+		const auto base = reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+		const auto value = reinterpret_cast<std::uintptr_t>(returnAddress);
+		if (!base || value < base + 5)
+			return 0;
+		const auto returnRva = value - base;
+		return returnRva >= 5 && returnRva <= 0xFFFFFFFFu
+			? static_cast<std::uint32_t>(returnRva - 5) : 0;
+	}
+
+	static std::uint64_t R70TagAppendedSpriteNodes(
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
+		OutRunVR::GameSemantic::RenderScope scope) noexcept
+	{
+		std::uint64_t tagged = 0;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == before[prio])
+				continue;
+			SpriteNode* node = before[prio]
+				? before[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < 0x230; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				++tagged;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+		return tagged;
+	}
+
+	static int __cdecl R70HudText_sprani(
+		std::uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		if (!R70HudTextProducerScreenHud)
+			return Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+		}
+		const auto tagged = R70TagAppendedSpriteNodes(
+			before, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		const auto total = R70HudTextTaggedNodes.fetch_add(
+			tagged, std::memory_order_relaxed) + tagged;
+		if (tagged && (total & (total - 1)) == 0)
+			spdlog::info(
+				"VR R70 OUTRUN HUD: BA9D0 sprani nodes pinned SCREEN_HUD tagged={} total={}",
+				tagged, total);
+		return result;
+	}
+
+	static int __cdecl R70HudText_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		if (!R70HudTextProducerScreenHud)
+			return Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount
+				? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			const auto total = R70HudTextTaggedNodes.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((total & (total - 1)) == 0)
+				spdlog::info(
+					"VR R70 OUTRUN HUD: BA9D0 clip node pinned SCREEN_HUD total={}",
+					total);
+		}
+		return result;
+	}
+
+	static void __cdecl R70HudTextProducer_dest(
+		int glyphSet, int x, int y, const char* text, int a4, float alpha)
+	{
+		const std::uint32_t callRva = R70ExeCallRva(_ReturnAddress());
+		const auto semantic = OutRunVRHudSemantics::ClassifyCaller(callRva);
+		const bool previous = R70HudTextProducerScreenHud;
+		R70HudTextProducerScreenHud =
+			previous ||
+			semantic.space == OutRunVR::GameSemantic::RenderScope::ScreenHud;
+
+		static std::atomic<bool> firstLogged{ false };
+		if (R70HudTextProducerScreenHud && !firstLogged.exchange(true))
+			spdlog::info(
+				"VR R70 OUTRUN HUD: FUN_004BA9D0 exact producer restored callerRva=0x{:X} semantic={}",
+				callRva, semantic.semantic);
+
+		R70HudTextProducer_hk.call(
+			glyphSet, x, y, text, a4, alpha);
+		R70HudTextProducerScreenHud = previous;
+	}
+
+	static int __cdecl R70ExactScreenHud_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount
+				? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* before = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != before)
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
+
+	// R71: exact runtime-observed gameplay rival indicator. It already has a
+	// real vehicle-relative Calc3D2D anchor; preserve that depth and let the
+	// existing projected-marker renderer reproject it independently per eye.
+	static int __cdecl R71RivalMarker_sprani(
+		std::uint32_t spriteId, float x, float y,
+		int a4, int a5, float alpha)
+	{
+		const auto* marker = RivalMarkerProjectedInfo.valid
+			? &RivalMarkerProjectedInfo : nullptr;
+		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+			marker
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::None,
+			marker);
+		return Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+	}
+
+	// R71: exact OutRun stage/checkpoint/result text uses Sumo_Printf instead
+	// of the BA9D0 producer restored by R70. Keep SCREEN_HUD ownership active
+	// only across the three statically proven direct calls.
+	inline static thread_local unsigned R71OutRunPrintDepth = 0;
+	inline static thread_local OutRunVR::GameSemantic::RenderScope
+		R71OutRunPrintPreviousScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo
+			R71OutRunPrintPreviousMarker{};
+	static inline SafetyHookMid R71OutRunPrintEnter1{};
+	static inline SafetyHookMid R71OutRunPrintLeave1{};
+	static inline SafetyHookMid R71OutRunPrintEnter2{};
+	static inline SafetyHookMid R71OutRunPrintLeave2{};
+	static inline SafetyHookMid R71OutRunPrintEnter3{};
+	static inline SafetyHookMid R71OutRunPrintLeave3{};
+
+	static void R71OutRunPrintEnter(safetyhook::Context&)
+	{
+		if (R71OutRunPrintDepth++ != 0)
+			return;
+		R71OutRunPrintPreviousScope =
+			OutRunVR::GameSemantic::CurrentProducerScope;
+		R71OutRunPrintPreviousMarker =
+			OutRunVR::GameSemantic::CurrentProducerMarker;
+		OutRunVR::GameSemantic::CurrentProducerScope =
+			OutRunVR::GameSemantic::RenderScope::ScreenHud;
+		OutRunVR::GameSemantic::CurrentProducerMarker = {};
+	}
+
+	static void R71OutRunPrintLeave(safetyhook::Context&)
+	{
+		if (R71OutRunPrintDepth == 0 || --R71OutRunPrintDepth != 0)
+			return;
+		OutRunVR::GameSemantic::CurrentProducerScope =
+			R71OutRunPrintPreviousScope;
+		OutRunVR::GameSemantic::CurrentProducerMarker =
+			R71OutRunPrintPreviousMarker;
+	}
+
+	using DispRankSpraniFn =
+		int(__cdecl*)(std::uint32_t, float, float, int, int);
+
+	static int __cdecl DispRank_sprani(
+		std::uint32_t spriteId, float x, float y, int a4, int a5)
+	{
+		auto original = reinterpret_cast<DispRankSpraniFn>(
+			Module::exe_ptr(0x29530));
+		constexpr bool exactPositionOwner = true;
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		if (exactPositionOwner)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				tailsBefore[prio] = root ? root->tail_4 : nullptr;
+			}
+		}
+
+		int result = 0;
+		if (exactPositionOwner)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = original(spriteId, x, y, a4, a5);
+		}
+		else
+		{
+			result = original(spriteId, x, y, a4, a5);
+		}
+
+		if (exactPositionOwner)
+		{
+			std::uint64_t tagged = 0;
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+				if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+					continue;
+
+				SpriteNode* node = tailsBefore[prio]
+					? tailsBefore[prio]->next_0 : root->next_0;
+				for (unsigned guard = 0; node && guard < 0x230; ++guard)
+				{
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+						node,
+						OutRunVR::GameSemantic::RenderScope::ScreenHud,
+						nullptr,
+						OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
+					++tagged;
+					if (node == tailAfter)
+						break;
+					node = node->next_0;
+				}
+			}
+
+			static std::atomic<std::uint64_t> directPositionKind1Tags{ 0 };
+			const auto total = directPositionKind1Tags.fetch_add(
+				tagged, std::memory_order_relaxed) + tagged;
+			if (tagged != 0 && (total & (total - 1)) == 0)
+				spdlog::info(
+					"VR R59 DIRECT SPRANI: owner=position kind=1 tagged={} total={}",
+					tagged, total);
+		}
+		return result;
+	}
+
+	static int __cdecl DispRank_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
+		AddSpriteSpacing(&x, false);
+
+		const int probe = VRHudProbeMode();
+		if (probe == 5) x += 96;
+		else if (probe == 6) x -= 96;
+		else if (probe == 7)
+			x = 320 + int((float(x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		constexpr bool exactPositionOwner = true;
+		int result = 0;
+		if (exactPositionOwner)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		else
+		{
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// R57 HMD modes 2/3 proved that the nested put_clip_sprite -> put_sprite_ex
+		// producer scope did not survive as an accepted kind-0 HUD owner. The
+		// canonical helper appends one node, so pin the exact new node directly.
+		if (exactPositionOwner)
+		{
+			root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != tailBefore)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node,
+					OutRunVR::GameSemantic::RenderScope::ScreenHud,
+					nullptr,
+					OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
+				static std::atomic<std::uint64_t> directPositionTags{ 0 };
+				const auto hit = directPositionTags.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((hit & (hit - 1)) == 0)
+					spdlog::info(
+						"VR R58 DIRECT CLIP: owner=position prio={} kind={} hits={}",
+						prio, node->kind_C, hit);
+			}
+		}
+		return result;
+	}
+
+	static int __cdecl OptionArrow_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// R66 review pass 5: exact option-arrow callsites are proven, but the
+		// 4th+ rank history showed that a nested producer scope alone can be lost
+		// before queue consumption. Pin the one node appended by put_clip_sprite.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> directArrowTags{ 0 };
+			const auto hit = directArrowTags.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R66 OPTION ARROW: exact node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
+		return result;
+	}
+
+	using TextGlyphPutSpriteFn =
+		int(__cdecl*)(SPRARGS*, float);
+
+	static int __cdecl TextGlyph_putSprite(
+		SPRARGS* args, float priority)
+	{
+		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
+			Module::exe_ptr(0x2CFE0));
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = original(args, priority);
+		}
+
+		// R68: canonical glyph rendering is deferred through the SpriteNode
+		// queue. Producer scope alone expires before the later queue draw.
+		// Pin only the node appended by the verified 0x2C808/0x2C9DB glyph edges.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> glyphTags{ 0 };
+			const auto hit = glyphTags.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R68 TEXT GLYPH: canonical node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
 		return result;
 	}
 
@@ -476,9 +1089,106 @@ class UIScaling : public Hook
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
 	}
+
+	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		// These 15 exact DispTimeAttack2D callsites are already individually
+		// identified by the original UI-scaling patch. Arm only the immediate
+		// render handoff instead of promoting generic put_scroll/put_clip paths.
+		OutRunVR::GameSemantic::ArmNextDraw(
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info("VR R65 TIME HUD: exact DispTimeAttack2D handoff hits={}", hit);
+	}
 	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
+	}
+
+	// R66: NaviPub_DispTimeAttackGoal (RVA 0xBEA50) does not execute the
+	// DispTimeAttack2D callsites above. Disassembly proves it calls only
+	// 0xBE020 and 0xBE150 after the 120-frame gate. Own only those two exact
+	// caller edges and tag every SpriteNode they append as SCREEN_HUD.
+	using GoalTimeHelperFn = void(__cdecl*)();
+
+	static void GoalTime_TagHelper(int helperRva, const char* label)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			auto original = reinterpret_cast<GoalTimeHelperFn>(
+				Module::exe_ptr(helperRva));
+			original();
+		}
+
+		std::uint64_t tagged = 0;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+				continue;
+
+			SpriteNode* node = tailsBefore[prio]
+				? tailsBefore[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < 0x230; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				++tagged;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+
+		static std::atomic<std::uint64_t> calls{ 0 };
+		static std::atomic<std::uint64_t> nodes{ 0 };
+		const auto call = calls.fetch_add(1, std::memory_order_relaxed) + 1;
+		const auto total = nodes.fetch_add(tagged, std::memory_order_relaxed) + tagged;
+		if ((call & (call - 1)) == 0)
+			spdlog::info(
+				"VR R66 GOAL TIME HUD: helper={} calls={} tagged={} totalTags={}",
+				label, call, tagged, total);
+	}
+
+	static void __cdecl GoalTime_Help020()
+	{
+		GoalTime_TagHelper(0xBE020, "BE020");
+	}
+
+	static void __cdecl GoalTime_Help150()
+	{
+		GoalTime_TagHelper(0xBE150, "BE150");
+	}
+
+	// R56 05-08/19: exact DispRank producer probe. The eight original-mod
+	// callsites all pass the rank/POSITION horizontal coordinate at ESP+4.
+	static void DispRankProbe_AdjustPosition(safetyhook::Context& ctx)
+	{
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
+		int* x = reinterpret_cast<int*>(ctx.esp + 4);
+		AddSpriteSpacing(x, false);
+		const int probe = VRHudProbeMode();
+		if (probe == 5) *x += 96;
+		else if (probe == 6) *x -= 96;
+		else if (probe == 7)
+			*x = 320 + int((float(*x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			*x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
 	}
 
 	// PutGhostGapInfo
@@ -626,11 +1336,44 @@ public:
 
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
 
+		// R70 exact producer/edge ownership from the 92ce3403 HMD trace.
+		R70HudTextProducer_hk = safetyhook::create_inline(
+			Module::exe_ptr(0xBA9D0), R70HudTextProducer_dest);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBAAA0),
+			R70HudText_putClipSprite, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBAAEA),
+			R70HudText_sprani, Memory::HookType::Call);
+		for (int addr : R70ExactScreenHudClipSpriteCalls)
+			Memory::VP::InjectHook(Module::exe_ptr(addr),
+				R70ExactScreenHud_putClipSprite, Memory::HookType::Call);
+
+		// R71 exact OutRun stage/checkpoint result text brackets.
+		R71OutRunPrintEnter1 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[0]), R71OutRunPrintEnter);
+		R71OutRunPrintLeave1 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[0] + 5), R71OutRunPrintLeave);
+		R71OutRunPrintEnter2 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[1]), R71OutRunPrintEnter);
+		R71OutRunPrintLeave2 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[1] + 5), R71OutRunPrintLeave);
+		R71OutRunPrintEnter3 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[2]), R71OutRunPrintEnter);
+		R71OutRunPrintLeave3 = safetyhook::create_mid(
+			Module::exe_ptr(R71OutRunStagePrintfCalls[2] + 5), R71OutRunPrintLeave);
+
+		// R71 gameplay rival indicator: exact world projection + exact sprani.
+		Memory::VP::InjectHook(Module::exe_ptr(R71RivalMarkerSpraniCall),
+			R71RivalMarker_sprani, Memory::HookType::Call);
+
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
 		for (int addr : RankMarker_SpraniCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
 		for (int addr : RankMarker_ClipSpriteCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
+		for (int addr : OptionArrow_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), OptionArrow_putClipSprite,
+				Memory::HookType::Call);
 
 		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
 		NaviPub_Disp_SpriteSpacingEnable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable2_Addr), SpriteSpacingEnable);
@@ -668,30 +1411,42 @@ public:
 		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
 		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
 
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
 
-		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B9F81, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4B9FD0, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4B9FFC, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BA01E, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BA035, put_scroll_AdjustPositionRight);
-		DispRank_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BA052, put_scroll_AdjustPositionRight);
+		// R68 canonical font glyph ownership. Disassembly proves two
+		// independent character renderers call put_sprite_ex directly:
+		// 0x2C808 (alternate/compact glyph path, observed on finish name/time)
+		// and 0x2C9DB (existing proportional glyph path). Keep this exact;
+		// generic put_sprite_ex/put_sprite_ex2 also carry non-font sprites.
+		for (int addr : { 0x2C808, 0x2C9DB })
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr),
+				TextGlyph_putSprite, Memory::HookType::Call);
+
+		// R57 direct producer ownership: DispRank is a composite. Its first
+		// element uses sprani/SPRARGS2 (kind_C=1), while the remaining eight
+		// use put_clip_sprite/SPRARGS (kind_C=0).
+		Memory::VP::InjectHook(
+			Module::exe_ptr(DispRank_SpraniCall),
+			DispRank_sprani, Memory::HookType::Call);
+		for (int addr : DispRank_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr),
+				DispRank_putClipSprite, Memory::HookType::Call);
 
 		// REV indicator
 		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
@@ -708,6 +1463,12 @@ public:
 		PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDAE8, PutGhostGapInfo_sub_AdjustPosition);
 
 		NaviPub_DispTimeAttackGoal_DisableScaling_hk = safetyhook::create_mid((void*)0x4BEA64, SpriteSpacingDisable);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBEA5A),
+			GoalTime_Help020, Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBEA5F),
+			GoalTime_Help150, Memory::HookType::Call);
 
 		// adjusts the girlfriend request speech bubble
 		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);
@@ -770,6 +1531,121 @@ public:
 
 UIScaling UIScaling::instance;
 
+// R63: isolate only exact PROJECTED_WORLD_MARKER_2D D3DXSprite draws.
+// R62 proved kind-0 rank markers are emitted as D3DXSprite fixed-function
+// batches (FVF 0x142). The HMD result then showed two rival rank quads can be
+// coalesced into one DrawIndexedPrimitive (prim=4), causing one vehicle anchor
+// to move both quads. Flush immediately after each projected D3DXSprite::Draw
+// while the current queue node/marker is still authoritative. Unlike rejected
+// R60, generic HUD and SCREEN_HUD batches are never flushed here.
+class VRProjectedD3DXSpriteIsolation : public Hook
+{
+	inline static SafetyHookInline Draw_hk{};
+	inline static std::atomic<std::uint64_t> Flushes{ 0 };
+	inline static std::atomic<std::uint64_t> Failures{ 0 };
+
+	static HRESULT __stdcall DrawDest(
+		void* self, IDirect3DTexture9* texture, const RECT* rect,
+		const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
+	{
+		const HRESULT hr = Draw_hk.stdcall<HRESULT>(
+			self, texture, rect, center, pos, color);
+		if (FAILED(hr))
+			return hr;
+
+		const auto scope =
+			OutRunVR::GameSemantic::EffectiveScope();
+		const auto* marker =
+			OutRunVR::GameSemantic::CurrentProjectedMarker();
+		const bool projectedRank =
+			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+				scope) &&
+			marker && marker->valid;
+		const bool dispRankHud =
+			OutRunVR::GameSemantic::CorroboratesHud(scope) &&
+			OutRunVR::GameSemantic::CurrentSpriteOwner() ==
+				OutRunVR::GameSemantic::SpriteNodeOwner::DispRank;
+		if ((!projectedRank && !dispRankHud) || !self)
+			return hr;
+
+		void** vtable = *reinterpret_cast<void***>(self);
+		if (!vtable || !vtable[10])
+			return hr;
+
+		using FlushFn = HRESULT(__stdcall*)(void*);
+		const HRESULT flushHr =
+			reinterpret_cast<FlushFn>(vtable[10])(self);
+		const auto hit = Flushes.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		if (FAILED(flushHr))
+			Failures.fetch_add(1, std::memory_order_relaxed);
+
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R64 D3DX ISOLATE: owner={} flushes={} failures={} markerValid={}",
+				projectedRank ? "projected-rank" : "disprank-hud",
+				hit,
+				Failures.load(std::memory_order_relaxed),
+				marker && marker->valid ? 1 : 0);
+		return hr;
+	}
+
+	static DWORD WINAPI InstallThread(void*)
+	{
+		for (int attempt = 0; attempt < 7200; ++attempt)
+		{
+			void* sprite = *Module::exe_ptr<void*>(0x55B218);
+			if (sprite)
+			{
+				void** vtable = *reinterpret_cast<void***>(sprite);
+				if (vtable && vtable[9] && vtable[10])
+				{
+					const auto disabled =
+						safetyhook::InlineHook::StartDisabled;
+					Draw_hk = safetyhook::create_inline(
+						vtable[9],
+						reinterpret_cast<void*>(&DrawDest),
+						disabled);
+					if (Draw_hk &&
+						Draw_hk.enable().has_value())
+					{
+						spdlog::info(
+							"VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE; generic HUD batching untouched");
+						return 0;
+					}
+					Draw_hk = {};
+				}
+			}
+			Sleep(25);
+		}
+		spdlog::warn(
+			"VR R63 PROJECTED D3DX ISOLATE: ID3DXSprite Draw hook unavailable; R62 behavior retained");
+		return 0;
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRProjectedD3DXSpriteIsolationR63";
+	}
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+	bool apply() override
+	{
+		HANDLE thread = CreateThread(
+			nullptr, 0, InstallThread, nullptr, 0, nullptr);
+		if (!thread)
+			return false;
+		CloseHandle(thread);
+		return true;
+	}
+	static VRProjectedD3DXSpriteIsolation instance;
+};
+VRProjectedD3DXSpriteIsolation
+	VRProjectedD3DXSpriteIsolation::instance;
+
 // VR semantic bridge for the game's canonical queued 2D renderer.
 // Canonical replacement EXE SHA256:
 // 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
@@ -788,6 +1664,10 @@ class VRHudQueueSemanticBridge : public Hook
 {
 	inline static SafetyHookMid QueueNode_hk{};
 	inline static SafetyHookMid QueueEnd_hk{};
+	inline static std::uint64_t QueuePasses = 0;
+	inline static std::uint64_t LastRegistered = 0;
+	inline static std::uint64_t LastConsumed = 0;
+	inline static std::uint64_t LastStaleCleared = 0;
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
@@ -798,6 +1678,31 @@ class VRHudQueueSemanticBridge : public Hook
 	static void QueueEnd(SafetyHookContext&)
 	{
 		OutRunVR::GameSemantic::EndSpriteQueueRender();
+		++QueuePasses;
+		if ((QueuePasses % 300u) != 0)
+			return;
+
+		const auto registered =
+			OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+				std::memory_order_relaxed);
+		const auto consumed =
+			OutRunVR::GameSemantic::SpriteNodeSemanticConsumed.load(
+				std::memory_order_relaxed);
+		const auto staleCleared =
+			OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
+				std::memory_order_relaxed);
+		if (registered != LastRegistered ||
+			consumed != LastConsumed ||
+			staleCleared != LastStaleCleared)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} deltaRegistered={} deltaConsumed={}",
+				QueuePasses, registered, consumed, staleCleared,
+				registered - LastRegistered, consumed - LastConsumed);
+			LastRegistered = registered;
+			LastConsumed = consumed;
+			LastStaleCleared = staleCleared;
+		}
 	}
 
 public:
@@ -813,6 +1718,17 @@ public:
 
 	bool apply() override
 	{
+		char modeText[8]{};
+		// R66: sticky exact queue ownership (mode 2) is the proven R57/R64
+		// baseline. Keep env=0 available only as an explicit diagnostic rollback.
+		int experimentMode = 2;
+		if (GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
+				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
+			modeText[0] >= '0' && modeText[0] <= '4')
+			experimentMode = modeText[0] - '0';
+		OutRunVR::GameSemantic::SetHudExperimentMode(experimentMode);
+
 		QueueNode_hk = safetyhook::create_mid(
 			Module::exe_ptr(0x2D762), QueueNode);
 		QueueEnd_hk = safetyhook::create_mid(
@@ -829,7 +1745,7 @@ public:
 		if (ok)
 		{
 			spdlog::info(
-				"VR HUD SEMANTIC R50: sprite queue node 0x2D762 selects explicit tags; untagged nodes use SCREEN_OVERLAY_2D FOV-only alignment; unsafe 0x2D734 entry hook is forbidden; original-mod tagged rival nodes remain WORLD_BILLBOARD");
+				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
 		}
 		else
 		{

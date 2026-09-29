@@ -16,6 +16,7 @@ on:
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_proven_baseline.py'
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
   pull_request:
@@ -32,6 +33,7 @@ on:
       - 'vrhost/**'
       - 'tools/verify_vr_architecture.py'
       - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_proven_baseline.py'
       - 'docs/VR_ARCHITECTURE.md'
       - '.github/workflows/vr-openxr.yml'
 
@@ -214,7 +216,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
+          cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify regenerated R26 safe production source graph
         shell: pwsh
@@ -293,7 +295,9 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: outrun2006-vr-x86
+          # R66: this is the intentionally old R26-only diagnostic owner.
+          # Keep its artifact name impossible to confuse with a production package.
+          name: outrun2006-vr-x86-r26-only-diagnostic-DO-NOT-PACKAGE
           path: build-vr-game/bin/dinput8.dll
           if-no-files-found: error
 
@@ -309,7 +313,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-safe-draw -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON
+          cmake -S . -B build-vr-safe-draw -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify R26 comparison source graph
         shell: pwsh
@@ -389,11 +393,15 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify HMD-proven VR baseline
+        shell: pwsh
+        run: python tools/verify_vr_proven_baseline.py
+
       - name: Configure Win32 R26 HUD/SkyGlow safe test
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-r26-hud -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON
+          cmake -S . -B build-vr-r26-hud -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify R26 HUD source graph
         shell: pwsh
@@ -445,12 +453,24 @@ jobs:
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE',
+            'VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay',
+            'VR R13: stereo hardening ACTIVE',
+            'VR R22 GAME: shadow-tracked viewport/scissor replay + common initial depth baseline + R21 eligibility gate ACTIVE',
+            'VR R23/R25 BASELINE: authoritative first seed opened only after live viewport/scissor + full game draw serial + current-generation depth + fresh current-frame pose; R20/R22 double approval removed',
             'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]=',
-            'VR R30.6 XYZRHW WORLD:'
+            'VR R30.6 XYZRHW WORLD:',
+            'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
+            'VR R66 OPTION ARROW: exact node pinned',
+            'VR R66 GOAL TIME HUD:',
+            'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
+            'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE'
           )) {
             if (-not $ascii.Contains($marker)) {
               throw "R26 HUD marker missing: $marker"
             }
+          }
+          if ($ascii.Contains('VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE')) {
+            throw 'R26 HUD artifact contains forbidden R26-only SAFE-DRAW marker'
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) {
@@ -475,7 +495,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON
+          cmake -S . -B build-vr-c1 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=ON -DOUTRUN_VR_C2_COMPARE=OFF
 
       - name: Verify C1 source graph
         shell: pwsh
@@ -562,7 +582,7 @@ jobs:
         shell: cmd
         run: |
           set CI=
-          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON
+          cmake -S . -B build-vr-c2 -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON
 
       - name: Verify C2 source graph
         shell: pwsh

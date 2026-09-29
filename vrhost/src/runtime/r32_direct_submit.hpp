@@ -130,6 +130,38 @@ namespace OutRunVrR32DirectSubmit
         AckedGeneration.fill(0);
     }
 
+    inline void MarkGenerationFault(
+        std::uint32_t generation) noexcept
+    {
+        if (!generation)
+            return;
+
+        // Never let a late failure from a superseded EVENT roll the active
+        // transport generation backwards or overwrite a newer generation's
+        // quarantine state. Exact old-slot lifetime is still handled by its
+        // pending/deferred owner.
+        if (ActiveAckGeneration != 0 &&
+            ActiveAckGeneration != generation)
+            return;
+
+        if (ActiveAckGeneration == 0)
+            ObserveGeneration(generation);
+        AckFaultGeneration = generation;
+    }
+
+    inline bool GenerationFaulted(
+        std::uint32_t generation) noexcept
+    {
+        return generation != 0 &&
+            AckFaultGeneration == generation;
+    }
+
+    inline bool ActiveGenerationFaulted() noexcept
+    {
+        return ActiveAckGeneration != 0 &&
+            AckFaultGeneration == ActiveAckGeneration;
+    }
+
     inline bool EnsureFence(std::uint32_t slot) noexcept
     {
         if (slot >= Pending.size() || !OutRunVrFinalTest::Device)
@@ -163,8 +195,7 @@ namespace OutRunVrR32DirectSubmit
                 const std::uint32_t generation =
                     pending.frame.reserved[
                         OutRunVR::RenderFrameDirectGenerationIndex];
-                if (generation)
-                    AckFaultGeneration = generation;
+                MarkGenerationFault(generation);
                 ++AckQueryErrors;
                 pending.armed = false;
                 pending.flushIssued = false;
@@ -182,6 +213,18 @@ namespace OutRunVrR32DirectSubmit
                 // Late completion from a superseded shared-eye generation is
                 // safe to forget, but must never roll the global ACK generation
                 // backwards and stall the producer's new ring.
+                pending.armed = false;
+                pending.flushIssued = false;
+                pending.frame = {};
+                ++AckCompleted;
+                continue;
+            }
+            if (!OutRunVrD3D9ExDirectPassthrough::FrameRunIdentityCurrent(
+                    pending.frame))
+            {
+                // A new game process has claimed Frame.v2. This completed fence
+                // belongs to an old producer run and must not rewrite the ACK
+                // mapping or remain as an infinite retry owner.
                 pending.armed = false;
                 pending.flushIssued = false;
                 pending.frame = {};
@@ -225,8 +268,18 @@ namespace OutRunVrR32DirectSubmit
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-        if (slot >= Pending.size() || !generation || !EnsureFence(slot))
+        if (slot >= Pending.size() || !generation)
             return false;
+        if (!EnsureFence(slot))
+        {
+            // Repeated EVENT allocation failure should not re-enter the fast
+            // path every XR tick and pressure more producer slots. Quarantine
+            // this generation and let the lower SafeEye copy/fence path own
+            // recovery without publishing an unsafe ACK.
+            MarkGenerationFault(generation);
+            ++AckQueryErrors;
+            return false;
+        }
 
         if (AckedGeneration[slot] == generation &&
             AckedFrame[slot] == frame.frameId)

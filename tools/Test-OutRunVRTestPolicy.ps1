@@ -58,9 +58,10 @@ Assert-True (Has-Argument $performance '-FrameCadenceTargetHz=0') 'PERFORMANCE m
 
 $requiredFiles = @(
     'Select-OutRunVRBackend.ps1',
+    'OutRunVR-BackendContract.ps1',
     'Run-OutRunVRTest.ps1',
     'Collect-OutRunVRLogs.ps1',
-    'OutRunVR-Backend-Selector.ps1'
+    'OutRunVR-Test-Selector.ps1'
 )
 $text = @{}
 $parseTargets = @('OutRunVR-TestProfiles.ps1') + $requiredFiles
@@ -75,13 +76,20 @@ foreach($name in $parseTargets) {
 }
 
 Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'TestProfile') 'selector must persist TestProfile'
+Assert-True ($text['Select-OutRunVRBackend.ps1'] -match 'Get-OutRunVRBackendContract') 'selector must consume the canonical backend contract'
+Assert-True ($text['OutRunVR-BackendContract.ps1'] -match "SemanticContract='R69_CLEAN'") 'VR backends must advertise the R69 CLEAN semantic contract'
+Assert-True ($text['OutRunVR-BackendContract.ps1'] -notmatch 'R57_05_RANK_PROJECTED_IPD') 'backend defaults must not reintroduce R57 experiment variants'
 Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'Get-OutRunVRTestProfile') 'runner must consume profile definitions'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'TEST_PROFILE') 'collector manifest must record profile'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match '\$variant/\$profile/\$session') 'collector path must separate Variant/Profile/Session'
 Assert-True ($text['Collect-OutRunVRLogs.ps1'] -match 'captureRoot') 'collector must include capture bundles'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CORRECTNESS') 'GUI must expose CORRECTNESS'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'CONTROL') 'GUI must expose CONTROL'
-Assert-True ($text['OutRunVR-Backend-Selector.ps1'] -match 'PERFORMANCE') 'GUI must expose PERFORMANCE'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -match 'R69_FIXPACK') 'single GUI must expose the R69 production variant'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -match 'R69_FIXPACK') 'runner must map the R69 production variant'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -notmatch 'R57_01_POSITION_KIND1_HUD35') 'R69 GUI must not expose obsolete R57 orthogonal modes'
+Assert-True ($text['Run-OutRunVRTest.ps1'] -notmatch 'OUTRUN_VR_R57_MODE') 'runner must not export the removed R57 mode selector'
+Assert-True ($text['OutRunVR-Test-Selector.ps1'] -notmatch 'R56_01_ZERO') 'R57 GUI must not waste user tests on the old redundant R55/R56 baseline matrix'
+Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Backend-Selector.ps1'))) 'obsolete backend GUI selector must stay removed'
+Assert-True (-not (Test-Path (Join-Path $root 'OutRunVR-Slot-Selector.ps1'))) 'obsolete slot GUI selector must stay removed'
 
 $watchdogPath = Join-Path $repoRoot 'vrhost/src/diagnostics/runtime_watchdog.cpp'
 Assert-True (Test-Path $watchdogPath) 'runtime watchdog source missing'
@@ -113,4 +121,4 @@ Assert-True ($state.testProfiles.CORRECTNESS.defaultUserTest -eq $true) 'CORRECT
 Assert-True ($state.testProfiles.CONTROL.defaultUserTest -eq $false) 'CONTROL must be optional'
 Assert-True ($state.testProfiles.PERFORMANCE.defaultUserTest -eq $false) 'PERFORMANCE must be optional'
 
-Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, GUI exposure, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'
+Write-Host 'VR test policy verification passed: profile identity, runtime defaults, session/log separation, single user-facing semantic selector, bounded Ctrl+F9 capture, single-active CI and TEST_LEVEL state are consistent.'

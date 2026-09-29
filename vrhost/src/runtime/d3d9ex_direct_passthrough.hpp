@@ -15,6 +15,7 @@
 #endif
 
 #include <d3d9types.h>
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <cstring>
@@ -22,14 +23,16 @@
 
 namespace OutRunVrD3D9ExDirectPassthrough
 {
-    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-R23-20260916";
+    inline constexpr const char* BuildId = "D3D9Ex-direct-gpu-copy-EXP-FENCE2-QPC-V2-20260928";
     inline constexpr const char* LegacyBuildId = "D3D9Ex-direct-passthrough-20260915";
     inline constexpr ULONGLONG FallbackSourceMaxAgeMs = 250;
 
-    // 90 Hz gives roughly 11.1 ms for a complete frame. A 25 ms synchronous
-    // GPU fence wait could consume more than two frames before fallback. Keep
-    // this bounded so a delayed direct copy fails closed to the classic path.
-    inline constexpr ULONGLONG CopyFenceTimeoutMs = 8;
+    // Experimental hitch-control build. The legacy SafeEye recovery path is
+    // not the normal R32 fast path; when it is entered, cap the synchronous
+    // copy fence to 2 ms instead of allowing an 8 ms CPU-side stall. A copy
+    // that misses this budget fails closed to the existing fallback/cached
+    // projection chain.
+    inline constexpr LONGLONG CopyFenceTimeoutUs = 2000;
 
     inline std::uint64_t DirectPassFrames = 0;
     inline std::uint64_t FallbackFrames = 0;
@@ -312,6 +315,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             DirectAckState->structSize = sizeof(*DirectAckState);
             DirectAckState->hostPid = GetCurrentProcessId();
             DirectAckState->transportGeneration = 0;
+            DirectAckState->clientPid = 0;
+            DirectAckState->runGeneration = 0;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
             EndAckWrite();
@@ -437,14 +442,33 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         OutRunVrFinalTest::Context->End(CopyFence);
         OutRunVrFinalTest::Context->Flush();
-        const ULONGLONG start = GetTickCount64();
+
+        static const LARGE_INTEGER frequency = []() noexcept {
+            LARGE_INTEGER value{};
+            QueryPerformanceFrequency(&value);
+            return value;
+        }();
+        LARGE_INTEGER start{};
+        if (frequency.QuadPart <= 0 ||
+            !QueryPerformanceCounter(&start))
+            return false;
+
+        const LONGLONG budgetTicks =
+            (frequency.QuadPart * CopyFenceTimeoutUs) / 1000000LL;
         for (;;)
         {
             const HRESULT hr = OutRunVrFinalTest::Context->GetData(
                 CopyFence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
             if (hr == S_OK)
                 return true;
-            if (FAILED(hr) || GetTickCount64() - start >= CopyFenceTimeoutMs)
+
+            LARGE_INTEGER now{};
+            const bool haveNow = QueryPerformanceCounter(&now) != FALSE;
+            const bool timedOut =
+                !haveNow ||
+                now.QuadPart - start.QuadPart >=
+                    std::max<LONGLONG>(1, budgetTicks);
+            if (FAILED(hr) || timedOut)
             {
                 ++CopyFenceTimeout;
                 if (!FirstCopyFenceTimeoutLogged)
@@ -452,8 +476,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
                     FirstCopyFenceTimeoutLogged = true;
                     std::cerr
                         << "[D3D9Ex R23] direct copy fence exceeded "
-                        << CopyFenceTimeoutMs
-                        << "ms VR budget; dropping direct candidate to fallback\n";
+                        << CopyFenceTimeoutUs
+                        << "us EXP-FENCE2-QPC budget; dropping direct candidate to fallback/cached projection\n";
                 }
                 return false;
             }
@@ -495,23 +519,38 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool FrameRunIdentityCurrent(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return EnsureFrameRing() &&
+            OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, frame);
+    }
+
     inline bool PublishCompletedFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!EnsureDirectAckState())
+        if (!EnsureDirectAckState() || !FrameRunIdentityCurrent(frame))
             return false;
         const std::uint32_t slot =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
         if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation ||
-            !frame.frameId)
+            !frame.frameId || !frame.clientPid || !runGeneration)
             return false;
 
         BeginAckWrite();
-        if (DirectAckState->transportGeneration != generation)
+        const bool identityChanged =
+            DirectAckState->transportGeneration != generation ||
+            DirectAckState->clientPid != frame.clientPid ||
+            DirectAckState->runGeneration != runGeneration;
+        if (identityChanged)
         {
             DirectAckState->transportGeneration = generation;
+            DirectAckState->clientPid = frame.clientPid;
+            DirectAckState->runGeneration = runGeneration;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
         }
