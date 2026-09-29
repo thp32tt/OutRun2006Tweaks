@@ -1,0 +1,89 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00092",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00027",
+  "recorded_at_kst": "2026-09-29T16:35:41+09:00",
+  "base_sha": "f5eee44919a5c0e72202ed91820c2741b64b9d75",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_EXACT_RELEASE_32BPP_PAYLOAD_EXTRACTION_SCOPES",
+  "summary": "Advanced C-consumed even indices 198/214/230/236 from accepted semantic-cell mappings to deterministic exact Release 32bpp payload extraction scopes for 37 unique regions / 38 current canonical physical semantic occurrences. Included all three C00071-reconciled omissions; BF229CF4 START/GOAL remain two semantics in one shared route-map cell and explicitly require independent glyph masks. Reused unchanged B00066/C00071 source/mapping evidence; 4/4 exact Release size equations and 37/37 extraction ranges pass with zero overlap. No Korean DDS or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1635-B126-P00027/B126_P00027_EVEN_RELEASE_32BPP_PAYLOAD_EXTRACTION_SCOPE.json"
+  ],
+  "evidence_blob_sha": "ffb229fe0fc9c014987ca4c1f8c281b8b727d03b",
+  "material_deliverable": {
+    "type": "FOUR_EVEN_EXACT_RELEASE_32BPP_PAYLOAD_EXTRACTION_SCOPES",
+    "indices": [
+      198,
+      214,
+      230,
+      236
+    ],
+    "assets": [
+      "9FC88069",
+      "BF229CF4",
+      "E95DA5",
+      "FEF70E85"
+    ],
+    "unique_extraction_regions": 37,
+    "mapped_physical_semantic_occurrences": 38,
+    "c_reconciled_omission_regions": 3,
+    "shared_cell_semantic_occurrences": 2,
+    "exact_release_size_equations": 4,
+    "out_of_bounds_ranges": 0,
+    "region_overlap_pairs": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "mapping_task": "LOCALIZATION-LOCALIZATION_B-00066",
+    "mapping_report_blob_sha": "32574cad4b249ff2bd2baa6a21e51b14ac0e46a8",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00071",
+    "c_acceptance_record_blob_sha": "fbdf336d6234c702d6cc429c255785faadd9d4f8",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "queue_blob_sha": "6fb584e6f0a11ed74fa76e2ba6389c6576c3f54f",
+    "reason": "Unchanged source/mapping fingerprint after C00071 acceptance; duplicate heavy QA intentionally reused. New work is exact Release payload extraction geometry for the current canonical semantics."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00087": [
+      86,
+      100,
+      106
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00090": [
+      130,
+      140,
+      154,
+      164
+    ]
+  },
+  "strict_hold": {
+    "dds_header_channel_masks_mips": "HOLD_EXACT_BINARY_HEADER_DECODE_REQUIRED",
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "signed_text_slant": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_full_effect_bboxes": "HOLD_EXACT_DECODE_REQUIRED",
+    "glyph_effect_masks": "HOLD_EXACT_DECODE_REQUIRED",
+    "clean_plates": "HOLD_EXACT_DECODE_REQUIRED",
+    "generation_v2_safe_bboxes": "HOLD_UNTIL_FULL_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE"
+  },
+  "self_qa": "PASS_EVEN_ONLY_198_214_230_236__38_OF_38_CURRENT_CANONICAL_SEMANTIC_OCCURRENCES__4_OF_4_32BPP_SIZE_EQUATIONS__37_OF_37_RANGES_IN_BOUNDS__0_OVERLAPS__SHARED_START_GOAL_CELL_FAIL_CLOSED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Payload extraction scopes are atlas-cell byte ranges, not glyph/effect edit masks. Exact DDS channel masks/mip semantics, decoded orientation/slant, full-effect bboxes, clean plates, v2 safe-fit geometry and final English-source-vs-Korean-candidate containment/alpha comparison remain required before candidate promotion.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
