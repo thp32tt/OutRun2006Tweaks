@@ -1,0 +1,216 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00149",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00070",
+  "recorded_at_kst": "2026-09-29T21:54:58+09:00",
+  "base_sha": "476e74c6cbd93c9720eb559d3ff686d6b2cb7328",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_SCHEMA9_THREE_ODD_CURRENT_CANONICAL_SOURCE_IDENTITY_GUARDS",
+  "summary": "Fresh latest-HEAD A-odd scan found no explicit RENDER_READY/ONE_STAGE_TO_RENDER asset and retained direct rework indices 51/53/111/121 as dependency-blocked with unchanged blockers. A00146 indices 99/215 remain producer-QA pending and were skipped. This invocation therefore used fallback-4 material work on odd pending indices 65/89/241. For each asset, immutable pinned-tag stock DDS bytes were actually fetched and SHA-256/header-decoded: all three are DXT5 and fail the current canonical RGBA inventory identity. For indices 65/89/241, the pinned Release Git blobs are unchanged from previously C-accepted pre-generation lineage, but their accepted canvases are 4x the current inventory canvases; those old geometry/generation assumptions are retired as current-canonical construction authority. Index89's historical 2048x256 generation spec and committed hd_source blob ca95f455... are explicitly nonauthoritative against current 512x64 inventory SHA 0a2c9a32.... No Korean DDS/shared state/build/runtime/N100/Drive/local-clone/Library/VR/FFB/DX changes.",
+  "evidence_embedded_in_task_record": true,
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_ODD_PINNED_GITHUB_DIRECT_SOURCE_IDENTITY_GUARDS_AND_STALE_4X_LINEAGE_RETIREMENT",
+    "indices": [
+      65,
+      89,
+      241
+    ],
+    "assets": [
+      "EBEF6D20",
+      "43B07A77",
+      "E1639D2E"
+    ],
+    "pinned_stock_dds_bytes_fetched_and_sha256_checked": 3,
+    "pinned_stock_identity_mismatches": 3,
+    "stale_4x_release_lineages_retired": 3,
+    "current_candidates_modified": 0,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "fresh_scan_head": "476e74c6cbd93c9720eb559d3ff686d6b2cb7328",
+    "explicit_render_ready_indices": [],
+    "explicit_one_stage_to_render_indices": [],
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_producer_indices": [
+      99,
+      215
+    ],
+    "selection_reason": "Candidate-completion tiers were exhausted after fresh HEAD scan; selected three independent odd PREFLIGHT_ONLY/pending assets with stale or unqualified source lineages for new identity-guard material.",
+    "conclusion": "ZERO_CANDIDATE_EXCEPTION_VALID__FALLBACK4_MATERIAL_SOURCE_IDENTITY_GUARDS_EXECUTED"
+  },
+  "source_policy": {
+    "canonical_repository": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "github_only": true,
+    "google_drive_used": false,
+    "release_zip_downloaded": false,
+    "source_acquisition_exhausted": false,
+    "note": "This task validates direct pinned-tag objects only. Direct mismatch does not prove the pinned Release bundle lacks the current canonical bytes; bundle fallback remains the next approved GitHub route."
+  },
+  "assets": [
+    {
+      "index": 65,
+      "asset": "EBEF6D20",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+      "current_inventory": {
+        "sha256": "1ee491be92af2e70d0dae33a8c205b13b152f198f8a534136fac1c3c4e164a3e",
+        "width": 512,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "pinned_stock_direct": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+        "git_blob_sha": "a79f5847643d261d2c79d1142375db692384817b",
+        "bytes": 262272,
+        "computed_sha256": "78fdc0d8591689f2743de4700a681b05d08376a391a6f1e2855e186a80c12f23",
+        "width": 512,
+        "height": 512,
+        "dds_fourcc": "DXT5",
+        "inventory_match": false,
+        "source_outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release_lineage": {
+        "path": "Release/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+        "git_blob_sha": "f05e35654433b4ce010d119d4a705f505cdd80c2",
+        "immutable_prior_canvas": [
+          2048,
+          2048
+        ],
+        "prior_evidence": "A00056 immutable Release/4x atlas lineage",
+        "current_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_GEOMETRY"
+      },
+      "next_safe_action": "Use the next approved GitHub acquisition tier and accept only bytes matching inventory SHA-256 1ee491be... and 512x512 RGBA before source-effect/removal-mask/CLEAN_PLATE work."
+    },
+    {
+      "index": 89,
+      "asset": "43B07A77",
+      "queue_path": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "current_inventory": {
+        "sha256": "0a2c9a32070771338dabc04a7bda67d9b474fd21d6a3456f60d9e1221fc8a96c",
+        "width": 512,
+        "height": 64,
+        "mode": "RGBA"
+      },
+      "pinned_stock_direct": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+        "git_blob_sha": "9c521d628e104b8d4833fbcaf7869f6d9e4d7e74",
+        "bytes": 32896,
+        "computed_sha256": "6db8e65661f76e5ac12e7090c039ced565731765e0cfc5dbe45329b52b5307f2",
+        "width": 512,
+        "height": 64,
+        "dds_fourcc": "DXT5",
+        "inventory_match": false,
+        "source_outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "stale_generation_spec": {
+        "prior_task": "LOCALIZATION-LOCALIZATION_A-00056",
+        "repo_hd_source_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+        "recorded_source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+        "recorded_canvas": [
+          2048,
+          256
+        ],
+        "recorded_mode": "RGBA32",
+        "prior_candidate_permitted_region": [
+          1,
+          13,
+          1494,
+          248
+        ],
+        "disposition": "RETIRE_AS_CURRENT_CANONICAL_CONSTRUCTION_INPUT",
+        "reason": "Current inventory is 512x64 RGBA SHA-256 0a2c9a32...; the old 2048x256 source/style/geometry fingerprint is not current-canonical."
+      },
+      "next_safe_action": "Acquire exact current canonical 512x64 RGBA bytes first, then remeasure Game Over effect bbox/slant/safe region from those bytes; do not render from A00056 geometry."
+    },
+    {
+      "index": 241,
+      "asset": "E1639D2E",
+      "queue_path": "textures/load/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+      "current_inventory": {
+        "sha256": "0af7362ff57b2ee9bfa04811838035861e919f5886244994dbede9aca6ed6c63",
+        "width": 256,
+        "height": 64,
+        "mode": "RGBA"
+      },
+      "pinned_stock_direct": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+        "git_blob_sha": "91f2a3f3621f6d5d67b6c11eadd3c4ceab76933e",
+        "bytes": 16512,
+        "computed_sha256": "3277d04661e0e348d41d0393df57676ce620bef445ee7cf7d461057547d4ac8b",
+        "width": 256,
+        "height": 64,
+        "dds_fourcc": "DXT5",
+        "inventory_match": false,
+        "source_outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release_lineage": {
+        "path": "Release/spr_sprani_sumo_loading_Exst/E1639D2E_256x64.dds",
+        "git_blob_sha": "1a119356bf20b0116d408ffe510e62ec90fc0c53",
+        "immutable_prior_canvas": [
+          1024,
+          256
+        ],
+        "prior_evidence": "A00061/A00102 accepted pre-generation Release/4x lineage",
+        "current_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_GEOMETRY"
+      },
+      "semantic_hold": {
+        "confirmed": "Loading -> 로딩",
+        "unresolved": "PLEASE WAIT exact canonical pixel binding",
+        "status": "PREFLIGHT_ONLY_CURRENT_SOURCE_REQUIRED"
+      },
+      "next_safe_action": "Acquire exact current canonical 256x64 RGBA bytes, bind PLEASE WAIT from decoded pixels, then derive effect/removal/protected masks and CLEAN_PLATE."
+    }
+  ],
+  "one_pass_self_qa": {
+    "parity": "PASS_ODD_ONLY_65_89_241",
+    "work_steal": "NONE",
+    "current_inventory_identity_inputs": "PASS_3_OF_3_FROM_CURRENT_INVENTORY_BLOB",
+    "pinned_stock_direct_bytes": "PASS_FETCHED_3_OF_3",
+    "pinned_stock_sha256_header_decode": "PASS_3_OF_3",
+    "pinned_stock_vs_inventory": "FAIL_CLOSED_3_OF_3_SOURCE_IDENTITY_MISMATCH",
+    "stale_release_geometry_reuse": "REJECTED_3_OF_3",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_NEW_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "queue_blob_sha": "a202cd0969dfc25b449301d204f0896ce3d2e7cc",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "resume_state_blob_sha": "3d2fb7ad7a3f47902aabaaa1340c93cc87011e4b",
+    "a00056_generation_spec_blob_sha": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+    "c00147_base_head": "476e74c6cbd93c9720eb559d3ff686d6b2cb7328"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
