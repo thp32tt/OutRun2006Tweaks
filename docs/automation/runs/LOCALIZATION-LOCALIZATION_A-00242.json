@@ -78,6 +78,6 @@
   "authoritative_result_sha": "254ac03b39a5fe21c5d9a2edc8a2449bc6e43751",
   "bookkeeping_note": "Verified immutable producer result contains only A lane-local index147 source-acquisition evidence and the durable task record. Producer automation_validation remains PENDING under C_BATCH_GATE; no producer-owned Actions Gate is claimed. RUNTIME_VALIDATION=UNTESTED.",
   "result_commit_message": "localization(A): close index147 source acquisition [AUTO:LOCALIZATION-LOCALIZATION_A-00242]",
-  "bookkeeping_recorded_at_kst": "2026-09-30T08:39:10+09:00",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:38:17+09:00",
   "bookkeeping_base_head_sha": "254ac03b39a5fe21c5d9a2edc8a2449bc6e43751"
 }
