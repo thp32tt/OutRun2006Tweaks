@@ -53,3 +53,10 @@ jobs:
           test -s tools/chat-controller/v0.4/localization_A.md
           test -s tools/chat-controller/v0.4/localization_B.md
           test -s tools/chat-controller/v0.4/localization_C.md
+
+      - name: Verify authorized game-mod context
+        run: |
+          grep -Fq 'GAME_MOD_CONTEXT = (' tools/chat-controller/v0.4/src/controller.py.part00
+          grep -Fq 'authorized offline game-mod/VR development' tools/chat-controller/v0.4/src/controller.py.part00
+          grep -Fq 'context_prefix = (GAME_MOD_CONTEXT' tools/chat-controller/v0.4/src/controller.py.part02
+          grep -Fq 'lines = [GAME_MOD_CONTEXT, ""] + lines' tools/chat-controller/v0.4/src/controller.py.part03
