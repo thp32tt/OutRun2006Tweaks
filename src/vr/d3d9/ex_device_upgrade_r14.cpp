@@ -84,6 +84,8 @@ namespace OutRunVRD3D9ExUpgradeR13
             16ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyShadowBudgetBytes =
             32ull * 1024ull * 1024ull;
+        constexpr std::uint64_t R73SelectorAuxShadowBudgetBytes =
+            16ull * 1024ull * 1024ull;
 
         bool R69IsSelectorAtlasReserveCandidate(
             const D3DSURFACE_DESC& desc, UINT levels,
@@ -138,6 +140,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<std::uint64_t> R14ShadowBytes{0};
         std::atomic<std::uint64_t> R14GeneralShadowBytes{0};
         std::atomic<std::uint64_t> R14EmergencyShadowBytes{0};
+        std::atomic<std::uint64_t> R73SelectorAuxShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
         struct R14ShadowEntry
@@ -158,6 +161,7 @@ namespace OutRunVRD3D9ExUpgradeR13
             std::uint64_t shadowBytes = 0;
             bool countsAgainstGeneralBudget = false;
             bool countsAgainstEmergencyBudget = false;
+            bool countsAgainstSelectorAuxBudget = false;
             bool selectorAtlas = false;
 
             ~R14ShadowEntry()
@@ -174,6 +178,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                             shadowBytes, std::memory_order_acq_rel);
                     if (countsAgainstEmergencyBudget)
                         R14EmergencyShadowBytes.fetch_sub(
+                            shadowBytes, std::memory_order_acq_rel);
+                    if (countsAgainstSelectorAuxBudget)
+                        R73SelectorAuxShadowBytes.fetch_sub(
                             shadowBytes, std::memory_order_acq_rel);
                 }
                 --R14InternalReleaseDepth;
@@ -466,7 +473,8 @@ namespace OutRunVRD3D9ExUpgradeR13
         }
 
         bool R14ReserveShadowBytes(
-            std::uint64_t bytes, bool emergencyReserve) noexcept
+            std::uint64_t bytes, bool emergencyReserve,
+            bool selectorAtlasReserve) noexcept
         {
             if (!bytes || bytes > R14ShadowBudgetBytes)
                 return false;
@@ -486,6 +494,28 @@ namespace OutRunVRD3D9ExUpgradeR13
 
             if (emergencyReserve)
             {
+                if (!selectorAtlasReserve)
+                {
+                    std::uint64_t aux =
+                        R73SelectorAuxShadowBytes.load(
+                            std::memory_order_acquire);
+                    for (;;)
+                    {
+                        if (bytes > R73SelectorAuxShadowBudgetBytes ||
+                            aux > R73SelectorAuxShadowBudgetBytes - bytes)
+                        {
+                            R14ShadowBytes.fetch_sub(
+                                bytes, std::memory_order_acq_rel);
+                            return false;
+                        }
+                        if (R73SelectorAuxShadowBytes.compare_exchange_weak(
+                                aux, aux + bytes,
+                                std::memory_order_acq_rel,
+                                std::memory_order_acquire))
+                            break;
+                    }
+                }
+
                 std::uint64_t emergency =
                     R14EmergencyShadowBytes.load(std::memory_order_acquire);
                 for (;;)
@@ -493,6 +523,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                     if (bytes > R14EmergencyShadowBudgetBytes ||
                         emergency > R14EmergencyShadowBudgetBytes - bytes)
                     {
+                        if (!selectorAtlasReserve)
+                            R73SelectorAuxShadowBytes.fetch_sub(
+                                bytes, std::memory_order_acq_rel);
                         R14ShadowBytes.fetch_sub(
                             bytes, std::memory_order_acq_rel);
                         return false;
@@ -535,14 +568,19 @@ namespace OutRunVRD3D9ExUpgradeR13
                 entry->shadowBytes = R14EstimateShadowBytes(gpu);
                 D3DSURFACE_DESC level0{};
                 const UINT levels = gpu->GetLevelCount();
-                const bool emergencyReserve =
+                const bool selectorAtlasReserve =
                     SUCCEEDED(gpu->GetLevelDesc(0, &level0)) &&
-                    (R69IsSelectorAtlasReserveCandidate(
-                         level0, levels, entry->shadowBytes) ||
-                     R72IsSelectorReserveCandidate(
-                         level0, levels, entry->shadowBytes));
+                    R69IsSelectorAtlasReserveCandidate(
+                        level0, levels, entry->shadowBytes);
+                const bool selectorAuxReserve =
+                    SUCCEEDED(gpu->GetLevelDesc(0, &level0)) &&
+                    R72IsSelectorReserveCandidate(
+                        level0, levels, entry->shadowBytes);
+                const bool emergencyReserve =
+                    selectorAtlasReserve || selectorAuxReserve;
                 if (!R14ReserveShadowBytes(
-                        entry->shadowBytes, emergencyReserve))
+                        entry->shadowBytes, emergencyReserve,
+                        selectorAtlasReserve))
                 {
                     entry->shadowBytes = 0;
                     ++R14ShadowBudgetRejects;
@@ -550,7 +588,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 }
                 entry->countsAgainstGeneralBudget = !emergencyReserve;
                 entry->countsAgainstEmergencyBudget = emergencyReserve;
-                entry->selectorAtlas = emergencyReserve;
+                entry->countsAgainstSelectorAuxBudget = selectorAuxReserve;
+                entry->selectorAtlas = selectorAtlasReserve;
                 entry->validMask = levels >= R14MaxTrackedLevels
                     ? 0xFFFFFFFFu : ((1u << levels) - 1u);
                 device->AddRef();
@@ -631,21 +670,29 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14GeneralShadowBytes.load(std::memory_order_acquire);
             const std::uint64_t currentEmergency =
                 R14EmergencyShadowBytes.load(std::memory_order_acquire);
+            const std::uint64_t currentSelectorAux =
+                R73SelectorAuxShadowBytes.load(std::memory_order_acquire);
 
             const bool selectorCompanion =
                 R71IsSelectorCompanionDiagnosticCandidate(
+                    desc, levels, estimate);
+            const bool selectorAtlasEligible =
+                R69IsSelectorAtlasReserveCandidate(
                     desc, levels, estimate);
             const bool r72SelectorReserve =
                 R72IsSelectorReserveCandidate(
                     desc, levels, estimate);
             const bool emergencyAtlasEligible =
-                R69IsSelectorAtlasReserveCandidate(
-                    desc, levels, estimate) ||
-                r72SelectorReserve;
+                selectorAtlasEligible || r72SelectorReserve;
 
             const bool totalBudgetReject =
                 !estimate || estimate > R14ShadowBudgetBytes ||
                 currentTotal > R14ShadowBudgetBytes - estimate;
+            const bool selectorAuxBudgetReject =
+                r72SelectorReserve &&
+                (estimate > R73SelectorAuxShadowBudgetBytes ||
+                 currentSelectorAux >
+                    R73SelectorAuxShadowBudgetBytes - estimate);
             const bool emergencyBudgetReject =
                 emergencyAtlasEligible &&
                 (estimate > R14EmergencyShadowBudgetBytes ||
@@ -657,15 +704,15 @@ namespace OutRunVRD3D9ExUpgradeR13
                  currentGeneral >
                     R14GeneralShadowBudgetBytes - estimate);
 
-            if (totalBudgetReject || emergencyBudgetReject ||
-                generalBudgetReject)
+            if (totalBudgetReject || selectorAuxBudgetReject ||
+                emergencyBudgetReject || generalBudgetReject)
             {
                 ++R14ShadowBudgetRejects;
                 if (selectorCompanion &&
                     !R14FirstSelectorCompanionBudgetRejectLogged.exchange(true))
                 {
                     spdlog::warn(
-                        "VR R71 SELECTOR DIAG: companion CPU-shadow budget reject ptr=0x{:08x} size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f} reject[total={},general={},emergency={}]",
+                        "VR R73 SELECTOR DIAG: CPU-shadow budget reject ptr=0x{:08x} size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f} auxMiB={:.1f} reject[total={},general={},emergency={},aux={}]",
                         static_cast<unsigned>(
                             reinterpret_cast<std::uintptr_t>(gpu)),
                         desc.Width, desc.Height,
@@ -673,8 +720,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                         static_cast<double>(currentTotal) / (1024.0 * 1024.0),
                         static_cast<double>(currentGeneral) / (1024.0 * 1024.0),
                         static_cast<double>(currentEmergency) / (1024.0 * 1024.0),
+                        static_cast<double>(currentSelectorAux) / (1024.0 * 1024.0),
                         totalBudgetReject, generalBudgetReject,
-                        emergencyBudgetReject);
+                        emergencyBudgetReject, selectorAuxBudgetReject);
                 }
                 return D3DERR_OUTOFVIDEOMEMORY;
             }
@@ -683,7 +731,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !R14FirstEmergencyReserveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R72 SELECTOR RESERVE: MANAGED CPU-shadow reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}; emergency class capped at 32 MiB, general at 368 MiB, total at 400 MiB",
+                    "VR R73 SELECTOR RESERVE: atlas keeps dedicated 16 MiB headroom; aux class capped at 16 MiB inside 32 MiB emergency, general at 368 MiB, total at 400 MiB size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}",
                     desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
                     estimate,
                     static_cast<double>(currentTotal) / (1024.0 * 1024.0),
