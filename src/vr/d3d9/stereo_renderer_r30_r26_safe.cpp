@@ -4641,8 +4641,52 @@ namespace OutRunVRStereo
             if (vs)
                 vs->Release();
 
+            // R71 visual diagnostic: the user reported HUD/menu content looking
+            // globally translucent. Do not force alpha or blend values here:
+            // several legitimate OutRun UI elements intentionally use alpha.
+            // Instead record the exact live blend contract only for proven
+            // SCREEN_HUD queue draws so the next HMD log can distinguish
+            // additive/dual-source state leakage from intended sprite alpha.
+            DWORD alphaBlend = FALSE;
+            DWORD srcBlend = D3DBLEND_ONE;
+            DWORD destBlend = D3DBLEND_ZERO;
+            DWORD blendOp = D3DBLENDOP_ADD;
+            DWORD separateAlpha = FALSE;
+            DWORD srcBlendAlpha = D3DBLEND_ONE;
+            DWORD destBlendAlpha = D3DBLEND_ZERO;
+            DWORD blendOpAlpha = D3DBLENDOP_ADD;
+            DWORD alphaTest = FALSE;
+            DWORD alphaRef = 0;
+            DWORD alphaFunc = D3DCMP_ALWAYS;
+            DWORD colorWrite = 0xFFFFFFFFu;
+            const bool blendStateOk =
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &alphaBlend)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SRCBLEND, &srcBlend)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_DESTBLEND, &destBlend)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_BLENDOP, &blendOp)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_SRCBLENDALPHA, &srcBlendAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_DESTBLENDALPHA, &destBlendAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_BLENDOPALPHA, &blendOpAlpha)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHATESTENABLE, &alphaTest)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHAREF, &alphaRef)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_ALPHAFUNC, &alphaFunc)) &&
+                SUCCEEDED(device->GetRenderState(
+                    D3DRS_COLORWRITEENABLE, &colorWrite));
+
             spdlog::info(
-                "VR R63 EXACT SCREENHUD DRAW: method={} type={} prim={} fvfHr=0x{:08X} fvf=0x{:08X} vsHr=0x{:08X} hasVS={} node={} effective={} hit={}",
+                "VR R71 HUD ALPHA DIAG: method={} type={} prim={} fvfHr=0x{:08X} fvf=0x{:08X} vsHr=0x{:08X} hasVS={} node={} effective={} blendOk={} ab={} src={} dst={} op={} sepA={} srcA={} dstA={} opA={} at={} ref={} func={} colorWrite=0x{:08X} hit={}",
                 method,
                 static_cast<unsigned>(type),
                 primitiveCount,
@@ -4654,6 +4698,19 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::CurrentQueueNode()),
                 OutRunVR::GameSemantic::Name(
                     OutRunVR::GameSemantic::EffectiveScope()),
+                blendStateOk ? 1 : 0,
+                static_cast<unsigned>(alphaBlend),
+                static_cast<unsigned>(srcBlend),
+                static_cast<unsigned>(destBlend),
+                static_cast<unsigned>(blendOp),
+                static_cast<unsigned>(separateAlpha),
+                static_cast<unsigned>(srcBlendAlpha),
+                static_cast<unsigned>(destBlendAlpha),
+                static_cast<unsigned>(blendOpAlpha),
+                static_cast<unsigned>(alphaTest),
+                static_cast<unsigned>(alphaRef),
+                static_cast<unsigned>(alphaFunc),
+                static_cast<unsigned>(colorWrite),
                 hit);
         }
 
