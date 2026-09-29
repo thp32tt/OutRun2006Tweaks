@@ -1,0 +1,66 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+  "wave_id": "P00110",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:24:00+09:00",
+  "base_head_sha": "6a7fc1f53de62bdede593dd1badd03423595d1d7",
+  "base_sha": "6a7fc1f53de62bdede593dd1badd03423595d1d7",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX232_SEMANTIC_BINDING_SAFE_BBOX_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX232_DESCRIPTION_TRANSLATIONS_BOUND_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Latest Git contract owns B shard index%3==1, overriding the stale even-index prompt. B00209 index226 is already candidate-bearing and C-QA-pending, so it is skipped. No B-owned DIRECT_REWORK/RENDER_READY/ONE_STAGE item is runnable. This single allowed candidate-completion preflight resolves index232's two missing description semantics lane-locally: Join your friends in a game of OutRun! -> 친구들과 아웃런 게임에 참가하세요!, while Create a game and invite your friends! reuses the current index237 translation 게임을 만들고 친구를 초대하세요!. The exact six physical regions and unchanged exact-source/full-clean-plate evidence are reused; 2px safe bboxes are now complete for 6/6. B does not modify shared transcription or render a candidate because C must reconcile the new bindings and independently replay the full six-region clean plate before RENDER_READY.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00211-P00110/B00211_P00110_INDEX232_SEMANTIC_BINDING.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX232_TWO_MISSING_DESCRIPTION_SEMANTIC_BINDINGS_AND_FULL_6_OF_6_SAFE_BBOX_HANDOFF",
+    "reviewed_indices": [
+      232
+    ],
+    "reviewed_assets": [
+      "EBFC709F"
+    ],
+    "new_semantic_bindings": 1,
+    "reused_exact_family_bindings": 1,
+    "total_physical_regions_bound_after": 6,
+    "candidate_safe_bboxes_complete": 6,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      232
+    ],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00209": [
+        226
+      ]
+    },
+    "readiness_after": {
+      "232": "PREFLIGHT_ONLY_SEMANTICS_RESOLVED_LANE_LOCAL__C_RECONCILIATION_AND_INDEPENDENT_FULL_CLEAN_PLATE_QA_REQUIRED"
+    }
+  },
+  "self_qa": "PASS_INDEX232_MOD3_EQ_1__B00209_226_QA_PENDING_NOT_REPEATED__EXACT_SOURCE_HEAVY_QA_REUSED_UNCHANGED__6_OF_6_PHYSICAL_BINDINGS__2PX_SAFE_BBOX_6_OF_6__NO_SHARED_STATE__NO_GUESSED_DDS",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_C_SHARED_SEMANTIC_RECONCILIATION_AND_INDEPENDENT_FULL_CLEAN_PLATE_QA_REQUIRED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT"
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00211-p00110-index232-semantic-binding-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+  "wave_id": "P00110",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:24:00+09:00",
+  "base_head_sha": "6a7fc1f53de62bdede593dd1badd03423595d1d7",
+  "selection": {
+    "current_head_sha": "6a7fc1f53de62bdede593dd1badd03423595d1d7",
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_shard_overridden_by_current_git_contract": true,
+    "selected_index": 232,
+    "asset": "EBFC709F",
+    "priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE",
+    "skipped_qa_pending": [
+      {
+        "index": 226,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
+        "result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7"
+      }
+    ],
+    "render_ready_in_b_shard": [],
+    "one_stage_to_render_in_b_shard": []
+  },
+  "reused_heavy_qa": {
+    "exact_source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "canvas": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "source_identity": "REUSE_C142_C145_UNCHANGED_PASS_FINGERPRINT",
+    "source_probe_repeated": false,
+    "prior_full_six_region_source_effect_mask_pixels": 245840,
+    "prior_full_clean_plate_result": "ALL_ZERO_RGBA_TEXT_ONLY_ATLAS",
+    "prior_partial_shared_clean_plate_pixels": 192602,
+    "heavy_qa_reuse_reason": "source/transcription geometry fingerprint for physical regions is unchanged; B00211 changes only missing semantic Korean bindings and safe-bbox completion"
+  },
+  "semantic_resolution": {
+    "status": "PASS_B_LANE_6_OF_6_PHYSICAL_TEXT_REGIONS_NOW_HAVE_KOREAN_BINDINGS",
+    "bindings": [
+      {
+        "sprite": "sprite_755",
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "source_bbox_readable_xyxy": [
+          9,
+          874,
+          979,
+          1019
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          11,
+          876,
+          977,
+          1017
+        ],
+        "binding": "CURRENT_SHARED"
+      },
+      {
+        "sprite": "sprite_756",
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "source_bbox_readable_xyxy": [
+          24,
+          695,
+          1245,
+          840
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          26,
+          697,
+          1243,
+          838
+        ],
+        "binding": "CURRENT_SHARED"
+      },
+      {
+        "sprite": "sprite_757",
+        "source": "Join your friends in a game of OutRun!",
+        "korean": "친구들과 아웃런 게임에 참가하세요!",
+        "source_bbox_readable_xyxy": [
+          4,
+          527,
+          1138,
+          597
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          6,
+          529,
+          1136,
+          595
+        ],
+        "binding": "NEW_B_LANE_CANONICAL_PROPOSAL",
+        "rationale": "Matches established project terminology 아웃런/게임/참가 and the approved front-end imperative style; preserves the source meaning without adding or dropping the friends/join concept."
+      },
+      {
+        "sprite": "sprite_758",
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "source_bbox_readable_xyxy": [
+          7,
+          367,
+          1120,
+          437
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          9,
+          369,
+          1118,
+          435
+        ],
+        "binding": "REUSE_CURRENT_INDEX237_EXACT_SOURCE_TRANSLATION",
+        "evidence": "localization/graphics/transcriptions.jsonl index237; C138 static-QA-passed index237 candidate"
+      },
+      {
+        "sprite": "sprite_759",
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "source_bbox_readable_xyxy": [
+          14,
+          287,
+          418,
+          350
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          16,
+          289,
+          416,
+          348
+        ],
+        "binding": "CURRENT_SHARED"
+      },
+      {
+        "sprite": "sprite_760",
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "source_bbox_readable_xyxy": [
+          898,
+          291,
+          1420,
+          354
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          900,
+          293,
+          1418,
+          352
+        ],
+        "binding": "CURRENT_SHARED"
+      }
+    ],
+    "current_shared_transcription_modified_by_b": false,
+    "c_reconciliation_required": true
+  },
+  "clean_plate_handoff": {
+    "physical_regions": 6,
+    "full_source_effect_mask_pixels": 245840,
+    "full_clean_plate_method": "zero exact source pixels where any RGBA channel is nonzero in the six exact text-only regions",
+    "producer_prior_machine_result": "PASS",
+    "c145_current_shared_state": "PARTIAL_FOUR_REGION_CLEAN_PLATE_ONLY_BECAUSE_TWO_DESCRIPTION_TRANSLATIONS_WERE_UNRESOLVED",
+    "required_next": "C must merge/review the two lane-local semantic bindings, then independently replay the full six-region mask/CLEAN_PLATE and confirm final 2px safe bboxes before promoting index232 to RENDER_READY.",
+    "candidate_rendered": false,
+    "reason_no_candidate": "Current render-ready definition requires independently QA-passed CLEAN_PLATE plus reconciled semantic binding. B cannot modify shared transcription/state and must not guess past the C gate."
+  },
+  "post_evidence_rescan": {
+    "direct_rework_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "selected_index_232": "PREFLIGHT_ONLY_SEMANTICS_RESOLVED_LANE_LOCAL__C_SHARED_RECONCILIATION_AND_INDEPENDENT_FULL_CLEAN_PLATE_QA_REQUIRED",
+    "unrelated_preflight_expanded": 0,
+    "candidate_dds_modified": false
+  },
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00207.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00209.json",
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX232_BINDING_CLEAN_PLATE_SEMANTIC_GAP.json",
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_EXACT_SOURCE_GEOMETRY_CLEANPLATE.json",
+    "localization/graphics/transcriptions.jsonl#index237"
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
