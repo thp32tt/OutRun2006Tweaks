@@ -8,6 +8,7 @@
 #include <cstring>
 #include <d3dcompiler.h>
 #include <dxgi1_2.h>
+#include <limits>
 #include <utility>
 
 namespace outrun::vr::dx11 {
@@ -15,6 +16,38 @@ namespace {
 
 bool same_luid(const LUID& a, const LUID& b) noexcept {
     return a.LowPart == b.LowPart && a.HighPart == b.HighPart;
+}
+
+bool texture_uncompressed_row_bytes(
+    D3DFORMAT format,
+    UINT width,
+    UINT& rowBytes) noexcept {
+
+    if (width == 0)
+        return false;
+
+    UINT bytesPerPixel = 0;
+    switch (format) {
+    case D3DFMT_A8R8G8B8:
+    case D3DFMT_X8R8G8B8:
+    case D3DFMT_A8B8G8R8:
+        bytesPerPixel = 4;
+        break;
+    case D3DFMT_R5G6B5:
+    case D3DFMT_A1R5G5B5:
+        bytesPerPixel = 2;
+        break;
+    case D3DFMT_A8:
+        bytesPerPixel = 1;
+        break;
+    default:
+        return false;
+    }
+
+    if (width > std::numeric_limits<UINT>::max() / bytesPerPixel)
+        return false;
+    rowBytes = width * bytesPerPixel;
+    return true;
 }
 
 bool find_adapter(
@@ -269,6 +302,71 @@ bool NativeFixedFunctionTextureView::initialize(
     device_ = device;
     texture_ = texture;
     srv_ = std::move(srv);
+    source_format_ = sourceFormat;
+    source_pool_ = sourcePool;
+    source_usage_ = sourceUsage;
+    source_metadata_valid_ = true;
+    upload_generation_ = 0;
+    return true;
+}
+
+bool NativeFixedFunctionTextureView::upload_full_discard(
+    ID3D11DeviceContext* context,
+    const void* source,
+    UINT sourceRowPitch,
+    UINT sourceRows) noexcept {
+
+    if (!ready() || !context || !source ||
+        sourceRowPitch == 0 || sourceRows == 0)
+        return false;
+
+    const auto mutation = translate_texture_mutation(
+        source_pool_, source_usage_, D3DLOCK_DISCARD, true);
+    if (!mutation.planExact ||
+        mutation.kind != TextureMutationUpdateKind::DynamicMapWriteDiscard ||
+        mutation.mapType != D3D11_MAP_WRITE_DISCARD)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != device_.Get())
+        return false;
+
+    D3D11_TEXTURE2D_DESC desc{};
+    texture_->GetDesc(&desc);
+    if (desc.MipLevels != 1 || desc.ArraySize != 1 ||
+        desc.SampleDesc.Count != 1 ||
+        desc.Usage != D3D11_USAGE_DYNAMIC ||
+        desc.CPUAccessFlags != D3D11_CPU_ACCESS_WRITE)
+        return false;
+
+    UINT rowBytes = 0;
+    if (!texture_uncompressed_row_bytes(source_format_, desc.Width, rowBytes) ||
+        sourceRows != desc.Height ||
+        sourceRowPitch < rowBytes)
+        return false;
+
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    if (FAILED(context->Map(
+            texture_.Get(), 0, mutation.mapType, 0, &mapped)) ||
+        !mapped.pData)
+        return false;
+
+    if (mapped.RowPitch < rowBytes) {
+        context->Unmap(texture_.Get(), 0);
+        return false;
+    }
+
+    const auto* sourceBytes = static_cast<const std::uint8_t*>(source);
+    auto* destinationBytes = static_cast<std::uint8_t*>(mapped.pData);
+    for (UINT row = 0; row < sourceRows; ++row) {
+        std::memcpy(
+            destinationBytes + static_cast<std::size_t>(row) * mapped.RowPitch,
+            sourceBytes + static_cast<std::size_t>(row) * sourceRowPitch,
+            rowBytes);
+    }
+    context->Unmap(texture_.Get(), 0);
+    ++upload_generation_;
     return true;
 }
 
@@ -276,6 +374,11 @@ void NativeFixedFunctionTextureView::shutdown() noexcept {
     srv_.Reset();
     texture_.Reset();
     device_.Reset();
+    source_format_ = D3DFMT_UNKNOWN;
+    source_pool_ = D3DPOOL_DEFAULT;
+    source_usage_ = 0;
+    source_metadata_valid_ = false;
+    upload_generation_ = 0;
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(

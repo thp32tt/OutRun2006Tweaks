@@ -1302,6 +1302,69 @@ def main() -> None:
                 "DX11 R100 texture-mutation probe drift: " + meaning
             )
 
+    r101_texture_upload_header = {
+        "upload_full_discard(": "R101 bounded Texture2D upload entrypoint",
+        "content_ready()": "R101 content readiness state",
+        "source_format_ = D3DFMT_UNKNOWN": "R101 source format provenance",
+        "source_pool_ = D3DPOOL_DEFAULT": "R101 source pool provenance",
+        "source_usage_ = 0": "R101 source usage provenance",
+        "source_metadata_valid_ = false": "R101 source metadata validity",
+        "upload_generation_ = 0": "R101 content generation",
+    }
+    missing_r101_header = [
+        meaning
+        for token, meaning in r101_texture_upload_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r101_header:
+        raise SystemExit(
+            "DX11 R101 texture-upload header drift: "
+            + ", ".join(missing_r101_header)
+        )
+
+    for token, meaning in {
+        "texture_uncompressed_row_bytes(": "R101 bounded uncompressed row layout",
+        "translate_texture_mutation(": "R101 reuse of R100 mutation gate",
+        "TextureMutationUpdateKind::DynamicMapWriteDiscard":
+            "R101 exact mutation kind requirement",
+        "desc.MipLevels != 1": "R101 single-mip scope gate",
+        "sourceRows != desc.Height": "R101 full-row coverage gate",
+        "sourceRowPitch < rowBytes": "R101 source pitch safety gate",
+        "texture_.Get(), 0, mutation.mapType": "R101 dynamic mirror Map operation",
+        "context->Unmap(texture_.Get(), 0)": "R101 mirror Unmap operation",
+        "++upload_generation_": "R101 successful content generation advance",
+        "source_metadata_valid_ = false": "R101 shutdown provenance reset",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R101 texture-upload source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R101 dynamic texture content starts uninitialized":
+            "R101 initial content state",
+        "R101 short source row pitch must fail closed":
+            "R101 short-pitch rejection",
+        "R101 partial source rows must fail closed":
+            "R101 partial-row rejection",
+        "R101 foreign device context must fail closed":
+            "R101 device ownership rejection",
+        "R101 full dynamic texture discard upload":
+            "R101 positive upload path",
+        "R101 uploaded texture bytes must match source rows":
+            "R101 staging readback content proof",
+        "R101 upload generation must advance monotonically":
+            "R101 repeated upload generation",
+        "R101 dynamic texture shutdown resets ownership and content generation":
+            "R101 shutdown content reset",
+        "DX11 fixed-function texture upload R101: PASS":
+            "R101 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R101 texture-upload probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

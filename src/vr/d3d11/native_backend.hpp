@@ -89,8 +89,9 @@ private:
 };
 
 // R99 dormant owner for a translated D3D11 Texture2D mirror and its SRV.
-// The mirror must already exist with an exact R73 descriptor. This class does
-// not copy D3D9 texture contents and never binds the SRV to a game context.
+// R101 adds a bounded full-subresource WRITE_DISCARD upload for exact
+// DEFAULT+DYNAMIC source semantics. The object still never binds its SRV to a
+// game context and has no production caller.
 class NativeFixedFunctionTextureView final {
 public:
     NativeFixedFunctionTextureView() = default;
@@ -106,10 +107,21 @@ public:
         D3DFORMAT sourceFormat,
         D3DPOOL sourcePool,
         DWORD sourceUsage) noexcept;
+    bool upload_full_discard(
+        ID3D11DeviceContext* context,
+        const void* source,
+        UINT sourceRowPitch,
+        UINT sourceRows) noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
-        return device_ && texture_ && srv_;
+        return device_ && texture_ && srv_ && source_metadata_valid_;
+    }
+    [[nodiscard]] bool content_ready() const noexcept {
+        return upload_generation_ != 0;
+    }
+    [[nodiscard]] std::uint64_t upload_generation() const noexcept {
+        return upload_generation_;
     }
     [[nodiscard]] ID3D11Device* device() const noexcept {
         return device_.Get();
@@ -125,6 +137,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv_;
+    D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
+    D3DPOOL source_pool_ = D3DPOOL_DEFAULT;
+    DWORD source_usage_ = 0;
+    bool source_metadata_valid_ = false;
+    std::uint64_t upload_generation_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

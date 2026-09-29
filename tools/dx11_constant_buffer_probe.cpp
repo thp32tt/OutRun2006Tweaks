@@ -406,6 +406,114 @@ int main()
         managedTextureRead.requiresCpuShadow,
         "R100 managed texture read requires CPU shadow");
 
+    D3D11_TEXTURE2D_DESC dynamicTextureDesc = textureDesc;
+    dynamicTextureDesc.Usage = D3D11_USAGE_DYNAMIC;
+    dynamicTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    ID3D11Texture2D* dynamicTexture = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateTexture2D(
+            &dynamicTextureDesc, nullptr, &dynamicTexture)) &&
+        dynamicTexture != nullptr,
+        "R101 dynamic texture prerequisite");
+
+    NativeFixedFunctionTextureView dynamicTextureView;
+    require(
+        dynamicTextureView.initialize(
+            d3d.device, dynamicTexture,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DUSAGE_DYNAMIC),
+        "R101 dynamic texture view initialize");
+    require(
+        dynamicTextureView.ready() &&
+        !dynamicTextureView.content_ready() &&
+        dynamicTextureView.upload_generation() == 0,
+        "R101 dynamic texture content starts uninitialized");
+
+    std::array<unsigned char, 80> dynamicSource{};
+    constexpr UINT dynamicSourcePitch = 20;
+    constexpr UINT dynamicRowBytes = 16;
+    constexpr UINT dynamicRows = 4;
+    for (UINT row = 0; row < dynamicRows; ++row) {
+        for (UINT column = 0; column < dynamicRowBytes; ++column) {
+            dynamicSource[static_cast<std::size_t>(row) * dynamicSourcePitch + column] =
+                static_cast<unsigned char>(row * 32 + column + 1);
+        }
+    }
+
+    require(
+        !dynamicTextureView.upload_full_discard(
+            d3d.context, dynamicSource.data(), dynamicRowBytes - 1, dynamicRows),
+        "R101 short source row pitch must fail closed");
+    require(
+        !dynamicTextureView.upload_full_discard(
+            d3d.context, dynamicSource.data(), dynamicSourcePitch, dynamicRows - 1),
+        "R101 partial source rows must fail closed");
+    require(
+        dynamicTextureView.upload_generation() == 0 &&
+        !dynamicTextureView.content_ready(),
+        "R101 rejected uploads must not advance content generation");
+
+    DevicePair textureOtherDevice = create_warp_device();
+    require(
+        !dynamicTextureView.upload_full_discard(
+            textureOtherDevice.context,
+            dynamicSource.data(), dynamicSourcePitch, dynamicRows),
+        "R101 foreign device context must fail closed");
+    require(
+        dynamicTextureView.upload_generation() == 0,
+        "R101 foreign-context rejection must preserve generation");
+
+    require(
+        dynamicTextureView.upload_full_discard(
+            d3d.context, dynamicSource.data(), dynamicSourcePitch, dynamicRows),
+        "R101 full dynamic texture discard upload");
+    require(
+        dynamicTextureView.content_ready() &&
+        dynamicTextureView.upload_generation() == 1,
+        "R101 successful upload advances content generation");
+
+    D3D11_TEXTURE2D_DESC stagingDesc = dynamicTextureDesc;
+    stagingDesc.Usage = D3D11_USAGE_STAGING;
+    stagingDesc.BindFlags = 0;
+    stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+    ID3D11Texture2D* stagingTexture = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateTexture2D(
+            &stagingDesc, nullptr, &stagingTexture)) &&
+        stagingTexture != nullptr,
+        "R101 staging readback prerequisite");
+    d3d.context->CopyResource(stagingTexture, dynamicTexture);
+
+    D3D11_MAPPED_SUBRESOURCE stagingMap{};
+    require(
+        SUCCEEDED(d3d.context->Map(
+            stagingTexture, 0, D3D11_MAP_READ, 0, &stagingMap)) &&
+        stagingMap.pData != nullptr &&
+        stagingMap.RowPitch >= dynamicRowBytes,
+        "R101 staging readback map");
+    for (UINT row = 0; row < dynamicRows; ++row) {
+        const auto* observed =
+            static_cast<const unsigned char*>(stagingMap.pData) +
+            static_cast<std::size_t>(row) * stagingMap.RowPitch;
+        const auto* expected =
+            dynamicSource.data() +
+            static_cast<std::size_t>(row) * dynamicSourcePitch;
+        require(
+            std::memcmp(observed, expected, dynamicRowBytes) == 0,
+            "R101 uploaded texture bytes must match source rows");
+    }
+    d3d.context->Unmap(stagingTexture, 0);
+
+    dynamicSource[0] ^= 0x5a;
+    require(
+        dynamicTextureView.upload_full_discard(
+            d3d.context, dynamicSource.data(), dynamicSourcePitch, dynamicRows),
+        "R101 second full-discard upload");
+    require(
+        dynamicTextureView.upload_generation() == 2,
+        "R101 upload generation must advance monotonically");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -512,6 +620,13 @@ int main()
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
+    dynamicTextureView.shutdown();
+    require(
+        !dynamicTextureView.ready() &&
+        !dynamicTextureView.content_ready() &&
+        dynamicTextureView.upload_generation() == 0,
+        "R101 dynamic texture shutdown resets ownership and content generation");
+
     textureView.shutdown();
     require(!textureView.ready(),
             "R99 texture view shutdown must release owner resources");
@@ -552,6 +667,10 @@ int main()
     require(owner.ready(), "R96 owner must be ready after reinitialize");
     owner.shutdown();
 
+    stagingTexture->Release();
+    dynamicTexture->Release();
+    textureOtherDevice.context->Release();
+    textureOtherDevice.device->Release();
     noSrvTexture->Release();
     fixedFunctionTexture->Release();
     otherDevice.context->Release();
@@ -568,5 +687,6 @@ int main()
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
+    std::cout << "DX11 fixed-function texture upload R101: PASS\n";
     return 0;
 }
