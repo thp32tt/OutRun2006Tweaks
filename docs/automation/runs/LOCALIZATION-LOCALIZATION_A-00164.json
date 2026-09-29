@@ -1,0 +1,74 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00080",
+  "recorded_at_kst": "2026-09-29T23:34:00+09:00",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MATERIAL_AND_TASK_RECORD",
+  "base_head_sha": "b51efdf0182c2e5188ae86ceb2c003cb470fe9d6",
+  "result": "PASS_MATERIAL_DIRECT_REWORK_INDEX99_EXPANDED_GHOST_EFFECT_MASK_AND_CLEAN_PLATE_PATCH_V2_RUNTIME_UNTESTED",
+  "summary": "Fresh precommit HEAD includes C129/Q00027, which returns A00157 odd index99/4F68708E as REWORK_REQUIRED because the threshold-18 CLEAN_PLATE leaves clearly readable dark-blue English ghost/shadow text. This task therefore supersedes unrelated fallback work and directly repairs index99 reconstruction input. It expands both prior threshold-18 line envelopes by 6 px within the exact panel ROI and materializes a new deterministic native RGBA clean-plate patch using per-line smooth background planes fitted from A00157's numeric clean-plate samples. The prior failed visual result is not reused as PASS: the revised plate remains pending independent C native readable/protected-art review and is explicitly NOT_RENDER_READY. Source fingerprint/header/orientation are unchanged and reused; no candidate DDS/shared state/build/runtime/N100/Drive/local-clone/Library/VR/FFB/DX changes are made.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-2334-A00164-P00080/A00164_P00080_INDEX99_CLEAN_PLATE_REWORK.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX99_REWORK_EXPANDED_LOW_LUMINANCE_EFFECT_ENVELOPE_AND_NATIVE_CLEAN_PLATE_PATCH_V2",
+    "indices": [
+      99
+    ],
+    "assets": [
+      "4F68708E"
+    ],
+    "report_path": "localization/graphics/role_A/20260929-2334-A00164-P00080/A00164_P00080_INDEX99_CLEAN_PLATE_REWORK.json",
+    "source_git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "prior_removal_pixels": 42774,
+    "expanded_removal_pixels": 156982,
+    "expanded_rle_runs": 166,
+    "clean_plate_patch_bytes": 627928,
+    "clean_plate_patch_sha256": "3e9e630a7f3919ba669193c20cb15ed8a0f69802f3e58eb0fa5ab258358ef0fd",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "selected_priority": "DIRECT_REWORK_REQUIRED",
+    "selected_index": 99,
+    "c_return_task": "LOCALIZATION-LOCALIZATION_C-00162",
+    "c_disposition": "REWORK_REQUIRED",
+    "readiness_before": "CLEAN_PLATE_REWORK_REQUIRED_VISUAL_GHOST_RESIDUE",
+    "readiness_after": "DIRECT_REWORK_CLEAN_PLATE_V2_INPUT_READY__C_NATIVE_VISUAL_AND_PROTECTED_ART_REVIEW_REQUIRED__NOT_RENDER_READY",
+    "candidate_completion_rule": "CHECKED__FINAL_CLEAN_PLATE_VISUAL_PREREQUISITE_NOT_ACCEPTED__BUILDER_STILL_FAILS_CLOSED_ON_DXT5",
+    "unrelated_preflight_deferred": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "builder_blob_sha": "4b58ada83e3e44e5e83eeb92864e95300be93ca0",
+    "source_git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "a00157_task_blob_sha": "3976a453444c6c0aacec5f52c6beefc9355a5253",
+    "c129_report_blob_sha": "6625eb51681838ca6deba68c68d9db6faef7b900",
+    "prior_clean_plate_patch_sha256": "a173dee774eac594c28c51d84e749b26c59d9927c3f55a4f2bb86609f8267e76",
+    "rework_clean_plate_patch_sha256": "3e9e630a7f3919ba669193c20cb15ed8a0f69802f3e58eb0fa5ab258358ef0fd"
+  },
+  "self_qa": "PASS_ODD_99_DIRECT_C_REWORK__EXPANDED_MASK_156982_PX__PATCH_3e9e630a7f39__NO_FALSE_CANDIDATE_PROMOTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_NEW_V2_KOREAN_CANDIDATE__REVISED_CLEAN_PLATE_REQUIRES_C_NATIVE_VISUAL_REVIEW",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
