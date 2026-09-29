@@ -1321,3 +1321,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Report: `localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json`
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+
+### C104 Q00002 independent QA batch — 2026-09-29T13:50:47+09:00
+- Immutable inputs: A00058 `6e2d340cf2707382573bdff69a6c6d154f5fba65`; B00059 `785a08e4a90e3345610bb850e6c486e17bf43553`.
+- Revalidated under current automation contract `583ed51e5e7062d4d686cec74c48488d9b19a603`; source identity **28/28 PASS**, lane ENGLISH_SOURCE evidence **7/7 PASS**, canonical translations/artwork plan **49/49 PASS**, accepted physical mappings **35**.
+- A mappings: index 35 = 2 occurrences, 43 = 4/4, 49 = 12/12. B mappings: index 198 = 2/7 (5 unresolved), 228 = 13/13, 230 = 2/12 (10 unresolved).
+- Index 182 `7D747BED`: canonical segment count 0 and source evidence confirms Ferrari/model + AT/MT only; queue reconciled to preserve-original.
+- Candidate DDS bytes changed by inputs/C: **false**. Candidate-only pixel/DDS/orientation/source-vs-candidate checks remain HOLD rather than fabricated PASS.
+- Supersession: none at merge base `2579efe87a6f20d7a9c12c930dec122d125d04d8`; A00064/B00062 explicitly skip these qa_pending inputs.
+- Queue: 137 total; 94 localize_text; 31 zoom_review; 9 font; 1 Hangul name-entry; 2 preserve-only; pending localize_text 77.
+- Report: `localization/graphics/role_C/20260929-1350-C104/C104_Q00002_INDEPENDENT_QA_BATCH.json`. Runtime: UNTESTED. VR/FFB/build: untouched.

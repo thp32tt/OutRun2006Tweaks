@@ -1,0 +1,80 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00063",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00002",
+  "qa_batch_id": "Q00002",
+  "recorded_at_kst": "2026-09-29T13:50:47+09:00",
+  "base_head_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+  "result": "PASS_Q00002_RECONSTRUCTION_MAPPING_EVIDENCE_7_ASSETS_49_SEGMENTS_35_OCCURRENCES_1_PRESERVE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "result_message": "localization(A): map P00001 odd source cells [AUTO:LOCALIZATION-LOCALIZATION_A-00058]",
+      "completed_at": "2026-09-29T13:16:41.799441+09:00",
+      "producer_id": "P00001"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "result_message": "localization(B): map P00002 even source cells [AUTO:LOCALIZATION-LOCALIZATION_B-00059]",
+      "completed_at": "2026-09-29T13:33:29.611244+09:00",
+      "producer_id": "P00002"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "disposition": "PASS",
+      "reason": "Metadata/reconstruction result accepted: 12/12 pinned upstream objects for three assets plus 3/3 lane ENGLISH_SOURCE blobs match, 17/17 canonical semantics match, and 18 physical occurrences are mapped. Korean candidate-only gates remain HOLD because no candidate DDS was written."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+      "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "disposition": "PASS",
+      "reason": "Metadata/reconstruction result accepted: 16/16 pinned upstream objects for four assets plus 4/4 lane ENGLISH_SOURCE blobs match, 32/32 canonical semantics match, 17 physical occurrences are mapped, and index 182 preserve-original classification is confirmed. Korean candidate-only gates remain HOLD because no candidate DDS was written."
+    }
+  ],
+  "source_identity_validation": "PASS_28_OF_28_EXACT_UPSTREAM_GITHUB_BLOB_IDENTITIES_PLUS_7_OF_7_LANE_EVIDENCE",
+  "semantic_translation_validation": "PASS_49_OF_49_CANONICAL",
+  "physical_mapping_validation": "PASS_35_PHYSICAL_OCCURRENCES_PLUS_INDEX182_PRESERVE_ORIGINAL",
+  "supersession_validation": "PASS_NONE_SUPERSEDED",
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      35,
+      43,
+      49,
+      182,
+      198,
+      228,
+      230
+    ],
+    "accepted_reconstruction_mapping_assets": 6,
+    "accepted_physical_mapping_occurrences": 35,
+    "preserve_original_reclassified_indices": [
+      182
+    ],
+    "candidate_dds_modified_by_c": false,
+    "input_candidate_dds_modified": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0
+  },
+  "report": "localization/graphics/role_C/20260929-1350-C104/C104_Q00002_INDEPENDENT_QA_BATCH.json",
+  "shared_state_modified": true,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,5 +1,5 @@
 {
-  "schema_version": 73,
+  "schema_version": 74,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,10 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "Use the C104/Q00002-accepted semantic-to-cell mappings for indices 35/43/49 and 198/228/230, but do not render Korean until each mapped HD element has exact full-effect bbox, raw/readable orientation, signed slant, alpha/style measurements, clean-plate evidence, and zero-pixel containment inputs.",
+    "Index 182 7D747BED is C104-confirmed preserve-original: Ferrari vehicle/model names and AT/MT indicators only. Skip Korean raster production unless canonical source/transcription policy changes.",
     "Render index 89 43B07A77 only from the C103-accepted exact-HD generation spec: Game Over -> 게임 오버, 2048x256 RGBA32 mip1, readable flip_y, right slant 19.29 degrees, candidate permitted region [1,13,1494,248]. Then require clean plate, zero-pixel containment, protected-mask, exact-source comparison and DDS round-trip QA.",
     "Continue exact-HD glyph/effect extraction for index 65 EBEF6D20 Loading -> 로딩 in sprite_11 + sprite_12 and index 107 841E796B No Handicap -> 핸디캡 없음 in sprite_516; preserve all logos, route artwork and nine Ferrari/model cards.",
-    "Continue source-faithful mapping/mask work for Q00001 indices 95/101/132/176/220/222. C103 validated their immutable source identities and canonical semantics, but no Korean candidate DDS exists; keep raster/DDS gates HOLD_STRICT_RECHECK.",
-    "A00058/P00001 and B00059/P00002 are newer producer results preserved on current HEAD and were intentionally not consumed by Q00001. They remain for a later independent C QA batch."
+    "Continue source-faithful mapping/mask work for Q00001 indices 95/101/132/176/220/222. C103 validated their immutable source identities and canonical semantics, but no Korean candidate DDS exists; keep raster/DDS gates HOLD_STRICT_RECHECK."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -98,9 +99,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-29T13:19:37+09:00",
+      "updated_at_kst": "2026-09-29T13:50:47+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json",
+      "report": "localization/graphics/role_C/20260929-1350-C104/C104_Q00002_INDEPENDENT_QA_BATCH.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 203,
@@ -126,10 +127,10 @@
         "FD90AA9"
       ],
       "failed_elements": 93,
-      "pending_production_localize_text": 78,
+      "pending_production_localize_text": 77,
       "hold_strict_recheck_zoom_review": 0,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "Q00001 consumed A00056/B00057 metadata/reconstruction results. Exact source identities and 55 canonical segments pass, but neither producer result contains Korean candidate DDS bytes. Candidate glyph/clipping/zero-pixel/DDS/alpha/compression/source-vs-candidate gates remain HOLD; index 89 has source-side orientation/slant/DDS preflight only.",
+      "promotion_hold_reason": "Q00002 accepted A00058/B00059 reconstruction metadata under the current contract. Upstream source identities pass 28/28, lane English-source evidence 7/7, canonical semantics 49/49, and 35 physical mapping occurrences are accepted. Index 182 is preserve-original. No Korean candidate DDS exists in either input, so glyph/clipping/zero-pixel/candidate DDS/alpha/compression/orientation/source-vs-candidate gates remain HOLD_STRICT_RECHECK.",
       "user_approved_locked": 0,
       "zoom_review_resolved_preserve_original": 31,
       "queue_reconciled_at_kst": "2026-09-29T08:14:06+09:00",
@@ -165,7 +166,25 @@
       "q00001_semantic_validation": "PASS_55_OF_55_CANONICAL",
       "q00001_superseded_inputs": [],
       "q00001_candidate_dds_modified": false,
-      "q00001_new_static_artwork_passes": 0
+      "q00001_new_static_artwork_passes": 0,
+      "q00002_reviewed_indices": [
+        35,
+        43,
+        49,
+        182,
+        198,
+        228,
+        230
+      ],
+      "q00002_source_identity_validation": "PASS_28_OF_28_EXACT_GITHUB_BLOB_IDENTITIES_PLUS_7_OF_7_LANE_ENGLISH_SOURCE_BLOBS",
+      "q00002_semantic_validation": "PASS_49_OF_49_CANONICAL_TRANSLATION_AND_ARTWORK_PLAN",
+      "q00002_physical_mapping_validation": "PASS_35_PHYSICAL_OCCURRENCES__INDEX182_PRESERVE_ORIGINAL",
+      "q00002_superseded_inputs": [],
+      "q00002_candidate_dds_modified": false,
+      "q00002_new_static_artwork_passes": 0,
+      "q00002_queue_reclassification": {
+        "182": "localize_text -> preserve_brand_song_credit / preserve_original / not_required"
+      }
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {

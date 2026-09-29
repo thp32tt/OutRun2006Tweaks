@@ -1,0 +1,295 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00063",
+  "wave_id": "Q00002",
+  "qa_batch_id": "Q00002",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_RECONCILIATION",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T13:50:47+09:00",
+  "base_head_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "result_message": "localization(A): map P00001 odd source cells [AUTO:LOCALIZATION-LOCALIZATION_A-00058]",
+      "completed_at": "2026-09-29T13:16:41.799441+09:00",
+      "producer_id": "P00001"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "result_message": "localization(B): map P00002 even source cells [AUTO:LOCALIZATION-LOCALIZATION_B-00059]",
+      "completed_at": "2026-09-29T13:33:29.611244+09:00",
+      "producer_id": "P00002"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "disposition": "PASS",
+      "reason": "Metadata/reconstruction result accepted: 12/12 pinned upstream objects for three assets plus 3/3 lane ENGLISH_SOURCE blobs match, 17/17 canonical semantics match, and 18 physical occurrences are mapped. Korean candidate-only gates remain HOLD because no candidate DDS was written."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+      "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "disposition": "PASS",
+      "reason": "Metadata/reconstruction result accepted: 16/16 pinned upstream objects for four assets plus 4/4 lane ENGLISH_SOURCE blobs match, 32/32 canonical semantics match, 17 physical occurrences are mapped, and index 182 preserve-original classification is confirmed. Korean candidate-only gates remain HOLD because no candidate DDS was written."
+    }
+  ],
+  "current_contract_fingerprint": {
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "producer_automation_contract_blob_sha": "2fc9de46e3545714ab40a41e839d9fdcfdfeb56f",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "queue_before_blob_sha": "1bc1b7c42da5a3c748c6ebd3ca65d4fffec5ecba"
+  },
+  "deduplication": {
+    "immutable_producer_results": 2,
+    "unique_assets": 7,
+    "unique_candidate_dds": 0,
+    "candidate_fingerprint": "NONE_NO_KOREAN_DDS_IN_EITHER_INPUT",
+    "source_identity_checks_run_once_per_asset": true,
+    "repeated_evidence_collapsed": [
+      "Producer source-identity claims were independently revalidated once under the current C contract fingerprint.",
+      "Each lane ENGLISH_SOURCE proof blob is byte-identical to its pinned upstream original PNG."
+    ],
+    "heavy_candidate_checks_skipped_as_not_applicable": [
+      "localized DDS header/format/mipmap/alpha/transparency",
+      "localized raw/readable orientation",
+      "localized bbox and one-pixel containment",
+      "compression round-trip",
+      "ENGLISH SOURCE vs KOREAN CANDIDATE final pixel comparison"
+    ],
+    "rationale": "Both inputs are fallback-step-4 metadata/reconstruction results with no Korean candidate DDS bytes. New evidence is validated once; candidate-only gates remain HOLD_STRICT_RECHECK."
+  },
+  "immutable_result_validation": {
+    "A00058": {
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "commit_message_match": true,
+      "runner_status": "NO_COMMIT_STATUS_EXPECTED_C_BATCH_GATE",
+      "candidate_dds_modified": false
+    },
+    "B00059": {
+      "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "commit_message_match": true,
+      "runner_status": "NO_COMMIT_STATUS_EXPECTED_C_BATCH_GATE",
+      "candidate_dds_modified": false
+    }
+  },
+  "source_identity_validation": {
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "unique_assets": 7,
+    "objects_per_asset": [
+      "Release DDS",
+      "original PNG",
+      "stock atlas JSON",
+      "4x atlas JSON"
+    ],
+    "upstream_objects_expected": 28,
+    "upstream_objects_matched": 28,
+    "lane_english_source_evidence_expected": 7,
+    "lane_english_source_evidence_matched": 7,
+    "result": "PASS_28_OF_28_EXACT_UPSTREAM_GITHUB_BLOB_IDENTITIES_PLUS_7_OF_7_LANE_EVIDENCE"
+  },
+  "semantic_validation": {
+    "canonical_source": "current HEAD transcriptions.jsonl + artwork_plan.jsonl",
+    "per_asset_segments": {
+      "35": 1,
+      "43": 4,
+      "49": 12,
+      "182": 0,
+      "198": 7,
+      "228": 13,
+      "230": 12
+    },
+    "total_segments": 49,
+    "transcription_matches": 49,
+    "artwork_plan_matches": 49,
+    "result": "PASS_49_OF_49_CANONICAL"
+  },
+  "physical_mapping_validation": {
+    "A00058": {
+      "35": 2,
+      "43": 4,
+      "49": 12,
+      "total_occurrences": 18,
+      "status": "PASS"
+    },
+    "B00059": {
+      "182": "PRESERVE_ORIGINAL_ZERO_LOCALIZABLE_SEGMENTS",
+      "198": "2_OF_7_DIRECT_MAPPED",
+      "228": "13_OF_13_DIRECT_MAPPED",
+      "230": "2_OF_12_DIRECT_MAPPED",
+      "mapped_occurrences": 17,
+      "unresolved_semantics": 15,
+      "status": "PASS_WITH_UNRESOLVED_CELLS_LEFT_HOLD"
+    },
+    "total_accepted_occurrences": 35,
+    "result": "PASS_35_PHYSICAL_OCCURRENCES_PLUS_INDEX182_PRESERVE_ORIGINAL"
+  },
+  "asset_results": [
+    {
+      "index": 35,
+      "asset": "E989E3B7",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_1_OF_1",
+      "mapping": "PASS_2_OCCURRENCES",
+      "candidate": "NONE",
+      "orientation": "HOLD_EXACT_HD_PER_ELEMENT_ORIENTATION_SLANT_PENDING",
+      "dds_header_mipmap_alpha": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_WRITE",
+      "containment": "HOLD_STRICT_RECHECK",
+      "final": "CELL_MAPPING_ACCEPTED_NOT_STATIC_ARTWORK_PASS"
+    },
+    {
+      "index": 43,
+      "asset": "455717B2",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_4_OF_4",
+      "mapping": "PASS_4_OF_4",
+      "candidate": "NONE",
+      "orientation": "HOLD_EXACT_HD_PER_ELEMENT_ORIENTATION_SLANT_PENDING",
+      "dds_header_mipmap_alpha": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_WRITE",
+      "containment": "HOLD_STRICT_RECHECK",
+      "final": "CELL_MAPPING_ACCEPTED_NOT_STATIC_ARTWORK_PASS"
+    },
+    {
+      "index": 49,
+      "asset": "BF3EE5C6",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_12_OF_12",
+      "mapping": "PASS_12_OF_12",
+      "candidate": "NONE",
+      "orientation": "HOLD_EXACT_HD_PER_ELEMENT_ORIENTATION_SLANT_PENDING",
+      "dds_header_mipmap_alpha": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_WRITE",
+      "containment": "HOLD_STRICT_RECHECK",
+      "final": "CELL_MAPPING_ACCEPTED_NOT_STATIC_ARTWORK_PASS"
+    },
+    {
+      "index": 182,
+      "asset": "7D747BED",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_ZERO_LOCALIZABLE_SEGMENTS",
+      "mapping": "PRESERVE_ORIGINAL",
+      "candidate": "ORIGINAL_PRESERVED",
+      "orientation": "PRESERVE_SOURCE_BYTES_NO_LOCALIZED_TRANSFORM",
+      "dds_header_mipmap_alpha": "UNCHANGED_NO_DDS_WRITE",
+      "containment": "NOT_APPLICABLE_NO_LOCALIZATION",
+      "final": "PRESERVE_ORIGINAL_ACCEPTED_QUEUE_RECLASSIFIED"
+    },
+    {
+      "index": 198,
+      "asset": "9FC88069",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_7_OF_7",
+      "mapping": "PASS_2_OF_7_DIRECT__5_UNRESOLVED_HOLD",
+      "candidate": "NONE",
+      "orientation": "HOLD_EXACT_HD_PER_ELEMENT_ORIENTATION_SLANT_PENDING",
+      "dds_header_mipmap_alpha": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_WRITE",
+      "containment": "HOLD_STRICT_RECHECK",
+      "final": "PARTIAL_CELL_MAPPING_ACCEPTED_NOT_STATIC_ARTWORK_PASS"
+    },
+    {
+      "index": 228,
+      "asset": "E7F6E9B7",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_13_OF_13",
+      "mapping": "PASS_13_OF_13",
+      "candidate": "NONE",
+      "orientation": "HOLD_EXACT_HD_PER_ELEMENT_ORIENTATION_SLANT_PENDING",
+      "dds_header_mipmap_alpha": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_WRITE",
+      "containment": "HOLD_STRICT_RECHECK",
+      "final": "CELL_MAPPING_ACCEPTED_NOT_STATIC_ARTWORK_PASS"
+    },
+    {
+      "index": 230,
+      "asset": "E95DA5",
+      "source_identity": "PASS_4_OF_4",
+      "semantic": "PASS_12_OF_12",
+      "mapping": "PASS_2_OF_12_DIRECT__10_UNRESOLVED_HOLD",
+      "candidate": "NONE",
+      "orientation": "HOLD_EXACT_HD_PER_ELEMENT_ORIENTATION_SLANT_PENDING",
+      "dds_header_mipmap_alpha": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE_WRITE",
+      "containment": "HOLD_STRICT_RECHECK",
+      "final": "PARTIAL_CELL_MAPPING_ACCEPTED_NOT_STATIC_ARTWORK_PASS"
+    }
+  ],
+  "supersession_check": {
+    "current_head_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+    "superseded_inputs": [],
+    "result": "PASS_NONE_SUPERSEDED",
+    "evidence": [
+      "A00064 explicitly lists A00058 assets 35/43/49 as qa_pending skipped and works only 133/135/139/143.",
+      "B00062 explicitly lists B00059 assets 182/198/228/230 as qa_pending skipped and works only 188/212/226/232.",
+      "A00061 works only 137/217/219/241; no newer candidate/evidence for this batch's seven indices is present in the newer producer lineage."
+    ]
+  },
+  "cross_lane_final_qa": {
+    "meaning_context_terms": "PASS_49_OF_49_CANONICAL",
+    "omissions": "PASS_NO_CANONICAL_TRANSLATION_DROP__15_B_SEMANTICS_EXPLICITLY_UNMAPPED_NOT_GUESSED",
+    "preserve_exclusion": "PASS_INDEX182_FERRARI_MODEL_NAMES_AT_MT",
+    "hangul_glyph_integrity": "HOLD_NO_KOREAN_RASTER",
+    "clipping": "HOLD_NO_KOREAN_RASTER",
+    "zero_pixel_containment": "HOLD_NO_KOREAN_RASTER",
+    "resolution": "PASS_HD_SOURCE_IDENTITIES_PINNED__NO_LOW_RES_KOREAN_INPUT_USED",
+    "dds_format_mipmap_alpha_transparency": "UNCHANGED_NO_KOREAN_DDS_WRITE__CANDIDATE_GATES_HOLD",
+    "raw_orientation": "HOLD_EXACT_HD_PER_ELEMENT_CONFIRMATION_FOR_LOCALIZABLE_ASSETS__INDEX182_SOURCE_PRESERVED",
+    "background_wrong_replacement": "HOLD_NO_KOREAN_CANDIDATE_PIXELS_TO_COMPARE",
+    "high_resolution_gui": "PASS_EXACT_RELEASE_HD_SOURCE_IDENTITIES_PINNED",
+    "compression_roundtrip": "NOT_APPLICABLE_NO_CANDIDATE_DDS",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "rework_required_assets": [],
+    "hold_strict_recheck_assets": [
+      35,
+      43,
+      49,
+      198,
+      228,
+      230
+    ],
+    "preserve_original_assets": [
+      182
+    ],
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0
+  },
+  "queue_after": {
+    "rows": 137,
+    "actions": {
+      "localize_text": 94,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "zoom_review": 31,
+      "preserve_brand_song_credit": 2
+    },
+    "pending_production_localize_text": 77,
+    "unresolved_zoom_review": 0,
+    "resolved_preserve_original_zoom_review": 31
+  },
+  "shared_state_updates": [
+    "localization/resume_state.json",
+    "localization/WORKLOG.md",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/progress/STATUS.md",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "candidate_dds_modified_by_c": false,
+  "input_candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_Q00002_RECONSTRUCTION_MAPPING_EVIDENCE_7_ASSETS_49_SEGMENTS_35_OCCURRENCES_1_PRESERVE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

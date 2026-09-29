@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-29T02:14:53+09:00
+Updated: 2026-09-29T13:50:47+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -855,4 +855,19 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No N100/local clone/GPT Library, game build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json`
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`
+
+
+### C104 Q00002 independent QA batch — 2026-09-29T13:50:47+09:00
+- Consumed exactly `LOCALIZATION-LOCALIZATION_A-00058@6e2d340cf2707382573bdff69a6c6d154f5fba65` and `LOCALIZATION-LOCALIZATION_B-00059@785a08e4a90e3345610bb850e6c486e17bf43553`; A/B commits correctly have no individual runner Gate under C-batch-only validation.
+- Revalidated the material evidence under current contract blob `583ed51e5e7062d4d686cec74c48488d9b19a603` because the producer reports used older contract blob `2fc9de46e3545714ab40a41e839d9fdcfdfeb56f`.
+- Exact upstream source identity: **28/28 PASS**; lane ENGLISH_SOURCE evidence blob identity: **7/7 PASS**; current canonical translation/artwork-plan pairs: **49/49 PASS**.
+- Accepted **35 physical mapping occurrences**: A 18 across indices 35/43/49; B 17 across 198/228/230. Index 182 has **0** canonical localizable segments and is reclassified to preserve-original for Ferrari model names and AT/MT indicators.
+- No input contains Korean candidate DDS bytes. Candidate glyph integrity/clipping, zero-pixel containment, candidate DDS format/mipmap/alpha/transparency, localized orientation, compression round-trip, background/protected-artwork final comparison, and ENGLISH SOURCE vs KOREAN CANDIDATE remain **HOLD_STRICT_RECHECK**.
+- No input is superseded at merge base `2579efe87a6f20d7a9c12c930dec122d125d04d8`; A00064 and B00062 explicitly skip this batch's qa_pending assets and work on disjoint indices.
+- Queue after reconciliation: **137 = 94 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 2 preserve-only**; pending production localize_text **77**; unresolved zoom-review **0**.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from the same blob.
+- No real-game test, N100/local clone/worktree, GPT Library, VR/FFB/DX work, or game build. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-1350-C104/C104_Q00002_INDEPENDENT_QA_BATCH.json`
+- `AUTOMATION_VALIDATION=PENDING` (this C commit is the runner-backed batch Gate)
 - `RUNTIME_VALIDATION=UNTESTED`
