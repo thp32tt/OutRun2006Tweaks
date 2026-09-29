@@ -455,12 +455,22 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "C150 source/mask/CLEAN_PLATE geometry and C153 semantic binding have unchanged fingerprints and are reused as accepted prerequisites. Q00054 cross-checks those exact hashes once and performs the new candidate-bound header/decoded-final/containment/alpha/preserve-source/visual gates once; no duplicate heavy pass.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_gate": null,
-  "bookkeeping_note": "This C result commit is the sole Q00054 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+  "result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+  "authoritative_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+  "validation_bearing_result_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36645535305,
+    "run_attempt": 1,
+    "head_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T08:30:27+09:00"
+  },
+  "bookkeeping_note": "Q00054 authoritative Gate PASS is owned by validation-bearing result 43d6c872a66de63d65a70c18dc2c55b91b1ed16c. This bookkeeping commit is separate and does not replace validation ownership. Out-of-batch B00237@index163, A00239@index102, and A00241@index111 remain QA_PENDING and are not dispositioned by Q00054. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:31:43+09:00",
+  "bookkeeping_base_head_sha": "43d6c872a66de63d65a70c18dc2c55b91b1ed16c"
 }
