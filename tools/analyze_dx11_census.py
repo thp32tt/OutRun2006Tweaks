@@ -272,6 +272,8 @@ def main() -> int:
                 stage = int(data.pop("stage"))
                 parsed = {"stage": stage}
                 for key, value in data.items():
+                    if value is None:
+                        continue
                     if key == "usage":
                         parsed[key] = int(value, 16)
                         parsed[key + "_hex"] = "0x" + value.upper()
