@@ -1,0 +1,87 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00229-p00122-index175-source-identity-mismatch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00229",
+  "wave_id": "P00122",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:28:37+09:00",
+  "base_head_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+  "base_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX175_SOURCE_IDENTITY_MISMATCH_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX175_SOURCE_IDENTITY_MISMATCH_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Fresh Q00050/current-head scan has no C-accepted B RENDER_READY or ONE_STAGE_TO_RENDER asset. B00226 index163 remains producer QA-pending and is not repeated; existing STATIC_QA PASS assets are not rerendered. Under the single legal PREFLIGHT_ONLY expansion, index175/754F0599 is advanced: approved Drive exact parent/name lookup is SOURCE_TRANSPORT_MISS; immutable v0.25.10a tag resolves blob 60cbe90b...; verified pinned Release fallback is byte-identical to that blob and yields SHA-256 93143725..., RGBA32 2048x1024 mip1. Current canonical inventory instead requires SHA-256 e6965d05..., 512x256 RGBA. Because exact bytes were obtained but fail current canonical identity, the typed result is SOURCE_IDENTITY_MISMATCH. No masks/CLEAN_PLATE/render/DDS are fabricated from the mismatched legacy 4x source. Runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00229-P00122/B00229_P00122_INDEX175_SOURCE_IDENTITY_MISMATCH.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX175_APPROVED_SOURCE_ACQUISITION_REPLAY_AND_TYPED_SOURCE_IDENTITY_MISMATCH",
+    "reviewed_indices": [
+      175
+    ],
+    "drive_exact_tier_closed_as_transport_miss": true,
+    "immutable_pinned_tag_blob_locator_verified": true,
+    "pinned_release_digest_verified": true,
+    "pinned_tag_release_byte_identity_verified": true,
+    "current_inventory_mismatch_proven": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "sticky_dependency_rule": "Do not repeat index175 source acquisition on unchanged inventory/source-policy/approved-transport fingerprints."
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_index_rule_overridden_by_current_git_contract": true,
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      175
+    ],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00226": [
+        163
+      ]
+    },
+    "static_pass_not_repeated": [
+      112,
+      130,
+      226
+    ],
+    "readiness_after": {
+      "175": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_STICKY_UNTIL_INVENTORY_SOURCE_POLICY_OR_APPROVED_TRANSPORT_FINGERPRINT_CHANGES"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX175__ZERO_ACCEPTED_READY_TIER_SKIPPED__ONE_PREFLIGHT_BATCH_ONLY__DRIVE_EXACT_MISS__PINNED_TAG_BLOB_60CBE90B__PINNED_ARCHIVE_76F85ED2_PASS__RELEASE_MEMBER_93143725_2048X1024_RGBA32_MIP1__CURRENT_INVENTORY_E6965D05_512X256_MISMATCH__FAIL_CLOSED_NO_CANDIDATE",
+  "candidate_static_qa": "HOLD_NO_KOREAN_CANDIDATE_SOURCE_IDENTITY_MISMATCH",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Exact immutable pinned v0.25.10a Release fallback only after approved Drive exact-path miss; GitHub remains state/progress/QA SSOT.",
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT",
+  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "result_commit_message": "localization(B): close index175 canonical source identity [AUTO:LOCALIZATION-LOCALIZATION_B-00229]",
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "406362826e2d6cd1857e93e1309ba2a44deb3190",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "c00228_task_record_blob_sha": "6c257bab00ef360e3ecdc5b9374b239bd259878c"
+  }
+}
