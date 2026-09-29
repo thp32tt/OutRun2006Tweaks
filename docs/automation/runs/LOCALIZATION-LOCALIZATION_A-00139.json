@@ -1,0 +1,945 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00139",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00063",
+  "recorded_at_kst": "2026-09-29T20:37:22.307+09:00",
+  "base_sha": "0f03eaaa98e7016024ad4ff88fa1acb57d6cde84",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FAST_PATH_POLICY_FOUR_ODD_COURSE_FAMILY_CANONICAL_SOURCE_REACQUISITION",
+  "summary": "Fresh candidate-first audit found the current odd-shard direct REWORK rows 51/53/111/121 dependency-blocked by unchanged runtime/source/recompression requirements, QA-pending producer candidates 57/97 excluded, runtime-validation candidates excluded from material rework, and index215 clean-plate evidence still dependency-blocked because no current Git evidence proves an approved source-faithful Hangul treatment for its yellow alpha-mask style. No current shared-state RENDER_READY/ONE_STAGE_TO_RENDER item is therefore safely runnable. Using the one permitted preflight-only batch, this result advances odd course/stage-name assets 159/163/173/201 under the new family/template fast-path contract: pins four canonical inventory SHA-256/canvas/RGBA identities, verifies exact queue-path sources and current HD candidates are absent, clusters 77 current translation entries into 31 normalized semantic keys with 27 repeated keys and zero translation conflicts, and routes semantic reuse to FAST_PATH while keeping every asset-specific geometry/style/CLEAN_PLATE decision in EXCEPTION_QUEUE until exact canonical source acquisition. No DDS/shared-state/build/runtime changes.",
+  "evidence_embedded_in_task_record": true,
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_COURSE_STAGE_FAMILY_CANONICAL_SOURCE_REACQUISITION_PLUS_FAST_PATH_SEMANTIC_CLUSTER",
+    "indices": [
+      159,
+      163,
+      173,
+      201
+    ],
+    "assets": [
+      "4EDA9DE3",
+      "59A79158",
+      "6DC89C6E",
+      "A9ABD877"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "current_semantic_entries_reused": 77,
+    "normalized_semantic_keys": 31,
+    "repeated_semantic_keys": 27,
+    "repeated_semantic_membership_occurrences": 73,
+    "translation_conflicts": 0,
+    "exact_hash_gated_acquisition_pipelines_created": 4,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_hd_candidates_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "schema9_zero_candidate_exception_proven": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "fresh_scan_head": "0f03eaaa98e7016024ad4ff88fa1acb57d6cde84",
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_candidate_indices_skipped": [
+      57,
+      97
+    ],
+    "runtime_or_validation_backlog_not_material_rework": [
+      61,
+      63,
+      195,
+      197
+    ],
+    "index215_clean_plate_status": "DEPENDENCY_BLOCKED_STYLE_GLYPH_INPUT_UNCHANGED__A00053_CLEAN_PLATE_EXISTS_BUT_NO_CURRENT_PROVEN_SOURCE_FAITHFUL_HANGUL_STYLE_FAMILY",
+    "explicit_current_render_ready_indices": [],
+    "explicit_current_one_stage_to_render_runnable_indices": [],
+    "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_A_SHARD_WITH_CURRENT_GITHUB_EVIDENCE__ONE_PREFLIGHT_ONLY_BATCH_ALLOWED"
+  },
+  "acceleration_route": {
+    "mode": "QUALITY_PRESERVING_FAMILY_TEMPLATE_FAST_PATH",
+    "family_id": "SUMO_FE_COURSE_STAGE_NAMES_V1",
+    "semantic_translation_reuse": "FAST_PATH",
+    "style_template_reuse_status": "HOLD_ASSET_SPECIFIC_CANONICAL_SOURCE_STYLE_COMPATIBILITY_REQUIRED",
+    "asset_specific_geometry_status": "EXCEPTION_QUEUE_UNTIL_EXACT_CANONICAL_SOURCE",
+    "quality_threshold_reduced": false,
+    "family_members": [
+      159,
+      163,
+      173,
+      201
+    ],
+    "total_segment_entries": 77,
+    "unique_normalized_semantics": 31,
+    "repeated_semantics": [
+      {
+        "source_key": "BAY AREA",
+        "korean": "베이 에어리어",
+        "members": [
+          159,
+          201
+        ],
+        "source_forms": [
+          "BAY AREA"
+        ]
+      },
+      {
+        "source_key": "BIG FOREST",
+        "korean": "빅 포레스트",
+        "members": [
+          159,
+          173,
+          201
+        ],
+        "source_forms": [
+          "BIG FOREST"
+        ]
+      },
+      {
+        "source_key": "CANYON",
+        "korean": "캐니언",
+        "members": [
+          159,
+          173,
+          201
+        ],
+        "source_forms": [
+          "CANYON"
+        ]
+      },
+      {
+        "source_key": "CASINO TOWN",
+        "korean": "카지노 타운",
+        "members": [
+          159,
+          163,
+          173,
+          201
+        ],
+        "source_forms": [
+          "CASINO TOWN",
+          "Casino Town"
+        ]
+      },
+      {
+        "source_key": "CASTLE WALL",
+        "korean": "캐슬 월",
+        "members": [
+          163,
+          201
+        ],
+        "source_forms": [
+          "Castle Wall",
+          "CASTLE WALL"
+        ]
+      },
+      {
+        "source_key": "CLOUDY HIGHLAND",
+        "korean": "클라우디 하이랜드",
+        "members": [
+          163,
+          201
+        ],
+        "source_forms": [
+          "Cloudy Highland",
+          "CLOUDY HIGHLAND"
+        ]
+      },
+      {
+        "source_key": "CONIFEROUS FOREST",
+        "korean": "침엽수림",
+        "members": [
+          163,
+          201
+        ],
+        "source_forms": [
+          "Coniferous Forest",
+          "CONIFEROUS FOREST"
+        ]
+      },
+      {
+        "source_key": "DEEP LAKE",
+        "korean": "딥 레이크",
+        "members": [
+          163,
+          201
+        ],
+        "source_forms": [
+          "Deep Lake",
+          "DEEP LAKE"
+        ]
+      },
+      {
+        "source_key": "DESERT",
+        "korean": "사막",
+        "members": [
+          163,
+          201
+        ],
+        "source_forms": [
+          "Desert",
+          "DESERT"
+        ]
+      },
+      {
+        "source_key": "FLORAL VILLAGE",
+        "korean": "플로럴 빌리지",
+        "members": [
+          159,
+          163,
+          173,
+          201
+        ],
+        "source_forms": [
+          "FLORAL VILLAGE",
+          "Floral Village"
+        ]
+      },
+      {
+        "source_key": "GHOST FOREST",
+        "korean": "고스트 포레스트",
+        "members": [
+          163,
+          173,
+          201
+        ],
+        "source_forms": [
+          "Ghost Forest",
+          "GHOST FOREST"
+        ]
+      },
+      {
+        "source_key": "GIANT STATUES",
+        "korean": "자이언트 스태추",
+        "members": [
+          159,
+          163,
+          173,
+          201
+        ],
+        "source_forms": [
+          "GIANT STATUES",
+          "Giant Statues"
+        ]
+      },
+      {
+        "source_key": "ICE SCAPE",
+        "korean": "아이스 스케이프",
+        "members": [
+          159,
+          163,
+          173,
+          201
+        ],
+        "source_forms": [
+          "ICE SCAPE",
+          "Ice Scape"
+        ]
+      },
+      {
+        "source_key": "IMPERIAL AVENUE",
+        "korean": "임페리얼 애비뉴",
+        "members": [
+          163,
+          173
+        ],
+        "source_forms": [
+          "Imperial Avenue",
+          "IMPERIAL AVENUE"
+        ]
+      },
+      {
+        "source_key": "INDUSTRIAL COMPLEX",
+        "korean": "인더스트리얼 컴플렉스",
+        "members": [
+          163,
+          173
+        ],
+        "source_forms": [
+          "Industrial Complex",
+          "INDUSTRIAL COMPLEX"
+        ]
+      },
+      {
+        "source_key": "JUNGLE",
+        "korean": "정글",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "JUNGLE",
+          "Jungle"
+        ]
+      },
+      {
+        "source_key": "LEGEND",
+        "korean": "레전드",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "LEGEND",
+          "Legend"
+        ]
+      },
+      {
+        "source_key": "LOST CITY",
+        "korean": "로스트 시티",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "LOST CITY",
+          "Lost City"
+        ]
+      },
+      {
+        "source_key": "METROPOLIS",
+        "korean": "메트로폴리스",
+        "members": [
+          163,
+          173
+        ],
+        "source_forms": [
+          "Metropolis",
+          "METROPOLIS"
+        ]
+      },
+      {
+        "source_key": "MILKY WAY",
+        "korean": "밀키 웨이",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "MILKY WAY",
+          "Milky Way"
+        ]
+      },
+      {
+        "source_key": "NATIONAL PARK",
+        "korean": "내셔널 파크",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "NATIONAL PARK",
+          "National Park"
+        ]
+      },
+      {
+        "source_key": "PALM BEACH",
+        "korean": "팜 비치",
+        "members": [
+          163,
+          173
+        ],
+        "source_forms": [
+          "Palm Beach",
+          "PALM BEACH"
+        ]
+      },
+      {
+        "source_key": "SKYSCRAPERS",
+        "korean": "스카이스크레이퍼",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "SKYSCRAPERS",
+          "Skyscrapers"
+        ]
+      },
+      {
+        "source_key": "SNOW MOUNTAIN",
+        "korean": "스노 마운틴",
+        "members": [
+          163,
+          173
+        ],
+        "source_forms": [
+          "Snow Mountain",
+          "SNOW MOUNTAIN"
+        ]
+      },
+      {
+        "source_key": "SUNNY BEACH",
+        "korean": "서니 비치",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "SUNNY BEACH",
+          "Sunny Beach"
+        ]
+      },
+      {
+        "source_key": "TULIP GARDEN",
+        "korean": "튤립 가든",
+        "members": [
+          163,
+          173
+        ],
+        "source_forms": [
+          "Tulip Garden",
+          "TULIP GARDEN"
+        ]
+      },
+      {
+        "source_key": "WATERFALLS",
+        "korean": "워터폴스",
+        "members": [
+          159,
+          163,
+          173
+        ],
+        "source_forms": [
+          "WATERFALLS",
+          "Waterfalls"
+        ]
+      }
+    ],
+    "unique_semantics": [
+      {
+        "source_key": "CAPE WAY",
+        "korean": "케이프 웨이",
+        "members": [
+          201
+        ],
+        "source_forms": [
+          "CAPE WAY"
+        ]
+      },
+      {
+        "source_key": "GOALS",
+        "korean": "골",
+        "members": [
+          201
+        ],
+        "source_forms": [
+          "GOALS"
+        ]
+      },
+      {
+        "source_key": "SPECIAL",
+        "korean": "스페셜",
+        "members": [
+          201
+        ],
+        "source_forms": [
+          "Special"
+        ]
+      },
+      {
+        "source_key": "STAGES",
+        "korean": "스테이지",
+        "members": [
+          201
+        ],
+        "source_forms": [
+          "STAGES"
+        ]
+      }
+    ],
+    "pairwise_shared_semantic_counts": {
+      "159-163": 12,
+      "159-173": 14,
+      "159-201": 7,
+      "163-173": 19,
+      "163-201": 10,
+      "173-201": 7
+    },
+    "next_route_after_source_acquisition": "For each asset independently prove canonical source binding/masks/CLEAN_PLATE/safe bbox; then group only visually compatible members into FAST_PATH style batches, otherwise QUALITY_PATH."
+  },
+  "assets": [
+    {
+      "queue_index": 159,
+      "asset": "4EDA9DE3",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "canonical_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "canonical_dimensions": [
+        2048,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 15,
+      "semantics": [
+        [
+          "BAY AREA",
+          "베이 에어리어"
+        ],
+        [
+          "CANYON",
+          "캐니언"
+        ],
+        [
+          "FLORAL VILLAGE",
+          "플로럴 빌리지"
+        ],
+        [
+          "ICE SCAPE",
+          "아이스 스케이프"
+        ],
+        [
+          "LEGEND",
+          "레전드"
+        ],
+        [
+          "MILKY WAY",
+          "밀키 웨이"
+        ],
+        [
+          "SKYSCRAPERS",
+          "스카이스크레이퍼"
+        ],
+        [
+          "WATERFALLS",
+          "워터폴스"
+        ],
+        [
+          "BIG FOREST",
+          "빅 포레스트"
+        ],
+        [
+          "CASINO TOWN",
+          "카지노 타운"
+        ],
+        [
+          "GIANT STATUES",
+          "자이언트 스태추"
+        ],
+        [
+          "JUNGLE",
+          "정글"
+        ],
+        [
+          "LOST CITY",
+          "로스트 시티"
+        ],
+        [
+          "NATIONAL PARK",
+          "내셔널 파크"
+        ],
+        [
+          "SUNNY BEACH",
+          "서니 비치"
+        ]
+      ],
+      "current_queue_path_source_present": false,
+      "current_hd_candidate_present": false,
+      "prior_accepted_evidence_role": "CONDITIONAL_STOCK_RELEASE_ATLAS_PRIOR_ONLY",
+      "canonical_pixel_authority": "EXACT_CURRENT_INVENTORY_SHA256_SOURCE_REQUIRED",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting header/orientation/pixel geometry.",
+        "Read canonical DDS header and preserve dimensions/format/alpha/mipmap behavior.",
+        "Rebind each current semantic entry to canonical decoded pixels; do not infer binding from stock/Release atlas order.",
+        "Measure per-element full-effect source bbox and raw/readable transform from canonical pixels.",
+        "Build removal/protected masks and CLEAN_PLATE at exact canonical resolution with independent clean-plate QA.",
+        "After asset-specific geometry exists, evaluate compatible course-name style family reuse; semantic reuse is already authorized, style/geometry reuse is not.",
+        "Derive v2 safe bboxes, render/measure/refit, encode exact DDS, then run decoded-final zero-pixel/protected-art/orientation/English-source comparison QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 163,
+      "asset": "59A79158",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "canonical_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "canonical_dimensions": [
+        1024,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 24,
+      "semantics": [
+        [
+          "Castle Wall",
+          "캐슬 월"
+        ],
+        [
+          "Casino Town",
+          "카지노 타운"
+        ],
+        [
+          "Cloudy Highland",
+          "클라우디 하이랜드"
+        ],
+        [
+          "Coniferous Forest",
+          "침엽수림"
+        ],
+        [
+          "Deep Lake",
+          "딥 레이크"
+        ],
+        [
+          "Desert",
+          "사막"
+        ],
+        [
+          "Floral Village",
+          "플로럴 빌리지"
+        ],
+        [
+          "Ghost Forest",
+          "고스트 포레스트"
+        ],
+        [
+          "Giant Statues",
+          "자이언트 스태추"
+        ],
+        [
+          "Ice Scape",
+          "아이스 스케이프"
+        ],
+        [
+          "Imperial Avenue",
+          "임페리얼 애비뉴"
+        ],
+        [
+          "Industrial Complex",
+          "인더스트리얼 컴플렉스"
+        ],
+        [
+          "Jungle",
+          "정글"
+        ],
+        [
+          "Legend",
+          "레전드"
+        ],
+        [
+          "Lost City",
+          "로스트 시티"
+        ],
+        [
+          "Metropolis",
+          "메트로폴리스"
+        ],
+        [
+          "Milky Way",
+          "밀키 웨이"
+        ],
+        [
+          "National Park",
+          "내셔널 파크"
+        ],
+        [
+          "Palm Beach",
+          "팜 비치"
+        ],
+        [
+          "Skyscrapers",
+          "스카이스크레이퍼"
+        ],
+        [
+          "Snow Mountain",
+          "스노 마운틴"
+        ],
+        [
+          "Sunny Beach",
+          "서니 비치"
+        ],
+        [
+          "Tulip Garden",
+          "튤립 가든"
+        ],
+        [
+          "Waterfalls",
+          "워터폴스"
+        ]
+      ],
+      "current_queue_path_source_present": false,
+      "current_hd_candidate_present": false,
+      "prior_accepted_evidence_role": "CONDITIONAL_STOCK_RELEASE_ATLAS_PRIOR_ONLY",
+      "canonical_pixel_authority": "EXACT_CURRENT_INVENTORY_SHA256_SOURCE_REQUIRED",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting header/orientation/pixel geometry.",
+        "Read canonical DDS header and preserve dimensions/format/alpha/mipmap behavior.",
+        "Rebind each current semantic entry to canonical decoded pixels; do not infer binding from stock/Release atlas order.",
+        "Measure per-element full-effect source bbox and raw/readable transform from canonical pixels.",
+        "Build removal/protected masks and CLEAN_PLATE at exact canonical resolution with independent clean-plate QA.",
+        "After asset-specific geometry exists, evaluate compatible course-name style family reuse; semantic reuse is already authorized, style/geometry reuse is not.",
+        "Derive v2 safe bboxes, render/measure/refit, encode exact DDS, then run decoded-final zero-pixel/protected-art/orientation/English-source comparison QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 173,
+      "asset": "6DC89C6E",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6DC89C6E_512x512.dds",
+      "canonical_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "canonical_dimensions": [
+        2048,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 21,
+      "semantics": [
+        [
+          "GHOST FOREST",
+          "고스트 포레스트"
+        ],
+        [
+          "IMPERIAL AVENUE",
+          "임페리얼 애비뉴"
+        ],
+        [
+          "INDUSTRIAL COMPLEX",
+          "인더스트리얼 컴플렉스"
+        ],
+        [
+          "METROPOLIS",
+          "메트로폴리스"
+        ],
+        [
+          "PALM BEACH",
+          "팜 비치"
+        ],
+        [
+          "SNOW MOUNTAIN",
+          "스노 마운틴"
+        ],
+        [
+          "TULIP GARDEN",
+          "튤립 가든"
+        ],
+        [
+          "BIG FOREST",
+          "빅 포레스트"
+        ],
+        [
+          "CANYON",
+          "캐니언"
+        ],
+        [
+          "CASINO TOWN",
+          "카지노 타운"
+        ],
+        [
+          "FLORAL VILLAGE",
+          "플로럴 빌리지"
+        ],
+        [
+          "GIANT STATUES",
+          "자이언트 스태추"
+        ],
+        [
+          "ICE SCAPE",
+          "아이스 스케이프"
+        ],
+        [
+          "JUNGLE",
+          "정글"
+        ],
+        [
+          "LEGEND",
+          "레전드"
+        ],
+        [
+          "LOST CITY",
+          "로스트 시티"
+        ],
+        [
+          "MILKY WAY",
+          "밀키 웨이"
+        ],
+        [
+          "NATIONAL PARK",
+          "내셔널 파크"
+        ],
+        [
+          "SKYSCRAPERS",
+          "스카이스크레이퍼"
+        ],
+        [
+          "SUNNY BEACH",
+          "서니 비치"
+        ],
+        [
+          "WATERFALLS",
+          "워터폴스"
+        ]
+      ],
+      "current_queue_path_source_present": false,
+      "current_hd_candidate_present": false,
+      "prior_accepted_evidence_role": "CONDITIONAL_STOCK_RELEASE_ATLAS_PRIOR_ONLY",
+      "canonical_pixel_authority": "EXACT_CURRENT_INVENTORY_SHA256_SOURCE_REQUIRED",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting header/orientation/pixel geometry.",
+        "Read canonical DDS header and preserve dimensions/format/alpha/mipmap behavior.",
+        "Rebind each current semantic entry to canonical decoded pixels; do not infer binding from stock/Release atlas order.",
+        "Measure per-element full-effect source bbox and raw/readable transform from canonical pixels.",
+        "Build removal/protected masks and CLEAN_PLATE at exact canonical resolution with independent clean-plate QA.",
+        "After asset-specific geometry exists, evaluate compatible course-name style family reuse; semantic reuse is already authorized, style/geometry reuse is not.",
+        "Derive v2 safe bboxes, render/measure/refit, encode exact DDS, then run decoded-final zero-pixel/protected-art/orientation/English-source comparison QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 201,
+      "asset": "A9ABD877",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/A9ABD877_512x512.dds",
+      "canonical_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "canonical_dimensions": [
+        2048,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 17,
+      "semantics": [
+        [
+          "BAY AREA",
+          "베이 에어리어"
+        ],
+        [
+          "BIG FOREST",
+          "빅 포레스트"
+        ],
+        [
+          "CANYON",
+          "캐니언"
+        ],
+        [
+          "CAPE WAY",
+          "케이프 웨이"
+        ],
+        [
+          "CASINO TOWN",
+          "카지노 타운"
+        ],
+        [
+          "CASTLE WALL",
+          "캐슬 월"
+        ],
+        [
+          "CLOUDY HIGHLAND",
+          "클라우디 하이랜드"
+        ],
+        [
+          "DEEP LAKE",
+          "딥 레이크"
+        ],
+        [
+          "DESERT",
+          "사막"
+        ],
+        [
+          "FLORAL VILLAGE",
+          "플로럴 빌리지"
+        ],
+        [
+          "GHOST FOREST",
+          "고스트 포레스트"
+        ],
+        [
+          "GIANT STATUES",
+          "자이언트 스태추"
+        ],
+        [
+          "ICE SCAPE",
+          "아이스 스케이프"
+        ],
+        [
+          "CONIFEROUS FOREST",
+          "침엽수림"
+        ],
+        [
+          "GOALS",
+          "골"
+        ],
+        [
+          "Special",
+          "스페셜"
+        ],
+        [
+          "STAGES",
+          "스테이지"
+        ]
+      ],
+      "current_queue_path_source_present": false,
+      "current_hd_candidate_present": false,
+      "prior_accepted_evidence_role": "CONDITIONAL_STOCK_RELEASE_ATLAS_PRIOR_ONLY",
+      "canonical_pixel_authority": "EXACT_CURRENT_INVENTORY_SHA256_SOURCE_REQUIRED",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting header/orientation/pixel geometry.",
+        "Read canonical DDS header and preserve dimensions/format/alpha/mipmap behavior.",
+        "Rebind each current semantic entry to canonical decoded pixels; do not infer binding from stock/Release atlas order.",
+        "Measure per-element full-effect source bbox and raw/readable transform from canonical pixels.",
+        "Build removal/protected masks and CLEAN_PLATE at exact canonical resolution with independent clean-plate QA.",
+        "After asset-specific geometry exists, evaluate compatible course-name style family reuse; semantic reuse is already authorized, style/geometry reuse is not.",
+        "Derive v2 safe bboxes, render/measure/refit, encode exact DDS, then run decoded-final zero-pixel/protected-art/orientation/English-source comparison QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    }
+  ],
+  "reused_current_fingerprints": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "f88386e1484054f2f6efb39e59d556ee6809067e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "a206e5f0c6364ca6d55dc50cb860da0847253b06",
+    "resume_state_blob_sha": "18ee8946b19e47b3cec3709520594c035eca4cb5",
+    "worklog_blob_sha": "02bb240fc358360e6ba8d04280eb835f35218c00",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3"
+  },
+  "self_qa": "PASS_ODD_ONLY_159_163_173_201__4_OF_4_PENDING_LOCALIZE_TEXT__4_OF_4_CANONICAL_SHA256_CANVAS_RGBA_IDENTITIES__77_CURRENT_SEGMENT_ENTRIES__31_NORMALIZED_KEYS__27_REPEATED_KEYS__ZERO_TRANSLATION_CONFLICTS__0_OF_4_QUEUE_PATH_SOURCES__0_OF_4_CURRENT_HD_CANDIDATES__SEMANTIC_FAST_PATH_ONLY_STYLE_GEOMETRY_HELD__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CURRENT_CANONICAL_V2_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact canonical DDS bytes matching the current inventory SHA-256 identities are absent for all four selected assets, and there is no current canonical-v2 candidate. Prior stock/Release atlas metrics remain conditional reconstruction evidence only. The family fast path authorizes semantic translation reuse, not blind geometry/style copying. Header/orientation/semantic-to-sprite binding/source-effect masks/CLEAN_PLATE/safe-bbox/style compatibility and final candidate QA remain held until exact canonical source acquisition.",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_4_OF_4_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_EXACT_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "removal_and_protected_masks": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "style_template_compatibility": "HOLD_ASSET_SPECIFIC_PROOF_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
