@@ -1,0 +1,102 @@
+{
+  "schema_version": 12,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00174",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00087",
+  "recorded_at_kst": "2026-09-30T00:55:33+09:00",
+  "base_head_sha": "7521981245c2a008a2f833063c23e551ab1295be",
+  "commit_mode": "GITHUB_ATOMIC_LANE_LOCAL_PREFLIGHT_MATERIAL_AND_TASK_RECORD",
+  "result": "PASS_MATERIAL_PREFLIGHT_ONLY_INDEX98_SOURCE_ACQUISITION_EXHAUSTED_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD B-even scan excludes B00167/index152, the newer index112 candidate, and B00171/index92 because those immutable producer results are already awaiting C. No C-accepted runnable RENDER_READY/ONE_STAGE_TO_RENDER/direct candidate rework remains in B. The one legal new PREFLIGHT_ONLY batch therefore audits index98/42E618FD through every approved canonical-source tier. Drive exact path is a transport miss; the immutable pinned-direct exact path is a 404 transport miss; the verified v0.25.10a Release bundle contains the exact member but it is 2048x128 DXT5 SHA-256 3b3cdd76..., not canonical RGBA SHA-256 c735efbd.... Final outcome is SOURCE_ACQUISITION_EXHAUSTED. No stale source is rendered, no shared state is touched, and runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-0055-B00174-P00087/B00174_P00087_INDEX98_SOURCE_ACQUISITION_AUDIT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX98_FULL_APPROVED_CANONICAL_SOURCE_LADDER_AUDIT",
+    "index": 98,
+    "asset": "42E618FD",
+    "drive_outcome": "SOURCE_TRANSPORT_MISS",
+    "pinned_direct_outcome": "SOURCE_TRANSPORT_MISS",
+    "pinned_direct_http": "404_NOT_FOUND",
+    "pinned_release_bundle_identity": "PASS_EXACT",
+    "pinned_release_member_outcome": "SOURCE_IDENTITY_MISMATCH",
+    "source_acquisition_exhausted": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_FRESH_CANDIDATE_COMPLETION_SCAN",
+    "excluded_already_qa_pending": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+        "index": 152,
+        "asset": "49BB5FE5"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00171",
+        "index": 92,
+        "asset": "1A43E9D9"
+      },
+      {
+        "task_id": "NEWER_INDEX112_PRODUCER_RESULT",
+        "index": 112,
+        "asset": "D41D0B1"
+      }
+    ],
+    "explicit_render_ready_count": 0,
+    "explicit_one_stage_to_render_count": 0,
+    "selected_indices": [
+      98
+    ],
+    "post_evidence_render_ready_count": 0,
+    "conclusion": "ZERO_NEW_CANDIDATE_EXCEPTION_VALID__FULL_APPROVED_SOURCE_LADDER_EXHAUSTED_FOR_INDEX98"
+  },
+  "source_result": {
+    "index": 98,
+    "asset": "42E618FD",
+    "canonical_sha256": "c735efbd27a6d41d697de11d3df7ba73543a8324f34690957d3a1099d47275f0",
+    "canonical_dimensions": [
+      2048,
+      128
+    ],
+    "canonical_mode": "RGBA",
+    "drive": "SOURCE_TRANSPORT_MISS",
+    "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+    "pinned_release": "SOURCE_IDENTITY_MISMATCH_DXT5_SHA3B3CDD76",
+    "final": "SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "queue_blob_sha": "a6fd39dd54e07c007ec5dda46b3075167a89280a",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "b00133_task_blob_sha": "f261f46f3e9a90722786436fa7e86c9afc9195b5",
+    "c120_report_blob_sha": "dbc8dcaaaa9cef53b1fd20c1097f6655e690f823",
+    "pinned_upstream_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "self_qa": "PASS_INDEX98_FULL_SOURCE_LADDER__NO_CANDIDATE_PATH_RUNNABLE__NO_REPEATED_HEAVY_CANDIDATE_QA__NO_STALE_RELEASE_RENDER__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_NEW_CANDIDATE_SOURCE_ACQUISITION_EXHAUSTED",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

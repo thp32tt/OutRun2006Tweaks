@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-canonical-source-acquisition-audit-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00174",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00087",
+  "recorded_at_kst": "2026-09-30T00:55:33+09:00",
+  "base_head_sha": "7521981245c2a008a2f833063c23e551ab1295be",
+  "target_branch": "korean-localization-clean",
+  "selection": {
+    "queue_index": 98,
+    "asset": "42E618FD",
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+    "parity": "EVEN_PRIMARY_SHARD_B",
+    "reason": "Fresh GitHub-HEAD readiness scan found no C-accepted runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework in B after excluding immutable producer results already awaiting C. B00167/index152 and the newer index112 candidate are C-pending; B00171/index92 is also a durable producer result pending C. The contract therefore permits one new PREFLIGHT_ONLY batch, and index98 is the first independent non-pending selector asset."
+  },
+  "freshness": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "queue_blob_sha": "a6fd39dd54e07c007ec5dda46b3075167a89280a",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "reused_b00133_task_blob_sha": "f261f46f3e9a90722786436fa7e86c9afc9195b5",
+    "reused_c120_report_blob_sha": "dbc8dcaaaa9cef53b1fd20c1097f6655e690f823",
+    "skipped_pending_b00171_task_blob_sha": "a80fb0e0383102e332d8cfe96b2fd6d0c41ffee1",
+    "skipped_pending_b00167_task_blob_sha": "80007d4757f8b93508a5df9daa32276f857f64ee",
+    "pinned_upstream_repo": "envido32/OR2006Sprites",
+    "pinned_upstream_ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_tag": "v0.25.10a"
+  },
+  "canonical_inventory": {
+    "sha256": "c735efbd27a6d41d697de11d3df7ba73543a8324f34690957d3a1099d47275f0",
+    "width": 2048,
+    "height": 128,
+    "mode": "RGBA",
+    "semantic_source": "Challenge the course record.",
+    "semantic_korean": "코스 기록에 도전하세요."
+  },
+  "acquisition_tiers": [
+    {
+      "tier": 1,
+      "transport": "GOOGLE_DRIVE_APPROVED_CANONICAL_HD_SOURCE_SUBTREE",
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "resolved_parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "note": "Exact filename search under the exact approved parent folder returned zero results. No historical localized-output folders or similar-name guesses were searched."
+    },
+    {
+      "tier": 2,
+      "transport": "PINNED_TAG_DIRECT_FILE",
+      "repo": "envido32/OR2006Sprites",
+      "ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "exact_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "http_semantics": "404_NOT_FOUND",
+      "note": "Immutable exact-path GitHub contents probe returned 404. Per contract this is a transport miss, not identity mismatch, and immediately falls through to the pinned Release."
+    },
+    {
+      "tier": 3,
+      "transport": "PINNED_RELEASE_FALLBACK",
+      "release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "release_asset_id": 306630789,
+      "expected_bundle_size": 306223257,
+      "observed_bundle_size": 306223257,
+      "expected_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "observed_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "bundle_identity": "PASS_EXACT",
+      "exact_member_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "member_size": 262272,
+      "member_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "member_width": 2048,
+      "member_height": 128,
+      "member_dds_format": "DXT5",
+      "member_mip_count_field": 1,
+      "outcome": "SOURCE_IDENTITY_MISMATCH",
+      "mismatch": [
+        "SHA256",
+        "FORMAT_MODE"
+      ],
+      "note": "Canvas matches 2048x128 but bytes/format do not match the canonical inventory RGBA identity. Release bytes are rejected as construction input."
+    }
+  ],
+  "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+  "readiness_before": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_REQUIRED",
+  "readiness_after": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+  "candidate_completion": {
+    "candidate_dds_modified": false,
+    "clean_plate_created": false,
+    "korean_render_attempted": false,
+    "reason": "No approved acquisition tier produced bytes matching the current canonical inventory identity. Rendering from the DXT5 Release member would violate the exact-source contract and C120/B00133 Release-geometry retirement."
+  },
+  "dedup_and_reuse": {
+    "reused_existing_c_evidence": true,
+    "repeated_heavy_candidate_qa": false,
+    "repeated_release_geometry_qa": false,
+    "note": "B00133/C120 canonical identity, translation and Release-geometry-retirement evidence were reused unchanged; this task adds the previously missing typed Drive/direct/Release acquisition outcomes for index98."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX98_FULL_APPROVED_CANONICAL_SOURCE_LADDER_AUDIT",
+    "materially_reduces_unresolved_work": true,
+    "prevents_repeated_optional_probe_spin": true,
+    "candidate_dds_modified": false
+  },
+  "self_qa": "PASS_EVEN_ONLY_INDEX98__DRIVE_EXACT_PATH_MISS__PINNED_DIRECT_404_TYPED_TRANSPORT_MISS__PINNED_RELEASE_BUNDLE_IDENTITY_EXACT__EXACT_MEMBER_2048X128_DXT5_SHA3B3C_MISMATCHES_CANONICAL_RGBA_SHAC735__SOURCE_ACQUISITION_EXHAUSTED__NO_STALE_RENDER__NO_SHARED_STATE",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "vr_ffb_dx_changes": false
+}
