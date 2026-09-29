@@ -134,8 +134,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9bfd30c5e5ffd813962b96037ad19373fa116513",
+  "authoritative_result_sha": "9bfd30c5e5ffd813962b96037ad19373fa116513",
   "result_commit_message": "localization(A): persist index231 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_A-00235]",
   "fingerprints": {
     "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
@@ -150,7 +150,7 @@
   },
   "drive_material_registration": {
     "producer_task_id": "LOCALIZATION-LOCALIZATION_A-00235",
-    "producing_result_sha": null,
+    "producing_result_sha": "9bfd30c5e5ffd813962b96037ad19373fa116513",
     "role": "LOCALIZATION_A",
     "validation_state": "PENDING_C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
@@ -159,5 +159,6 @@
     "candidate_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
     "candidate_inner_dds_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594"
   },
-  "bookkeeping_note": "RESULT_SHA and producing_result_sha are filled only after verifying the immutable AUTO result commit. Producer automation_validation remains PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
+  "bookkeeping_note": "Verified immutable producer result 9bfd30c5... changes only the A lane-local task/production/prompt/QA JSON files. Exact DDS and review binaries are registered under approved Drive CURRENT_PIPELINE with hashes and IDs in this record. This bookkeeping commit uses CI skip and does not replace the producer result; automation_validation remains PENDING/C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:08:31+09:00"
 }
