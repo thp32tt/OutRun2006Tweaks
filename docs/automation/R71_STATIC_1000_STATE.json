@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 28,
+  "completedCycles": 29,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "b87c7f7a425aeef1d1bb154fbd865dcdec311029",
+  "currentHead": "de7a00820b11076148a7f8c00d9bc108004e39ed",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -832,14 +832,60 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "design pure sampled-identity history helper only if it can be LEVEL0 proven"
+    },
+    {
+      "cycle": 29,
+      "lenses": [
+        "architecture/control-flow: positive sampled-identity evidence",
+        "lifetime/reset/sync: sampled EVENT ownership separation",
+        "stereo/HUD/visual correctness: no renderer/HUD behavior change",
+        "hot path/frame pacing/copies/waits: pure metadata helper only",
+        "adversarial/falsification: partial RenderTo failure can still mean D3D11 sampling"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "Added a bounded SampledHistory<SlotCount> helper that records only positive exact sampled identities keyed by clientPid+runGeneration+transportGeneration+slot+frameId.",
+        "Query returns ExactSampled only for a full exact identity match. Absence, same-producer/new-frame, transport-generation change, run change and other-slot identities all remain Unknown; Unknown is not treated as proof of never-sampled ownership.",
+        "LEVEL0 smoke coverage proves exact match, slot reuse replacement, full-identity mismatch, invalid identity rejection and Clear semantics. The existing host dependency already executes this smoke target during hosted x64 builds.",
+        "Structural verifier now requires the SampledHistory/ExactSampled contract and mismatch cases so future cleanup cannot silently weaken positive-evidence semantics.",
+        "R23RenderProjection review found that a false return is not proof of zero D3D11 sampling: eye 0 RenderTo may have queued work before eye 1 fails. Therefore runtime history wiring must not record samples only on freshProjectionRendered=true; it needs explicit sampling-issued evidence at the render boundary."
+      ],
+      "evidence": [
+        "vrhost/src/runtime/r41_skipped_release.hpp SampledHistory",
+        "vrhost/tests/r41_skipped_release_smoke.cpp return cases 25-37",
+        "tools/verify_vr_r32_review.py sampled-history markers",
+        "R23RenderProjection executes left RenderTo then right RenderTo; final bool can be false after partial command issuance",
+        "exact-head CI queued: Build 36508474321/36508475118; OpenXR 36508474271/36508475169; HUD Inspector 36508474268/36508475158"
+      ],
+      "changedFiles": [
+        "vrhost/src/runtime/r41_skipped_release.hpp",
+        "vrhost/tests/r41_skipped_release_smoke.cpp",
+        "tools/verify_vr_r32_review.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "d3b5e5a316aa528d6eb88debb1d90524bfed9ab1",
+        "1b55a1e089fa7df6046008f43464c6aaeba01cae",
+        "de7a00820b11076148a7f8c00d9bc108004e39ed"
+      ],
+      "automationValidation": "LEVEL0_POSITIVE_SAMPLED_HISTORY_ADDED; exact-head GitHub-hosted CI queued due repository runner backlog; no PASS claimed yet",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 30: consume de7a008 exact-head CI. If green, design a testable projection result/observation boundary that positively reports whether any direct SRV sampling command was issued, including partial RenderTo failure, before wiring SampledHistory into runtime transitions."
     }
   ],
   "nextCycle": {
-    "cycle": 29,
+    "cycle": 30,
     "priority": [
-      "design pure sampled-identity history helper only if it can be LEVEL0 proven"
+      "consume de7a008 exact-head Build/OpenXR/HUD results",
+      "design positive sampling-issued result at R23RenderProjection boundary",
+      "cover partial first-eye-success/second-eye-failure semantics in LEVEL0 or isolated helper",
+      "do not infer never-sampled from RenderProjection false",
+      "do not wire transition ACK until exact sample evidence exists"
     ],
-    "guard": "frozen 34eef500 user-test package immutable; GitHub remains source of truth"
+    "guard": "Frozen 34eef500 user-test package remains immutable. No waits/copies/HUD/visual changes and no sampled EVENT ownership changes without evidence."
   },
-  "updatedKst": "2026-09-29T10:09:00+09:00"
+  "updatedKst": "2026-09-29T10:34:00+09:00"
 }
