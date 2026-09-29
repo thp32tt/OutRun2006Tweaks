@@ -26,6 +26,12 @@ Method: ten deliberately different review lenses. A later set must use findings 
 - **F04 LOW/STRUCTURE — R70 facades solve compiled ownership, but historical include-chain complexity remains behind the facade.**
 - **F05 LOW/TESTING — CI one-click contract is mainly textual and needs behavior-level payload-selection tests.**
 
+## Post-review progress — F04 renderer facade modularization
+
+F04 remains an open structural finding, but two bounded renderer edges are now removed. The current DXVK branch extracts the R13 hardening body and R23/R27/R28 eligibility body into include-free overlays. Production R23 no longer nests `outrun_renderer_r13.cpp`, and production R29 no longer nests `outrun_renderer_r23.cpp`; compatibility wrappers remain for the safe/diagnostic facade choices.
+
+`CONVERSION-DXVK-00061` exact result `6c46bd6aa111e84781bdebca2fa25e232ff3490b` passed Backend Conversion Gate `36577007581`, Build `36577017102`, OpenXR architecture `36577016752`, and HUD Inspector `36577016670`. The verifier explicitly rejects reintroduction of either historical renderer .cpp edge and stale OpenXR marker ownership. This is source-graph/build evidence only. Stereo and D3D9Ex chains still retain versioned include layering, so F04 is not closed and runtime validation remains UNTESTED.
+
 ## Set 02 direction derived from Set 01
 
 Set 02 will not repeat facade/branch checks. It will focus on the execution identity chain: slot precedence, root mutation atomicity, pre/post-selection hashes, crash/interruption during mutation, stale host/provider cleanup, SOURCE_SHA provenance, VariantId normalization, session manifest consistency, selector re-entry/idempotence, and failure rollback.

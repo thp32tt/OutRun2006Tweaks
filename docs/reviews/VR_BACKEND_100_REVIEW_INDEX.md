@@ -37,6 +37,9 @@ Each set contains ten distinct review passes and derives the next set's directio
 
 ## Main unresolved groups
 
+### Structure / facade debt
+- **F04 phase 1/2 progressed 2026-09-29:** the renderer facade no longer requires the historical R13 or R23 versioned translation units as nested production implementation edges. R13 and R23/R27/R28 bodies are now include-free overlays; the R23 compatibility owner composes base+R13+R23 for safe/diagnostic paths, while production R29 composes those layers directly. `verify_vr_facade_modularization.py` and OpenXR hardening guards enforce the new ownership. Exact result `6c46bd6aa111e84781bdebca2fa25e232ff3490b` passed Backend Conversion Gate `36577007581`, Build `36577017102`, OpenXR architecture `36577016752`, and HUD Inspector `36577016670`. **F04 remains OPEN** because the stereo and D3D9Ex historical include chains are still physically nested; no runtime/HMD behavior is claimed by this source-graph refactor.
+
 ### A. Backend-neutral semantics
 - Shared WVP/address anchors are live and consistent.
 - **F13/F14 closed 2026-09-28:** the reviewed 25-range producer catalog is centralized in `disasm_render_contract.hpp`; runtime `hud_semantics.hpp` delegates to it and `analyze_outrun_exe.py` is mechanically checked against it. Exact-SHA gate `36391517935` passes on `d2d02c774ee85046acd42a453f2cf1f392927a20`.
