@@ -260,6 +260,33 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30SkyGlow.temp[eye];',
     'VR R76 SKY GLOW BASELINE RESTORE:',
 ], "P8_R76_SKYGLOW_COMMON_BASELINE")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'VR R81 FRAME HITCH:',
+    'dumping 4 pre + hit + 4 post frames',
+    'R81ReadParticleLoad',
+    'NLPartSourceCount',
+    'liveParticles',
+    'managedTextureCreates',
+    'vertexBufferCreates',
+    'bufferDiscardLocks',
+    'skyGlowUs',
+    'presentUs',
+], "P8_R81_FRAME_HITCH_TRACE")
+require_all("src/vr/debug/perf_hitch_trace.hpp", [
+    'struct ResourceSnapshot',
+    'NoteManagedTextureCreate',
+    'NoteTextureUpload',
+    'NoteVertexBufferCreate',
+    'NoteIndexBufferCreate',
+    'NoteBufferLock',
+    'ResourceSnapshot Consume()',
+], "P8_R81_FRAME_HITCH_RESOURCE_COUNTERS")
+require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
+    'OutRunVR::PerfHitch::NoteManagedTextureCreate',
+    'OutRunVR::PerfHitch::NoteTextureLock',
+    'OutRunVR::PerfHitch::NoteTextureUpload',
+    'R81EstimateLevelBytes',
+], "P8_R81_TEXTURE_STREAM_TIMING")
 require_all("src/hooks_uiscaling.cpp", [
     'R71RivalMarkerSpraniCall = 0xBB796',
     'Module::exe_ptr(0xBB6F5)',
