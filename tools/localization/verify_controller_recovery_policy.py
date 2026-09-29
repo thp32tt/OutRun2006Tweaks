@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 6:
-    raise SystemExit("controller_roles schema_version must be >= 6")
+if int(cfg.get("schema_version", 0)) < 7:
+    raise SystemExit("controller_roles schema_version must be >= 7")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -86,6 +86,15 @@ required["qa_deduplication.identity"] = qa.get("identity") == "TASK_ID@RESULT_SH
 required["qa_deduplication.reuse_unchanged_pass_evidence"] = qa.get("reuse_unchanged_pass_evidence") is True
 required["qa_deduplication.shared_state_merge_frequency"] = qa.get("shared_state_merge_frequency") == "once_per_c_batch"
 
+strategy = cfg.get("production_strategy") or {}
+required["production_strategy.mode"] = strategy.get("mode") == "candidate_completion_first"
+required["production_strategy.forbid_new_preflight_while_ready_exists"] = strategy.get("forbid_new_preflight_while_ready_exists") is True
+required["production_strategy.max_new_preflight_only_batches_when_no_ready_assets"] = int(strategy.get("max_new_preflight_only_batches_when_no_ready_assets", 99)) <= 1
+required["production_strategy.candidate_target_per_invocation_when_ready_exists"] = int(strategy.get("candidate_target_per_invocation_when_ready_exists", 0)) >= 1
+required["production_strategy.continue_to_next_ready_asset_after_fail_closed"] = strategy.get("continue_to_next_ready_asset_after_fail_closed") is True
+required["production_strategy.qa_strictness_unchanged"] = strategy.get("qa_strictness_unchanged") is True
+required["production_strategy.readiness_tiers"] = strategy.get("readiness_tiers") == ["RENDER_READY", "ONE_STAGE_TO_RENDER", "PREFLIGHT_ONLY"]
+
 bad = [name for name, ok in required.items() if not ok]
 if bad:
     raise SystemExit("controller recovery policy invalid: " + ", ".join(bad))
@@ -93,4 +102,5 @@ if bad:
 print("controller recovery policy PASS")
 print("bound Actions poll <=30s, WAIT_ACTIONS recovery <=90s, idle rearm <=90s")
 print("A/B release on durable commit; only C batch consumes runner-backed Actions validation")
+print("candidate-completion-first production; no new preflight while render-ready work exists")
 print("same-slot localization gap <=15s, slot dedup <=30s, heartbeat <=15s")
