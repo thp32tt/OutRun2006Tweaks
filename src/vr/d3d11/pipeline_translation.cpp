@@ -265,6 +265,50 @@ namespace outrun::vr::dx11
             return true;
         }
 
+        bool append_fvf_blend_weights(
+            VertexInputLayoutTranslation& out,
+            UINT count,
+            UINT& offset,
+            UINT stream0Stride) noexcept
+        {
+            switch (count)
+            {
+            case 0:
+                return true;
+            case 1:
+                return append_fvf_element(
+                    out, "BLENDWEIGHT", 0,
+                    DXGI_FORMAT_R32_FLOAT, 4,
+                    offset, stream0Stride);
+            case 2:
+                return append_fvf_element(
+                    out, "BLENDWEIGHT", 0,
+                    DXGI_FORMAT_R32G32_FLOAT, 8,
+                    offset, stream0Stride);
+            case 3:
+                return append_fvf_element(
+                    out, "BLENDWEIGHT", 0,
+                    DXGI_FORMAT_R32G32B32_FLOAT, 12,
+                    offset, stream0Stride);
+            case 4:
+                return append_fvf_element(
+                    out, "BLENDWEIGHT", 0,
+                    DXGI_FORMAT_R32G32B32A32_FLOAT, 16,
+                    offset, stream0Stride);
+            case 5:
+                return append_fvf_element(
+                           out, "BLENDWEIGHT", 0,
+                           DXGI_FORMAT_R32G32B32A32_FLOAT, 16,
+                           offset, stream0Stride) &&
+                       append_fvf_element(
+                           out, "BLENDWEIGHT", 1,
+                           DXGI_FORMAT_R32_FLOAT, 4,
+                           offset, stream0Stride);
+            default:
+                return false;
+            }
+        }
+
         bool translate_fvf_layout(
             DWORD fvf,
             UINT stream0Stride,
@@ -273,9 +317,9 @@ namespace outrun::vr::dx11
             if (fvf == 0 || stream0Stride == 0)
                 return false;
 
-            // Deliberately exclude reserved/LASTBETA encodings. Position blend
-            // weights/indices stay pending until their exact D3D9 semantics are
-            // paired with the future shader-signature F21 gate.
+            // R88 treats FVF blend weights/indices as descriptor-level input
+            // layout semantics only. Shader use remains an independent F21
+            // gate, so this does not activate native DX11 drawing.
             constexpr DWORD supportedFlags =
                 D3DFVF_POSITION_MASK |
                 D3DFVF_NORMAL |
@@ -283,11 +327,15 @@ namespace outrun::vr::dx11
                 D3DFVF_DIFFUSE |
                 D3DFVF_SPECULAR |
                 D3DFVF_TEXCOUNT_MASK |
+                D3DFVF_LASTBETA_UBYTE4 |
+                D3DFVF_LASTBETA_D3DCOLOR |
                 0xFFFF0000u;
             if ((fvf & ~supportedFlags) != 0)
                 return false;
 
             UINT offset = 0;
+            UINT betaCount = 0;
+            bool blendPosition = false;
             const DWORD position = fvf & D3DFVF_POSITION_MASK;
             switch (position)
             {
@@ -297,6 +345,26 @@ namespace outrun::vr::dx11
                         DXGI_FORMAT_R32G32B32_FLOAT, 12,
                         offset, stream0Stride))
                     return false;
+                break;
+            case D3DFVF_XYZB1:
+                betaCount = 1;
+                blendPosition = true;
+                break;
+            case D3DFVF_XYZB2:
+                betaCount = 2;
+                blendPosition = true;
+                break;
+            case D3DFVF_XYZB3:
+                betaCount = 3;
+                blendPosition = true;
+                break;
+            case D3DFVF_XYZB4:
+                betaCount = 4;
+                blendPosition = true;
+                break;
+            case D3DFVF_XYZB5:
+                betaCount = 5;
+                blendPosition = true;
                 break;
             case D3DFVF_XYZRHW:
                 if ((fvf & D3DFVF_NORMAL) != 0 ||
@@ -314,14 +382,53 @@ namespace outrun::vr::dx11
                     return false;
                 break;
             default:
-                // XYZB1..XYZB5 and any unknown position encoding remain
-                // fail-closed until blend-weight/index semantics are modeled.
+                return false;
+            }
+
+            const bool lastBetaUbyte4 =
+                (fvf & D3DFVF_LASTBETA_UBYTE4) != 0;
+            const bool lastBetaD3DColor =
+                (fvf & D3DFVF_LASTBETA_D3DCOLOR) != 0;
+            if (lastBetaUbyte4 && lastBetaD3DColor)
+                return false;
+
+            if (blendPosition)
+            {
+                if (!append_fvf_element(
+                        out, "POSITION", 0,
+                        DXGI_FORMAT_R32G32B32_FLOAT, 12,
+                        offset, stream0Stride))
+                    return false;
+
+                const bool hasBlendIndices =
+                    lastBetaUbyte4 || lastBetaD3DColor;
+                const UINT blendWeightCount =
+                    betaCount - (hasBlendIndices ? 1u : 0u);
+                if (!append_fvf_blend_weights(
+                        out, blendWeightCount, offset, stream0Stride))
+                    return false;
+
+                if (hasBlendIndices)
+                {
+                    const DXGI_FORMAT indexFormat =
+                        lastBetaUbyte4
+                        ? DXGI_FORMAT_R8G8B8A8_UINT
+                        : DXGI_FORMAT_B8G8R8A8_UNORM;
+                    if (!append_fvf_element(
+                            out, "BLENDINDICES", 0,
+                            indexFormat, 4,
+                            offset, stream0Stride))
+                        return false;
+                }
+            }
+            else if (lastBetaUbyte4 || lastBetaD3DColor)
+            {
                 return false;
             }
 
             if ((fvf & D3DFVF_NORMAL) != 0)
             {
-                if (position != D3DFVF_XYZ ||
+                if ((position != D3DFVF_XYZ && !blendPosition) ||
                     !append_fvf_element(
                         out, "NORMAL", 0,
                         DXGI_FORMAT_R32G32B32_FLOAT, 12,

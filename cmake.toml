@@ -375,3 +375,15 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_input_layout_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_input_layout_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

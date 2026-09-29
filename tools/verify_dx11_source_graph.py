@@ -13,6 +13,9 @@ BACKEND_GATE = (
 SEMANTIC_SMOKE = (
     ROOT / "tools" / "dx11_fixed_function_shader_semantics.cpp"
 ).read_text(encoding="utf-8")
+INPUT_LAYOUT_SMOKE = (
+    ROOT / "tools" / "dx11_input_layout_semantics.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -446,6 +449,80 @@ def main() -> None:
         if token not in BACKEND_GATE:
             raise SystemExit(
                 "DX11 R86/R87 semantic smoke missing from Backend Conversion Gate: "
+                + token
+            )
+
+    pipeline_translation = (
+        DX11 / "pipeline_translation.cpp"
+    ).read_text(encoding="utf-8")
+    r88_translation_contract = {
+        "append_fvf_blend_weights": "R88 FVF blend-weight descriptor builder",
+        "D3DFVF_XYZB1": "R88 one-beta FVF position encoding",
+        "D3DFVF_XYZB5": "R88 five-beta FVF position encoding",
+        "D3DFVF_LASTBETA_UBYTE4": "R88 packed UBYTE4 blend-index encoding",
+        "D3DFVF_LASTBETA_D3DCOLOR": "R88 packed D3DCOLOR blend-index encoding",
+        '"BLENDWEIGHT"': "R88 blend-weight semantic",
+        '"BLENDINDICES"': "R88 blend-index semantic",
+        "DXGI_FORMAT_R8G8B8A8_UINT": "R88 UBYTE4 blend-index format",
+        "DXGI_FORMAT_B8G8R8A8_UNORM": "R88 D3DCOLOR blend-index format",
+    }
+    missing_r88_translation = [
+        meaning
+        for token, meaning in r88_translation_contract.items()
+        if token not in pipeline_translation
+    ]
+    if missing_r88_translation:
+        raise SystemExit(
+            "DX11 R88 FVF blend-layout drift: "
+            + ", ".join(missing_r88_translation)
+        )
+
+    r88_smoke_contract = {
+        "D3DFVF_XYZB1": "R88 basic blend-weight case",
+        "D3DFVF_XYZB4 | D3DFVF_NORMAL": "R88 blend weights plus normal case",
+        "D3DFVF_XYZB5": "R88 split five-weight case",
+        "D3DFVF_LASTBETA_UBYTE4": "R88 packed UBYTE4 index case",
+        "D3DFVF_LASTBETA_D3DCOLOR": "R88 packed D3DCOLOR index case",
+        "DXGI_FORMAT_R32G32B32A32_FLOAT": "R88 four-weight descriptor",
+        "DXGI_FORMAT_R8G8B8A8_UINT": "R88 UBYTE4 index descriptor",
+        "DXGI_FORMAT_B8G8R8A8_UNORM": "R88 D3DCOLOR index descriptor",
+        "dual LASTBETA flags must fail closed": "R88 conflicting index encodings",
+        "LASTBETA on XYZ must fail closed": "R88 invalid nonblend LASTBETA",
+        "short XYZB5 stride must fail closed": "R88 stride fail-closed case",
+        "DX11 input layout semantics smoke R88: PASS": "R88 smoke completion marker",
+    }
+    missing_r88_smoke = [
+        meaning
+        for token, meaning in r88_smoke_contract.items()
+        if token not in INPUT_LAYOUT_SMOKE
+    ]
+    if missing_r88_smoke:
+        raise SystemExit(
+            "DX11 R88 input-layout semantic smoke drift: "
+            + ", ".join(missing_r88_smoke)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_input_layout_semantics" not in graph:
+            raise SystemExit(
+                f"DX11 R88 input-layout semantic target missing from {graph_name}"
+            )
+        if "tools/dx11_input_layout_semantics.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R88 input-layout semantic source missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 input-layout semantic smoke",
+        "Run DX11 input-layout semantic smoke",
+        "dx11_input_layout_semantics",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R88 input-layout semantic smoke missing from Backend Conversion Gate: "
                 + token
             )
 

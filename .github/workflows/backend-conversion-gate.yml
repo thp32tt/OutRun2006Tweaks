@@ -82,6 +82,17 @@ jobs:
           & $smoke.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 fixed-function shader semantic smoke failed with exit code $LASTEXITCODE" }
 
+      - name: Build DX11 input-layout semantic smoke
+        run: cmake --build build-auto --config Release --target dx11_input_layout_semantics
+
+      - name: Run DX11 input-layout semantic smoke
+        shell: pwsh
+        run: |
+          $smoke = Get-ChildItem build-auto -Recurse -Filter dx11_input_layout_semantics.exe | Select-Object -First 1
+          if (-not $smoke) { throw "DX11 input-layout semantic smoke executable missing" }
+          & $smoke.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 input-layout semantic smoke failed with exit code $LASTEXITCODE" }
+
       - name: Verify binary exists
         shell: pwsh
         run: |

@@ -149,9 +149,10 @@ namespace outrun::vr::dx11
     compile_fixed_function_pixel_shader_prototype(
         const FixedFunctionPixelShaderPrototype& prototype) noexcept;
 
-    // R79 translates either an explicit D3D9 declaration or a conservative
-    // supported FVF subset into canonical D3D11 input-layout descriptors.
-    // FVF blend-weight/index encodings and any unmodelled flag combination
+    // R79/R88 translates either an explicit D3D9 declaration or a
+    // conservative FVF subset into canonical D3D11 input-layout descriptors.
+    // R88 models XYZB1..XYZB5 blend weights plus LASTBETA_UBYTE4 and
+    // LASTBETA_D3DCOLOR index encodings. Unmodelled/reserved combinations
     // remain fail-closed. Programmable shader-signature compatibility remains
     // an independent F21 gate; exact means descriptor-level readiness only.
     struct VertexInputLayoutTranslation
