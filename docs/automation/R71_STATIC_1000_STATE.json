@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 31,
+  "completedCycles": 32,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "b2800448c85f89ca1736a0ee1b0df50511abd42a",
+  "currentHead": "e0f11ac08371ab3b6ebdb4c105837f50f7d28552",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -946,14 +946,38 @@
       "automationValidation": "CI_CONTRACT_REPAIRED / EXACT_HEAD_REVALIDATION_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "consume repaired-head Build/OpenXR/HUD; continue P0 visual review"
+    },
+    {
+      "cycle": 32,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "SkyGlow pre-HUD path saves and restores ALPHABLENDENABLE, SRCBLEND, DESTBLEND, BLENDOP, COLORWRITE, alpha-test, shaders, texture0, stream0, sampler state, viewport and render targets. Static evidence therefore does not support forcing HUD alpha/blend state globally; that could break intentional translucent UI. Keep HUD alpha diagnosis independent and telemetry-led."
+      ],
+      "evidence": [
+        "R30RestoreSkyGlowState exact state restoration"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "e0f11ac08371ab3b6ebdb4c105837f50f7d28552"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace selector white/colorless car resource/material state"
     }
   ],
   "nextCycle": {
-    "cycle": 32,
+    "cycle": 33,
     "priority": [
-      "consume repaired-head CI",
-      "P0 selector white/colorless car trace",
-      "HUD/menu alpha/blend contamination"
+      "trace selector white/colorless car resource/material state"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
