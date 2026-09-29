@@ -1263,3 +1263,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 ## 2026-09-30 04:52 KST - C146 Q00044 AUTHORITATIVE GATE PASS
 - Validation-bearing result: `07952efd569649598034692745c745d71cc1c5fc`; Localization Automation Gate `36622258041` completed **success**.
 - Q00044 dispositions remain **PASS / PASS** for A00204 and B00206. Index198 is **RENDER_READY**; index133 remains **PREFLIGHT_ONLY** pending semantic re-binding. RUNTIME_VALIDATION=UNTESTED.
+## 2026-09-30 05:40 KST - C147 Q00045 INDEPENDENT CANDIDATE QA BATCH
+- B00209 `a7c5725b...` / index226 E3F4BA07: **PASS / STATIC_QA PASS / RUNTIME_UNTESTED**. Exact source/candidate deterministic replay matches committed candidate SHA-256 `8ab49a70...` and Git blob `11260e86...`; RGBA32 2048×512 mip1/header/FLIP_Y exact.
+- 8/8 Korean elements pass zero-pixel containment with ≥2 px original-envelope margin. Changed outside allowed geometry **0**, alpha escape **0**, protected OUTRUN2/OUTRUN2SP changes **0**. Mandatory GitHub PNG review lineage reproduced exactly; native/NN2x review shows no residue, clipping, broken Hangul, box/seam/halo or resolution loss.
+- Pending production **71 -> 70**. Shared next-action order remains **RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY 133/222/232**; B00211@index232 and B00213@index133 are newer out-of-batch QA-pending evidence and are not implicitly promoted by Q00045.
+- Report: `localization/graphics/role_C/20260930-0540-C147/C147_Q00045_INDEPENDENT_QA_BATCH.json`.

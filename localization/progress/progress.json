@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T04:52:31+09:00",
+  "updated_at_kst": "2026-09-30T05:40:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C146/Q00044 authoritative Gate PASS on 07952efd569649598034692745c745d71cc1c5fc. A00204@e064952 PASS promotes index198 to RENDER_READY after independent exact-source CLEAN_PLATE replay; B00206@d95e296 PASS leaves index133 PREFLIGHT_ONLY with eight absent assigned strings requiring semantic re-binding. Shared order remains RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY index133/222/232, with candidate-QA 159/201 and direct rework 226 ahead of unrelated preflight. Counts unchanged: pending production 71; actionable localize_text 93; canonical segments 753. Runtime remains UNTESTED.",
+  "next_checkpoint": "C147/Q00045 independent QA result: B00209@a7c5725 PASS promotes index226/E3F4BA07 to STATIC_QA PASS / RUNTIME_UNTESTED after C independently reproduces exact canonical source, 84,629-pixel corrected removal mask, clean plate, candidate SHA-256/Git blob, DDS header/roundtrip, 8/8 containment, zero outside/protected/alpha escape and persisted review PNG lineage. Pending production 71 -> 70; actionable localize_text 93; canonical segments 753. Index198 remains RENDER_READY. Newer B00211@index232 and B00213@index133 are outside Q00045 and remain QA-pending. This result commit is pending its sole Localization Automation Gate.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -982,162 +982,410 @@
   },
   "latest_c_batch_qa": {
     "schema_version": 11,
-    "schema": "outrun-c146-q00044-independent-qa-batch-v1",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00210",
-    "wave_id": "Q00044",
-    "qa_batch_id": "Q00044",
-    "run": "C146",
+    "schema": "outrun-c147-q00045-independent-candidate-qa-batch-v1",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00212",
+    "wave_id": "Q00045",
+    "qa_batch_id": "Q00045",
+    "run": "C147",
     "lane": "LOCALIZATION_C",
     "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
     "target_branch": "korean-localization-clean",
     "attempt": "1/3",
-    "recorded_at_kst": "2026-09-30T04:42:00+09:00",
-    "base_head_sha": "a43278e28f102890a13e5fdf396ec7b41a4811fd",
-    "base_sha": "a43278e28f102890a13e5fdf396ec7b41a4811fd",
-    "result": "PASS_Q00044_A00204_INDEX198_RENDER_READY__B00206_INDEX133_SEMANTIC_CONFLICT_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
-    "summary": "Q00044 independently reviews immutable A00204@e064952137805d785ee71675babe75e22982a83a and B00206@d95e2968e33929b857e9701c78edefc0a17d678b. C independently replays index198 exact-source mask/CLEAN_PLATE evidence from the pinned v0.25.10a archive and reproduces all seven masks, 77,975 changed pixels, both CLEAN_PLATE hashes and zero protected/outside changes; with 7/7 semantic bindings and final 2px safe bboxes this promotes index198 to RENDER_READY. C also independently confirms index133 exact source contains only ANCIENT RUINS from the nine currently assigned strings; B's fail-closed audit is correct, but index133 remains PREFLIGHT_ONLY until the eight absent strings are semantically re-bound. No Korean candidate bytes are approved or modified; runtime remains UNTESTED.",
+    "recorded_at_kst": "2026-09-30T05:40:00+09:00",
+    "base_head_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+    "base_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+    "result": "PASS_Q00045_B00209_INDEX226_STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "summary": "Q00045 independently consumes immutable B00209@a7c5725b49be4096abd29a071aef8e0ce83627a7 for index226/E3F4BA07. C replays the deterministic candidate from the exact pinned canonical source and reproduces the committed DDS SHA-256/Git blob, corrected source-removal mask, clean plate, all candidate pixel/alpha/protected metrics and the persisted review PNG lineage exactly. Native and nearest-neighbor readable review finds all eight Korean labels complete, source-faithful and contained; OUTRUN2/OUTRUN2SP remain protected. The input is PASS and index226 becomes STATIC_QA PASS / RUNTIME_UNTESTED. Newer B00211/index232 and B00213/index133 are outside Q00045 and remain QA-pending without implicit promotion.",
     "qa_batch_inputs": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
-        "lane": "LOCALIZATION_A",
-        "result_sha": "e064952137805d785ee71675babe75e22982a83a",
-        "result_message": "localization(A): close index198 precandidate gates [AUTO:LOCALIZATION-LOCALIZATION_A-00204]",
-        "completed_at": "2026-09-30T04:37:46.829826+09:00",
-        "producer_id": "P00106",
-        "automation_validation": "PENDING",
-        "validation_mode": "C_BATCH_GATE"
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00206",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
         "lane": "LOCALIZATION_B",
-        "result_sha": "d95e2968e33929b857e9701c78edefc0a17d678b",
-        "result_message": "localization(B): audit index133 exact-source semantic binding [AUTO:LOCALIZATION-LOCALIZATION_B-00206]",
-        "completed_at": "2026-09-30T04:39:39.962633+09:00",
-        "producer_id": "P00107",
+        "result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+        "result_message": "localization(B): persist index226 corrected candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00209]",
+        "completed_at": "2026-09-30T05:24:18.771543+09:00",
+        "producer_id": "P00109",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       }
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
-        "result_sha": "e064952137805d785ee71675babe75e22982a83a",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
+        "result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
         "status": "PASS",
-        "reason": "Immutable A00204 pre-generation evidence is accepted. C independently verified the pinned OR2-HD-GUI-v0.25.10a archive SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958, extracted exact 9FC88069 source SHA-256 2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4, and re-decoded 4096x2048 RGBA32 mip1 with the recorded FLIP_Y readable transform. Replaying the seven producer mask rules from exact pixels reproduces per-cell mask counts 11581/12160/10624/13088/9584/10549/10389, aggregate 77975, CLEAN_PLATE raw/display SHA-256 c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7 / d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320, zero changed pixels outside removal masks, zero protected-mask changes, and zero alpha changes outside removal masks. The 7/7 exact-lineage semantic bindings and 2px v2 candidate_safe_bbox set remain current, no newer index198 candidate exists at merge HEAD, and candidate-only DDS/containment/source-vs-Korean gates are not applicable because no Korean candidate was emitted. This evidence is therefore PASS with production_readiness=RENDER_READY; producer A must measure source style/signed slant and continue through Korean render/persistence in the same invocation. RUNTIME_VALIDATION=UNTESTED."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00206",
-        "result_sha": "d95e2968e33929b857e9701c78edefc0a17d678b",
-        "status": "PASS",
-        "reason": "Immutable B00206 semantic-binding audit is accepted as fail-closed pre-generation evidence. C independently verified exact 25F697C6 source SHA-256 8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04, 2048x2048 RGBA32 mip1 and FLIP_Y readable orientation from the same pinned archive. Readable exact-source review confirms ANCIENT RUINS is present while ALPINE, BLU MIRABEAU, ARGENTO NURBURGRING, BIANCO AVUS, NERO, ROSSO SCUDERIA, GRIGIO ALLOY and GIALLO MODENA are absent; the remaining visible strings are protected Ferrari model names. B correctly refused guessed/partial rendering. No newer index133 candidate exists at merge HEAD. The eight existing translation strings are retained as unbound metadata only and are not authorized for placement in this DDS until semantic re-binding is proven. production_readiness=PREFLIGHT_ONLY; masks/CLEAN_PLATE/safe-bbox/render remain blocked by the semantic metadata conflict. RUNTIME_VALIDATION=UNTESTED."
+        "reason": "Immutable B00209 index226 candidate is accepted for STATIC_QA. The result commit contains the durable task record, candidate DDS and mandatory GitHub review set. C independently verified the pinned v0.25.10a archive identity (306223257 bytes, SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958) and exact canonical E3F4BA07 source (2048x512 RGBA32 mip1, SHA-256 fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72, Git blob 0ac26331b6c2765b9c46b867ff1f2151fd7a15b1, header SHA-256 db8b5f3df045aa54a0a573d78a44ba811308d9cb09a700ff7abe6147c5593eb4, FLIP_Y readable orientation). Replaying the deterministic producer from that exact source under the recorded Pillow 12.3.0 / NumPy 2.3.5 / NotoSansCJK-Bold.ttc#1 environment reproduces the committed candidate byte-for-byte: SHA-256 8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153 and Git blob 11260e86b2a088767907c2aa5ad0fd064acd7366. The same replay reproduces the corrected 84,629-pixel removal mask SHA dcc28d8d..., clean-plate raw RGBA SHA 55ce1f8e..., 84,774 changed pixels, zero changed pixels outside the allowed source-removal-plus-lettering geometry, zero alpha changes outside allowed geometry, and zero protected OUTRUN2/OUTRUN2SP changes. All eight localized effect-inclusive bboxes remain at least 2px inside the original source envelope; safe-bbox edge-touch cases received nearest-neighbor high-zoom review and show complete unclipped glyphs with no escape. Persisted source/clean/candidate/lettering/mask/protected/diff/comparison/element-comparison PNG Git blobs also reproduce exactly from the immutable source/candidate lineage. Visual QA finds no visible localized-region English residue, broken Hangul, clipping, overlap, cover box, seam, alpha halo, background damage, wrong-image substitution or resolution loss; protected brand text remains original. Semantics match the current reviewed transcription. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
       }
     ],
     "immutable_input_resolution": {
-      "current_head_sha": "a43278e28f102890a13e5fdf396ec7b41a4811fd",
-      "current_head_after_inputs": true,
-      "a00204_result_descends_to_current_head": true,
-      "b00206_result_descends_to_current_head": true,
-      "newer_index198_candidate_at_merge": false,
-      "newer_index133_candidate_at_merge": false,
-      "disposition_rule": "PASS_VALID_PREGEN_EVIDENCE_WITH_ASSET_LOCAL_READINESS_CLASSIFICATION"
+      "exact_input_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "producer_auto_marker": "PASS_EXACT_B00209",
+      "producer_durable_task_record_same_commit": true,
+      "candidate_dds_same_commit": true,
+      "mandatory_review_set_same_commit": true,
+      "result_commit_descends_to_merge_head": true,
+      "merge_head_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+      "current_candidate_path_latest_modifying_commit": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "newer_persisted_candidate_sha_for_226": false,
+      "out_of_batch_pending_producers": [
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+          "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837",
+          "indices": [
+            232
+          ]
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+          "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6",
+          "indices": [
+            133
+          ]
+        }
+      ],
+      "disposition_rule": "PASS_EXACT_PERSISTED_CANDIDATE_NEW_FINGERPRINT_STATIC_QA"
     },
     "fingerprint_reconciliation": {
       "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
-      "current_asset_queue_blob_sha": "3e2ddab4862e80aa6c8ba051c219615bbcaa47e0",
+      "current_asset_queue_blob_sha": "dfe780f0b45616215cc454cc785ff4821f7554ed",
       "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
-      "pinned_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-      "duplicated_heavy_source_checks": "DEDUPED_PER_UNIQUE_ASSET_SOURCE_FINGERPRINT",
-      "index198_source_fingerprint": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4|RGBA32|4096x2048|mip1|flip_y|contract:19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
-      "index133_source_fingerprint": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04|RGBA32|2048x2048|mip1|flip_y|contract:19f5bb4ade80ee5ae110637b146ef1bb367d2fe4"
+      "canonical_source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "canonical_source_git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+      "candidate_sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
+      "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+      "source_text_transform": "flip_y",
+      "transcription_fingerprint": "index226 current reviewed 8 localize strings + OUTRUN2/OUTRUN2SP protected",
+      "qa_contract_version": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+      "heavy_qa_execution": "RUN_ONCE_NEW_CANDIDATE_FINGERPRINT"
+    },
+    "independent_replay": {
+      "environment": {
+        "pillow": "12.3.0",
+        "numpy": "2.3.5",
+        "font_identifier": "NotoSansCJK-Bold.ttc#1",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb"
+      },
+      "source": {
+        "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "archive_bytes": 306223257,
+        "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+        "sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+        "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+        "bytes": 4194432,
+        "header_128_sha256": "db8b5f3df045aa54a0a573d78a44ba811308d9cb09a700ff7abe6147c5593eb4",
+        "width": 2048,
+        "height": 512,
+        "pitch": 8192,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "pixel_masks": {
+          "r": "0x00ff0000",
+          "g": "0x0000ff00",
+          "b": "0x000000ff",
+          "a": "0xff000000"
+        },
+        "raw_to_readable": "flip_y"
+      },
+      "clean_plate": {
+        "removal_mask_pixels": 84629,
+        "removal_mask_raw_sha256": "dcc28d8da195df03de5f3a8fbfc71a5dbf3d88a70146479541432c5f96c1a6ee",
+        "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
+        "english_alpha_residue_localize_regions": 0,
+        "changed_pixels_outside_mask": 0,
+        "alpha_changes_outside_mask": 0,
+        "protected_brand_pixels_unchanged": true
+      },
+      "candidate": {
+        "sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
+        "git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+        "bytes": 4194432,
+        "header_128_exact": true,
+        "decoded_roundtrip_exact": true,
+        "changed_pixels": 84774,
+        "changed_pixels_outside_allowed_edit_mask": 0,
+        "alpha_changed_pixels_total": 84772,
+        "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+        "changed_pixels_in_protected_cells": 0,
+        "candidate_letter_pixels": 28614,
+        "source_signed_slant": {
+          "angle_deg": 0,
+          "direction": "none"
+        },
+        "candidate_signed_slant": {
+          "angle_deg": 0,
+          "direction": "none"
+        },
+        "raster_resampling": "NOT_USED",
+        "containment": [
+          {
+            "sprite": "sprite_296",
+            "source": "STAGE",
+            "korean": "스테이지",
+            "original_bbox": [
+              0,
+              436,
+              228,
+              500
+            ],
+            "safe_bbox": [
+              2,
+              438,
+              226,
+              498
+            ],
+            "localized_bbox": [
+              2,
+              439,
+              215,
+              496
+            ],
+            "delta_left": 2,
+            "delta_right": 13,
+            "delta_top": 3,
+            "delta_bottom": 4,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_299",
+            "source": "GOAL E",
+            "korean": "골 E",
+            "original_bbox": [
+              980,
+              346,
+              1233,
+              410
+            ],
+            "safe_bbox": [
+              982,
+              348,
+              1231,
+              408
+            ],
+            "localized_bbox": [
+              982,
+              348,
+              1093,
+              407
+            ],
+            "delta_left": 2,
+            "delta_right": 140,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_300",
+            "source": "GOAL D",
+            "korean": "골 D",
+            "original_bbox": [
+              4,
+              262,
+              256,
+              326
+            ],
+            "safe_bbox": [
+              6,
+              264,
+              254,
+              324
+            ],
+            "localized_bbox": [
+              6,
+              264,
+              124,
+              323
+            ],
+            "delta_left": 2,
+            "delta_right": 132,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_301",
+            "source": "GOAL C",
+            "korean": "골 C",
+            "original_bbox": [
+              983,
+              262,
+              1234,
+              326
+            ],
+            "safe_bbox": [
+              985,
+              264,
+              1232,
+              324
+            ],
+            "localized_bbox": [
+              985,
+              264,
+              1101,
+              323
+            ],
+            "delta_left": 2,
+            "delta_right": 133,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_302",
+            "source": "GOAL B",
+            "korean": "골 B",
+            "original_bbox": [
+              4,
+              170,
+              257,
+              234
+            ],
+            "safe_bbox": [
+              6,
+              172,
+              255,
+              232
+            ],
+            "localized_bbox": [
+              6,
+              172,
+              123,
+              231
+            ],
+            "delta_left": 2,
+            "delta_right": 134,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_303",
+            "source": "GOAL A",
+            "korean": "골 A",
+            "original_bbox": [
+              986,
+              170,
+              1242,
+              234
+            ],
+            "safe_bbox": [
+              988,
+              172,
+              1240,
+              232
+            ],
+            "localized_bbox": [
+              988,
+              172,
+              1105,
+              231
+            ],
+            "delta_left": 2,
+            "delta_right": 137,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_304",
+            "source": "GOAL",
+            "korean": "골",
+            "original_bbox": [
+              4,
+              86,
+              195,
+              150
+            ],
+            "safe_bbox": [
+              6,
+              88,
+              193,
+              148
+            ],
+            "localized_bbox": [
+              6,
+              88,
+              62,
+              147
+            ],
+            "delta_left": 2,
+            "delta_right": 133,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS"
+          },
+          {
+            "sprite": "sprite_305",
+            "source": "15 STAGE CONTINUOUS",
+            "korean": "15코스 연속",
+            "original_bbox": [
+              985,
+              86,
+              1809,
+              150
+            ],
+            "safe_bbox": [
+              987,
+              88,
+              1807,
+              148
+            ],
+            "localized_bbox": [
+              987,
+              88,
+              1301,
+              148
+            ],
+            "delta_left": 2,
+            "delta_right": 508,
+            "delta_top": 2,
+            "delta_bottom": 2,
+            "containment": "PASS_HIGH_ZOOM_SAFE_EDGE_TOUCH"
+          }
+        ]
+      },
+      "review_artifact_git_blobs": {
+        "source_display": "f9a40e94e9f50e2898b4dd22354b5e2408dba96b",
+        "clean_plate_display": "281eb4feb4ab68e2683421976439ad6502043d4d",
+        "candidate_display": "acce429b1005cd7b279637c78c6f0ff6adee63ac",
+        "lettering_display": "f52e6f98cfb3ea65cd22865c26ef18971a9fcbc4",
+        "source_text_mask_display": "4ccf413e047699538837782c099e260ded98c506",
+        "protected_mask_display": "cb709be0509a60fbe99b1b74d7121f64fa6482ee",
+        "diff_display": "85c9fa3f03934f9e9d923ca383a4e245e06c100b",
+        "comparison": "eb4a537f44a4c717b452aa0c924dc5598c99a644",
+        "element_comparison": "b1e1be0bc1e24fc5d720a87653174f2deb65e897"
+      },
+      "visual_review": "PASS_NATIVE_AND_NN2X__NO_LOCALIZED_ENGLISH_RESIDUE__NO_BROKEN_HANGUL__NO_CLIPPING_OR_OVERLAP__NO_BOX_SEAM_ALPHA_HALO__PROTECTED_BRANDS_PRESERVED__NO_RESOLUTION_LOSS",
+      "high_risk_safe_edge_review": "PASS_ALL_CANDIDATE_PIXELS_REMAIN_AT_LEAST_2PX_INSIDE_ORIGINAL_SOURCE_EFFECT_ENVELOPES"
     },
     "reviewed_assets": [
       {
-        "index": 198,
-        "asset": "9FC88069",
-        "canonical_source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
-        "source_format": "RGBA32",
-        "canvas": [
-          4096,
-          2048
-        ],
-        "mipmaps": 1,
-        "raw_to_readable": "flip_y",
-        "semantic_binding": "7/7 exact-lineage semantic cells accepted",
-        "removal_mask_pixels_by_cell": [
-          11581,
-          12160,
-          10624,
-          13088,
-          9584,
-          10549,
-          10389
-        ],
-        "removal_mask_pixels": 77975,
-        "clean_plate_raw_rgba_sha256": "c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7",
-        "clean_plate_display_rgba_sha256": "d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320",
-        "clean_plate_changed_outside_mask": 0,
-        "clean_plate_changed_in_protected_mask": 0,
-        "clean_plate_alpha_changed_outside_mask": 0,
-        "candidate_safe_bbox": "PASS_2PX_7_OF_7",
-        "candidate_generated": false,
+        "index": 226,
+        "asset": "E3F4BA07",
         "disposition": "PASS",
-        "production_readiness": "RENDER_READY",
-        "required_next": "Producer A: measure source typography/baseline/signed slant and render/refit/encode/persist the outrun-first-pass-edit-v2 Korean candidate plus mandatory GitHub PNG review set in the same invocation.",
-        "runtime_validation": "UNTESTED"
-      },
-      {
-        "index": 133,
-        "asset": "25F697C6",
-        "canonical_source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
-        "source_format": "RGBA32",
-        "canvas": [
-          2048,
-          2048
-        ],
-        "mipmaps": 1,
-        "raw_to_readable": "flip_y",
-        "semantic_binding": "1/9 physically bound: ANCIENT RUINS -> 고대 유적; 8 assigned strings absent from exact source",
-        "absent_assigned_strings": [
-          "ALPINE",
-          "BLU MIRABEAU",
-          "ARGENTO NURBURGRING",
-          "BIANCO AVUS",
-          "NERO",
-          "ROSSO SCUDERIA",
-          "GRIGIO ALLOY",
-          "GIALLO MODENA"
-        ],
-        "protected_visible_model_names": [
-          "F430",
-          "512BB",
-          "328 GTS",
-          "F50",
-          "F40",
-          "DINO 246 GTS",
-          "250 GTO",
-          "288 GTO",
-          "365 GTS/4 DAYTONA",
-          "360 SPIDER",
-          "SUPERAMERICA",
-          "ENZO FERRARI",
-          "550 BARCHETTA",
-          "F355 SPIDER",
-          "TESTAROSSA"
-        ],
-        "candidate_generated": false,
-        "disposition": "PASS",
-        "production_readiness": "PREFLIGHT_ONLY",
-        "required_next": "Re-bind the eight absent translation strings to their exact canonical source assets/regions. Do not render them into 25F697C6. After semantic resolution, derive source-effect/removal/protected masks, independently validate CLEAN_PLATE and final safe bbox before Korean rendering.",
-        "runtime_validation": "UNTESTED"
+        "production_readiness": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS",
+        "static_qa": "PASS",
+        "runtime_validation": "UNTESTED",
+        "semantic_validation": "PASS_8_OF_8_CURRENT_LOCALIZE_STRINGS__OUTRUN2_OUTRUN2SP_PRESERVED",
+        "dds_validation": "PASS_RGBA32_2048x512_MIP1_EXACT_HEADER_AND_ROUNDTRIP",
+        "orientation_validation": "PASS_FLIP_Y_RAW_AND_READABLE_POSTFLIGHT",
+        "containment_validation": "PASS_8_OF_8_ZERO_PIXEL_OVERFLOW",
+        "alpha_transparency_validation": "PASS_ZERO_OUTSIDE_ALLOWED_ALPHA_CHANGES",
+        "protected_artwork_validation": "PASS_OUTRUN2_OUTRUN2SP_BYTE_EXACT",
+        "english_source_comparison": "PASS_MANDATORY_GITHUB_REVIEW_SET_EXACT_LINEAGE_REPRODUCED",
+        "required_next": "Do not rerender index226. Keep it in STATIC_QA PASS / RUNTIME_UNTESTED until isolated real-game validation is supplied."
       }
     ],
     "candidate_only_gates": {
-      "index198_candidate_gates": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE__PREGEN_EVIDENCE_ONLY",
-      "index133_candidate_gates": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE__SEMANTIC_BINDING_BLOCKER",
-      "static_approval": "NONE_Q00044"
+      "index226_dds_header_mipmap_alpha_orientation": "PASS_INDEPENDENT_BYTE_IDENTICAL_REPLAY",
+      "index226_one_pixel_containment": "PASS_8_OF_8_MIN_ORIGINAL_ENVELOPE_MARGIN_2PX",
+      "index226_english_source_vs_korean_candidate": "PASS_INDEPENDENT_NATIVE_AND_NN2X_REVIEW",
+      "index226_semantics": "PASS_8_OF_8_CURRENT_TRANSCRIPTION",
+      "static_approval": "PASS_INDEX226_RUNTIME_UNTESTED"
     },
     "readiness_reconciliation": {
-      "classification": "A00204_PASS_RENDER_READY__B00206_PASS_PREFLIGHT_ONLY",
+      "classification": "ONE_RENDERED_CANDIDATE_STATIC_QA_PASS",
+      "production_readiness": {
+        "226": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS"
+      },
       "render_ready_indices": [
         198
       ],
@@ -1151,51 +1399,79 @@
         222,
         232
       ],
-      "direct_rework_candidate_indices": [
-        226
+      "already_rendered_static_qa_pass_indices": [
+        99,
+        112,
+        130,
+        152,
+        226,
+        237
       ],
-      "input_production_readiness": {
-        "133": "PREFLIGHT_ONLY",
-        "198": "RENDER_READY"
-      },
+      "direct_rework_candidate_indices": [],
+      "out_of_batch_producer_qa_pending": [
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+          "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837",
+          "indices": [
+            232
+          ],
+          "kind": "PREGEN"
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+          "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6",
+          "indices": [
+            133
+          ],
+          "kind": "PREGEN"
+        }
+      ],
       "candidate_completion_priority": [
-        "RENDER_READY: index198/9FC88069 is newly accepted by Q00044. Exact source, 7/7 semantic bindings, seven source-effect/removal masks, independently replayed CLEAN_PLATE and final 2px candidate_safe_bbox set are accepted. Producer A must measure source typography/baseline/signed slant and render/persist the v2 Korean candidate in the same invocation; do not open another unrelated preflight first.",
-        "ONE_STAGE_TO_RENDER: none newly accepted by Q00044.",
-        "PREFLIGHT_ONLY CANDIDATE-COMPLETION: index133/25F697C6 remains blocked because only ANCIENT RUINS is physically bound and eight assigned translation strings are absent from the exact source; semantic re-binding is required before mask/CLEAN_PLATE/safe-bbox/render. Indices222/232 remain prior candidate-completion preflight. Existing candidate-QA 159/201 and direct REWORK_REQUIRED index226 remain candidate-bearing work and stay ahead of unrelated preflight.",
+        "RENDER_READY: index198/9FC88069 remains the highest accepted pre-generation priority from Q00044. Producer A should complete source typography/baseline/signed-slant measurement and render/persist the v2 Korean candidate in the same invocation unless a newer out-of-batch A result supersedes this state before selection. Index226 is now already rendered STATIC_QA PASS and must not be rerendered.",
+        "ONE_STAGE_TO_RENDER: none newly accepted by Q00045.",
+        "PREFLIGHT_ONLY CANDIDATE-COMPLETION: shared accepted state keeps indices133/222/232 in preflight. Newer out-of-batch B00211@index232 and B00213@index133 lane-local results are QA-pending and preserved for later independent C consumption; Q00045 does not implicitly promote them. Existing candidate-QA indices159/201 remain ahead of unrelated preflight.",
         "PREFLIGHT_ONLY SOURCE-EXHAUSTED: 28/30/34/36/46/48/52/55/100/103/106/132/135/139/147/154/164/172/205/214/219/225/228 remain sticky until source/inventory/policy fingerprint changes."
       ]
     },
+    "heavy_qa_reuse": {
+      "new_candidate_fingerprint": true,
+      "exact_source_decode_replayed_once": true,
+      "candidate_deterministic_byte_replay_once": true,
+      "review_png_provenance_replayed_once": true,
+      "duplicate_heavy_checks": false
+    },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_PREGEN_QA_AND_SHARED_STATE_RECONCILIATION",
+      "type": "INDEPENDENT_C_CANDIDATE_QA_AND_SHARED_STATE_RECONCILIATION",
       "reviewed_indices": [
-        198,
-        133
+        226
       ],
-      "reviewed_assets": 2,
-      "producer_inputs_pass": 2,
+      "reviewed_assets": 1,
+      "producer_inputs_pass": 1,
       "producer_inputs_rework_required": 0,
       "producer_inputs_hold_strict_recheck": 0,
       "producer_inputs_superseded": 0,
       "metadata_segments_changed": 0,
       "canonical_segments_after_merge": 753,
       "actionable_localize_text_after": 93,
-      "pending_production_localize_text_after": 71,
+      "pending_production_localize_text_before": 71,
+      "pending_production_localize_text_after": 70,
       "candidate_dds_modified_by_c": false,
-      "new_render_ready": 1,
-      "new_static_artwork_passes": 0,
+      "new_static_artwork_passes": 1,
       "new_runtime_approvals": 0,
-      "report": "localization/graphics/role_C/20260930-0442-C146/C146_Q00044_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260930-0540-C147/C147_Q00045_INDEPENDENT_QA_BATCH.json"
     },
     "evidence": [
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00204.json@e064952137805d785ee71675babe75e22982a83a",
-      "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_INDEX198_MASK_GEOMETRY.json@e064952137805d785ee71675babe75e22982a83a",
-      "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_INDEX198_CLEAN_PLATE_PATCH.json@e064952137805d785ee71675babe75e22982a83a",
-      "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_MOD3_INDEX198_PREFLIGHT.json@e064952137805d785ee71675babe75e22982a83a",
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00206.json@d95e2968e33929b857e9701c78edefc0a17d678b",
-      "localization/graphics/role_B/20260930-B00206-P00107/B00206_P00107_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_AUDIT.json@d95e2968e33929b857e9701c78edefc0a17d678b",
-      "pinned archive OR2-HD-GUI-v0.25.10a.zip SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958 independently decoded by C"
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00209.json@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "localization/graphics/role_B/20260930-B00209-P00108/B00209_P00108_INDEX226_CORRECTED_GEOMETRY_PRODUCTION.json@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/comparison.png@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/element_comparison.png@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json@a7c5725b49be4096abd29a071aef8e0ce83627a7",
+      "localization/graphics/role_B/20260930-B00209-P00108/generate_index226.py@ce15e8d562d4ce730f9e95b47099064b9bd737a6"
     ],
     "candidate_dds_modified": false,
+    "new_static_artwork_passes": 1,
+    "new_runtime_approvals": 0,
     "shared_state_modified": true,
     "peer_candidate_files_modified": false,
     "runtime_test_performed": false,
@@ -1207,21 +1483,10 @@
     "google_drive_write_performed": false,
     "uploaded_archive_used": true,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
     "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SHARED_STATE",
-    "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner.",
-    "result_sha": "07952efd569649598034692745c745d71cc1c5fc",
-    "validation_bearing_result_sha": "07952efd569649598034692745c745d71cc1c5fc",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36622258041,
-      "run_attempt": 1,
-      "head_sha": "07952efd569649598034692745c745d71cc1c5fc",
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-09-30T04:52:31+09:00"
-    }
+    "bookkeeping_note": "Pre-Gate C task record. This C AUTO result commit is the sole Localization Automation Gate owner for Q00045; result_sha/automation gate fields are added only after validation completes."
   }
 }
