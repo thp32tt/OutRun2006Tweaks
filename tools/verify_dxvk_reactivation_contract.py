@@ -96,9 +96,20 @@ preflight = require(
     "DXVK_VERSION.txt",
     "DXVK_D3D9_SHA256.txt",
     "DXVK d3d9.dll hash mismatch",
-    "Package variant mismatch",
+    "Package variant mismatch: backends/d3d9 VARIANT_ID=",
+    "Package variant mismatch: backends/dxvk VARIANT_ID=",
+    "Package variant mismatch: BUILD_INPUTS=",
     "VARIANT_ID.txt",
     "MultiviewEnabled = ($resolvedBackend -eq 'dxvk')",
+)
+
+behavior = require(
+    "tools/Test-OutRunVROneClickBehavior.ps1",
+    "Expect-Failure 'package-variant'",
+    "Expect-Failure 'd3d9-backend-variant'",
+    "Package variant mismatch: backends/d3d9",
+    "Expect-Failure 'dxvk-backend-variant'",
+    "Package variant mismatch: backends/dxvk",
 )
 
 package = require(

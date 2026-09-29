@@ -124,9 +124,18 @@ try{
     $buildInputs.VariantId='R69_FIXPACK'
     $buildInputs|ConvertTo-Json -Depth 4|Set-Content (Join-Path $root 'BUILD_INPUTS.json') -Encoding UTF8
 
+    # F02 canonical VariantId must fail closed at every packaged identity layer,
+    # not only BUILD_INPUTS and the DXVK provider directory.
+    Set-Content (Join-Path $root 'backends/d3d9/VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69' -Encoding ascii
+    Write-PackageManifest $root
+    Expect-Failure 'd3d9-backend-variant' {
+        & (Join-Path $root 'Test-OutRunVROneClickPreflight.ps1') -Backend dxvk-safe
+    } 'Package variant mismatch: backends/d3d9'
+    Set-Content (Join-Path $root 'backends/d3d9/VARIANT_ID.txt') 'R69_FIXPACK' -Encoding ascii
+
     Set-Content (Join-Path $root 'backends/dxvk/VARIANT_ID.txt') 'DXVK_SAFE_R71' -Encoding ascii
     Write-PackageManifest $root
-    Expect-Failure 'backend-variant' {
+    Expect-Failure 'dxvk-backend-variant' {
         & (Join-Path $root 'Test-OutRunVROneClickPreflight.ps1') -Backend dxvk-safe
     } 'Package variant mismatch: backends/dxvk'
     Set-Content (Join-Path $root 'backends/dxvk/VARIANT_ID.txt') 'R69_FIXPACK' -Encoding ascii
