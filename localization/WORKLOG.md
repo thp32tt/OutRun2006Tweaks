@@ -1697,3 +1697,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Indices46/100/106 are **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. C changes no DDS bytes; new static passes **0**, runtime approvals **0**.
 - Candidate-completion-first order remains; producer results outside Q00038 receive no disposition and stay in later C backlog. No N100/local clone/worktree, GPT Library, Drive write, build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING` before the single C batch Gate.
+
+## 2026-09-30 03:20 KST - C140 Q00038 ATTEMPT 2 GATE RECONCILIATION
+
+- Attempt-1 result `9d7e6d8f0e444bcbd0c52753d5583719b8a28c43` failed Gate `36610798833` only at exact producer-SHA replay.
+- Root cause: B00190 `5969fd31...` fails `verify_parallel_lane_commit.py` because its exact result diff does not contain the unique B00190 durable task record; that record was staged in the parent commit.
+- Q00038 disposition is corrected from **PASS** to **HOLD_STRICT_RECHECK**. Independent Drive/direct/inventory evidence remains useful but is not promoted to shared source-exhausted status from this immutable producer SHA.
+- B must re-emit current-contract evidence. No DDS/runtime changes; `RUNTIME_VALIDATION=UNTESTED`. Attempt-2 report: `localization/graphics/role_C/20260930-0320-C140-A2/C140_Q00038_ATTEMPT2_INDEPENDENT_QA_BATCH.json`.
+
