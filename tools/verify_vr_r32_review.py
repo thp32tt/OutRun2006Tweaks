@@ -42,6 +42,26 @@ policy = require(
     "ClassifyPendingFence",
 )
 
+r31_wrapper = require(
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    '#include "stereo_renderer_r30.cpp"',
+    '#include "stereo_renderer_r31_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in r31_wrapper:
+    raise SystemExit("R31 compatibility wrapper regained implementation body")
+r31_overlay = require(
+    "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
+    "R31StateBlockTrackingReliable",
+    "GetR28VerifiedProjection",
+    "R31 fast left-eye c64 rollback",
+    "R31 HUD left-eye c64 rollback",
+    "R31StateBlockResyncPending",
+    "R31FlushPendingStateBlockResync",
+    "VR R31 PERF: cached world stereo + draw-route telemetry READY",
+)
+if "#include" in r31_overlay:
+    raise SystemExit("R31 overlay must remain include-free")
+
 r32_wrapper = require(
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     '#include "r32_policy.hpp"',
@@ -280,7 +300,7 @@ r34 = require(
 if r34.find("Present/pre") > r34.find("R34PresentR33Hook.stdcall<HRESULT>"):
     raise SystemExit("R34 must reassert Reset replay fail-close before lower Present work")
 
-r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
+r31 = load("src/vr/d3d9/stereo_renderer_r31_overlay.inc")
 state_enable = r31.find("const bool stateHooks =")
 end_enable = r31.find("R31EndStateBlockHook.enable()", state_enable)
 begin_enable = r31.find("R31BeginStateBlockHook.enable()", state_enable)
@@ -379,7 +399,7 @@ if "cullNone && alphaBlendEnabled && !depthWriteEnabled;" in effect_policy:
         "effect policy regressed to zero-disparity classification without the depth-test signal")
 
 r31_lazy = require(
-    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
     "R31StateBlockResyncPending",
     "R31MarkStateBlockCachesDirty",
     "R31FlushPendingStateBlockResync",

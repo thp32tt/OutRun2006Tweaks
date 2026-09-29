@@ -90,7 +90,7 @@ jobs:
               'passive original Clear only',
               'authoritative first seed'
             )
-            'src/vr/d3d9/stereo_renderer_r31.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r31_overlay.inc' = @(
               'R31StateBlockTrackingReliable',
               'GetR28VerifiedProjection',
               'R31 fast left-eye c64 rollback'
