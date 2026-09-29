@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 35,
+  "completedCycles": 36,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "6967e7b81b337da982d3c8c862a8028f1039d3cf",
+  "currentHead": "6bf80e4c7a9e0fae8ad06da2ef08079ca0987c0e",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1050,12 +1050,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "inspect checkpoint/result double producer lifetime"
+    },
+    {
+      "cycle": 36,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "OutRun checkpoint remaining-time and final-result double images are runtime-observed mode-specific regressions, but no new static evidence proves a safe producer lifetime mutation. Treat as exact producer/lifetime issue rather than blanket HUD duplication; no behavior change this cycle."
+      ],
+      "evidence": [
+        "existing runtime report + prohibition on broad HUD heuristic"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "6bf80e4c7a9e0fae8ad06da2ef08079ca0987c0e"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect stage marker/head-follow ownership"
     }
   ],
   "nextCycle": {
-    "cycle": 36,
+    "cycle": 37,
     "priority": [
-      "inspect checkpoint/result double producer lifetime"
+      "inspect stage marker/head-follow ownership"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
