@@ -813,3 +813,19 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: inspect checkpoint/result double producer lifetime.
+
+
+## Cycle 0036 — checkpoint/result double-image ownership
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- OutRun checkpoint remaining-time and final-result double images are runtime-observed mode-specific regressions, but no new static evidence proves a safe producer lifetime mutation. Treat as exact producer/lifetime issue rather than blanket HUD duplication; no behavior change this cycle.
+- Evidence: existing runtime report + prohibition on broad HUD heuristic.
+- No additional production/runtime behavior changed in this cycle.
+- Frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged; performance-only work remains paused.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect stage marker/head-follow ownership.
