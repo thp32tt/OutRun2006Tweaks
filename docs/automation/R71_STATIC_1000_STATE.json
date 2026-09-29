@@ -6,7 +6,7 @@
   "completedCycles": 145,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "aef90ff3a1992f1b2fec95d97893f78f56f4e431",
+  "currentHead": "a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -3965,7 +3965,9 @@
         "The exact flare producer at EXE+0xCABE is classified ProjectedScreenEffect2D and R30 deliberately uses the same stock WVP for both eyes to fuse the flare into one image.",
         "Renderer c64 ownership bypass omitted ProjectedScreenEffect2D, so the exact flare could receive HMD WVP injection before reaching R30. That creates two transform owners: renderer head injection followed by R30 projected-screen mono fusion.",
         "Added explicit ProjectedScreenEffect corroboration and included it in renderer semanticOverlay bypass. The flare c64 remains raw until R30, making R30 the single transform owner.",
-        "The known-bad restored console base-shadow remains disabled in VR. No start-grid shadow policy was changed without separate evidence."
+        "A second lower-layer ownership leak was found in R28RunWithVerifiedWorldEpoch: it vetoed ScreenOverlay2D/ScreenHud but not ProjectedScreenEffect2D, so a verified prior world epoch could rebind the exact flare back onto the world-stereo path after renderer c64 bypass.",
+        "The known-bad restored console base-shadow remains disabled in VR. No start-grid shadow policy was changed without separate evidence.",
+        "R28 world-rebind now explicitly vetoes ProjectedScreenEffect2D, preserving the R30-only mono-fusion contract through the complete lower-layer chain."
       ],
       "evidence": [
         "069c6f26: Build 36524651051/36524651645 SUCCESS",
@@ -3974,29 +3976,34 @@
         "hooks_graphics.cpp EXE+0xCABE -> RenderScope::ProjectedScreenEffect2D",
         "stereo_renderer_r30_r26_safe.cpp R69 flare mono fusion copies identical stock WVP to L/R",
         "outrun_renderer.cpp prior semanticOverlay bypass omitted ProjectedScreenEffect2D",
-        "hooks_graphics.cpp VR R69 base shadow keeps stock PC nullsub path"
+        "hooks_graphics.cpp VR R69 base shadow keeps stock PC nullsub path",
+        "stereo_renderer_r26.cpp prior R28 semantic veto omitted ProjectedScreenEffect2D",
+        "R28 world-rebind now declares PROJECTED_SCREEN_EFFECT_2D exclusively owned by R30"
       ],
       "changedFiles": [
         "src/vr/game/render_semantics.hpp",
         "src/vr/game/outrun_renderer.cpp",
         "tools/verify_vr_proven_baseline.py",
         "docs/automation/R71_STATIC_1000_STATE.json",
-        "docs/VR_R71_STATIC_1000_LOG.md"
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "src/vr/d3d9/stereo_renderer_r26.cpp"
       ],
       "commits": [
         "088a2d223589e1c2fee1ab4598b428dd1966db8d",
         "c2aaac5fdbd44237bb3adf9464d7709415ca5159",
-        "aef90ff3a1992f1b2fec95d97893f78f56f4e431"
+        "aef90ff3a1992f1b2fec95d97893f78f56f4e431",
+        "c4dee043c0a0e1d1380052b96ccc0c38603bf173",
+        "a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f"
       ],
-      "automationValidation": "FLARE_SINGLE_TRANSFORM_OWNER_CONTRACT_COMMITTED; exact-head GitHub CI pending",
+      "automationValidation": "FULL_FLARE_SINGLE_OWNER_CHAIN_COMMITTED; exact-head a07db31 GitHub CI pending",
       "runtimeValidation": "UNTESTED",
-      "next": "Cycle 146: consume aef90ff3 exact-head CI. Keep console base-shadow disabled; isolate the stock-PC start-grid stencil/projected-shadow draw identity and determine whether R13/R27 effect stereo ownership is causing the remaining split before any behavior change."
+      "next": "Cycle 146: consume a07db31 exact-head CI. Keep console base-shadow disabled; isolate stock-PC start-grid stencil/projected-shadow identity and add diagnostics before any shadow stereo-policy change."
     }
   ],
   "nextCycle": {
     "cycle": 146,
     "priority": [
-      "consume aef90ff3 exact-head Build/OpenXR/HUD results",
+      "consume a07db31 exact-head Build/OpenXR/HUD results",
       "isolate stock-PC start-grid stencil/projected-shadow draw identity",
       "check R13/R27 effect classification and c64 owner around that exact draw",
       "add bounded shadow diagnostics if identity is not statically decisive",
@@ -4004,7 +4011,7 @@
     ],
     "guard": "Do not re-enable restored console base shadow. No performance-only work, no broad shadow/alpha heuristic change, no HUD widening, no global material/color/resource-budget mutation."
   },
-  "updatedKst": "2026-09-29T15:46:00+09:00",
+  "updatedKst": "2026-09-29T15:49:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
