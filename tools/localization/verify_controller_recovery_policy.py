@@ -52,13 +52,13 @@ required = {
     "runtime_tuning.github_bound_run_poll_seconds": int(rt.get("github_bound_run_poll_seconds", 9999)) <= 30,
     "runtime_tuning.github_discovery_poll_seconds": int(rt.get("github_discovery_poll_seconds", 9999)) <= 60,
     "runtime_tuning.bound_run_nonterminal_cache_ttl_seconds": rt.get("bound_run_nonterminal_cache_ttl_seconds") == 0,
-    "runtime_tuning.queue_next_task_delay_seconds": int(rt.get("queue_next_task_delay_seconds", 9999)) <= 15,
-    "runtime_tuning.parallel_lane_stagger_seconds": int(rt.get("parallel_lane_stagger_seconds", 9999)) <= 15,
-    "runtime_tuning.parallel_distinct_slot_send_gap_seconds": int(rt.get("parallel_distinct_slot_send_gap_seconds", 9999)) <= 15,
+    "runtime_tuning.queue_next_task_delay_seconds": int(rt.get("queue_next_task_delay_seconds", 9999)) <= 30,
+    "runtime_tuning.parallel_lane_stagger_seconds": int(rt.get("parallel_lane_stagger_seconds", 9999)) <= 45,
+    "runtime_tuning.parallel_distinct_slot_send_gap_seconds": int(rt.get("parallel_distinct_slot_send_gap_seconds", 9999)) <= 60,
     "runtime_tuning.localization_qa_batch_size": int(rt.get("localization_qa_batch_size", 0)) == 4,
-    "runtime_tuning.localization_qa_coalesce_seconds": int(rt.get("localization_qa_coalesce_seconds", 9999)) <= 30,
-    "runtime_tuning.localization_same_slot_send_gap_seconds": int(rt.get("localization_same_slot_send_gap_seconds", 9999)) <= 15,
-    "runtime_tuning.localization_slot_dedup_seconds": int(rt.get("localization_slot_dedup_seconds", 9999)) <= 30,
+    "runtime_tuning.localization_qa_coalesce_seconds": int(rt.get("localization_qa_coalesce_seconds", 9999)) <= 60,
+    "runtime_tuning.localization_same_slot_send_gap_seconds": int(rt.get("localization_same_slot_send_gap_seconds", 9999)) <= 90,
+    "runtime_tuning.localization_slot_dedup_seconds": int(rt.get("localization_slot_dedup_seconds", 9999)) <= 90,
     "runtime_observability.queue_loop_heartbeat_seconds": int(obs.get("queue_loop_heartbeat_seconds", 9999)) <= 15,
     "runtime_observability.heartbeat_stale_after_seconds": int(obs.get("heartbeat_stale_after_seconds", 9999)) <= 45,
     "runtime_observability.active_state_source_of_truth": obs.get("active_state_source_of_truth") == "active_by_lane",
@@ -73,7 +73,7 @@ required["runtime_observability.required_runtime_fields"] = runtime_fields.issub
 
 execution = cfg.get("execution") or {}
 qa = cfg.get("qa_deduplication") or {}
-required["execution.mode"] = execution.get("mode") == "continuous_production_with_c_batch_gate"
+required["execution.mode"] = execution.get("mode") == "continuous_three_producers_with_c_batch_gate"
 required["execution.qa_consumer"] = execution.get("qa_consumer") == "C"
 required["execution.producer_next_after"] = execution.get("producer_next_after") == "OWN_LANE_DURABLE_COMMIT"
 required["execution.producer_individual_actions_gate"] = execution.get("producer_individual_actions_gate") is False
@@ -81,7 +81,10 @@ required["execution.batch_gate_role"] = execution.get("batch_gate_role") == "C"
 required["execution.batch_gate_is_only_runner_validation"] = execution.get("batch_gate_is_only_runner_validation") is True
 required["execution.c_gates_production"] = execution.get("c_gates_production") is False
 required["execution.qa_batch_size"] = int(execution.get("qa_batch_size", 0)) == 4
-required["execution.qa_coalesce_seconds"] = int(execution.get("qa_coalesce_seconds", 9999)) <= 30
+required["execution.qa_coalesce_seconds"] = int(execution.get("qa_coalesce_seconds", 9999)) <= 60
+required["execution.max_parallel_production"] = int(execution.get("max_parallel_production", 0)) == 3
+required["execution.concurrent_group"] = execution.get("concurrent_group") == ["A", "B", "E"]
+required["execution.e_backlog_throttle"] = (execution.get("extra_producer_backlog_throttle") or {}).get("lane") == "E"
 required["qa_deduplication.identity"] = qa.get("identity") == "TASK_ID@RESULT_SHA"
 required["qa_deduplication.reuse_unchanged_pass_evidence"] = qa.get("reuse_unchanged_pass_evidence") is True
 required["qa_deduplication.shared_state_merge_frequency"] = qa.get("shared_state_merge_frequency") == "once_per_c_batch"
@@ -101,6 +104,6 @@ if bad:
 
 print("controller recovery policy PASS")
 print("bound Actions poll <=30s, WAIT_ACTIONS recovery <=90s, idle rearm <=90s")
-print("A/B release on durable commit; only C batch consumes runner-backed Actions validation")
+print("A/B/E release on durable commit; only C batch consumes runner-backed Actions validation")
 print("candidate-completion-first production; no new preflight while render-ready work exists")
-print("same-slot localization gap <=15s, slot dedup <=30s, heartbeat <=15s")
+print("pressure-tuned three-producer dispatch; E backlog throttle enabled; heartbeat <=15s")
