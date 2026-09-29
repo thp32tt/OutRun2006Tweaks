@@ -380,7 +380,7 @@ if($assetSemanticsPresent){
 
 $resultFile=Join-Path $dest 'TEST_RESULT.txt'
 if(!(Test-Path $resultFile)){
-    @('FPS=','HMD_SMOOTHNESS=','STEREO=','RECENTER=','HUD_RANK_SCORE=','SKY_CLOUD=','SMOKE_SKID=','MENU_CAR=','EXIT_YES_NO=','NOTES=')|Set-Content $resultFile -Encoding UTF8
+    @('FPS=','HMD_SMOOTHNESS=','STEREO=','RECENTER=','HUD_RANK_SCORE=','HUD_OPACITY=','OUTRUN_STAGE_TEXT=','RIVAL_MARKER=','LENS_FLARE=','SKY_CLOUD=','SMOKE_SKID=','MENU_CAR=','EXIT_YES_NO=','NOTES=')|Set-Content $resultFile -Encoding UTF8
 }
 
 if($All){
