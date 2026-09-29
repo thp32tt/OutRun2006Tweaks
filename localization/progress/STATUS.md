@@ -1276,3 +1276,17 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Validation-bearing result: `5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527`; Localization Automation Gate `36628996001` completed **success**.
 - Q00045 authoritative disposition is **REWORK_REQUIRED** for B00209 `a7c5725b...` because the immutable producer result fails the exact-result machine-readable PASS contract. Candidate content-level QA remains reusable but is not STATIC_QA-promoted.
 - Index226 remains pending producer-result re-emission; pending production **71**. Runtime remains **UNTESTED**. The earlier failed C result `57d5d423...` is non-authoritative.
+
+### C148 Q00046 AUTHORITATIVE GATE PASS — 2026-09-30T06:12:14+09:00
+- Validation-bearing result `b562b57de350fce90397ac9bbcab0c9fbd04db92`; Localization Automation Gate `36631638860` — **success**.
+- Index226 remains **STATIC_QA PASS / RUNTIME_UNTESTED** on unchanged candidate.
+- Pending production **70**, actionable localize_text **93**, canonical segments **753**.
+
+
+### C149 Q00047 ATTEMPT2 — 2026-09-30T06:31:19+09:00
+- Attempt1 result `7e4f97b3af23c09f86c63e4570e70e84b5cf0f93` / Gate `36633656775` failed only at **Verify localization state** because canonical/legacy progress files were not byte-identical; QA findings are unchanged.
+- A00215 `64e756e0...` — **PASS / RENDER_READY** for index222 after independent exact-source, 6/6 binding, six-mask, 56,615-pixel CLEAN_PLATE and 2px safe-bbox replay.
+- B00216 `1ff1bc8a...` — **SUPERSEDED for Q00047 de-dup only** because authoritative C148/Q00046 already consumed this exact input; index226 remains STATIC_QA PASS / RUNTIME_UNTESTED.
+- Canonical/legacy progress drift repaired by writing identical Q00047 bytes to both paths.
+- Pending production **70**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+

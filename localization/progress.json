@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T06:12:14+09:00",
+  "updated_at_kst": "2026-09-30T06:31:19+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C148/Q00046 authoritative Gate PASS on b562b57de350fce90397ac9bbcab0c9fbd04db92 (run 36631638860). Fresh B00216@1ff1bc8 verifier-contract re-emission is PASS and restores index226/E3F4BA07 STATIC_QA on the unchanged independently validated candidate; runtime remains UNTESTED. Pending production 71 -> 70; actionable localize_text 93; canonical segments 753. Candidate QA remains pending for 159/198/201. A00215@index222 arrived after Q00046 dispatch and remains out-of-batch QA-pending together with B00211@index232, B00213@index133 and B00214@index220.",
+  "next_checkpoint": "C149/Q00047 ATTEMPT2: A00215@index222 PASS -> RENDER_READY; B00216@index226 SUPERSEDED in this batch only because exact input was already consumed by authoritative C148/Q00046, leaving index226 STATIC_QA PASS. Attempt1 failed only on canonical/legacy progress mirror drift; ATTEMPT2 repairs both paths to identical bytes. Pending production remains 70; actionable localize_text 93; canonical segments 753. Candidate QA 159/198/201 remains ahead of unrelated preflight. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -645,29 +645,39 @@
     },
     "latest_c_batch_qa": {
       "schema_version": 14,
-      "schema": "outrun-c148-q00046-index226-contract-repromotion-v1",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00217",
-      "wave_id": "Q00046",
-      "qa_batch_id": "Q00046",
-      "run": "C148",
+      "schema": "outrun-c149-q00047-attempt2-progress-mirror-repair-v1",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00220",
+      "wave_id": "Q00047",
+      "qa_batch_id": "Q00047",
+      "run": "C149",
       "lane": "LOCALIZATION_C",
       "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
       "target_branch": "korean-localization-clean",
-      "attempt": "1/3",
+      "attempt": "2/3",
       "chat_rollover": 1,
-      "recorded_at_kst": "2026-09-30T06:08:00+09:00",
-      "base_head_sha": "0f64ce4ffc76ea88ccc12da51f83f2964f177efc",
-      "base_sha": "0f64ce4ffc76ea88ccc12da51f83f2964f177efc",
-      "commit_mode": "C_BATCH_VALIDATION_BEARING_RESULT__INDEX226_PRODUCER_CONTRACT_REPROMOTION",
-      "result": "PASS_Q00046_B00216_INDEX226_FRESH_VERIFIER_PASS_RESULT__STATIC_QA_REPROMOTED_RUNTIME_UNTESTED",
-      "summary": "Q00046 consumes only B00216's immutable fresh producer result. B00216 re-emits the already C-validated index226/E3F4BA07 candidate without changing DDS/review bytes, and adds verifier-recognized machine-readable PASS evidence. C independently confirms the exact producer commit carries the AUTO marker, the candidate Git blob and mandatory source/clean/candidate/comparison/element-comparison/prompt lineage are byte-identical to the previously reproduced C147 content-QA set, and the fresh QA JSON exposes PASS provenance plus zero outside-edit/protected/alpha escape metrics. The prior Q00045 producer-contract blocker is therefore repaired and index226 is re-promoted to STATIC_QA_PASS while runtime remains UNTESTED. A00215@index222 completed after Q00046 dispatch and is preserved as out-of-batch QA-pending rather than being retroactively added to this batch.",
+      "recorded_at_kst": "2026-09-30T06:31:19+09:00",
+      "base_head_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+      "base_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+      "commit_mode": "ATOMIC_C_BATCH_ATTEMPT2_PROGRESS_MIRROR_REPAIR_AND_SINGLE_SHARED_STATE_MERGE",
+      "result": "PASS_Q00047_A00215_RENDER_READY__B00216_SUPERSEDED_ALREADY_CONSUMED_Q00046__ATTEMPT2_PROGRESS_MIRROR_REPAIR_RUNTIME_UNTESTED",
+      "summary": "Q00047 ATTEMPT2 preserves the attempt-1 QA findings without repeating heavy checks. A00215@index222 remains PASS / RENDER_READY from the independently reproduced canonical DDF0392A source, six semantic bindings, six source-effect masks, deterministic CLEAN_PLATE and final 2px safe bboxes. B00216@index226 remains SUPERSEDED only for Q00047 de-dup because the exact TASK_ID@RESULT_SHA was already authoritatively consumed by C148/Q00046; index226 stays STATIC_QA_PASS_RUNTIME_UNTESTED. Attempt-1 result 7e4f97b3 failed Localization Automation Gate run 36633656775 solely because the pre-existing compatibility progress mirror localization/progress.json did not match canonical localization/progress/progress.json. ATTEMPT2 repairs that drift and merges Q00047 shared state once. Runtime remains UNTESTED.",
       "qa_batch_inputs": [
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+          "lane": "LOCALIZATION_A",
+          "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+          "result_message": "localization(A): preflight index222 exact binding and clean plate [AUTO:LOCALIZATION-LOCALIZATION_A-00215]",
+          "completed_at": "2026-09-30T06:06:55.115545+09:00",
+          "producer_id": "P00113",
+          "automation_validation": "PENDING",
+          "validation_mode": "C_BATCH_GATE"
+        },
         {
           "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
           "lane": "LOCALIZATION_B",
           "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
           "result_message": "localization(B): re-emit index226 verifier PASS evidence [AUTO:LOCALIZATION-LOCALIZATION_B-00216]",
-          "completed_at": "2026-09-30T05:56:06+09:00",
+          "completed_at": "2026-09-30T06:11:31.831352+09:00",
           "producer_id": "P00114",
           "automation_validation": "PENDING",
           "validation_mode": "C_BATCH_GATE"
@@ -675,70 +685,216 @@
       ],
       "qa_dispositions": [
         {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+          "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+          "status": "PASS",
+          "reason": "PASS: C independently reproduced the exact pinned archive SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958 and DDF0392A member SHA-256 bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72 (2,097,280 bytes), DXT5 1024x2048 mip1, FLIP_Y readable transform, raw/readable decoded RGBA hashes, all six canonical semantic bindings and 19 preserve-original regions. Replaying alpha>0 within exact regions 0/1/2/3/6/7 reproduces per-region mask counts 11883/7402/14349/6407/8102/8472, aggregate 56,615, aggregate mask SHA-256 f2c2cfb1c5b743005692433719db60fee56597a3d11368b35d8902deff642408, CLEAN_PLATE readable/raw SHA-256 ecf8d502b699cb94af1d2af1563c8c7e630afd926dbe8ed37c54e903ea7608e1 / c75279677800c75db338aaa5285b6e64dded5f4b4c7f67452e7686aaef21447f, zero outside-mask/alpha/protected changes, zero localized-cell alpha after cleaning, and exact 2px-inset candidate-safe bboxes. No candidate exists, so candidate-only DDS/visual gates are not applicable. production_readiness=RENDER_READY; runtime remains UNTESTED."
+        },
+        {
           "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
           "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-          "status": "PASS",
-          "reason": "PASS: fresh producer result contains verifier-recognized machine-readable PASS evidence for index226/E3F4BA07. Candidate DDS Git blob 11260e86b2a088767907c2aa5ad0fd064acd7366 is unchanged from the previously independently reproduced C147 content-QA candidate; mandatory review/prompt artifact Git blobs are also unchanged. Fresh QA records provide status=PASS, exact source/candidate SHA-256, v2 prompt hashes, signed_slant_gate=PASS, runtime_validation=UNTESTED and zero outside-edit/protected/alpha escape metrics. No rerender or heavy pixel replay is required because the content fingerprint is unchanged."
+          "status": "SUPERSEDED",
+          "reason": "SUPERSEDED for Q00047 de-dup only: exact identity B00216@1ff1bc8 was already consumed as PASS by C148/Q00046 validation-bearing result b562b57de350fce90397ac9bbcab0c9fbd04db92 and Localization Automation Gate run 36631638860 success. Re-running the same immutable QA identity would violate the controller's duplicate/no-op optimization. Index226/E3F4BA07 retains the existing STATIC_QA_PASS_RUNTIME_UNTESTED state; this disposition does not revoke or replace Q00046."
         }
       ],
-      "producer_contract_repair": {
-        "prior_rework_task_id": "LOCALIZATION-LOCALIZATION_B-00209",
-        "prior_rework_result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
-        "prior_authoritative_c_result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
-        "prior_gate_failure": "DDS changed but no machine-readable PASS record exists in changed QA JSON",
-        "fresh_result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-        "fresh_contract_status": "PASS_MACHINE_READABLE_PROVENANCE_AND_ZERO_PIXEL_FIELDS_PRESENT",
-        "source_or_candidate_fingerprint_changed": false
-      },
-      "lineage_recheck": {
-        "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
-        "source_display_png_blob_sha": "f9a40e94e9f50e2898b4dd22354b5e2408dba96b",
-        "clean_plate_display_png_blob_sha": "281eb4feb4ab68e2683421976439ad6502043d4d",
-        "candidate_display_png_blob_sha": "acce429b1005cd7b279637c78c6f0ff6adee63ac",
-        "comparison_png_blob_sha": "eb4a537f44a4c717b452aa0c924dc5598c99a644",
-        "element_comparison_png_blob_sha": "b1e1be0bc1e24fc5d720a87653174f2deb65e897",
-        "generation_prompt_blob_sha": "b8f328e4f4b556509c6785eeec9f55025138a3c3",
-        "all_equal_to_prior_c147_verified_lineage": true
-      },
-      "content_level_qa_reuse": {
-        "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
-        "source_git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
-        "source_format": "RGBA32",
-        "source_canvas": [
-          2048,
-          512
+      "independent_replay": {
+        "archive": {
+          "name": "OR2-HD-GUI-v0.25.10a.zip",
+          "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+        },
+        "source": {
+          "index": 222,
+          "asset_id": "DDF0392A",
+          "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+          "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+          "bytes": 2097280,
+          "width": 1024,
+          "height": 2048,
+          "dds_format": "DXT5",
+          "mipmaps": 1,
+          "raw_to_readable": "flip_y",
+          "decoded_raw_rgba_sha256": "6b053c75c6074d6ebb16bfe0a38b3a770923c223beb281ab1611872cf271659f",
+          "decoded_readable_rgba_sha256": "8d2de43a8575aa0661f1013fbd8929964c44c3cabb31b2e09b2b7779b75ab5c3"
+        },
+        "canonical_semantics": {
+          "status": "PASS_6_OF_6_EXACT_CURRENT_TRANSCRIPTION",
+          "localized": [
+            [
+              "OutRun Mode / 15 C.",
+              "아웃런 모드 / 15코스",
+              0
+            ],
+            [
+              "OutRun 1986",
+              "아웃런 1986",
+              1
+            ],
+            [
+              "Journey Mode / Random",
+              "저니 모드 / 무작위",
+              2
+            ],
+            [
+              "Who Are You?",
+              "당신은 누구?",
+              3
+            ],
+            [
+              "Shake The Street",
+              "거리를 뒤흔들어라",
+              6
+            ],
+            [
+              "Rush A Difficulty",
+              "난이도에 도전",
+              7
+            ]
+          ],
+          "protected_original_count": 19,
+          "protected_original_summary": "4 song titles + 15 Ferrari model names"
+        },
+        "masks": [
+          {
+            "region_index": 0,
+            "pixels": 11883,
+            "mask_sha256": "2ce842e4548201e2c50e088f709f14b5ac2a35e80ea8fbdb5f2784056858f1f7",
+            "source_effect_bbox_local_xyxy": [
+              6,
+              14,
+              548,
+              66
+            ],
+            "candidate_safe_bbox_local_xyxy": [
+              8,
+              16,
+              546,
+              64
+            ]
+          },
+          {
+            "region_index": 1,
+            "pixels": 7402,
+            "mask_sha256": "349ff963d0aebf0ae1fe6909cd4d9ce18d7909dde19be119220e81660c4a78d5",
+            "source_effect_bbox_local_xyxy": [
+              4,
+              17,
+              333,
+              61
+            ],
+            "candidate_safe_bbox_local_xyxy": [
+              6,
+              19,
+              331,
+              59
+            ]
+          },
+          {
+            "region_index": 2,
+            "pixels": 14349,
+            "mask_sha256": "b8f773f47536dfa3917eece034fed358323d2f15a87cbfbb09f34bade3bf4dbe",
+            "source_effect_bbox_local_xyxy": [
+              2,
+              10,
+              627,
+              68
+            ],
+            "candidate_safe_bbox_local_xyxy": [
+              4,
+              12,
+              625,
+              66
+            ]
+          },
+          {
+            "region_index": 3,
+            "pixels": 6407,
+            "mask_sha256": "72051598ae3662c21e347666deb6bc825e13e1c3099ec9cf8e0e10fdea2f32c5",
+            "source_effect_bbox_local_xyxy": [
+              2,
+              17,
+              342,
+              60
+            ],
+            "candidate_safe_bbox_local_xyxy": [
+              4,
+              19,
+              340,
+              58
+            ]
+          },
+          {
+            "region_index": 6,
+            "pixels": 8102,
+            "mask_sha256": "669eb0c12e6b6a3e4e4c3b3828a7afa4e50dc7751a535a4d2f36ed214403bbc1",
+            "source_effect_bbox_local_xyxy": [
+              3,
+              17,
+              419,
+              60
+            ],
+            "candidate_safe_bbox_local_xyxy": [
+              5,
+              19,
+              417,
+              58
+            ]
+          },
+          {
+            "region_index": 7,
+            "pixels": 8472,
+            "mask_sha256": "e435df981046fe8ebe4bc7355473dfb29010699f6d947f7e6944de5f508146d5",
+            "source_effect_bbox_local_xyxy": [
+              6,
+              17,
+              421,
+              70
+            ],
+            "candidate_safe_bbox_local_xyxy": [
+              8,
+              19,
+              419,
+              68
+            ]
+          }
         ],
-        "source_mipmaps": 1,
-        "raw_to_readable": "flip_y",
-        "removal_mask_pixels": 84629,
-        "removal_mask_raw_sha256": "dcc28d8da195df03de5f3a8fbfc71a5dbf3d88a70146479541432c5f96c1a6ee",
-        "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
-        "candidate_sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
-        "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
-        "containment": "PASS_8_OF_8_AT_LEAST_2PX_INSIDE_ORIGINAL_SOURCE_EFFECT_ENVELOPES",
-        "changed_pixels_outside_allowed_edit_mask": 0,
-        "alpha_changed_pixels_outside_allowed_edit_mask": 0,
-        "changed_pixels_in_protected_cells": 0,
-        "visual_review": "PASS_REUSED_UNCHANGED_FINGERPRINT_FROM_C147_NATIVE_AND_NN2X_REVIEW",
-        "repeated_heavy_checks": false
+        "aggregate_removal_mask_pixels": 56615,
+        "aggregate_removal_mask_sha256": "f2c2cfb1c5b743005692433719db60fee56597a3d11368b35d8902deff642408",
+        "clean_plate_readable_rgba_sha256": "ecf8d502b699cb94af1d2af1563c8c7e630afd926dbe8ed37c54e903ea7608e1",
+        "clean_plate_raw_rgba_sha256": "c75279677800c75db338aaa5285b6e64dded5f4b4c7f67452e7686aaef21447f",
+        "changed_pixels_outside_removal_mask": 0,
+        "alpha_changed_pixels_outside_removal_mask": 0,
+        "changed_pixels_in_protected_regions": 0,
+        "localized_cells_nonzero_alpha_after_clean_plate": 0,
+        "safe_bbox_gate": "PASS_6_OF_6_EXACT_2PX_INSET_FROM_SOURCE_EFFECT_BBOX"
       },
       "reviewed_assets": [
         {
+          "index": 222,
+          "asset": "DDF0392A",
+          "disposition": "PASS",
+          "production_readiness": "RENDER_READY",
+          "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE",
+          "runtime_validation": "UNTESTED",
+          "required_next": "Producer A: treat Q00047 RENDER_READY as sticky. Measure source typography/baseline/signed slant, render/refit/encode/persist the outrun-first-pass-edit-v2 Korean DDS candidate and mandatory GitHub PNG review set in the same invocation; then submit a fresh immutable producer result for C candidate QA."
+        },
+        {
           "index": 226,
           "asset": "E3F4BA07",
-          "disposition": "PASS",
+          "disposition": "SUPERSEDED_ALREADY_CONSUMED_Q00046",
           "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
-          "static_qa": "PASS",
           "runtime_validation": "UNTESTED",
-          "required_next": "Do not rerender index226 while candidate/source fingerprint is unchanged; retain for eventual isolated in-game validation."
+          "required_next": "Do not rerender while source/candidate fingerprint remains unchanged; eventual isolated in-game validation remains separate."
         }
       ],
       "readiness_reconciliation": {
-        "classification": "B00216_PRODUCER_CONTRACT_REPAIR_PASS_INDEX226_STATIC_QA_REPROMOTED",
+        "classification": "A00215_PASS_INDEX222_RENDER_READY__B00216_DUPLICATE_QA_IDENTITY_SUPERSEDED_BY_Q00046",
         "production_readiness": {
+          "222": "RENDER_READY",
           "226": "STATIC_QA_PASS_RUNTIME_UNTESTED"
         },
-        "render_ready_indices": [],
+        "render_ready_indices": [
+          222
+        ],
         "one_stage_to_render_indices": [],
         "candidate_qa_pending_indices": [
           159,
@@ -747,7 +903,6 @@
         ],
         "preflight_only_candidate_completion_indices": [
           133,
-          222,
           232
         ],
         "already_rendered_static_qa_pass_indices": [
@@ -759,82 +914,45 @@
           237
         ],
         "direct_rework_candidate_indices": [],
-        "out_of_batch_producer_qa_pending": [
-          {
-            "task_id": "LOCALIZATION-LOCALIZATION_A-00208",
-            "result_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
-            "indices": [
-              198
-            ],
-            "kind": "CANDIDATE"
-          },
-          {
-            "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
-            "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837",
-            "indices": [
-              232
-            ],
-            "kind": "PREGEN"
-          },
-          {
-            "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
-            "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6",
-            "indices": [
-              133
-            ],
-            "kind": "PREGEN"
-          },
-          {
-            "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
-            "result_sha": "e607e79b45c5c5cbdad4469f0eb6b1ce19d4f639",
-            "indices": [
-              220
-            ],
-            "kind": "PREGEN"
-          },
-          {
-            "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
-            "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
-            "indices": [
-              222
-            ],
-            "kind": "PREGEN_LATE_ARRIVAL_AFTER_Q00046_DISPATCH"
-          }
-        ],
         "candidate_completion_priority": [
-          "STATIC_QA index226 restored from unchanged verified candidate after producer-contract repair; do not rerender.",
-          "Candidate QA remains pending for 159/198/201; out-of-batch A00215@index222 and B00211@index232/B00213@index133/B00214@index220 require later C disposition.",
-          "Counts after Q00046 shared-state reconciliation target actionable localize_text 93, pending production 70, canonical segments 753."
+          "RENDER_READY index222/DDF0392A is newly accepted by Q00047 and is sticky until producer A attempts the Korean candidate or records a deterministic blocker.",
+          "Candidate QA remains pending for 159/198/201. Out-of-batch B00211@index232, B00213@index133 and B00214@index220 still require their own C dispositions; later producer results present on branch are not retroactively included in Q00047.",
+          "Index226 remains STATIC_QA_PASS from Q00046; do not rerender unchanged content."
         ]
       },
       "material_deliverable": {
-        "type": "INDEPENDENT_C_QA_PRODUCER_CONTRACT_REPAIR_REPROMOTION",
+        "type": "INDEPENDENT_C_QA_PREGEN_REPLAY_AND_RENDER_READY_PROMOTION",
         "reviewed_indices": [
+          222,
           226
         ],
-        "reviewed_assets": 1,
+        "reviewed_assets": 2,
         "producer_inputs_pass": 1,
         "producer_inputs_rework_required": 0,
         "producer_inputs_hold_strict_recheck": 0,
-        "producer_inputs_superseded": 0,
+        "producer_inputs_superseded": 1,
         "metadata_segments_changed": 0,
         "canonical_segments_after_merge": 753,
         "actionable_localize_text_after": 93,
         "pending_production_localize_text_after": 70,
         "candidate_dds_modified_by_c": false,
-        "new_static_artwork_passes": 1,
+        "new_render_ready": 1,
+        "new_static_artwork_passes": 0,
         "new_runtime_approvals": 0,
-        "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json"
+        "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00220.json"
       },
       "evidence": [
-        "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00216.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-        "localization/graphics/role_B/20260930-B00216-P00114/B00216_P00114_INDEX226_VERIFIER_PASS_REEMISSION.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-        "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-        "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-        "localization/graphics/role_C/20260930-0545-C147-A2/C147_Q00045_ATTEMPT2_GATE_REPAIR.json@5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527"
+        "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00215.json@64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "localization/graphics/role_A/20260930-A00215-P00113/A00215_P00113_INDEX222_BINDING_MASK_CLEANPLATE_PREFLIGHT.json@64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "localization/graphics/transcriptions.jsonl@64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "localization/graphics/artwork_plan.jsonl@64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json@8bd95944dbff05900a6755c9546741f70af018c3",
+        "Localization Automation Gate 36631638860 success on b562b57de350fce90397ac9bbcab0c9fbd04db92",
+        "Localization Automation Gate 36633656775 failure on 7e4f97b3af23c09f86c63e4570e70e84b5cf0f93: verify_state progress mirror drift only"
       ],
       "candidate_dds_modified": false,
-      "new_static_artwork_passes": 1,
+      "new_render_ready": 1,
+      "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
       "shared_state_modified": true,
       "peer_candidate_files_modified": false,
@@ -845,24 +963,32 @@
       "gpt_library_used": false,
       "google_drive_used": false,
       "google_drive_write_performed": false,
-      "uploaded_archive_used": false,
+      "uploaded_archive_used": true,
+      "uploaded_archive_purpose": "independent exact-source replay only; GitHub branch remains state/progress/QA SSOT",
       "vr_ffb_dx_changes": false,
-      "automation_validation": "PASS",
+      "automation_validation": "PENDING",
       "validation_mode": "C_BATCH_GATE",
       "runtime_validation": "UNTESTED",
-      "result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
-      "validation_bearing_result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
-      "bookkeeping_note": "Q00046 Gate result recorded after the validation-bearing C result commit. This bookkeeping commit is separate and does not replace the validation owner. Shared queue/progress/resume/worklog now reflect index226 STATIC_QA re-promotion; runtime remains UNTESTED.",
-      "automation_gate": {
-        "workflow": "Localization Automation Gate",
-        "run_id": 36631638860,
-        "run_attempt": 1,
-        "head_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
-        "status": "completed",
-        "conclusion": "success",
-        "validated_at_kst": "2026-09-30T06:12:14+09:00"
+      "result_sha": "PENDING_POST_COMMIT",
+      "validation_bearing_result_sha": "PENDING_POST_COMMIT",
+      "bookkeeping_note": "ATTEMPT2 is the replacement validation-bearing AUTO result after attempt1 failed only on pre-existing progress mirror drift. Do not add CI-skip. After this result Gate completes, record the authoritative SHA/Gate in a separate bookkeeping commit.",
+      "prior_failed_attempt": {
+        "result_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+        "gate_run_id": 36633656775,
+        "conclusion": "failure",
+        "failed_step": "Verify localization state",
+        "exact_error": "compatibility progress path localization/progress.json is out of sync with localization/progress/progress.json",
+        "qa_findings_changed": false,
+        "heavy_qa_repeated": false
       },
-      "bookkeeping_recorded_at_kst": "2026-09-30T06:12:14+09:00"
+      "progress_mirror_repair": {
+        "canonical_path": "localization/progress/progress.json",
+        "canonical_blob_sha_before": "c33af44f17fbb71c870e4fbe5f99fadcb9f2f82f",
+        "compatibility_path": "localization/progress.json",
+        "compatibility_blob_sha_before": "8de512aeca28aafb12be845b9ed39611c7b54d0d",
+        "byte_identical_before": false,
+        "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT"
+      }
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -1008,29 +1134,39 @@
   },
   "latest_c_batch_qa": {
     "schema_version": 14,
-    "schema": "outrun-c148-q00046-index226-contract-repromotion-v1",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00217",
-    "wave_id": "Q00046",
-    "qa_batch_id": "Q00046",
-    "run": "C148",
+    "schema": "outrun-c149-q00047-attempt2-progress-mirror-repair-v1",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00220",
+    "wave_id": "Q00047",
+    "qa_batch_id": "Q00047",
+    "run": "C149",
     "lane": "LOCALIZATION_C",
     "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
     "target_branch": "korean-localization-clean",
-    "attempt": "1/3",
+    "attempt": "2/3",
     "chat_rollover": 1,
-    "recorded_at_kst": "2026-09-30T06:08:00+09:00",
-    "base_head_sha": "0f64ce4ffc76ea88ccc12da51f83f2964f177efc",
-    "base_sha": "0f64ce4ffc76ea88ccc12da51f83f2964f177efc",
-    "commit_mode": "C_BATCH_VALIDATION_BEARING_RESULT__INDEX226_PRODUCER_CONTRACT_REPROMOTION",
-    "result": "PASS_Q00046_B00216_INDEX226_FRESH_VERIFIER_PASS_RESULT__STATIC_QA_REPROMOTED_RUNTIME_UNTESTED",
-    "summary": "Q00046 consumes only B00216's immutable fresh producer result. B00216 re-emits the already C-validated index226/E3F4BA07 candidate without changing DDS/review bytes, and adds verifier-recognized machine-readable PASS evidence. C independently confirms the exact producer commit carries the AUTO marker, the candidate Git blob and mandatory source/clean/candidate/comparison/element-comparison/prompt lineage are byte-identical to the previously reproduced C147 content-QA set, and the fresh QA JSON exposes PASS provenance plus zero outside-edit/protected/alpha escape metrics. The prior Q00045 producer-contract blocker is therefore repaired and index226 is re-promoted to STATIC_QA_PASS while runtime remains UNTESTED. A00215@index222 completed after Q00046 dispatch and is preserved as out-of-batch QA-pending rather than being retroactively added to this batch.",
+    "recorded_at_kst": "2026-09-30T06:31:19+09:00",
+    "base_head_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+    "base_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+    "commit_mode": "ATOMIC_C_BATCH_ATTEMPT2_PROGRESS_MIRROR_REPAIR_AND_SINGLE_SHARED_STATE_MERGE",
+    "result": "PASS_Q00047_A00215_RENDER_READY__B00216_SUPERSEDED_ALREADY_CONSUMED_Q00046__ATTEMPT2_PROGRESS_MIRROR_REPAIR_RUNTIME_UNTESTED",
+    "summary": "Q00047 ATTEMPT2 preserves the attempt-1 QA findings without repeating heavy checks. A00215@index222 remains PASS / RENDER_READY from the independently reproduced canonical DDF0392A source, six semantic bindings, six source-effect masks, deterministic CLEAN_PLATE and final 2px safe bboxes. B00216@index226 remains SUPERSEDED only for Q00047 de-dup because the exact TASK_ID@RESULT_SHA was already authoritatively consumed by C148/Q00046; index226 stays STATIC_QA_PASS_RUNTIME_UNTESTED. Attempt-1 result 7e4f97b3 failed Localization Automation Gate run 36633656775 solely because the pre-existing compatibility progress mirror localization/progress.json did not match canonical localization/progress/progress.json. ATTEMPT2 repairs that drift and merges Q00047 shared state once. Runtime remains UNTESTED.",
     "qa_batch_inputs": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "result_message": "localization(A): preflight index222 exact binding and clean plate [AUTO:LOCALIZATION-LOCALIZATION_A-00215]",
+        "completed_at": "2026-09-30T06:06:55.115545+09:00",
+        "producer_id": "P00113",
+        "automation_validation": "PENDING",
+        "validation_mode": "C_BATCH_GATE"
+      },
       {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
         "lane": "LOCALIZATION_B",
         "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
         "result_message": "localization(B): re-emit index226 verifier PASS evidence [AUTO:LOCALIZATION-LOCALIZATION_B-00216]",
-        "completed_at": "2026-09-30T05:56:06+09:00",
+        "completed_at": "2026-09-30T06:11:31.831352+09:00",
         "producer_id": "P00114",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
@@ -1038,70 +1174,216 @@
     ],
     "qa_dispositions": [
       {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+        "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "status": "PASS",
+        "reason": "PASS: C independently reproduced the exact pinned archive SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958 and DDF0392A member SHA-256 bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72 (2,097,280 bytes), DXT5 1024x2048 mip1, FLIP_Y readable transform, raw/readable decoded RGBA hashes, all six canonical semantic bindings and 19 preserve-original regions. Replaying alpha>0 within exact regions 0/1/2/3/6/7 reproduces per-region mask counts 11883/7402/14349/6407/8102/8472, aggregate 56,615, aggregate mask SHA-256 f2c2cfb1c5b743005692433719db60fee56597a3d11368b35d8902deff642408, CLEAN_PLATE readable/raw SHA-256 ecf8d502b699cb94af1d2af1563c8c7e630afd926dbe8ed37c54e903ea7608e1 / c75279677800c75db338aaa5285b6e64dded5f4b4c7f67452e7686aaef21447f, zero outside-mask/alpha/protected changes, zero localized-cell alpha after cleaning, and exact 2px-inset candidate-safe bboxes. No candidate exists, so candidate-only DDS/visual gates are not applicable. production_readiness=RENDER_READY; runtime remains UNTESTED."
+      },
+      {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
         "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-        "status": "PASS",
-        "reason": "PASS: fresh producer result contains verifier-recognized machine-readable PASS evidence for index226/E3F4BA07. Candidate DDS Git blob 11260e86b2a088767907c2aa5ad0fd064acd7366 is unchanged from the previously independently reproduced C147 content-QA candidate; mandatory review/prompt artifact Git blobs are also unchanged. Fresh QA records provide status=PASS, exact source/candidate SHA-256, v2 prompt hashes, signed_slant_gate=PASS, runtime_validation=UNTESTED and zero outside-edit/protected/alpha escape metrics. No rerender or heavy pixel replay is required because the content fingerprint is unchanged."
+        "status": "SUPERSEDED",
+        "reason": "SUPERSEDED for Q00047 de-dup only: exact identity B00216@1ff1bc8 was already consumed as PASS by C148/Q00046 validation-bearing result b562b57de350fce90397ac9bbcab0c9fbd04db92 and Localization Automation Gate run 36631638860 success. Re-running the same immutable QA identity would violate the controller's duplicate/no-op optimization. Index226/E3F4BA07 retains the existing STATIC_QA_PASS_RUNTIME_UNTESTED state; this disposition does not revoke or replace Q00046."
       }
     ],
-    "producer_contract_repair": {
-      "prior_rework_task_id": "LOCALIZATION-LOCALIZATION_B-00209",
-      "prior_rework_result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
-      "prior_authoritative_c_result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
-      "prior_gate_failure": "DDS changed but no machine-readable PASS record exists in changed QA JSON",
-      "fresh_result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-      "fresh_contract_status": "PASS_MACHINE_READABLE_PROVENANCE_AND_ZERO_PIXEL_FIELDS_PRESENT",
-      "source_or_candidate_fingerprint_changed": false
-    },
-    "lineage_recheck": {
-      "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
-      "source_display_png_blob_sha": "f9a40e94e9f50e2898b4dd22354b5e2408dba96b",
-      "clean_plate_display_png_blob_sha": "281eb4feb4ab68e2683421976439ad6502043d4d",
-      "candidate_display_png_blob_sha": "acce429b1005cd7b279637c78c6f0ff6adee63ac",
-      "comparison_png_blob_sha": "eb4a537f44a4c717b452aa0c924dc5598c99a644",
-      "element_comparison_png_blob_sha": "b1e1be0bc1e24fc5d720a87653174f2deb65e897",
-      "generation_prompt_blob_sha": "b8f328e4f4b556509c6785eeec9f55025138a3c3",
-      "all_equal_to_prior_c147_verified_lineage": true
-    },
-    "content_level_qa_reuse": {
-      "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
-      "source_git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
-      "source_format": "RGBA32",
-      "source_canvas": [
-        2048,
-        512
+    "independent_replay": {
+      "archive": {
+        "name": "OR2-HD-GUI-v0.25.10a.zip",
+        "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+      },
+      "source": {
+        "index": 222,
+        "asset_id": "DDF0392A",
+        "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+        "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+        "bytes": 2097280,
+        "width": 1024,
+        "height": 2048,
+        "dds_format": "DXT5",
+        "mipmaps": 1,
+        "raw_to_readable": "flip_y",
+        "decoded_raw_rgba_sha256": "6b053c75c6074d6ebb16bfe0a38b3a770923c223beb281ab1611872cf271659f",
+        "decoded_readable_rgba_sha256": "8d2de43a8575aa0661f1013fbd8929964c44c3cabb31b2e09b2b7779b75ab5c3"
+      },
+      "canonical_semantics": {
+        "status": "PASS_6_OF_6_EXACT_CURRENT_TRANSCRIPTION",
+        "localized": [
+          [
+            "OutRun Mode / 15 C.",
+            "아웃런 모드 / 15코스",
+            0
+          ],
+          [
+            "OutRun 1986",
+            "아웃런 1986",
+            1
+          ],
+          [
+            "Journey Mode / Random",
+            "저니 모드 / 무작위",
+            2
+          ],
+          [
+            "Who Are You?",
+            "당신은 누구?",
+            3
+          ],
+          [
+            "Shake The Street",
+            "거리를 뒤흔들어라",
+            6
+          ],
+          [
+            "Rush A Difficulty",
+            "난이도에 도전",
+            7
+          ]
+        ],
+        "protected_original_count": 19,
+        "protected_original_summary": "4 song titles + 15 Ferrari model names"
+      },
+      "masks": [
+        {
+          "region_index": 0,
+          "pixels": 11883,
+          "mask_sha256": "2ce842e4548201e2c50e088f709f14b5ac2a35e80ea8fbdb5f2784056858f1f7",
+          "source_effect_bbox_local_xyxy": [
+            6,
+            14,
+            548,
+            66
+          ],
+          "candidate_safe_bbox_local_xyxy": [
+            8,
+            16,
+            546,
+            64
+          ]
+        },
+        {
+          "region_index": 1,
+          "pixels": 7402,
+          "mask_sha256": "349ff963d0aebf0ae1fe6909cd4d9ce18d7909dde19be119220e81660c4a78d5",
+          "source_effect_bbox_local_xyxy": [
+            4,
+            17,
+            333,
+            61
+          ],
+          "candidate_safe_bbox_local_xyxy": [
+            6,
+            19,
+            331,
+            59
+          ]
+        },
+        {
+          "region_index": 2,
+          "pixels": 14349,
+          "mask_sha256": "b8f773f47536dfa3917eece034fed358323d2f15a87cbfbb09f34bade3bf4dbe",
+          "source_effect_bbox_local_xyxy": [
+            2,
+            10,
+            627,
+            68
+          ],
+          "candidate_safe_bbox_local_xyxy": [
+            4,
+            12,
+            625,
+            66
+          ]
+        },
+        {
+          "region_index": 3,
+          "pixels": 6407,
+          "mask_sha256": "72051598ae3662c21e347666deb6bc825e13e1c3099ec9cf8e0e10fdea2f32c5",
+          "source_effect_bbox_local_xyxy": [
+            2,
+            17,
+            342,
+            60
+          ],
+          "candidate_safe_bbox_local_xyxy": [
+            4,
+            19,
+            340,
+            58
+          ]
+        },
+        {
+          "region_index": 6,
+          "pixels": 8102,
+          "mask_sha256": "669eb0c12e6b6a3e4e4c3b3828a7afa4e50dc7751a535a4d2f36ed214403bbc1",
+          "source_effect_bbox_local_xyxy": [
+            3,
+            17,
+            419,
+            60
+          ],
+          "candidate_safe_bbox_local_xyxy": [
+            5,
+            19,
+            417,
+            58
+          ]
+        },
+        {
+          "region_index": 7,
+          "pixels": 8472,
+          "mask_sha256": "e435df981046fe8ebe4bc7355473dfb29010699f6d947f7e6944de5f508146d5",
+          "source_effect_bbox_local_xyxy": [
+            6,
+            17,
+            421,
+            70
+          ],
+          "candidate_safe_bbox_local_xyxy": [
+            8,
+            19,
+            419,
+            68
+          ]
+        }
       ],
-      "source_mipmaps": 1,
-      "raw_to_readable": "flip_y",
-      "removal_mask_pixels": 84629,
-      "removal_mask_raw_sha256": "dcc28d8da195df03de5f3a8fbfc71a5dbf3d88a70146479541432c5f96c1a6ee",
-      "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
-      "candidate_sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
-      "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
-      "containment": "PASS_8_OF_8_AT_LEAST_2PX_INSIDE_ORIGINAL_SOURCE_EFFECT_ENVELOPES",
-      "changed_pixels_outside_allowed_edit_mask": 0,
-      "alpha_changed_pixels_outside_allowed_edit_mask": 0,
-      "changed_pixels_in_protected_cells": 0,
-      "visual_review": "PASS_REUSED_UNCHANGED_FINGERPRINT_FROM_C147_NATIVE_AND_NN2X_REVIEW",
-      "repeated_heavy_checks": false
+      "aggregate_removal_mask_pixels": 56615,
+      "aggregate_removal_mask_sha256": "f2c2cfb1c5b743005692433719db60fee56597a3d11368b35d8902deff642408",
+      "clean_plate_readable_rgba_sha256": "ecf8d502b699cb94af1d2af1563c8c7e630afd926dbe8ed37c54e903ea7608e1",
+      "clean_plate_raw_rgba_sha256": "c75279677800c75db338aaa5285b6e64dded5f4b4c7f67452e7686aaef21447f",
+      "changed_pixels_outside_removal_mask": 0,
+      "alpha_changed_pixels_outside_removal_mask": 0,
+      "changed_pixels_in_protected_regions": 0,
+      "localized_cells_nonzero_alpha_after_clean_plate": 0,
+      "safe_bbox_gate": "PASS_6_OF_6_EXACT_2PX_INSET_FROM_SOURCE_EFFECT_BBOX"
     },
     "reviewed_assets": [
       {
+        "index": 222,
+        "asset": "DDF0392A",
+        "disposition": "PASS",
+        "production_readiness": "RENDER_READY",
+        "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE",
+        "runtime_validation": "UNTESTED",
+        "required_next": "Producer A: treat Q00047 RENDER_READY as sticky. Measure source typography/baseline/signed slant, render/refit/encode/persist the outrun-first-pass-edit-v2 Korean DDS candidate and mandatory GitHub PNG review set in the same invocation; then submit a fresh immutable producer result for C candidate QA."
+      },
+      {
         "index": 226,
         "asset": "E3F4BA07",
-        "disposition": "PASS",
+        "disposition": "SUPERSEDED_ALREADY_CONSUMED_Q00046",
         "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
-        "static_qa": "PASS",
         "runtime_validation": "UNTESTED",
-        "required_next": "Do not rerender index226 while candidate/source fingerprint is unchanged; retain for eventual isolated in-game validation."
+        "required_next": "Do not rerender while source/candidate fingerprint remains unchanged; eventual isolated in-game validation remains separate."
       }
     ],
     "readiness_reconciliation": {
-      "classification": "B00216_PRODUCER_CONTRACT_REPAIR_PASS_INDEX226_STATIC_QA_REPROMOTED",
+      "classification": "A00215_PASS_INDEX222_RENDER_READY__B00216_DUPLICATE_QA_IDENTITY_SUPERSEDED_BY_Q00046",
       "production_readiness": {
+        "222": "RENDER_READY",
         "226": "STATIC_QA_PASS_RUNTIME_UNTESTED"
       },
-      "render_ready_indices": [],
+      "render_ready_indices": [
+        222
+      ],
       "one_stage_to_render_indices": [],
       "candidate_qa_pending_indices": [
         159,
@@ -1110,7 +1392,6 @@
       ],
       "preflight_only_candidate_completion_indices": [
         133,
-        222,
         232
       ],
       "already_rendered_static_qa_pass_indices": [
@@ -1122,82 +1403,45 @@
         237
       ],
       "direct_rework_candidate_indices": [],
-      "out_of_batch_producer_qa_pending": [
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00208",
-          "result_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
-          "indices": [
-            198
-          ],
-          "kind": "CANDIDATE"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
-          "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837",
-          "indices": [
-            232
-          ],
-          "kind": "PREGEN"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
-          "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6",
-          "indices": [
-            133
-          ],
-          "kind": "PREGEN"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
-          "result_sha": "e607e79b45c5c5cbdad4469f0eb6b1ce19d4f639",
-          "indices": [
-            220
-          ],
-          "kind": "PREGEN"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
-          "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
-          "indices": [
-            222
-          ],
-          "kind": "PREGEN_LATE_ARRIVAL_AFTER_Q00046_DISPATCH"
-        }
-      ],
       "candidate_completion_priority": [
-        "STATIC_QA index226 restored from unchanged verified candidate after producer-contract repair; do not rerender.",
-        "Candidate QA remains pending for 159/198/201; out-of-batch A00215@index222 and B00211@index232/B00213@index133/B00214@index220 require later C disposition.",
-        "Counts after Q00046 shared-state reconciliation target actionable localize_text 93, pending production 70, canonical segments 753."
+        "RENDER_READY index222/DDF0392A is newly accepted by Q00047 and is sticky until producer A attempts the Korean candidate or records a deterministic blocker.",
+        "Candidate QA remains pending for 159/198/201. Out-of-batch B00211@index232, B00213@index133 and B00214@index220 still require their own C dispositions; later producer results present on branch are not retroactively included in Q00047.",
+        "Index226 remains STATIC_QA_PASS from Q00046; do not rerender unchanged content."
       ]
     },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_QA_PRODUCER_CONTRACT_REPAIR_REPROMOTION",
+      "type": "INDEPENDENT_C_QA_PREGEN_REPLAY_AND_RENDER_READY_PROMOTION",
       "reviewed_indices": [
+        222,
         226
       ],
-      "reviewed_assets": 1,
+      "reviewed_assets": 2,
       "producer_inputs_pass": 1,
       "producer_inputs_rework_required": 0,
       "producer_inputs_hold_strict_recheck": 0,
-      "producer_inputs_superseded": 0,
+      "producer_inputs_superseded": 1,
       "metadata_segments_changed": 0,
       "canonical_segments_after_merge": 753,
       "actionable_localize_text_after": 93,
       "pending_production_localize_text_after": 70,
       "candidate_dds_modified_by_c": false,
-      "new_static_artwork_passes": 1,
+      "new_render_ready": 1,
+      "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
-      "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json"
+      "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00220.json"
     },
     "evidence": [
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00216.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-      "localization/graphics/role_B/20260930-B00216-P00114/B00216_P00114_INDEX226_VERIFIER_PASS_REEMISSION.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-      "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-      "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
-      "localization/graphics/role_C/20260930-0545-C147-A2/C147_Q00045_ATTEMPT2_GATE_REPAIR.json@5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527"
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00215.json@64e756e0cfba3b141a2e94915168f709a1a226a3",
+      "localization/graphics/role_A/20260930-A00215-P00113/A00215_P00113_INDEX222_BINDING_MASK_CLEANPLATE_PREFLIGHT.json@64e756e0cfba3b141a2e94915168f709a1a226a3",
+      "localization/graphics/transcriptions.jsonl@64e756e0cfba3b141a2e94915168f709a1a226a3",
+      "localization/graphics/artwork_plan.jsonl@64e756e0cfba3b141a2e94915168f709a1a226a3",
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json@8bd95944dbff05900a6755c9546741f70af018c3",
+      "Localization Automation Gate 36631638860 success on b562b57de350fce90397ac9bbcab0c9fbd04db92",
+      "Localization Automation Gate 36633656775 failure on 7e4f97b3af23c09f86c63e4570e70e84b5cf0f93: verify_state progress mirror drift only"
     ],
     "candidate_dds_modified": false,
-    "new_static_artwork_passes": 1,
+    "new_render_ready": 1,
+    "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "shared_state_modified": true,
     "peer_candidate_files_modified": false,
@@ -1208,23 +1452,31 @@
     "gpt_library_used": false,
     "google_drive_used": false,
     "google_drive_write_performed": false,
-    "uploaded_archive_used": false,
+    "uploaded_archive_used": true,
+    "uploaded_archive_purpose": "independent exact-source replay only; GitHub branch remains state/progress/QA SSOT",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
-    "validation_bearing_result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
-    "bookkeeping_note": "Q00046 Gate result recorded after the validation-bearing C result commit. This bookkeeping commit is separate and does not replace the validation owner. Shared queue/progress/resume/worklog now reflect index226 STATIC_QA re-promotion; runtime remains UNTESTED.",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36631638860,
-      "run_attempt": 1,
-      "head_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-09-30T06:12:14+09:00"
+    "result_sha": "PENDING_POST_COMMIT",
+    "validation_bearing_result_sha": "PENDING_POST_COMMIT",
+    "bookkeeping_note": "ATTEMPT2 is the replacement validation-bearing AUTO result after attempt1 failed only on pre-existing progress mirror drift. Do not add CI-skip. After this result Gate completes, record the authoritative SHA/Gate in a separate bookkeeping commit.",
+    "prior_failed_attempt": {
+      "result_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+      "gate_run_id": 36633656775,
+      "conclusion": "failure",
+      "failed_step": "Verify localization state",
+      "exact_error": "compatibility progress path localization/progress.json is out of sync with localization/progress/progress.json",
+      "qa_findings_changed": false,
+      "heavy_qa_repeated": false
     },
-    "bookkeeping_recorded_at_kst": "2026-09-30T06:12:14+09:00"
+    "progress_mirror_repair": {
+      "canonical_path": "localization/progress/progress.json",
+      "canonical_blob_sha_before": "c33af44f17fbb71c870e4fbe5f99fadcb9f2f82f",
+      "compatibility_path": "localization/progress.json",
+      "compatibility_blob_sha_before": "8de512aeca28aafb12be845b9ed39611c7b54d0d",
+      "byte_identical_before": false,
+      "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT"
+    }
   }
 }

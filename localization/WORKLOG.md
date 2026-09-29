@@ -1871,3 +1871,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B00216 disposition remains **PASS** and index226 STATIC_QA promotion is authoritative for static QA only; runtime remains **UNTESTED**.
 - This bookkeeping checkpoint is separate from the validation-bearing result and does not replace its validation ownership. Shared queue/progress/resume state now records pending production **70**, actionable localize_text **93**, canonical segments **753**.
 
+## 2026-09-30 06:31 KST - C149 Q00047 ATTEMPT2 GATE REPAIR + SHARED MERGE
+- Attempt1 validation-bearing result `7e4f97b3af23c09f86c63e4570e70e84b5cf0f93` failed Localization Automation Gate `36633656775` only at `verify_state.py`: compatibility `localization/progress.json` differed from canonical `localization/progress/progress.json`. No producer QA check ran and no A00215 heavy QA finding changed.
+- ATTEMPT2 keeps A00215@index222 **PASS / RENDER_READY** and B00216@index226 **SUPERSEDED for de-dup only** because B00216 was already authoritatively consumed by C148/Q00046. Index226 remains STATIC_QA PASS / RUNTIME_UNTESTED.
+- Index222 exact replay remains: pinned DDF0392A source 1024x2048 DXT5 mip1 FLIP_Y; 6/6 semantics; six effect masks totaling **56,615 px**; CLEAN_PLATE hashes `ecf8d502...` / `c7527967...`; zero outside-mask/alpha/protected changes; six exact 2px safe bboxes. No Korean DDS candidate exists yet.
+- Shared merge records index222 RENDER_READY while keeping its queue artwork status pending until an actual candidate is produced. Canonical and legacy progress are written byte-for-byte identical in this result commit.
+- Pending production remains **70**, actionable localize_text **93**, canonical segments **753**. No DDS/runtime approval/build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+

@@ -1,6 +1,6 @@
 {
   "schema_version": 14,
-  "schema": "outrun-c149-q00047-index222-render-ready-dedup-v1",
+  "schema": "outrun-c149-q00047-attempt2-progress-mirror-repair-v1",
   "task_id": "LOCALIZATION-LOCALIZATION_C-00220",
   "wave_id": "Q00047",
   "qa_batch_id": "Q00047",
@@ -8,21 +8,21 @@
   "lane": "LOCALIZATION_C",
   "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
   "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "chat_rollover": 1,
-  "recorded_at_kst": "2026-09-30T06:29:00+09:00",
-  "base_head_sha": "243204dcd960512fe4f4477743355bd60094589f",
-  "base_sha": "243204dcd960512fe4f4477743355bd60094589f",
-  "commit_mode": "C_BATCH_VALIDATION_BEARING_RESULT__INDEX222_INDEPENDENT_PREGEN_REPLAY__B00216_DEDUP_SUPERSEDED",
-  "result": "PASS_Q00047_A00215_INDEX222_RENDER_READY__B00216_SUPERSEDED_ALREADY_CONSUMED_Q00046_RUNTIME_UNTESTED",
-  "summary": "Q00047 consumes the immutable A00215@index222 pre-generation result and independently replays its exact HD source, semantic binding, source-effect masks, deterministic CLEAN_PLATE and final 2px safe-bbox evidence. The pinned OR2-HD-GUI-v0.25.10a archive and DDF0392A member hashes reproduce exactly; Pillow DXT5 decode reproduces the producer raw/readable RGBA hashes, all six local effect masks, aggregate 56,615-pixel removal mask and both CLEAN_PLATE hashes with zero outside-mask, protected-region or alpha escape. The six canonical localizable strings bind to regions 0/1/2/3/6/7 while four song titles and fifteen Ferrari model names remain protected original. Index222 is therefore promoted to RENDER_READY, not STATIC_QA, because no Korean DDS candidate exists yet. B00216@index226 is the second immutable dispatch input but exact TASK_ID@RESULT_SHA was already authoritatively consumed by C148/Q00046 and Gate run 36631638860; Q00047 records SUPERSEDED to avoid duplicate/no-op QA and leaves index226 STATIC_QA_PASS_RUNTIME_UNTESTED unchanged. Producer results committed after Q00047 dispatch are out-of-batch and are not retroactively added.",
+  "recorded_at_kst": "2026-09-30T06:31:19+09:00",
+  "base_head_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+  "base_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+  "commit_mode": "ATOMIC_C_BATCH_ATTEMPT2_PROGRESS_MIRROR_REPAIR_AND_SINGLE_SHARED_STATE_MERGE",
+  "result": "PASS_Q00047_A00215_RENDER_READY__B00216_SUPERSEDED_ALREADY_CONSUMED_Q00046__ATTEMPT2_PROGRESS_MIRROR_REPAIR_RUNTIME_UNTESTED",
+  "summary": "Q00047 ATTEMPT2 preserves the attempt-1 QA findings without repeating heavy checks. A00215@index222 remains PASS / RENDER_READY from the independently reproduced canonical DDF0392A source, six semantic bindings, six source-effect masks, deterministic CLEAN_PLATE and final 2px safe bboxes. B00216@index226 remains SUPERSEDED only for Q00047 de-dup because the exact TASK_ID@RESULT_SHA was already authoritatively consumed by C148/Q00046; index226 stays STATIC_QA_PASS_RUNTIME_UNTESTED. Attempt-1 result 7e4f97b3 failed Localization Automation Gate run 36633656775 solely because the pre-existing compatibility progress mirror localization/progress.json did not match canonical localization/progress/progress.json. ATTEMPT2 repairs that drift and merges Q00047 shared state once. Runtime remains UNTESTED.",
   "qa_batch_inputs": [
     {
       "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
       "lane": "LOCALIZATION_A",
       "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
       "result_message": "localization(A): preflight index222 exact binding and clean plate [AUTO:LOCALIZATION-LOCALIZATION_A-00215]",
-      "completed_at": "2026-09-30T06:04:17+09:00",
+      "completed_at": "2026-09-30T06:06:55.115545+09:00",
       "producer_id": "P00113",
       "automation_validation": "PENDING",
       "validation_mode": "C_BATCH_GATE"
@@ -32,10 +32,9 @@
       "lane": "LOCALIZATION_B",
       "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
       "result_message": "localization(B): re-emit index226 verifier PASS evidence [AUTO:LOCALIZATION-LOCALIZATION_B-00216]",
-      "completed_at": "2026-09-30T05:56:06+09:00",
+      "completed_at": "2026-09-30T06:11:31.831352+09:00",
       "producer_id": "P00114",
-      "automation_validation_at_dispatch": "PENDING",
-      "current_authoritative_validation": "PASS_BY_C148_Q00046_GATE_36631638860",
+      "automation_validation": "PENDING",
       "validation_mode": "C_BATCH_GATE"
     }
   ],
@@ -303,13 +302,14 @@
     "localization/graphics/transcriptions.jsonl@64e756e0cfba3b141a2e94915168f709a1a226a3",
     "localization/graphics/artwork_plan.jsonl@64e756e0cfba3b141a2e94915168f709a1a226a3",
     "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json@8bd95944dbff05900a6755c9546741f70af018c3",
-    "Localization Automation Gate 36631638860 success on b562b57de350fce90397ac9bbcab0c9fbd04db92"
+    "Localization Automation Gate 36631638860 success on b562b57de350fce90397ac9bbcab0c9fbd04db92",
+    "Localization Automation Gate 36633656775 failure on 7e4f97b3af23c09f86c63e4570e70e84b5cf0f93: verify_state progress mirror drift only"
   ],
   "candidate_dds_modified": false,
   "new_render_ready": 1,
   "new_static_artwork_passes": 0,
   "new_runtime_approvals": 0,
-  "shared_state_modified": false,
+  "shared_state_modified": true,
   "peer_candidate_files_modified": false,
   "runtime_test_performed": false,
   "build_performed": false,
@@ -326,5 +326,22 @@
   "runtime_validation": "UNTESTED",
   "result_sha": "PENDING_POST_COMMIT",
   "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-  "bookkeeping_note": "This AUTO result commit is the Q00047 validation owner. Do not add CI-skip. After Localization Automation Gate completes, record its result and reconcile shared queue/progress/resume/worklog in a separate bookkeeping commit without changing validation ownership."
+  "bookkeeping_note": "ATTEMPT2 is the replacement validation-bearing AUTO result after attempt1 failed only on pre-existing progress mirror drift. Do not add CI-skip. After this result Gate completes, record the authoritative SHA/Gate in a separate bookkeeping commit.",
+  "prior_failed_attempt": {
+    "result_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
+    "gate_run_id": 36633656775,
+    "conclusion": "failure",
+    "failed_step": "Verify localization state",
+    "exact_error": "compatibility progress path localization/progress.json is out of sync with localization/progress/progress.json",
+    "qa_findings_changed": false,
+    "heavy_qa_repeated": false
+  },
+  "progress_mirror_repair": {
+    "canonical_path": "localization/progress/progress.json",
+    "canonical_blob_sha_before": "c33af44f17fbb71c870e4fbe5f99fadcb9f2f82f",
+    "compatibility_path": "localization/progress.json",
+    "compatibility_blob_sha_before": "8de512aeca28aafb12be845b9ed39611c7b54d0d",
+    "byte_identical_before": false,
+    "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT"
+  }
 }
