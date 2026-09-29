@@ -1758,7 +1758,6 @@ namespace OutRunVRStereo
             if (R73OutRunTransientHudPresents > 0)
                 --R73OutRunTransientHudPresents;
             R67GuardStageTransitionPresent();
-            R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
                 StereoWanted() && FrameHadWorldStereo &&
@@ -1768,7 +1767,7 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 R30ApplyStereoSkyGlow(device);
             }
-            return R30PresentR29Hook.stdcall<HRESULT>(
+            return R30PresentR26Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
         }
