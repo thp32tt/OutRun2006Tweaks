@@ -1,0 +1,236 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00190-p00097-mod3-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00190",
+  "wave_id": "P00097",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T02:51:03+09:00",
+  "base_head_sha": "dc1694e42af30a422614b31cd9b7038a11de5b29",
+  "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+  "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+  "current_queue_blob_sha": "d070bbbf999dd16fdea0536eefe236fa29db4aa9",
+  "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+  "shard_rule": "asset_queue.index % 3 == 1",
+  "selection": {
+    "selected_indices": [
+      46,
+      100,
+      106
+    ],
+    "selected_assets": [
+      "AA04D779",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_RUNNABLE_CANDIDATE_SCAN",
+    "reason": "C138/Q00036 leaves no B-owned render-ready or one-stage-to-render item. Existing B-owned reworks 94/121 remain unchanged dependency-blocked; 112/130 are already STATIC_QA PASS and are not rerendered. B00188 indices34/52 are not repeated."
+  },
+  "drive_source_transport": {
+    "account": "ezflash557",
+    "root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "exact_parent_checks": [
+      {
+        "index": 46,
+        "asset": "AA04D779",
+        "relative_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "parent_folder_id": "1XcE9G3jb9V8mx-aLyQqyJL7uc_mKT5tu",
+        "observed_children": [
+          "FF2462BB_1024x512.dds"
+        ],
+        "exact_file_present": false,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      {
+        "index": 100,
+        "asset": "53CE39D5",
+        "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+        "parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
+        "observed_children": [
+          "FD90AA9_1024x1024.dds",
+          "C075FB49_512x512.dds",
+          "411827E_512x512.dds",
+          "2DA43E41_1024x1024.dds"
+        ],
+        "exact_file_present": false,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      {
+        "index": 106,
+        "asset": "788CE557",
+        "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+        "parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
+        "observed_children": [
+          "FD90AA9_1024x1024.dds",
+          "C075FB49_512x512.dds",
+          "411827E_512x512.dds",
+          "2DA43E41_1024x1024.dds"
+        ],
+        "exact_file_present": false,
+        "result": "SOURCE_TRANSPORT_MISS"
+      }
+    ],
+    "exact_path_misses": 3,
+    "read_only": true,
+    "write_performed": false
+  },
+  "pinned_direct": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "files": [
+      {
+        "index": 46,
+        "asset": "AA04D779",
+        "path": "Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "direct_path_resolves": true
+      },
+      {
+        "index": 100,
+        "asset": "53CE39D5",
+        "path": "Release/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+        "git_blob_sha": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
+        "direct_path_resolves": true
+      },
+      {
+        "index": 106,
+        "asset": "788CE557",
+        "path": "Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+        "git_blob_sha": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
+        "direct_path_resolves": true
+      }
+    ]
+  },
+  "canonical_identity_gate": [
+    {
+      "index": 46,
+      "asset": "AA04D779",
+      "canonical": {
+        "sha256": "5a4ca513da3545b7da91e62fd27692f39fc211a93983122a193db79c254f28b0",
+        "width": 512,
+        "height": 512,
+        "format": "RGBA"
+      },
+      "pinned_release_lineage": {
+        "git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 16777344
+      },
+      "lineage_reused_from": "localization/graphics/role_B/20260929-1609-B123-P00022/B123_P00022_EVEN_RELEASE_RGBA32_PAYLOAD_EXTRACTION_SCOPE.json",
+      "prior_c_acceptance": "C110 accepted exact Release payload scope; Release geometry is nonauthoritative for current canonical inventory",
+      "identity_match": false,
+      "mismatch": [
+        "width",
+        "height"
+      ],
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 100,
+      "asset": "53CE39D5",
+      "canonical": {
+        "sha256": "3bfea3882b73ec133cd8badca8f9be67c130d4f4b277c52bbc6d2b1c4014efa5",
+        "width": 512,
+        "height": 512,
+        "format": "RGBA"
+      },
+      "pinned_release_lineage": {
+        "git_blob_sha": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 16777344
+      },
+      "lineage_reused_from": "localization/graphics/role_B/20260929-1618-B124-P00023/B124_P00023_EVEN_RELEASE_PAYLOAD_EXTRACTION_SCOPE.json",
+      "prior_c_acceptance": "C111 accepted exact Release payload scope; current canonical 1x inventory remains authoritative",
+      "identity_match": false,
+      "mismatch": [
+        "width",
+        "height"
+      ],
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 106,
+      "asset": "788CE557",
+      "canonical": {
+        "sha256": "b9e7d15a4561bac2267f8dea1bc5561825acadddd3632763a5fd67ddfab7814a",
+        "width": 512,
+        "height": 256,
+        "format": "RGBA"
+      },
+      "pinned_release_lineage": {
+        "git_blob_sha": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 8388736
+      },
+      "lineage_reused_from": "localization/graphics/role_B/20260929-1618-B124-P00023/B124_P00023_EVEN_RELEASE_PAYLOAD_EXTRACTION_SCOPE.json",
+      "prior_c_acceptance": "C111 accepted exact Release payload scope with OutRun2SP protected; current canonical 1x inventory remains authoritative",
+      "identity_match": false,
+      "mismatch": [
+        "width",
+        "height"
+      ],
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  ],
+  "pinned_release_fallback": {
+    "tag": "v0.25.10a",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "heavy_bundle_redownload_performed": false,
+    "reason": "Pinned direct blobs exactly equal the already C-accepted Release lineage blobs for all three assets; duplicate 306 MB bundle download/decode is intentionally avoided under unchanged fingerprints."
+  },
+  "fail_closed_candidate_gate": {
+    "exact_canonical_source_available": false,
+    "source_effect_mask_authorized_for_current_canonical": false,
+    "clean_plate_authorized_for_current_canonical": false,
+    "candidate_safe_bbox_authorized_for_current_canonical": false,
+    "korean_candidate_rendered": false,
+    "candidate_dds_modified": false,
+    "status": "HOLD_STRICT_RECHECK_NO_EXACT_CANONICAL_SOURCE"
+  },
+  "readiness_after": {
+    "46": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "100": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "106": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "retry_condition": "Retry source acquisition only if approved source transport, canonical inventory identity, or source fingerprint changes."
+  },
+  "self_qa": {
+    "shard_ownership": "PASS_46_100_106_ALL_MOD3_EQ_1",
+    "anti_duplication": "PASS_B00188_34_52_NOT_REPEATED__STATIC_PASS_112_130_NOT_REPEATED__PEER_ASSETS_NOT_STOLEN",
+    "drive_exact_path_gate": "PASS_MISS_3_OF_3",
+    "pinned_direct_path_gate": "PASS_RESOLVES_3_OF_3",
+    "direct_to_release_lineage": "PASS_EXACT_GIT_BLOB_MATCH_3_OF_3",
+    "canonical_identity": "FAIL_CLOSED_DIMENSION_MISMATCH_3_OF_3",
+    "candidate_generation": "NONE_FAIL_CLOSED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "conclusion": "B00190 materially narrows three B-owned unresolved assets by exhausting every currently approved exact-source acquisition tier on unchanged fingerprints. Because the only pinned upstream bytes are 4x Release lineage while the canonical inventory is 1x RGBA, production fails closed before any pixel edit. No DDS candidate, shared-state edit, build, or runtime claim is made."
+}
