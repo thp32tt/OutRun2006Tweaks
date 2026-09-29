@@ -2476,3 +2476,35 @@ Next:
 - Correlate the same pointer from R14 companion DirectOnly fallback to R13 LockRect failure.
 - If budget admitted the resource but SYSTEMMEM texture creation failed, implement a bounded single-level CPU surface/backing upload fallback.
 - If budget rejection is the cause, modify only the proven selector companion class while keeping the 384 MiB total cap unchanged.
+
+
+## Cycle 0143 — exact OutRun stage SpriteNode lifetime fix
+
+Finding: `DX9EX-OUTRUN-STAGE-NODE-LIFETIME-001`
+
+Evidence:
+- Selector diagnostic head `878f891371243a88f3be307bc5af794ffe3e0ae2` passed Win32 Build (`36521683004`, `36521684327`) and HUD Inspector (`36521683010`, `36521684334`); OpenXR architecture remained queued.
+- No new HMD pointer-correlated selector log exists, so resource budget/material behavior was not changed.
+- The three exact OutRun stage/checkpoint/result calls `0x975EE/0x97727/0x977FB` previously only bracketed `CurrentProducerScope=ScreenHud`.
+- This source already records the deferred-lifetime failure mode elsewhere: R68 glyph and R66 option-arrow comments explicitly state producer scope can expire before the later SpriteNode queue draw.
+
+Fix:
+- On outermost R71 Sumo_Printf entry, snapshot every SpritePriority queue tail.
+- On exact call return, use the existing bounded `R70TagAppendedSpriteNodes` walk to tag only nodes appended during that call as `ScreenHud`.
+- Added `R71OutRunStageTaggedNodes` evidence logging.
+- Kept the exact three-callsite scope; no broad `0x097300..0x097F00` range was restored.
+- Did not change menu `< >`, generic HUD ownership, projected rival/world-marker semantics, SkyGlow intensity, world stereo, or performance policy.
+
+Commits:
+- `f4fe2d5f16875abac92795665ed0dd82e1f683e5` — runtime ownership fix.
+- `4c4f0b603c0eb68686633532cd86fc937151bd2f` — structural regression guard.
+
+Validation:
+- `P8_R71_RIVAL_AND_OUTRUN_STAGE_TEXT` now requires the exact tail snapshot, appended-node tagging, and R71 stage tag evidence.
+- AUTOMATION_VALIDATION: `SOURCE_AND_STRUCTURAL_GUARD_COMMITTED / EXACT_HEAD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+- Consume exact-head `4c4f0b6` Build/OpenXR/HUD Inspector.
+- Inspect exact final-result clips `0x97BB7/0x97DA7` and GOAL/time composite ownership for the same deferred-node lifetime class.
+- Keep selector resource policy unchanged until a new HMD log correlates the same companion pointer from R14 fallback to R13 LockRect failure.
