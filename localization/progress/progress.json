@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T06:42:33+09:00",
+  "updated_at_kst": "2026-09-30T06:44:54+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C150/Q00048 pre-Gate: A00218@index231 PASS pre-generation evidence / PREFLIGHT_ONLY. Exact EBE401C8 canonical source, RGBA32 2048x1024 mip1 FLIP_Y, six effect masks totaling 150,173 px, CLEAN_PLATE and six 2px safe bboxes independently replayed with zero outside/alpha escape. Two source descriptions remain absent from canonical transcription/artwork plan, so no candidate or RENDER_READY promotion. RENDER_READY index222 remains first; candidate QA 159/198/201 remains ahead of unrelated preflight. Pending production 70; actionable localize_text 93; canonical segments 753. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C150/Q00048 authoritative Gate PASS on bd354484bd976ec11a67036a66bd102ba797107d (run 36635267415). A00218@index231 PASS / PREFLIGHT_ONLY; exact source, six masks totaling 150,173 px, CLEAN_PLATE and 2px safe bboxes independently replayed. Two exact source descriptions still lack reviewed canonical translations/bindings, so no candidate or RENDER_READY promotion. Pending production 70; actionable localize_text 93; canonical segments 753. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -944,12 +944,22 @@
       "google_drive_write_performed": false,
       "uploaded_archive_used": true,
       "vr_ffb_dx_changes": false,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "validation_mode": "C_BATCH_GATE",
       "runtime_validation": "UNTESTED",
-      "result_sha": "PENDING_POST_COMMIT",
-      "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-      "bookkeeping_note": "This AUTO result commit is the Q00048 validation owner. Do not add CI-skip. After Localization Automation Gate completes, record the authoritative SHA/Gate in a separate bookkeeping commit."
+      "result_sha": "bd354484bd976ec11a67036a66bd102ba797107d",
+      "validation_bearing_result_sha": "bd354484bd976ec11a67036a66bd102ba797107d",
+      "bookkeeping_note": "Q00048 Gate result recorded after the validation-bearing C result commit. This bookkeeping commit is separate and does not replace validation ownership. RUNTIME_VALIDATION remains UNTESTED.",
+      "automation_gate": {
+        "workflow": "Localization Automation Gate",
+        "run_id": 36635267415,
+        "run_attempt": 1,
+        "head_sha": "bd354484bd976ec11a67036a66bd102ba797107d",
+        "status": "completed",
+        "conclusion": "success",
+        "validated_at_kst": "2026-09-30T06:44:54+09:00"
+      },
+      "bookkeeping_recorded_at_kst": "2026-09-30T06:44:54+09:00"
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
