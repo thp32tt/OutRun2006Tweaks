@@ -15,7 +15,7 @@ def require(path: str, needles: list[str]) -> str:
 
 
 def main() -> None:
-    require(
+    transport = require(
         "src/vr/core/transport.hpp",
         [
             "D3D11NativeShared = 4",
@@ -30,8 +30,14 @@ def main() -> None:
             "TransportAckReleasesFrame",
             "ack.slot == slot",
             "ack.frameId >= frameId",
+            "class IFrameConsumer",
+            "virtual void acknowledge(const FrameAck& ack) noexcept = 0;",
         ],
     )
+    if "acknowledge(std::uint64_t frameId)" in transport:
+        raise SystemExit(
+            "DX11 R117 frameId-only consumer ACK contract must not reappear"
+        )
     require(
         "src/vr/d3d11/native_shared_eye_ring.hpp",
         [
@@ -79,6 +85,8 @@ def main() -> None:
         "tools/dx11_native_transport_probe.cpp",
         [
             "D3D_DRIVER_TYPE_WARP",
+            "ConsumerAckSignature",
+            "IFrameConsumer::acknowledge",
             "ring.initialize(",
             "ring.bind_lifetime(",
             "in-flight allocation must reject generation retag",
@@ -92,6 +100,15 @@ def main() -> None:
             "DX11 native shared-eye transport behavior R116: PASS",
         ],
     )
+    require(
+        "vrhost/tests/direct_ack_identity_smoke.cpp",
+        [
+            "ConsumerAckSignature",
+            "IFrameConsumer::acknowledge",
+            "TransportAckReleasesFrame",
+        ],
+    )
+
     require(
         "cmake.toml",
         [

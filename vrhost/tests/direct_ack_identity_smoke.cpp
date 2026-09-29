@@ -2,10 +2,22 @@
 #include "vr/core/transport.hpp"
 
 #include <cstdint>
+#include <type_traits>
+
+namespace
+{
+    using ConsumerAckSignature =
+        void (OutRunVR::Core::IFrameConsumer::*)(
+            const OutRunVR::Core::FrameAck&) noexcept;
+    static_assert(
+        std::is_same_v<
+            decltype(&OutRunVR::Core::IFrameConsumer::acknowledge),
+            ConsumerAckSignature>,
+        "R117 consumer ACK contract must carry exact FrameAck identity");
+}
 
 int main()
-{
-    using namespace OutRunVR::R13;
+{    using namespace OutRunVR::R13;
     DirectGpuAckState ack{};
     ack.hostPid = 10;
     ack.clientPid = 20;

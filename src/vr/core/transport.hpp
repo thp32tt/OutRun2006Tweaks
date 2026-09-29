@@ -104,6 +104,10 @@ namespace OutRunVR::Core
         virtual TransportKind kind() const noexcept = 0;
         virtual void invalidate() noexcept = 0;
         virtual bool acquire(const PresentedFrame& frame, const FrameSlot& slot) noexcept = 0;
-        virtual void acknowledge(std::uint64_t frameId) noexcept = 0;
+        // R117: acknowledgement is identity-complete by contract. A bare
+        // frameId cannot prove producer/consumer PID, run generation,
+        // transport generation or slot ownership, so it must never cross
+        // the backend-neutral consumer boundary.
+        virtual void acknowledge(const FrameAck& ack) noexcept = 0;
     };
 }

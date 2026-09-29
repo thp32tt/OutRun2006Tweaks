@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <type_traits>
 
 #include <d3d11.h>
 
@@ -14,6 +15,14 @@ namespace
     using outrun::vr::dx11::SharedEyeSlotState;
     using OutRunVR::Core::FrameAck;
     using OutRunVR::Core::TransportIdentity;
+
+    using ConsumerAckSignature =
+        void (OutRunVR::Core::IFrameConsumer::*)(const FrameAck&) noexcept;
+    static_assert(
+        std::is_same_v<
+            decltype(&OutRunVR::Core::IFrameConsumer::acknowledge),
+            ConsumerAckSignature>,
+        "R117 consumer ACK contract must carry exact FrameAck identity");
 
     void require(bool condition, const char* message)
     {
