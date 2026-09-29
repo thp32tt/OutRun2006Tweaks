@@ -44,7 +44,7 @@ bool texture_uncompressed_row_bytes(
         return false;
     }
 
-    if (width > std::numeric_limits<UINT>::max() / bytesPerPixel)
+    if (width > (std::numeric_limits<UINT>::max)() / bytesPerPixel)
         return false;
     rowBytes = width * bytesPerPixel;
     return true;

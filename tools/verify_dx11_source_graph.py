@@ -1324,6 +1324,8 @@ def main() -> None:
 
     for token, meaning in {
         "texture_uncompressed_row_bytes(": "R101 bounded uncompressed row layout",
+        "(std::numeric_limits<UINT>::max)()":
+            "R101 Windows max-macro-safe overflow bound",
         "translate_texture_mutation(": "R101 reuse of R100 mutation gate",
         "TextureMutationUpdateKind::DynamicMapWriteDiscard":
             "R101 exact mutation kind requirement",
