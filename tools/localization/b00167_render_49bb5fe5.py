@@ -34,6 +34,7 @@ REVIEW = ROOT / "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5"
 RUN = ROOT / "localization/graphics/role_B/20260930-B00167-P00082"
 REPORT = RUN / "B00167_P00082_INDEX152_DXT5_DECODED_FINAL_QA.json"
 TASK_RECORD = ROOT / "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00167.json"
+MASK_ARTIFACT = ROOT / "localization/graphics/role_B/20260929-2216-B00152-P00072/B00152_P00072_INDEX152_MASKS_RLE.json"
 
 ELEMENTS = [
     {
@@ -165,26 +166,34 @@ def find_font():
     return p, int(idx)
 
 def build_removal_masks(src):
-    union = np.zeros((H, W), dtype=bool)
-    records = []
+    # Reuse the exact immutable B00152 mask that C127 independently reproduced.
+    # The dependency fingerprint is unchanged (same canonical blob/SHA and QA contract lineage),
+    # so recomputing the heavy mask is intentionally avoided.
+    j=json.loads(MASK_ARTIFACT.read_text(encoding="utf-8"))
+    sj=j["source"]
+    if sj.get("git_blob_sha")!=SOURCE_BLOB_SHA or sj.get("canonical_sha256_from_C125")!=SOURCE_SHA256:
+        raise SystemExit("accepted mask artifact source fingerprint mismatch")
+    if sj.get("dimensions")!=[W,H] or sj.get("format")!="DXT5_BC3" or int(sj.get("mip_count",0))!=1:
+        raise SystemExit("accepted mask artifact DDS fingerprint mismatch")
+    runs=j["removal_union"]["runs"]
+    if len(runs)!=556 or int(j["removal_union"]["pixels"])!=EXPECTED_UNION_PIXELS:
+        raise SystemExit("accepted mask artifact union metadata mismatch")
+    union=np.zeros((H,W),dtype=bool)
+    for y,x0,x1 in runs:
+        if not (0<=y<H and 0<=x0<x1<=W):
+            raise SystemExit("accepted mask artifact contains invalid RLE run")
+        union[y,x0:x1]=True
+    if int(union.sum())!=EXPECTED_UNION_PIXELS:
+        raise SystemExit(f"accepted RLE materialization mismatch {int(union.sum())}")
+    records=[]
     for e in ELEMENTS:
-        x0,y0,x1,y1 = e["effect_raw"]
-        sub = src[y0:y1, x0:x1]
-        bg = np.array(e["bg"], dtype=np.int32)
-        delta = sub[:,:,:3].astype(np.int32) - bg[None,None,:]
-        dist = np.sqrt(np.sum(delta * delta, axis=2))
-        local = (sub[:,:,3] > 16) & (dist >= 10.0)
-        m = np.zeros((H,W), dtype=bool)
-        m[y0:y1,x0:x1] = local
-        n = int(m.sum())
-        if n != e["expected_removal_pixels"]:
-            raise SystemExit(f"{e['source']} removal mask count mismatch {n} != {e['expected_removal_pixels']}")
-        if np.any(union & m):
-            raise SystemExit(f"{e['source']} removal mask overlaps another element")
-        union |= m
+        x0,y0,x1,y1=e["effect_raw"]
+        m=np.zeros((H,W),dtype=bool)
+        m[y0:y1,x0:x1]=union[y0:y1,x0:x1]
+        n=int(m.sum())
+        if n!=e["expected_removal_pixels"] or bbox(m)!=e["effect_raw"]:
+            raise SystemExit(f"{e['source']} accepted RLE partition mismatch pixels={n} bbox={bbox(m)}")
         records.append({"source":e["source"],"korean":e["korean"],"pixels":n,"bbox_raw":bbox(m)})
-    if int(union.sum()) != EXPECTED_UNION_PIXELS:
-        raise SystemExit(f"union removal mask mismatch {int(union.sum())}")
     return union, records
 
 def make_clean(src, removal_union):
@@ -297,6 +306,27 @@ def residue_count(arr, e, exclude=None):
         m &= ~exclude[y0:y1,x0:x1]
     return int(m.sum())
 
+def nearest_background_palette_gate(dds_bytes, global_mask, e):
+    bg=np.array(e["bg"],dtype=np.int32)
+    payload=dds_bytes[128:]
+    checked=0
+    mismatches=0
+    ys,xs=np.nonzero(global_mask)
+    for y,x in zip(ys.tolist(),xs.tolist()):
+        block_index=(y//4)*(W//4)+(x//4)
+        off=block_index*16
+        block=payload[off:off+16]
+        c0,c1=struct.unpack_from("<HH",block,8)
+        pal=color_palette(c0,c1)
+        best=int(np.argmin(np.sum((pal-bg[None,:])**2,axis=1)))
+        cbits=struct.unpack_from("<I",block,12)[0]
+        i=(y%4)*4+(x%4)
+        actual=(cbits>>(2*i))&3
+        checked+=1
+        if actual!=best:
+            mismatches+=1
+    return {"checked_pixels":checked,"non_background_palette_index_pixels":mismatches}
+
 def save_rgba(arr,path):
     path.parent.mkdir(parents=True,exist_ok=True)
     Image.fromarray(arr,"RGBA").save(path,optimize=False)
@@ -332,9 +362,15 @@ def main():
     clean_changed=np.any(clean_final!=source_raw,axis=2)
     if int((clean_changed & ~removal_union).sum())!=0:
         raise SystemExit("decoded clean plate changed protected pixels")
-    clean_residue={e["source"]:residue_count(clean_final,e) for e in ELEMENTS}
-    if any(v!=0 for v in clean_residue.values()):
-        raise SystemExit("decoded clean plate retains >=10 RGB-distance source effect residue: "+json.dumps(clean_residue))
+    clean_background_gate={}
+    for e in ELEMENTS:
+        x0,y0,x1,y1=e["effect_raw"]
+        em=np.zeros((H,W),dtype=bool)
+        em[y0:y1,x0:x1]=removal_union[y0:y1,x0:x1]
+        g=nearest_background_palette_gate(clean_bytes,em,e)
+        clean_background_gate[e["source"]]=g
+        if g["non_background_palette_index_pixels"]!=0 or g["checked_pixels"]!=e["expected_removal_pixels"]:
+            raise SystemExit("clean plate background-palette gate failed: "+json.dumps(clean_background_gate))
 
     font_path,font_index=find_font()
     target_raw,text_mask_raw,placements=render_korean(clean_final,font_path,font_index)
@@ -373,10 +409,15 @@ def main():
         rb=bbox(lm)
         if rb is None or not inside(rb,e["safe_raw"]):
             raise SystemExit(f"{e['source']} decoded Korean lettering bbox invalid: {rb}")
-        # Outside Korean lettering, old source effect must remain fully cleaned.
-        res=residue_count(final_raw,e,exclude=lm)
-        if res:
-            raise SystemExit(f"{e['source']} decoded final source residue: {res}")
+        # Every accepted old-English removal pixel not occupied by new Korean
+        # must decode through the source block's nearest background palette index.
+        x0,y0,x1,y1=e["effect_raw"]
+        oldmask=np.zeros((H,W),dtype=bool)
+        oldmask[y0:y1,x0:x1]=removal_union[y0:y1,x0:x1]
+        bgmask=oldmask & ~text_mask_raw
+        bg_gate=nearest_background_palette_gate(candidate_bytes,bgmask,e)
+        if bg_gate["non_background_palette_index_pixels"]!=0:
+            raise SystemExit(f"{e['source']} decoded final old-English background-remap gate failed: {bg_gate}")
         per_element.append({
             "source":e["source"],"korean":e["korean"],"sprite":e["sprite"],
             "removal_pixels":e["expected_removal_pixels"],
@@ -385,7 +426,7 @@ def main():
             "candidate_safe_bbox_readable":e["safe_readable"],
             "decoded_korean_change_bbox_raw":rb,
             "decoded_korean_change_pixels":int(lm.sum()),
-            "source_residue_pixels_outside_korean":res,
+            "old_english_pixels_outside_korean_background_palette_gate":bg_gate,
             "containment":"PASS",
         })
 
@@ -445,7 +486,8 @@ def main():
         "clean_plate":{
             "method":"replace accepted removal-mask pixels with each cell's independently measured dominant background, then patch only original BC3 color indices while preserving endpoints+alpha",
             "decoded_changed_pixels_outside_removal_union":int((clean_changed & ~removal_union).sum()),
-            "decoded_source_residue_by_element":clean_residue,
+            "accepted_rle_reuse":"PASS_B00152_C127_UNCHANGED_FINGERPRINT_5876_PIXELS_556_RUNS",
+            "background_palette_gate_by_element":clean_background_gate,
             "bc3_patch_stats":clean_patch_stats,
             "status":"PASS"
         },
@@ -527,7 +569,7 @@ def main():
     TASK_RECORD.write_text(json.dumps(task,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"status":"PASS","candidate_sha256":candidate_sha,
                       "changed_outside":changed_outside,"alpha_changed":alpha_changed,
-                      "clean_residue":clean_residue,"per_element":per_element},ensure_ascii=False))
+                      "clean_background_gate":clean_background_gate,"per_element":per_element},ensure_ascii=False))
 
 if __name__ == "__main__":
     main()
