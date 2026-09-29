@@ -208,6 +208,37 @@ namespace outrun::vr::dx11
                    value == D3DTADDRESS_CLAMP;
         }
 
+        D3D11_FILTER translate_fixed_function_filter(
+            DWORD minFilter,
+            DWORD magFilter,
+            DWORD mipFilter) noexcept
+        {
+            const unsigned key =
+                (minFilter == D3DTEXF_LINEAR ? 4u : 0u) |
+                (magFilter == D3DTEXF_LINEAR ? 2u : 0u) |
+                (mipFilter == D3DTEXF_LINEAR ? 1u : 0u);
+            switch (key)
+            {
+            case 0u: return D3D11_FILTER_MIN_MAG_MIP_POINT;
+            case 1u: return D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+            case 2u: return D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+            case 3u: return D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+            case 4u: return D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+            case 5u: return D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+            case 6u: return D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+            case 7u: return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+            default: return D3D11_FILTER_MIN_MAG_MIP_POINT;
+            }
+        }
+
+        D3D11_TEXTURE_ADDRESS_MODE translate_fixed_function_address(
+            DWORD value) noexcept
+        {
+            return value == D3DTADDRESS_CLAMP
+                ? D3D11_TEXTURE_ADDRESS_CLAMP
+                : D3D11_TEXTURE_ADDRESS_WRAP;
+        }
+
         void validate_fixed_function_op(
             DWORD op,
             DWORD arg1,
@@ -507,6 +538,39 @@ namespace outrun::vr::dx11
 
             return out.elementCount > 0;
         }
+    }
+
+    FixedFunctionSamplerTranslation translate_fixed_function_sampler(
+        const FixedFunctionStageState& source) noexcept
+    {
+        FixedFunctionSamplerTranslation out{};
+        if (!fixed_function_filter_supported(source.minFilter, false) ||
+            !fixed_function_filter_supported(source.magFilter, false) ||
+            !fixed_function_filter_supported(source.mipFilter, true) ||
+            !fixed_function_address_supported(source.addressU) ||
+            !fixed_function_address_supported(source.addressV))
+            return out;
+
+        out.desc.Filter = translate_fixed_function_filter(
+            source.minFilter, source.magFilter, source.mipFilter);
+        out.desc.AddressU = translate_fixed_function_address(source.addressU);
+        out.desc.AddressV = translate_fixed_function_address(source.addressV);
+        // R84 currently accepts Texture2D only, so W is not sampled. Keep a
+        // deterministic WRAP value rather than inventing uncaptured D3D9 state.
+        out.desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        out.desc.MipLODBias = 0.0f;
+        out.desc.MaxAnisotropy = 1;
+        out.desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        out.desc.BorderColor[0] = 0.0f;
+        out.desc.BorderColor[1] = 0.0f;
+        out.desc.BorderColor[2] = 0.0f;
+        out.desc.BorderColor[3] = 0.0f;
+        out.desc.MinLOD = 0.0f;
+        out.desc.MaxLOD = source.mipFilter == D3DTEXF_NONE
+            ? 0.0f
+            : D3D11_FLOAT32_MAX;
+        out.exact = true;
+        return out;
     }
 
     FixedFunctionTranslationReadiness translate_fixed_function_readiness(

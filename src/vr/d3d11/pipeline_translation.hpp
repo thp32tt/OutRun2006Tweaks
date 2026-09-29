@@ -79,6 +79,19 @@ namespace outrun::vr::dx11
         DWORD addressV = D3DTADDRESS_WRAP;
     };
 
+    // R98 translates the conservative R82 sampler subset into a concrete
+    // D3D11 sampler descriptor for the R84 Texture2D path. This remains a
+    // readiness contract only; no game draw path binds the resulting state.
+    struct FixedFunctionSamplerTranslation
+    {
+        D3D11_SAMPLER_DESC desc{};
+        bool exact = false;
+    };
+
+    [[nodiscard]] FixedFunctionSamplerTranslation
+    translate_fixed_function_sampler(
+        const FixedFunctionStageState& source) noexcept;
+
     struct FixedFunctionTranslationReadiness
     {
         std::uint32_t unsupported = FixedFunctionUnsupportedNone;

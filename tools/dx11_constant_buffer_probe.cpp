@@ -13,10 +13,12 @@ namespace
 {
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::NativeFixedFunctionPipelineBundle;
+    using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
+    using outrun::vr::dx11::translate_fixed_function_sampler;
     using outrun::vr::dx11::translate_vertex_input_layout;
 
     void require(bool condition, const char* message)
@@ -204,6 +206,71 @@ int main()
 
     DevicePair d3d = create_warp_device();
 
+    const auto pointWrapSampler =
+        translate_fixed_function_sampler(stages[0]);
+    require(
+        pointWrapSampler.exact &&
+        pointWrapSampler.desc.Filter == D3D11_FILTER_MIN_MAG_MIP_POINT &&
+        pointWrapSampler.desc.AddressU == D3D11_TEXTURE_ADDRESS_WRAP &&
+        pointWrapSampler.desc.AddressV == D3D11_TEXTURE_ADDRESS_WRAP &&
+        pointWrapSampler.desc.MaxLOD == 0.0f,
+        "R98 point/wrap sampler translation");
+
+    NativeFixedFunctionSamplerState samplerOwner;
+    require(!samplerOwner.ready(),
+            "R98 sampler owner must start dormant");
+    require(
+        samplerOwner.initialize(d3d.device, stages[0]),
+        "R98 sampler owner initialize");
+    require(
+        samplerOwner.ready() &&
+        samplerOwner.device() == d3d.device &&
+        samplerOwner.sampler() != nullptr,
+        "R98 sampler owner readiness");
+
+    D3D11_SAMPLER_DESC observedSampler{};
+    samplerOwner.sampler()->GetDesc(&observedSampler);
+    require(
+        observedSampler.Filter == D3D11_FILTER_MIN_MAG_MIP_POINT &&
+        observedSampler.AddressU == D3D11_TEXTURE_ADDRESS_WRAP &&
+        observedSampler.AddressV == D3D11_TEXTURE_ADDRESS_WRAP &&
+        observedSampler.MaxLOD == 0.0f,
+        "R98 created sampler descriptor");
+
+    auto linearClampStage = stages[0];
+    linearClampStage.minFilter = D3DTEXF_LINEAR;
+    linearClampStage.magFilter = D3DTEXF_LINEAR;
+    linearClampStage.mipFilter = D3DTEXF_LINEAR;
+    linearClampStage.addressU = D3DTADDRESS_CLAMP;
+    linearClampStage.addressV = D3DTADDRESS_CLAMP;
+    const auto linearClampSampler =
+        translate_fixed_function_sampler(linearClampStage);
+    require(
+        linearClampSampler.exact &&
+        linearClampSampler.desc.Filter == D3D11_FILTER_MIN_MAG_MIP_LINEAR &&
+        linearClampSampler.desc.AddressU == D3D11_TEXTURE_ADDRESS_CLAMP &&
+        linearClampSampler.desc.AddressV == D3D11_TEXTURE_ADDRESS_CLAMP &&
+        linearClampSampler.desc.MaxLOD == D3D11_FLOAT32_MAX,
+        "R98 linear/clamp sampler translation");
+    require(
+        samplerOwner.initialize(d3d.device, linearClampStage),
+        "R98 sampler owner reinitialize with linear clamp");
+
+    auto unsupportedSamplerStage = stages[0];
+    unsupportedSamplerStage.minFilter = D3DTEXF_ANISOTROPIC;
+    require(
+        !translate_fixed_function_sampler(unsupportedSamplerStage).exact,
+        "R98 anisotropic sampler translation must fail closed");
+    require(
+        !samplerOwner.initialize(d3d.device, unsupportedSamplerStage),
+        "R98 unsupported sampler owner must fail closed");
+    require(
+        !samplerOwner.ready(),
+        "R98 failed sampler reinitialize must leave owner dormant");
+    require(
+        samplerOwner.initialize(d3d.device, stages[0]),
+        "R98 sampler owner recovery after fail-closed reset");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -310,6 +377,14 @@ int main()
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
+    samplerOwner.shutdown();
+    require(!samplerOwner.ready(),
+            "R98 sampler shutdown must release owner resources");
+    require(
+        samplerOwner.device() == nullptr &&
+        samplerOwner.sampler() == nullptr,
+        "R98 sampler shutdown must clear owned objects");
+
     pipelineBundle.shutdown();
     require(!pipelineBundle.ready(),
             "R97 shutdown must release bundle resources");
@@ -344,5 +419,6 @@ int main()
     std::cout << "DX11 constant buffer probe R95: PASS\n";
     std::cout << "DX11 constant buffer lifetime R96: PASS\n";
     std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
+    std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     return 0;
 }

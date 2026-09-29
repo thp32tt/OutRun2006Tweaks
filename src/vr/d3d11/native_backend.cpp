@@ -190,6 +190,34 @@ void NativeFixedFunctionTransformBuffer::shutdown() noexcept {
     upload_generation_ = 0;
 }
 
+bool NativeFixedFunctionSamplerState::initialize(
+    ID3D11Device* device,
+    const FixedFunctionStageState& stage) noexcept {
+
+    shutdown();
+    if (!device)
+        return false;
+
+    const auto translation = translate_fixed_function_sampler(stage);
+    if (!translation.exact)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
+    if (FAILED(device->CreateSamplerState(
+            &translation.desc, sampler.ReleaseAndGetAddressOf())) ||
+        !sampler)
+        return false;
+
+    device_ = device;
+    sampler_ = std::move(sampler);
+    return true;
+}
+
+void NativeFixedFunctionSamplerState::shutdown() noexcept {
+    sampler_.Reset();
+    device_.Reset();
+}
+
 bool NativeFixedFunctionPipelineBundle::initialize(
     ID3D11Device* device,
     const VertexInputLayoutTranslation& layout,

@@ -11,6 +11,7 @@ struct FixedFunctionTransformConstants;
 struct FixedFunctionVertexShaderPrototype;
 struct FixedFunctionPixelShaderPrototype;
 struct VertexInputLayoutTranslation;
+struct FixedFunctionStageState;
 
 struct NativeBackendConfig {
     std::uint32_t width = 0;
@@ -53,6 +54,37 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_;
     std::uint64_t upload_generation_ = 0;
+};
+
+// R98 dormant owner for one translated fixed-function sampler state. It
+// creates a D3D11 sampler object but never binds it to a game context.
+class NativeFixedFunctionSamplerState final {
+public:
+    NativeFixedFunctionSamplerState() = default;
+    ~NativeFixedFunctionSamplerState() = default;
+    NativeFixedFunctionSamplerState(
+        const NativeFixedFunctionSamplerState&) = delete;
+    NativeFixedFunctionSamplerState& operator=(
+        const NativeFixedFunctionSamplerState&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const FixedFunctionStageState& stage) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && sampler_;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11SamplerState* sampler() const noexcept {
+        return sampler_.Get();
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler_;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

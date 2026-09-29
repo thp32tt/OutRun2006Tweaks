@@ -1046,6 +1046,96 @@ def main() -> None:
                 "DX11 R97 pipeline-bundle probe drift: " + meaning
             )
 
+    r98_sampler_translation_header = {
+        "FixedFunctionSamplerTranslation": "R98 concrete sampler translation result",
+        "D3D11_SAMPLER_DESC desc": "R98 D3D11 sampler descriptor",
+        "translate_fixed_function_sampler": "R98 sampler translation entrypoint",
+    }
+    missing_r98_translation_header = [
+        meaning
+        for token, meaning in r98_sampler_translation_header.items()
+        if token not in PIPELINE_TRANSLATION_HPP
+    ]
+    if missing_r98_translation_header:
+        raise SystemExit(
+            "DX11 R98 sampler translation header drift: "
+            + ", ".join(missing_r98_translation_header)
+        )
+
+    for token, meaning in {
+        "D3D11_FILTER_MIN_MAG_MIP_POINT": "R98 point sampler mapping",
+        "D3D11_FILTER_MIN_MAG_MIP_LINEAR": "R98 linear sampler mapping",
+        "D3D11_TEXTURE_ADDRESS_CLAMP": "R98 clamp address mapping",
+        "source.mipFilter == D3DTEXF_NONE": "R98 no-mip MaxLOD contract",
+        "D3D11_FLOAT32_MAX": "R98 mip-enabled MaxLOD contract",
+    }.items():
+        if token not in PIPELINE_TRANSLATION_CPP:
+            raise SystemExit(
+                "DX11 R98 sampler translation source drift: " + meaning
+            )
+
+    r98_sampler_owner_header = {
+        "NativeFixedFunctionSamplerState": "R98 dormant sampler owner",
+        "Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler_":
+            "R98 owned sampler object",
+    }
+    missing_r98_sampler_owner = [
+        meaning
+        for token, meaning in r98_sampler_owner_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r98_sampler_owner:
+        raise SystemExit(
+            "DX11 R98 sampler-owner header drift: "
+            + ", ".join(missing_r98_sampler_owner)
+        )
+
+    for token, meaning in {
+        "translate_fixed_function_sampler(stage)": "R98 fail-closed translation gate",
+        "CreateSamplerState": "R98 D3D11 sampler object creation",
+        "sampler_.Reset()": "R98 sampler release",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R98 sampler-owner source drift: " + meaning
+            )
+
+    if "PSSetSamplers(" in NATIVE_BACKEND_CPP:
+        raise SystemExit(
+            "DX11 R98 sampler owner must remain non-routing; found PSSetSamplers binding"
+        )
+
+    runtime_sampler_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "native_backend.cpp":
+            continue
+        if "NativeFixedFunctionSamplerState" in source_path.read_text(
+            encoding="utf-8"
+        ):
+            runtime_sampler_users.append(source_path.relative_to(ROOT).as_posix())
+    if runtime_sampler_users:
+        raise SystemExit(
+            "DX11 R98 sampler owner gained a production caller before activation gate: "
+            + ", ".join(runtime_sampler_users)
+        )
+
+    for token, meaning in {
+        "R98 point/wrap sampler translation": "R98 point/wrap descriptor case",
+        "R98 linear/clamp sampler translation": "R98 linear/clamp descriptor case",
+        "R98 anisotropic sampler translation must fail closed":
+            "R98 unsupported filter negative case",
+        "R98 failed sampler reinitialize must leave owner dormant":
+            "R98 fail-closed cleanup",
+        "R98 sampler shutdown must clear owned objects":
+            "R98 shutdown lifecycle",
+        "DX11 fixed-function sampler ownership R98: PASS":
+            "R98 probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R98 sampler-owner probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 
