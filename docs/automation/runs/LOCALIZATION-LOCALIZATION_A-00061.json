@@ -1,0 +1,85 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00061",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00003",
+  "recorded_at_kst": "2026-09-29T13:17:42+09:00",
+  "precommit_head_sha": "0d996e0a323da67b0259be914798829a76612588",
+  "preserved_peer_head": true,
+  "prerequisite": {
+    "previous_task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+    "previous_result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+    "exact_gate_run_id": 36520444918,
+    "exact_gate_conclusion": "success"
+  },
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_RECONSTRUCTION_INPUTS_FIVE_DIRECT_CELL_TARGETS",
+  "material_deliverable": {
+    "type": "FOUR_ODD_EXACT_SOURCE_RECONSTRUCTION_INPUTS_WITH_SEMANTIC_CELL_MAPPING",
+    "indices": [
+      137,
+      217,
+      219,
+      241
+    ],
+    "assets": [
+      "30CF0D",
+      "D1039D6F",
+      "D263B3F1",
+      "E1639D2E"
+    ],
+    "exact_release_identities": 4,
+    "source_png_evidence": 4,
+    "atlas_pairs": 4,
+    "canonical_semantics_total": 8,
+    "confirmed_semantic_targets": 5,
+    "unresolved_semantics": 3,
+    "report": "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_P00003_ODD_RECONSTRUCTION_MAPPING.json",
+    "evidence_pngs": [
+      "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_137_30CF0D_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_217_D1039D6F_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_219_D263B3F1_ENGLISH_SOURCE.png",
+      "localization/graphics/role_A/20260929-1317-A00061-P00003/A00061_241_E1639D2E_ENGLISH_SOURCE.png"
+    ],
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "A00058": {
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "assets": [
+        35,
+        43,
+        49
+      ]
+    },
+    "A00056": {
+      "result_sha": "f6f1646a9369ebab33691b45a5df496993758b8f",
+      "assets": [
+        65,
+        89,
+        95,
+        101,
+        107
+      ]
+    }
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "fail_closed_reason": "Five semantic targets are physically mapped, but exact HD decoded glyph/effect bboxes and raw orientation remain unresolved. Three ambiguous semantics were deliberately not guessed. No Korean DDS or containment PASS is emitted until decoded-pixel evidence exists.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
