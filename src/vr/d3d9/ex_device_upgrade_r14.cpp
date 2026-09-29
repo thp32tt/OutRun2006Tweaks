@@ -14,12 +14,14 @@
 // mip generation) retire the shadow instead of risking a stale CPU overwrite.
 
 #include <algorithm>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
 
 #include "ex_device_upgrade_r13.cpp"
+#include "vr/debug/perf_hitch_trace.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -471,6 +473,41 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             return total;
         }
+
+        std::uint64_t R81EstimateLevelBytes(
+            IDirect3DTexture9* texture, UINT level) noexcept
+        {
+            if (!texture)
+                return 0;
+            D3DSURFACE_DESC d{};
+            if (FAILED(texture->GetLevelDesc(level, &d)) ||
+                d.Width == 0 || d.Height == 0)
+                return 0;
+            if (d.Format == D3DFMT_DXT1)
+            {
+                return ((static_cast<std::uint64_t>(d.Width) + 3) / 4) *
+                    ((static_cast<std::uint64_t>(d.Height) + 3) / 4) * 8;
+            }
+            if (d.Format == D3DFMT_DXT2 ||
+                d.Format == D3DFMT_DXT3 ||
+                d.Format == D3DFMT_DXT4 ||
+                d.Format == D3DFMT_DXT5)
+            {
+                return ((static_cast<std::uint64_t>(d.Width) + 3) / 4) *
+                    ((static_cast<std::uint64_t>(d.Height) + 3) / 4) * 16;
+            }
+            std::uint64_t bpp = 4;
+            if (d.Format == D3DFMT_R5G6B5 ||
+                d.Format == D3DFMT_X1R5G5B5 ||
+                d.Format == D3DFMT_A1R5G5B5 ||
+                d.Format == D3DFMT_A4R4G4B4)
+                bpp = 2;
+            else if (d.Format == D3DFMT_A8 || d.Format == D3DFMT_L8)
+                bpp = 1;
+            return static_cast<std::uint64_t>(d.Width) *
+                static_cast<std::uint64_t>(d.Height) * bpp;
+        }
+
 
         bool R14ReserveShadowBytes(
             std::uint64_t bytes, bool emergencyReserve,
@@ -1088,6 +1125,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !OutRunVRD3D9ExUpgrade::IsCompatDevice(device))
                 return hr;
 
+            OutRunVR::PerfHitch::NoteManagedTextureCreate(
+                R14EstimateShadowBytes(*texture));
+
             IDirect3DTexture9* shadow = nullptr;
             const HRESULT shadowHr = R14CreateCpuShadow(
                 device, *texture, shadow);
@@ -1169,6 +1209,8 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (!entry || level >= R14MaxTrackedLevels)
                 return R14TextureLockR13Hook.stdcall<HRESULT>(
                     texture, level, locked, rect, flags);
+
+            OutRunVR::PerfHitch::NoteTextureLock();
 
             IDirect3DTexture9* cpuToRelease = nullptr;
             HRESULT shadowHr = D3DERR_INVALIDCALL;
@@ -1402,7 +1444,19 @@ namespace OutRunVRD3D9ExUpgradeR13
                 }
                 else if (!readOnly)
                 {
+                    const auto uploadStart =
+                        std::chrono::steady_clock::now();
                     result = R14UploadLevel(*entry, level);
+                    const auto uploadEnd =
+                        std::chrono::steady_clock::now();
+                    const auto uploadUs =
+                        static_cast<std::uint64_t>(
+                            std::chrono::duration_cast<
+                                std::chrono::microseconds>(
+                                    uploadEnd - uploadStart).count());
+                    OutRunVR::PerfHitch::NoteTextureUpload(
+                        R81EstimateLevelBytes(entry->gpu, level),
+                        uploadUs);
                     entry->lockRectValid[level] = false;
                     if (SUCCEEDED(result))
                     {
