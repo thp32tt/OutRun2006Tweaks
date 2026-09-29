@@ -56,6 +56,7 @@ GITHUB_BOUND_RUN_POLL_SECONDS = max(10, int(os.getenv("GITHUB_BOUND_RUN_POLL_SEC
 GITHUB_TASK_COMMIT_CACHE_SECONDS = max(15, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "60")))
 GITHUB_ACTIONS_CACHE_SECONDS = max(10, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "60")))
 WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_STALE_SECONDS", "75")))
+WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS = max(GITHUB_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS", "600")))
 QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "15")))
 QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
@@ -233,6 +234,7 @@ runtime = {
     "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
     "github_actions_cache_seconds": GITHUB_ACTIONS_CACHE_SECONDS,
     "wait_actions_stale_seconds": WAIT_ACTIONS_STALE_SECONDS,
+    "wait_actions_no_run_timeout_seconds": WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS,
     "github_token_configured": bool(GITHUB_TOKEN),
     "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
     "queue_idle_rearm_seconds": QUEUE_IDLE_REARM_SECONDS,
@@ -513,6 +515,21 @@ def github_commit_message(sha: str) -> Optional[str]:
         return None
 
 
+GITHUB_ACTIONS_SKIP_PATTERNS = [
+    r"\[(?:skip ci|ci skip|no ci|skip actions|actions skip)\]",
+    r"(?im)^skip-checks:\s*true\s*$",
+]
+
+
+def github_actions_skip_directive(message: str) -> Optional[str]:
+    """Return the CI-skip directive that would prevent a required push workflow."""
+    for pattern in GITHUB_ACTIONS_SKIP_PATTERNS:
+        match = re.search(pattern, message or "", flags=re.I)
+        if match:
+            return match.group(0).strip()
+    return None
+
+
 def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> Optional[dict]:
     """Find a task commit using a short shared branch-history cache to protect REST rate limits."""
     try:
@@ -654,6 +671,7 @@ def queue_dynamic_prefix() -> str:
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
         "반드시 GitHub만 직접 사용하고 N100 로컬 저장소로 우회하지 마.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
+        "필수 GitHub Actions Gate가 exact result SHA에 생성되어야 하므로 커밋에 [skip ci], [ci skip], [no ci], [skip actions], [actions skip], skip-checks:true 같은 CI-skip 지시어를 넣지 마.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
