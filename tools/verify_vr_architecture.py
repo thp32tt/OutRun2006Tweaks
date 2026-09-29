@@ -33,6 +33,7 @@ required = [
     "src/vr/d3d9/stereo_renderer.cpp",
     "src/vr/d3d9/stereo_renderer_r13.cpp",
     "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "src/vr/d3d9/stereo_renderer_r20_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
@@ -250,10 +251,19 @@ if installer_start >= 0 and installer_end > installer_start:
 # hook transactions are enabled.
 require(
     "src/vr/d3d9/stereo_renderer_r20.cpp",
+    "#include \"stereo_renderer_r13.cpp\"",
+    "#include \"../runtime_eligibility.hpp\"",
+    "#include \"stereo_renderer_r20_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r20_overlay.inc",
     "R20InstallState",
     "using State = OutRunVR::RuntimeEligibility::InstallState",
     "State::Pending",
     "State::Failed",
+    "R20StereoEligibilityGate",
+    "R20DepthHistorySafeForInitialSeed",
+    "R20AcceptVerifiedBaseline",
     "InlineHook::StartDisabled",
 )
 require(

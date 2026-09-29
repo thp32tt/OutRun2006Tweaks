@@ -170,6 +170,9 @@ require("src/vr/d3d9/stereo_renderer_r22_overlay.inc",
 require("src/vr/d3d9/stereo_renderer_r13.cpp",
         'VR R13: stereo hardening ACTIVE;',
         "P8_R13_HARDENING")
+require("src/vr/d3d9/stereo_renderer_r20_overlay.inc",
+        'VR R20 PRODUCTION: first stereo seed requires current-generation Z/stencil clears; disabled-first bootstrap transaction READY',
+        "P8_R20_BOOTSTRAP_DEPTH_BASELINE")
 require_all("vrhost/src/main_r23.cpp", [
     'Do not publish the legacy global consumed-frame',
     'R32 arms an EVENT after the',
@@ -273,7 +276,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r20.cpp"',
+    '#include "stereo_renderer_r13.cpp"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "stereo_renderer_r20_overlay.inc"',
     '#include "stereo_renderer_r21_overlay.inc"',
     '#include "stereo_renderer_r22_overlay.inc"',
     '#include "stereo_renderer_r23_overlay.inc"',
@@ -289,6 +294,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r20.cpp"',
+       "P11_R70_STEREO_NO_R20_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r21.cpp"',
        "P11_R70_STEREO_NO_R21_NESTING")
@@ -369,7 +377,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r20.cpp"',
+    '#include "stereo_renderer_r13.cpp"',
+    '#include "../runtime_eligibility.hpp"',
+    '#include "stereo_renderer_r20_overlay.inc"',
     '#include "stereo_renderer_r21_overlay.inc"',
     '#include "stereo_renderer_r22_overlay.inc"',
     '#include "stereo_renderer_r23_overlay.inc"',
@@ -385,6 +395,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r20.cpp"',
+       "P11_R70_STEREO_NO_R20_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r21.cpp"',
        "P11_R70_STEREO_NO_R21_NESTING")

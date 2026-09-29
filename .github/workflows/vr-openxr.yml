@@ -64,8 +64,11 @@ jobs:
               'SafetyOverlayReady',
               'BaselineVerified'
             )
-            'src/vr/d3d9/stereo_renderer_r20.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r20_overlay.inc' = @(
               'R20InstallState',
+              'R20StereoEligibilityGate',
+              'R20DepthHistorySafeForInitialSeed',
+              'R20AcceptVerifiedBaseline',
               'StartDisabled',
               'InstallState::Failed'
             )
