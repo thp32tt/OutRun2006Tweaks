@@ -1,0 +1,2948 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-v2-source-mask-clean-plate-work-order-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00100",
+  "wave_id": "P00033",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T17:08:42+09:00",
+  "precommit_head_sha": "b7ce5c1ae43b238846d6f1f44e6a8dca0139630f",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "selected_assets": [
+      "AA04D779",
+      "B1696633",
+      "CBF8ECBF",
+      "33491F83"
+    ],
+    "basis": "Q00008/C110 consumed B00085 as PASS. These four even assets have 37 accepted exact Release RGBA32 payload scopes and no newer B producer result. Current B00092/B00095/B00097 producer outputs remain QA-pending at selection HEAD and are skipped.",
+    "skipped_current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00092": [
+        198,
+        214,
+        230,
+        236
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00095": [
+        34,
+        44,
+        52,
+        172
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00097": [
+        86,
+        100,
+        106,
+        130
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ]
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "assets_advanced": 4,
+    "deterministic_localize_work_units": 37,
+    "localizable_physical_semantic_occurrences": 40,
+    "rgba32_work_units": 37,
+    "unresolved_semantics_retained": 4,
+    "c110_accepted_payload_scopes_reused": 37,
+    "new_two_px_inner_guards": 37,
+    "candidate_dds_written": false,
+    "description": "Turns C110-accepted B00085 RGBA32 payload evidence into executable first-pass-v2 source-effect-mask/CLEAN_PLATE work units without repeating immutable source QA or fabricating source-effect bboxes, clean plates, candidate-safe bboxes, or Korean DDS pixels."
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00085",
+    "producer_result_sha": "7dca0c99022e0938102b8fc9e7bc27ccd0a301fd",
+    "producer_report_blob_sha": "749b5e4bac2807b1f1b443fdcb287957aa55b440",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00089",
+    "c_acceptance_result": "PASS",
+    "c_acceptance_record_blob_sha": "d081bdc2cc7f618ba80dbf004ea2df90f1dc3169",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "fb8790a70f0ace95e1cfe7d185042a9b1da6a70f",
+    "reason": "C110 independently accepted the immutable source identities, current canonical semantics, 37 RGBA32 extraction scopes and bounds. P00033 advances only the changed first-pass-v2 source-mask/CLEAN_PLATE execution contract."
+  },
+  "assets": [
+    {
+      "queue_index": 46,
+      "asset": "AA04D779",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "source_format": "RGBA32",
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mip_count": 1,
+        "size_equation_matches_file": true
+      },
+      "protected_artwork": [
+        "REV/TOP/player-number labels and non-text course icons/artwork"
+      ],
+      "localize_work_units": [
+        {
+          "work_unit": 1,
+          "sprite": "sprite_173",
+          "semantics": [
+            {
+              "source": "Palm Beach",
+              "korean": "팜 비치"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            1488,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            1488,
+            504,
+            1640
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1490,
+            502,
+            1638
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 12189824,
+            "final_row_start_byte": 13426816,
+            "final_row_end_exclusive_byte": 13428832,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 2,
+          "sprite": "sprite_172",
+          "semantics": [
+            {
+              "source": "Coniferous Forest",
+              "korean": "침엽수림"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            1336,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            1336,
+            504,
+            1488
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1338,
+            502,
+            1486
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 10944640,
+            "final_row_start_byte": 12181632,
+            "final_row_end_exclusive_byte": 12183648,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 3,
+          "sprite": "sprite_171",
+          "semantics": [
+            {
+              "source": "Snow Mountain",
+              "korean": "스노 마운틴"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            1184,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            1184,
+            504,
+            1336
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1186,
+            502,
+            1334
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 9699456,
+            "final_row_start_byte": 10936448,
+            "final_row_end_exclusive_byte": 10938464,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 4,
+          "sprite": "sprite_170",
+          "semantics": [
+            {
+              "source": "Ancient Ruins",
+              "korean": "고대 유적"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            1032,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            1032,
+            504,
+            1184
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1034,
+            502,
+            1182
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 8454272,
+            "final_row_start_byte": 9691264,
+            "final_row_end_exclusive_byte": 9693280,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 5,
+          "sprite": "sprite_169",
+          "semantics": [
+            {
+              "source": "Bay Area",
+              "korean": "베이 에어리어"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            880,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            880,
+            504,
+            1032
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            882,
+            502,
+            1030
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 7209088,
+            "final_row_start_byte": 8446080,
+            "final_row_end_exclusive_byte": 8448096,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 6,
+          "sprite": "sprite_208",
+          "semantics": [
+            {
+              "source": "Big Forest",
+              "korean": "빅 포레스트"
+            }
+          ],
+          "accepted_cell_xywh": [
+            168,
+            712,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            168,
+            712,
+            672,
+            864
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            170,
+            714,
+            670,
+            862
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 5833504,
+            "final_row_start_byte": 7070496,
+            "final_row_end_exclusive_byte": 7072512,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 7,
+          "sprite": "sprite_196",
+          "semantics": [
+            {
+              "source": "Castle Wall",
+              "korean": "캐슬 월"
+            }
+          ],
+          "accepted_cell_xywh": [
+            504,
+            1336,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            504,
+            1336,
+            1008,
+            1488
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            506,
+            1338,
+            1006,
+            1486
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 10946656,
+            "final_row_start_byte": 12183648,
+            "final_row_end_exclusive_byte": 12185664,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 8,
+          "sprite": "sprite_199",
+          "semantics": [
+            {
+              "source": "Industrial Complex",
+              "korean": "인더스트리얼 컴플렉스"
+            }
+          ],
+          "accepted_cell_xywh": [
+            504,
+            1184,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            504,
+            1184,
+            1008,
+            1336
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            506,
+            1186,
+            1006,
+            1334
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 9701472,
+            "final_row_start_byte": 10938464,
+            "final_row_end_exclusive_byte": 10940480,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 9,
+          "sprite": "sprite_202",
+          "semantics": [
+            {
+              "source": "Metropolis",
+              "korean": "메트로폴리스"
+            }
+          ],
+          "accepted_cell_xywh": [
+            504,
+            1032,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            504,
+            1032,
+            1008,
+            1184
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            506,
+            1034,
+            1006,
+            1182
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 8456288,
+            "final_row_start_byte": 9693280,
+            "final_row_end_exclusive_byte": 9695296,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 10,
+          "sprite": "sprite_205",
+          "semantics": [
+            {
+              "source": "Sunny Beach",
+              "korean": "서니 비치"
+            }
+          ],
+          "accepted_cell_xywh": [
+            504,
+            880,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            504,
+            880,
+            1008,
+            1032
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            506,
+            882,
+            1006,
+            1030
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 7211104,
+            "final_row_start_byte": 8448096,
+            "final_row_end_exclusive_byte": 8450112,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 11,
+          "sprite": "sprite_209",
+          "semantics": [
+            {
+              "source": "Water Falls",
+              "korean": "워터폴스"
+            }
+          ],
+          "accepted_cell_xywh": [
+            672,
+            712,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            672,
+            712,
+            1176,
+            864
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            674,
+            714,
+            1174,
+            862
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 5835520,
+            "final_row_start_byte": 7072512,
+            "final_row_end_exclusive_byte": 7074528,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 12,
+          "sprite": "sprite_194",
+          "semantics": [
+            {
+              "source": "Alpine",
+              "korean": "알파인"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1008,
+            1488,
+            596,
+            128
+          ],
+          "accepted_cell_ltrb": [
+            1008,
+            1488,
+            1604,
+            1616
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1010,
+            1490,
+            1602,
+            1614
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2384,
+            "rows": 128,
+            "first_row_start_byte": 12193856,
+            "final_row_start_byte": 13234240,
+            "final_row_end_exclusive_byte": 13236624,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 13,
+          "sprite": "sprite_197",
+          "semantics": [
+            {
+              "source": "Cloudy Highland",
+              "korean": "클라우디 하이랜드"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1008,
+            1336,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1008,
+            1336,
+            1512,
+            1488
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1010,
+            1338,
+            1510,
+            1486
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 10948672,
+            "final_row_start_byte": 12185664,
+            "final_row_end_exclusive_byte": 12187680,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 14,
+          "sprite": "sprite_200",
+          "semantics": [
+            {
+              "source": "Tulip Garden",
+              "korean": "튤립 가든"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1008,
+            1184,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1008,
+            1184,
+            1512,
+            1336
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1010,
+            1186,
+            1510,
+            1334
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 9703488,
+            "final_row_start_byte": 10940480,
+            "final_row_end_exclusive_byte": 10942496,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 15,
+          "sprite": "sprite_203",
+          "semantics": [
+            {
+              "source": "Cape Way",
+              "korean": "케이프 웨이"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1008,
+            1032,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1008,
+            1032,
+            1512,
+            1184
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1010,
+            1034,
+            1510,
+            1182
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 8458304,
+            "final_row_start_byte": 9695296,
+            "final_row_end_exclusive_byte": 9697312,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 16,
+          "sprite": "sprite_210",
+          "semantics": [
+            {
+              "source": "National Park",
+              "korean": "내셔널 파크"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1176,
+            712,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1176,
+            712,
+            1680,
+            864
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1178,
+            714,
+            1678,
+            862
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 5837536,
+            "final_row_start_byte": 7074528,
+            "final_row_end_exclusive_byte": 7076544,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 17,
+          "sprite": "sprite_195",
+          "semantics": [
+            {
+              "source": "Deep Lake",
+              "korean": "딥 레이크"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1604,
+            1488,
+            384,
+            120
+          ],
+          "accepted_cell_ltrb": [
+            1604,
+            1488,
+            1988,
+            1608
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1606,
+            1490,
+            1986,
+            1606
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 1536,
+            "rows": 120,
+            "first_row_start_byte": 12196240,
+            "final_row_start_byte": 13171088,
+            "final_row_end_exclusive_byte": 13172624,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 18,
+          "sprite": "sprite_198",
+          "semantics": [
+            {
+              "source": "Desert",
+              "korean": "사막"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1512,
+            1336,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1512,
+            1336,
+            2016,
+            1488
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1514,
+            1338,
+            2014,
+            1486
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 10950688,
+            "final_row_start_byte": 12187680,
+            "final_row_end_exclusive_byte": 12189696,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 19,
+          "sprite": "sprite_201",
+          "semantics": [
+            {
+              "source": "Ghost Forest",
+              "korean": "고스트 포레스트"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1512,
+            1184,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1512,
+            1184,
+            2016,
+            1336
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1514,
+            1186,
+            2014,
+            1334
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 9705504,
+            "final_row_start_byte": 10942496,
+            "final_row_end_exclusive_byte": 10944512,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 20,
+          "sprite": "sprite_204",
+          "semantics": [
+            {
+              "source": "Imperial Avenue",
+              "korean": "임페리얼 애비뉴"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1512,
+            1032,
+            504,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            1512,
+            1032,
+            2016,
+            1184
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1514,
+            1034,
+            2014,
+            1182
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 152,
+            "first_row_start_byte": 8460320,
+            "final_row_start_byte": 9697312,
+            "final_row_end_exclusive_byte": 9699328,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 21,
+          "sprite": "sprite_188",
+          "semantics": [
+            {
+              "source": "Sector4",
+              "korean": "섹터 4"
+            }
+          ],
+          "accepted_cell_xywh": [
+            188,
+            1640,
+            200,
+            72
+          ],
+          "accepted_cell_ltrb": [
+            188,
+            1640,
+            388,
+            1712
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            190,
+            1642,
+            386,
+            1710
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 800,
+            "rows": 72,
+            "first_row_start_byte": 13435760,
+            "final_row_start_byte": 14017392,
+            "final_row_end_exclusive_byte": 14018192,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        }
+      ],
+      "unresolved_semantics": []
+    },
+    {
+      "queue_index": 48,
+      "asset": "B1696633",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+      "source_format": "RGBA32",
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+        "git_blob_sha": "cf1c92d295191bf955b9bb1614860614965529f2",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mip_count": 1,
+        "size_equation_matches_file": true
+      },
+      "protected_artwork": [
+        "numeric/rank glyphs, arrows/icons, bars and non-text UI artwork"
+      ],
+      "localize_work_units": [
+        {
+          "work_unit": 22,
+          "sprite": "sprite_20",
+          "semantics": [
+            {
+              "source": "NAME",
+              "korean": "이름"
+            },
+            {
+              "source": "STATUS",
+              "korean": "상태"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            1228,
+            1920,
+            64
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            1228,
+            1920,
+            1292
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            1230,
+            1918,
+            1290
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7680,
+            "rows": 64,
+            "first_row_start_byte": 10059904,
+            "final_row_start_byte": 10576000,
+            "final_row_end_exclusive_byte": 10583680,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "MULTIPLE_LOCALIZABLE_SEMANTICS_SHARE_THIS_ACCEPTED_CELL__DERIVE_INDEPENDENT_SOURCE_EFFECT_MASKS__NO_WHOLE_CELL_CLEAR"
+          }
+        },
+        {
+          "work_unit": 23,
+          "sprite": "sprite_66",
+          "semantics": [
+            {
+              "source": "Stage",
+              "korean": "스테이지"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1084,
+            1148,
+            144,
+            72
+          ],
+          "accepted_cell_ltrb": [
+            1084,
+            1148,
+            1228,
+            1220
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1086,
+            1150,
+            1226,
+            1218
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 576,
+            "rows": 72,
+            "first_row_start_byte": 9408880,
+            "final_row_start_byte": 9990512,
+            "final_row_end_exclusive_byte": 9991088,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 24,
+          "sprite": "sprite_72",
+          "semantics": [
+            {
+              "source": "Next Stage",
+              "korean": "다음 스테이지"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1308,
+            1060,
+            328,
+            88
+          ],
+          "accepted_cell_ltrb": [
+            1308,
+            1060,
+            1636,
+            1148
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1310,
+            1062,
+            1634,
+            1146
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 1312,
+            "rows": 88,
+            "first_row_start_byte": 8688880,
+            "final_row_start_byte": 9401584,
+            "final_row_end_exclusive_byte": 9402896,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 25,
+          "sprite": "sprite_73",
+          "semantics": [
+            {
+              "source": "Ghost",
+              "korean": "고스트"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1636,
+            1060,
+            200,
+            88
+          ],
+          "accepted_cell_ltrb": [
+            1636,
+            1060,
+            1836,
+            1148
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1638,
+            1062,
+            1834,
+            1146
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 800,
+            "rows": 88,
+            "first_row_start_byte": 8690192,
+            "final_row_start_byte": 9402896,
+            "final_row_end_exclusive_byte": 9403696,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 26,
+          "sprite": "sprite_2",
+          "semantics": [
+            {
+              "source": "Total Time",
+              "korean": "총 시간"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            200,
+            840,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            200,
+            840,
+            352
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            202,
+            838,
+            350
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3360,
+            "rows": 152,
+            "first_row_start_byte": 1638528,
+            "final_row_start_byte": 2875520,
+            "final_row_end_exclusive_byte": 2878880,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 27,
+          "sprite": "sprite_156",
+          "semantics": [
+            {
+              "source": "Slipstream",
+              "korean": "슬립스트림"
+            }
+          ],
+          "accepted_cell_xywh": [
+            840,
+            200,
+            600,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            840,
+            200,
+            1440,
+            352
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            842,
+            202,
+            1438,
+            350
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2400,
+            "rows": 152,
+            "first_row_start_byte": 1641888,
+            "final_row_start_byte": 2878880,
+            "final_row_end_exclusive_byte": 2881280,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 28,
+          "sprite": "sprite_158",
+          "semantics": [
+            {
+              "source": "NEW Record!!",
+              "korean": "신기록!!"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1608,
+            200,
+            280,
+            120
+          ],
+          "accepted_cell_ltrb": [
+            1608,
+            200,
+            1888,
+            320
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1610,
+            202,
+            1886,
+            318
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 1120,
+            "rows": 120,
+            "first_row_start_byte": 1644960,
+            "final_row_start_byte": 2619808,
+            "final_row_end_exclusive_byte": 2620928,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 29,
+          "sprite": "sprite_163",
+          "semantics": [
+            {
+              "source": "Extend Time",
+              "korean": "시간 연장"
+            }
+          ],
+          "accepted_cell_xywh": [
+            800,
+            0,
+            1016,
+            152
+          ],
+          "accepted_cell_ltrb": [
+            800,
+            0,
+            1816,
+            152
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            802,
+            2,
+            1814,
+            150
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 4064,
+            "rows": 152,
+            "first_row_start_byte": 3328,
+            "final_row_start_byte": 1240320,
+            "final_row_end_exclusive_byte": 1244384,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        }
+      ],
+      "unresolved_semantics": []
+    },
+    {
+      "queue_index": 50,
+      "asset": "CBF8ECBF",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "source_format": "RGBA32",
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+        "git_blob_sha": "8aa143bb3518713687bdaf565101bc0a437fc2ed",
+        "bytes": 33554560,
+        "width": 4096,
+        "height": 2048,
+        "format": "RGBA32",
+        "mip_count": 1,
+        "size_equation_matches_file": true
+      },
+      "protected_artwork": [
+        "controller/steering-wheel art, rank ordinals, Ferrari/logo artwork and all non-target UI panels"
+      ],
+      "localize_work_units": [
+        {
+          "work_unit": 30,
+          "sprite": "sprite_441",
+          "semantics": [
+            {
+              "source": "Time Over",
+              "korean": "시간 종료"
+            }
+          ],
+          "accepted_cell_xywh": [
+            0,
+            520,
+            1916,
+            292
+          ],
+          "accepted_cell_ltrb": [
+            0,
+            520,
+            1916,
+            812
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            2,
+            522,
+            1914,
+            810
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 16384,
+            "row_slice_bytes": 7664,
+            "rows": 292,
+            "first_row_start_byte": 8519808,
+            "final_row_start_byte": 13287552,
+            "final_row_end_exclusive_byte": 13295216,
+            "file_bytes": 33554560,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 31,
+          "sprite": "sprite_541",
+          "semantics": [
+            {
+              "source": "Game Over",
+              "korean": "게임 오버"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1916,
+            520,
+            1496,
+            248
+          ],
+          "accepted_cell_ltrb": [
+            1916,
+            520,
+            3412,
+            768
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1918,
+            522,
+            3410,
+            766
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 16384,
+            "row_slice_bytes": 5984,
+            "rows": 248,
+            "first_row_start_byte": 8527472,
+            "final_row_start_byte": 12574320,
+            "final_row_end_exclusive_byte": 12580304,
+            "file_bytes": 33554560,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 32,
+          "sprite": "sprite_548",
+          "semantics": [
+            {
+              "source": "GOAL",
+              "korean": "골"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1444,
+            0,
+            1540,
+            472
+          ],
+          "accepted_cell_ltrb": [
+            1444,
+            0,
+            2984,
+            472
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1446,
+            2,
+            2982,
+            470
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 16384,
+            "row_slice_bytes": 6160,
+            "rows": 472,
+            "first_row_start_byte": 5904,
+            "final_row_start_byte": 7722768,
+            "final_row_end_exclusive_byte": 7728928,
+            "file_bytes": 33554560,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        }
+      ],
+      "unresolved_semantics": [
+        {
+          "source": "PLEASE WAIT",
+          "korean": "잠시만요"
+        },
+        {
+          "source": "PLAYERS",
+          "korean": "플레이어"
+        },
+        {
+          "source": "YOUR FRIENDS",
+          "korean": "내 친구"
+        },
+        {
+          "source": "FRIEND REQUEST",
+          "korean": "친구 요청"
+        }
+      ]
+    },
+    {
+      "queue_index": 62,
+      "asset": "33491F83",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "source_format": "RGBA32",
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+        "git_blob_sha": "00a94c32cc35fc773ceed0ece6d1f2f64da841f5",
+        "bytes": 8388736,
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32",
+        "mip_count": 1,
+        "size_equation_matches_file": true
+      },
+      "protected_artwork": [
+        "road geometry, arrows, signals and all non-text loading artwork"
+      ],
+      "localize_work_units": [
+        {
+          "work_unit": 33,
+          "sprite": "sprite_13",
+          "semantics": [
+            {
+              "source": "Diverge",
+              "korean": "분기"
+            },
+            {
+              "source": "Left",
+              "korean": "왼쪽"
+            },
+            {
+              "source": "Right",
+              "korean": "오른쪽"
+            }
+          ],
+          "accepted_cell_xywh": [
+            4,
+            212,
+            1192,
+            808
+          ],
+          "accepted_cell_ltrb": [
+            4,
+            212,
+            1196,
+            1020
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            6,
+            214,
+            1194,
+            1018
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 4768,
+            "rows": 808,
+            "first_row_start_byte": 1736848,
+            "final_row_start_byte": 8347792,
+            "final_row_end_exclusive_byte": 8352560,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "MULTIPLE_LOCALIZABLE_SEMANTICS_SHARE_THIS_ACCEPTED_CELL__DERIVE_INDEPENDENT_SOURCE_EFFECT_MASKS__NO_WHOLE_CELL_CLEAR"
+          }
+        },
+        {
+          "work_unit": 34,
+          "sprite": "sprite_14",
+          "semantics": [
+            {
+              "source": "HARD",
+              "korean": "어려움"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1204,
+            900,
+            504,
+            120
+          ],
+          "accepted_cell_ltrb": [
+            1204,
+            900,
+            1708,
+            1020
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1206,
+            902,
+            1706,
+            1018
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 120,
+            "first_row_start_byte": 7377744,
+            "final_row_start_byte": 8352592,
+            "final_row_end_exclusive_byte": 8354608,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 35,
+          "sprite": "sprite_15",
+          "semantics": [
+            {
+              "source": "EASY",
+              "korean": "쉬움"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1204,
+            772,
+            504,
+            120
+          ],
+          "accepted_cell_ltrb": [
+            1204,
+            772,
+            1708,
+            892
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1206,
+            774,
+            1706,
+            890
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 2016,
+            "rows": 120,
+            "first_row_start_byte": 6329168,
+            "final_row_start_byte": 7304016,
+            "final_row_end_exclusive_byte": 7306032,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 36,
+          "sprite": "sprite_16",
+          "semantics": [
+            {
+              "source": "HARD",
+              "korean": "어려움"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1716,
+            900,
+            320,
+            120
+          ],
+          "accepted_cell_ltrb": [
+            1716,
+            900,
+            2036,
+            1020
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1718,
+            902,
+            2034,
+            1018
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 1280,
+            "rows": 120,
+            "first_row_start_byte": 7379792,
+            "final_row_start_byte": 8354640,
+            "final_row_end_exclusive_byte": 8355920,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        },
+        {
+          "work_unit": 37,
+          "sprite": "sprite_17",
+          "semantics": [
+            {
+              "source": "EASY",
+              "korean": "쉬움"
+            }
+          ],
+          "accepted_cell_xywh": [
+            1716,
+            772,
+            320,
+            120
+          ],
+          "accepted_cell_ltrb": [
+            1716,
+            772,
+            2036,
+            892
+          ],
+          "permitted_inner_guard_ltrb_2px": [
+            1718,
+            774,
+            2034,
+            890
+          ],
+          "guard_classification": "C110_ACCEPTED_CELL_INNER_GUARD_UPPER_BOUND_ONLY_NOT_FINAL_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_RGBA32_ROW_STRIDED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 1280,
+            "rows": 120,
+            "first_row_start_byte": 6331216,
+            "final_row_start_byte": 7306064,
+            "final_row_end_exclusive_byte": 7307344,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "source_mask_work_order": {
+            "stage": "SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "derive": [
+              "exact effect-inclusive source text bbox including fill, outline, shadow, glow and alpha fringe",
+              "independent exact source glyph/effect removal mask per semantic containing no protected non-text pixels",
+              "raw-to-readable transform and orientation from the exact pinned Release source",
+              "baseline vector and signed slant measurements",
+              "protected non-text mask including all listed protected artwork",
+              "CLEAN_PLATE reconstructed only inside each measured removal mask"
+            ],
+            "required_outputs": {
+              "source_effect_bbox_ltrb": "REQUIRED_PER_SEMANTIC",
+              "removal_mask_sha256": "REQUIRED_PER_SEMANTIC",
+              "raw_to_readable_transform": "REQUIRED",
+              "baseline_vector": "REQUIRED_PER_SEMANTIC",
+              "slant_dx_per_dy": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_angle_deg": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "slant_direction": "REQUIRED_PER_SEMANTIC_WHEN_STYLIZED",
+              "protected_non_text_mask_sha256": "REQUIRED",
+              "clean_plate_sha256": "REQUIRED",
+              "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+              "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+            },
+            "unblock_condition": "All required outputs exist for every localizable semantic in the accepted cell, CLEAN_PLATE independently passes outrun-clean-plate-qa-v1, and every computed candidate_safe_bbox is non-empty.",
+            "fail_closed": "HOLD_STRICT_RECHECK",
+            "read_scope": "DECODE_ONLY_THIS_C110_ACCEPTED_EXACT_RELEASE_RGBA32_ROW_SLICE; CELL RECT IS NOT AN EDIT MASK",
+            "orientation_constraint": "DERIVE_EXACT_RAW_TO_READABLE_TRANSFORM_PER_SPRITE; DO NOT INFER FROM NEIGHBORING CELLS",
+            "permitted_inner_guard": "USE_permitted_inner_guard_ltrb_2px_AS_UPPER_BOUND_ONLY",
+            "shared_semantic_constraint": "SINGLE_LOCALIZABLE_SEMANTIC_IN_THIS_ACCEPTED_CELL"
+          }
+        }
+      ],
+      "unresolved_semantics": []
+    }
+  ],
+  "strict_holds": {
+    "index50_unmapped_semantics": [
+      "PLEASE WAIT",
+      "PLAYERS",
+      "YOUR FRIENDS",
+      "FRIEND REQUEST"
+    ],
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "glyph_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "raw_orientation_and_signed_slant": "HOLD_EXACT_DECODE_REQUIRED_PER_ELEMENT",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_UNTIL_MEASURED_SOURCE_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_46_48_50_62",
+    "anti_duplication": "PASS_C110_CONSUMED_B00085__B00092_B00095_B00097_QA_PENDING_SKIPPED",
+    "source_mapping_reuse": "PASS_B00085_C110_UNCHANGED",
+    "work_units": "PASS_37_OF_37_C110_ACCEPTED_PAYLOAD_SCOPES_CONVERTED",
+    "canonical_physical_semantics": "PASS_40_OCCURRENCES_IN_37_WORK_UNITS",
+    "release_size_equations": "PASS_4_OF_4_EXACT_RGBA32_FILE_SIZES",
+    "extraction_ranges": "PASS_37_OF_37_IN_CANVAS_AND_IN_FILE",
+    "region_overlap_pairs": 0,
+    "two_px_inner_guards": "PASS_37_OF_37_NONEMPTY",
+    "unmapped_index50_semantics": "HOLD_4_RETAINED_NOT_GUESSED",
+    "candidate_write": "NONE_FAIL_CLOSED",
+    "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00033 advances four C-consumed even-shard unfinished assets by converting 37 accepted exact Release RGBA32 payload scopes / 40 mapped physical semantic occurrences into strict first-pass-v2 source-effect-mask/CLEAN_PLATE work orders with 2px cell inner guards. Four index-50 semantics remain explicitly unmapped. No source-effect bbox, mask, clean plate, candidate-safe bbox or Korean DDS is guessed; downstream gates remain fail-closed and runtime remains UNTESTED."
+}
