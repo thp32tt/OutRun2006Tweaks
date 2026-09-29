@@ -42,6 +42,12 @@ namespace OutRunVR::GameSemantic
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     inline thread_local ProjectedMarkerInfo LatestProjectedScreenAnchor{};
+    // R73: exact OutRun runtime evidence shows the checkpoint "+TIME" and
+    // final time/progress companions are emitted through generic sprite helper
+    // edges (0x28E81 / 0x2D26C) adjacent to exact result producers. This shared
+    // frame window lets only those two helper edges inherit SCREEN_HUD for a
+    // bounded period; no broad call-range or render-state heuristic is used.
+    inline std::atomic<int> TransientOutRunHudFrames{ 0 };
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local RenderScope CurrentProducerScope = RenderScope::None;
     inline thread_local ProjectedMarkerInfo CurrentProducerMarker{};
@@ -166,6 +172,38 @@ namespace OutRunVR::GameSemantic
     {
         return LatestProjectedScreenAnchor.valid
             ? &LatestProjectedScreenAnchor : nullptr;
+    }
+
+    inline void ArmTransientOutRunHudFrames(int frames) noexcept
+    {
+        if (frames <= 0)
+            return;
+        int current = TransientOutRunHudFrames.load(std::memory_order_acquire);
+        while (current < frames &&
+            !TransientOutRunHudFrames.compare_exchange_weak(
+                current, frames,
+                std::memory_order_acq_rel,
+                std::memory_order_acquire))
+        {
+        }
+    }
+
+    inline void TickTransientOutRunHudFrame() noexcept
+    {
+        int current = TransientOutRunHudFrames.load(std::memory_order_acquire);
+        while (current > 0 &&
+            !TransientOutRunHudFrames.compare_exchange_weak(
+                current, current - 1,
+                std::memory_order_acq_rel,
+                std::memory_order_acquire))
+        {
+        }
+    }
+
+    inline bool TransientOutRunHudActive() noexcept
+    {
+        return TransientOutRunHudFrames.load(
+            std::memory_order_acquire) > 0;
     }
 
     inline void ArmNextDraw(RenderScope scope) noexcept
