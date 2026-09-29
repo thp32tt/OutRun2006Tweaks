@@ -68,7 +68,7 @@ def queue_rollover_prompt(active: dict) -> str:
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
-        "반드시 GitHub만 직접 사용하고 N100 로컬 clone/worktree로 우회하지 마.",
+        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마.",
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
         "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
     ]
