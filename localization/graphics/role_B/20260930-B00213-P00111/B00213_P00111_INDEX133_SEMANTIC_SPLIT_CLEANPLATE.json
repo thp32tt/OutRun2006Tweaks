@@ -1,0 +1,219 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00213-p00111-index133-semantic-split-single-region-cleanplate-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+  "wave_id": "P00111",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:36:00+09:00",
+  "base_head_sha": "35048061e9f2255598c771cec7f69e18dbeef52e",
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "dfe780f0b45616215cc454cc785ff4821f7554ed",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "canonical_source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_shard_overridden_by_current_git_contract": true,
+    "selected_index": 133,
+    "asset": "25F697C6",
+    "current_c_gate": "C146/Q00044",
+    "priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_NO_RUNNABLE_B_DIRECT_REWORK_RENDER_READY_ONE_STAGE",
+    "qa_pending_not_repeated": [
+      {
+        "index": 226,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
+        "result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837"
+      }
+    ]
+  },
+  "exact_source": {
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+    "bytes": 16777344,
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "identity": "REUSE_B00206_C146_EXACT_PASS_UNCHANGED"
+  },
+  "semantic_reconciliation_handoff": {
+    "status": "INDEX133_SHOULD_CONTAIN_ONE_LOCALIZABLE_SEGMENT_ONLY",
+    "keep_on_index133": [
+      {
+        "source": "ANCIENT RUINS",
+        "korean": "고대 유적",
+        "status": "EXACT_SOURCE_PRESENT_BOUND"
+      }
+    ],
+    "remove_from_index133": [
+      {
+        "source": "ALPINE",
+        "korean": "알파인",
+        "reason": "ABSENT_FROM_25F697C6; positively present in current transcription indices147 and227 stage/route assets",
+        "positive_rebind_indices": [
+          147,
+          227
+        ]
+      },
+      {
+        "source": "BLU MIRABEAU",
+        "korean": "블루 미라보",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      },
+      {
+        "source": "ARGENTO NURBURGRING",
+        "korean": "아르젠토 뉘르부르크링",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      },
+      {
+        "source": "BIANCO AVUS",
+        "korean": "비앙코 아부스",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      },
+      {
+        "source": "NERO",
+        "korean": "네로",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      },
+      {
+        "source": "ROSSO SCUDERIA",
+        "korean": "로쏘 스쿠데리아",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      },
+      {
+        "source": "GRIGIO ALLOY",
+        "korean": "그리지오 알로이",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      },
+      {
+        "source": "GIALLO MODENA",
+        "korean": "지알로 모데나",
+        "reason": "ABSENT_FROM_25F697C6; no other positive current-branch transcription binding found",
+        "next_state": "UNBOUND_SEMANTIC_BACKLOG"
+      }
+    ],
+    "exact_source_visible_protected_text": [
+      "F430",
+      "512BB",
+      "328 GTS",
+      "F50",
+      "F40",
+      "DINO 246 GTS",
+      "250 GTO",
+      "288 GTO",
+      "365 GTS/4 DAYTONA",
+      "360 SPIDER",
+      "SUPERAMERICA",
+      "ENZO FERRARI",
+      "550 BARCHETTA",
+      "F355 SPIDER",
+      "TESTAROSSA"
+    ],
+    "c_shared_state_action": "C should reconcile index133 transcription from 9 entries to only ANCIENT RUINS, preserve ALPINE translations at their positive indices147/227, and move seven color translations to unbound backlog rather than guessing an asset."
+  },
+  "ancient_ruins_geometry": {
+    "source_effect_bbox_raw_xyxy": [
+      549,
+      733,
+      1390,
+      827
+    ],
+    "source_effect_bbox_readable_xyxy": [
+      549,
+      1220,
+      1390,
+      1314
+    ],
+    "candidate_safe_bbox_2px_raw_xyxy": [
+      551,
+      735,
+      1388,
+      825
+    ],
+    "candidate_safe_bbox_2px_readable_xyxy": [
+      551,
+      1222,
+      1388,
+      1312
+    ],
+    "baseline_direction": "left_to_right_horizontal",
+    "displayed_slant_direction": "none",
+    "approximate_text_height_px": 95,
+    "median_rgba": [
+      46,
+      53,
+      57,
+      255
+    ]
+  },
+  "single_region_clean_plate": {
+    "method": "inside the exact ANCIENT RUINS effect bbox only, clear every source pixel with any nonzero RGBA channel; leave all pixels outside the bound localizable region byte-exact",
+    "removal_mask_pixels": 55385,
+    "alpha_nonzero_pixels_in_mask": 41813,
+    "removal_mask_bool_raw_sha256": "948d5629e17557f6c7de52b50620550e2b3409e489a2e1f7432dce84d7747489",
+    "decoded_clean_plate_raw_rgba_sha256": "bf8f71bbae6f23e2703defe4b8d456cee832ac6226d81f1b7332ffbc346dabe6",
+    "decoded_clean_plate_display_rgba_sha256": "3ee1480e5b4652f2d84ea9a0e612ebc2914aff2b6654ee5699f6695aa61a1813",
+    "changed_pixels": 55385,
+    "changed_pixels_outside_removal_mask": 0,
+    "alpha_changed_pixels": 41813,
+    "alpha_changed_pixels_outside_removal_mask": 0,
+    "protected_model_text_changed_pixels": 0,
+    "producer_machine_qa": "PASS",
+    "c_independent_qa_required": true
+  },
+  "readiness_after": {
+    "index133": "PREFLIGHT_ONLY_LANE_LOCAL_SEMANTIC_SPLIT_AND_SINGLE_REGION_CLEAN_PLATE_READY_FOR_C_RECONCILIATION",
+    "why_not_render_ready": "Current contract requires shared semantic reconciliation and independently QA-passed CLEAN_PLATE before Korean rendering. B cannot modify shared transcription/progress and C has not yet independently replayed this corrected one-region clean plate.",
+    "candidate_rendered": false,
+    "candidate_dds_modified": false
+  },
+  "post_evidence_rescan": {
+    "b_owned_direct_rework_runnable": [],
+    "b_owned_render_ready": [],
+    "b_owned_one_stage_to_render": [],
+    "qa_pending_indices": [
+      226,
+      232
+    ],
+    "unrelated_new_preflight_started": false
+  },
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00210.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00206.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00209.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00211.json",
+    "localization/graphics/transcriptions.jsonl indices133,147,227",
+    "localization/graphics/role_B/20260930-B00206-P00107/B00206_P00107_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_AUDIT.json"
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

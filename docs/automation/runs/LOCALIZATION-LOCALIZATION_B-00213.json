@@ -1,0 +1,73 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+  "wave_id": "P00111",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T05:36:00+09:00",
+  "base_head_sha": "35048061e9f2255598c771cec7f69e18dbeef52e",
+  "base_sha": "35048061e9f2255598c771cec7f69e18dbeef52e",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX133_SEMANTIC_SPLIT_SINGLE_REGION_CLEANPLATE_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX133_SEMANTIC_SPLIT_ANCIENT_RUINS_CLEAN_PLATE_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Current Git contract owns B shard index%3==1, overriding the stale even-index prompt. B00209 index226 and B00211 index232 are durable producer results awaiting C and are skipped. With no B-owned DIRECT_REWORK/RENDER_READY/ONE_STAGE item runnable, this single candidate-completion preflight resolves index133's semantic conflict lane-locally: exact 25F697C6 contains only ANCIENT RUINS from the nine assigned translations. ALPINE is positively bound elsewhere at indices147/227; the seven Ferrari color strings are removed from index133 and remain unbound rather than guessed. For the sole valid index133 localizable region, B materializes exact source-effect geometry, a 55,385-pixel deterministic clean plate with zero outside/protected/alpha escape, and a final 2px safe bbox. C must reconcile shared transcription and independently replay the corrected one-region CLEAN_PLATE before RENDER_READY; no DDS candidate is emitted.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00213-P00111/B00213_P00111_INDEX133_SEMANTIC_SPLIT_CLEANPLATE.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX133_SEMANTIC_SPLIT_PLUS_SINGLE_VALID_REGION_MASK_CLEAN_PLATE_SAFE_BBOX_HANDOFF",
+    "reviewed_indices": [
+      133
+    ],
+    "reviewed_assets": [
+      "25F697C6"
+    ],
+    "valid_localizable_segments_on_asset": 1,
+    "stale_or_misassigned_segments_removed_from_asset_contract": 8,
+    "positively_rebound_segments": 1,
+    "unbound_backlog_segments": 7,
+    "removal_mask_pixels": 55385,
+    "clean_plate_zero_outside_mask": true,
+    "protected_model_text_unchanged": true,
+    "candidate_safe_bboxes_complete": 1,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      133
+    ],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00209": [
+        226
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00211": [
+        232
+      ]
+    },
+    "readiness_after": {
+      "133": "PREFLIGHT_ONLY_LANE_LOCAL_SEMANTIC_SPLIT_AND_SINGLE_REGION_CLEAN_PLATE_READY_FOR_C_RECONCILIATION"
+    }
+  },
+  "self_qa": "PASS_INDEX133_MOD3_EQ_1__226_232_QA_PENDING_NOT_REPEATED__EXACT_SOURCE_PASS_REUSED__1_OF_9_TRUE_BINDING__ALPINE_POSITIVE_REBIND_147_227__7_COLOR_TOKENS_FAIL_CLOSED_UNBOUND__55385_PIXEL_CLEAN_PLATE_ZERO_OUTSIDE_ZERO_ALPHA_ESCAPE__15_PROTECTED_MODEL_NAMES_UNCHANGED__2PX_SAFE_BBOX",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_C_SHARED_SEMANTIC_RECONCILIATION_AND_INDEPENDENT_SINGLE_REGION_CLEAN_PLATE_QA_REQUIRED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT"
+}
