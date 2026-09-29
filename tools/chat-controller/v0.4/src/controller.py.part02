@@ -249,6 +249,7 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
             "A": "localization_A.md",
             "B": "localization_B.md",
             "C": "localization_C.md",
+            "D": "localization_E.md",
         }
         default_prompt = "localization_A.md"
     context_prefix = (GAME_MOD_CONTEXT + "\n\n") if CONTROLLER_MODE == "conversion" else ""
