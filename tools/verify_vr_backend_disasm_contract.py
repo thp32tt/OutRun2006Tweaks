@@ -98,6 +98,8 @@ def main() -> None:
             "GoalTime_TagHelper<0x000BEA5Au, 0xBE020>",
             "GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>",
             "VR R121 GOAL TIME HUD: shared producer-map",
+            "C2CTestSlipstream_AdjustPositionAndHud<0x000BD32Eu>",
+            "VR R122 SLIPSTREAM HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -126,6 +128,10 @@ def main() -> None:
     if 'GoalTime_TagHelper(0xBE020, "BE020")' in hooks_text or \
        'GoalTime_TagHelper(0xBE150, "BE150")' in hooks_text:
         raise SystemExit("F13 GoalTime ownership regressed to legacy unclassified helper")
+    if "C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BD32E, put_scroll_AdjustPositionRight);" in hooks_text:
+        raise SystemExit(
+            "F13 C2CTestSlipstream ownership regressed to spacing-only callback"
+        )
     require(
         "tools/analyze_outrun_exe.py",
         [
