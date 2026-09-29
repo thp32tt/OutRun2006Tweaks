@@ -280,7 +280,7 @@
         ]
       },
       "stock_mapping_dds": {
-        "git_blob_sha": "b3d7a6d251071987f4987b933d68f01137abf4a8",
+        "git_blob_sha": "9f67a3f374b76afd4edc5255520fe52ca7fa118b",
         "format": "DXT5_REFERENCE_ONLY",
         "readable_reference_transform": "flip_y"
       },
@@ -1104,7 +1104,7 @@
     "qa_pending_dedup": "PASS_B00059_182_198_228_230_SKIPPED",
     "prior_consumed_dedup": "PASS_B00057_132_176_220_222_NOT_REPEATED",
     "canonical_translation_match": "PASS_26_OF_26_EXISTING_SEGMENTS_AGAINST_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
-    "immutable_git_source_identity": "PASS_20_PINNED_GITHUB_OBJECTS__4_ASSETS_X_RELEASE_STOCK_DDS_PNG_STOCK_ATLAS_4X_ATLAS",
+    "immutable_git_source_identity": "PASS_20_PINNED_GITHUB_OBJECTS_AFTER_BA0147DA_STOCK_DDS_SHA_CORRECTION",
     "direct_visual_mapping": "PASS_29_PHYSICAL_OCCURRENCES__25_OF_26_CANONICAL_SEMANTICS",
     "omission_detection": "PASS_2_NEW_ENGLISH_DESCRIPTIONS_IN_EBFC709F_FLAGGED_FOR_C_WITHOUT_GUESSED_KOREAN",
     "exact_hd_text_bbox": "HOLD_STRICT_RECHECK_NO_HD_GLYPH_MASK_THIS_RUN",
@@ -1126,5 +1126,13 @@
   "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_SOURCE_CELL_MAPS_WITH_TWO_TRANSCRIPTION_OMISSIONS",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "correction": {
+    "corrected_at_kst": "2026-09-29T13:44:43+09:00",
+    "reason": "Immediate self-QA source-identity correction before task finalization.",
+    "field": "assets[index=212].stock_mapping_dds.git_blob_sha",
+    "prior_incorrect_value": "b3d7a6d251071987f4987b933d68f01137abf4a8",
+    "corrected_value": "9f67a3f374b76afd4edc5255520fe52ca7fa118b",
+    "verification": "GitHub fetch_file at immutable upstream commit a95efe01d1f136514cef94b0d9e9fd61df021754"
+  }
 }

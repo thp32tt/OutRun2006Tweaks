@@ -8,7 +8,7 @@
   "recorded_at_kst": "2026-09-29T13:44:43+09:00",
   "base_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
   "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_SOURCE_CELL_MAPS_WITH_TWO_TRANSCRIPTION_OMISSIONS",
-  "summary": "Advanced four fresh even-shard pending artwork assets with GitHub-only exact Release/source/atlas identities and source-faithful semantic cell reconstruction evidence. Mapped 29 physical occurrences covering 25/26 existing canonical semantics; left E3F4BA07 STAGE unresolved rather than guessing and detected two previously omitted EBFC709F English descriptions for C reconciliation. No DDS candidate or shared state changed.",
+  "summary": "Advanced four fresh even-shard pending artwork assets with GitHub-only exact Release/source/atlas identities and source-faithful semantic cell reconstruction evidence. Mapped 29 physical occurrences covering 25/26 existing canonical semantics; left E3F4BA07 STAGE unresolved rather than guessing and detected two previously omitted EBFC709F English descriptions for C reconciliation. No DDS candidate or shared state changed. Immediate self-QA corrected the BA0147DA stock mapping DDS Git blob identity before finalization; all other pinned source identities are unchanged.",
   "evidence": [
     "localization/graphics/role_B/20260929-1344-B115-P00004/B115_P00004_EVEN_SEMANTIC_CELL_MAPPING.json",
     "localization/graphics/role_B/20260929-1344-B115-P00004/B115_188_8C259C68_ENGLISH_SOURCE.png",
@@ -56,5 +56,14 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "material_commit_sha": "def90d65027194ceb7118f9a784cd739982defdc",
+  "supersedes_result_sha": "def90d65027194ceb7118f9a784cd739982defdc",
+  "source_identity_correction": {
+    "asset": "BA0147DA",
+    "field": "stock_mapping_dds.git_blob_sha",
+    "prior_incorrect_value": "b3d7a6d251071987f4987b933d68f01137abf4a8",
+    "corrected_value": "9f67a3f374b76afd4edc5255520fe52ca7fa118b",
+    "verification": "PASS_GITHUB_IMMUTABLE_UPSTREAM"
+  }
 }
