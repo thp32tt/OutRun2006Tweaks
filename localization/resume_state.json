@@ -8,8 +8,8 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "RENDER_READY: no new item from Q00038; indices99/112/130/152/237 remain static-QA PASS and runtime-untested.",
-    "HOLD_STRICT_RECHECK: B00190 indices46/100/106 require a new current-contract B result because exact result 5969fd31 lacks its unique task record in the result diff. Do not promote or repeat the same immutable SHA as PASS.",
-    "PREFLIGHT_ONLY: previously accepted source-exhausted indices30/34/36/48/52/132/154/164/172/228 remain unchanged. Later producer results after Q00038 stay separate QA backlog."
+    "REWORK_REQUIRED: B00190 indices46/100/106 must be atomically re-emitted by B because immutable result 5969fd31 does not include its unique durable task record in the exact result diff. Do not promote or re-consume that SHA as PASS.",
+    "PREFLIGHT_ONLY: previously accepted source-exhausted indices30/34/36/48/52/132/154/164/172/228 remain unchanged. Producer results after Q00038 remain separate QA backlog inputs."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2483,11 +2483,11 @@
     "runtime_validation": "UNTESTED",
     "automation_gate": {
       "workflow": "Localization Automation Gate",
-      "run_id": 36611801924,
+      "run_id": 36612087138,
       "run_attempt": 1,
       "status": "completed",
       "conclusion": "success",
-      "validated_at_kst": "2026-09-30T03:24:46+09:00"
+      "validated_at_kst": "2026-09-30T03:27:03+09:00"
     }
   }
 }
