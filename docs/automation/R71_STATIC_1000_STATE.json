@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 22,
+  "completedCycles": 23,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "7ca9b09bfafc0a21b71cea72954ee7dbd1ae3f5b",
+  "currentHead": "e91a18f3b16f3d263bccb499a36eb3b8c981bf56",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -676,12 +676,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "review DirectGPU producer identity"
+    },
+    {
+      "cycle": 23,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Skipped-release ownership carries clientPid, runGeneration, transportGeneration, slot and frameId; stale producers are dropped and live same-slot conflicts fail closed."
+      ],
+      "evidence": [
+        "R41SkippedRelease::Identity/Queue"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "e91a18f3b16f3d263bccb499a36eb3b8c981bf56"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "review deferred EVENT poison/reset lifetime"
     }
   ],
   "nextCycle": {
-    "cycle": 23,
+    "cycle": 24,
     "priority": [
-      "review DirectGPU producer identity"
+      "review deferred EVENT poison/reset lifetime"
     ],
     "guard": "frozen 34eef500 user-test package immutable; GitHub remains source of truth"
   },
