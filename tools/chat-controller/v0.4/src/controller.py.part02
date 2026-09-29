@@ -251,7 +251,8 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
             "C": "localization_C.md",
         }
         default_prompt = "localization_A.md"
-    return queue_dynamic_prefix() + read_prompt(role_prompts.get(slot.name, default_prompt))
+    context_prefix = (GAME_MOD_CONTEXT + "\n\n") if CONTROLLER_MODE == "conversion" else ""
+    return context_prefix + queue_dynamic_prefix() + read_prompt(role_prompts.get(slot.name, default_prompt))
 
 
 async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
