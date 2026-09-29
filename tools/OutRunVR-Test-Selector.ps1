@@ -8,6 +8,19 @@ $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $launcher=Join-Path $root 'Invoke-OutRunVROneClick.ps1'
 if(!(Test-Path $launcher -PathType Leaf)){throw "One-click launcher missing: $launcher"}
 
+# Preserve the HMD-proven R57 selector contract as diagnostic metadata.
+# The evening UI below intentionally launches the current branch target/variant,
+# but these identities remain visible to baseline verification and manual fallback.
+$provenBackendBaseline=@(
+    @('DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD'),
+    @('DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD'),
+    @('DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD')
+)
+$provenDiagnosticSlots=[ordered]@{
+    'R57_05_RANK_PROJECTED_IPD'=@('comparison','projected-IPD diagnostic')
+    'R57_06_RANK_PROJECTED_HEAD'=@('proven-default','head-inverse projected rank')
+}
+
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun 2006 VR - Tonight Test Selector'
 $form.StartPosition='CenterScreen'
