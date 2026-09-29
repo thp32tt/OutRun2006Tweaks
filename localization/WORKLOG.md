@@ -1896,3 +1896,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Validation-bearing result `bd354484bd976ec11a67036a66bd102ba797107d`; Localization Automation Gate `36635267415` completed **success**.
 - A00218@index231 remains **PASS / PREFLIGHT_ONLY**. No Korean DDS candidate or runtime approval was created.
 - Pending production **70**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 07:02 KST - C151 Q00049 INDEPENDENT QA BATCH
+- QA input: B00219 `e15a33cae69671ea6325d95b94a221d8b5a779ae` / index217 `D1039D6F` — **SUPERSEDED** because current HEAD contains newer overlapping B00223 `37b579a9f850ccb4f5f1a347133851d875fac663` that closes the same source-byte uncertainty.
+- C independently cross-checked the pinned v0.25.10a archive once: bundle digest/size are exact, D1039D6F member SHA-256 is `d3d2d155...`, and computed Git blob SHA-1 `544b638f...` exactly equals B00219/B00223's pinned-tag locator. These bytes mismatch current canonical inventory `035714f9...`; this confirms material supersession but does not disposition out-of-batch B00223.
+- B00219 correctly stayed fail-closed and produced no Korean DDS. No duplicate candidate/header/alpha/orientation/containment/English-source comparison work was run. Index217 receives no new readiness promotion in Q00049 and retains prior PREFLIGHT_ONLY only.
+- Shared state merged once. Index222 is now candidate-QA pending after A00221; candidate QA 159/198/201/222 stays ahead of unrelated preflight, while B00223 indices193/217 await their own C batch. Pending production 70, actionable localize_text 93, canonical segments 753.
+- `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`. No runtime test, build, N100/local clone/GPT Library/Drive write, VR/FFB/DX changes.

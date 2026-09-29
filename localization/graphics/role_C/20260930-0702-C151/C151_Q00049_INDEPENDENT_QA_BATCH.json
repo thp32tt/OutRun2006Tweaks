@@ -1,0 +1,245 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-c151-q00049-b00219-superseded-by-b00223-source-lineage-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00224",
+  "wave_id": "Q00049",
+  "qa_batch_id": "Q00049",
+  "run": "C151",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:02:35+09:00",
+  "base_head_sha": "ac79c2fa241c1440cebed2e3512b55cfb76364e7",
+  "base_sha": "ac79c2fa241c1440cebed2e3512b55cfb76364e7",
+  "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SINGLE_SHARED_STATE_MERGE",
+  "result": "PASS_Q00049_B00219_SUPERSEDED_BY_NEWER_B00223_INDEX217_SOURCE_REPLAY_NO_DUPLICATE_PROMOTION_RUNTIME_UNTESTED",
+  "summary": "Q00049 reviews immutable B00219@e15a33cae69671ea6325d95b94a221d8b5a779ae for index217/D1039D6F. The producer correctly failed closed at an immutable pinned-tag locator and did not claim canonical source bytes or a Korean candidate. Before C merged this batch, current HEAD gained newer producer B00223@37b579a9f850ccb4f5f1a347133851d875fac663, which explicitly closes B00219's raw-byte uncertainty for the same asset: the pinned v0.25.10a tag blob and pinned Release member are byte-identical but SHA-256 d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0, not current canonical inventory 035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf. C independently cross-checked the pinned ZIP digest/size, member SHA/header and Git-blob identity once. Therefore the older B00219 input is SUPERSEDED and must not overwrite or implicitly approve the newer B00223 evidence. B00223 is outside Q00049 and remains PENDING for a later C disposition. No Korean candidate exists for index217; runtime remains UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00219",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "e15a33cae69671ea6325d95b94a221d8b5a779ae",
+      "result_message": "localization(B): pin index217 canonical source locator [AUTO:LOCALIZATION-LOCALIZATION_B-00219]",
+      "completed_at": "2026-09-30T06:40:09.004052+09:00",
+      "producer_id": "P00116",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00219",
+      "result_sha": "e15a33cae69671ea6325d95b94a221d8b5a779ae",
+      "status": "SUPERSEDED",
+      "reason": "SUPERSEDED: immutable B00219 correctly pinned the v0.25.10a tag locator and held SHA/header/orientation/candidate gates, but current HEAD contains newer overlapping B00223@37b579a9f850ccb4f5f1a347133851d875fac663 for index217. B00223 closes the exact source-byte question using the pinned archive and establishes that tag blob 544b638f755c2c1615ff1882853635bfd438e4c2 equals the Release member while SHA-256 d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0 mismatches canonical inventory 035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf. Q00049 therefore does not promote the older locator-only result or overwrite newer evidence. B00223 is not a Q00049 input and is not approved here. Runtime remains UNTESTED."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "producer_task_record_blob_sha": "969ab55c1c3ea7bb4975910e677bbac1be48f3c2",
+    "producer_evidence_blob_sha": "9b2f6b90188426abd8a9e8c203b2f838b065c126",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "canonical_inventory_sha256": "035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf",
+    "candidate_sha256": null,
+    "newer_overlapping_result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663"
+  },
+  "supersession": {
+    "newer_task_id": "LOCALIZATION-LOCALIZATION_B-00223",
+    "newer_result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663",
+    "newer_result_message": "localization(B): exact source replay and index193 preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00223]",
+    "same_asset_index": 217,
+    "same_asset": "D1039D6F",
+    "material_overlap": "EXACT_PINNED_SOURCE_IDENTITY_REPLAY_CLOSES_B00219_RAW_BYTE_UNCERTAINTY",
+    "q00049_disposition_scope": "B00219_ONLY",
+    "newer_input_approved_by_q00049": false
+  },
+  "independent_source_identity_crosscheck": {
+    "archive": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "bytes": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "identity": "PASS_EXACT_PINNED_BUNDLE"
+    },
+    "current_inventory": {
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "sha256": "035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA"
+    },
+    "pinned_tag_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "git_blob_sha1": "544b638f755c2c1615ff1882853635bfd438e4c2",
+      "bytes": 16777344,
+      "raw_byte_equivalence": "PASS_SAME_GIT_BLOB_AS_RELEASE_MEMBER",
+      "sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "canonical_inventory_match": false,
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    },
+    "pinned_release_member": {
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "bytes": 16777344,
+      "sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "computed_git_blob_sha1": "544b638f755c2c1615ff1882853635bfd438e4c2",
+      "width": 2048,
+      "height": 2048,
+      "dds_format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192,
+      "channel_masks": {
+        "r": "0x000000ff",
+        "g": "0x0000ff00",
+        "b": "0x00ff0000",
+        "a": "0xff000000"
+      },
+      "canonical_inventory_match": false,
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    },
+    "approved_drive_fast_path_from_immutable_b00219": "SOURCE_TRANSPORT_MISS",
+    "note": "This one-time C cross-check confirms the newer B00223 supersession is material; it does not disposition or promote B00223 in Q00049."
+  },
+  "semantic_validation": {
+    "current_canonical_pairs": [
+      {
+        "source": "START",
+        "korean": "출발"
+      },
+      {
+        "source": "GOAL",
+        "korean": "골"
+      }
+    ],
+    "context": "route-map labeling; START intentionally follows index63 route-map context",
+    "status": "PASS_METADATA_UNCHANGED",
+    "semantic_to_pixel_binding": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "metadata_changed_by_c": false
+  },
+  "candidate_gate": {
+    "korean_candidate_present": false,
+    "dds_header_mipmap_alpha_orientation": "NOT_APPLICABLE_NO_CANDIDATE_AND_SUPERSEDED_INPUT",
+    "one_pixel_containment": "NOT_APPLICABLE_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_CANDIDATE",
+    "broken_hangul_clipping_artwork_damage": "NOT_APPLICABLE_NO_CANDIDATE",
+    "promotion": "NONE"
+  },
+  "reviewed_assets": [
+    {
+      "index": 217,
+      "asset": "D1039D6F",
+      "disposition": "SUPERSEDED",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "promotion_scope": "NO_NEW_PROMOTION_Q00049_SUPERSEDED_INPUT",
+      "candidate_static_qa": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Do not repeat B00219 locator-only work. Keep index217 at prior accepted PREFLIGHT_ONLY state. Newer B00223@37b579a9f850ccb4f5f1a347133851d875fac663 is a separate immutable QA input and must receive its own later C disposition before its source-identity findings change accepted shared readiness."
+    }
+  ],
+  "readiness_reconciliation": {
+    "classification": "B00219_SUPERSEDED_BY_NEWER_B00223_INDEX217_SOURCE_EVIDENCE",
+    "production_readiness": {
+      "217": "PREFLIGHT_ONLY_PRIOR_ACCEPTED_STATE_NO_Q00049_PROMOTION"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      198,
+      201,
+      222
+    ],
+    "out_of_batch_producer_qa_pending": [
+      {
+        "index": 193,
+        "asset": "97E863AD",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00223",
+        "result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663"
+      },
+      {
+        "index": 217,
+        "asset": "D1039D6F",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00223",
+        "result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663"
+      }
+    ],
+    "preflight_only_candidate_completion_indices": [
+      133,
+      231,
+      232
+    ],
+    "prior_preflight_only_no_new_promotion_indices": [
+      217
+    ],
+    "already_rendered_static_qa_pass_indices": [
+      99,
+      112,
+      130,
+      152,
+      226,
+      237
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: none accepted at the Q00049 merge HEAD; index222/DDF0392A has moved to a persisted producer candidate and is now C-QA-pending.",
+      "ONE_STAGE_TO_RENDER: none accepted.",
+      "Candidate QA 159/198/201/222 remains ahead of unrelated preflight; do not rerender unchanged QA-pending candidates.",
+      "PREFLIGHT_ONLY candidate-completion work remains 133/231/232. Index217 remains prior PREFLIGHT_ONLY only; B00219 is superseded and newer B00223 index193/217 evidence awaits its own C disposition."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_SUPERSESSION_RECONCILIATION_WITH_SINGLE_SOURCE_IDENTITY_CROSSCHECK",
+    "reviewed_indices": [
+      217
+    ],
+    "reviewed_assets": 1,
+    "producer_inputs_pass": 0,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 1,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 70,
+    "candidate_dds_modified_by_c": false,
+    "new_render_ready": 0,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00224.json"
+  },
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00219.json@e15a33cae69671ea6325d95b94a221d8b5a779ae",
+    "localization/graphics/role_B/20260930-B00219-P00116/B00219_P00116_INDEX217_PINNED_SOURCE_LOCATOR_PREFLIGHT.json@e15a33cae69671ea6325d95b94a221d8b5a779ae",
+    "localization/graphics/inventory.csv@current-head",
+    "localization/graphics/transcriptions.jsonl@current-head",
+    "localization/graphics/artwork_plan.jsonl@current-head",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00223.json@37b579a9f850ccb4f5f1a347133851d875fac663"
+  ],
+  "candidate_dds_modified": false,
+  "new_render_ready": 0,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "one-time independent pinned-release identity cross-check only; GitHub remains state/progress/QA SSOT",
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "No candidate/header/containment/visual gate was rerun for the superseded B00219 input. Only the source-identity equivalence needed to establish material supersession was checked once.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": "PENDING_POST_COMMIT",
+  "validation_bearing_result_sha": "PENDING_POST_COMMIT",
+  "bookkeeping_note": "This AUTO result commit is the Q00049 validation owner and must not contain CI-skip. Gate outcome is recorded later in a separate bookkeeping commit."
+}

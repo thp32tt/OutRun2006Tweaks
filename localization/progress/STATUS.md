@@ -1307,3 +1307,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 ### C150 Q00048 AUTHORITATIVE GATE PASS — 2026-09-30T06:44:54+09:00
 - Validation-bearing result `bd354484bd976ec11a67036a66bd102ba797107d`; Gate `36635267415` — **success**.
 - A00218@index231 remains **PASS / PREFLIGHT_ONLY**; two description translations/bindings remain unresolved. `RUNTIME_VALIDATION=UNTESTED`.
+
+### C151 Q00049 — 2026-09-30T07:02:35+09:00
+- Immutable input B00219 `e15a33ca...` / index217 `D1039D6F` — **SUPERSEDED** by newer overlapping B00223 `37b579a9...`; Q00049 does not overwrite or implicitly approve the newer producer evidence.
+- One-time C source-identity cross-check confirms pinned ZIP SHA-256 `76f85ed2...` / 306,223,257 bytes; exact D1039D6F member SHA-256 `d3d2d155...`, Git blob `544b638f...`, RGBA32 2048x2048 mip1. Those bytes are the same immutable pinned-tag blob and do **not** match current canonical inventory SHA-256 `035714f9...`.
+- B00219 had correctly failed closed and emitted no Korean DDS. Candidate-only DDS/alpha/orientation/1px/source-comparison gates are not rerun for the superseded input. Index217 keeps only its prior accepted **PREFLIGHT_ONLY** state; B00223 requires a later C disposition.
+- Shared order now has **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate QA 159/198/201/222 -> PREFLIGHT_ONLY 133/231/232**. Newer B00223 indices193/217 are out-of-batch QA-pending and must not be duplicated.
+- No DDS/build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
