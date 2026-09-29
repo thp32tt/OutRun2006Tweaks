@@ -4,7 +4,7 @@
   "lane": "LOCALIZATION_B",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "chat_rollover": 2,
+  "chat_rollover": 4,
   "wave_id": "P00082",
   "recorded_at_kst": "2026-09-30T00:49:31+09:00",
   "base_head_sha": "fb925aa9aad852ffb9ddc66e73f2cfd51ca61f5b",
@@ -61,5 +61,35 @@
   "work_stolen_from_lane": null,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "validation_bearing_result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+  "rollover4_visual_review": {
+    "reviewed_at_kst": "2026-09-30T00:51:00+09:00",
+    "reviewed_exact_git_result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+    "status": "PASS",
+    "evidence": [
+      "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/comparison.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/clean_plate_display.png",
+      "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/candidate_display.png"
+    ],
+    "checks": {
+      "clean_plate_visible_english_residue": "PASS_NONE_VISIBLE",
+      "korean_legibility": "PASS_PRO_YEONJU_GITA_YURO",
+      "font_size_consistency": "PASS_24PX_ALL_FOUR",
+      "clipping_or_overlap": "PASS_NONE_VISIBLE",
+      "safe_bbox_containment": "PASS_MATCHES_STATIC_QA",
+      "preserve_year_cells": "PASS_VISUAL_AND_STATIC_QA",
+      "orientation": "PASS_FLIP_Y_READABLE"
+    },
+    "note": "Exact Git-rendered PNG review; superseded 47031/d6fbe visual false-positive outputs were not accepted."
+  },
+  "rollover4_bookkeeping": {
+    "removes_orphaned_helper_files_from_conflicted_full_effect_attempt": [
+      ".github/workflows/localization-b00167-49bb5fe5.yml",
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00167.dispatch.json",
+      "tools/localization/b00167_render_49bb5fe5.py"
+    ],
+    "strict_rework_result_unchanged": true,
+    "shared_state_modified": false
+  }
 }
