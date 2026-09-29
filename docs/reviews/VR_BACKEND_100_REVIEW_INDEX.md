@@ -38,7 +38,7 @@ Each set contains ten distinct review passes and derives the next set's directio
 ## Main unresolved groups
 
 ### Structure / facade debt
-- **F04 phase 1/2/3/4 progressed 2026-09-30:** renderer R13 and R23/R27/R28 bodies are include-free overlays; production D3D9Ex now composes the R13/base chain plus include-free R14 and R15 overlays directly instead of nesting the historical R14/R15 wrappers. Compatibility wrappers remain for diagnostic/build-graph ownership. Phase 4 exact result `9093668dc6052db11122aa908e17597358d773a6` passed Backend Conversion Gate `36588776139`, Build `36588782824`, OpenXR architecture `36588782832` (all six jobs), HUD Inspector `36588783126`, and hosted package runs `36588782977`/`36588776360`. **F04 remains OPEN** because the production R13->base edge and stereo historical include chains remain; no Quest3/VDXR or in-game validation was performed.
+- **F04 phase 1/2/3/4/5 progressed 2026-09-30:** renderer R13 and R23/R27/R28 bodies are include-free overlays; production D3D9Ex now composes the optimization-bounded base `ex_device_upgrade.cpp` plus include-free R13/R14/R15 overlays directly instead of nesting historical R13/R14/R15 wrappers. Compatibility wrappers remain for diagnostic/build-graph ownership. Phase 5 exact result `888cda6918e5e9639969cfde1a2ed344015eccdd` passed Backend Conversion Gate `36592888839`, Build `36592896343`, OpenXR architecture `36592896345` (all six jobs), HUD Inspector `36592896476`, and hosted package runs `36592896708`/`36592888566`; PC Fast `36592888565` was skipped by policy. **F04 remains OPEN** only because stereo historical include chains remain; no Quest3/VDXR or in-game validation was performed.
 
 ### A. Backend-neutral semantics
 - Shared WVP/address anchors are live and consistent.
