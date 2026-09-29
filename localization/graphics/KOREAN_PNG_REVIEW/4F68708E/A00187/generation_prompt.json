@@ -1,0 +1,145 @@
+{
+  "alpha_behavior": "Outside touched source/effect + Korean BC3 blocks preserve original compressed bytes. Clean plate clears exact visible source alpha/effect pixels to RGBA 0. No opaque panel/background.",
+  "approved_korean_lines": [
+    "고스트 카와 달리며",
+    "코스 기록에 도전하세요!"
+  ],
+  "asset_id": "4F68708E",
+  "background_class": "transparent text/effect-only atlas",
+  "contract": "outrun-first-pass-edit-v2",
+  "contract_version": 2,
+  "display_transform": "flip_y_to_readable",
+  "edit_instruction": "EDIT, DO NOT REDESIGN. Remove the complete English glyph/effect pixels to exact transparency, then render only the approved Korean two-line wording inside 2px-inset source full-effect bboxes.",
+  "elements": [
+    {
+      "candidate_safe_bbox_readable": [
+        536,
+        39,
+        1351,
+        123
+      ],
+      "containment": "PASS",
+      "containment_margins_px": {
+        "bottom": 4,
+        "left": 4,
+        "right": 285,
+        "top": 4
+      },
+      "decoded_final_containment": "PASS",
+      "decoded_final_localized_bbox_readable": [
+        540,
+        43,
+        1066,
+        119
+      ],
+      "delta_bottom": 6,
+      "delta_left": 6,
+      "delta_right": 287,
+      "delta_top": 6,
+      "korean": "고스트 카와 달리며",
+      "line": 1,
+      "localized_bbox_readable": [
+        540,
+        43,
+        1066,
+        119
+      ],
+      "original_bbox_readable": [
+        534,
+        37,
+        1353,
+        125
+      ],
+      "render_raster_size": [
+        526,
+        76
+      ],
+      "source": "Drive against the Ghost Car"
+    },
+    {
+      "candidate_safe_bbox_readable": [
+        516,
+        127,
+        1612,
+        215
+      ],
+      "containment": "PASS",
+      "containment_margins_px": {
+        "bottom": 6,
+        "left": 4,
+        "right": 424,
+        "top": 6
+      },
+      "decoded_final_containment": "PASS",
+      "decoded_final_localized_bbox_readable": [
+        520,
+        133,
+        1188,
+        209
+      ],
+      "delta_bottom": 8,
+      "delta_left": 6,
+      "delta_right": 426,
+      "delta_top": 8,
+      "korean": "코스 기록에 도전하세요!",
+      "line": 2,
+      "localized_bbox_readable": [
+        520,
+        133,
+        1188,
+        209
+      ],
+      "original_bbox_readable": [
+        514,
+        125,
+        1614,
+        217
+      ],
+      "render_raster_size": [
+        668,
+        76
+      ],
+      "source": "and challenge for the course record!!"
+    }
+  ],
+  "font_identifier": "NotoSansCJK-Regular.ttc#1 (font bytes not distributed)",
+  "forbidden": [
+    "visible English residue",
+    "opaque/semtransparent cover rectangles",
+    "new panels",
+    "blur/smudge concealment",
+    "changes outside source full-effect regions",
+    "cropping/padding/resizing",
+    "upright raw DDS text",
+    "generic shadow/glow not present",
+    "fallback glyph boxes"
+  ],
+  "queue_index": 99,
+  "raw_orientation": "mirror-Y",
+  "single_pass_self_check": "Before producing the candidate, verify no source-language text/effect remains; no cover box, patch, seam or invented panel exists; protected pixels remain unchanged; Korean effects stay inside 2px-inset source bboxes; raw mirror-Y orientation and transparency remain correct.",
+  "source_dimensions": [
+    2048,
+    256
+  ],
+  "source_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+  "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+  "style": {
+    "fill_rgb": [
+      255,
+      255,
+      255
+    ],
+    "outer_effect_rgb": [
+      5,
+      14,
+      60
+    ],
+    "slant_angle_deg": 12.407,
+    "slant_direction": "right",
+    "slant_dx_per_dy": 0.22,
+    "source_style_note": "white italic sans lettering with thick dark-navy outer effect on transparent atlas",
+    "stroke_width_px": 8,
+    "tracking_px": 1
+  },
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00187"
+}

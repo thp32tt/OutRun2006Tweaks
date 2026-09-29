@@ -1,0 +1,201 @@
+{
+  "schema_version": 10,
+  "schema": "outrun-a00187-index99-dxt5-decoded-final-qa-v2",
+  "status": "PASS_SELF_QA_PENDING_C",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00187",
+  "wave_id": "P00095",
+  "lane": "LOCALIZATION_A",
+  "asset_id": "4F68708E",
+  "queue_index": 99,
+  "recorded_at_kst": "2026-09-30T02:42:22+09:00",
+  "base_head_sha": "8430b831136f0f78f381fc4a1e5a55e267543e1d",
+  "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+  "candidate_dds_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+  "candidate_decoded_rgba_sha256": "fbdd0050b882d9e20f95834b2f56a57dc4b19ac316560f8f0b4ec627636aa23b",
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_sha256": "1b9fc55cdf14b876b1d72fe66922cb76b00a14b990765c430a6fdbc82dae3885",
+  "prompt_json_sha256": "1b9fc55cdf14b876b1d72fe66922cb76b00a14b990765c430a6fdbc82dae3885",
+  "signed_slant_gate": "PASS",
+  "signed_slant_source_estimate_deg": 12.0,
+  "signed_slant_candidate_deg": 12.407,
+  "slant_direction": "right",
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "bytes": 524416,
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5_BC3",
+    "mip_count": 1,
+    "raw_to_readable": "mirror-Y"
+  },
+  "source_acquisition": {
+    "google_drive_account": "ezflash557",
+    "google_drive_exact_filename": "SOURCE_TRANSPORT_MISS_RECONFIRMED_PRE_DISPATCH",
+    "pinned_upstream_direct_file": "PASS_EXACT_CANONICAL_SOURCE",
+    "pinned_release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "final": "PASS_EXACT_CANONICAL_SOURCE"
+  },
+  "c_handoff": {
+    "latest_task": "LOCALIZATION-LOCALIZATION_C-00186",
+    "latest_result_sha": "68aa068a82d17ea041f6d265c51ade59bc3e1f2a",
+    "readiness": "ONE_STAGE_TO_RENDER",
+    "rework_origin_task": "LOCALIZATION-LOCALIZATION_C-00181",
+    "rework_reason": "visible English ghost silhouettes in A00173 clean plate v3"
+  },
+  "clean_plate": {
+    "contract": "outrun-clean-plate-qa-v1",
+    "method": "transparent_text_only_exact_source_alpha_effect_removal",
+    "source_effect_pixels": 125135,
+    "remaining_visible_pixels": 0,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "visible_source_residue": "PASS_NONE"
+  },
+  "decoded_final": {
+    "changed_pixels_total": 127945,
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "alpha_changed_outside_source_region": 0,
+    "introduced_alpha_outside_candidate_safe_bbox": 0,
+    "touched_bc3_blocks": 8676,
+    "block_closure_pixels": 138816,
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "DXT5_BC3",
+    "mip_count": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror-Y",
+    "per_element": [
+      {
+        "line": 1,
+        "source": "Drive against the Ghost Car",
+        "korean": "고스트 카와 달리며",
+        "original_bbox_readable": [
+          534,
+          37,
+          1353,
+          125
+        ],
+        "candidate_safe_bbox_readable": [
+          536,
+          39,
+          1351,
+          123
+        ],
+        "localized_bbox_readable": [
+          540,
+          43,
+          1066,
+          119
+        ],
+        "containment_margins_px": {
+          "left": 4,
+          "top": 4,
+          "right": 285,
+          "bottom": 4
+        },
+        "render_raster_size": [
+          526,
+          76
+        ],
+        "delta_left": 6,
+        "delta_top": 6,
+        "delta_right": 287,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "decoded_final_localized_bbox_readable": [
+          540,
+          43,
+          1066,
+          119
+        ],
+        "decoded_final_containment": "PASS"
+      },
+      {
+        "line": 2,
+        "source": "and challenge for the course record!!",
+        "korean": "코스 기록에 도전하세요!",
+        "original_bbox_readable": [
+          514,
+          125,
+          1614,
+          217
+        ],
+        "candidate_safe_bbox_readable": [
+          516,
+          127,
+          1612,
+          215
+        ],
+        "localized_bbox_readable": [
+          520,
+          133,
+          1188,
+          209
+        ],
+        "containment_margins_px": {
+          "left": 4,
+          "top": 6,
+          "right": 424,
+          "bottom": 6
+        },
+        "render_raster_size": [
+          668,
+          76
+        ],
+        "delta_left": 6,
+        "delta_top": 8,
+        "delta_right": 426,
+        "delta_bottom": 8,
+        "containment": "PASS",
+        "decoded_final_localized_bbox_readable": [
+          520,
+          133,
+          1188,
+          209
+        ],
+        "decoded_final_containment": "PASS"
+      }
+    ],
+    "english_source_comparison": "PASS_PRECOMMIT_NATIVE_READABLE",
+    "source_language_residue": "PASS_NONE_VISIBLE",
+    "clean_plate_box_or_seam": "PASS_NONE_TRANSPARENT"
+  },
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_outside_source_region": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "introduced_alpha_outside_source_region": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "candidate_dds_modified": true,
+  "candidate_static_qa": "PASS_SELF_QA_PENDING_INDEPENDENT_C",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "tool_versions": {
+    "pillow": "12.3.0",
+    "numpy": "2.5.3"
+  },
+  "notes": "Direct C REWORK_REQUIRED/ONE_STAGE_TO_RENDER index99. v3 failed because alpha-preserving inpaint retained readable dark-blue English silhouettes. v4 treats the exact canonical asset as a transparent text/effect-only atlas: every exact source-visible effect pixel is cleared to transparent; Korean is freshly rendered inside 2px-inset source bboxes; raw mirror-Y is restored; only touched BC3 blocks are re-encoded; untouched BC3 blocks remain byte-identical."
+}
