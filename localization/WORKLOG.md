@@ -1380,3 +1380,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Added CI verifier `verify_generation_contract_v2.py`.
 - Strict zero-pixel QA remains unchanged; runtime validation remains UNTESTED.
 - Durable policy report: `localization/graphics/GENERATION_V2_SAFE_FIT_20260929.json`.
+
+### C108 Q00006 independent QA batch — 2026-09-29T15:56:43+09:00
+- Immutable inputs: A00074 `6cf9089ed5039b0e997893ccce4d50d90d090643` and B00077 `0dca6ef541a57f1c01b29b65bd56daa96f2388c9`; both dispositions **PASS** as pre-generation extraction deliverables and neither is superseded at merge base `43c90861c97d6d0a974dfd328988498ad7c79a8b`. A00079/B00080 are newer disjoint producers and remain queued for later C QA.
+- Direct GitHub identity QA: **24/24 PASS** against immutable `Sonic-TV/OR2006Sprites@a95efe01`; pinned reused A00058/C00063/B00057/C00060 evidence-record blobs still match exactly.
+- Canonical semantics: **37/37 PASS** against both current `transcriptions.jsonl` and `artwork_plan.jsonl` (A00074 17/17, B00077 20/20).
+- A00074: **18/18** exact HD cell bounds + 32-bpp row-slice offset/end formulas PASS; overlap pairs **0**.
+- B00077: **106/106** exact Release payload-region bounds/extraction formulas PASS, including **25/25** 16-byte 4x4 block-aligned regions; overlap pairs **0**.
+- Current generation-v2 policy is stricter than the producer snapshots but does not promote or invalidate this immutable extraction evidence. No Korean candidate DDS exists, so exact full-effect bbox/orientation/slant/clean-plate, decoded-final 1px containment, alpha/format/mipmap/compression and ENGLISH SOURCE vs KOREAN CANDIDATE gates remain **HOLD_STRICT_RECHECK**.
+- Shared-state bookkeeping repaired: latest C-batch pointers advance to Q00006/C108 and stale workstream segment counters are normalized from 754 to canonical **753**; no translation/queue/candidate bytes changed.
+- No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-1556-C108/C108_Q00006_INDEPENDENT_QA_BATCH.json`.
+

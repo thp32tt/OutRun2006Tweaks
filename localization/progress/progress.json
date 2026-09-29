@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T15:22:08.613+09:00",
+  "updated_at_kst": "2026-09-29T15:56:43+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -105,7 +105,7 @@
       "percent": 100,
       "transcribed_assets": 95,
       "localize_text_targets": 95,
-      "transcribed_segments": 754,
+      "transcribed_segments": 753,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -131,15 +131,15 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 95,
-      "translated_segments": 754,
+      "translated_segments": 753,
       "plan_file": "localization/graphics/artwork_plan.jsonl",
       "localize_text_targets": 95,
-      "transcribed_segments": 754,
+      "transcribed_segments": 753,
       "pending_plan_assets": 0,
       "pending_indices": []
     }
   },
-  "next_checkpoint": "Q00004 C106 consumed immutable A00068@96173be6940f1504fb71f48d06561d9888386cb5, B00069@256c7ca9b65d570f5420a9b339398fb9b0342483, A00070@9686b3b946a2ecbb87507b5404827a19d5ab4aa8, and A00072@52578815228c4114fd656a0fdf93b5c1b78ad888. Existing producer canonical pairs pass 95/95; 292/292 stock-to-4x atlas regions and 60/60 direct mapping/variant/omission evidence cells pass. B00069 SHOWROOM omission was reconciled as SHOWROOM -> 쇼룸; 31C58963 PRESS ENTER vs canonical PRESS START remains HOLD pending exact Release-HD decode. A00070 index 209 has zero canonical segments and was reconciled from actionable localize_text to preserve-original/not-required. No input contains Korean candidate DDS bytes; Hangul raster/clipping, 1-pixel containment, candidate DDS format/mipmap/alpha/transparency, compression round-trip, final orientation/slant, protected-artwork/background, and ENGLISH SOURCE vs KOREAN CANDIDATE remain HOLD_STRICT_RECHECK. Later A00074/B00073 are disjoint and preserved. Canonical assets remain 95 with 754 segments; actionable queue remains 137 rows = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production localize_text 76; runtime UNTESTED.",
+  "next_checkpoint": "Q00006 C108 consumed immutable A00074@6cf9089ed5039b0e997893ccce4d50d90d090643 and B00077@0dca6ef541a57f1c01b29b65bd56daa96f2388c9. Direct GitHub upstream identities pass 24/24; current canonical producer pairs pass 37/37; A00074 row-slice extraction arithmetic passes 18/18 with zero overlap; B00077 payload-region extraction arithmetic passes 106/106 including 25/25 4x4 block-aligned regions with zero overlap. No Korean candidate DDS bytes exist, so generation-v2 full-effect bbox/orientation/slant/clean-plate and candidate-only zero-pixel/DDS/alpha/compression/source-vs-candidate gates remain HOLD_STRICT_RECHECK. A00079/B00080 are newer disjoint producers preserved for later C QA. Canonical segments remain 753; actionable queue remains 137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production localize_text 76; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -644,79 +644,59 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_c_batch_qa": {
-      "recorded_at_kst": "2026-09-29T15:22:08.613+09:00",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00075",
-      "qa_batch_id": "Q00004",
-      "run": "C106",
-      "result": "PASS_Q00004_RECONSTRUCTION_MAPPING_BATCH_12_ASSETS_95_PRODUCER_SEMANTICS_1_OMISSION_RECONCILED_1_QUEUE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
-      "base_head": "b2f19f6d31246e874abec638719a721e150313b4",
+      "recorded_at_kst": "2026-09-29T15:56:43+09:00",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00081",
+      "qa_batch_id": "Q00006",
+      "run": "C108",
+      "result": "PASS_Q00006_A74_B77_7_ASSETS_37_SEMANTICS_18_CELL_106_REGION_EXTRACTION_SPECS_NO_DDS_RUNTIME_UNTESTED",
+      "base_head": "43c90861c97d6d0a974dfd328988498ad7c79a8b",
       "qa_batch_inputs": [
-        "LOCALIZATION-LOCALIZATION_A-00068@96173be6940f1504fb71f48d06561d9888386cb5",
-        "LOCALIZATION-LOCALIZATION_B-00069@256c7ca9b65d570f5420a9b339398fb9b0342483",
-        "LOCALIZATION-LOCALIZATION_A-00070@9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
-        "LOCALIZATION-LOCALIZATION_A-00072@52578815228c4114fd656a0fdf93b5c1b78ad888"
+        "LOCALIZATION-LOCALIZATION_A-00074@6cf9089ed5039b0e997893ccce4d50d90d090643",
+        "LOCALIZATION-LOCALIZATION_B-00077@0dca6ef541a57f1c01b29b65bd56daa96f2388c9"
       ],
       "reviewed_indices": [
-        95,
-        101,
-        130,
-        140,
-        154,
-        164,
-        175,
-        205,
-        209,
-        227,
-        231,
-        237
+        35,
+        43,
+        49,
+        132,
+        176,
+        220,
+        222
       ],
       "qa_dispositions": [
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00068",
-          "result_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00074",
+          "result_sha": "6cf9089ed5039b0e997893ccce4d50d90d090643",
           "status": "PASS",
-          "reason": "A00068 reconstruction input accepted: 20/20 immutable upstream source objects independently match Sonic-TV/OR2006Sprites@a95efe01; 123/123 stock-to-4x atlas regions are exact x4; 41/41 canonical source/Korean pairs match current transcription and artwork-plan metadata. Exact source-pixel semantic binding, full-effect bbox/orientation/slant/clean-plate and candidate-only gates remain HOLD_STRICT_RECHECK."
+          "reason": "A00074 exact Release-DDS cell-byte extraction evidence accepted. Direct GitHub source identity checks matched 12/12 pinned upstream objects at Sonic-TV/OR2006Sprites@a95efe01; reused A00058 semantic-cell mapping and C00063 acceptance records still match their pinned blobs. Current transcription/artwork-plan canonical pairs match 17/17. Independent arithmetic recheck passes all 18/18 mapped HD cell bounds and raw 32-bpp row-slice offset/end formulas with zero cell overlap. No Korean candidate DDS exists, and exact source full-effect bbox, source-pixel orientation/slant, clean plate and candidate-only zero-pixel/DDS gates remain HOLD_STRICT_RECHECK under the current generation-v2 contract."
         },
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_B-00069",
-          "result_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483",
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00077",
+          "result_sha": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
           "status": "PASS",
-          "reason": "B00069 direct-mapping input accepted: reused B00054 heavy-QA report blob matches exactly; 4 lane evidence PNGs and 4 pinned stock PNG source blobs match; 24/24 stock-to-4x atlas regions and 19/19 mapped/variant/omission evidence cells match upstream atlas geometry. Current 16/16 canonical pairs match. The observed 4D38BBB0 SHOWROOM omission is reconciled to 쇼룸; 31C58963 PRESS ENTER vs canonical PRESS START remains fail-closed HOLD pending exact Release-HD prompt decode."
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00070",
-          "result_sha": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
-          "status": "PASS",
-          "reason": "A00070 final odd-shard input accepted: 10/10 immutable upstream source objects match and 10/10 stock-to-4x atlas regions are exact x4; index 237 matches 6/6 canonical pairs. Index 209 has zero canonical segments in both transcription and artwork plan and is the only actionable localize_text row with no segments, so C reconciles it to preserve-original/not-required. No Korean candidate exists; index 237 source-effect/candidate gates remain HOLD."
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00072",
-          "result_sha": "52578815228c4114fd656a0fdf93b5c1b78ad888",
-          "status": "PASS",
-          "reason": "A00072 direct selector mapping accepted: 8/8 immutable Release/decoded-source/atlas objects match, 135/135 stock-to-4x atlas regions are exact x4, all 32/32 canonical pairs match current metadata, and all 41/41 physical occurrence mappings match exact upstream atlas cells. Exact HD full-effect bbox/orientation/slant/clean-plate and candidate-only gates remain HOLD_STRICT_RECHECK."
+          "reason": "B00077 exact Release payload-region extraction evidence accepted. Direct GitHub source identity checks matched 12/12 pinned upstream Release DDS/stock PNG/4x-atlas objects at Sonic-TV/OR2006Sprites@a95efe01; reused B00057 producer and C00060 acceptance records still match their pinned blobs. Current transcription/artwork-plan canonical pairs match 20/20. Independent arithmetic recheck passes 106/106 region bounds and extraction formulas, including 25/25 16-byte 4x4 block-aligned regions, with zero region overlap. No Korean candidate DDS exists; exact binary header fields where producer evidence was intentionally unavailable, per-element raw orientation/slant, clean plate and candidate-only zero-pixel/DDS gates remain HOLD_STRICT_RECHECK."
         }
       ],
-      "source_identity_validation": "PASS_A68_A70_A72_38_OF_38_UPSTREAM_OBJECTS_PLUS_B69_4_OF_4_STOCK_SOURCE_AND_4_OF_4_LANE_EVIDENCE_BLOBS__B54_REUSED_REPORT_BLOB_EXACT",
-      "canonical_semantic_validation": "PASS_95_OF_95_EXISTING_PRODUCER_CANONICAL_PAIRS_PLUS_1_SHOWROOM_OMISSION_RECONCILED",
-      "geometry_mapping_validation": "PASS_292_OF_292_STOCK_TO_4X_ATLAS_REGIONS_PLUS_60_OF_60_DIRECT_MAPPING_VARIANT_OMISSION_CELLS",
-      "metadata_reconciled_segments": 1,
-      "canonical_transcribed_segments_after_merge": 754,
-      "queue_reclassification": {
-        "209": "localize_text -> preserve_brand_song_credit / preserve_original / not_required"
-      },
-      "source_variant_hold": {
-        "140": "31C58963 stock source PRESS ENTER vs canonical PRESS START; exact Release-HD prompt decode required before render"
-      },
+      "source_identity_validation": "PASS_24_OF_24_DIRECT_UPSTREAM_GITHUB_OBJECTS__A58_C63_B57_C60_PINNED_REUSED_RECORD_BLOBS_EXACT",
+      "canonical_semantic_validation": "PASS_37_OF_37_CURRENT_TRANSCRIPTION_AND_ARTWORK_PLAN_PAIRS",
+      "geometry_mapping_validation": "PASS_A74_18_OF_18_LINEAR32_CELL_ROW_SLICE_FORMULAS_ZERO_OVERLAP__B77_106_OF_106_REGION_EXTRACTION_FORMULAS_25_OF_25_BLOCK_ALIGNED_ZERO_OVERLAP",
+      "current_contract_compatibility": "PASS_EVIDENCE_ONLY__LATEST_GENERATION_V2_CONTRACT_IS_STRICTER_FOR_FUTURE_CANDIDATES_AND_DOES_NOT_PROMOTE_OR_INVALIDATE_IMMUTABLE_PREGENERATION_EXTRACTION_EVIDENCE",
+      "metadata_reconciled_segments": 0,
+      "canonical_transcribed_segments_after_merge": 753,
+      "shared_state_reconciliations": [
+        "advance duplicate/latest C-batch pointers to Q00006/C108",
+        "repair stale workstream segment counters from 754 to canonical 753 after Q00005 logo-preserve reconciliation"
+      ],
       "superseded_inputs": [],
       "newer_disjoint_producers": [
-        "LOCALIZATION-LOCALIZATION_A-00074",
-        "LOCALIZATION-LOCALIZATION_B-00073"
+        "LOCALIZATION-LOCALIZATION_A-00079",
+        "LOCALIZATION-LOCALIZATION_B-00080"
       ],
       "candidate_dds_modified": false,
       "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
       "runtime_validation": "UNTESTED",
-      "report": "localization/graphics/role_C/20260929-1520-C106/C106_Q00004_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260929-1556-C108/C108_Q00006_INDEPENDENT_QA_BATCH.json"
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -861,52 +841,58 @@
     ]
   },
   "latest_c_batch_qa": {
-    "recorded_at_kst": "2026-09-29T15:34:00+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00078",
-    "qa_batch_id": "Q00005",
-    "run": "C107",
-    "result": "PASS_Q00005_TWO_B_INPUTS_7_ASSETS_45_SEMANTICS_42_CELL_MAPPING_1_LOGO_PRESERVE_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
-    "base_head": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
+    "recorded_at_kst": "2026-09-29T15:56:43+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00081",
+    "qa_batch_id": "Q00006",
+    "run": "C108",
+    "result": "PASS_Q00006_A74_B77_7_ASSETS_37_SEMANTICS_18_CELL_106_REGION_EXTRACTION_SPECS_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "43c90861c97d6d0a974dfd328988498ad7c79a8b",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00073@683b87c323593333f471256e4a167d9ae73a53a0",
-      "LOCALIZATION-LOCALIZATION_B-00076@b2f19f6d31246e874abec638719a721e150313b4"
+      "LOCALIZATION-LOCALIZATION_A-00074@6cf9089ed5039b0e997893ccce4d50d90d090643",
+      "LOCALIZATION-LOCALIZATION_B-00077@0dca6ef541a57f1c01b29b65bd56daa96f2388c9"
     ],
     "reviewed_indices": [
-      86,
-      92,
-      98,
-      100,
-      106,
-      112,
-      152
+      35,
+      43,
+      49,
+      132,
+      176,
+      220,
+      222
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
-        "result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00074",
+        "result_sha": "6cf9089ed5039b0e997893ccce4d50d90d090643",
         "status": "PASS",
-        "reason": "B00073 exact-HD reconstruction/layout evidence accepted. Direct GitHub re-fetch matched 4/4 immutable HD DDS blobs, 8/8 raw/readable evidence PNG blobs, and the reused B110 heavy-QA report blob. All 10/10 producer source/Korean semantic pairs still match current canonical metadata, all 10/10 measured fill bboxes are inside exact HD dimensions, and flip_y is consistently proven for all four assets. No new Korean candidate DDS exists in this producer result, so decoded-final 1px containment, compression, alpha, slant/style and ENGLISH SOURCE vs KOREAN CANDIDATE gates remain HOLD_STRICT_RECHECK rather than being promoted."
+        "reason": "A00074 exact Release-DDS cell-byte extraction evidence accepted. Direct GitHub source identity checks matched 12/12 pinned upstream objects at Sonic-TV/OR2006Sprites@a95efe01; reused A00058 semantic-cell mapping and C00063 acceptance records still match their pinned blobs. Current transcription/artwork-plan canonical pairs match 17/17. Independent arithmetic recheck passes all 18/18 mapped HD cell bounds and raw 32-bpp row-slice offset/end formulas with zero cell overlap. No Korean candidate DDS exists, and exact source full-effect bbox, source-pixel orientation/slant, clean plate and candidate-only zero-pixel/DDS gates remain HOLD_STRICT_RECHECK under the current generation-v2 contract."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
-        "result_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00077",
+        "result_sha": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
         "status": "PASS",
-        "reason": "B00076 direct semantic-cell mapping evidence accepted. Direct GitHub re-fetch matched 3/3 immutable HD DDS blobs, 3/3 lane mapping-reference PNG blobs, the reused B111 heavy-QA report blob, and the pinned C101 consumer record. All 35/35 producer semantic pairs match pre-merge canonical metadata and all 42/42 reported atlas-to-stock cell relations are exact x4. The 788CE557 OutRun2SP occurrence is confirmed as a protected logo wordmark; C removes only that one item from Korean raster localization while retaining the other three localizable semantics. No Korean candidate DDS exists, so candidate-only pixel gates remain HOLD_STRICT_RECHECK."
+        "reason": "B00077 exact Release payload-region extraction evidence accepted. Direct GitHub source identity checks matched 12/12 pinned upstream Release DDS/stock PNG/4x-atlas objects at Sonic-TV/OR2006Sprites@a95efe01; reused B00057 producer and C00060 acceptance records still match their pinned blobs. Current transcription/artwork-plan canonical pairs match 20/20. Independent arithmetic recheck passes 106/106 region bounds and extraction formulas, including 25/25 16-byte 4x4 block-aligned regions, with zero region overlap. No Korean candidate DDS exists; exact binary header fields where producer evidence was intentionally unavailable, per-element raw orientation/slant, clean plate and candidate-only zero-pixel/DDS gates remain HOLD_STRICT_RECHECK."
       }
     ],
-    "source_identity_validation": "PASS_21_OF_21_DIRECT_GITHUB_BLOB_CHECKS__B110_B111_C101_HEAVY_QA_REUSED_UNCHANGED",
-    "canonical_semantic_validation": "PASS_45_OF_45_PRODUCER_PAIRS__INDEX106_OUTRUN2SP_RECONCILED_TO_PROTECTED_ORIGINAL",
-    "geometry_mapping_validation": "PASS_B73_10_OF_10_HD_FILL_BOUNDS_AND_FLIP_Y_4_OF_4__B76_42_OF_42_EXACT_X4_CELL_RELATIONS",
-    "metadata_reconciled_segments_removed": 1,
+    "source_identity_validation": "PASS_24_OF_24_DIRECT_UPSTREAM_GITHUB_OBJECTS__A58_C63_B57_C60_PINNED_REUSED_RECORD_BLOBS_EXACT",
+    "canonical_semantic_validation": "PASS_37_OF_37_CURRENT_TRANSCRIPTION_AND_ARTWORK_PLAN_PAIRS",
+    "geometry_mapping_validation": "PASS_A74_18_OF_18_LINEAR32_CELL_ROW_SLICE_FORMULAS_ZERO_OVERLAP__B77_106_OF_106_REGION_EXTRACTION_FORMULAS_25_OF_25_BLOCK_ALIGNED_ZERO_OVERLAP",
+    "current_contract_compatibility": "PASS_EVIDENCE_ONLY__LATEST_GENERATION_V2_CONTRACT_IS_STRICTER_FOR_FUTURE_CANDIDATES_AND_DOES_NOT_PROMOTE_OR_INVALIDATE_IMMUTABLE_PREGENERATION_EXTRACTION_EVIDENCE",
+    "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
+    "shared_state_reconciliations": [
+      "advance duplicate/latest C-batch pointers to Q00006/C108",
+      "repair stale workstream segment counters from 754 to canonical 753 after Q00005 logo-preserve reconciliation"
+    ],
     "superseded_inputs": [],
     "newer_disjoint_producers": [
-      "LOCALIZATION-LOCALIZATION_B-00077"
+      "LOCALIZATION-LOCALIZATION_A-00079",
+      "LOCALIZATION-LOCALIZATION_B-00080"
     ],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-1534-C107/C107_Q00005_INDEPENDENT_QA_BATCH.json"
+    "report": "localization/graphics/role_C/20260929-1556-C108/C108_Q00006_INDEPENDENT_QA_BATCH.json"
   }
 }

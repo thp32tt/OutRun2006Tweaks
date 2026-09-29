@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "report_id": "C108_Q00006_INDEPENDENT_QA_BATCH",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00081",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "qa_batch_id": "Q00006",
+  "recorded_at_kst": "2026-09-29T15:56:43+09:00",
+  "base_head_sha": "43c90861c97d6d0a974dfd328988498ad7c79a8b",
+  "result": "PASS_Q00006_A74_B77_7_ASSETS_37_SEMANTICS_18_CELL_106_REGION_EXTRACTION_SPECS_NO_DDS_RUNTIME_UNTESTED",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false,
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00074",
+      "result_sha": "6cf9089ed5039b0e997893ccce4d50d90d090643",
+      "wave_id": "P00014",
+      "evidence": "localization/graphics/role_A/20260929-1500-A00074-P00014/A00074_P00014_ODD_RAW_DDS_CELL_BYTE_EXTRACTION_SPEC.json",
+      "evidence_blob_sha": "d9570d6a74e037636257ec941ca1f5fa0541901e",
+      "reviewed_indices": [
+        35,
+        43,
+        49
+      ],
+      "assets": [
+        "E989E3B7",
+        "455717B2",
+        "BF3EE5C6"
+      ],
+      "source_objects": {
+        "direct_upstream_checks": 12,
+        "passed": 12,
+        "reused_a58_mapping_blob_sha": "9c2a5f2eafcdbec525d98dab13de094fb3a2c0dc",
+        "reused_c63_record_blob_sha": "6d86b4de8be989e948678f13bce5b5e6412feb3b"
+      },
+      "semantic_checks": {
+        "producer_pairs": 17,
+        "current_transcription_pairs": 17,
+        "current_artwork_plan_pairs": 17,
+        "status": "PASS"
+      },
+      "extraction_checks": {
+        "physical_cells": 18,
+        "bounds_pass": 18,
+        "row_slice_formula_pass": 18,
+        "overlap_pairs": 0,
+        "status": "PASS"
+      },
+      "disposition": "PASS_EVIDENCE_ONLY_HOLD_CANDIDATE_GATES"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00077",
+      "result_sha": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
+      "wave_id": "P00016",
+      "evidence": "localization/graphics/role_B/20260929-1530-B120-P00016/B120_P00016_EVEN_RELEASE_PAYLOAD_REGION_EXTRACTION_SPEC.json",
+      "evidence_blob_sha": "9ce98df9a0b69ef604514ae6569d78ab74440fed",
+      "reviewed_indices": [
+        132,
+        176,
+        220,
+        222
+      ],
+      "assets": [
+        "1F5FE6E9",
+        "75C3586A",
+        "D657C2EB",
+        "DDF0392A"
+      ],
+      "source_objects": {
+        "direct_upstream_checks": 12,
+        "passed": 12,
+        "reused_b57_record_blob_sha": "8461a19ef2549a98bdfa2407e269aa18ec13d341",
+        "reused_c60_record_blob_sha": "9b7a34a3d4cb3e396e988663c89c3e7da43042c4"
+      },
+      "semantic_checks": {
+        "producer_pairs": 20,
+        "current_transcription_pairs": 20,
+        "current_artwork_plan_pairs": 20,
+        "status": "PASS"
+      },
+      "extraction_checks": {
+        "regions": 106,
+        "bounds_pass": 106,
+        "formula_pass": 106,
+        "linear32_regions": 81,
+        "block_16byte_4x4_regions": 25,
+        "block_aligned_pass": 25,
+        "overlap_pairs": 0,
+        "status": "PASS"
+      },
+      "disposition": "PASS_EVIDENCE_ONLY_HOLD_CANDIDATE_GATES"
+    }
+  ],
+  "aggregate": {
+    "reviewed_assets": 7,
+    "canonical_semantics_validated": 37,
+    "direct_upstream_objects_checked": 24,
+    "direct_upstream_objects_passed": 24,
+    "mapped_cells_validated": 18,
+    "payload_regions_validated": 106,
+    "block_regions_validated": 25,
+    "overlap_pairs": 0
+  },
+  "policy_review": {
+    "current_automation_contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "current_orientation_policy": "localization/graphics/ORIENTATION_POLICY.md",
+    "generation_contract": "outrun-first-pass-edit-v2",
+    "evidence_compatibility": "PASS: inputs are immutable pre-generation extraction evidence; newer candidate-generation gates are additive and remain HOLD until source orientation/full-effect bbox/clean-plate/candidate evidence exists.",
+    "zero_pixel_rule": "NOT_APPLICABLE_TO_PASS_PROMOTION_BECAUSE_NO_KOREAN_CANDIDATE_EXISTS; future candidate remains HOLD_STRICT_RECHECK",
+    "runtime_rule": "UNTESTED"
+  },
+  "shared_state": {
+    "canonical_segments": 753,
+    "classification_assets_localize_text": 95,
+    "actionable_queue": "137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only",
+    "pending_production_localize_text": 76,
+    "stale_duplicate_c_batch_pointer_repaired": true,
+    "stale_workstream_segment_count_754_repaired_to_753": true
+  },
+  "newer_disjoint_producers": [
+    "LOCALIZATION-LOCALIZATION_A-00079",
+    "LOCALIZATION-LOCALIZATION_B-00080"
+  ],
+  "candidate_dds_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
