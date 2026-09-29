@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-c-batch-independent-qa-v1",
+  "recorded_at_kst": "2026-09-29T19:41:08+09:00",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00130",
+  "qa_batch_id": "Q00016",
+  "run": "C118",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00016",
+  "base_head": "f00fd5ada49ffc121a23b584ee5b925471e83a8c",
+  "current_qa_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+  "current_policy": "candidate_completion_first",
+  "source_policy": "GITHUB_SSOT_ONLY_NO_N100_CLONE_WORKTREE_GPT_LIBRARY",
+  "qa_batch_inputs": [
+    "LOCALIZATION-LOCALIZATION_A-00121@2b879eaa22e033f120728f0ec3849bcc78b04290",
+    "LOCALIZATION-LOCALIZATION_B-00122@9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+    "LOCALIZATION-LOCALIZATION_A-00123@910cf76e9df41ff2549fabbd1f34c4409ab69985",
+    "LOCALIZATION-LOCALIZATION_B-00125@e6c3159520d26b085bd8f28fda049320aabab511"
+  ],
+  "reviewed_indices": [
+    26,
+    28,
+    30,
+    32,
+    133,
+    135,
+    139,
+    143,
+    147,
+    161,
+    163,
+    198,
+    214,
+    230,
+    236
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00121",
+      "result_sha": "2b879eaa22e033f120728f0ec3849bcc78b04290",
+      "status": "REWORK_REQUIRED",
+      "reason": "Material content remains valid: exact copies of C00120-accepted A00114 work orders; 4/4 inventory SHA-256+canvas identities and 24/24 current translations recheck. But A00121 records automation_contract_blob_sha=194fd6c64cafede90b537446fddf96934dc9ea37 while the actual docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md blob at this exact RESULT_SHA is d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b. The recorded 194fd6 blob is a different queue-controller contract, so the machine-readable QA-contract fingerprint is false and unsafe for de-duplication. Re-emit unchanged accepted material with the accurate latest localization-contract fingerprint."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00122",
+      "result_sha": "9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+      "status": "PASS",
+      "reason": "Durable exact result. 4/4 inventory SHA-256 identities, canvases and RGBA modes match current inventory; all four canonical queue-path sources are absent at the exact result SHA; 38/38 translations match current metadata. Prior Release geometry is retired and zero header/orientation/mask/CLEAN_PLATE/candidate geometry is fabricated while canonical bytes are unavailable. PASS is limited PREFLIGHT_ONLY evidence under candidate-completion-first; no candidate/static approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00123",
+      "result_sha": "910cf76e9df41ff2549fabbd1f34c4409ab69985",
+      "status": "PASS",
+      "reason": "Durable exact result and unchanged re-emission of C00120-accepted A00112 material. Because the current QA contract changed, C re-ran the stock-heavy check: 3/3 pinned stock DXT5 blobs and 3/3 atlases match exact Git identities/headers; round-nearest BC3 alpha decode reproduces 77/77 alpha>0 bboxes/counts and 77/77 alpha>=128 counts. 77/77 source/Korean pairs match current metadata and 2 structural regions remain preserve-only. PASS is stock reconstruction-prior only; canonical-HD/CLEAN_PLATE/candidate gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00125",
+      "result_sha": "e6c3159520d26b085bd8f28fda049320aabab511",
+      "status": "PASS",
+      "reason": "Durable exact result. 4/4 canonical SHA-256 identities, native/irregular canvases, RGBA modes and decoded RGBA byte equations match current inventory; all four canonical queue-path sources are absent at the exact result SHA; all 6 physical Total Rank -> 종합 랭크 occurrences match current metadata. Rejected Release geometry is retired with no replacement coordinates fabricated. PASS is source-reacquisition PREFLIGHT_ONLY evidence under candidate-completion-first."
+    }
+  ],
+  "source_identity_validation": "REWORK_A00121_FALSE_QA_CONTRACT_FINGERPRINT_CONTENT_IDENTITIES_STILL_4_OF_4__PASS_B00122_4_OF_4_CANONICAL_INVENTORY_GATES_38_OF_38_SEMANTICS__PASS_A00123_CURRENT_CONTRACT_REDECODE_3_OF_3_STOCK_77_OF_77_METRICS_77_OF_77_SEMANTICS__PASS_B00125_4_OF_4_CANONICAL_REACQUISITION_GATES_6_PHYSICAL_SEMANTICS",
+  "canonical_semantic_validation": "PASS_A00121_24_OF_24_CONTENT__B00122_38_OF_38__A00123_77_OF_77_PLUS_2_PRESERVE__B00125_6_OF_6_PHYSICAL",
+  "geometry_mapping_validation": "A00121_NO_PIXEL_GEOMETRY_FABRICATED_CONTENT_UNCHANGED_BUT_FINGERPRINT_REWORK__B00122_ZERO_PRIOR_RELEASE_GEOMETRY_REUSED_ZERO_PIXEL_GEOMETRY_FABRICATED__A00123_77_OF_77_STOCK_ALPHA_BBOX_COUNTS_REPRODUCED_ROUND_NEAREST__B00125_4_OF_4_REJECTED_RELEASE_GEOMETRIES_RETIRED_ZERO_REPLACEMENT_COORDINATES",
+  "current_contract_compatibility": "LATEST_CANDIDATE_FIRST_POLICY_REVIEWED__PASS_B00122_A00123_B00125_AS_LIMITED_PREFLIGHT_ONLY_EVIDENCE_NO_CANDIDATE_PROMOTION__REWORK_A00121_MACHINE_READABLE_QA_CONTRACT_FINGERPRINT_INCORRECT",
+  "qa_contract_transition": {
+    "producer_contract_at_inputs": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b except A00121 falsely records 194fd6c64cafede90b537446fddf96934dc9ea37",
+    "current_contract": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+    "heavy_rerun": "A00123 3 stock DDS / 77 semantic-binding alpha metrics re-decoded because QA-contract fingerprint changed",
+    "policy_effect": "Candidate-completion-first changes future producer selection/success conditions; it does not retroactively grant/revoke candidate approval for valid limited source-gated evidence."
+  },
+  "metadata_reconciled_segments": 0,
+  "canonical_transcribed_segments_after_merge": 753,
+  "actionable_localize_text_after": 93,
+  "pending_production_localize_text_after": 76,
+  "superseded_inputs": [],
+  "newer_disjoint_producers": [
+    "LOCALIZATION-LOCALIZATION_A-00126",
+    "LOCALIZATION-LOCALIZATION_B-00127",
+    "LOCALIZATION-LOCALIZATION_B-00129"
+  ],
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00016_THREE_INPUTS_PASS_ONE_REWORK_REQUIRED_NO_DDS_RUNTIME_UNTESTED",
+  "report": "localization/graphics/role_C/20260929-1941-C118/C118_Q00016_INDEPENDENT_QA_BATCH.json",
+  "rework_required_inputs": [
+    "LOCALIZATION-LOCALIZATION_A-00121@2b879eaa22e033f120728f0ec3849bcc78b04290"
+  ],
+  "passed_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00122@9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+    "LOCALIZATION-LOCALIZATION_A-00123@910cf76e9df41ff2549fabbd1f34c4409ab69985",
+    "LOCALIZATION-LOCALIZATION_B-00125@e6c3159520d26b085bd8f28fda049320aabab511"
+  ],
+  "shared_state_modified": true,
+  "candidate_dds_modified_by_c": false,
+  "input_candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
