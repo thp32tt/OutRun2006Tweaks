@@ -1,0 +1,1241 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-v2-even-direct-source-inspection-work-order-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00119",
+  "wave_id": "P00049",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T18:50:00+09:00",
+  "precommit_head_sha": "2a6e9fcadf478ca1bdb915d3a7326299f5667fd0",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_policy": "GITHUB_SSOT_ONLY_NO_N100_CLONE_WORKTREE_GPT_LIBRARY",
+  "selection": {
+    "indices": [
+      188,
+      226,
+      232
+    ],
+    "assets": [
+      "8C259C68",
+      "E3F4BA07",
+      "EBFC709F"
+    ],
+    "reason": "Three untouched even primary-shard pending_artwork rows were selected. Existing B00113/B00115 QA-pending indices and C-returned dependency-blocked rework are skipped."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_EVEN_EXACT_RELEASE_ATLAS_DIRECT_SOURCE_INSPECTION_WORK_ORDERS",
+    "assets_advanced": 3,
+    "canonical_semantics": 16,
+    "exact_atlas_regions": 22,
+    "release_blob_identities": 3,
+    "atlas_blob_identities": 3,
+    "strict_2px_inspection_guards": 22,
+    "deterministic_payload_scopes": 22,
+    "candidate_dds_written": false,
+    "source_effect_masks_written": false,
+    "clean_plate_pixels_written": false
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "8316cb2f563d7064d931591369620d538e5e16c7",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "release_repo_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "assets": [
+    {
+      "queue_index": 188,
+      "asset": "8C259C68",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "git_blob_sha": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "size_equation": "128 + 2048 * 2048 * 4 = 16777344",
+        "size_equation_matches_file": true,
+        "dds_header_channel_masks": "HOLD_BINARY_HEADER_DECODE_REQUIRED"
+      },
+      "exact_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_8C259C68_512x512_atlas.json",
+        "git_blob_sha": "6061128430caeb04773ac8caa7918629eeef8ba8",
+        "width": 2048,
+        "height": 2048,
+        "regions_count": 6,
+        "rotations": false
+      },
+      "canonical_semantics": [
+        {
+          "source": "Online and LAN OutRun for up to 6 players",
+          "korean": "온라인/LAN 아웃런 최대 6인 플레이"
+        },
+        {
+          "source": "Complete Race and Heart Attack missions to win OR Miles!",
+          "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!"
+        },
+        {
+          "source": "Try to win Hearts by meeting your girlfriend's demands!",
+          "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!"
+        },
+        {
+          "source": "Try to reach the goal with your girlfriend!",
+          "korean": "여자친구와 함께 골에 도착하세요!"
+        },
+        {
+          "source": "Buy your OutRun items here!",
+          "korean": "여기서 아웃런 아이템을 구매하세요!"
+        },
+        {
+          "source": "Drive against the Ghost Cars and go for the course records!",
+          "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+        }
+      ],
+      "canonical_semantic_count": 6,
+      "protected_or_binding_note": "front-end help descriptions; atlas order is not assumed to equal transcription order",
+      "semantic_to_region_binding": "HOLD_FAIL_CLOSED_NO_ATLAS_ORDER_GUESS",
+      "direct_source_inspection_work_units": [
+        {
+          "sprite": "sprite_774",
+          "atlas_rect_xywh": [
+            0,
+            1888,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            1888,
+            1800,
+            2048
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            1890,
+            1798,
+            2046
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 15466624,
+            "final_row_start_byte": 16769152,
+            "final_row_end_exclusive_byte": 16776352,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_775",
+          "atlas_rect_xywh": [
+            0,
+            1728,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            1728,
+            1800,
+            1888
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            1730,
+            1798,
+            1886
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 14155904,
+            "final_row_start_byte": 15458432,
+            "final_row_end_exclusive_byte": 15465632,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_776",
+          "atlas_rect_xywh": [
+            0,
+            1568,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            1568,
+            1800,
+            1728
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            1570,
+            1798,
+            1726
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 12845184,
+            "final_row_start_byte": 14147712,
+            "final_row_end_exclusive_byte": 14154912,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_777",
+          "atlas_rect_xywh": [
+            0,
+            1408,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            1408,
+            1800,
+            1568
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            1410,
+            1798,
+            1566
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 11534464,
+            "final_row_start_byte": 12836992,
+            "final_row_end_exclusive_byte": 12844192,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_778",
+          "atlas_rect_xywh": [
+            0,
+            1248,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            1248,
+            1800,
+            1408
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            1250,
+            1798,
+            1406
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 10223744,
+            "final_row_start_byte": 11526272,
+            "final_row_end_exclusive_byte": 11533472,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_779",
+          "atlas_rect_xywh": [
+            0,
+            1088,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            1088,
+            1800,
+            1248
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            1090,
+            1798,
+            1246
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 8913024,
+            "final_row_start_byte": 10215552,
+            "final_row_end_exclusive_byte": 10222752,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        }
+      ]
+    },
+    {
+      "queue_index": 226,
+      "asset": "E3F4BA07",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+        "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+        "bytes": 4194432,
+        "width": 2048,
+        "height": 512,
+        "size_equation": "128 + 2048 * 512 * 4 = 4194432",
+        "size_equation_matches_file": true,
+        "dds_header_channel_masks": "HOLD_BINARY_HEADER_DECODE_REQUIRED"
+      },
+      "exact_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_E3F4BA07_512x128_atlas.json",
+        "git_blob_sha": "50256e8d4d5af1335249993d44abc5d18a4c5672",
+        "width": 2048,
+        "height": 512,
+        "regions_count": 10,
+        "rotations": false
+      },
+      "canonical_semantics": [
+        {
+          "source": "GOAL",
+          "korean": "골"
+        },
+        {
+          "source": "GOAL A",
+          "korean": "골 A"
+        },
+        {
+          "source": "GOAL B",
+          "korean": "골 B"
+        },
+        {
+          "source": "GOAL C",
+          "korean": "골 C"
+        },
+        {
+          "source": "GOAL D",
+          "korean": "골 D"
+        },
+        {
+          "source": "GOAL E",
+          "korean": "골 E"
+        },
+        {
+          "source": "15 STAGE CONTINUOUS",
+          "korean": "15코스 연속"
+        },
+        {
+          "source": "STAGE",
+          "korean": "스테이지"
+        }
+      ],
+      "canonical_semantic_count": 8,
+      "protected_or_binding_note": "OutRun2/OutRun2SP names are protected; exact two non-localizable atlas regions must be proven rather than inferred",
+      "semantic_to_region_binding": "HOLD_FAIL_CLOSED_NO_ATLAS_ORDER_GUESS",
+      "direct_source_inspection_work_units": [
+        {
+          "sprite": "sprite_296",
+          "atlas_rect_xywh": [
+            0,
+            424,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            424,
+            980,
+            512
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            426,
+            978,
+            510
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 3473536,
+            "final_row_start_byte": 4186240,
+            "final_row_end_exclusive_byte": 4190160,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_297",
+          "atlas_rect_xywh": [
+            980,
+            424,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            980,
+            424,
+            1960,
+            512
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            982,
+            426,
+            1958,
+            510
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 3477456,
+            "final_row_start_byte": 4190160,
+            "final_row_end_exclusive_byte": 4194080,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_298",
+          "atlas_rect_xywh": [
+            0,
+            336,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            336,
+            980,
+            424
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            338,
+            978,
+            422
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 2752640,
+            "final_row_start_byte": 3465344,
+            "final_row_end_exclusive_byte": 3469264,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_299",
+          "atlas_rect_xywh": [
+            980,
+            336,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            980,
+            336,
+            1960,
+            424
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            982,
+            338,
+            1958,
+            422
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 2756560,
+            "final_row_start_byte": 3469264,
+            "final_row_end_exclusive_byte": 3473184,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_300",
+          "atlas_rect_xywh": [
+            0,
+            248,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            248,
+            980,
+            336
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            250,
+            978,
+            334
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 2031744,
+            "final_row_start_byte": 2744448,
+            "final_row_end_exclusive_byte": 2748368,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_301",
+          "atlas_rect_xywh": [
+            980,
+            248,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            980,
+            248,
+            1960,
+            336
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            982,
+            250,
+            1958,
+            334
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 2035664,
+            "final_row_start_byte": 2748368,
+            "final_row_end_exclusive_byte": 2752288,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_302",
+          "atlas_rect_xywh": [
+            0,
+            160,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            160,
+            980,
+            248
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            162,
+            978,
+            246
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 1310848,
+            "final_row_start_byte": 2023552,
+            "final_row_end_exclusive_byte": 2027472,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_303",
+          "atlas_rect_xywh": [
+            980,
+            160,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            980,
+            160,
+            1960,
+            248
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            982,
+            162,
+            1958,
+            246
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 1314768,
+            "final_row_start_byte": 2027472,
+            "final_row_end_exclusive_byte": 2031392,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_304",
+          "atlas_rect_xywh": [
+            0,
+            72,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            72,
+            980,
+            160
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            74,
+            978,
+            158
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 589952,
+            "final_row_start_byte": 1302656,
+            "final_row_end_exclusive_byte": 1306576,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_305",
+          "atlas_rect_xywh": [
+            980,
+            72,
+            980,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            980,
+            72,
+            1960,
+            160
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            982,
+            74,
+            1958,
+            158
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3920,
+            "rows": 88,
+            "first_row_start_byte": 593872,
+            "final_row_start_byte": 1306576,
+            "final_row_end_exclusive_byte": 1310496,
+            "file_bytes": 4194432,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        }
+      ]
+    },
+    {
+      "queue_index": 232,
+      "asset": "EBFC709F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "queue_state": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "exact_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+        "git_blob_sha": "f95c09096c948738efc477a2577513151b3179f7",
+        "bytes": 8388736,
+        "width": 2048,
+        "height": 1024,
+        "size_equation": "128 + 2048 * 1024 * 4 = 8388736",
+        "size_equation_matches_file": true,
+        "dds_header_channel_masks": "HOLD_BINARY_HEADER_DECODE_REQUIRED"
+      },
+      "exact_4x_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4x_EBFC709F_512x256_atlas.json",
+        "git_blob_sha": "0792142ed98c7ae16c47834daf8a4095799faf17",
+        "width": 2048,
+        "height": 1024,
+        "regions_count": 6,
+        "rotations": false
+      },
+      "canonical_semantics": [
+        {
+          "source": "JOIN GAME",
+          "korean": "게임 참가"
+        },
+        {
+          "source": "CREATE GAME",
+          "korean": "게임 만들기"
+        }
+      ],
+      "canonical_semantic_count": 2,
+      "protected_or_binding_note": "two canonical localizable labels among six atlas regions; remaining region disposition is fail-closed until direct binding",
+      "semantic_to_region_binding": "HOLD_FAIL_CLOSED_NO_ATLAS_ORDER_GUESS",
+      "direct_source_inspection_work_units": [
+        {
+          "sprite": "sprite_755",
+          "atlas_rect_xywh": [
+            0,
+            852,
+            1760,
+            172
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            852,
+            1760,
+            1024
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            854,
+            1758,
+            1022
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7040,
+            "rows": 172,
+            "first_row_start_byte": 6979712,
+            "final_row_start_byte": 8380544,
+            "final_row_end_exclusive_byte": 8387584,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_756",
+          "atlas_rect_xywh": [
+            0,
+            680,
+            1760,
+            172
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            680,
+            1760,
+            852
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            682,
+            1758,
+            850
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7040,
+            "rows": 172,
+            "first_row_start_byte": 5570688,
+            "final_row_start_byte": 6971520,
+            "final_row_end_exclusive_byte": 6978560,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_757",
+          "atlas_rect_xywh": [
+            0,
+            520,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            520,
+            1800,
+            680
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            522,
+            1798,
+            678
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 4259968,
+            "final_row_start_byte": 5562496,
+            "final_row_end_exclusive_byte": 5569696,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_758",
+          "atlas_rect_xywh": [
+            0,
+            360,
+            1800,
+            160
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            360,
+            1800,
+            520
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            362,
+            1798,
+            518
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 7200,
+            "rows": 160,
+            "first_row_start_byte": 2949248,
+            "final_row_start_byte": 4251776,
+            "final_row_end_exclusive_byte": 4258976,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_759",
+          "atlas_rect_xywh": [
+            0,
+            272,
+            880,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            0,
+            272,
+            880,
+            360
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            2,
+            274,
+            878,
+            358
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3520,
+            "rows": 88,
+            "first_row_start_byte": 2228352,
+            "final_row_start_byte": 2941056,
+            "final_row_end_exclusive_byte": 2944576,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        },
+        {
+          "sprite": "sprite_760",
+          "atlas_rect_xywh": [
+            880,
+            272,
+            768,
+            88
+          ],
+          "atlas_rect_ltrb": [
+            880,
+            272,
+            1648,
+            360
+          ],
+          "strict_2px_inspection_guard_ltrb": [
+            882,
+            274,
+            1646,
+            358
+          ],
+          "guard_role": "DIRECT_SOURCE_INSPECTION_UPPER_BOUND_ONLY_NOT_TEXT_MASK_NOT_CANDIDATE_SAFE_BBOX",
+          "payload_scope": {
+            "profile": "LINEAR_32BPP_ROW_STRIDED_SIZE_EQUATION_GATED",
+            "header_bytes": 128,
+            "row_stride_bytes": 8192,
+            "row_slice_bytes": 3072,
+            "rows": 88,
+            "first_row_start_byte": 2231872,
+            "final_row_start_byte": 2944576,
+            "final_row_end_exclusive_byte": 2947648,
+            "file_bytes": 8388736,
+            "in_file_bounds": true
+          },
+          "semantic_binding": "HOLD_STRICT_RECHECK_DIRECT_PIXEL_BINDING_REQUIRED",
+          "next_stage": [
+            "decode exact DDS header/channel masks",
+            "prove localizable semantic occupancy in this region",
+            "measure effect-inclusive source text bbox",
+            "derive removal/protected masks",
+            "build and independently QA CLEAN_PLATE",
+            "derive v2 candidate_safe_bbox with >=2px inset",
+            "render Korean only after CLEAN_PLATE PASS"
+          ]
+        }
+      ]
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_188_226_232",
+    "queue_state": "PASS_3_OF_3_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_metadata": "PASS_16_CURRENT_SEMANTICS_REUSED_NO_RETRANSLATION",
+    "release_identity": "PASS_3_OF_3_GITHUB_BLOBS_PINNED",
+    "release_size_equations": "PASS_3_OF_3_32BPP_BASELEVEL_SIZE_EQUATIONS",
+    "atlas_identity": "PASS_3_OF_3_4X_ATLAS_BLOBS_PINNED",
+    "atlas_regions": "PASS_22_OF_22_IN_CANVAS",
+    "strict_2px_guards": "PASS_22_OF_22_NONEMPTY",
+    "payload_scopes": "PASS_22_OF_22_IN_FILE",
+    "semantic_binding": "HOLD_STRICT_RECHECK_NO_BINDING_GUESSED",
+    "dds_header_channel_masks": "HOLD_BINARY_HEADER_DECODE_REQUIRED",
+    "source_effect_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bbox": "HOLD_REQUIRES_MEASURED_SOURCE_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "strict_holds": {
+    "exact_dds_header_channel_masks_mips": "HOLD_BINARY_HEADER_DECODE_REQUIRED",
+    "exact_semantic_to_region_binding": "HOLD_DIRECT_PIXEL_INSPECTION_REQUIRED",
+    "raw_to_readable_orientation_per_text_element": "HOLD_DIRECT_PIXEL_INSPECTION_REQUIRED",
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "protected_non_text_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_pixels": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_YET_EXECUTED",
+    "candidate_safe_bboxes": "HOLD_NOT_YET_DERIVED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

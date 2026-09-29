@@ -1,0 +1,103 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00119",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00049",
+  "recorded_at_kst": "2026-09-29T18:50:00+09:00",
+  "base_sha": "2a6e9fcadf478ca1bdb915d3a7326299f5667fd0",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_EVEN_EXACT_RELEASE_ATLAS_DIRECT_SOURCE_INSPECTION_WORK_ORDERS",
+  "summary": "Advanced even indices 188/226/232 from transcription-only pending_artwork into exact GitHub Release + 4x-atlas v2 direct-inspection work orders. Pinned 3 Release blobs, 3 atlas blobs, 22 atlas regions/payload scopes and 22 strict 2px inspection guards for 16 canonical semantics. Semantic binding/header masks/orientation/source-effect/CLEAN_PLATE/candidate gates remain fail-closed HOLD; no DDS/shared state/build/runtime changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1850-B00119-P00049/B00119_P00049_THREE_EVEN_RELEASE_ATLAS_WORK_ORDERS.json"
+  ],
+  "material_deliverable": {
+    "type": "THREE_EVEN_EXACT_RELEASE_ATLAS_DIRECT_SOURCE_INSPECTION_WORK_ORDERS",
+    "indices": [
+      188,
+      226,
+      232
+    ],
+    "assets": [
+      "8C259C68",
+      "E3F4BA07",
+      "EBFC709F"
+    ],
+    "canonical_semantics": 16,
+    "exact_atlas_regions": 22,
+    "deterministic_payload_scopes": 22,
+    "new_two_px_source_inspection_guards": 22,
+    "release_source_blobs_pinned": 3,
+    "atlas_blobs_pinned": 3,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "8316cb2f563d7064d931591369620d538e5e16c7",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reason": "Canonical translations/transcriptions are unchanged; this task adds missing exact Release/atlas identities, payload scopes and strict v2 inspection guards."
+  },
+  "skipped_or_deferred": {
+    "qa_pending_or_newer_disjoint": {
+      "LOCALIZATION-LOCALIZATION_B-00113": [
+        26,
+        28,
+        30,
+        32,
+        206
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00115": [
+        36,
+        38,
+        128,
+        206
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ],
+    "separate_runtime_validation_backlog": [
+      12,
+      54,
+      60,
+      104,
+      116
+    ]
+  },
+  "self_qa": "PASS_EVEN_ONLY_188_226_232__3_OF_3_PENDING_LOCALIZE_TEXT__22_OF_22_ATLAS_REGIONS_PAYLOAD_SCOPES_AND_2PX_GUARDS_VALID__16_CANONICAL_SEMANTICS_REUSED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact Release/atlas geometry is new executable reconstruction input, but atlas rectangles are not text masks. Exact DDS header decode, semantic binding, orientation, source-effect/protected/removal masks, CLEAN_PLATE QA, candidate_safe_bbox, Korean render, containment and English-source comparison remain mandatory.",
+  "strict_hold": {
+    "exact_dds_header_channel_masks_mips": "HOLD_BINARY_HEADER_DECODE_REQUIRED",
+    "exact_semantic_to_region_binding": "HOLD_DIRECT_PIXEL_INSPECTION_REQUIRED",
+    "raw_to_readable_orientation_per_text_element": "HOLD_DIRECT_PIXEL_INSPECTION_REQUIRED",
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "protected_non_text_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_pixels": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_YET_EXECUTED",
+    "candidate_safe_bboxes": "HOLD_NOT_YET_DERIVED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
