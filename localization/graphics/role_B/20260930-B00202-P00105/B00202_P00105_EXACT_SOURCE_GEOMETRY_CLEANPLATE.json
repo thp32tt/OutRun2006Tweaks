@@ -1,0 +1,723 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+  "wave_id": "P00105",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-09-30T04:27:00+09:00",
+  "base_head_sha": "f946bdce27d534b40d7b04acc6d63de780b7ea68",
+  "schema": "outrun-b00202-p00105-exact-source-geometry-cleanplate-v1",
+  "source_fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "pinned_release": {
+    "name": "OR2-HD-GUI-v0.25.10a.zip",
+    "bytes": 306223257,
+    "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "verification": "PASS_EXACT",
+    "transport": "conversation-uploaded byte-identical pinned release fallback"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "indices": [
+      133,
+      226,
+      232
+    ],
+    "current_c_gate": "LOCALIZATION-LOCALIZATION_C-00205 / C144 / Q00042",
+    "priority": "exact-source candidate-completion preflight before unrelated source acquisition"
+  },
+  "assets": [
+    {
+      "index": 133,
+      "asset": "25F697C6",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "source": {
+        "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+        "bytes": 16777344,
+        "canvas": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "raw_to_readable": "flip_y"
+      },
+      "binding_result": "PASS_9_OF_9_CURRENT_CANONICAL_LOCALIZABLE_LABELS_POSITIVELY_BOUND_FROM_EXACT_HD_PIXELS",
+      "element_schema": [
+        "source",
+        "korean",
+        "source_bbox_readable_xyxy",
+        "source_bbox_raw_xyxy",
+        "candidate_safe_bbox_2px_readable_xyxy",
+        "candidate_safe_bbox_2px_raw_xyxy"
+      ],
+      "elements": [
+        [
+          "BLU MIRABEAU",
+          "블루 미라보",
+          [
+            492,
+            904,
+            940,
+            956
+          ],
+          [
+            492,
+            1092,
+            940,
+            1144
+          ],
+          [
+            494,
+            906,
+            938,
+            954
+          ],
+          [
+            494,
+            1094,
+            938,
+            1142
+          ]
+        ],
+        [
+          "NERO",
+          "네로",
+          [
+            1728,
+            904,
+            1884,
+            956
+          ],
+          [
+            1728,
+            1092,
+            1884,
+            1144
+          ],
+          [
+            1730,
+            906,
+            1882,
+            954
+          ],
+          [
+            1730,
+            1094,
+            1882,
+            1142
+          ]
+        ],
+        [
+          "ARGENTO NURBURGRING",
+          "아르젠토 뉘르부르크링",
+          [
+            216,
+            960,
+            932,
+            1024
+          ],
+          [
+            216,
+            1024,
+            932,
+            1088
+          ],
+          [
+            218,
+            962,
+            930,
+            1022
+          ],
+          [
+            218,
+            1026,
+            930,
+            1086
+          ]
+        ],
+        [
+          "ROSSO SCUDERIA",
+          "로쏘 스쿠데리아",
+          [
+            1368,
+            972,
+            1884,
+            1024
+          ],
+          [
+            1368,
+            1024,
+            1884,
+            1076
+          ],
+          [
+            1370,
+            974,
+            1882,
+            1022
+          ],
+          [
+            1370,
+            1026,
+            1882,
+            1074
+          ]
+        ],
+        [
+          "BIANCO AVUS",
+          "비앙코 아부스",
+          [
+            544,
+            1040,
+            940,
+            1092
+          ],
+          [
+            544,
+            956,
+            940,
+            1008
+          ],
+          [
+            546,
+            1042,
+            938,
+            1090
+          ],
+          [
+            546,
+            958,
+            938,
+            1006
+          ]
+        ],
+        [
+          "GRIGIO ALLOY",
+          "그리지오 알로이",
+          [
+            1480,
+            1040,
+            1888,
+            1092
+          ],
+          [
+            1480,
+            956,
+            1888,
+            1008
+          ],
+          [
+            1482,
+            1042,
+            1886,
+            1090
+          ],
+          [
+            1482,
+            958,
+            1886,
+            1006
+          ]
+        ],
+        [
+          "ALPINE",
+          "알파인",
+          [
+            664,
+            1103,
+            1067,
+            1192
+          ],
+          [
+            664,
+            856,
+            1067,
+            945
+          ],
+          [
+            666,
+            1105,
+            1065,
+            1190
+          ],
+          [
+            666,
+            858,
+            1065,
+            943
+          ]
+        ],
+        [
+          "GIALLO MODENA",
+          "지알로 모데나",
+          [
+            1528,
+            1152,
+            2012,
+            1204
+          ],
+          [
+            1528,
+            844,
+            2012,
+            896
+          ],
+          [
+            1530,
+            1154,
+            2010,
+            1202
+          ],
+          [
+            1530,
+            846,
+            2010,
+            894
+          ]
+        ],
+        [
+          "ANCIENT RUINS",
+          "고대 유적",
+          [
+            549,
+            1221,
+            1027,
+            1315
+          ],
+          [
+            549,
+            733,
+            1027,
+            827
+          ],
+          [
+            551,
+            1223,
+            1025,
+            1313
+          ],
+          [
+            551,
+            735,
+            1025,
+            825
+          ]
+        ]
+      ],
+      "clean_plate": {
+        "method": "clear exact nonzero-alpha source-effect pixels only inside positively bound localizable regions; transparent text-only background requires no inpainting",
+        "removal_mask_pixels": 143814,
+        "removal_mask_raw_sha256": "536e6641704ee32cd8376ae03e44bf44c770667e03ce01da87e36a8fddd5dc05",
+        "clean_plate_raw_rgba_sha256": "80824a6a616cfd8b3816db43fdffcaf3c3eb58cb4410d7e7abcfb217f85de852",
+        "changed_pixels_outside_mask": 0,
+        "alpha_changes_outside_mask": 0,
+        "protected_pixels_unchanged": true,
+        "qa": "PASS_PRODUCER_REPRODUCIBLE_DECODED_RGBA__C_INDEPENDENT_QA_PENDING"
+      },
+      "readiness_after": "PREFLIGHT_ONLY_EXACT_SOURCE_BOUND_9_OF_9__REMOVAL_MASK_PRODUCER_CLEAN_PLATE_SAFE_BBOX_READY__STYLE_RENDER_DDS_PENDING"
+    },
+    {
+      "index": 226,
+      "asset": "E3F4BA07",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+      "source": {
+        "sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+        "bytes": 4194432,
+        "canvas": [
+          2048,
+          512
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "raw_to_readable": "flip_y"
+      },
+      "binding_result": "PASS_10_OF_10_EXACT_HD_REGIONS__8_LOCALIZABLE__2_PROTECTED_BRANDS",
+      "exact_hd_mapping_correction": {
+        "supersedes": "B115/B00062 conditional stock-atlas semantic assignment",
+        "reason": "exact canonical HD readable pixels override stale bottom-origin/list-order assignment",
+        "mapping": [
+          [
+            "sprite_296",
+            "STAGE",
+            "스테이지",
+            "LOCALIZE",
+            [
+              0,
+              436,
+              228,
+              500
+            ],
+            [
+              2,
+              438,
+              226,
+              498
+            ]
+          ],
+          [
+            "sprite_297",
+            "OUTRUN2SP",
+            null,
+            "PRESERVE_BRAND",
+            [
+              983,
+              430,
+              1416,
+              494
+            ],
+            null
+          ],
+          [
+            "sprite_298",
+            "OUTRUN2",
+            null,
+            "PRESERVE_BRAND",
+            [
+              3,
+              346,
+              343,
+              410
+            ],
+            null
+          ],
+          [
+            "sprite_299",
+            "GOAL E",
+            "골 E",
+            "LOCALIZE",
+            [
+              980,
+              346,
+              1233,
+              410
+            ],
+            [
+              982,
+              348,
+              1231,
+              408
+            ]
+          ],
+          [
+            "sprite_300",
+            "GOAL D",
+            "골 D",
+            "LOCALIZE",
+            [
+              4,
+              262,
+              256,
+              326
+            ],
+            [
+              6,
+              264,
+              254,
+              324
+            ]
+          ],
+          [
+            "sprite_301",
+            "GOAL C",
+            "골 C",
+            "LOCALIZE",
+            [
+              983,
+              262,
+              1234,
+              326
+            ],
+            [
+              985,
+              264,
+              1232,
+              324
+            ]
+          ],
+          [
+            "sprite_302",
+            "GOAL B",
+            "골 B",
+            "LOCALIZE",
+            [
+              4,
+              170,
+              257,
+              234
+            ],
+            [
+              6,
+              172,
+              255,
+              232
+            ]
+          ],
+          [
+            "sprite_303",
+            "GOAL A",
+            "골 A",
+            "LOCALIZE",
+            [
+              986,
+              170,
+              1242,
+              234
+            ],
+            [
+              988,
+              172,
+              1240,
+              232
+            ]
+          ],
+          [
+            "sprite_304",
+            "GOAL",
+            "골",
+            "LOCALIZE",
+            [
+              4,
+              86,
+              195,
+              150
+            ],
+            [
+              6,
+              88,
+              193,
+              148
+            ]
+          ],
+          [
+            "sprite_305",
+            "15 STAGE CONTINUOUS",
+            "15코스 연속",
+            "LOCALIZE",
+            [
+              985,
+              86,
+              1809,
+              150
+            ],
+            [
+              987,
+              88,
+              1807,
+              148
+            ]
+          ]
+        ],
+        "status": "STALE_MAPPING_CORRECTED_BY_EXACT_SOURCE_PIXEL_EVIDENCE"
+      },
+      "clean_plate": {
+        "scope": "8 current canonical localizable regions; OUTRUN2/OUTRUN2SP preserved byte-for-byte",
+        "removal_mask_pixels": 84629,
+        "removal_mask_raw_sha256": "dcc28d8da195df03de5f3a8fbfc71a5dbf3d88a70146479541432c5f96c1a6ee",
+        "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
+        "changed_pixels_outside_mask": 0,
+        "alpha_changes_outside_mask": 0,
+        "protected_pixels_unchanged": true,
+        "qa": "PASS_PRODUCER_REPRODUCIBLE_DECODED_RGBA__C_INDEPENDENT_QA_PENDING"
+      },
+      "readiness_after": "PREFLIGHT_ONLY_EXACT_SOURCE_BOUND_10_OF_10__8_LOCALIZABLE_2_PROTECTED__REMOVAL_MASK_PRODUCER_CLEAN_PLATE_SAFE_BBOX_READY__STYLE_RENDER_DDS_PENDING"
+    },
+    {
+      "index": 232,
+      "asset": "EBFC709F",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "source": {
+        "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+        "bytes": 8388736,
+        "canvas": [
+          2048,
+          1024
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "raw_to_readable": "flip_y"
+      },
+      "binding_result": "PASS_6_OF_6_EXACT_HD_TEXT_REGIONS__4_CURRENT_TRANSLATABLE_OCCURRENCES__2_CANONICAL_TRANSLATION_BLOCKERS",
+      "element_schema": [
+        "sprite",
+        "source",
+        "korean",
+        "role",
+        "source_bbox_readable_xyxy",
+        "candidate_safe_bbox_2px_readable_xyxy"
+      ],
+      "elements": [
+        [
+          "sprite_755",
+          "JOIN GAME",
+          "게임 참가",
+          "LOCALIZE",
+          [
+            9,
+            874,
+            979,
+            1019
+          ],
+          [
+            11,
+            876,
+            977,
+            1017
+          ]
+        ],
+        [
+          "sprite_756",
+          "CREATE GAME",
+          "게임 만들기",
+          "LOCALIZE",
+          [
+            24,
+            695,
+            1245,
+            840
+          ],
+          [
+            26,
+            697,
+            1243,
+            838
+          ]
+        ],
+        [
+          "sprite_757",
+          "Join your friends in a game of OutRun!",
+          null,
+          "CANONICAL_TRANSLATION_REQUIRED",
+          [
+            4,
+            527,
+            1138,
+            597
+          ],
+          null
+        ],
+        [
+          "sprite_758",
+          "Create a game and invite your friends!",
+          null,
+          "CANONICAL_TRANSLATION_REQUIRED",
+          [
+            7,
+            367,
+            1120,
+            437
+          ],
+          null
+        ],
+        [
+          "sprite_759",
+          "JOIN GAME",
+          "게임 참가",
+          "LOCALIZE",
+          [
+            14,
+            287,
+            418,
+            350
+          ],
+          [
+            16,
+            289,
+            416,
+            348
+          ]
+        ],
+        [
+          "sprite_760",
+          "CREATE GAME",
+          "게임 만들기",
+          "LOCALIZE",
+          [
+            898,
+            291,
+            1420,
+            354
+          ],
+          [
+            900,
+            293,
+            1418,
+            352
+          ]
+        ]
+      ],
+      "clean_plate": {
+        "scope": "four current translated JOIN/CREATE occurrences only; two untranslated description regions untouched",
+        "removal_mask_pixels": 192602,
+        "removal_mask_raw_sha256": "2312c328ddec0c7c1b0397caf05e54f98fcd142f9331099a61342cdf887e3c79",
+        "clean_plate_raw_rgba_sha256": "928ded01af014cde5bc9fbbc9dc5aaf52d7cb72b873cc5ab74bb199783995ed0",
+        "changed_pixels_outside_mask": 0,
+        "alpha_changes_outside_mask": 0,
+        "protected_pixels_unchanged": true,
+        "qa": "PASS_PRODUCER_REPRODUCIBLE_PARTIAL_DECODED_RGBA__C_INDEPENDENT_QA_PENDING"
+      },
+      "canonical_translation_blockers": [
+        "Join your friends in a game of OutRun!",
+        "Create a game and invite your friends!"
+      ],
+      "readiness_after": "PREFLIGHT_ONLY_EXACT_SOURCE_BOUND_6_OF_6__4_TRANSLATABLE_REGIONS_MASKED_WITH_PARTIAL_CLEAN_PLATE__2_DESCRIPTION_TRANSLATIONS_REQUIRED__NO_RENDER"
+    }
+  ],
+  "material_advance": {
+    "exact_source_assets_verified": 3,
+    "positive_bindings": 25,
+    "source_effect_bboxes_measured": 25,
+    "candidate_safe_bboxes_measured": 21,
+    "index226_stale_mapping_corrected": true,
+    "index232_missing_canonical_translation_regions": 2,
+    "producer_clean_plate_surfaces_reproducibly_hashed": 3,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "post_evidence_rescan": {
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "preflight_only_indices": [
+      133,
+      226,
+      232
+    ],
+    "reason": "Geometry/removal/clean-plate prerequisites materially advanced. Style/render/DDS gates remain for 133/226; index232 additionally requires canonical Korean wording for two descriptions. No guessed candidate emitted."
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_133_226_232_ALL_MOD3_EQ_1",
+    "pinned_release_identity": "PASS_306223257_BYTES_SHA256_76F85ED2_EXACT",
+    "exact_asset_identity": "PASS_3_OF_3_CANONICAL_SHA256_HEADER_CANVAS_RGBA32_MIP1",
+    "raw_orientation": "PASS_FLIP_Y_3_OF_3_READABLE_SOURCE_TEXT",
+    "index133_binding": "PASS_9_OF_9",
+    "index226_binding": "PASS_10_OF_10_WITH_2_PROTECTED_BRANDS_AND_STALE_MAPPING_CORRECTION",
+    "index232_binding": "PASS_6_OF_6_FAIL_CLOSED_2_CANONICAL_TRANSLATIONS_MISSING",
+    "clean_plate_containment": "PASS_ZERO_CHANGED_PIXELS_OUTSIDE_REMOVAL_MASK_3_OF_3__ZERO_ALPHA_CHANGE_OUTSIDE_MASK_3_OF_3",
+    "candidate_generation": "NONE_FAIL_CLOSED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
