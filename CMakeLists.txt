@@ -793,3 +793,34 @@ target_link_libraries(dx11_input_layout_semantics PUBLIC
     d3dcompiler.lib
     d3d11.lib
 )
+
+# Target: dx11_input_signature_semantics
+set(dx11_input_signature_semantics_SOURCES
+    "tools/dx11_input_signature_semantics.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_input_signature_semantics)
+
+target_sources(dx11_input_signature_semantics PRIVATE ${dx11_input_signature_semantics_SOURCES})
+
+target_compile_features(dx11_input_signature_semantics PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_input_signature_semantics PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_input_signature_semantics PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_input_signature_semantics PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)

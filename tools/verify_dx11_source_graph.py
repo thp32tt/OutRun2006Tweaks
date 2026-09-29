@@ -16,6 +16,9 @@ SEMANTIC_SMOKE = (
 INPUT_LAYOUT_SMOKE = (
     ROOT / "tools" / "dx11_input_layout_semantics.cpp"
 ).read_text(encoding="utf-8")
+INPUT_SIGNATURE_SMOKE = (
+    ROOT / "tools" / "dx11_input_signature_semantics.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -523,6 +526,52 @@ def main() -> None:
         if token not in BACKEND_GATE:
             raise SystemExit(
                 "DX11 R88 input-layout semantic smoke missing from Backend Conversion Gate: "
+                + token
+            )
+
+    r89_smoke_contract = {
+        "D3DReflect": "R89 shader-signature reflection",
+        "D3D11_SIGNATURE_PARAMETER_DESC": "R89 reflected semantic descriptor",
+        "D3D_REGISTER_COMPONENT_UINT32": "R89 UBYTE4 uint shader contract",
+        "D3D_REGISTER_COMPONENT_FLOAT32": "R89 float/unorm shader contract",
+        "D3DFVF_XYZB5": "R89 split BLENDWEIGHT0/1 case",
+        "D3DFVF_LASTBETA_UBYTE4": "R89 UBYTE4 BLENDINDICES case",
+        "D3DFVF_LASTBETA_D3DCOLOR": "R89 D3DCOLOR BLENDINDICES case",
+        "wrongUbyte4TypeShader": "R89 deliberate float4 mismatch fail-closed case",
+        "DX11 input signature semantics smoke R89: PASS": "R89 smoke completion marker",
+    }
+    missing_r89_smoke = [
+        meaning
+        for token, meaning in r89_smoke_contract.items()
+        if token not in INPUT_SIGNATURE_SMOKE
+    ]
+    if missing_r89_smoke:
+        raise SystemExit(
+            "DX11 R89 input-signature semantic smoke drift: "
+            + ", ".join(missing_r89_smoke)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_input_signature_semantics" not in graph:
+            raise SystemExit(
+                f"DX11 R89 input-signature semantic target missing from {graph_name}"
+            )
+        if "tools/dx11_input_signature_semantics.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R89 input-signature semantic source missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 input-signature semantic smoke",
+        "Run DX11 input-signature semantic smoke",
+        "dx11_input_signature_semantics",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R89 input-signature semantic smoke missing from Backend Conversion Gate: "
                 + token
             )
 
