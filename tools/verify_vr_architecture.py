@@ -36,6 +36,8 @@ required = [
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
     "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "src/vr/d3d9/stereo_renderer_r26_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r29.cpp",
     "src/vr/d3d9/stereo_renderer_r29_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -430,7 +432,7 @@ require(
     "SAFE modes stuck in the default direct-only path",
 )
 require(
-    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "src/vr/d3d9/stereo_renderer_r26_overlay.inc",
     "R37DepthDisabledFragileOverlay",
     "R13EffectSnapshot effect = R13CaptureDrawTimeEffect",
     "unknown state fails closed",

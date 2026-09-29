@@ -4,7 +4,7 @@
 Set 01 F04 records that stable facades still hide historical .cpp include chains.
 Phase 1 extracted renderer R13 into an include-free overlay. Phase 2 did the same
 for renderer R23/R27/R28. Phases 3-5 flattened the production D3D9Ex R15/R14/R13
-wrapper edges. Phases 6-11 flatten the default stereo R34/R33/R32/R31/R30/R29 wrapper edges
+wrapper edges. Phases 6-12 flatten the default stereo R34/R33/R32/R31/R30/R29/R26 wrapper edges
 into include-free overlays while preserving the historical translation-unit
 wrappers for compatibility/build-graph ownership. These steps change source
 ownership only; runtime policy must remain unchanged.
@@ -58,6 +58,8 @@ ex_r14_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc"
 ex_r15_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r15.cpp"
 ex_r15_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc"
 ex_facade_rel = "src/vr/d3d9/ex_device_pipeline.cpp"
+stereo_r26_wrapper_rel = "src/vr/d3d9/stereo_renderer_r26.cpp"
+stereo_r26_overlay_rel = "src/vr/d3d9/stereo_renderer_r26_overlay.inc"
 stereo_r29_wrapper_rel = "src/vr/d3d9/stereo_renderer_r29.cpp"
 stereo_r29_overlay_rel = "src/vr/d3d9/stereo_renderer_r29_overlay.inc"
 stereo_r30_wrapper_rel = "src/vr/d3d9/stereo_renderer_r30.cpp"
@@ -85,6 +87,8 @@ ex_r14_overlay = read(ex_r14_overlay_rel)
 ex_r15_wrapper = read(ex_r15_wrapper_rel)
 ex_r15_overlay = read(ex_r15_overlay_rel)
 ex_facade = read(ex_facade_rel)
+stereo_r26_wrapper = read(stereo_r26_wrapper_rel)
+stereo_r26_overlay = read(stereo_r26_overlay_rel)
 stereo_r29_wrapper = read(stereo_r29_wrapper_rel)
 stereo_r29_overlay = read(stereo_r29_overlay_rel)
 stereo_r30_wrapper = read(stereo_r30_wrapper_rel)
@@ -283,6 +287,31 @@ require_order(
 )
 
 require_order(
+    stereo_r26_wrapper,
+    stereo_r26_wrapper_rel,
+    '#include "stereo_renderer_r23.cpp"',
+    '#include "shader_fingerprint_gpl.hpp"',
+    '#include "../game/render_semantics.hpp"',
+    '#include "stereo_renderer_r26_overlay.inc"',
+)
+if "namespace OutRunVRRenderer" in stereo_r26_wrapper or "namespace OutRunVRStereo" in stereo_r26_wrapper:
+    raise SystemExit("Stereo R26 compatibility wrapper regained implementation body")
+if "#include" in stereo_r26_overlay:
+    raise SystemExit("Stereo R26 overlay must remain include-free")
+require(
+    stereo_r26_overlay,
+    stereo_r26_overlay_rel,
+    "namespace OutRunVRRenderer",
+    "R28PerspectiveWorldSemantic",
+    "namespace OutRunVRStereo",
+    "R26InstallState",
+    "R37DepthDisabledFragileOverlay",
+    "R13CaptureDrawTimeEffect",
+    "unknown state fails closed",
+    "VR R26/R28 GAME: verified-world shader-epoch recovery",
+)
+
+require_order(
     stereo_r29_wrapper,
     stereo_r29_wrapper_rel,
     '#include "stereo_renderer_r26.cpp"',
@@ -428,6 +457,7 @@ require(
     "stereo remains fail-closed",
 )
 for stale_stereo_owner in (
+    '#include "stereo_renderer_r26.cpp"',
     '#include "stereo_renderer_r29.cpp"',
     '#include "stereo_renderer_r30.cpp"',
     '#include "stereo_renderer_r31.cpp"',
@@ -447,7 +477,10 @@ require_order(
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "stereo_renderer_r30_r26_safe.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r26.cpp"',
+    '#include "stereo_renderer_r23.cpp"',
+    '#include "shader_fingerprint_gpl.hpp"',
+    '#include "../game/render_semantics.hpp"',
+    '#include "stereo_renderer_r26_overlay.inc"',
     '#include "stereo_renderer_r29_overlay.inc"',
     "#include <d3dcompiler.h>",
     "#include <algorithm>",
@@ -464,16 +497,20 @@ require_order(
     '#include "stereo_renderer_r34_overlay.inc"',
 )
 
-r26_pos = stereo_facade.find('#include "stereo_renderer_r26.cpp"')
-r29_semantics_pos = stereo_facade.find('#include "vr/game/render_semantics.hpp"', r26_pos)
+r23_pos = stereo_facade.find('#include "stereo_renderer_r23.cpp"')
+r26_semantics_pos = stereo_facade.find('#include "../game/render_semantics.hpp"', r23_pos)
+r26_overlay_pos = stereo_facade.find('#include "stereo_renderer_r26_overlay.inc"')
+r29_semantics_pos = stereo_facade.find('#include "vr/game/render_semantics.hpp"', r26_overlay_pos)
 r29_overlay_pos = stereo_facade.find('#include "stereo_renderer_r29_overlay.inc"')
 r33_overlay_pos = stereo_facade.find('#include "stereo_renderer_r33_overlay.inc"')
 r34_semantics_pos = stereo_facade.rfind('#include "vr/game/render_semantics.hpp"')
 r34_namespace_pos = stereo_facade.find("namespace OutRunVRD3D9ExUpgradeR13")
-if min(r26_pos, r29_semantics_pos, r29_overlay_pos, r33_overlay_pos,
-       r34_semantics_pos, r34_namespace_pos) < 0:
+if min(r23_pos, r26_semantics_pos, r26_overlay_pos, r29_semantics_pos,
+       r29_overlay_pos, r33_overlay_pos, r34_semantics_pos, r34_namespace_pos) < 0:
     raise SystemExit("production stereo facade semantic include boundary missing")
-if not (r26_pos < r29_semantics_pos < r29_overlay_pos):
+if not (r23_pos < r26_semantics_pos < r26_overlay_pos):
+    raise SystemExit("R26 semantic prelude moved outside the R23 -> R26 overlay boundary")
+if not (r26_overlay_pos < r29_semantics_pos < r29_overlay_pos):
     raise SystemExit("R29 semantic prelude moved outside the R26 -> R29 overlay boundary")
 if not (r33_overlay_pos < r34_semantics_pos < r34_namespace_pos):
     raise SystemExit("R34 render-semantics include moved outside the R33 -> R34 boundary")
@@ -522,6 +559,10 @@ require(
     "'src/vr/d3d9/ex_device_upgrade_r15_overlay.inc' = @(",
     "D3DSBT_ALL",
     "Ex promotion rolled back transactionally",
+    "'src/vr/d3d9/stereo_renderer_r26_overlay.inc' = @(",
+    "R26InstallState",
+    "R37DepthDisabledFragileOverlay",
+    "unknown state fails closed",
     "'src/vr/d3d9/stereo_renderer_r29_overlay.inc' = @(",
     "R29StableStereoBase",
     "R29FragileEffectCached",
@@ -552,6 +593,7 @@ for stale_guard in (
     "'src/vr/d3d9/ex_device_upgrade_r13.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(",
+    "'src/vr/d3d9/stereo_renderer_r26.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r29.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r30.cpp' = @(",
     "'src/vr/d3d9/stereo_renderer_r31.cpp' = @(",
@@ -564,4 +606,4 @@ for stale_guard in (
             f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
         )
 
-print("VR facade modularization F04 phase 11: PASS")
+print("VR facade modularization F04 phase 12: PASS")

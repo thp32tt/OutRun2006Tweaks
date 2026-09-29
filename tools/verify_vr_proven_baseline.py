@@ -273,7 +273,10 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r26.cpp"',
+    '#include "stereo_renderer_r23.cpp"',
+    '#include "shader_fingerprint_gpl.hpp"',
+    '#include "../game/render_semantics.hpp"',
+    '#include "stereo_renderer_r26_overlay.inc"',
     '#include "stereo_renderer_r29_overlay.inc"',
     '#include <d3dcompiler.h>',
     '#include "stereo_renderer_r30_overlay.inc"',
@@ -283,6 +286,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r26.cpp"',
+       "P11_R70_STEREO_NO_R26_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r29.cpp"',
        "P11_R70_STEREO_NO_R29_NESTING")
@@ -351,7 +357,10 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
     '#include "r32_policy.hpp"',
-    '#include "stereo_renderer_r26.cpp"',
+    '#include "stereo_renderer_r23.cpp"',
+    '#include "shader_fingerprint_gpl.hpp"',
+    '#include "../game/render_semantics.hpp"',
+    '#include "stereo_renderer_r26_overlay.inc"',
     '#include "stereo_renderer_r29_overlay.inc"',
     '#include <d3dcompiler.h>',
     '#include "stereo_renderer_r30_overlay.inc"',
@@ -361,6 +370,9 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r26.cpp"',
+       "P11_R70_STEREO_NO_R26_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r29.cpp"',
        "P11_R70_STEREO_NO_R29_NESTING")

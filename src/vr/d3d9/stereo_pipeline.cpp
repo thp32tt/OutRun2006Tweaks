@@ -1,7 +1,7 @@
 // R70 production stereo owner.
-// F04 phases 6-11 keep diagnostic comparison paths unchanged while the default
-// production path directly composes the R26 base plus include-free R29-R34
-// overlays. Historical R29-R34 wrappers remain compatibility/build-graph owners.
+// F04 phases 6-12 keep diagnostic comparison paths unchanged while the default
+// production path directly composes the R23 base plus include-free R26/R29-R34
+// overlays. Historical R26/R29-R34 wrappers remain compatibility/build-graph owners.
 
 #if defined(OUTRUN_VR_SAFE_DRAW_COMPARE)
 #include "stereo_renderer_r26_compare.cpp"
@@ -13,7 +13,10 @@
 #include "stereo_renderer_r30_r26_safe.cpp"
 #else
 #include "r32_policy.hpp"
-#include "stereo_renderer_r26.cpp"
+#include "stereo_renderer_r23.cpp"
+#include "shader_fingerprint_gpl.hpp"
+#include "../game/render_semantics.hpp"
+#include "stereo_renderer_r26_overlay.inc"
 #include "vr/game/render_semantics.hpp"\n
 #include "stereo_renderer_r29_overlay.inc"
 #include <d3dcompiler.h>

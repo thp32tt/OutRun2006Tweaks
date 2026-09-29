@@ -90,6 +90,11 @@ jobs:
               'passive original Clear only',
               'authoritative first seed'
             )
+            'src/vr/d3d9/stereo_renderer_r26_overlay.inc' = @(
+              'R26InstallState',
+              'R37DepthDisabledFragileOverlay',
+              'unknown state fails closed'
+            )
             'src/vr/d3d9/stereo_renderer_r29_overlay.inc' = @(
               'R29StableStereoBase',
               'R29FragileEffectCached',
