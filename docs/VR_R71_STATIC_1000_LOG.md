@@ -440,3 +440,27 @@ Changed files:
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review process binding and restart identity.
+
+
+## Cycle 0020 — process binding / restart identity
+
+Review lenses:
+1. architecture/control flow;
+2. lifetime/reset/sync;
+3. stereo/HUD/visual correctness;
+4. hot path/frame pacing/copies/waits;
+5. adversarial/falsification.
+
+Finding/evidence:
+- Host/game selection prefers published client identity and frame reads enforce current run identity; no evidence supports relaxing restart guards.
+- Evidence: Shared client/run identity guards.
+- No production/runtime, HUD classification, GPU wait/copy, or synchronization behavior changed.
+- Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+
+Changed files:
+- `docs/VR_R71_STATIC_1000_LOG.md`
+- `docs/automation/R71_STATIC_1000_STATE.json`
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review view-history pose matching.
