@@ -429,7 +429,7 @@ bool NativeManagedTextureShadow::write_full(
     UINT sourceRowPitch,
     UINT sourceRows) noexcept {
 
-    if (!ready() || source_lock_active_ || !source ||
+    if (!ready() || source_lock_active_ || source_unlock_staged_ || !source ||
         sourceRows != height_ || sourceRowPitch < row_bytes_)
         return false;
 
@@ -457,7 +457,8 @@ bool NativeManagedTextureShadow::read_full(
     UINT destinationRowPitch,
     UINT destinationRows) const noexcept {
 
-    if (!ready() || source_lock_active_ || !shadow_valid() || !destination ||
+    if (!ready() || source_lock_active_ || source_unlock_staged_ ||
+        !shadow_valid() || !destination ||
         destinationRows != height_ || destinationRowPitch < row_bytes_)
         return false;
 
@@ -480,7 +481,8 @@ bool NativeManagedTextureShadow::read_full(
 bool NativeManagedTextureShadow::recreate_and_upload_mirror(
     ID3D11Device* device) noexcept {
 
-    if (!ready() || source_lock_active_ || !shadow_valid() || !device)
+    if (!ready() || source_lock_active_ || source_unlock_staged_ ||
+        !shadow_valid() || !device)
         return false;
 
     const auto format = translate_resource_format(
@@ -546,7 +548,7 @@ bool NativeManagedTextureShadow::begin_source_lock(
     DWORD lockFlags,
     const D3DLOCKED_RECT& lockedRect) noexcept {
 
-    if (!ready() || source_lock_active_ ||
+    if (!ready() || source_lock_active_ || source_unlock_staged_ ||
         level != 0 || sourceRect != nullptr ||
         !lockedRect.pBits || lockedRect.Pitch <= 0)
         return false;
@@ -572,21 +574,68 @@ bool NativeManagedTextureShadow::begin_source_lock(
     return true;
 }
 
-bool NativeManagedTextureShadow::commit_source_unlock(UINT level) noexcept {
-    if (!source_lock_active_ || level != source_lock_level_)
+bool NativeManagedTextureShadow::stage_source_unlock(UINT level) noexcept {
+    if (!source_lock_active_ || source_unlock_staged_ ||
+        level != source_lock_level_ || !source_lock_bits_ ||
+        source_lock_pitch_ < row_bytes_)
         return false;
 
-    const void* bits = source_lock_bits_;
-    const UINT pitch = source_lock_pitch_;
-    clear_source_lock();
+    try {
+        pending_unlock_.resize(shadow_.size());
+    } catch (...) {
+        invalidate_shadow();
+        clear_source_lock();
+        clear_unlock_stage();
+        return false;
+    }
 
-    // This must run before the real IDirect3DTexture9::UnlockRect so pBits
-    // still references the final D3D9 lock contents.
-    return write_full(bits, pitch, height_);
+    const auto* sourceBytes =
+        static_cast<const std::uint8_t*>(source_lock_bits_);
+    for (UINT row = 0; row < height_; ++row) {
+        std::memcpy(
+            pending_unlock_.data() +
+                static_cast<std::size_t>(row) * row_bytes_,
+            sourceBytes +
+                static_cast<std::size_t>(row) * source_lock_pitch_,
+            row_bytes_);
+    }
+
+    clear_source_lock();
+    source_unlock_level_ = level;
+    source_unlock_staged_ = true;
+    return true;
+}
+
+bool NativeManagedTextureShadow::finish_source_unlock(
+    UINT level,
+    HRESULT unlockResult) noexcept {
+
+    if (!source_unlock_staged_ || level != source_unlock_level_)
+        return false;
+
+    if (FAILED(unlockResult) || !ready() ||
+        pending_unlock_.size() != shadow_.size()) {
+        clear_unlock_stage();
+        invalidate_shadow();
+        return false;
+    }
+
+    std::memcpy(
+        shadow_.data(), pending_unlock_.data(), pending_unlock_.size());
+    clear_unlock_stage();
+    release_mirror();
+    lifetime_ = note_managed_shadow_write(lifetime_);
+    return true;
+}
+
+bool NativeManagedTextureShadow::commit_source_unlock(UINT level) noexcept {
+    return stage_source_unlock(level) &&
+        finish_source_unlock(level, S_OK);
 }
 
 void NativeManagedTextureShadow::cancel_source_lock() noexcept {
     clear_source_lock();
+    clear_unlock_stage();
 }
 
 void NativeManagedTextureShadow::note_mirror_uploaded() noexcept {
@@ -597,6 +646,7 @@ void NativeManagedTextureShadow::note_mirror_uploaded() noexcept {
 
 void NativeManagedTextureShadow::observe_device_reset() noexcept {
     clear_source_lock();
+    clear_unlock_stage();
     release_mirror();
     lifetime_ = advance_managed_device_generation(lifetime_);
 }
@@ -608,6 +658,12 @@ void NativeManagedTextureShadow::release_mirror() noexcept {
     lifetime_.mirrorValid = false;
 }
 
+void NativeManagedTextureShadow::invalidate_shadow() noexcept {
+    release_mirror();
+    lifetime_.cpuShadowValid = false;
+    lifetime_.mirrorValid = false;
+}
+
 void NativeManagedTextureShadow::clear_source_lock() noexcept {
     source_lock_bits_ = nullptr;
     source_lock_pitch_ = 0;
@@ -615,8 +671,15 @@ void NativeManagedTextureShadow::clear_source_lock() noexcept {
     source_lock_active_ = false;
 }
 
+void NativeManagedTextureShadow::clear_unlock_stage() noexcept {
+    pending_unlock_.clear();
+    source_unlock_level_ = 0;
+    source_unlock_staged_ = false;
+}
+
 void NativeManagedTextureShadow::shutdown() noexcept {
     clear_source_lock();
+    clear_unlock_stage();
     release_mirror();
     source_format_ = D3DFMT_UNKNOWN;
     width_ = 0;
@@ -624,6 +687,168 @@ void NativeManagedTextureShadow::shutdown() noexcept {
     row_bytes_ = 0;
     shadow_.clear();
     lifetime_ = {};
+}
+
+bool NativeManagedTextureRegistry::register_texture(
+    const void* textureKey,
+    D3DFORMAT sourceFormat,
+    UINT width,
+    UINT height,
+    UINT levels,
+    DWORD usage,
+    D3DPOOL pool) noexcept {
+
+    if (!textureKey || levels != 1)
+        return false;
+
+    const auto behavior = translate_resource_behavior(
+        ResourceRole::Texture, pool, usage);
+    if (!behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow ||
+        pool != D3DPOOL_MANAGED || usage != 0)
+        return false;
+
+    try {
+        auto shadow = std::make_unique<NativeManagedTextureShadow>();
+        if (!shadow->initialize(sourceFormat, width, height))
+            return false;
+
+        std::lock_guard<std::mutex> lock(mutex_);
+        shadows_[textureKey] = std::move(shadow);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+NativeManagedTextureShadow* NativeManagedTextureRegistry::find_locked(
+    const void* textureKey) noexcept {
+    const auto it = shadows_.find(textureKey);
+    return it == shadows_.end() ? nullptr : it->second.get();
+}
+
+const NativeManagedTextureShadow* NativeManagedTextureRegistry::find_locked(
+    const void* textureKey) const noexcept {
+    const auto it = shadows_.find(textureKey);
+    return it == shadows_.end() ? nullptr : it->second.get();
+}
+
+bool NativeManagedTextureRegistry::begin_source_lock(
+    const void* textureKey,
+    UINT level,
+    const RECT* sourceRect,
+    DWORD lockFlags,
+    const D3DLOCKED_RECT& lockedRect) noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto* shadow = find_locked(textureKey);
+    return shadow &&
+        shadow->begin_source_lock(level, sourceRect, lockFlags, lockedRect);
+}
+
+bool NativeManagedTextureRegistry::stage_source_unlock(
+    const void* textureKey,
+    UINT level) noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto* shadow = find_locked(textureKey);
+    return shadow && shadow->stage_source_unlock(level);
+}
+
+bool NativeManagedTextureRegistry::finish_source_unlock(
+    const void* textureKey,
+    UINT level,
+    HRESULT unlockResult) noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto* shadow = find_locked(textureKey);
+    return shadow &&
+        shadow->finish_source_unlock(level, unlockResult);
+}
+
+void NativeManagedTextureRegistry::observe_device_reset() noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto& entry : shadows_) {
+        if (entry.second)
+            entry.second->observe_device_reset();
+    }
+}
+
+void NativeManagedTextureRegistry::forget_texture(
+    const void* textureKey) noexcept {
+    if (!textureKey)
+        return;
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto it = shadows_.find(textureKey);
+    if (it == shadows_.end())
+        return;
+    if (it->second)
+        it->second->shutdown();
+    shadows_.erase(it);
+}
+
+void NativeManagedTextureRegistry::clear() noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto& entry : shadows_) {
+        if (entry.second)
+            entry.second->shutdown();
+    }
+    shadows_.clear();
+}
+
+std::size_t NativeManagedTextureRegistry::size() const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return shadows_.size();
+}
+
+bool NativeManagedTextureRegistry::contains(
+    const void* textureKey) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return find_locked(textureKey) != nullptr;
+}
+
+bool NativeManagedTextureRegistry::shadow_valid(
+    const void* textureKey) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    return shadow && shadow->shadow_valid();
+}
+
+std::uint64_t NativeManagedTextureRegistry::shadow_version(
+    const void* textureKey) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    return shadow ? shadow->shadow_version() : 0;
+}
+
+std::uint64_t NativeManagedTextureRegistry::device_generation(
+    const void* textureKey) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    return shadow ? shadow->device_generation() : 0;
+}
+
+bool NativeManagedTextureRegistry::source_lock_active(
+    const void* textureKey) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    return shadow && shadow->source_lock_active();
+}
+
+bool NativeManagedTextureRegistry::source_unlock_staged(
+    const void* textureKey) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    return shadow && shadow->source_unlock_staged();
+}
+
+bool NativeManagedTextureRegistry::read_shadow(
+    const void* textureKey,
+    void* destination,
+    UINT destinationRowPitch,
+    UINT destinationRows) const noexcept {
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    return shadow && shadow->read_full(
+        destination, destinationRowPitch, destinationRows);
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(

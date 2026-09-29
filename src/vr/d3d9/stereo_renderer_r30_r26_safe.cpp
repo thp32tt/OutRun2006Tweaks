@@ -138,6 +138,7 @@ namespace OutRunVRStereo
         constexpr std::size_t R30UpdateSurfaceVtableIndex = 30;
         constexpr std::size_t R30UpdateTextureVtableIndex = 31;
         constexpr std::size_t R30BufferReleaseVtableIndex = 2;
+        constexpr std::size_t R30TextureReleaseVtableIndex = 2;
         constexpr std::size_t R30BufferLockVtableIndex = 11;
         constexpr std::size_t R30BufferUnlockVtableIndex = 12;
         constexpr std::size_t R30TextureLockRectVtableIndex = 19;
@@ -147,6 +148,7 @@ namespace OutRunVRStereo
         SafetyHookInline R30CreateTextureHook{};
         SafetyHookInline R30UpdateSurfaceHook{};
         SafetyHookInline R30UpdateTextureHook{};
+        SafetyHookInline R30TextureReleaseHook{};
         SafetyHookInline R30TextureLockRectHook{};
         SafetyHookInline R30TextureUnlockRectHook{};
         SafetyHookInline R30CreateVertexBufferHook{};
@@ -545,6 +547,16 @@ namespace OutRunVRStereo
             return refs;
         }
 
+        ULONG __stdcall R30TextureReleaseDest(
+            IDirect3DTexture9* texture)
+        {
+            const ULONG refs =
+                R30TextureReleaseHook.stdcall<ULONG>(texture);
+            if (refs == 0)
+                outrun::vr::dx11::forget_texture_mutation(texture);
+            return refs;
+        }
+
         HRESULT __stdcall R30TextureLockRectDest(
             IDirect3DTexture9* texture, UINT level,
             D3DLOCKED_RECT* lockedRect, const RECT* rect, DWORD flags)
@@ -552,16 +564,24 @@ namespace OutRunVRStereo
             const HRESULT hr = R30TextureLockRectHook.stdcall<HRESULT>(
                 texture, level, lockedRect, rect, flags);
             if (SUCCEEDED(hr) && lockedRect && lockedRect->pBits)
+            {
                 outrun::vr::dx11::observe_texture_lock_rect(
                     texture, level, flags);
+                outrun::vr::dx11::observe_managed_texture_lock_rect(
+                    texture, level, *lockedRect, rect, flags);
+            }
             return hr;
         }
 
         HRESULT __stdcall R30TextureUnlockRectDest(
             IDirect3DTexture9* texture, UINT level)
         {
+            outrun::vr::dx11::stage_managed_texture_unlock_rect(
+                texture, level);
             const HRESULT hr =
                 R30TextureUnlockRectHook.stdcall<HRESULT>(texture, level);
+            outrun::vr::dx11::finish_managed_texture_unlock_rect(
+                texture, level, hr);
             outrun::vr::dx11::observe_texture_unlock_rect(
                 texture, level, hr);
             return hr;
@@ -573,6 +593,10 @@ namespace OutRunVRStereo
                 return false;
             std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             auto** vtable = *reinterpret_cast<void***>(texture);
+            if (!R30TextureReleaseHook)
+                R30TextureReleaseHook = safetyhook::create_inline(
+                    vtable[R30TextureReleaseVtableIndex],
+                    R30TextureReleaseDest);
             if (!R30TextureLockRectHook)
                 R30TextureLockRectHook = safetyhook::create_inline(
                     vtable[R30TextureLockRectVtableIndex],
@@ -581,7 +605,8 @@ namespace OutRunVRStereo
                 R30TextureUnlockRectHook = safetyhook::create_inline(
                     vtable[R30TextureUnlockRectVtableIndex],
                     R30TextureUnlockRectDest);
-            return R30TextureLockRectHook && R30TextureUnlockRectHook;
+            return R30TextureReleaseHook &&
+                R30TextureLockRectHook && R30TextureUnlockRectHook;
         }
 
         bool R30EnsureVertexBufferHooks(IDirect3DVertexBuffer9* buffer)
@@ -740,6 +765,7 @@ namespace OutRunVRStereo
             R30CreateTextureHook = {};
             R30TextureUnlockRectHook = {};
             R30TextureLockRectHook = {};
+            R30TextureReleaseHook = {};
             R30CreateIndexBufferHook = {};
             R30CreateVertexBufferHook = {};
             R30IndexBufferUnlockHook = {};
@@ -754,6 +780,7 @@ namespace OutRunVRStereo
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
             }
+            outrun::vr::dx11::clear_managed_texture_shadows();
         }
 
 

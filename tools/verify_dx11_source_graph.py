@@ -264,6 +264,11 @@ def main() -> None:
         "forget_index_buffer_mutation": "IB release cleanup API",
         "observe_texture_lock_rect": "texture LockRect observation API",
         "observe_texture_unlock_rect": "texture UnlockRect observation API",
+        "observe_managed_texture_lock_rect": "R105 managed LockRect shadow API",
+        "stage_managed_texture_unlock_rect": "R105 pre-Unlock staging API",
+        "finish_managed_texture_unlock_rect": "R105 post-Unlock commit API",
+        "forget_texture_mutation": "R105 texture Release cleanup API",
+        "clear_managed_texture_shadows": "R105 renderer rollback cleanup API",
         "observe_update_texture": "device UpdateTexture observation API",
         "observe_update_surface": "device UpdateSurface observation API",
         "observe_device_reset_generation": "successful Reset generation observation API",
@@ -333,12 +338,18 @@ def main() -> None:
             "observe_index_buffer_unlock": "IB Unlock bridge",
             "forget_index_buffer_mutation": "IB release cleanup bridge",
             "R30CreateTextureVtableIndex": "CreateTexture hook index",
+            "R30TextureReleaseVtableIndex": "Texture Release hook index",
             "R30TextureLockRectVtableIndex": "Texture LockRect hook index",
             "R30TextureUnlockRectVtableIndex": "Texture UnlockRect hook index",
             "R30UpdateSurfaceVtableIndex": "UpdateSurface hook index",
             "R30UpdateTextureVtableIndex": "UpdateTexture hook index",
             "observe_texture_lock_rect": "texture LockRect bridge",
             "observe_texture_unlock_rect": "texture UnlockRect bridge",
+            "observe_managed_texture_lock_rect": "R105 managed LockRect capture bridge",
+            "stage_managed_texture_unlock_rect": "R105 pre-Unlock staging bridge",
+            "finish_managed_texture_unlock_rect": "R105 post-Unlock commit bridge",
+            "forget_texture_mutation": "R105 texture Release cleanup bridge",
+            "clear_managed_texture_shadows": "R105 rollback registry cleanup bridge",
             "observe_update_texture": "UpdateTexture bridge",
             "observe_update_surface": "UpdateSurface bridge",
             "observe_device_reset_generation": "successful Reset generation bridge",
@@ -354,26 +365,64 @@ def main() -> None:
                 + ", ".join(missing_bridge)
             )
 
-        # R104 is a dormant transaction prerequisite only. The live R30
-        # Texture2D hooks still provide census telemetry, but they must not
-        # construct, mutate, upload, or bind the managed DX11 shadow owner
-        # until a later task explicitly closes the production lifetime model.
-        r104_forbidden_renderer_tokens = {
-            "NativeManagedTextureShadow": "managed shadow owner construction",
-            "begin_source_lock(": "R104 source-lock capture activation",
-            "commit_source_unlock(": "R104 source-unlock commit activation",
-            "recreate_and_upload_mirror(": "R104 managed mirror upload activation",
-            "mirror_srv()": "R104 managed SRV binding surface",
+        # R105 permits census-only CPU-shadow capture through runtime_census,
+        # but the R30 renderer must still not own the shadow class, upload a
+        # D3D11 mirror, bind an SRV, or route a native draw.
+        r105_forbidden_renderer_tokens = {
+            "NativeManagedTextureShadow": "direct managed shadow owner construction",
+            "NativeManagedTextureRegistry": "direct registry ownership in renderer",
+            "begin_source_lock(": "direct source-lock method call",
+            "commit_source_unlock(": "direct source-unlock commit call",
+            "recreate_and_upload_mirror(": "managed mirror upload activation",
+            "mirror_srv()": "managed SRV binding surface",
+            "PSSetShaderResources": "native texture binding activation",
         }
-        active_r104_tokens = [
+        active_r105_tokens = [
             meaning
-            for token, meaning in r104_forbidden_renderer_tokens.items()
+            for token, meaning in r105_forbidden_renderer_tokens.items()
             if token in renderer
         ]
-        if active_r104_tokens:
+        if active_r105_tokens:
             raise SystemExit(
-                f"DX11 R104 dormant bridge activated early in {renderer_name}: "
-                + ", ".join(active_r104_tokens)
+                f"DX11 R105 native draw/mirror activated early in {renderer_name}: "
+                + ", ".join(active_r105_tokens)
+            )
+
+        r105_renderer_contract = {
+            "R30TextureReleaseHook": "texture Release hook ownership",
+            "R30TextureReleaseDest": "texture Release cleanup detour",
+            "observe_managed_texture_lock_rect": "managed LockRect registry begin",
+            "stage_managed_texture_unlock_rect": "pre-Unlock byte staging",
+            "finish_managed_texture_unlock_rect": "post-Unlock HRESULT commit",
+            "forget_texture_mutation": "zero-ref texture registry cleanup",
+            "clear_managed_texture_shadows": "renderer rollback registry cleanup",
+        }
+        missing_r105_renderer = [
+            meaning
+            for token, meaning in r105_renderer_contract.items()
+            if token not in renderer
+        ]
+        if missing_r105_renderer:
+            raise SystemExit(
+                f"DX11 R105 managed registry bridge drift in {renderer_name}: "
+                + ", ".join(missing_r105_renderer)
+            )
+
+        stage_pos = renderer.find("stage_managed_texture_unlock_rect")
+        real_unlock_pos = renderer.find(
+            "R30TextureUnlockRectHook.stdcall<HRESULT>", stage_pos
+        )
+        finish_pos = renderer.find(
+            "finish_managed_texture_unlock_rect", real_unlock_pos
+        )
+        if not (
+            stage_pos >= 0 and
+            real_unlock_pos > stage_pos and
+            finish_pos > real_unlock_pos
+        ):
+            raise SystemExit(
+                f"DX11 R105 Unlock ordering drift in {renderer_name}: "
+                "stage bytes before real UnlockRect, commit after HRESULT"
             )
 
     analyzer = (ROOT / "tools" / "analyze_dx11_census.py").read_text(
@@ -1581,12 +1630,12 @@ def main() -> None:
             "R104 source pitch capture",
         "source_lock_active_ = true":
             "R104 lock transaction arm",
-        "return write_full(bits, pitch, height_)":
-            "R104 UnlockRect-to-R102 shadow commit",
-        "clear_source_lock();\n    release_mirror();":
-            "R104 Reset stale pointer cleanup",
-        "source_lock_active_ || !shadow_valid()":
-            "R104 active-lock mirror upload rejection",
+        "return stage_source_unlock(level) &&\n        finish_source_unlock(level, S_OK)":
+            "R104 compatibility commit uses staged R105 path",
+        "clear_source_lock();\n    clear_unlock_stage();\n    release_mirror();":
+            "R104/R105 Reset stale transaction cleanup",
+        "source_lock_active_ || source_unlock_staged_":
+            "R104/R105 active transaction mirror upload rejection",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
             raise SystemExit(
@@ -1628,6 +1677,117 @@ def main() -> None:
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(
                 "DX11 R104 LockRect bridge probe drift: " + meaning
+            )
+
+    r105_registry_header = {
+        "stage_source_unlock(UINT level)": "R105 pre-Unlock staging entrypoint",
+        "finish_source_unlock(UINT level, HRESULT unlockResult)":
+            "R105 HRESULT-gated shadow commit entrypoint",
+        "source_unlock_staged() const noexcept":
+            "R105 staged transaction visibility",
+        "std::vector<std::uint8_t> pending_unlock_":
+            "R105 pointer-free staged byte ownership",
+        "class NativeManagedTextureRegistry final":
+            "R105 per-texture registry owner",
+        "register_texture(": "R105 registry metadata gate",
+        "forget_texture(": "R105 Release cleanup API",
+        "read_shadow(": "R105 hosted content verification surface",
+    }
+    missing_r105_header = [
+        meaning
+        for token, meaning in r105_registry_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r105_header:
+        raise SystemExit(
+            "DX11 R105 managed-registry header drift: "
+            + ", ".join(missing_r105_header)
+        )
+
+    for token, meaning in {
+        "pending_unlock_.resize(shadow_.size())":
+            "R105 pre-Unlock owned staging allocation",
+        "clear_source_lock();\n    source_unlock_level_ = level":
+            "R105 raw LockRect pointer cleared before real Unlock",
+        "FAILED(unlockResult)":
+            "R105 failed Unlock fail-closed gate",
+        "lifetime_.cpuShadowValid = false":
+            "R105 failed Unlock shadow invalidation",
+        "shadow_.data(), pending_unlock_.data(), pending_unlock_.size()":
+            "R105 successful HRESULT-gated staged commit",
+        "std::make_unique<NativeManagedTextureShadow>()":
+            "R105 per-texture shadow allocation",
+        "shadows_[textureKey] = std::move(shadow)":
+            "R105 registry identity ownership",
+        "entry.second->observe_device_reset()":
+            "R105 registry Reset propagation",
+        "shadows_.erase(it)":
+            "R105 zero-ref registry cleanup",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R105 managed-registry source drift: " + meaning
+            )
+
+    r105_runtime_contract = {
+        '#include "native_backend.hpp"': "R105 runtime registry owner include",
+        "NativeManagedTextureRegistry ManagedTextureShadowRegistry":
+            "R105 runtime registry instance",
+        "observe_managed_texture_lock_rect(":
+            "R105 live LockRect-to-registry bridge",
+        "ManagedTextureShadowRegistry.register_texture(":
+            "R105 lazy exact MANAGED registration",
+        "stage_managed_texture_unlock_rect(":
+            "R105 live pre-Unlock staging",
+        "finish_managed_texture_unlock_rect(":
+            "R105 live post-Unlock HRESULT commit",
+        "ManagedTextureShadowRegistry.forget_texture(texture)":
+            "R105 live Release cleanup",
+        "ManagedTextureShadowRegistry.observe_device_reset()":
+            "R105 successful Reset propagation",
+        "ManagedTextureShadowRegistry.clear()":
+            "R105 renderer rollback cleanup",
+    }
+    missing_r105_runtime = [
+        meaning
+        for token, meaning in r105_runtime_contract.items()
+        if token not in census
+    ]
+    if missing_r105_runtime:
+        raise SystemExit(
+            "DX11 R105 runtime registry drift: "
+            + ", ".join(missing_r105_runtime)
+        )
+
+    for token, meaning in {
+        "R105 registry rejects null texture identity":
+            "R105 null identity rejection",
+        "R105 registry rejects multi-mip MANAGED texture":
+            "R105 mip-count fail-closed gate",
+        "R105 registry rejects non-MANAGED texture":
+            "R105 pool fail-closed gate",
+        "R105 pre-Unlock staging clears raw source pointer":
+            "R105 pointer lifetime proof",
+        "R105 successful real Unlock commits staged bytes":
+            "R105 HRESULT success commit proof",
+        "R105 commit uses pre-Unlock staged snapshot, not post-stage source":
+            "R105 owned staging content proof",
+        "R105 failed real Unlock invalidates shadow without commit":
+            "R105 failed Unlock fail-closed proof",
+        "R105 later successful Unlock recovers invalidated shadow":
+            "R105 recovery proof",
+        "R105 Reset preserves CPU shadow and advances registry generation":
+            "R105 Reset lifetime proof",
+        "R105 Release cleanup forgets per-texture shadow":
+            "R105 Release cleanup proof",
+        "R105 registry shutdown clears all texture ownership":
+            "R105 registry shutdown proof",
+        "DX11 managed Texture2D lifetime registry R105: PASS":
+            "R105 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R105 managed-registry probe drift: " + meaning
             )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

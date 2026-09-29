@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include "runtime_census.hpp"
+#include "native_backend.hpp"
 #include "resource_translation.hpp"
 
 #include <array>
@@ -111,6 +112,7 @@ namespace outrun::vr::dx11
         BufferMutationRegistry VertexMutationEvidence;
         BufferMutationRegistry IndexMutationEvidence;
         ManagedMirrorLifetimeState ManagedLifetimeEvidence{};
+        NativeManagedTextureRegistry ManagedTextureShadowRegistry{};
 
         struct TextureMutationEvidence
         {
@@ -1443,6 +1445,73 @@ namespace outrun::vr::dx11
         finish_observed_texture_unlock(texture, level, result);
     }
 
+    bool observe_managed_texture_lock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        const D3DLOCKED_RECT& lockedRect,
+        const RECT* rect,
+        DWORD flags) noexcept
+    {
+        if (!texture || !census_enabled() || level != 0)
+            return false;
+
+        if (!ManagedTextureShadowRegistry.contains(texture))
+        {
+            D3DSURFACE_DESC desc{};
+            const UINT levels = texture->GetLevelCount();
+            if (levels != 1 || FAILED(texture->GetLevelDesc(0, &desc)) ||
+                !ManagedTextureShadowRegistry.register_texture(
+                    texture, desc.Format, desc.Width, desc.Height,
+                    levels, desc.Usage, desc.Pool))
+                return false;
+        }
+
+        return ManagedTextureShadowRegistry.begin_source_lock(
+            texture, level, rect, flags, lockedRect);
+    }
+
+    bool stage_managed_texture_unlock_rect(
+        IDirect3DTexture9* texture,
+        UINT level) noexcept
+    {
+        if (!texture || !census_enabled())
+            return false;
+        return ManagedTextureShadowRegistry.stage_source_unlock(
+            texture, level);
+    }
+
+    bool finish_managed_texture_unlock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        HRESULT result) noexcept
+    {
+        if (!texture || !census_enabled())
+            return false;
+        return ManagedTextureShadowRegistry.finish_source_unlock(
+            texture, level, result);
+    }
+
+    void forget_texture_mutation(
+        IDirect3DTexture9* texture) noexcept
+    {
+        if (!texture)
+            return;
+        {
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            TextureMutationEvidenceRegistry.erase(texture);
+        }
+        ManagedTextureShadowRegistry.forget_texture(texture);
+    }
+
+    void clear_managed_texture_shadows() noexcept
+    {
+        {
+            std::lock_guard<std::mutex> lock(MutationEvidenceMutex);
+            TextureMutationEvidenceRegistry.clear();
+        }
+        ManagedTextureShadowRegistry.clear();
+    }
+
     void observe_update_texture(
         IDirect3DBaseTexture9* source,
         IDirect3DBaseTexture9* destination,
@@ -1476,6 +1545,7 @@ namespace outrun::vr::dx11
 
         ResourceManagedResetSuccesses.fetch_add(
             1, std::memory_order_relaxed);
+        ManagedTextureShadowRegistry.observe_device_reset();
         bool shadowPreserved = false;
         {
             std::lock_guard<std::mutex> lock(MutationEvidenceMutex);

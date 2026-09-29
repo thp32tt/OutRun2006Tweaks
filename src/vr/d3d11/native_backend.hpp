@@ -5,6 +5,9 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
 #include <vector>
 #include <d3d9.h>
 #include <d3d11.h>
@@ -150,9 +153,11 @@ private:
 
 // R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED
 // Texture2D. R103 adds concrete generation-bound D3D11 DEFAULT mirror/SRV
-// recreation from the shadow. R104 adds a fail-closed transaction bridge for
-// an eventual D3D9 Texture2D LockRect/UnlockRect hook. No production hook or
-// game draw path constructs or binds it.
+// recreation from the shadow. R104 adds the LockRect source transaction.
+// R105 stages bytes before the real D3D9 UnlockRect and commits them only after
+// that UnlockRect succeeds, so no source pointer survives across the COM call.
+// The registry below owns per-texture CPU shadows only; native draw/SRV binding
+// remains disabled.
 class NativeManagedTextureShadow final {
 public:
     NativeManagedTextureShadow() = default;
@@ -178,6 +183,8 @@ public:
         const RECT* sourceRect,
         DWORD lockFlags,
         const D3DLOCKED_RECT& lockedRect) noexcept;
+    bool stage_source_unlock(UINT level) noexcept;
+    bool finish_source_unlock(UINT level, HRESULT unlockResult) noexcept;
     bool commit_source_unlock(UINT level) noexcept;
     void cancel_source_lock() noexcept;
     void note_mirror_uploaded() noexcept;
@@ -205,6 +212,9 @@ public:
     [[nodiscard]] bool source_lock_active() const noexcept {
         return source_lock_active_;
     }
+    [[nodiscard]] bool source_unlock_staged() const noexcept {
+        return source_unlock_staged_;
+    }
     [[nodiscard]] ID3D11Device* mirror_device() const noexcept {
         return mirror_device_.Get();
     }
@@ -221,7 +231,9 @@ public:
 
 private:
     void release_mirror() noexcept;
+    void invalidate_shadow() noexcept;
     void clear_source_lock() noexcept;
+    void clear_unlock_stage() noexcept;
 
     D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
     UINT width_ = 0;
@@ -233,9 +245,74 @@ private:
     UINT source_lock_pitch_ = 0;
     UINT source_lock_level_ = 0;
     bool source_lock_active_ = false;
+    std::vector<std::uint8_t> pending_unlock_;
+    UINT source_unlock_level_ = 0;
+    bool source_unlock_staged_ = false;
     Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mirror_srv_;
+};
+
+// R105 census-only per-texture owner. Keys are observed D3D9 texture identities;
+// the registry never AddRefs them, so the R30 Release hook must forget an entry
+// when the real COM refcount reaches zero. It owns CPU shadows and transaction
+// staging only and does not bind D3D11 resources to a game draw.
+class NativeManagedTextureRegistry final {
+public:
+    NativeManagedTextureRegistry() = default;
+    ~NativeManagedTextureRegistry() = default;
+    NativeManagedTextureRegistry(const NativeManagedTextureRegistry&) = delete;
+    NativeManagedTextureRegistry& operator=(const NativeManagedTextureRegistry&) = delete;
+
+    bool register_texture(
+        const void* textureKey,
+        D3DFORMAT sourceFormat,
+        UINT width,
+        UINT height,
+        UINT levels,
+        DWORD usage,
+        D3DPOOL pool) noexcept;
+    bool begin_source_lock(
+        const void* textureKey,
+        UINT level,
+        const RECT* sourceRect,
+        DWORD lockFlags,
+        const D3DLOCKED_RECT& lockedRect) noexcept;
+    bool stage_source_unlock(const void* textureKey, UINT level) noexcept;
+    bool finish_source_unlock(
+        const void* textureKey,
+        UINT level,
+        HRESULT unlockResult) noexcept;
+    void observe_device_reset() noexcept;
+    void forget_texture(const void* textureKey) noexcept;
+    void clear() noexcept;
+
+    [[nodiscard]] std::size_t size() const noexcept;
+    [[nodiscard]] bool contains(const void* textureKey) const noexcept;
+    [[nodiscard]] bool shadow_valid(const void* textureKey) const noexcept;
+    [[nodiscard]] std::uint64_t shadow_version(
+        const void* textureKey) const noexcept;
+    [[nodiscard]] std::uint64_t device_generation(
+        const void* textureKey) const noexcept;
+    [[nodiscard]] bool source_lock_active(
+        const void* textureKey) const noexcept;
+    [[nodiscard]] bool source_unlock_staged(
+        const void* textureKey) const noexcept;
+    bool read_shadow(
+        const void* textureKey,
+        void* destination,
+        UINT destinationRowPitch,
+        UINT destinationRows) const noexcept;
+
+private:
+    NativeManagedTextureShadow* find_locked(const void* textureKey) noexcept;
+    const NativeManagedTextureShadow* find_locked(
+        const void* textureKey) const noexcept;
+
+    mutable std::mutex mutex_;
+    std::unordered_map<
+        const void*,
+        std::unique_ptr<NativeManagedTextureShadow>> shadows_;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

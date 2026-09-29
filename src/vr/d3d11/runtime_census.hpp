@@ -48,6 +48,28 @@ namespace outrun::vr::dx11
         IDirect3DTexture9* texture,
         UINT level,
         HRESULT result) noexcept;
+
+    // R105 census-only MANAGED texture shadow capture. LockRect begins a
+    // per-texture transaction after the real lock succeeds. UnlockRect staging
+    // runs before the real COM UnlockRect; finish commits only on real success.
+    // No SRV is bound and no draw is rerouted.
+    bool observe_managed_texture_lock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        const D3DLOCKED_RECT& lockedRect,
+        const RECT* rect,
+        DWORD flags) noexcept;
+    bool stage_managed_texture_unlock_rect(
+        IDirect3DTexture9* texture,
+        UINT level) noexcept;
+    bool finish_managed_texture_unlock_rect(
+        IDirect3DTexture9* texture,
+        UINT level,
+        HRESULT result) noexcept;
+    void forget_texture_mutation(
+        IDirect3DTexture9* texture) noexcept;
+    void clear_managed_texture_shadows() noexcept;
+
     void observe_update_texture(
         IDirect3DBaseTexture9* source,
         IDirect3DBaseTexture9* destination,

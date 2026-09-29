@@ -17,6 +17,7 @@ namespace
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
+    using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::TextureMutationUpdateKind;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
@@ -833,6 +834,129 @@ int main()
         lockBridgeShadow.shadow_version() == 1,
         "R104 cancelled LockRect clears capture without shadow mutation");
 
+    NativeManagedTextureRegistry managedRegistry;
+    int registryTextureA = 0;
+    int registryTextureB = 0;
+    require(
+        !managedRegistry.register_texture(
+            nullptr, D3DFMT_A8R8G8B8, 4, 4, 1, 0, D3DPOOL_MANAGED),
+        "R105 registry rejects null texture identity");
+    require(
+        !managedRegistry.register_texture(
+            &registryTextureB, D3DFMT_A8R8G8B8, 4, 4, 2, 0,
+            D3DPOOL_MANAGED),
+        "R105 registry rejects multi-mip MANAGED texture");
+    require(
+        !managedRegistry.register_texture(
+            &registryTextureB, D3DFMT_A8R8G8B8, 4, 4, 1, 0,
+            D3DPOOL_DEFAULT),
+        "R105 registry rejects non-MANAGED texture");
+    require(
+        managedRegistry.register_texture(
+            &registryTextureA, D3DFMT_A8R8G8B8, 4, 4, 1, 0,
+            D3DPOOL_MANAGED) &&
+        managedRegistry.size() == 1 &&
+        managedRegistry.contains(&registryTextureA),
+        "R105 registry accepts exact single-mip MANAGED texture");
+
+    std::array<unsigned char, 80> registrySource{};
+    for (UINT row = 0; row < managedRows; ++row) {
+        for (UINT column = 0; column < managedRowBytes; ++column) {
+            registrySource[
+                static_cast<std::size_t>(row) * managedSourcePitch + column] =
+                static_cast<unsigned char>(0x30 + row * 16 + column);
+        }
+    }
+    D3DLOCKED_RECT registryLock{};
+    registryLock.Pitch = static_cast<INT>(managedSourcePitch);
+    registryLock.pBits = registrySource.data();
+
+    require(
+        managedRegistry.begin_source_lock(
+            &registryTextureA, 0, nullptr, 0, registryLock) &&
+        managedRegistry.source_lock_active(&registryTextureA),
+        "R105 registry begins exact managed LockRect transaction");
+    registrySource[0] ^= 0x19;
+    require(
+        managedRegistry.stage_source_unlock(&registryTextureA, 0) &&
+        !managedRegistry.source_lock_active(&registryTextureA) &&
+        managedRegistry.source_unlock_staged(&registryTextureA),
+        "R105 pre-Unlock staging clears raw source pointer");
+    const unsigned char stagedFirstByte = registrySource[0];
+    registrySource[0] ^= 0x7f;
+    require(
+        managedRegistry.finish_source_unlock(
+            &registryTextureA, 0, S_OK) &&
+        managedRegistry.shadow_valid(&registryTextureA) &&
+        managedRegistry.shadow_version(&registryTextureA) == 1 &&
+        !managedRegistry.source_unlock_staged(&registryTextureA),
+        "R105 successful real Unlock commits staged bytes");
+
+    std::array<unsigned char, 96> registryReadback{};
+    require(
+        managedRegistry.read_shadow(
+            &registryTextureA,
+            registryReadback.data(), managedReadbackPitch, managedRows) &&
+        registryReadback[0] == stagedFirstByte &&
+        registryReadback[0] != registrySource[0],
+        "R105 commit uses pre-Unlock staged snapshot, not post-stage source");
+
+    registrySource[0] ^= 0x23;
+    require(
+        managedRegistry.begin_source_lock(
+            &registryTextureA, 0, nullptr, 0, registryLock) &&
+        managedRegistry.stage_source_unlock(&registryTextureA, 0),
+        "R105 failed-Unlock transaction stages before COM call");
+    require(
+        !managedRegistry.finish_source_unlock(
+            &registryTextureA, 0, E_FAIL) &&
+        !managedRegistry.shadow_valid(&registryTextureA) &&
+        managedRegistry.shadow_version(&registryTextureA) == 1,
+        "R105 failed real Unlock invalidates shadow without commit");
+
+    require(
+        managedRegistry.begin_source_lock(
+            &registryTextureA, 0, nullptr, 0, registryLock) &&
+        managedRegistry.stage_source_unlock(&registryTextureA, 0) &&
+        managedRegistry.finish_source_unlock(
+            &registryTextureA, 0, S_OK) &&
+        managedRegistry.shadow_valid(&registryTextureA) &&
+        managedRegistry.shadow_version(&registryTextureA) == 2,
+        "R105 later successful Unlock recovers invalidated shadow");
+
+    const auto registryVersionBeforeReset =
+        managedRegistry.shadow_version(&registryTextureA);
+    const auto registryGenerationBeforeReset =
+        managedRegistry.device_generation(&registryTextureA);
+    managedRegistry.observe_device_reset();
+    require(
+        managedRegistry.shadow_valid(&registryTextureA) &&
+        managedRegistry.shadow_version(&registryTextureA) ==
+            registryVersionBeforeReset &&
+        managedRegistry.device_generation(&registryTextureA) ==
+            registryGenerationBeforeReset + 1,
+        "R105 Reset preserves CPU shadow and advances registry generation");
+
+    managedRegistry.forget_texture(&registryTextureA);
+    require(
+        !managedRegistry.contains(&registryTextureA) &&
+        managedRegistry.size() == 0,
+        "R105 Release cleanup forgets per-texture shadow");
+
+    require(
+        managedRegistry.register_texture(
+            &registryTextureA, D3DFMT_A8R8G8B8, 4, 4, 1, 0,
+            D3DPOOL_MANAGED) &&
+        managedRegistry.register_texture(
+            &registryTextureB, D3DFMT_A8R8G8B8, 4, 4, 1, 0,
+            D3DPOOL_MANAGED) &&
+        managedRegistry.size() == 2,
+        "R105 registry clear prerequisite");
+    managedRegistry.clear();
+    require(
+        managedRegistry.size() == 0,
+        "R105 registry shutdown clears all texture ownership");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -1032,5 +1156,6 @@ int main()
     std::cout << "DX11 managed texture shadow lifetime R102: PASS\n";
     std::cout << "DX11 managed texture mirror reupload R103: PASS\n";
     std::cout << "DX11 managed Texture2D LockRect bridge R104: PASS\n";
+    std::cout << "DX11 managed Texture2D lifetime registry R105: PASS\n";
     return 0;
 }
