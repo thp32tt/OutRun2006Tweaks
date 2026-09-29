@@ -1,5 +1,5 @@
 {
-  "schema_version": 78,
+  "schema_version": 79,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -2367,11 +2367,11 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-29T18:14:21+09:00",
+    "recorded_at_kst": "2026-09-29T18:19:28+09:00",
     "task_id": "LOCALIZATION-LOCALIZATION_C-00111",
     "qa_batch_id": "Q00012",
     "run": "C114",
-    "result": "PASS_Q00012_FOUR_INPUTS_12_ASSETS_72_WORK_ORDERS_PLUS_1_EXACT_BC3_PREFLIGHT_NO_DDS_RUNTIME_UNTESTED",
+    "result": "PASS_Q00012_THREE_INPUTS_STRICT_VALIDATED_ONE_PRODUCER_REWORK_REQUIRED_NO_DDS_RUNTIME_UNTESTED",
     "base_head": "0d0ab35e25192ae0da8a174d7f00c5c1cbb1cd91",
     "qa_batch_inputs": [
       "LOCALIZATION-LOCALIZATION_B-00101@476ecf7fb8622866a8a2e258f4bb946060b9a474",
@@ -2397,8 +2397,8 @@
       {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00101",
         "result_sha": "476ecf7fb8622866a8a2e258f4bb946060b9a474",
-        "status": "PASS",
-        "reason": "B00101 header-gated first-pass-v2 source-mask/CLEAN_PLATE work orders accepted for indices 198/214/230/236. The exact material result SHA adds the immutable B130 report; the later task record pins that material SHA. Q00010/C112 already accepted the unchanged B00092 exact Release 32bpp extraction lineage and current contract/generation-v2/orientation/transcription/artwork-plan fingerprints remain compatible. C independently rechecked 4/4 source size equations, 37/37 row-scope formulas/file/canvas bounds, 37/37 exact nonempty 2px upper-bound guards, 38/38 physical semantic occurrences and zero overlap. Exact DDS channel masks/mips, raw orientation, source-effect/removal/protected masks, CLEAN_PLATE, measured final candidate_safe_bbox and all Korean-candidate gates remain HOLD_STRICT_RECHECK; no Korean candidate DDS exists."
+        "status": "REWORK_REQUIRED",
+        "reason": "B00101 material work-order evidence itself passed C arithmetic/canonical review, but immutable producer RESULT_SHA 476ecf7fb8622866a8a2e258f4bb946060b9a474 does not contain the required unique durable docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00101 task record. The Q00012 Localization Automation Gate therefore cannot accept this exact producer commit as PASS under verify_parallel_lane_commit.py. Re-emit the producer result as one durable commit containing its task record (without changing accepted material evidence unless needed), then submit the new exact RESULT_SHA for a later C batch."
       },
       {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00103",
@@ -2439,6 +2439,15 @@
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-1814-C114/C114_Q00012_INDEPENDENT_QA_BATCH.json"
+    "report": "localization/graphics/role_C/20260929-1814-C114/C114_Q00012_INDEPENDENT_QA_BATCH.json",
+    "rework_required_inputs": [
+      "LOCALIZATION-LOCALIZATION_B-00101@476ecf7fb8622866a8a2e258f4bb946060b9a474"
+    ],
+    "gate_repair": {
+      "attempt": "2/3",
+      "previous_result_commit": "07e3428ef685582c56db047c5e3765e570608d49",
+      "failed_workflow_run_id": 36548234757,
+      "reason": "B00101 immutable producer result SHA missing durable task record; content QA not repeated."
+    }
   }
 }
