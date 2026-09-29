@@ -51,12 +51,17 @@ QUEUE_MODE = os.getenv("QUEUE_MODE", "true").lower() == "true"
 QUEUE_CHECK_SECONDS = max(10, int(os.getenv("QUEUE_CHECK_SECONDS", "15")))
 QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
 QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
-GITHUB_POLL_SECONDS = max(60, int(os.getenv("GITHUB_POLL_SECONDS", "180")))
-GITHUB_TASK_COMMIT_CACHE_SECONDS = max(30, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "120")))
-GITHUB_ACTIONS_CACHE_SECONDS = max(60, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "180")))
-QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "180")))
+GITHUB_POLL_SECONDS = max(15, int(os.getenv("GITHUB_POLL_SECONDS", "60")))
+GITHUB_BOUND_RUN_POLL_SECONDS = max(10, int(os.getenv("GITHUB_BOUND_RUN_POLL_SECONDS", "30")))
+GITHUB_TASK_COMMIT_CACHE_SECONDS = max(15, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "60")))
+GITHUB_ACTIONS_CACHE_SECONDS = max(10, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "60")))
+WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_STALE_SECONDS", "75")))
+QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "15")))
+QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
-PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "60")))
+PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
+PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
+HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
@@ -209,6 +214,7 @@ class Registry:
     rate_limit_attempts: int = 0
     rate_limit_until: Optional[str] = None
     last_global_send_at: Optional[str] = None
+    last_global_send_slot: Optional[str] = None
 
 runtime = {
     "started_at": datetime.now(TZ).isoformat(),
@@ -219,12 +225,17 @@ runtime = {
     "queue_check_seconds": QUEUE_CHECK_SECONDS,
     "queue_stable_seconds": QUEUE_STABLE_SECONDS,
     "github_poll_seconds": GITHUB_POLL_SECONDS,
+    "github_bound_run_poll_seconds": GITHUB_BOUND_RUN_POLL_SECONDS,
     "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
     "github_actions_cache_seconds": GITHUB_ACTIONS_CACHE_SECONDS,
+    "wait_actions_stale_seconds": WAIT_ACTIONS_STALE_SECONDS,
     "github_token_configured": bool(GITHUB_TOKEN),
     "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
+    "queue_idle_rearm_seconds": QUEUE_IDLE_REARM_SECONDS,
     "localization_parallel": LOCALIZATION_PARALLEL,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
+    "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
+    "heartbeat_seconds": HEARTBEAT_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
     "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
@@ -238,6 +249,10 @@ runtime = {
     "schedule_minutes": SCHEDULE_MINUTES,
     "status": "starting",
     "last_tick": None,
+    "queue_loop_heartbeat_at": None,
+    "last_scheduler_decision_at": None,
+    "last_scheduler_decision": None,
+    "blocked_reason": None,
     "last_action": None,
     "last_error": None,
     "watchdog_enabled": WATCHDOG_ENABLED,
@@ -256,11 +271,22 @@ runtime = {
     "rate_limit_until": None,
 }
 
+
 def write_runtime(**updates):
+    now = datetime.now(TZ)
+    if updates.get("last_action") is not None:
+        runtime["last_scheduler_decision_at"] = now.isoformat()
+        runtime["last_scheduler_decision"] = updates.get("last_action")
+    status = str(updates.get("status", ""))
+    if "blocked" in status or status in {"queue_error", "watchdog_error", "login_required", "limit_detected"}:
+        runtime["blocked_reason"] = updates.get("last_action") or updates.get("last_error") or status
+    elif status in {"idle", "sent", "queue_wait_chat", "queue_wait_actions", "parallel_wave_running",
+                    "parallel_wait_actions", "parallel_wave_complete", "queue_pass",
+                    "parallel_c_barrier", "startup_reconcile"}:
+        runtime["blocked_reason"] = None
     runtime.update(updates)
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
-
 
 def logical_date(now: datetime) -> str:
     shifted = now - timedelta(days=1) if now.hour < ROLLOVER_HOUR else now
@@ -275,6 +301,7 @@ def new_registry(now: datetime) -> Registry:
         rate_limit_attempts=0,
         rate_limit_until=None,
         last_global_send_at=None,
+        last_global_send_slot=None,
     )
 
 
@@ -293,6 +320,7 @@ def load_registry(now: datetime) -> Registry:
             rate_limit_attempts=int(raw.get("rate_limit_attempts", 0)),
             rate_limit_until=raw.get("rate_limit_until"),
             last_global_send_at=raw.get("last_global_send_at"),
+            last_global_send_slot=raw.get("last_global_send_slot"),
         )
     except Exception:
         log.exception("registry read failed; recreating")
@@ -329,6 +357,7 @@ def save_registry(reg: Registry):
         "rate_limit_attempts": reg.rate_limit_attempts,
         "rate_limit_until": reg.rate_limit_until,
         "last_global_send_at": reg.last_global_send_at,
+        "last_global_send_slot": reg.last_global_send_slot,
     }
     tmp = REGISTRY_FILE.with_suffix(".tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -494,38 +523,79 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> O
         return None
 
 
-def github_gate_run(branch: str, sha: str, workflow_name: str) -> Optional[dict]:
+
+def _normalize_github_run(r: dict) -> dict:
+    return {
+        "id": r.get("id"),
+        "name": r.get("name"),
+        "status": r.get("status"),
+        "conclusion": r.get("conclusion"),
+        "html_url": r.get("html_url"),
+        "event": r.get("event"),
+        "head_sha": r.get("head_sha"),
+        "created_at": r.get("created_at"),
+        "updated_at": r.get("updated_at"),
+    }
+
+
+def github_action_run_by_id(run_id: int, sha: str, workflow_name: str) -> Optional[dict]:
+    try:
+        r = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs/{int(run_id)}")
+        if not isinstance(r, dict):
+            return None
+        if r.get("head_sha") != sha or r.get("name") != workflow_name:
+            log.warning("bound actions run mismatch id=%s expected_sha=%s actual_sha=%s", run_id, sha, r.get("head_sha"))
+            return None
+        return _normalize_github_run(r)
+    except Exception as e:
+        log.warning("github exact actions lookup failed run=%s sha=%s error=%r", run_id, sha, e)
+        write_runtime(last_github_error=f"actions-run:{run_id}:{sha}:{e!r}")
+        return None
+
+
+def github_action_jobs_summary(run_id: int) -> list[dict]:
+    try:
+        payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs/{int(run_id)}/jobs?per_page=100")
+        jobs = payload.get("jobs", []) if isinstance(payload, dict) else []
+        return [{
+            "id": j.get("id"),
+            "name": j.get("name"),
+            "status": j.get("status"),
+            "conclusion": j.get("conclusion"),
+            "started_at": j.get("started_at"),
+            "completed_at": j.get("completed_at"),
+        } for j in jobs]
+    except Exception as e:
+        log.warning("github actions jobs lookup failed run=%s error=%r", run_id, e)
+        write_runtime(last_github_error=f"actions-jobs:{run_id}:{e!r}")
+        return []
+
+
+def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[int] = None, force_discovery: bool = False) -> Optional[dict]:
+    if run_id:
+        return github_action_run_by_id(int(run_id), sha, workflow_name)
     try:
         now_mono = time.monotonic()
         cached = _github_actions_cache.get(branch)
-        if cached and now_mono - cached[0] < GITHUB_ACTIONS_CACHE_SECONDS:
-            data = cached[1]
+        if cached and not force_discovery and now_mono - cached[0] < GITHUB_ACTIONS_CACHE_SECONDS:
+            payload = cached[1]
         else:
             q = urllib.parse.urlencode({"branch": branch, "per_page": 30})
-            data = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
-            if isinstance(data, dict):
-                _github_actions_cache[branch] = (now_mono, data)
+            payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
+            if isinstance(payload, dict):
+                _github_actions_cache[branch] = (now_mono, payload)
         matches = [
-            r for r in data.get("workflow_runs", [])
+            r for r in payload.get("workflow_runs", [])
             if r.get("head_sha") == sha and r.get("name") == workflow_name
         ]
         if not matches:
             return None
         matches.sort(key=lambda r: r.get("created_at", ""), reverse=True)
-        r = matches[0]
-        return {
-            "id": r.get("id"),
-            "name": r.get("name"),
-            "status": r.get("status"),
-            "conclusion": r.get("conclusion"),
-            "html_url": r.get("html_url"),
-            "event": r.get("event"),
-        }
+        return _normalize_github_run(matches[0])
     except Exception as e:
-        log.warning("github actions lookup failed branch=%s sha=%s error=%r", branch, sha, e)
-        write_runtime(last_github_error=f"actions:{branch}:{sha}:{e!r}")
+        log.warning("github actions discovery failed branch=%s sha=%s error=%r", branch, sha, e)
+        write_runtime(last_github_error=f"actions-discovery:{branch}:{sha}:{e!r}")
         return None
-
 
 def queue_target_for_slot(slot_name: str) -> dict:
     if CONTROLLER_MODE == "conversion":
@@ -784,12 +854,14 @@ def mark_rate_limit(reg: Registry, now: datetime, source: str):
     )
 
 
-def note_successful_request(reg: Registry, now: datetime):
-    """Record that a request was sent; do not clear rate-limit history until a real response is observed."""
-    reg.last_global_send_at = now.isoformat()
-    save_registry(reg)
-    write_runtime(last_global_send_at=reg.last_global_send_at)
 
+def note_successful_request(reg: Registry, now: datetime, slot_name: Optional[str] = None):
+    """Record a request without treating successful traffic as a rate-limit signal."""
+    reg.last_global_send_at = now.isoformat()
+    if slot_name:
+        reg.last_global_send_slot = slot_name
+    save_registry(reg)
+    write_runtime(last_global_send_at=reg.last_global_send_at, last_global_send_slot=reg.last_global_send_slot)
 
 def clear_rate_limit_after_response(reg: Registry):
     """Clear adaptive backoff only after a genuine assistant response or durable result is observed."""
@@ -804,15 +876,25 @@ def clear_rate_limit_after_response(reg: Registry):
         )
 
 
+
 def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Optional[str]:
     if rate_limit_active(reg, now):
         return f"rate_limit_backoff:{rate_limit_seconds_remaining(reg, now)}s"
 
     last_global = _parse_iso(reg.last_global_send_at)
     if last_global and MIN_SEND_GAP_SECONDS > 0:
+        global_gap = MIN_SEND_GAP_SECONDS
+        if (
+            slot
+            and CONTROLLER_MODE == "localization"
+            and LOCALIZATION_PARALLEL
+            and reg.last_global_send_slot
+            and reg.last_global_send_slot != slot.name
+        ):
+            global_gap = min(global_gap, PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS)
         age = (now - last_global).total_seconds()
-        if age < MIN_SEND_GAP_SECONDS:
-            return f"global_send_gap:{int(MIN_SEND_GAP_SECONDS - age)}s"
+        if age < global_gap:
+            return f"global_send_gap:{int(global_gap - age)}s"
 
     if slot and slot.last_sent_at and SLOT_DEDUP_SECONDS > 0:
         last_slot = _parse_iso(slot.last_sent_at)
@@ -821,7 +903,6 @@ def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Opt
             if age < SLOT_DEDUP_SECONDS:
                 return f"slot_dedup:{int(SLOT_DEDUP_SECONDS - age)}s"
     return None
-
 
 async def detect_busy(page: Page) -> bool:
     for sel in BUSY_SELECTORS:
