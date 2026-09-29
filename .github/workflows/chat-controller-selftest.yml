@@ -60,3 +60,26 @@ jobs:
           grep -Fq 'authorized offline game-mod/VR development' tools/chat-controller/v0.4/src/controller.py.part00
           grep -Fq 'context_prefix = (GAME_MOD_CONTEXT' tools/chat-controller/v0.4/src/controller.py.part02
           grep -Fq 'lines = [GAME_MOD_CONTEXT, ""] + lines' tools/chat-controller/v0.4/src/controller.py.part03
+
+
+      - name: Verify localization liveness runtime policy
+        run: |
+          compose=tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'QUEUE_RESULT_GRACE_SECONDS: "180"' "$compose"
+          grep -Fq 'GITHUB_POLL_SECONDS: "60"' "$compose"
+          grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' "$compose"
+          grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' "$compose"
+          grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "15"' "$compose"
+          grep -Fq 'QUEUE_IDLE_REARM_SECONDS: "90"' "$compose"
+          grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
+          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
+          grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
+          grep -Fq 'def github_action_run_by_id' /tmp/controller.py
+          grep -Fq 'run_id=bound_run_id' /tmp/controller.py
+          grep -Fq 'def startup_reconcile_queue_state' /tmp/controller.py
+          grep -Fq 'def watchdog_rearm_queue_state' /tmp/controller.py
+          grep -Fq 'queue_loop_heartbeat_at=now.isoformat()' /tmp/controller.py
+          if grep -Fq 'watchdog_queue_observe_only' /tmp/controller.py; then
+            echo "legacy observe-only queue watchdog remains"
+            exit 1
+          fi
