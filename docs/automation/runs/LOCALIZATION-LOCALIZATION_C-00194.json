@@ -135,14 +135,21 @@
     "failed_step": "Verify exact producer SHAs in C batch",
     "error": "B00190 exact result: missing unique durable task record under docs/automation/runs/"
   },
-  "result_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
-  "validation_bearing_result_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
+  "result_sha": "eb395208c34498da655106ea5d9f4f6ebc72c167",
+  "validation_bearing_result_sha": "eb395208c34498da655106ea5d9f4f6ebc72c167",
   "automation_gate": {
     "workflow": "Localization Automation Gate",
-    "run_id": 36611801924,
+    "run_id": 36612087138,
     "run_attempt": 1,
     "status": "completed",
     "conclusion": "success",
-    "validated_at_kst": "2026-09-30T03:24:46+09:00"
+    "validated_at_kst": "2026-09-30T03:27:03+09:00"
+  },
+  "superseded_concurrent_result": {
+    "result_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
+    "gate_run_id": 36611801924,
+    "conclusion": "success",
+    "disposition": "HOLD_STRICT_RECHECK",
+    "reason": "Concurrent same-attempt rollover result; superseded by later eb395208 result with stricter REWORK_REQUIRED disposition and its own passing C Gate."
   }
 }
