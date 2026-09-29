@@ -70,8 +70,35 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         thread_local std::uint32_t R14InternalReleaseDepth = 0;
+        // Keep the total MANAGED CPU-shadow budget at the established 384 MiB.
+        // R68 HMD evidence showed raising the process budget to 448 MiB caused
+        // a start-grid shadow regression while a later 2048x2048 selector atlas
+        // could still miss its CPU shadow. Reserve 16 MiB *inside* the 384 MiB
+        // ceiling: ordinary shadows stop at 368 MiB, while one exact-size
+        // uncompressed selector/car atlas may consume the reserved headroom.
+        constexpr std::uint64_t R14GeneralShadowBudgetBytes =
+            368ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14ShadowBudgetBytes =
             384ull * 1024ull * 1024ull;
+        constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
+            16ull * 1024ull * 1024ull;
+
+        bool R69IsSelectorAtlasReserveCandidate(
+            const D3DSURFACE_DESC& desc, UINT levels,
+            std::uint64_t estimate) noexcept
+        {
+            // HMD R68 evidence: the earlier <=2048 heuristic let a 2048x512
+            // texture consume the reserve first, then the real 2048x2048
+            // selector/car atlas had no CPU shadow and LockRect failed.
+            // Reserve is intentionally exact-size and never broadens the
+            // general MANAGED compatibility policy.
+            return levels == 1 &&
+                desc.Width == 2048 && desc.Height == 2048 &&
+                estimate > 0 && estimate <= R14EmergencyAtlasMaxBytes &&
+                (desc.Format == D3DFMT_A8R8G8B8 ||
+                 desc.Format == D3DFMT_X8R8G8B8);
+        }
+
         std::atomic<std::uint64_t> R14ShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
 
@@ -126,6 +153,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<bool> R14FirstUploadFailureLogged{false};
         std::atomic<bool> R14FirstRetireLogged{false};
         std::atomic<bool> R14FirstConcurrentWriteLogged{false};
+        std::atomic<bool> R14FirstEmergencyReserveLogged{false};
 
         struct R14InternalUploadScope
         {
@@ -488,11 +516,30 @@ namespace OutRunVRD3D9ExUpgradeR13
             const std::uint64_t estimate = R14EstimateShadowBytes(gpu);
             const std::uint64_t current =
                 R14ShadowBytes.load(std::memory_order_acquire);
-            if (!estimate || estimate > R14ShadowBudgetBytes ||
-                current > R14ShadowBudgetBytes - estimate)
+
+            const bool emergencyAtlasEligible =
+                R69IsSelectorAtlasReserveCandidate(
+                    desc, levels, estimate);
+            const std::uint64_t softBudget = emergencyAtlasEligible
+                ? R14ShadowBudgetBytes
+                : R14GeneralShadowBudgetBytes;
+
+            if (!estimate || estimate > softBudget ||
+                current > softBudget - estimate)
             {
                 ++R14ShadowBudgetRejects;
                 return D3DERR_OUTOFVIDEOMEMORY;
+            }
+
+            if (emergencyAtlasEligible &&
+                current > R14GeneralShadowBudgetBytes - estimate &&
+                !R14FirstEmergencyReserveLogged.exchange(true))
+            {
+                spdlog::info(
+                    "VR R69 EX: in-budget MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} currentMiB={:.1f}; 384 MiB total cap preserved",
+                    desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
+                    estimate,
+                    static_cast<double>(current) / (1024.0 * 1024.0));
             }
 
             const HRESULT hr = device->CreateTexture(

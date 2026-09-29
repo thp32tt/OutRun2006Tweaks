@@ -105,6 +105,7 @@ private:
 		{ "Menu Right",  "Press Right on the wheel D-pad/POV, or another menu button.", Sw,  int(SwitchId::SelectionRight) },
 		{ "Menu Down",   "Press Down on the wheel D-pad/POV, or another menu button.",  Sw,  int(SwitchId::SelectionDown) },
 		{ "Menu Left",   "Press Left on the wheel D-pad/POV, or another menu button.",  Sw,  int(SwitchId::SelectionLeft) },
+		{ "VR Recenter", "Press the keyboard, wheel or gamepad button you want to recenter both the VR menu theater and gameplay.", Mod, int(ModAction::VRRecenter) },
 	};
 
 	// How far an analog action has to move from rest before its name lights up.

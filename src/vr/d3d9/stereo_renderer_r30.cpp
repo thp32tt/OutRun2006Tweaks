@@ -1274,6 +1274,14 @@ namespace OutRunVRStereo
             if (!device || !TargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
 
+            // R65: exact producer evidence beats the generic projection/state
+            // classifier. Lens flare is projected by Calc3D2D before its alpha
+            // object draw, so reuse the proven HUD eye-FOV affine without
+            // finite-plane head/IPD placement or global alpha heuristics.
+            if (OutRunVR::GameSemantic::CurrentScope ==
+                OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D)
+                return R30ScreenSpaceKind::Hud2D;
+
             float projection[16]{};
             if (!OutRunVRRenderer::GetRendererBaseProjection(projection))
                 return R30ScreenSpaceKind::None;
