@@ -1,0 +1,214 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00209",
+  "wave_id": "P00108",
+  "queue_index": 226,
+  "asset": "E3F4BA07",
+  "source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+    "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+    "bytes": 4194432,
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "elements": [
+    {
+      "sprite": "sprite_296",
+      "source": "STAGE",
+      "korean": "스테이지",
+      "src": [
+        0,
+        436,
+        228,
+        500
+      ],
+      "safe": [
+        2,
+        438,
+        226,
+        498
+      ]
+    },
+    {
+      "sprite": "sprite_299",
+      "source": "GOAL E",
+      "korean": "골 E",
+      "src": [
+        980,
+        346,
+        1233,
+        410
+      ],
+      "safe": [
+        982,
+        348,
+        1231,
+        408
+      ]
+    },
+    {
+      "sprite": "sprite_300",
+      "source": "GOAL D",
+      "korean": "골 D",
+      "src": [
+        4,
+        262,
+        256,
+        326
+      ],
+      "safe": [
+        6,
+        264,
+        254,
+        324
+      ]
+    },
+    {
+      "sprite": "sprite_301",
+      "source": "GOAL C",
+      "korean": "골 C",
+      "src": [
+        983,
+        262,
+        1234,
+        326
+      ],
+      "safe": [
+        985,
+        264,
+        1232,
+        324
+      ]
+    },
+    {
+      "sprite": "sprite_302",
+      "source": "GOAL B",
+      "korean": "골 B",
+      "src": [
+        4,
+        170,
+        257,
+        234
+      ],
+      "safe": [
+        6,
+        172,
+        255,
+        232
+      ]
+    },
+    {
+      "sprite": "sprite_303",
+      "source": "GOAL A",
+      "korean": "골 A",
+      "src": [
+        986,
+        170,
+        1242,
+        234
+      ],
+      "safe": [
+        988,
+        172,
+        1240,
+        232
+      ]
+    },
+    {
+      "sprite": "sprite_304",
+      "source": "GOAL",
+      "korean": "골",
+      "src": [
+        4,
+        86,
+        195,
+        150
+      ],
+      "safe": [
+        6,
+        88,
+        193,
+        148
+      ]
+    },
+    {
+      "sprite": "sprite_305",
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "src": [
+        985,
+        86,
+        1809,
+        150
+      ],
+      "safe": [
+        987,
+        88,
+        1807,
+        148
+      ]
+    }
+  ],
+  "protected": [
+    {
+      "sprite": "sprite_297",
+      "source": "OUTRUN2SP",
+      "bbox": [
+        983,
+        430,
+        1416,
+        494
+      ]
+    },
+    {
+      "sprite": "sprite_298",
+      "source": "OUTRUN2",
+      "bbox": [
+        3,
+        346,
+        343,
+        410
+      ]
+    }
+  ],
+  "style": {
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "local_reference_font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "fill_rgb": [
+      79,
+      97,
+      101
+    ],
+    "outline": "none",
+    "shadow": "none",
+    "glow": "none",
+    "source_signed_slant_deg": 0.0,
+    "candidate_signed_slant_deg": 0.0,
+    "raster_resampling": "forbidden/not_used"
+  },
+  "instructions": {
+    "positive": [
+      "EDIT, DO NOT REDESIGN. Exact HD English source is authoritative.",
+      "Remove only alpha-positive source text/effect pixels inside the eight positively bound localize regions.",
+      "Preserve OUTRUN2 and OUTRUN2SP byte-exact.",
+      "Render the approved Korean strings fully inside the 2px safe bboxes in readable coordinates.",
+      "Preserve raw flip_y storage transform, canvas, DDS RGBA32 header, alpha semantics and transparent atlas background."
+    ],
+    "negative": [
+      "No visible English residue in localized regions.",
+      "No cover box, rectangle, panel, blur, seam, crop, resize, generic outline/shadow/glow or invented decoration.",
+      "No previous Korean candidate pixels or cleaned regions as construction input.",
+      "No 1px escape outside permitted edit geometry and no protected-brand modification."
+    ]
+  }
+}
