@@ -73,5 +73,7 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "PENDING_POST_COMMIT"
+  "result_sha": "e607e79b45c5c5cbdad4469f0eb6b1ce19d4f639",
+  "authoritative_result_sha": "e607e79b45c5c5cbdad4469f0eb6b1ce19d4f639",
+  "bookkeeping_note": "Immutable producer result commit contains the exact AUTO marker, lane-local material report and durable B00214 task record atomically. This separate bookkeeping update records RESULT_SHA only. Producer automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED."
 }
