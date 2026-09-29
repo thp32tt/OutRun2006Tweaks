@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-index152-exact-bc3-effect-envelope-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00104",
+  "wave_id": "P00037",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T17:29:21+09:00",
+  "precommit_head_sha": "470c7863c7b7ef92f65bdfab28361dd0f1566da8",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      152
+    ],
+    "selected_assets": [
+      "49BB5FE5"
+    ],
+    "basis": "Index 152 is C107-consumed and explicitly skipped by B00083 only because no C-accepted full-effect bbox existed. Current source/translation/orientation fingerprints are unchanged. This task directly decodes the exact pinned upstream BC3 DDS from GitHub to resolve that missing v2 geometry input without touching any QA-pending producer asset.",
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00097": [
+        86,
+        100,
+        106,
+        130
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00100": [
+        46,
+        48,
+        50,
+        62
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00101": [
+        198,
+        214,
+        230,
+        236
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00103": [
+        140,
+        154,
+        164
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ]
+  },
+  "exact_source": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+    "bytes": 65664,
+    "dds_header": {
+      "magic": "DDS ",
+      "header_size": 124,
+      "width": 512,
+      "height": 128,
+      "linear_size": 65536,
+      "mip_count": 1,
+      "pixel_format_flags": 4,
+      "fourcc": "DXT5",
+      "payload_start": 128,
+      "payload_bytes": 65536,
+      "payload_consumed_exactly": true
+    },
+    "decode_method": "Direct deterministic BC3/DXT5 top-level decode from exact GitHub base64 bytes; no N100/local clone/worktree/Library.",
+    "source_text_transform": "flip_y"
+  },
+  "measurement_method": {
+    "purpose": "Resolve missing full-effect envelope only; not a removal mask and not a clean plate.",
+    "search_window": "Prior C107-accepted fill bbox expanded by 6 px and clipped to its exact semantic cell.",
+    "background_reference": "Most frequent decoded RGB color inside each cell; alpha retained only as a validity guard.",
+    "effect_signal": "Euclidean RGB distance from dominant cell background with alpha > 16.",
+    "threshold_stability_required": "Bounding envelope must be identical for thresholds 10,15,20,25,30,40,50,60.",
+    "result": "PASS_4_OF_4_THRESHOLD_STABLE_EFFECT_ENVELOPES",
+    "caveat": "The stable envelope is suitable for v2 safe-fit geometry. Exact per-pixel source glyph/effect removal masks remain a separate required artifact and are not inferred from the bbox."
+  },
+  "elements": [
+    {
+      "source": "PRO.",
+      "korean": "프로",
+      "sprite": "sprite_832",
+      "raw_cell": [
+        0,
+        0,
+        116,
+        48
+      ],
+      "dominant_bg_rgb": [
+        143,
+        62,
+        120
+      ],
+      "prior_fill_bbox_inclusive": [
+        19,
+        7,
+        102,
+        40
+      ],
+      "raw_effect_bbox_ltrb_exclusive": [
+        18,
+        7,
+        104,
+        41
+      ],
+      "effect_pixels_at_rgb_distance_ge_10": 1688,
+      "coordinate_convention": "LTRB_HALF_OPEN",
+      "readable_effect_bbox_ltrb_exclusive": [
+        18,
+        87,
+        104,
+        121
+      ],
+      "permitted_cell_inner_guard_ltrb_exclusive_2px": [
+        2,
+        2,
+        114,
+        46
+      ],
+      "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+        20,
+        9,
+        102,
+        39
+      ],
+      "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+        20,
+        89,
+        102,
+        119
+      ],
+      "safe_bbox_nonempty": true,
+      "safe_bbox_inside_cell_guard": true,
+      "effect_bbox_threshold_stability": "IDENTICAL_RGB_DISTANCE_THRESHOLDS_10_15_20_25_30_40_50_60_WITHIN_FILL_PLUS_6PX_SEARCH_WINDOW",
+      "removal_mask_status": "HOLD_NOT_YET_MATERIALIZED",
+      "clean_plate_status": "HOLD_NOT_YET_MATERIALIZED"
+    },
+    {
+      "source": "INS.",
+      "korean": "연주",
+      "sprite": "sprite_833",
+      "raw_cell": [
+        116,
+        0,
+        232,
+        48
+      ],
+      "dominant_bg_rgb": [
+        107,
+        161,
+        77
+      ],
+      "prior_fill_bbox_inclusive": [
+        137,
+        7,
+        213,
+        40
+      ],
+      "raw_effect_bbox_ltrb_exclusive": [
+        136,
+        6,
+        214,
+        41
+      ],
+      "effect_pixels_at_rgb_distance_ge_10": 1546,
+      "coordinate_convention": "LTRB_HALF_OPEN",
+      "readable_effect_bbox_ltrb_exclusive": [
+        136,
+        87,
+        214,
+        122
+      ],
+      "permitted_cell_inner_guard_ltrb_exclusive_2px": [
+        118,
+        2,
+        230,
+        46
+      ],
+      "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+        138,
+        8,
+        212,
+        39
+      ],
+      "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+        138,
+        89,
+        212,
+        120
+      ],
+      "safe_bbox_nonempty": true,
+      "safe_bbox_inside_cell_guard": true,
+      "effect_bbox_threshold_stability": "IDENTICAL_RGB_DISTANCE_THRESHOLDS_10_15_20_25_30_40_50_60_WITHIN_FILL_PLUS_6PX_SEARCH_WINDOW",
+      "removal_mask_status": "HOLD_NOT_YET_MATERIALIZED",
+      "clean_plate_status": "HOLD_NOT_YET_MATERIALIZED"
+    },
+    {
+      "source": "G.M.",
+      "korean": "기타",
+      "sprite": "sprite_834",
+      "raw_cell": [
+        232,
+        0,
+        348,
+        48
+      ],
+      "dominant_bg_rgb": [
+        244,
+        104,
+        46
+      ],
+      "prior_fill_bbox_inclusive": [
+        253,
+        7,
+        331,
+        40
+      ],
+      "raw_effect_bbox_ltrb_exclusive": [
+        252,
+        7,
+        333,
+        41
+      ],
+      "effect_pixels_at_rgb_distance_ge_10": 1449,
+      "coordinate_convention": "LTRB_HALF_OPEN",
+      "readable_effect_bbox_ltrb_exclusive": [
+        252,
+        87,
+        333,
+        121
+      ],
+      "permitted_cell_inner_guard_ltrb_exclusive_2px": [
+        234,
+        2,
+        346,
+        46
+      ],
+      "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+        254,
+        9,
+        331,
+        39
+      ],
+      "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+        254,
+        89,
+        331,
+        119
+      ],
+      "safe_bbox_nonempty": true,
+      "safe_bbox_inside_cell_guard": true,
+      "effect_bbox_threshold_stability": "IDENTICAL_RGB_DISTANCE_THRESHOLDS_10_15_20_25_30_40_50_60_WITHIN_FILL_PLUS_6PX_SEARCH_WINDOW",
+      "removal_mask_status": "HOLD_NOT_YET_MATERIALIZED",
+      "clean_plate_status": "HOLD_NOT_YET_MATERIALIZED"
+    },
+    {
+      "source": "E.R.",
+      "korean": "유로",
+      "sprite": "sprite_835",
+      "raw_cell": [
+        348,
+        0,
+        464,
+        48
+      ],
+      "dominant_bg_rgb": [
+        192,
+        60,
+        63
+      ],
+      "prior_fill_bbox_inclusive": [
+        374,
+        8,
+        442,
+        39
+      ],
+      "raw_effect_bbox_ltrb_exclusive": [
+        374,
+        8,
+        444,
+        40
+      ],
+      "effect_pixels_at_rgb_distance_ge_10": 1193,
+      "coordinate_convention": "LTRB_HALF_OPEN",
+      "readable_effect_bbox_ltrb_exclusive": [
+        374,
+        88,
+        444,
+        120
+      ],
+      "permitted_cell_inner_guard_ltrb_exclusive_2px": [
+        350,
+        2,
+        462,
+        46
+      ],
+      "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+        376,
+        10,
+        442,
+        38
+      ],
+      "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+        376,
+        90,
+        442,
+        118
+      ],
+      "safe_bbox_nonempty": true,
+      "safe_bbox_inside_cell_guard": true,
+      "effect_bbox_threshold_stability": "IDENTICAL_RGB_DISTANCE_THRESHOLDS_10_15_20_25_30_40_50_60_WITHIN_FILL_PLUS_6PX_SEARCH_WINDOW",
+      "removal_mask_status": "HOLD_NOT_YET_MATERIALIZED",
+      "clean_plate_status": "HOLD_NOT_YET_MATERIALIZED"
+    }
+  ],
+  "preserve_original": [
+    {
+      "source": "'89",
+      "sprite": "sprite_836",
+      "disposition": "PRESERVE_ORIGINAL",
+      "edit_forbidden": true
+    },
+    {
+      "source": "'86",
+      "sprite": "sprite_837",
+      "disposition": "PRESERVE_ORIGINAL",
+      "edit_forbidden": true
+    }
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX152_EXACT_BC3_FULL_EFFECT_ENVELOPES_AND_V2_SAFE_BBOXES",
+    "assets_advanced": 1,
+    "localizable_elements": 4,
+    "preserve_original_elements": 2,
+    "exact_bc3_header_decoded": 1,
+    "stable_full_effect_bboxes": 4,
+    "new_candidate_safe_bboxes": 4,
+    "candidate_dds_modified": false,
+    "description": "Resolves the exact blocker recorded by B00083 for index 152: four localizable labels now have exact-source decoded threshold-stable full-effect envelopes and explicit 2px v2 candidate-safe boxes. Removal masks, CLEAN_PLATE and Korean candidate remain fail-closed."
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00073",
+    "producer_result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+    "producer_report_blob_sha": "f4ec7539abe10664101feb8d1f6fbdf88d40dc4f",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00078",
+    "c_acceptance_record_blob_sha": "218e6c1c60d91e9598a124da33049c68d96a1f36",
+    "v2_skip_task": "LOCALIZATION-LOCALIZATION_B-00083",
+    "v2_skip_reason": "No C-accepted full-effect bbox existed for index 152; fill bbox/cell rectangle could not be used as candidate_safe_bbox.",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "strict_hold": {
+    "removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "protected_non_text_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "signed_slant_style_metrics": "HOLD_EXACT_STYLE_MEASUREMENT_REQUIRED_BEFORE_RENDER",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "decoded_final_bc3_qa": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_152",
+    "anti_duplication": "PASS_C107_CONSUMED_B00073__B00083_SKIPPED_152_FOR_EXACT_MISSING_BBOX__NO_QA_PENDING_ASSET_REUSED",
+    "exact_source_blob": "PASS_0288BABBB9C70E8F092BDD15561DB4CADC19DCB3",
+    "dds_header": "PASS_512x128_DXT5_MIP1_65536_PAYLOAD",
+    "orientation": "PASS_REUSE_C107_ACCEPTED_FLIP_Y",
+    "effect_envelopes": "PASS_4_OF_4_THRESHOLD_STABLE_10_TO_60",
+    "safe_bboxes": "PASS_4_OF_4_NONEMPTY_AND_INSIDE_2PX_CELL_GUARDS",
+    "preserve_original": "PASS_2_YEAR_LABELS_EDIT_FORBIDDEN",
+    "candidate_write": "NONE_FAIL_CLOSED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00037 materially resolves index 152's missing v2 full-effect-envelope blocker from exact upstream GitHub BC3 bytes. Four localizable labels now have stable measured effect bboxes and 2px safe boxes; the two year labels remain protected. Per-pixel removal masks, clean plates, source-faithful style/slant measurements, Korean rendering, decoded-final BC3 QA and runtime remain HOLD/UNTESTED."
+}
