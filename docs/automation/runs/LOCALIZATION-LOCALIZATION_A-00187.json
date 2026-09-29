@@ -8,7 +8,7 @@
   "recorded_at_kst": "2026-09-30T02:42:22+09:00",
   "base_sha": "8430b831136f0f78f381fc4a1e5a55e267543e1d",
   "base_head_sha": "8430b831136f0f78f381fc4a1e5a55e267543e1d",
-  "result_sha": null,
+  "result_sha": "047972fbd8fbb494f0046a0c829d670a0fd02753",
   "result": "PASS_MATERIAL_INDEX99_DXT5_KOREAN_CANDIDATE_V2_SELF_QA_PENDING_C_RUNTIME_UNTESTED",
   "summary": "C00186 identifies index99/4F68708E as ONE_STAGE_TO_RENDER, retaining C00181's direct rework because A00173 v3 clean plate had visible English silhouettes. This producer replaces the residue-prone plate with exact transparent source-effect removal, renders the approved two-line Korean wording with source-like white/dark-navy right slant inside 2px safe bboxes, restores mirror-Y raw orientation, preserves untouched DXT5 blocks, and passes decoded-final self-QA and exact English-source comparison. Independent C remains pending; runtime is UNTESTED.",
   "evidence": [
@@ -75,5 +75,35 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "postcommit_visual_review": {
+    "reviewed_exact_result_sha": "047972fbd8fbb494f0046a0c829d670a0fd02753",
+    "status": "PASS",
+    "exact_blob_identity_to_precommit_visual_review": {
+      "source_display": "2d1598cbc1c502595f8ab5578397478448313b14",
+      "clean_plate_display": "5d2dca502ca698b26457cc4d227652beb9b77ba5",
+      "candidate_display": "96def4cd50e4560b3448e8ed2e477cf52718ba5a",
+      "comparison": "be1d67f33390eca3e16c23799aadb57bf9ff1d5a",
+      "text_region_nn2x": "6adca8deb84c58e7d5630f5b153f6929bea314a9",
+      "alpha_comparison": "305b41f29481b3457019d48f8f30aa4e290e911e",
+      "candidate_raw": "6c42ef9afd13b786905c7cc7728b676b98050289",
+      "candidate_dds": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d"
+    },
+    "checks": {
+      "english_source_vs_korean_candidate": "PASS",
+      "source_language_residue": "PASS_NONE_VISIBLE",
+      "clean_plate_box_or_seam": "PASS_NONE_VISIBLE__FULLY_TRANSPARENT_AFTER_EXACT_EFFECT_REMOVAL",
+      "korean_legibility": "PASS",
+      "clipping_or_overlap": "PASS_NONE_VISIBLE",
+      "source_fill_outline_slant_style_consistency": "PASS_VISUAL",
+      "one_pixel_containment": "PASS_POSITIVE_MARGIN_BOTH_LINES",
+      "alpha_transparency": "PASS_NO_VISIBLE_BACKGROUND_DAMAGE",
+      "orientation": "PASS_MIRROR_Y_RAW__READABLE_DISPLAY"
+    },
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "independent_c_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "note": "Bookkeeping only. 047972fbd8fbb494f0046a0c829d670a0fd02753 remains the authoritative producer RESULT_SHA and owns the material DDS/QA payload."
+  }
 }
