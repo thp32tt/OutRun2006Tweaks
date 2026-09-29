@@ -3,8 +3,8 @@
   "task_id": "CONVERSION-DX11-00084",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
-  "recorded_kst": "2026-09-30T04:43:08+09:00",
+  "attempt": "2/3",
+  "recorded_kst": "2026-09-30T04:45:00+09:00",
   "checkpoint": "C6_STATE",
   "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
   "base_sha": "6df06da69c17743a836da458b2969a5a4aff546d",
@@ -87,8 +87,9 @@
     "issue": 14,
     "implementation_comment_id": 5897276486,
     "repair_comment_id": 5897288207,
-    "validation_comment_id": 5897390001,
-    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN"
+    "validation_comment_id": 5897390984,
+    "status": "IMPLEMENTATION_REPAIR_VALIDATION_AND_CONTROLLER_RETRY_RECONCILED",
+    "prior_validation_comment_id": 5897390001
   },
   "evidence": [
     "Every task source/verification commit contains the exact controller marker [AUTO:CONVERSION-DX11-00084]; the validation-bearing result contains no CI-skip directive.",
@@ -99,5 +100,12 @@
   ],
   "blocker": null,
   "resume_cursor": "R114 is automation-validated but runtime-untested. Fixed-phase 1/64 alias is reduced and signature-cap saturation is explicit; the census remains non-exhaustive diagnostic evidence and NativeDrawPathActivationAllowed remains false.",
-  "next_action": "Continue with the next independent bounded DX11 exactness/activation prerequisite. Do not promote native draw routing or claim visual/runtime correctness until exact-build Quest3/VDXR evidence exists."
+  "next_action": "Continue with the next independent bounded DX11 exactness/activation prerequisite. Do not promote native draw routing or claim visual/runtime correctness until exact-build Quest3/VDXR evidence exists.",
+  "controller_retry_reconciliation": {
+    "requested_attempt": "2/3",
+    "previous_automatic_failure_run_id": 36620302882,
+    "validation_bearing_result_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+    "action": "Reused the already-created deterministic verifier repair instead of repeating the failed change. Exact-SHA Backend Conversion Gate, Build, OpenXR VR architecture and HUD Inspector all passed.",
+    "cas_note": "A concurrent bookkeeping commit 5d01a57863e29db1f6fce3600432dc67c47a2dc5 landed after validation. The controller retry metadata is reconciled on top without changing the validation-bearing result SHA."
+  }
 }
