@@ -2433,3 +2433,46 @@ Next:
 - No source/runtime behavior change in this recovery write. Frozen user-test source 34eef500b2f79e7e68477d7ffe675f803e809e01 and standalone package remain untouched.
 - RUNTIME_VALIDATION=NEED_HMD_LOG. Compile/CI status is not represented as visual PASS.
 - Cycle 142 is intentionally not counted until it produces new evidence, a proven minimal fix, or regression-verifier strengthening.
+
+
+## Cycle 0142 — selector companion failure-cause + identity correlation
+
+User/runtime control:
+- DX9Ex vehicle-selection car remains white/colorless or graphically abnormal.
+- Same selection content was reported normal on DXVK.
+
+New R70 evidence:
+- exact 2048x2048 selector reserve activated at only ~30.1 MiB total/general usage;
+- a later 2048x512 A8R8G8B8 single-level translated MANAGED resource still fell to DirectOnly;
+- a translated MANAGED LockRect later failed with `0x8876086C`.
+Together with R69's analogous 2048x1024 fallback, this narrows the defect to a selector-companion resource family rather than the 2048x2048 atlas alone.
+
+Diagnostic changes:
+- exact diagnostic-only classifier for 2048x512/1024 single-level A8R8G8B8/X8R8G8B8 companion resources;
+- separate logs for shadow-budget rejection vs actual SYSTEMMEM `CreateTexture` failure after budget admission;
+- R14 DirectOnly fallback logs exact texture pointer;
+- R13 LockRect failure logs exact texture pointer, dimensions, format, level, flags and rect;
+- deterministic verifier guards these diagnostics.
+
+No behavior change:
+- no total/general/emergency budget modification;
+- no material/color or texture-stage mutation;
+- no HUD classification change;
+- no performance tuning.
+
+Commits:
+- `83ca24b54d4a0ee063fae018a6737836d62b6359`
+- `12ec779d533d41914e5ead3f359f01b9a40cb590`
+- `878f891371243a88f3be307bc5af794ffe3e0ae2`
+
+Validation:
+- Build `36521683004` queued
+- HUD Inspector `36521683010` queued
+- OpenXR architecture `36521683025` queued
+- AUTOMATION_VALIDATION: `SELECTOR_COMPANION_FAILURE_CAUSE_AND_IDENTITY_DIAGNOSTICS_ADDED / EXACT_HEAD_CI_QUEUED`
+- RUNTIME_VALIDATION: `USER_REPORTED_DX9EX_BAD_DXVK_GOOD / NEED_HMD_LOG`
+
+Next:
+- Correlate the same pointer from R14 companion DirectOnly fallback to R13 LockRect failure.
+- If budget admitted the resource but SYSTEMMEM texture creation failed, implement a bounded single-level CPU surface/backing upload fallback.
+- If budget rejection is the cause, modify only the proven selector companion class while keeping the 384 MiB total cap unchanged.
