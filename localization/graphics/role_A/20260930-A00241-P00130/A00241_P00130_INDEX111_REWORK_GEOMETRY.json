@@ -1,0 +1,436 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00241-p00130-index111-rework-geometry-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00241",
+  "wave_id": "P00130",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T08:26:15+09:00",
+  "base_head_sha": "6bfe650867e1a46269b9a78f2ee0dae917c0e9cd",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_REWORK_GEOMETRY_INPUT_RUNTIME_UNTESTED",
+  "summary": "Fresh A modulo-3 scan reuses unchanged A00239/C155 evidence: no runnable C-accepted RENDER_READY or ONE_STAGE_TO_RENDER asset exists; indices159/198/201/231 remain candidate QA-pending and are not repeated. Existing STATIC_QA runtime-isolation fallbacks in A shard are already covered. Fallback step 4 therefore narrows C075FB49@index111's six remaining overlap/artwork-sensitive failures into explicit v2 2px-safe geometry constraints. Exact source and current candidate Git blobs are unchanged from C85/A00004 lineage. One element (drift) is translation-geometry feasible; five require native re-render from source-style parameters. No candidate DDS is modified because exact source-effect removal/protected masks, clean plates and signed style/slant evidence for these six elements remain unresolved; readiness stays PREFLIGHT_ONLY_REWORK_NARROWED. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "latest_authoritative_c_gate": "C155/Q00053 cf375f6695e2d933c420002a6476f1c081b29b75 / Gate 36643892797 success",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "qa_pending_not_repeated": {
+      "159": "candidate QA pending",
+      "198": "candidate QA pending",
+      "201": "candidate QA pending",
+      "231": "A00235 candidate QA pending"
+    },
+    "direct_rework_not_repeated": {
+      "51": "newer producer candidate exists; pending independent C visual/style QA"
+    },
+    "dependency_blocked_not_repeated": {
+      "30": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "36": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "48": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "132": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "135": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "147": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "219": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "225": "SOURCE_ACQUISITION_EXHAUSTED sticky",
+      "228": "SOURCE_ACQUISITION_EXHAUSTED sticky"
+    },
+    "selected_priority": "FALLBACK_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      111
+    ]
+  },
+  "fingerprint": {
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "source_unchanged_from_c85": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+    "candidate_git_blob_sha": "de1ad4cdcf2e26ddd5265e495b821e8b98f4199e",
+    "candidate_unchanged_from_a00004": true,
+    "structure": "2048x2048 RGBA32 mip1 header-128 exact / mirror_y",
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3"
+  },
+  "provenance": {
+    "independent_c_source": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "partial_rework_source": "localization/graphics/role_A/20260928-A00004/A00004_C075FB49_PARTIAL_REWORK_REPORT.json",
+    "current_source_blob_equals_c85_source_blob": true,
+    "current_candidate_blob_equals_a00004_result_blob": true,
+    "heavy_qa_repeated": false
+  },
+  "geometry_rule": {
+    "coordinate_space": "readable/display coordinates, 2048x2048; raw mirror_y mapping raw=[left,2048-bottom,right,2048-top]",
+    "safe_bbox_rule": "2px inset of intersection(source_full_effect_bbox, sprite_cell)",
+    "flattened_raster_resampling_allowed": false,
+    "interpretation": "max_geometry_ratio is an upper bound for native font/effect re-render geometry only; never resize the flattened Korean raster to achieve it."
+  },
+  "remaining_elements": [
+    {
+      "key": "keep_passing",
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!",
+      "sprite_cell": [
+        0,
+        120,
+        520,
+        245
+      ],
+      "source_full_effect_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "current_localized_bbox": [
+        41,
+        144,
+        520,
+        245
+      ],
+      "candidate_safe_bbox": [
+        3,
+        145,
+        518,
+        234
+      ],
+      "candidate_safe_bbox_raw": [
+        3,
+        1814,
+        518,
+        1903
+      ],
+      "current_geometry": [
+        479,
+        101
+      ],
+      "safe_capacity": [
+        515,
+        89
+      ],
+      "translation_only_feasible": false,
+      "rerender_required": true,
+      "max_geometry_ratio": {
+        "width": 1.075157,
+        "height": 0.881188
+      },
+      "next_constraint": "Re-render from source-style parameters with final fill/outline/shadow/AA height <= 89 px; flattened-raster scaling is forbidden."
+    },
+    {
+      "key": "drift",
+      "source": "Drift!",
+      "korean": "드리프트!",
+      "sprite_cell": [
+        500,
+        120,
+        720,
+        245
+      ],
+      "source_full_effect_bbox": [
+        500,
+        120,
+        720,
+        228
+      ],
+      "current_localized_bbox": [
+        517,
+        148,
+        720,
+        245
+      ],
+      "candidate_safe_bbox": [
+        502,
+        122,
+        718,
+        226
+      ],
+      "candidate_safe_bbox_raw": [
+        502,
+        1822,
+        718,
+        1926
+      ],
+      "current_geometry": [
+        203,
+        97
+      ],
+      "safe_capacity": [
+        216,
+        104
+      ],
+      "translation_only_feasible": true,
+      "translation_fit_range": {
+        "dx": [
+          -15,
+          -2
+        ],
+        "dy": [
+          -26,
+          -19
+        ],
+        "minimal_shift": [
+          -2,
+          -19
+        ]
+      },
+      "rerender_required": false,
+      "max_geometry_ratio": {
+        "width": 1.064039,
+        "height": 1.072165
+      },
+      "next_constraint": "Geometry can fit without scaling by translation; do not apply until exact source-effect removal/protected masks and clean-plate lineage are independently proven."
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "sprite_cell": [
+        680,
+        120,
+        1160,
+        245
+      ],
+      "source_full_effect_bbox": [
+        680,
+        120,
+        1137,
+        227
+      ],
+      "current_localized_bbox": [
+        680,
+        149,
+        1160,
+        245
+      ],
+      "candidate_safe_bbox": [
+        682,
+        122,
+        1135,
+        225
+      ],
+      "candidate_safe_bbox_raw": [
+        682,
+        1823,
+        1135,
+        1926
+      ],
+      "current_geometry": [
+        480,
+        96
+      ],
+      "safe_capacity": [
+        453,
+        103
+      ],
+      "translation_only_feasible": false,
+      "rerender_required": true,
+      "max_geometry_ratio": {
+        "width": 0.94375,
+        "height": 1.072917
+      },
+      "next_constraint": "Re-render from source-style parameters with final effect width <= 453 px; translation alone cannot satisfy the 2px safe envelope."
+    },
+    {
+      "key": "tuned_setting",
+      "source": "Tuned Setting",
+      "korean": "튜닝 / 설정",
+      "sprite_cell": [
+        40,
+        1170,
+        245,
+        1305
+      ],
+      "source_full_effect_bbox": [
+        40,
+        1195,
+        245,
+        1305
+      ],
+      "current_localized_bbox": [
+        40,
+        1184,
+        240,
+        1305
+      ],
+      "candidate_safe_bbox": [
+        42,
+        1197,
+        243,
+        1303
+      ],
+      "candidate_safe_bbox_raw": [
+        42,
+        745,
+        243,
+        851
+      ],
+      "current_geometry": [
+        200,
+        121
+      ],
+      "safe_capacity": [
+        201,
+        106
+      ],
+      "translation_only_feasible": false,
+      "rerender_required": true,
+      "max_geometry_ratio": {
+        "width": 1.005,
+        "height": 0.876033
+      },
+      "next_constraint": "Re-render from source-style parameters with final effect height <= 106 px; flattened-raster scaling is forbidden."
+    },
+    {
+      "key": "normal_setting",
+      "source": "Normal Setting",
+      "korean": "일반 / 설정",
+      "sprite_cell": [
+        375,
+        1170,
+        600,
+        1305
+      ],
+      "source_full_effect_bbox": [
+        381,
+        1195,
+        600,
+        1305
+      ],
+      "current_localized_bbox": [
+        383,
+        1184,
+        600,
+        1305
+      ],
+      "candidate_safe_bbox": [
+        383,
+        1197,
+        598,
+        1303
+      ],
+      "candidate_safe_bbox_raw": [
+        383,
+        745,
+        598,
+        851
+      ],
+      "current_geometry": [
+        217,
+        121
+      ],
+      "safe_capacity": [
+        215,
+        106
+      ],
+      "translation_only_feasible": false,
+      "rerender_required": true,
+      "max_geometry_ratio": {
+        "width": 0.990783,
+        "height": 0.876033
+      },
+      "next_constraint": "Re-render from source-style parameters with final effect <= 215x106 px; translation alone cannot satisfy both axes."
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "sprite_cell": [
+        1710,
+        1410,
+        2008,
+        1515
+      ],
+      "source_full_effect_bbox": [
+        1710,
+        1435,
+        2008,
+        1515
+      ],
+      "current_localized_bbox": [
+        1710,
+        1431,
+        2008,
+        1515
+      ],
+      "candidate_safe_bbox": [
+        1712,
+        1437,
+        2006,
+        1513
+      ],
+      "candidate_safe_bbox_raw": [
+        1712,
+        535,
+        2006,
+        611
+      ],
+      "current_geometry": [
+        298,
+        84
+      ],
+      "safe_capacity": [
+        294,
+        76
+      ],
+      "translation_only_feasible": false,
+      "rerender_required": true,
+      "max_geometry_ratio": {
+        "width": 0.986577,
+        "height": 0.904762
+      },
+      "next_constraint": "Re-render from source-style parameters with final effect <= 294x76 px; flattened-raster scaling is forbidden."
+    }
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_C075FB49_SIX_ELEMENT_V2_REWORK_GEOMETRY_SPEC",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "narrowed_failures": 6,
+    "translation_geometry_feasible": [
+      "drift"
+    ],
+    "native_rerender_required": [
+      "keep_passing",
+      "maximum_speed",
+      "tuned_setting",
+      "normal_setting",
+      "random"
+    ],
+    "candidate_dds_modified": false,
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_before": "PREFLIGHT_ONLY_REWORK_BLOCKED_SIX_OVERLAP_ARTWORK_SENSITIVE_FAILURES",
+  "readiness_after": "PREFLIGHT_ONLY_REWORK_NARROWED_GEOMETRY_LOCKED_MASK_CLEAN_PLATE_STYLE_STILL_REQUIRED",
+  "blockers_after": [
+    "Exact per-element source-effect removal masks for the six remaining elements are not independently accepted on the current source fingerprint.",
+    "Protected-artwork masks and clean plates for the six remaining elements are not independently accepted.",
+    "Per-element readable-space baseline, signed slant and source-letterform/effect measurements are not yet accepted.",
+    "A changed production DDS would require the mandatory KOREAN_PNG_REVIEW set and decoded-final self-QA; those gates are intentionally not bypassed."
+  ],
+  "self_qa": "PASS_A_MOD3_INDEX111__C155_ZERO_READY_TIERS__QA_PENDING_NOT_REPEATED__SOURCE_AND_CANDIDATE_BLOBS_UNCHANGED__SIX_FAILURES_NARROWED_TO_SAFE_GEOMETRY__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
