@@ -1,0 +1,231 @@
+{
+  "schema_version": 10,
+  "schema": "outrun-c139-q00037-independent-batch-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00192",
+  "qa_batch_id": "Q00037",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T02:57:00+09:00",
+  "base_head_sha": "5969fd310d7d1311977effb967d24c31354d6811",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00188",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "0278c04c8e0cc83f9e4275c3d312fff4a3d7f580",
+      "result_message": "localization(B): exhaust mod3 source tiers indices34/52 [AUTO:LOCALIZATION-LOCALIZATION_B-00188]",
+      "completed_at": "2026-09-30T02:43:34.879442+09:00",
+      "producer_id": "P00096",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00187",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "047972fbd8fbb494f0046a0c829d670a0fd02753",
+      "result_message": "localization(A): complete index99 residue-free Korean DXT5 candidate [AUTO:LOCALIZATION-LOCALIZATION_A-00187]",
+      "completed_at": "2026-09-30T02:45:23.001900+09:00",
+      "producer_id": "P00095",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00188",
+      "result_sha": "0278c04c8e0cc83f9e4275c3d312fff4a3d7f580",
+      "status": "PASS",
+      "reason": "Exact B00188 pre-generation evidence is accepted as PREFLIGHT_ONLY source-acquisition exhaustion for indices34/B7E25BAD and52/A8CE339F. C independently listed the approved ezflash557 canonical Drive load folder and confirmed both exact parent folders are absent. Current inventory blob 5a3d3b09... still requires index34 1024x512 RGBA SHA fe6b18a8... and index52 2048x1024 RGBA SHA 08afacc6.... C independently resolved pinned v0.25.10a direct paths to immutable blobs 9ca9aa7e... and53f75d34..., matching the producer's unchanged C-accepted Release lineages; index34 remains a 4096x2048-vs-1024x512 canvas mismatch and index52 remains DXT5-vs-canonical-RGBA mode mismatch. C136's exact pinned bundle digest/member lineage is reused because bundle/upstream/inventory fingerprints are unchanged. No candidate exists and no pixel geometry is promoted. production_readiness=PREFLIGHT_ONLY for both; RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00187",
+      "result_sha": "047972fbd8fbb494f0046a0c829d670a0fd02753",
+      "status": "PASS",
+      "reason": "Exact A00187 index99/4F68708E candidate blob a170fc1e8378e66415cde138b07ab3deb2ca4a2d is unchanged at refreshed HEAD. Exact pinned source lineage eb8c2dda... / canonical SHA-256 d97206d8... is the previously C-accepted 2048x256 DXT5 mip1 source. Current semantic binding remains the single sentence 'Drive against the Ghost Car and challenge for the course record!!' -> '고스트 카와 달리며 코스 기록에 도전하세요!', rendered as two lines without omission. Producer decoded-final evidence records exact 128-byte header, mirror-Y raw orientation, zero changed pixels outside edit/source/protected regions, zero alpha change/introduction outside allowed regions, and positive 2px-safe containment for both lines. Independent C review of the exact result-SHA source/candidate comparison, 2x text region, alpha proof, clean plate and raw orientation finds no visible English residue, opaque cover box, clipping, overlap or broken Hangul; white/dark-navy right-slant styling is source-consistent. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "reviewed_assets": [
+    {
+      "index": 34,
+      "asset": "B7E25BAD",
+      "input": "LOCALIZATION-LOCALIZATION_B-00188@0278c04c8e0cc83f9e4275c3d312fff4a3d7f580",
+      "candidate_exists": false,
+      "canonical_inventory": {
+        "sha256": "fe6b18a80918b8ede35d0603faa271accfd178f68da96209984c8f9b551591b9",
+        "dimensions": [
+          1024,
+          512
+        ],
+        "mode": "RGBA"
+      },
+      "drive_exact_parent": "MISS_INDEPENDENT_C",
+      "pinned_direct_blob": "9ca9aa7e2e2528a101379257035533ea9d175b17",
+      "pinned_direct_lineage": "LEGACY_RELEASE_RGBA32_4096x2048",
+      "identity_result": "SOURCE_IDENTITY_MISMATCH_CANVAS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "source_acquisition": "EXHAUSTED_ON_CURRENT_FINGERPRINT",
+      "candidate_gates": "NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_CANDIDATE",
+      "disposition": "PASS",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 52,
+      "asset": "A8CE339F",
+      "input": "LOCALIZATION-LOCALIZATION_B-00188@0278c04c8e0cc83f9e4275c3d312fff4a3d7f580",
+      "candidate_exists": false,
+      "canonical_inventory": {
+        "sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      "drive_exact_parent": "MISS_INDEPENDENT_C",
+      "pinned_direct_blob": "53f75d347682c7b5f436a6d45dc3e1950a42b5eb",
+      "pinned_direct_lineage": "LEGACY_RELEASE_DXT5_2048x1024",
+      "identity_result": "SOURCE_IDENTITY_MISMATCH_MODE",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "source_acquisition": "EXHAUSTED_ON_CURRENT_FINGERPRINT",
+      "candidate_gates": "NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_CANDIDATE",
+      "disposition": "PASS",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 99,
+      "asset": "4F68708E",
+      "input": "LOCALIZATION-LOCALIZATION_A-00187@047972fbd8fbb494f0046a0c829d670a0fd02753",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "candidate_blob": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+      "candidate_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+      "source_blob": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+      "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "dds": "DXT5_2048x256_MIP1_HEADER_EXACT",
+      "orientation": "PASS_MIRROR_Y_RAW_READABLE_DISPLAY",
+      "semantic_binding": "PASS_1_OF_1_CANONICAL_SENTENCE_SPLIT_TO_TWO_RENDER_LINES",
+      "clean_plate": "PASS_EXACT_VISIBLE_EFFECT_CLEAR_TO_TRANSPARENT__NO_VISIBLE_RESIDUE",
+      "containment": "PASS_2_OF_2_POSITIVE_MARGIN_ZERO_OUTSIDE",
+      "alpha_transparency": "PASS_ZERO_OUTSIDE_ALLOWED",
+      "english_residue": "PASS_NONE_VISIBLE",
+      "visual": "PASS_C_INDEPENDENT_EXACT_RESULT_EVIDENCE",
+      "disposition": "PASS",
+      "static_qa": "PASS",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "source_identity_validation": "PASS_INDEX99_CANONICAL_SOURCE_UNCHANGED__INDEX34_52_CURRENT_INVENTORY_AND_PINNED_DIRECT_IDENTITIES_RECHECKED__DRIVE_PARENT_MISS_2_OF_2",
+  "canonical_semantic_validation": "PASS_INDEX99_1_OF_1__INDEX34_1_OF_1__INDEX52_3_OF_3__NO_METADATA_CHANGE",
+  "geometry_mapping_validation": "PASS_INDEX99_2_OF_2_POSITIVE_MARGIN_ZERO_OUTSIDE__INDEX34_52_NOT_PROMOTED_NO_EXACT_CANONICAL_SOURCE",
+  "current_contract_compatibility": "PASS_A00187_EXACT_RESULT_POST_RESET_V2_MACHINE_QA__B00188_NO_DDS_PREFLIGHT_EVIDENCE__BOTH_EXACT_PRODUCER_SHAS_GATE_ELIGIBLE",
+  "readiness_reconciliation": {
+    "classification": "ONE_RENDERED_CANDIDATE_STATIC_QA_PASS_PLUS_TWO_PREFLIGHT_ONLY_SOURCE_EXHAUSTED",
+    "production_readiness": {
+      "34": "PREFLIGHT_ONLY",
+      "52": "PREFLIGHT_ONLY",
+      "99": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "preflight_only_indices": [
+      30,
+      34,
+      36,
+      48,
+      52,
+      132,
+      154,
+      164,
+      172,
+      228
+    ],
+    "already_rendered_static_qa_pass_indices": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: none newly created by Q00037. Indices99/112/130/152/237 are already rendered STATIC_QA PASS candidates; do not rerender them. Runtime/final approval remains separate and requires isolated real-game evidence.",
+      "ONE_STAGE_TO_RENDER: none proven by Q00037. Continue any newer candidate-bearing or direct REWORK_REQUIRED producer results before unrelated source-acquisition preflight; Q00037 does not implicitly consume producer work outside QA_BATCH_INPUTS.",
+      "PREFLIGHT_ONLY: indices34/52 are now source-acquisition-exhausted on the unchanged approved Drive/direct/Release/inventory fingerprints. Existing source-exhausted indices30/36/48/132/154/164/172/228 remain behind candidate completion. Newer B00190 indices46/100/106 are outside Q00037 and remain QA-pending until a later C batch."
+    ]
+  },
+  "heavy_qa_reuse": {
+    "b00188_drive_check": {
+      "folder_id": "1M_zaCiIOP1S7khgRynMLxc_iLCAMKfib",
+      "listed_children": 8,
+      "exact_parent_matches": [],
+      "result": "PASS_PARENT_MISS_2_OF_2"
+    },
+    "b00188_pinned_direct": {
+      "index34_blob": "9ca9aa7e2e2528a101379257035533ea9d175b17",
+      "index52_blob": "53f75d347682c7b5f436a6d45dc3e1950a42b5eb",
+      "result": "PASS_MATCH_PRODUCER_AND_C_ACCEPTED_RELEASE_LINEAGE"
+    },
+    "b00188_release_bundle": "REUSED_C136_Q00034_EXACT_BUNDLE_SHA256_76F85ED2_UNCHANGED_FINGERPRINT",
+    "b00188_release_lineage": "REUSED_C109_C121_UNCHANGED_EXACT_MEMBER_LINEAGE",
+    "a00187_new_candidate_heavy_qa": true,
+    "a00187_visual_review": "PASS_INDEPENDENT_EXACT_RESULT_SHA_SOURCE_VS_CANDIDATE_PLUS_NATIVE_2X_ALPHA_CLEAN_PLATE_RAW",
+    "repeated_heavy_checks": false
+  },
+  "validation": {
+    "producer_auto_markers": "PASS_EXACT_BOTH",
+    "producer_candidate_identity_vs_current_head": "PASS_A00187_NOT_SUPERSEDED",
+    "machine_readable_current_contract_pass": "PASS_A00187__B00188_NO_DDS_PREFLIGHT",
+    "mandatory_english_source_comparison": "PASS_A00187_DIRECT_C_REVIEW",
+    "zero_pixel_overflow": "PASS_A00187",
+    "dds_header_format_mip": "PASS_A00187",
+    "alpha_transparency": "PASS_A00187",
+    "protected_artwork": "PASS_A00187_ZERO_OUTSIDE_PROTECTED",
+    "orientation": "PASS_A00187",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state": {
+    "metadata_segments_changed": 0,
+    "canonical_segments": 753,
+    "actionable_localize_text": 93,
+    "pending_production_localize_text": 71,
+    "static_pass_added": 1,
+    "runtime_approvals_added": 0,
+    "candidate_dds_modified_by_c": false
+  },
+  "concurrent_preservation": [
+    "B00190@5969fd310d7d1311977effb967d24c31354d6811 is outside Q00037 and receives no disposition or shared-state promotion.",
+    "Any producer result after the Q00037 base is preserved for later C consumption."
+  ],
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      34,
+      52,
+      99
+    ],
+    "reviewed_assets": 3,
+    "producer_inputs_pass": 2,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 71,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 1,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json"
+  },
+  "environment": {
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false,
+    "google_drive_used": true,
+    "google_drive_write_performed": false,
+    "uploaded_archive_used": false,
+    "build_performed": false,
+    "runtime_test_performed": false,
+    "vr_ffb_dx_changes": false
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

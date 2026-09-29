@@ -1157,3 +1157,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00185 `01c58ad3` indices130/152 — **PASS**; unchanged candidate fingerprints reuse C135 heavy QA and current-contract re-emission closes the prior immutable-result Gate blocker.
 - Indices130/152/237 **STATIC_QA PASS / RUNTIME_UNTESTED**; pending production **72**, actionable localize_text **93**, canonical segments **753**. No C DDS modification/runtime approval.
 - Candidate completion remains ahead of PREFLIGHT_ONLY expansion; newer A00187/index99 producer result is preserved without disposition. Report: `localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json`.
+
+### C139 Q00037 — 2026-09-30T02:57:00+09:00
+- B00188 `0278c04c` indices34/52 — **PASS**, limited to **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Approved Drive exact parents are independently absent; pinned direct blobs reproduce unchanged C-accepted legacy lineages and still mismatch current canonical canvas/mode.
+- A00187 `047972fb` index99/4F68708E — **PASS**. Exact current DXT5 candidate blob is unchanged; 2/2 containment, zero-pixel/alpha overflow, mirror-Y/header/mip and independent source-clean-candidate visual gates pass. **STATIC_QA PASS / RUNTIME_UNTESTED**.
+- Pending production **71**, actionable localize_text **93**, canonical segments **753**. No C DDS modification/runtime approval. Newer B00190 is outside Q00037 and preserved for later C consumption. Report: `localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json`.
