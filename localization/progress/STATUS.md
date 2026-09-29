@@ -1088,3 +1088,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Index99 exact canonical `eb8c2dda...` 2048x256 DXT5 mip1 source and threshold-18 effect boundary reproduce **42,774** pixels; alpha-positive 1px protected ring **13,263**, max luminance 17.482.
 - Index152 exact canonical `0288babb...` 512x128 DXT5 mip1 source and 4/4 removal masks reproduce **5,876 pixels / 556 RLE runs** exactly; protection complements are consistent and `'89`/`'86` remain preserve-original.
 - CLEAN_PLATE/style/render/candidate containment/source-comparison gates remain **HOLD_STRICT_RECHECK**; runtime **UNTESTED**. Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2235-C127/C127_Q00025_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C128 Q00026 — 2026-09-29T22:56:21+09:00
+- QA inputs: A00154 `0091b5e` (63) and B00155 `8cd826c` (112). Dispositions: **PASS / REWORK_REQUIRED**.
+- A00154 PASS: unchanged C85-passed 48DEBE77 source/candidate fingerprint; deterministic non-duplicate DDS_ONLY isolation input accepted. Runtime test remains **UNTESTED**.
+- B00155 sub-evidence: canonical D41D0B1 full-alpha mask reproduces **132,035 px / 1,291 RLE runs** exactly; old hard limit omitted **29** pixels. REWORK_REQUIRED because CLEAN_PLATE method says 8-neighbor but 49 iterations match 4-neighbor while 8-neighbor independently converges in 42, and current contract requires same-task continuation from KOREAN_RENDER_NEXT through candidate generation/decoded-final QA.
+- No new candidate/static/runtime approval. Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2256-C128/C128_Q00026_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
