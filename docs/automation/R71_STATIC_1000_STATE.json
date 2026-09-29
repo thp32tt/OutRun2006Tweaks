@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 30,
+  "completedCycles": 31,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "56135e92a140c9753c558a7aff98c1759a6ff9bd",
+  "currentHead": "b2800448c85f89ca1736a0ee1b0df50511abd42a",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -915,21 +915,49 @@
       "automationValidation": "EXACT_HEAD_CI_PENDING",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 31: consume exact-head CI. Then inspect HUD/menu alpha/blend state independently from global haze; do not tune SkyGlow 0.38 until HMD confirms ordering/blur-source result."
+    },
+    {
+      "cycle": 31,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findingKeys": [
+        "VR-R41-SKIPPED-DIRECT-ACK-LOSS-001"
+      ],
+      "findings": [
+        "Exact-head 56135e92 Build and HUD Inspector passed, but both OpenXR runs failed deterministically because verify_vr_r32_review.py required the literal SampleEvidence::ExactSampled marker in the LEVEL0 smoke while the test exercised only ExactSampled() plus Unknown enum cases. Added an explicit Query(sampledExact) == SampleEvidence::ExactSampled assertion; no runtime behavior changed."
+      ],
+      "evidence": [
+        "OpenXR runs 36512385393/36512385576 host-x64 and game-x86 failed at Verify reconstructed VR architecture boundaries with 'R32/R33 invariant missing: vrhost/tests/r41_skipped_release_smoke.cpp :: SampleEvidence::ExactSampled'; fix commit 55ac395b7fe6a24a054b43ec767b2deb59f49b27"
+      ],
+      "changedFiles": [
+        "vrhost/tests/r41_skipped_release_smoke.cpp",
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "55ac395b7fe6a24a054b43ec767b2deb59f49b27",
+        "b2800448c85f89ca1736a0ee1b0df50511abd42a"
+      ],
+      "automationValidation": "CI_CONTRACT_REPAIRED / EXACT_HEAD_REVALIDATION_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "consume repaired-head Build/OpenXR/HUD; continue P0 visual review"
     }
   ],
   "nextCycle": {
-    "cycle": 31,
+    "cycle": 32,
     "priority": [
-      "consume 56135e92 exact-head Build/OpenXR/HUD results",
-      "P0 visual: DX9Ex vehicle-selection 3D car renders white/colorless while DXVK is normal; trace selector MANAGED texture/resource upload plus material/texture-stage state before changing behavior",
-      "inspect HUD/menu alpha and blend/render-state contamination independently from SkyGlow",
-      "inspect OutRun checkpoint/result/stage-mark double/head-follow exact producer lifetime",
-      "inspect rival marker vehicle/world anchor and per-eye depth",
-      "do not start performance-only work"
+      "consume repaired-head CI",
+      "P0 selector white/colorless car trace",
+      "HUD/menu alpha/blend contamination"
     ],
-    "guard": "Performance optimization remains paused. Frozen 34eef500 HMD package remains immutable. Selector white/colorless car is now a top visual regression; do not treat 2048x2048 reserve activation alone as proof of a fix."
+    "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
-  "updatedKst": "2026-09-29T11:30:00+09:00",
+  "updatedKst": "2026-09-29T12:20:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
