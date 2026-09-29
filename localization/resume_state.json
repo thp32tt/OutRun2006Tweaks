@@ -7,9 +7,9 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: none newly created by Q00035. Index112/D41D0B1 is already rendered and is now STATIC_QA PASS on candidate blob 30971e83/5bb92bce; do not rerender it. Only isolated real-game validation can advance runtime/final approval.",
-    "ONE_STAGE_TO_RENDER: keep candidate-completion work ahead of unrelated preflight. Index99/4F68708E still needs source-effect CLEAN_PLATE residue repair before Korean render; independently consume newer candidate QA such as A00182@e78b9160 index237 and structurally valid current-contract re-emissions for indices130/152 before expanding preflight.",
-    "PREFLIGHT_ONLY: Q00034 source-acquisition-exhausted indices30/36/48/132/154/164/172/228 remain behind candidate completion and must not repeat Drive/direct/Release probes until source/inventory fingerprints change. RUNTIME_VALIDATION=UNTESTED."
+    "RENDER_READY: no new pre-generation item is created by Q00036. Indices112/130/152/237 are already rendered STATIC_QA PASS candidates; do not rerender them. Runtime/final approval remains deferred to isolated real-game validation.",
+    "ONE_STAGE_TO_RENDER: keep index99/4F68708E candidate-completion work ahead of unrelated preflight. Refreshed merge HEAD contains the newer A00187 durable producer result/review for index99; Q00036 does not consume or promote it because it is not in QA_BATCH_INPUTS. Preserve it for the next independent C batch rather than duplicating work.",
+    "PREFLIGHT_ONLY: source-acquisition-exhausted indices30/36/48/132/154/164/172/228 remain behind candidate completion and must not repeat Drive/direct/Release probes until an approved source or inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2363,42 +2363,60 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-30T02:24:00+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00186",
-    "qa_batch_id": "Q00035",
-    "run": "C137",
-    "result": "PASS_Q00035_B00183_INDEX112_STATIC_QA_PASS_CURRENT_CONTRACT_RUNTIME_UNTESTED",
-    "base_head": "01c58ad3af8545b5c0f48dd914cdb1ca38a80f30",
+    "recorded_at_kst": "2026-09-30T02:34:00+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00189",
+    "qa_batch_id": "Q00036",
+    "run": "C138",
+    "result": "PASS_Q00036_A00182_B00185_INDICES130_152_237_STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "base_head": "0c1ead84eaa2b24bfc607d7dd3b4314f37defd94",
     "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
     "current_controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
     "qa_batch_inputs": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00183",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00182",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "e78b9160064c3b60f55f0a336be7448482836da0",
+        "result_message": "localization(A): complete index237 RGBA32 Korean candidate [AUTO:LOCALIZATION-LOCALIZATION_A-00182]",
+        "completed_at": "2026-09-30T02:25:41.112596+09:00",
+        "producer_id": "P00092",
+        "automation_validation": "PENDING",
+        "validation_mode": "C_BATCH_GATE"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00185",
         "lane": "LOCALIZATION_B",
-        "result_sha": "8b7842b4d6903e3ad6b518a95daff9bc37893e0e",
-        "result_message": "localization(B): re-emit index112 current-contract QA [AUTO:LOCALIZATION-LOCALIZATION_B-00183]",
-        "completed_at": "2026-09-30T02:19:08.667726+09:00",
-        "producer_id": "P00093",
+        "result_sha": "01c58ad3af8545b5c0f48dd914cdb1ca38a80f30",
+        "result_message": "localization(B): re-emit indices130/152 current-contract QA [AUTO:LOCALIZATION-LOCALIZATION_B-00185]",
+        "completed_at": "2026-09-30T02:27:23.466805+09:00",
+        "producer_id": "P00094",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       }
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00183",
-        "result_sha": "8b7842b4d6903e3ad6b518a95daff9bc37893e0e",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00182",
+        "result_sha": "e78b9160064c3b60f55f0a336be7448482836da0",
         "status": "PASS",
-        "reason": "Exact immutable B00183@8b7842b4 carries the current-contract machine-readable PASS re-emission for index112/D41D0B1 without changing candidate bytes. Producer-result candidate blob 30971e83bebe619520f27dfece37f8ebdc02ff28 equals current HEAD and C135's independently reviewed blob; canonical pinned source blob 278a518f5151f0759dfcfdc78e129a7a7cb55cf0 / SHA-256 524de4c0... is unchanged. Reused C135 heavy QA for the identical fingerprint: DXT5 2048x256 mip1/header exact, zero outside-edit/source/protected changes, zero outside alpha introduction/change, containment PASS, readable orientation/slant PASS, no visible English residue or clipping. B00183 supplies the missing current-contract PASS structure that caused B00160's prior immutable-result Gate rejection. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+        "reason": "Exact immutable A00182@index237 candidate blob a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac is unchanged at refreshed merge HEAD. Pinned source identity and current 6/6 semantics match. Exact v2 decoded-final evidence records RGBA32 2048x2048 mip1/header exact, 9/9 positive-margin Korean containment, zero changes outside edit/source/protected regions, zero outside alpha change/introduction, protected K1 exact and decoded roundtrip exact. Independent C review of exact committed ENGLISH SOURCE / CLEAN PLATE / KOREAN CANDIDATE and native/2x/alpha proofs finds no visible English residue, cover box, clipping or broken Hangul. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00185",
+        "result_sha": "01c58ad3af8545b5c0f48dd914cdb1ca38a80f30",
+        "status": "PASS",
+        "reason": "Exact immutable B00185 re-emits current-contract machine-readable QA for unchanged index130 blob 905f0d05.../823c7691... and index152 blob 5d938fd6.../0a92b614..., both equal refreshed HEAD. C135 independently content/visual-checked these exact fingerprints; its prior non-promotion was solely the immutable producer-result contract blocker. B00185 supplies the missing current zero-pixel/protected-mask PASS structure without DDS changes. Reused C135 heavy QA: index130 RGBA32 2048x512 mip1/header exact, 5/5 containment and protected numeric marker exact; index152 DXT5 512x128 mip1/header exact, 4/4 containment, protected '89/'86 exact, zero outside-region/alpha changes and no visible English residue/clipping. STATIC_QA=PASS for indices130/152; RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_PINNED_SOURCE_BLOB_278A518F_MATCHES_B00183_AND_C135_UNCHANGED_FINGERPRINT",
-    "canonical_semantic_validation": "PASS_INDEX112_ONE_OF_ONE_CURRENT_TRANSCRIPTION__NO_METADATA_CHANGE",
-    "geometry_mapping_validation": "PASS_REUSED_C135_EXACT_CANDIDATE_DXT5_2048x256_MIP1_HEADER_EXACT__FLIP_Y_READABLE_ORIENTATION__CONTAINMENT_AND_NO_CLIP_PASS",
-    "current_contract_compatibility": "PASS_B00183_CURRENT_CONTRACT_MACHINE_READABLE_PASS_REEMISSION__EXACT_PRODUCER_SHA_GATE_ELIGIBLE__UNCHANGED_CANDIDATE_HEAVY_QA_REUSED",
+    "source_identity_validation": "PASS_A237_PINNED_BLOB_6E9D40D1__B130_CE5158F8__B152_0288BABB__ALL_CANDIDATE_BLOBS_EQUAL_REFRESHED_HEAD",
+    "canonical_semantic_validation": "PASS_INDEX237_6_OF_6__INDEX130_5_OF_5__INDEX152_4_LOCALIZE_PLUS_2_PRESERVE__NO_METADATA_CHANGE",
+    "geometry_mapping_validation": "PASS_A237_9_OF_9_POSITIVE_MARGIN_ZERO_OUTSIDE__B130_5_OF_5_REUSED_C135__B152_4_OF_4_REUSED_C135",
+    "current_contract_compatibility": "PASS_A00182_EXACT_RESULT_POST_RESET_V2_MACHINE_QA__B00185_CURRENT_CONTRACT_REEMISSION__BOTH_EXACT_PRODUCER_SHAS_GATE_ELIGIBLE",
     "readiness_reconciliation": {
-      "classification": "ONE_RENDERED_CANDIDATE_STATIC_QA_PASS",
+      "classification": "THREE_RENDERED_CANDIDATES_STATIC_QA_PASS",
       "production_readiness": {
-        "112": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS"
+        "130": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS",
+        "152": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS",
+        "237": "NOT_APPLICABLE_ALREADY_RENDERED_STATIC_QA_PASS"
       },
       "render_ready_indices": [],
       "one_stage_to_render_indices": [
@@ -2415,53 +2433,51 @@
         228
       ],
       "already_rendered_static_qa_pass_indices": [
-        112
+        112,
+        130,
+        152,
+        237
       ],
       "candidate_completion_priority": [
-        "RENDER_READY: none newly created by Q00035. Index112/D41D0B1 is already rendered and is now STATIC_QA PASS on candidate blob 30971e83/5bb92bce; do not rerender it. Only isolated real-game validation can advance runtime/final approval.",
-        "ONE_STAGE_TO_RENDER: keep candidate-completion work ahead of unrelated preflight. Index99/4F68708E still needs source-effect CLEAN_PLATE residue repair before Korean render; independently consume newer candidate QA such as A00182@e78b9160 index237 and structurally valid current-contract re-emissions for indices130/152 before expanding preflight.",
-        "PREFLIGHT_ONLY: Q00034 source-acquisition-exhausted indices30/36/48/132/154/164/172/228 remain behind candidate completion and must not repeat Drive/direct/Release probes until source/inventory fingerprints change. RUNTIME_VALIDATION=UNTESTED."
+        "RENDER_READY: no new pre-generation item is created by Q00036. Indices112/130/152/237 are already rendered STATIC_QA PASS candidates; do not rerender them. Runtime/final approval remains deferred to isolated real-game validation.",
+        "ONE_STAGE_TO_RENDER: keep index99/4F68708E candidate-completion work ahead of unrelated preflight. Refreshed merge HEAD contains the newer A00187 durable producer result/review for index99; Q00036 does not consume or promote it because it is not in QA_BATCH_INPUTS. Preserve it for the next independent C batch rather than duplicating work.",
+        "PREFLIGHT_ONLY: source-acquisition-exhausted indices30/36/48/132/154/164/172/228 remain behind candidate completion and must not repeat Drive/direct/Release probes until an approved source or inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
       ]
     },
     "heavy_qa_reuse": {
-      "fingerprint": {
-        "source_git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
-        "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
-        "candidate_git_blob_sha": "30971e83bebe619520f27dfece37f8ebdc02ff28",
-        "candidate_dds_sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
-        "raw_readable_orientation_contract": "flip_y / readable source-direction slant preserved",
-        "semantic_binding": "index112 one canonical segment",
-        "qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4"
-      },
-      "reused_from": "localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json",
-      "reused_report_blob_sha": "a68af38b0a8d32b308c1e7c4a2b81e23563ebc58",
-      "repeated_candidate_pixel_qa": false,
-      "repeated_visual_qa": false,
-      "repeated_dds_header_alpha_orientation_qa": false,
-      "reason": "Unchanged source/candidate/orientation/semantic/QA-contract fingerprint; C135 exact-candidate heavy QA is reused. B00183 changes only producer-result contract evidence."
+      "repeated_candidate_pixel_qa_for_b00185": false,
+      "repeated_visual_qa_for_b00185": false,
+      "repeated_dds_header_alpha_orientation_qa_for_b00185": false,
+      "b00185_reused_from": "localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json",
+      "b00185_reason": "Index130 and index152 source/candidate/orientation/semantic fingerprints are byte-identical to C135; B00185 changes only current-contract producer QA evidence.",
+      "a00182_new_independent_visual_review": true,
+      "a00182_machine_geometry_rechecked_from_exact_result": true,
+      "a00182_reason": "Index237 is a new C fingerprint. C independently matched current candidate/source identities and canonical semantics and reviewed exact committed source/clean/candidate/native-zoom/alpha evidence; exact-result v2 decoded-final zero-pixel metrics satisfy the current contract."
     },
     "material_deliverable": {
       "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
       "reviewed_indices": [
-        112
+        130,
+        152,
+        237
       ],
-      "reviewed_assets": 1,
-      "producer_inputs_pass": 1,
+      "reviewed_assets": 3,
+      "producer_inputs_pass": 2,
       "producer_inputs_rework_required": 0,
       "producer_inputs_hold_strict_recheck": 0,
       "producer_inputs_superseded": 0,
       "metadata_segments_changed": 0,
       "canonical_segments_after_merge": 753,
       "actionable_localize_text_after": 93,
-      "pending_production_localize_text_after": 75,
+      "pending_production_localize_text_after": 72,
       "candidate_dds_modified_by_c": false,
-      "new_static_artwork_passes": 1,
+      "new_static_artwork_passes": 3,
       "new_runtime_approvals": 0,
-      "report": "localization/graphics/role_C/20260930-0224-C137/C137_Q00035_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json"
     },
-    "report": "localization/graphics/role_C/20260930-0224-C137/C137_Q00035_INDEPENDENT_QA_BATCH.json",
+    "report": "localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json",
     "candidate_dds_modified": false,
-    "new_static_artwork_passes": 1,
+    "new_static_artwork_passes": 3,
     "new_runtime_approvals": 0,
     "shared_state_modified": true,
     "peer_candidate_files_modified": false,

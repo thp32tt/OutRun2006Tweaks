@@ -1670,3 +1670,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Index112 is **STATIC_QA PASS / RUNTIME_UNTESTED**. Pending production **76 -> 75**; actionable localize_text **93**, canonical segments **753**. C changes no DDS bytes and adds no runtime approval.
 - A00182@e78b9160 index237 is preserved without Q00035 disposition. Candidate completion remains ahead of unrelated PREFLIGHT_ONLY work.
 - Report: `localization/graphics/role_C/20260930-0224-C137/C137_Q00035_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 02:34 KST - C138 Q00036 INDEPENDENT CANDIDATE QA BATCH
+
+- Immutable inputs: A00182 `e78b9160064c3b60f55f0a336be7448482836da0` (index237/FF514CEB) and B00185 `01c58ad3af8545b5c0f48dd914cdb1ca38a80f30` (indices130/1762489B and 152/49BB5FE5). Dispositions: **PASS / PASS**.
+- All three candidate Git blobs equal refreshed merge HEAD `0c1ead84eaa2b24bfc607d7dd3b4314f37defd94`; no input is superseded. A00182 exact v2 QA records RGBA32 2048x2048 mip1/header exact, 9/9 positive-margin containment and zero outside edit/source/protected/alpha changes. Independent C native/readable source-clean-candidate review finds no visible English residue, patch artifact, clipping or broken Hangul.
+- B00185 changes no DDS bytes and closes only the C135 immutable-result contract blocker. C135 heavy QA is reused on exact unchanged fingerprints: index130 RGBA32 2048x512 mip1 with 5/5 containment and protected numeric marker exact; index152 DXT5 512x128 mip1 with 4/4 containment and protected '89/'86 exact; no visible English residue/clipping and zero outside-region/alpha changes.
+- Indices **130/152/237 = STATIC_QA PASS / RUNTIME_UNTESTED**. Pending production **75 -> 72**; actionable localize_text **93**; canonical segments **753**. C modifies no DDS candidate bytes; new static passes **3**, runtime approvals **0**.
+- Candidate-completion-first remains active: newer A00187/index99 producer result at merge HEAD is preserved without Q00036 disposition for a later independent C batch; do not duplicate it or expand unrelated PREFLIGHT_ONLY work ahead of candidate completion. Source-acquisition-exhausted 30/36/48/132/154/164/172/228 remain PREFLIGHT_ONLY.
+- Report: `localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, Drive write, build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

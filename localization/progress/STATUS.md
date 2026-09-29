@@ -1151,3 +1151,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00183 `8b7842b4` index112/D41D0B1 — **PASS**; unchanged fingerprint reuses C135 heavy QA and current-contract result structure now passes the content precondition.
 - Index112 **STATIC_QA PASS / RUNTIME_UNTESTED**; pending production **75**, actionable localize_text **93**, canonical segments **753**. No C DDS modification/runtime approval.
 - Preserve A00182@e78b9160 index237 for later independent C QA. Report: `localization/graphics/role_C/20260930-0224-C137/C137_Q00035_INDEPENDENT_QA_BATCH.json`.
+
+### C138 Q00036 — 2026-09-30T02:34:00+09:00
+- A00182 `e78b9160` index237/FF514CEB — **PASS**; exact current RGBA32 candidate, 6/6 semantics, 9/9 positive-margin containment, zero-pixel/alpha overflow and independent source-clean-candidate visual review pass.
+- B00185 `01c58ad3` indices130/152 — **PASS**; unchanged candidate fingerprints reuse C135 heavy QA and current-contract re-emission closes the prior immutable-result Gate blocker.
+- Indices130/152/237 **STATIC_QA PASS / RUNTIME_UNTESTED**; pending production **72**, actionable localize_text **93**, canonical segments **753**. No C DDS modification/runtime approval.
+- Candidate completion remains ahead of PREFLIGHT_ONLY expansion; newer A00187/index99 producer result is preserved without disposition. Report: `localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json`.
