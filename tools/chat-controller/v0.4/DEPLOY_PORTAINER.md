@@ -140,7 +140,7 @@ WATCHDOG_ENABLED=true
 QUEUE_MODE=true
 PREFERRED_THINKING_LEVEL=High
 STRICT_THINKING_LEVEL=true
-GITHUB_POLL_SECONDS=180
+GITHUB_POLL_SECONDS=60
 MAX_TASK_ATTEMPTS=3
 ```
 
@@ -153,10 +153,32 @@ If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each 
 When `LOCALIZATION_PARALLEL=true`, the localization controller uses a wave barrier:
 
 1. Lane A starts on the odd-index asset_queue shard.
-2. Lane B starts after `PARALLEL_LANE_STAGGER_SECONDS` (default 60s) on the even-index shard.
+2. Lane B starts after `PARALLEL_LANE_STAGGER_SECONDS` (default 15s) on the even-index shard.
 3. A and B run concurrently in separate project chats and may not modify shared resume/worklog/progress/asset_queue state.
 4. Each lane is completed by locating its exact `[AUTO:<TASK_ID>]` commit in branch history and validating GitHub Actions for that exact SHA; branch HEAD may belong to the peer lane and is not used as the lane completion identity.
 5. After both production lanes reach a durable terminal result, C starts as the synchronization barrier, performs cross-lane final QA, and reconciles shared state.
 6. After C is terminal, the next A+B wave begins.
 
 The existing single-active queue state is migrated on first startup: an in-flight A/B task becomes that lane of the first parallel wave, and the missing peer lane is dispatched without discarding the existing task.
+
+
+### Localization liveness tuning
+
+The localization stack now uses these controller-runtime values directly:
+
+- queue loop: 15s
+- missing-response/no-commit grace: 180s (previously 1800s)
+- Actions discovery: 60s
+- bound exact Actions run polling: 30s, uncached
+- stale WAIT_ACTIONS rearm: 75s
+- idle queue rearm: 90s
+- next-task delay: 15s
+- A/B lane stagger: 15s
+- distinct A/B slot send gap: 15s
+- scheduler heartbeat: 15s
+- active-generation busy-stall protection: 30m
+- explicit rate-limit backoff: 90/180/300/600s
+
+On startup, persisted nonterminal queue records are reconciled. WAIT_ACTIONS poll guards are cleared so the next queue cycle checks the stored GitHub Actions run ID directly. A failed terminal run retries the same TASK_ID while retry budget remains, after refreshing the current target-branch HEAD.
+
+When redeploying in Portainer, retain the existing localization /data volume so persisted W00018 state can be reconciled instead of discarded.
