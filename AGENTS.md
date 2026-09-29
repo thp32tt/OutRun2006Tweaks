@@ -125,6 +125,19 @@ Do not rerun a completed batch unless a relevant input changed. Mark only affect
 - Record every component SHA used by a package; integration HEAD alone is not package identity.
 - Do not silently substitute fallback backends or fake A-F variants.
 
+## Backend development priority override — 2026-09-29
+
+This section is the current backend-allocation policy and overrides older backend-priority text elsewhere in this repository when the two conflict.
+
+- **DX11 Native is the primary implementation/performance lane** (nominal engineering allocation about 50%).
+- **DXVK is the secondary implementation/performance lane** (nominal engineering allocation about 40%) and remains isolated until exact-build Quest 3/VDXR evidence is available.
+- **DX9Ex is maintenance/reference only** (normally <=10%). Do not spend autonomous cycles on new DX9Ex performance tuning or feature expansion. Keep it as the protected visual/regression baseline and fallback; change it only for a critical crash/regression, a deterministic baseline verifier, or work strictly required to compare/unblock DX11/DXVK.
+- **DX12/D3D9On12 is frozen/reference-only.** Do not autonomously implement, build, package, optimize, or promote it unless the user explicitly reopens that lane.
+- Distribution performance work must target hardware below the development RTX 4070. Do not claim a minimum GPU until measured; prioritize scalable PERFORMANCE/BALANCED/QUALITY profiles, frame-time stability, transport/copy/wait reduction, and 72 Hz viability on lower-tier hardware.
+- Single-pass/multiview remains a later optimization candidate only after graphics, lifecycle, selector and two-pass runtime gates are stable.
+- Build/CI success is not runtime or low-end performance proof. Quest 3/VDXR exact-build evidence remains required for visual, pacing and performance claims.
+- Stale queue/history text that still describes active DX9Ex performance or DX12 development must not create new autonomous work; preserve it as history until explicitly reconciled.
+
 ## Interactive chat default
 
 When a user asks to review, fix, build, package, or continue this OutRun2 VR project in chat, follow this contract automatically.
