@@ -879,13 +879,37 @@
   "nextCycle": {
     "cycle": 30,
     "priority": [
-      "consume de7a008 exact-head Build/OpenXR/HUD results",
-      "design positive sampling-issued result at R23RenderProjection boundary",
-      "cover partial first-eye-success/second-eye-failure semantics in LEVEL0 or isolated helper",
-      "do not infer never-sampled from RenderProjection false",
-      "do not wire transition ACK until exact sample evidence exists"
+      "review/fix SkyGlow overbright sky, cloud loss and overall haze before any performance work",
+      "separate global haze from HUD/menu blend or alpha-state contamination",
+      "revalidate exact OutRun result/checkpoint HUD producer ownership and head-follow",
+      "review rival marker exact vehicle/world anchor and per-eye projected depth",
+      "then lens flare, vehicle selector color/3D and pre-race shadow corruption",
+      "only after visual queue is exhausted continue other functional/stability defects"
     ],
-    "guard": "Frozen 34eef500 user-test package remains immutable. No waits/copies/HUD/visual changes and no sampled EVENT ownership changes without evidence."
+    "guard": "User paused performance optimization. Do not create or advance performance-only findings. Frozen 34eef500 HMD package remains immutable; build/static success is not visual success."
   },
-  "updatedKst": "2026-09-29T10:34:00+09:00"
+  "updatedKst": "2026-09-29T10:38:00+09:00",
+  "workPolicy": {
+    "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
+    "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
+    "allowPerformanceChangesOnlyWhen": "directly required to fix a proven visual/functional/stability defect",
+    "priorities": [
+      "SkyGlow/overbright sky/cloud loss/overall haze and color washout",
+      "HUD/menu transparency and blend/render-state contamination",
+      "OutRun checkpoint added time, stage clear time, stage marks, GOAL/result double image and head-follow",
+      "rival/rank marker world anchor, depth/IPD and per-eye projection",
+      "lens flare double image",
+      "vehicle selector 3D/color/translated MANAGED texture corruption",
+      "pre-race lineup shadow split/corruption",
+      "remaining HUD semantic-lifetime issues including 1st/2nd/3rd, 6th/6, white result text",
+      "stage-transition sky regression",
+      "other functional/stability defects: recenter, transitions, startup/white-screen, ResetEx/device lost, OpenXR session/reference-space, DirectGPU lifetime, stale frame/run, crash/resource lifetime"
+    ],
+    "preserve": [
+      "frozen user-test source 34eef500b2f79e7e68477d7ffe675f803e809e01",
+      "menu <> user-confirmed fix",
+      "protected road/background/vehicle stereo",
+      "existing recenter and stage-transition improvements unless direct regression evidence exists"
+    ]
+  }
 }
