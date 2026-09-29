@@ -1,0 +1,100 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00070",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00011",
+  "wave_id_note": "Reconstructed from producer sequence after committed P00010; rollover payload omitted WAVE_ID.",
+  "recorded_at_kst": "2026-09-29T14:36:00+09:00",
+  "base_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483",
+  "selection_base_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483",
+  "material_commit_sha": "6922aaf9931359710cd6983d292baa616aecda70",
+  "pre_task_record_head_sha": "6922aaf9931359710cd6983d292baa616aecda70",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_ODD_FINAL_SHARD_CLASSIFICATION_PLUS_RECONSTRUCTION_INPUT",
+  "summary": "Advanced the remaining fresh odd-shard indices 209/237 without touching shared state. Index 209 has zero canonical text segments in both transcriptions and artwork plan and is flagged NO_LOCALIZABLE_TEXT_PRESERVE_ORIGINAL for C reconciliation. Index 237 pins 5 immutable GitHub source objects, 9 exact stock-to-4x atlas regions, and 6 canonical Korean semantics. No Korean DDS was written; decoded semantic-to-sprite mapping, full-effect bbox/orientation and candidate-only zero-pixel/visual gates remain fail-closed HOLD.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1436-A00070-P00011/A00070_P00011_ODD_FINAL_SHARD_RECONSTRUCTION_INPUTS.json"
+  ],
+  "material_deliverable": {
+    "type": "ODD_FINAL_SHARD_CLASSIFICATION_PLUS_EXACT_RELEASE_ATLAS_RECONSTRUCTION_INPUTS",
+    "indices": [
+      209,
+      237
+    ],
+    "assets": [
+      "B3D9B074",
+      "FF514CEB"
+    ],
+    "index209_disposition": "PROPOSE_PRESERVE_ORIGINAL_FOR_C_RECONCILIATION",
+    "index237_reconstruction_input": "EXACT_GITHUB_SOURCE_AND_4X_ATLAS_GEOMETRY_READY",
+    "exact_github_objects_pinned": 10,
+    "atlas_regions_total": 10,
+    "canonical_semantics_total": 6,
+    "stock_to_4x_geometry": "PASS_10_OF_10_EXACT_X4",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "A00061": {
+      "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+      "assets": [
+        137,
+        217,
+        219,
+        241
+      ]
+    },
+    "A00064": {
+      "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+      "assets": [
+        133,
+        135,
+        139,
+        143
+      ]
+    },
+    "A00065": {
+      "result_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+      "assets": [
+        147,
+        159,
+        161,
+        163
+      ]
+    },
+    "A00067": {
+      "result_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+      "assets": [
+        173,
+        193,
+        201,
+        225
+      ]
+    },
+    "A00068": {
+      "result_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
+      "assets": [
+        175,
+        205,
+        227,
+        231
+      ]
+    }
+  },
+  "self_qa": "PASS_ODD_SHARD_DEDUP__INDEX209_ZERO_SEGMENT_CANONICAL_MATCH__INDEX237_6_OF_6_CANONICAL__10_OF_10_GITHUB_OBJECTS__10_OF_10_X4_GEOMETRY",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "No Korean DDS candidate was written. Index 237 still requires direct decoded source-pixel semantic-to-sprite binding, full glyph/effect bboxes, raw per-element orientation/slant and source-faithful clean-plate proof before rendering. Candidate containment/DDS/alpha/English-source comparison cannot pass without candidate bytes.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
