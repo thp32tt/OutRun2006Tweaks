@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Guard the first bounded R70 renderer-facade modularization step.
+"""Guard bounded R70 renderer-facade modularization.
 
 Set 01 F04 records that stable facades still hide historical .cpp include chains.
-This verifier protects the first reduction: production R23 must compose the base
-renderer plus the reusable R13 overlay directly instead of including
-outrun_renderer_r13.cpp. Runtime behavior is intentionally unchanged.
+Phase 1 extracted R13 into an include-free overlay. Phase 2 does the same for
+R23/R27/R28 so production R29 no longer includes outrun_renderer_r23.cpp.
+These steps change source ownership only; runtime policy must remain unchanged.
 """
 
 from pathlib import Path
@@ -42,15 +42,17 @@ def require_order(data: str, rel: str, *markers: str) -> None:
         )
 
 
-wrapper_rel = "src/vr/game/outrun_renderer_r13.cpp"
-overlay_rel = "src/vr/game/outrun_renderer_r13_overlay.inc"
-r23_rel = "src/vr/game/outrun_renderer_r23.cpp"
+r13_wrapper_rel = "src/vr/game/outrun_renderer_r13.cpp"
+r13_overlay_rel = "src/vr/game/outrun_renderer_r13_overlay.inc"
+r23_wrapper_rel = "src/vr/game/outrun_renderer_r23.cpp"
+r23_overlay_rel = "src/vr/game/outrun_renderer_r23_overlay.inc"
 r29_rel = "src/vr/game/outrun_renderer_r29.cpp"
 facade_rel = "src/vr/d3d9/renderer_pipeline.cpp"
 
-wrapper = read(wrapper_rel)
-overlay = read(overlay_rel)
-r23 = read(r23_rel)
+r13_wrapper = read(r13_wrapper_rel)
+r13_overlay = read(r13_overlay_rel)
+r23_wrapper = read(r23_wrapper_rel)
+r23_overlay = read(r23_overlay_rel)
 r29 = read(r29_rel)
 facade = read(facade_rel)
 cmake_toml = read("cmake.toml")
@@ -58,32 +60,19 @@ cmake_generated = read("CMakeLists.txt")
 openxr_workflow = read(".github/workflows/vr-openxr.yml")
 
 require_order(
-    wrapper,
-    wrapper_rel,
+    r13_wrapper,
+    r13_wrapper_rel,
     '#include "vr/d3d9/r13_bridge.hpp"',
     '#include "outrun_renderer.cpp"',
     '#include "outrun_renderer_r13_overlay.inc"',
 )
-if "namespace OutRunVRRenderer" in wrapper:
+if "namespace OutRunVRRenderer" in r13_wrapper:
     raise SystemExit("R13 compatibility wrapper regained implementation body")
-
-if '#include "outrun_renderer_r13.cpp"' in r23:
-    raise SystemExit("R23 regressed to historical R13 .cpp inclusion")
-require_order(
-    r23,
-    r23_rel,
-    '#include "../runtime_eligibility.hpp"',
-    '#include "../ipc/recenter_request.hpp"',
-    '#include "vr/d3d9/r13_bridge.hpp"',
-    '#include "outrun_renderer.cpp"',
-    '#include "outrun_renderer_r13_overlay.inc"',
-)
-
-if '#include' in overlay:
+if "#include" in r13_overlay:
     raise SystemExit("R13 overlay must remain include-free")
 require(
-    overlay,
-    overlay_rel,
+    r13_overlay,
+    r13_overlay_rel,
     "namespace OutRunVRRenderer",
     "R13CurrentRenderSemantic",
     "SetVertexShaderConstantFDestR13",
@@ -91,7 +80,54 @@ require(
     "VRRendererR13HardeningHook",
 )
 
-require(r29, r29_rel, '#include "outrun_renderer_r23.cpp"')
+if '#include "outrun_renderer_r13.cpp"' in r23_wrapper:
+    raise SystemExit("R23 regressed to historical R13 .cpp inclusion")
+require_order(
+    r23_wrapper,
+    r23_wrapper_rel,
+    '#include "../runtime_eligibility.hpp"',
+    '#include "../ipc/recenter_request.hpp"',
+    '#include "vr/d3d9/r13_bridge.hpp"',
+    '#include "outrun_renderer.cpp"',
+    '#include "outrun_renderer_r13_overlay.inc"',
+    '#include "outrun_renderer_r23_overlay.inc"',
+)
+if "namespace OutRunVRRenderer" in r23_wrapper:
+    raise SystemExit("R23 compatibility wrapper regained implementation body")
+if "#include" in r23_overlay:
+    raise SystemExit("R23 overlay must remain include-free")
+require(
+    r23_overlay,
+    r23_overlay_rel,
+    "namespace OutRunVRRenderer",
+    "R23RendererInstallState",
+    "R23ServiceRenderThreadCleanup",
+    "R28TrackRawWvpWrite",
+    "R23RendererInstallThread",
+    "VRRendererR23EligibilityHook",
+    "GetR28VerifiedProjection",
+)
+
+if '#include "outrun_renderer_r23.cpp"' in r29:
+    raise SystemExit("R29 regressed to historical R23 .cpp inclusion")
+require_order(
+    r29,
+    r29_rel,
+    "#include <limits>",
+    '#include "../runtime_eligibility.hpp"',
+    '#include "../ipc/recenter_request.hpp"',
+    '#include "vr/d3d9/r13_bridge.hpp"',
+    '#include "outrun_renderer.cpp"',
+    '#include "outrun_renderer_r13_overlay.inc"',
+    '#include "outrun_renderer_r23_overlay.inc"',
+)
+require(
+    r29,
+    r29_rel,
+    "R29BuildCoherentUploadEnvelope",
+    "R29InvalidateRendererStateAfterExternalRestore",
+)
+
 require(
     facade,
     facade_rel,
@@ -115,8 +151,18 @@ require(
     "'src/vr/game/outrun_renderer_r13_overlay.inc' = @(",
     "R13FragileEffectNeedsZeroDisparity",
     "shadow/billboard/panel pass kept stock",
+    "'src/vr/game/outrun_renderer_r23_overlay.inc' = @(",
+    "R23RenderThreadCleanupRequested",
+    "R23ServiceRenderThreadCleanup",
+    "recovery pose warmup is stock-visible",
 )
-if "'src/vr/game/outrun_renderer_r13.cpp' = @(" in openxr_workflow:
-    raise SystemExit("OpenXR hardening guard regressed to the compatibility wrapper")
+for stale_guard in (
+    "'src/vr/game/outrun_renderer_r13.cpp' = @(",
+    "'src/vr/game/outrun_renderer_r23.cpp' = @(",
+):
+    if stale_guard in openxr_workflow:
+        raise SystemExit(
+            f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
+        )
 
-print("VR renderer facade modularization F04 phase 1: PASS")
+print("VR renderer facade modularization F04 phase 2: PASS")

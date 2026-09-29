@@ -142,7 +142,7 @@ jobs:
               'R29BuildCoherentUploadEnvelope',
               'R29InvalidateRendererStateAfterExternalRestore'
             )
-            'src/vr/game/outrun_renderer_r23.cpp' = @(
+            'src/vr/game/outrun_renderer_r23_overlay.inc' = @(
               'R23RenderThreadCleanupRequested',
               'R23ServiceRenderThreadCleanup',
               'R23KeepWarmupPoseStockOnRenderThread',
