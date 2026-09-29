@@ -1759,3 +1759,14 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion-first remains: exact-source multistage 133/159/198/201/222/226/232 must be advanced before unrelated source-preflight expansion.
 - Counts remain actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS change or real-game test. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 - This bookkeeping commit is separate from the validation-bearing result and does not own the Gate.
+
+
+## 2026-09-30 03:57 KST - C143 Q00041 INDEPENDENT QA BATCH
+
+- Immutable input: B00199 `9522933476e2cff4f53698b914a7a128418afc7c` — **PASS**.
+- The exact producer result now contains the AUTO marker, durable B00199 task record and material re-emission report in one commit, repairing the sole C140/Q00038 B00190 contract defect.
+- Current contract/inventory/transcription fingerprints are unchanged; 46/100/106 have no candidate bytes. C therefore reused C140-accepted source/semantic heavy QA without repeating Drive/direct/Release probes.
+- Indices **46/100/106** are reaccepted as **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Semantics remain **21/21 + 7/7 + 3 localize**, with OutRun2SP protected original.
+- Candidate-completion-first remains unchanged: exact-source multistage **133/159/198/201/222/226/232** precede unrelated new preflight; source-exhausted fingerprints are sticky.
+- Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS modification, build, N100/local clone/worktree, GPT Library, Drive write, VR/FFB/DX work or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0357-C143/C143_Q00041_INDEPENDENT_QA_BATCH.json`.

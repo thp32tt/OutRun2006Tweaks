@@ -7,11 +7,11 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: none newly proven by Q00040. Indices99/112/130/152/237 remain already-rendered STATIC_QA PASS; do not rerender them. Runtime/final approval remains separate and requires real-game evidence.",
-    "ONE_STAGE_TO_RENDER: none proven by Q00040.",
-    "PREFLIGHT_ONLY CANDIDATE-COMPLETION: prioritize exact-source-acquired multistage indices133/159/198/201/222/226/232 for semantic binding, effect/removal/protected masks, independently QA-passed CLEAN_PLATE and final candidate_safe_bbox before unrelated source-acquisition expansion.",
-    "PREFLIGHT_ONLY SOURCE-EXHAUSTED: 28/30/34/36/48/52/55/103/132/135/139/147/154/164/172/205/214/219/225/228 are sticky until source/inventory/policy fingerprint changes; do not repeat unchanged source probes.",
-    "QA_BACKLOG: producer results outside immutable Q00040 remain for later C batches; current merge-base includes newer B00199@95229334 and it receives no Q00040 disposition."
+    "RENDER_READY: none newly proven by Q00041. Indices99/112/130/152/237 remain already-rendered STATIC_QA PASS; do not rerender them. Runtime/final approval still requires real-game evidence.",
+    "ONE_STAGE_TO_RENDER: none proven by Q00041.",
+    "PREFLIGHT_ONLY CANDIDATE-COMPLETION: prioritize exact-source-acquired multistage indices133/159/198/201/222/226/232 for semantic binding, effect/removal/protected masks, independently QA-passed CLEAN_PLATE and final candidate_safe_bbox before unrelated source preflight.",
+    "PREFLIGHT_ONLY SOURCE-EXHAUSTED: 28/30/34/36/46/48/52/55/100/103/106/132/135/139/147/154/164/172/205/214/219/225/228 are sticky until source/inventory/policy fingerprint changes; do not repeat unchanged source probes.",
+    "QA_BACKLOG: producer results outside immutable Q00041 remain for later independent C batches."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2366,215 +2366,141 @@
   },
   "latest_qa_batch": {
     "schema_version": 11,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00201",
-    "wave_id": "Q00040",
-    "qa_batch_id": "Q00040",
-    "run": "C142",
+    "schema": "outrun-c143-q00041-independent-qa-batch-v1",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00203",
+    "wave_id": "Q00041",
+    "qa_batch_id": "Q00041",
+    "run": "C143",
     "lane": "LOCALIZATION_C",
     "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
     "target_branch": "korean-localization-clean",
     "attempt": "1/3",
-    "recorded_at_kst": "2026-09-30T03:45:00+09:00",
-    "base_head_sha": "9522933476e2cff4f53698b914a7a128418afc7c",
-    "base_sha": "9522933476e2cff4f53698b914a7a128418afc7c",
-    "result": "PASS_Q00040_2_PRODUCERS_8_ASSETS_PREFLIGHT_ONLY_4_SOURCE_EXHAUSTED_4_EXACT_SOURCE_ACQUIRED_RUNTIME_UNTESTED",
-    "summary": "Q00040 independently consumes immutable B00197@ac24b30 and A00196@86a5583. Both exact producer commits are contract-complete. One de-duplicated source pass independently verifies the approved Drive parent, pinned-tag direct paths, pinned v0.25.10a archive identity, eight Release member headers/SHA values, current inventory, and 55/55 current localizable transcription pairs. Indices198/222/226/232 acquire exact canonical source but remain multi-stage PREFLIGHT_ONLY. Indices205/214/219/225 exhaust approved source acquisition and remain PREFLIGHT_ONLY. No Korean candidate bytes exist for this batch, so candidate-only containment/visual/static gates are not promoted. Runtime remains UNTESTED.",
+    "recorded_at_kst": "2026-09-30T03:57:26+09:00",
+    "base_head_sha": "1e563d008f2916d9bc857c8d2e86f793af918c9e",
+    "base_sha": "1e563d008f2916d9bc857c8d2e86f793af918c9e",
+    "result": "PASS_Q00041_B00199_ATOMIC_REEMISSION_REACCEPTED_3_SOURCE_EXHAUSTED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+    "summary": "Q00041 independently consumes immutable B00199@9522933476e2cff4f53698b914a7a128418afc7c. The exact producer result now atomically contains its AUTO marker, durable task record, and material re-emission report, repairing the only C140/Q00038 defect. Current contract/inventory/transcription fingerprints remain unchanged and no candidate bytes exist for indices46/100/106, so C reuses the previously accepted source/semantic heavy QA without repeating source transport or binary checks. All three are reaccepted as PREFLIGHT_ONLY/SOURCE_ACQUISITION_EXHAUSTED. No static or runtime promotion.",
     "qa_batch_inputs": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00197",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00199",
         "lane": "LOCALIZATION_B",
-        "result_sha": "ac24b30ca1ce60407855ddceda705b18cc825e59",
-        "result_message": "localization(B): audit mod3 source ladder indices205/214/226/232 [AUTO:LOCALIZATION-LOCALIZATION_B-00197]",
-        "completed_at": "2026-09-30T03:35:15.810986+09:00",
-        "producer_id": "P00102",
-        "automation_validation": "PENDING",
-        "validation_mode": "C_BATCH_GATE"
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00196",
-        "lane": "LOCALIZATION_A",
-        "result_sha": "86a5583fd9ae02f7c23744ae709da2da82ae501e",
-        "result_message": "localization(A): narrow source ladder indices198/219/222/225 [AUTO:LOCALIZATION-LOCALIZATION_A-00196]",
-        "completed_at": "2026-09-30T03:37:17.132508+09:00",
-        "producer_id": "P00101",
+        "result_sha": "9522933476e2cff4f53698b914a7a128418afc7c",
+        "result_message": "localization(B): atomically re-emit B00190 evidence [AUTO:LOCALIZATION-LOCALIZATION_B-00199]",
+        "completed_at": "2026-09-30T03:44:20.145536+09:00",
+        "producer_id": "P00103",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       }
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00197",
-        "result_sha": "ac24b30ca1ce60407855ddceda705b18cc825e59",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00199",
+        "result_sha": "9522933476e2cff4f53698b914a7a128418afc7c",
         "status": "PASS",
-        "reason": "Exact B00197 result is contract-complete and contains its AUTO marker, durable task record, and lane-local material report. C independently re-lists the approved Drive parent (only 9F060EC1_512x512.dds; selected 4/4 miss), reproduces pinned-tag direct 404 for all four paths, verifies the pinned v0.25.10a ZIP once, and reproduces all four Release member SHA/header identities. Indices205/214 mismatch current canonical identity and are PREFLIGHT_ONLY/SOURCE_ACQUISITION_EXHAUSTED. Indices226/232 exactly match current canonical SHA/canvas and are PREFLIGHT_ONLY exact-source-acquired, but semantic-to-region binding/effect masks/CLEAN_PLATE/final candidate_safe_bbox remain incomplete. No candidate/static/runtime approval; RUNTIME_VALIDATION=UNTESTED."
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00196",
-        "result_sha": "86a5583fd9ae02f7c23744ae709da2da82ae501e",
-        "status": "PASS",
-        "reason": "Exact A00196 result is contract-complete and correctly stopped before falsely claiming source exhaustion while Release fallback was unconsumed. C independently consumes that remaining approved tier using the same pinned ZIP. Index198 Release member exactly matches canonical SHA/canvas and is RGBA32 mip1; index222 exactly matches canonical raw SHA/canvas and has DXT5 mip1 header. Their prior pre-generation geometry remains insufficient for rendering because source-effect/removal masks, independently QA-passed CLEAN_PLATE, final candidate_safe_bbox, and/or exact semantic binding remain incomplete. Indices219/225 mismatch canonical identity after Drive miss + pinned-direct 404 + Release comparison and become PREFLIGHT_ONLY/SOURCE_ACQUISITION_EXHAUSTED. No candidate/static/runtime approval; RUNTIME_VALIDATION=UNTESTED."
+        "reason": "B00199 repairs the sole C140/Q00038 producer-contract defect: immutable result 9522933476e2cff4f53698b914a7a128418afc7c contains the exact AUTO marker, durable B00199 task record, and lane-local material re-emission report in the same commit. Current automation contract, controller roles, canonical inventory and transcriptions are unchanged from the producer/reused C140 fingerprint; current queue classifications for indices46/100/106 remain localize_text/pending_artwork/transcribed_reviewed and no current candidate bytes exist. C therefore reuses the already accepted heavy source/semantic QA rather than repeating Drive/direct/Release checks. Indices46/100/106 are reaccepted as PREFLIGHT_ONLY/SOURCE_ACQUISITION_EXHAUSTED. No candidate/static/runtime approval; RUNTIME_VALIDATION=UNTESTED."
       }
     ],
+    "immutable_input_resolution": {
+      "task_record_at_result_sha": true,
+      "material_report_at_result_sha": true,
+      "auto_marker_at_result_sha": true,
+      "exact_result_sha": "9522933476e2cff4f53698b914a7a128418afc7c",
+      "superseded_by_newer_candidate": false,
+      "current_candidate_hits": 0
+    },
     "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
     "current_controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
-    "source_identity_validation": "PASS_CURRENT_INVENTORY_8_OF_8__APPROVED_DRIVE_EXACT_MISS_8_OF_8__PINNED_DIRECT_404_8_OF_8__PINNED_ZIP_306223257_BYTES_SHA256_76F85ED2_EXACT__RELEASE_MEMBER_HEADER_SHA_REPRODUCED_8_OF_8__CANONICAL_EXACT_4_OF_8__MISMATCH_FAIL_CLOSED_4_OF_8",
-    "canonical_semantic_validation": "PASS_CURRENT_TRANSCRIPTIONS_55_OF_55_LOCALIZABLE_PAIRS__PROTECTED_SONG_MODEL_BRAND_LOGO_ARTWORK_PRESERVED",
-    "geometry_mapping_validation": "NOT_PROMOTED_NO_CANDIDATE__EXACT_SOURCE_198_222_226_232_STILL_REQUIRE_MULTI_STAGE_BINDING_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_WORK",
-    "current_contract_compatibility": "PASS_B00197_AND_A00196_EXACT_RESULT_SHAS_INCLUDE_AUTO_MARKER_DURABLE_TASK_RECORD_AND_LANE_LOCAL_MATERIAL_REPORT",
-    "release_bundle": {
-      "name": "OR2-HD-GUI-v0.25.10a.zip",
-      "bytes": 306223257,
-      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-      "hash_verified_once_for_batch": true
+    "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "heavy_qa_reuse": {
+      "rule": "REUSE_IDENTICAL_SOURCE_CANDIDATE_CONTRACT_FINGERPRINTS",
+      "source_semantic_fingerprint": "UNCHANGED_FROM_C140_Q00038_ATTEMPT2",
+      "c140_gate_repair_report": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
+      "b00190_source_report": "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
+      "b00199_reemission_report": "localization/graphics/role_B/20260930-B00199-P00103/B00199_P00103_B00190_ATOMIC_REEMISSION.json",
+      "contract_unchanged": true,
+      "inventory_unchanged": true,
+      "transcriptions_unchanged": true,
+      "source_or_candidate_dependency_change": false,
+      "source_transport_repeated": false,
+      "release_bundle_redownloaded": false,
+      "candidate_pixel_qa_repeated": false
     },
-    "drive_parent_validation": {
-      "account": "ezflash557",
-      "folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
-      "observed_children": [
-        "9F060EC1_512x512.dds"
-      ],
-      "selected_exact_path_misses": 8,
-      "read_only": true
-    },
-    "pinned_direct_validation": {
-      "repository": "envido32/OR2006Sprites",
-      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
-      "exact_path_404": 8
-    },
-    "assets": [
+    "reviewed_assets": [
       {
-        "index": 198,
-        "asset": "9FC88069",
-        "canonical_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
-        "release_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
-        "release_width": 4096,
-        "release_height": 2048,
-        "release_format": "RGBA32",
-        "mip_count": 1,
-        "source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
-        "production_readiness": "PREFLIGHT_ONLY",
-        "remaining": [
-          "effect-inclusive source text bbox/removal+protected masks",
-          "independently QA-passed CLEAN_PLATE",
-          "final v2 candidate_safe_bbox",
-          "raw/readable orientation/header details not yet promoted to render contract"
-        ]
-      },
-      {
-        "index": 219,
-        "asset": "D263B3F1",
-        "canonical_sha256": "489fec388b636cd681e3d691ef9b5026a9036e1fbfd2948845d327a184050084",
-        "release_sha256": "6cb45f18647bb20965d89c9e6e48b427241ea08edccf7b09be3aa53af213555d",
-        "release_width": 2048,
-        "release_height": 2048,
-        "release_format": "RGBA32",
-        "mip_count": 1,
+        "index": 46,
+        "asset": "AA04D779",
+        "canonical_sha256": "5a4ca513da3545b7da91e62fd27692f39fc211a93983122a193db79c254f28b0",
+        "canonical_canvas": [
+          512,
+          512
+        ],
+        "canonical_mode": "RGBA",
+        "reused_pinned_lineage_blob": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "reused_pinned_canvas": [
+          2048,
+          2048
+        ],
+        "semantic_validation": "PASS_21_OF_21",
         "source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
-        "production_readiness": "PREFLIGHT_ONLY"
-      },
-      {
-        "index": 222,
-        "asset": "DDF0392A",
-        "canonical_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
-        "release_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
-        "release_width": 1024,
-        "release_height": 2048,
-        "release_format": "DXT5",
-        "mip_count": 1,
-        "source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
         "production_readiness": "PREFLIGHT_ONLY",
-        "identity_note": "Exact raw SHA-256 equality is authoritative. inventory mode=RGBA is decoded-image metadata and does not override the raw DDS DXT5 header.",
-        "remaining": [
-          "exact semantic-to-region binding",
-          "effect-inclusive source bboxes/removal+protected masks",
-          "independently QA-passed CLEAN_PLATE",
-          "final v2 candidate_safe_bbox"
-        ]
+        "candidate_exists": false
       },
       {
-        "index": 225,
-        "asset": "E3C455FA",
-        "canonical_sha256": "03d29bbabcffa88887dd538b30a35348b28d3a556026c2c63cbb824d70dabc36",
-        "release_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
-        "release_width": 2048,
-        "release_height": 1024,
-        "release_format": "RGBA32",
-        "mip_count": 1,
+        "index": 100,
+        "asset": "53CE39D5",
+        "canonical_sha256": "3bfea3882b73ec133cd8badca8f9be67c130d4f4b277c52bbc6d2b1c4014efa5",
+        "canonical_canvas": [
+          512,
+          512
+        ],
+        "canonical_mode": "RGBA",
+        "reused_pinned_lineage_blob": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
+        "reused_pinned_canvas": [
+          2048,
+          2048
+        ],
+        "semantic_validation": "PASS_7_OF_7",
         "source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
-        "production_readiness": "PREFLIGHT_ONLY"
-      },
-      {
-        "index": 205,
-        "asset": "ACF61D7C",
-        "canonical_sha256": "34cadbc0b33b6280978c81614a9347ad667cbe8279cf105dc8623ebd13888f07",
-        "release_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
-        "release_width": 4096,
-        "release_height": 2048,
-        "release_format": "RGBA32",
-        "mip_count": 1,
-        "source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
-        "production_readiness": "PREFLIGHT_ONLY"
-      },
-      {
-        "index": 214,
-        "asset": "BF229CF4",
-        "canonical_sha256": "9a2e428bdb87399a7589338053b49efdcfd103d14f12a33a4bcde7705ab76c6b",
-        "release_sha256": "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071",
-        "release_width": 2048,
-        "release_height": 2048,
-        "release_format": "RGBA32",
-        "mip_count": 1,
-        "source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
-        "production_readiness": "PREFLIGHT_ONLY"
-      },
-      {
-        "index": 226,
-        "asset": "E3F4BA07",
-        "canonical_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
-        "release_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
-        "release_width": 2048,
-        "release_height": 512,
-        "release_format": "RGBA32",
-        "mip_count": 1,
-        "source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
         "production_readiness": "PREFLIGHT_ONLY",
-        "remaining": [
-          "semantic-to-region binding for atlas regions",
-          "effect-inclusive source bboxes/removal+protected masks",
-          "independently QA-passed CLEAN_PLATE",
-          "final v2 candidate_safe_bbox"
-        ]
+        "candidate_exists": false
       },
       {
-        "index": 232,
-        "asset": "EBFC709F",
-        "canonical_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
-        "release_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
-        "release_width": 2048,
-        "release_height": 1024,
-        "release_format": "RGBA32",
-        "mip_count": 1,
-        "source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+        "index": 106,
+        "asset": "788CE557",
+        "canonical_sha256": "b9e7d15a4561bac2267f8dea1bc5561825acadddd3632763a5fd67ddfab7814a",
+        "canonical_canvas": [
+          512,
+          256
+        ],
+        "canonical_mode": "RGBA",
+        "reused_pinned_lineage_blob": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
+        "reused_pinned_canvas": [
+          2048,
+          1024
+        ],
+        "semantic_validation": "PASS_3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE_ORIGINAL",
+        "source_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
         "production_readiness": "PREFLIGHT_ONLY",
-        "remaining": [
-          "semantic-to-region binding for atlas regions",
-          "effect-inclusive source bboxes/removal+protected masks",
-          "independently QA-passed CLEAN_PLATE",
-          "final v2 candidate_safe_bbox"
-        ]
+        "candidate_exists": false
       }
     ],
+    "source_identity_validation": "PASS_REUSED_C140_ACCEPTED_UNCHANGED_FINGERPRINT__CANONICAL_1X_RGBA_VS_PINNED_4X_RGBA32_MISMATCH_3_OF_3__SOURCE_ACQUISITION_EXHAUSTED",
+    "canonical_semantic_validation": "PASS_31_OF_31_LOCALIZABLE_PAIRS__OUTRUN2SP_PROTECTED_ORIGINAL_RETAINED",
+    "candidate_only_gates": {
+      "korean_candidate_dds": "HOLD_NO_CANDIDATE",
+      "hangul_breakage_and_clipping": "HOLD_NO_CANDIDATE_PIXELS",
+      "one_pixel_containment": "HOLD_NO_CANDIDATE",
+      "dds_candidate_format_mipmap_alpha_transparency": "HOLD_NO_CANDIDATE",
+      "background_protected_artwork": "HOLD_NO_CANDIDATE",
+      "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE"
+    },
     "readiness_reconciliation": {
-      "classification": "EIGHT_PREFLIGHT_ONLY__FOUR_SOURCE_EXHAUSTED__FOUR_EXACT_SOURCE_ACQUIRED_MULTI_STAGE_INCOMPLETE",
+      "classification": "B00199_DIRECT_CONTRACT_REWORK_REACCEPTED__3_PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
       "production_readiness": {
-        "198": "PREFLIGHT_ONLY",
-        "205": "PREFLIGHT_ONLY",
-        "214": "PREFLIGHT_ONLY",
-        "219": "PREFLIGHT_ONLY",
-        "222": "PREFLIGHT_ONLY",
-        "225": "PREFLIGHT_ONLY",
-        "226": "PREFLIGHT_ONLY",
-        "232": "PREFLIGHT_ONLY"
+        "46": "PREFLIGHT_ONLY",
+        "100": "PREFLIGHT_ONLY",
+        "106": "PREFLIGHT_ONLY"
       },
       "render_ready_indices": [],
       "one_stage_to_render_indices": [],
@@ -2583,10 +2509,13 @@
         30,
         34,
         36,
+        46,
         48,
         52,
         55,
+        100,
         103,
+        106,
         132,
         133,
         135,
@@ -2607,22 +2536,23 @@
         228,
         232
       ],
-      "already_rendered_static_qa_pass_indices": [
-        99,
-        112,
-        130,
-        152,
-        237
+      "newly_reaccepted_source_exhausted_indices": [
+        46,
+        100,
+        106
       ],
       "source_acquisition_exhausted_indices": [
         28,
         30,
         34,
         36,
+        46,
         48,
         52,
         55,
+        100,
         103,
+        106,
         132,
         135,
         139,
@@ -2645,47 +2575,30 @@
         226,
         232
       ],
+      "already_rendered_static_qa_pass_indices": [
+        99,
+        112,
+        130,
+        152,
+        237
+      ],
       "candidate_completion_priority": [
-        "RENDER_READY: none newly proven by Q00040. Indices99/112/130/152/237 remain already-rendered STATIC_QA PASS and must not be rerendered. Runtime/final approval remains separate.",
-        "ONE_STAGE_TO_RENDER: none proven by Q00040.",
-        "PREFLIGHT_ONLY CANDIDATE-COMPLETION: prioritize exact-source-acquired multistage indices133/159/198/201/222/226/232 for binding/masks/CLEAN_PLATE/safe-bbox completion before expanding unrelated source-acquisition preflight.",
-        "PREFLIGHT_ONLY SOURCE-EXHAUSTED: indices28/30/34/36/48/52/55/103/132/135/139/147/154/164/172/205/214/219/225/228 are sticky until source/inventory/policy fingerprint changes; do not repeat unchanged source probes.",
-        "QA_BACKLOG: newer producer results outside Q00040, including B00199@95229334, remain for later independent C disposition."
+        "RENDER_READY: none newly proven by Q00041. Indices99/112/130/152/237 remain already-rendered STATIC_QA PASS and must not be rerendered; runtime/final approval remains separate.",
+        "ONE_STAGE_TO_RENDER: none proven by Q00041.",
+        "PREFLIGHT_ONLY CANDIDATE-COMPLETION: prioritize exact-source-acquired multistage indices133/159/198/201/222/226/232 for semantic binding, effect/removal/protected masks, independently QA-passed CLEAN_PLATE and final candidate_safe_bbox before unrelated source-acquisition expansion.",
+        "PREFLIGHT_ONLY SOURCE-EXHAUSTED: indices28/30/34/36/46/48/52/55/100/103/106/132/135/139/147/154/164/172/205/214/219/225/228 are sticky until source/inventory/policy fingerprint changes; do not repeat unchanged source probes.",
+        "QA_BACKLOG: producer results outside immutable Q00041 remain for later independent C disposition."
       ]
     },
-    "heavy_qa_reuse": {
-      "release_archive_hashed_once_for_batch": true,
-      "release_members_inspected_once_each": 8,
-      "drive_parent_listed_once_for_batch": true,
-      "pinned_direct_probes_once_each": 8,
-      "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
-      "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
-      "canonical_pairs_checked": 55,
-      "candidate_pixel_qa_repeated": false,
-      "candidate_visual_qa_repeated": false
-    },
-    "candidate_only_gates": {
-      "korean_candidate_dds": "HOLD_NO_CANDIDATE_IN_Q00040",
-      "hangul_breakage_and_clipping": "HOLD_NO_CANDIDATE_PIXELS",
-      "one_pixel_containment": "HOLD_NO_CANDIDATE",
-      "dds_candidate_format_mipmap_alpha_transparency": "HOLD_NO_CANDIDATE",
-      "background_protected_artwork": "HOLD_NO_CANDIDATE",
-      "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE"
-    },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+      "type": "INDEPENDENT_C_QA_ATOMIC_REEMISSION_REACCEPTANCE_SHARED_STATE_RECONCILIATION",
       "reviewed_indices": [
-        198,
-        205,
-        214,
-        219,
-        222,
-        225,
-        226,
-        232
+        46,
+        100,
+        106
       ],
-      "reviewed_assets": 8,
-      "producer_inputs_pass": 2,
+      "reviewed_assets": 3,
+      "producer_inputs_pass": 1,
       "producer_inputs_rework_required": 0,
       "producer_inputs_hold_strict_recheck": 0,
       "producer_inputs_superseded": 0,
@@ -2693,25 +2606,19 @@
       "canonical_segments_after_merge": 753,
       "actionable_localize_text_after": 93,
       "pending_production_localize_text_after": 71,
-      "source_acquisition_exhausted_new": 4,
-      "exact_canonical_sources_acquired_new": 4,
       "candidate_dds_modified_by_c": false,
       "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
-      "report": "localization/graphics/role_C/20260930-0345-C142/C142_Q00040_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260930-0357-C143/C143_Q00041_INDEPENDENT_QA_BATCH.json"
     },
     "evidence": [
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00197.json@ac24b30ca1ce60407855ddceda705b18cc825e59",
-      "localization/graphics/role_B/20260930-B00197-P00102/B00197_P00102_MOD3_SOURCE_LADDER_BATCH.json@ac24b30ca1ce60407855ddceda705b18cc825e59",
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00196.json@86a5583fd9ae02f7c23744ae709da2da82ae501e",
-      "localization/graphics/role_A/20260930-A00196-P00101/A00196_P00101_MOD3_RELEASE_FALLBACK_MANIFEST.json@86a5583fd9ae02f7c23744ae709da2da82ae501e",
-      "localization/graphics/inventory.csv",
-      "localization/graphics/transcriptions.jsonl",
-      "localization/graphics/role_C/20260930-0345-C142/C142_Q00040_INDEPENDENT_QA_BATCH.json"
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00199.json@9522933476e2cff4f53698b914a7a128418afc7c",
+      "localization/graphics/role_B/20260930-B00199-P00103/B00199_P00103_B00190_ATOMIC_REEMISSION.json@9522933476e2cff4f53698b914a7a128418afc7c",
+      "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
+      "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
+      "localization/graphics/role_C/20260930-0357-C143/C143_Q00041_INDEPENDENT_QA_BATCH.json"
     ],
     "candidate_dds_modified": false,
-    "new_static_artwork_passes": 0,
-    "new_runtime_approvals": 0,
     "shared_state_modified": true,
     "peer_candidate_files_modified": false,
     "runtime_test_performed": false,
@@ -2719,24 +2626,12 @@
     "n100_used": false,
     "local_clone_used": false,
     "gpt_library_used": false,
-    "google_drive_used": true,
+    "google_drive_used": false,
     "google_drive_write_performed": false,
-    "uploaded_archive_used": true,
+    "uploaded_archive_used": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "validation_mode": "C_BATCH_GATE",
-    "runtime_validation": "UNTESTED",
-    "result_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
-    "validation_bearing_result_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36614790150,
-      "run_attempt": 1,
-      "head_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-09-30T03:49:41+09:00"
-    },
-    "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner."
+    "runtime_validation": "UNTESTED"
   }
 }
