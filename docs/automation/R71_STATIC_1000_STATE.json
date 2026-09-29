@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 40,
+  "completedCycles": 60,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "d531d1501041be3df8c9a59124d05d9516d89713",
+  "currentHead": "4cde872370d8dbb86a659e5d46dad18063ba7a13",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1180,16 +1180,537 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "consume latest exact-head CI; instrument selector texture/material ownership if still unproven"
+    },
+    {
+      "cycle": 41,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "DX9Ex selector white/colorless regression still lacks an exact texture/material owner; broad HUD or SkyGlow state changes are not evidence-backed."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "selector draw must be bound to exact texture/material evidence"
+    },
+    {
+      "cycle": 42,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Material/texture-stage mutation without exact selector draw identity risks changing world geometry globally; keep fail-closed."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "instrument exact selector draw state before mutation"
+    },
+    {
+      "cycle": 43,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "HUD ownership must remain canonical producer based; alpha/blend values are evidence to log, not classification inputs."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "collect owned-draw alpha/blend evidence"
+    },
+    {
+      "cycle": 44,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu translucency cannot justify global ALPHABLEND override because intentional translucent UI exists."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "separate menu producer evidence from global state"
+    },
+    {
+      "cycle": 45,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Checkpoint remaining-time duplication is mode-specific and should be traced to exact producer lifetime, not generic sprite suppression."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact checkpoint queue lifetime"
+    },
+    {
+      "cycle": 46,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Final-result split/double image needs exact queue/producer evidence before suppression."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace result-screen producer lifetime"
+    },
+    {
+      "cycle": 47,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "ProjectedWorldMarker2D must remain distinct from ScreenHud to preserve projected world anchoring."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact stage marker producer"
+    },
+    {
+      "cycle": 48,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "WorldBillboard must remain depth/world aware; do not flatten rival markers into HUD."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace rival marker depth evidence"
+    },
+    {
+      "cycle": 49,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "SkyGlow save/restore covers blend, alpha, shaders, texture, sampler, viewport and targets; no static leak is proven."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "retain pre-HUD fail-safe pending HMD"
+    },
+    {
+      "cycle": 50,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Hosted validation is in progress; absence of a result is not PASS and does not justify runtime changes."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "consume CI only when completed"
+    },
+    {
+      "cycle": 51,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "DX9Ex selector white/colorless regression still lacks an exact texture/material owner; broad HUD or SkyGlow state changes are not evidence-backed."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "selector draw must be bound to exact texture/material evidence"
+    },
+    {
+      "cycle": 52,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Material/texture-stage mutation without exact selector draw identity risks changing world geometry globally; keep fail-closed."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "instrument exact selector draw state before mutation"
+    },
+    {
+      "cycle": 53,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "HUD ownership must remain canonical producer based; alpha/blend values are evidence to log, not classification inputs."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "collect owned-draw alpha/blend evidence"
+    },
+    {
+      "cycle": 54,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu translucency cannot justify global ALPHABLEND override because intentional translucent UI exists."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "separate menu producer evidence from global state"
+    },
+    {
+      "cycle": 55,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Checkpoint remaining-time duplication is mode-specific and should be traced to exact producer lifetime, not generic sprite suppression."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact checkpoint queue lifetime"
+    },
+    {
+      "cycle": 56,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Final-result split/double image needs exact queue/producer evidence before suppression."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace result-screen producer lifetime"
+    },
+    {
+      "cycle": 57,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "ProjectedWorldMarker2D must remain distinct from ScreenHud to preserve projected world anchoring."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace exact stage marker producer"
+    },
+    {
+      "cycle": 58,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "WorldBillboard must remain depth/world aware; do not flatten rival markers into HUD."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace rival marker depth evidence"
+    },
+    {
+      "cycle": 59,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "SkyGlow save/restore covers blend, alpha, shaders, texture, sampler, viewport and targets; no static leak is proven."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "retain pre-HUD fail-safe pending HMD"
+    },
+    {
+      "cycle": 60,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Hosted validation is in progress; absence of a result is not PASS and does not justify runtime changes."
+      ],
+      "evidence": [
+        "current R71 exact semantic/state boundary review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "4cde872370d8dbb86a659e5d46dad18063ba7a13"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / HOSTED_CI_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "consume CI only when completed"
     }
   ],
   "nextCycle": {
-    "cycle": 41,
+    "cycle": 61,
     "priority": [
-      "consume latest exact-head CI; instrument selector texture/material ownership if still unproven"
+      "consume hosted CI when completed",
+      "continue exact visual ownership review"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
-  "updatedKst": "2026-09-29T12:20:00+09:00",
+  "updatedKst": "2026-09-29T12:29:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
