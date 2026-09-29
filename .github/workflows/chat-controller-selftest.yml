@@ -144,9 +144,12 @@ jobs:
 
       - name: Verify missing Actions run recovery
         run: |
+          grep -Fq 'QUEUE_RESULT_GRACE_SECONDS: "180"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq '"queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS' /tmp/controller.py
+          grep -Fq 'no-response grace {QUEUE_RESULT_GRACE_SECONDS}s' /tmp/controller.py
           grep -Fq 'def github_actions_skip_directive' /tmp/controller.py
           grep -Fq 'if github_actions_skip_directive(message):' /tmp/controller.py
           grep -Fq 'async def recover_missing_gate_run' /tmp/controller.py
