@@ -1714,10 +1714,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Required repair: re-emit B00190 material payload + durable task record atomically under the exact AUTO marker. No DDS bytes/build/runtime test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json`.
 
-## 2026-09-30 03:26 KST - C140 Q00038 ATTEMPT 2 GATE PASS
+## 2026-09-30 03:31 KST - C140 Q00038 ATTEMPT 2 AUTHORITATIVE GATE PASS
 
-- Validation-bearing result `fdeaa9b4e98f5919f8f1615eeb9db32580065d85`; Localization Automation Gate `36611801924` completed **success**.
-- Authoritative Q00038 disposition is **HOLD_STRICT_RECHECK** for B00190 `5969fd31...`. Attempt-1 PASS promotion is withdrawn from queue/progress/resume shared state.
-- Independent source evidence remains consistent but cannot be promoted from that immutable producer result because its exact result diff lacks the unique B00190 durable task record. B must re-emit a current-contract result before later C PASS.
+- Authoritative validation-bearing result: `eb395208c34498da655106ea5d9f4f6ebc72c167`; Localization Automation Gate `36612087138` completed **success**.
+- Q00038 disposition is **REWORK_REQUIRED** for B00190 `5969fd31...`. Exact producer replay cannot PASS because the material result commit does not itself include the unique durable B00190 task record; the task record was staged in its parent.
+- Independent Drive/direct/inventory/semantic evidence remains internally consistent, but indices46/100/106 receive no readiness/static/runtime promotion from the malformed immutable producer result. B must atomically re-emit equivalent current-contract evidence for a later C batch.
+- Concurrent same-attempt result `fdeaa9b4...` / Gate `36611801924` is superseded by the later authoritative `eb395208...` REWORK_REQUIRED result.
 - Counts remain actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS change or real-game test. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
