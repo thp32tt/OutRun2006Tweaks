@@ -1,0 +1,547 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00202-index226-exact-binding-render-qa-persistence-hold-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+  "wave_id": "P00105",
+  "lane": "LOCALIZATION_B",
+  "queue_index": 226,
+  "asset": "E3F4BA07",
+  "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+  "recorded_at_kst": "2026-09-30T04:28:58.076+09:00",
+  "base_head_sha": "bf85838ea9ce2b1cb776ed2c987a8a9b75ea7e01",
+  "source": {
+    "transport": "approved_pinned_v0.25.10a_release_bundle",
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+    "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+    "bytes": 4194432,
+    "width": 2048,
+    "height": 512,
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y",
+    "canonical_inventory_match": true,
+    "header_128_sha256": "db8b5f3df045aa54a0a573d78a44ba811308d9cb09a700ff7abe6147c5593eb4"
+  },
+  "semantic_binding": {
+    "status": "PASS_EXACT_SOURCE_DIRECT_PIXEL_BINDING_10_OF_10",
+    "atlas_regions": 10,
+    "localize_regions": 8,
+    "protected_regions": 2,
+    "protected": [
+      "OUTRUN2SP",
+      "OUTRUN2"
+    ],
+    "mapping": [
+      {
+        "sprite": "sprite_296",
+        "source": "STAGE",
+        "korean": "스테이지",
+        "action": "localize",
+        "raw_cell": [
+          0,
+          0,
+          980,
+          88
+        ],
+        "source_effect_bbox_raw": [
+          0,
+          12,
+          237,
+          88
+        ],
+        "source_effect_bbox_readable": [
+          0,
+          424,
+          237,
+          500
+        ],
+        "source_effect_pixels": 14597
+      },
+      {
+        "sprite": "sprite_297",
+        "source": "OUTRUN2SP",
+        "korean": null,
+        "action": "protect",
+        "raw_cell": [
+          980,
+          0,
+          1960,
+          88
+        ],
+        "source_effect_bbox_raw": [
+          983,
+          18,
+          1416,
+          88
+        ],
+        "source_effect_bbox_readable": [
+          983,
+          424,
+          1416,
+          494
+        ],
+        "source_effect_pixels": 19681
+      },
+      {
+        "sprite": "sprite_298",
+        "source": "OUTRUN2",
+        "korean": null,
+        "action": "protect",
+        "raw_cell": [
+          0,
+          88,
+          980,
+          176
+        ],
+        "source_effect_bbox_raw": [
+          3,
+          88,
+          352,
+          174
+        ],
+        "source_effect_bbox_readable": [
+          3,
+          338,
+          352,
+          424
+        ],
+        "source_effect_pixels": 20379
+      },
+      {
+        "sprite": "sprite_299",
+        "source": "GOAL E",
+        "korean": "골 E",
+        "action": "localize",
+        "raw_cell": [
+          980,
+          88,
+          1960,
+          176
+        ],
+        "source_effect_bbox_raw": [
+          980,
+          88,
+          1355,
+          174
+        ],
+        "source_effect_bbox_readable": [
+          980,
+          338,
+          1355,
+          424
+        ],
+        "source_effect_pixels": 10994
+      },
+      {
+        "sprite": "sprite_300",
+        "source": "GOAL D",
+        "korean": "골 D",
+        "action": "localize",
+        "raw_cell": [
+          0,
+          176,
+          980,
+          264
+        ],
+        "source_effect_bbox_raw": [
+          4,
+          186,
+          264,
+          258
+        ],
+        "source_effect_bbox_readable": [
+          4,
+          254,
+          264,
+          326
+        ],
+        "source_effect_pixels": 13719
+      },
+      {
+        "sprite": "sprite_301",
+        "source": "GOAL C",
+        "korean": "골 C",
+        "action": "localize",
+        "raw_cell": [
+          980,
+          176,
+          1960,
+          264
+        ],
+        "source_effect_bbox_raw": [
+          983,
+          186,
+          1234,
+          258
+        ],
+        "source_effect_bbox_readable": [
+          983,
+          254,
+          1234,
+          326
+        ],
+        "source_effect_pixels": 10604
+      },
+      {
+        "sprite": "sprite_302",
+        "source": "GOAL B",
+        "korean": "골 B",
+        "action": "localize",
+        "raw_cell": [
+          0,
+          264,
+          980,
+          352
+        ],
+        "source_effect_bbox_raw": [
+          4,
+          278,
+          265,
+          342
+        ],
+        "source_effect_bbox_readable": [
+          4,
+          170,
+          265,
+          234
+        ],
+        "source_effect_pixels": 12013
+      },
+      {
+        "sprite": "sprite_303",
+        "source": "GOAL A",
+        "korean": "골 A",
+        "action": "localize",
+        "raw_cell": [
+          980,
+          264,
+          1960,
+          352
+        ],
+        "source_effect_bbox_raw": [
+          986,
+          278,
+          1242,
+          342
+        ],
+        "source_effect_bbox_readable": [
+          986,
+          170,
+          1242,
+          234
+        ],
+        "source_effect_pixels": 8288
+      },
+      {
+        "sprite": "sprite_304",
+        "source": "GOAL",
+        "korean": "골",
+        "action": "localize",
+        "raw_cell": [
+          0,
+          352,
+          980,
+          440
+        ],
+        "source_effect_bbox_raw": [
+          4,
+          362,
+          203,
+          426
+        ],
+        "source_effect_bbox_readable": [
+          4,
+          86,
+          203,
+          150
+        ],
+        "source_effect_pixels": 9259
+      },
+      {
+        "sprite": "sprite_305",
+        "source": "15 STAGE CONTINUOUS",
+        "korean": "15코스 연속",
+        "action": "localize",
+        "raw_cell": [
+          980,
+          352,
+          1960,
+          440
+        ],
+        "source_effect_bbox_raw": [
+          985,
+          362,
+          1809,
+          426
+        ],
+        "source_effect_bbox_readable": [
+          985,
+          86,
+          1809,
+          150
+        ],
+        "source_effect_pixels": 28252
+      }
+    ]
+  },
+  "clean_plate": {
+    "method": "zero exact any-nonzero-RGBA source footprint in eight positively bound localize cells only; preserve two protected cells byte-exact",
+    "source_removal_pixels": 107726,
+    "changed_pixels_outside_removal_mask": 0,
+    "protected_cells_exact": true,
+    "clean_plate_rgba_sha256": "777e0d8b13b90d711f7b43f073395c3abab363e6fb7665b963f88c55a93cca4d",
+    "machine_qa": "PASS"
+  },
+  "style": {
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+    "fill_rgb": [
+      79,
+      97,
+      101
+    ],
+    "outline_shadow_glow": "none",
+    "horizontal_condense_policy": "only when required to preserve source height and source-region containment"
+  },
+  "render_metrics": [
+    {
+      "source": "STAGE",
+      "korean": "스테이지",
+      "source_bbox_readable": [
+        0,
+        424,
+        237,
+        500
+      ],
+      "safe_bbox_readable": [
+        2,
+        426,
+        235,
+        498
+      ],
+      "localized_bbox_readable": [
+        2,
+        426,
+        235,
+        498
+      ],
+      "font_size_px": 75,
+      "horizontal_scale": 0.879245
+    },
+    {
+      "source": "GOAL E",
+      "korean": "골 E",
+      "source_bbox_readable": [
+        980,
+        338,
+        1355,
+        424
+      ],
+      "safe_bbox_readable": [
+        982,
+        340,
+        1353,
+        422
+      ],
+      "localized_bbox_readable": [
+        982,
+        340,
+        1134,
+        422
+      ],
+      "font_size_px": 91,
+      "horizontal_scale": 1
+    },
+    {
+      "source": "GOAL D",
+      "korean": "골 D",
+      "source_bbox_readable": [
+        4,
+        254,
+        264,
+        326
+      ],
+      "safe_bbox_readable": [
+        6,
+        256,
+        262,
+        324
+      ],
+      "localized_bbox_readable": [
+        6,
+        256,
+        139,
+        324
+      ],
+      "font_size_px": 75,
+      "horizontal_scale": 1
+    },
+    {
+      "source": "GOAL C",
+      "korean": "골 C",
+      "source_bbox_readable": [
+        983,
+        254,
+        1234,
+        326
+      ],
+      "safe_bbox_readable": [
+        985,
+        256,
+        1232,
+        324
+      ],
+      "localized_bbox_readable": [
+        985,
+        256,
+        1116,
+        324
+      ],
+      "font_size_px": 75,
+      "horizontal_scale": 1
+    },
+    {
+      "source": "GOAL B",
+      "korean": "골 B",
+      "source_bbox_readable": [
+        4,
+        170,
+        265,
+        234
+      ],
+      "safe_bbox_readable": [
+        6,
+        172,
+        263,
+        232
+      ],
+      "localized_bbox_readable": [
+        6,
+        172,
+        123,
+        231
+      ],
+      "font_size_px": 66,
+      "horizontal_scale": 1
+    },
+    {
+      "source": "GOAL A",
+      "korean": "골 A",
+      "source_bbox_readable": [
+        986,
+        170,
+        1242,
+        234
+      ],
+      "safe_bbox_readable": [
+        988,
+        172,
+        1240,
+        232
+      ],
+      "localized_bbox_readable": [
+        988,
+        172,
+        1105,
+        231
+      ],
+      "font_size_px": 66,
+      "horizontal_scale": 1
+    },
+    {
+      "source": "GOAL",
+      "korean": "골",
+      "source_bbox_readable": [
+        4,
+        86,
+        203,
+        150
+      ],
+      "safe_bbox_readable": [
+        6,
+        88,
+        201,
+        148
+      ],
+      "localized_bbox_readable": [
+        6,
+        88,
+        62,
+        147
+      ],
+      "font_size_px": 66,
+      "horizontal_scale": 1
+    },
+    {
+      "source": "15 STAGE CONTINUOUS",
+      "korean": "15코스 연속",
+      "source_bbox_readable": [
+        985,
+        86,
+        1809,
+        150
+      ],
+      "safe_bbox_readable": [
+        987,
+        88,
+        1807,
+        148
+      ],
+      "localized_bbox_readable": [
+        987,
+        88,
+        1301,
+        148
+      ],
+      "font_size_px": 63,
+      "horizontal_scale": 1
+    }
+  ],
+  "generated_candidate": {
+    "local_generation_completed": true,
+    "intended_repo_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "sha256": "9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b",
+    "expected_git_blob_sha": "aaaf3f9619062bcb412b72dc3d1f0486da0367be",
+    "bytes": 4194432,
+    "header_128_exact": true,
+    "roundtrip_decoded_exact": true,
+    "changed_pixels": 106425,
+    "changed_bbox_raw": [
+      0,
+      12,
+      1809,
+      426
+    ],
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_total": 89626,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_cells": 0,
+    "changed_pixels_outside_localizable_source_cells": 0,
+    "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "containment": "PASS_ZERO_CHANGE_OUTSIDE_ALLOWED_AND_PROTECTED_EXACT",
+    "visual_validation": "PASS_MANUAL_EXACT_SOURCE_VS_KOREAN_CANDIDATE__ORIENTATION_AND_ALL_10_CELLS_REVIEWED__NO_CLIPPING_OR_WRONG_BINDING_SEEN"
+  },
+  "persistence": {
+    "candidate_dds_persisted_to_git": false,
+    "visual_pngs_persisted_to_git": false,
+    "status": "HOLD_CONNECTOR_BINARY_BLOB_INGEST_UNAVAILABLE_FROM_CONTAINER",
+    "detail": "Candidate bytes and visual proofs were generated and inspected in the task runtime, but the authorized GitHub connector exposes create_blob only from inline text/base64 and no container-file ingest path. N100/local clone/worktree fallback is prohibited, so this producer does not claim a branch candidate modification."
+  },
+  "candidate_static_qa": "PASS_LOCAL_GENERATION_MACHINE_AND_VISUAL__HOLD_DURABLE_BINARY_PERSISTENCE__PENDING_INDEPENDENT_C",
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "ephemeral_library_upload_attempt_succeeded": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false
+}

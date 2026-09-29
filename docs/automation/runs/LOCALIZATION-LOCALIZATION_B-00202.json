@@ -1,0 +1,93 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00105",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T04:28:58.076+09:00",
+  "base_head_sha": "bf85838ea9ce2b1cb776ed2c987a8a9b75ea7e01",
+  "base_sha": "bf85838ea9ce2b1cb776ed2c987a8a9b75ea7e01",
+  "commit_mode": "ATOMIC_LANE_LOCAL_EXACT_BINDING_CLEAN_PLATE_RENDER_QA_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX226_RENDER_QA_COMPLETE_BINARY_PERSISTENCE_HOLD__INDEX232_EXACT_BINDING_CLEAN_PLATE_SEMANTIC_GAP__RUNTIME_UNTESTED",
+  "summary": "Latest C144/Q00042 keeps B-owned exact-source indices226/232 in candidate-completion priority. This invocation consumes approved pinned v0.25.10a exact sources without repeating the source ladder. Index226 directly binds all 10 atlas cells, protects OUTRUN2SP/OUTRUN2, builds an exact-source clean plate, renders all 8 approved Korean labels, preserves the source DDS header, round-trips the decoded final candidate exactly, passes zero-change-outside/protected QA, and passes manual source-vs-candidate visual review. The generated 4.2 MiB candidate SHA-256 is recorded, but the authorized GitHub connector has no container-file binary ingest path and N100/local-clone fallback is prohibited, so branch candidate bytes are not falsely claimed as persisted. Index232 directly binds all 6 source text regions and passes exact clean-plate machine QA, but discovers two description strings missing from current shared transcription; one lacks any approved Korean binding, so rendering stops fail-closed and B does not edit shared state.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX226_CANDIDATE_QA_AND_PERSISTENCE_HOLD.json",
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX232_BINDING_CLEAN_PLATE_SEMANTIC_GAP.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00205.json",
+    "localization/graphics/role_B/20260929-1850-B00119-P00049/B00119_P00049_THREE_EVEN_RELEASE_ATLAS_WORK_ORDERS.json",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "material_deliverable": {
+    "type": "B_MOD3_TWO_ASSET_EXACT_SOURCE_CANDIDATE_COMPLETION_ADVANCE",
+    "reviewed_indices": [
+      226,
+      232
+    ],
+    "reviewed_assets": [
+      "E3F4BA07",
+      "EBFC709F"
+    ],
+    "index226_exact_semantic_cells_bound": 10,
+    "index226_localize_cells": 8,
+    "index226_protected_cells": 2,
+    "index226_clean_plate_machine_qa": "PASS",
+    "index226_local_candidate_generation": "PASS_MACHINE_AND_VISUAL",
+    "index226_candidate_sha256": "9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b",
+    "index226_candidate_persisted_to_branch": false,
+    "index232_exact_semantic_cells_bound": 6,
+    "index232_clean_plate_machine_qa": "PASS",
+    "index232_missing_shared_transcription_occurrences": 2,
+    "index232_candidate_generated": false,
+    "candidate_dds_modified_on_branch": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_c_gate": "C144/Q00042",
+    "selected_priority": "EXACT_SOURCE_CANDIDATE_COMPLETION_BEFORE_UNRELATED_PREFLIGHT",
+    "selected_indices": [
+      226,
+      232
+    ],
+    "skipped_already_rendered_static_qa_pass": [
+      99,
+      112,
+      130,
+      152,
+      237
+    ],
+    "skipped_sticky_source_exhausted": [
+      46,
+      100,
+      106
+    ],
+    "readiness_after": {
+      "226": "LOCAL_RENDER_AND_QA_COMPLETE__DURABLE_BINARY_PERSISTENCE_HOLD__NO_BRANCH_CANDIDATE",
+      "232": "PREFLIGHT_ADVANCED__EXACT_6_OF_6_BINDING_AND_CLEAN_PLATE_PASS__SEMANTIC_TRANSCRIPTION_GAP_HOLD"
+    }
+  },
+  "self_qa": "PASS_EXACT_SOURCE_IDENTITY_REUSED_FROM_C142_C144__NO_REPEAT_SOURCE_LADDER__226_10_OF_10_DIRECT_BINDING__226_PROTECTED_EXACT__226_ZERO_CHANGE_OUTSIDE_ALLOWED__226_ROUNDTRIP_EXACT__226_VISUAL_PASS__232_6_OF_6_BINDING__232_CLEAN_PLATE_PASS__232_FAIL_CLOSED_ON_MISSING_TRANSCRIPTION__NO_SHARED_STATE",
+  "candidate_static_qa": "INDEX226_PASS_LOCAL_MACHINE_AND_VISUAL_HOLD_GIT_BINARY_PERSISTENCE__INDEX232_HOLD_SEMANTIC_GAP",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "ephemeral_library_transport_attempt": "FAILED_NO_ACTIVE_CONTAINER_SESSION_NO_LIBRARY_OBJECT_CREATED",
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "bookkeeping_note": "Tagged producer result commit must remain the immutable C_BATCH_GATE input. A later bookkeeping-only commit may backlink result_sha without changing producer evidence."
+}

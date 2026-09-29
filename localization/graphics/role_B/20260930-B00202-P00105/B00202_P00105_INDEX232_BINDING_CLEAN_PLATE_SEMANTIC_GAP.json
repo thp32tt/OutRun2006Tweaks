@@ -1,0 +1,256 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00202-index232-exact-source-binding-clean-plate-semantic-gap-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+  "wave_id": "P00105",
+  "lane": "LOCALIZATION_B",
+  "queue_index": 232,
+  "asset": "EBFC709F",
+  "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "recorded_at_kst": "2026-09-30T04:28:58.076+09:00",
+  "base_head_sha": "bf85838ea9ce2b1cb776ed2c987a8a9b75ea7e01",
+  "source": {
+    "transport": "approved_pinned_v0.25.10a_release_bundle",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "bytes": 8388736,
+    "width": 2048,
+    "height": 1024,
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y",
+    "canonical_inventory_match": true,
+    "header_128_sha256": "532576d0ccd0d1eb3392c6754f1d13cf0afb4d34d02dd4fd9e1c14c2c4ea0a0f",
+    "channel_masks": {
+      "R": "0x00ff0000",
+      "G": "0x0000ff00",
+      "B": "0x000000ff",
+      "A": "0xff000000"
+    }
+  },
+  "binding": {
+    "prior_atlas_regions_revalidated_against_exact_canonical_source": true,
+    "physical_text_regions": 6,
+    "all_source_nonzero_rgba_pixels_covered_by_bound_cells": true,
+    "nonzero_rgba_pixels_total": 245840,
+    "nonzero_rgba_pixels_outside_six_cells": 0,
+    "elements": [
+      {
+        "sprite": "sprite_755",
+        "id": "big_join",
+        "raw_cell": [
+          0,
+          0,
+          1760,
+          172
+        ],
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "semantic_status": "CURRENT_TRANSCRIPTION",
+        "source_effect_bbox_raw": [
+          9,
+          5,
+          979,
+          150
+        ],
+        "source_effect_bbox_readable": [
+          9,
+          874,
+          979,
+          1019
+        ],
+        "source_effect_pixels": 70756
+      },
+      {
+        "sprite": "sprite_756",
+        "id": "big_create",
+        "raw_cell": [
+          0,
+          172,
+          1760,
+          344
+        ],
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "semantic_status": "CURRENT_TRANSCRIPTION",
+        "source_effect_bbox_raw": [
+          24,
+          184,
+          1245,
+          329
+        ],
+        "source_effect_bbox_readable": [
+          24,
+          695,
+          1245,
+          840
+        ],
+        "source_effect_pixels": 90495
+      },
+      {
+        "sprite": "sprite_757",
+        "id": "desc_join",
+        "raw_cell": [
+          0,
+          344,
+          1800,
+          504
+        ],
+        "source": "Join your friends in a game of OutRun!",
+        "korean": null,
+        "semantic_status": "MISSING_CURRENT_TRANSCRIPTION",
+        "source_effect_bbox_raw": [
+          4,
+          427,
+          1138,
+          497
+        ],
+        "source_effect_bbox_readable": [
+          4,
+          527,
+          1138,
+          597
+        ],
+        "source_effect_pixels": 26671
+      },
+      {
+        "sprite": "sprite_758",
+        "id": "desc_create",
+        "raw_cell": [
+          0,
+          504,
+          1800,
+          664
+        ],
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "semantic_status": "C138_ACCEPTED_FAMILY_TRANSLATION_NOT_IN_INDEX232_TRANSCRIPTION",
+        "source_effect_bbox_raw": [
+          7,
+          587,
+          1120,
+          657
+        ],
+        "source_effect_bbox_readable": [
+          7,
+          367,
+          1120,
+          437
+        ],
+        "source_effect_pixels": 26222
+      },
+      {
+        "sprite": "sprite_759",
+        "id": "small_join",
+        "raw_cell": [
+          0,
+          664,
+          880,
+          752
+        ],
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "semantic_status": "CURRENT_TRANSCRIPTION",
+        "source_effect_bbox_raw": [
+          14,
+          674,
+          418,
+          737
+        ],
+        "source_effect_bbox_readable": [
+          14,
+          287,
+          418,
+          350
+        ],
+        "source_effect_pixels": 13855
+      },
+      {
+        "sprite": "sprite_760",
+        "id": "small_create",
+        "raw_cell": [
+          880,
+          664,
+          1648,
+          752
+        ],
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "semantic_status": "CURRENT_TRANSCRIPTION",
+        "source_effect_bbox_raw": [
+          898,
+          670,
+          1420,
+          733
+        ],
+        "source_effect_bbox_readable": [
+          898,
+          291,
+          1420,
+          354
+        ],
+        "source_effect_pixels": 17841
+      }
+    ]
+  },
+  "transcription_gap": {
+    "current_index232_semantic_entries": 2,
+    "current_index232_physical_occurrences_for_those_entries": 4,
+    "newly_proven_source_text_occurrences_missing_from_current_transcription": 2,
+    "missing": [
+      {
+        "source": "Join your friends in a game of OutRun!",
+        "korean": null,
+        "status": "MISSING_TRANSLATION_FAIL_CLOSED_NO_GUESS"
+      },
+      {
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "status": "C138_ACCEPTED_FAMILY_TRANSLATION_EXISTS_BUT_INDEX232_SHARED_TRANSCRIPTION_OMITS_IT"
+      }
+    ],
+    "shared_state_write_by_B": false,
+    "required_next": "C_RECONCILE_TRANSCRIPTION_THEN_PRODUCER_RENDER"
+  },
+  "clean_plate": {
+    "method": "zero only exact source pixels where any RGBA channel is nonzero; exact source is text-only across six positively bound cells",
+    "source_effect_mask_pixels": 245840,
+    "changed_pixels": 245840,
+    "changed_bbox_raw": [
+      4,
+      5,
+      1420,
+      737
+    ],
+    "changed_pixels_outside_source_effect_mask": 0,
+    "alpha_changed_pixels_total": 245495,
+    "alpha_changed_pixels_outside_source_effect_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "protected_artwork_nonzero_pixels_outside_six_cells": 0,
+    "result_all_zero_rgba": true,
+    "status": "PASS_MACHINE_EXACT_SOURCE_EFFECT_REMOVAL",
+    "mask_png_sha256": "952f1e8c3d35daca81ade9d4f909377bb41c52737c9f86dc824e42cd43d2c83e",
+    "clean_plate_png_sha256": "d7088744990d7e93d5d00f4d11687ae0b891423a3ecb5ecca5204b88417a3a72",
+    "binding_proof_png_sha256": "022c718eaf2604d8f2f756b12f8ff984e5ced2b33c5eb7b6cb324cf3d072c2e6"
+  },
+  "post_evidence_rescan": {
+    "render_ready": false,
+    "one_stage_to_render": false,
+    "candidate_dds_modified": false,
+    "reason": "Two exact-source description strings are absent from current index232 shared transcription; one has no current approved Korean binding. Final rendering would require semantic guessing and is fail-closed."
+  },
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_SEMANTIC_TRANSCRIPTION_GAP",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false
+}
