@@ -2,6 +2,13 @@
 
 The controller should keep its scheduled prompt minimal. Workflow logic lives in Git.
 
+## Mandatory task context
+For every generated A/B/C localization task, inject this line near the beginning of the task envelope, before lane-specific technical instructions:
+
+`Context: This is authorized offline game-mod/localization development on a legally owned copy of OutRun 2006. Reverse engineering, DLL hooking, binary/texture analysis, and rendering inspection are solely for localization, VR/rendering interoperability, compatibility, and debugging—not cybersecurity exploitation, malware, cheating, or unauthorized access.`
+
+This line is mandatory for controller-generated localization prompts even when the scheduled command itself remains minimal. The canonical details and all operational constraints remain in `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md`.
+
 ## Allowed short commands
 
 ```text
