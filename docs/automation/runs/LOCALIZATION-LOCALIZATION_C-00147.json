@@ -1,0 +1,98 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00147",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00022",
+  "qa_batch_id": "Q00022",
+  "recorded_at_kst": "2026-09-29T21:31:45+09:00",
+  "base_head_sha": "b1d6aa128d62094b08bbeb08158d667b4332d4da",
+  "result": "PASS_Q00022_ONE_INPUT_PASS_PREFLIGHT_ONLY_LEGACY_4X_RETIREMENT_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Independent C batch QA consumed A00143@92ceb1a exactly once. The producer's limited preflight material is accurate: 4/4 current canonical identities, 18/18 current semantic entries / 19 expected physical occurrences, and four pinned-tag Release legacy blobs whose accepted canvases are exactly 4x current canonical canvases and therefore remain retired as current construction geometry. No current v2 Korean DDS candidate exists, so candidate-only static gates are not promoted. Current contract makes branch-source absence/optional probe misses non-blocking typed transport outcomes; future production must acquire exact canonical source bytes. This task obeyed its GitHub-only dispatch and preserved newer disjoint B00144/A00146.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00143",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "92ceb1a720d028be4ee7dbe3710dde440255b9e5",
+      "result_message": "localization(A): retire stale 4x geometry for canonical sources [AUTO:LOCALIZATION-LOCALIZATION_A-00143]",
+      "completed_at": "2026-09-29T21:05:34.378566+09:00",
+      "producer_id": "P00066",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00143",
+      "result_sha": "92ceb1a720d028be4ee7dbe3710dde440255b9e5",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 4/4 current canonical inventory SHA-256/canvas/RGBA identities for indices 35/43/49/107 and all 18/18 current semantic entries, totaling 19 expected physical occurrences. At pinned upstream v0.25.10a commit 55f67a813dd3603d201d0be0da47c071965f53a4, the four recorded legacy Release Git blobs match exactly, and their accepted canvases are exactly 4x the current canonical inventory canvases, so retirement of that legacy pixel geometry remains correct. No current v2 Korean DDS candidate is part of this producer result; candidate-only DDS/header/mipmap/alpha/orientation, zero-pixel containment and English-source comparison are therefore not promoted. PASS is limited PREFLIGHT_ONLY evidence. Current contract makes branch-source absence/optional direct-file misses non-blocking typed transport outcomes, so future production must acquire exact canonical source bytes rather than repeat source-absence preflight. This C dispatch remained GitHub-only."
+    }
+  ],
+  "current_qa_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+  "current_controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      35,
+      43,
+      49,
+      107
+    ],
+    "reviewed_assets": 4,
+    "producer_inputs_strict_pass": 1,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_superseded": 0,
+    "canonical_inventory_identities_checked": 4,
+    "canonical_semantic_entries_checked": 18,
+    "expected_physical_occurrences_checked": 19,
+    "pinned_tag_legacy_release_blob_identities_checked": 4,
+    "legacy_4x_geometry_sets_retired": 4,
+    "exact_current_queue_path_sources_present": 0,
+    "current_v2_candidates_present": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-2131-C124/C124_Q00022_INDEPENDENT_QA_BATCH.json"
+  },
+  "source_identity_validation": "PASS_4_OF_4_CURRENT_CANONICAL_INVENTORY_SHA256_CANVAS_RGBA_IDENTITIES__PINNED_TAG_LEGACY_RELEASE_GIT_BLOBS_4_OF_4_MATCH_PRODUCER_RECORD",
+  "canonical_semantic_validation": "PASS_18_OF_18_CURRENT_SEMANTIC_ENTRIES__19_EXPECTED_PHYSICAL_OCCURRENCES__INDEX107_FERRARI_MODEL_CARDS_PRESERVE_ORIGINAL_GUARD_RETAINED",
+  "geometry_mapping_validation": "PASS_LEGACY_RELEASE_CANVASES_4_OF_4_EXACTLY_4X_LINEAR_AND_RETIRED__ZERO_CURRENT_CANONICAL_PIXEL_GEOMETRY_PROMOTED__NO_CURRENT_V2_CANDIDATE",
+  "current_contract_compatibility": "PASS_LIMITED_PREFLIGHT_EVIDENCE__PRODUCER_94FA49C_BRANCH_ABSENCE_REASON_SUPERSEDED_BY_CURRENT_E8731043_ACQUISITION_POLICY__IDENTITY_SEMANTIC_AND_LEGACY_GEOMETRY_RETIREMENT_EVIDENCE_REMAINS_VALID__Q00022_EXECUTION_GITHUB_ONLY",
+  "readiness_reconciliation": {
+    "classification": "PREFLIGHT_ONLY",
+    "indices": [
+      35,
+      43,
+      49,
+      107
+    ],
+    "reason": "Canonical identity and semantics are known, and prior work-order/cell evidence exists, but exact current canonical source-effect/removal/protected masks, independently validated CLEAN_PLATE pixels, final candidate_safe_bbox measurements and a current v2 Korean DDS candidate are not materialized. Current source acquisition policy removes branch absence/optional-probe miss as a blocker; a future producer should acquire exact canonical bytes and continue rather than issue another absence-only preflight."
+  },
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_same_asset_candidate_or_source_fingerprints": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00144",
+      "LOCALIZATION-LOCALIZATION_A-00146"
+    ]
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

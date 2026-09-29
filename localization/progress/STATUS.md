@@ -1062,3 +1062,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - No Korean candidate DDS exists for these assets, so candidate-only DDS/alpha/orientation/1px/source-comparison gates remain **HOLD_STRICT_RECHECK**.
 - Current contract `7d8a39b52f54c34b3305f54b86c43979bd7f6952`: branch source absence is no longer a blocker. Q00021 remained GitHub-only per dispatch; pinned `v0.25.10a` GitHub source acquisition should be used before further production on these assets.
 - Queue counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2114-C123/C123_Q00021_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C124 Q00022 — 2026-09-29T21:31:45+09:00
+- QA input: A00143 `92ceb1a` (35/43/49/107).
+- Result: **PASS**, limited **PREFLIGHT_ONLY** evidence. **4/4** current canonical identities, **18/18** semantic entries and **19** expected physical occurrences independently rechecked.
+- Pinned `v0.25.10a` legacy Release Git blobs match A00143 **4/4**; their accepted canvases are exactly 4x current canonical canvases, so legacy pixel geometry remains nonauthoritative for current construction.
+- No current v2 Korean candidate DDS exists. DDS/alpha/orientation/zero-pixel/source-comparison candidate gates remain **HOLD_STRICT_RECHECK**. Current contract treats missing optional direct-file probes as transport misses and requires fallback rather than repeated absence-only preflight.
+- Newer B00144 and A00146 are disjoint and preserved. Queue counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2131-C124/C124_Q00022_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

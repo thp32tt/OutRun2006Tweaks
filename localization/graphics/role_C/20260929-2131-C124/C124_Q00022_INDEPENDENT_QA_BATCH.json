@@ -1,0 +1,212 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-independent-c-batch-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00147",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00022",
+  "qa_batch_id": "Q00022",
+  "recorded_at_kst": "2026-09-29T21:31:45+09:00",
+  "base_head_sha": "b1d6aa128d62094b08bbeb08158d667b4332d4da",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00143",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "92ceb1a720d028be4ee7dbe3710dde440255b9e5",
+      "result_message": "localization(A): retire stale 4x geometry for canonical sources [AUTO:LOCALIZATION-LOCALIZATION_A-00143]",
+      "completed_at": "2026-09-29T21:05:34.378566+09:00",
+      "producer_id": "P00066",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00143",
+      "result_sha": "92ceb1a720d028be4ee7dbe3710dde440255b9e5",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 4/4 current canonical inventory SHA-256/canvas/RGBA identities for indices 35/43/49/107 and all 18/18 current semantic entries, totaling 19 expected physical occurrences. At pinned upstream v0.25.10a commit 55f67a813dd3603d201d0be0da47c071965f53a4, the four recorded legacy Release Git blobs match exactly, and their accepted canvases are exactly 4x the current canonical inventory canvases, so retirement of that legacy pixel geometry remains correct. No current v2 Korean DDS candidate is part of this producer result; candidate-only DDS/header/mipmap/alpha/orientation, zero-pixel containment and English-source comparison are therefore not promoted. PASS is limited PREFLIGHT_ONLY evidence. Current contract makes branch-source absence/optional direct-file misses non-blocking typed transport outcomes, so future production must acquire exact canonical source bytes rather than repeat source-absence preflight. This C dispatch remained GitHub-only."
+    }
+  ],
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3"
+  },
+  "producer_contract_fingerprint": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "interpretation": "Producer material predates current source-acquisition transport/typed-miss policy. The new policy invalidates branch absence as a future production blocker but does not invalidate canonical inventory identities, semantics, or retirement of 4x legacy Release geometry."
+  },
+  "reviewed_assets": [
+    {
+      "index": 35,
+      "asset": "E989E3B7",
+      "canonical_sha256": "224398b53b16475afa5a3d7c37365eb83643506edb8bc4bfe14aa0e8e18784a0",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 1,
+      "expected_physical_occurrences": 2,
+      "legacy_release_git_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+      "legacy_release_dimensions": [
+        4096,
+        4096
+      ],
+      "legacy_linear_scale": [
+        4,
+        4
+      ],
+      "status": "PASS_PREFLIGHT_ONLY"
+    },
+    {
+      "index": 43,
+      "asset": "455717B2",
+      "canonical_sha256": "e0e4f56d22808b8fece7e86997e173e41244466c83b6fe8bc405a579d85cac5f",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 4,
+      "expected_physical_occurrences": 4,
+      "legacy_release_git_blob_sha": "92a3cb717afb6ea10aa76df23941353fd0a04148",
+      "legacy_release_dimensions": [
+        2048,
+        2048
+      ],
+      "legacy_linear_scale": [
+        4,
+        4
+      ],
+      "status": "PASS_PREFLIGHT_ONLY"
+    },
+    {
+      "index": 49,
+      "asset": "BF3EE5C6",
+      "canonical_sha256": "b8d5716d1e8d555ed839fc8bbe80aaf02b21c44f203f73d57278bd0533e9fc8a",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 12,
+      "expected_physical_occurrences": 12,
+      "legacy_release_git_blob_sha": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+      "legacy_release_dimensions": [
+        2048,
+        2048
+      ],
+      "legacy_linear_scale": [
+        4,
+        4
+      ],
+      "status": "PASS_PREFLIGHT_ONLY"
+    },
+    {
+      "index": 107,
+      "asset": "841E796B",
+      "canonical_sha256": "872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da",
+      "canonical_dimensions": [
+        512,
+        128
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 1,
+      "expected_physical_occurrences": 1,
+      "legacy_release_git_blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+      "legacy_release_dimensions": [
+        2048,
+        512
+      ],
+      "legacy_linear_scale": [
+        4,
+        4
+      ],
+      "preserve_policy": "Preserve nine Ferrari/model cards, pictograms, model names, brand/model artwork and all non-target art; localize only No Handicap after exact canonical pixel binding.",
+      "status": "PASS_PREFLIGHT_ONLY"
+    }
+  ],
+  "checks": {
+    "producer_commit_marker": "PASS_EXACT_AUTO_MARKER",
+    "producer_payload_isolation": "PASS_ONLY_TASK_RECORD_AND_LANE_LOCAL_REPORT_CHANGED",
+    "canonical_inventory_identity": "PASS_4_OF_4",
+    "canonical_semantics": "PASS_18_OF_18",
+    "expected_physical_occurrences": "PASS_19_TOTAL",
+    "pinned_tag_legacy_release_git_blob_identity": "PASS_4_OF_4",
+    "legacy_4x_geometry_retirement": "PASS_4_OF_4",
+    "supersession": "PASS_NONE_AT_MERGE_BASE",
+    "current_v2_candidate_present": false,
+    "candidate_dds_header_mipmap_alpha_orientation": "NOT_APPLICABLE_NO_CURRENT_CANDIDATE_HOLD_STRICT_RECHECK",
+    "zero_pixel_containment": "NOT_APPLICABLE_NO_CURRENT_CANDIDATE_HOLD_STRICT_RECHECK",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_CURRENT_CANDIDATE_HOLD_STRICT_RECHECK",
+    "runtime_validation": "UNTESTED"
+  },
+  "readiness_reconciliation": {
+    "classification": "PREFLIGHT_ONLY",
+    "indices": [
+      35,
+      43,
+      49,
+      107
+    ],
+    "reason": "Canonical identity and semantics are known, and prior work-order/cell evidence exists, but exact current canonical source-effect/removal/protected masks, independently validated CLEAN_PLATE pixels, final candidate_safe_bbox measurements and a current v2 Korean DDS candidate are not materialized. Current source acquisition policy removes branch absence/optional-probe miss as a blocker; a future producer should acquire exact canonical bytes and continue rather than issue another absence-only preflight."
+  },
+  "source_acquisition_policy": {
+    "contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "q00022_execution_override": "GITHUB_ONLY_PER_USER_DISPATCH__GOOGLE_DRIVE_NOT_USED",
+    "pinned_repository": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+    "pinned_release_asset_id": 306630789,
+    "pinned_zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_tag_legacy_release_blob_matches": 4,
+    "canonical_source_acquisition_performed_by_c": false,
+    "typed_transport_policy": "OPTIONAL_DIRECT_FILE_MISS_IS_SOURCE_TRANSPORT_MISS_AND_MUST_FALL_THROUGH__SOURCE_IDENTITY_MISMATCH_ONLY_FOR_OBTAINED_BYTES_THAT_FAIL_CANONICAL_IDENTITY"
+  },
+  "heavy_qa_reuse": {
+    "repeated_heavy_candidate_pixel_qa": false,
+    "reason": "A00143 contains no new/current Korean DDS candidate. Existing C-accepted semantic/cell/work-order evidence is reused only as pre-generation evidence; candidate-only header/mipmap/alpha/orientation, containment and English-source comparison remain fail-closed until candidate bytes exist.",
+    "newly_rechecked_inventory_identities": 4,
+    "newly_rechecked_semantic_entries": 18,
+    "expected_physical_occurrences_rechecked": 19,
+    "pinned_tag_legacy_release_blob_identities_rechecked": 4,
+    "prior_c_evidence_reused_without_promotion": [
+      "index35 C104 semantic/occurrence mapping + C111 v2 work-order",
+      "index43 C104 semantic/cell mapping + C111 v2 work-order",
+      "index49 C104 semantic/cell mapping + C111 v2 work-order",
+      "index107 C103/C110/C112 semantic/payload/work-order lineage with Ferrari/model preserve-original guard"
+    ]
+  },
+  "shared_state_merge": {
+    "performed_once": true,
+    "progress_counts_changed": false,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "peer_candidate_files_modified": false,
+    "preserved_newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00144",
+      "LOCALIZATION-LOCALIZATION_A-00146"
+    ]
+  },
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
