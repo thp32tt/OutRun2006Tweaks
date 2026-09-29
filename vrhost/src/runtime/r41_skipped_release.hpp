@@ -49,6 +49,67 @@ namespace OutRunVrR41SkippedRelease
         LiveSlotConflict,
     };
 
+    enum class SampleEvidence : std::uint8_t
+    {
+        Unknown = 0,
+        ExactSampled,
+    };
+
+    // Positive sampled-identity evidence only. This deliberately does not infer
+    // "never sampled" from absence: transition code may use ExactSampled to
+    // exclude known D3D11-owned identities, but Unknown must remain fail-closed.
+    //
+    // One exact identity per physical ring slot is sufficient for the bounded
+    // ring because a slot cannot legitimately carry two live frame identities
+    // at once. Slot reuse naturally overwrites the previous exact sample proof.
+    template <std::size_t SlotCount>
+    class SampledHistory
+    {
+    public:
+        struct Entry
+        {
+            bool sampled = false;
+            Identity identity{};
+        };
+
+        bool ObserveSampled(const Identity& identity) noexcept
+        {
+            if (!Valid(identity, SlotCount))
+                return false;
+            entries_[identity.slot].sampled = true;
+            entries_[identity.slot].identity = identity;
+            return true;
+        }
+
+        SampleEvidence Query(const Identity& identity) const noexcept
+        {
+            if (!Valid(identity, SlotCount))
+                return SampleEvidence::Unknown;
+            const Entry& entry = entries_[identity.slot];
+            return entry.sampled && SameIdentity(entry.identity, identity)
+                ? SampleEvidence::ExactSampled
+                : SampleEvidence::Unknown;
+        }
+
+        bool ExactSampled(const Identity& identity) const noexcept
+        {
+            return Query(identity) == SampleEvidence::ExactSampled;
+        }
+
+        void Clear() noexcept
+        {
+            entries_ = {};
+        }
+
+        const Entry& At(std::size_t slot) const noexcept
+        {
+            return entries_[slot];
+        }
+
+    private:
+        std::array<Entry, SlotCount> entries_{};
+    };
+
     // Pure LEVEL0 owner for DirectGPU frames that were never sampled by D3D11.
     // Unlike sampled frames, these do not need a GPU EVENT; they only need a
     // durable retry if publishing the per-slot completion ACK temporarily fails.
