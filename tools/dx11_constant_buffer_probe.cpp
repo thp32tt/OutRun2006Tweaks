@@ -1337,6 +1337,70 @@ int main()
         pipelineBundle.transform_buffer().ready(),
         "R97 bundle owned-object readiness");
 
+    const auto pipelineIdentityReady =
+        pipelineBundle.translation_readiness(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype);
+    require(
+        pipelineIdentityReady.inputValid &&
+        pipelineIdentityReady.bundleReady &&
+        pipelineIdentityReady.deviceMatches &&
+        pipelineIdentityReady.inputLayoutMatches &&
+        pipelineIdentityReady.vertexShaderMatches &&
+        pipelineIdentityReady.pixelShaderMatches &&
+        pipelineIdentityReady.ready &&
+        pipelineIdentityReady.bundleGeneration != 0 &&
+        pipelineIdentityReady.snapshotToken != 0 &&
+        pipelineBundle.validate_translation_snapshot(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R112 exact fixed-function pipeline translation identity issues a valid snapshot");
+
+    DevicePair pipelineOtherDevice = create_warp_device();
+    auto changedLayout = inputLayout;
+    changedLayout.elements[0].SemanticIndex ^= 1u;
+    auto changedVertexPrototype = vertexPrototype;
+    changedVertexPrototype.sourceHash ^= 0x100000001b3ull;
+    auto changedPixelPrototype = pixelPrototype;
+    changedPixelPrototype.sourceHash ^= 0x9e3779b97f4a7c15ull;
+    const auto pipelineForeignDevice =
+        pipelineBundle.translation_readiness(
+            pipelineOtherDevice.device, inputLayout,
+            vertexPrototype, pixelPrototype);
+    const auto pipelineChangedLayout =
+        pipelineBundle.translation_readiness(
+            d3d.device, changedLayout, vertexPrototype, pixelPrototype);
+    const auto pipelineChangedVertex =
+        pipelineBundle.translation_readiness(
+            d3d.device, inputLayout, changedVertexPrototype, pixelPrototype);
+    const auto pipelineChangedPixel =
+        pipelineBundle.translation_readiness(
+            d3d.device, inputLayout, vertexPrototype, changedPixelPrototype);
+    require(
+        pipelineForeignDevice.inputValid &&
+        pipelineForeignDevice.bundleReady &&
+        !pipelineForeignDevice.deviceMatches &&
+        !pipelineForeignDevice.ready &&
+        pipelineForeignDevice.snapshotToken == 0 &&
+        pipelineChangedLayout.inputValid &&
+        !pipelineChangedLayout.inputLayoutMatches &&
+        !pipelineChangedLayout.ready &&
+        pipelineChangedLayout.snapshotToken == 0 &&
+        pipelineChangedVertex.inputValid &&
+        !pipelineChangedVertex.vertexShaderMatches &&
+        !pipelineChangedVertex.ready &&
+        pipelineChangedVertex.snapshotToken == 0 &&
+        pipelineChangedPixel.inputValid &&
+        !pipelineChangedPixel.pixelShaderMatches &&
+        !pipelineChangedPixel.ready &&
+        pipelineChangedPixel.snapshotToken == 0,
+        "R112 pipeline identity fails closed on device layout and shader provenance drift");
+    pipelineOtherDevice.context->Release();
+    pipelineOtherDevice.device->Release();
+
+    const auto pipelineInitialToken = pipelineIdentityReady.snapshotToken;
+    const auto pipelineInitialGeneration =
+        pipelineIdentityReady.bundleGeneration;
+
     auto inexactLayout = inputLayout;
     inexactLayout.exact = false;
     require(
@@ -1353,6 +1417,22 @@ int main()
     require(
         pipelineBundle.ready(),
         "R97 bundle must recover after exact reinitialize");
+    const auto pipelineIdentityRecreated =
+        pipelineBundle.translation_readiness(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype);
+    require(
+        pipelineIdentityRecreated.ready &&
+        pipelineIdentityRecreated.bundleGeneration >
+            pipelineInitialGeneration &&
+        pipelineIdentityRecreated.snapshotToken != 0 &&
+        pipelineIdentityRecreated.snapshotToken != pipelineInitialToken &&
+        !pipelineBundle.validate_translation_snapshot(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineInitialToken) &&
+        pipelineBundle.validate_translation_snapshot(
+            d3d.device, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityRecreated.snapshotToken),
+        "R112 bundle recreation invalidates stale pipeline translation snapshot");
 
     D3D11_BUFFER_DESC observedDesc{};
     owner.buffer()->GetDesc(&observedDesc);
@@ -1508,5 +1588,6 @@ int main()
     std::cout << "DX11 managed Texture2D stage mirror readiness R109: PASS\n";
     std::cout << "DX11 managed Texture2D readiness snapshot token R110: PASS\n";
     std::cout << "DX11 managed Texture2D mirror descriptor exactness R111: PASS\n";
+    std::cout << "DX11 fixed-function pipeline translation identity R112: PASS\n";
     return 0;
 }

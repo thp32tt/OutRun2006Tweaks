@@ -377,6 +377,22 @@ private:
     std::uint64_t membership_generation_ = 1;
 };
 
+// R112 seals the exact translation identity of an R97 bundle without routing
+// it into a game draw. A nonzero snapshot is issued only when the live bundle
+// still belongs to the expected D3D11 device and matches the exact input-layout
+// plus R93/R84 shader prototypes used for the activation candidate.
+struct NativeFixedFunctionPipelineReadiness {
+    bool inputValid{};
+    bool bundleReady{};
+    bool deviceMatches{};
+    bool inputLayoutMatches{};
+    bool vertexShaderMatches{};
+    bool pixelShaderMatches{};
+    bool ready{};
+    std::uint64_t bundleGeneration{};
+    std::uint64_t snapshotToken{};
+};
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.
@@ -395,6 +411,17 @@ public:
         const FixedFunctionVertexShaderPrototype& vertexPrototype,
         const FixedFunctionPixelShaderPrototype& pixelPrototype) noexcept;
     void shutdown() noexcept;
+    [[nodiscard]] NativeFixedFunctionPipelineReadiness translation_readiness(
+        ID3D11Device* expectedDevice,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype) const noexcept;
+    [[nodiscard]] bool validate_translation_snapshot(
+        ID3D11Device* expectedDevice,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t snapshotToken) const noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
         return device_ && vertex_shader_ && pixel_shader_ && input_layout_ &&
@@ -423,6 +450,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader_;
     Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_;
     NativeFixedFunctionTransformBuffer transform_buffer_;
+    std::uint64_t input_layout_identity_ = 0;
+    std::uint64_t vertex_shader_source_hash_ = 0;
+    std::uint64_t pixel_shader_source_hash_ = 0;
+    std::uint64_t bundle_generation_ = 0;
 };
 
 class NativeBackend final {

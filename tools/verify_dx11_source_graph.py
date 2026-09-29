@@ -2230,6 +2230,87 @@ def main() -> None:
                 "DX11 R111 managed-mirror descriptor probe drift: " + meaning
             )
 
+    r112_pipeline_identity_header = {
+        "struct NativeFixedFunctionPipelineReadiness":
+            "R112 fixed-function pipeline identity readiness",
+        "translation_readiness(":
+            "R112 exact translation identity query",
+        "validate_translation_snapshot(":
+            "R112 stale pipeline snapshot rejection API",
+        "input_layout_identity_ = 0":
+            "R112 stored input-layout identity",
+        "vertex_shader_source_hash_ = 0":
+            "R112 stored vertex-shader source identity",
+        "pixel_shader_source_hash_ = 0":
+            "R112 stored pixel-shader source identity",
+        "bundle_generation_ = 0":
+            "R112 bundle recreation generation",
+    }
+    missing_r112_header = [
+        meaning
+        for token, meaning in r112_pipeline_identity_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r112_header:
+        raise SystemExit(
+            "DX11 R112 pipeline-identity header drift: "
+            + ", ".join(missing_r112_header)
+        )
+
+    for token, meaning in {
+        "hash_pipeline_input_layout_identity(":
+            "R112 canonical input-layout identity",
+        "vertexPrototype.sourceHash == 0":
+            "R112 vertex-source identity prerequisite",
+        "pixelPrototype.sourceHash == 0":
+            "R112 pixel-source identity prerequisite",
+        "input_layout_identity_ = inputLayoutIdentity":
+            "R112 persisted input-layout identity",
+        "vertex_shader_source_hash_ = vertexPrototype.sourceHash":
+            "R112 persisted vertex-source identity",
+        "pixel_shader_source_hash_ = pixelPrototype.sourceHash":
+            "R112 persisted pixel-source identity",
+        "++bundle_generation_":
+            "R112 recreation generation advance",
+        "vertex_shader_->GetDevice(":
+            "R112 live vertex-shader device verification",
+        "pixel_shader_->GetDevice(":
+            "R112 live pixel-shader device verification",
+        "input_layout_->GetDevice(":
+            "R112 live input-layout device verification",
+        "transform_buffer_.buffer()->GetDevice(":
+            "R112 live transform-buffer device verification",
+        "out.inputLayoutMatches =":
+            "R112 input-layout provenance comparison",
+        "out.vertexShaderMatches =":
+            "R112 vertex-shader provenance comparison",
+        "out.pixelShaderMatches =":
+            "R112 pixel-shader provenance comparison",
+        "out.snapshotToken = snapshotToken == 0 ? 1 : snapshotToken":
+            "R112 nonzero exact pipeline snapshot",
+        "current.ready && current.snapshotToken == snapshotToken":
+            "R112 stale snapshot validation",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R112 pipeline-identity source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R112 exact fixed-function pipeline translation identity issues a valid snapshot":
+            "R112 positive identity snapshot proof",
+        "R112 pipeline identity fails closed on device layout and shader provenance drift":
+            "R112 device/layout/shader negative proof",
+        "R112 bundle recreation invalidates stale pipeline translation snapshot":
+            "R112 recreation stale-token proof",
+        "DX11 fixed-function pipeline translation identity R112: PASS":
+            "R112 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R112 pipeline-identity probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census

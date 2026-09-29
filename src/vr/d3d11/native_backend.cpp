@@ -25,6 +25,39 @@ std::uint64_t mix_readiness_snapshot_token(
     return token;
 }
 
+std::uint64_t hash_pipeline_input_layout_identity(
+    const VertexInputLayoutTranslation& layout) noexcept {
+    if (!layout.exact || layout.elementCount == 0 ||
+        layout.elementCount > layout.elements.size())
+        return 0;
+
+    std::uint64_t hash = 0xcbf29ce484222325ull;
+    hash = mix_readiness_snapshot_token(hash, layout.elementCount);
+    hash = mix_readiness_snapshot_token(hash, layout.declarationPath ? 1u : 0u);
+    hash = mix_readiness_snapshot_token(hash, layout.fvfPath ? 1u : 0u);
+    hash = mix_readiness_snapshot_token(hash, layout.fvfPending ? 1u : 0u);
+    for (UINT index = 0; index < layout.elementCount; ++index) {
+        const auto& element = layout.elements[index];
+        if (!element.SemanticName || element.SemanticName[0] == '\0')
+            return 0;
+        for (const unsigned char* ch =
+                 reinterpret_cast<const unsigned char*>(element.SemanticName);
+             *ch != 0; ++ch)
+            hash = mix_readiness_snapshot_token(hash, *ch);
+        hash = mix_readiness_snapshot_token(hash, 0xffu);
+        hash = mix_readiness_snapshot_token(hash, element.SemanticIndex);
+        hash = mix_readiness_snapshot_token(
+            hash, static_cast<std::uint32_t>(element.Format));
+        hash = mix_readiness_snapshot_token(hash, element.InputSlot);
+        hash = mix_readiness_snapshot_token(hash, element.AlignedByteOffset);
+        hash = mix_readiness_snapshot_token(
+            hash, static_cast<std::uint32_t>(element.InputSlotClass));
+        hash = mix_readiness_snapshot_token(
+            hash, element.InstanceDataStepRate);
+    }
+    return hash == 0 ? 1 : hash;
+}
+
 bool texture_uncompressed_row_bytes(
     D3DFORMAT format,
     UINT width,
@@ -1127,9 +1160,11 @@ bool NativeFixedFunctionPipelineBundle::initialize(
     const FixedFunctionPixelShaderPrototype& pixelPrototype) noexcept {
 
     shutdown();
-    if (!device || !layout.exact || layout.elementCount == 0 ||
-        layout.elementCount > layout.elements.size() ||
-        !vertexPrototype.generated() || !pixelPrototype.generated())
+    const auto inputLayoutIdentity =
+        hash_pipeline_input_layout_identity(layout);
+    if (!device || inputLayoutIdentity == 0 ||
+        !vertexPrototype.generated() || !pixelPrototype.generated() ||
+        vertexPrototype.sourceHash == 0 || pixelPrototype.sourceHash == 0)
         return false;
 
     Microsoft::WRL::ComPtr<ID3DBlob> vertexBytecode;
@@ -1178,7 +1213,101 @@ bool NativeFixedFunctionPipelineBundle::initialize(
     vertex_shader_ = std::move(vertexShader);
     pixel_shader_ = std::move(pixelShader);
     input_layout_ = std::move(inputLayout);
+    input_layout_identity_ = inputLayoutIdentity;
+    vertex_shader_source_hash_ = vertexPrototype.sourceHash;
+    pixel_shader_source_hash_ = pixelPrototype.sourceHash;
+    ++bundle_generation_;
+    if (bundle_generation_ == 0)
+        ++bundle_generation_;
     return true;
+}
+
+NativeFixedFunctionPipelineReadiness
+NativeFixedFunctionPipelineBundle::translation_readiness(
+    ID3D11Device* expectedDevice,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype) const noexcept {
+    NativeFixedFunctionPipelineReadiness out{};
+    const auto inputLayoutIdentity =
+        hash_pipeline_input_layout_identity(layout);
+    if (!expectedDevice || inputLayoutIdentity == 0 ||
+        !vertexPrototype.generated() || !pixelPrototype.generated() ||
+        vertexPrototype.sourceHash == 0 || pixelPrototype.sourceHash == 0)
+        return out;
+
+    out.inputValid = true;
+    out.bundleReady = ready();
+    out.bundleGeneration = bundle_generation_;
+    out.inputLayoutMatches =
+        input_layout_identity_ != 0 &&
+        input_layout_identity_ == inputLayoutIdentity;
+    out.vertexShaderMatches =
+        vertex_shader_source_hash_ != 0 &&
+        vertex_shader_source_hash_ == vertexPrototype.sourceHash;
+    out.pixelShaderMatches =
+        pixel_shader_source_hash_ != 0 &&
+        pixel_shader_source_hash_ == pixelPrototype.sourceHash;
+
+    if (out.bundleReady) {
+        Microsoft::WRL::ComPtr<ID3D11Device> vertexDevice;
+        Microsoft::WRL::ComPtr<ID3D11Device> pixelDevice;
+        Microsoft::WRL::ComPtr<ID3D11Device> layoutDevice;
+        Microsoft::WRL::ComPtr<ID3D11Device> transformDevice;
+        vertex_shader_->GetDevice(vertexDevice.ReleaseAndGetAddressOf());
+        pixel_shader_->GetDevice(pixelDevice.ReleaseAndGetAddressOf());
+        input_layout_->GetDevice(layoutDevice.ReleaseAndGetAddressOf());
+        transform_buffer_.buffer()->GetDevice(
+            transformDevice.ReleaseAndGetAddressOf());
+        out.deviceMatches =
+            device_.Get() == expectedDevice &&
+            vertexDevice.Get() == expectedDevice &&
+            pixelDevice.Get() == expectedDevice &&
+            layoutDevice.Get() == expectedDevice &&
+            transformDevice.Get() == expectedDevice;
+    }
+
+    out.ready =
+        out.bundleReady &&
+        out.deviceMatches &&
+        out.inputLayoutMatches &&
+        out.vertexShaderMatches &&
+        out.pixelShaderMatches &&
+        out.bundleGeneration != 0;
+    if (out.ready) {
+        std::uint64_t snapshotToken = 0xcbf29ce484222325ull;
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.bundleGeneration);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, input_layout_identity_);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, vertex_shader_source_hash_);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, pixel_shader_source_hash_);
+        out.snapshotToken = snapshotToken == 0 ? 1 : snapshotToken;
+    }
+    return out;
+}
+
+bool NativeFixedFunctionPipelineBundle::validate_translation_snapshot(
+    ID3D11Device* expectedDevice,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = translation_readiness(
+        expectedDevice, layout, vertexPrototype, pixelPrototype);
+    return current.ready && current.snapshotToken == snapshotToken;
 }
 
 void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
@@ -1187,6 +1316,9 @@ void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
     pixel_shader_.Reset();
     vertex_shader_.Reset();
     device_.Reset();
+    input_layout_identity_ = 0;
+    vertex_shader_source_hash_ = 0;
+    pixel_shader_source_hash_ = 0;
 }
 
 bool NativeBackend::initialize(const NativeBackendConfig& config) noexcept {
