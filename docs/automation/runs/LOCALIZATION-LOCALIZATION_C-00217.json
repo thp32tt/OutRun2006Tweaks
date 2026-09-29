@@ -1,0 +1,211 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-c148-q00046-index226-contract-repromotion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00217",
+  "wave_id": "Q00046",
+  "qa_batch_id": "Q00046",
+  "run": "C148",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T06:08:00+09:00",
+  "base_head_sha": "0f64ce4ffc76ea88ccc12da51f83f2964f177efc",
+  "base_sha": "0f64ce4ffc76ea88ccc12da51f83f2964f177efc",
+  "commit_mode": "C_BATCH_VALIDATION_BEARING_RESULT__INDEX226_PRODUCER_CONTRACT_REPROMOTION",
+  "result": "PASS_Q00046_B00216_INDEX226_FRESH_VERIFIER_PASS_RESULT__STATIC_QA_REPROMOTED_RUNTIME_UNTESTED",
+  "summary": "Q00046 consumes only B00216's immutable fresh producer result. B00216 re-emits the already C-validated index226/E3F4BA07 candidate without changing DDS/review bytes, and adds verifier-recognized machine-readable PASS evidence. C independently confirms the exact producer commit carries the AUTO marker, the candidate Git blob and mandatory source/clean/candidate/comparison/element-comparison/prompt lineage are byte-identical to the previously reproduced C147 content-QA set, and the fresh QA JSON exposes PASS provenance plus zero outside-edit/protected/alpha escape metrics. The prior Q00045 producer-contract blocker is therefore repaired and index226 is re-promoted to STATIC_QA_PASS while runtime remains UNTESTED. A00215@index222 completed after Q00046 dispatch and is preserved as out-of-batch QA-pending rather than being retroactively added to this batch.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+      "result_message": "localization(B): re-emit index226 verifier PASS evidence [AUTO:LOCALIZATION-LOCALIZATION_B-00216]",
+      "completed_at": "2026-09-30T05:56:06+09:00",
+      "producer_id": "P00114",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00216",
+      "result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+      "status": "PASS",
+      "reason": "PASS: fresh producer result contains verifier-recognized machine-readable PASS evidence for index226/E3F4BA07. Candidate DDS Git blob 11260e86b2a088767907c2aa5ad0fd064acd7366 is unchanged from the previously independently reproduced C147 content-QA candidate; mandatory review/prompt artifact Git blobs are also unchanged. Fresh QA records provide status=PASS, exact source/candidate SHA-256, v2 prompt hashes, signed_slant_gate=PASS, runtime_validation=UNTESTED and zero outside-edit/protected/alpha escape metrics. No rerender or heavy pixel replay is required because the content fingerprint is unchanged."
+    }
+  ],
+  "producer_contract_repair": {
+    "prior_rework_task_id": "LOCALIZATION-LOCALIZATION_B-00209",
+    "prior_rework_result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+    "prior_authoritative_c_result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+    "prior_gate_failure": "DDS changed but no machine-readable PASS record exists in changed QA JSON",
+    "fresh_result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+    "fresh_contract_status": "PASS_MACHINE_READABLE_PROVENANCE_AND_ZERO_PIXEL_FIELDS_PRESENT",
+    "source_or_candidate_fingerprint_changed": false
+  },
+  "lineage_recheck": {
+    "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+    "source_display_png_blob_sha": "f9a40e94e9f50e2898b4dd22354b5e2408dba96b",
+    "clean_plate_display_png_blob_sha": "281eb4feb4ab68e2683421976439ad6502043d4d",
+    "candidate_display_png_blob_sha": "acce429b1005cd7b279637c78c6f0ff6adee63ac",
+    "comparison_png_blob_sha": "eb4a537f44a4c717b452aa0c924dc5598c99a644",
+    "element_comparison_png_blob_sha": "b1e1be0bc1e24fc5d720a87653174f2deb65e897",
+    "generation_prompt_blob_sha": "b8f328e4f4b556509c6785eeec9f55025138a3c3",
+    "all_equal_to_prior_c147_verified_lineage": true
+  },
+  "content_level_qa_reuse": {
+    "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+    "source_git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+    "source_format": "RGBA32",
+    "source_canvas": [
+      2048,
+      512
+    ],
+    "source_mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "removal_mask_pixels": 84629,
+    "removal_mask_raw_sha256": "dcc28d8da195df03de5f3a8fbfc71a5dbf3d88a70146479541432c5f96c1a6ee",
+    "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
+    "candidate_sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
+    "candidate_git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+    "containment": "PASS_8_OF_8_AT_LEAST_2PX_INSIDE_ORIGINAL_SOURCE_EFFECT_ENVELOPES",
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_cells": 0,
+    "visual_review": "PASS_REUSED_UNCHANGED_FINGERPRINT_FROM_C147_NATIVE_AND_NN2X_REVIEW",
+    "repeated_heavy_checks": false
+  },
+  "reviewed_assets": [
+    {
+      "index": 226,
+      "asset": "E3F4BA07",
+      "disposition": "PASS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "static_qa": "PASS",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Do not rerender index226 while candidate/source fingerprint is unchanged; retain for eventual isolated in-game validation."
+    }
+  ],
+  "readiness_reconciliation": {
+    "classification": "B00216_PRODUCER_CONTRACT_REPAIR_PASS_INDEX226_STATIC_QA_REPROMOTED",
+    "production_readiness": {
+      "226": "STATIC_QA_PASS_RUNTIME_UNTESTED"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      198,
+      201
+    ],
+    "preflight_only_candidate_completion_indices": [
+      133,
+      222,
+      232
+    ],
+    "already_rendered_static_qa_pass_indices": [
+      99,
+      112,
+      130,
+      152,
+      226,
+      237
+    ],
+    "direct_rework_candidate_indices": [],
+    "out_of_batch_producer_qa_pending": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00208",
+        "result_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+        "indices": [
+          198
+        ],
+        "kind": "CANDIDATE"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837",
+        "indices": [
+          232
+        ],
+        "kind": "PREGEN"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+        "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6",
+        "indices": [
+          133
+        ],
+        "kind": "PREGEN"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
+        "result_sha": "e607e79b45c5c5cbdad4469f0eb6b1ce19d4f639",
+        "indices": [
+          220
+        ],
+        "kind": "PREGEN"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+        "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+        "indices": [
+          222
+        ],
+        "kind": "PREGEN_LATE_ARRIVAL_AFTER_Q00046_DISPATCH"
+      }
+    ],
+    "candidate_completion_priority": [
+      "STATIC_QA index226 restored from unchanged verified candidate after producer-contract repair; do not rerender.",
+      "Candidate QA remains pending for 159/198/201; out-of-batch A00215@index222 and B00211@index232/B00213@index133/B00214@index220 require later C disposition.",
+      "Counts after Q00046 shared-state reconciliation target actionable localize_text 93, pending production 70, canonical segments 753."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_PRODUCER_CONTRACT_REPAIR_REPROMOTION",
+    "reviewed_indices": [
+      226
+    ],
+    "reviewed_assets": 1,
+    "producer_inputs_pass": 1,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 70,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 1,
+    "new_runtime_approvals": 0,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json"
+  },
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00216.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+    "localization/graphics/role_B/20260930-B00216-P00114/B00216_P00114_INDEX226_VERIFIER_PASS_REEMISSION.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+    "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+    "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds@1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+    "localization/graphics/role_C/20260930-0545-C147-A2/C147_Q00045_ATTEMPT2_GATE_REPAIR.json@5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527"
+  ],
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 1,
+  "new_runtime_approvals": 0,
+  "shared_state_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": "PENDING_POST_COMMIT",
+  "validation_bearing_result_sha": "PENDING_POST_COMMIT",
+  "bookkeeping_note": "This AUTO result commit is the Q00046 validation owner. Do not add CI-skip. After the Localization Automation Gate completes, record its result and update shared progress/worklog/queue in separate bookkeeping commits without changing validation ownership."
+}
