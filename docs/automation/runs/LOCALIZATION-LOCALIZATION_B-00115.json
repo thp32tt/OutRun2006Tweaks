@@ -1,0 +1,144 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00115",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00046",
+  "recorded_at_kst": "2026-09-29T18:27:00+09:00",
+  "base_sha": "0b6b886a152ccc004399e27f75f23040425a6dcc",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_V2_DEDUP_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_11_UNIQUE_UNITS",
+  "summary": "Advanced even primary-shard indices 36/38/128/206 into current first-pass-v2 header-gated source-effect-mask/CLEAN_PLATE work orders. De-duplicated 36/38 because both map to the same physical 6AB5CEE HD blob; added 11 unique strict 2px source-inspection guards across 3 physical HD sources. Index 128's seven semantic-to-strip bindings remain explicit fail-closed HOLD rather than guessed. No Korean DDS bytes or shared state were modified.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1827-B136-P00046/B136_P00046_EVEN_V2_DEDUP_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_EVEN_V2_DEDUP_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      36,
+      38,
+      128,
+      206
+    ],
+    "assets": [
+      "06AB5CEE",
+      "6AB5CEE",
+      "12519155",
+      "AEA507A4"
+    ],
+    "unique_physical_hd_sources": 3,
+    "queue_physical_text_occurrences": 14,
+    "deduplicated_source_work_units": 11,
+    "new_two_px_source_inspection_guards": 11,
+    "alias_queue_rows_deduplicated": 2,
+    "unresolved_semantic_bindings_retained": 7,
+    "source_effect_masks_created": 0,
+    "clean_plates_created": 0,
+    "candidate_safe_bboxes_created": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "b00036_report_blob_sha": "886dfcfcde49aa44ed429349675b1b0e22c31f3e",
+    "b00042_report_blob_sha": "d40bf3de5b77ddade38d3b1034ea9a0853f084dc",
+    "b00051_report_blob_sha": "cd4b075f16f6a1c354b67e25584bd4266adb2485",
+    "b00039_report_blob_sha": "a71c5d8bb0da2ace8028a7fd68b0894f49978ffe",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reason": "Prior accepted GitHub evidence already establishes source identities, canonical translations and parent atlas regions. P00046 adds only missing current-v2 header-gated 2px decoded-source inspection/source-mask/CLEAN_PLATE execution contracts and de-duplicates the 36/38 shared physical source."
+  },
+  "skipped_or_deferred": {
+    "qa_pending_or_newer_disjoint": {
+      "LOCALIZATION-LOCALIZATION_B-00113": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00110": [
+        92,
+        98,
+        112
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00108": [
+        132,
+        176,
+        220,
+        222
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00104": [
+        152
+      ]
+    },
+    "c_returned_rework_not_replayed_without_new_material": {
+      "LOCALIZATION-LOCALIZATION_B-00101": [
+        198,
+        214,
+        230,
+        236
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ],
+    "separate_runtime_validation_backlog": [
+      12,
+      54,
+      60,
+      104,
+      116
+    ],
+    "prior_output_duplication_not_selected": [
+      188,
+      212,
+      226,
+      232
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_36_38_128_206",
+    "current_queue_action": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "alias_dedup": "PASS_36_38_SHARE_EXACT_HD_BLOB_2302D121__HEAVY_SOURCE_WORK_3_UNITS_NOT_DUPLICATED",
+    "canonical_semantics": "PASS_10_OF_10_CURRENT_QUEUE_SEMANTIC_ENTRIES__INDEX128_BINDING_ORDER_REMAINS_UNRESOLVED_FAIL_CLOSED",
+    "geometry": "PASS_11_OF_11_PARENT_RECTS_IN_CANVAS__11_OF_11_NONEMPTY_STRICT_2PX_GUARDS__ZERO_SAME_SOURCE_RECT_OVERLAP_EXCEPT_INTENTIONAL_QUEUE_ALIAS_REUSE",
+    "source_effect_masks": "HOLD_NOT_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_MUST_DERIVE_FROM_EXACT_SOURCE_EFFECT_PIXELS",
+    "candidate_dds": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "This task creates current-v2 executable reconstruction bounds, not source-derived mask/CLEAN_PLATE/candidate pixels. Exact DDS header decode, source-effect masks, protected-art masks, independently passing CLEAN_PLATE pixels/QA, measured candidate_safe_bbox, Korean render, zero-pixel containment and exact English-source-vs-Korean-candidate gates remain mandatory. Index 128 semantic-to-strip ordering is explicitly unresolved.",
+  "strict_hold": {
+    "exact_dds_header_channel_masks_mips": "HOLD_BINARY_DECODE_REQUIRED",
+    "per_element_raw_orientation": "HOLD_EXACT_DECODE_RECONFIRM_REQUIRED",
+    "index128_semantic_to_strip_binding": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_effect_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "protected_non_text_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_pixels": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_YET_EXECUTED",
+    "candidate_safe_bboxes": "HOLD_MUST_DERIVE_FROM_MEASURED_SOURCE_EFFECT_PIXELS",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

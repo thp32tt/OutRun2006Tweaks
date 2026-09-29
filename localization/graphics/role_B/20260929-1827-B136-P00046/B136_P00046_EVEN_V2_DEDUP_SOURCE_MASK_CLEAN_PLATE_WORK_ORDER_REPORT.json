@@ -1,0 +1,438 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00115",
+  "wave_id": "P00046",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T18:27:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "precommit_head_sha": "0b6b886a152ccc004399e27f75f23040425a6dcc",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_V2_DEDUP_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_11_UNIQUE_UNITS",
+  "runtime_validation": "UNTESTED",
+  "source_policy": {
+    "source_repo": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "rule": "Exact HD Release DDS is the construction source. Current GitHub branch metadata is the only work-state source. No N100/local clone/GPT Library."
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "asset_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "reused_immutable_evidence": [
+    {
+      "queue_indices": [
+        36
+      ],
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00036",
+      "report_blob_sha": "886dfcfcde49aa44ed429349675b1b0e22c31f3e",
+      "current_queue_acceptance": "B00036+C96"
+    },
+    {
+      "queue_indices": [
+        38
+      ],
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00042",
+      "report_blob_sha": "d40bf3de5b77ddade38d3b1034ea9a0853f084dc",
+      "current_queue_acceptance": "B00042+C98"
+    },
+    {
+      "queue_indices": [
+        128
+      ],
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00051",
+      "report_blob_sha": "cd4b075f16f6a1c354b67e25584bd4266adb2485",
+      "current_queue_acceptance": "B00051+C101"
+    },
+    {
+      "queue_indices": [
+        206
+      ],
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00039",
+      "report_blob_sha": "a71c5d8bb0da2ace8028a7fd68b0894f49978ffe",
+      "current_queue_acceptance": "B00039+C97"
+    }
+  ],
+  "assets": [
+    {
+      "queue_indices": [
+        36,
+        38
+      ],
+      "assets": [
+        "06AB5CEE",
+        "6AB5CEE"
+      ],
+      "queue_paths": [
+        "textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+        "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds"
+      ],
+      "alias_dedup": {
+        "physical_hd_source": "Release/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+        "hd_release_blob_sha": "2302d1218646d51f3d23ce7b93ce9c941ceaaf93",
+        "hd_bytes": 67108992,
+        "expected_dimensions": [
+          4096,
+          4096
+        ],
+        "expected_format": "RGBA32",
+        "expected_mipmaps": 1,
+        "size_equation": "67108992 = 128 + 4096*4096*4",
+        "rule": "Run heavy source/header/orientation/mask QA once for this shared physical source fingerprint; reuse for both queue aliases unless their source/candidate/contract fingerprint diverges."
+      },
+      "canonical_translation": {
+        "source": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      "queue_physical_occurrences": 6,
+      "deduplicated_source_work_units": 3,
+      "elements": [
+        {
+          "sprite": "sprite_7",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "hd_sprite_rect": [
+            1088,
+            3080,
+            2048,
+            1016
+          ],
+          "inspection_guard_2px": [
+            1090,
+            3082,
+            2044,
+            1012
+          ]
+        },
+        {
+          "sprite": "sprite_8",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "hd_sprite_rect": [
+            0,
+            1488,
+            1720,
+            1016
+          ],
+          "inspection_guard_2px": [
+            2,
+            1490,
+            1716,
+            1012
+          ]
+        },
+        {
+          "sprite": "sprite_9",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "hd_sprite_rect": [
+            1720,
+            1488,
+            1640,
+            1016
+          ],
+          "inspection_guard_2px": [
+            1722,
+            1490,
+            1636,
+            1012
+          ]
+        }
+      ],
+      "protected_artwork": [
+        "A/B/C/D/E grade artwork",
+        "heart/icon artwork",
+        "lens flare",
+        "Jennifer character art",
+        "speech/starburst backgrounds"
+      ],
+      "raw_orientation": "HOLD_EXACT_DECODE_RECONFIRM_REQUIRED",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_PITCH_MIPCOUNT_32BPP_CHANNEL_MASKS_BEFORE_PIXEL_INTERPRETATION",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 128,
+      "asset": "12519155",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+        "git_blob_sha": "f67f3e3f4031d3e72dac17ec8ade898125518b5f",
+        "bytes": 4194432,
+        "expected_dimensions": [
+          1024,
+          1024
+        ],
+        "size_equation": "4194432 = 128 + 1024*1024*4",
+        "format_status": "RGBA32_MIP1_SIZE_COMPATIBLE__HEADER_CONFIRM_REQUIRED"
+      },
+      "atlas4x": {
+        "git_blob_sha": "2d6e416344ef31afa1cbe8cb8c4315692780ead7",
+        "width": 1024,
+        "height": 1024,
+        "regions_count": 7,
+        "regions": [
+          {
+            "sprite": "sprite_450",
+            "rect": [
+              0,
+              948,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              950,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          },
+          {
+            "sprite": "sprite_451",
+            "rect": [
+              0,
+              872,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              874,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          },
+          {
+            "sprite": "sprite_452",
+            "rect": [
+              0,
+              796,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              798,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          },
+          {
+            "sprite": "sprite_453",
+            "rect": [
+              0,
+              720,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              722,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          },
+          {
+            "sprite": "sprite_454",
+            "rect": [
+              0,
+              644,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              646,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          },
+          {
+            "sprite": "sprite_455",
+            "rect": [
+              0,
+              568,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              570,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          },
+          {
+            "sprite": "sprite_456",
+            "rect": [
+              0,
+              492,
+              960,
+              76
+            ],
+            "inspection_guard_2px": [
+              2,
+              494,
+              956,
+              72
+            ],
+            "semantic_binding": "UNRESOLVED_FAIL_CLOSED"
+          }
+        ]
+      },
+      "canonical_semantics": [
+        {
+          "source": "Time Attack Mode / 15 C.",
+          "korean": "타임 어택 모드 / 15코스"
+        },
+        {
+          "source": "Alpine",
+          "korean": "알파인"
+        },
+        {
+          "source": "Ancient Ruins",
+          "korean": "고대 유적"
+        },
+        {
+          "source": "Bay Area",
+          "korean": "베이 에어리어"
+        },
+        {
+          "source": "Big Forest",
+          "korean": "빅 포레스트"
+        },
+        {
+          "source": "Canyon",
+          "korean": "캐니언"
+        },
+        {
+          "source": "Cape Way",
+          "korean": "케이프 웨이"
+        }
+      ],
+      "binding_contract": "All seven strips are localizable-text reconstruction scopes, but current evidence does not prove which canonical semantic belongs to which strip. Keep every semantic-to-strip assignment UNRESOLVED_FAIL_CLOSED until exact decoded English source confirms it.",
+      "protected_artwork": [
+        "non-text background/effects outside the seven strip cells"
+      ],
+      "raw_orientation": "HOLD_EXACT_DECODE_RECONFIRM_REQUIRED",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_PITCH_MIPCOUNT_32BPP_CHANNEL_MASKS_BEFORE_PIXEL_INTERPRETATION",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 206,
+      "asset": "AEA507A4",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+        "git_blob_sha": "63a29db6e8eaaface8036a03f87e9de2ad750184",
+        "bytes": 2796368,
+        "expected_dimensions": [
+          2048,
+          1024
+        ],
+        "size_equation": "2796368 = 128 + 2796240 bytes, exactly compatible with a 2048x1024 BC3/DXT5 full 12-level mip chain; DDS header must confirm format/mip count before decode.",
+        "format_status": "BC3_DXT5_FULL_MIP_CHAIN_SIZE_COMPATIBLE__HEADER_CONFIRM_REQUIRED"
+      },
+      "canonical_translation": {
+        "source": "START",
+        "korean": "출발"
+      },
+      "element": {
+        "sprite": "sprite_1448",
+        "source": "START",
+        "korean": "출발",
+        "hd_sprite_rect": [
+          0,
+          348,
+          1160,
+          676
+        ],
+        "inspection_guard_2px": [
+          2,
+          350,
+          1156,
+          672
+        ],
+        "parent_rect_bc3_block_aligned": true
+      },
+      "protected_artwork": [
+        "route/road artwork",
+        "controller icon",
+        "yin-yang/symbol icon",
+        "car artwork",
+        "all non-text transparent/background pixels"
+      ],
+      "raw_orientation": "HOLD_EXACT_DECODE_RECONFIRM_REQUIRED",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_LINEAR_SIZE_MIPCOUNT_FOURCC_DXT5_BEFORE_BC3_PIXEL_INTERPRETATION",
+      "candidate_dds_modified": false
+    }
+  ],
+  "deterministic_v2_work_order": {
+    "selected_queue_rows": 4,
+    "unique_physical_hd_sources": 3,
+    "queue_physical_text_occurrences": 14,
+    "deduplicated_source_work_units": 11,
+    "new_two_px_inspection_guards": 11,
+    "inspection_guard_semantics": "Upper bounds for exact decoded-source analysis only. Never treat a guard rectangle as a removal mask or final candidate_safe_bbox.",
+    "stage_1_header_and_decode": [
+      "Fetch the exact pinned HD Release DDS binary from GitHub.",
+      "Verify DDS magic/dimensions/pitch-or-linear-size/mip count/format masks or FourCC before interpreting pixels.",
+      "Decode without normalizing raw atlas orientation."
+    ],
+    "stage_2_source_effect_mask": [
+      "Inside only the listed parent sprite/strip rect, isolate the complete English glyph/effect footprint including antialias fringe, outline, shadow and glow.",
+      "Require the measured source-effect bbox to remain fully inside the listed 2px inspection guard; touching/exceeding the guard is HOLD_STRICT_RECHECK.",
+      "Record source-effect-mask hash, pixel count and effect-inclusive bbox per unique work unit.",
+      "For index 128 first prove semantic-to-strip binding from the exact decoded English source; do not guess ordering."
+    ],
+    "stage_3_clean_plate": [
+      "Remove only source-effect-mask pixels.",
+      "Reconstruct from the same exact HD source neighborhood; no previous Korean pixels, opaque patches, cross-asset copies or flattened-raster scaling.",
+      "Require zero mutation outside the removal mask, zero protected-art mutation, zero alpha change outside the removal mask, no English residue and no seam/box/patch.",
+      "If source-faithful reconstruction is not provable, stop as MANUAL_RECONSTRUCTION_REQUIRED."
+    ],
+    "stage_4_candidate_safe_bbox": [
+      "Derive candidate_safe_bbox only after measured source-effect pixels exist, using the current v2 default 2px safety inset and applicable permitted region.",
+      "Do not promote these inspection guards directly to candidate_safe_bbox.",
+      "Render/measure/refit Korean lettering at native resolution; never shrink a flattened text raster."
+    ],
+    "final_candidate_gate": [
+      "All Korean/effect pixels remain inside candidate_safe_bbox with zero-pixel overflow.",
+      "DDS dimensions/format/mips/alpha behavior and per-element raw orientation are preserved.",
+      "Exact identical-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof passes with no residue, clipping, overlap or artwork intrusion.",
+      "Runtime remains UNTESTED until real game evidence exists."
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_36_38_128_206",
+    "current_queue_action": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "alias_dedup": "PASS_36_38_SHARE_EXACT_HD_BLOB_2302D121__HEAVY_SOURCE_WORK_3_UNITS_NOT_DUPLICATED",
+    "canonical_semantics": "PASS_10_OF_10_CURRENT_QUEUE_SEMANTIC_ENTRIES__INDEX128_BINDING_ORDER_REMAINS_UNRESOLVED_FAIL_CLOSED",
+    "geometry": "PASS_11_OF_11_PARENT_RECTS_IN_CANVAS__11_OF_11_NONEMPTY_STRICT_2PX_GUARDS__ZERO_SAME_SOURCE_RECT_OVERLAP_EXCEPT_INTENTIONAL_QUEUE_ALIAS_REUSE",
+    "source_effect_masks": "HOLD_NOT_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_MUST_DERIVE_FROM_EXACT_SOURCE_EFFECT_PIXELS",
+    "candidate_dds": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00046 materially advances four even primary-shard rows into current first-pass-v2 header-gated source-effect-mask/CLEAN_PLATE execution work. Alias rows 36/38 are deduplicated to one physical HD source fingerprint, index 128 remains semantic-binding fail-closed, and no candidate/static/runtime PASS is fabricated."
+}
