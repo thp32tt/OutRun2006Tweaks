@@ -124,6 +124,34 @@ def main() -> int:
             "R71 renderer c64 guard lost generic-overlay non-promotion rationale"
         )
 
+    # L1-VIS-002 / SkyGlow: the stereo world glow must be composited before
+    # recognized HUD/non-world overlay draws. Present is only a fallback when
+    # no pre-HUD attempt occurred; a failed pre-HUD attempt must not retry over UI.
+    for marker in (
+        "R30SkyGlowAppliedEpoch",
+        "R30SkyGlowPreHudAttemptEpoch",
+        "R30CompositeSkyGlowBeforeHud(",
+        "R30SkyGlowPreHudAttemptEpoch = PresentEpoch",
+        "R30SkyGlowAppliedEpoch = PresentEpoch",
+        "R30SkyGlowAppliedEpoch != PresentEpoch",
+        "R30SkyGlowPreHudAttemptEpoch != PresentEpoch",
+        "if (!state.worldEffect)\n                R30CompositeSkyGlowBeforeHud(device);",
+        "Composite completed world glow before the first recognized HUD",
+    ):
+        if marker not in r30_source:
+            raise AssertionError(
+                f"DXVK SkyGlow pre-HUD composite contract missing marker: {marker}"
+            )
+
+    helper_pos = r30_source.find("bool R30CompositeSkyGlowBeforeHud(")
+    present_pos = r30_source.find("HRESULT __stdcall PresentDestR30(")
+    if helper_pos < 0 or present_pos < 0 or helper_pos > present_pos:
+        raise AssertionError("SkyGlow pre-HUD helper must be defined before Present fallback")
+    if r30_source.count("R30CompositeSkyGlowBeforeHud(device);") < 2:
+        raise AssertionError(
+            "SkyGlow pre-HUD composite must cover both non-world XYZRHW and recognized HUD paths"
+        )
+
     # DX9EX-FINGERPRINT-001: diagnostics may fingerprint exact queue owners,
     # projected screen effects, and generic queue overlays only while the queue
     # renderer is active. Fingerprints are bounded and never grant ownership.
