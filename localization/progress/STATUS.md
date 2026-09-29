@@ -1255,3 +1255,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00202 `a35266ef` disposition remains **REWORK_REQUIRED**. Index226's unpersisted candidate is not promoted because current corrected geometry invalidates its fingerprint; index232 remains **PREFLIGHT_ONLY** with two canonical description-translation blockers.
 - No static/runtime approval was added. Counts remain pending production **71**, actionable localize_text **93**, canonical segments **753**.
 - `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`. This bookkeeping commit is separate from the validation-bearing result and does not own the Gate.
+## 2026-09-30 04:42 KST - C146 Q00044 INDEPENDENT QA BATCH
+- A00204 `e0649521...`: **PASS**, index198/9FC88069 -> **RENDER_READY** after independent exact-source CLEAN_PLATE replay (77,975 mask pixels; raw/display SHA `c210abb5...` / `d9d044a6...`; 0 outside/protected/alpha-outside changes; 2px safe bboxes accepted).
+- B00206 `d95e2968...`: **PASS** for the fail-closed semantic audit, index133/25F697C6 remains **PREFLIGHT_ONLY**. Exact source contains ANCIENT RUINS but not the other 8 currently assigned strings; re-bind those semantics before any mask/render work.
+- Shared next action order: **RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY index133/222/232**; candidate-QA 159/201 and direct rework 226 remain ahead of unrelated preflight. Runtime remains **UNTESTED**.
+- Report: `localization/graphics/role_C/20260930-0442-C146/C146_Q00044_INDEPENDENT_QA_BATCH.json`.

@@ -7,9 +7,9 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: none newly accepted by Q00043. Direct REWORK_REQUIRED candidate-completion priority is index226: regenerate from current corrected exact-source geometry and persist the candidate plus mandatory review set; existing candidate-QA backlog 159/201 remains ahead of unrelated preflight.",
-    "ONE_STAGE_TO_RENDER: none newly accepted by Q00043.",
-    "PREFLIGHT_ONLY CANDIDATE-COMPLETION: indices133/198/222 remain prior exact-source multistage; index226 current-head corrected geometry is out-of-batch and awaits a fresh immutable producer result/C acceptance; index232 requires two canonical description translations before complete clean-plate/render work.",
+    "RENDER_READY: index198/9FC88069 is newly accepted by Q00044. Exact source, 7/7 semantic bindings, seven source-effect/removal masks, independently replayed CLEAN_PLATE and final 2px candidate_safe_bbox set are accepted. Producer A must measure source typography/baseline/signed slant and render/persist the v2 Korean candidate in the same invocation; do not open another unrelated preflight first.",
+    "ONE_STAGE_TO_RENDER: none newly accepted by Q00044.",
+    "PREFLIGHT_ONLY CANDIDATE-COMPLETION: index133/25F697C6 remains blocked because only ANCIENT RUINS is physically bound and eight assigned translation strings are absent from the exact source; semantic re-binding is required before mask/CLEAN_PLATE/safe-bbox/render. Indices222/232 remain prior candidate-completion preflight. Existing candidate-QA 159/201 and direct REWORK_REQUIRED index226 remain candidate-bearing work and stay ahead of unrelated preflight.",
     "PREFLIGHT_ONLY SOURCE-EXHAUSTED: 28/30/34/36/46/48/52/55/100/103/106/132/135/139/147/154/164/172/205/214/219/225/228 remain sticky until source/inventory/policy fingerprint changes."
   ],
   "prototype_history": {
@@ -2365,125 +2365,165 @@
   },
   "latest_qa_batch": {
     "schema_version": 11,
-    "schema": "outrun-c145-q00043-independent-qa-batch-v1",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00207",
-    "wave_id": "Q00043",
-    "qa_batch_id": "Q00043",
-    "run": "C145",
+    "schema": "outrun-c146-q00044-independent-qa-batch-v1",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00210",
+    "wave_id": "Q00044",
+    "qa_batch_id": "Q00044",
+    "run": "C146",
     "lane": "LOCALIZATION_C",
     "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
     "target_branch": "korean-localization-clean",
     "attempt": "1/3",
-    "recorded_at_kst": "2026-09-30T04:30:00+09:00",
-    "base_head_sha": "9667b84bf5b2e020356acb94323f340a838018d7",
-    "base_sha": "9667b84bf5b2e020356acb94323f340a838018d7",
-    "result": "REWORK_REQUIRED_Q00043_B00202_INDEX226_STALE_GEOMETRY_UNPERSISTED_CANDIDATE__INDEX232_TRANSLATION_HOLD_RUNTIME_UNTESTED",
-    "summary": "Q00043 independently reviews immutable B00202@a35266ef074dea4b8e84ca95806928384298f4ea. Exact canonical source identity for indices226/232 is unchanged from C142 and is reused rather than re-probed. The index226 locally generated candidate cannot be promoted because its DDS/review PNG set was never persisted and current HEAD inherits corrected exact-source geometry with a materially different removal-mask/clean-plate fingerprint. Index232 has no candidate and current HEAD conservatively retains two canonical translation blockers. The immutable producer input is REWORK_REQUIRED as one input; no static/runtime approval is issued.",
+    "recorded_at_kst": "2026-09-30T04:42:00+09:00",
+    "base_head_sha": "a43278e28f102890a13e5fdf396ec7b41a4811fd",
+    "base_sha": "a43278e28f102890a13e5fdf396ec7b41a4811fd",
+    "result": "PASS_Q00044_A00204_INDEX198_RENDER_READY__B00206_INDEX133_SEMANTIC_CONFLICT_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+    "summary": "Q00044 independently reviews immutable A00204@e064952137805d785ee71675babe75e22982a83a and B00206@d95e2968e33929b857e9701c78edefc0a17d678b. C independently replays index198 exact-source mask/CLEAN_PLATE evidence from the pinned v0.25.10a archive and reproduces all seven masks, 77,975 changed pixels, both CLEAN_PLATE hashes and zero protected/outside changes; with 7/7 semantic bindings and final 2px safe bboxes this promotes index198 to RENDER_READY. C also independently confirms index133 exact source contains only ANCIENT RUINS from the nine currently assigned strings; B's fail-closed audit is correct, but index133 remains PREFLIGHT_ONLY until the eight absent strings are semantically re-bound. No Korean candidate bytes are approved or modified; runtime remains UNTESTED.",
     "qa_batch_inputs": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "e064952137805d785ee71675babe75e22982a83a",
+        "result_message": "localization(A): close index198 precandidate gates [AUTO:LOCALIZATION-LOCALIZATION_A-00204]",
+        "completed_at": "2026-09-30T04:37:46.829826+09:00",
+        "producer_id": "P00106",
+        "automation_validation": "PENDING",
+        "validation_mode": "C_BATCH_GATE"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00206",
         "lane": "LOCALIZATION_B",
-        "result_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
-        "result_message": "localization(B): bind 226/232 and record persistence hold [AUTO:LOCALIZATION-LOCALIZATION_B-00202]",
-        "completed_at": "2026-09-30T04:29:58.553803+09:00",
-        "producer_id": "P00105",
+        "result_sha": "d95e2968e33929b857e9701c78edefc0a17d678b",
+        "result_message": "localization(B): audit index133 exact-source semantic binding [AUTO:LOCALIZATION-LOCALIZATION_B-00206]",
+        "completed_at": "2026-09-30T04:39:39.962633+09:00",
+        "producer_id": "P00107",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       }
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
-        "result_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
-        "status": "REWORK_REQUIRED",
-        "reason": "Immutable B00202@a35266e generated index226 candidate SHA-256 9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b but did not persist the DDS or mandatory GitHub PNG review set, so C cannot independently replay candidate-byte/header/alpha/orientation/English-vs-Korean visual gates. More importantly, current HEAD inherits newer exact-source geometry at 7e4e565 for the same canonical source: index226 removal-mask pixels change from 107726 to 84629 and clean-plate SHA changes from 777e0d8b... to 55ce1f8e..., invalidating the immutable candidate geometry fingerprint rather than merely leaving it ambiguous. Index232 also remains non-renderable: current HEAD restricts the clean plate to four canonically translated JOIN/CREATE occurrences and keeps both description strings as canonical-translation blockers. No newer persisted candidate SHA exists for index226, so SUPERSEDED does not apply. The producer input is REWORK_REQUIRED; regenerate/persist index226 from corrected geometry with the required review set, and keep index232 fail-closed until canonical translations are resolved. RUNTIME_VALIDATION=UNTESTED."
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
+        "result_sha": "e064952137805d785ee71675babe75e22982a83a",
+        "status": "PASS",
+        "reason": "Immutable A00204 pre-generation evidence is accepted. C independently verified the pinned OR2-HD-GUI-v0.25.10a archive SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958, extracted exact 9FC88069 source SHA-256 2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4, and re-decoded 4096x2048 RGBA32 mip1 with the recorded FLIP_Y readable transform. Replaying the seven producer mask rules from exact pixels reproduces per-cell mask counts 11581/12160/10624/13088/9584/10549/10389, aggregate 77975, CLEAN_PLATE raw/display SHA-256 c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7 / d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320, zero changed pixels outside removal masks, zero protected-mask changes, and zero alpha changes outside removal masks. The 7/7 exact-lineage semantic bindings and 2px v2 candidate_safe_bbox set remain current, no newer index198 candidate exists at merge HEAD, and candidate-only DDS/containment/source-vs-Korean gates are not applicable because no Korean candidate was emitted. This evidence is therefore PASS with production_readiness=RENDER_READY; producer A must measure source style/signed slant and continue through Korean render/persistence in the same invocation. RUNTIME_VALIDATION=UNTESTED."
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00206",
+        "result_sha": "d95e2968e33929b857e9701c78edefc0a17d678b",
+        "status": "PASS",
+        "reason": "Immutable B00206 semantic-binding audit is accepted as fail-closed pre-generation evidence. C independently verified exact 25F697C6 source SHA-256 8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04, 2048x2048 RGBA32 mip1 and FLIP_Y readable orientation from the same pinned archive. Readable exact-source review confirms ANCIENT RUINS is present while ALPINE, BLU MIRABEAU, ARGENTO NURBURGRING, BIANCO AVUS, NERO, ROSSO SCUDERIA, GRIGIO ALLOY and GIALLO MODENA are absent; the remaining visible strings are protected Ferrari model names. B correctly refused guessed/partial rendering. No newer index133 candidate exists at merge HEAD. The eight existing translation strings are retained as unbound metadata only and are not authorized for placement in this DDS until semantic re-binding is proven. production_readiness=PREFLIGHT_ONLY; masks/CLEAN_PLATE/safe-bbox/render remain blocked by the semantic metadata conflict. RUNTIME_VALIDATION=UNTESTED."
       }
     ],
     "immutable_input_resolution": {
-      "exact_input_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
-      "producer_auto_marker": "PASS_EXACT_B00202",
-      "producer_durable_task_record_same_commit": true,
-      "producer_lane_local_material_reports_same_commit": true,
-      "result_commit_descends_to_current_head": true,
-      "current_head_sha": "9667b84bf5b2e020356acb94323f340a838018d7",
-      "current_head_ahead_of_input_by": 4,
-      "newer_persisted_candidate_sha_for_226": false,
-      "newer_out_of_batch_geometry_evidence_sha": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
-      "newer_disjoint_producer_at_merge": "LOCALIZATION-LOCALIZATION_A-00204@9667b84bf5b2e020356acb94323f340a838018d7",
-      "disposition_rule": "REWORK_REQUIRED_CANDIDATE_FINGERPRINT_INVALIDATED_AND_REQUIRED_REVIEW_BYTES_NOT_PERSISTED"
+      "current_head_sha": "a43278e28f102890a13e5fdf396ec7b41a4811fd",
+      "current_head_after_inputs": true,
+      "a00204_result_descends_to_current_head": true,
+      "b00206_result_descends_to_current_head": true,
+      "newer_index198_candidate_at_merge": false,
+      "newer_index133_candidate_at_merge": false,
+      "disposition_rule": "PASS_VALID_PREGEN_EVIDENCE_WITH_ASSET_LOCAL_READINESS_CLASSIFICATION"
     },
     "fingerprint_reconciliation": {
       "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
-      "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+      "current_asset_queue_blob_sha": "3e2ddab4862e80aa6c8ba051c219615bbcaa47e0",
       "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
-      "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
-      "current_geometry_report_blob_sha": "ea4c8557b7a5dc5f664cdf6f3be5d694e3e98d71",
-      "source_identity_heavy_qa": "REUSED_UNCHANGED_C142_EXACT_CANONICAL_SOURCE__NOT_REPEATED",
-      "source_or_contract_change": false,
-      "geometry_evidence_change": true,
-      "candidate_bytes_available_at_result_sha": false,
-      "candidate_review_set_available_at_result_sha": false
+      "pinned_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "duplicated_heavy_source_checks": "DEDUPED_PER_UNIQUE_ASSET_SOURCE_FINGERPRINT",
+      "index198_source_fingerprint": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4|RGBA32|4096x2048|mip1|flip_y|contract:19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+      "index133_source_fingerprint": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04|RGBA32|2048x2048|mip1|flip_y|contract:19f5bb4ade80ee5ae110637b146ef1bb367d2fe4"
     },
     "reviewed_assets": [
       {
-        "index": 226,
-        "asset": "E3F4BA07",
-        "canonical_source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+        "index": 198,
+        "asset": "9FC88069",
+        "canonical_source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
         "source_format": "RGBA32",
         "canvas": [
-          2048,
-          512
+          4096,
+          2048
         ],
         "mipmaps": 1,
         "raw_to_readable": "flip_y",
-        "immutable_candidate_sha256": "9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b",
-        "immutable_candidate_persisted": false,
-        "immutable_review_pngs_persisted": false,
-        "immutable_removal_mask_pixels": 107726,
-        "current_head_removal_mask_pixels": 84629,
-        "immutable_clean_plate_rgba_sha256": "777e0d8b13b90d711f7b43f073395c3abab363e6fb7665b963f88c55a93cca4d",
-        "current_head_clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
-        "semantic_binding": "10/10 exact regions; 8 localize + 2 protected brands, reusable",
-        "disposition": "REWORK_REQUIRED",
-        "production_readiness": "NOT_PROMOTED_REWORK_REQUIRED",
-        "required_next": "Regenerate from current corrected exact-source geometry; persist DDS plus KOREAN_PNG_REVIEW source/clean/candidate/comparison, generation_prompt.json and qa_report.json; then submit a fresh immutable producer result.",
+        "semantic_binding": "7/7 exact-lineage semantic cells accepted",
+        "removal_mask_pixels_by_cell": [
+          11581,
+          12160,
+          10624,
+          13088,
+          9584,
+          10549,
+          10389
+        ],
+        "removal_mask_pixels": 77975,
+        "clean_plate_raw_rgba_sha256": "c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7",
+        "clean_plate_display_rgba_sha256": "d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320",
+        "clean_plate_changed_outside_mask": 0,
+        "clean_plate_changed_in_protected_mask": 0,
+        "clean_plate_alpha_changed_outside_mask": 0,
+        "candidate_safe_bbox": "PASS_2PX_7_OF_7",
+        "candidate_generated": false,
+        "disposition": "PASS",
+        "production_readiness": "RENDER_READY",
+        "required_next": "Producer A: measure source typography/baseline/signed slant and render/refit/encode/persist the outrun-first-pass-edit-v2 Korean candidate plus mandatory GitHub PNG review set in the same invocation.",
         "runtime_validation": "UNTESTED"
       },
       {
-        "index": 232,
-        "asset": "EBFC709F",
-        "canonical_source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+        "index": 133,
+        "asset": "25F697C6",
+        "canonical_source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
         "source_format": "RGBA32",
         "canvas": [
           2048,
-          1024
+          2048
         ],
         "mipmaps": 1,
         "raw_to_readable": "flip_y",
-        "immutable_candidate_generated": false,
-        "immutable_clean_plate_scope": "all six source text regions",
-        "current_head_clean_plate_scope": "four currently translated JOIN/CREATE occurrences only; two descriptions untouched",
-        "current_head_removal_mask_pixels": 192602,
-        "canonical_translation_blockers": [
-          "Join your friends in a game of OutRun!",
-          "Create a game and invite your friends!"
+        "semantic_binding": "1/9 physically bound: ANCIENT RUINS -> 고대 유적; 8 assigned strings absent from exact source",
+        "absent_assigned_strings": [
+          "ALPINE",
+          "BLU MIRABEAU",
+          "ARGENTO NURBURGRING",
+          "BIANCO AVUS",
+          "NERO",
+          "ROSSO SCUDERIA",
+          "GRIGIO ALLOY",
+          "GIALLO MODENA"
         ],
-        "disposition": "INPUT_REWORK_REQUIRED_NO_ASSET_PROMOTION",
+        "protected_visible_model_names": [
+          "F430",
+          "512BB",
+          "328 GTS",
+          "F50",
+          "F40",
+          "DINO 246 GTS",
+          "250 GTO",
+          "288 GTO",
+          "365 GTS/4 DAYTONA",
+          "360 SPIDER",
+          "SUPERAMERICA",
+          "ENZO FERRARI",
+          "550 BARCHETTA",
+          "F355 SPIDER",
+          "TESTAROSSA"
+        ],
+        "candidate_generated": false,
+        "disposition": "PASS",
         "production_readiness": "PREFLIGHT_ONLY",
-        "required_next": "Resolve both index232 canonical Korean description bindings in shared transcription, then complete full removal mask/CLEAN_PLATE/safe-bbox independent QA before render.",
+        "required_next": "Re-bind the eight absent translation strings to their exact canonical source assets/regions. Do not render them into 25F697C6. After semantic resolution, derive source-effect/removal/protected masks, independently validate CLEAN_PLATE and final safe bbox before Korean rendering.",
         "runtime_validation": "UNTESTED"
       }
     ],
     "candidate_only_gates": {
-      "index226_one_pixel_containment": "NOT_INDEPENDENTLY_REPLAYABLE_REQUIRED_CANDIDATE_BYTES_MISSING_AND_GEOMETRY_FINGERPRINT_CHANGED",
-      "index226_dds_header_mipmap_alpha_orientation": "PRODUCER_CLAIM_PRESENT_BUT_NOT_PROMOTED_WITHOUT_PERSISTED_CANDIDATE_BYTES",
-      "index226_english_source_vs_korean_candidate": "REQUIRED_GITHUB_REVIEW_SET_NOT_PERSISTED__NO_C_PASS",
-      "index232_candidate_gates": "NOT_APPLICABLE_NO_CANDIDATE",
-      "static_approval": "NONE_Q00043"
+      "index198_candidate_gates": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE__PREGEN_EVIDENCE_ONLY",
+      "index133_candidate_gates": "NOT_APPLICABLE_NO_KOREAN_CANDIDATE__SEMANTIC_BINDING_BLOCKER",
+      "static_approval": "NONE_Q00044"
     },
     "readiness_reconciliation": {
-      "classification": "INPUT_REWORK_REQUIRED__NO_NEW_PREGEN_ACCEPTANCE",
-      "render_ready_indices": [],
+      "classification": "A00204_PASS_RENDER_READY__B00206_PASS_PREFLIGHT_ONLY",
+      "render_ready_indices": [
+        198
+      ],
       "one_stage_to_render_indices": [],
       "candidate_qa_pending_indices": [
         159,
@@ -2491,31 +2531,32 @@
       ],
       "preflight_only_candidate_completion_indices": [
         133,
-        198,
         222,
-        226,
         232
       ],
+      "direct_rework_candidate_indices": [
+        226
+      ],
       "input_production_readiness": {
-        "226": "NOT_PROMOTED_REWORK_REQUIRED",
-        "232": "PREFLIGHT_ONLY_NO_NEW_PROMOTION"
+        "133": "PREFLIGHT_ONLY",
+        "198": "RENDER_READY"
       },
       "candidate_completion_priority": [
-        "RENDER_READY: none newly accepted by Q00043. Direct REWORK_REQUIRED candidate-completion priority is index226: regenerate from current corrected exact-source geometry and persist the candidate plus mandatory review set; existing candidate-QA backlog 159/201 remains ahead of unrelated preflight.",
-        "ONE_STAGE_TO_RENDER: none newly accepted by Q00043.",
-        "PREFLIGHT_ONLY CANDIDATE-COMPLETION: indices133/198/222 remain prior exact-source multistage; index226 current-head corrected geometry is out-of-batch and awaits a fresh immutable producer result/C acceptance; index232 requires two canonical description translations before complete clean-plate/render work.",
+        "RENDER_READY: index198/9FC88069 is newly accepted by Q00044. Exact source, 7/7 semantic bindings, seven source-effect/removal masks, independently replayed CLEAN_PLATE and final 2px candidate_safe_bbox set are accepted. Producer A must measure source typography/baseline/signed slant and render/persist the v2 Korean candidate in the same invocation; do not open another unrelated preflight first.",
+        "ONE_STAGE_TO_RENDER: none newly accepted by Q00044.",
+        "PREFLIGHT_ONLY CANDIDATE-COMPLETION: index133/25F697C6 remains blocked because only ANCIENT RUINS is physically bound and eight assigned translation strings are absent from the exact source; semantic re-binding is required before mask/CLEAN_PLATE/safe-bbox/render. Indices222/232 remain prior candidate-completion preflight. Existing candidate-QA 159/201 and direct REWORK_REQUIRED index226 remain candidate-bearing work and stay ahead of unrelated preflight.",
         "PREFLIGHT_ONLY SOURCE-EXHAUSTED: 28/30/34/36/46/48/52/55/100/103/106/132/135/139/147/154/164/172/205/214/219/225/228 remain sticky until source/inventory/policy fingerprint changes."
       ]
     },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_REWORK_QA_AND_SHARED_STATE_RECONCILIATION",
+      "type": "INDEPENDENT_C_PREGEN_QA_AND_SHARED_STATE_RECONCILIATION",
       "reviewed_indices": [
-        226,
-        232
+        198,
+        133
       ],
       "reviewed_assets": 2,
-      "producer_inputs_pass": 0,
-      "producer_inputs_rework_required": 1,
+      "producer_inputs_pass": 2,
+      "producer_inputs_rework_required": 0,
       "producer_inputs_hold_strict_recheck": 0,
       "producer_inputs_superseded": 0,
       "metadata_segments_changed": 0,
@@ -2523,17 +2564,19 @@
       "actionable_localize_text_after": 93,
       "pending_production_localize_text_after": 71,
       "candidate_dds_modified_by_c": false,
+      "new_render_ready": 1,
       "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
-      "report": "localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260930-0442-C146/C146_Q00044_INDEPENDENT_QA_BATCH.json"
     },
     "evidence": [
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00202.json@a35266ef074dea4b8e84ca95806928384298f4ea",
-      "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX226_CANDIDATE_QA_AND_PERSISTENCE_HOLD.json@a35266ef074dea4b8e84ca95806928384298f4ea",
-      "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX232_BINDING_CLEAN_PLATE_SEMANTIC_GAP.json@a35266ef074dea4b8e84ca95806928384298f4ea",
-      "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_EXACT_SOURCE_GEOMETRY_CLEANPLATE.json@7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
-      "localization/graphics/role_C/20260930-0345-C142/C142_Q00040_INDEPENDENT_QA_BATCH.json",
-      "localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json"
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00204.json@e064952137805d785ee71675babe75e22982a83a",
+      "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_INDEX198_MASK_GEOMETRY.json@e064952137805d785ee71675babe75e22982a83a",
+      "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_INDEX198_CLEAN_PLATE_PATCH.json@e064952137805d785ee71675babe75e22982a83a",
+      "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_MOD3_INDEX198_PREFLIGHT.json@e064952137805d785ee71675babe75e22982a83a",
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00206.json@d95e2968e33929b857e9701c78edefc0a17d678b",
+      "localization/graphics/role_B/20260930-B00206-P00107/B00206_P00107_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_AUDIT.json@d95e2968e33929b857e9701c78edefc0a17d678b",
+      "pinned archive OR2-HD-GUI-v0.25.10a.zip SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958 independently decoded by C"
     ],
     "candidate_dds_modified": false,
     "shared_state_modified": true,
@@ -2545,22 +2588,12 @@
     "gpt_library_used": false,
     "google_drive_used": false,
     "google_drive_write_performed": false,
-    "uploaded_archive_used": false,
+    "uploaded_archive_used": true,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": "fbbf13f927f8c169379cbef94d76b793ecf01c6c",
-    "validation_bearing_result_sha": "fbbf13f927f8c169379cbef94d76b793ecf01c6c",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36620675196,
-      "run_attempt": 1,
-      "head_sha": "fbbf13f927f8c169379cbef94d76b793ecf01c6c",
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-09-30T04:38:53+09:00"
-    },
-    "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner."
+    "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SHARED_STATE",
+    "bookkeeping_note": "Pre-Gate C task record. This C AUTO result commit is the sole Localization Automation Gate owner for Q00044; result_sha/automation gate fields are added only after validation completes."
   }
 }
