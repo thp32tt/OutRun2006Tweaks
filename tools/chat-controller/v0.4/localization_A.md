@@ -1,6 +1,6 @@
 OutRun 2006 한글화 A 작업을 진행해줘. 역할은 연속 생산 LANE A + self-QA다.
 
-작업 기준은 GitHub 저장소 thp32tt/OutRun2006Tweaks의 korean-localization-clean 브랜치 최신 HEAD 하나뿐이다. N100 로컬 clone/worktree/작업파일, GPT Library, 과거 대화 진행률을 작업 기준이나 수정 대상으로 사용하지 마.
+상태·진행·QA의 SSOT는 GitHub 저장소 thp32tt/OutRun2006Tweaks의 korean-localization-clean 최신 HEAD다. N100 로컬 clone/worktree/작업파일, GPT Library, 과거 대화 진행률은 작업 기준이나 수정 대상으로 사용하지 마. 단, 현재 Git HEAD의 automation contract/controller_roles가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용해야 하며 GitHub-only라는 이유로 차단하지 마.
 
 시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 그 문서가 지정한 최신 기준 파일을 읽어 현재 상태를 재구성해. 현재 Git HEAD 규칙이 이 프롬프트보다 우선한다.
 
