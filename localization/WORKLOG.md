@@ -1801,3 +1801,16 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 159/201 remain candidate-QA-pending outside Q00042; 198/222 retain prior C142 **PREFLIGHT_ONLY** exact-source state. No Q00042 static/runtime approval.
 - Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 - This bookkeeping commit is separate from the validation-bearing result and does not own the Gate.
+
+
+## 2026-09-30 04:30 KST - C145 Q00043 INDEPENDENT QA BATCH
+
+- Immutable input: B00202 `a35266ef074dea4b8e84ca95806928384298f4ea` — **REWORK_REQUIRED**.
+- Source identity for E3F4BA07/EBFC709F is unchanged from C142 and heavy source/header/orientation identity checks are reused, not repeated.
+- Index226 candidate SHA-256 `9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b` was not persisted to Git and has no retained mandatory GitHub review PNG set. Current HEAD inherits `7e4e565` corrected exact-source geometry: removal-mask pixels **107726 -> 84629**, clean-plate SHA `777e0d8b...` -> `55ce1f8e...`. The old candidate fingerprint therefore requires re-render, not static promotion.
+- Index232 remains fail-closed with two canonical description strings unresolved; current HEAD uses a partial four-occurrence clean plate and does not render a candidate.
+- No SUPERSEDED disposition: there is no newer persisted candidate SHA for index226. Newer disjoint A00204 `9667b84` is outside this batch and preserved.
+- No candidate bytes were modified by C and no runtime test/build was performed.
+- Shared next actions keep candidate completion first: index226 rework/persistence; existing 159/201 candidate QA; exact-source multistage 133/198/222/226/232; unrelated source preflight last.
+- Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json`.

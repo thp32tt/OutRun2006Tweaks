@@ -1238,3 +1238,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - A00200 remains **SUPERSEDED** by newer overlapping 159/201 candidate state. 198/222 retain prior C142 **PREFLIGHT_ONLY** exact-source status.
 - Newer 159/201 candidates are not approved by this batch and still require their own C QA. No runtime validation was performed.
 - Pending production **71**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### C145 Q00043 — 2026-09-30T04:30:00+09:00
+- B00202 `a35266ef` — **REWORK_REQUIRED**.
+- Index226 immutable candidate `9bdc5176...` was generated only in producer runtime; DDS and mandatory GitHub PNG review set were not persisted, so independent candidate-byte/header/alpha/orientation/English-vs-Korean review cannot be promoted.
+- Current HEAD inherits corrected exact-source geometry from `7e4e565`: removal mask **107,726 -> 84,629** pixels and clean-plate hash changed, invalidating the immutable candidate fingerprint. No newer persisted candidate SHA exists, so this is not SUPERSEDED.
+- Index232 has no candidate and remains **PREFLIGHT_ONLY**; current HEAD keeps four translated JOIN/CREATE occurrences and two canonical description-translation blockers.
+- Newer disjoint A00204 `9667b84` evidence is outside Q00043 and preserved for a later immutable C batch.
+- Candidate-completion-first: regenerate/persist index226 from corrected geometry; keep 159/201 candidate QA and exact-source 133/198/222/226/232 work ahead of unrelated preflight.
+- Counts unchanged: pending production **71**, actionable localize_text **93**, canonical segments **753**. Report: `localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

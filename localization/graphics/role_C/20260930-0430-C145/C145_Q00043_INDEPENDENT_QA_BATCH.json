@@ -1,0 +1,188 @@
+{
+  "schema_version": 11,
+  "schema": "outrun-c145-q00043-independent-qa-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00207",
+  "wave_id": "Q00043",
+  "qa_batch_id": "Q00043",
+  "run": "C145",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T04:30:00+09:00",
+  "base_head_sha": "9667b84bf5b2e020356acb94323f340a838018d7",
+  "base_sha": "9667b84bf5b2e020356acb94323f340a838018d7",
+  "result": "REWORK_REQUIRED_Q00043_B00202_INDEX226_STALE_GEOMETRY_UNPERSISTED_CANDIDATE__INDEX232_TRANSLATION_HOLD_RUNTIME_UNTESTED",
+  "summary": "Q00043 independently reviews immutable B00202@a35266ef074dea4b8e84ca95806928384298f4ea. Exact canonical source identity for indices226/232 is unchanged from C142 and is reused rather than re-probed. The index226 locally generated candidate cannot be promoted because its DDS/review PNG set was never persisted and current HEAD inherits corrected exact-source geometry with a materially different removal-mask/clean-plate fingerprint. Index232 has no candidate and current HEAD conservatively retains two canonical translation blockers. The immutable producer input is REWORK_REQUIRED as one input; no static/runtime approval is issued.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
+      "result_message": "localization(B): bind 226/232 and record persistence hold [AUTO:LOCALIZATION-LOCALIZATION_B-00202]",
+      "completed_at": "2026-09-30T04:29:58.553803+09:00",
+      "producer_id": "P00105",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00202",
+      "result_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
+      "status": "REWORK_REQUIRED",
+      "reason": "Immutable B00202@a35266e generated index226 candidate SHA-256 9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b but did not persist the DDS or mandatory GitHub PNG review set, so C cannot independently replay candidate-byte/header/alpha/orientation/English-vs-Korean visual gates. More importantly, current HEAD inherits newer exact-source geometry at 7e4e565 for the same canonical source: index226 removal-mask pixels change from 107726 to 84629 and clean-plate SHA changes from 777e0d8b... to 55ce1f8e..., invalidating the immutable candidate geometry fingerprint rather than merely leaving it ambiguous. Index232 also remains non-renderable: current HEAD restricts the clean plate to four canonically translated JOIN/CREATE occurrences and keeps both description strings as canonical-translation blockers. No newer persisted candidate SHA exists for index226, so SUPERSEDED does not apply. The producer input is REWORK_REQUIRED; regenerate/persist index226 from corrected geometry with the required review set, and keep index232 fail-closed until canonical translations are resolved. RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "immutable_input_resolution": {
+    "exact_input_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
+    "producer_auto_marker": "PASS_EXACT_B00202",
+    "producer_durable_task_record_same_commit": true,
+    "producer_lane_local_material_reports_same_commit": true,
+    "result_commit_descends_to_current_head": true,
+    "current_head_sha": "9667b84bf5b2e020356acb94323f340a838018d7",
+    "current_head_ahead_of_input_by": 4,
+    "newer_persisted_candidate_sha_for_226": false,
+    "newer_out_of_batch_geometry_evidence_sha": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+    "newer_disjoint_producer_at_merge": "LOCALIZATION-LOCALIZATION_A-00204@9667b84bf5b2e020356acb94323f340a838018d7",
+    "disposition_rule": "REWORK_REQUIRED_CANDIDATE_FINGERPRINT_INVALIDATED_AND_REQUIRED_REVIEW_BYTES_NOT_PERSISTED"
+  },
+  "fingerprint_reconciliation": {
+    "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "current_geometry_report_blob_sha": "ea4c8557b7a5dc5f664cdf6f3be5d694e3e98d71",
+    "source_identity_heavy_qa": "REUSED_UNCHANGED_C142_EXACT_CANONICAL_SOURCE__NOT_REPEATED",
+    "source_or_contract_change": false,
+    "geometry_evidence_change": true,
+    "candidate_bytes_available_at_result_sha": false,
+    "candidate_review_set_available_at_result_sha": false
+  },
+  "reviewed_assets": [
+    {
+      "index": 226,
+      "asset": "E3F4BA07",
+      "canonical_source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_format": "RGBA32",
+      "canvas": [
+        2048,
+        512
+      ],
+      "mipmaps": 1,
+      "raw_to_readable": "flip_y",
+      "immutable_candidate_sha256": "9bdc5176a1f435a95ad6f3c16a06aab992a0e73b85e0eea4f754173f5d26e71b",
+      "immutable_candidate_persisted": false,
+      "immutable_review_pngs_persisted": false,
+      "immutable_removal_mask_pixels": 107726,
+      "current_head_removal_mask_pixels": 84629,
+      "immutable_clean_plate_rgba_sha256": "777e0d8b13b90d711f7b43f073395c3abab363e6fb7665b963f88c55a93cca4d",
+      "current_head_clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
+      "semantic_binding": "10/10 exact regions; 8 localize + 2 protected brands, reusable",
+      "disposition": "REWORK_REQUIRED",
+      "production_readiness": "NOT_PROMOTED_REWORK_REQUIRED",
+      "required_next": "Regenerate from current corrected exact-source geometry; persist DDS plus KOREAN_PNG_REVIEW source/clean/candidate/comparison, generation_prompt.json and qa_report.json; then submit a fresh immutable producer result.",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 232,
+      "asset": "EBFC709F",
+      "canonical_source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "source_format": "RGBA32",
+      "canvas": [
+        2048,
+        1024
+      ],
+      "mipmaps": 1,
+      "raw_to_readable": "flip_y",
+      "immutable_candidate_generated": false,
+      "immutable_clean_plate_scope": "all six source text regions",
+      "current_head_clean_plate_scope": "four currently translated JOIN/CREATE occurrences only; two descriptions untouched",
+      "current_head_removal_mask_pixels": 192602,
+      "canonical_translation_blockers": [
+        "Join your friends in a game of OutRun!",
+        "Create a game and invite your friends!"
+      ],
+      "disposition": "INPUT_REWORK_REQUIRED_NO_ASSET_PROMOTION",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "required_next": "Resolve both index232 canonical Korean description bindings in shared transcription, then complete full removal mask/CLEAN_PLATE/safe-bbox independent QA before render.",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "candidate_only_gates": {
+    "index226_one_pixel_containment": "NOT_INDEPENDENTLY_REPLAYABLE_REQUIRED_CANDIDATE_BYTES_MISSING_AND_GEOMETRY_FINGERPRINT_CHANGED",
+    "index226_dds_header_mipmap_alpha_orientation": "PRODUCER_CLAIM_PRESENT_BUT_NOT_PROMOTED_WITHOUT_PERSISTED_CANDIDATE_BYTES",
+    "index226_english_source_vs_korean_candidate": "REQUIRED_GITHUB_REVIEW_SET_NOT_PERSISTED__NO_C_PASS",
+    "index232_candidate_gates": "NOT_APPLICABLE_NO_CANDIDATE",
+    "static_approval": "NONE_Q00043"
+  },
+  "readiness_reconciliation": {
+    "classification": "INPUT_REWORK_REQUIRED__NO_NEW_PREGEN_ACCEPTANCE",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      201
+    ],
+    "preflight_only_candidate_completion_indices": [
+      133,
+      198,
+      222,
+      226,
+      232
+    ],
+    "input_production_readiness": {
+      "226": "NOT_PROMOTED_REWORK_REQUIRED",
+      "232": "PREFLIGHT_ONLY_NO_NEW_PROMOTION"
+    },
+    "candidate_completion_priority": [
+      "RENDER_READY: none newly accepted by Q00043. Direct REWORK_REQUIRED candidate-completion priority is index226: regenerate from current corrected exact-source geometry and persist the candidate plus mandatory review set; existing candidate-QA backlog 159/201 remains ahead of unrelated preflight.",
+      "ONE_STAGE_TO_RENDER: none newly accepted by Q00043.",
+      "PREFLIGHT_ONLY CANDIDATE-COMPLETION: indices133/198/222 remain prior exact-source multistage; index226 current-head corrected geometry is out-of-batch and awaits a fresh immutable producer result/C acceptance; index232 requires two canonical description translations before complete clean-plate/render work.",
+      "PREFLIGHT_ONLY SOURCE-EXHAUSTED: 28/30/34/36/46/48/52/55/100/103/106/132/135/139/147/154/164/172/205/214/219/225/228 remain sticky until source/inventory/policy fingerprint changes."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_REWORK_QA_AND_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      226,
+      232
+    ],
+    "reviewed_assets": 2,
+    "producer_inputs_pass": 0,
+    "producer_inputs_rework_required": 1,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 71,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json"
+  },
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00202.json@a35266ef074dea4b8e84ca95806928384298f4ea",
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX226_CANDIDATE_QA_AND_PERSISTENCE_HOLD.json@a35266ef074dea4b8e84ca95806928384298f4ea",
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_INDEX232_BINDING_CLEAN_PLATE_SEMANTIC_GAP.json@a35266ef074dea4b8e84ca95806928384298f4ea",
+    "localization/graphics/role_B/20260930-B00202-P00105/B00202_P00105_EXACT_SOURCE_GEOMETRY_CLEANPLATE.json@7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+    "localization/graphics/role_C/20260930-0345-C142/C142_Q00040_INDEPENDENT_QA_BATCH.json",
+    "localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json"
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
