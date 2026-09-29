@@ -639,3 +639,18 @@ Effective 2026-09-29:
 - If measurement fails, reposition or re-render font/effect geometry and measure again. Resampling/shrinking a flattened lettering raster is forbidden because prior QA showed ragged-stroke degradation after this shortcut.
 - Clean-plate QA and final lettering QA are independent gates. A clean-plate defect cannot be hidden by Korean lettering.
 - Containment is solved before style optimization. Style matching must not consume the safety margin.
+
+
+## Song-title preservation and title-size normalization
+
+Effective 2026-09-30 by user visual-review direction.
+
+- **Song titles are preserve-original.** Do not translate, transliterate, redraw into Korean, or otherwise replace song-title text. Preserve the exact source-language song title and its source artwork/effects. Song credits/artist names remain preserve-original under the existing `preserve_brand_song_credit` policy unless an explicit later instruction overrides it.
+- **Course names remain localization targets.** Korean course-name translations continue to use the canonical approved translations.
+- Font size must be normalized **within the same semantic/display family**, not independently per title. Song-title elements form their own family; course-name elements form their own family. Do not mix unrelated UI labels into either family.
+- For each family/style/atlas geometry, determine the largest source-faithful title size used by that same family that still respects the permitted region and mandatory safe inset. Use that as the family target size for all members that fit.
+- A shorter title must not be rendered smaller merely because its text is shorter. Start from the family target size and keep it identical whenever it fits.
+- If a specific longer title cannot fit at the family target size, re-render only that title at the **largest size not exceeding the family target** that passes native-resolution containment. Never enlarge any title beyond the family target and never stretch/squash a flattened raster.
+- Preserve source alignment, baseline, orientation, signed slant, outline/shadow/effect hierarchy, and spacing rules while normalizing nominal font size.
+- QA must record `title_family`, `family_target_font_size`, `actual_font_size`, and any fit-reduction reason. Unjustified per-title font-size variation is `REWORK_REQUIRED`.
+- Existing Korean candidates containing translated song titles, or visually inconsistent course/song title sizing under this rule, are rework candidates and must not be promoted until corrected. Runtime validation remains separate.
