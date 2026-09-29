@@ -177,6 +177,10 @@ require_all("src/vr/game/outrun_renderer.cpp", [
     'PROJECTED_SCREEN_EFFECT_2D',
     'R30 owns exactly one HUD/flare/world-billboard transform',
 ], "P7_FLARE_SINGLE_TRANSFORM_OWNER")
+require_all("src/vr/d3d9/stereo_renderer_r26.cpp", [
+    'RenderScope::ProjectedScreenEffect2D',
+    'PROJECTED_SCREEN_EFFECT_2D stay exclusively owned by R30',
+], "P7_FLARE_R28_WORLD_REBIND_VETO")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'std::clamp(Settings::SkyGlowFactor.get(), 1, 16)',
     'Keep the stereo',
