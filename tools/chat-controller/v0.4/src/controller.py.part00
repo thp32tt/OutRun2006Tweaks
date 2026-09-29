@@ -683,6 +683,9 @@ def queue_dynamic_prefix() -> str:
         lines += [
             "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
             "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
+            "생산 우선순위는 candidate-completion-first다. C가 받아들인 RENDER_READY 또는 ONE_STAGE_TO_RENDER 자산이 shard에 있으면 새 unrelated preflight/work-order를 시작하지 말고 그 자산을 실제 Korean DDS candidate까지 완료해.",
+            "baseline/slant/style 측정만 남았다면 같은 invocation에서 측정하고 render -> measure/refit -> DDS encode -> decoded-final self-QA까지 이어가. ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
+            "ready 자산이 모두 fail-closed일 때만 정확한 blocker를 기록하고 다음 ready 자산을 시도해. ready 자산이 전혀 없을 때만 새 preflight-only batch를 최대 1개 확장해.",
         ]
     if qa_batch:
         lines += [
@@ -690,6 +693,7 @@ def queue_dynamic_prefix() -> str:
             "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
             "각 입력의 TASK_ID + RESULT_SHA를 고정 기준으로 사용하고, 동일 candidate/source/contract fingerprint의 무거운 검증은 한 번만 수행해.",
             "각 input에 대해 qa_dispositions를 기록해: PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, SUPERSEDED 중 하나. C commit 하나의 Localization Automation Gate가 이 batch 전체의 자동 검증이다.",
+            "C가 pre-generation evidence를 PASS할 때 가능한 경우 production_readiness를 RENDER_READY, ONE_STAGE_TO_RENDER, PREFLIGHT_ONLY 중 하나로 분류하고 shared next_actions는 candidate 완성을 unrelated preflight보다 앞에 둬.",
         ]
     if failure:
         lines += [
