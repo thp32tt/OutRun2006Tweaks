@@ -1238,6 +1238,11 @@ def main() -> None:
                 "DX11 R99 texture-view probe drift: " + meaning
             )
 
+    if '#include "vr/d3d11/resource_translation.hpp"' not in CONSTANT_BUFFER_PROBE:
+        raise SystemExit(
+            "DX11 R100 constant-buffer probe must include resource_translation.hpp"
+        )
+
     r100_texture_mutation_header = {
         "TextureMutationUpdateKind": "R100 texture mutation operation identity",
         "TextureMutationTranslation": "R100 texture mutation readiness result",

@@ -8,6 +8,7 @@
 
 #include "vr/d3d11/native_backend.hpp"
 #include "vr/d3d11/pipeline_translation.hpp"
+#include "vr/d3d11/resource_translation.hpp"
 
 namespace
 {
