@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -261,6 +261,10 @@
     "candidate_target_per_invocation_when_ready_exists": 1,
     "continue_to_next_ready_asset_after_fail_closed": true,
     "primary_throughput_metric": "NEW_OR_MATERIALLY_REWORKED_V2_KOREAN_DDS_CANDIDATES_TO_C_QA",
-    "qa_strictness_unchanged": true
+    "qa_strictness_unchanged": true,
+    "hard_candidate_success_condition": true,
+    "preflight_fallback_requires_no_runnable_ready_tier": true,
+    "preflight_evidence_not_success_when_ready_exists": true,
+    "zero_candidate_exception": "ONLY_WHEN_NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_AFTER_FRESH_SCAN"
   }
 }
