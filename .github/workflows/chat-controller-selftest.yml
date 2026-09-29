@@ -74,6 +74,10 @@ jobs:
           grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
           grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
           grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
+          grep -Fq 'LOCALIZATION_QA_BATCH_SIZE: "4"' "$compose"
+          grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "30"' "$compose"
+          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
+          grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "30"' "$compose"
           grep -Fq 'def github_action_run_by_id' /tmp/controller.py
           grep -Fq 'run_id=bound_run_id' /tmp/controller.py
           grep -Fq 'def startup_reconcile_queue_state' /tmp/controller.py
@@ -84,6 +88,33 @@ jobs:
             exit 1
           fi
 
+
+      - name: Verify continuous producer and batch-QA architecture
+        run: |
+          grep -Fq 'def enqueue_producer_result_for_qa' /tmp/controller.py
+          grep -Fq 'def finalize_c_qa_batch' /tmp/controller.py
+          grep -Fq 'qa_pending' /tmp/controller.py
+          grep -Fq 'LOCALIZATION_QA_BATCH_SIZE' /tmp/controller.py
+          grep -Fq 'QA_BATCH_INPUTS' tools/chat-controller/v0.4/localization_C.md
+          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_A.md
+          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_B.md
+          if grep -Fq 'A+B -> C synchronization barrier' tools/chat-controller/v0.4/DEPLOY_PORTAINER.md; then
+            echo "legacy localization QA barrier remains in deployment docs"
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("/tmp/controller.py").read_text(encoding="utf-8")
+          a = src.index("async def localization_parallel_cycle")
+          b = src.index("def reconcile_legacy_conversion_blocked", a)
+          body = src[a:b]
+          assert 'for lane_key in ("A", "B", "C")' in body
+          assert 'enqueue_producer_result_for_qa' in body
+          assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
+          assert 'No A+B/C barrier exists.' in body
+          assert 'all(active_by_lane[k].get("phase") == "DONE"' not in body
+          print("continuous producers and independent batched QA verified")
+          PY
 
       - name: Verify queue recovery ordering
         run: |

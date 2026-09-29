@@ -148,18 +148,20 @@ MAX_TASK_ATTEMPTS=3
 
 If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each stack after this controller update.
 
-## Localization parallel waves
+## Localization continuous production + independent batch QA
 
-When `LOCALIZATION_PARALLEL=true`, the localization controller uses a wave barrier:
+When `LOCALIZATION_PARALLEL=true`, localization no longer uses an A+B -> C synchronization barrier.
 
-1. Lane A starts on the odd-index asset_queue shard.
-2. Lane B starts after `PARALLEL_LANE_STAGGER_SECONDS` (default 15s) on the even-index shard.
-3. A and B run concurrently in separate project chats and may not modify shared resume/worklog/progress/asset_queue state.
-4. Each lane is completed by locating its exact `[AUTO:<TASK_ID>]` commit in branch history and validating GitHub Actions for that exact SHA; branch HEAD may belong to the peer lane and is not used as the lane completion identity.
-5. After both production lanes reach a durable terminal result, C starts as the synchronization barrier, performs cross-lane final QA, and reconciles shared state.
-6. After C is terminal, the next A+B wave begins.
+1. Lane A continuously produces the odd-index shard. After its exact task commit passes Automation Gate, the slot becomes available for the next A task immediately.
+2. Lane B does the same for the even-index shard.
+3. Each successful A/B task result is appended to persistent `qa_pending` as an immutable `TASK_ID + RESULT_SHA` input. Production does not wait for C.
+4. Lane C is an independent QA consumer. It coalesces up to `LOCALIZATION_QA_BATCH_SIZE` producer results (default 4) for up to `LOCALIZATION_QA_COALESCE_SECONDS` (default 30s), reviews them in one task, and reconciles shared state once for the whole batch.
+5. QA de-duplication key is the exact producer `TASK_ID@RESULT_SHA`. The C prompt additionally requires heavy source/DDS/visual checks to be reused for identical source SHA + candidate SHA + QA-contract fingerprints.
+6. A/B must skip candidates still awaiting C QA unless C later records `REWORK_REQUIRED` or the relevant fingerprint changed.
+7. A C failure never stops A/B production. Exhausted C batches move to `qa_blocked` for later diagnosis while producers continue.
+8. On restart, persisted completed A/B tasks are migrated into `qa_pending`; existing in-flight lanes are preserved.
 
-The existing single-active queue state is migrated on first startup: an in-flight A/B task becomes that lane of the first parallel wave, and the missing peer lane is dispatched without discarding the existing task.
+This model allows QA backlog to grow temporarily without reducing production throughput to zero.
 
 
 ### Localization liveness tuning
@@ -174,7 +176,11 @@ The localization stack now uses these controller-runtime values directly:
 - idle queue rearm: 90s
 - next-task delay: 15s
 - A/B lane stagger: 15s
-- distinct A/B slot send gap: 15s
+- distinct-slot send gap: 15s
+- localization same-slot next-task send gap: 15s
+- localization slot dedup: 30s
+- C QA batch size: 4 producer results
+- C QA coalesce window: 30s
 - scheduler heartbeat: 15s
 - active-generation busy-stall protection: 30m
 - explicit rate-limit backoff: 90/180/300/600s

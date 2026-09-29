@@ -62,6 +62,10 @@ LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
+LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", "4")))
+LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "30")))
+LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "15")))
+LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
@@ -236,6 +240,10 @@ runtime = {
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
     "heartbeat_seconds": HEARTBEAT_SECONDS,
+    "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
+    "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
+    "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
+    "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
     "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
@@ -379,6 +387,11 @@ def load_queue_state() -> dict:
             "wave_counter": 0,
             "wave_id": None,
             "wave_started_at": None,
+            "producer_counter": 0,
+            "qa_batch_counter": 0,
+            "qa_pending": [],
+            "qa_completed": [],
+            "qa_blocked": [],
             "completed": [],
             "blocked": [],
             "last_github_poll_at": None,
@@ -394,6 +407,11 @@ def load_queue_state() -> dict:
         raw.setdefault("wave_counter", 0)
         raw.setdefault("wave_id", None)
         raw.setdefault("wave_started_at", None)
+        raw.setdefault("producer_counter", 0)
+        raw.setdefault("qa_batch_counter", 0)
+        raw.setdefault("qa_pending", [])
+        raw.setdefault("qa_completed", [])
+        raw.setdefault("qa_blocked", [])
         raw.setdefault("completed", [])
         raw.setdefault("blocked", [])
         raw.setdefault("last_github_poll_at", None)
@@ -401,7 +419,7 @@ def load_queue_state() -> dict:
         return raw
     except Exception:
         log.exception("queue state read failed; recreating")
-        state = {"counter": 0, "active": None, "active_by_lane": {}, "wave_counter": 0, "wave_id": None, "wave_started_at": None, "completed": [], "blocked": [], "last_github_poll_at": None, "conversion_blocked_reconcile_version": 0}
+        state = {"counter": 0, "active": None, "active_by_lane": {}, "wave_counter": 0, "wave_id": None, "wave_started_at": None, "producer_counter": 0, "qa_batch_counter": 0, "qa_pending": [], "qa_completed": [], "qa_blocked": [], "completed": [], "blocked": [], "last_github_poll_at": None, "conversion_blocked_reconcile_version": 0}
         save_queue_state(state)
         return state
 
@@ -627,6 +645,7 @@ def queue_dynamic_prefix() -> str:
     attempt = int(runtime.get("queue_attempt") or 1)
     failure = str(runtime.get("queue_failure_context") or "").strip()
     wave_id = str(runtime.get("queue_wave_id") or "").strip()
+    qa_batch = runtime.get("queue_qa_batch") or []
     lines = [
         f"[자동 큐 작업] TASK_ID={task_id}",
         f"LANE={lane}",
@@ -638,6 +657,12 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
+    if qa_batch:
+        lines += [
+            "이 C 작업은 독립 QA 소비자다. 아래 생산 결과들을 하나의 배치로 중복 없이 검수하고 공용 상태를 한 번만 병합해.",
+            "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
+            "각 입력의 TASK_ID + RESULT_SHA를 고정 기준으로 사용하고, 동일 candidate/source/contract fingerprint의 무거운 검증은 한 번만 수행해.",
+        ]
     if failure:
         lines += [
             "",
@@ -645,7 +670,6 @@ def queue_dynamic_prefix() -> str:
             "FAILURE_CONTEXT=" + failure,
         ]
     return "\n".join(lines) + "\n\n"
-
 
 async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
     """Wait for React composer hydration instead of sampling the DOM once."""
@@ -884,24 +908,25 @@ def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Opt
     last_global = _parse_iso(reg.last_global_send_at)
     if last_global and MIN_SEND_GAP_SECONDS > 0:
         global_gap = MIN_SEND_GAP_SECONDS
-        if (
-            slot
-            and CONTROLLER_MODE == "localization"
-            and LOCALIZATION_PARALLEL
-            and reg.last_global_send_slot
-            and reg.last_global_send_slot != slot.name
-        ):
-            global_gap = min(global_gap, PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS)
+        if slot and CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
+            if reg.last_global_send_slot and reg.last_global_send_slot != slot.name:
+                global_gap = min(global_gap, PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS)
+            else:
+                global_gap = min(global_gap, LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS)
         age = (now - last_global).total_seconds()
         if age < global_gap:
             return f"global_send_gap:{int(global_gap - age)}s"
 
-    if slot and slot.last_sent_at and SLOT_DEDUP_SECONDS > 0:
-        last_slot = _parse_iso(slot.last_sent_at)
-        if last_slot:
-            age = (now - last_slot).total_seconds()
-            if age < SLOT_DEDUP_SECONDS:
-                return f"slot_dedup:{int(SLOT_DEDUP_SECONDS - age)}s"
+    if slot and slot.last_sent_at:
+        slot_gap = SLOT_DEDUP_SECONDS
+        if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
+            slot_gap = min(slot_gap, LOCALIZATION_SLOT_DEDUP_SECONDS)
+        if slot_gap > 0:
+            last_slot = _parse_iso(slot.last_sent_at)
+            if last_slot:
+                age = (now - last_slot).total_seconds()
+                if age < slot_gap:
+                    return f"slot_dedup:{int(slot_gap - age)}s"
     return None
 
 async def detect_busy(page: Page) -> bool:

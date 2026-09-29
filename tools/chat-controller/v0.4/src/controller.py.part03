@@ -10,7 +10,7 @@ class StatusHandler(BaseHTTPRequestHandler):
         q = load_queue_state()
         execution = (
             (
-                f"QUEUE / localization parallel A+B -> C barrier (check every {QUEUE_CHECK_SECONDS}s)"
+                f"QUEUE / localization continuous A+B producers + independent batched C QA (check every {QUEUE_CHECK_SECONDS}s)"
                 if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL
                 else f"QUEUE / event-driven (check every {QUEUE_CHECK_SECONDS}s; legacy schedule ignored)"
             )
@@ -270,6 +270,7 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     runtime["queue_attempt"] = active["attempt"]
     runtime["queue_wave_id"] = active.get("wave_id")
     runtime["queue_failure_context"] = reason
+    runtime["queue_qa_batch"] = active.get("qa_batch") or []
 
     prompt = prompt_for_slot(slot, "repair")
     if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
@@ -308,6 +309,7 @@ async def localization_send_lane_task(
     q: dict,
     slot_name: str,
     wave_id: str,
+    qa_batch: Optional[list[dict]] = None,
 ) -> bool:
     """Send one lane task without changing the other parallel lane."""
     now = datetime.now(TZ)
@@ -372,6 +374,7 @@ async def localization_send_lane_task(
     runtime["queue_attempt"] = 1
     runtime["queue_wave_id"] = wave_id
     runtime["queue_failure_context"] = ""
+    runtime["queue_qa_batch"] = qa_batch or []
 
     if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
         write_runtime(status="thinking_level_blocked", last_action=f"Wave {wave_id} lane {slot_name}: High not verified")
@@ -426,6 +429,7 @@ async def localization_send_lane_task(
         "last_hash_changed_at": sent_at.isoformat(),
         "last_gate_poll_at": None,
         "failure_context": "",
+        "qa_batch": [dict(item) for item in (qa_batch or [])],
     }
     save_queue_state(q)
     write_runtime(
@@ -616,8 +620,60 @@ async def localization_process_lane(
         save_queue_state(q)
 
 
+def _qa_item_key(item: dict) -> str:
+    return f"{item.get('task_id','')}@{item.get('result_sha','')}"
+
+
+def _qa_completed_input_keys(q: dict) -> set[str]:
+    keys: set[str] = set()
+    for record in q.get("qa_completed", []):
+        keys.update(record.get("input_keys", []))
+    for record in q.get("qa_blocked", []):
+        keys.update(record.get("input_keys", []))
+    return keys
+
+
+def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
+    if task.get("terminal") != "PASS" or not task.get("result_sha"):
+        return False
+    item = {
+        "task_id": task.get("task_id"),
+        "lane": task.get("lane"),
+        "result_sha": task.get("result_sha"),
+        "result_message": task.get("result_message"),
+        "completed_at": task.get("completed_at"),
+        "producer_id": task.get("wave_id"),
+    }
+    key = _qa_item_key(item)
+    pending_keys = {_qa_item_key(x) for x in q.get("qa_pending", [])}
+    if key in pending_keys or key in _qa_completed_input_keys(q):
+        return False
+    q.setdefault("qa_pending", []).append(item)
+    q["qa_pending"] = q["qa_pending"][-200:]
+    return True
+
+
+def finalize_c_qa_batch(q: dict, task: dict) -> None:
+    batch = task.get("qa_batch") or []
+    input_keys = [_qa_item_key(x) for x in batch]
+    record = {
+        "qa_task_id": task.get("task_id"),
+        "qa_result_sha": task.get("result_sha"),
+        "terminal": task.get("terminal"),
+        "completed_at": task.get("completed_at") or task.get("blocked_at"),
+        "input_keys": input_keys,
+        "inputs": batch,
+    }
+    if task.get("terminal") == "PASS":
+        q["qa_completed"] = (q.get("qa_completed", []) + [record])[-100:]
+    else:
+        q["qa_blocked"] = (q.get("qa_blocked", []) + [record])[-100:]
+    consumed = set(input_keys)
+    q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
+
+
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """A+B production wave in parallel, followed by C as a synchronization barrier."""
+    """Run A/B as continuous producers and C as an independent batched QA consumer."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reg = load_registry(now)
@@ -628,11 +684,6 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     if legacy and not active_by_lane:
         legacy_slot = legacy.get("slot")
         if legacy_slot in {"A", "B", "C"}:
-            if not q.get("wave_id"):
-                q["wave_counter"] = int(q.get("wave_counter", 0)) + 1
-                q["wave_id"] = f"W{q['wave_counter']:05d}"
-                q["wave_started_at"] = legacy.get("sent_at") or now.isoformat()
-            legacy["wave_id"] = q["wave_id"]
             legacy.setdefault("terminal", None)
             active_by_lane[legacy_slot] = legacy
             q["active"] = None
@@ -641,89 +692,81 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     if rate_limit_active(reg, now):
         write_runtime(
             status="rate_limited_backoff",
-            last_action=f"Localization parallel queue paused ({rate_limit_seconds_remaining(reg, now)}s remaining)",
+            last_action=f"Localization queue paused ({rate_limit_seconds_remaining(reg, now)}s remaining)",
             queue=q,
         )
         return
 
-    # If a C barrier is active, it owns the wave until terminal.
-    if "C" in active_by_lane:
-        await localization_process_lane(context, pages, q, "C")
-        ctask = active_by_lane.get("C")
-        if ctask and ctask.get("phase") == "DONE":
-            summary = {
-                "wave_id": q.get("wave_id"),
-                "A": dict(active_by_lane["A"]) if "A" in active_by_lane else None,
-                "B": dict(active_by_lane["B"]) if "B" in active_by_lane else None,
-                "C": dict(ctask),
-                "finished_at": datetime.now(TZ).isoformat(),
-            }
-            q["waves"] = (q.get("waves", []) + [summary])[-50:]
-            q["active_by_lane"] = {}
-            q["wave_id"] = None
-            q["wave_started_at"] = None
-            q["next_task_not_before"] = (datetime.now(TZ) + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
-            save_queue_state(q)
-            write_runtime(status="parallel_wave_complete", last_action=f"Wave {summary['wave_id']} C barrier complete", queue=q)
-        return
-
-    # Process both production workers independently on every cycle.
-    for lane_key in ("A", "B"):
+    # Advance all three lanes independently. C never blocks A/B production.
+    for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             await localization_process_lane(context, pages, q, lane_key)
 
     active_by_lane = q.setdefault("active_by_lane", {})
 
-    # Start a new production wave when no lane is active.
-    if not active_by_lane:
-        not_before = _parse_iso(q.get("next_task_not_before"))
-        if not_before and now < not_before:
+    # Retire completed producers immediately and enqueue immutable task/result SHAs for C.
+    producer_retired = []
+    for lane_key in ("A", "B"):
+        task = active_by_lane.get(lane_key)
+        if task and task.get("phase") == "DONE":
+            if enqueue_producer_result_for_qa(q, task):
+                producer_retired.append(f"{task.get('task_id')}->{task.get('result_sha')}")
+            active_by_lane.pop(lane_key, None)
+
+    # Retire one finished C batch without touching producer slots.
+    ctask = active_by_lane.get("C")
+    if ctask and ctask.get("phase") == "DONE":
+        finalize_c_qa_batch(q, ctask)
+        active_by_lane.pop("C", None)
+
+    if producer_retired or (ctask and ctask.get("phase") == "DONE"):
+        save_queue_state(q)
+
+    # Keep both producers fed independently. No A+B/C barrier exists.
+    for lane_key in ("A", "B"):
+        active_by_lane = q.setdefault("active_by_lane", {})
+        if lane_key in active_by_lane:
+            continue
+        producer_id = f"P{int(q.get('producer_counter', 0)) + 1:05d}"
+        if await localization_send_lane_task(context, pages, q, lane_key, producer_id):
+            q["producer_counter"] = int(q.get("producer_counter", 0)) + 1
+            save_queue_state(q)
+
+    # C consumes immutable producer results in batches. Waiting briefly for coalescing
+    # reduces repeated source/header/atlas/shared-state work without pausing production.
+    active_by_lane = q.setdefault("active_by_lane", {})
+    pending = q.get("qa_pending", [])
+    if "C" not in active_by_lane and pending:
+        batch = pending[:LOCALIZATION_QA_BATCH_SIZE]
+        oldest = _parse_iso(batch[0].get("completed_at")) or now
+        age = (now - oldest).total_seconds()
+        if len(batch) < LOCALIZATION_QA_BATCH_SIZE and age < LOCALIZATION_QA_COALESCE_SECONDS:
             write_runtime(
-                status="parallel_wave_cooldown",
-                last_action=f"Waiting {max(1, int((not_before-now).total_seconds()))}s before the next A+B wave",
+                status="qa_batch_coalescing",
+                last_action=f"C QA collecting batch: {len(batch)}/{LOCALIZATION_QA_BATCH_SIZE}, oldest {int(age)}s",
                 queue=q,
             )
             return
-        q["wave_counter"] = int(q.get("wave_counter", 0)) + 1
-        q["wave_id"] = f"W{q['wave_counter']:05d}"
-        q["wave_started_at"] = now.isoformat()
-        save_queue_state(q)
-
-    wave_id = q.get("wave_id") or f"W{int(q.get('wave_counter', 0)):05d}"
-
-    # Dispatch A first, B after the stagger/global-gap. Existing migrated lanes are preserved.
-    if "A" not in active_by_lane:
-        if await localization_send_lane_task(context, pages, q, "A", wave_id):
+        qa_id = f"Q{int(q.get('qa_batch_counter', 0)) + 1:05d}"
+        if await localization_send_lane_task(context, pages, q, "C", qa_id, qa_batch=batch):
+            q["qa_batch_counter"] = int(q.get("qa_batch_counter", 0)) + 1
+            save_queue_state(q)
+            write_runtime(
+                status="qa_batch_running",
+                last_action=f"{qa_id}: C reviewing {len(batch)} producer results while A/B continue",
+                queue=q,
+            )
             return
 
     active_by_lane = q.setdefault("active_by_lane", {})
-    if "B" not in active_by_lane:
-        a_sent = _parse_iso(active_by_lane.get("A", {}).get("sent_at"))
-        if a_sent and (datetime.now(TZ) - a_sent).total_seconds() < PARALLEL_LANE_STAGGER_SECONDS:
-            remaining = max(1, int(PARALLEL_LANE_STAGGER_SECONDS - (datetime.now(TZ)-a_sent).total_seconds()))
-            write_runtime(status="parallel_stagger", last_action=f"Wave {wave_id}: lane B starts in {remaining}s", queue=q)
-            return
-        if await localization_send_lane_task(context, pages, q, "B", wave_id):
-            return
-
-    active_by_lane = q.setdefault("active_by_lane", {})
-    if not all(k in active_by_lane for k in ("A", "B")):
-        return
-
-    if not all(active_by_lane[k].get("phase") == "DONE" for k in ("A", "B")):
-        write_runtime(
-            status="parallel_wave_running",
-            last_action=f"Wave {wave_id}: A/B production running concurrently",
-            queue=q,
-        )
-        return
-
-    # Both production lanes are terminal. C now reconciles shared state and performs cross-lane QA.
-    if "C" not in active_by_lane:
-        if await localization_send_lane_task(context, pages, q, "C", wave_id):
-            write_runtime(status="parallel_c_barrier", last_action=f"Wave {wave_id}: A/B terminal; C synchronization barrier started", queue=q)
-        return
-
+    write_runtime(
+        status="continuous_production_qa_running",
+        last_action=(
+            f"A/B continuous producers; C QA pending={len(q.get('qa_pending', []))} "
+            f"active={','.join(sorted(active_by_lane.keys())) or 'none'}"
+        ),
+        queue=q,
+    )
 
 def reconcile_legacy_conversion_blocked(q: dict) -> bool:
     """Move historical UI-detection false failures to completed when exact task SHA gate already passed."""
