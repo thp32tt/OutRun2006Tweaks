@@ -1,0 +1,513 @@
+{
+  "alpha_behavior": "preserve exact source outside source-effect removal masks; Korean alpha only inside measured safe bboxes",
+  "asset_id": "FF514CEB",
+  "background_class": "transparent text-only/menu-label atlas",
+  "contract": "outrun-first-pass-edit-v2",
+  "contract_version": 2,
+  "display_transform": "flip_y_to_readable",
+  "elements": [
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        16,
+        777,
+        534,
+        836
+      ],
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "small_create",
+      "font_size_nominal": 11,
+      "korean": "게임 만들기",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        740,
+        560,
+        850
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        14,
+        775,
+        536,
+        838
+      ],
+      "source_text": "CREATE GAME",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        14,
+        865,
+        519,
+        924
+      ],
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "small_custom",
+      "font_size_nominal": 12,
+      "korean": "커스텀 게임",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        850,
+        560,
+        940
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        12,
+        863,
+        521,
+        926
+      ],
+      "source_text": "CUSTOM GAME",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        15,
+        953,
+        467,
+        1016
+      ],
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "small_quick",
+      "font_size_nominal": 13,
+      "korean": "빠른 게임",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        940,
+        550,
+        1025
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        13,
+        951,
+        469,
+        1018
+      ],
+      "source_text": "QUICK GAME",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        10,
+        1037,
+        1152,
+        1099
+      ],
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "desc_create",
+      "font_size_nominal": 12,
+      "korean": "게임을 만들고 친구를 초대하세요!",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        1025,
+        1220,
+        1135
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        8,
+        1035,
+        1154,
+        1101
+      ],
+      "source_text": "Create a game and invite your friends!",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        5,
+        1198,
+        1255,
+        1261
+      ],
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "desc_custom",
+      "font_size_nominal": 12,
+      "korean": "플레이할 게임 유형을 설정하세요!",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        1160,
+        1320,
+        1300
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        3,
+        1196,
+        1257,
+        1263
+      ],
+      "source_text": "Specify what gametype you'd like to play!",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        6,
+        1355,
+        1039,
+        1417
+      ],
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "desc_quick",
+      "font_size_nominal": 12,
+      "korean": "빠른 아웃런 게임에 참가하세요!",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        1320,
+        1120,
+        1450
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        4,
+        1353,
+        1041,
+        1419
+      ],
+      "source_text": "Jump into a quick game of OutRun!",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        20,
+        1519,
+        1241,
+        1660
+      ],
+      "colors": {
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "big_create",
+      "font_size_nominal": 34,
+      "korean": "게임 만들기",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        1480,
+        1300,
+        1680
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        18,
+        1517,
+        1243,
+        1662
+      ],
+      "source_text": "CREATE GAME",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        19,
+        1697,
+        1084,
+        1847
+      ],
+      "colors": {
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "big_quick",
+      "font_size_nominal": 36,
+      "korean": "빠른 게임",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        1675,
+        1150,
+        1870
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        17,
+        1695,
+        1086,
+        1849
+      ],
+      "source_text": "QUICK GAME",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    },
+    {
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "candidate_safe_bbox": [
+        18,
+        1896,
+        1258,
+        2038
+      ],
+      "colors": {
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ]
+      },
+      "effects": {
+        "glow": "none",
+        "outline": "none",
+        "shadow": "none"
+      },
+      "element_id": "big_custom",
+      "font_size_nominal": 35,
+      "korean": "커스텀 게임",
+      "line_count": 1,
+      "permitted_region": [
+        0,
+        1875,
+        1300,
+        2048
+      ],
+      "safety_inset_px": 2,
+      "slant_angle_deg": 0.0,
+      "slant_direction": "none",
+      "slant_dx_per_dy": 0.0,
+      "source_bbox": [
+        16,
+        1894,
+        1260,
+        2040
+      ],
+      "source_text": "CUSTOM GAME",
+      "source_text_transform": "flip_y raw / normal readable",
+      "style_traits": {
+        "weight": "bold",
+        "width_character": "source-like block sans"
+      }
+    }
+  ],
+  "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+  "forbidden": [
+    "visible English/source glyph residue",
+    "cover rectangles or invented panels",
+    "blur/smudge concealment",
+    "changes to neighboring sprites or protected pixels",
+    "cropping/padding/resizing the DDS canvas",
+    "generic new outline/shadow/glow",
+    "low-resolution reconstruction followed by upscale as background evidence",
+    "fallback glyph boxes"
+  ],
+  "protected_regions": [
+    "all pixels outside each source removal mask and Korean safe bbox",
+    "K1 source fragment remains byte-exact",
+    "unrelated atlas pixels remain byte-exact"
+  ],
+  "queue_index": 237,
+  "raw_orientation": "flip_y",
+  "single_pass_self_check": "Before producing the candidate, verify that no source-language text or effect remains in target footprints; no cover box, patch, seam or invented panel exists; all protected artwork is unchanged; Korean text is fully inside the permitted safe region and unclipped; canvas, orientation and transparency are unchanged. If any condition cannot be satisfied, do not produce a production candidate.",
+  "source_dimensions": [
+    2048,
+    2048
+  ],
+  "source_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+  "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+  "source_style": {
+    "glow": "none",
+    "grey_fill_rgb": [
+      63,
+      71,
+      74
+    ],
+    "outline": "none",
+    "red_fill_rgb": [
+      186,
+      0,
+      0
+    ],
+    "shadow": "none",
+    "slant_angle_deg": 0.0,
+    "slant_direction": "none",
+    "weight": "bold block sans"
+  },
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00182"
+}

@@ -1,0 +1,492 @@
+{
+  "asset_id": "FF514CEB",
+  "automation_validation": "PENDING",
+  "build_performed": false,
+  "candidate_dds_sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+  "candidate_static_qa": "PASS_MACHINE_V2_PENDING_EXACT_GITHUB_VISUAL_AND_INDEPENDENT_C",
+  "clean_plate": {
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_outside_edit_mask": 0,
+    "contract": "outrun-clean-plate-qa-v1",
+    "visible_source_residue_in_target_search_windows": 0
+  },
+  "comparison_evidence": [
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/source_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/clean_plate_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/candidate_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/text_region_native.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/text_region_nn2x.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/diff_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/alpha_comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/generation_prompt.json"
+  ],
+  "decoded_final": {
+    "alpha_changed_outside_edit_mask": 0,
+    "bytes": 16777344,
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "changed_pixels": 641321,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "containment": "PASS_ALL_NINE_PHYSICAL_OCCURRENCES_POSITIVE_MARGIN",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "header_128_exact": true,
+    "introduced_alpha_outside_source_region": 0,
+    "lettering_changed_outside_permitted_regions": 0,
+    "mip_count": 1,
+    "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "per_element": [
+      {
+        "candidate_safe_bbox_readable": [
+          16,
+          777,
+          534,
+          836
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 4,
+          "left": 2,
+          "right": 308,
+          "top": 3
+        },
+        "element_id": "small_create",
+        "font_size_nominal": 11,
+        "korean": "게임 만들기",
+        "localized_bbox_readable": [
+          18,
+          780,
+          226,
+          832
+        ],
+        "removal_search_bbox_readable": [
+          10,
+          771,
+          540,
+          842
+        ],
+        "source": "CREATE GAME",
+        "source_effect_bbox_readable": [
+          14,
+          775,
+          536,
+          838
+        ],
+        "source_removal_pixels": 28976
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          14,
+          865,
+          519,
+          924
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 4,
+          "left": 2,
+          "right": 275,
+          "top": 3
+        },
+        "element_id": "small_custom",
+        "font_size_nominal": 12,
+        "korean": "커스텀 게임",
+        "localized_bbox_readable": [
+          16,
+          868,
+          244,
+          920
+        ],
+        "removal_search_bbox_readable": [
+          8,
+          859,
+          525,
+          930
+        ],
+        "source": "CUSTOM GAME",
+        "source_effect_bbox_readable": [
+          12,
+          863,
+          521,
+          926
+        ],
+        "source_removal_pixels": 29410
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          15,
+          953,
+          467,
+          1016
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 4,
+          "left": 2,
+          "right": 250,
+          "top": 3
+        },
+        "element_id": "small_quick",
+        "font_size_nominal": 13,
+        "korean": "빠른 게임",
+        "localized_bbox_readable": [
+          17,
+          956,
+          217,
+          1012
+        ],
+        "removal_search_bbox_readable": [
+          9,
+          947,
+          473,
+          1022
+        ],
+        "source": "QUICK GAME",
+        "source_effect_bbox_readable": [
+          13,
+          951,
+          469,
+          1018
+        ],
+        "source_removal_pixels": 26389
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          10,
+          1037,
+          1152,
+          1099
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 5,
+          "left": 2,
+          "right": 472,
+          "top": 5
+        },
+        "element_id": "desc_create",
+        "font_size_nominal": 12,
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "localized_bbox_readable": [
+          12,
+          1042,
+          680,
+          1094
+        ],
+        "removal_search_bbox_readable": [
+          4,
+          1031,
+          1158,
+          1105
+        ],
+        "source": "Create a game and invite your friends!",
+        "source_effect_bbox_readable": [
+          8,
+          1035,
+          1154,
+          1101
+        ],
+        "source_removal_pixels": 50941
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          5,
+          1198,
+          1255,
+          1261
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 4,
+          "left": 2,
+          "right": 580,
+          "top": 3
+        },
+        "element_id": "desc_custom",
+        "font_size_nominal": 12,
+        "korean": "플레이할 게임 유형을 설정하세요!",
+        "localized_bbox_readable": [
+          7,
+          1201,
+          675,
+          1257
+        ],
+        "removal_search_bbox_readable": [
+          0,
+          1192,
+          1261,
+          1267
+        ],
+        "source": "Specify what gametype you'd like to play!",
+        "source_effect_bbox_readable": [
+          3,
+          1196,
+          1257,
+          1263
+        ],
+        "source_removal_pixels": 59764
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          6,
+          1355,
+          1039,
+          1417
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 3,
+          "left": 2,
+          "right": 407,
+          "top": 3
+        },
+        "element_id": "desc_quick",
+        "font_size_nominal": 12,
+        "korean": "빠른 아웃런 게임에 참가하세요!",
+        "localized_bbox_readable": [
+          8,
+          1358,
+          632,
+          1414
+        ],
+        "removal_search_bbox_readable": [
+          0,
+          1349,
+          1045,
+          1423
+        ],
+        "source": "Jump into a quick game of OutRun!",
+        "source_effect_bbox_readable": [
+          4,
+          1353,
+          1041,
+          1419
+        ],
+        "source_removal_pixels": 47317
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          20,
+          1519,
+          1241,
+          1660
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 3,
+          "left": 6,
+          "right": 575,
+          "top": 2
+        },
+        "element_id": "big_create",
+        "font_size_nominal": 34,
+        "korean": "게임 만들기",
+        "localized_bbox_readable": [
+          26,
+          1521,
+          666,
+          1657
+        ],
+        "removal_search_bbox_readable": [
+          14,
+          1513,
+          1247,
+          1666
+        ],
+        "source": "CREATE GAME",
+        "source_effect_bbox_readable": [
+          18,
+          1517,
+          1243,
+          1662
+        ],
+        "source_removal_pixels": 133250
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          19,
+          1697,
+          1084,
+          1847
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 5,
+          "left": 6,
+          "right": 511,
+          "top": 5
+        },
+        "element_id": "big_quick",
+        "font_size_nominal": 36,
+        "korean": "빠른 게임",
+        "localized_bbox_readable": [
+          25,
+          1702,
+          573,
+          1842
+        ],
+        "removal_search_bbox_readable": [
+          13,
+          1691,
+          1090,
+          1853
+        ],
+        "source": "QUICK GAME",
+        "source_effect_bbox_readable": [
+          17,
+          1695,
+          1086,
+          1849
+        ],
+        "source_removal_pixels": 121488
+      },
+      {
+        "candidate_safe_bbox_readable": [
+          18,
+          1896,
+          1258,
+          2038
+        ],
+        "containment": "PASS",
+        "containment_margins": {
+          "bottom": 3,
+          "left": 6,
+          "right": 574,
+          "top": 3
+        },
+        "element_id": "big_custom",
+        "font_size_nominal": 35,
+        "korean": "커스텀 게임",
+        "localized_bbox_readable": [
+          24,
+          1899,
+          684,
+          2035
+        ],
+        "removal_search_bbox_readable": [
+          12,
+          1890,
+          1264,
+          2044
+        ],
+        "source": "CUSTOM GAME",
+        "source_effect_bbox_readable": [
+          16,
+          1894,
+          1260,
+          2040
+        ],
+        "source_removal_pixels": 139616
+      }
+    ],
+    "protected_k1_exact": true,
+    "roundtrip_decoded_exact": true
+  },
+  "english_source_vs_korean_candidate": "PASS_MACHINE_GEOMETRY__HUMAN_EXACT_GITHUB_VISUAL_PENDING",
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "lane": "LOCALIZATION_A",
+  "local_clone_used": false,
+  "n100_used": false,
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_json_sha256": "c5d9e57a0c08b14a76f23954bc2784a8069efbffa11f1368447868191d6f3714",
+  "prompt_sha256": "c5d9e57a0c08b14a76f23954bc2784a8069efbffa11f1368447868191d6f3714",
+  "queue_index": 237,
+  "raw_orientation": "flip_y",
+  "recorded_at_kst": "2026-09-30T02:18:06+09:00",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "schema": "outrun-a00182-index237-rgba32-decoded-final-qa-v2",
+  "schema_version": 10,
+  "signed_slant_angle_deg": 0.0,
+  "signed_slant_gate": "PASS",
+  "slant_direction": "none",
+  "source": {
+    "bytes": 16777344,
+    "canonical_inventory_match": true,
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "format": "RGBA32",
+    "git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30",
+    "height": 2048,
+    "mip_count": 1,
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "pitch": 8192,
+    "raw_to_readable": "flip_y",
+    "repository": "envido32/OR2006Sprites",
+    "sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "width": 2048
+  },
+  "source_acquisition": {
+    "google_drive_exact_filename": "SOURCE_TRANSPORT_MISS",
+    "local_pre_dispatch_bundle_crosscheck": "PASS_EXACT_DIGEST_AND_MEMBER_SHA",
+    "pinned_queue_path_direct": "SOURCE_TRANSPORT_MISS_404",
+    "pinned_release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_release_object_direct": "PASS_EXACT_CANONICAL_SOURCE",
+    "pinned_release_object_git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30"
+  },
+  "source_removal_mask": {
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_edit_mask": 0,
+    "method": "source-effect-aware exact search windows; any nonzero RGBA in 4px-expanded measured English effect bbox; no rectangular whole-cell erase",
+    "pixels": 637151,
+    "protected_k1_exact": true
+  },
+  "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+  "source_text_transform": "flip_y",
+  "status": "PASS_SELF_QA_PENDING_C",
+  "style": {
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+    "grey_fill_rgb": [
+      63,
+      71,
+      74
+    ],
+    "outline_shadow_glow": "none",
+    "red_fill_rgb": [
+      186,
+      0,
+      0
+    ]
+  },
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00182",
+  "translations": [
+    {
+      "korean": "게임 만들기",
+      "physical_occurrences": 2,
+      "source": "CREATE GAME"
+    },
+    {
+      "korean": "커스텀 게임",
+      "physical_occurrences": 2,
+      "source": "CUSTOM GAME"
+    },
+    {
+      "korean": "빠른 게임",
+      "physical_occurrences": 2,
+      "source": "QUICK GAME"
+    },
+    {
+      "korean": "게임을 만들고 친구를 초대하세요!",
+      "physical_occurrences": 1,
+      "source": "Create a game and invite your friends!"
+    },
+    {
+      "korean": "플레이할 게임 유형을 설정하세요!",
+      "physical_occurrences": 1,
+      "source": "Specify what gametype you'd like to play!"
+    },
+    {
+      "korean": "빠른 아웃런 게임에 참가하세요!",
+      "physical_occurrences": 1,
+      "source": "Jump into a quick game of OutRun!"
+    }
+  ],
+  "validation_mode": "C_BATCH_GATE",
+  "vr_ffb_dx_changes": false,
+  "wave_id": "P00092"
+}
