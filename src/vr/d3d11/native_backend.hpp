@@ -149,9 +149,8 @@ private:
 };
 
 // R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED
-// Texture2D. Shadow bytes survive device-generation changes while mirror
-// readiness is invalidated until a future GPU reupload is acknowledged.
-// This class owns no D3D11 resource and has no production caller.
+// Texture2D. R103 adds concrete generation-bound D3D11 DEFAULT mirror/SRV
+// recreation from the shadow. No game draw path constructs or binds it.
 class NativeManagedTextureShadow final {
 public:
     NativeManagedTextureShadow() = default;
@@ -171,6 +170,7 @@ public:
         void* destination,
         UINT destinationRowPitch,
         UINT destinationRows) const noexcept;
+    bool recreate_and_upload_mirror(ID3D11Device* device) noexcept;
     void note_mirror_uploaded() noexcept;
     void observe_device_reset() noexcept;
     void shutdown() noexcept;
@@ -184,7 +184,8 @@ public:
         return lifetime_.cpuShadowValid;
     }
     [[nodiscard]] bool mirror_ready() const noexcept {
-        return managed_mirror_ready(lifetime_);
+        return managed_mirror_ready(lifetime_) &&
+            mirror_device_ && mirror_texture_ && mirror_srv_;
     }
     [[nodiscard]] std::uint64_t shadow_version() const noexcept {
         return lifetime_.cpuShadowVersion;
@@ -192,18 +193,32 @@ public:
     [[nodiscard]] std::uint64_t device_generation() const noexcept {
         return lifetime_.deviceGeneration;
     }
+    [[nodiscard]] ID3D11Device* mirror_device() const noexcept {
+        return mirror_device_.Get();
+    }
+    [[nodiscard]] ID3D11Texture2D* mirror_texture() const noexcept {
+        return mirror_texture_.Get();
+    }
+    [[nodiscard]] ID3D11ShaderResourceView* mirror_srv() const noexcept {
+        return mirror_srv_.Get();
+    }
     [[nodiscard]] const ManagedMirrorLifetimeState&
     lifetime_state() const noexcept {
         return lifetime_;
     }
 
 private:
+    void release_mirror() noexcept;
+
     D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
     UINT width_ = 0;
     UINT height_ = 0;
     UINT row_bytes_ = 0;
     std::vector<std::uint8_t> shadow_;
     ManagedMirrorLifetimeState lifetime_{};
+    Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mirror_srv_;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

@@ -1440,6 +1440,85 @@ def main() -> None:
                 "DX11 R102 managed-shadow probe drift: " + meaning
             )
 
+    r103_managed_mirror_header = {
+        "recreate_and_upload_mirror(ID3D11Device* device)":
+            "R103 concrete managed mirror recreation entrypoint",
+        "mirror_device() const noexcept": "R103 managed mirror device getter",
+        "mirror_texture() const noexcept": "R103 managed mirror texture getter",
+        "mirror_srv() const noexcept": "R103 managed mirror SRV getter",
+        "void release_mirror() noexcept": "R103 generation-bound mirror release helper",
+        "Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_":
+            "R103 managed mirror texture ownership",
+        "Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mirror_srv_":
+            "R103 managed mirror SRV ownership",
+    }
+    missing_r103_header = [
+        meaning
+        for token, meaning in r103_managed_mirror_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r103_header:
+        raise SystemExit(
+            "DX11 R103 managed-mirror header drift: "
+            + ", ".join(missing_r103_header)
+        )
+
+    for token, meaning in {
+        "behavior.usage != D3D11_USAGE_DEFAULT":
+            "R103 DEFAULT mirror usage requirement",
+        "D3D11_SUBRESOURCE_DATA initialData{}":
+            "R103 CPU-shadow initial upload descriptor",
+        "initialData.pSysMem = shadow_.data()":
+            "R103 CPU shadow upload source",
+        "initialData.SysMemPitch = row_bytes_":
+            "R103 compact shadow row pitch",
+        "device->CreateTexture2D(":
+            "R103 concrete D3D11 Texture2D creation",
+        "device->CreateShaderResourceView(":
+            "R103 concrete SRV creation",
+        "mirror_device_ = device":
+            "R103 mirror device ownership",
+        "note_mirror_uploaded();":
+            "R103 mirror lifetime acknowledgment after resources exist",
+        "lifetime_.mirrorValid = false":
+            "R103 released mirror lifetime invalidation",
+        "release_mirror();\n    lifetime_ = note_managed_shadow_write(lifetime_)":
+            "R103 source mutation releases stale mirror",
+        "release_mirror();\n    lifetime_ = advance_managed_device_generation(lifetime_)":
+            "R103 Reset releases generation-bound mirror",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R103 managed-mirror source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R103 mirror upload requires valid CPU shadow":
+            "R103 invalid-shadow fail-closed gate",
+        "R103 bare mirror acknowledgment must not fabricate readiness":
+            "R103 no-resource lifetime acknowledgment guard",
+        "R103 managed shadow creates DEFAULT mirror":
+            "R103 positive mirror creation",
+        "R103 managed mirror DEFAULT descriptor contract":
+            "R103 concrete mirror descriptor proof",
+        "R103 managed mirror uploaded bytes must match shadow rows":
+            "R103 GPU mirror content readback proof",
+        "R103 Reset preserves shadow and releases generation-bound mirror":
+            "R103 Reset mirror release proof",
+        "R103 post-Reset mirror upload uses new device generation":
+            "R103 new-generation mirror proof",
+        "R103 shadow mutation invalidates and releases uploaded mirror":
+            "R103 stale mirror release on shadow mutation",
+        "R103 managed shadow shutdown resets CPU and GPU ownership":
+            "R103 shutdown ownership proof",
+        "DX11 managed texture mirror reupload R103: PASS":
+            "R103 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R103 managed-mirror probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

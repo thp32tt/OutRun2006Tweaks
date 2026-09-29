@@ -523,9 +523,19 @@ int main()
         managedShadow.ready() &&
         !managedShadow.shadow_valid() &&
         !managedShadow.mirror_ready() &&
+        managedShadow.mirror_device() == nullptr &&
+        managedShadow.mirror_texture() == nullptr &&
+        managedShadow.mirror_srv() == nullptr &&
         managedShadow.shadow_version() == 0 &&
         managedShadow.device_generation() == 1,
         "R102 managed shadow starts allocated but content-invalid");
+    require(
+        !managedShadow.recreate_and_upload_mirror(d3d.device),
+        "R103 mirror upload requires valid CPU shadow");
+    managedShadow.note_mirror_uploaded();
+    require(
+        !managedShadow.mirror_ready(),
+        "R103 bare mirror acknowledgment must not fabricate readiness");
 
     std::array<unsigned char, 80> managedSource{};
     constexpr UINT managedSourcePitch = 20;
@@ -578,20 +588,75 @@ int main()
             "R102 managed shadow readback must match source rows");
     }
 
-    managedShadow.note_mirror_uploaded();
+    require(
+        managedShadow.recreate_and_upload_mirror(d3d.device),
+        "R103 managed shadow creates DEFAULT mirror");
     require(
         managedShadow.mirror_ready() &&
+        managedShadow.mirror_device() == d3d.device &&
+        managedShadow.mirror_texture() != nullptr &&
+        managedShadow.mirror_srv() != nullptr &&
         managedShadow.lifetime_state().mirrorGeneration == 1 &&
         managedShadow.lifetime_state().mirrorShadowVersion == 1,
-        "R102 managed mirror acknowledgment matches shadow generation");
+        "R103 managed mirror ownership matches shadow generation");
+
+    D3D11_TEXTURE2D_DESC managedMirrorDesc{};
+    managedShadow.mirror_texture()->GetDesc(&managedMirrorDesc);
+    require(
+        managedMirrorDesc.Width == 4 &&
+        managedMirrorDesc.Height == 4 &&
+        managedMirrorDesc.MipLevels == 1 &&
+        managedMirrorDesc.ArraySize == 1 &&
+        managedMirrorDesc.Format == DXGI_FORMAT_B8G8R8A8_UNORM &&
+        managedMirrorDesc.Usage == D3D11_USAGE_DEFAULT &&
+        managedMirrorDesc.CPUAccessFlags == 0 &&
+        (managedMirrorDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0,
+        "R103 managed mirror DEFAULT descriptor contract");
+
+    D3D11_TEXTURE2D_DESC managedStagingDesc = managedMirrorDesc;
+    managedStagingDesc.Usage = D3D11_USAGE_STAGING;
+    managedStagingDesc.BindFlags = 0;
+    managedStagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Texture2D* managedStagingTexture = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateTexture2D(
+            &managedStagingDesc, nullptr, &managedStagingTexture)) &&
+        managedStagingTexture != nullptr,
+        "R103 managed mirror staging prerequisite");
+    d3d.context->CopyResource(
+        managedStagingTexture, managedShadow.mirror_texture());
+
+    D3D11_MAPPED_SUBRESOURCE managedStagingMap{};
+    require(
+        SUCCEEDED(d3d.context->Map(
+            managedStagingTexture, 0, D3D11_MAP_READ, 0, &managedStagingMap)) &&
+        managedStagingMap.pData != nullptr &&
+        managedStagingMap.RowPitch >= managedRowBytes,
+        "R103 managed mirror staging readback map");
+    for (UINT row = 0; row < managedRows; ++row) {
+        const auto* observed =
+            static_cast<const unsigned char*>(managedStagingMap.pData) +
+            static_cast<std::size_t>(row) * managedStagingMap.RowPitch;
+        const auto* expected =
+            managedSource.data() +
+            static_cast<std::size_t>(row) * managedSourcePitch;
+        require(
+            std::memcmp(observed, expected, managedRowBytes) == 0,
+            "R103 managed mirror uploaded bytes must match shadow rows");
+    }
+    d3d.context->Unmap(managedStagingTexture, 0);
+    managedStagingTexture->Release();
 
     managedShadow.observe_device_reset();
     require(
         managedShadow.device_generation() == 2 &&
         managedShadow.shadow_valid() &&
         managedShadow.shadow_version() == 1 &&
-        !managedShadow.mirror_ready(),
-        "R102 Reset preserves CPU shadow and invalidates GPU mirror");
+        !managedShadow.mirror_ready() &&
+        managedShadow.mirror_device() == nullptr &&
+        managedShadow.mirror_texture() == nullptr &&
+        managedShadow.mirror_srv() == nullptr,
+        "R103 Reset preserves shadow and releases generation-bound mirror");
 
     managedReadback.fill(0);
     require(
@@ -605,11 +670,14 @@ int main()
             managedRowBytes) == 0,
         "R102 Reset-preserved first row must match");
 
-    managedShadow.note_mirror_uploaded();
+    require(
+        managedShadow.recreate_and_upload_mirror(d3d.device),
+        "R103 post-Reset mirror recreation");
     require(
         managedShadow.mirror_ready() &&
-        managedShadow.lifetime_state().mirrorGeneration == 2,
-        "R102 post-Reset mirror acknowledgment uses new device generation");
+        managedShadow.lifetime_state().mirrorGeneration == 2 &&
+        managedShadow.lifetime_state().mirrorShadowVersion == 1,
+        "R103 post-Reset mirror upload uses new device generation");
 
     managedSource[0] ^= 0x33;
     require(
@@ -618,8 +686,11 @@ int main()
         "R102 second managed shadow full write");
     require(
         managedShadow.shadow_version() == 2 &&
-        !managedShadow.mirror_ready(),
-        "R102 second shadow write invalidates acknowledged mirror");
+        !managedShadow.mirror_ready() &&
+        managedShadow.mirror_device() == nullptr &&
+        managedShadow.mirror_texture() == nullptr &&
+        managedShadow.mirror_srv() == nullptr,
+        "R103 shadow mutation invalidates and releases uploaded mirror");
 
     NativeManagedTextureShadow unsupportedManagedShadow;
     require(
@@ -741,8 +812,11 @@ int main()
         !managedShadow.shadow_valid() &&
         !managedShadow.mirror_ready() &&
         managedShadow.shadow_version() == 0 &&
-        managedShadow.device_generation() == 1,
-        "R102 managed shadow shutdown resets storage and lifetime");
+        managedShadow.device_generation() == 1 &&
+        managedShadow.mirror_device() == nullptr &&
+        managedShadow.mirror_texture() == nullptr &&
+        managedShadow.mirror_srv() == nullptr,
+        "R103 managed shadow shutdown resets CPU and GPU ownership");
 
     dynamicTextureView.shutdown();
     require(
@@ -813,5 +887,6 @@ int main()
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
     std::cout << "DX11 fixed-function texture upload R101: PASS\n";
     std::cout << "DX11 managed texture shadow lifetime R102: PASS\n";
+    std::cout << "DX11 managed texture mirror reupload R103: PASS\n";
     return 0;
 }

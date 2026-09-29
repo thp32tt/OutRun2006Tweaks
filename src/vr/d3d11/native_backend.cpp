@@ -446,6 +446,8 @@ bool NativeManagedTextureShadow::write_full(
             sourceBytes + static_cast<std::size_t>(row) * sourceRowPitch,
             row_bytes_);
     }
+
+    release_mirror();
     lifetime_ = note_managed_shadow_write(lifetime_);
     return true;
 }
@@ -475,15 +477,89 @@ bool NativeManagedTextureShadow::read_full(
     return true;
 }
 
+bool NativeManagedTextureShadow::recreate_and_upload_mirror(
+    ID3D11Device* device) noexcept {
+
+    if (!ready() || !shadow_valid() || !device)
+        return false;
+
+    const auto format = translate_resource_format(
+        source_format_, ResourceRole::Texture);
+    const auto behavior = translate_resource_behavior(
+        ResourceRole::Texture, D3DPOOL_MANAGED, 0);
+    if (!format.exact || !behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.cpuAccessFlags != 0 ||
+        (behavior.bindFlags & D3D11_BIND_SHADER_RESOURCE) == 0)
+        return false;
+
+    release_mirror();
+
+    D3D11_TEXTURE2D_DESC desc{};
+    desc.Width = width_;
+    desc.Height = height_;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = format.format;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    D3D11_SUBRESOURCE_DATA initialData{};
+    initialData.pSysMem = shadow_.data();
+    initialData.SysMemPitch = row_bytes_;
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    if (FAILED(device->CreateTexture2D(
+            &desc, &initialData, texture.ReleaseAndGetAddressOf())) ||
+        !texture)
+        return false;
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = desc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+    if (FAILED(device->CreateShaderResourceView(
+            texture.Get(), &srvDesc, srv.ReleaseAndGetAddressOf())) ||
+        !srv)
+        return false;
+
+    mirror_device_ = device;
+    mirror_texture_ = std::move(texture);
+    mirror_srv_ = std::move(srv);
+    note_mirror_uploaded();
+    if (!mirror_ready()) {
+        release_mirror();
+        return false;
+    }
+    return true;
+}
+
 void NativeManagedTextureShadow::note_mirror_uploaded() noexcept {
+    if (!mirror_device_ || !mirror_texture_ || !mirror_srv_)
+        return;
     lifetime_ = note_managed_mirror_upload(lifetime_);
 }
 
 void NativeManagedTextureShadow::observe_device_reset() noexcept {
+    release_mirror();
     lifetime_ = advance_managed_device_generation(lifetime_);
 }
 
+void NativeManagedTextureShadow::release_mirror() noexcept {
+    mirror_srv_.Reset();
+    mirror_texture_.Reset();
+    mirror_device_.Reset();
+    lifetime_.mirrorValid = false;
+}
+
 void NativeManagedTextureShadow::shutdown() noexcept {
+    release_mirror();
     source_format_ = D3DFMT_UNKNOWN;
     width_ = 0;
     height_ = 0;
