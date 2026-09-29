@@ -2,6 +2,18 @@
 
 This repository-side protocol matches the four Work scheduled roles. The schedule is external; this file defines durable coordination and ownership.
 
+## Backend allocation override — 2026-09-29
+
+This override supersedes older lane-priority statements in this protocol and any stale queue prose that still treats DX9Ex performance or DX12/D3D9On12 as active autonomous development.
+
+- Primary lane: **DX11 Native** (~50% nominal engineering effort).
+- Secondary lane: **DXVK** (~40% nominal engineering effort).
+- **DX9Ex is frozen for performance/feature development** and retained as the protected reference/fallback. Limit work to critical crash/regression repair, baseline verification, and evidence needed to compare or unblock DX11/DXVK (normally <=10%).
+- **DX12/D3D9On12 is frozen/reference-only** until the user explicitly reopens it.
+- New performance investigation and optimization must be attributed to DX11 or DXVK, with priority on frame-time stability, copy/wait/synchronization cost, scalable quality profiles, and eventual lower-than-RTX-4070 distribution viability.
+- Do not claim a minimum GPU or runtime performance result from CI. Exact-build Quest 3/VDXR measurements remain the runtime authority.
+- Single-pass/multiview work is deferred until the two-pass graphics/lifecycle/runtime gates are stable.
+
 ## Integration target and backend scope
 
 - Integration/production branch: `vr-d3d9ex-focus`.
