@@ -50,6 +50,9 @@ SUMMARY_RE = re.compile(
     r"mirrorGeneration=(?P<managedMirrorGeneration>\d+),"
     r"mirrorVersion=(?P<managedMirrorVersion>\d+),"
     r"mirrorReady=(?P<managedMirrorReady>\d+)\] )?"
+    r"(?:managedTextureShadow\[requiredSamples=(?P<managedTextureShadowRequiredSamples>\d+),"
+    r"readySamples=(?P<managedTextureShadowReadySamples>\d+),"
+    r"pendingSamples=(?P<managedTextureShadowPendingSamples>\d+)\] )?"
     r"(?:inputLayout\[exact=(?P<inputLayoutExact>\d+),"
     r"unsupported=(?P<inputLayoutUnsupported>\d+),"
     r"(?:fvfExact=(?P<inputLayoutFvfExact>\d+),)?"
@@ -70,6 +73,9 @@ SUMMARY_RE = re.compile(
     r"(?:textureStageResource\[bound=(?P<textureStageBound>\d+),"
     r"exact=(?P<textureStageExact>\d+),"
     r"pending=(?P<textureStagePending>\d+)\] )?"
+    r"(?:textureStageManagedShadow\[required=(?P<textureStageManagedShadowRequired>\d+),"
+    r"ready=(?P<textureStageManagedShadowReady>\d+),"
+    r"pending=(?P<textureStageManagedShadowPending>\d+)\] )?"
     r"unsupported\[incomplete=(?P<incomplete>\d+),"
     r"wbuffer=(?P<wbuffer>\d+),sepAlpha=(?P<sepAlpha>\d+),"
     r"alphaTest=(?P<alphaTest>\d+),stencil=(?P<stencil>\d+),"
@@ -116,6 +122,8 @@ TEXTURE_RE = re.compile(
     r"observed=(?P<observed>[01]) type=(?P<type>-?\d+) "
     r"pool=(?P<pool>-?\d+) usage=0x(?P<usage>[0-9A-Fa-f]+) "
     r"fmt=(?P<format>-?\d+) exact=(?P<exact>[01])"
+    r"(?: managedShadowRequired=(?P<managedShadowRequired>[01])"
+    r" managedShadowReady=(?P<managedShadowReady>[01]))?"
 )
 FFP_SHADER_PROTOTYPE_RE = re.compile(
     r"VR DX11 R8[45] ffp shader prototype#(?P<signature>\d+): "
@@ -355,14 +363,45 @@ def main() -> int:
     else:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
 
+    managed_texture_shadow_evidence = {
+        "RequiredSamples": (
+            latest["managedTextureShadowRequiredSamples"] if latest else 0
+        ),
+        "ReadySamples": (
+            latest["managedTextureShadowReadySamples"] if latest else 0
+        ),
+        "PendingSamples": (
+            latest["managedTextureShadowPendingSamples"] if latest else 0
+        ),
+        "RequiredStages": (
+            latest["textureStageManagedShadowRequired"] if latest else 0
+        ),
+        "ReadyStages": (
+            latest["textureStageManagedShadowReady"] if latest else 0
+        ),
+        "PendingStages": (
+            latest["textureStageManagedShadowPending"] if latest else 0
+        ),
+    }
+    managed_texture_shadow_evidence["ObservedReady"] = bool(
+        managed_texture_shadow_evidence["RequiredSamples"] > 0
+        and managed_texture_shadow_evidence["PendingSamples"] == 0
+        and managed_texture_shadow_evidence["ReadySamples"]
+        == managed_texture_shadow_evidence["RequiredSamples"]
+    )
+
     report = {
         "SchemaVersion": 2,
         "Status": status,
         "NativeDrawPathActivationAllowed": False,
+        "ActivationEvidence": {
+            "ManagedTextureShadow": managed_texture_shadow_evidence,
+        },
         "ActivationNote": (
-            "Census exactness is evidence only. Native D3D11 draw routing remains "
-            "disabled until resource mutation classification/lifetime mirrors, shader/input "
-            "translation and HMD graphics parity gates pass."
+            "Census exactness and managed-texture shadow readiness are evidence only. "
+            "Native D3D11 draw routing remains disabled until resource mutation "
+            "classification/lifetime mirrors, shader/input translation and HMD "
+            "graphics parity gates pass."
         ),
         "SourceLogs": source_logs,
         "Startup": startup,

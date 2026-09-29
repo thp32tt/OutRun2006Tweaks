@@ -242,6 +242,12 @@ def main() -> None:
         "ResourceBehaviorUnsupportedSamples": "unmodelled descriptor counter",
         "ResourceMutationTelemetryRequiredSamples": "lock/update blocker counter",
         "ResourceManagedShadowRequiredSamples": "managed shadow blocker counter",
+        "ManagedTextureShadowRequiredSamples": "R106 managed texture shadow-required sample counter",
+        "ManagedTextureShadowReadySamples": "R106 managed texture shadow-ready sample counter",
+        "ManagedTextureShadowPendingSamples": "R106 managed texture shadow-pending sample counter",
+        "TextureStageManagedShadowRequiredResources": "R106 bound managed stage requirement counter",
+        "TextureStageManagedShadowReadyResources": "R106 bound managed stage ready counter",
+        "TextureStageManagedShadowPendingResources": "R106 bound managed stage pending counter",
         "translate_resource_behavior": "per-bound-resource behavior classification",
         "mutationTelemetryRequired": "exact-sample mutation gate",
         "managedShadowRequired": "exact-sample managed lifetime gate",
@@ -435,6 +441,14 @@ def main() -> None:
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
         "managedShadowRequired": "managed lifetime blocker evidence",
+        "managedTextureShadowRequiredSamples": "R106 managed texture sample requirement evidence",
+        "managedTextureShadowReadySamples": "R106 managed texture sample ready evidence",
+        "managedTextureShadowPendingSamples": "R106 managed texture sample pending evidence",
+        "textureStageManagedShadowRequired": "R106 managed texture stage requirement evidence",
+        "textureStageManagedShadowReady": "R106 managed texture stage ready evidence",
+        "textureStageManagedShadowPending": "R106 managed texture stage pending evidence",
+        "ManagedTextureShadow": "R106 activation evidence object",
+        "ObservedReady": "R106 all-observed managed texture readiness evidence",
         "R(?:7[23456789]|8[012345]) census": "R72 through R85 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
@@ -1788,6 +1802,69 @@ def main() -> None:
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(
                 "DX11 R105 managed-registry probe drift: " + meaning
+            )
+
+    r106_readiness_contract = {
+        "bool managedShadowRequired{}": "R106 per-stage managed requirement state",
+        "bool managedShadowReady{}": "R106 per-stage managed readiness state",
+        "textureManagedShadowRequiredMask": "R106 per-signature required mask",
+        "textureManagedShadowReadyMask": "R106 per-signature ready mask",
+        "ManagedTextureShadowRegistry.shadow_valid(textureIdentity)":
+            "R106 bound Texture2D registry readiness query",
+        "ManagedTextureShadowRequiredSamples":
+            "R106 managed texture required sample counter",
+        "ManagedTextureShadowReadySamples":
+            "R106 managed texture ready sample counter",
+        "ManagedTextureShadowPendingSamples":
+            "R106 managed texture pending sample counter",
+        "managedTextureShadow[requiredSamples=":
+            "R106 periodic managed texture readiness summary",
+        "textureStageManagedShadow[required=":
+            "R106 periodic stage readiness summary",
+        "managedShadowRequired={} managedShadowReady={}":
+            "R106 per-stage readiness signature evidence",
+        "R106 exposes managed Texture2D shadow readiness as an independent":
+            "R106 non-activation scope marker",
+    }
+    missing_r106 = [
+        meaning
+        for token, meaning in r106_readiness_contract.items()
+        if token not in census
+    ]
+    if missing_r106:
+        raise SystemExit(
+            "DX11 R106 managed-texture readiness drift: "
+            + ", ".join(missing_r106)
+        )
+
+    for forbidden, meaning in {
+        "recreate_and_upload_mirror(": "production mirror upload",
+        "mirror_srv()": "production managed SRV access",
+        "PSSetShaderResources": "production D3D11 texture binding",
+    }.items():
+        if forbidden in census:
+            raise SystemExit(
+                "DX11 R106 readiness census activated native texture path: "
+                + meaning
+            )
+
+    for token, meaning in {
+        "managedTextureShadow\\[requiredSamples=":
+            "R106 analyzer sample readiness parser",
+        "textureStageManagedShadow\\[required=":
+            "R106 analyzer stage readiness parser",
+        "managedShadowRequired=(?P<managedShadowRequired>":
+            "R106 per-stage readiness parser",
+        '"ManagedTextureShadow": managed_texture_shadow_evidence':
+            "R106 activation evidence export",
+        '"ObservedReady"':
+            "R106 observed-ready evidence flag",
+        '"NativeDrawPathActivationAllowed": False':
+            "R106 non-activation invariant",
+    }.items():
+        if token not in analyzer:
+            raise SystemExit(
+                "DX11 R106 analyzer readiness drift: " + meaning
             )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

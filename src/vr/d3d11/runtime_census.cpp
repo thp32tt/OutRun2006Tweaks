@@ -64,6 +64,12 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> ResourceManagedResetSuccesses{0};
         std::atomic<std::uint64_t> ResourceManagedResetShadowPreserved{0};
         std::atomic<std::uint64_t> ResourceManagedShadowRequiredSamples{0};
+        std::atomic<std::uint64_t> ManagedTextureShadowRequiredSamples{0};
+        std::atomic<std::uint64_t> ManagedTextureShadowReadySamples{0};
+        std::atomic<std::uint64_t> ManagedTextureShadowPendingSamples{0};
+        std::atomic<std::uint64_t> TextureStageManagedShadowRequiredResources{0};
+        std::atomic<std::uint64_t> TextureStageManagedShadowReadyResources{0};
+        std::atomic<std::uint64_t> TextureStageManagedShadowPendingResources{0};
         std::atomic<std::uint64_t> UniqueDrawSignatures{0};
         std::atomic<std::uint64_t> VertexDeclarationSamples{0};
         std::atomic<std::uint64_t> InputLayoutExactSamples{0};
@@ -135,6 +141,8 @@ namespace outrun::vr::dx11
             D3DFORMAT format = D3DFMT_UNKNOWN;
             bool present{};
             bool observed{};
+            bool managedShadowRequired{};
+            bool managedShadowReady{};
         };
 
         struct ShaderFunctionSignature
@@ -168,6 +176,8 @@ namespace outrun::vr::dx11
             std::array<TextureStageResourceState, 8> textureStages{};
             std::uint8_t textureResourcePresentMask{};
             std::uint8_t textureResourceExactMask{};
+            std::uint8_t textureManagedShadowRequiredMask{};
+            std::uint8_t textureManagedShadowReadyMask{};
             // D3D9 fixed-function texture blending exposes stages 0..7.
             // R81 observes all eight stages and the currently modeled sampler
             // fields for each stage; this remains evidence, not emulation.
@@ -251,9 +261,13 @@ namespace outrun::vr::dx11
                 hash = hash_mix(hash, texture.usage);
                 hash = hash_mix(hash, static_cast<std::uint32_t>(texture.pool));
                 hash = hash_mix(hash, static_cast<std::uint32_t>(texture.format));
+                hash = hash_mix(hash, texture.managedShadowRequired ? 1u : 0u);
+                hash = hash_mix(hash, texture.managedShadowReady ? 1u : 0u);
             }
             hash = hash_mix(hash, sig.textureResourcePresentMask);
             hash = hash_mix(hash, sig.textureResourceExactMask);
+            hash = hash_mix(hash, sig.textureManagedShadowRequiredMask);
+            hash = hash_mix(hash, sig.textureManagedShadowReadyMask);
             hash = hash_mix(hash, sig.colorOp0);
             hash = hash_mix(hash, sig.alphaOp0);
             hash = hash_mix(hash, sig.colorOp1);
@@ -553,13 +567,18 @@ namespace outrun::vr::dx11
             DWORD& usage,
             D3DPOOL& pool,
             D3DFORMAT& format,
-            bool& present) noexcept
+            bool& present,
+            bool& managedShadowRequired,
+            bool& managedShadowReady) noexcept
         {
             type = D3DRTYPE_FORCE_DWORD;
             usage = 0;
             pool = D3DPOOL_FORCE_DWORD;
             format = D3DFMT_UNKNOWN;
             present = false;
+            managedShadowRequired = false;
+            managedShadowReady = false;
+            const void* textureIdentity = nullptr;
 
             IDirect3DBaseTexture9* base = nullptr;
             const HRESULT getHr = device->GetTexture(stage, &base);
@@ -585,6 +604,7 @@ namespace outrun::vr::dx11
                         pool = desc.Pool;
                         format = desc.Format;
                         descriptorObserved = true;
+                        textureIdentity = texture;
                     }
                     texture->Release();
                 }
@@ -625,6 +645,20 @@ namespace outrun::vr::dx11
                     texture->Release();
                 }
             }
+
+            if (descriptorObserved)
+            {
+                const auto behavior = translate_resource_behavior(
+                    ResourceRole::Texture, pool, usage);
+                managedShadowRequired =
+                    behavior.descriptorExact && behavior.requiresCpuShadow;
+                managedShadowReady =
+                    !managedShadowRequired ||
+                    (type == D3DRTYPE_TEXTURE &&
+                     textureIdentity != nullptr &&
+                     ManagedTextureShadowRegistry.shadow_valid(textureIdentity));
+            }
+
             base->Release();
             return descriptorObserved;
         }
@@ -821,14 +855,23 @@ namespace outrun::vr::dx11
                 auto& texture = sig.textureStages[stage];
                 texture.observed = inspect_texture(
                     device, stage, texture.type, texture.usage,
-                    texture.pool, texture.format, texture.present);
+                    texture.pool, texture.format, texture.present,
+                    texture.managedShadowRequired,
+                    texture.managedShadowReady);
                 if (!texture.observed)
                     sig.resourceIntrospectionComplete = false;
                 if (texture.present)
                 {
                     sig.textured = true;
-                    sig.textureResourcePresentMask |=
+                    const auto stageBit =
                         static_cast<std::uint8_t>(1u << stage);
+                    sig.textureResourcePresentMask |= stageBit;
+                    if (texture.managedShadowRequired)
+                    {
+                        sig.textureManagedShadowRequiredMask |= stageBit;
+                        if (texture.managedShadowReady)
+                            sig.textureManagedShadowReadyMask |= stageBit;
+                    }
                 }
             }
 
@@ -1052,12 +1095,22 @@ namespace outrun::vr::dx11
                     ? TextureStageExactResources
                     : TextureStagePendingResources).fetch_add(
                         1, std::memory_order_relaxed);
+
+                if ((sig.textureManagedShadowRequiredMask & stageBit) != 0)
+                {
+                    TextureStageManagedShadowRequiredResources.fetch_add(
+                        1, std::memory_order_relaxed);
+                    ((sig.textureManagedShadowReadyMask & stageBit) != 0
+                        ? TextureStageManagedShadowReadyResources
+                        : TextureStageManagedShadowPendingResources).fetch_add(
+                            1, std::memory_order_relaxed);
+                }
             }
 
             if (inserted && unique <= 64)
             {
                 spdlog::info(
-                    "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
+                    "VR DX11 R85 signature#{}: primitive={} fixedFn={} fvf=0x{:08X} decl={} declHash=0x{:016X} declElems={} inputLayout[exact={},elements={},fvfExact={},fvfPending={}] shader[introspection={},mixed={},exact={},vsPresent={},vsBytes={},vsVersion=0x{:08X},vsHash=0x{:016X},psPresent={},psBytes={},psVersion=0x{:08X},psHash=0x{:016X}] ffpCoverage[exact={}] ffpReadiness[ready={},mask=0x{:08X},activeStages={}] texMask[present=0x{:02X},exact=0x{:02X}] managedTexShadow[required=0x{:02X},ready=0x{:02X}] stream0[offset={},stride={},present={},pool={},usage=0x{:08X}] ib[present={},pool={},usage=0x{:08X},fmt={}] rt[present={},pool={},usage=0x{:08X},fmt={}] depth[present={},pool={},usage=0x{:08X},fmt={}] tex0[present={},type={},pool={},usage=0x{:08X},fmt={}] tex1[present={},type={},pool={},usage=0x{:08X},fmt={}] tss0[color={},alpha={}] tss1[color={},alpha={}] samp0[min={},mag={},mip={},u={},v={}]",
                     unique,
                     static_cast<int>(primitive),
                     sig.fixedFunction ? 1 : 0,
@@ -1086,6 +1139,8 @@ namespace outrun::vr::dx11
                     sig.fixedFunctionActiveStages,
                     sig.textureResourcePresentMask,
                     sig.textureResourceExactMask,
+                    sig.textureManagedShadowRequiredMask,
+                    sig.textureManagedShadowReadyMask,
                     sig.streamOffset,
                     sig.stride,
                     sig.vertexBufferPresent ? 1 : 0,
@@ -1133,7 +1188,7 @@ namespace outrun::vr::dx11
                     const auto stageBit = static_cast<std::uint8_t>(
                         1u << static_cast<unsigned>(stageIndex));
                     spdlog::info(
-                        "VR DX11 R85 texture signature#{} stage#{}: observed={} type={} pool={} usage=0x{:08X} fmt={} exact={}",
+                        "VR DX11 R85 texture signature#{} stage#{}: observed={} type={} pool={} usage=0x{:08X} fmt={} exact={} managedShadowRequired={} managedShadowReady={}",
                         unique,
                         stageIndex,
                         texture.observed ? 1 : 0,
@@ -1141,7 +1196,9 @@ namespace outrun::vr::dx11
                         static_cast<int>(texture.pool),
                         texture.usage,
                         static_cast<int>(texture.format),
-                        (sig.textureResourceExactMask & stageBit) != 0 ? 1 : 0);
+                        (sig.textureResourceExactMask & stageBit) != 0 ? 1 : 0,
+                        texture.managedShadowRequired ? 1 : 0,
+                        texture.managedShadowReady ? 1 : 0);
                 }
 
                 if (sig.fixedFunction)
@@ -1268,7 +1325,7 @@ namespace outrun::vr::dx11
 
             const auto managedLifetime = managed_lifetime_snapshot();
             spdlog::info(
-                "VR DX11 R85 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R85 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1313,6 +1370,9 @@ namespace outrun::vr::dx11
                 managedLifetime.mirrorGeneration,
                 managedLifetime.mirrorShadowVersion,
                 managed_mirror_ready(managedLifetime) ? 1 : 0,
+                ManagedTextureShadowRequiredSamples.load(std::memory_order_relaxed),
+                ManagedTextureShadowReadySamples.load(std::memory_order_relaxed),
+                ManagedTextureShadowPendingSamples.load(std::memory_order_relaxed),
                 InputLayoutExactSamples.load(std::memory_order_relaxed),
                 InputLayoutUnsupportedSamples.load(std::memory_order_relaxed),
                 InputLayoutFvfExactSamples.load(std::memory_order_relaxed),
@@ -1342,6 +1402,12 @@ namespace outrun::vr::dx11
                 TextureStageBoundResources.load(std::memory_order_relaxed),
                 TextureStageExactResources.load(std::memory_order_relaxed),
                 TextureStagePendingResources.load(std::memory_order_relaxed),
+                TextureStageManagedShadowRequiredResources.load(
+                    std::memory_order_relaxed),
+                TextureStageManagedShadowReadyResources.load(
+                    std::memory_order_relaxed),
+                TextureStageManagedShadowPendingResources.load(
+                    std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -1670,6 +1736,27 @@ namespace outrun::vr::dx11
         if (managedShadowRequired)
             ResourceManagedShadowRequiredSamples.fetch_add(
                 1, std::memory_order_relaxed);
+
+        const bool managedTextureShadowRequired =
+            signature.textureManagedShadowRequiredMask != 0;
+        const bool managedTextureShadowReady =
+            managedTextureShadowRequired &&
+            (signature.textureManagedShadowReadyMask &
+             signature.textureManagedShadowRequiredMask) ==
+                signature.textureManagedShadowRequiredMask;
+        if (managedTextureShadowRequired)
+        {
+            ManagedTextureShadowRequiredSamples.fetch_add(
+                1, std::memory_order_relaxed);
+            (managedTextureShadowReady
+                ? ManagedTextureShadowReadySamples
+                : ManagedTextureShadowPendingSamples).fetch_add(
+                    1, std::memory_order_relaxed);
+        }
+
+        // R106 exposes managed Texture2D shadow readiness as an independent
+        // activation prerequisite. It deliberately does not clear the older
+        // mutation-telemetry/resource-lifetime blocker or activate native draw.
         if (!behaviorDescriptorExact || mutationTelemetryRequired ||
             managedShadowRequired)
             resourcesExact = false;
