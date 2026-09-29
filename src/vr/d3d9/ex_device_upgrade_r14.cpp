@@ -79,11 +79,11 @@ namespace OutRunVRD3D9ExUpgradeR13
         constexpr std::uint64_t R14GeneralShadowBudgetBytes =
             368ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14ShadowBudgetBytes =
-            400ull * 1024ull * 1024ull;
+            432ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
             16ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyShadowBudgetBytes =
-            32ull * 1024ull * 1024ull;
+            64ull * 1024ull * 1024ull;
 
         bool R69IsSelectorAtlasReserveCandidate(
             const D3DSURFACE_DESC& desc, UINT levels,
@@ -683,7 +683,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !R14FirstEmergencyReserveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R72 SELECTOR RESERVE: MANAGED CPU-shadow reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}; emergency class capped at 32 MiB, general at 368 MiB, total at 400 MiB",
+                    "VR R73 SELECTOR RESERVE: MANAGED CPU-shadow reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}; emergency class capped at 64 MiB, general at 368 MiB, total at 432 MiB",
                     desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
                     estimate,
                     static_cast<double>(currentTotal) / (1024.0 * 1024.0),
