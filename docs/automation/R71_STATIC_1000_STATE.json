@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 145,
+  "completedCycles": 146,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "a07db31dbf2bc94bb788ecc07a03a8ff4122ed6f",
+  "currentHead": "637ef8431ab66431d2bb57c7b92e41b627151395",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -3998,20 +3998,61 @@
       "automationValidation": "FULL_FLARE_SINGLE_OWNER_CHAIN_COMMITTED; exact-head a07db31 GitHub CI pending",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 146: consume a07db31 exact-head CI. Keep console base-shadow disabled; isolate stock-PC start-grid stencil/projected-shadow identity and add diagnostics before any shadow stereo-policy change."
+    },
+    {
+      "cycle": 146,
+      "lenses": [
+        "known-bad console base-shadow falsification",
+        "stock-PC fragile effect isolation",
+        "R13/R27 stereo ownership observation",
+        "start-grid bounded telemetry",
+        "adversarial: diagnostic-only no render-policy change"
+      ],
+      "findingKeys": [
+        "DX9EX-START-GRID-SHADOW-IDENTITY-001"
+      ],
+      "findings": [
+        "The restored console CalcPeraShadow path is definitively not the current VR source: Settings::VREnabled returns before DrawObjectAlpha_Internal at all three injected car/base-shadow callsites, preserving stock PC nullsub behavior.",
+        "The remaining start-grid corruption must therefore come from stock-PC stencil/projected/effect rendering, not the previously known split console base shadow.",
+        "Current R13/R27 policy covers a broad family of alpha/billboard/shadow effects; static evidence is insufficient to change that family safely because smoke/skid/decal and legitimate depth-tested effects share the same policy.",
+        "Added bounded telemetry only for gameplay depth-tested fragile candidates: alpha blend/test, no-Z-write, stencil, or cull-none. It logs Present/draw serial, current semantic scope, VS/PS identity and alpha/Z/stencil/cull/color-write state.",
+        "Logging is capped to the first 32 matches and then powers of two. No render state, matrix, stereo classification, draw count, resource policy or synchronization behavior is changed."
+      ],
+      "evidence": [
+        "hooks_graphics.cpp CalcPeraShadow returns immediately whenever VR is enabled",
+        "P8_SELECTOR_SHADOW already guards stock PC nullsub behavior",
+        "vr_pass_policy.hpp warns projected shadows/camera-facing panels require conservative ownership",
+        "stereo_renderer_r26.cpp R27/R28 shares effect handling with smoke/skid/decal and shadow-like draws",
+        "a07db31 flare-owner validation workflows still queued/in-progress at diagnostic checkpoint",
+        "637ef843 exact-head Build/OpenXR/HUD workflows registered"
+      ],
+      "changedFiles": [
+        "src/vr/d3d9/stereo_renderer_r26.cpp",
+        "tools/verify_vr_proven_baseline.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "f19cf11fecef28ae065749b22e62b7af59fe75e1",
+        "637ef8431ab66431d2bb57c7b92e41b627151395"
+      ],
+      "automationValidation": "BOUNDED_SHADOW_IDENTITY_DIAGNOSTIC_COMMITTED; exact-head CI pending",
+      "runtimeValidation": "UNTESTED / NEED_HMD_LOG",
+      "next": "Cycle 147: consume 637ef843 hosted CI. From the next Quest3/VDXR run, correlate VR R71 START SHADOW DIAG entries with the visible start-grid split; only then create an exact shader/state/semantic owner fix. Do not change the broad R13/R27 effect policy speculatively."
     }
   ],
   "nextCycle": {
-    "cycle": 146,
+    "cycle": 147,
     "priority": [
-      "consume a07db31 exact-head Build/OpenXR/HUD results",
-      "isolate stock-PC start-grid stencil/projected-shadow draw identity",
-      "check R13/R27 effect classification and c64 owner around that exact draw",
-      "add bounded shadow diagnostics if identity is not statically decisive",
-      "keep selector resource fix blocked until new HMD pointer-correlated log"
+      "consume 637ef843 exact-head Build/OpenXR/HUD results",
+      "use VR R71 START SHADOW DIAG from next HMD log to identify exact broken draw",
+      "fix only the proven shadow shader/state/semantic owner",
+      "re-test flare single fusion and rival/stage HUD fixes together",
+      "keep selector resource policy blocked until pointer-correlated HMD evidence"
     ],
-    "guard": "Do not re-enable restored console base shadow. No performance-only work, no broad shadow/alpha heuristic change, no HUD widening, no global material/color/resource-budget mutation."
+    "guard": "Do not re-enable console base shadow, broadly demote depth-tested effects, widen HUD semantics, resume performance work, force vehicle material/color, or increase global shadow-resource budget."
   },
-  "updatedKst": "2026-09-29T15:49:00+09:00",
+  "updatedKst": "2026-09-29T15:53:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
