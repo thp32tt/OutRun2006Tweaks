@@ -28,6 +28,20 @@ namespace outrun::vr::dx11
         SharedEyeSlotState state{SharedEyeSlotState::Free};
     };
 
+    // R118 immutable handoff evidence. A caller may advertise a native eye pair
+    // only while this exact lifetime/slot/frame snapshot is still Published.
+    struct NativeSharedEyePublication
+    {
+        OutRunVR::Core::TransportIdentity identity{};
+        std::uint32_t slot{};
+        std::uint64_t frame_id{};
+        HANDLE left_handle{};
+        HANDLE right_handle{};
+        std::uint32_t width{};
+        std::uint32_t height{};
+        DXGI_FORMAT format{DXGI_FORMAT_UNKNOWN};
+    };
+
     class NativeSharedEyeRing final
     {
     public:
@@ -92,6 +106,16 @@ namespace outrun::vr::dx11
             ID3D11DeviceContext* context,
             std::uint32_t slot,
             std::uint64_t frame_id) noexcept;
+
+        // Snapshot only a fully Published frame. The snapshot is immutable
+        // evidence for a later IPC handoff; validation fails after ACK,
+        // lifetime invalidation, generation replacement or hard retirement.
+        bool snapshot_published_frame(
+            std::uint32_t slot,
+            std::uint64_t frame_id,
+            NativeSharedEyePublication& out) const noexcept;
+        [[nodiscard]] bool validate_publication_snapshot(
+            const NativeSharedEyePublication& publication) const noexcept;
 
         // Consumer ACK retirement is exact-identity and exact-slot gated.
         bool retire_acknowledged(
