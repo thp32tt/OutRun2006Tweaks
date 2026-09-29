@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T13:50:47+09:00",
+  "updated_at_kst": "2026-09-29T15:22:08.613+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -105,7 +105,7 @@
       "percent": 100,
       "transcribed_assets": 95,
       "localize_text_targets": 95,
-      "transcribed_segments": 753,
+      "transcribed_segments": 754,
       "blocked_context_assets": 0,
       "blocked_context_indices": []
     },
@@ -131,15 +131,15 @@
       "status": "done",
       "percent": 100,
       "planned_assets": 95,
-      "translated_segments": 753,
+      "translated_segments": 754,
       "plan_file": "localization/graphics/artwork_plan.jsonl",
       "localize_text_targets": 95,
-      "transcribed_segments": 753,
+      "transcribed_segments": 754,
       "pending_plan_assets": 0,
       "pending_indices": []
     }
   },
-  "next_checkpoint": "Q00003 C105 consumed immutable A00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2, A00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27, A00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0, and B00066@380f4e237c9ceeb12923044f9192f4d9a5c96b8c. Producer reconstruction/mapping evidence passes as metadata: 195/195 existing canonical semantic pairs match, 200/200 reported x4 geometry/mapped-cell relations pass, and B00066's three visually confirmed English omissions were reconciled to canonical Korean metadata. No input contains Korean candidate DDS bytes; Hangul raster/clipping, 1-pixel containment, candidate DDS format/mipmap/alpha/transparency, compression round-trip, final orientation/slant, protected-artwork/background, and ENGLISH SOURCE vs KOREAN CANDIDATE remain HOLD_STRICT_RECHECK. Current later producers A00068/B00069/A00070 are disjoint, so no input is superseded. Canonical assets remain 95 with 753 segments; actionable queue remains 137 rows = 94 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 2 preserve-only; pending production localize_text 77; runtime UNTESTED.",
+  "next_checkpoint": "Q00004 C106 consumed immutable A00068@96173be6940f1504fb71f48d06561d9888386cb5, B00069@256c7ca9b65d570f5420a9b339398fb9b0342483, A00070@9686b3b946a2ecbb87507b5404827a19d5ab4aa8, and A00072@52578815228c4114fd656a0fdf93b5c1b78ad888. Existing producer canonical pairs pass 95/95; 292/292 stock-to-4x atlas regions and 60/60 direct mapping/variant/omission evidence cells pass. B00069 SHOWROOM omission was reconciled as SHOWROOM -> 쇼룸; 31C58963 PRESS ENTER vs canonical PRESS START remains HOLD pending exact Release-HD decode. A00070 index 209 has zero canonical segments and was reconciled from actionable localize_text to preserve-original/not-required. No input contains Korean candidate DDS bytes; Hangul raster/clipping, 1-pixel containment, candidate DDS format/mipmap/alpha/transparency, compression round-trip, final orientation/slant, protected-artwork/background, and ENGLISH SOURCE vs KOREAN CANDIDATE remain HOLD_STRICT_RECHECK. Later A00074/B00073 are disjoint and preserved. Canonical assets remain 95 with 754 segments; actionable queue remains 137 rows = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only; pending production localize_text 76; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -169,7 +169,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 95,
-    "transcribed_segments": 753,
+    "transcribed_segments": 754,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -186,7 +186,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 95,
-    "artwork_plan_segments": 753,
+    "artwork_plan_segments": 754,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -644,78 +644,79 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_c_batch_qa": {
-      "recorded_at_kst": "2026-09-29T14:47:33+09:00",
-      "task_id": "LOCALIZATION-LOCALIZATION_C-00071",
-      "qa_batch_id": "Q00003",
-      "run": "C105",
-      "result": "PASS_Q00003_RECONSTRUCTION_MAPPING_BATCH_16_ASSETS_195_PRODUCER_SEMANTICS_3_OMISSIONS_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
-      "base_head": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
+      "recorded_at_kst": "2026-09-29T15:22:08.613+09:00",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00075",
+      "qa_batch_id": "Q00004",
+      "run": "C106",
+      "result": "PASS_Q00004_RECONSTRUCTION_MAPPING_BATCH_12_ASSETS_95_PRODUCER_SEMANTICS_1_OMISSION_RECONCILED_1_QUEUE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
+      "base_head": "b2f19f6d31246e874abec638719a721e150313b4",
       "qa_batch_inputs": [
-        "LOCALIZATION-LOCALIZATION_A-00061@e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
-        "LOCALIZATION-LOCALIZATION_A-00065@144838b1bf57c52f18cb924f1f8e7e5db1548a27",
-        "LOCALIZATION-LOCALIZATION_A-00067@e2be75d74860d3794f02fc56f0d94d7e93f307e0",
-        "LOCALIZATION-LOCALIZATION_B-00066@380f4e237c9ceeb12923044f9192f4d9a5c96b8c"
+        "LOCALIZATION-LOCALIZATION_A-00068@96173be6940f1504fb71f48d06561d9888386cb5",
+        "LOCALIZATION-LOCALIZATION_B-00069@256c7ca9b65d570f5420a9b339398fb9b0342483",
+        "LOCALIZATION-LOCALIZATION_A-00070@9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
+        "LOCALIZATION-LOCALIZATION_A-00072@52578815228c4114fd656a0fdf93b5c1b78ad888"
       ],
       "reviewed_indices": [
-        137,
-        147,
-        159,
-        161,
-        163,
-        173,
-        193,
-        198,
-        201,
-        214,
-        217,
-        219,
-        225,
-        230,
-        236,
-        241
+        95,
+        101,
+        130,
+        140,
+        154,
+        164,
+        175,
+        205,
+        209,
+        227,
+        231,
+        237
       ],
       "qa_dispositions": [
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00061",
-          "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00068",
+          "result_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
           "status": "PASS",
-          "reason": "A00061 reconstruction evidence accepted: current canonical semantics 8/8 match; 4/4 lane ENGLISH_SOURCE blobs match the pinned original PNG identities and were visually checked; 5/5 confirmed mapped cells preserve exact x4 geometry. Three unresolved labels remain fail-closed HOLD. No Korean candidate DDS exists, so candidate-only gates remain HOLD_STRICT_RECHECK."
+          "reason": "A00068 reconstruction input accepted: 20/20 immutable upstream source objects independently match Sonic-TV/OR2006Sprites@a95efe01; 123/123 stock-to-4x atlas regions are exact x4; 41/41 canonical source/Korean pairs match current transcription and artwork-plan metadata. Exact source-pixel semantic binding, full-effect bbox/orientation/slant/clean-plate and candidate-only gates remain HOLD_STRICT_RECHECK."
         },
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00065",
-          "result_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00069",
+          "result_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483",
           "status": "PASS",
-          "reason": "A00065 reconstruction input accepted: 20/20 immutable upstream Release/stock DDS/PNG/stock-atlas/4x-atlas identities independently match Sonic-TV/OR2006Sprites@a95efe01; 94/94 atlas regions are exact x4; 92 canonical semantic pairs match current transcription/artwork-plan state. Semantic-to-sprite and candidate-only gates remain HOLD."
+          "reason": "B00069 direct-mapping input accepted: reused B00054 heavy-QA report blob matches exactly; 4 lane evidence PNGs and 4 pinned stock PNG source blobs match; 24/24 stock-to-4x atlas regions and 19/19 mapped/variant/omission evidence cells match upstream atlas geometry. Current 16/16 canonical pairs match. The observed 4D38BBB0 SHOWROOM omission is reconciled to 쇼룸; 31C58963 PRESS ENTER vs canonical PRESS START remains fail-closed HOLD pending exact Release-HD prompt decode."
         },
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00067",
-          "result_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00070",
+          "result_sha": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
           "status": "PASS",
-          "reason": "A00067 reconstruction input accepted: 20/20 immutable upstream source objects independently match; 66/66 stock-to-4x region relations pass; 60/60 semantic pairs match current transcription/artwork-plan state. Semantic-to-sprite and exact source-effect/candidate gates remain HOLD."
+          "reason": "A00070 final odd-shard input accepted: 10/10 immutable upstream source objects match and 10/10 stock-to-4x atlas regions are exact x4; index 237 matches 6/6 canonical pairs. Index 209 has zero canonical segments in both transcription and artwork plan and is the only actionable localize_text row with no segments, so C reconciles it to preserve-original/not-required. No Korean candidate exists; index 237 source-effect/candidate gates remain HOLD."
         },
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_B-00066",
-          "result_sha": "380f4e237c9ceeb12923044f9192f4d9a5c96b8c",
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00072",
+          "result_sha": "52578815228c4114fd656a0fdf93b5c1b78ad888",
           "status": "PASS",
-          "reason": "B00066 mapping input accepted: 20/20 immutable upstream source objects match, 35/35 existing canonical semantic-to-cell mappings and 35/35 mapped x4 cell relations pass. Three additional English source strings were correctly detected fail-closed; C reconciled them into canonical metadata only. No Korean candidate DDS exists, so candidate-only gates remain HOLD."
+          "reason": "A00072 direct selector mapping accepted: 8/8 immutable Release/decoded-source/atlas objects match, 135/135 stock-to-4x atlas regions are exact x4, all 32/32 canonical pairs match current metadata, and all 41/41 physical occurrence mappings match exact upstream atlas cells. Exact HD full-effect bbox/orientation/slant/clean-plate and candidate-only gates remain HOLD_STRICT_RECHECK."
         }
       ],
-      "source_identity_validation": "PASS_A61_4_OF_4_LANE_ENGLISH_SOURCE_BLOBS_VISUAL_PLUS_A65_A67_B66_60_OF_60_EXACT_UPSTREAM_OBJECTS",
-      "canonical_semantic_validation": "PASS_195_OF_195_PRODUCER_CANONICAL_PAIRS_PLUS_3_SOURCE_OMISSIONS_RECONCILED",
-      "geometry_mapping_validation": "PASS_200_OF_200_REPORTED_X4_REGION_OR_MAPPED_CELL_RELATIONS",
-      "metadata_reconciled_segments": 3,
-      "canonical_transcribed_segments_after_merge": 753,
+      "source_identity_validation": "PASS_A68_A70_A72_38_OF_38_UPSTREAM_OBJECTS_PLUS_B69_4_OF_4_STOCK_SOURCE_AND_4_OF_4_LANE_EVIDENCE_BLOBS__B54_REUSED_REPORT_BLOB_EXACT",
+      "canonical_semantic_validation": "PASS_95_OF_95_EXISTING_PRODUCER_CANONICAL_PAIRS_PLUS_1_SHOWROOM_OMISSION_RECONCILED",
+      "geometry_mapping_validation": "PASS_292_OF_292_STOCK_TO_4X_ATLAS_REGIONS_PLUS_60_OF_60_DIRECT_MAPPING_VARIANT_OMISSION_CELLS",
+      "metadata_reconciled_segments": 1,
+      "canonical_transcribed_segments_after_merge": 754,
+      "queue_reclassification": {
+        "209": "localize_text -> preserve_brand_song_credit / preserve_original / not_required"
+      },
+      "source_variant_hold": {
+        "140": "31C58963 stock source PRESS ENTER vs canonical PRESS START; exact Release-HD prompt decode required before render"
+      },
       "superseded_inputs": [],
       "newer_disjoint_producers": [
-        "LOCALIZATION-LOCALIZATION_A-00068",
-        "LOCALIZATION-LOCALIZATION_B-00069",
-        "LOCALIZATION-LOCALIZATION_A-00070"
+        "LOCALIZATION-LOCALIZATION_A-00074",
+        "LOCALIZATION-LOCALIZATION_B-00073"
       ],
       "candidate_dds_modified": false,
       "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
       "runtime_validation": "UNTESTED",
-      "report": "localization/graphics/role_C/20260929-1447-C105/C105_Q00003_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260929-1520-C106/C106_Q00004_INDEPENDENT_QA_BATCH.json"
     }
   },
   "data_build": {

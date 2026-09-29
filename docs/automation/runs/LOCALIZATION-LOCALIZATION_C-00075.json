@@ -1,0 +1,119 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00075",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "wave_id": "Q00004",
+  "qa_batch_id": "Q00004",
+  "recorded_at_kst": "2026-09-29T15:22:08.613+09:00",
+  "base_head_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+  "result": "PASS_Q00004_RECONSTRUCTION_MAPPING_BATCH_12_ASSETS_95_PRODUCER_SEMANTICS_1_OMISSION_RECONCILED_1_QUEUE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Independent Q00004 batch accepted four immutable producer reconstruction/mapping results, reconciled one missing SHOWROOM -> 쇼룸 canonical segment, and removed zero-segment index 209 from actionable Korean raster work. No Korean DDS candidate bytes or runtime evidence were produced; PRESS ENTER/PRESS START remains a strict source-variant HOLD.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00068",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "96173be6940f1504fb71f48d06561d9888386cb5"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00069",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00070",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00072",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "52578815228c4114fd656a0fdf93b5c1b78ad888"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00068",
+      "result_sha": "96173be6940f1504fb71f48d06561d9888386cb5",
+      "status": "PASS",
+      "reason": "A00068 reconstruction input accepted: 20/20 immutable upstream source objects independently match Sonic-TV/OR2006Sprites@a95efe01; 123/123 stock-to-4x atlas regions are exact x4; 41/41 canonical source/Korean pairs match current transcription and artwork-plan metadata. Exact source-pixel semantic binding, full-effect bbox/orientation/slant/clean-plate and candidate-only gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00069",
+      "result_sha": "256c7ca9b65d570f5420a9b339398fb9b0342483",
+      "status": "PASS",
+      "reason": "B00069 direct-mapping input accepted: reused B00054 heavy-QA report blob matches exactly; 4 lane evidence PNGs and 4 pinned stock PNG source blobs match; 24/24 stock-to-4x atlas regions and 19/19 mapped/variant/omission evidence cells match upstream atlas geometry. Current 16/16 canonical pairs match. The observed 4D38BBB0 SHOWROOM omission is reconciled to 쇼룸; 31C58963 PRESS ENTER vs canonical PRESS START remains fail-closed HOLD pending exact Release-HD prompt decode."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00070",
+      "result_sha": "9686b3b946a2ecbb87507b5404827a19d5ab4aa8",
+      "status": "PASS",
+      "reason": "A00070 final odd-shard input accepted: 10/10 immutable upstream source objects match and 10/10 stock-to-4x atlas regions are exact x4; index 237 matches 6/6 canonical pairs. Index 209 has zero canonical segments in both transcription and artwork plan and is the only actionable localize_text row with no segments, so C reconciles it to preserve-original/not-required. No Korean candidate exists; index 237 source-effect/candidate gates remain HOLD."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00072",
+      "result_sha": "52578815228c4114fd656a0fdf93b5c1b78ad888",
+      "status": "PASS",
+      "reason": "A00072 direct selector mapping accepted: 8/8 immutable Release/decoded-source/atlas objects match, 135/135 stock-to-4x atlas regions are exact x4, all 32/32 canonical pairs match current metadata, and all 41/41 physical occurrence mappings match exact upstream atlas cells. Exact HD full-effect bbox/orientation/slant/clean-plate and candidate-only gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      95,
+      101,
+      130,
+      140,
+      154,
+      164,
+      175,
+      205,
+      209,
+      227,
+      231,
+      237
+    ],
+    "reviewed_assets": 12,
+    "producer_existing_semantics_validated": 95,
+    "x4_atlas_regions_validated": 292,
+    "direct_mapping_variant_omission_cells_validated": 60,
+    "metadata_segments_reconciled": 1,
+    "canonical_segments_after_merge": 754,
+    "queue_reclassifications": 1,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "input_candidate_dds_modified": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-1520-C106/C106_Q00004_INDEPENDENT_QA_BATCH.json"
+  },
+  "source_variant_hold": {
+    "index": 140,
+    "asset": "31C58963",
+    "observed_stock_source": "PRESS ENTER",
+    "canonical_source": "PRESS START",
+    "status": "HOLD_EXACT_RELEASE_HD_DECODE_REQUIRED"
+  },
+  "supersession": {
+    "superseded_inputs": [],
+    "later_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00074",
+      "LOCALIZATION-LOCALIZATION_B-00073"
+    ]
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
