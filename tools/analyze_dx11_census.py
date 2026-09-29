@@ -9,11 +9,18 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R(?:7[23456789]|8[012345]) census: "
+    r"VR DX11 R(?:7[23456789]|8[012345]|114) census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
-    r"signatures=(?P<signatures>\d+) declSamples=(?P<declSamples>\d+) "
+    r"signatures=(?P<signatures>\d+) "
+    r"(?:sampling\[drawsSeen=(?P<samplingDrawsSeen>\d+),"
+    r"stride=(?P<samplingStride>\d+),scheme=(?P<samplingScheme>\d+)\] "
+    r"signatureCaps\[hashCap=(?P<signatureHashCap>\d+),"
+    r"hashCapHitSamples=(?P<signatureHashCapHitSamples>\d+),"
+    r"detailCap=(?P<signatureDetailCap>\d+),"
+    r"detailSkipped=(?P<signatureDetailSkipped>\d+)\] )?"
+    r"declSamples=(?P<declSamples>\d+) "
     r"indexedSamples=(?P<indexedSamples>\d+) texturedSamples=(?P<texturedSamples>\d+) "
     r"resourceExact\[(?:introspectionFailure=(?P<introspectionFailure>\d+),)?"
     r"(?:(?:behaviorUnsupported=(?P<behaviorUnsupported>\d+),"
@@ -187,6 +194,7 @@ def main() -> int:
             and "VR DX11 R83" not in text
             and "VR DX11 R84" not in text
             and "VR DX11 R85" not in text
+            and "VR DX11 R114" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -373,12 +381,48 @@ def main() -> int:
         "ActivationProof": False,
     }
 
+    sampling_scheme_id = latest["samplingScheme"] if latest else 0
+    sampling_coverage = {
+        "DrawsSeen": latest["samplingDrawsSeen"] if latest else 0,
+        "Samples": latest["samples"] if latest else 0,
+        "Stride": latest["samplingStride"] if latest else 0,
+        "SchemeId": sampling_scheme_id,
+        "Scheme": (
+            "HASHED_ORDINAL_V1"
+            if sampling_scheme_id == 1
+            else "LEGACY_OR_UNSPECIFIED"
+        ),
+        "SignatureHashCap": latest["signatureHashCap"] if latest else 0,
+        "SignatureHashCapHitSamples": (
+            latest["signatureHashCapHitSamples"] if latest else 0
+        ),
+        "DetailedSignatureLogCap": (
+            latest["signatureDetailCap"] if latest else 0
+        ),
+        "DetailedSignatureLogSkippedSignatures": (
+            latest["signatureDetailSkipped"] if latest else 0
+        ),
+        "SignatureHashCapSaturated": bool(
+            latest and latest["signatureHashCapHitSamples"] > 0
+        ),
+        "DetailedSignatureLogCapSaturated": bool(
+            latest and latest["signatureDetailSkipped"] > 0
+        ),
+        "NonExhaustive": True,
+        "ActivationProof": False,
+    }
+
     if not source_logs:
         status = "NO_DX11_CENSUS_LOG"
     elif not summaries:
         status = "CENSUS_ACTIVE_NO_PERIODIC_SUMMARY"
     elif unsupported_total != 0:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    elif (
+        sampled_exactness["AllSampledExact"]
+        and sampling_coverage["SignatureHashCapSaturated"]
+    ):
+        status = "OBSERVED_SAMPLED_TRANSLATION_EXACT_COVERAGE_SATURATED"
     elif sampled_exactness["AllSampledExact"]:
         status = "OBSERVED_SAMPLED_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
     else:
@@ -427,15 +471,15 @@ def main() -> int:
         "NativeDrawPathActivationAllowed": False,
         "ActivationEvidence": {
             "CensusExactness": sampled_exactness,
+            "SamplingCoverage": sampling_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
         },
         "ActivationNote": (
-            "R113 sampled census exactness is diagnostic-only and never an activation "
-            "proof: the 1/64 sampler is not exhaustive, signature capture is bounded, "
-            "and native D3D11 draw routing remains disabled. Managed-texture shadow "
-            "readiness and external-mutation invalidation are also observation-only "
-            "until the remaining translation/lifetime gates and exact-build HMD "
-            "graphics parity pass."
+            "R114 replaces the fixed-phase 1/64 selector with hashed-ordinal sampling "
+            "to reduce periodic draw-order alias, but sampling remains non-exhaustive. "
+            "Signature hash/detail caps are explicit evidence and hash-cap saturation "
+            "prevents the normal exact-sampled status. NativeDrawPathActivationAllowed "
+            "remains false; exact-build HMD graphics parity is still required."
         ),
         "SourceLogs": source_logs,
         "Startup": startup,
