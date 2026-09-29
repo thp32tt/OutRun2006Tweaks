@@ -1,0 +1,81 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00117",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00047",
+  "recorded_at_kst": "2026-09-29T18:44:54.467+09:00",
+  "base_sha": "2947bed7ba265790c0f82d8db638b9b6bb254347",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_REWORK159_DURABLE_REEMIT_PLUS_THREE_ODD_V2_WORK_ORDERS",
+  "summary": "Resolved the Q00013/C00116 producer-contract REWORK for odd index159 by re-emitting the C-content-QA-accepted A00109 stock semantic-binding/orientation payload in the same durable result commit as this task record; heavy stock content QA was not repeated. In the same A batch, advanced independent odd pending indices 205/227/231 into source-gated first-pass-v2 direct source/source-effect-mask/CLEAN_PLATE work orders covering 36 current canonical semantics across 118 pinned HD4 atlas regions. Exact Release/HD4 identities and RGBA32 size equations were directly rechecked earlier in this P00047 run. No DDS/shared-state/build/runtime changes were made.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1844-A00117-P00047/A00117_P00047_REWORK159_PLUS_THREE_ODD_V2_WORK_ORDERS.json"
+  ],
+  "evidence_blob_sha": "7ac03c6604dc2e8f95096a01c3508ed5da214fc9",
+  "material_deliverable": {
+    "type": "INDEX159_DURABLE_ACCEPTED_MATERIAL_REEMIT_PLUS_THREE_ODD_V2_DIRECT_INSPECTION_WORK_ORDERS",
+    "indices": [
+      159,
+      205,
+      227,
+      231
+    ],
+    "assets": [
+      "4EDA9DE3",
+      "ACF61D7C",
+      "E596B7AC",
+      "EBE401C8"
+    ],
+    "rework_resolved_indices": [
+      159
+    ],
+    "reemitted_semantic_bindings": 15,
+    "reemitted_stock_effect_bboxes": 15,
+    "new_v2_assets": [
+      205,
+      227,
+      231
+    ],
+    "new_v2_canonical_semantics": 36,
+    "new_v2_atlas_regions": 118,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00116",
+    "c_result_sha": "2947bed7ba265790c0f82d8db638b9b6bb254347",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+    "prior_material_sha": "5c42c0da1237d1a9a662c759cc107bb7de6dfa33",
+    "prior_evidence_blob_sha": "3a4d8cbd19937332271730c2230a33c9bc77621f",
+    "disposition_defect": "MISSING_DURABLE_TASK_RECORD_IN_IMMUTABLE_PRODUCER_RESULT_SHA",
+    "content_qa_repeated": false,
+    "accepted_material_changed": false
+  },
+  "self_qa": "PASS_ODD_ONLY_159_205_227_231__INDEX159_ACCEPTED_PAYLOAD_REEMITTED_COMPLETE__15_OF_15_CURRENT_CANONICAL_SET_EQUAL__NEW_36_OF_36_CANONICAL__118_PINNED_HD4_REGIONS__3_OF_3_RELEASE_RGBA32_SIZE_EQUATIONS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "strict_hold": {
+    "new_assets_exact_dds_header_decode": "HOLD_REQUIRED_BEFORE_PIXEL_EDIT",
+    "new_assets_semantic_binding": "HOLD_DIRECT_DECODE_REQUIRED",
+    "new_assets_source_effect_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "new_assets_clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "new_assets_candidate_safe_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,1012 @@
+{
+  "schema_version": 10,
+  "schema": "outrun-a-producer-rework-reemit-plus-v2-work-orders-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00117",
+  "wave_id": "P00047",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T18:44:54.467+09:00",
+  "selection_head_sha": "2947bed7ba265790c0f82d8db638b9b6bb254347",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      159,
+      205,
+      227,
+      231
+    ],
+    "priority_order": [
+      "REWORK_REQUIRED index159 durable-result contract repair",
+      "unfinished localize_text 205",
+      "unfinished localize_text 227",
+      "unfinished localize_text 231"
+    ],
+    "skipped_dependency_blocked_rework": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "skipped_current_qa_pending_or_newer_producer": {
+      "LOCALIZATION-LOCALIZATION_A-00112": [
+        147,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00114": [
+        133,
+        135,
+        139,
+        143
+      ]
+    }
+  },
+  "rework_resolution": {
+    "source_task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+    "source_material_commit_sha": "5c42c0da1237d1a9a662c759cc107bb7de6dfa33",
+    "source_task_record_child_sha": "0d0ab35e25192ae0da8a174d7f00c5c1cbb1cd91",
+    "source_evidence_blob_sha": "3a4d8cbd19937332271730c2230a33c9bc77621f",
+    "c_rework_task_id": "LOCALIZATION-LOCALIZATION_C-00116",
+    "c_rework_result_sha": "2947bed7ba265790c0f82d8db638b9b6bb254347",
+    "c_disposition": "REWORK_REQUIRED",
+    "defect": "Exact producer RESULT_SHA carried accepted material evidence but not its durable task record.",
+    "content_qa_status": "C00116 independently reproduced all 15/15 stock alpha>0 bboxes and alpha pixel counts and confirmed all 15/15 canonical source/Korean pairs; no heavy content QA is repeated.",
+    "repair": "Re-emit the complete accepted A00109 material payload without field/value changes inside this A00117 evidence and commit it atomically with the A00117 durable task record.",
+    "current_canonical_semantics_match": "PASS_15_OF_15_SET_EQUAL_ORDER_INDEPENDENT",
+    "re_emitted_accepted_payload": {
+      "schema_version": 1,
+      "schema": "outrun-v2-stock-semantic-binding-orientation-prior-v1",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+      "wave_id": "P00041",
+      "lane": "LOCALIZATION_A",
+      "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+      "target_branch": "korean-localization-clean",
+      "attempt": "1/3",
+      "recorded_at_kst": "2026-09-29T18:06:57+09:00",
+      "precommit_head_sha": "705ecdb282f48c594a6347aa1837bc320b7254e3",
+      "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+      "selection": {
+        "selected_indices": [
+          159
+        ],
+        "selected_assets": [
+          "4EDA9DE3"
+        ],
+        "basis": "Q00011/C113 consumed A00096 as PASS. Index 159 is odd-shard pending artwork with 15 C-accepted direct-inspection work regions and 15 canonical semantics. A00102/A00105/A00107 remain newer QA-pending and were not repeated.",
+        "skipped_qa_pending": {
+          "LOCALIZATION-LOCALIZATION_A-00102": [
+            137,
+            217,
+            219,
+            241
+          ],
+          "LOCALIZATION-LOCALIZATION_A-00105": [
+            119
+          ],
+          "LOCALIZATION-LOCALIZATION_A-00107": [
+            55
+          ]
+        },
+        "dependency_blocked_rework_indices": [
+          51,
+          53,
+          111,
+          121
+        ]
+      },
+      "material_advance": {
+        "fallback_ladder_step": 4,
+        "type": "INDEX159_EXACT_STOCK_DIRECT_SEMANTIC_BINDING_AND_ORIENTATION_PRIOR",
+        "assets_advanced": 1,
+        "stock_sprite_regions_inspected": 15,
+        "semantic_bindings_resolved": 15,
+        "stock_effect_bboxes_measured": 15,
+        "stale_orientation_hint_challenged": true,
+        "candidate_dds_written": false,
+        "description": "Directly decoded the exact immutable stock DXT5 DDS from GitHub, used the exact stock atlas regions, and resolved all 15 visible English labels to sprite identities. Exact stock pixels show readable text after Y-axis atlas/raw reconciliation with no X mirror; applying X mirror reverses the glyphs, so the historical mirror_x draft hint is not accepted as current source truth. Stock decoded-alpha effect bboxes/counts are retained as reconstruction priors only. Exact 4x Release DDS decode remains required before final source-effect/removal-mask/CLEAN_PLATE/orientation promotion."
+      },
+      "asset": {
+        "queue_index": 159,
+        "asset": "4EDA9DE3",
+        "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+        "canonical_translation_status": "PASS_REUSED_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+        "exact_stock_source": {
+          "repository": "Sonic-TV/OR2006Sprites",
+          "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+          "git_blob_sha": "00f40e8b7b2c1e8c77442bb2a2e50270fff388dd",
+          "bytes": 131200,
+          "direct_dds_decode": {
+            "magic": "DDS ",
+            "width": 512,
+            "height": 256,
+            "fourcc": "DXT5",
+            "format": "BC3",
+            "mip_count_header": 0,
+            "payload_bytes": 131072,
+            "header_bytes": 128,
+            "size_equation": "128 + (512/4)*(256/4)*16 = 131200",
+            "result": "PASS_EXACT_PINNED_STOCK_BLOB_AND_FULL_BASE_PAYLOAD"
+          }
+        },
+        "exact_stock_atlas": {
+          "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256_atlas.json",
+          "git_blob_sha": "471c9e7c64cdce948d00fe5cfcc70754da72b0a2",
+          "regions": 15
+        },
+        "exact_release_4x": {
+          "repository": "Sonic-TV/OR2006Sprites",
+          "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+          "git_blob_sha": "8685dc0122bff16243faca3ca3cbc1308b241b08",
+          "bytes": 8388736,
+          "expected_dimensions": [
+            2048,
+            1024
+          ],
+          "exact_binary_decode_status": "HOLD_CONNECTOR_LARGE_BINARY_BODY_NOT_EXPOSED",
+          "note": "A00065/C00071 and A00096/C113 immutable identity/4x-region arithmetic remain accepted. This task does not infer final Release pixel geometry from stock pixels."
+        },
+        "stock_orientation_evidence": {
+          "atlas_coordinate_convention": "bottom_left_y",
+          "decoded_dds_memory_view": "top_left_row_order",
+          "readable_mapping_from_atlas_region": "raw_y = 255 - atlas_y; x unchanged",
+          "x_mirror_test": "FAIL_READABILITY_GLYPHS_REVERSED",
+          "exact_stock_source_text_transform": "flip_y",
+          "historical_mirror_x_hint_status": "STALE_HINT_NOT_ACCEPTED_AGAINST_EXACT_STOCK_PIXELS",
+          "release_4x_orientation_status": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION"
+        },
+        "semantic_bindings": [
+          {
+            "sprite": "sprite_344",
+            "source": "WATERFALLS",
+            "korean": "워터폴스",
+            "stock_region_xywh": [
+              0,
+              234,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              3,
+              123,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              0,
+              2,
+              123,
+              19
+            ],
+            "alpha_gt0_pixels": 1206,
+            "alpha_ge128_pixels": 961,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_345",
+            "source": "SUNNY BEACH",
+            "korean": "서니 비치",
+            "stock_region_xywh": [
+              245,
+              234,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              4,
+              133,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              245,
+              2,
+              378,
+              18
+            ],
+            "alpha_gt0_pixels": 1368,
+            "alpha_ge128_pixels": 1073,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_346",
+            "source": "SKYSCRAPERS",
+            "korean": "스카이스크레이퍼",
+            "stock_region_xywh": [
+              0,
+              212,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              0,
+              245,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              0,
+              24,
+              245,
+              44
+            ],
+            "alpha_gt0_pixels": 1380,
+            "alpha_ge128_pixels": 1026,
+            "edge_touch": [
+              "left",
+              "right",
+              "top"
+            ]
+          },
+          {
+            "sprite": "sprite_347",
+            "source": "NATIONAL PARK",
+            "korean": "내셔널 파크",
+            "stock_region_xywh": [
+              245,
+              212,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              4,
+              146,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              245,
+              24,
+              391,
+              40
+            ],
+            "alpha_gt0_pixels": 1431,
+            "alpha_ge128_pixels": 1170,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_348",
+            "source": "MILKY WAY",
+            "korean": "밀키 웨이",
+            "stock_region_xywh": [
+              0,
+              190,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              4,
+              106,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              1,
+              46,
+              106,
+              62
+            ],
+            "alpha_gt0_pixels": 1038,
+            "alpha_ge128_pixels": 741,
+            "edge_touch": []
+          },
+          {
+            "sprite": "sprite_349",
+            "source": "LOST CITY",
+            "korean": "로스트 시티",
+            "stock_region_xywh": [
+              245,
+              190,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              3,
+              96,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              246,
+              46,
+              341,
+              63
+            ],
+            "alpha_gt0_pixels": 827,
+            "alpha_ge128_pixels": 644,
+            "edge_touch": []
+          },
+          {
+            "sprite": "sprite_350",
+            "source": "LEGEND",
+            "korean": "레전드",
+            "stock_region_xywh": [
+              0,
+              168,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              3,
+              76,
+              19
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              0,
+              69,
+              76,
+              85
+            ],
+            "alpha_gt0_pixels": 764,
+            "alpha_ge128_pixels": 631,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_351",
+            "source": "JUNGLE",
+            "korean": "정글",
+            "stock_region_xywh": [
+              245,
+              168,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              3,
+              72,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              245,
+              68,
+              317,
+              85
+            ],
+            "alpha_gt0_pixels": 712,
+            "alpha_ge128_pixels": 594,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_352",
+            "source": "ICE SCAPE",
+            "korean": "아이스 스케이프",
+            "stock_region_xywh": [
+              0,
+              146,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              3,
+              98,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              0,
+              90,
+              98,
+              107
+            ],
+            "alpha_gt0_pixels": 939,
+            "alpha_ge128_pixels": 773,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_353",
+            "source": "GIANT STATUES",
+            "korean": "자이언트 스태추",
+            "stock_region_xywh": [
+              245,
+              146,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              0,
+              245,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              246,
+              90,
+              490,
+              110
+            ],
+            "alpha_gt0_pixels": 1388,
+            "alpha_ge128_pixels": 1049,
+            "edge_touch": [
+              "right",
+              "top"
+            ]
+          },
+          {
+            "sprite": "sprite_354",
+            "source": "FLORAL VILLAGE",
+            "korean": "플로럴 빌리지",
+            "stock_region_xywh": [
+              0,
+              124,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              4,
+              155,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              1,
+              112,
+              155,
+              128
+            ],
+            "alpha_gt0_pixels": 1457,
+            "alpha_ge128_pixels": 1101,
+            "edge_touch": []
+          },
+          {
+            "sprite": "sprite_355",
+            "source": "CASINO TOWN",
+            "korean": "카지노 타운",
+            "stock_region_xywh": [
+              245,
+              124,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              4,
+              128,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              246,
+              112,
+              373,
+              128
+            ],
+            "alpha_gt0_pixels": 1388,
+            "alpha_ge128_pixels": 1073,
+            "edge_touch": []
+          },
+          {
+            "sprite": "sprite_356",
+            "source": "CANYON",
+            "korean": "캐니언",
+            "stock_region_xywh": [
+              0,
+              102,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              3,
+              76,
+              20
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              1,
+              134,
+              76,
+              151
+            ],
+            "alpha_gt0_pixels": 789,
+            "alpha_ge128_pixels": 644,
+            "edge_touch": []
+          },
+          {
+            "sprite": "sprite_357",
+            "source": "BIG FOREST",
+            "korean": "빅 포레스트",
+            "stock_region_xywh": [
+              245,
+              102,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              0,
+              2,
+              109,
+              18
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              245,
+              136,
+              354,
+              152
+            ],
+            "alpha_gt0_pixels": 1158,
+            "alpha_ge128_pixels": 889,
+            "edge_touch": [
+              "left"
+            ]
+          },
+          {
+            "sprite": "sprite_358",
+            "source": "BAY AREA",
+            "korean": "베이 에어리어",
+            "stock_region_xywh": [
+              0,
+              80,
+              245,
+              22
+            ],
+            "stock_readable_effect_bbox_local_ltrb": [
+              1,
+              3,
+              94,
+              19
+            ],
+            "stock_raw_effect_bbox_ltrb": [
+              1,
+              157,
+              94,
+              173
+            ],
+            "alpha_gt0_pixels": 865,
+            "alpha_ge128_pixels": 726,
+            "edge_touch": []
+          }
+        ],
+        "binding_result": "PASS_15_OF_15_EXACT_STOCK_VISIBLE_LABELS_BOUND_TO_SPRITES",
+        "stock_effect_bbox_result": "PASS_15_OF_15_DECODED_ALPHA_GT0_BBOXES_MEASURED",
+        "edge_risk_stock_regions": [
+          "sprite_344",
+          "sprite_345",
+          "sprite_346",
+          "sprite_347",
+          "sprite_350",
+          "sprite_351",
+          "sprite_352",
+          "sprite_353",
+          "sprite_357"
+        ],
+        "remaining_holds": {
+          "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_REQUIRED",
+          "release_raw_to_readable_transform": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+          "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+          "release_source_removal_masks": "HOLD_NOT_MATERIALIZED",
+          "release_protected_non_text_masks": "HOLD_NOT_MATERIALIZED",
+          "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+          "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+          "signed_slant_style_metrics": "HOLD_EXACT_RELEASE_MEASUREMENT_REQUIRED",
+          "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+          "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+          "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+          "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+          "runtime_validation": "UNTESTED"
+        }
+      },
+      "reused_immutable_evidence": {
+        "producer_task": "LOCALIZATION-LOCALIZATION_A-00096",
+        "producer_result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+        "producer_report_blob_sha": "1add8700513c68255a90e4e84500c9dde32997dd",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00106",
+        "c_acceptance_batch": "Q00011/C113",
+        "c_acceptance_record_blob_sha": "64878729481d9246bd7f000775892e006faad26a",
+        "earlier_source_geometry_task": "LOCALIZATION-LOCALIZATION_A-00065",
+        "earlier_source_geometry_blob_sha": "25e8f4037603fd843a7d8770b29fd233a4367a81",
+        "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+        "current_queue_blob_sha": "d000d952a7bdb95a3d60a0b9877352a4a6d47213",
+        "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+        "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+        "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3"
+      },
+      "integrated_self_qa": {
+        "parity_shard": "PASS_ODD_INDEX_159",
+        "c_acceptance": "PASS_A00096_CONSUMED_BY_Q00011_C113",
+        "exact_stock_dds_identity": "PASS_GIT_BLOB_00F40E8B7B2C1E8C77442BB2A2E50270FFF388DD",
+        "stock_dds_decode": "PASS_512x256_DXT5_BASE_PAYLOAD_EXACT",
+        "exact_stock_atlas_identity": "PASS_GIT_BLOB_471C9E7C64CDCE948D00FE5CFCC70754DA72B0A2",
+        "semantic_binding": "PASS_15_OF_15_DIRECT_VISIBLE_SOURCE_LABELS",
+        "stock_effect_geometry": "PASS_15_OF_15_ALPHA_GT0_BBOXES",
+        "stock_orientation": "PASS_FLIP_Y_NO_X_MIRROR",
+        "release_orientation": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+        "candidate_dds_modified": false,
+        "shared_state_modified": false,
+        "peer_lane_files_modified": false,
+        "runtime_test_performed": false,
+        "runtime_validation": "UNTESTED"
+      },
+      "candidate_dds_modified": false,
+      "shared_state_modified": false,
+      "peer_lane_files_modified": false,
+      "build_performed": false,
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "local_clone_used": false,
+      "gpt_library_used": false,
+      "vr_ffb_dx_changes": false,
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "new_v2_work_orders": {
+    "basis": "Q00004/C106 accepted A00068 immutable source/atlas reconstruction lineage for indices 205/227/231. Current queue remains localize_text/pending_artwork/transcribed_reviewed. Exact Release and HD4 atlas identities/sizes were re-fetched earlier in this same P00047 run from Sonic-TV/OR2006Sprites@a95efe01; no binary pixel claims are inferred from atlas order.",
+    "assets": [
+      {
+        "queue_index": 205,
+        "asset": "ACF61D7C",
+        "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+        "release": {
+          "repository": "Sonic-TV/OR2006Sprites",
+          "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C_1024x512.dds",
+          "git_blob_sha": "c9417c1b47b1af93d025cdfcdb08bef64de44341",
+          "bytes": 33554560,
+          "width": 4096,
+          "height": 2048,
+          "size_equation": "128 + 4096 * 2048 * 4 = 33554560"
+        },
+        "hd4_atlas": {
+          "git_blob_sha": "d41e6e15758c64086e0f6d3e93e6b4add7105951",
+          "width": 4096,
+          "height": 2048,
+          "regions": 75,
+          "min_region_width": 24,
+          "min_region_height": 48
+        },
+        "stock_refs": {
+          "dds": "82e9aa45a921d12391aa7c240532d7b07a0e6b77",
+          "png": "36d1cd674b5b0a1e60b75124a492e305742bec5e",
+          "atlas": "1ff7b7a2c3328a0a7653ff25151b1185ff22ac7d"
+        },
+        "preserve_note": "Song titles and OutRun2SP logo preserved; all non-text artwork remains protected.",
+        "canonical_semantics": [
+          {
+            "source": "LOCAL MIXED",
+            "korean": "로컬 혼합"
+          },
+          {
+            "source": "LOCAL MT",
+            "korean": "로컬 MT"
+          },
+          {
+            "source": "LOCAL AT",
+            "korean": "로컬 AT"
+          },
+          {
+            "source": "FRIENDS",
+            "korean": "친구"
+          },
+          {
+            "source": "CANCEL",
+            "korean": "취소"
+          },
+          {
+            "source": "LICENSE DETAILS",
+            "korean": "라이선스 정보"
+          },
+          {
+            "source": "YES",
+            "korean": "예"
+          },
+          {
+            "source": "NO",
+            "korean": "아니오"
+          },
+          {
+            "source": "YOUR POSITION OK",
+            "korean": "현재 순위 확인"
+          },
+          {
+            "source": "REVERSE",
+            "korean": "반전"
+          },
+          {
+            "source": "Exchange OutRun miles for this item?",
+            "korean": "이 아이템을 아웃런 마일로 교환하시겠습니까?"
+          },
+          {
+            "source": "Adjust your Game settings",
+            "korean": "게임 설정 조정"
+          },
+          {
+            "source": "View single player and multiplayer rankings",
+            "korean": "싱글/멀티플레이 랭킹 보기"
+          },
+          {
+            "source": "Enjoy the original OutRun2SP",
+            "korean": "오리지널 아웃런2 SP 즐기기"
+          },
+          {
+            "source": "OutRun for 1 player!",
+            "korean": "1인 아웃런 플레이!"
+          },
+          {
+            "source": "RANKINGS",
+            "korean": "랭킹"
+          },
+          {
+            "source": "OPTIONS",
+            "korean": "옵션"
+          },
+          {
+            "source": "CONGRATULATIONS!",
+            "korean": "축하합니다!"
+          },
+          {
+            "source": "You got this item",
+            "korean": "이 아이템을 획득했습니다"
+          },
+          {
+            "source": "SORRY! You need more miles!",
+            "korean": "죄송합니다! 마일이 더 필요합니다!"
+          }
+        ],
+        "canonical_semantics_count": 20,
+        "identical_source_translation_count": 0,
+        "work_order_generator": {
+          "region_selector": "ALL_REGIONS_FROM_PINNED_HD4_ATLAS_JSON",
+          "region_count": 75,
+          "guard_formula": "for atlas rect [x,y,w,h], permitted_inner_guard_ltrb_2px = [x+2,y+2,x+w-2,y+h-2]",
+          "guard_nonempty_precondition": "current-run direct GitHub atlas fetch: min width 24px, min height 48px (>4px)",
+          "rgba32_payload_formula": "header=128; row_stride=source_width*4; first=128+y*row_stride+x*4; row_slice=w*4; rows=h; final_end=128+(y+h-1)*row_stride+x*4+w*4",
+          "source_stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+          "binding_rule": "Bind semantics only from exact decoded source pixels; never infer by atlas order.",
+          "required_outputs": [
+            "exact_dds_header_confirmation",
+            "observed_source_text_clusters",
+            "semantic_binding_or_preserve_reason",
+            "effect_inclusive_source_bbox",
+            "removal_mask_sha256",
+            "protected_non_text_mask_sha256",
+            "raw_to_readable_transform",
+            "baseline_and_signed_slant",
+            "clean_plate_sha256",
+            "clean_plate_qa",
+            "measured_candidate_safe_bbox"
+          ],
+          "candidate_render_permitted": false
+        }
+      },
+      {
+        "queue_index": 227,
+        "asset": "E596B7AC",
+        "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+        "release": {
+          "repository": "Sonic-TV/OR2006Sprites",
+          "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E596B7AC_512x512.dds",
+          "git_blob_sha": "0947ec4031cb0c84fe0d63fdbee9e5b3173214e5",
+          "bytes": 16777344,
+          "width": 2048,
+          "height": 2048,
+          "size_equation": "128 + 2048 * 2048 * 4 = 16777344"
+        },
+        "hd4_atlas": {
+          "git_blob_sha": "78466c9877d45db40c0a976ab3b24f34c61184e6",
+          "width": 2048,
+          "height": 2048,
+          "regions": 37,
+          "min_region_width": 72,
+          "min_region_height": 8
+        },
+        "stock_refs": {
+          "dds": "500cb0b106733302033a6925d87151df82ffcb49",
+          "png": "2d6cc8a4cbb500176931fe16499fdcc483f832c6",
+          "atlas": "05594901dbb84221a0ae6248e043df40bd10d32d"
+        },
+        "preserve_note": "Route/class atlas non-text artwork and controls remain protected.",
+        "canonical_semantics": [
+          {
+            "source": "INTERMEDIATE",
+            "korean": "중급"
+          },
+          {
+            "source": "OUTRUN",
+            "korean": "아웃런"
+          },
+          {
+            "source": "PROFESSIONAL",
+            "korean": "프로"
+          },
+          {
+            "source": "ALPINE",
+            "korean": "알파인"
+          },
+          {
+            "source": "ANCIENT RUINS",
+            "korean": "고대 유적"
+          },
+          {
+            "source": "CASTLE WALL",
+            "korean": "캐슬 월"
+          },
+          {
+            "source": "CLOUDY HIGHLAND",
+            "korean": "클라우디 하이랜드"
+          },
+          {
+            "source": "CONIFEROUS FOREST",
+            "korean": "침엽수림"
+          },
+          {
+            "source": "DEEP LAKE",
+            "korean": "딥 레이크"
+          },
+          {
+            "source": "DESERT",
+            "korean": "사막"
+          },
+          {
+            "source": "FLAGMAN 1",
+            "korean": "플래그맨 1"
+          },
+          {
+            "source": "FLAGMAN 2",
+            "korean": "플래그맨 2"
+          },
+          {
+            "source": "FLAGMAN 3",
+            "korean": "플래그맨 3"
+          },
+          {
+            "source": "NOVICE",
+            "korean": "초급"
+          }
+        ],
+        "canonical_semantics_count": 14,
+        "identical_source_translation_count": 0,
+        "work_order_generator": {
+          "region_selector": "ALL_REGIONS_FROM_PINNED_HD4_ATLAS_JSON",
+          "region_count": 37,
+          "guard_formula": "for atlas rect [x,y,w,h], permitted_inner_guard_ltrb_2px = [x+2,y+2,x+w-2,y+h-2]",
+          "guard_nonempty_precondition": "current-run direct GitHub atlas fetch: min width 72px, min height 8px (>4px)",
+          "rgba32_payload_formula": "header=128; row_stride=source_width*4; first=128+y*row_stride+x*4; row_slice=w*4; rows=h; final_end=128+(y+h-1)*row_stride+x*4+w*4",
+          "source_stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+          "binding_rule": "Bind semantics only from exact decoded source pixels; never infer by atlas order.",
+          "required_outputs": [
+            "exact_dds_header_confirmation",
+            "observed_source_text_clusters",
+            "semantic_binding_or_preserve_reason",
+            "effect_inclusive_source_bbox",
+            "removal_mask_sha256",
+            "protected_non_text_mask_sha256",
+            "raw_to_readable_transform",
+            "baseline_and_signed_slant",
+            "clean_plate_sha256",
+            "clean_plate_qa",
+            "measured_candidate_safe_bbox"
+          ],
+          "candidate_render_permitted": false
+        }
+      },
+      {
+        "queue_index": 231,
+        "asset": "EBE401C8",
+        "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+        "release": {
+          "repository": "Sonic-TV/OR2006Sprites",
+          "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+          "path": "Release/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+          "git_blob_sha": "6b0ed8617cb0dc3e37fbadf61c91bcef08bda944",
+          "bytes": 8388736,
+          "width": 2048,
+          "height": 1024,
+          "size_equation": "128 + 2048 * 1024 * 4 = 8388736"
+        },
+        "hd4_atlas": {
+          "git_blob_sha": "ef277877fe50dbafae9ed8ba1a4635f6e0d25b63",
+          "width": 2048,
+          "height": 1024,
+          "regions": 6,
+          "min_region_width": 412,
+          "min_region_height": 88
+        },
+        "stock_refs": {
+          "dds": "8a4596e2ebe2ce7115aad60bff75de09f0d4f121",
+          "png": "e7ba9f6dfe3ed98786f869ed78e18529ce896e1a",
+          "atlas": "77eed13accb3cddc6a120a8c2a9ae2516d42d60d"
+        },
+        "preserve_note": "Non-text UI artwork remains protected; LAN->LAN is an identical canonical translation and may require no pixel edit after exact binding.",
+        "canonical_semantics": [
+          {
+            "source": "LAN",
+            "korean": "LAN"
+          },
+          {
+            "source": "ONLINE",
+            "korean": "온라인"
+          }
+        ],
+        "canonical_semantics_count": 2,
+        "identical_source_translation_count": 1,
+        "work_order_generator": {
+          "region_selector": "ALL_REGIONS_FROM_PINNED_HD4_ATLAS_JSON",
+          "region_count": 6,
+          "guard_formula": "for atlas rect [x,y,w,h], permitted_inner_guard_ltrb_2px = [x+2,y+2,x+w-2,y+h-2]",
+          "guard_nonempty_precondition": "current-run direct GitHub atlas fetch: min width 412px, min height 88px (>4px)",
+          "rgba32_payload_formula": "header=128; row_stride=source_width*4; first=128+y*row_stride+x*4; row_slice=w*4; rows=h; final_end=128+(y+h-1)*row_stride+x*4+w*4",
+          "source_stage": "DIRECT_SOURCE_CLASSIFICATION_THEN_SEMANTIC_BINDING_THEN_SOURCE_EFFECT_MASK_THEN_CLEAN_PLATE",
+          "binding_rule": "Bind semantics only from exact decoded source pixels; never infer by atlas order.",
+          "required_outputs": [
+            "exact_dds_header_confirmation",
+            "observed_source_text_clusters",
+            "semantic_binding_or_preserve_reason",
+            "effect_inclusive_source_bbox",
+            "removal_mask_sha256",
+            "protected_non_text_mask_sha256",
+            "raw_to_readable_transform",
+            "baseline_and_signed_slant",
+            "clean_plate_sha256",
+            "clean_plate_qa",
+            "measured_candidate_safe_bbox"
+          ],
+          "candidate_render_permitted": false
+        }
+      }
+    ],
+    "assets_advanced": 3,
+    "canonical_semantics_total": 36,
+    "atlas_regions_total": 118,
+    "exact_release_rgba32_size_equations": 3,
+    "strict_2px_guard_generators": 3,
+    "candidate_dds_written": false
+  },
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_159_205_227_231",
+    "current_queue_action": "PASS_4_OF_4_LOCALIZE_TEXT",
+    "current_transcriptions_vs_artwork_plan": "PASS_ALL_SELECTED",
+    "index159_reemit": "PASS_COMPLETE_ACCEPTED_PAYLOAD_REEMITTED__CURRENT_15_OF_15_CANONICAL_SET_EQUAL",
+    "index159_heavy_qa_repeated": false,
+    "new_work_order_semantics": "PASS_36_OF_36_CURRENT_CANONICAL",
+    "new_work_order_atlas_regions": 118,
+    "new_work_order_guard_preconditions": "PASS_ALL_PINNED_ATLAS_REGION_MIN_DIMENSIONS_GT_4PX_FROM_CURRENT_RUN_DIRECT_GITHUB_FETCH",
+    "exact_release_size_equations": "PASS_3_OF_3_RGBA32_EQUATIONS_FROM_CURRENT_RUN_DIRECT_GITHUB_TREE_FETCH",
+    "source_effect_bboxes": "HOLD_NEW_ASSETS_NOT_YET_MATERIALIZED",
+    "clean_plates": "HOLD_NEW_ASSETS_NOT_YET_MATERIALIZED",
+    "korean_candidates": "HOLD_NO_NEW_CANDIDATE",
+    "one_pixel_containment": "HOLD_NO_NEW_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_NEW_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "current_queue_blob_sha": "8316cb2f563d7064d931591369620d538e5e16c7",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_REWORK159_DURABLE_REEMIT_PLUS_THREE_ODD_V2_WORK_ORDERS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
