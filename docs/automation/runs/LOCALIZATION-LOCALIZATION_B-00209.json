@@ -76,5 +76,14 @@
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE"
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+  "authoritative_result_sha": "a7c5725b49be4096abd29a071aef8e0ce83627a7",
+  "producer_persistence_run": {
+    "workflow": "Localization B00209 E3F4BA07 Corrected Candidate",
+    "run_id": 36625399785,
+    "conclusion": "success",
+    "dispatch_sha": "ce15e8d562d4ce730f9e95b47099064b9bd737a6"
+  },
+  "bookkeeping_note": "Tagged producer result SHA recorded after the atomic candidate/review/task commit. Exact result-SHA full-atlas and per-element review PNGs were re-opened after persistence and remain visually clean/unclipped with protected brands preserved. This producer record remains automation_validation=PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
 }
