@@ -514,6 +514,120 @@ int main()
         dynamicTextureView.upload_generation() == 2,
         "R101 upload generation must advance monotonically");
 
+    NativeManagedTextureShadow managedShadow;
+    require(
+        managedShadow.initialize(D3DFMT_A8R8G8B8, 4, 4),
+        "R102 managed shadow initialize");
+    require(
+        managedShadow.ready() &&
+        !managedShadow.shadow_valid() &&
+        !managedShadow.mirror_ready() &&
+        managedShadow.shadow_version() == 0 &&
+        managedShadow.device_generation() == 1,
+        "R102 managed shadow starts allocated but content-invalid");
+
+    std::array<unsigned char, 80> managedSource{};
+    constexpr UINT managedSourcePitch = 20;
+    constexpr UINT managedRowBytes = 16;
+    constexpr UINT managedRows = 4;
+    for (UINT row = 0; row < managedRows; ++row) {
+        for (UINT column = 0; column < managedRowBytes; ++column) {
+            managedSource[static_cast<std::size_t>(row) * managedSourcePitch + column] =
+                static_cast<unsigned char>(0x40 + row * 16 + column);
+        }
+    }
+
+    require(
+        !managedShadow.write_full(
+            managedSource.data(), managedRowBytes - 1, managedRows),
+        "R102 managed shadow short source pitch must fail closed");
+    require(
+        !managedShadow.write_full(
+            managedSource.data(), managedSourcePitch, managedRows - 1),
+        "R102 managed shadow partial rows must fail closed");
+    require(
+        managedShadow.shadow_version() == 0 &&
+        !managedShadow.shadow_valid(),
+        "R102 rejected managed writes must preserve invalid version");
+
+    require(
+        managedShadow.write_full(
+            managedSource.data(), managedSourcePitch, managedRows),
+        "R102 managed shadow full write");
+    require(
+        managedShadow.shadow_valid() &&
+        managedShadow.shadow_version() == 1 &&
+        !managedShadow.mirror_ready(),
+        "R102 managed write advances shadow version and invalidates mirror");
+
+    std::array<unsigned char, 96> managedReadback{};
+    constexpr UINT managedReadbackPitch = 24;
+    require(
+        managedShadow.read_full(
+            managedReadback.data(), managedReadbackPitch, managedRows),
+        "R102 managed shadow full read");
+    for (UINT row = 0; row < managedRows; ++row) {
+        require(
+            std::memcmp(
+                managedReadback.data() +
+                    static_cast<std::size_t>(row) * managedReadbackPitch,
+                managedSource.data() +
+                    static_cast<std::size_t>(row) * managedSourcePitch,
+                managedRowBytes) == 0,
+            "R102 managed shadow readback must match source rows");
+    }
+
+    managedShadow.note_mirror_uploaded();
+    require(
+        managedShadow.mirror_ready() &&
+        managedShadow.lifetime_state().mirrorGeneration == 1 &&
+        managedShadow.lifetime_state().mirrorShadowVersion == 1,
+        "R102 managed mirror acknowledgment matches shadow generation");
+
+    managedShadow.observe_device_reset();
+    require(
+        managedShadow.device_generation() == 2 &&
+        managedShadow.shadow_valid() &&
+        managedShadow.shadow_version() == 1 &&
+        !managedShadow.mirror_ready(),
+        "R102 Reset preserves CPU shadow and invalidates GPU mirror");
+
+    managedReadback.fill(0);
+    require(
+        managedShadow.read_full(
+            managedReadback.data(), managedReadbackPitch, managedRows),
+        "R102 managed shadow remains readable after Reset");
+    require(
+        std::memcmp(
+            managedReadback.data(),
+            managedSource.data(),
+            managedRowBytes) == 0,
+        "R102 Reset-preserved first row must match");
+
+    managedShadow.note_mirror_uploaded();
+    require(
+        managedShadow.mirror_ready() &&
+        managedShadow.lifetime_state().mirrorGeneration == 2,
+        "R102 post-Reset mirror acknowledgment uses new device generation");
+
+    managedSource[0] ^= 0x33;
+    require(
+        managedShadow.write_full(
+            managedSource.data(), managedSourcePitch, managedRows),
+        "R102 second managed shadow full write");
+    require(
+        managedShadow.shadow_version() == 2 &&
+        !managedShadow.mirror_ready(),
+        "R102 second shadow write invalidates acknowledged mirror");
+
+    NativeManagedTextureShadow unsupportedManagedShadow;
+    require(
+        !unsupportedManagedShadow.initialize(D3DFMT_DXT1, 4, 4),
+        "R102 compressed managed shadow must fail closed");
+    require(
+        !unsupportedManagedShadow.ready(),
+        "R102 failed managed shadow initialize stays dormant");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -620,6 +734,15 @@ int main()
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
+    managedShadow.shutdown();
+    require(
+        !managedShadow.ready() &&
+        !managedShadow.shadow_valid() &&
+        !managedShadow.mirror_ready() &&
+        managedShadow.shadow_version() == 0 &&
+        managedShadow.device_generation() == 1,
+        "R102 managed shadow shutdown resets storage and lifetime");
+
     dynamicTextureView.shutdown();
     require(
         !dynamicTextureView.ready() &&
@@ -688,5 +811,6 @@ int main()
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
     std::cout << "DX11 fixed-function texture upload R101: PASS\n";
+    std::cout << "DX11 managed texture shadow lifetime R102: PASS\n";
     return 0;
 }

@@ -381,6 +381,117 @@ void NativeFixedFunctionTextureView::shutdown() noexcept {
     upload_generation_ = 0;
 }
 
+bool NativeManagedTextureShadow::initialize(
+    D3DFORMAT sourceFormat,
+    UINT width,
+    UINT height) noexcept {
+
+    shutdown();
+    if (width == 0 || height == 0)
+        return false;
+
+    const auto format = translate_resource_format(
+        sourceFormat, ResourceRole::Texture);
+    const auto behavior = translate_resource_behavior(
+        ResourceRole::Texture, D3DPOOL_MANAGED, 0);
+    if (!format.exact || !behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow)
+        return false;
+
+    UINT rowBytes = 0;
+    if (!texture_uncompressed_row_bytes(sourceFormat, width, rowBytes))
+        return false;
+
+    if (static_cast<std::size_t>(height) >
+        (std::numeric_limits<std::size_t>::max)() / rowBytes)
+        return false;
+    const std::size_t shadowBytes =
+        static_cast<std::size_t>(rowBytes) * height;
+
+    try {
+        shadow_.assign(shadowBytes, 0);
+    } catch (...) {
+        shutdown();
+        return false;
+    }
+
+    source_format_ = sourceFormat;
+    width_ = width;
+    height_ = height;
+    row_bytes_ = rowBytes;
+    lifetime_ = {};
+    return true;
+}
+
+bool NativeManagedTextureShadow::write_full(
+    const void* source,
+    UINT sourceRowPitch,
+    UINT sourceRows) noexcept {
+
+    if (!ready() || !source ||
+        sourceRows != height_ || sourceRowPitch < row_bytes_)
+        return false;
+
+    const auto mutation = translate_texture_mutation(
+        D3DPOOL_MANAGED, 0, 0, true);
+    if (mutation.kind != TextureMutationUpdateKind::ManagedCpuShadowWrite ||
+        !mutation.requiresCpuShadow || mutation.planExact)
+        return false;
+
+    const auto* sourceBytes = static_cast<const std::uint8_t*>(source);
+    for (UINT row = 0; row < height_; ++row) {
+        std::memcpy(
+            shadow_.data() + static_cast<std::size_t>(row) * row_bytes_,
+            sourceBytes + static_cast<std::size_t>(row) * sourceRowPitch,
+            row_bytes_);
+    }
+    lifetime_ = note_managed_shadow_write(lifetime_);
+    return true;
+}
+
+bool NativeManagedTextureShadow::read_full(
+    void* destination,
+    UINT destinationRowPitch,
+    UINT destinationRows) const noexcept {
+
+    if (!ready() || !shadow_valid() || !destination ||
+        destinationRows != height_ || destinationRowPitch < row_bytes_)
+        return false;
+
+    const auto mutation = translate_texture_mutation(
+        D3DPOOL_MANAGED, 0, D3DLOCK_READONLY, true);
+    if (mutation.kind != TextureMutationUpdateKind::ManagedCpuShadowRead ||
+        !mutation.requiresCpuShadow || mutation.planExact)
+        return false;
+
+    auto* destinationBytes = static_cast<std::uint8_t*>(destination);
+    for (UINT row = 0; row < height_; ++row) {
+        std::memcpy(
+            destinationBytes + static_cast<std::size_t>(row) * destinationRowPitch,
+            shadow_.data() + static_cast<std::size_t>(row) * row_bytes_,
+            row_bytes_);
+    }
+    return true;
+}
+
+void NativeManagedTextureShadow::note_mirror_uploaded() noexcept {
+    lifetime_ = note_managed_mirror_upload(lifetime_);
+}
+
+void NativeManagedTextureShadow::observe_device_reset() noexcept {
+    lifetime_ = advance_managed_device_generation(lifetime_);
+}
+
+void NativeManagedTextureShadow::shutdown() noexcept {
+    source_format_ = D3DFMT_UNKNOWN;
+    width_ = 0;
+    height_ = 0;
+    row_bytes_ = 0;
+    shadow_.clear();
+    lifetime_ = {};
+}
+
 bool NativeFixedFunctionPipelineBundle::initialize(
     ID3D11Device* device,
     const VertexInputLayoutTranslation& layout,

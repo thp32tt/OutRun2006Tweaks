@@ -1367,6 +1367,74 @@ def main() -> None:
                 "DX11 R101 texture-upload probe drift: " + meaning
             )
 
+    r102_managed_shadow_header = {
+        '#include "resource_translation.hpp"': "R102 lifetime contract header dependency",
+        "class NativeManagedTextureShadow final": "R102 dormant managed shadow owner",
+        "write_full(": "R102 full managed write entrypoint",
+        "read_full(": "R102 full managed read entrypoint",
+        "note_mirror_uploaded()": "R102 mirror acknowledgment transition",
+        "observe_device_reset()": "R102 Reset generation transition",
+        "ManagedMirrorLifetimeState lifetime_{}": "R102 lifetime state storage",
+        "std::vector<std::uint8_t> shadow_": "R102 CPU shadow byte storage",
+    }
+    missing_r102_header = [
+        meaning
+        for token, meaning in r102_managed_shadow_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r102_header:
+        raise SystemExit(
+            "DX11 R102 managed-shadow header drift: "
+            + ", ".join(missing_r102_header)
+        )
+
+    for token, meaning in {
+        "D3DPOOL_MANAGED, 0": "R102 managed behavior/mutation contract",
+        "ResourceMirrorLifetime::ManagedCpuShadow": "R102 managed lifetime requirement",
+        "(std::numeric_limits<std::size_t>::max)()":
+            "R102 macro-safe CPU shadow size bound",
+        "shadow_.assign(shadowBytes, 0)": "R102 CPU shadow allocation",
+        "TextureMutationUpdateKind::ManagedCpuShadowWrite":
+            "R102 managed write translation gate",
+        "TextureMutationUpdateKind::ManagedCpuShadowRead":
+            "R102 managed read translation gate",
+        "note_managed_shadow_write(lifetime_)":
+            "R102 shadow-version transition",
+        "note_managed_mirror_upload(lifetime_)":
+            "R102 mirror acknowledgment transition",
+        "advance_managed_device_generation(lifetime_)":
+            "R102 Reset invalidation transition",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R102 managed-shadow source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R102 managed shadow starts allocated but content-invalid":
+            "R102 initial invalid-content state",
+        "R102 managed shadow short source pitch must fail closed":
+            "R102 short-pitch rejection",
+        "R102 managed shadow partial rows must fail closed":
+            "R102 partial-row rejection",
+        "R102 managed shadow readback must match source rows":
+            "R102 CPU shadow content proof",
+        "R102 Reset preserves CPU shadow and invalidates GPU mirror":
+            "R102 Reset lifetime proof",
+        "R102 post-Reset mirror acknowledgment uses new device generation":
+            "R102 post-Reset reupload state",
+        "R102 compressed managed shadow must fail closed":
+            "R102 unsupported-format rejection",
+        "R102 managed shadow shutdown resets storage and lifetime":
+            "R102 shutdown lifetime reset",
+        "DX11 managed texture shadow lifetime R102: PASS":
+            "R102 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R102 managed-shadow probe drift: " + meaning
+            )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 

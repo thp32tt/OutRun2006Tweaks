@@ -1,7 +1,11 @@
 #pragma once
 
+#include "resource_translation.hpp"
+
 #include <array>
+#include <cstddef>
 #include <cstdint>
+#include <vector>
 #include <d3d9.h>
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -142,6 +146,64 @@ private:
     DWORD source_usage_ = 0;
     bool source_metadata_valid_ = false;
     std::uint64_t upload_generation_ = 0;
+};
+
+// R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED
+// Texture2D. Shadow bytes survive device-generation changes while mirror
+// readiness is invalidated until a future GPU reupload is acknowledged.
+// This class owns no D3D11 resource and has no production caller.
+class NativeManagedTextureShadow final {
+public:
+    NativeManagedTextureShadow() = default;
+    ~NativeManagedTextureShadow() = default;
+    NativeManagedTextureShadow(const NativeManagedTextureShadow&) = delete;
+    NativeManagedTextureShadow& operator=(const NativeManagedTextureShadow&) = delete;
+
+    bool initialize(
+        D3DFORMAT sourceFormat,
+        UINT width,
+        UINT height) noexcept;
+    bool write_full(
+        const void* source,
+        UINT sourceRowPitch,
+        UINT sourceRows) noexcept;
+    bool read_full(
+        void* destination,
+        UINT destinationRowPitch,
+        UINT destinationRows) const noexcept;
+    void note_mirror_uploaded() noexcept;
+    void observe_device_reset() noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return source_format_ != D3DFMT_UNKNOWN &&
+            width_ != 0 && height_ != 0 && row_bytes_ != 0 &&
+            !shadow_.empty();
+    }
+    [[nodiscard]] bool shadow_valid() const noexcept {
+        return lifetime_.cpuShadowValid;
+    }
+    [[nodiscard]] bool mirror_ready() const noexcept {
+        return managed_mirror_ready(lifetime_);
+    }
+    [[nodiscard]] std::uint64_t shadow_version() const noexcept {
+        return lifetime_.cpuShadowVersion;
+    }
+    [[nodiscard]] std::uint64_t device_generation() const noexcept {
+        return lifetime_.deviceGeneration;
+    }
+    [[nodiscard]] const ManagedMirrorLifetimeState&
+    lifetime_state() const noexcept {
+        return lifetime_;
+    }
+
+private:
+    D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
+    UINT width_ = 0;
+    UINT height_ = 0;
+    UINT row_bytes_ = 0;
+    std::vector<std::uint8_t> shadow_;
+    ManagedMirrorLifetimeState lifetime_{};
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
