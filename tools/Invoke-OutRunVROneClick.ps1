@@ -14,6 +14,14 @@ $runner = Join-Path $scriptRoot 'Run-OutRunVRTest.ps1'
 $targetFile = Join-Path $scriptRoot 'VR_ONE_CLICK_TARGET.json'
 $visualChecklist = Join-Path $scriptRoot 'ONE_RUN_VISUAL_CHECKLIST.txt'
 $preflight = Join-Path $scriptRoot 'Test-OutRunVROneClickPreflight.ps1'
+$runtimeIni = Join-Path $scriptRoot 'OutRun2006Tweaks.ini'
+$packagedBaselineIni = Join-Path $scriptRoot 'package-baseline/OutRun2006Tweaks.ini'
+
+function Restore-PackagedBaselineIni {
+    if (Test-Path $packagedBaselineIni -PathType Leaf) {
+        Copy-Item $packagedBaselineIni $runtimeIni -Force
+    }
+}
 
 if (!(Test-Path $selector)) { throw "Select-OutRunVRBackend.ps1 not found: $selector" }
 if (!(Test-Path $runner)) { throw "Run-OutRunVRTest.ps1 not found: $runner" }
@@ -103,6 +111,11 @@ if (Test-Path $visualChecklist) {
 }
 Write-Host ''
 
+# The backend selector intentionally mutates the root INI for each run.
+# Restore the immutable packaged copy before package-integrity verification so
+# DXVK -> D3D9 -> DX11 (or any other order) can be tested repeatedly.
+Restore-PackagedBaselineIni
+
 # Fail before mutating the game directory when the packaged renderer/host/provider
 # identity does not match this branch target. The report is collected into the
 # same session ZIP for exact reproduction.
@@ -153,6 +166,9 @@ try {
     }
 } finally {
     $env:OUTRUN_VR_DX11_CENSUS = $oldDx11Census
+    # Run-OutRunVRTest seals the logs/analysis ZIP before returning.
+    # Leave the extracted package pristine for the next selector choice.
+    Restore-PackagedBaselineIni
 }
 
 exit $oneClickExitCode
