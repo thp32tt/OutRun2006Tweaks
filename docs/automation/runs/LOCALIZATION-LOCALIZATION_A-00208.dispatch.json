@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00208",
+  "wave_id": "P00108",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "recovery_target": {
+    "index": 198,
+    "asset": "9FC88069"
+  },
+  "accepted_c_gate": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00210",
+    "qa_batch_id": "Q00044",
+    "result_sha": "07952efd569649598034692745c745d71cc1c5fc",
+    "readiness": "RENDER_READY"
+  },
+  "source_fingerprint": {
+    "sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+    "git_blob_sha": "e97d852a905aa8a219b786b843089e0998037f52",
+    "source_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "accepted_precandidate": {
+    "removal_mask_pixels": 77975,
+    "clean_plate_raw_rgba_sha256": "c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7",
+    "clean_plate_display_rgba_sha256": "d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320",
+    "safe_bbox": "PASS_2PX_7_OF_7"
+  },
+  "deterministic_expected_candidate_sha256": "851ba4d5b3b0ea5c3d7a07471bf991640d517870cca24e41fcaf8202d00cf60d",
+  "purpose": "Trigger GitHub-hosted completion of C146/Q00044 RENDER_READY index198: source-style/signed-slant measurement, seven-string Korean v2 render, exact-header DDS persistence, zero-pixel self-QA and mandatory GitHub PNG review set. Do not repeat A00204 preflight. Producer remains automation_validation=PENDING for C_BATCH_GATE; runtime remains UNTESTED."
+}
