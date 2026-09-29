@@ -3,6 +3,11 @@ set -euo pipefail
 
 DEST="${DEST:-/opt/outrun-chat-controller}"
 BASE="https://raw.githubusercontent.com/thp32tt/OutRun2006Tweaks/chat-controller-downloads/tools/chat-controller/v0.4"
+
+cat >&2 <<'EOF'
+WARNING: install.sh installs the legacy packaged ZIP (part00.b64..part11.b64), not the current Portainer source-build controller.
+For the localization Docker stack, deploy from refs/heads/chat-controller-downloads with docker-compose.portainer-localization.yml so src/controller.py.part* and current prompts are baked into the image.
+EOF
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
