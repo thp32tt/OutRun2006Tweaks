@@ -107,9 +107,14 @@ Write-Host ''
 # identity does not match this branch target. The report is collected into the
 # same session ZIP for exact reproduction.
 try {
+    # PowerShell child scripts that return normally do not guarantee that the
+    # automatic $LASTEXITCODE variable has ever been created. Under StrictMode
+    # reading an undefined automatic variable throws even after a PASS.
+    $LASTEXITCODE = 0
     & $preflight -Backend $resolvedBackend
-    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-        throw "One-click preflight failed with exit code $LASTEXITCODE"
+    $preflightExitCode = [int]$LASTEXITCODE
+    if ($preflightExitCode -ne 0) {
+        throw "One-click preflight failed with exit code $preflightExitCode"
     }
 } catch {
     $preflightFailure = $_.Exception
@@ -133,14 +138,18 @@ if ($target -and [string]$target.RendererTarget -eq 'dx11-native') {
 
 $oneClickExitCode = 0
 try {
+    $LASTEXITCODE = 0
     & $selector -Backend $resolvedBackend -TestProfile $TestProfile -VariantId $resolvedVariant
-    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-        throw "Backend preparation failed with exit code $LASTEXITCODE"
+    $selectorExitCode = [int]$LASTEXITCODE
+    if ($selectorExitCode -ne 0) {
+        throw "Backend preparation failed with exit code $selectorExitCode"
     }
 
+    $LASTEXITCODE = 0
     & $runner -TestProfile $TestProfile
-    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-        $oneClickExitCode = $LASTEXITCODE
+    $runnerExitCode = [int]$LASTEXITCODE
+    if ($runnerExitCode -ne 0) {
+        $oneClickExitCode = $runnerExitCode
     }
 } finally {
     $env:OUTRUN_VR_DX11_CENSUS = $oldDx11Census
