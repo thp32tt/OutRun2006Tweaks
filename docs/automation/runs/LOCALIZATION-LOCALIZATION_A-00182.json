@@ -88,5 +88,33 @@
   "validation_mode": "C_BATCH_GATE",
   "vr_ffb_dx_changes": false,
   "wave_id": "P00092",
-  "work_stolen_from_lane": null
+  "work_stolen_from_lane": null,
+  "postcommit_visual_review": {
+    "reviewed_exact_result_sha": "e78b9160064c3b60f55f0a336be7448482836da0",
+    "status": "PASS",
+    "exact_blob_identity_to_precommit_visual_review": {
+      "source_display": "f2f0db696cf4ab568d829bedc18503137899082e",
+      "clean_plate_display": "83ff3c17765be9fd539ea592e09dc249cbf18b77",
+      "candidate_display": "51fc42fe1551c050f81c9996da5d9135bf2397d5",
+      "comparison": "0746f14a71456f5168251533f7ee362dbe8e7c35",
+      "text_region_nn2x": "45053dbd653a80edebf2a2fc376fc030a254336d",
+      "candidate_dds": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac"
+    },
+    "checks": {
+      "english_source_vs_korean_candidate": "PASS",
+      "source_language_residue": "PASS_NONE_VISIBLE_IN_TARGETS",
+      "clean_plate_box_or_seam": "PASS_NONE_VISIBLE",
+      "korean_legibility": "PASS",
+      "clipping_or_overlap": "PASS_NONE_VISIBLE",
+      "source_fill_weight_style_consistency": "PASS_VISUAL",
+      "protected_k1_and_unrelated_artwork": "PASS_UNCHANGED_BY_MACHINE_AND_VISUAL_EVIDENCE",
+      "alpha_transparency": "PASS_NO_VISIBLE_BACKGROUND_DAMAGE",
+      "orientation": "PASS_FLIP_Y_READABLE"
+    },
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "independent_c_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "note": "Bookkeeping only. e78b9160064c3b60f55f0a336be7448482836da0 remains the authoritative producer RESULT_SHA."
+  }
 }
