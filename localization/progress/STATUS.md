@@ -1175,3 +1175,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Unchanged source/semantic heavy QA is reused; indices46/100/106 receive no Q00038 readiness/static/runtime promotion.
 - Accepted PREFLIGHT_ONLY remains 30/34/36/48/52/132/154/164/172/228; pending production **71**, actionable localize_text **93**, canonical segments **753**.
 - Producer must atomically re-emit B00190 result + task record. Report: `localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C141 Q00039 — 2026-09-30T03:34:00+09:00
+- B00193 `f635326a`, A00191 `24f31efd`, B00195 `0601de6d` — **PASS / PASS / PASS**.
+- Independent Drive exact-file miss **9/9**; pinned ZIP digest/member SHA/header reproduced. Exact canonical source: **133/159/201**. Source exhausted: **28/55/103/135/139/147**.
+- Current semantics **71/71** pairs match; no candidate exists, so candidate-only gates are not promoted.
+- production_readiness **PREFLIGHT_ONLY 9/9**; accepted set 28/30/34/36/48/52/55/103/132/133/135/139/147/154/159/164/172/201/228. Q00038 B00190 remains unchanged; newer B00197 is outside this batch.
+- Pending production **71**, actionable localize_text **93**, canonical segments **753**. Report: `localization/graphics/role_C/20260930-0334-C141/C141_Q00039_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

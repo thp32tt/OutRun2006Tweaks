@@ -1722,3 +1722,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Concurrent same-attempt result `fdeaa9b4...` / Gate `36611801924` is superseded by the later authoritative `eb395208...` REWORK_REQUIRED result.
 - Counts remain actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS change or real-game test. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
+## 2026-09-30 03:34 KST - C141 Q00039 INDEPENDENT QA BATCH
+
+- Immutable inputs: B00193 `f635326a` (28), A00191 `24f31efd` (135/147/159/201), B00195 `0601de6d` (55/103/133/139). Dispositions: **PASS / PASS / PASS**.
+- C independently re-listed approved ezflash557 Drive parents: exact DDS misses **9/9**. Pinned `OR2-HD-GUI-v0.25.10a.zip` independently hashes to `76f85ed2...`; all nine member SHA/header values reproduce producer evidence.
+- Current inventory: exact canonical source **133/159/201**; fail-closed mismatch **28/55/103/135/139/147**. Current transcriptions **71/71** localizable pairs match; protected brand/song/model/flag artwork stays preserve-original.
+- All nine are **PREFLIGHT_ONLY**. Exact-source 133/159/201 still lack complete binding/masks/CLEAN_PLATE/final safe bbox, so no RENDER_READY/ONE_STAGE_TO_RENDER promotion. Source-exhausted assets are sticky until source/inventory/policy changes.
+- Accepted PREFLIGHT_ONLY: 28/30/34/36/48/52/55/103/132/133/135/139/147/154/159/164/172/201/228. Q00038 B00190 disposition is unchanged; newer B00197 results are outside Q00039 and remain later QA backlog.
+- Counts unchanged: actionable localize_text **93**, pending production **71**, canonical segments **753**. No DDS/static/runtime approval. No N100/local clone/worktree, GPT Library, Drive write, build, or VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0334-C141/C141_Q00039_INDEPENDENT_QA_BATCH.json`.
