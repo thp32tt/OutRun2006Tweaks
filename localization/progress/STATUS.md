@@ -1297,3 +1297,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Canonical and compatibility progress paths are byte-identical after repair. Pending production **70**, actionable localize_text **93**, canonical segments **753**.
 - `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
+### C150 Q00048 — 2026-09-30T06:42:33+09:00
+- A00218 `f0e94bd5...` / index231 `EBE401C8` — **PASS / PREFLIGHT_ONLY**.
+- Exact 2048x1024 RGBA32/mip1 FLIP_Y source and six physical alpha masks independently reproduced; aggregate **150,173 px**, CLEAN_PLATE hashes exact, outside-mask/alpha escape **0**, six 2px safe bboxes PASS.
+- Two source descriptions remain absent from canonical transcription/artwork plan; no Korean DDS candidate is authorized until reviewed translations/bindings are added.
+- Shared order: **RENDER_READY index222 -> ONE_STAGE_TO_RENDER none -> candidate QA 159/198/201 -> PREFLIGHT_ONLY 231/133/232**. Pending production **70**, actionable localize_text **93**, canonical segments **753**.
+- `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+

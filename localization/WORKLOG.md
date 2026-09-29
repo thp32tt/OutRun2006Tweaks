@@ -1885,3 +1885,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Canonical `localization/progress/progress.json` and compatibility `localization/progress.json` are now byte-for-byte identical. Pending production **70**, actionable localize_text **93**, canonical segments **753**.
 - This bookkeeping commit is separate from the validation-bearing result and does not own the Gate. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
+## 2026-09-30 06:42 KST - C150 Q00048 INDEPENDENT QA BATCH
+- Immutable input: A00218 `f0e94bd55b8b3a3c94f8b442934277a95b764f40` / index231 `EBE401C8` — **PASS** pre-generation evidence.
+- Independent replay reproduces exact source SHA `29b87a5c...`, 2048x1024 RGBA32 mip1, FLIP_Y raw/readable hashes, all six source-effect masks (**150,173 px** total), CLEAN_PLATE hashes `f6a66a70...` / `a8f863fe...`, zero outside-mask/alpha escape, and six 2px safe bboxes.
+- Current canonical transcription/artwork plan still contains only `LAN -> LAN` and `ONLINE -> 온라인`. Exact source descriptions `Play OutRun Online with Friends or other players!` and `Join or Create a LAN game of OutRun!` remain unreviewed/unbound. Producer correctly emitted no candidate.
+- Disposition **PASS / PREFLIGHT_ONLY**. No RENDER_READY/STATIC_QA/runtime approval. Existing RENDER_READY index222 stays first; candidate QA 159/198/201 remains ahead of unrelated preflight. Pending production **70**, actionable localize_text **93**, canonical segments **753**.
+- C changed shared QA/progress metadata only; no DDS/build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
