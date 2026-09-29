@@ -733,3 +733,19 @@ Next visual investigation:
 5. add bounded selector-specific telemetry/verifiers before a behavior change if static evidence is not decisive.
 
 RUNTIME_VALIDATION: `USER_REPORTED_DX9EX_BAD_DXVK_GOOD`.
+
+
+## Cycle 0031 — exact-head CI contract repair
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Exact-head 56135e92 Build and HUD Inspector passed, but both OpenXR runs failed deterministically because verify_vr_r32_review.py required the literal SampleEvidence::ExactSampled marker in the LEVEL0 smoke while the test exercised only ExactSampled() plus Unknown enum cases. Added an explicit Query(sampledExact) == SampleEvidence::ExactSampled assertion; no runtime behavior changed.
+- Evidence: OpenXR runs 36512385393/36512385576 host-x64 and game-x86 failed at Verify reconstructed VR architecture boundaries with 'R32/R33 invariant missing: vrhost/tests/r41_skipped_release_smoke.cpp :: SampleEvidence::ExactSampled'; fix commit 55ac395b7fe6a24a054b43ec767b2deb59f49b27.
+- Build/HUD success is preserved; OpenXR must be revalidated on the repaired head.
+- Frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `vrhost/tests/r41_skipped_release_smoke.cpp`, `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `CI_CONTRACT_REPAIRED / EXACT_HEAD_REVALIDATION_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: consume repaired-head Build/OpenXR/HUD; then continue P0 visual review without performance-only changes.
