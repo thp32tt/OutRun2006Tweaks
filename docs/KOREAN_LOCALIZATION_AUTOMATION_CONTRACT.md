@@ -130,11 +130,11 @@ A/B select work in this order inside their parity shard:
 When any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane, the producer MUST NOT select a new unrelated preflight/work-order asset merely to satisfy the material-deliverable rule.
 
 ### Candidate completion requirement
-- A/B should finish at least one actual new or materially reworked Korean DDS candidate per invocation whenever a RENDER_READY or ONE_STAGE_TO_RENDER asset exists.
+- A/B MUST finish at least one actual new or materially reworked Korean DDS candidate per invocation whenever any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane. This is a hard producer success condition, not a best-effort target.
 - The required path is: exact canonical HD source -> verified CLEAN_PLATE -> source typography/baseline/slant measurement -> native-resolution Korean render -> measure/refit loop -> exact DDS encode -> decoded-final static self-QA -> English-source-vs-Korean-candidate evidence.
 - If baseline/slant/style is the only missing information, measure it and continue to rendering in the **same task**. Do not emit a separate preflight-only task for those measurements.
 - If the first ready asset becomes fail-closed during rendering, record the exact new blocker and continue to the next ready asset in the same shard before considering new preflight.
-- A producer may finish with zero candidate DDS only when it proves that no RENDER_READY or ONE_STAGE_TO_RENDER asset in its shard can safely advance with currently available GitHub evidence. In that case it may create at most **one** new preflight-only batch before the next candidate-completion attempt.
+- A producer may finish with zero candidate DDS only when it proves that no RENDER_READY or ONE_STAGE_TO_RENDER asset in its shard can safely advance with currently available GitHub evidence. In that exceptional case it may create at most **one** new preflight-only batch before the next candidate-completion attempt. A preflight/reconstruction-only result MUST NOT be selected while any ready-tier asset remains runnable.
 - Work-order count, extraction-scope count, mask count, or commit count is not a throughput success metric. The primary graphics-production metric is newly created/materially reworked v2 Korean DDS candidates that reach C candidate QA.
 
 ### C readiness reconciliation
@@ -153,6 +153,8 @@ When any RENDER_READY or ONE_STAGE_TO_RENDER asset exists in the lane, the produ
 - Do not require Docker/controller configuration changes for workflow-rule changes; modify this Git contract/state instead.
 
 ## Mandatory fallback ladder when DDS production is blocked
+This ladder is subordinate to the Candidate-completion-first policy. Steps 2-5 are legal only after the producer has refreshed the lane and demonstrated that no runnable `DIRECT_REWORK_REQUIRED`, `RENDER_READY`, `ONE_STAGE_TO_RENDER`, or existing-candidate material rework remains in its shard. `PREFLIGHT_ONLY` evidence is never an acceptable substitute for an available candidate render.
+
 When the current candidate cannot safely be rewritten, do not end the run. Select the first applicable action below on another unfinished asset in the lane:
 1. Produce/rework the next runnable `localize_text` DDS candidate and self-QA it.
 2. Resolve an unfinished `zoom_review` asset: positively classify whether it contains localizable text; if yes, produce a candidate when safe; if no, record machine-readable evidence that removes it from the unresolved review backlog.
@@ -168,7 +170,7 @@ A fallback deliverable must materially reduce unresolved work or create new exec
 - C should inspect each unique asset/candidate fingerprint once per batch, reuse unchanged PASS evidence, and update shared state once for the entire batch.
 - A producer result already present in `qa_pending`, `qa_completed`, or an active C batch MUST NOT be enqueued or reviewed again under the same TASK_ID@RESULT_SHA.
 - C invoked on metadata/reconstruction-only producer results should validate only the new material evidence and resulting eligibility change; it must not recreate unchanged full DDS QA merely to restate a previous PASS/HOLD.
-- A productive producer task is one where the lane creates/materially reworks candidate DDS bytes or adds material new QA/runtime/reconstruction evidence that changes an asset's eligibility/state.
+- A productive producer task is normally one where the lane creates/materially reworks candidate DDS bytes. New QA/runtime/reconstruction evidence counts as productive only when the lane has no runnable ready-tier/candidate-rework asset after a fresh queue scan and that evidence advances a specific PREFLIGHT_ONLY asset toward `ONE_STAGE_TO_RENDER` or `RENDER_READY`.
 
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state.
