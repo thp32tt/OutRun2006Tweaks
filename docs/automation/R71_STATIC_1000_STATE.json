@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 20,
+  "completedCycles": 21,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "c0fe1aa12dfc2910fc8e495e86505db1ead266bd",
+  "currentHead": "c7ebb5fab8bcb522b98f3f276c701cf3846f5fda",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -624,12 +624,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "review view-history pose matching"
+    },
+    {
+      "cycle": 21,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "View history stores only valid stereo view states keyed by hostSequence before cadence release; no stale-pose bypass was found in the reviewed boundary."
+      ],
+      "evidence": [
+        "viewHistory.Store(hostSequence, views) guarded by valid orientation+position"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "c7ebb5fab8bcb522b98f3f276c701cf3846f5fda"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "review presentation bootstrap/theater boundary"
     }
   ],
   "nextCycle": {
-    "cycle": 21,
+    "cycle": 22,
     "priority": [
-      "review view-history pose matching"
+      "review presentation bootstrap/theater boundary"
     ],
     "guard": "frozen 34eef500 user-test package immutable; GitHub remains source of truth"
   },
