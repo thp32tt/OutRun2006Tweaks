@@ -26,11 +26,13 @@ Method: ten deliberately different review lenses. A later set must use findings 
 - **F04 LOW/STRUCTURE — R70 facades solve compiled ownership, but historical include-chain complexity remains behind the facade.**
 - **F05 LOW/TESTING — CI one-click contract is mainly textual and needs behavior-level payload-selection tests.**
 
-## Post-review progress — F04 renderer facade modularization
+## Post-review progress — F04 facade modularization
 
 F04 remains an open structural finding, but two bounded renderer edges are now removed. The current DXVK branch extracts the R13 hardening body and R23/R27/R28 eligibility body into include-free overlays. Production R23 no longer nests `outrun_renderer_r13.cpp`, and production R29 no longer nests `outrun_renderer_r23.cpp`; compatibility wrappers remain for the safe/diagnostic facade choices.
 
 `CONVERSION-DXVK-00061` exact result `6c46bd6aa111e84781bdebca2fa25e232ff3490b` passed Backend Conversion Gate `36577007581`, Build `36577017102`, OpenXR architecture `36577016752`, and HUD Inspector `36577016670`. The verifier explicitly rejects reintroduction of either historical renderer .cpp edge and stale OpenXR marker ownership. This is source-graph/build evidence only. Stereo and D3D9Ex chains still retain versioned include layering, so F04 is not closed and runtime validation remains UNTESTED.
+
+`CONVERSION-DXVK-00063` phase 3 removes the top-level production D3D9Ex facade edge to `ex_device_upgrade_r15.cpp`. The R15 implementation body now lives in include-free `ex_device_upgrade_r15_overlay.inc`; the historical R15 file remains as a compatibility/build-graph wrapper. After retargeting baseline, architecture, and R32 review guards to the extracted implementation owners, exact result `d3cdeb3b8e53c7a9cb6359137e1db128e4ff1692` passed Backend Conversion Gate `36583754063`, Build `36583762624`, OpenXR architecture `36583762752`, HUD Inspector `36583762665`, and both hosted-package runs `36583762629`/`36583753778`. F04 remains open because the deeper D3D9Ex R14/R13/base layering and stereo versioned include chains are still physically nested. No Quest3/VDXR or in-game execution was performed, so runtime validation remains UNTESTED.
 
 ## Set 02 direction derived from Set 01
 
