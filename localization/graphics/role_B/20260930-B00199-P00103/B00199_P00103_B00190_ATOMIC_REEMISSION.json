@@ -1,0 +1,181 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00199-p00103-b00190-atomic-reemission-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00199",
+  "wave_id": "P00103",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T03:41:51+09:00",
+  "base_head_sha": "e92613b48e99f114247a531f039deac99301a1a4",
+  "current_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+  "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+  "current_queue_blob_sha": "72222529fe824c548a5f2324bc51fb03891715c1",
+  "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+  "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+  "selection": {
+    "selected_indices": [
+      46,
+      100,
+      106
+    ],
+    "selected_assets": [
+      "AA04D779",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "priority": "DIRECT_REWORK_REQUIRED_RUNNABLE",
+    "c_rework_origin": "LOCALIZATION-LOCALIZATION_C-00194@eb395208c34498da655106ea5d9f4f6ebc72c167",
+    "malformed_producer_input": "LOCALIZATION-LOCALIZATION_B-00190@5969fd310d7d1311977effb967d24c31354d6811",
+    "reason": "C140/Q00038 authoritative PASS returned B00190 REWORK_REQUIRED solely because the immutable producer result split its lane-local material report and durable task record across two commits. C explicitly authorized reuse of unchanged source/semantic heavy-QA after atomic re-emission. Latest C141/Q00039 introduces no B-owned RENDER_READY or ONE_STAGE_TO_RENDER asset; B00197 remains QA-pending and is not repeated."
+  },
+  "current_state_recheck": {
+    "latest_c_validation_bearing_result_sha": "b39df3617d3dd39f7dc3b8f71c42722e24b590d0",
+    "latest_c_gate": "C141/Q00039 PASS",
+    "queue_rows": {
+      "46": "localize_text/pending_artwork/transcribed_reviewed; Q00038 B00190 contract rework retained",
+      "100": "localize_text/pending_artwork/transcribed_reviewed; Q00038 B00190 contract rework retained",
+      "106": "localize_text/pending_artwork/transcribed_reviewed; Q00038 B00190 contract rework retained; OutRun2SP protected original"
+    },
+    "b00197_qa_pending_not_repeated": true,
+    "render_ready_indices_from_latest_c": [],
+    "one_stage_to_render_indices_from_latest_c": []
+  },
+  "heavy_qa_reuse": {
+    "prior_b00190_report": {
+      "path": "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
+      "git_blob_sha": "232f1cec23226c871655b0d24573f88a50996410"
+    },
+    "c140_rework_report": {
+      "path": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
+      "git_blob_sha": "e0ba8f62cde379fff7b000dbf0ed4357c8e0224a"
+    },
+    "source_semantic_fingerprint": "UNCHANGED_FROM_C140_Q00038_ATTEMPT2",
+    "canonical_inventory_blob_unchanged_from_b00190": true,
+    "source_or_candidate_dependency_change": false,
+    "drive_direct_release_checks": "REUSED_NOT_REPEATED",
+    "release_bundle_redownload_performed": false,
+    "candidate_pixel_qa": "NOT_APPLICABLE_NO_CANDIDATE",
+    "repeated_heavy_checks": false
+  },
+  "reemitted_source_identity": [
+    {
+      "index": 46,
+      "asset": "AA04D779",
+      "canonical": {
+        "sha256": "5a4ca513da3545b7da91e62fd27692f39fc211a93983122a193db79c254f28b0",
+        "width": 512,
+        "height": 512,
+        "format": "RGBA"
+      },
+      "pinned_release_lineage": {
+        "git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32"
+      },
+      "semantic_binding": "21_OF_21",
+      "identity_match": false,
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 100,
+      "asset": "53CE39D5",
+      "canonical": {
+        "sha256": "3bfea3882b73ec133cd8badca8f9be67c130d4f4b277c52bbc6d2b1c4014efa5",
+        "width": 512,
+        "height": 512,
+        "format": "RGBA"
+      },
+      "pinned_release_lineage": {
+        "git_blob_sha": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32"
+      },
+      "semantic_binding": "7_OF_7",
+      "identity_match": false,
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 106,
+      "asset": "788CE557",
+      "canonical": {
+        "sha256": "b9e7d15a4561bac2267f8dea1bc5561825acadddd3632763a5fd67ddfab7814a",
+        "width": 512,
+        "height": 256,
+        "format": "RGBA"
+      },
+      "pinned_release_lineage": {
+        "git_blob_sha": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32"
+      },
+      "semantic_binding": "3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE_ORIGINAL",
+      "identity_match": false,
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  ],
+  "atomic_reemission_gate": {
+    "prior_failure": "B00190 exact result contained material report but not its durable task record in the same commit",
+    "required_repair": "Equivalent current-contract material evidence plus this task's durable record in one immutable B00199 result commit",
+    "material_report_path": "localization/graphics/role_B/20260930-B00199-P00103/B00199_P00103_B00190_ATOMIC_REEMISSION.json",
+    "durable_task_record_path": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00199.json",
+    "expected_same_result_commit": true,
+    "old_b00190_result_mutated": false
+  },
+  "readiness_after": {
+    "46": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_PENDING_C_REACCEPTANCE",
+    "100": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_PENDING_C_REACCEPTANCE",
+    "106": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_PENDING_C_REACCEPTANCE",
+    "render_ready_count": 0,
+    "one_stage_to_render_count": 0,
+    "korean_candidate_rendered": false
+  },
+  "self_qa": {
+    "shard_ownership": "PASS_46_100_106_ALL_MOD3_EQ_1",
+    "direct_rework_priority": "PASS_C_REWORK_BEFORE_NEW_PREFLIGHT",
+    "anti_duplication": "PASS_B00197_QA_PENDING_NOT_REPEATED__STATIC_PASS_CANDIDATES_NOT_RERENDERED",
+    "current_inventory_fingerprint": "PASS_UNCHANGED",
+    "source_identity_reuse": "PASS_C_AUTHORIZED_UNCHANGED_FINGERPRINT",
+    "atomic_payload_plan": "PASS_REPORT_AND_DURABLE_RECORD_SAME_RESULT_COMMIT",
+    "candidate_generation": "NONE_FAIL_CLOSED_NO_EXACT_CANONICAL_SOURCE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "type": "B_DIRECT_REWORK_ATOMIC_REEMISSION_OF_C_REJECTED_PRODUCER_CONTRACT_PAYLOAD",
+    "reviewed_indices": [
+      46,
+      100,
+      106
+    ],
+    "replaces_malformed_input": "LOCALIZATION-LOCALIZATION_B-00190@5969fd310d7d1311977effb967d24c31354d6811",
+    "heavy_qa_recomputed": false,
+    "equivalent_source_exhaustion_evidence_reemitted": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "candidate_dds_modified": false,
+    "materially_resolves_c_rework_blocker": true
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "conclusion": "B00199 repairs the only C140 defect on the unchanged B00190 fingerprint by atomically re-emitting equivalent source-exhaustion material evidence with a new durable B00199 task record. No DDS bytes, shared state, build, or runtime claim are changed."
+}
