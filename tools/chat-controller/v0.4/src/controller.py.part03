@@ -502,7 +502,7 @@ async def localization_send_lane_task(
 
 
 def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
-    """Release A/B/E on durable commit; validation is deferred to the C batch gate."""
+    """Release A/B on durable commit; validation is deferred to the C batch gate."""
     active["result_sha"] = task_commit["sha"]
     active["result_message"] = task_commit.get("message")
     active["automation_validation"] = "PENDING"
@@ -568,7 +568,7 @@ async def localization_process_lane(
             text = await last_assistant_text(page)
             if not text:
                 if task_commit:
-                    if lane_key in {"A", "B", "D"}:
+                    if lane_key in {"A", "B"}:
                         finalize_localization_producer_commit(q, active, task_commit, now)
                     else:
                         active["result_sha"] = task_commit["sha"]
@@ -600,7 +600,7 @@ async def localization_process_lane(
 
             task_commit = task_commit or github_find_task_commit(active["branch"], active["task_id"])
             if task_commit:
-                if lane_key in {"A", "B", "D"}:
+                if lane_key in {"A", "B"}:
                     finalize_localization_producer_commit(q, active, task_commit, now)
                     save_queue_state(q)
                     write_runtime(
@@ -650,7 +650,7 @@ async def localization_process_lane(
             active["phase"] = "BLOCKED"
 
         if active["phase"] == "WAIT_ACTIONS":
-            if lane_key in {"A", "B", "D"}:
+            if lane_key in {"A", "B"}:
                 task_commit = github_find_task_commit(active["branch"], active["task_id"])
                 if task_commit:
                     finalize_localization_producer_commit(q, active, task_commit, now)
@@ -826,7 +826,7 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
 
 
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Run A/B/E as continuous producers and C as an independent batched QA consumer."""
+    """Run A/B as continuous producers and C as an independent batched QA consumer."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reg = load_registry(now)
@@ -850,8 +850,8 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         )
         return
 
-    # Advance three producers plus C independently. C never blocks A/B; E is backlog-throttled only at dispatch.
-    for lane_key in ("A", "B", "C", "D"):
+    # Advance all three lanes independently. C never blocks A/B production.
+    for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             await localization_process_lane(context, pages, q, lane_key)
 
@@ -859,7 +859,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
 
     # Retire completed producers immediately and enqueue immutable task/result SHAs for C.
     producer_retired = []
-    for lane_key in ("A", "B", "D"):
+    for lane_key in ("A", "B"):
         task = active_by_lane.get(lane_key)
         if task and task.get("phase") == "DONE":
             if enqueue_producer_result_for_qa(q, task):
@@ -875,24 +875,10 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     if producer_retired or (ctask and ctask.get("phase") == "DONE"):
         save_queue_state(q)
 
-    # Keep producers fed independently. E is elastic: pause only new E dispatches
-    # when C backlog is high, with hysteresis to avoid rapid on/off oscillation.
-    pending_count = len(q.get("qa_pending", []))
-    e_throttled = bool(q.get("e_backlog_throttled", False))
-    if e_throttled and pending_count < LOCALIZATION_E_QA_RESUME_THRESHOLD:
-        e_throttled = False
-    elif not e_throttled and pending_count >= LOCALIZATION_E_QA_PAUSE_THRESHOLD:
-        e_throttled = True
-    q["e_backlog_throttled"] = e_throttled
-    q["e_backlog_pending_count"] = pending_count
-    save_queue_state(q)
-
-    # No producer/C barrier exists.
-    for lane_key in ("A", "B", "D"):
+    # Keep both producers fed independently. No A+B/C barrier exists.
+    for lane_key in ("A", "B"):
         active_by_lane = q.setdefault("active_by_lane", {})
         if lane_key in active_by_lane:
-            continue
-        if lane_key == "D" and e_throttled:
             continue
         producer_id = f"P{int(q.get('producer_counter', 0)) + 1:05d}"
         if await localization_send_lane_task(context, pages, q, lane_key, producer_id):
@@ -920,7 +906,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             save_queue_state(q)
             write_runtime(
                 status="qa_batch_running",
-                last_action=f"{qa_id}: C reviewing {len(batch)} producer results while A/B/E continue",
+                last_action=f"{qa_id}: C reviewing {len(batch)} producer results while A/B continue",
                 queue=q,
             )
             return
@@ -929,7 +915,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     write_runtime(
         status="continuous_production_qa_running",
         last_action=(
-            f"A/B/E continuous producers; C QA pending={len(q.get('qa_pending', []))} "
+            f"A/B continuous producers; C QA pending={len(q.get('qa_pending', []))} "
             f"active={','.join(sorted(active_by_lane.keys())) or 'none'}"
         ),
         queue=q,
@@ -1368,7 +1354,7 @@ def startup_reconcile_queue_state() -> None:
     rebounds = []
     for task in records:
         if task.get("phase") == "WAIT_ACTIONS":
-            if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
+            if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
                 _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
                 commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
                 if commit:
@@ -1408,7 +1394,7 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
     for task in records:
         if task.get("phase") != "WAIT_ACTIONS":
             continue
-        if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
+        if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
             _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
             commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
             if commit:
