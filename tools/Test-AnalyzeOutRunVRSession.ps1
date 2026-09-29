@@ -33,7 +33,10 @@ function Invoke-AnalyzerCase {
         [int64]$ExpectedProducerFenceOk=0,
         [int64]$ExpectedProducerBudgetFallback=0,
         [Nullable[double]]$ExpectedCaptureMaxMs=$null,
-        [Nullable[double]]$ExpectedEndFrameP95MaxMs=$null
+        [Nullable[double]]$ExpectedEndFrameP95MaxMs=$null,
+        [int]$ExpectedDrawFingerprintCount=0,
+        [int64]$ExpectedDrawFingerprintDropped=0,
+        [string]$ExpectedFirstDrawFingerprintScope=''
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -143,6 +146,20 @@ function Invoke-AnalyzerCase {
     if($null -ne $ExpectedEndFrameP95MaxMs){
         if([math]::Abs([double]$summary.FrameBudget.XrEndFrameMs.MaxP95Observed-[double]$ExpectedEndFrameP95MaxMs) -gt 0.0001){
             throw "${Name}: XrEndFrame P95 max=$($summary.FrameBudget.XrEndFrameMs.MaxP95Observed), expected $ExpectedEndFrameP95MaxMs"
+        }
+    }
+    if([int]$summary.DrawFingerprintUniqueCount -ne $ExpectedDrawFingerprintCount){
+        throw "${Name}: DrawFingerprintUniqueCount=$($summary.DrawFingerprintUniqueCount), expected $ExpectedDrawFingerprintCount"
+    }
+    if([int64]$summary.DrawFingerprintDropped -ne $ExpectedDrawFingerprintDropped){
+        throw "${Name}: DrawFingerprintDropped=$($summary.DrawFingerprintDropped), expected $ExpectedDrawFingerprintDropped"
+    }
+    if($ExpectedFirstDrawFingerprintScope){
+        if(@($summary.DrawFingerprints).Count -eq 0){
+            throw "${Name}: expected draw fingerprint entries but none were parsed"
+        }
+        if([string]$summary.DrawFingerprints[0].Scope -ne $ExpectedFirstDrawFingerprintScope){
+            throw "${Name}: first draw fingerprint scope=$($summary.DrawFingerprints[0].Scope), expected $ExpectedFirstDrawFingerprintScope"
         }
     }
     $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
@@ -310,6 +327,17 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedStatus 'DIRECT_GPU_UNAVAILABLE' `
         -IdentityMode 'INCOMPLETE' -ExpectedBuildIdentityVerified $false `
         -ExpectedBuildIdentityMismatch $false
+
+    # R71 bounded semantic draw fingerprints are parsed without granting any
+    # render ownership. The runtime emits first-seen unique fingerprints only.
+    Invoke-AnalyzerCase -Name 'semantic-draw-fingerprint-aggregation' `
+        -GameLog "direct[frames=0,fallbacks=2,fenceTimeout=0]`nVR DRAW FP: id=1111222233334444 scope=SCREEN_HUD owner=NONE api=DIP prim=4 primCount=2 arg0=4 arg1=0 arg2=0 vsHash=aaaaaaaaaaaaaaaa psHash=bbbbbbbbbbbbbbbb vsBytes=128 psBytes=96 exact=1 marker=0`nVR DRAW FP: id=5555666677778888 scope=SCREEN_OVERLAY_2D owner=NONE api=DPUP prim=5 primCount=2 arg0=24 arg1=0 arg2=0 vsHash=0000000000000000 psHash=cccccccccccccccc vsBytes=0 psBytes=64 exact=0 marker=0`nVR R30.9: drawFp[unique=2,hits=7,dropped=1]" `
+        -DxvkLog "DXVK: v3.1.1" -HostLog "" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 0 -ExpectedFallbacks 2 `
+        -ExpectedStatus 'DIRECT_GPU_UNAVAILABLE' `
+        -ExpectedDrawFingerprintCount 2 -ExpectedDrawFingerprintDropped 1 `
+        -ExpectedFirstDrawFingerprintScope 'SCREEN_HUD'
 
     # Existing game/host telemetry is promoted into a structured common
     # frame-budget summary without changing runtime instrumentation.

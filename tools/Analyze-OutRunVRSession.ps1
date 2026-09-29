@@ -118,6 +118,33 @@ $driverSeatCount=([regex]::Matches($gameLog,'VR DRIVER SEAT CAMERA:')).Count
 $crashEvidence=($combined -match '(?im)\b(crash|unhandled exception|access violation|fatal error)\b')
 $whiteScreenEvidence=($combined -match '(?im)white screen|white-screen|startup white')
 
+$drawFingerprints=@()
+$drawFingerprintPattern='VR DRAW FP:\s*id=([0-9A-Fa-f]{16})\s+scope=([A-Z0-9_]+)\s+owner=([A-Z0-9_]+)\s+api=([A-Z]+)\s+prim=(\d+)\s+primCount=(\d+)\s+arg0=(\d+)\s+arg1=(\d+)\s+arg2=(\d+)\s+vsHash=([0-9A-Fa-f]{16})\s+psHash=([0-9A-Fa-f]{16})\s+vsBytes=(\d+)\s+psBytes=(\d+)\s+exact=(\d+)\s+marker=(\d+)'
+foreach($fp in [regex]::Matches($gameLog,$drawFingerprintPattern,[Text.RegularExpressions.RegexOptions]::IgnoreCase)){
+    $drawFingerprints += [pscustomobject]@{
+        Id=$fp.Groups[1].Value.ToLowerInvariant()
+        Scope=$fp.Groups[2].Value
+        Owner=$fp.Groups[3].Value
+        Api=$fp.Groups[4].Value
+        PrimitiveType=[int]$fp.Groups[5].Value
+        PrimitiveCount=[int]$fp.Groups[6].Value
+        Arg0=[uint32]$fp.Groups[7].Value
+        Arg1=[uint32]$fp.Groups[8].Value
+        Arg2=[uint32]$fp.Groups[9].Value
+        VertexShaderHash=$fp.Groups[10].Value.ToLowerInvariant()
+        PixelShaderHash=$fp.Groups[11].Value.ToLowerInvariant()
+        VertexShaderBytes=[uint32]$fp.Groups[12].Value
+        PixelShaderBytes=[uint32]$fp.Groups[13].Value
+        ExactQueueScope=([int]$fp.Groups[14].Value -ne 0)
+        ProjectedMarker=([int]$fp.Groups[15].Value -ne 0)
+    }
+}
+$drawFpSummary=Get-LastRegexMatch $gameLog 'drawFp\[unique=(\d+),hits=(\d+),dropped=(\d+)\]'
+$drawFingerprintUniqueCount=if($null -ne $drawFpSummary){[int]$drawFpSummary.Groups[1].Value}else{$drawFingerprints.Count}
+$drawFingerprintHits=if($null -ne $drawFpSummary){[int64]$drawFpSummary.Groups[2].Value}else{[int64]$drawFingerprints.Count}
+$drawFingerprintDropped=if($null -ne $drawFpSummary){[int64]$drawFpSummary.Groups[3].Value}else{0}
+$drawFingerprintEvidenceAvailable=($drawFingerprints.Count -gt 0 -or $null -ne $drawFpSummary)
+
 $directFrames=0
 $directFallbacks=0
 $fenceTimeout=0
@@ -334,6 +361,11 @@ $result=[ordered]@{
     DirectFallbacks=$directFallbacks
     FenceTimeouts=$fenceTimeout
     DriverSeatCameraActivationCount=$driverSeatCount
+    DrawFingerprintEvidenceAvailable=$drawFingerprintEvidenceAvailable
+    DrawFingerprintUniqueCount=$drawFingerprintUniqueCount
+    DrawFingerprintHits=$drawFingerprintHits
+    DrawFingerprintDropped=$drawFingerprintDropped
+    DrawFingerprints=@($drawFingerprints)
     SemanticRegistered=$semanticRegistered
     SemanticConsumed=$semanticConsumed
     SemanticStaleCleared=$semanticStaleCleared
@@ -410,6 +442,10 @@ $lines=@(
     "directFallbacks=$directFallbacks"
     "fenceTimeouts=$fenceTimeout"
     "driverSeatCameraActivationCount=$driverSeatCount"
+    "drawFingerprintEvidenceAvailable=$drawFingerprintEvidenceAvailable"
+    "drawFingerprintUniqueCount=$drawFingerprintUniqueCount"
+    "drawFingerprintHits=$drawFingerprintHits"
+    "drawFingerprintDropped=$drawFingerprintDropped"
     "semanticRegistered=$semanticRegistered"
     "semanticConsumed=$semanticConsumed"
     "semanticStaleCleared=$semanticStaleCleared"

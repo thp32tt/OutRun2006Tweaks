@@ -14,6 +14,7 @@
 #include "stereo_renderer_r29.cpp"
 #include <d3dcompiler.h>
 #include <algorithm>
+#include <array>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -57,6 +58,206 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwAtomicFallbackLogged = false;
         std::uint64_t R30XyzrhwBilateralFallbacks = 0;
         bool R30FirstXyzrhwBilateralFallbackLogged = false;
+
+        // R71 bounded diagnostic fingerprints. This never grants HUD/world
+        // ownership; it only identifies already-classified queue/effect draws
+        // during CORRECTNESS runs where shader fingerprinting is explicitly on.
+        enum class R30DrawFingerprintApi : std::uint8_t
+        {
+            DrawPrimitive = 0,
+            DrawIndexedPrimitive,
+            DrawPrimitiveUP,
+            DrawIndexedPrimitiveUP
+        };
+
+        struct R30DrawFingerprintKey
+        {
+            OutRunVR::GameSemantic::RenderScope scope =
+                OutRunVR::GameSemantic::RenderScope::None;
+            OutRunVR::GameSemantic::SpriteNodeOwner owner =
+                OutRunVR::GameSemantic::SpriteNodeOwner::None;
+            R30DrawFingerprintApi api = R30DrawFingerprintApi::DrawPrimitive;
+            D3DPRIMITIVETYPE primitiveType = D3DPT_POINTLIST;
+            UINT primitiveCount = 0;
+            UINT arg0 = 0;
+            UINT arg1 = 0;
+            UINT arg2 = 0;
+            std::uint64_t vertexHash = 0;
+            std::uint64_t pixelHash = 0;
+            std::uint32_t vertexBytes = 0;
+            std::uint32_t pixelBytes = 0;
+            bool exactQueueScope = false;
+            bool projectedMarker = false;
+        };
+
+        constexpr std::size_t R30DrawFingerprintCapacity = 64;
+        std::array<R30DrawFingerprintKey, R30DrawFingerprintCapacity>
+            R30DrawFingerprints{};
+        std::size_t R30DrawFingerprintCount = 0;
+        std::uint64_t R30DrawFingerprintHits = 0;
+        std::uint64_t R30DrawFingerprintDropped = 0;
+
+        [[nodiscard]] constexpr bool R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope scope,
+            bool queueRenderActive) noexcept
+        {
+            using Scope = OutRunVR::GameSemantic::RenderScope;
+            return OutRunVR::GameSemantic::IsExactHudScope(scope) ||
+                scope == Scope::ProjectedScreenEffect2D ||
+                (queueRenderActive && scope == Scope::ScreenOverlay2D);
+        }
+
+        static_assert(R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::ScreenHud, false));
+        static_assert(R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::WorldBillboard, false));
+        static_assert(R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D, false));
+        static_assert(R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D, false));
+        static_assert(R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D, true));
+        static_assert(!R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D, false));
+        static_assert(!R30FingerprintEligible(
+            OutRunVR::GameSemantic::RenderScope::SceneEffect, true));
+
+        bool R30SameDrawFingerprint(
+            const R30DrawFingerprintKey& a,
+            const R30DrawFingerprintKey& b) noexcept
+        {
+            return a.scope == b.scope &&
+                a.owner == b.owner &&
+                a.api == b.api &&
+                a.primitiveType == b.primitiveType &&
+                a.primitiveCount == b.primitiveCount &&
+                a.arg0 == b.arg0 &&
+                a.arg1 == b.arg1 &&
+                a.arg2 == b.arg2 &&
+                a.vertexHash == b.vertexHash &&
+                a.pixelHash == b.pixelHash &&
+                a.vertexBytes == b.vertexBytes &&
+                a.pixelBytes == b.pixelBytes &&
+                a.exactQueueScope == b.exactQueueScope &&
+                a.projectedMarker == b.projectedMarker;
+        }
+
+        std::uint64_t R30DrawFingerprintId(
+            const R30DrawFingerprintKey& key) noexcept
+        {
+            std::uint64_t hash = 0xcbf29ce484222325ULL;
+            auto mix = [&](std::uint64_t value) noexcept {
+                hash ^= value;
+                hash *= 0x100000001b3ULL;
+            };
+            mix(static_cast<std::uint64_t>(key.scope));
+            mix(static_cast<std::uint64_t>(key.owner));
+            mix(static_cast<std::uint64_t>(key.api));
+            mix(static_cast<std::uint64_t>(key.primitiveType));
+            mix(key.primitiveCount);
+            mix(key.arg0);
+            mix(key.arg1);
+            mix(key.arg2);
+            mix(key.vertexHash);
+            mix(key.pixelHash);
+            mix(key.vertexBytes);
+            mix(key.pixelBytes);
+            mix(key.exactQueueScope ? 1u : 0u);
+            mix(key.projectedMarker ? 1u : 0u);
+            return hash;
+        }
+
+        const char* R30DrawFingerprintApiName(
+            R30DrawFingerprintApi api) noexcept
+        {
+            switch (api)
+            {
+            case R30DrawFingerprintApi::DrawPrimitive: return "DP";
+            case R30DrawFingerprintApi::DrawIndexedPrimitive: return "DIP";
+            case R30DrawFingerprintApi::DrawPrimitiveUP: return "DPUP";
+            case R30DrawFingerprintApi::DrawIndexedPrimitiveUP: return "DIPUP";
+            default: return "UNKNOWN";
+            }
+        }
+
+        const char* R30SpriteOwnerName(
+            OutRunVR::GameSemantic::SpriteNodeOwner owner) noexcept
+        {
+            using Owner = OutRunVR::GameSemantic::SpriteNodeOwner;
+            return owner == Owner::DispRank ? "DISP_RANK" : "NONE";
+        }
+
+        void R30TraceDrawFingerprint(
+            IDirect3DDevice9* device,
+            R30DrawFingerprintApi api,
+            D3DPRIMITIVETYPE primitiveType,
+            UINT primitiveCount,
+            UINT arg0 = 0,
+            UINT arg1 = 0,
+            UINT arg2 = 0) noexcept
+        {
+            if (!device || !Settings::VRTelemetry ||
+                !OutRunVR::GplShaderFingerprint::TraceEnabled())
+                return;
+
+            using Scope = OutRunVR::GameSemantic::RenderScope;
+            const Scope exactScope =
+                OutRunVR::GameSemantic::CurrentQueueExactScope;
+            const bool exactQueueScope =
+                OutRunVR::GameSemantic::IsExactHudScope(exactScope);
+            const Scope scope = exactQueueScope
+                ? exactScope : OutRunVR::GameSemantic::CurrentScope;
+            if (!R30FingerprintEligible(
+                    scope, OutRunVR::GameSemantic::QueueRenderActive()))
+                return;
+
+            ++R30DrawFingerprintHits;
+            const auto shaderPair =
+                OutRunVR::GplShaderFingerprint::CaptureCurrent(device);
+            if (!shaderPair.valid)
+                return;
+
+            R30DrawFingerprintKey key{};
+            key.scope = scope;
+            key.owner = OutRunVR::GameSemantic::CurrentSpriteOwner();
+            key.api = api;
+            key.primitiveType = primitiveType;
+            key.primitiveCount = primitiveCount;
+            key.arg0 = arg0;
+            key.arg1 = arg1;
+            key.arg2 = arg2;
+            key.vertexHash = shaderPair.vertex.value;
+            key.pixelHash = shaderPair.pixel.value;
+            key.vertexBytes = shaderPair.vertex.bytecodeBytes;
+            key.pixelBytes = shaderPair.pixel.bytecodeBytes;
+            key.exactQueueScope = exactQueueScope;
+            key.projectedMarker =
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+
+            for (std::size_t i = 0; i < R30DrawFingerprintCount; ++i)
+                if (R30SameDrawFingerprint(R30DrawFingerprints[i], key))
+                    return;
+
+            if (R30DrawFingerprintCount >= R30DrawFingerprints.size())
+            {
+                ++R30DrawFingerprintDropped;
+                return;
+            }
+
+            R30DrawFingerprints[R30DrawFingerprintCount++] = key;
+            spdlog::info(
+                "VR DRAW FP: id={:016x} scope={} owner={} api={} prim={} primCount={} arg0={} arg1={} arg2={} vsHash={:016x} psHash={:016x} vsBytes={} psBytes={} exact={} marker={}",
+                R30DrawFingerprintId(key),
+                OutRunVR::GameSemantic::Name(key.scope),
+                R30SpriteOwnerName(key.owner),
+                R30DrawFingerprintApiName(key.api),
+                static_cast<unsigned>(key.primitiveType),
+                key.primitiveCount, key.arg0, key.arg1, key.arg2,
+                key.vertexHash, key.pixelHash,
+                key.vertexBytes, key.pixelBytes,
+                key.exactQueueScope ? 1 : 0,
+                key.projectedMarker ? 1 : 0);
+        }
 
 
         // R30.6 CPU shadows for XYZRHW vertex/index buffers.
@@ -1056,7 +1257,7 @@ namespace OutRunVRStereo
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(
-                "VR R30.9: bufferShadow[writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
+                "VR R30.9: bufferShadow[writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},rhwPromote={},atomicFallback={},depthPreserve={},bilateralFallback={}] skyGlow[frames={},failures={},factor={},buffer={}x{}] drawFp[unique={},hits={},dropped={}]",
                 R30ShadowWrites, R30ShadowReadHits, R30ShadowReadMisses,
                 R30ShadowDiscardInvalidations,
                 R30XyzrhwWorldEffectDraws, R30XyzrhwHudDraws,
@@ -1066,7 +1267,9 @@ namespace OutRunVRStereo
                 R30XyzrhwBilateralFallbacks,
                 R30SkyGlowFrames, R30SkyGlowFailures,
                 R30SkyGlow.factor, R30SkyGlow.glowWidth,
-                R30SkyGlow.glowHeight);
+                R30SkyGlow.glowHeight,
+                R30DrawFingerprintCount, R30DrawFingerprintHits,
+                R30DrawFingerprintDropped);
         }
 
         HRESULT __stdcall PresentDestR30(
@@ -2979,6 +3182,9 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            R30TraceDrawFingerprint(
+                device, R30DrawFingerprintApi::DrawPrimitive,
+                type, primitiveCount, startVertex);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -3001,6 +3207,10 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            R30TraceDrawFingerprint(
+                device, R30DrawFingerprintApi::DrawIndexedPrimitive,
+                type, primitiveCount, numVertices, startIndex,
+                static_cast<UINT>(baseVertexIndex));
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
@@ -3025,6 +3235,9 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            R30TraceDrawFingerprint(
+                device, R30DrawFingerprintApi::DrawPrimitiveUP,
+                type, primitiveCount, stride);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -3048,6 +3261,10 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            R30TraceDrawFingerprint(
+                device, R30DrawFingerprintApi::DrawIndexedPrimitiveUP,
+                type, primitiveCount, numVertices, stride,
+                static_cast<UINT>(indexFormat));
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);

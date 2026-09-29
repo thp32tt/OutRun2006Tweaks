@@ -12,6 +12,7 @@ CONTRACT = ROOT / "src" / "vr" / "game" / "disasm_render_contract.hpp"
 HUD = ROOT / "src" / "vr" / "hud_semantics.hpp"
 RUNTIME_SEMANTICS = ROOT / "src" / "vr" / "game" / "render_semantics.hpp"
 OUTRUN_RENDERER = ROOT / "src" / "vr" / "game" / "outrun_renderer.cpp"
+R30_RENDERER = ROOT / "src" / "vr" / "d3d9" / "stereo_renderer_r30.cpp"
 ANALYZER = ROOT / "tools" / "analyze_outrun_exe.py"
 
 ENTRY_RE = re.compile(
@@ -122,6 +123,25 @@ def main() -> int:
         raise AssertionError(
             "R71 renderer c64 guard lost generic-overlay non-promotion rationale"
         )
+
+    # DX9EX-FINGERPRINT-001: diagnostics may fingerprint exact queue owners,
+    # projected screen effects, and generic queue overlays only while the queue
+    # renderer is active. Fingerprints are bounded and never grant ownership.
+    r30_source = R30_RENDERER.read_text(encoding="utf-8")
+    for marker in (
+        "R30DrawFingerprintCapacity = 64",
+        "R30FingerprintEligible(",
+        "QueueRenderActive()",
+        "GplShaderFingerprint::CaptureCurrent(device)",
+        "VR DRAW FP:",
+        "R30TraceDrawFingerprint(",
+        "ScreenOverlay2D, false",
+        "SceneEffect, true",
+    ):
+        if marker not in r30_source:
+            raise AssertionError(
+                f"R71 bounded draw-fingerprint contract missing marker: {marker}"
+            )
 
     expected_f14 = {
         (0x060900, 0x061100, "ctrl_icon_work", "HUD_CTRL_ICON", "SCREEN_HUD"),
