@@ -512,3 +512,27 @@ Changed files:
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review DirectGPU producer identity.
+
+
+## Cycle 0023 — DirectGPU producer identity
+
+Review lenses:
+1. architecture/control flow;
+2. lifetime/reset/sync;
+3. stereo/HUD/visual correctness;
+4. hot path/frame pacing/copies/waits;
+5. adversarial/falsification.
+
+Finding/evidence:
+- Skipped-release ownership carries clientPid, runGeneration, transportGeneration, slot and frameId; stale producers are dropped and live same-slot conflicts fail closed.
+- Evidence: R41SkippedRelease::Identity/Queue.
+- No production/runtime, HUD classification, GPU wait/copy, or synchronization behavior changed.
+- Frozen user-test source/package `34eef500b2f79e7e68477d7ffe675f803e809e01`: unchanged.
+
+Changed files:
+- `docs/VR_R71_STATIC_1000_LOG.md`
+- `docs/automation/R71_STATIC_1000_STATE.json`
+
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review deferred EVENT poison/reset lifetime.
