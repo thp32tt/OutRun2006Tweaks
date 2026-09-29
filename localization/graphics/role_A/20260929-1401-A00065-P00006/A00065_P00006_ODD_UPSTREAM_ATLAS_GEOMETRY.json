@@ -1,0 +1,354 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00065",
+  "wave_id": "P00006",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:01:05+09:00",
+  "selection_head_sha": "0e105d24d7ffadfe42469c28cc2da51aa5ab92df",
+  "selection_head_message": "localization(C): Q00002 independent batch QA [AUTO:LOCALIZATION-LOCALIZATION_C-00063]",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "2752dd3fbc5170c8e2263b2ca1be8e3b27a17182",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "producer_policy": {
+    "validation_mode": "C_BATCH_GATE",
+    "producer_waits_for_actions": false,
+    "previous_A00064_shell_run": {
+      "workflow_run_id": 36523169697,
+      "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+      "conclusion": "skipped",
+      "interpretation": "EXPECTED_SKIPPED_NO_RUNNER_NOT_FAILURE"
+    },
+    "skipped_qa_pending": {
+      "A00061": {
+        "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+        "indices": [
+          137,
+          217,
+          219,
+          241
+        ]
+      },
+      "A00064": {
+        "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+        "indices": [
+          133,
+          135,
+          139,
+          143
+        ]
+      }
+    },
+    "c_consumed_not_repeated": {
+      "A00058": {
+        "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+        "indices": [
+          35,
+          43,
+          49
+        ]
+      }
+    }
+  },
+  "selection": {
+    "selected_indices": [
+      147,
+      159,
+      161,
+      163
+    ],
+    "selected_state": "localize_text/pending_artwork/transcribed_reviewed",
+    "work_steal": false,
+    "reason": "Fresh odd-shard unfinished assets not present in A00061/A00064 QA-pending producer sets."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "type": "EXACT_RELEASE_AND_ATLAS_GEOMETRY_RECONSTRUCTION_INPUTS",
+    "assets_advanced": 4,
+    "exact_release_dds_identities": 4,
+    "atlas_pairs": 4,
+    "atlas_regions_total": 94,
+    "canonical_semantics_total": 92,
+    "candidate_dds_written": false,
+    "description": "Pinned exact immutable Release DDS Git identities and deterministic stock-to-4x atlas geometry for four fresh odd assets. All 94 atlas regions scale exactly 4x. Canonical Korean translation inputs are pinned by current transcription/artwork-plan blobs. Semantic-to-sprite ordering is deliberately not guessed."
+  },
+  "assets": [
+    {
+      "queue_index": 147,
+      "asset": "39BCA907",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "canonical_source": {
+        "sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+        "width": 2048,
+        "height": 1024,
+        "inventory_mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+        "git_blob_sha": "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+        "size_bytes": 8388736
+      },
+      "mapping_references": {
+        "stock_dds_git_blob_sha": "af08fdb692c84d4008248e3f2a3600876525b91c",
+        "stock_png_git_blob_sha": "0dd6de37d80991a9490adde226e03a1f3b12af0b",
+        "stock_atlas_git_blob_sha": "76491b0aa09781eb76eb07beed1f89d825b0bd56",
+        "hd4_atlas_git_blob_sha": "60b751126f313f7239d37522a6291c38b782635c",
+        "stock_atlas_dimensions": [
+          256,
+          256
+        ],
+        "hd4_atlas_dimensions": [
+          2048,
+          1024
+        ],
+        "regions_count": 17,
+        "all_regions_exact_4x_geometry": true,
+        "first_region": {
+          "sprite": "sprite_264",
+          "rect": [
+            0,
+            222,
+            351,
+            34
+          ]
+        },
+        "last_region": {
+          "sprite": "sprite_280",
+          "rect": [
+            0,
+            44,
+            395,
+            2
+          ]
+        }
+      },
+      "canonical_semantic_count": 15,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_VISUAL_SOURCE_IDENTITY_REQUIRED_DO_NOT_INFER_BY_LIST_ORDER",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "queue_index": 159,
+      "asset": "4EDA9DE3",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "canonical_source": {
+        "sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+        "width": 2048,
+        "height": 1024,
+        "inventory_mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+        "git_blob_sha": "8685dc0122bff16243faca3ca3cbc1308b241b08",
+        "size_bytes": 8388736
+      },
+      "mapping_references": {
+        "stock_dds_git_blob_sha": "00f40e8b7b2c1e8c77442bb2a2e50270fff388dd",
+        "stock_png_git_blob_sha": "0f9864e666d50dc1db1c112404b486d065a683a8",
+        "stock_atlas_git_blob_sha": "471c9e7c64cdce948d00fe5cfcc70754da72b0a2",
+        "hd4_atlas_git_blob_sha": "ff05bb13de866f809ea96052e72fde1a4769b3cc",
+        "stock_atlas_dimensions": [
+          256,
+          256
+        ],
+        "hd4_atlas_dimensions": [
+          2048,
+          1024
+        ],
+        "regions_count": 15,
+        "all_regions_exact_4x_geometry": true,
+        "first_region": {
+          "sprite": "sprite_344",
+          "rect": [
+            0,
+            234,
+            245,
+            22
+          ]
+        },
+        "last_region": {
+          "sprite": "sprite_358",
+          "rect": [
+            0,
+            80,
+            245,
+            22
+          ]
+        }
+      },
+      "historical_orientation_evidence": {
+        "source": "localization/graphics/BATCH5_SOURCEFAITHFUL_REPORT.json",
+        "raw_orientation": "mirror_x",
+        "note": "Historical draft was mirrored to match original raw orientation; current strict candidate still requires exact Release pixel revalidation."
+      },
+      "canonical_semantic_count": 15,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_VISUAL_SOURCE_IDENTITY_REQUIRED_DO_NOT_INFER_BY_LIST_ORDER",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "queue_index": 161,
+      "asset": "55B57CDE",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+      "canonical_source": {
+        "sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+        "width": 2048,
+        "height": 2048,
+        "inventory_mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+        "git_blob_sha": "0b12c672224ce05acb9470af895bbda335cc5543",
+        "size_bytes": 4194432
+      },
+      "mapping_references": {
+        "stock_dds_git_blob_sha": "c18995f91772a163704c66578c0c37b1432d2436",
+        "stock_png_git_blob_sha": "e903d020c4d10f916a304bb8cd2ec45ed42974af",
+        "stock_atlas_git_blob_sha": "88a53b701a4becf26dc7d1f5415cba5b2697050e",
+        "hd4_atlas_git_blob_sha": "70001b44445f3e10b46eb7e3480abdece8eda790",
+        "stock_atlas_dimensions": [
+          512,
+          512
+        ],
+        "hd4_atlas_dimensions": [
+          2048,
+          2048
+        ],
+        "regions_count": 38,
+        "all_regions_exact_4x_geometry": true,
+        "first_region": {
+          "sprite": "sprite_73",
+          "rect": [
+            0,
+            496,
+            179,
+            16
+          ]
+        },
+        "last_region": {
+          "sprite": "sprite_110",
+          "rect": [
+            179,
+            208,
+            179,
+            16
+          ]
+        }
+      },
+      "canonical_semantic_count": 38,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_VISUAL_SOURCE_IDENTITY_REQUIRED_DO_NOT_INFER_BY_LIST_ORDER",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    },
+    {
+      "queue_index": 163,
+      "asset": "59A79158",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "canonical_source": {
+        "sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+        "width": 1024,
+        "height": 2048,
+        "inventory_mode": "RGBA"
+      },
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+        "git_blob_sha": "693548c2c4ec53a4b75adbfe2868328896a115de",
+        "size_bytes": 8388736
+      },
+      "mapping_references": {
+        "stock_dds_git_blob_sha": "ded707827ee64453b3f254e6ed32d9f9cfb93599",
+        "stock_png_git_blob_sha": "2fa99fa06c19af7c94e2548d7008ee0628b46957",
+        "stock_atlas_git_blob_sha": "a8eb3d2bf8251bd779c32684b9c6f59e3a9a0155",
+        "hd4_atlas_git_blob_sha": "bcd439152c3fe1b04b1374609db27244a4d0e9df",
+        "stock_atlas_dimensions": [
+          512,
+          512
+        ],
+        "hd4_atlas_dimensions": [
+          1024,
+          2048
+        ],
+        "regions_count": 24,
+        "all_regions_exact_4x_geometry": true,
+        "first_region": {
+          "sprite": "sprite_426",
+          "rect": [
+            0,
+            493,
+            240,
+            19
+          ]
+        },
+        "last_region": {
+          "sprite": "sprite_449",
+          "rect": [
+            0,
+            56,
+            240,
+            19
+          ]
+        }
+      },
+      "canonical_semantic_count": 24,
+      "semantic_input_status": "PASS_TRANSCRIPTIONS_MATCH_ARTWORK_PLAN",
+      "semantic_to_sprite_assignment": "HOLD_DIRECT_VISUAL_SOURCE_IDENTITY_REQUIRED_DO_NOT_INFER_BY_LIST_ORDER",
+      "candidate_dds_written": false,
+      "qa_status": "HOLD_STRICT_RECHECK"
+    }
+  ],
+  "next_safe_action": [
+    "Fetch/decode the exact pinned Release DDS bytes from immutable upstream GitHub.",
+    "Inspect raw and readable orientation per sprite before editing.",
+    "Bind each English semantic to a stock sprite and exact 4x cell by direct source inspection; do not infer by list order.",
+    "Measure full-effect source text bbox including outline/shadow/glow/alpha fringe.",
+    "Render Korean only inside the permitted source text region while preserving untouched artwork.",
+    "Run zero-pixel containment and DDS header/format/mip/alpha checks plus exact ENGLISH SOURCE vs KOREAN CANDIDATE proof."
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_147_159_161_163",
+    "qa_pending_dedup": "PASS_A00061_A00064_NOT_REPEATED",
+    "prior_consumed_dedup": "PASS_A00058_NOT_REPEATED",
+    "canonical_translation_match": "PASS_92_OF_92_TRANSCRIPTIONS_VS_ARTWORK_PLAN",
+    "immutable_release_identity": "PASS_4_OF_4_PINNED_FROM_IMMUTABLE_UPSTREAM_TREE",
+    "immutable_atlas_identity": "PASS_8_OF_8",
+    "atlas_4x_geometry": "PASS_94_OF_94_REGIONS_EXACT_SCALE4",
+    "semantic_to_sprite_mapping": "HOLD_NOT_GUESSED",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation": "HOLD_EXACT_RELEASE_PIXEL_INSPECTION_REQUIRED_EXCEPT_HISTORICAL_4EDA9DE3_MIRROR_X_HINT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_RELEASE_ATLAS_GEOMETRY_INPUTS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
