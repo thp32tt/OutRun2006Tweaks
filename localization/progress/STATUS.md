@@ -1033,3 +1033,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - A00128: false A00121 QA-contract fingerprint is repaired to current `e6feafaf6c0719e59c1bae4dc7b92610e5beb411`; **4/4** canonical identities and **24/24** translations remain unchanged and accepted; all 4 exact sources absent. **PASS PREFLIGHT_ONLY**.
 - No producer input or C changed Korean candidate DDS bytes. Header/format/mipmap/alpha/orientation, source-effect/removal/protected masks, CLEAN_PLATE, candidate-safe bboxes, 1px containment and ENGLISH SOURCE vs KOREAN CANDIDATE remain **HOLD_STRICT_RECHECK** until exact canonical source/candidate fingerprints exist. New static artwork passes 0; runtime approvals 0.
 - Queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending localize_text **76**; canonical segments **753**. Shared state merged once. Report: `localization/graphics/role_C/20260929-1954-C119/C119_Q00017_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C120 Q00018 — 2026-09-29T20:15:44+09:00
+- QA inputs: B00129 `f00fd5a` (188/226/232), B00133 `a947b6a` (92/98/112).
+- Result: **PASS / PASS**, limited to canonical-source reacquisition preflight evidence. Six canonical inventory identities and 20 current semantics/physical occurrences rechecked; exact canonical DDS source bytes remain absent.
+- Release-derived geometry/identity and historical candidate hashes are not promoted. Candidate/header/orientation/mask/CLEAN_PLATE/1px containment/source-vs-candidate gates remain **HOLD_STRICT_RECHECK**.
+- No Korean DDS candidate change, no new static approval, no runtime approval. Queue **137 = 93 + 31 + 9 + 1 + 3**, pending production localize_text **76**, canonical segments **753**.
+- Report: `localization/graphics/role_C/20260929-2015-C120/C120_Q00018_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-independent-c-batch-qa-v1",
+  "recorded_at_kst": "2026-09-29T20:15:44+09:00",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00135",
+  "qa_batch_id": "Q00018",
+  "run": "C120",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00018",
+  "base_head": "24b094367972f4898935ce9a5bd043bf14380dbf",
+  "current_qa_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+  "current_policy": "candidate_completion_first_schema8",
+  "source_policy": "exact canonical user-HD inventory SHA-256 identity required before pixel/header/orientation/mask/CLEAN_PLATE/candidate promotion",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00129",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "f00fd5ada49ffc121a23b584ee5b925471e83a8c",
+      "producer_id": "P00057"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00133",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "a947b6a627862d620a9954581b30c783a8a0f688",
+      "producer_id": "P00059"
+    }
+  ],
+  "reviewed_indices": [
+    92,
+    98,
+    112,
+    188,
+    226,
+    232
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00129",
+      "result_sha": "f00fd5ada49ffc121a23b584ee5b925471e83a8c",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 3/3 canonical inventory SHA-256/canvas/RGBA identities and 16/16 current source/Korean semantic entries. The exact canonical queue-path DDS sources are absent at RESULT_SHA; B00129 explicitly retires Sonic-TV Release identities as canonical proof and reuses C117's 22/22 internal atlas/guard/payload arithmetic only as conditional reconstruction prior. No source/header/orientation/mask/CLEAN_PLATE/candidate pixel geometry is promoted. PASS is PREFLIGHT_ONLY source-reacquisition evidence under the current candidate-first contract."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00133",
+      "result_sha": "a947b6a627862d620a9954581b30c783a8a0f688",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 3/3 canonical inventory SHA-256/canvas/RGBA identities and 4/4 current semantic/physical occurrences for indices 92/98/112. The exact canonical queue-path DDS sources and current canonical-v2 candidates are absent; B00133 carries zero rejected Release pixel geometry and demotes the two historical candidate hashes from authority. Header/alpha/mips, orientation, masks, CLEAN_PLATE, safe bbox, candidate containment and English-source comparison remain fail-closed. PASS is PREFLIGHT_ONLY source-reacquisition evidence."
+    }
+  ],
+  "source_identity_validation": "PASS_B00129_3_OF_3_CANONICAL_INVENTORY_SHA256_CANVAS_RGBA_IDENTITIES__PASS_B00133_3_OF_3_CANONICAL_INVENTORY_SHA256_CANVAS_RGBA_IDENTITIES",
+  "canonical_semantic_validation": "PASS_B00129_16_OF_16_CURRENT_SEMANTIC_ENTRIES__PASS_B00133_4_OF_4_CURRENT_SEMANTIC_PHYSICAL_OCCURRENCES",
+  "geometry_mapping_validation": "B00129_C117_22_OF_22_INTERNAL_ATLAS_GUARD_PAYLOAD_ARITHMETIC_REUSED_AS_CONDITIONAL_PRIOR_ONLY_ZERO_PIXEL_PROMOTION__B00133_ZERO_REJECTED_RELEASE_PIXEL_GEOMETRY_REUSED_TWO_HISTORICAL_CANDIDATE_HASHES_DEMOTED",
+  "current_contract_compatibility": "PASS_BOTH_AS_LIMITED_PREFLIGHT_SOURCE_REACQUISITION_EVIDENCE__CANDIDATE_FIRST_ZERO_CANDIDATE_EXCEPTION_VALID_AT_IMMUTABLE_RESULTS__NO_CANDIDATE_STATIC_APPROVAL",
+  "heavy_qa_reuse": {
+    "repeated_heavy_pixel_qa": false,
+    "b00129_reused": [
+      "C117 16/16 canonical semantic acceptance",
+      "C117 3/3 atlas identity/count bookkeeping",
+      "C117 22/22 atlas bounds, 2px guard and payload arithmetic as conditional prior only"
+    ],
+    "b00133_reused": [
+      "C116 4/4 semantic acceptance only"
+    ],
+    "intentionally_not_reused_as_canonical": [
+      "Release DDS identities",
+      "Release orientation/effect/fill/safe-bbox/removal-mask/CLEAN_PLATE geometry",
+      "historical pre-reset candidate hashes",
+      "any absent-source DDS/header/alpha/mipmap/containment claim"
+    ]
+  },
+  "immutable_fingerprints": {
+    "contract": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+    "inventory": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan": "6164d63d074233203b1f620dc73100bd192da820",
+    "premerge_queue": "c22a6a3b9a4890bd1c5bae959542b40da78d6b1b",
+    "postmerge_queue": "f88386e1484054f2f6efb39e59d556ee6809067e",
+    "postmerge_resume": "18ee8946b19e47b3cec3709520594c035eca4cb5",
+    "postmerge_progress": "a206e5f0c6364ca6d55dc50cb860da0847253b06"
+  },
+  "exact_tree_probe": {
+    "b00129_exact_sources_present": 0,
+    "b00133_exact_sources_present": 0,
+    "current_canonical_v2_candidates_for_reviewed_assets_present": 0,
+    "evidence_only_previews_do_not_count_as_sources_or_candidates": true
+  },
+  "metadata_reconciled_segments": 0,
+  "canonical_transcribed_segments_after_merge": 753,
+  "actionable_localize_text_after": 93,
+  "pending_production_localize_text_after": 76,
+  "superseded_inputs": [],
+  "newer_disjoint_producers": [
+    "LOCALIZATION-LOCALIZATION_B-00134"
+  ],
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00018_TWO_INPUTS_PASS_NO_DDS_RUNTIME_UNTESTED",
+  "report": "localization/graphics/role_C/20260929-2015-C120/C120_Q00018_INDEPENDENT_QA_BATCH.json",
+  "rework_required_inputs": [],
+  "passed_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00129@f00fd5ada49ffc121a23b584ee5b925471e83a8c",
+    "LOCALIZATION-LOCALIZATION_B-00133@a947b6a627862d620a9954581b30c783a8a0f688"
+  ],
+  "shared_state_modified": true,
+  "candidate_dds_modified_by_c": false,
+  "input_candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
