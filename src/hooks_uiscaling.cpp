@@ -989,9 +989,24 @@ class UIScaling : public Hook
 				"VR R119 TIME HUD: shared producer-map handoff rva=0x{:x} hits={}",
 				CallerRva, hit);
 	}
-	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void DispGearPosition_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispGearPosition callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R124 GEAR REV HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	// R66: NaviPub_DispTimeAttackGoal (RVA 0xBEA50) does not execute the
@@ -1324,10 +1339,18 @@ public:
 		Memory::VP::InjectHook(Module::exe_ptr(0xBA052),
 			DispRank_putClipSprite<0x000BA052u>, Memory::HookType::Call);
 
-		// REV indicator
-		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
-		DispGearPosition_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B90B3, put_scroll_AdjustPositionLeft);
-		DispGearPosition_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B90F6, put_scroll_AdjustPositionLeft);
+		// R124/F13: exact DispGearPosition/REV producer edges are canonical
+		// SCREEN_HUD in the shared disassembly map. Preserve left-side spacing
+		// correction while sourcing only the immediate draw owner from that map.
+		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid(
+			(void*)0x4B9096,
+			DispGearPosition_AdjustPositionAndHud<0x000B9096u>);
+		DispGearPosition_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid(
+			(void*)0x4B90B3,
+			DispGearPosition_AdjustPositionAndHud<0x000B90B3u>);
+		DispGearPosition_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid(
+			(void*)0x4B90F6,
+			DispGearPosition_AdjustPositionAndHud<0x000B90F6u>);
 
 		// Fix ghost car info text positions
 		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDE3A, PutGhostGapInfo_AdjustPosition);
