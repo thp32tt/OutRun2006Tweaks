@@ -1,0 +1,89 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00243-p00132-index226-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00243",
+  "wave_id": "P00132",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T08:40:00+09:00",
+  "base_head_sha": "183c603ec1b33bb75d70842a8805c2af3a35f5ff",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "prompt_even_index_rule_overridden_by_current_git_contract": true,
+    "latest_c_gate": "C156/Q00054 43d6c872a66de63d65a70c18dc2c55b91b1ed16c / Gate 36645535305 success",
+    "runnable_render_ready_indices": [],
+    "runnable_one_stage_to_render_indices": [],
+    "skipped_qa_pending": [
+      {
+        "index": 163,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00237",
+        "kind": "CANDIDATE"
+      },
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+        "kind": "PREGEN"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "kind": "PREGEN"
+      }
+    ],
+    "skipped_dependency_blocked": [
+      175,
+      217
+    ],
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_CANDIDATE_COMPLETION_PATHS",
+    "selected_index": 226,
+    "selected_asset": "E3F4BA07"
+  },
+  "fingerprint_reuse": {
+    "source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+    "candidate_sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
+    "candidate_git_blob_at_c148": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+    "candidate_git_blob_at_base_head": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+    "qa_contract_source": "C148/Q00046",
+    "fingerprint_changed": false,
+    "heavy_qa_repeated": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX226_E3F4BA07_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      226
+    ],
+    "reviewed_assets": [
+      "E3F4BA07"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX226__Q00054_ZERO_RUNNABLE_READY_TIERS__B_PREGEN_AND_CANDIDATE_QA_PENDING_NOT_REPEATED__DEPENDENCY_BLOCKERS_NOT_RETRIED__CURRENT_CANDIDATE_BLOB_EQUALS_C148_LINEAGE__C148_HEAVY_QA_REUSED__NEW_DDS_ONLY_ISOLATION_INPUT__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "REUSED_C148_Q00046_STATIC_QA_PASS_UNCHANGED_FINGERPRINT",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00132_B00243_E3F4BA07.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00216.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00217.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json"
+  ]
+}

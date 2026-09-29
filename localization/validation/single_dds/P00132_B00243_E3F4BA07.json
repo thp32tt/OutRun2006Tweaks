@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00243-p00132-index226-single-dds-isolation-v1",
+  "case_id": "P00132_B00243_E3F4BA07",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00243",
+  "wave_id": "P00132",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T08:40:00+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "183c603ec1b33bb75d70842a8805c2af3a35f5ff",
+  "active": true,
+  "purpose": "Provide an exact single-DDS runtime-isolation input for the unchanged C148/Q00046 STATIC_QA_PASS_RUNTIME_UNTESTED E3F4BA07 candidate without rerendering or repeating heavy QA. Runtime remains untested until a real game test.",
+  "asset": {
+    "id": "E3F4BA07",
+    "queue_index": 226,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "translations": [
+      "GOAL -> 골",
+      "GOAL A -> 골 A",
+      "GOAL B -> 골 B",
+      "GOAL C -> 골 C",
+      "GOAL D -> 골 D",
+      "GOAL E -> 골 E",
+      "15 STAGE CONTINUOUS -> 15코스 연속",
+      "STAGE -> 스테이지"
+    ],
+    "preserve_original": [
+      "OUTRUN2",
+      "OUTRUN2SP"
+    ],
+    "raw_orientation": "flip_y"
+  },
+  "source": {
+    "identity_mode": "REUSED_UNCHANGED_C148_Q00046_ACCEPTED_FINGERPRINT",
+    "canonical_source_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+    "canonical_git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+    "bytes": 4194432,
+    "dds": {
+      "width": 2048,
+      "height": 512,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "source_locator": "envido32/OR2006Sprites@55f67a813dd3603d201d0be0da47c071965f53a4:Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds"
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "git_blob_sha": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+    "sha256": "8ab49a7015ced5e75ef3a3fe49213924075ac4c722d53d8fda54e73f25f92153",
+    "bytes": 4194432,
+    "dds": {
+      "width": 2048,
+      "height": 512,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "c148_validation_bearing_result": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
+      "c148_gate_run_id": 36631638860,
+      "c148_candidate_blob": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+      "current_head": "183c603ec1b33bb75d70842a8805c2af3a35f5ff",
+      "current_candidate_blob": "11260e86b2a088767907c2aa5ad0fd064acd7366",
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00216",
+    "producer_result_sha": "1ff1bc8aff9cfb182bcb28fc2cec2cc1a133112f",
+    "producer_qa": "localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07/qa_report.json",
+    "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00217",
+    "independent_c_result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
+    "independent_c_gate_run_id": 36631638860,
+    "static_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "removal_mask_pixels": 84629,
+    "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a",
+    "localized_regions": 8,
+    "safe_bbox_containment": "PASS_8_OF_8_AT_LEAST_2PX_INSIDE_ORIGINAL_SOURCE_EFFECT_ENVELOPES",
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_cells": 0,
+    "source_language_residue": "NONE_OBSERVED_BY_C148",
+    "broken_hangul": "NONE_OBSERVED_BY_C148",
+    "clipping_overlap_box_escape": "NONE_OBSERVED_BY_C148",
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the E3F4BA07 replacement DDS and confirm the affected front-end/route UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all eight localized regions.",
+    "Confirm FLIP_Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, preserved OUTRUN2/OUTRUN2SP artwork and any 1-pixel overflow.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
