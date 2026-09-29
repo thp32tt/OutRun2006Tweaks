@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-exact-hd-payload-scope-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00084",
+  "wave_id": "P00021",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-29T16:05:00+09:00",
+  "base_head_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+  "queue_index": 65,
+  "asset": "EBEF6D20",
+  "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+  "exact_release": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+    "git_blob_sha": "f05e35654433b4ce010d119d4a705f505cdd80c2",
+    "bytes": 16777344,
+    "canvas": [
+      2048,
+      2048
+    ],
+    "size_geometry_check": "PASS_128_PLUS_2048x2048x4"
+  },
+  "occurrences": [
+    {
+      "occurrence": 1,
+      "sprite": "sprite_11",
+      "source": "Loading",
+      "korean": "로딩",
+      "hd_cell_xywh": [
+        0,
+        424,
+        920,
+        120
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        2,
+        426,
+        918,
+        542
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 120,
+        "row_slice_bytes": 3680,
+        "row_k_byte_offset_formula": "128 + (424 + k) * 8192 + 0, 0 <= k < 120",
+        "first_row_start_byte": 3473536,
+        "final_row_start_byte": 4448384,
+        "final_row_end_exclusive_byte": 4452064,
+        "file_bytes": 16777344,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "v2_gate": "EXACT_LOADING_GLYPH_EFFECT_MASK + CLEAN_PLATE REQUIRED; inner guard is NOT candidate_safe_bbox"
+    },
+    {
+      "occurrence": 2,
+      "sprite": "sprite_12",
+      "source": "Loading",
+      "korean": "로딩",
+      "hd_cell_xywh": [
+        920,
+        424,
+        920,
+        120
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        922,
+        426,
+        1838,
+        542
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 120,
+        "row_slice_bytes": 3680,
+        "row_k_byte_offset_formula": "128 + (424 + k) * 8192 + 3680, 0 <= k < 120",
+        "first_row_start_byte": 3477216,
+        "final_row_start_byte": 4452064,
+        "final_row_end_exclusive_byte": 4455744,
+        "file_bytes": 16777344,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "v2_gate": "EXACT_LOADING_GLYPH_EFFECT_MASK + CLEAN_PLATE REQUIRED; inner guard is NOT candidate_safe_bbox"
+    }
+  ],
+  "raw_orientation_prior": "mirror_y; exact HD reconfirm required",
+  "protected_artwork": [
+    "OutRun2SP logo",
+    "OutRun2 logo",
+    "road/branch artwork",
+    "Left/Right/Diverge until canonical reconciliation",
+    "all non-Loading pixels"
+  ],
+  "material_advance": "Exact row-slice scopes for the two C103-accepted Loading occurrences; no whole-atlas scan or whole-cell clearing is permitted.",
+  "reused_evidence": {
+    "a56_mapping_blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+    "c_acceptance": "Q00001/C103"
+  },
+  "v2": {
+    "contract": "outrun-first-pass-edit-v2",
+    "default_safety_inset_px": 2,
+    "cell_inner_guard_is_upper_bound_only": true,
+    "clean_plate_required": true,
+    "candidate_generation_permitted": false
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "reused_a47_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+    "reused_a56_mapping_blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+    "reused_a68_blob_sha": "1be098334c00c541fadebe65ffdedf3ca0e391fa"
+  },
+  "candidate_dds_modified": false,
+  "candidate_static_qa": "HOLD_NO_CANDIDATE",
+  "runtime_validation": "UNTESTED"
+}

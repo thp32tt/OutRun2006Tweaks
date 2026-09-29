@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-exact-hd-payload-scope-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00084",
+  "wave_id": "P00021",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-29T16:05:00+09:00",
+  "base_head_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+  "queue_index": 107,
+  "asset": "841E796B",
+  "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+  "exact_release": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+    "git_blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+    "bytes": 4194432,
+    "canvas": [
+      2048,
+      512
+    ],
+    "size_geometry_check": "PASS_128_PLUS_2048x512x4"
+  },
+  "occurrence": {
+    "sprite": "sprite_516",
+    "source": "No Handicap",
+    "korean": "핸디캡 없음",
+    "hd_cell_xywh": [
+      1476,
+      212,
+      360,
+      200
+    ],
+    "hd_cell_inner_guard_ltrb_2px": [
+      1478,
+      214,
+      1834,
+      410
+    ],
+    "payload_scope": {
+      "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+      "header_bytes": 128,
+      "bytes_per_pixel": 4,
+      "row_stride_bytes": 8192,
+      "rows": 200,
+      "row_slice_bytes": 1440,
+      "row_k_byte_offset_formula": "128 + (212 + k) * 8192 + 5904, 0 <= k < 200",
+      "first_row_start_byte": 1742736,
+      "final_row_start_byte": 3372944,
+      "final_row_end_exclusive_byte": 3374384,
+      "file_bytes": 4194432,
+      "in_file_bounds": true,
+      "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+    },
+    "v2_gate": "EXACT_NO_HANDICAP_GLYPH_EFFECT_MASK + CLEAN_PLATE REQUIRED; inner guard is NOT candidate_safe_bbox"
+  },
+  "preserve_cells": [
+    "sprite_507",
+    "sprite_508",
+    "sprite_509",
+    "sprite_510",
+    "sprite_511",
+    "sprite_512",
+    "sprite_513",
+    "sprite_514",
+    "sprite_515"
+  ],
+  "preserve_policy": "Ferrari/model names, vehicle pictograms, blue model cards and brand/model artwork must remain byte/pixel faithful.",
+  "raw_orientation_prior": "mirror_y; exact HD reconfirm required",
+  "material_advance": "Exact row-slice scope for the sole C103-accepted localizable card while explicitly excluding all nine preserve-only Ferrari/model cards.",
+  "reused_evidence": {
+    "a56_mapping_blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+    "c_acceptance": "Q00001/C103"
+  },
+  "v2": {
+    "contract": "outrun-first-pass-edit-v2",
+    "default_safety_inset_px": 2,
+    "cell_inner_guard_is_upper_bound_only": true,
+    "clean_plate_required": true,
+    "candidate_generation_permitted": false
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "reused_a47_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+    "reused_a56_mapping_blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+    "reused_a68_blob_sha": "1be098334c00c541fadebe65ffdedf3ca0e391fa"
+  },
+  "candidate_dds_modified": false,
+  "candidate_static_qa": "HOLD_NO_CANDIDATE",
+  "runtime_validation": "UNTESTED"
+}

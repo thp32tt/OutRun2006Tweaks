@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00084",
+  "wave_id": "P00021",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T16:05:00+09:00",
+  "precommit_head_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_HD_PAYLOAD_SCOPES_FOR_V2_SOURCE_MASKING",
+  "selection": {
+    "selected_indices": [
+      59,
+      65,
+      107,
+      175
+    ],
+    "selected_assets": [
+      "7CE1CFC5",
+      "EBEF6D20",
+      "841E796B",
+      "754F0599"
+    ],
+    "skipped_qa_pending_indices": [
+      35,
+      43,
+      49,
+      55,
+      95,
+      101,
+      119
+    ],
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "reason": "All four selected assets have prior reconstruction/mapping evidence already reconciled by C or retained in current shared queue; current v2 contract requires new exact source-mask/CLEAN_PLATE stages. No current A QA-pending asset is reused."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_EXACT_HD_PAYLOAD_SCOPE_INPUTS",
+    "assets_advanced": 4,
+    "physical_localizable_occurrences_with_exact_payload_scopes": 7,
+    "additional_atlas_cells_scoped_for_direct_semantic_inspection": 5,
+    "total_payload_scopes": 12,
+    "candidate_dds_written": false,
+    "shared_state_modified": false,
+    "description": "Converts accepted cell geometry into exact raw payload row/block scopes at immutable Release blobs, so the next pass can isolate source glyph/effect masks without scanning or rewriting unrelated atlas regions."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260929-1605-A00084-P00021/A00084_59_7CE1CFC5_EXACT_PAYLOAD_SCOPE.json",
+    "localization/graphics/role_A/20260929-1605-A00084-P00021/A00084_65_EBEF6D20_EXACT_PAYLOAD_SCOPE.json",
+    "localization/graphics/role_A/20260929-1605-A00084-P00021/A00084_107_841E796B_EXACT_PAYLOAD_SCOPE.json",
+    "localization/graphics/role_A/20260929-1605-A00084-P00021/A00084_175_754F0599_EXACT_PAYLOAD_SCOPE.json"
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_59_65_107_175",
+    "work_steal": "NONE",
+    "exact_release_blob_identity": "PASS_4_OF_4_MATCH_PINNED_UPSTREAM_GITHUB_METADATA",
+    "size_geometry": "PASS_4_OF_4",
+    "payload_scope_bounds": "PASS_12_OF_12_IN_FILE",
+    "mapped_semantics": "PASS_REUSED_C_RECONCILED_59_65_107; 175_SEMANTIC_BINDING_REMAINS_HOLD",
+    "v2_safety_inset_policy": "RECORDED_2PX_CELL_INNER_GUARDS_AS_UPPER_BOUNDS_ONLY_NOT_CANDIDATE_SAFE_BBOX",
+    "exact_source_glyph_effect_bbox": "HOLD_STRICT_RECHECK",
+    "clean_plate": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_alpha_mips": "UNCHANGED_NO_DDS_WRITE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "reused_a47_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+    "reused_a56_mapping_blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+    "reused_a68_blob_sha": "1be098334c00c541fadebe65ffdedf3ca0e391fa"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

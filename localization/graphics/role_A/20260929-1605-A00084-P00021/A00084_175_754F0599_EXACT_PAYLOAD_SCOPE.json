@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-exact-hd-payload-scope-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00084",
+  "wave_id": "P00021",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-09-29T16:05:00+09:00",
+  "base_head_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+  "queue_index": 175,
+  "asset": "754F0599",
+  "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+  "exact_release": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/754F0599_512x256.dds",
+    "git_blob_sha": "60cbe90be5765b4ade3ce80916d9b2c7ed23e589",
+    "bytes": 8388736,
+    "canvas": [
+      2048,
+      1024
+    ],
+    "size_geometry_check": "PASS_128_PLUS_2048x1024x4"
+  },
+  "canonical_semantics": [
+    {
+      "source": "stage select",
+      "korean": "스테이지 선택"
+    },
+    {
+      "source": "showroom",
+      "korean": "쇼룸"
+    },
+    {
+      "source": "single player",
+      "korean": "싱글 플레이"
+    },
+    {
+      "source": "system link",
+      "korean": "시스템 링크"
+    },
+    {
+      "source": "xbox live",
+      "korean": "Xbox Live"
+    }
+  ],
+  "atlas_regions": [
+    {
+      "region_index": 0,
+      "sprite": "sprite_489",
+      "hd_cell_xywh": [
+        0,
+        868,
+        2048,
+        156
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        2,
+        870,
+        2046,
+        1022
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 156,
+        "row_slice_bytes": 8192,
+        "row_k_byte_offset_formula": "128 + (868 + k) * 8192 + 0, 0 <= k < 156",
+        "first_row_start_byte": 7110784,
+        "final_row_start_byte": 8380544,
+        "final_row_end_exclusive_byte": 8388736,
+        "file_bytes": 8388736,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "semantic_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED"
+    },
+    {
+      "region_index": 1,
+      "sprite": "sprite_490",
+      "hd_cell_xywh": [
+        0,
+        712,
+        2048,
+        156
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        2,
+        714,
+        2046,
+        866
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 156,
+        "row_slice_bytes": 8192,
+        "row_k_byte_offset_formula": "128 + (712 + k) * 8192 + 0, 0 <= k < 156",
+        "first_row_start_byte": 5832832,
+        "final_row_start_byte": 7102592,
+        "final_row_end_exclusive_byte": 7110784,
+        "file_bytes": 8388736,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "semantic_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED"
+    },
+    {
+      "region_index": 2,
+      "sprite": "sprite_491",
+      "hd_cell_xywh": [
+        0,
+        556,
+        2048,
+        156
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        2,
+        558,
+        2046,
+        710
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 156,
+        "row_slice_bytes": 8192,
+        "row_k_byte_offset_formula": "128 + (556 + k) * 8192 + 0, 0 <= k < 156",
+        "first_row_start_byte": 4554880,
+        "final_row_start_byte": 5824640,
+        "final_row_end_exclusive_byte": 5832832,
+        "file_bytes": 8388736,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "semantic_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED"
+    },
+    {
+      "region_index": 3,
+      "sprite": "sprite_492",
+      "hd_cell_xywh": [
+        0,
+        400,
+        2048,
+        156
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        2,
+        402,
+        2046,
+        554
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 156,
+        "row_slice_bytes": 8192,
+        "row_k_byte_offset_formula": "128 + (400 + k) * 8192 + 0, 0 <= k < 156",
+        "first_row_start_byte": 3276928,
+        "final_row_start_byte": 4546688,
+        "final_row_end_exclusive_byte": 4554880,
+        "file_bytes": 8388736,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "semantic_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED"
+    },
+    {
+      "region_index": 4,
+      "sprite": "sprite_493",
+      "hd_cell_xywh": [
+        0,
+        244,
+        2048,
+        156
+      ],
+      "hd_cell_inner_guard_ltrb_2px": [
+        2,
+        246,
+        2046,
+        398
+      ],
+      "payload_scope": {
+        "model": "LINEAR_32BPP_SIZE_GEOMETRY",
+        "header_bytes": 128,
+        "bytes_per_pixel": 4,
+        "row_stride_bytes": 8192,
+        "rows": 156,
+        "row_slice_bytes": 8192,
+        "row_k_byte_offset_formula": "128 + (244 + k) * 8192 + 0, 0 <= k < 156",
+        "first_row_start_byte": 1998976,
+        "final_row_start_byte": 3268736,
+        "final_row_end_exclusive_byte": 3276928,
+        "file_bytes": 8388736,
+        "in_file_bounds": true,
+        "caveat": "Payload size is exactly 128 + width*height*4. Channel masks/FourCC are not re-decoded in this task; preserve the exact source header and bytes outside selected row slices."
+      },
+      "semantic_assignment": "HOLD_DIRECT_DECODED_SOURCE_INSPECTION_REQUIRED"
+    }
+  ],
+  "material_advance": "Pins exact linear payload row slices for all five HD atlas cells. This turns the previously C106-accepted stock-to-4x geometry into directly executable per-cell source inspection while semantic-to-sprite binding remains fail-closed.",
+  "reused_evidence": {
+    "a68_blob_sha": "1be098334c00c541fadebe65ffdedf3ca0e391fa",
+    "c_acceptance": "Q00004/C106"
+  },
+  "v2": {
+    "contract": "outrun-first-pass-edit-v2",
+    "default_safety_inset_px": 2,
+    "cell_inner_guard_is_upper_bound_only": true,
+    "exact_source_effect_bbox": "HOLD_STRICT_RECHECK",
+    "clean_plate_required": true,
+    "candidate_generation_permitted": false
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "reused_a47_blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+    "reused_a56_mapping_blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+    "reused_a68_blob_sha": "1be098334c00c541fadebe65ffdedf3ca0e391fa"
+  },
+  "candidate_dds_modified": false,
+  "candidate_static_qa": "HOLD_NO_CANDIDATE",
+  "runtime_validation": "UNTESTED"
+}
