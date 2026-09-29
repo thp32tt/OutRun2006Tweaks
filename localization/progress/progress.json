@@ -169,7 +169,7 @@
     "work_queue_file": "localization/graphics/asset_queue.csv",
     "artwork_completed": 0,
     "transcribed_assets": 95,
-    "transcribed_segments": 754,
+    "transcribed_segments": 753,
     "transcription_state_file": "localization/graphics/transcriptions.jsonl",
     "artwork_proof_specs": 7,
     "artwork_pipeline": "deterministic PNG proof renderer committed; DDS preservation gate pending",
@@ -186,7 +186,7 @@
     "blocked_context_assets": 0,
     "blocked_context_indices": [],
     "artwork_plan_assets": 95,
-    "artwork_plan_segments": 754,
+    "artwork_plan_segments": 753,
     "artwork_proof_candidates": 7,
     "simple6_package": {
       "name": "OutRun2_Korean_GFX_Proof_Simple6.zip",
@@ -848,5 +848,54 @@
       "C075FB49",
       "FD90AA9"
     ]
+  },
+  "latest_c_batch_qa": {
+    "recorded_at_kst": "2026-09-29T15:34:00+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00078",
+    "qa_batch_id": "Q00005",
+    "run": "C107",
+    "result": "PASS_Q00005_TWO_B_INPUTS_7_ASSETS_45_SEMANTICS_42_CELL_MAPPING_1_LOGO_PRESERVE_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
+    "qa_batch_inputs": [
+      "LOCALIZATION-LOCALIZATION_B-00073@683b87c323593333f471256e4a167d9ae73a53a0",
+      "LOCALIZATION-LOCALIZATION_B-00076@b2f19f6d31246e874abec638719a721e150313b4"
+    ],
+    "reviewed_indices": [
+      86,
+      92,
+      98,
+      100,
+      106,
+      112,
+      152
+    ],
+    "qa_dispositions": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
+        "result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+        "status": "PASS",
+        "reason": "B00073 exact-HD reconstruction/layout evidence accepted. Direct GitHub re-fetch matched 4/4 immutable HD DDS blobs, 8/8 raw/readable evidence PNG blobs, and the reused B110 heavy-QA report blob. All 10/10 producer source/Korean semantic pairs still match current canonical metadata, all 10/10 measured fill bboxes are inside exact HD dimensions, and flip_y is consistently proven for all four assets. No new Korean candidate DDS exists in this producer result, so decoded-final 1px containment, compression, alpha, slant/style and ENGLISH SOURCE vs KOREAN CANDIDATE gates remain HOLD_STRICT_RECHECK rather than being promoted."
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
+        "result_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+        "status": "PASS",
+        "reason": "B00076 direct semantic-cell mapping evidence accepted. Direct GitHub re-fetch matched 3/3 immutable HD DDS blobs, 3/3 lane mapping-reference PNG blobs, the reused B111 heavy-QA report blob, and the pinned C101 consumer record. All 35/35 producer semantic pairs match pre-merge canonical metadata and all 42/42 reported atlas-to-stock cell relations are exact x4. The 788CE557 OutRun2SP occurrence is confirmed as a protected logo wordmark; C removes only that one item from Korean raster localization while retaining the other three localizable semantics. No Korean candidate DDS exists, so candidate-only pixel gates remain HOLD_STRICT_RECHECK."
+      }
+    ],
+    "source_identity_validation": "PASS_21_OF_21_DIRECT_GITHUB_BLOB_CHECKS__B110_B111_C101_HEAVY_QA_REUSED_UNCHANGED",
+    "canonical_semantic_validation": "PASS_45_OF_45_PRODUCER_PAIRS__INDEX106_OUTRUN2SP_RECONCILED_TO_PROTECTED_ORIGINAL",
+    "geometry_mapping_validation": "PASS_B73_10_OF_10_HD_FILL_BOUNDS_AND_FLIP_Y_4_OF_4__B76_42_OF_42_EXACT_X4_CELL_RELATIONS",
+    "metadata_reconciled_segments_removed": 1,
+    "canonical_transcribed_segments_after_merge": 753,
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00077"
+    ],
+    "candidate_dds_modified": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20260929-1534-C107/C107_Q00005_INDEPENDENT_QA_BATCH.json"
   }
 }

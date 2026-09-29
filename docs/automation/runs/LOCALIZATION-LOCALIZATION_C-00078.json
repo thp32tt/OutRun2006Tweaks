@@ -1,0 +1,88 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00078",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00005",
+  "qa_batch_id": "Q00005",
+  "recorded_at_kst": "2026-09-29T15:34:00+09:00",
+  "base_head_sha": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
+  "result": "PASS_Q00005_TWO_B_INPUTS_7_ASSETS_45_SEMANTICS_42_CELL_MAPPING_1_LOGO_PRESERVE_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Independent Q00005 batch accepted B00073 exact-HD orientation/layout evidence and B00076 direct semantic-cell mappings, then reconciled 788CE557 OutRun2SP as a protected original logo wordmark. No Korean DDS candidate bytes or runtime evidence were produced; candidate-only raster/DDS gates remain strict HOLD.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+      "producer_id": "P00013"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+      "producer_id": "P00015"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
+      "result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+      "status": "PASS",
+      "reason": "B00073 exact-HD reconstruction/layout evidence accepted. Direct GitHub re-fetch matched 4/4 immutable HD DDS blobs, 8/8 raw/readable evidence PNG blobs, and the reused B110 heavy-QA report blob. All 10/10 producer source/Korean semantic pairs still match current canonical metadata, all 10/10 measured fill bboxes are inside exact HD dimensions, and flip_y is consistently proven for all four assets. No new Korean candidate DDS exists in this producer result, so decoded-final 1px containment, compression, alpha, slant/style and ENGLISH SOURCE vs KOREAN CANDIDATE gates remain HOLD_STRICT_RECHECK rather than being promoted."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
+      "result_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+      "status": "PASS",
+      "reason": "B00076 direct semantic-cell mapping evidence accepted. Direct GitHub re-fetch matched 3/3 immutable HD DDS blobs, 3/3 lane mapping-reference PNG blobs, the reused B111 heavy-QA report blob, and the pinned C101 consumer record. All 35/35 producer semantic pairs match pre-merge canonical metadata and all 42/42 reported atlas-to-stock cell relations are exact x4. The 788CE557 OutRun2SP occurrence is confirmed as a protected logo wordmark; C removes only that one item from Korean raster localization while retaining the other three localizable semantics. No Korean candidate DDS exists, so candidate-only pixel gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      86,
+      92,
+      98,
+      100,
+      106,
+      112,
+      152
+    ],
+    "reviewed_assets": 7,
+    "producer_semantics_validated": 45,
+    "b00073_fill_regions_validated": 10,
+    "b00076_physical_cells_validated": 42,
+    "metadata_segments_removed_as_protected_logo": 1,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "input_candidate_dds_modified": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-1534-C107/C107_Q00005_INDEPENDENT_QA_BATCH.json"
+  },
+  "source_identity_validation": "PASS_21_OF_21_DIRECT_GITHUB_BLOB_CHECKS__B110_B111_C101_HEAVY_QA_REUSED_UNCHANGED",
+  "canonical_semantic_validation": "PASS_45_OF_45_PRODUCER_PAIRS__INDEX106_OUTRUN2SP_RECONCILED_TO_PROTECTED_ORIGINAL",
+  "geometry_mapping_validation": "PASS_B73_10_OF_10_HD_FILL_BOUNDS_AND_FLIP_Y_4_OF_4__B76_42_OF_42_EXACT_X4_CELL_RELATIONS",
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00077"
+    ],
+    "result": "NONE_AT_BASE_HEAD"
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

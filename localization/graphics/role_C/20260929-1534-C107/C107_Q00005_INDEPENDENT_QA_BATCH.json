@@ -1,0 +1,103 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00078",
+  "attempt": "1/3",
+  "wave_id": "Q00005",
+  "qa_batch_id": "Q00005",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T15:34:00+09:00",
+  "base_head_sha": "0dca6ef541a57f1c01b29b65bd56daa96f2388c9",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+      "producer_id": "P00013"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+      "producer_id": "P00015"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
+      "result_sha": "683b87c323593333f471256e4a167d9ae73a53a0",
+      "status": "PASS",
+      "reason": "B00073 exact-HD reconstruction/layout evidence accepted. Direct GitHub re-fetch matched 4/4 immutable HD DDS blobs, 8/8 raw/readable evidence PNG blobs, and the reused B110 heavy-QA report blob. All 10/10 producer source/Korean semantic pairs still match current canonical metadata, all 10/10 measured fill bboxes are inside exact HD dimensions, and flip_y is consistently proven for all four assets. No new Korean candidate DDS exists in this producer result, so decoded-final 1px containment, compression, alpha, slant/style and ENGLISH SOURCE vs KOREAN CANDIDATE gates remain HOLD_STRICT_RECHECK rather than being promoted."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00076",
+      "result_sha": "b2f19f6d31246e874abec638719a721e150313b4",
+      "status": "PASS",
+      "reason": "B00076 direct semantic-cell mapping evidence accepted. Direct GitHub re-fetch matched 3/3 immutable HD DDS blobs, 3/3 lane mapping-reference PNG blobs, the reused B111 heavy-QA report blob, and the pinned C101 consumer record. All 35/35 producer semantic pairs match pre-merge canonical metadata and all 42/42 reported atlas-to-stock cell relations are exact x4. The 788CE557 OutRun2SP occurrence is confirmed as a protected logo wordmark; C removes only that one item from Korean raster localization while retaining the other three localizable semantics. No Korean candidate DDS exists, so candidate-only pixel gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "result": "PASS_Q00005_TWO_B_INPUTS_7_ASSETS_45_SEMANTICS_42_CELL_MAPPING_1_LOGO_PRESERVE_RECONCILED_NO_DDS_RUNTIME_UNTESTED",
+  "source_identity_validation": {
+    "direct_git_blob_checks": "PASS_21_OF_21",
+    "direct_breakdown": {
+      "immutable_hd_dds": 7,
+      "lane_evidence_png": 11,
+      "reused_heavy_qa_reports": 2,
+      "pinned_c_consumer_record": 1
+    },
+    "reused_heavy_qa": "B110/B111/C101 header-format-mipmap/source/alpha identities reused because exact dependency fingerprints are unchanged; no candidate DDS exists in either input.",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754"
+  },
+  "semantic_validation": {
+    "b00073": "PASS_10_OF_10",
+    "b00076": "PASS_35_OF_35_PRE_MERGE",
+    "total_producer_semantics": "PASS_45_OF_45",
+    "canonical_reconciliation": "REMOVE_1_PROTECTED_OUTRUN2SP_LOGO_FROM_INDEX_106_LOCALIZATION_SEGMENTS",
+    "canonical_segments_after_merge": 753
+  },
+  "geometry_validation": {
+    "b00073_measured_fill_bboxes": "PASS_10_OF_10_INSIDE_EXACT_HD_DIMENSIONS",
+    "b00073_source_text_transform": "PASS_FLIP_Y_4_OF_4",
+    "b00076_physical_cells": 42,
+    "b00076_x4_atlas_to_stock_relations": "PASS_42_OF_42"
+  },
+  "reviewed_indices": [
+    86,
+    92,
+    98,
+    100,
+    106,
+    112,
+    152
+  ],
+  "metadata_reconciled_segments_removed": 1,
+  "queue_counts_after": {
+    "localize_text": 93,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "zoom_review": 31,
+    "preserve_brand_song_credit": 3
+  },
+  "pending_production_localize_text_after": 76,
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00077"
+    ],
+    "result": "PASS_NO_NEWER_SAME_ASSET_PRODUCER_OR_CANDIDATE_BYTES_AT_BASE_HEAD"
+  },
+  "candidate_dds_modified": false,
+  "input_candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "candidate_only_gates": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_DDS",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false
+}
