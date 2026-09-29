@@ -24,6 +24,16 @@ Progress-path compatibility: `localization/progress/progress.json` is the canoni
 - Preserve source style: fill/gradient, outline, shadow/glow, proportions, alignment, scale and spacing.
 - Reject seams, black lines, erasure residue, opaque boxes, alpha halos, clipping, overlap and unintended artwork changes.
 
+## Canonical HD source acquisition
+- The canonical external HD graphics bundle for the current localization baseline is pinned to GitHub repository `envido32/OR2006Sprites`, release tag `v0.25.10a`, release asset `OR2-HD-GUI-v0.25.10a.zip` (GitHub release asset ID `306630789`). Do **not** follow `latest`; newer upstream releases, including v0.26.09a, are not the current localization baseline unless the project explicitly migrates its inventory.
+- Pinned release page: `https://github.com/envido32/OR2006Sprites/releases/tag/v0.25.10a`. Pinned asset download: `https://github.com/envido32/OR2006Sprites/releases/download/v0.25.10a/OR2-HD-GUI-v0.25.10a.zip`.
+- GitHub reports the pinned ZIP digest as SHA-256 `76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958` and size `306223257` bytes. A/B/C or supporting automation MUST verify this bundle identity before treating extracted bytes as canonical.
+- Missing canonical DDS bytes in the localization repository are **not** by themselves a production blocker. When a queue item requires its English HD source and the source is absent from the current branch, fetch the pinned GitHub Release asset, verify the pinned bundle digest, extract only the required DDS path(s), then verify each extracted DDS against the project's existing canonical inventory identity before measuring, masking, rendering, or QA.
+- External source acquisition is read-only input. Do not commit the entire upstream ZIP or unrelated upstream DDS files into this repository. Commit only localization outputs and the evidence required by the existing lane/QA contract.
+- If an extracted DDS does not match the project's pinned per-asset inventory SHA/dimensions/format, fail closed for that asset and record `SOURCE_IDENTITY_MISMATCH`; do not silently substitute a newer upstream file, a Release/stock atlas, or a previous Korean candidate.
+- Source acquisition and verification should happen inside the same producer invocation as reconstruction/rendering whenever the remaining prerequisites are deterministic. Do not create repeated `canonical source reacquisition` preflight tasks merely because the branch itself does not contain source DDS bytes.
+- The GitHub-only rule permits this pinned upstream GitHub Release because it is a GitHub-hosted canonical input. N100 local clones/worktrees and Google Drive remain non-authoritative fallbacks unless the user explicitly changes the project policy.
+
 ## Zero-pixel-overflow rule
 All new, modified and previously approved graphics are subject to exhaustive containment QA.
 For each text element determine the original/HD baseline's actual non-transparent text-pixel bounding box and the applicable sprite-cell/text-region boundary. Compare the localized non-transparent pixels including outline, shadow, glow and alpha fringe.
