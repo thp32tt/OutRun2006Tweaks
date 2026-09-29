@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 36,
+  "completedCycles": 37,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "6bf80e4c7a9e0fae8ad06da2ef08079ca0987c0e",
+  "currentHead": "dc1a64dd83b1604706207b8b105f64abef1c3157",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1076,12 +1076,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "inspect stage marker/head-follow ownership"
+    },
+    {
+      "cycle": 37,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "ProjectedWorldMarker2D is intentionally an exact queue owner distinct from ScreenHud and WorldBillboard. Head-follow/stereo errors in stage/rank markers should preserve that distinction; collapsing them into ScreenHud would destroy world-anchor semantics."
+      ],
+      "evidence": [
+        "RenderScope::ProjectedWorldMarker2D and IsExactHudScope"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "dc1a64dd83b1604706207b8b105f64abef1c3157"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect rival marker vehicle/world anchor"
     }
   ],
   "nextCycle": {
-    "cycle": 37,
+    "cycle": 38,
     "priority": [
-      "inspect stage marker/head-follow ownership"
+      "inspect rival marker vehicle/world anchor"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
