@@ -131,8 +131,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "PENDING_POST_COMMIT",
-  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "result_sha": "29c0f8f37786d025a3c9a4b168c6232860573745",
+  "authoritative_result_sha": "29c0f8f37786d025a3c9a4b168c6232860573745",
   "result_commit_message": "localization(B): persist index193 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00231]",
   "fingerprints": {
     "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
@@ -144,5 +144,18 @@
     "c00228_blob_sha": "166cee891bf8fb636d664c46c6eb7ec7fc39a19e",
     "c00233_blob_sha": "82dd33fcc9e8ee5f053637822b74fd1aefae89e6",
     "b00223_blob_sha": "faedc7b53a3c89dde49d9e09fd63eab88b788c9d"
-  }
+  },
+  "drive_material_registration": {
+    "producer_task_id": "LOCALIZATION-LOCALIZATION_B-00231",
+    "producing_result_sha": "29c0f8f37786d025a3c9a4b168c6232860573745",
+    "role": "LOCALIZATION_B",
+    "validation_state": "PENDING_C_BATCH_GATE",
+    "runtime_validation": "UNTESTED",
+    "drive_folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "candidate_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+    "candidate_archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+    "candidate_inner_dds_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d"
+  },
+  "bookkeeping_recorded_at_kst": "2026-09-30T07:50:37+09:00",
+  "bookkeeping_note": "Verified immutable producer result 29c0f8f3... is exactly one commit ahead of parent and changes only the B lane-local task/production/prompt/QA JSON files. Exact DDS and review binaries are registered under Drive CURRENT_PIPELINE with hashes and IDs above. This bookkeeping commit uses CI skip and does not replace the producer result; automation_validation remains PENDING/C_BATCH_GATE and runtime_validation remains UNTESTED."
 }
