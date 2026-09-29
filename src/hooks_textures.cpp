@@ -655,10 +655,20 @@ class TextureReplacement : public Hook
 		const void* returnAddress = _ReturnAddress();
 		const auto producerScope =
 			OutRunVR::GameSemantic::ProducerScope();
-		const auto semanticScope =
+		auto semanticScope =
 			producerScope != OutRunVR::GameSemantic::RenderScope::None
 			? producerScope
 			: OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+		if (semanticScope == OutRunVR::GameSemantic::RenderScope::None &&
+			OutRunVR::GameSemantic::TransientOutRunHudActive() &&
+			returnAddress == Module::exe_ptr(0x28E86))
+		{
+			semanticScope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+			static std::atomic<bool> firstR73ResultSprite2Logged{ false };
+			if (!firstR73ResultSprite2Logged.exchange(true))
+				spdlog::info(
+					"VR R73 OUTRUN COMPANION HUD: put_sprite_ex2 0x28E81 promoted SCREEN_HUD inside bounded checkpoint/result window");
+		}
 		const auto* producerMarker =
 			OutRunVR::GameSemantic::ProducerProjectedMarker();
 		const int semanticPrio = VrSpritePriorityIndex(a2);
@@ -704,10 +714,20 @@ class TextureReplacement : public Hook
 		const void* returnAddress = _ReturnAddress();
 		const auto producerScope =
 			OutRunVR::GameSemantic::ProducerScope();
-		const auto semanticScope =
+		auto semanticScope =
 			producerScope != OutRunVR::GameSemantic::RenderScope::None
 			? producerScope
 			: OutRunVRHudInspector::ResolveRenderScope(returnAddress);
+		if (semanticScope == OutRunVR::GameSemantic::RenderScope::None &&
+			OutRunVR::GameSemantic::TransientOutRunHudActive() &&
+			returnAddress == Module::exe_ptr(0x2D271))
+		{
+			semanticScope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+			static std::atomic<bool> firstR73ResultSpriteLogged{ false };
+			if (!firstR73ResultSpriteLogged.exchange(true))
+				spdlog::info(
+					"VR R73 OUTRUN COMPANION HUD: put_sprite_ex 0x2D26C promoted SCREEN_HUD inside bounded result window");
+		}
 		const auto* producerMarker =
 			OutRunVR::GameSemantic::ProducerProjectedMarker();
 		const int semanticPrio = VrSpritePriorityIndex(a2);
