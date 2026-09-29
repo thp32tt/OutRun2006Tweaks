@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
+#include "vr/game/render_semantics.hpp"
 
 namespace OutRunVRRenderer
 {
@@ -161,10 +162,39 @@ namespace SumoUISpriteReplay
 		uint32_t kind;
 		SPRARGS args;
 		SPRARGS2 args2;
+		OutRunVR::GameSemantic::RenderScope sourceScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+		OutRunVR::GameSemantic::ProjectedMarkerInfo sourceMarker{};
+		OutRunVR::GameSemantic::SpriteNodeOwner sourceOwner =
+			OutRunVR::GameSemantic::SpriteNodeOwner::None;
+		std::uint64_t sourceSerial = 0;
+		std::uint64_t payloadHash = 0;
 	};
 
 	static Entry Captured[Game::SpriteNodeMax];
 	static int CapturedCount = 0;
+	static std::atomic<std::uint64_t> ExactSourceCaptured{ 0 };
+	static std::atomic<std::uint64_t> ReplaySemanticMismatch{ 0 };
+
+	static std::uint64_t hashBytes(
+		const void* data, std::size_t size,
+		std::uint64_t h = 1469598103934665603ull) noexcept
+	{
+		const auto* p = static_cast<const unsigned char*>(data);
+		for (std::size_t i = 0; i < size; ++i)
+		{
+			h ^= p[i];
+			h *= 1099511628211ull;
+		}
+		return h;
+	}
+
+	static std::uint64_t payloadHash(const Entry& entry) noexcept
+	{
+		std::uint64_t h = hashBytes(&entry.kind, sizeof(entry.kind));
+		h = hashBytes(&entry.args, sizeof(entry.args), h);
+		return hashBytes(&entry.args2, sizeof(entry.args2), h);
+	}
 
 	static bool available()
 	{
@@ -196,6 +226,23 @@ namespace SumoUISpriteReplay
 				entry.kind = node->kind_C;
 				entry.args = node->args_10;
 				entry.args2 = node->args2_58;
+				entry.sourceScope =
+					OutRunVR::GameSemantic::PeekSpriteNodeScope(
+						node, &entry.sourceMarker,
+						&entry.sourceOwner, &entry.sourceSerial);
+				entry.payloadHash = payloadHash(entry);
+				if (OutRunVR::GameSemantic::IsExactHudScope(entry.sourceScope))
+				{
+					const auto count = ExactSourceCaptured.fetch_add(
+						1, std::memory_order_relaxed) + 1;
+					if ((count & (count - 1)) == 0)
+						spdlog::info(
+							"VR R77 REPLAY CAPTURE: exact source node=0x{:08x} scope={} owner={} serial={} hash=0x{:016x} count={}",
+							reinterpret_cast<std::uintptr_t>(node),
+							OutRunVR::GameSemantic::Name(entry.sourceScope),
+							static_cast<unsigned>(entry.sourceOwner),
+							entry.sourceSerial, entry.payloadHash, count);
+				}
 			}
 		}
 	}
@@ -235,6 +282,30 @@ namespace SumoUISpriteReplay
 			node->kind_C = entry.kind;
 			node->args_10 = entry.args;
 			node->args2_58 = entry.args2;
+
+			OutRunVR::GameSemantic::ProjectedMarkerInfo replayMarker{};
+			OutRunVR::GameSemantic::SpriteNodeOwner replayOwner =
+				OutRunVR::GameSemantic::SpriteNodeOwner::None;
+			std::uint64_t replaySerial = 0;
+			const auto replayScope =
+				OutRunVR::GameSemantic::PeekSpriteNodeScope(
+					node, &replayMarker, &replayOwner, &replaySerial);
+			if (OutRunVR::GameSemantic::IsExactHudScope(entry.sourceScope) &&
+				replayScope != entry.sourceScope)
+			{
+				const auto count = ReplaySemanticMismatch.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((count & (count - 1)) == 0)
+					spdlog::warn(
+						"VR R77 REPLAY SEMANTIC LOSS: sourceScope={} replayScope={} sourceSerial={} replaySerial={} sourceOwner={} replayOwner={} replayNode=0x{:08x} hash=0x{:016x} count={}",
+						OutRunVR::GameSemantic::Name(entry.sourceScope),
+						OutRunVR::GameSemantic::Name(replayScope),
+						entry.sourceSerial, replaySerial,
+						static_cast<unsigned>(entry.sourceOwner),
+						static_cast<unsigned>(replayOwner),
+						reinterpret_cast<std::uintptr_t>(node),
+						entry.payloadHash, count);
+			}
 		}
 	}
 
