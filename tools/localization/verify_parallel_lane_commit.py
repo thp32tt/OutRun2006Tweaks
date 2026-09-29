@@ -88,9 +88,13 @@ if lane in {"A", "B", "E"}:
     if dds_changes:
         evidence_prefix = f"localization/graphics/role_{lane}/"
         evidence = [p for p in changed if p.startswith(evidence_prefix) and (p.endswith(".json") or p.endswith(".png") or p.endswith(".jpg"))]
-        required_tokens = ("CLEAN", "SOURCE", "CANDIDATE", "COMPARE", "QA", "MASK")
-        if not any(any(t in pathlib.PurePosixPath(p).name.upper() for t in required_tokens) for p in evidence):
-            print(f"{task_id}: DDS change blocked: missing post-reset clean-generation QA evidence")
+        # This lane-isolation verifier checks that a DDS-producing A/B/E task
+        # carries lane-local evidence. Machine-readable PASS provenance,
+        # zero-pixel/protected-mask metrics and prompt/slant gates are enforced
+        # separately by verify_automation_commit.py on the same immutable SHA.
+        # Do not infer QA validity from evidence filenames.
+        if not evidence:
+            print(f"{task_id}: DDS change blocked: missing lane-local production/QA evidence")
             raise SystemExit(1)
 
     run_prefix = "docs/automation/runs/"
