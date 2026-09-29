@@ -1,0 +1,107 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00100",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00033",
+  "recorded_at_kst": "2026-09-29T17:08:42+09:00",
+  "base_sha": "b7ce5c1ae43b238846d6f1f44e6a8dca0139630f",
+  "material_commit_sha": "1997005c3dab3db46df90dc3082a67749ef17c73",
+  "pre_task_record_head_sha": "1997005c3dab3db46df90dc3082a67749ef17c73",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_37_UNITS",
+  "summary": "Advanced Q00008/C110-consumed even indices 46/48/50/62 from 37 independently accepted exact Release RGBA32 payload scopes into 37 deterministic first-pass-v2 source-effect-mask/CLEAN_PLATE work units covering 40 mapped physical semantic occurrences. Added strict 2px cell inner guards as upper bounds only, retained four index-50 unmapped semantics as explicit HOLD, and did not fabricate source-effect bboxes, masks, clean plates, candidate-safe bboxes, or Korean DDS pixels. No shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1708-B129-P00033/B129_P00033_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "evidence_blob_sha": "33ed68198b6f90c6731bcfa2bd3dfd249c9b5962",
+  "material_deliverable": {
+    "type": "FOUR_EVEN_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "assets": [
+      "AA04D779",
+      "B1696633",
+      "CBF8ECBF",
+      "33491F83"
+    ],
+    "deterministic_localize_work_units": 37,
+    "localizable_physical_semantic_occurrences": 40,
+    "unresolved_semantics_retained": 4,
+    "rgba32_work_units": 37,
+    "c110_accepted_payload_scopes_reused": 37,
+    "new_two_px_inner_guards": 37,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00085",
+    "producer_result_sha": "7dca0c99022e0938102b8fc9e7bc27ccd0a301fd",
+    "producer_report_blob_sha": "749b5e4bac2807b1f1b443fdcb287957aa55b440",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00089",
+    "c_acceptance_record_blob_sha": "d081bdc2cc7f618ba80dbf004ea2df90f1dc3169",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "fb8790a70f0ace95e1cfe7d185042a9b1da6a70f",
+    "reason": "C110 independently accepted the immutable source identities, current canonical semantics and all 37 RGBA32 extraction scopes/bounds from B00085. P00033 advances only the changed first-pass-v2 source-mask/CLEAN_PLATE execution contract."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00092": [
+      198,
+      214,
+      230,
+      236
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00095": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00097": [
+      86,
+      100,
+      106,
+      130
+    ]
+  },
+  "dependency_blocked_rework_indices": [
+    94,
+    102
+  ],
+  "strict_hold": {
+    "index50_unmapped_semantics": [
+      "PLEASE WAIT",
+      "PLAYERS",
+      "YOUR FRIENDS",
+      "FRIEND REQUEST"
+    ],
+    "source_effect_bboxes": "HOLD_NOT_YET_MATERIALIZED",
+    "glyph_effect_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "raw_orientation_and_signed_slant": "HOLD_EXACT_DECODE_REQUIRED_PER_ELEMENT",
+    "clean_plates": "HOLD_NOT_YET_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_UNTIL_MEASURED_SOURCE_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_EVEN_ONLY_46_48_50_62__37_OF_37_C110_ACCEPTED_RGBA32_SCOPES__40_MAPPED_PHYSICAL_SEMANTIC_OCCURRENCES__4_OF_4_RGBA32_SIZE_EQUATIONS__37_OF_37_IN_FILE_IN_CANVAS__37_OF_37_NONEMPTY_2PX_GUARDS__ZERO_REGION_OVERLAP__4_INDEX50_UNMAPPED_RETAINED_HOLD__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "The v2 work orders are decode/source-inspection boundaries, not edit masks. Exact decoded per-element orientation, source-effect bboxes, independent glyph/effect removal masks, protected-art masks, independently passing CLEAN_PLATE and measured candidate_safe_bbox remain required before Korean rendering. Index 50 also retains four unmapped semantics. Final DDS/alpha/zero-pixel containment and English-source comparison cannot pass without candidate bytes.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
