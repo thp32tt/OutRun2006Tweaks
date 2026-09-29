@@ -1,0 +1,90 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00125",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00053",
+  "recorded_at_kst": "2026-09-29T19:14:00+09:00",
+  "base_sha": "910cf76e9df41ff2549fabbd1f34c4409ab69985",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_REWORK_C00120_B00113_FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_MANIFESTS",
+  "summary": "Resolved the runnable Q00014/C00120 B00113 source-lineage rework for even indices 26/28/30/32 by retiring the rejected Sonic-TV Release pixel geometry and pinning the four current canonical user-HD inventory SHA-256/canvas identities plus deterministic reacquisition/import gates. Current Git HEAD contains none of the four canonical source files, so header/orientation/mask/CLEAN_PLATE/candidate gates remain fail-closed. Current Total Rank -> 종합 랭크 semantics (6 physical occurrences) are reused without repeating accepted heavy QA. No DDS/shared-state/build/runtime changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1914-B00125-P00053/B00125_P00053_C00120_B00113_CANONICAL_HD_REACQUISITION.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_AND_INVALID_GEOMETRY_RETIREMENT_MANIFESTS",
+    "indices": [
+      26,
+      28,
+      30,
+      32
+    ],
+    "assets": [
+      "63C91067",
+      "A05BF610",
+      "8215FD25",
+      "DCC7B488"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "exact_inventory_canvases_pinned": 4,
+    "canonical_git_queue_path_sources_present": 0,
+    "rejected_release_pixel_geometries_retired": 4,
+    "canonical_semantic_physical_occurrences": 6,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "c_result_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_B-00113",
+    "prior_result_sha": "b4a5e837880d830adc6bd44cbc1a55693ecd8d80",
+    "disposition_defect": "NONCANONICAL_RELEASE_GEOMETRY_PLUS_MISSING_DURABLE_RECORD_AT_PRIOR_MATERIAL_RESULT_SHA",
+    "semantic_qa_repeated": false,
+    "old_pixel_geometry_reused": false,
+    "resolution": "CURRENT_CANONICAL_INVENTORY_HASH_GATED_REACQUISITION_MANIFESTS_PLUS_ATOMIC_TASK_RECORD"
+  },
+  "reused_immutable_evidence": {
+    "prior_b00113_report_blob_sha": "944a3c91ec1b2b24ed1e9045890b71edf35eedc9",
+    "contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "c00120_task_record_blob_sha": "67077f244bd850f3c908ee1d745ff6e668975e32",
+    "b00113_task_record_blob_sha": "71f0ad34794cfc2ca3dee0a6d3313a9d5f6c7b74",
+    "reason": "Reuse only current/C-accepted semantics. Rejected Release pixel geometry is explicitly not reused."
+  },
+  "self_qa": "PASS_EVEN_ONLY_26_28_30_32__4_OF_4_CURRENT_CANONICAL_INVENTORY_IDENTITIES_AND_CANVASES__4_OF_4_CURRENT_GIT_QUEUE_PATHS_ABSENT_FAIL_CLOSED__6_SEMANTIC_OCCURRENCES_REUSED__ZERO_REJECTED_RELEASE_PIXEL_GEOMETRY_REUSED__REPORT_AND_TASK_RECORD_ATOMIC__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact canonical user-HD bytes are absent from current Git HEAD. DDS header/alpha/mips, orientation, source-effect/removal/protected masks, CLEAN_PLATE, candidate_safe_bbox, Korean render, zero-pixel containment and English-source comparison cannot be inferred from the rejected Release geometry.",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_ON_CURRENT_GIT_HEAD",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,249 @@
+{
+  "schema_version": 8,
+  "schema": "outrun-canonical-hd-source-reacquisition-manifest-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00125",
+  "wave_id": "P00053",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T19:14:00+09:00",
+  "precommit_head_sha": "910cf76e9df41ff2549fabbd1f34c4409ab69985",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_REWORK_C00120_B00113_FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_MANIFESTS",
+  "selection": {
+    "selected_indices": [
+      26,
+      28,
+      30,
+      32
+    ],
+    "selected_assets": [
+      "63C91067",
+      "A05BF610",
+      "8215FD25",
+      "DCC7B488"
+    ],
+    "basis": "Q00014/C00120 returned B00113 REWORK_REQUIRED because its Sonic-TV Release geometry/dimensions are not the current canonical user-HD inventory baseline. This task replaces that invalid geometry dependency with exact current inventory identities and deterministic source reacquisition/import gates. It does not repeat C-accepted semantic QA and does not reuse rejected pixel geometry.",
+    "c_returned_rework": true,
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_B-00113"
+  },
+  "current_fingerprints": {
+    "contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "c00120_task_record_blob_sha": "67077f244bd850f3c908ee1d745ff6e668975e32",
+    "b00113_task_record_blob_sha": "71f0ad34794cfc2ca3dee0a6d3313a9d5f6c7b74"
+  },
+  "canonical_source_policy": {
+    "authoritative_source": "localization/graphics/inventory.csv current user-HD identities",
+    "stock_or_sonic_release_role": "semantic/orientation reconstruction prior only; never canonical construction geometry when user-HD source exists",
+    "filename_suffix_dimensions_authoritative": false,
+    "exact_source_required_before_pixel_work": true
+  },
+  "c00120_rework_resolution": {
+    "defect": "B00113 reused noncanonical Sonic-TV Release dimensions/pixel geometry and its immutable material RESULT_SHA lacked the durable task record.",
+    "resolved_now": [
+      "Pinned all four current canonical inventory SHA-256 identities and actual inventory canvases.",
+      "Explicitly invalidated every old Release pixel coordinate/guard/size equation for canonical production.",
+      "Verified all four canonical queue-path source files are absent on the refreshed Git HEAD, so pixel/header claims remain fail-closed.",
+      "Carried only current/C-accepted semantic occurrence counts and Total Rank -> 종합 랭크 wording.",
+      "Prepared material report and task record for one atomic producer result commit."
+    ],
+    "unresolved_dependency": "Exact canonical HD source bytes are not present on current Git HEAD; acquire/import bytes matching the pinned SHA-256 identities before source-effect/CLEAN_PLATE/candidate work."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_AND_INVALID_GEOMETRY_RETIREMENT_MANIFESTS",
+    "assets_advanced": 4,
+    "canonical_inventory_identities_pinned": 4,
+    "exact_inventory_canvas_identities_pinned": 4,
+    "canonical_git_queue_path_sources_present": 0,
+    "rejected_release_pixel_geometries_retired": 4,
+    "c_accepted_semantic_physical_occurrences_reused": 6,
+    "candidate_dds_written": false,
+    "description": "Creates executable source-acquisition/import gates for the four C00120-returned B00113 assets, based only on current canonical inventory identities. Future production can deterministically reject the wrong source before decode and can no longer accidentally inherit the superseded Release geometry."
+  },
+  "assets": [
+    {
+      "queue_index": 26,
+      "asset": "63C91067",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "canonical_sha256": "febbe4ed440bf9780239352efe49da01c15c2ff1d93cc8eb43c65b3ac21e09e5",
+      "canonical_dimensions": [
+        2048,
+        2047
+      ],
+      "canonical_mode": "RGBA",
+      "decoded_rgba_bytes": 16769024,
+      "physical_occurrences": 2,
+      "current_git_source_present": false,
+      "semantic": {
+        "source": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      "canonical_geometry_policy": "NO_PIXEL_COORDINATES_CARRIED_FROM_SUPERSEDED_RELEASE_WORK_ORDER",
+      "reacquisition_gate": [
+        "Acquire the exact canonical HD source matching canonical_sha256.",
+        "Verify exact SHA-256 before any header/pixel interpretation.",
+        "Decode and verify actual width/height/mode against current inventory; filename suffix dimensions are non-authoritative.",
+        "Determine raw/readable orientation from the acquired canonical source; do not import orientation from rejected Release geometry.",
+        "Measure effect-inclusive English bboxes and build removal/protected masks only from the acquired canonical source.",
+        "Create and independently QA CLEAN_PLATE before Korean lettering.",
+        "Derive measured v2 candidate_safe_bbox with default 2px inset; never reuse old inspection guards as final safe bboxes.",
+        "Render Korean from source parameters, measure at native resolution, refit by fresh render, then run exact English-source vs Korean-candidate proof.",
+        "Preserve DDS header/format/mips/alpha from the acquired canonical DDS at final write.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "canonical_sha256": "ede0367228e0a97bbbdbc58f71c03ff0e044826e17fd7697b74d852aff7a3e64",
+      "canonical_dimensions": [
+        2047,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "decoded_rgba_bytes": 16769024,
+      "physical_occurrences": 1,
+      "current_git_source_present": false,
+      "semantic": {
+        "source": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      "canonical_geometry_policy": "NO_PIXEL_COORDINATES_CARRIED_FROM_SUPERSEDED_RELEASE_WORK_ORDER",
+      "reacquisition_gate": [
+        "Acquire the exact canonical HD source matching canonical_sha256.",
+        "Verify exact SHA-256 before any header/pixel interpretation.",
+        "Decode and verify actual width/height/mode against current inventory; filename suffix dimensions are non-authoritative.",
+        "Determine raw/readable orientation from the acquired canonical source; do not import orientation from rejected Release geometry.",
+        "Measure effect-inclusive English bboxes and build removal/protected masks only from the acquired canonical source.",
+        "Create and independently QA CLEAN_PLATE before Korean lettering.",
+        "Derive measured v2 candidate_safe_bbox with default 2px inset; never reuse old inspection guards as final safe bboxes.",
+        "Render Korean from source parameters, measure at native resolution, refit by fresh render, then run exact English-source vs Korean-candidate proof.",
+        "Preserve DDS header/format/mips/alpha from the acquired canonical DDS at final write.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 30,
+      "asset": "8215FD25",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "canonical_sha256": "0cd71138fd6811f5466a9c6674a243324d88ecc8dd82ad36df05234d759abc56",
+      "canonical_dimensions": [
+        1024,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "decoded_rgba_bytes": 2097152,
+      "physical_occurrences": 2,
+      "current_git_source_present": false,
+      "semantic": {
+        "source": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      "canonical_geometry_policy": "NO_PIXEL_COORDINATES_CARRIED_FROM_SUPERSEDED_RELEASE_WORK_ORDER",
+      "reacquisition_gate": [
+        "Acquire the exact canonical HD source matching canonical_sha256.",
+        "Verify exact SHA-256 before any header/pixel interpretation.",
+        "Decode and verify actual width/height/mode against current inventory; filename suffix dimensions are non-authoritative.",
+        "Determine raw/readable orientation from the acquired canonical source; do not import orientation from rejected Release geometry.",
+        "Measure effect-inclusive English bboxes and build removal/protected masks only from the acquired canonical source.",
+        "Create and independently QA CLEAN_PLATE before Korean lettering.",
+        "Derive measured v2 candidate_safe_bbox with default 2px inset; never reuse old inspection guards as final safe bboxes.",
+        "Render Korean from source parameters, measure at native resolution, refit by fresh render, then run exact English-source vs Korean-candidate proof.",
+        "Preserve DDS header/format/mips/alpha from the acquired canonical DDS at final write.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 32,
+      "asset": "DCC7B488",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "canonical_sha256": "f6a4599b452f2b2b4cced33b94f12e92be1a22bf59df6ec0b084c120d30842c2",
+      "canonical_dimensions": [
+        2048,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "decoded_rgba_bytes": 8388608,
+      "physical_occurrences": 1,
+      "current_git_source_present": false,
+      "semantic": {
+        "source": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      "canonical_geometry_policy": "NO_PIXEL_COORDINATES_CARRIED_FROM_SUPERSEDED_RELEASE_WORK_ORDER",
+      "reacquisition_gate": [
+        "Acquire the exact canonical HD source matching canonical_sha256.",
+        "Verify exact SHA-256 before any header/pixel interpretation.",
+        "Decode and verify actual width/height/mode against current inventory; filename suffix dimensions are non-authoritative.",
+        "Determine raw/readable orientation from the acquired canonical source; do not import orientation from rejected Release geometry.",
+        "Measure effect-inclusive English bboxes and build removal/protected masks only from the acquired canonical source.",
+        "Create and independently QA CLEAN_PLATE before Korean lettering.",
+        "Derive measured v2 candidate_safe_bbox with default 2px inset; never reuse old inspection guards as final safe bboxes.",
+        "Render Korean from source parameters, measure at native resolution, refit by fresh render, then run exact English-source vs Korean-candidate proof.",
+        "Preserve DDS header/format/mips/alpha from the acquired canonical DDS at final write.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    }
+  ],
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_ONLY_26_28_30_32",
+    "current_rework_basis": "PASS_C00120_B00113_REWORK_REQUIRED_TARGETS_ONLY",
+    "canonical_inventory": "PASS_4_OF_4_SHA256_WIDTH_HEIGHT_MODE_PINNED_FROM_CURRENT_INVENTORY",
+    "current_translation": "PASS_4_OF_4_TOTAL_RANK_TO_종합_랭크__6_PHYSICAL_OCCURRENCES_REUSED_FROM_CURRENT_TRANSCRIPTIONS_C_ACCEPTED_SEMANTICS",
+    "git_source_presence": "PASS_4_OF_4_QUEUE_PATHS_ABSENT_FAIL_CLOSED",
+    "stale_geometry_retirement": "PASS_ZERO_RELEASE_PIXEL_COORDINATES_OR_OLD_2PX_GUARDS_CARRIED",
+    "source_effect_masks": "HOLD_EXACT_CANONICAL_SOURCE_BYTES_REQUIRED",
+    "clean_plate": "HOLD_EXACT_CANONICAL_SOURCE_BYTES_REQUIRED",
+    "candidate_safe_bbox": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "candidate_dds": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_validation": "UNTESTED"
+  },
+  "heavy_qa_reuse": {
+    "repeated": false,
+    "reused_only": "C00120 accepted semantic wording/occurrence structure and current transcription/artwork-plan content.",
+    "intentionally_not_reused": [
+      "B00113 Sonic-TV Release width/height",
+      "B00113 Release file-size equations",
+      "B00113 Release sprite rectangles",
+      "B00113 Release 2px inspection guards",
+      "any Release-derived source-effect/removal/CLEAN_PLATE/candidate geometry"
+    ]
+  },
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_ON_CURRENT_GIT_HEAD",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
