@@ -1,0 +1,59 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00148",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00069",
+  "recorded_at_kst": "2026-09-29T21:56:37+09:00",
+  "base_sha": "e136d3f70d60534c63b0845b47ccfb17826a8418",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_INDEX112_EXACT_CANONICAL_SOURCE_PROVEN_AND_UNSAFE_ALPHA_CONNECTED_MASK_RECIPE_REJECTED",
+  "summary": "Fresh current-head B-even candidate-first scan found no runnable direct rework, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rewrite; B00144/index152 remains QA-pending and was excluded. The one permitted fallback-4 batch advanced index112 D41D0B1: immutable envido32/OR2006Sprites v0.25.10a Release bytes were fetched from GitHub and SHA-256 exactly match the current inventory (524de4c0..., 2048x256 DXT5 mip1). This resolves the prior C source-identity objection for that exact blob. Direct BC3 alpha decoding then executed B00110's previously specified alpha>0 8-connected removal-mask recipe on canonical pixels: all 7 components intersect the seed, the selected mask expands to the full effect hard-limit [435,19,1356,237], and it touches the boundary, so the recipe is rejected fail-closed under its own rule. No CLEAN_PLATE or Korean DDS is fabricated; bounded luminance metrics are retained only as non-authoritative input for the next safer color/effect segmentation pass. No shared state, runtime, build, N100, Drive, local clone, Library, uploaded archive, or VR/FFB changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-2153-B00148-P00069/B00148_P00069_INDEX112_CANONICAL_SOURCE_AND_MASK_RECIPE_AUDIT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX112_EXACT_CANONICAL_SOURCE_IDENTITY_AND_UNSAFE_ALPHA_MASK_RECIPE_REJECTION",
+    "report_path": "localization/graphics/role_B/20260929-2153-B00148-P00069/B00148_P00069_INDEX112_CANONICAL_SOURCE_AND_MASK_RECIPE_AUDIT.json",
+    "indices": [
+      112
+    ],
+    "assets": [
+      "D41D0B1"
+    ],
+    "exact_canonical_sources_newly_proven": 1,
+    "canonical_source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "canonical_source_git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "legacy_mask_recipe_directly_executed": true,
+    "legacy_mask_recipe_disposition": "REJECT_FAIL_CLOSED_FULL_HARD_LIMIT_AND_BOUNDARY_TOUCH",
+    "alpha_positive_components": 7,
+    "selected_mask_pixels": 132006,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true,
+    "readiness_after": "PREFLIGHT_ONLY_NARROWED_SAFE_COLOR_EFFECT_SEGMENTATION_REQUIRED"
+  },
+  "self_qa": "PASS_EVEN_112__SOURCE_SHA256_EXACT__LEGACY_MASK_EXECUTED_ON_CANONICAL_BYTES_AND_REJECTED_FAIL_CLOSED__NO_SHARED_STATE__NO_CANDIDATE_FALSE_PROMOTION",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_UNSAFE_ALPHA_MASK_RECIPE_NO_CLEAN_PLATE_OR_CURRENT_V2_KOREAN_CANDIDATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "preserved_peer_commit": {
+    "sha": "e136d3f70d60534c63b0845b47ccfb17826a8418",
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00149"
+  }
+}

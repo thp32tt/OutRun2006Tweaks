@@ -1,0 +1,367 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-canonical-source-mask-recipe-audit-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00148",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00069",
+  "recorded_at_kst": "2026-09-29T21:56:37+09:00",
+  "base_head_sha": "e136d3f70d60534c63b0845b47ccfb17826a8418",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection_policy": "CANDIDATE_COMPLETION_FIRST__ZERO_READY_EXCEPTION__ONE_FALLBACK4_RECONSTRUCTION_BATCH",
+  "result": "PASS_MATERIAL_INDEX112_EXACT_CANONICAL_SOURCE_PROVEN_AND_UNSAFE_ALPHA_CONNECTED_MASK_RECIPE_REJECTED",
+  "selection": {
+    "selected_indices": [
+      112
+    ],
+    "selected_assets": [
+      "D41D0B1"
+    ],
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "basis": "Fresh current-HEAD B-even scan found no runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rewrite. B00144/index152 remains an immutable producer result awaiting its own C batch and is excluded. Index112 is C-reconciled PREFLIGHT_ONLY and its prior B00110 mask recipe was rejected by C only because exact current canonical identity was then unproven. The current immutable v0.25.10a GitHub bytes are now directly available for index112, so this invocation resolves source identity and executes that exact recipe against canonical pixels instead of creating another source-absence manifest."
+  },
+  "readiness_audit": {
+    "refreshed_head_sha": "e136d3f70d60534c63b0845b47ccfb17826a8418",
+    "runnable_direct_rework_even_indices": [],
+    "dependency_or_runtime_blocked_rework_even_indices": [
+      94,
+      102
+    ],
+    "render_ready_even_indices": [],
+    "one_stage_to_render_even_indices": [],
+    "runnable_existing_candidate_rework_even_indices": [],
+    "qa_pending_producer_indices": [
+      152
+    ],
+    "qa_pending_producer_task": "LOCALIZATION-LOCALIZATION_B-00144",
+    "existing_candidate_or_runtime_backlog_not_selected": [
+      12,
+      54,
+      60,
+      94,
+      102,
+      104,
+      116
+    ],
+    "current_index112_candidate_present": false,
+    "current_index112_branch_source_present": false,
+    "conclusion": "ZERO_CANDIDATE_EXCEPTION_VALID__NO_RUNNABLE_READY_TIER_OR_MATERIAL_CANDIDATE_REWRITE__FALLBACK4_EXECUTED_ON_INDEX112"
+  },
+  "source_acquisition": {
+    "transport": "GITHUB_ONLY",
+    "repository": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "bytes": 524416,
+    "computed_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "current_inventory_sha256": "524de4c0db3db69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "exact_inventory_match": true,
+    "current_inventory_dimensions": [
+      2048,
+      256
+    ],
+    "current_inventory_decoded_mode": "RGBA",
+    "dds_header": {
+      "magic": "DDS ",
+      "width": 2048,
+      "height": 256,
+      "mip_count": 1,
+      "fourcc": "DXT5",
+      "payload_bytes": 524288
+    },
+    "hash_method": "GitHub connector fetched base64 bytes from immutable pinned commit; bytes were decoded and SHA-256 computed in-task. No N100/local clone/worktree/Drive/Library or uploaded archive was used."
+  },
+  "inherited_geometry_lineage": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00110",
+    "producer_report": "localization/graphics/role_B/20260929-1758-B134-P00042/B134_P00042_SELECTOR_REMOVAL_MASK_CLEAN_PLATE_EXECUTION_MANIFEST.json",
+    "prior_c_disposition_task": "LOCALIZATION-LOCALIZATION_C-00120",
+    "prior_c_disposition": "REWORK_REQUIRED_SOURCE_IDENTITY",
+    "same_git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "source_text_transform": "flip_y",
+    "source": "Try to reach the goal with your girlfriend.",
+    "korean": "여자친구와 함께 골에 도착하세요.",
+    "source_effect_bbox_readable_ltrb_exclusive": [
+      435,
+      19,
+      1356,
+      237
+    ],
+    "source_effect_bbox_raw_ltrb_exclusive": [
+      435,
+      18,
+      1356,
+      236
+    ],
+    "source_fill_bbox_readable_ltrb_exclusive": [
+      448,
+      33,
+      1341,
+      223
+    ],
+    "source_fill_bbox_raw_ltrb_exclusive": [
+      448,
+      32,
+      1341,
+      222
+    ],
+    "candidate_safe_bbox_readable_ltrb_exclusive": [
+      437,
+      21,
+      1354,
+      235
+    ],
+    "candidate_safe_bbox_raw_ltrb_exclusive": [
+      437,
+      20,
+      1354,
+      234
+    ],
+    "identity_requalification": "PASS_SAME_IMMUTABLE_GIT_BLOB_NOW_SHA256_EXACT_TO_CURRENT_INVENTORY",
+    "geometry_promotion": "NOT_PROMOTED_AS_EDIT_MASK__THE_OLD_REMOVAL_RECIPE_IS_DIRECTLY_TESTED_BELOW"
+  },
+  "canonical_pixel_audit": {
+    "decode": "DIRECT_BC3_DXT5_ALPHA_DECODE_FROM_EXACT_CANONICAL_BYTES",
+    "working_orientation": "readable_flip_y",
+    "tested_legacy_recipe": {
+      "seed_bbox": [
+        448,
+        33,
+        1341,
+        223
+      ],
+      "hard_limit_bbox": [
+        435,
+        19,
+        1356,
+        237
+      ],
+      "seed_rule": "alpha > 0 inside seed bbox",
+      "growth_rule": "8-connected alpha > 0 components within hard limit that intersect a seed pixel",
+      "alpha_positive_pixels_hard_limit": 132006,
+      "alpha_positive_pixels_seed_bbox": 126684,
+      "alpha_histogram_hard_limit": {
+        "zero": 68772,
+        "alpha_1_63": 22152,
+        "alpha_64_127": 9584,
+        "alpha_128_254": 15047,
+        "alpha_255": 85223
+      },
+      "alpha_positive_components_in_hard_limit": 7,
+      "components_intersecting_seed": 7,
+      "selected_mask_pixels": 132006,
+      "selected_mask_bbox_ltrb_exclusive": [
+        435,
+        19,
+        1356,
+        237
+      ],
+      "selected_component_touches_hard_limit_edge": true,
+      "disposition": "REJECT_RECIPE_FAIL_CLOSED",
+      "reason": "All seven alpha-positive components connect to the seed and the selected set expands to the entire accepted hard-limit bbox, touching its boundary. Under the recipe's own forbidden rule this cannot be used as a text/effect removal mask or CLEAN_PLATE edit mask."
+    },
+    "exploratory_color_separation_metrics": {
+      "authority": "METRICS_ONLY_NOT_A_REMOVAL_MASK",
+      "rule": "alpha > 0 and Rec.709 luminance >= threshold inside the same hard limit",
+      "thresholds": {
+        "80": {
+          "pixels": 38833,
+          "bbox_ltrb_exclusive": [
+            448,
+            33,
+            1342,
+            224
+          ],
+          "touches_hard_limit_edge": false
+        },
+        "120": {
+          "pixels": 37085,
+          "bbox_ltrb_exclusive": [
+            448,
+            33,
+            1342,
+            224
+          ],
+          "touches_hard_limit_edge": false
+        },
+        "160": {
+          "pixels": 36649,
+          "bbox_ltrb_exclusive": [
+            448,
+            33,
+            1342,
+            224
+          ],
+          "touches_hard_limit_edge": false
+        },
+        "190": {
+          "pixels": 34125,
+          "bbox_ltrb_exclusive": [
+            448,
+            33,
+            1342,
+            224
+          ],
+          "touches_hard_limit_edge": false
+        },
+        "210": {
+          "pixels": 33862,
+          "bbox_ltrb_exclusive": [
+            448,
+            33,
+            1342,
+            224
+          ],
+          "touches_hard_limit_edge": false
+        },
+        "230": {
+          "pixels": 33497,
+          "bbox_ltrb_exclusive": [
+            448,
+            33,
+            1342,
+            224
+          ],
+          "touches_hard_limit_edge": false
+        }
+      },
+      "dominant_fill_rgba_examples": [
+        {
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "pixels": 27922
+        },
+        {
+          "rgba": [
+            5,
+            15,
+            61,
+            255
+          ],
+          "pixels": 19525
+        },
+        {
+          "rgba": [
+            0,
+            12,
+            58,
+            255
+          ],
+          "pixels": 8276
+        },
+        {
+          "rgba": [
+            3,
+            13,
+            61,
+            255
+          ],
+          "pixels": 7606
+        },
+        {
+          "rgba": [
+            8,
+            16,
+            58,
+            255
+          ],
+          "pixels": 3430
+        },
+        {
+          "rgba": [
+            255,
+            251,
+            255,
+            255
+          ],
+          "pixels": 1873
+        }
+      ],
+      "interpretation": "Bright-source pixels form a bounded interior signal and may support a safer future color/effect segmentation pass, but shadow/glow ownership and protected/background separation are not yet proven. These thresholds MUST NOT be promoted to a removal mask or candidate construction input without deterministic full-effect coverage and protected-art validation."
+    }
+  },
+  "readiness_after": {
+    "classification": "PREFLIGHT_ONLY_NARROWED",
+    "resolved": [
+      "exact canonical source byte identity for index112",
+      "DDS 2048x256 DXT5 mip1 source header",
+      "same-blob provenance for B00110 flip_y geometry lineage",
+      "direct execution of B00110 alpha-connectivity removal recipe on exact canonical bytes",
+      "proof that the old alpha-connectivity recipe is unsafe for this asset"
+    ],
+    "remaining": [
+      "deterministic per-pixel source glyph/effect removal mask that covers full lettering effects without selecting background/protected artwork",
+      "protected non-text/background mask",
+      "independently validated CLEAN_PLATE",
+      "source style/baseline/signed-slant measurement",
+      "native-resolution Korean render and measure/refit",
+      "exact DDS re-encode and decoded-final header/alpha/orientation QA",
+      "zero-pixel containment and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof",
+      "runtime validation"
+    ],
+    "next_safe_action": "Replace the rejected alpha-connectivity selector with a deterministic color/effect segmentation method on this exact canonical blob, prove full glyph/outline/shadow/glow coverage and zero protected-art selection, then materialize and independently QA the CLEAN_PLATE before rendering Korean."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX112_EXACT_CANONICAL_SOURCE_IDENTITY_AND_UNSAFE_ALPHA_MASK_RECIPE_REJECTION",
+    "exact_canonical_sources_newly_proven": 1,
+    "canonical_pixel_audits_executed": 1,
+    "prior_mask_recipes_safely_rejected": 1,
+    "alpha_components_measured": 7,
+    "exploratory_color_separation_metric_sets": 6,
+    "candidate_dds_modified": false,
+    "clean_plate_modified": false,
+    "shared_state_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "a202cd0969dfc25b449301d204f0896ce3d2e7cc",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "canonical_source_git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "canonical_source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617"
+  },
+  "integrated_self_qa": {
+    "parity": "PASS_EVEN_INDEX_112_ONLY",
+    "source_identity": "PASS_SHA256_EXACT_CURRENT_INVENTORY",
+    "source_header": "PASS_2048x256_DXT5_MIP1",
+    "heavy_qa_dedup": "PASS_REUSED_EXISTING_SEMANTIC_AND_GEOMETRY_LINEAGE__ONLY_NEW_SOURCE_IDENTITY_AND_PIXEL_MASK_DEPENDENCIES_EXECUTED",
+    "legacy_mask_recipe": "PASS_TEST_EXECUTION__REJECTED_FAIL_CLOSED_ON_BOUNDARY_TOUCH",
+    "candidate_gate": "HOLD_STRICT_RECHECK_NO_SAFE_REMOVAL_MASK_CLEAN_PLATE_OR_CURRENT_V2_KOREAN_CANDIDATE",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "concurrent_head_preserved": {
+    "commit_sha": "e136d3f70d60534c63b0845b47ccfb17826a8418",
+    "message": "localization(A): guard stale source identities for odd assets [AUTO:LOCALIZATION-LOCALIZATION_A-00149]",
+    "disposition": "PRESERVED_AS_PARENT_NO_PEER_FILES_OVERWRITTEN"
+  }
+}
