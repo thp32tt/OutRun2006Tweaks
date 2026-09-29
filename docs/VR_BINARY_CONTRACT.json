@@ -351,6 +351,34 @@
           "needle": "0xED7A3"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-R74-OUTRUN-RESULT-PROGRESS-A",
+      "rva": "0x00097BE4",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e81756f9fff30f2c7c245c6a00e8ba50",
+      "purpose": "Exact final-result percentage/progress companion producer edge. R73 hudtrace binds its lower 0x2D26C enqueue path to the animated progress element.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "R74OutRunResultProgressCallA = 0x97BE4"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-R74-OUTRUN-RESULT-PROGRESS-B",
+      "rva": "0x00097DEC",
+      "signatureLength": 16,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e80f54f9fff30f10872c100000f30f59",
+      "purpose": "Second exact final-result percentage/progress companion producer edge in FUN_004979E0.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "R74OutRunResultProgressCallB = 0x97DEC"
+        }
+      ]
     }
   ]
 }
