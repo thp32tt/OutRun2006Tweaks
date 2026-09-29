@@ -652,6 +652,10 @@ class UIScaling : public Hook
 	// of the BA9D0 producer restored by R70. Keep SCREEN_HUD ownership active
 	// only across the three statically proven direct calls.
 	inline static thread_local unsigned R71OutRunPrintDepth = 0;
+	inline static thread_local
+		std::array<SpriteNode*, Game::SpritePriorityCount>
+			R71OutRunPrintTailsBefore{};
+	inline static std::atomic<std::uint64_t> R71OutRunStageTaggedNodes{ 0 };
 	inline static thread_local OutRunVR::GameSemantic::RenderScope
 		R71OutRunPrintPreviousScope =
 			OutRunVR::GameSemantic::RenderScope::None;
@@ -669,6 +673,19 @@ class UIScaling : public Hook
 	{
 		if (R71OutRunPrintDepth++ != 0)
 			return;
+
+		// The Sumo_Printf call is synchronous, but its visible glyph/sprite work
+		// is deferred through the SpriteNode queue. Producer scope alone expires
+		// before that queue is rendered (the same lifetime boundary already
+		// handled by the R68 glyph and R66 option-arrow fixes). Snapshot the
+		// exact queue tails so only nodes appended by these three proven OutRun
+		// stage/checkpoint/result callsites are pinned on return.
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			R71OutRunPrintTailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
 		R71OutRunPrintPreviousScope =
 			OutRunVR::GameSemantic::CurrentProducerScope;
 		R71OutRunPrintPreviousMarker =
@@ -682,6 +699,19 @@ class UIScaling : public Hook
 	{
 		if (R71OutRunPrintDepth == 0 || --R71OutRunPrintDepth != 0)
 			return;
+
+		const auto tagged = R70TagAppendedSpriteNodes(
+			R71OutRunPrintTailsBefore,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		const auto total = R71OutRunStageTaggedNodes.fetch_add(
+			tagged, std::memory_order_relaxed) + tagged;
+		if (tagged && (total & (total - 1)) == 0)
+		{
+			spdlog::info(
+				"VR R71 OUTRUN STAGE HUD: exact Sumo_Printf queue nodes pinned SCREEN_HUD tagged={} total={}",
+				tagged, total);
+		}
+
 		OutRunVR::GameSemantic::CurrentProducerScope =
 			R71OutRunPrintPreviousScope;
 		OutRunVR::GameSemantic::CurrentProducerMarker =
