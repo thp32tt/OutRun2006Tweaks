@@ -1,5 +1,5 @@
 {
-  "schema_version": 9,
+  "schema_version": 10,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -294,5 +294,25 @@
       "c_independent_final_candidate_validation": true,
       "throughput_counts_candidate_dds_only": true
     }
+  },
+  "source_transport": {
+    "state_ssot": "github:korean-localization-clean",
+    "large_binary_store": "google_drive",
+    "canonical_hd_source": {
+      "provider": "google_drive",
+      "account": "ezflash557",
+      "folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "allowed_subtree": "OutRun2006_Korean_Artifacts/90_ARCHIVE/LOCALIZATION_SNAPSHOT_20260927_0302/03_ORIGINAL_REFERENCE/hd_source/OR2-HD-GUI-v0.25.10a/textures/load",
+      "read_only": true,
+      "historical_localized_outputs_allowed": false
+    },
+    "acquisition_order": [
+      "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+      "PINNED_UPSTREAM_DIRECT_FILE",
+      "PINNED_V0.25.10A_RELEASE"
+    ],
+    "missing_object_behavior": "FALL_THROUGH_NEXT_TIER",
+    "identity_gate": "CANONICAL_INVENTORY_SHA_DIMENSIONS_FORMAT",
+    "producer_requirement": "A/B MUST attempt approved Drive exact-relative-path source acquisition before declaring canonical source unavailable or selecting source-reacquisition-only preflight."
   }
 }
