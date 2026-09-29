@@ -541,6 +541,19 @@ async def localization_process_lane(
             active["phase"] = "BLOCKED"
 
         if active["phase"] == "WAIT_ACTIONS":
+            # Persisted state may still point at an older failed attempt. Rebind by TASK_ID
+            # before trusting a stored result SHA or gate run.
+            rebound = refresh_wait_actions_task_binding(
+                active,
+                force_refresh=bool(active.get("startup_reconcile_pending")),
+            )
+            if rebound:
+                save_queue_state(q)
+                write_runtime(
+                    status="task_commit_rebound",
+                    last_action=f"Rebound stale WAIT_ACTIONS task commit {rebound}",
+                    queue=q,
+                )
             bound_run_id = (active.get("gate_run") or {}).get("id")
             poll_seconds = GITHUB_BOUND_RUN_POLL_SECONDS if bound_run_id else GITHUB_POLL_SECONDS
             last_poll = _parse_iso(active.get("last_gate_poll_at"))
@@ -1106,6 +1119,47 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         write_runtime(status="queue_blocked", last_action=f"{record['task_id']} blocked after {record['attempt']} attempts; advancing to next independent task", last_blocked=record)
 
 
+def refresh_wait_actions_task_binding(task: dict, force_refresh: bool = False) -> Optional[str]:
+    """Rebind persisted WAIT_ACTIONS to the newest durable commit for the same TASK_ID."""
+    if task.get("phase") != "WAIT_ACTIONS":
+        return None
+    branch = str(task.get("branch") or "").strip()
+    task_id = str(task.get("task_id") or "").strip()
+    if not branch or not task_id:
+        return None
+    if force_refresh:
+        _github_commit_list_cache.pop(branch, None)
+    commit = github_find_task_commit(branch, task_id)
+    if not commit or not commit.get("sha"):
+        return None
+
+    old_sha = task.get("result_sha")
+    new_sha = commit["sha"]
+    task["startup_reconcile_pending"] = False
+    if new_sha == old_sha:
+        return None
+
+    if old_sha:
+        task["rebound_from_result_sha"] = old_sha
+    old_failure = str(task.get("failure_context") or "").strip()
+    if old_failure:
+        task["previous_failure_context"] = old_failure
+    task["result_sha"] = new_sha
+    task["result_message"] = commit.get("message")
+    task["failure_context"] = ""
+    task["last_gate_poll_at"] = None
+    task["task_commit_rebound_at"] = datetime.now(TZ).isoformat()
+    for key in (
+        "gate_run",
+        "last_gate_status",
+        "last_gate_status_changed_at",
+        "gate_jobs",
+        "last_jobs_refresh_at",
+    ):
+        task.pop(key, None)
+    return f"{task_id}:{str(old_sha or 'none')[:8]}->{new_sha[:8]}"
+
+
 def _queue_nonterminal_records(q: dict) -> list[dict]:
     records = []
     active = q.get("active")
@@ -1118,7 +1172,7 @@ def _queue_nonterminal_records(q: dict) -> list[dict]:
 
 
 def startup_reconcile_queue_state() -> None:
-    """Invalidate stale discovery cache and immediately re-arm persisted WAIT_ACTIONS."""
+    """Invalidate stale caches and rebind persisted WAIT_ACTIONS to the latest TASK_ID commit."""
     _github_commit_list_cache.clear()
     _github_actions_cache.clear()
     q = load_queue_state()
@@ -1130,20 +1184,30 @@ def startup_reconcile_queue_state() -> None:
         head = github_branch_head(branch_name)
         if head:
             heads[branch_name] = head
+
+    rebounds = []
     for task in records:
         if task.get("phase") == "WAIT_ACTIONS":
             task["last_gate_poll_at"] = None
             task["startup_reconcile_pending"] = True
+            rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
+            if rebound:
+                rebounds.append(rebound)
+
     if not records:
         not_before = _parse_iso(q.get("next_task_not_before"))
         if not_before and (not_before - now).total_seconds() > QUEUE_IDLE_REARM_SECONDS:
             q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
     q["last_startup_reconcile_at"] = now.isoformat()
     q["startup_branch_heads"] = heads
+    q["startup_task_rebounds"] = rebounds[-20:]
     save_queue_state(q)
     write_runtime(
         status="startup_reconcile",
-        last_action=f"Startup reconciled {len(records)} nonterminal queue record(s); WAIT_ACTIONS will use exact run IDs",
+        last_action=(
+            f"Startup reconciled {len(records)} nonterminal queue record(s); "
+            f"task-commit rebounds={len(rebounds)}"
+        ),
         queue=q,
     )
 
@@ -1157,11 +1221,17 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
     for task in records:
         if task.get("phase") != "WAIT_ACTIONS":
             continue
+        if task.get("startup_reconcile_pending"):
+            rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
+            if rebound:
+                rearmed.append("commit-rebound:" + rebound)
+                changed = True
         last_poll = _parse_iso(task.get("last_gate_poll_at"))
         if last_poll and (now - last_poll).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS:
+            rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
             task["last_gate_poll_at"] = None
             task["watchdog_rearmed_at"] = now.isoformat()
-            rearmed.append(task.get("task_id"))
+            rearmed.append(("commit-rebound:" + rebound) if rebound else str(task.get("task_id")))
             changed = True
     if not records:
         not_before = _parse_iso(q.get("next_task_not_before"))

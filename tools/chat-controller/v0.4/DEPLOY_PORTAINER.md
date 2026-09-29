@@ -188,3 +188,11 @@ The localization stack now uses these controller-runtime values directly:
 On startup, persisted nonterminal queue records are reconciled. WAIT_ACTIONS poll guards are cleared so the next queue cycle checks the stored GitHub Actions run ID directly. A failed terminal run retries the same TASK_ID while retry budget remains, after refreshing the current target-branch HEAD.
 
 When redeploying in Portainer, retain the existing localization /data volume so persisted W00018 state can be reconciled instead of discarded.
+
+
+### Persisted WAIT_ACTIONS task-commit rebinding
+
+On localization stack restart/redeploy, a persisted lane can still contain the result SHA from an older failed attempt even though a newer commit with the same `[AUTO:TASK_ID]` already exists on `korean-localization-clean`.
+
+The controller now force-refreshes branch history during startup reconciliation and rebinds every persisted `WAIT_ACTIONS` record to the newest durable commit carrying that exact TASK_ID. When the SHA changes it clears the stale gate-run binding/status/jobs metadata before Actions discovery. The watchdog repeats this rebinding for stale or still-pending startup records, so an old failed attempt cannot pin a producer lane after redeploy.
+
