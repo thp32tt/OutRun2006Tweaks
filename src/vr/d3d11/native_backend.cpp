@@ -781,6 +781,52 @@ bool NativeManagedTextureRegistry::invalidate_external_mutation(
     return shadow && shadow->invalidate_external_mutation();
 }
 
+bool NativeManagedTextureRegistry::recreate_and_upload_mirror_for_observation(
+    const void* textureKey,
+    ID3D11Device* device) noexcept {
+    if (!textureKey || !device)
+        return false;
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto* shadow = find_locked(textureKey);
+    return shadow && shadow->recreate_and_upload_mirror(device);
+}
+
+NativeManagedTextureMirrorReadiness
+NativeManagedTextureRegistry::mirror_readiness(
+    const void* textureKey,
+    ID3D11Device* expectedDevice) const noexcept {
+    NativeManagedTextureMirrorReadiness out{};
+    if (!textureKey)
+        return out;
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto* shadow = find_locked(textureKey);
+    if (!shadow)
+        return out;
+
+    out.registered = true;
+    out.shadowValid = shadow->shadow_valid();
+    const auto& lifetime = shadow->lifetime_state();
+    out.deviceGeneration = lifetime.deviceGeneration;
+    out.shadowVersion = lifetime.cpuShadowVersion;
+    out.mirrorGeneration = lifetime.mirrorGeneration;
+    out.mirrorShadowVersion = lifetime.mirrorShadowVersion;
+    out.resourcesOwned =
+        shadow->mirror_device() != nullptr &&
+        shadow->mirror_texture() != nullptr &&
+        shadow->mirror_srv() != nullptr;
+    out.lifetimeCurrent = managed_mirror_ready(lifetime);
+    out.deviceMatches =
+        expectedDevice != nullptr &&
+        shadow->mirror_device() == expectedDevice;
+    out.ready =
+        shadow->mirror_ready() &&
+        out.resourcesOwned &&
+        out.lifetimeCurrent &&
+        out.deviceMatches;
+    return out;
+}
+
 void NativeManagedTextureRegistry::observe_device_reset() noexcept {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto& entry : shadows_) {

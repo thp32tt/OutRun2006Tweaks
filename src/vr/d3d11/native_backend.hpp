@@ -156,8 +156,21 @@ private:
 // recreation from the shadow. R104 adds the LockRect source transaction.
 // R105 stages bytes before the real D3D9 UnlockRect and commits them only after
 // that UnlockRect succeeds, so no source pointer survives across the COM call.
-// The registry below owns per-texture CPU shadows only; native draw/SRV binding
-// remains disabled.
+// R108 adds registry-level, non-routing mirror ownership/readiness observation.
+// Native draw/SRV binding remains disabled.
+struct NativeManagedTextureMirrorReadiness {
+    bool registered{};
+    bool shadowValid{};
+    bool resourcesOwned{};
+    bool lifetimeCurrent{};
+    bool deviceMatches{};
+    bool ready{};
+    std::uint64_t deviceGeneration{};
+    std::uint64_t shadowVersion{};
+    std::uint64_t mirrorGeneration{};
+    std::uint64_t mirrorShadowVersion{};
+};
+
 class NativeManagedTextureShadow final {
 public:
     NativeManagedTextureShadow() = default;
@@ -285,6 +298,12 @@ public:
         UINT level,
         HRESULT unlockResult) noexcept;
     bool invalidate_external_mutation(const void* textureKey) noexcept;
+    bool recreate_and_upload_mirror_for_observation(
+        const void* textureKey,
+        ID3D11Device* device) noexcept;
+    [[nodiscard]] NativeManagedTextureMirrorReadiness mirror_readiness(
+        const void* textureKey,
+        ID3D11Device* expectedDevice) const noexcept;
     void observe_device_reset() noexcept;
     void forget_texture(const void* textureKey) noexcept;
     void clear() noexcept;

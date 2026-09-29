@@ -927,11 +927,60 @@ int main()
     const auto registryVersionBeforeExternalMutation =
         managedRegistry.shadow_version(&registryTextureA);
     require(
+        !managedRegistry.recreate_and_upload_mirror_for_observation(
+            nullptr, d3d.device) &&
+        !managedRegistry.recreate_and_upload_mirror_for_observation(
+            &registryTextureA, nullptr),
+        "R108 registry mirror preparation rejects incomplete ownership identity");
+    require(
+        managedRegistry.recreate_and_upload_mirror_for_observation(
+            &registryTextureA, d3d.device),
+        "R108 registry prepares exact identity-owned mirror for observation");
+    const auto registryMirrorReady =
+        managedRegistry.mirror_readiness(&registryTextureA, d3d.device);
+    require(
+        registryMirrorReady.registered &&
+        registryMirrorReady.shadowValid &&
+        registryMirrorReady.resourcesOwned &&
+        registryMirrorReady.lifetimeCurrent &&
+        registryMirrorReady.deviceMatches &&
+        registryMirrorReady.ready &&
+        registryMirrorReady.deviceGeneration ==
+            managedRegistry.device_generation(&registryTextureA) &&
+        registryMirrorReady.shadowVersion ==
+            registryVersionBeforeExternalMutation &&
+        registryMirrorReady.mirrorGeneration ==
+            registryMirrorReady.deviceGeneration &&
+        registryMirrorReady.mirrorShadowVersion ==
+            registryMirrorReady.shadowVersion,
+        "R108 registry mirror readiness seals texture identity generation and shadow version");
+    const auto registryMirrorForeignDevice =
+        managedRegistry.mirror_readiness(
+            &registryTextureA, textureOtherDevice.device);
+    require(
+        registryMirrorForeignDevice.registered &&
+        registryMirrorForeignDevice.shadowValid &&
+        registryMirrorForeignDevice.resourcesOwned &&
+        registryMirrorForeignDevice.lifetimeCurrent &&
+        !registryMirrorForeignDevice.deviceMatches &&
+        !registryMirrorForeignDevice.ready,
+        "R108 foreign D3D11 device cannot claim registered mirror readiness");
+
+    require(
         managedRegistry.invalidate_external_mutation(&registryTextureA) &&
         !managedRegistry.shadow_valid(&registryTextureA) &&
         managedRegistry.shadow_version(&registryTextureA) ==
             registryVersionBeforeExternalMutation,
         "R107 external update invalidates current MANAGED texture shadow");
+    const auto registryMirrorAfterExternalMutation =
+        managedRegistry.mirror_readiness(&registryTextureA, d3d.device);
+    require(
+        registryMirrorAfterExternalMutation.registered &&
+        !registryMirrorAfterExternalMutation.shadowValid &&
+        !registryMirrorAfterExternalMutation.resourcesOwned &&
+        !registryMirrorAfterExternalMutation.lifetimeCurrent &&
+        !registryMirrorAfterExternalMutation.ready,
+        "R108 external mutation clears registry mirror ownership readiness");
     require(
         !managedRegistry.invalidate_external_mutation(&registryTextureA) &&
         !managedRegistry.shadow_valid(&registryTextureA),
@@ -949,6 +998,20 @@ int main()
             registryVersionBeforeExternalMutation + 1,
         "R107 LockRect recapture restores readiness after external update");
 
+    require(
+        managedRegistry.recreate_and_upload_mirror_for_observation(
+            &registryTextureA, d3d.device),
+        "R108 recaptured shadow recreates registry mirror");
+    const auto registryMirrorBeforeReset =
+        managedRegistry.mirror_readiness(&registryTextureA, d3d.device);
+    require(
+        registryMirrorBeforeReset.ready &&
+        registryMirrorBeforeReset.mirrorGeneration ==
+            registryMirrorBeforeReset.deviceGeneration &&
+        registryMirrorBeforeReset.mirrorShadowVersion ==
+            registryMirrorBeforeReset.shadowVersion,
+        "R108 recaptured mirror is generation-current before Reset");
+
     const auto registryVersionBeforeReset =
         managedRegistry.shadow_version(&registryTextureA);
     const auto registryGenerationBeforeReset =
@@ -961,6 +1024,33 @@ int main()
         managedRegistry.device_generation(&registryTextureA) ==
             registryGenerationBeforeReset + 1,
         "R105 Reset preserves CPU shadow and advances registry generation");
+    const auto registryMirrorAfterReset =
+        managedRegistry.mirror_readiness(&registryTextureA, d3d.device);
+    require(
+        registryMirrorAfterReset.registered &&
+        registryMirrorAfterReset.shadowValid &&
+        !registryMirrorAfterReset.resourcesOwned &&
+        !registryMirrorAfterReset.lifetimeCurrent &&
+        !registryMirrorAfterReset.ready &&
+        registryMirrorAfterReset.deviceGeneration ==
+            registryGenerationBeforeReset + 1 &&
+        registryMirrorAfterReset.shadowVersion == registryVersionBeforeReset,
+        "R108 Reset invalidates generation-bound registry mirror readiness");
+    require(
+        managedRegistry.recreate_and_upload_mirror_for_observation(
+            &registryTextureA, d3d.device),
+        "R108 post-Reset registry mirror recreation");
+    const auto registryMirrorAfterResetRecreate =
+        managedRegistry.mirror_readiness(&registryTextureA, d3d.device);
+    require(
+        registryMirrorAfterResetRecreate.ready &&
+        registryMirrorAfterResetRecreate.deviceGeneration ==
+            registryGenerationBeforeReset + 1 &&
+        registryMirrorAfterResetRecreate.mirrorGeneration ==
+            registryMirrorAfterResetRecreate.deviceGeneration &&
+        registryMirrorAfterResetRecreate.mirrorShadowVersion ==
+            registryVersionBeforeReset,
+        "R108 post-Reset mirror readiness uses current device generation");
 
     managedRegistry.forget_texture(&registryTextureA);
     require(
@@ -1183,5 +1273,6 @@ int main()
     std::cout << "DX11 managed Texture2D LockRect bridge R104: PASS\n";
     std::cout << "DX11 managed Texture2D lifetime registry R105: PASS\n";
     std::cout << "DX11 managed Texture2D mutation-source completeness R107: PASS\n";
+    std::cout << "DX11 managed Texture2D registry mirror readiness R108: PASS\n";
     return 0;
 }

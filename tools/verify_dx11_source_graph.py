@@ -1931,6 +1931,76 @@ def main() -> None:
                 "DX11 R107 analyzer mutation-source drift: " + meaning
             )
 
+    r108_mirror_readiness_header = {
+        "struct NativeManagedTextureMirrorReadiness":
+            "R108 non-routing readiness snapshot",
+        "recreate_and_upload_mirror_for_observation(":
+            "R108 registry observation-only mirror creation API",
+        "NativeManagedTextureMirrorReadiness mirror_readiness(":
+            "R108 registry readiness query API",
+        "bool resourcesOwned{}": "R108 resource ownership evidence",
+        "bool lifetimeCurrent{}": "R108 generation/version evidence",
+        "bool deviceMatches{}": "R108 exact D3D11 device ownership evidence",
+    }
+    missing_r108_header = [
+        meaning
+        for token, meaning in r108_mirror_readiness_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r108_header:
+        raise SystemExit(
+            "DX11 R108 managed-mirror readiness header drift: "
+            + ", ".join(missing_r108_header)
+        )
+
+    for token, meaning in {
+        "shadow && shadow->recreate_and_upload_mirror(device)":
+            "R108 registry identity-to-shadow mirror bridge",
+        "out.resourcesOwned =":
+            "R108 concrete owned-resource evidence",
+        "out.lifetimeCurrent = managed_mirror_ready(lifetime)":
+            "R108 generation/shadow-version readiness gate",
+        "shadow->mirror_device() == expectedDevice":
+            "R108 exact device ownership gate",
+        "out.ready =":
+            "R108 composite readiness result",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R108 managed-mirror readiness source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R108 registry mirror preparation rejects incomplete ownership identity":
+            "R108 null identity/device rejection",
+        "R108 registry prepares exact identity-owned mirror for observation":
+            "R108 positive registry mirror creation",
+        "R108 registry mirror readiness seals texture identity generation and shadow version":
+            "R108 identity/generation/version proof",
+        "R108 foreign D3D11 device cannot claim registered mirror readiness":
+            "R108 foreign-device rejection",
+        "R108 external mutation clears registry mirror ownership readiness":
+            "R108 mutation invalidation proof",
+        "R108 Reset invalidates generation-bound registry mirror readiness":
+            "R108 Reset invalidation proof",
+        "R108 post-Reset mirror readiness uses current device generation":
+            "R108 post-Reset recreation proof",
+        "DX11 managed Texture2D registry mirror readiness R108: PASS":
+            "R108 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R108 managed-mirror probe drift: " + meaning
+            )
+
+    if (
+        "recreate_and_upload_mirror_for_observation(" in census
+        or "mirror_readiness(" in census
+    ):
+        raise SystemExit(
+            "DX11 R108 observation-only registry mirror API gained a runtime census caller"
+        )
+
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 
