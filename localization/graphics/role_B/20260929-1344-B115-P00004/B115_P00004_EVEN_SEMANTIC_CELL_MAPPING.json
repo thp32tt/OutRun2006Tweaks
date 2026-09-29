@@ -1,0 +1,1130 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
+  "wave_id": "P00004",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "attempt": "1/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T13:44:43+09:00",
+  "precommit_head_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+  "precommit_head_message": "localization(A): prepare P00005 odd reconstruction inputs [AUTO:LOCALIZATION-LOCALIZATION_A-00064]",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "1bc1b7c42da5a3c748c6ebd3ca65d4fffec5ecba",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "exact_release_dds_is_construction_authority": true,
+    "stock_dds_png_atlas_are_semantic_mapping_evidence_only": true,
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "continuous_producer_rules": {
+    "validation_mode": "C_BATCH_GATE",
+    "producer_actions_wait": false,
+    "skipped_qa_pending_task": "LOCALIZATION-LOCALIZATION_B-00059@785a08e4a90e3345610bb850e6c486e17bf43553",
+    "skipped_qa_pending_assets": [
+      182,
+      198,
+      228,
+      230
+    ],
+    "prior_c_consumed_b57_assets_skipped_as_unchanged": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "peer_lane_commits_preserved": true,
+    "heavy_qa_dedup": "No candidate DDS changed; candidate-only DDS/header/round-trip/containment QA not rerun."
+  },
+  "selection": {
+    "selected_indices": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "selected_state": "localize_text/pending_artwork/transcribed_reviewed",
+    "reason": "Fresh even-shard unfinished assets not awaiting C and not previously accepted as unchanged reconstruction inputs. Work-steal disabled."
+  },
+  "mapping_method": {
+    "reference": "upstream stock DXT5 DDS + stock atlas + immutable 4x atlas",
+    "method": "Decode stock DXT5 alpha, convert atlas Y from bottom-origin to DDS rows, visually identify exact English source words, then carry the same sprite identity to the 4x atlas cell.",
+    "safety": "Stock assets are mapping references only. Exact Release HD DDS pixels remain authoritative for raw orientation, signed slant, text/effect masks, clean plate, alpha, and final containment."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "description": "Four fresh even assets gained immutable exact-HD/source lineage and new semantic-to-cell evidence. Three have full canonical semantic mapping, E3F4BA07 maps 7/8 semantics without guessing, and EBFC709F exposes two previously missing source text descriptions for C reconciliation.",
+    "assets_advanced": 4,
+    "canonical_semantics_total": 26,
+    "canonical_semantics_mapped": 25,
+    "physical_occurrences_mapped": 29,
+    "transcription_omissions_detected": 2,
+    "candidate_dds_written": false
+  },
+  "assets": [
+    {
+      "queue_index": 188,
+      "asset": "8C259C68",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "classification": "LOCALIZABLE_TEXT_FULL_CELL_MAPPING",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "git_blob_sha": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+        "expected_canvas": [
+          2048,
+          2048
+        ]
+      },
+      "stock_mapping_dds": {
+        "git_blob_sha": "eba82aaba88d226cc22fc758ef54bf7f9ece2cdb",
+        "format": "DXT5_REFERENCE_ONLY",
+        "readable_reference_transform": "flip_y"
+      },
+      "original_png": {
+        "git_blob_sha": "d11093f1dff2e897226db856c56bd9fa62dad579",
+        "evidence_path": "localization/graphics/role_B/20260929-1344-B115-P00004/B115_188_8C259C68_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "d44294907577e8b5b7d9ddc87bc91c163cdda613",
+        "regions": 6
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "6061128430caeb04773ac8caa7918629eeef8ba8",
+        "canvas": [
+          2048,
+          2048
+        ],
+        "regions": 6,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_6_OF_6_DIRECT_STOCK_DXT5_ALPHA_VISUAL_PLUS_ATLAS_GEOMETRY",
+      "mappings": [
+        {
+          "source": "Drive against the Ghost Cars and go for the course records!",
+          "korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+          "sprite": "sprite_774",
+          "stock_cell": [
+            0,
+            472,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            1888,
+            1800,
+            160
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "Buy your OutRun items here!",
+          "korean": "여기서 아웃런 아이템을 구매하세요!",
+          "sprite": "sprite_775",
+          "stock_cell": [
+            0,
+            432,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            1728,
+            1800,
+            160
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "Try to reach the goal with your girlfriend!",
+          "korean": "여자친구와 함께 골에 도착하세요!",
+          "sprite": "sprite_776",
+          "stock_cell": [
+            0,
+            392,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            1568,
+            1800,
+            160
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "Try to win Hearts by meeting your girlfriend's demands!",
+          "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+          "sprite": "sprite_777",
+          "stock_cell": [
+            0,
+            352,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            1408,
+            1800,
+            160
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "Complete Race and Heart Attack missions to win OR Miles!",
+          "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+          "sprite": "sprite_778",
+          "stock_cell": [
+            0,
+            312,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            1248,
+            1800,
+            160
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "Online and LAN OutRun for up to 6 players",
+          "korean": "온라인/LAN 아웃런 최대 6인 플레이",
+          "sprite": "sprite_779",
+          "stock_cell": [
+            0,
+            272,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            1088,
+            1800,
+            160
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "preserve": [
+        "all pixels outside future exact English glyph/effect masks",
+        "panel/background alpha outside edit masks"
+      ],
+      "next_action": "Decode the exact 2048x2048 Release DDS cells and measure per-element raw/readable orientation, signed slant, full-effect bboxes, alpha/style and protected masks before clean-plate/Korean generation."
+    },
+    {
+      "queue_index": 212,
+      "asset": "BA0147DA",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "classification": "LOCALIZABLE_TEXT_FULL_CANONICAL_MAPPING_WITH_DUPLICATE_PHYSICAL_OCCURRENCES",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+        "git_blob_sha": "4a0ffb723e48313e3bdd7106dfadacd36cb212e8",
+        "expected_canvas": [
+          2048,
+          2048
+        ]
+      },
+      "stock_mapping_dds": {
+        "git_blob_sha": "b3d7a6d251071987f4987b933d68f01137abf4a8",
+        "format": "DXT5_REFERENCE_ONLY",
+        "readable_reference_transform": "flip_y"
+      },
+      "original_png": {
+        "git_blob_sha": "fef9136cb8940f2d50c50171696f0023cd2f635b",
+        "evidence_path": "localization/graphics/role_B/20260929-1344-B115-P00004/B115_212_BA0147DA_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "f99872a0434029c10e8ed5d3c45eefd00da6bbbd",
+        "canvas": [
+          512,
+          512
+        ],
+        "regions": 60
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "7f7432f469c86362670c8e2ca7a2f0473b64f694",
+        "canvas": [
+          2048,
+          2048
+        ],
+        "regions": 60,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_12_PHYSICAL_OCCURRENCES_FROM_10_CANONICAL_SEMANTICS_DIRECT_STOCK_DXT5_ALPHA_VISUAL",
+      "mappings": [
+        {
+          "source": "HEART ATTACK",
+          "korean": "하트 어택",
+          "sprite": "sprite_707",
+          "stock_cell": [
+            0,
+            327,
+            445,
+            43
+          ],
+          "hd_cell": [
+            0,
+            1308,
+            1780,
+            172
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "SHOWROOM",
+          "korean": "쇼룸",
+          "sprite": "sprite_708",
+          "stock_cell": [
+            0,
+            284,
+            440,
+            43
+          ],
+          "hd_cell": [
+            0,
+            1136,
+            1760,
+            172
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트",
+          "sprite": "sprite_709",
+          "stock_cell": [
+            0,
+            241,
+            440,
+            43
+          ],
+          "hd_cell": [
+            0,
+            964,
+            1760,
+            172
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런",
+          "sprite": "sprite_710",
+          "stock_cell": [
+            147,
+            374,
+            273,
+            43
+          ],
+          "hd_cell": [
+            588,
+            1496,
+            1092,
+            172
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "SELECT STAR SIGN",
+          "korean": "별자리 선택",
+          "sprite": "sprite_718",
+          "stock_cell": [
+            0,
+            193,
+            353,
+            23
+          ],
+          "hd_cell": [
+            0,
+            772,
+            1412,
+            92
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "SELECT PHOTO",
+          "korean": "사진 선택",
+          "sprite": "sprite_719",
+          "stock_cell": [
+            0,
+            170,
+            353,
+            23
+          ],
+          "hd_cell": [
+            0,
+            680,
+            1412,
+            92
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "SELECT NATIONALITY",
+          "korean": "국적 선택",
+          "sprite": "sprite_720",
+          "stock_cell": [
+            0,
+            147,
+            353,
+            23
+          ],
+          "hd_cell": [
+            0,
+            588,
+            1412,
+            92
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "ENTER NAME",
+          "korean": "이름 입력",
+          "sprite": "sprite_721",
+          "stock_cell": [
+            0,
+            124,
+            353,
+            23
+          ],
+          "hd_cell": [
+            0,
+            496,
+            1412,
+            92
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "DONE",
+          "korean": "완료",
+          "sprite": "sprite_723",
+          "stock_cell": [
+            270,
+            101,
+            182,
+            23
+          ],
+          "hd_cell": [
+            1080,
+            404,
+            728,
+            92
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "PROFESSIONAL",
+          "korean": "프로",
+          "sprite": "sprite_736",
+          "stock_cell": [
+            0,
+            81,
+            160,
+            20
+          ],
+          "hd_cell": [
+            0,
+            324,
+            640,
+            80
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런",
+          "sprite": "sprite_737",
+          "stock_cell": [
+            353,
+            127,
+            107,
+            20
+          ],
+          "hd_cell": [
+            1412,
+            508,
+            428,
+            80
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "DONE",
+          "korean": "완료",
+          "sprite": "sprite_746",
+          "stock_cell": [
+            0,
+            17,
+            166,
+            16
+          ],
+          "hd_cell": [
+            0,
+            68,
+            664,
+            64
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "duplicate_physical_occurrences": {
+        "OUTRUN": [
+          "sprite_710",
+          "sprite_737"
+        ],
+        "DONE": [
+          "sprite_723",
+          "sprite_746"
+        ]
+      },
+      "preserve": [
+        "character names including SAM/JENNIFER/HOLLY/CLARISSA/ALBERTO",
+        "VERDE MUGELLO vehicle color name",
+        "zodiac symbols/icons",
+        "all unrelated UI bars/artwork"
+      ],
+      "next_action": "Decode only mapped exact-HD cells, derive source glyph/effect and protected masks, and keep character/model/color names and zodiac art unchanged."
+    },
+    {
+      "queue_index": 226,
+      "asset": "E3F4BA07",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+      "classification": "LOCALIZABLE_TEXT_PARTIAL_MAPPING_ONE_CANONICAL_SEMANTIC_UNRESOLVED",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+        "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+        "expected_canvas": [
+          2048,
+          512
+        ]
+      },
+      "stock_mapping_dds": {
+        "git_blob_sha": "96fa728f8c77ea5a8cdabe35c76ce68bd1fbc1b4",
+        "format": "DXT5_REFERENCE_ONLY",
+        "readable_reference_transform": "flip_y"
+      },
+      "original_png": {
+        "git_blob_sha": "179b9c36fc1a3529f0bc50f46fd092e56e146b44",
+        "evidence_path": "localization/graphics/role_B/20260929-1344-B115-P00004/B115_226_E3F4BA07_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "4952476fac373393bd6312757406c3b39eb7088c",
+        "metadata_canvas": [
+          128,
+          128
+        ],
+        "rect_extent": [
+          490,
+          128
+        ],
+        "regions": 10
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "50256e8d4d5af1335249993d44abc5d18a4c5672",
+        "canvas": [
+          2048,
+          512
+        ],
+        "rect_extent": [
+          1960,
+          512
+        ],
+        "regions": 10,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_7_OF_8_CANONICAL_SEMANTICS_PLUS_PROTECTED_OUTRUN2_CELL",
+      "mappings": [
+        {
+          "source": "GOAL",
+          "korean": "골",
+          "sprite": "sprite_298",
+          "stock_cell": [
+            0,
+            84,
+            245,
+            22
+          ],
+          "hd_cell": [
+            0,
+            336,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "15 STAGE CONTINUOUS",
+          "korean": "15코스 연속",
+          "sprite": "sprite_299",
+          "stock_cell": [
+            245,
+            84,
+            245,
+            22
+          ],
+          "hd_cell": [
+            980,
+            336,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "GOAL B",
+          "korean": "골 B",
+          "sprite": "sprite_300",
+          "stock_cell": [
+            0,
+            62,
+            245,
+            22
+          ],
+          "hd_cell": [
+            0,
+            248,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "GOAL A",
+          "korean": "골 A",
+          "sprite": "sprite_301",
+          "stock_cell": [
+            245,
+            62,
+            245,
+            22
+          ],
+          "hd_cell": [
+            980,
+            248,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "GOAL D",
+          "korean": "골 D",
+          "sprite": "sprite_302",
+          "stock_cell": [
+            0,
+            40,
+            245,
+            22
+          ],
+          "hd_cell": [
+            0,
+            160,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "GOAL C",
+          "korean": "골 C",
+          "sprite": "sprite_303",
+          "stock_cell": [
+            245,
+            40,
+            245,
+            22
+          ],
+          "hd_cell": [
+            980,
+            160,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "GOAL E",
+          "korean": "골 E",
+          "sprite": "sprite_305",
+          "stock_cell": [
+            245,
+            18,
+            245,
+            22
+          ],
+          "hd_cell": [
+            980,
+            72,
+            980,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "protected_mapped": [
+        {
+          "source": "OUTRUN 2",
+          "sprite": "sprite_304",
+          "stock_cell": [
+            0,
+            18,
+            245,
+            22
+          ],
+          "hd_cell": [
+            0,
+            72,
+            980,
+            88
+          ],
+          "action": "PRESERVE_BRAND_TITLE"
+        }
+      ],
+      "unresolved_semantics": [
+        "STAGE"
+      ],
+      "unresolved_regions": [
+        {
+          "sprite": "sprite_296",
+          "stock_cell": [
+            0,
+            106,
+            245,
+            22
+          ],
+          "hd_cell": [
+            0,
+            424,
+            980,
+            88
+          ]
+        },
+        {
+          "sprite": "sprite_297",
+          "stock_cell": [
+            245,
+            106,
+            245,
+            22
+          ],
+          "hd_cell": [
+            980,
+            424,
+            980,
+            88
+          ]
+        }
+      ],
+      "caution": "Do not assign STAGE or remaining protected OutRun2/OutRun2SP branding to sprite_296/sprite_297 by list order. Exact HD pixel inspection is required.",
+      "next_action": "Use exact Release DDS to disambiguate sprite_296/sprite_297, then measure orientation/slant/text-effect bboxes before any Korean raster."
+    },
+    {
+      "queue_index": 232,
+      "asset": "EBFC709F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "classification": "LOCALIZABLE_TEXT_CANONICAL_MAPPING_WITH_TWO_TRANSCRIPTION_OMISSIONS",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+        "git_blob_sha": "f95c09096c948738efc477a2577513151b3179f7",
+        "expected_canvas": [
+          2048,
+          1024
+        ]
+      },
+      "stock_mapping_dds": {
+        "git_blob_sha": "6c8aba5309532f49ca4a36a56afcc3474e072bdf",
+        "format": "DXT5_REFERENCE_ONLY",
+        "readable_reference_transform": "flip_y"
+      },
+      "original_png": {
+        "git_blob_sha": "ec80062a42042ef4c7719f4c07129ae3ba7f7e3e",
+        "evidence_path": "localization/graphics/role_B/20260929-1344-B115-P00004/B115_232_EBFC709F_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "e163bb7748fd36c5c5e3a653a0fc1fb8e9109f32",
+        "metadata_canvas": [
+          256,
+          256
+        ],
+        "rect_extent": [
+          450,
+          256
+        ],
+        "regions": 6
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "0792142ed98c7ae16c47834daf8a4095799faf17",
+        "canvas": [
+          2048,
+          1024
+        ],
+        "rect_extent": [
+          1800,
+          1024
+        ],
+        "regions": 6,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_4_CANONICAL_PHYSICAL_OCCURRENCES_PLUS_2_NEW_SOURCE_TEXT_OMISSIONS",
+      "mappings": [
+        {
+          "source": "JOIN GAME",
+          "korean": "게임 참가",
+          "sprite": "sprite_755",
+          "stock_cell": [
+            0,
+            213,
+            440,
+            43
+          ],
+          "hd_cell": [
+            0,
+            852,
+            1760,
+            172
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "CREATE GAME",
+          "korean": "게임 만들기",
+          "sprite": "sprite_756",
+          "stock_cell": [
+            0,
+            170,
+            440,
+            43
+          ],
+          "hd_cell": [
+            0,
+            680,
+            1760,
+            172
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "JOIN GAME",
+          "korean": "게임 참가",
+          "sprite": "sprite_759",
+          "stock_cell": [
+            0,
+            68,
+            220,
+            22
+          ],
+          "hd_cell": [
+            0,
+            272,
+            880,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "CREATE GAME",
+          "korean": "게임 만들기",
+          "sprite": "sprite_760",
+          "stock_cell": [
+            220,
+            68,
+            192,
+            22
+          ],
+          "hd_cell": [
+            880,
+            272,
+            768,
+            88
+          ],
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "transcription_omissions": [
+        {
+          "source": "Join your friends in a game of OutRun!",
+          "sprite": "sprite_757",
+          "stock_cell": [
+            0,
+            130,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            520,
+            1800,
+            160
+          ],
+          "status": "MISSING_CANONICAL_TRANSLATION_C_RECONCILIATION_REQUIRED"
+        },
+        {
+          "source": "Create a game and invite your friends!",
+          "sprite": "sprite_758",
+          "stock_cell": [
+            0,
+            90,
+            450,
+            40
+          ],
+          "hd_cell": [
+            0,
+            360,
+            1800,
+            160
+          ],
+          "status": "MISSING_CANONICAL_TRANSLATION_C_RECONCILIATION_REQUIRED"
+        }
+      ],
+      "caution": "B does not invent Korean translations for newly detected omissions and does not modify shared transcription/artwork-plan files; C must reconcile canonical wording before production.",
+      "next_action": "C adds/approves canonical translations for the two omitted descriptions; B then measures exact-HD masks/orientation/style for all six cells before candidate generation."
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_188_212_226_232",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_B00059_182_198_228_230_SKIPPED",
+    "prior_consumed_dedup": "PASS_B00057_132_176_220_222_NOT_REPEATED",
+    "canonical_translation_match": "PASS_26_OF_26_EXISTING_SEGMENTS_AGAINST_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "immutable_git_source_identity": "PASS_20_PINNED_GITHUB_OBJECTS__4_ASSETS_X_RELEASE_STOCK_DDS_PNG_STOCK_ATLAS_4X_ATLAS",
+    "direct_visual_mapping": "PASS_29_PHYSICAL_OCCURRENCES__25_OF_26_CANONICAL_SEMANTICS",
+    "omission_detection": "PASS_2_NEW_ENGLISH_DESCRIPTIONS_IN_EBFC709F_FLAGGED_FOR_C_WITHOUT_GUESSED_KOREAN",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK_NO_HD_GLYPH_MASK_THIS_RUN",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_EXACT_HD_PER_ELEMENT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_EVEN_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_SOURCE_CELL_MAPS_WITH_TWO_TRANSCRIPTION_OMISSIONS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

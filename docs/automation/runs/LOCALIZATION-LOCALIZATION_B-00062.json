@@ -1,0 +1,60 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00004",
+  "recorded_at_kst": "2026-09-29T13:44:43+09:00",
+  "base_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_SOURCE_CELL_MAPS_WITH_TWO_TRANSCRIPTION_OMISSIONS",
+  "summary": "Advanced four fresh even-shard pending artwork assets with GitHub-only exact Release/source/atlas identities and source-faithful semantic cell reconstruction evidence. Mapped 29 physical occurrences covering 25/26 existing canonical semantics; left E3F4BA07 STAGE unresolved rather than guessing and detected two previously omitted EBFC709F English descriptions for C reconciliation. No DDS candidate or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1344-B115-P00004/B115_P00004_EVEN_SEMANTIC_CELL_MAPPING.json",
+    "localization/graphics/role_B/20260929-1344-B115-P00004/B115_188_8C259C68_ENGLISH_SOURCE.png",
+    "localization/graphics/role_B/20260929-1344-B115-P00004/B115_212_BA0147DA_ENGLISH_SOURCE.png",
+    "localization/graphics/role_B/20260929-1344-B115-P00004/B115_226_E3F4BA07_ENGLISH_SOURCE.png",
+    "localization/graphics/role_B/20260929-1344-B115-P00004/B115_232_EBFC709F_ENGLISH_SOURCE.png"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_NEW_EVEN_SEMANTIC_CELL_RECONSTRUCTION_INPUTS",
+    "indices": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "assets": [
+      "8C259C68",
+      "BA0147DA",
+      "E3F4BA07",
+      "EBFC709F"
+    ],
+    "canonical_semantics_mapped": 25,
+    "canonical_semantics_total": 26,
+    "physical_occurrences_mapped": 29,
+    "transcription_omissions_detected": 2,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "task_result": "LOCALIZATION-LOCALIZATION_B-00059@785a08e4a90e3345610bb850e6c486e17bf43553",
+    "assets": [
+      182,
+      198,
+      228,
+      230
+    ]
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
