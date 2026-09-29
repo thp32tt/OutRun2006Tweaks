@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00036",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T10:30:32+09:00",
+  "base_sha": "eda8005cb0fbafa671ffc25cb4a8f779ac4cd0de",
+  "code_result_sha": "8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf",
+  "result_sha": "8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf",
+  "automation_validation": "BLOCKED_CI_QUEUE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R89 hosted vertex-shader input-signature contract smoke for R88 FVF blend-weight/index layouts.",
+  "summary": "Added a hosted-only semantic ABI smoke that translates representative R88 FVF blend layouts, compiles matching vs_4_0 HLSL with D3DCompile, reflects the vertex-shader input signature with D3DReflect, and compares semantic name/index plus reflected component type/mask against the translated D3D11 input elements. Cases cover XYZB5 split BLENDWEIGHT0/1, UBYTE4 BLENDINDICES as uint4, D3DCOLOR BLENDINDICES as normalized float4, and blend+NORMAL. A deliberate UBYTE4 float4 mismatch must fail closed. Production renderer/runtime translation source was not changed.",
+  "evidence": [
+    "CONVERSION-DX11-00034 completed R88 descriptor-level F19 blend semantics and selected hosted shader-signature/input-contract validation as the next bounded runtime-independent task.",
+    "Implementation commit 8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf contains only hosted smoke/build/workflow/verifier changes.",
+    "Exact-SHA Backend Conversion Gate 36507552160 was created but remained queued with no job start.",
+    "Exact-SHA Build 36507555723 was created but remained queued with no job start.",
+    "Exact-SHA OpenXR VR architecture 36507555770 was created but remained queued with no job start.",
+    "Exact-SHA HUD Inspector 36507555711 was created but remained queued with no job start.",
+    "Repository-wide Actions inspection showed a large concurrent backlog on vr-d3d9ex-candidate/R71-STATIC-1000-20260929, korean-localization-clean and chat-controller-downloads; no R89 compile/test failure was observed because R89 jobs never started.",
+    "No Quest 3/VDXR, game execution, GPU shader binding or native D3D11 input-layout execution validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "tools/dx11_input_signature_semantics.cpp",
+      "result": "Added deterministic D3DCompile(vs_4_0)+D3DReflect contract checks for R88 blend input layouts and a deliberate UBYTE4 float4 mismatch fail-closed case."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Added dx11_input_signature_semantics executable to cmkr source-of-truth graph."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added checked-in generated CMake target for R89 hosted smoke."
+    },
+    {
+      "path": ".github/workflows/backend-conversion-gate.yml",
+      "result": "Added build/run steps for R89 input-signature semantic smoke."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for R89 reflection contract, target/source presence and Backend Conversion Gate execution."
+    }
+  ],
+  "semantic_cases": {
+    "supported": [
+      "D3DFVF_XYZB5 -> POSITION float3 + BLENDWEIGHT0 float4 + BLENDWEIGHT1 float reflected signature",
+      "D3DFVF_XYZB3 | LASTBETA_UBYTE4 -> BLENDINDICES uint4 reflected signature",
+      "D3DFVF_XYZB2 | LASTBETA_D3DCOLOR -> BLENDINDICES float4 reflected signature for UNORM input",
+      "D3DFVF_XYZB4 | NORMAL -> blend-weight plus NORMAL reflected signature"
+    ],
+    "fail_closed": [
+      "UBYTE4 BLENDINDICES descriptor paired with float4 BLENDINDICES HLSL must fail the reflected component-type contract"
+    ]
+  },
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "R88_BLEND_DESCRIPTOR_SUBSET_PLUS_R89_HOSTED_SHADER_SIGNATURE_CONTRACT_IMPLEMENTED_CI_EXECUTION_PENDING_QUEUE",
+    "F20_fixed_function_stage_sampler_coverage": "SUPPORTED_SUBSET_HAS_GENERATION_COMPILER_AND_BROADER_DETERMINISTIC_SEMANTIC_SMOKE_NATIVE_BINDING_NOT_ENABLED",
+    "F21_shader_translation_readiness": "PROGRAMMABLE_TRANSLATION_OPEN_R89_ONLY_INPUT_SIGNATURE_CONTRACT",
+    "F22_sampling_signature_saturation": "OPEN_RUNTIME_CENSUS_COVERAGE_LIMITS_REMAIN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED_AND_HOSTED_CONTRACT_SEPARATED_FROM_RUNTIME"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R89 is hosted-only shader input-signature contract validation. It creates no D3D11 device/input-layout object, binds no shader, routes no native draw, and does not implement F21 programmable shader translation or exact-build Quest3/VDXR parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36507552160,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf"
+    },
+    "build": {
+      "run_id": 36507555723,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36507555770,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf"
+    },
+    "hud_inspector": {
+      "run_id": 36507555711,
+      "status": "queued",
+      "conclusion": null,
+      "validated_sha": "8d6032689bb79c45e55fbacd8cdd9f7f389d4bcf"
+    },
+    "pc_fast": {
+      "run_id": 36507552123,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "blocker": {
+    "key": "CI_QUEUE_BACKLOG",
+    "description": "GitHub-hosted Actions capacity was unavailable to R89 during ATTEMPT 1/3. Repository-wide queued/in-progress runs were dominated by other branches/tasks. This is not evidence of a source/test failure.",
+    "source_repair_required": false
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5881835145,
+    "validation_comment_id": 5881919815
+  },
+  "next_action": "Do not modify R89 source for the queue condition. On retry, first recheck exact-SHA runs 36507552160, 36507555723, 36507555770 and 36507555711. If they start, validate the same code_result_sha. Only make a repair commit if an evidence-backed source/test failure appears. Native draw and shaderTranslationExact remain disabled.",
+  "finalized_kst": "2026-09-29T10:30:32+09:00"
+}
