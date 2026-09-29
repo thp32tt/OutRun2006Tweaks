@@ -538,6 +538,11 @@ skipped_release = require(
     "ReplacedStaleProducer",
     "void Retry",
     "SlotBlocked",
+    "enum class SampleEvidence",
+    "class SampledHistory",
+    "ObserveSampled",
+    "SampleEvidence::ExactSampled",
+    "return SampleEvidence::Unknown",
 )
 skipped_release_test = require(
     "vrhost/tests/r41_skipped_release_smoke.cpp",
@@ -545,6 +550,12 @@ skipped_release_test = require(
     "StageResult::LiveSlotConflict",
     "StageResult::ReplacedStaleProducer",
     "stalePublishAttempts != 0",
+    "SampledHistory<4>",
+    "sampledHistory.ObserveSampled",
+    "SampleEvidence::ExactSampled",
+    "sameProducerNewFrame",
+    "nextTransportSameSlot",
+    "nextRunSameSlot",
 )
 require(
     "vrhost/CMakeLists.txt",
