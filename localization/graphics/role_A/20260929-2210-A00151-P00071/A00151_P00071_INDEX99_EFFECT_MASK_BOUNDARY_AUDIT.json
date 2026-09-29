@@ -1,0 +1,212 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-index99-effect-mask-boundary-audit-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00151",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00071",
+  "recorded_at_kst": "2026-09-29T22:10:34+09:00",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      99
+    ],
+    "selected_assets": [
+      "4F68708E"
+    ],
+    "basis": "Latest shared state contains zero RENDER_READY and zero ONE_STAGE_TO_RENDER markers. Direct rework indices 51/53/111/121 remain dependency-blocked. A00149 indices 65/89/241 are producer-QA pending and excluded. C00150/Q00023 independently accepted A00146 index99 exact canonical source plus two-line core segmentation, so this task advances only the next unresolved source-faithful effect-mask boundary dependency without repeating source/header/core QA."
+  },
+  "source_lineage": {
+    "repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "bytes": 524416,
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "width": 2048,
+    "height": 256,
+    "format": "DXT5_BC3",
+    "mip_count": 1,
+    "identity_authority": "REUSED_UNCHANGED_C00150_Q00023_INDEPENDENT_PASS_FINGERPRINT",
+    "heavy_qa_recomputed": false
+  },
+  "orientation": {
+    "raw_to_readable": "mirror-Y",
+    "authority": "unchanged A00041 lineage retained by A00146/C00150",
+    "orientation_recomputed": false
+  },
+  "exact_panel_roi_ltrb": [
+    514,
+    39,
+    1613,
+    218
+  ],
+  "prior_core_seeds": {
+    "line1": {
+      "pixels": 18531,
+      "bbox": [
+        527,
+        53,
+        1600,
+        119
+      ]
+    },
+    "line2": {
+      "pixels": 14332,
+      "bbox": [
+        547,
+        139,
+        1340,
+        205
+      ]
+    },
+    "authority": "A00146 independently reproduced by C00150"
+  },
+  "new_effect_boundary_analysis": {
+    "decode": "direct BC3/DXT5 decode from immutable pinned GitHub blob in-task",
+    "luminance": "Rec.601 = 0.299R + 0.587G + 0.114B",
+    "background_boundary_probe": {
+      "panel_edge_width_px": 10,
+      "max_visible_background_luminance": 17.482,
+      "threshold": 18,
+      "rule": "alpha>0 AND luminance>=18 inside exact panel ROI",
+      "rationale": "18 is the first integer luminance above the measured protected panel-edge maximum. The 1px outside ring around the selected set contains no luminance >=18."
+    },
+    "effect_mask_candidate": {
+      "pixels": 42774,
+      "connected_components_8": 48,
+      "largest_component_pixels": 4511,
+      "line1": {
+        "pixels": 24228,
+        "bbox": [
+          527,
+          52,
+          1601,
+          120
+        ],
+        "alpha_bins": [
+          0,
+          0,
+          3,
+          10,
+          7,
+          24208
+        ]
+      },
+      "line2": {
+        "pixels": 18546,
+        "bbox": [
+          542,
+          136,
+          1340,
+          208
+        ],
+        "alpha_bins": [
+          1,
+          0,
+          3,
+          2,
+          2,
+          18538
+        ]
+      },
+      "status": "DETERMINISTIC_EFFECT_MASK_CANDIDATE_RULE_FOR_C_REVIEW_NOT_YET_PROMOTED_TO_CLEAN_PLATE_AUTHORITY"
+    },
+    "protected_outside_ring": {
+      "pixels": 13263,
+      "rgb4_003_pixels": 13255,
+      "rgb4_003_percent": 99.93968182160899,
+      "other_rgb4": {
+        "002": 5,
+        "000": 3
+      },
+      "min_luminance": 0,
+      "max_luminance": 17.482,
+      "conclusion": "PASS_STRONG_PANEL_BACKGROUND_SEPARATION_EVIDENCE__NO_THRESHOLD18_PIXEL_IN_1PX_RING"
+    },
+    "proposed_v2_safe_bboxes_if_C_accepts_effect_envelopes": {
+      "line1_inset2": [
+        529,
+        54,
+        1599,
+        118
+      ],
+      "line2_inset2": [
+        544,
+        138,
+        1338,
+        206
+      ],
+      "authority": "PROVISIONAL_ONLY__NOT_RENDER_AUTHORITY_UNTIL_C_ACCEPTS_MASK_AND_CLEAN_PLATE"
+    },
+    "source_preserving_layout_spec": {
+      "source": "Drive against the Ghost Car and challenge for the course record!!",
+      "korean_full": "고스트 카와 달리며 코스 기록에 도전하세요!",
+      "line1": "고스트 카와 달리며",
+      "line2": "코스 기록에 도전하세요!",
+      "semantic_change": false,
+      "status": "LAYOUT_INPUT_ONLY_NO_RASTER_RENDER"
+    }
+  },
+  "fail_closed_gates": {
+    "final_effect_mask": "HOLD_C_INDEPENDENT_REVIEW",
+    "protected_mask": "HOLD_FULL_PANEL_PROTECTED_MASK_MATERIALIZATION",
+    "clean_plate": "HOLD_NOT_MATERIALIZED",
+    "source_style_signed_slant": "HOLD_NOT_MEASURED_THIS_TASK",
+    "korean_candidate_dds": "HOLD_NOT_RENDERED",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_NEW_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "readiness_after": "PREFLIGHT_ONLY_NARROWED_EFFECT_BOUNDARY_RULE_READY_FOR_C_REVIEW",
+  "next_safe_action": "C independently verify the threshold-18 effect-boundary rule against the exact canonical blob. If accepted, materialize a protected-panel mask and CLEAN_PLATE constrained strictly to that effect mask, validate native-resolution residue/seam/alpha preservation, then measure source signed slant/style and continue to v2 Korean render in the same producer invocation.",
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX99_DETERMINISTIC_EFFECT_MASK_BOUNDARY_AND_PROTECTED_RING_EVIDENCE",
+    "candidate_dds_modified": false,
+    "clean_plate_modified": false,
+    "new_effect_boundary_rule": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "69fd9b02c400062f56862fc2cb007a69c5fee8ef",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00146_report_blob_sha": "5558a986d7e2c92fa660f3756b800f51655d785b",
+    "c00150_task_blob_sha": "c69f7d6a5f435ea4341508e5be4e956c56507859",
+    "canonical_source_git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8"
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_ODD_INDEX_99_ONLY",
+    "qa_pending_exclusion": "PASS_A00149_65_89_241_NOT_TOUCHED",
+    "source_identity": "REUSED_UNCHANGED_C00150_PASS",
+    "heavy_qa_dedup": "PASS_NO_SOURCE_HEADER_OR_CORE_RECOMPUTE_AS_AUTHORITY__ONLY_NEW_EFFECT_BOUNDARY_DEPENDENCY_ANALYZED",
+    "effect_boundary": "PASS_DETERMINISTIC_THRESHOLD_AND_PROTECTED_RING_EVIDENCE_FOR_C_REVIEW",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
