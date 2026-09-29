@@ -403,7 +403,7 @@ require(
 )
 
 require(
-    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "SetRenderTarget implicit viewport/scissor transition observed",
     "R23/SetRenderTarget/live-state-capture",
 )

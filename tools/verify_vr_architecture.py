@@ -36,6 +36,7 @@ required = [
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "src/vr/d3d9/stereo_renderer_r22.cpp",
     "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r26.cpp",
     "src/vr/d3d9/stereo_renderer_r26_overlay.inc",
     "src/vr/d3d9/stereo_renderer_r29.cpp",
@@ -276,6 +277,10 @@ require(
 require(
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "#include \"stereo_renderer_r22.cpp\"",
+    "#include \"stereo_renderer_r23_overlay.inc\"",
+)
+require(
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "R23InstallState",
     "IsFailed(R22InstallState)",
     "R23RecoveryNeedsBaseline",
@@ -310,7 +315,7 @@ if "EnsureStereoResources(device)" in install_body:
     )
 
 r23_startup = require(
-    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "R23 is the final effective Present owner in the layered hook chain.",
     "if (SUCCEEDED(hr) && !StereoResourcesReady)",
     "EnsureStereoResources(device)",

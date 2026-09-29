@@ -82,7 +82,7 @@ jobs:
               'StartDisabled',
               'per-draw GetViewport/GetScissorRect/GetRenderState eliminated'
             )
-            'src/vr/d3d9/stereo_renderer_r23.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r23_overlay.inc' = @(
               'R23InstallState',
               'IsFailed(R22InstallState)',
               'R23CaptureActualGameState',
