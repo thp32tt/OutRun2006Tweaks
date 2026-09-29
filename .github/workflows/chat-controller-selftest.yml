@@ -70,15 +70,15 @@ jobs:
           grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' "$compose"
           grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' "$compose"
           grep -Fq 'WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"' "$compose"
-          grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "15"' "$compose"
+          grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "30"' "$compose"
           grep -Fq 'QUEUE_IDLE_REARM_SECONDS: "90"' "$compose"
-          grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
-          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
+          grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "45"' "$compose"
+          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "60"' "$compose"
           grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
           grep -Fq 'LOCALIZATION_QA_BATCH_SIZE: "4"' "$compose"
-          grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "30"' "$compose"
-          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
-          grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "30"' "$compose"
+          grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "60"' "$compose"
+          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "90"' "$compose"
+          grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "90"' "$compose"
           grep -Fq 'def github_action_run_by_id' /tmp/controller.py
           grep -Fq 'run_id=bound_run_id' /tmp/controller.py
           grep -Fq 'def startup_reconcile_queue_state' /tmp/controller.py
@@ -109,6 +109,13 @@ jobs:
           grep -Fq 'ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.' tools/chat-controller/v0.4/src/controller.py.part00
           grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_A.md
           grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'index % 3 == 0' tools/chat-controller/v0.4/localization_A.md
+          grep -Fq 'index % 3 == 1' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'index % 3 == 2' tools/chat-controller/v0.4/localization_E.md
+          grep -Fq '"D": "localization_E.md"' tools/chat-controller/v0.4/src/controller.py.part02
+          grep -Fq 'LOCALIZATION_E_QA_PAUSE_THRESHOLD: "8"' "$compose"
+          grep -Fq 'LOCALIZATION_E_QA_RESUME_THRESHOLD: "6"' "$compose"
+          grep -Fq 'CHAT_SLOTS: "4"' "$compose"
           grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part00
           grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part03
           if grep -Fq '반드시 GitHub만 직접 사용하고 N100' tools/chat-controller/v0.4/src/controller.py.part00 tools/chat-controller/v0.4/src/controller.py.part03; then
@@ -126,16 +133,16 @@ jobs:
           a = src.index("async def localization_parallel_cycle")
           b = src.index("def reconcile_legacy_conversion_blocked", a)
           body = src[a:b]
-          assert 'for lane_key in ("A", "B", "C")' in body
+          assert 'for lane_key in ("A", "B", "C", "D")' in body
           assert 'enqueue_producer_result_for_qa' in body
           assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
           qa_helpers = src[src.index("def _qa_item_key"):src.index("async def localization_parallel_cycle")]
           assert 'task.get("terminal") not in {"PRODUCED", "PASS"}' in qa_helpers
           proc = src[src.index("async def localization_process_lane"):src.index("def _qa_item_key")]
-          assert 'if lane_key in {"A", "B"}:' in proc
+          assert 'if lane_key in {"A", "B", "D"}:' in proc
           assert 'finalize_localization_producer_commit' in proc
           assert 'producer_wait_actions_migrated' in proc
-          assert 'No A+B/C barrier exists.' in body
+          assert 'No producer/C barrier exists.' in body
           assert 'all(active_by_lane[k].get("phase") == "DONE"' not in body
           print("continuous producers and independent batched QA verified")
           PY
