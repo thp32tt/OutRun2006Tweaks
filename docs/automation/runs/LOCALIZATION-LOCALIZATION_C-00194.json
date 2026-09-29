@@ -125,7 +125,7 @@
   "google_drive_write_performed": false,
   "uploaded_archive_used": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "prior_failed_attempt": {
@@ -134,5 +134,15 @@
     "conclusion": "failure",
     "failed_step": "Verify exact producer SHAs in C batch",
     "error": "B00190 exact result: missing unique durable task record under docs/automation/runs/"
+  },
+  "result_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
+  "validation_bearing_result_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36611801924,
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T03:24:46+09:00"
   }
 }
