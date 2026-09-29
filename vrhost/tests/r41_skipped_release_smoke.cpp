@@ -4,6 +4,8 @@
 
 using OutRunVrR41SkippedRelease::Identity;
 using OutRunVrR41SkippedRelease::Queue;
+using OutRunVrR41SkippedRelease::SampledHistory;
+using OutRunVrR41SkippedRelease::SampleEvidence;
 using OutRunVrR41SkippedRelease::StageResult;
 
 int main()
@@ -116,6 +118,46 @@ int main()
         if (queue.Stage(sampled) == StageResult::Invalid) return 23;
     }
     if (queue.PendingCount() != 0) return 24;
+
+    // Positive sampled-history contract. Absence is never proof that a frame
+    // was not sampled; only an exact full identity may return ExactSampled.
+    SampledHistory<4> sampledHistory{};
+    const Identity sampledExact{ 90, 91, 92, 0, 900 };
+    if (sampledHistory.Query(sampledExact) != SampleEvidence::Unknown)
+        return 25;
+    if (!sampledHistory.ObserveSampled(sampledExact)) return 26;
+    if (!sampledHistory.ExactSampled(sampledExact)) return 27;
+
+    const Identity sameProducerNewFrame{ 90, 91, 92, 0, 901 };
+    if (sampledHistory.Query(sameProducerNewFrame) !=
+        SampleEvidence::Unknown) return 28;
+
+    const Identity nextTransportSameSlot{ 90, 91, 93, 0, 902 };
+    if (sampledHistory.Query(nextTransportSameSlot) !=
+        SampleEvidence::Unknown) return 29;
+
+    const Identity nextRunSameSlot{ 90, 94, 93, 0, 903 };
+    if (sampledHistory.Query(nextRunSameSlot) !=
+        SampleEvidence::Unknown) return 30;
+
+    const Identity otherSlot{ 90, 91, 92, 1, 904 };
+    if (sampledHistory.Query(otherSlot) != SampleEvidence::Unknown)
+        return 31;
+
+    // Reusing a physical slot replaces only the positive exact proof for that
+    // slot; it never retroactively labels a different identity as sampled.
+    if (!sampledHistory.ObserveSampled(sameProducerNewFrame)) return 32;
+    if (sampledHistory.ExactSampled(sampledExact)) return 33;
+    if (!sampledHistory.ExactSampled(sameProducerNewFrame)) return 34;
+
+    const Identity invalidSample{ 0, 91, 92, 0, 905 };
+    if (sampledHistory.ObserveSampled(invalidSample)) return 35;
+    if (sampledHistory.Query(invalidSample) != SampleEvidence::Unknown)
+        return 36;
+
+    sampledHistory.Clear();
+    if (sampledHistory.Query(sameProducerNewFrame) !=
+        SampleEvidence::Unknown) return 37;
 
     return 0;
 }
