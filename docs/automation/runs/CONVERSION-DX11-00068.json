@@ -3,8 +3,8 @@
   "task_id": "CONVERSION-DX11-00068",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "3/3",
-  "recorded_kst": "2026-09-30T01:13:28+09:00",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T01:15:03+09:00",
   "checkpoint": "C6_STATE",
   "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
   "base_sha": "880672381667086d0fef13778859972c98966400",
@@ -87,8 +87,12 @@
     "issue": 14,
     "implementation_comment_id": 5893926853,
     "repair_comment_id": 5893952762,
-    "validation_comment_id": 5894108442,
-    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN"
+    "validation_comment_id": 5894126361,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN",
+    "validation_comment_ids": [
+      5894108442,
+      5894126361
+    ]
   },
   "evidence": [
     "Initial implementation commit 5125581a9c782b313e9ce177db370f6a3bde58d4 and validation-bearing repair commit 8cd1a176e695caf8cc6007f78a57418395164981 both contain the exact controller marker [AUTO:CONVERSION-DX11-00068] and no CI-skip directive.",
@@ -98,5 +102,10 @@
   ],
   "blocker": null,
   "resume_cursor": "R106 is automation-validated but runtime-untested. Bound MANAGED Texture2D CPU-shadow readiness is now observable without mirror upload, SRV binding or native game draw routing.",
-  "next_action": "Continue Set 05 F18 with one bounded non-routing managed-mirror readiness prerequisite before any production SRV binding or native draw promotion. Keep runtime graphics parity HMD-gated."
+  "next_action": "Continue Set 05 F18 with one bounded R107 mutation-source completeness step: distinguish MANAGED Texture2D shadows made current by LockRect capture from textures that may also change through UpdateTexture/UpdateSurface and therefore remain activation-pending. Do not bind SRVs or route native draws until exact mutation-source coverage and HMD graphics parity close.",
+  "controller_reconciliation": {
+    "corrected_from_attempt": "3/3",
+    "corrected_to_attempt": "1/3",
+    "reason": "The active controller-issued request specifies ATTEMPT=1/3. A concurrent bookkeeping writer recorded 3/3 after the same validation-bearing SHA had already passed; validation identity and CI evidence are unchanged."
+  }
 }
