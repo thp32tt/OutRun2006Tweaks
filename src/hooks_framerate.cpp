@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
+#include "vr/debug/perf_hitch_trace.hpp"
 
 namespace OutRunVRRenderer
 {
@@ -281,6 +282,25 @@ class ReplaceGameUpdateLoop : public Hook
 	// a millisecond building objects or textures before returning, and the other
 	// request servers it drives are bounded the same way.
 	static constexpr double FileLoadSliceMs = 0.5;
+
+	inline static SafetyHookInline R81FileLoadPerfHook{};
+
+	static int __cdecl R81FileLoadPerfDest()
+	{
+		LARGE_INTEGER before{}, after{}, frequency{};
+		QueryPerformanceCounter(&before);
+		const int busy = R81FileLoadPerfHook.ccall<int>();
+		QueryPerformanceCounter(&after);
+		QueryPerformanceFrequency(&frequency);
+		const std::uint64_t elapsedUs =
+			frequency.QuadPart > 0
+				? static_cast<std::uint64_t>(
+					(after.QuadPart - before.QuadPart) * 1000000ll /
+					frequency.QuadPart)
+				: 0;
+		OutRunVR::PerfHitch::NoteFileLoad(elapsedUs, busy != 0);
+		return busy;
+	}
 
 	// FileLoad_Ctrl returns zero once every request server has run dry, so one
 	// call answers immediately when there is nothing to load and today's single
@@ -727,6 +747,14 @@ public:
 		constexpr int HookAddr = 0x17C7B;
 		constexpr int GameLoopFrameLimiterAddr = 0x17DD3;
 		constexpr int GameLoopFileLoad_CtrlCaller = 0x17D8D;
+
+		R81FileLoadPerfHook = safetyhook::create_inline(
+			Module::exe_ptr(0x4FBA0), R81FileLoadPerfDest);
+		if (!R81FileLoadPerfHook)
+		{
+			spdlog::warn(
+				"VR R81 FRAME HITCH: FileLoad_Ctrl timing hook unavailable; geometry/resource/particle hitch telemetry remains active");
+		}
 
 		// disable broken framelimiter
 		Memory::VP::Nop(Module::exe_ptr(GameLoopFrameLimiterAddr), 2);
