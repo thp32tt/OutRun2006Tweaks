@@ -959,14 +959,15 @@ namespace OutRunVRStereo
         // but the companion checkpoint/result sprites remained generic queue 2D.
         // Promote only generic ScreenOverlay2D during a short stage-transition
         // window, never world/rival/projected semantics.
-        int R72OutRunTransientHudPresents = 0;
-        bool R72FirstTransientHudLogged = false;
+        int R73OutRunTransientHudPresents = 0;
+        bool R73OutRunHudStageSeen = false;
+        int R73OutRunHudLastStage = -1;
+        bool R73FirstTransientHudLogged = false;
+        constexpr bool R73BypassStereoSkyGlow = true;
 
         void R67GuardStageTransitionPresent() noexcept
         {
             auto& frame = R69FrameContext;
-            if (R72OutRunTransientHudPresents > 0)
-                --R72OutRunTransientHudPresents;
             if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
             {
                 frame.stageHoldRemaining = 0;
@@ -987,17 +988,6 @@ namespace OutRunVRStereo
                 frame.lastStageIdentity = stage;
                 frame.stageHoldRemaining = R68StageHoldPresents;
                 ++frame.stageTransitionHolds;
-                // Checkpoint "+TIME" overlays appear immediately after a stage
-                // identity change. The final-result overlay starts several
-                // seconds after stage 14, so keep a longer bounded window there.
-                R72OutRunTransientHudPresents =
-                    stage == 14 ? 1200 : 240;
-                if (!R72FirstTransientHudLogged)
-                {
-                    R72FirstTransientHudLogged = true;
-                    spdlog::info(
-                        "VR R72 OUTRUN HUD WINDOW: generic ScreenOverlay2D -> finite SCREEN_HUD only during bounded stage-transition/result windows");
-                }
                 R30SkyGlowSceneCaptureEpoch = 0;
                 R30SkyGlowAppliedEpoch = 0;
                 R30SkyGlowPreHudAttemptEpoch = 0;
@@ -1460,6 +1450,8 @@ namespace OutRunVRStereo
         bool R30CaptureSkyGlowSceneBeforeHud(
             IDirect3DDevice9* device)
         {
+            if (R73BypassStereoSkyGlow)
+                return false;
             if (!device || Settings::SkyGlowFactor <= 0 ||
                 !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
                 FrameRightDrawFailed || FrameStereoIncomplete ||
@@ -1489,6 +1481,8 @@ namespace OutRunVRStereo
 
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
+            if (R73BypassStereoSkyGlow)
+                return true;
             if (!device || Settings::SkyGlowFactor <= 0 ||
                 !StereoWanted() || !FrameHadWorldStereo ||
                 !FrameHadDuplicatedDraw || FrameRightDrawFailed ||
@@ -1703,6 +1697,8 @@ namespace OutRunVRStereo
             const RECT* destRect, HWND destWindowOverride,
             const RGNDATA* dirtyRegion)
         {
+            if (R73OutRunTransientHudPresents > 0)
+                --R73OutRunTransientHudPresents;
             R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
@@ -2119,6 +2115,49 @@ namespace OutRunVRStereo
             return R44OverlayMatrixKind::Unknown;
         }
 
+        bool R73OutRunTransientHudActive() noexcept
+        {
+            if (!Game::game_mode || !Game::current_mode ||
+                *Game::game_mode != 32)
+            {
+                R73OutRunTransientHudPresents = 0;
+                R73OutRunHudStageSeen = false;
+                R73OutRunHudLastStage = -1;
+                return false;
+            }
+
+            // Final OutRun result pages remain visible after the last stage
+            // transition. Keep generic queue 2D on the finite HUD plane for the
+            // exact gameplay/result states instead of expiring after N frames.
+            if (*Game::current_mode == GameState::STATE_GOAL ||
+                *Game::current_mode == GameState::STATE_RESULT)
+                return true;
+
+            if (Game::stg_stage_num)
+            {
+                const int stage = static_cast<int>(*Game::stg_stage_num);
+                if (!R73OutRunHudStageSeen)
+                {
+                    R73OutRunHudStageSeen = true;
+                    R73OutRunHudLastStage = stage;
+                }
+                else if (stage != R73OutRunHudLastStage)
+                {
+                    R73OutRunHudLastStage = stage;
+                    // Arm before the first draw on the new stage. R72 armed in
+                    // Present, after +TIME had already been queued.
+                    R73OutRunTransientHudPresents = 360;
+                    if (!R73FirstTransientHudLogged)
+                    {
+                        R73FirstTransientHudLogged = true;
+                        spdlog::info(
+                            "VR R73 OUTRUN HUD: draw-time stage transition/result ownership ACTIVE for game_mode=32");
+                    }
+                }
+            }
+            return R73OutRunTransientHudPresents > 0;
+        }
+
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
         {
@@ -2132,8 +2171,8 @@ namespace OutRunVRStereo
             const auto directScreenKind =
                 OutRunVR::ScreenSpacePolicy::DirectKind(semanticRoute);
             const bool transientOutRunHud =
-                R72OutRunTransientHudPresents > 0 &&
-                directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D;
+                directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D &&
+                R73OutRunTransientHudActive();
             const bool semanticHud =
                 semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud ||
                 transientOutRunHud;
@@ -4002,13 +4041,48 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
-                // R72 HMD evidence: copying one stock WVP into both eyes still
-                // leaves different angular placement because the OpenXR eyes
-                // have asymmetric FOVs. Align the authored centre-eye screen
-                // effect into the common angular frustum without adding IPD.
-                // Lens flare remains an optical/screen effect, so zero disparity
-                // is intentional; the fix target is one fused flare, not a
-                // false world-depth billboard.
+                // R73: R67 full IPD reprojection separated too much, while
+                // R69/R72 zero-disparity variants still did not fuse in HMD.
+                // Reuse the exact Calc3D2D anchor, but compress only the
+                // binocular component to 20%. This preserves shallow depth and
+                // the common world/light direction without full disparity.
+                float deltaX[2]{}, deltaY[2]{};
+                if (R57BuildProjectedMarkerDelta(
+                        stereo, baseProjection, deltaX, deltaY,
+                        nullptr, nullptr,
+                        OutRunVR::GameSemantic::ProjectedScreenAnchor()))
+                {
+                    const float meanX = 0.5f * (deltaX[0] + deltaX[1]);
+                    const float meanY = 0.5f * (deltaY[0] + deltaY[1]);
+                    constexpr float FlareStereoDepth = 0.20f;
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        D3DMATRIX clipShift = IdentityMatrix();
+                        clipShift._41 = meanX +
+                            (deltaX[eye] - meanX) * FlareStereoDepth;
+                        clipShift._42 = meanY +
+                            (deltaY[eye] - meanY) * FlareStereoDepth;
+                        const D3DMATRIX corrected =
+                            MultiplyMatrix(stockWvp, clipShift);
+                        if (!MatrixFinite(corrected))
+                            return false;
+                        const D3DMATRIX correctedT =
+                            TransposeMatrix(corrected);
+                        std::memcpy(eyeConstants[eye], &correctedT,
+                            sizeof(correctedT));
+                    }
+                    static bool firstR73FlareLogged = false;
+                    if (!firstR73FlareLogged)
+                    {
+                        firstR73FlareLogged = true;
+                        spdlog::info(
+                            "VR R73 FLARE: exact Calc3D2D anchor with 20% binocular disparity ACTIVE");
+                    }
+                    return true;
+                }
+
+                // Fail-soft: retain R72 common-angular alignment if the exact
+                // projected anchor is unavailable.
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     D3DMATRIX clipAffine = IdentityMatrix();
@@ -4018,17 +4092,9 @@ namespace OutRunVRStereo
                         MultiplyMatrix(stockWvp, clipAffine);
                     if (!MatrixFinite(corrected))
                         return false;
-                    const D3DMATRIX correctedT =
-                        TransposeMatrix(corrected);
+                    const D3DMATRIX correctedT = TransposeMatrix(corrected);
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
-                }
-                static bool firstFlareFovFusionLogged = false;
-                if (!firstFlareFovFusionLogged)
-                {
-                    firstFlareFovFusionLogged = true;
-                    spdlog::info(
-                        "VR R72 FLARE FUSION: exact Calc3D2D effect aligned to common angular FOV in L/R; zero-disparity optical flare");
                 }
                 return true;
             }
@@ -4418,7 +4484,7 @@ namespace OutRunVRStereo
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
-                        "VR R72 FLARE FIX: exact projected-screen effect uses common-angular-FOV zero-disparity fusion");
+                        "VR R73 FLARE FIX: exact projected-screen effect uses reduced-disparity Calc3D2D reprojection");
                 }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
