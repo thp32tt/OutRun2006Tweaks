@@ -1047,3 +1047,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Current schema9 family/template fast path does not relax QA or promote these metadata/source gates to Korean DDS approval. Exact canonical source bytes/candidates remain absent; Release-derived geometry remains nonauthoritative.
 - No Korean DDS candidate change, no new static approval, no runtime approval. Queue **137 = 93 + 31 + 9 + 1 + 3**, pending production localize_text **76**, canonical segments **753**.
 - Report: `localization/graphics/role_C/20260929-2038-C121/C121_Q00019_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### C122 Q00020 independent QA batch — 2026-09-29T20:59:10+09:00
+- Immutable inputs: B00136 `9e66a8c`, A00131 `23af3e8`, A00139 `a950e14`, B00138 `0f03eaa`. All four dispositions are **PASS** for limited canonical-source reacquisition / semantic-routing **PREFLIGHT_ONLY** evidence; B00136 reuses its unchanged Q00019/C121 PASS fingerprint, so heavy QA was not repeated.
+- Batch validation: **14/14** canonical inventory identities and **113** current localizable semantic entries plus **1** preserve-original semantic are consistent. A00131 **2/2**, A00139 **77/77**, B00138 **16/16** semantic pairs were independently rechecked; B00136 prior PASS remains fingerprint-identical.
+- Exact canonical queue-path DDS sources remain absent for the reviewed assets. Release/stock header/orientation/mask/CLEAN_PLATE/safe-bbox geometry is not promoted; family/template fast path authorizes semantic reuse only, never asset-specific style/geometry without canonical proof.
+- All reviewed assets classify **PREFLIGHT_ONLY**. Candidate DDS changes 0, new static approvals 0, runtime approvals 0. Queue remains **137 = 93 + 31 + 9 + 1 + 3**; pending production localize_text **76**; canonical segments **753**.
+- Newer producer results A00140/B00141 are disjoint and preserved. Report: `localization/graphics/role_C/20260929-2059-C122/C122_Q00020_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
