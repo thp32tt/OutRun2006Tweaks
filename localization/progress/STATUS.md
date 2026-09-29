@@ -1248,3 +1248,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Newer disjoint A00204 `9667b84` evidence is outside Q00043 and preserved for a later immutable C batch.
 - Candidate-completion-first: regenerate/persist index226 from corrected geometry; keep 159/201 candidate QA and exact-source 133/198/222/226/232 work ahead of unrelated preflight.
 - Counts unchanged: pending production **71**, actionable localize_text **93**, canonical segments **753**. Report: `localization/graphics/role_C/20260930-0430-C145/C145_Q00043_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### C145 Q00043 AUTHORITATIVE GATE PASS — 2026-09-30T04:38:53+09:00
+- Validation-bearing result `fbbf13f927f8c169379cbef94d76b793ecf01c6c`; Localization Automation Gate `36620675196` — **success**.
+- B00202 `a35266ef` disposition remains **REWORK_REQUIRED**. Index226's unpersisted candidate is not promoted because current corrected geometry invalidates its fingerprint; index232 remains **PREFLIGHT_ONLY** with two canonical description-translation blockers.
+- No static/runtime approval was added. Counts remain pending production **71**, actionable localize_text **93**, canonical segments **753**.
+- `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`. This bookkeeping commit is separate from the validation-bearing result and does not own the Gate.
