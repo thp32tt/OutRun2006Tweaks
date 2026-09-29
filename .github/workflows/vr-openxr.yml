@@ -739,6 +739,18 @@ jobs:
           & 'build-vrhost/bin/outrun-vr-r32-policy-smoke.exe'
           if ($LASTEXITCODE -ne 0) { throw "R32 policy regression failed: $LASTEXITCODE" }
 
+      - name: Run Frame.v2 producer-run identity regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-frame-run-identity-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "Frame.v2 producer-run identity regression failed: $LASTEXITCODE" }
+
+      - name: Run exact DirectGPU ACK identity regression
+        shell: pwsh
+        run: |
+          & 'build-vrhost/bin/outrun-vr-direct-ack-identity-smoke.exe'
+          if ($LASTEXITCODE -ne 0) { throw "DirectGPU ACK identity regression failed: $LASTEXITCODE" }
+
       - name: Verify x64 R32 host binary
         shell: pwsh
         run: |

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T19:43:00+09:00",
+  "updatedKst": "2026-09-29T20:08:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -248,22 +248,18 @@
     {
       "id": "VR-HOST-002",
       "priority": 10,
-      "status": "NEEDS_POST_REVIEW",
+      "status": "DONE",
       "preferredRole": "C_PERF_REVIEW",
       "summary": "Restore omitted post-test runtime safety fixes: loading/stall projection hold, Frame.v2 run-generation identity, stale slot/run rejection, DirectGPU run binding, validated gameplay handoff, fallback stale-run rejection, and matching verifiers.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 0,
+      "attempts": 1,
       "runtimeCandidate": false,
       "candidateBranch": "vr-d3d9ex-candidate/VR-HOST-002-reconcile",
       "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
       "validationRunId": 35531382160,
-      "validationResult": "BUILD_VERIFIED",
-      "postReviewRequired": [
-        "A",
-        "B",
-        "C"
-      ],
+      "validationResult": "PENDING",
+      "postReviewRequired": [],
       "provenance": [
         "ad14ed6c6757634233ec79b71f42be53c563edb7",
         "edee6b911198f4ab1fd9bd0e36ca3a5cf54a6162",
@@ -274,7 +270,16 @@
         "94be96fb8bbdc20ac53349707d53111d8d5ae885",
         "256fd8c5867042d73458a2f58f125c01352c76b3",
         "6585f9c7770de4e1c68bd16ffeb6ddeb9b3b8a4d"
-      ]
+      ],
+      "automationValidation": "PENDING",
+      "runtimeValidation": "UNTESTED",
+      "lastAutomationTaskId": "CONVERSION-DXVK-00051",
+      "postReviewEvidence": [
+        "Issue #6 comment 5755798832: VR-HOST-002 runtime changes passed independent A/B/C review.",
+        "Issue #6 comment 5863277718: current-focus revalidation found the old candidate diverged while protocol/host/direct-passthrough core remained present; instruction was to reconcile queue state rather than merge the stale candidate."
+      ],
+      "implementationProgress": "Current DXVK head already contains the VR-HOST-002 runtime safety chain: Frame.v2 producer run generation, host ReadSlot stale-run rejection, exact DirectGPU ACK identity, R23 host-owned hold/copy-before-ACK, verified bundle handoff, cached projection hold, and exact-source classic fallback rejection. CONVERSION-DXVK-00051 adds an executable Frame.v2 run-identity smoke, starts executing the existing exact DirectGPU ACK identity smoke in OpenXR CI, and expands the DXVK transport verifier across the current post-review chain. No runtime behavior changed.",
+      "nextAction": "Software/post-review closure is complete after exact-SHA CI. Do not recreate or merge the historical a2b2e4d candidate. Hardware-specific DXVK transport failures remain tracked separately under VR-DXVK-D3D9EX-SHARED-HANDLE-001 and require Quest3/VDXR evidence."
     },
     {
       "id": "DX9EX-SKYGLOW-001",

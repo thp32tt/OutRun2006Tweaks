@@ -275,6 +275,96 @@ for forbidden in (
             + forbidden
         )
 
+# VR-HOST-002 post-review closure. The old reconciliation candidate is
+# historical only; protect the current run-identity, stale-run rejection,
+# verified handoff, loading/stall hold, and exact fallback contracts.
+protocol = require(
+    "src/vr/ipc/protocol.hpp",
+    "RenderFrameRunGenerationIndex = 11",
+    "bool RenderFrameRunIdentityMatches(",
+    "ring.clientPid != 0",
+    "ring.reserved0 != 0",
+    "frame.clientPid == ring.clientPid",
+    "frame.reserved[RenderFrameRunGenerationIndex] == ring.reserved0",
+)
+
+for marker in (
+    "bool ClaimRenderFrameRingForCurrentRun() noexcept",
+    "RenderFrameRing->clientPid = self;",
+    "RenderFrameRing->reserved0 = RenderFrameRunGeneration;",
+    "std::memset(&slot, 0, sizeof(slot));",
+    "frame.reserved[OutRunVR::RenderFrameRunGenerationIndex]=RenderFrameRunGeneration",
+    "const bool holdPreviousProjection=R67HoldPreviousProjectionThisPresent;",
+):
+    if marker not in game:
+        raise SystemExit(
+            f"VR-HOST-002 producer/run-hold invariant missing: {marker}"
+        )
+
+for marker in (
+    "class RenderFrameReader",
+    "bool ReadSlot(std::uint32_t index",
+    "OutRunVR::RenderFrameRunIdentityMatches(*state_, out)",
+):
+    if marker not in host:
+        raise SystemExit(
+            f"VR-HOST-002 host stale-run rejection invariant missing: {marker}"
+        )
+
+for marker in (
+    "const bool cachedHold = cachedProjectionValid;",
+    'finalLayerKind = "projection-cached";',
+    "pendingBundlePublish = true;",
+    "OutRunVrR23VerifiedBundle::Publish(",
+    'finalLayerKind = "direct-only-no-classic-fallback";',
+    "generation != currentGeneration",
+):
+    if marker not in host_r23:
+        raise SystemExit(
+            f"VR-HOST-002 verified handoff/hold invariant missing: {marker}"
+        )
+
+r23_hardening = require(
+    "vrhost/src/runtime/r23_runtime_hardening.hpp",
+    "OutRunVrR23VerifiedBundle::ReadFresh(verified)",
+    "OutRunVrSbsCaptureOverride::FrameComplete(verified.frame)",
+    "RenderCommittedDirect(session, endInfo, verified)",
+    "const bool exactClassicSource = verified.sourceCaptureQpc > 0",
+    "OutRunVrSbsCaptureOverride::LastProductionPresentQpc ==",
+    "verified.sourceCaptureQpc",
+    "FreshClassicFallbackAvailable()",
+    "classic fallback blocked: current production capture is not the committed bundle source",
+)
+
+frame_identity_smoke = require(
+    "vrhost/tests/frame_run_identity_smoke.cpp",
+    "RenderFrameRunIdentityMatches(ring, frame)",
+    "frame.clientPid = 1002",
+    "ring.reserved0 = 0",
+    "Simulate a fast game restart",
+)
+
+ack_identity_smoke = require(
+    "vrhost/tests/direct_ack_identity_smoke.cpp",
+    "DirectGpuAckIdentityMatches(ack, 10, 20, 30, 40)",
+    "DirectGpuAckIdentityMatches(ack, 10, 20, 31, 40)",
+    "DirectGpuAckIdentityMatches(ack, 10, 20, 30, 41)",
+)
+
+cmake = require(
+    "vrhost/CMakeLists.txt",
+    "outrun-vr-frame-run-identity-smoke",
+    "tests/frame_run_identity_smoke.cpp",
+    "outrun-vr-direct-ack-identity-smoke",
+)
+workflow = require(
+    ".github/workflows/vr-openxr.yml",
+    "Run Frame.v2 producer-run identity regression",
+    "outrun-vr-frame-run-identity-smoke.exe",
+    "Run exact DirectGPU ACK identity regression",
+    "outrun-vr-direct-ack-identity-smoke.exe",
+)
+
 # Keep the smoke target in the host build graph; it provides compile-time ABI
 # checks in addition to this source-order/lifetime verifier.
 require(
@@ -283,4 +373,4 @@ require(
     "tests/dxvk_shared_eye_bridge_smoke.cpp",
 )
 
-print("DXVK host-owned transport synchronization contract: PASS")
+print("DXVK host-owned transport synchronization + VR-HOST-002 post-review contract: PASS")

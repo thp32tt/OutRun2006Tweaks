@@ -159,6 +159,12 @@ target_include_directories(outrun-vr-direct-ack-identity-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-direct-ack-identity-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
+add_executable(outrun-vr-frame-run-identity-smoke tests/frame_run_identity_smoke.cpp)
+target_include_directories(outrun-vr-frame-run-identity-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+)
+target_compile_definitions(outrun-vr-frame-run-identity-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+
 add_executable(outrun-vr-dxvk-shared-eye-bridge-smoke tests/dxvk_shared_eye_bridge_smoke.cpp)
 target_include_directories(outrun-vr-dxvk-shared-eye-bridge-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
@@ -184,6 +190,7 @@ foreach(target
     outrun-vr-r23-verified-bundle-smoke
     outrun-vr-r32-policy-smoke
     outrun-vr-direct-ack-identity-smoke
+    outrun-vr-frame-run-identity-smoke
     outrun-vr-dxvk-shared-eye-bridge-smoke
     outrun-vr-recenter-ipc-smoke)
     set_target_properties(${target} PROPERTIES
