@@ -95,15 +95,16 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     "fixed projected-world-marker production path active",
 ], "P2_FIXED_RENDERER_PATH")
 require_all("tools/OutRunVR-Test-Selector.ps1", [
-    "'DX9Ex + D3D11 Host','d3d9','R69_FIXPACK'",
-    "'DX11 Host DirectGPU','dx11','R69_FIXPACK'",
-    "'DXVK SAFE','dxvk-safe','R69_FIXPACK'",
-], "P2_SELECTOR_DEFAULT_R69")
+    "& $selector -Backend d3d9 -TestProfile $profile -VariantId $variant",
+    "Invoke-R71Test 'CORRECTNESS' 'R71_HUD_FLARE'",
+    "Invoke-R71Test 'HUD_MENU' 'R71_HUD_MENU'",
+], "P2_SELECTOR_R71_EVENING")
 selector = read("tools/OutRunVR-Test-Selector.ps1")
-if selector.count("'R69_FIXPACK'=@") != 1:
-    errors.append("P2_SELECTOR_UNIQUE_R69: R69_FIXPACK must be defined exactly once")
-else:
-    passes.append("P2_SELECTOR_UNIQUE_R69")
+for variant in ["R71_HUD_FLARE", "R71_HUD_MENU"]:
+    if selector.count(variant) != 1:
+        errors.append(f"P2_SELECTOR_UNIQUE_R71: {variant} must appear exactly once in the evening GUI")
+if not any(e.startswith("P2_SELECTOR_UNIQUE_R71") for e in errors):
+    passes.append("P2_SELECTOR_UNIQUE_R71")
 for stale in ["R57_01_POSITION_KIND1_HUD35", "R57_05_RANK_PROJECTED_IPD", "R57_10_RANK_PROJECTED_TRACE"]:
     if stale in selector:
         errors.append(f"P2_SELECTOR_NO_STALE_R57: stale selector entry present: {stale}")
@@ -111,7 +112,9 @@ if not any(e.startswith("P2_SELECTOR_NO_STALE_R57") for e in errors):
     passes.append("P2_SELECTOR_NO_STALE_R57")
 require_all("tools/Run-OutRunVRTest.ps1", [
     "'R69_FIXPACK' { $semanticMode='0'; $hudExperimentMode='2' }",
-], "P2_RUNNER_R69_MAPPING")
+    "'R71_HUD_FLARE' { $semanticMode='0'; $hudExperimentMode='2' }",
+    "'R71_HUD_MENU' { $semanticMode='0'; $hudExperimentMode='2' }",
+], "P2_RUNNER_R69_R71_MAPPING")
 
 # PASS 3 — diagnostics stay disabled and exact queue ownership stays sticky.
 require_all("src/hooks_uiscaling.cpp", [
@@ -377,7 +380,7 @@ forbid(".github/workflows/vr-openxr.yml",
 require_all("tools/OutRunVR-Test-Selector.ps1", [
     "R71_HUD_FLARE",
     "R71_HUD_MENU",
-    "DX9Ex R71 HUD + FLARE",
+    "OutRun 2006 VR R71 - HUD / Lens Flare Test",
     "OutRun2_VR_ANALYZE_*.zip",
 ], "P9_R71_EVENING_SELECTOR")
 require_all("tools/START_HERE_VR_TEST.cmd", [
