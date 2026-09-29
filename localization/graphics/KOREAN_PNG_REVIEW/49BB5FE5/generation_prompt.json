@@ -1,0 +1,72 @@
+{
+  "schema": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+  "wave_id": "P00082",
+  "asset": "49BB5FE5",
+  "index": 152,
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+    "sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "dimensions": [
+      512,
+      128
+    ],
+    "fourcc": "DXT5",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y"
+  },
+  "translations": [
+    {
+      "source": "PRO.",
+      "korean": "프로"
+    },
+    {
+      "source": "INS.",
+      "korean": "연주"
+    },
+    {
+      "source": "G.M.",
+      "korean": "기타"
+    },
+    {
+      "source": "E.R.",
+      "korean": "유로"
+    }
+  ],
+  "preserve_original": [
+    "'89",
+    "'86"
+  ],
+  "clean_plate": {
+    "base_mask": "C127-accepted per-pixel mask; PRO/INS/G.M. threshold 10, E.R. threshold 12 reproduces exact B00152 RLE",
+    "residue_closure": "2 px 8-neighbor dilation clipped to each accepted source full-effect bbox after producer visual residue review",
+    "background_reconstruction": "verified flat dominant color per cell",
+    "alpha": "preserve source alpha"
+  },
+  "lettering": {
+    "font_family": "Noto Sans CJK KR Bold",
+    "start_font_size_px": 24,
+    "fill_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "outline": null,
+    "shadow": null,
+    "glow": null,
+    "signed_slant_deg": 0.0,
+    "placement": "centered in 4x4-block-aligned inner rectangle of each v2 candidate_safe_bbox",
+    "flattened_resample": false
+  },
+  "dds": {
+    "compression": "DXT5/BC3",
+    "header": "exact original 128-byte header",
+    "strategy": "encode clean and candidate at native 512x128; splice only source-removal blocks and Korean-lettering blocks; copy all other 16-byte BC3 blocks byte-identically from source",
+    "encoder": "Version: ImageMagick 6.9.12-98 Q16 x86_64 18038 https://legacy.imagemagick.org"
+  },
+  "runtime_validation": "UNTESTED"
+}
