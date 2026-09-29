@@ -1040,3 +1040,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Release-derived geometry/identity and historical candidate hashes are not promoted. Candidate/header/orientation/mask/CLEAN_PLATE/1px containment/source-vs-candidate gates remain **HOLD_STRICT_RECHECK**.
 - No Korean DDS candidate change, no new static approval, no runtime approval. Queue **137 = 93 + 31 + 9 + 1 + 3**, pending production localize_text **76**, canonical segments **753**.
 - Report: `localization/graphics/role_C/20260929-2015-C120/C120_Q00018_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C121 Q00019 — 2026-09-29T20:38:26+09:00
+- QA inputs: B00134 `24b0943` (212/220/222), B00136 `9e66a8c` (34/44/52/172).
+- Result: **PASS / PASS**, limited to canonical-source reacquisition PREFLIGHT_ONLY evidence. Seven canonical inventory identities, 40 current localizable semantics plus one preserve-original semantic, and 44 expected localizable physical occurrences were rechecked.
+- Current schema9 family/template fast path does not relax QA or promote these metadata/source gates to Korean DDS approval. Exact canonical source bytes/candidates remain absent; Release-derived geometry remains nonauthoritative.
+- No Korean DDS candidate change, no new static approval, no runtime approval. Queue **137 = 93 + 31 + 9 + 1 + 3**, pending production localize_text **76**, canonical segments **753**.
+- Report: `localization/graphics/role_C/20260929-2038-C121/C121_Q00019_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
