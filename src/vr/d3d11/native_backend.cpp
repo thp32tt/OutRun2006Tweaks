@@ -18,6 +18,13 @@ bool same_luid(const LUID& a, const LUID& b) noexcept {
     return a.LowPart == b.LowPart && a.HighPart == b.HighPart;
 }
 
+std::uint64_t mix_readiness_snapshot_token(
+    std::uint64_t token,
+    std::uint64_t value) noexcept {
+    token ^= value + 0x9e3779b97f4a7c15ull + (token << 6) + (token >> 2);
+    return token;
+}
+
 bool texture_uncompressed_row_bytes(
     D3DFORMAT format,
     UINT width,
@@ -539,6 +546,9 @@ bool NativeManagedTextureShadow::recreate_and_upload_mirror(
         release_mirror();
         return false;
     }
+    ++mirror_instance_generation_;
+    if (mirror_instance_generation_ == 0)
+        ++mirror_instance_generation_;
     return true;
 }
 
@@ -695,6 +705,7 @@ void NativeManagedTextureShadow::shutdown() noexcept {
     row_bytes_ = 0;
     shadow_.clear();
     lifetime_ = {};
+    mirror_instance_generation_ = 0;
 }
 
 bool NativeManagedTextureRegistry::register_texture(
@@ -852,6 +863,14 @@ NativeManagedTextureRegistry::mirror_readiness_for_stages(
         return out;
 
     out.inputValid = true;
+    std::uint64_t snapshotToken = 0xcbf29ce484222325ull;
+    snapshotToken = mix_readiness_snapshot_token(
+        snapshotToken, static_cast<std::uint64_t>(requiredMask));
+    snapshotToken = mix_readiness_snapshot_token(
+        snapshotToken,
+        static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(expectedDevice)));
+
     std::lock_guard<std::mutex> lock(mutex_);
     for (std::size_t stage = 0; stage < textureCount; ++stage) {
         const auto bit = static_cast<std::uint32_t>(1u << stage);
@@ -886,11 +905,47 @@ NativeManagedTextureRegistry::mirror_readiness_for_stages(
             lifetimeCurrent &&
             deviceMatches)
             out.readyMask |= bit;
+
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, static_cast<std::uint64_t>(stage));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(textureKeys[stage])));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, lifetime.deviceGeneration);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, lifetime.cpuShadowVersion);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, lifetime.mirrorGeneration);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, lifetime.mirrorShadowVersion);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, shadow->mirror_instance_generation());
     }
 
     out.pendingMask = out.requiredMask & ~out.readyMask;
     out.allRequiredReady = out.pendingMask == 0;
+    if (out.allRequiredReady && out.requiredMask != 0) {
+        out.snapshotToken = snapshotToken == 0 ? 1 : snapshotToken;
+    }
     return out;
+}
+
+bool NativeManagedTextureRegistry::validate_mirror_readiness_snapshot_for_stages(
+    const void* const* textureKeys,
+    std::size_t textureCount,
+    std::uint32_t requiredMask,
+    ID3D11Device* expectedDevice,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0 || requiredMask == 0)
+        return false;
+
+    const auto current = mirror_readiness_for_stages(
+        textureKeys, textureCount, requiredMask, expectedDevice);
+    return current.inputValid &&
+        current.allRequiredReady &&
+        current.snapshotToken == snapshotToken;
 }
 
 void NativeManagedTextureRegistry::observe_device_reset() noexcept {

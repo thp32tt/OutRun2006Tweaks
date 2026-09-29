@@ -1010,6 +1010,47 @@ int main()
         registryStageReady.pendingMask == 0 &&
         registryStageReady.allRequiredReady,
         "R109 exact required stage aggregates all R108 readiness evidence");
+    require(
+        registryStageReady.snapshotToken != 0 &&
+        managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, registryStageReady.snapshotToken),
+        "R110 ready stage aggregate issues a valid nonzero snapshot token");
+    require(
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, textureOtherDevice.device, registryStageReady.snapshotToken) &&
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x3u, d3d.device, registryStageReady.snapshotToken) &&
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, 0),
+        "R110 snapshot token is bound to exact device mask and nonzero identity");
+    const auto registryStageInitialToken = registryStageReady.snapshotToken;
+    require(
+        managedRegistry.recreate_and_upload_mirror_for_observation(
+            &registryTextureA, d3d.device),
+        "R110 same-shadow mirror recreation prerequisite");
+    const auto registryStageAfterSameShadowRecreate =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageAfterSameShadowRecreate.allRequiredReady &&
+        registryStageAfterSameShadowRecreate.snapshotToken != 0 &&
+        registryStageAfterSameShadowRecreate.snapshotToken !=
+            registryStageInitialToken &&
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, registryStageInitialToken) &&
+        managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device,
+            registryStageAfterSameShadowRecreate.snapshotToken),
+        "R110 mirror instance recreation invalidates stale readiness token");
+    const auto registryStageBeforeExternalMutationToken =
+        registryStageAfterSameShadowRecreate.snapshotToken;
     const auto registryStageMissingRequired =
         managedRegistry.mirror_readiness_for_stages(
             registryStageKeys.data(), registryStageKeys.size(),
@@ -1068,6 +1109,12 @@ int main()
         !registryStageAfterExternalMutation.allRequiredReady,
         "R109 external mutation makes required stage activation-pending");
     require(
+        registryStageAfterExternalMutation.snapshotToken == 0 &&
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, registryStageBeforeExternalMutationToken),
+        "R110 external mutation invalidates prior readiness snapshot token");
+    require(
         !managedRegistry.invalidate_external_mutation(&registryTextureA) &&
         !managedRegistry.shadow_valid(&registryTextureA),
         "R107 repeated external update remains fail-closed while shadow is stale");
@@ -1107,6 +1154,16 @@ int main()
         registryStageAfterRecapture.pendingMask == 0 &&
         registryStageAfterRecapture.allRequiredReady,
         "R109 recaptured mirror restores required stage readiness");
+    require(
+        registryStageAfterRecapture.snapshotToken != 0 &&
+        registryStageAfterRecapture.snapshotToken !=
+            registryStageBeforeExternalMutationToken &&
+        managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, registryStageAfterRecapture.snapshotToken),
+        "R110 recapture and mirror recreation issue a fresh valid token");
+    const auto registryStageBeforeResetToken =
+        registryStageAfterRecapture.snapshotToken;
 
     const auto registryVersionBeforeReset =
         managedRegistry.shadow_version(&registryTextureA);
@@ -1148,6 +1205,12 @@ int main()
         !registryStageAfterReset.allRequiredReady,
         "R109 Reset keeps required stage activation-pending");
     require(
+        registryStageAfterReset.snapshotToken == 0 &&
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, registryStageBeforeResetToken),
+        "R110 Reset invalidates pre-Reset readiness snapshot token");
+    require(
         managedRegistry.recreate_and_upload_mirror_for_observation(
             &registryTextureA, d3d.device),
         "R108 post-Reset registry mirror recreation");
@@ -1172,6 +1235,15 @@ int main()
         registryStageAfterResetRecreate.pendingMask == 0 &&
         registryStageAfterResetRecreate.allRequiredReady,
         "R109 post-Reset recreation restores required stage readiness");
+    require(
+        registryStageAfterResetRecreate.snapshotToken != 0 &&
+        registryStageAfterResetRecreate.snapshotToken !=
+            registryStageBeforeResetToken &&
+        managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device,
+            registryStageAfterResetRecreate.snapshotToken),
+        "R110 post-Reset recreation issues a generation-current fresh token");
 
     managedRegistry.forget_texture(&registryTextureA);
     require(
@@ -1396,5 +1468,6 @@ int main()
     std::cout << "DX11 managed Texture2D mutation-source completeness R107: PASS\n";
     std::cout << "DX11 managed Texture2D registry mirror readiness R108: PASS\n";
     std::cout << "DX11 managed Texture2D stage mirror readiness R109: PASS\n";
+    std::cout << "DX11 managed Texture2D readiness snapshot token R110: PASS\n";
     return 0;
 }

@@ -2070,13 +2070,87 @@ def main() -> None:
                 "DX11 R109 stage-readiness probe drift: " + meaning
             )
 
+    r110_snapshot_header = {
+        "std::uint64_t snapshotToken{}":
+            "R110 stage-readiness snapshot token",
+        "mirror_instance_generation() const noexcept":
+            "R110 mirror-instance generation getter",
+        "std::uint64_t mirror_instance_generation_ = 0":
+            "R110 mirror-instance generation storage",
+        "validate_mirror_readiness_snapshot_for_stages(":
+            "R110 snapshot validation API",
+    }
+    missing_r110_header = [
+        meaning
+        for token, meaning in r110_snapshot_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r110_header:
+        raise SystemExit(
+            "DX11 R110 readiness-snapshot header drift: "
+            + ", ".join(missing_r110_header)
+        )
+
+    for token, meaning in {
+        "mix_readiness_snapshot_token(":
+            "R110 snapshot token mixer",
+        "++mirror_instance_generation_":
+            "R110 successful mirror recreation generation",
+        "reinterpret_cast<std::uintptr_t>(expectedDevice)":
+            "R110 expected-device token binding",
+        "reinterpret_cast<std::uintptr_t>(textureKeys[stage])":
+            "R110 texture-identity token binding",
+        "lifetime.deviceGeneration":
+            "R110 device-generation token binding",
+        "lifetime.cpuShadowVersion":
+            "R110 CPU-shadow-version token binding",
+        "lifetime.mirrorGeneration":
+            "R110 mirror-generation token binding",
+        "lifetime.mirrorShadowVersion":
+            "R110 mirror-shadow-version token binding",
+        "shadow->mirror_instance_generation()":
+            "R110 mirror-instance token binding",
+        "out.snapshotToken = snapshotToken == 0 ? 1 : snapshotToken":
+            "R110 nonzero ready token",
+        "current.snapshotToken == snapshotToken":
+            "R110 stale-token validation gate",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R110 readiness-snapshot source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R110 ready stage aggregate issues a valid nonzero snapshot token":
+            "R110 initial token validation",
+        "R110 snapshot token is bound to exact device mask and nonzero identity":
+            "R110 token identity binding proof",
+        "R110 mirror instance recreation invalidates stale readiness token":
+            "R110 same-shadow recreation invalidation proof",
+        "R110 external mutation invalidates prior readiness snapshot token":
+            "R110 mutation invalidation proof",
+        "R110 recapture and mirror recreation issue a fresh valid token":
+            "R110 recapture fresh-token proof",
+        "R110 Reset invalidates pre-Reset readiness snapshot token":
+            "R110 Reset stale-token proof",
+        "R110 post-Reset recreation issues a generation-current fresh token":
+            "R110 post-Reset token proof",
+        "DX11 managed Texture2D readiness snapshot token R110: PASS":
+            "R110 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R110 readiness-snapshot probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census
         or "mirror_readiness_for_stages(" in census
+        or "validate_mirror_readiness_snapshot_for_stages(" in census
     ):
         raise SystemExit(
-            "DX11 R108/R109 observation-only registry mirror API gained a runtime census caller"
+            "DX11 R108-R110 observation-only registry mirror API gained a runtime census caller"
         )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

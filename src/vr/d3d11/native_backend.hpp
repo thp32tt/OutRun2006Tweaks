@@ -158,7 +158,9 @@ private:
 // that UnlockRect succeeds, so no source pointer survives across the COM call.
 // R108 adds registry-level, non-routing mirror ownership/readiness observation.
 // R109 adds fail-closed per-stage aggregation over those readiness snapshots.
-// Native draw/SRV binding remains disabled.
+// R110 adds a stale-snapshot token that changes on every successful mirror
+// recreation and on every generation/shadow-version transition represented by
+// the aggregate. Native draw/SRV binding remains disabled.
 struct NativeManagedTextureMirrorReadiness {
     bool registered{};
     bool shadowValid{};
@@ -183,6 +185,7 @@ struct NativeManagedTextureStageReadiness {
     std::uint32_t deviceMatchesMask{};
     std::uint32_t readyMask{};
     std::uint32_t pendingMask{};
+    std::uint64_t snapshotToken{};
 };
 
 class NativeManagedTextureShadow final {
@@ -252,6 +255,9 @@ public:
     [[nodiscard]] ID3D11ShaderResourceView* mirror_srv() const noexcept {
         return mirror_srv_.Get();
     }
+    [[nodiscard]] std::uint64_t mirror_instance_generation() const noexcept {
+        return mirror_instance_generation_;
+    }
     [[nodiscard]] const ManagedMirrorLifetimeState&
     lifetime_state() const noexcept {
         return lifetime_;
@@ -279,6 +285,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mirror_srv_;
+    std::uint64_t mirror_instance_generation_ = 0;
 };
 
 // R105 census-only per-texture owner. Keys are observed D3D9 texture identities;
@@ -324,6 +331,12 @@ public:
         std::size_t textureCount,
         std::uint32_t requiredMask,
         ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] bool validate_mirror_readiness_snapshot_for_stages(
+        const void* const* textureKeys,
+        std::size_t textureCount,
+        std::uint32_t requiredMask,
+        ID3D11Device* expectedDevice,
+        std::uint64_t snapshotToken) const noexcept;
     void observe_device_reset() noexcept;
     void forget_texture(const void* textureKey) noexcept;
     void clear() noexcept;
