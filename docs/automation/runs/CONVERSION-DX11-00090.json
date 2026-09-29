@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00090",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_kst": "2026-09-30T06:06:49+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "d786fe267ab944d81a0cc24dfb2b297ccee61640",
+  "initial_result_sha": "0c263f751e50fd26ae9d3d8bc8c9e79454bb4feb",
+  "result_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+  "validation_bearing_result_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R117/R118 native DX11 transport handoff sealing: require identity-complete FrameAck acknowledgements and expose an immutable exact Published lifetime/slot/frame shared-eye publication snapshot without enabling native draw or host routing.",
+  "summary": "R117 removes the frameId-only IFrameConsumer acknowledgement boundary and compile-locks IFrameConsumer::acknowledge(const FrameAck&) so producer/consumer PID, run generation, transport generation, slot and frame identity remain intact. R118 adds NativeSharedEyePublication plus snapshot_published_frame/validate_publication_snapshot, allowing handoff only for an exact currently Published frame after producer EVENT completion and rejecting stale snapshots after ACK retirement, lifetime invalidation, generation replacement or hard retirement. Hosted WARP transport coverage and the mandatory source verifier seal the contract; native game draw and OpenXR host routing remain dormant.",
+  "source_commits": [
+    "0c263f751e50fd26ae9d3d8bc8c9e79454bb4feb",
+    "c0658735d3a162bf21ee5dc780720cb40ad1cb5a",
+    "dcd0fd98cfba67978962e7a3e5250e1d52cac3c9",
+    "02a1e280cde0415f8ab9dec5646114554ec747fe",
+    "3425a1512c87fa7ecd977b600af0fc2eb828594e"
+  ],
+  "changed_paths": [
+    "src/vr/core/transport.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py",
+    "vrhost/tests/direct_ack_identity_smoke.cpp"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "openxr_host_routing_changed": false,
+    "d3d9_render_policy_changed": false,
+    "hud_ownership_changed": false,
+    "selector_changed": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_07:F26",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "reason": "The task changes dormant backend-neutral/DX11 transport contracts and hosted verification only. It does not activate native draw ownership, alter the D3D9/DX9Ex render policy, route OpenXR host consumption, or claim Quest3/VDXR graphics correctness. Exact identity and publication-lifetime checks reduce stale-handoff risk but remain runtime-untested."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36629779044,
+      "conclusion": "success",
+      "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+      "artifact_id": 11062007673,
+      "artifact_digest": "sha256:84f33e0cc0448421a3d180ab5031fdf014cdeff5ab68d2d8b4f2c5ad24689c8f",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer probes PASS; R118 dx11_native_transport_probe build and run PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36629784432,
+      "conclusion": "success",
+      "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36629784308,
+      "conclusion": "success",
+      "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36629784651,
+      "conclusion": "success",
+      "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36629778935,
+      "conclusion": "skipped",
+      "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_ids": [
+      5898674287,
+      5898714211
+    ],
+    "validation_comment_id": 5898898161,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact controller marker [AUTO:CONVERSION-DX11-00090] and no CI-skip directive.",
+    "The task is exactly five commits ahead of the CONVERSION-DX11-00088 bookkeeping base and changes six bounded transport/probe/verifier paths.",
+    "R117 rejects reintroduction of a frameId-only consumer acknowledgement contract and compile-locks the exact FrameAck member signature.",
+    "R118 snapshots only a live Published frame and validates exact transport identity, slot, frame, both shared handles, dimensions and format; hosted coverage proves ACK retirement and lifetime invalidation make the snapshot stale.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R117/R118 are automation-validated but runtime-untested. The native shared-eye handoff contract is now identity-complete and publication-lifetime sealed; native game draw and host consumption remain dormant.",
+  "next_action": "Continue with the next independent bounded DX11 prerequisite. Do not claim graphics/runtime correctness or activate native draw/host ownership before exact-build Quest3/VDXR evidence."
+}
