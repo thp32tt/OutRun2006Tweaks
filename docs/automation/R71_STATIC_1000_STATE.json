@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 26,
+  "completedCycles": 27,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "7ccdc4921712bc1ab9891cd4ce30ac38363e8de7",
+  "currentHead": "d0bac38b6c9c954c077410d6687bf649b7c258d0",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -780,12 +780,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "review candidate rejection diagnostics"
+    },
+    {
+      "cycle": 27,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "candidateRejectReason and final-layer counters provide bounded evidence for selection failures without changing renderer semantics; no additional broad HUD heuristic is justified."
+      ],
+      "evidence": [
+        "candidateRejectReason + R23FinalCounters/R23PipelineWindow"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "d0bac38b6c9c954c077410d6687bf649b7c258d0"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "review release-owner interaction at generation changes"
     }
   ],
   "nextCycle": {
-    "cycle": 27,
+    "cycle": 28,
     "priority": [
-      "review candidate rejection diagnostics"
+      "review release-owner interaction at generation changes"
     ],
     "guard": "frozen 34eef500 user-test package immutable; GitHub remains source of truth"
   },
