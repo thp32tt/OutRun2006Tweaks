@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-v2-bc3-effect-mask-clean-plate-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00107",
+  "wave_id": "P00039",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T17:49:30+09:00",
+  "precommit_head_sha": "6e8a205c0c9fdb5aed4c55527466aa2ca637e95f",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      55
+    ],
+    "selected_assets": [
+      "2EA557B4"
+    ],
+    "basis": "Q00007/C109 consumed A00082 as PASS. Index 55 is an odd-shard single mapped BC3 text sprite whose accepted v2 preflight explicitly requires exact source-effect mask/CLEAN_PLATE evidence before Korean rendering. Index 119 is skipped because A00105 is now an immutable producer result awaiting C QA.",
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00096": [
+        147,
+        159,
+        161,
+        163
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00098": [
+        173,
+        193,
+        201,
+        225
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00102": [
+        137,
+        217,
+        219,
+        241
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00105": [
+        119
+      ]
+    }
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX55_EXACT_BC3_SOURCE_EFFECT_MASK_AND_CLEAN_PLATE_PREFLIGHT",
+    "assets_advanced": 1,
+    "candidate_dds_written": false,
+    "description": "Directly decoded the exact pinned Release BC3 DDS from GitHub, reconciled decoder semantics against C-accepted A00041 metrics, isolated the exact visible source-effect mask inside mapped sprite_337, materialized deterministic mask/CLEAN_PLATE fingerprints, and resolved the first-pass-v2 candidate-safe bbox. Korean rendering remains blocked on exact baseline/signed-slant/style measurements and subsequent candidate QA."
+  },
+  "asset": {
+    "queue_index": 55,
+    "asset": "2EA557B4",
+    "queue_path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+    "translation": {
+      "source": "NEXT ROUND",
+      "korean": "다음 라운드"
+    },
+    "exact_release": {
+      "repository": "Sonic-TV/OR2006Sprites",
+      "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "path": "Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "git_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79",
+      "bytes": 524416
+    },
+    "direct_dds_decode": {
+      "magic": "DDS ",
+      "width": 2048,
+      "height": 256,
+      "fourcc": "DXT5",
+      "format": "BC3",
+      "mip_count": 1,
+      "linear_size": 524288,
+      "payload_bytes": 524288,
+      "header_bytes": 128,
+      "decode_consumed_bytes": 524416,
+      "size_equation": "128 + (2048/4)*(256/4)*16 = 524416",
+      "alpha_interpolation_profile": "ROUND_NEAREST_FOR_A00041_LINEAGE",
+      "color_decode_profile": "RGB565_ROUND_TO_8BIT__BC3_4COLOR_INTERPOLATION_FLOOR_THIRDS",
+      "result": "PASS_EXACT_PINNED_BLOB_AND_FULL_MIP1_PAYLOAD"
+    },
+    "decoder_lineage_reconciliation": {
+      "accepted_a00041_full_alpha_gt0_count": 116444,
+      "reproduced_full_alpha_gt0_count": 116444,
+      "accepted_a00041_full_alpha_ge128_count": 107196,
+      "reproduced_full_alpha_ge128_count": 107196,
+      "accepted_a00041_bbox_values_were_inclusive_extrema": true,
+      "normalized_full_alpha_gt0_bbox_exclusive": [
+        1,
+        8,
+        1090,
+        151
+      ],
+      "normalized_full_alpha_ge128_bbox_exclusive": [
+        2,
+        9,
+        1087,
+        150
+      ],
+      "floor_interpolation_crosscheck": {
+        "full_alpha_gt0_count": 116439,
+        "full_alpha_ge128_count": 107183,
+        "full_alpha_gt0_bbox_exclusive": [
+          1,
+          8,
+          1090,
+          151
+        ],
+        "note": "The effect envelope is identical but five >0 and thirteen >=128 fringe pixels differ. This report uses round-nearest because it exactly reproduces the already C-accepted A00041 source metrics."
+      },
+      "result": "PASS_REPRODUCES_C_ACCEPTED_A00041_PIXEL_COUNTS_AND_GEOMETRY"
+    },
+    "mapped_sprite": {
+      "sprite": "sprite_337",
+      "raw_cell_ltrb": [
+        0,
+        92,
+        1456,
+        256
+      ],
+      "accepted_cell_inner_guard_ltrb_2px": [
+        2,
+        94,
+        1454,
+        254
+      ],
+      "raw_to_readable_transform": "flip_y"
+    },
+    "source_effect_geometry": {
+      "coordinate_convention": "LTRB_RIGHT_BOTTOM_EXCLUSIVE",
+      "mapped_cell_decoded_alpha_gt_0_bbox_ltrb": [
+        26,
+        92,
+        1090,
+        151
+      ],
+      "mapped_cell_decoded_alpha_gt_0_pixels": 48292,
+      "mapped_cell_decoded_alpha_ge_128_bbox_ltrb": [
+        27,
+        92,
+        1087,
+        150
+      ],
+      "mapped_cell_decoded_alpha_ge_128_pixels": 45061,
+      "source_effect_scope": "Only visible alpha inside the C-accepted sprite_337 cell is classified as the NEXT ROUND source effect; visible alpha outside sprite_337 is retained as another source sprite and is not part of this removal mask.",
+      "raw_to_readable_transform": "flip_y",
+      "orientation_status": "REUSED_A00041_A00047_ACCEPTED_FLIP_Y__RENDER_POSTFLIGHT_STILL_REQUIRED"
+    },
+    "source_removal_mask": {
+      "definition": "row-major 1 byte/pixel mask over the 2048x256 decoded mip1; 1 iff pixel is inside sprite_337 and A00041-compatible decoded BC3 alpha > 0, else 0",
+      "bytes": 524288,
+      "pixels_set": 48292,
+      "sha256": "8ff40aaf9ab9155f21c9e3401fe82ae1898c508b54a5a62caa8f680ecc16551c",
+      "protected_non_text_pixels_in_mask": 0,
+      "protected_non_text_basis": "C-accepted atlas/transcription mapping isolates NEXT ROUND to sprite_337; the mask is additionally clipped to that exact mapped cell, so visible source pixels belonging to the other sprite remain outside the mask.",
+      "whole_cell_clear_forbidden": true
+    },
+    "clean_plate": {
+      "construction": "Deterministic decoded RGBA8 using the recorded decoder profile; set RGBA=0 only where the removal mask is 1; retain every decoded pixel outside the mask byte-for-byte.",
+      "decoded_source_rgba_sha256": "513947133b711e719cc98dde16fec8e54a80c57455949a0d68a868a8435e95d3",
+      "decoded_clean_plate_rgba_sha256": "6c7ad46e47891a4b2824ab0a8c81782ae55bbfb7b4e292e7035e6be771e29595",
+      "visible_alpha_pixels_in_sprite_337_after_removal": 0,
+      "visible_alpha_pixels_retained_outside_sprite_337": 68152,
+      "structural_qa": "PASS_ZERO_VISIBLE_SOURCE_EFFECT_RESIDUE_IN_MAPPED_CELL_AND_OUTSIDE_MASK_UNCHANGED",
+      "qa_schema": "outrun-clean-plate-qa-v1",
+      "note": "This is deterministic reconstruction input, not a recompressed Korean candidate DDS."
+    },
+    "candidate_safe_bbox": {
+      "accepted_permitted_inner_guard_ltrb_2px": [
+        2,
+        94,
+        1454,
+        254
+      ],
+      "measured_source_effect_bbox_ltrb": [
+        26,
+        92,
+        1090,
+        151
+      ],
+      "measured_source_effect_bbox_inset_2px_ltrb": [
+        28,
+        94,
+        1088,
+        149
+      ],
+      "formula": "intersection(inset(measured source-effect bbox,2px), accepted permitted inner guard)",
+      "final_ltrb": [
+        28,
+        94,
+        1088,
+        149
+      ],
+      "nonempty": true,
+      "result": "PASS_V2_SAFE_BBOX_RESOLVED"
+    },
+    "remaining_holds": {
+      "baseline_vector": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+      "slant_dx_per_dy": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+      "slant_angle_deg": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+      "slant_direction": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+      "source_letterform_style": "HOLD_EXACT_MEASUREMENT_REQUIRED",
+      "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+      "decoded_final_bc3_qa": "HOLD_NO_NEW_CANDIDATE",
+      "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+      "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00082",
+    "producer_result_sha": "43c90861c97d6d0a974dfd328988498ad7c79a8b",
+    "producer_report_blob_sha": "bb0d7c74980f3a502d4593e570d5ae73c43c32e4",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00086",
+    "c_acceptance_batch": "Q00007/C109",
+    "c_acceptance_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_INDEX_55",
+    "exact_source_identity": "PASS_GIT_BLOB_BBF53949C7D9F1DC4949E661CAEEAF19FE667D79",
+    "dds_header_and_payload": "PASS_2048x256_DXT5_MIP1_EXACT_SIZE",
+    "accepted_decoder_lineage": "PASS_A00041_COUNTS_EXACT",
+    "effect_bbox": "PASS_DIRECT_DECODE_CLIPPED_TO_C_ACCEPTED_SPRITE_337",
+    "removal_mask_fingerprint": "PASS",
+    "clean_plate_structural": "PASS",
+    "candidate_safe_bbox": "PASS_NONEMPTY_2PX_INSET",
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "queue_blob_sha": "fc19a21fd29df1497e67e757060c784ae36c6e7c",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "a00082_evidence_blob_sha": "bb0d7c74980f3a502d4593e570d5ae73c43c32e4",
+    "c00086_acceptance_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f",
+    "exact_release_blob_sha": "bbf53949c7d9f1dc4949e661caeeaf19fe667d79"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
