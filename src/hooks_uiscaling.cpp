@@ -934,6 +934,26 @@ class UIScaling : public Hook
 	}
 
 	template<std::uintptr_t CallerRva>
+	static void C2CTestSlipstream_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CTestSlipstream callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R122 SLIPSTREAM HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
 	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
@@ -1362,8 +1382,12 @@ public:
 		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BD414, put_scroll_AdjustPositionRight);
 		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BD472, put_scroll_AdjustPositionRight);
 
-		// "test your slipstream" rival text
-		C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BD32E, put_scroll_AdjustPositionRight);
+		// R122/F13: exact C2CTestSlipstream producer is already canonical
+		// SCREEN_HUD in the shared disassembly map. Preserve the original spacing
+		// correction while sourcing the immediate draw owner from that map.
+		C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BD32E,
+			C2CTestSlipstream_AdjustPositionAndHud<0x000BD32Eu>);
 
 		return true;
 	}
