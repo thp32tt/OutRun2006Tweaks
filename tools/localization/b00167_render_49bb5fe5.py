@@ -414,14 +414,21 @@ def main():
         if rb is None or not inside(rb,e["safe_raw"]):
             raise SystemExit(f"{e['source']} decoded Korean lettering bbox invalid: {rb}")
         # Every accepted old-English removal pixel not occupied by new Korean
-        # must decode through the source block's nearest background palette index.
+        # must decode exactly as the validated clean plate. Palette-index
+        # identity is not required because distinct BC1 indices can decode to
+        # the same RGB value when palette entries coincide.
         x0,y0,x1,y1=e["effect_raw"]
         oldmask=np.zeros((H,W),dtype=bool)
         oldmask[y0:y1,x0:x1]=removal_union[y0:y1,x0:x1]
         bgmask=oldmask & ~text_mask_raw
-        bg_gate=nearest_background_palette_gate(candidate_bytes,bgmask,e)
-        if bg_gate["non_background_palette_index_pixels"]!=0:
-            raise SystemExit(f"{e['source']} decoded final old-English background-remap gate failed: {bg_gate}")
+        decoded_bg_mismatch=np.any(final_raw!=clean_final,axis=2) & bgmask
+        bg_gate={
+            "checked_pixels":int(bgmask.sum()),
+            "decoded_mismatch_pixels":int(decoded_bg_mismatch.sum()),
+            "rule":"final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering",
+        }
+        if bg_gate["decoded_mismatch_pixels"]!=0:
+            raise SystemExit(f"{e['source']} decoded final old-English clean-plate equality gate failed: {bg_gate}")
         per_element.append({
             "source":e["source"],"korean":e["korean"],"sprite":e["sprite"],
             "removal_pixels":e["expected_removal_pixels"],
@@ -430,7 +437,7 @@ def main():
             "candidate_safe_bbox_readable":e["safe_readable"],
             "decoded_korean_change_bbox_raw":rb,
             "decoded_korean_change_pixels":int(lm.sum()),
-            "old_english_pixels_outside_korean_background_palette_gate":bg_gate,
+            "old_english_pixels_outside_korean_decoded_clean_plate_gate":bg_gate,
             "containment":"PASS",
         })
 
@@ -531,13 +538,13 @@ def main():
         "automation_validation":"PENDING","validation_mode":"C_BATCH_GATE",
         "runtime_validation":"UNTESTED","runtime_test_performed":False,
         "build_performed":False,"n100_used":False,"local_clone_used":False,
-        "google_drive_used":False,"google_drive_probe_attempted":True,
-        "gpt_library_used":False,"uploaded_archive_used":False,"vr_ffb_dx_changes":False
+        "google_drive_used":True,"google_drive_probe_attempted":True,
+        "gpt_library_used":False,"uploaded_archive_used":True,"uploaded_archive_role":"NON_AUTHORITATIVE_LOCAL_VISUAL_PREVIEW_ONLY; final candidate source reacquired from pinned upstream direct file","vr_ffb_dx_changes":False
     }
     REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     task={
         "schema_version":9,"task_id":TASK_ID,"lane":"LOCALIZATION_B",
-        "target_branch":"korean-localization-clean","attempt":"1/3","chat_rollover":1,
+        "target_branch":"korean-localization-clean","attempt":"1/3","chat_rollover":4,
         "wave_id":WAVE_ID,"recorded_at_kst":now,"base_head_sha":base_sha,
         "commit_mode":"GITHUB_ACTIONS_ONE_SHOT_LANE_LOCAL_CANDIDATE_AND_TASK_RECORD",
         "result":report["result"],
