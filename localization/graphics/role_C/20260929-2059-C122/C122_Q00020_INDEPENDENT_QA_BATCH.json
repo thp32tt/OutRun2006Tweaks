@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-independent-c-batch-qa-v1",
+  "recorded_at_kst": "2026-09-29T20:59:10+09:00",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00142",
+  "qa_batch_id": "Q00020",
+  "run": "C122",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00020",
+  "base_head": "02ca6a8092928f8183c380c4f47f866fd9986208",
+  "current_qa_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+  "current_controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+  "current_policy": "candidate_completion_first_schema9_quality_preserving_family_template_fast_path",
+  "source_policy": "exact canonical user-HD inventory SHA-256 identity required before pixel/header/orientation/mask/CLEAN_PLATE/candidate promotion",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00136",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "9e66a8c5d7589c7dd0e06584b9f225f3769dc54d",
+      "producer_id": "P00061",
+      "completed_at": "2026-09-29T20:23:58.121255+09:00"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00131",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "23af3e8e08a360303c36e81c655a20b79bd209d9",
+      "producer_id": "P00058",
+      "completed_at": "2026-09-29T20:30:18.980176+09:00"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00139",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "a950e147519d79c526c5d9e66e99d7ced4f9e8da",
+      "producer_id": "P00063",
+      "completed_at": "2026-09-29T20:43:02.266763+09:00"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00138",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "0f03eaaa98e7016024ad4ff88fa1acb57d6cde84",
+      "producer_id": "P00062",
+      "completed_at": "2026-09-29T20:43:03.746978+09:00"
+    }
+  ],
+  "reviewed_indices": [
+    34,
+    44,
+    52,
+    55,
+    119,
+    140,
+    152,
+    154,
+    159,
+    163,
+    164,
+    172,
+    173,
+    201
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00136",
+      "result_sha": "9e66a8c5d7589c7dd0e06584b9f225f3769dc54d",
+      "status": "PASS",
+      "reason": "Exact producer result already received independent PASS in Q00019/C121 under the same current schema9 contract, inventory and transcription fingerprints. Q00020 reuses that machine-readable PASS and does not repeat heavy QA. The four canonical sources/candidates remain absent and no newer candidate/source fingerprint exists for indices 34/44/52/172, so the limited PREFLIGHT_ONLY PASS remains valid and is not superseded."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00131",
+      "result_sha": "23af3e8e08a360303c36e81c655a20b79bd209d9",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 2/2 current canonical inventory SHA-256/canvas/RGBA identities for indices 55/119 and 2/2 current source/Korean semantic pairs. Exact canonical queue-path DDS sources are absent both at RESULT_SHA and merge HEAD. The old 2048x256 DXT5 Release mask/CLEAN_PLATE/safe-bbox lineage is explicitly retired as canonical authority; current schema9 routing changes future production only. PASS is limited PREFLIGHT_ONLY source-reacquisition evidence, not candidate/static approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00139",
+      "result_sha": "a950e147519d79c526c5d9e66e99d7ced4f9e8da",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 4/4 canonical inventory SHA-256/canvas/RGBA identities for indices 159/163/173/201 and all 77/77 current semantic pairs. Exact canonical queue-path sources are absent at RESULT_SHA and merge HEAD. Semantic family reuse is translation-only; asset-specific style/geometry, masks, CLEAN_PLATE, safe bboxes, DDS candidate containment and English-source comparison remain fail-closed. PASS is limited PREFLIGHT_ONLY evidence."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00138",
+      "result_sha": "0f03eaaa98e7016024ad4ff88fa1acb57d6cde84",
+      "status": "PASS",
+      "reason": "Durable exact producer result. C independently matched 4/4 canonical inventory SHA-256/canvas/RGBA identities for indices 140/152/154/164 and 16/16 current semantic pairs. Exact canonical queue-path sources are absent at RESULT_SHA and merge HEAD. SHOWROOM/SELECT LICENSE reuse is semantic-only; style/geometry template reuse, source masks, CLEAN_PLATE, candidate-safe bboxes and final DDS gates remain held. PASS is limited PREFLIGHT_ONLY evidence."
+    }
+  ],
+  "source_identity_validation": "PASS_14_OF_14_CANONICAL_INVENTORY_IDENTITIES__B00136_4_REUSED_FROM_Q00019__A00131_2_OF_2__A00139_4_OF_4__B00138_4_OF_4",
+  "canonical_semantic_validation": "PASS_B00136_18_LOCALIZABLE_PLUS_1_PRESERVE_REUSED__A00131_2_OF_2__A00139_77_OF_77__B00138_16_OF_16",
+  "geometry_mapping_validation": "ZERO_CANONICAL_PIXEL_GEOMETRY_PROMOTED__RELEASE_STOCK_GEOMETRY_RETIRED_OR_CONDITIONAL_ONLY__FAMILY_FAST_PATH_SEMANTIC_REUSE_ONLY",
+  "current_contract_compatibility": "PASS_ALL_FOUR_AS_LIMITED_PREFLIGHT_SOURCE_REACQUISITION_EVIDENCE__SCHEMA9_FAST_PATH_DOES_NOT_RELAX_CANONICAL_SOURCE_OR_CANDIDATE_QA",
+  "heavy_qa_reuse": {
+    "repeated_heavy_pixel_qa": false,
+    "reused_prior_pass": [
+      "LOCALIZATION-LOCALIZATION_B-00136@9e66a8c5d7589c7dd0e06584b9f225f3769dc54d from Q00019/C121"
+    ],
+    "newly_rechecked_inventory_identities": 10,
+    "newly_rechecked_semantic_pairs": 95,
+    "intentionally_not_reused_as_canonical": [
+      "Release/stock DDS identity without exact canonical SHA-256 equality",
+      "Release/stock header/orientation/effect/removal-mask/CLEAN_PLATE/safe-bbox geometry",
+      "Family/template style or geometry without asset-specific canonical proof",
+      "Absent-source candidate containment or English-source comparison"
+    ]
+  },
+  "immutable_fingerprints": {
+    "contract": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "inventory": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "exact_tree_probe": {
+    "a00131_exact_sources_present_at_result": 0,
+    "a00131_exact_sources_present_at_merge_head": 0,
+    "a00139_exact_sources_present_at_result": 0,
+    "a00139_exact_sources_present_at_merge_head": 0,
+    "b00138_exact_sources_present_at_result": 0,
+    "b00138_exact_sources_present_at_merge_head": 0,
+    "b00136_prior_q00019_exact_sources_present": 0,
+    "current_canonical_v2_candidates_promoted_by_batch": 0,
+    "evidence_only_previews_do_not_count_as_sources_or_candidates": true
+  },
+  "readiness_reconciliation": {
+    "classification": "PREFLIGHT_ONLY",
+    "indices": [
+      34,
+      44,
+      52,
+      55,
+      119,
+      140,
+      152,
+      154,
+      159,
+      163,
+      164,
+      172,
+      173,
+      201
+    ],
+    "reason": "Exact canonical user-HD DDS bytes are absent from Git at the queue paths; no reviewed asset can legally advance to RENDER_READY or ONE_STAGE_TO_RENDER from the evidence in this batch."
+  },
+  "deduplication": {
+    "input_count": 4,
+    "prior_pass_inputs_reused": 1,
+    "newly_validated_inputs": 3,
+    "shared_state_reconciled_once": true
+  },
+  "metadata_reconciled_segments": 0,
+  "canonical_transcribed_segments_after_merge": 753,
+  "actionable_localize_text_after": 93,
+  "pending_production_localize_text_after": 76,
+  "superseded_inputs": [],
+  "newer_disjoint_producers": [
+    "LOCALIZATION-LOCALIZATION_A-00140",
+    "LOCALIZATION-LOCALIZATION_B-00141"
+  ],
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00020_FOUR_INPUTS_PASS_ONE_PRIOR_PASS_REUSED_NO_DDS_RUNTIME_UNTESTED",
+  "report": "localization/graphics/role_C/20260929-2059-C122/C122_Q00020_INDEPENDENT_QA_BATCH.json",
+  "rework_required_inputs": [],
+  "passed_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00136@9e66a8c5d7589c7dd0e06584b9f225f3769dc54d",
+    "LOCALIZATION-LOCALIZATION_A-00131@23af3e8e08a360303c36e81c655a20b79bd209d9",
+    "LOCALIZATION-LOCALIZATION_A-00139@a950e147519d79c526c5d9e66e99d7ced4f9e8da",
+    "LOCALIZATION-LOCALIZATION_B-00138@0f03eaaa98e7016024ad4ff88fa1acb57d6cde84"
+  ],
+  "shared_state_modified": true,
+  "candidate_dds_modified_by_c": false,
+  "input_candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
