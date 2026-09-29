@@ -1,0 +1,71 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00064",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00005",
+  "recorded_at_kst": "2026-09-29T13:45:47+09:00",
+  "selection_head_sha": "f4b61c73d01b028014fc31e120959ee6fda473f6",
+  "precommit_head_sha": "f4b61c73d01b028014fc31e120959ee6fda473f6",
+  "preserved_peer_head": true,
+  "result": "MATERIAL_DELIVERABLE_FALLBACK4_FOUR_ODD_RECONSTRUCTION_INPUTS",
+  "material_deliverable": {
+    "type": "FOUR_ODD_SOURCE_FAITHFUL_RECONSTRUCTION_INPUTS",
+    "indices": [
+      133,
+      135,
+      139,
+      143
+    ],
+    "assets": [
+      "25F697C6",
+      "2B0863D6",
+      "313DB8CB",
+      "34923C8A"
+    ],
+    "canonical_semantics_total": 24,
+    "report": "localization/graphics/role_A/20260929-1345-A00064-P00005/A00064_P00005_ODD_RECONSTRUCTION_INPUTS.json",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "qa_pending_assets_skipped": {
+    "A00058": {
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "assets": [
+        35,
+        43,
+        49
+      ]
+    },
+    "A00061": {
+      "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+      "assets": [
+        137,
+        217,
+        219,
+        241
+      ]
+    }
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_RECONSTRUCTION_INPUT_INTEGRITY_ONLY",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "Exact source DDS bytes for these four assets are not materialized in the current GitHub HD source tree. Raw orientation, per-element decoded full-effect bboxes, DDS header/alpha/mipmap preservation, zero-pixel containment, and English-source-vs-Korean-candidate visual QA therefore remain unresolved. No raster or DDS PASS is claimed.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

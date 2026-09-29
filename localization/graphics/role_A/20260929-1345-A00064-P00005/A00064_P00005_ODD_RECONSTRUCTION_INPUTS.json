@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00064",
+  "lane": "LOCALIZATION_A",
+  "wave_id": "P00005",
+  "recorded_at_kst": "2026-09-29T13:45:47+09:00",
+  "selection_head_sha": "f4b61c73d01b028014fc31e120959ee6fda473f6",
+  "fallback_ladder_step": 4,
+  "deliverable_type": "ODD_SHARD_SOURCE_FAITHFUL_RECONSTRUCTION_INPUTS",
+  "purpose": "Create new executable/reproducible reconstruction inputs for unfinished odd-shard assets whose exact source DDS bytes are not materialized in the current GitHub graphics source tree.",
+  "authority": {
+    "queue_blob_sha": "1bc1b7c42da5a3c748c6ebd3ca65d4fffec5ecba",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603"
+  },
+  "assets": [
+    {
+      "index": 133,
+      "asset": "25F697C6",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "source_dimensions": [
+        2048,
+        2048
+      ],
+      "source_mode": "RGBA",
+      "segments": [
+        [
+          "ALPINE",
+          "알파인"
+        ],
+        [
+          "ANCIENT RUINS",
+          "고대 유적"
+        ],
+        [
+          "BLU MIRABEAU",
+          "블루 미라보"
+        ],
+        [
+          "ARGENTO NURBURGRING",
+          "아르젠토 뉘르부르크링"
+        ],
+        [
+          "BIANCO AVUS",
+          "비앙코 아부스"
+        ],
+        [
+          "NERO",
+          "네로"
+        ],
+        [
+          "ROSSO SCUDERIA",
+          "로쏘 스쿠데리아"
+        ],
+        [
+          "GRIGIO ALLOY",
+          "그리지오 알로이"
+        ],
+        [
+          "GIALLO MODENA",
+          "지알로 모데나"
+        ]
+      ],
+      "preserve": [
+        "Ferrari model/variant names",
+        "logos/brand artwork",
+        "non-text artwork"
+      ],
+      "source_specific_guard": "Factory color names may be transliterated only in their confirmed plain-text regions; Ferrari model/variant names remain original.",
+      "queue_state_at_selection": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "source_git_blob_sha": null,
+      "source_materialization_status": "NOT_MATERIALIZED_IN_CURRENT_GITHUB_HD_SOURCE_TREE",
+      "candidate_git_blob_sha": null,
+      "candidate_sha256": null,
+      "raw_orientation": "UNRESOLVED_REQUIRES_EXACT_SOURCE_BYTES",
+      "element_bboxes": "UNRESOLVED_REQUIRES_DECODED_SOURCE",
+      "qa_disposition": "HOLD_STRICT_RECHECK",
+      "next_safe_action": [
+        "Materialize/fetch the exact source DDS from an approved GitHub source only and verify SHA-256 against source_sha256.",
+        "Decode in raw DDS orientation and determine per-element full-effect source bounding boxes including outline/shadow/glow/alpha fringe.",
+        "Classify every segment as localizable plain text versus protected logo/model/credit artwork using the source pixels.",
+        "Render Korean only inside the confirmed source text masks while preserving untouched artwork and DDS header/format/mipmap/alpha behavior.",
+        "Run zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE side-by-side QA before any candidate promotion."
+      ]
+    },
+    {
+      "index": 135,
+      "asset": "2B0863D6",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "source_sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521",
+      "source_dimensions": [
+        2048,
+        256
+      ],
+      "source_mode": "RGBA",
+      "segments": [
+        [
+          "INTERMEDIATE A",
+          "중급 A"
+        ],
+        [
+          "OUTRUN",
+          "아웃런"
+        ],
+        [
+          "PROFESSIONAL",
+          "프로"
+        ],
+        [
+          "CHANGE CLASS",
+          "클래스 변경"
+        ],
+        [
+          "CLASS",
+          "클래스"
+        ],
+        [
+          "ACCELERATION",
+          "가속"
+        ],
+        [
+          "MAX SPEED",
+          "최고 속도"
+        ],
+        [
+          "INTERMEDIATE B",
+          "중급 B"
+        ],
+        [
+          "HANDLING",
+          "핸들링"
+        ],
+        [
+          "NOVICE",
+          "초급"
+        ]
+      ],
+      "preserve": [
+        "logos/brand artwork",
+        "vehicle/model names",
+        "non-text artwork"
+      ],
+      "source_specific_guard": "OUTRUN must be translated only if decoded source inspection confirms a plain mode/class label; preserve it if it is logo/brand artwork.",
+      "queue_state_at_selection": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "source_git_blob_sha": null,
+      "source_materialization_status": "NOT_MATERIALIZED_IN_CURRENT_GITHUB_HD_SOURCE_TREE",
+      "candidate_git_blob_sha": null,
+      "candidate_sha256": null,
+      "raw_orientation": "UNRESOLVED_REQUIRES_EXACT_SOURCE_BYTES",
+      "element_bboxes": "UNRESOLVED_REQUIRES_DECODED_SOURCE",
+      "qa_disposition": "HOLD_STRICT_RECHECK",
+      "next_safe_action": [
+        "Materialize/fetch the exact source DDS from an approved GitHub source only and verify SHA-256 against source_sha256.",
+        "Decode in raw DDS orientation and determine per-element full-effect source bounding boxes including outline/shadow/glow/alpha fringe.",
+        "Classify every segment as localizable plain text versus protected logo/model/credit artwork using the source pixels.",
+        "Render Korean only inside the confirmed source text masks while preserving untouched artwork and DDS header/format/mipmap/alpha behavior.",
+        "Run zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE side-by-side QA before any candidate promotion."
+      ]
+    },
+    {
+      "index": 139,
+      "asset": "313DB8CB",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "source_sha256": "45cd9acffa98e79079774c4af41f90471627f7531fa33c12ff16dc4ed9292209",
+      "source_dimensions": [
+        512,
+        256
+      ],
+      "source_mode": "RGBA",
+      "segments": [
+        [
+          "TUNED",
+          "튜닝"
+        ],
+        [
+          "NORMAL",
+          "일반"
+        ]
+      ],
+      "preserve": [
+        "Ferrari model names",
+        "flags",
+        "MT/AT abbreviations",
+        "logos/brand artwork",
+        "non-text artwork"
+      ],
+      "source_specific_guard": "Only the confirmed TUNED and NORMAL word regions are localizable; all model/flag/transmission artwork remains byte-faithful outside touched text masks.",
+      "queue_state_at_selection": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "source_git_blob_sha": null,
+      "source_materialization_status": "NOT_MATERIALIZED_IN_CURRENT_GITHUB_HD_SOURCE_TREE",
+      "candidate_git_blob_sha": null,
+      "candidate_sha256": null,
+      "raw_orientation": "UNRESOLVED_REQUIRES_EXACT_SOURCE_BYTES",
+      "element_bboxes": "UNRESOLVED_REQUIRES_DECODED_SOURCE",
+      "qa_disposition": "HOLD_STRICT_RECHECK",
+      "next_safe_action": [
+        "Materialize/fetch the exact source DDS from an approved GitHub source only and verify SHA-256 against source_sha256.",
+        "Decode in raw DDS orientation and determine per-element full-effect source bounding boxes including outline/shadow/glow/alpha fringe.",
+        "Classify every segment as localizable plain text versus protected logo/model/credit artwork using the source pixels.",
+        "Render Korean only inside the confirmed source text masks while preserving untouched artwork and DDS header/format/mipmap/alpha behavior.",
+        "Run zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE side-by-side QA before any candidate promotion."
+      ]
+    },
+    {
+      "index": 143,
+      "asset": "34923C8A",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/34923C8A_512x128.dds",
+      "source_sha256": "e1461c131037d9cd347fb59af5208b55eaf621dce2edc42e752f66a040676c7c",
+      "source_dimensions": [
+        2048,
+        512
+      ],
+      "source_mode": "RGBA",
+      "segments": [
+        [
+          "RUSH A DIFFICULTY",
+          "난이도에 도전"
+        ],
+        [
+          "SHAKE THE STREET",
+          "거리를 뒤흔들어라"
+        ],
+        [
+          "WHO ARE YOU",
+          "당신은 누구?"
+        ]
+      ],
+      "preserve": [
+        "logos/brand artwork",
+        "non-text artwork"
+      ],
+      "source_specific_guard": "Stylized heading tone is provisional; keep current canonical Korean wording unless later in-game context supplies a correction.",
+      "queue_state_at_selection": {
+        "action": "localize_text",
+        "artwork_status": "pending_artwork",
+        "transcription_status": "transcribed_reviewed"
+      },
+      "source_git_blob_sha": null,
+      "source_materialization_status": "NOT_MATERIALIZED_IN_CURRENT_GITHUB_HD_SOURCE_TREE",
+      "candidate_git_blob_sha": null,
+      "candidate_sha256": null,
+      "raw_orientation": "UNRESOLVED_REQUIRES_EXACT_SOURCE_BYTES",
+      "element_bboxes": "UNRESOLVED_REQUIRES_DECODED_SOURCE",
+      "qa_disposition": "HOLD_STRICT_RECHECK",
+      "next_safe_action": [
+        "Materialize/fetch the exact source DDS from an approved GitHub source only and verify SHA-256 against source_sha256.",
+        "Decode in raw DDS orientation and determine per-element full-effect source bounding boxes including outline/shadow/glow/alpha fringe.",
+        "Classify every segment as localizable plain text versus protected logo/model/credit artwork using the source pixels.",
+        "Render Korean only inside the confirmed source text masks while preserving untouched artwork and DDS header/format/mipmap/alpha behavior.",
+        "Run zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE side-by-side QA before any candidate promotion."
+      ]
+    }
+  ],
+  "integrated_self_qa": {
+    "odd_index_primary_shard": "PASS_4_OF_4",
+    "queue_pending_localize_text_at_selection": "PASS_4_OF_4",
+    "transcription_matches_artwork_plan_segments": "PASS_4_OF_4",
+    "inventory_source_identity_present": "PASS_4_OF_4",
+    "prior_lane_local_asset_records_found": "NONE_IN_ROLE_A_B_C_D_TREES_AT_SELECTION",
+    "matching_hd_source_blobs_found": "NONE_FOR_THESE_4_ASSETS",
+    "matching_hd_candidate_blobs_found": "NONE_FOR_THESE_4_ASSETS",
+    "protected_artwork_guards_present": "PASS_4_OF_4",
+    "dds_header_alpha_orientation_containment": "NOT_RUN_NO_CANDIDATE",
+    "english_source_vs_korean_candidate_visual_gate": "NOT_RUN_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "heavy_qa_reuse": {
+    "reusable_pass_evidence": false,
+    "reason": "No candidate DDS exists for these fingerprints; there is no prior PASS evidence to reuse.",
+    "fingerprint_inputs": {
+      "canonical_source_sha256": "PER_ASSET",
+      "candidate_sha256": null,
+      "orientation_contract_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+      "translation_layout_input_blobs": [
+        "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+        "6111b595e520270842005f478298ef3a6cc56646"
+      ],
+      "qa_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603"
+    }
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false
+}
