@@ -3,8 +3,9 @@
 
 Set 01 F04 records that stable facades still hide historical .cpp include chains.
 Phase 1 extracted renderer R13 into an include-free overlay. Phase 2 did the same
-for renderer R23/R27/R28. Phase 3 extracts the final D3D9Ex R15 layer so the
-production Ex facade no longer includes ex_device_upgrade_r15.cpp.
+for renderer R23/R27/R28. Phase 3 extracted the final D3D9Ex R15 layer. Phase 4
+extracts R14 so the production Ex facade composes R13/base plus R14/R15 overlays
+without nesting the historical R14 or R15 translation-unit wrappers.
 These steps change source ownership only; runtime policy must remain unchanged.
 """
 
@@ -49,6 +50,8 @@ r23_wrapper_rel = "src/vr/game/outrun_renderer_r23.cpp"
 r23_overlay_rel = "src/vr/game/outrun_renderer_r23_overlay.inc"
 r29_rel = "src/vr/game/outrun_renderer_r29.cpp"
 facade_rel = "src/vr/d3d9/renderer_pipeline.cpp"
+ex_r14_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r14.cpp"
+ex_r14_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc"
 ex_r15_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r15.cpp"
 ex_r15_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc"
 ex_facade_rel = "src/vr/d3d9/ex_device_pipeline.cpp"
@@ -59,6 +62,8 @@ r23_wrapper = read(r23_wrapper_rel)
 r23_overlay = read(r23_overlay_rel)
 r29 = read(r29_rel)
 facade = read(facade_rel)
+ex_r14_wrapper = read(ex_r14_wrapper_rel)
+ex_r14_overlay = read(ex_r14_overlay_rel)
 ex_r15_wrapper = read(ex_r15_wrapper_rel)
 ex_r15_overlay = read(ex_r15_overlay_rel)
 ex_facade = read(ex_facade_rel)
@@ -136,6 +141,32 @@ require(
 )
 
 require_order(
+    ex_r14_wrapper,
+    ex_r14_wrapper_rel,
+    "#include <algorithm>",
+    "#include <memory>",
+    "#include <mutex>",
+    "#include <unordered_map>",
+    "#include <vector>",
+    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "ex_device_upgrade_r14_overlay.inc"',
+)
+if "namespace OutRunVRD3D9ExUpgradeR13" in ex_r14_wrapper:
+    raise SystemExit("R14 compatibility wrapper regained implementation body")
+if "#include" in ex_r14_overlay:
+    raise SystemExit("R14 overlay must remain include-free")
+require(
+    ex_r14_overlay,
+    ex_r14_overlay_rel,
+    "namespace OutRunVRD3D9ExUpgradeR13",
+    "std::unordered_map<IDirect3DTexture9*, R14EntryPtr>",
+    "R69IsSelectorAtlasReserveCandidate",
+    "R14CopyWholeLevelByLock",
+    "InstallManagedResourceCompatR14",
+    "exact mip CPU-shadow upload failed",
+)
+
+require_order(
     ex_r15_wrapper,
     ex_r15_wrapper_rel,
     "#include <algorithm>",
@@ -162,8 +193,14 @@ require(
     "Ex promotion rolled back transactionally",
     "LastResetStateReplaySucceeded",
 )
-if '#include "ex_device_upgrade_r15.cpp"' in ex_facade:
-    raise SystemExit("production Ex facade regressed to historical R15 .cpp inclusion")
+for stale_ex_owner in (
+    '#include "ex_device_upgrade_r14.cpp"',
+    '#include "ex_device_upgrade_r15.cpp"',
+):
+    if stale_ex_owner in ex_facade:
+        raise SystemExit(
+            f"production Ex facade regressed to historical wrapper inclusion: {stale_ex_owner}"
+        )
 require_order(
     ex_facade,
     ex_facade_rel,
@@ -171,8 +208,12 @@ require_order(
     "#include <array>",
     "#include <atomic>",
     "#include <cstdint>",
+    "#include <memory>",
     "#include <mutex>",
-    '#include "ex_device_upgrade_r14.cpp"',
+    "#include <unordered_map>",
+    "#include <vector>",
+    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
 )
@@ -206,6 +247,10 @@ require(
     "R23RenderThreadCleanupRequested",
     "R23ServiceRenderThreadCleanup",
     "recovery pose warmup is stock-visible",
+    "'src/vr/d3d9/ex_device_upgrade_r14_overlay.inc' = @(",
+    "std::unordered_map<IDirect3DTexture9*, R14EntryPtr>",
+    "R14CopyWholeLevelByLock",
+    "exact mip CPU-shadow upload failed",
     "'src/vr/d3d9/ex_device_upgrade_r15_overlay.inc' = @(",
     "D3DSBT_ALL",
     "Ex promotion rolled back transactionally",
@@ -213,6 +258,7 @@ require(
 for stale_guard in (
     "'src/vr/game/outrun_renderer_r13.cpp' = @(",
     "'src/vr/game/outrun_renderer_r23.cpp' = @(",
+    "'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(",
 ):
     if stale_guard in openxr_workflow:
@@ -220,4 +266,4 @@ for stale_guard in (
             f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
         )
 
-print("VR facade modularization F04 phase 3: PASS")
+print("VR facade modularization F04 phase 4: PASS")

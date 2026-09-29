@@ -42,6 +42,7 @@ required = [
     "src/vr/d3d9/ex_device_upgrade.cpp",
     "src/vr/d3d9/ex_device_upgrade_r13.cpp",
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "src/vr/d3d9/r13_bridge.hpp",
     "src/vr/d3d9/vr_pass_policy.hpp",
     "src/vr/ipc/protocol.hpp",
@@ -181,7 +182,7 @@ require(
 # any write route that cannot be mirrored. A lower-mip fallback must copy that
 # exact level rather than relying on UpdateTexture's level-zero dirty rules.
 r14 = require(
-    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "std::unordered_map<IDirect3DTexture9*, R14EntryPtr>",
     "TextureReleaseDestR14",
     "InstallManagedResourceCompatR14",

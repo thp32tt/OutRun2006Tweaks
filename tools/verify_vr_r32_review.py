@@ -297,7 +297,7 @@ if "c.CommitDirectStereoSource(frame)" in host_r23:
         "R23 production DirectGPU path must bypass legacy snapshot/fence commit")
 
 r14 = require(
-    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "singleLevelTexture",
     "entry.gpu->GetLevelCount() <= 1",
     "R14EnsureSurfaceHooks",

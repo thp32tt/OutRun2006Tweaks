@@ -141,7 +141,7 @@ require_all("src/hooks_graphics.cpp", [
     'if (Settings::VREnabled)',
     'VR R69 BASE SHADOW: restored console shadow disabled for all VR presentations; stock PC nullsub behavior ACTIVE',
 ], "P8_SELECTOR_SHADOW")
-require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
+require_all("src/vr/d3d9/ex_device_upgrade_r14_overlay.inc", [
     'R69IsSelectorAtlasReserveCandidate',
     'desc.Width == 2048 && desc.Height == 2048',
     '384 MiB total cap preserved',
@@ -274,10 +274,14 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r30_c2_compare.cpp"',
 ], "P11_R70_STEREO_FACADE")
 require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
-    '#include "ex_device_upgrade_r14.cpp"',
+    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
 ], "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r14.cpp"',
+       "P11_R70_EX_DEVICE_NO_R14_NESTING")
 require_all("src/vr/d3d9/renderer_pipeline.cpp", [
     '#include "../game/outrun_renderer_r23.cpp"',
     '#include "../game/outrun_renderer_r29.cpp"',
@@ -315,10 +319,14 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r30_c2_compare.cpp"',
 ], "P11_R70_STEREO_FACADE")
 require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
-    '#include "ex_device_upgrade_r14.cpp"',
+    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
 ], "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r14.cpp"',
+       "P11_R70_EX_DEVICE_NO_R14_NESTING")
 require_all("src/vr/d3d9/renderer_pipeline.cpp", [
     '#include "../game/outrun_renderer_r23.cpp"',
     '#include "../game/outrun_renderer_r29.cpp"',
