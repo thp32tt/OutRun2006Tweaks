@@ -263,7 +263,7 @@ def main():
                 "pinned_release_archive_sha256":ARCHIVE_SHA},
       "elements":ELEMENTS,"protected":PROTECTED,
       "style":{"font_identifier":f"{font_path.name}#{font_index} Noto Sans CJK KR Bold",
-               "font_sha256":font_sha,"fill_rgb":list(FILL),"outline":"none","shadow":"none",
+               "font_sha256":font_sha,"local_reference_font_sha256":LOCAL_REFERENCE_FONT_SHA,"fill_rgb":list(FILL),"outline":"none","shadow":"none",
                "glow":"none","source_signed_slant_deg":0.0,"candidate_signed_slant_deg":0.0,
                "raster_resampling":"forbidden/not_used"},
       "instructions":{
