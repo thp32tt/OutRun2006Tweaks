@@ -2546,3 +2546,35 @@ Next:
 - Review lens-flare exact projected-screen producer/node lifetime and double-display symptom.
 - Review pre-race start-grid shadow split/corruption.
 - Keep selector resource-policy changes blocked until new HMD pointer-correlated evidence exists.
+
+
+## Cycle 0145 — lens flare single-transform ownership
+
+Finding: `DX9EX-FLARE-DOUBLE-TRANSFORM-OWNER-001`
+
+Hosted gate:
+- Exact `069c6f26ec68d50018deda8ba2b52c3452575525` Build, OpenXR architecture and HUD Inspector all completed SUCCESS.
+
+Root cause:
+- Exact flare callsite `EXE+0xCABE` is tagged `ProjectedScreenEffect2D`.
+- R30's R69 flare path intentionally copies the same stock centre-eye WVP into both eyes so the flare fuses as one image.
+- Renderer c64 bypass covered HUD, generic screen overlay, world billboard and projected-world marker, but omitted `ProjectedScreenEffect2D`.
+- The flare could therefore receive renderer HMD WVP injection first and then enter R30 mono fusion: two transform owners for one exact projected-screen effect.
+
+Fix:
+- Added `CorroboratesProjectedScreenEffect`.
+- Added projected-screen effects to renderer semantic c64 bypass.
+- Exact flare keeps raw game c64 until R30; R30 remains the single flare transform owner.
+- Added deterministic verifier coverage for that ownership split.
+
+Commits:
+- `088a2d223589e1c2fee1ab4598b428dd1966db8d`
+- `c2aaac5fdbd44237bb3adf9464d7709415ca5159`
+- `aef90ff3a1992f1b2fec95d97893f78f56f4e431`
+
+Shadow falsification:
+- The restored console base-shadow path is already disabled whenever VR is enabled and stock PC nullsub behavior is preserved.
+- The remaining start-grid shadow corruption therefore requires separate stock-PC stencil/projected-shadow identity evidence; the known-bad console shadow path was not re-enabled.
+
+AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
+RUNTIME_VALIDATION: `UNTESTED`
