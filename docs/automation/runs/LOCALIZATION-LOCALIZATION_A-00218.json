@@ -1,0 +1,79 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00218",
+  "wave_id": "P00115",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T06:19:34+09:00",
+  "base_head_sha": "8bd95944dbff05900a6755c9546741f70af018c3",
+  "base_sha": "8bd95944dbff05900a6755c9546741f70af018c3",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX231_EXACT_SOURCE_PHYSICAL_TEXT_BINDING_CLEANPLATE_SAFE_BBOX_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX231_EXACT_SOURCE_PHYSICAL_TEXT_CLEAN_PLATE_SAFE_BBOX_PREFLIGHT_SEMANTIC_GAP_RUNTIME_UNTESTED",
+  "summary": "Fresh current-contract A-shard scan skips QA-pending candidates 159/198/201 and A00215@index222 preflight QA-pending, and repeats no sticky source-exhausted work. Index231 EBE401C8 is selected as the single allowed new PREFLIGHT_ONLY expansion. Approved Drive exact path misses and pinned-tag direct path 404s; pinned v0.25.10a Release member EBE401C8 exactly matches current canonical inventory SHA-256 29b87a5c... and historical Release Git blob 6b0ed861.... Exact RGBA32 2048x1024 mip1 pixels prove FLIP_Y readable orientation and six physical text elements. Current canonical transcription/artwork plan binds only LAN and ONLINE (two occurrences each) while the exact source contains two additional localizable descriptions. All 150,173 visible alpha pixels are bound, six source-effect masks and 2px safe bboxes are produced, and deterministic transparent CLEAN_PLATE replay changes zero pixels/alpha outside the removal union. Candidate DDS is deliberately not emitted because inventing Korean descriptions or leaving English descriptions would violate fail-closed semantics. Independent C replay is required; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00218-P00115/A00218_P00115_INDEX231_EXACT_SOURCE_PHYSICAL_TEXT_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX231_EXACT_CANONICAL_SOURCE_6_PHYSICAL_TEXT_BINDINGS_EFFECT_MASKS_DETERMINISTIC_CLEAN_PLATE_2PX_SAFE_BBOX_AND_SEMANTIC_GAP_HANDOFF",
+    "reviewed_indices": [
+      231
+    ],
+    "reviewed_assets": [
+      "EBE401C8"
+    ],
+    "physical_text_elements": 6,
+    "canonical_semantic_keys": 2,
+    "canonical_occurrence_bindings": 4,
+    "untranscribed_source_descriptions": 2,
+    "source_effect_masks": 6,
+    "candidate_safe_bboxes": 6,
+    "removal_mask_pixels": 150173,
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "qa_pending_not_repeated": {
+      "159": "A00196 candidate",
+      "198": "A00208 candidate",
+      "201": "A00196 candidate",
+      "222": "A00215 preflight"
+    },
+    "latest_c_gate": "C148/Q00046",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "selected_priority": "PREFLIGHT_ONLY_SINGLE_BATCH_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      231
+    ],
+    "readiness_before": {
+      "231": "PREFLIGHT_ONLY_CANONICAL_INVENTORY_PINNED_EXACT_SOURCE_NOT_HASH_ACTIVATED"
+    },
+    "readiness_after": {
+      "231": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE__6_PHYSICAL_TEXT_MASKS_CLEAN_PLATE_2PX_SAFE_BBOX_COMPLETE__BLOCKED_2_UNTRANSCRIBED_DESCRIPTIONS__C_INDEPENDENT_REPLAY_REQUIRED"
+    }
+  },
+  "self_qa": "PASS_INDEX231_MOD3_EQ_0__DRIVE_EXACT_MISS__PINNED_TAG_404__RELEASE_MEMBER_SHA_EXACT__RGBA32_2048X1024_MIP1__FLIP_Y__6_PHYSICAL_TEXT_ELEMENTS__150173_OF_150173_VISIBLE_ALPHA_BOUND__6_EFFECT_MASKS__ZERO_CLEANPLATE_OUTSIDE_MASK__ZERO_ALPHA_ESCAPE__2PX_SAFE_BBOX_6_OF_6__FAIL_CLOSED_2_UNTRANSCRIBED_DESCRIPTIONS__NO_CANDIDATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_SEMANTIC_TRANSCRIPTION_GAP_2_DESCRIPTIONS_C_REPLAY_REQUIRED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "bookkeeping_note": "The immutable producer result commit atomically contains the exact AUTO marker, lane-local material report and durable task record. RESULT_SHA is filled only by a later bookkeeping commit; producer automation_validation remains PENDING for C_BATCH_GATE and runtime_validation remains UNTESTED."
+}

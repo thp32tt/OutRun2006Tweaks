@@ -1,0 +1,325 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00218-index231-exact-source-physical-text-cleanplate-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00218",
+  "wave_id": "P00115",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T06:19:34+09:00",
+  "base_head_sha": "8bd95944dbff05900a6755c9546741f70af018c3",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_index": 231,
+    "asset": "EBE401C8",
+    "priority": "PREFLIGHT_ONLY_AFTER_ZERO_RUNNABLE_READY_OR_REWORK_TIERS",
+    "skipped_qa_pending_indices": [
+      159,
+      198,
+      201,
+      222
+    ],
+    "source_exhausted_not_repeated": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "note": "Latest C148/Q00046 has no accepted A-shard RENDER_READY/ONE_STAGE_TO_RENDER without an already QA-pending candidate; A00215@index222 is out-of-batch C-QA-pending and is not repeated."
+  },
+  "input_fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "asset_queue_blob_sha": "16aceaa56c66ed5f2d385d541afc5b92e17cd917",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e"
+  },
+  "source_identity": {
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "canonical_inventory_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "acquired_member_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "acquired_git_blob_sha1": "6b0ed8617cb0dc3e37fbadf61c91bcef08bda944",
+    "historical_release_member_git_blob_sha1": "6b0ed8617cb0dc3e37fbadf61c91bcef08bda944",
+    "file_bytes": 8388736,
+    "canvas": [
+      2048,
+      1024
+    ],
+    "dds_format": "RGBA32",
+    "mipmaps": 1,
+    "channel_masks": {
+      "r": "0x00ff0000",
+      "g": "0x0000ff00",
+      "b": "0x000000ff",
+      "a": "0xff000000"
+    },
+    "drive_fast_path": {
+      "approved_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+      "result": "SOURCE_TRANSPORT_MISS",
+      "observed_parent_contents": [
+        "9F060EC1_512x512.dds"
+      ]
+    },
+    "pinned_tag_direct_path": {
+      "repo": "envido32/OR2006Sprites",
+      "ref": "v0.25.10a",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "result": "SOURCE_TRANSPORT_MISS_404"
+    },
+    "pinned_release_fallback": {
+      "asset_id": 306630789,
+      "asset_name": "OR2-HD-GUI-v0.25.10a.zip",
+      "github_metadata_size": 306223257,
+      "github_metadata_digest": "sha256:76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+      "member_identity_result": "PASS_EXACT_CANONICAL_INVENTORY_SHA_AND_HISTORICAL_RELEASE_GIT_BLOB"
+    },
+    "decoded_raw_rgba_sha256": "e4db10759fa035d1435fdfb6b3e1a003fddc706a5058b486f463c20347faa31e",
+    "decoded_readable_rgba_sha256": "555b84e402ce01a6028e5df9d944308ee738e9a5ee7dbf6da8676bac0060ae79",
+    "raw_to_readable": "flip_y"
+  },
+  "physical_text_inventory": {
+    "status": "PASS_6_PHYSICAL_TEXT_ELEMENTS_EXACT_ALPHA_BOUND",
+    "visible_alpha_pixels_total": 150173,
+    "union_mask_pixels": 150173,
+    "union_covers_all_visible_alpha": true,
+    "elements": [
+      {
+        "element_id": "desc_online",
+        "source": "Play OutRun Online with Friends or other players!",
+        "binding_status": "UNTRANSCRIBED_DESCRIPTION",
+        "source_effect_bbox_readable_xyxy": [
+          7,
+          371,
+          1446,
+          437
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          9,
+          373,
+          1444,
+          435
+        ],
+        "source_effect_pixel_count": 35514,
+        "source_effect_mask_sha256_u8_full_canvas": "836a36dc48590cb90e3c9f968c83e83563be4cdde7aed117209f4c06f8c893e6",
+        "dominant_rgba_style_rgb_alpha128plus": [
+          63,
+          71,
+          74
+        ]
+      },
+      {
+        "element_id": "desc_lan",
+        "source": "Join or Create a LAN game of OutRun!",
+        "binding_status": "UNTRANSCRIBED_DESCRIPTION",
+        "source_effect_bbox_readable_xyxy": [
+          2,
+          531,
+          1122,
+          597
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          4,
+          533,
+          1120,
+          595
+        ],
+        "source_effect_pixel_count": 26651,
+        "source_effect_mask_sha256_u8_full_canvas": "1419cfbf526e198bf81197688a0eef27e809ef42aa7ec36d5efe6459234a961a",
+        "dominant_rgba_style_rgb_alpha128plus": [
+          63,
+          71,
+          74
+        ]
+      },
+      {
+        "element_id": "lan_large",
+        "source": "LAN",
+        "binding_status": "CANONICAL_PRESERVE_LATIN",
+        "source_effect_bbox_readable_xyxy": [
+          6,
+          696,
+          335,
+          834
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          8,
+          698,
+          333,
+          832
+        ],
+        "source_effect_pixel_count": 24266,
+        "source_effect_mask_sha256_u8_full_canvas": "e38291bc29a552b231b402096527e6a537ae1b6eabb214e057e90a0df281c2f2",
+        "dominant_rgba_style_rgb_alpha128plus": [
+          186,
+          0,
+          0
+        ]
+      },
+      {
+        "element_id": "lan_small",
+        "source": "LAN",
+        "binding_status": "CANONICAL_PRESERVE_LATIN",
+        "source_effect_bbox_readable_xyxy": [
+          1295,
+          780,
+          1436,
+          839
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          1297,
+          782,
+          1434,
+          837
+        ],
+        "source_effect_pixel_count": 4619,
+        "source_effect_mask_sha256_u8_full_canvas": "26b150d9cd398bb4752fb169ecbd98ba456d4f5035e257dc816aca5411b054ec",
+        "dominant_rgba_style_rgb_alpha128plus": [
+          63,
+          71,
+          74
+        ]
+      },
+      {
+        "element_id": "online_large",
+        "source": "ONLINE",
+        "binding_status": "CANONICAL_LOCALIZE",
+        "source_effect_bbox_readable_xyxy": [
+          6,
+          867,
+          640,
+          1012
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          8,
+          869,
+          638,
+          1010
+        ],
+        "source_effect_pixel_count": 49596,
+        "source_effect_mask_sha256_u8_full_canvas": "1035cecb21c898ebc6e91ecd55f0d7bf801660878bacf7b1468db285d0d8ad61",
+        "dominant_rgba_style_rgb_alpha128plus": [
+          186,
+          0,
+          0
+        ]
+      },
+      {
+        "element_id": "online_small",
+        "source": "ONLINE",
+        "binding_status": "CANONICAL_LOCALIZE",
+        "source_effect_bbox_readable_xyxy": [
+          1298,
+          949,
+          1560,
+          1011
+        ],
+        "candidate_safe_bbox_inset2_readable_xyxy": [
+          1300,
+          951,
+          1558,
+          1009
+        ],
+        "source_effect_pixel_count": 9527,
+        "source_effect_mask_sha256_u8_full_canvas": "3a93056222517f5f1ce55d46864b3984ca6309511e802bc4fef4b5ece1c2c69c",
+        "dominant_rgba_style_rgb_alpha128plus": [
+          63,
+          71,
+          74
+        ]
+      }
+    ]
+  },
+  "canonical_semantics": {
+    "current_transcription_pairs": [
+      {
+        "source": "LAN",
+        "korean": "LAN"
+      },
+      {
+        "source": "ONLINE",
+        "korean": "온라인"
+      }
+    ],
+    "canonical_occurrence_bindings": {
+      "LAN": [
+        "lan_large",
+        "lan_small"
+      ],
+      "ONLINE": [
+        "online_large",
+        "online_small"
+      ]
+    },
+    "unbound_physical_source_strings": [
+      "Play OutRun Online with Friends or other players!",
+      "Join or Create a LAN game of OutRun!"
+    ],
+    "status": "BLOCKED_2_SOURCE_DESCRIPTION_STRINGS_ABSENT_FROM_CURRENT_CANONICAL_TRANSCRIPTION_AND_ARTWORK_PLAN",
+    "fail_closed_rule": "Do not invent Korean translations or preserve English descriptions in a production candidate."
+  },
+  "clean_plate_spec": {
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "mask_rule": "READABLE_RGBA_ALPHA_GT_0_WITHIN_6_EXACT_PHYSICAL_TEXT_BBOXES",
+    "removal_mask_pixels": 150173,
+    "removal_mask_sha256_u8_full_canvas": "2d1ee0e64f653d440960abaffabf36fe997ba0daefac9be3ab28869175f14ae2",
+    "deterministic_operation": "SET_RGBA_0_0_0_0_ON_REMOVAL_MASK_ONLY",
+    "clean_plate_readable_rgba_sha256": "f6a66a70b9a1f775f43219d28b6caa3453290766a09bfdb5eb249723def07f01",
+    "clean_plate_raw_rgba_sha256": "a8f863fefc33e69de96f58b48f2dba4937e85a7b48d82479866365564254b509",
+    "changed_pixels": 150173,
+    "changed_pixels_outside_removal_mask": 0,
+    "alpha_changed_pixels_outside_removal_mask": 0,
+    "visible_alpha_after_clean_plate": 0,
+    "candidate_persistence": "NO_DDS_CANDIDATE_SEMANTIC_GAP_FAIL_CLOSED",
+    "independent_c_replay_required": true
+  },
+  "readiness_after": {
+    "classification": "PREFLIGHT_ONLY_SEMANTIC_TRANSCRIPTION_GAP",
+    "resolved_now": [
+      "exact canonical source identity",
+      "DDS header/channel masks/mip",
+      "FLIP_Y readable orientation",
+      "6 physical text element bboxes",
+      "LAN/ONLINE occurrence bindings",
+      "6 alpha-effect masks",
+      "deterministic clean plate",
+      "2px candidate-safe bboxes"
+    ],
+    "blocking_prerequisite": "Add reviewed canonical Korean translations/bindings for the two source description strings before candidate rendering.",
+    "candidate_render_attempted": false,
+    "reason_candidate_not_attempted": "Rendering only LAN/ONLINE would intentionally leave two localizable English descriptions or require invented translations; both violate the localization contract."
+  },
+  "self_qa": {
+    "status": "PASS_PREFLIGHT_MATERIAL_INDEX231_EXACT_SOURCE_AND_FAIL_CLOSED_SEMANTIC_GAP",
+    "source_identity": "PASS",
+    "orientation": "PASS_FLIP_Y",
+    "all_visible_alpha_bound": "PASS_150173_OF_150173",
+    "clean_plate_outside_mask_changes": 0,
+    "clean_plate_alpha_escape": 0,
+    "candidate_dds_modified": false
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
