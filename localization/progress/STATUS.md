@@ -1368,3 +1368,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00231@index193 is authoritative **STATIC_QA_PASS_RUNTIME_UNTESTED** on candidate `3646e6b6...`. No runtime approval was granted.
 - A00235@index231 and B00237@index163 are newer out-of-batch **QA_PENDING** producer candidates. Candidate QA remains ahead of unrelated preflight: **159/198/201/231/163 -> 133/232**.
 - Pending production **68**, actionable localize_text **93**, canonical segments **755**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C156 Q00054 — 2026-09-30T08:21:34+09:00
+- Immutable input A00235 `9bfd30c5...` / index231 EBE401C8 — **PASS / STATIC_QA_PASS_RUNTIME_UNTESTED**.
+- Exact pinned source `29b87a5c...`; exact Drive candidate `ba9e0c73...` inside ZIP `9c373ce8...`; RGBA32 2048x1024 mip1, byte-identical DDS header, FLIP_Y orientation.
+- C150 source/mask/CLEAN_PLATE prerequisite fingerprint remains unchanged and is reused; Q00054 independently validates the new candidate: 4/4 localized elements inside 2px safe bboxes, LAN 2/2 pixel-exact, zero outside-localizable-region RGBA/alpha changes, and full-atlas + six-element English-source comparison PASS.
+- Index231 leaves candidate-QA backlog. Order: **RENDER_READY none -> ONE_STAGE none -> candidate QA 159/198/201/163 -> PREFLIGHT_ONLY 133/232**. Runtime isolation 99/237 remains accepted; A00239@index102 is out-of-batch QA_PENDING. Pending production **67**, actionable **93**, canonical segments **755**.
+- No runtime test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+

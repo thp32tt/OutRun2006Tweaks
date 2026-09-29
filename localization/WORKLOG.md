@@ -1963,3 +1963,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Newer out-of-batch A00235@index231 and B00237@index163 are preserved as **QA_PENDING** producer candidates and are not implicitly approved.
 - Order: **RENDER_READY none -> ONE_STAGE none -> candidate QA 159/198/201/231/163 -> PREFLIGHT_ONLY 133/232**; runtime isolation 99/237 separate. Pending production **68**, actionable **93**, canonical segments **755**.
 - This bookkeeping checkpoint is separate from the validation-bearing result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 08:21 KST - C156 Q00054 INDEPENDENT QA BATCH
+- Consumed immutable A00235 `9bfd30c5e5ffd813962b96037ad19373fa116513` / index231 EBE401C8; disposition **PASS**.
+- Verified Git-registered Drive ZIP `9c373ce8...` / DDS `ba9e0c73...` and all review PNG hashes, then replayed exact pinned v0.25.10a source `29b87a5c...`. Source/candidate are 2048x1024 RGBA32 mip1 with byte-identical 128-byte header `532576d0...` and FLIP_Y raw/readable hashes matching registered evidence.
+- Reused unchanged authoritative C150 source geometry after exact fingerprint cross-check: six source masks total **150,173 px** / `2d1ee0e6...`, CLEAN_PLATE readable/raw `f6a66a70...` / `a8f863fe...`, zero outside-mask changes/alpha escape.
+- New-candidate QA: 4/4 localized Hangul bboxes have positive margin inside 2px safe boxes; LAN 2/2 source regions are pixel-exact; changed RGBA **134,953 px**, alpha changes **134,952 px**, both **0** outside localizable source regions; introduced alpha outside all six source regions **0**. Canonical semantics remain **4/4**.
+- Independent full-atlas and six-element visual review PASS: no broken Hangul, clipping/overlap, localized English residue, wrong image, resolution loss, added background box, preserve-source damage or orientation/slant mismatch. Index231 promoted to **STATIC_QA_PASS_RUNTIME_UNTESTED**.
+- Out-of-batch B00237@index163 candidate and A00239@index102 isolation input remain **QA_PENDING**, not implicitly approved. Order **candidate QA 159/198/201/163 -> PREFLIGHT_ONLY 133/232**; pending production **67**, actionable **93**, canonical segments **755**.
+- No runtime test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+

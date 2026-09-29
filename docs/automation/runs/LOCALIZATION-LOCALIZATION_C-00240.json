@@ -1,0 +1,466 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-c156-q00054-a00235-index231-independent-static-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00240",
+  "wave_id": "Q00054",
+  "qa_batch_id": "Q00054",
+  "run": "C156",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T08:21:34+09:00",
+  "base_head_sha": "1012e7e182c87fab4ba24bdad15d7c56fd391eae",
+  "base_sha": "1012e7e182c87fab4ba24bdad15d7c56fd391eae",
+  "commit_mode": "ATOMIC_C_BATCH_RESULT_AND_SINGLE_SHARED_STATE_MERGE",
+  "result": "PASS_Q00054_A00235_INDEX231_STATIC_QA_PASS_RUNTIME_UNTESTED",
+  "summary": "Q00054 independently consumes immutable A00235@index231/EBE401C8. The exact producer RESULT_SHA carries the required AUTO marker and no newer index231 candidate exists at the refreshed merge HEAD. C verified the Git-registered Drive candidate/review artifacts byte-for-byte, replayed the exact pinned v0.25.10a source member from the verified 76f85ed2... archive, reused the already-authoritative C150 source/mask/CLEAN_PLATE geometry fingerprint only where unchanged, and independently executed the new-candidate DDS/decoded-final/containment/alpha/preserve-source/English-source visual gates. The 8,388,736-byte RGBA32 candidate ba9e0c73... has a byte-identical 128-byte source header, FLIP_Y storage, all four localized Korean elements inside their 2px safe bboxes, both LAN occurrences pixel-exact to source, and zero changed RGBA/alpha outside the four localizable source regions. Canonical semantics remain 4/4 current. Full-atlas and six-element visual review finds no broken Hangul, clipping, English residue in localized regions, wrong-image replacement, resolution loss, added backing box, or source-preservation damage. Index231 is promoted to STATIC_QA_PASS_RUNTIME_UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00235",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "9bfd30c5e5ffd813962b96037ad19373fa116513",
+      "result_message": "localization(A): persist index231 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_A-00235]",
+      "completed_at": "2026-09-30T08:13:57.634005+09:00",
+      "producer_id": "P00127",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00235",
+      "result_sha": "9bfd30c5e5ffd813962b96037ad19373fa116513",
+      "status": "PASS",
+      "reason": "Index231/EBE401C8 candidate PASS. C independently verifies Drive ZIP 9c373ce8... (45,594 bytes) contains exactly EBE401C8_512x256.dds (8,388,736 bytes) SHA-256 ba9e0c73.... Exact pinned v0.25.10a source is 29b87a5c... and matches current canonical inventory 2048x1024 RGBA32/mip1. Source/candidate 128-byte DDS headers are byte-identical (header SHA-256 532576d0...). Decoded raw/readable hashes match producer evidence and registered source/candidate PNG pixels exactly. Unchanged C150 source geometry is reproduced: six source alpha-effect masks 35,514/26,651/24,266/4,619/49,596/9,527 px, aggregate 150,173 px / 2d1ee0e6..., CLEAN_PLATE readable/raw hashes f6a66a70.../a8f863fe..., zero clean-plate changes outside the removal mask and zero visible clean-plate alpha. New-candidate checks independently find localized alpha bboxes [15,377,1174,431], [13,537,1073,591], [17,873,389,1006], [1306,955,1444,1005], all inside exact 2px safe bboxes with positive margins; both LAN source regions are pixel-exact. Candidate changes total 134,953 px, alpha changes 134,952 px, with zero RGBA/alpha change outside the four localizable regions and zero introduced alpha outside the six source-effect regions. Current canonical transcriptions/artwork plan remain 4/4 with no omissions. Independent visual review PASS; runtime not tested."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "producer_task_blob_sha": "1bf303f00650d55bb9777a31a973d856284d0b3e",
+    "producer_report_blob_sha": "4d2c1be50f5ef77a5b03077127df15d9922702f4",
+    "producer_prompt_blob_sha": "15a275808a2236dfbb6145fb3b31ad6b70ec3dbc",
+    "producer_qa_blob_sha": "d3dc36c5df5d46ed9024c3f5a76d9cb6210389b2",
+    "source_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "candidate_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "candidate_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+    "candidate_drive_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC"
+  },
+  "independent_replay": {
+    "source": {
+      "archive_bytes": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+      "bytes": 8388736,
+      "sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+      "decoded_raw_rgba_sha256": "e4db10759fa035d1435fdfb6b3e1a003fddc706a5058b486f463c20347faa31e",
+      "decoded_display_rgba_sha256": "555b84e402ce01a6028e5df9d944308ee738e9a5ee7dbf6da8676bac0060ae79"
+    },
+    "candidate": {
+      "drive_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+      "zip_bytes": 45594,
+      "zip_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+      "member": "EBE401C8_512x256.dds",
+      "bytes": 8388736,
+      "sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+      "decoded_raw_rgba_sha256": "233f4afec10151b3f06a9680eb7ab1c9bd52cb17ad0eeca647917e69bfa89285",
+      "decoded_display_rgba_sha256": "2568786752e02aea2f11572445b571c0a7ac840f4c60742c92af4a89de8257b7"
+    },
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "pitch": 8192,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "header_128_exact": true,
+      "header_128_sha256": "532576d0ccd0d1eb3392c6754f1d13cf0afb4d34d02dd4fd9e1c14c2c4ea0a0f",
+      "channel_masks": {
+        "r": "0x00ff0000",
+        "g": "0x0000ff00",
+        "b": "0x000000ff",
+        "a": "0xff000000"
+      },
+      "raw_to_readable": "flip_y"
+    },
+    "drive_review_artifacts": {
+      "source_display": {
+        "file_id": "1gd73Al0iW8DNq_EMzcPw-f6InJxGjtK6",
+        "sha256": "7caa120e9f3036570d3d741af937afae47f22d0b91635b30c67e882a3054e4fe",
+        "bytes": 60485,
+        "decoded_pixels_exact": true
+      },
+      "clean_plate_display": {
+        "file_id": "1oSqDVaEMOtr4YU0yaGNll1fl3lWpOKAs",
+        "sha256": "d8f31d026aba172514dc3f6379245a1617dea53f14ab2cdd580e6f6145d440fc",
+        "bytes": 9553,
+        "decoded_rgba_sha256": "f6a66a70b9a1f775f43219d28b6caa3453290766a09bfdb5eb249723def07f01"
+      },
+      "candidate_display": {
+        "file_id": "1Eg6wDK7ozXQC1fN8UauIEvsX3_H6LkAu",
+        "sha256": "903295b15316d5e9d89f53be99fde8b263987b1d475211f87f685870942b10a9",
+        "bytes": 52293,
+        "decoded_pixels_exact": true
+      },
+      "comparison": {
+        "file_id": "13Oskub9aRmCwx50ysrR6t4wBtjipkdk-",
+        "sha256": "c7cd074a24cb0134b367e728e3e8667c9bd5c9ad664538a6c0955cf05895229e",
+        "bytes": 108896
+      },
+      "element_comparison": {
+        "file_id": "1vsdOR0DswrCpj3P080GNGWhs0exmkDbC",
+        "sha256": "c93585668784a1050bcc0f20609da12d086da429b9db4ee827a1d4b6b8566098",
+        "bytes": 160959
+      }
+    },
+    "masks": {
+      "elements": [
+        {
+          "id": "desc_online",
+          "pixels": 35514,
+          "sha256": "836a36dc48590cb90e3c9f968c83e83563be4cdde7aed117209f4c06f8c893e6"
+        },
+        {
+          "id": "desc_lan",
+          "pixels": 26651,
+          "sha256": "1419cfbf526e198bf81197688a0eef27e809ef42aa7ec36d5efe6459234a961a"
+        },
+        {
+          "id": "lan_large",
+          "pixels": 24266,
+          "sha256": "e38291bc29a552b231b402096527e6a537ae1b6eabb214e057e90a0df281c2f2"
+        },
+        {
+          "id": "lan_small",
+          "pixels": 4619,
+          "sha256": "26b150d9cd398bb4752fb169ecbd98ba456d4f5035e257dc816aca5411b054ec"
+        },
+        {
+          "id": "online_large",
+          "pixels": 49596,
+          "sha256": "1035cecb21c898ebc6e91ecd55f0d7bf801660878bacf7b1468db285d0d8ad61"
+        },
+        {
+          "id": "online_small",
+          "pixels": 9527,
+          "sha256": "3a93056222517f5f1ce55d46864b3984ca6309511e802bc4fef4b5ece1c2c69c"
+        }
+      ],
+      "removal_mask_pixels": 150173,
+      "removal_mask_sha256": "2d1ee0e64f653d440960abaffabf36fe997ba0daefac9be3ab28869175f14ae2",
+      "clean_plate_display_rgba_sha256": "f6a66a70b9a1f775f43219d28b6caa3453290766a09bfdb5eb249723def07f01",
+      "clean_plate_raw_rgba_sha256": "a8f863fefc33e69de96f58b48f2dba4937e85a7b48d82479866365564254b509",
+      "clean_diff_outside_removal": 0,
+      "clean_alpha_changed_outside_removal": 0,
+      "clean_visible_alpha_pixels": 0,
+      "localized_candidate_letter_pixels": 73154,
+      "localized_candidate_letter_mask_sha256": "c949bef022daf9a76557ea4a1b010df787af5f06e1efb4e0975a3f08b1debf61"
+    },
+    "per_element_safe_fit": [
+      {
+        "id": "desc_online",
+        "safe_bbox": [
+          9,
+          373,
+          1444,
+          435
+        ],
+        "candidate_bbox": [
+          15,
+          377,
+          1174,
+          431
+        ],
+        "margins_ltrb": [
+          6,
+          4,
+          270,
+          4
+        ],
+        "status": "PASS"
+      },
+      {
+        "id": "desc_lan",
+        "safe_bbox": [
+          4,
+          533,
+          1120,
+          595
+        ],
+        "candidate_bbox": [
+          13,
+          537,
+          1073,
+          591
+        ],
+        "margins_ltrb": [
+          9,
+          4,
+          47,
+          4
+        ],
+        "status": "PASS"
+      },
+      {
+        "id": "lan_large",
+        "role": "preserve_source",
+        "source_bbox": [
+          6,
+          696,
+          335,
+          834
+        ],
+        "pixel_exact": true,
+        "status": "PASS"
+      },
+      {
+        "id": "lan_small",
+        "role": "preserve_source",
+        "source_bbox": [
+          1295,
+          780,
+          1436,
+          839
+        ],
+        "pixel_exact": true,
+        "status": "PASS"
+      },
+      {
+        "id": "online_large",
+        "safe_bbox": [
+          8,
+          869,
+          638,
+          1010
+        ],
+        "candidate_bbox": [
+          17,
+          873,
+          389,
+          1006
+        ],
+        "margins_ltrb": [
+          9,
+          4,
+          249,
+          4
+        ],
+        "status": "PASS"
+      },
+      {
+        "id": "online_small",
+        "safe_bbox": [
+          1300,
+          951,
+          1558,
+          1009
+        ],
+        "candidate_bbox": [
+          1306,
+          955,
+          1444,
+          1005
+        ],
+        "margins_ltrb": [
+          6,
+          4,
+          114,
+          4
+        ],
+        "status": "PASS"
+      }
+    ],
+    "candidate_delta": {
+      "candidate_alpha_pixels": 102039,
+      "changed_pixels_total": 134953,
+      "alpha_changed_pixels_total": 134952,
+      "changed_rgba_outside_localizable_source_regions": 0,
+      "alpha_changed_outside_localizable_source_regions": 0,
+      "changed_rgba_outside_all_source_effect_regions": 0,
+      "introduced_alpha_outside_all_source_effect_regions": 0,
+      "preserve_lan_pixel_exact": "PASS_2_OF_2"
+    },
+    "semantic_validation": {
+      "current_canonical_pairs": "PASS_4_OF_4",
+      "pairs": [
+        {
+          "source": "LAN",
+          "korean": "LAN",
+          "physical_bindings": [
+            "lan_large",
+            "lan_small"
+          ]
+        },
+        {
+          "source": "ONLINE",
+          "korean": "온라인",
+          "physical_bindings": [
+            "online_large",
+            "online_small"
+          ]
+        },
+        {
+          "source": "Play OutRun Online with Friends or other players!",
+          "korean": "친구나 다른 플레이어와 온라인 아웃런을 즐기세요!",
+          "physical_bindings": [
+            "desc_online"
+          ]
+        },
+        {
+          "source": "Join or Create a LAN game of OutRun!",
+          "korean": "LAN 아웃런 게임에 참가하거나 만들어 보세요!",
+          "physical_bindings": [
+            "desc_lan"
+          ]
+        }
+      ],
+      "omissions": 0
+    },
+    "visual_review": {
+      "full_atlas": "PASS",
+      "six_element_comparison": "PASS",
+      "broken_hangul": false,
+      "clipping": false,
+      "overlap": false,
+      "english_residue_in_localized_regions": false,
+      "wrong_image_replacement": false,
+      "resolution_loss": false,
+      "added_background_boxes": false,
+      "preserve_source_damage": false,
+      "orientation": "PASS_FLIP_Y_SOURCE_STORAGE_READABLE_DISPLAY",
+      "signed_slant": "PASS_NONE_TO_NONE",
+      "style": "PASS_SOURCE_LIKE_UPRIGHT_CONDENSED_HEAVY_SANS_FLAT_RED_GREY_NO_ADDED_EFFECTS"
+    }
+  },
+  "reviewed_assets": [
+    {
+      "index": 231,
+      "asset": "EBE401C8",
+      "disposition": "PASS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "candidate_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+      "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Do not rerender unchanged content. Create/use a deterministic DDS_ONLY isolation input only when entering real-game validation; runtime approval requires actual game evidence."
+    }
+  ],
+  "concurrent_head_reconciliation": {
+    "observed_head": "1012e7e182c87fab4ba24bdad15d7c56fd391eae",
+    "index231_superseded": false,
+    "out_of_batch_newer_inputs": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00237",
+        "result_sha": "b138928bfc031026d37573c7055685460131d7d7",
+        "index": 163,
+        "asset": "59A79158",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00054"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00239",
+        "result_sha": "eb621c769fd430cc737c73adda3468b92d9c139d",
+        "index": 102,
+        "asset": "571E78F3",
+        "status": "QA_PENDING_RUNTIME_ISOLATION_INPUT_NOT_DISPOSITIONED_BY_Q00054"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00241",
+        "result_sha": "12ce7988c2330a526476d83e0079a3b81df7d45a",
+        "index": 111,
+        "asset": "C075FB49",
+        "status": "QA_PENDING_PREGEN_REWORK_EVIDENCE_NOT_DISPOSITIONED_BY_Q00054"
+      }
+    ]
+  },
+  "readiness_reconciliation": {
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      198,
+      201,
+      163
+    ],
+    "preflight_only_actionable_indices": [
+      133,
+      232
+    ],
+    "preflight_only_dependency_blocked_indices": [
+      175,
+      217,
+      135
+    ],
+    "static_qa_pass_runtime_untested_indices": [
+      99,
+      112,
+      130,
+      152,
+      193,
+      195,
+      222,
+      226,
+      231,
+      237
+    ],
+    "runtime_isolation_ready_indices": [
+      99,
+      237
+    ],
+    "runtime_isolation_qa_pending_indices": [
+      102
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: none.",
+      "ONE_STAGE_TO_RENDER: none.",
+      "QA_BACKLOG: candidate-bearing indices159/198/201 plus out-of-batch B00237@index163 before unrelated preflight.",
+      "PREFLIGHT_ONLY: index133/232 after candidate QA backlog; out-of-batch A00241@index111 rework-preflight evidence is QA_PENDING and is not promoted by Q00054.",
+      "STATIC_QA: index231 joins prior accepted static-QA candidates; do not rerender unchanged content.",
+      "RUNTIME_ISOLATION: indices99/237 accepted; A00239@index102 isolation input awaits its own C batch and does not block production.",
+      "Dependency-blocked: index175/217 source mismatch and index135 acquisition exhausted."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_INDEX231_CANDIDATE_STATIC_QA_AND_SINGLE_SHARED_STATE_MERGE",
+    "reviewed_inputs": 1,
+    "reviewed_assets": 1,
+    "producer_inputs_pass": 1,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "new_static_artwork_passes": 1,
+    "new_runtime_approvals": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 755,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 67,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00240.json",
+    "role_c_report": "localization/graphics/role_C/202609300821-C156/C156_Q00054_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Independent candidate-bound replay used the exact pinned v0.25.10a archive only after verifying bundle SHA-256 76f85ed2...; GitHub remains state/progress/QA SSOT.",
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "C150 source/mask/CLEAN_PLATE geometry and C153 semantic binding have unchanged fingerprints and are reused as accepted prerequisites. Q00054 cross-checks those exact hashes once and performs the new candidate-bound header/decoded-final/containment/alpha/preserve-source/visual gates once; no duplicate heavy pass.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_gate": null,
+  "bookkeeping_note": "This C result commit is the sole Q00054 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED."
+}
