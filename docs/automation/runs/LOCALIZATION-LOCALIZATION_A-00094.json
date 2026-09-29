@@ -1,0 +1,79 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00094",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00028",
+  "recorded_at_kst": "2026-09-29T16:39:00+09:00",
+  "base_sha": "f5eee44919a5c0e72202ed91820c2741b64b9d75",
+  "material_commit_sha": "58986ea6c4f040c6e988fec470ec060ea354b633",
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_ODD_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_15_UNITS",
+  "summary": "Advanced the remaining Q00007/C109-consumed odd assets 55/101/119 into deterministic first-pass-v2 source-effect-mask/CLEAN_PLATE work orders. Reused 15 accepted exact Release payload scopes: 2 BC3 units and 13 RGBA32 mapped-cell units. Added 13 strict 2px cell inner guards for index 101 while keeping them as upper bounds only. A00088 and A00091 producer-QA-pending assets were skipped. No Korean DDS or shared state changed; exact source masks/CLEAN_PLATE/final candidate geometry and candidate-only static gates remain HOLD_STRICT_RECHECK.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1638-A00094-P00028/A00094_P00028_V2_SOURCE_MASK_CLEAN_PLATE_WORK_ORDER_REPORT.json"
+  ],
+  "material_deliverable": {
+    "type": "THREE_ODD_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "indices": [
+      55,
+      101,
+      119
+    ],
+    "assets": [
+      "2EA557B4",
+      "560FA536",
+      "F6811E94"
+    ],
+    "deterministic_work_units": 15,
+    "bc3_work_units": 2,
+    "rgba32_work_units": 13,
+    "c109_accepted_payload_scopes_reused": 15,
+    "new_two_px_inner_guards_for_index_101": 13,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "a00079_evidence_blob_sha": "3b2263deedcaa2b4a565b37ce28419a41c368751",
+    "a00082_55_blob_sha": "bb0d7c74980f3a502d4593e570d5ae73c43c32e4",
+    "a00082_119_blob_sha": "68d0a58882eed71595f42ff5415362f7222b396d",
+    "a00079_a00082_c_acceptance": "LOCALIZATION-LOCALIZATION_C-00086/Q00007 PASS",
+    "c00086_acceptance_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f",
+    "current_queue_blob_sha": "6fb584e6f0a11ed74fa76e2ba6389c6576c3f54f",
+    "reason": "Q00007 independently accepted the source/payload/preflight evidence. P00028 adds the next executable v2 source-mask/CLEAN_PLATE contract instead of repeating unchanged heavy QA."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_A-00088": [
+      35,
+      43,
+      49,
+      95
+    ],
+    "LOCALIZATION-LOCALIZATION_A-00091": [
+      59,
+      65,
+      107,
+      175
+    ]
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_ODD_ONLY_55_101_119__15_OF_15_C109_ACCEPTED_PAYLOAD_SCOPES__13_OF_13_NEW_NONEMPTY_2PX_INDEX101_GUARDS__2_OF_2_BC3_PREFLIGHT_BOUNDS_REUSED_AS_UPPER_BOUNDS_ONLY__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "No exact source glyph/effect removal mask or independently validated CLEAN_PLATE has been materialized. The 2px bounds are only upper limits; final candidate_safe_bbox must be derived from measured source-effect geometry. Korean candidate DDS creation, decoded-final zero-pixel containment and English-source-vs-Korean-candidate approval remain prohibited until those prerequisites exist.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
