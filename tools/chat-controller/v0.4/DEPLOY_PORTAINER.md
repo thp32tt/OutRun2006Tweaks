@@ -128,7 +128,7 @@ A chat response is not completion. The controller requires:
 3. required GitHub Actions workflow exists for that exact result SHA;
 4. workflow conclusion is `success`.
 
-A missing workflow run remains validation-pending. A failed run triggers a repair turn in the same task chat. Maximum repair attempts: 3. After that, the task is recorded BLOCKED and the controller advances to another independent task.
+A required workflow run is never allowed to remain validation-pending forever. If the exact task commit contains a GitHub Actions skip directive (for example `[skip ci]`), the controller immediately treats it as a repairable automation failure and asks for a follow-up task commit without the skip directive. If no authoritative run appears for any other reason, `WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS` bounds the wait (600s in the VR/localization Portainer stacks) before the same repair path is used. A failed run also triggers a repair turn in the same task chat. Maximum repair attempts: 3. After that, the task is recorded BLOCKED and the controller advances to another independent task.
 
 ### Watchdog
 In queue mode the watchdog may recover Retry / Continue generating / browser-composer failures, but it does not select or send the next work item. Task ownership remains with the queue engine.
