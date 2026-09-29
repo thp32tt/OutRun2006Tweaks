@@ -20,5 +20,8 @@
     "removal_mask_raw_sha256": "dcc28d8da195df03de5f3a8fbfc71a5dbf3d88a70146479541432c5f96c1a6ee",
     "clean_plate_raw_rgba_sha256": "55ce1f8e762673fc93e9c8bfff604dbc52fe4e1184976baa128ed4c22241256a"
   },
-  "purpose": "Trigger GitHub-hosted reconstruction of C145/Q00043 direct-rework index226 and atomically persist the corrected Korean DDS plus mandatory GitHub review set and durable producer task record. A/B remains automation_validation=PENDING for C_BATCH_GATE; runtime remains UNTESTED."
+  "purpose": "Trigger GitHub-hosted reconstruction of C145/Q00043 direct-rework index226 and atomically persist the corrected Korean DDS plus mandatory GitHub review set and durable producer task record. A/B remains automation_validation=PENDING for C_BATCH_GATE; runtime remains UNTESTED.",
+  "dispatch_revision": 2,
+  "setup_fix": "d91fa9f4875b1fa5bd71c1ee1a871c00e0d51fbe",
+  "note": "Retry one-shot persistence after setup-only provenance NameError; no durable B00209 producer result existed, so task ATTEMPT remains 1/3."
 }
