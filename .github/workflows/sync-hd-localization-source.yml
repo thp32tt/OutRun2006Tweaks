@@ -73,6 +73,7 @@ jobs:
             --git-blob-sha "$PRE_BLOB" \
             --cell 0 8 1496 248 \
             --display-transform flip_y
+          python tools/localization/prepare_43B07A77_generation_inputs.py
 
           mkdir -p "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
           printf '%s\n' \
@@ -99,4 +100,5 @@ jobs:
             exit 0
           fi
           git commit -m "localization: sync canonical HD GUI source DDS"
+          git pull --rebase origin korean-localization-clean
           git push origin HEAD:korean-localization-clean
