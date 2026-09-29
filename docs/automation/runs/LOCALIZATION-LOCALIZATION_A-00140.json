@@ -1,0 +1,294 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00140",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00064",
+  "recorded_at_kst": "2026-09-29T20:49:00+09:00",
+  "base_sha": "7a40ae7fb1f0b0ae3fcac317ab6924ab5c055732",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_SCHEMA9_FOUR_ODD_SEMANTIC_FAST_PATH_CONTEXT_COLLISION_GUARD_PREFLIGHT",
+  "summary": "Fresh HEAD audit preserves A00131/A00139 as C-pending and does not rework their assets. C121/Q00019 reviewed only B00134/B00136. A direct REWORK indices 51/53/111/121 remain dependency-blocked, and no new A-side source/candidate fingerprint makes a current RENDER_READY/ONE_STAGE_TO_RENDER/existing-candidate rewrite runnable. Historical index89 generation evidence is not current-canonical authority because it pins 2048x256 SHA 906a17ef... while current inventory pins 512x64 SHA 0a2c9a32.... Under the one legal zero-candidate fallback batch, odd indices 95/101/137/217 are advanced with current canonical identities plus a schema9 semantic fast-path/context-collision guard. Their 37 canonical semantic entries are retained. Repeated selector/front-end semantics may reuse translations, but global source-string reuse is explicitly forbidden for START because current canonical transcriptions intentionally contain both 시작 and 출발 by asset/context. Exact canonical queue-path DDS sources and current v2 candidates are absent for all four, so style/geometry/CLEAN_PLATE/candidate gates remain fail-closed. No shared-state, DDS, build, or runtime changes.",
+  "evidence_embedded_in_task_record": true,
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_CANONICAL_SOURCE_IDENTITY_PLUS_SEMANTIC_FAST_PATH_CONTEXT_COLLISION_GUARD",
+    "indices": [
+      95,
+      101,
+      137,
+      217
+    ],
+    "assets": [
+      "37759842",
+      "560FA536",
+      "30CF0D",
+      "D1039D6F"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "current_semantic_entries": 37,
+    "batch_repeated_semantic_keys": 4,
+    "globally_consistent_reusable_keys": 13,
+    "context_sensitive_collision_keys": 1,
+    "context_collision_guard_added": true,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_hd_candidates_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "fresh_scan_head": "7a40ae7fb1f0b0ae3fcac317ab6924ab5c055732",
+    "a00131_pending_c": true,
+    "a00139_pending_c": true,
+    "c121_inputs": [
+      "LOCALIZATION-LOCALIZATION_B-00134@24b094367972f4898935ce9a5bd043bf14380dbf",
+      "LOCALIZATION-LOCALIZATION_B-00136@9e66a8c5d7589c7dd0e06584b9f225f3769dc54d"
+    ],
+    "c121_does_not_disposition_a00131_or_a00139": true,
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_or_newer_producer_assets_skipped": [
+      55,
+      57,
+      97,
+      119,
+      159,
+      163,
+      173,
+      201
+    ],
+    "runtime_validation_backlog_not_material_rework": [
+      61,
+      63,
+      195,
+      197
+    ],
+    "index215_status": "CLEAN_PLATE_EXISTS_BUT_SOURCE_FAITHFUL_HANGUL_STYLE_GLYPH_DEPENDENCY_UNCHANGED_FROM_A00139_AUDIT",
+    "index89_historical_source_identity_guard": {
+      "old_generation_spec_blob_sha": "3f36b060bbfcd588ea651f33e2dbd4cfad9a8a7f",
+      "old_source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+      "old_dimensions": [
+        2048,
+        256
+      ],
+      "current_inventory_sha256": "0a2c9a32070771338dabc04a7bda67d9b474fd21d6a3456f60d9e1221fc8a96c",
+      "current_inventory_dimensions": [
+        512,
+        64
+      ],
+      "current_inventory_mode": "RGBA",
+      "authority": "OLD_GENERATION_SPEC_NOT_CURRENT_CANONICAL_SOURCE_AUTHORITY"
+    },
+    "explicit_current_render_ready_indices": [],
+    "explicit_current_one_stage_to_render_runnable_indices": [],
+    "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_A_SHARD_WITH_CURRENT_GITHUB_EVIDENCE__ONE_PREFLIGHT_ONLY_BATCH_ALLOWED"
+  },
+  "semantic_fast_path": {
+    "mode": "SCHEMA9_QUALITY_PRESERVING_SEMANTIC_REUSE_WITH_CONTEXT_GUARD",
+    "selected_batch_repeated_keys": [
+      {
+        "source_key": "MANUAL",
+        "korean": "수동",
+        "members": [
+          95,
+          137
+        ]
+      },
+      {
+        "source_key": "RANDOM",
+        "korean": "무작위",
+        "members": [
+          95,
+          101
+        ]
+      },
+      {
+        "source_key": "TIME ATTACK MODE",
+        "korean": "타임 어택 모드",
+        "members": [
+          95,
+          101
+        ]
+      },
+      {
+        "source_key": "TUNED",
+        "korean": "튜닝",
+        "members": [
+          95,
+          101
+        ]
+      }
+    ],
+    "globally_consistent_reusable_keys": [
+      "AUTOMATIC",
+      "GOAL",
+      "HEART ATTACK MODE",
+      "MANUAL",
+      "NO",
+      "NORMAL",
+      "OUTRUN MODE",
+      "RANDOM",
+      "SELECT TRANSMISSION",
+      "TIME ATTACK MODE",
+      "TUNED",
+      "YES",
+      "YOU WILL RUN 15 COURSES CONTINUOUSLY."
+    ],
+    "context_sensitive_collisions": [
+      {
+        "source_key": "START",
+        "rule": "DO_NOT_GLOBAL_DEDUP_BY_SOURCE_STRING",
+        "variants": [
+          {
+            "korean": "시작",
+            "indices": [
+              51,
+              52,
+              53,
+              57,
+              172
+            ]
+          },
+          {
+            "korean": "출발",
+            "indices": [
+              63,
+              206,
+              214,
+              217
+            ]
+          }
+        ],
+        "rationale": "Current canonical transcriptions deliberately use two Korean renderings. Future family/template reuse must be asset/context-qualified."
+      }
+    ],
+    "style_template_reuse_status": "HOLD_UNTIL_EXACT_CANONICAL_ASSET_SPECIFIC_SOURCE_GEOMETRY_AND_STYLE_COMPATIBILITY",
+    "geometry_reuse_status": "FORBIDDEN_WITHOUT_ASSET_SPECIFIC_CANONICAL_PROOF",
+    "quality_threshold_reduced": false
+  },
+  "assets": [
+    {
+      "index": 95,
+      "asset": "37759842",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "canonical_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 20,
+      "prior_c_accepted_preflight": "C111 accepted 28/28 v2 source-mask/CLEAN_PLATE work units across 20/20 semantics; no actual CLEAN_PLATE/candidate DDS.",
+      "exact_source_present": false,
+      "current_v2_candidate_present": false
+    },
+    {
+      "index": 101,
+      "asset": "560FA536",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "canonical_sha256": "98f7fdf7e45408d8669741bb1620decf1f4ceea610183d9f2dc10e6cdd764377",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 12,
+      "prior_c_accepted_preflight": "C112 accepted v2 source-mask/CLEAN_PLATE work order; guards are upper bounds only; no actual source-effect mask/CLEAN_PLATE/candidate DDS.",
+      "exact_source_present": false,
+      "current_v2_candidate_present": false
+    },
+    {
+      "index": 137,
+      "asset": "30CF0D",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+      "canonical_sha256": "ad19e8dc4fb5da0defe4d2702bd73ab874a4bd321176fbade7b09c6a1271c9ff",
+      "canonical_dimensions": [
+        512,
+        256
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 3,
+      "prior_c_accepted_preflight": "C114 accepted direct-inspection work-order scopes/guards; exact decode/source masks/CLEAN_PLATE/candidate remain HOLD.",
+      "exact_source_present": false,
+      "current_v2_candidate_present": false
+    },
+    {
+      "index": 217,
+      "asset": "D1039D6F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+      "canonical_sha256": "035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf",
+      "canonical_dimensions": [
+        2048,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 2,
+      "prior_c_accepted_preflight": "C114 accepted direct-inspection work-order scopes/guards and current START/GOAL semantics; exact decode/source masks/CLEAN_PLATE/candidate remain HOLD.",
+      "exact_source_present": false,
+      "current_v2_candidate_present": false
+    }
+  ],
+  "canonical_reacquisition_gate": [
+    "Acquire exact DDS bytes matching each current inventory SHA-256; historical Release/old-HD geometry is nonauthoritative unless exact identity is proven.",
+    "Verify canonical DDS header and raw/readable orientation before pixel interpretation.",
+    "Bind semantics to canonical decoded pixels; apply the START context-collision guard instead of global source-string replacement.",
+    "Create asset-specific source-effect/removal/protected masks and CLEAN_PLATE with independent QA.",
+    "Evaluate style-family reuse only after canonical asset-specific geometry exists; semantic reuse is not style approval.",
+    "Derive v2 candidate_safe_bbox, render/measure/refit, preserve format/alpha/mips/orientation, and require zero-pixel containment plus exact English-source comparison.",
+    "Keep runtime_validation UNTESTED until a real game test exists."
+  ],
+  "reused_current_fingerprints": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "4d7b9dce5beaed4c8dd7fdf33794a288ca372ba7",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "e323daf9dba540cac5dd788bed79b1223a2bf055",
+    "resume_state_blob_sha": "8d66904b729bdd201d8859ad516ebc0ccedcaa12",
+    "worklog_blob_sha": "085a9578668d5d4fb31d646eb6bb0c38df6e88c6",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00131_task_record_blob_sha": "66f91f49e8af6e649e9bd4cfea0d26f20e2c6c93",
+    "a00139_task_record_blob_sha": "ef54ff23adb60ec513e59da66d10b976e37c898b",
+    "c00137_task_record_blob_sha": "0c707628e796d5a65af98adb26716df29ec77d96"
+  },
+  "self_qa": "PASS_ODD_ONLY_95_101_137_217__4_OF_4_PENDING_LOCALIZE_TEXT__4_OF_4_CURRENT_CANONICAL_SHA256_CANVAS_RGBA_IDENTITIES__37_CURRENT_SEMANTIC_ENTRIES__4_BATCH_REUSE_KEYS__13_GLOBAL_CONSISTENT_KEYS__START_CONTEXT_COLLISION_GUARDED__0_OF_4_QUEUE_SOURCES__0_OF_4_CURRENT_V2_CANDIDATES__NO_STYLE_GEOMETRY_PROMOTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CURRENT_CANONICAL_V2_KOREAN_CANDIDATE",
+  "fail_closed_reason": "All four selected exact canonical queue-path DDS sources and current v2 Korean candidates are absent. Existing C-accepted payload/work-order evidence is reused only as pre-generation evidence. Semantic reuse does not authorize masks, CLEAN_PLATE, style/geometry copying, DDS emission, containment PASS, or English-source comparison. START is context-sensitive and cannot be globally replaced.",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_4_OF_4_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_EXACT_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "removal_and_protected_masks": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "style_template_compatibility": "HOLD_ASSET_SPECIFIC_PROOF_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
