@@ -168,6 +168,15 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
     'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
 ], "P7_FLARE_R26HUD_PATH")
+require_all("src/vr/game/render_semantics.hpp", [
+    'CorroboratesProjectedScreenEffect',
+    'scope == RenderScope::ProjectedScreenEffect2D',
+], "P7_FLARE_PROJECTED_SCREEN_OWNER")
+require_all("src/vr/game/outrun_renderer.cpp", [
+    'CorroboratesProjectedScreenEffect(',
+    'PROJECTED_SCREEN_EFFECT_2D',
+    'R30 owns exactly one HUD/flare/world-billboard transform',
+], "P7_FLARE_SINGLE_TRANSFORM_OWNER")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'std::clamp(Settings::SkyGlowFactor.get(), 1, 16)',
     'Keep the stereo',
