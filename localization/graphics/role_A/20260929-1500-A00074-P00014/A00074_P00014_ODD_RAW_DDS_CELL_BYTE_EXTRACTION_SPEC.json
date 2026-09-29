@@ -1,0 +1,797 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00074",
+  "wave_id": "P00014",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T15:00:00+09:00",
+  "precommit_head_sha": "015ca4bbc91f2f244e316c04649dd0cbec58757f",
+  "precommit_head_message": "localization(B): reconcile P00010 rollover [AUTO:LOCALIZATION-LOCALIZATION_B-00069]",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "79a97c8ed6aa5fedee71f1f405483fa737e77306",
+    "reused_a58_mapping_blob_sha": "9c2a5f2eafcdbec525d98dab13de094fb3a2c0dc",
+    "c104_acceptance_record_blob_sha": "6d86b4de8be989e948678f13bce5b5e6412feb3b",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "selection": {
+    "selected_indices": [
+      35,
+      43,
+      49
+    ],
+    "selected_assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6"
+    ],
+    "basis": "C104 already consumed A00058 as PASS. Reuse immutable semantic/cell/source evidence and add the previously missing raw DDS row-slice extraction specification; do not touch current QA-pending A results."
+  },
+  "material_advance": {
+    "type": "THREE_ODD_EXACT_RELEASE_DDS_CELL_BYTE_EXTRACTION_SPEC",
+    "fallback_ladder_step": 4,
+    "assets_advanced": 3,
+    "physical_occurrences": 18,
+    "mapped_hd_cells": 18,
+    "exact_row_slice_specs": 18,
+    "candidate_dds_written": false,
+    "description": "Pins byte-accurate row-slice extraction for every already-mapped target HD cell in the exact Release DDS. This removes whole-atlas decoding/search ambiguity for the next exact glyph/effect bbox pass while preserving all non-target bytes."
+  },
+  "assets": [
+    {
+      "queue_index": 35,
+      "asset": "E989E3B7",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "exact_release_dds": {
+        "git_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+        "bytes": 67108992,
+        "canvas": [
+          4096,
+          4096
+        ],
+        "payload_model": "128-byte DDS header + 32bpp linear pixel payload",
+        "expected_bytes_from_geometry": 67108992,
+        "size_geometry_match": true,
+        "row_stride_bytes": 16384
+      },
+      "canonical_source_png_blob_sha": "7377da8531185e7e0df1bd399c044a0f1e85bd9b",
+      "stock_atlas_blob_sha": "4072705bc70475aea27e1d961f98180ee71b12b8",
+      "hd_atlas_blob_sha": "fbe3495161865a3da65e6c26a6c32da84edba6ac",
+      "mapped_cells": [
+        {
+          "occurrence": 1,
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_6",
+          "hd_cell": [
+            0,
+            208,
+            1720,
+            1016
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 16384,
+            "rows": 1016,
+            "row_slice_bytes": 6880,
+            "row_k_byte_offset_formula": "128 + (208 + k) * 16384 + 0, 0 <= k < 1016",
+            "first_row_start_byte": 3408000,
+            "final_row_start_byte": 20037760,
+            "final_row_end_exclusive_byte": 20044640,
+            "file_bytes": 67108992,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 2,
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "sprite": "sprite_7",
+          "hd_cell": [
+            1720,
+            208,
+            1640,
+            1016
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 16384,
+            "rows": 1016,
+            "row_slice_bytes": 6560,
+            "row_k_byte_offset_formula": "128 + (208 + k) * 16384 + 6880, 0 <= k < 1016",
+            "first_row_start_byte": 3414880,
+            "final_row_start_byte": 20044640,
+            "final_row_end_exclusive_byte": 20051200,
+            "file_bytes": 67108992,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        }
+      ],
+      "next_action": "Read only the listed row slices from the exact Release DDS; derive per-occurrence English glyph+outline+shadow/glow mask and bbox without clearing non-text pixels. Keep candidate generation fail-closed until orientation/slant and exact source bbox are measured."
+    },
+    {
+      "queue_index": 43,
+      "asset": "455717B2",
+      "queue_path": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "exact_release_dds": {
+        "git_blob_sha": "92a3cb717afb6ea10aa76df23941353fd0a04148",
+        "bytes": 16777344,
+        "canvas": [
+          2048,
+          2048
+        ],
+        "payload_model": "128-byte DDS header + 32bpp linear pixel payload",
+        "expected_bytes_from_geometry": 16777344,
+        "size_geometry_match": true,
+        "row_stride_bytes": 8192
+      },
+      "canonical_source_png_blob_sha": "b5a7e8724bbf6c7fb6f7f2281db7cdbb1d530f27",
+      "stock_atlas_blob_sha": "80f304ad008da4d3ebaa88b379de1641c82f86d3",
+      "hd_atlas_blob_sha": "95e98515af9d7727919d8b6019ecdcb386590d46",
+      "mapped_cells": [
+        {
+          "occurrence": 1,
+          "source": "CONTINUE",
+          "korean": "계속하기",
+          "sprite": "sprite_7",
+          "hd_cell": [
+            0,
+            252,
+            700,
+            100
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 100,
+            "row_slice_bytes": 2800,
+            "row_k_byte_offset_formula": "128 + (252 + k) * 8192 + 0, 0 <= k < 100",
+            "first_row_start_byte": 2064512,
+            "final_row_start_byte": 2875520,
+            "final_row_end_exclusive_byte": 2878320,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 2,
+          "source": "PERFECT!",
+          "korean": "완벽!",
+          "sprite": "sprite_6",
+          "hd_cell": [
+            0,
+            352,
+            1412,
+            208
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 208,
+            "row_slice_bytes": 5648,
+            "row_k_byte_offset_formula": "128 + (352 + k) * 8192 + 0, 0 <= k < 208",
+            "first_row_start_byte": 2883712,
+            "final_row_start_byte": 4579456,
+            "final_row_end_exclusive_byte": 4585104,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 3,
+          "source": "CONGRATULATIONS!",
+          "korean": "축하합니다!",
+          "sprite": "sprite_5",
+          "hd_cell": [
+            0,
+            560,
+            2028,
+            228
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 228,
+            "row_slice_bytes": 8112,
+            "row_k_byte_offset_formula": "128 + (560 + k) * 8192 + 0, 0 <= k < 228",
+            "first_row_start_byte": 4587648,
+            "final_row_start_byte": 6447232,
+            "final_row_end_exclusive_byte": 6455344,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 4,
+          "source": "PASSED!",
+          "korean": "통과!",
+          "sprite": "sprite_2",
+          "hd_cell": [
+            0,
+            788,
+            1700,
+            244
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 244,
+            "row_slice_bytes": 6800,
+            "row_k_byte_offset_formula": "128 + (788 + k) * 8192 + 0, 0 <= k < 244",
+            "first_row_start_byte": 6455424,
+            "final_row_start_byte": 8446080,
+            "final_row_end_exclusive_byte": 8452880,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        }
+      ],
+      "next_action": "Read only the listed row slices from the exact Release DDS; derive per-occurrence English glyph+outline+shadow/glow mask and bbox without clearing non-text pixels. Keep candidate generation fail-closed until orientation/slant and exact source bbox are measured."
+    },
+    {
+      "queue_index": 49,
+      "asset": "BF3EE5C6",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+      "exact_release_dds": {
+        "git_blob_sha": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+        "bytes": 16777344,
+        "canvas": [
+          2048,
+          2048
+        ],
+        "payload_model": "128-byte DDS header + 32bpp linear pixel payload",
+        "expected_bytes_from_geometry": 16777344,
+        "size_geometry_match": true,
+        "row_stride_bytes": 8192
+      },
+      "canonical_source_png_blob_sha": "0f4712e293cac5c90493264d9cb09a38c7c35c29",
+      "stock_atlas_blob_sha": "aadb817729492376b97faaf83f1a92d4c6f649da",
+      "hd_atlas_blob_sha": "298417865257ed116ec795bd5f34eb83348e96fa",
+      "mapped_cells": [
+        {
+          "occurrence": 1,
+          "source": "Rank for this stage",
+          "korean": "이 스테이지 랭크",
+          "sprite": "sprite_386",
+          "hd_cell": [
+            0,
+            152,
+            632,
+            104
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 104,
+            "row_slice_bytes": 2528,
+            "row_k_byte_offset_formula": "128 + (152 + k) * 8192 + 0, 0 <= k < 104",
+            "first_row_start_byte": 1245312,
+            "final_row_start_byte": 2089088,
+            "final_row_end_exclusive_byte": 2091616,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 2,
+          "source": "NORMAL",
+          "korean": "일반",
+          "sprite": "sprite_397",
+          "hd_cell": [
+            692,
+            184,
+            360,
+            72
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 72,
+            "row_slice_bytes": 1440,
+            "row_k_byte_offset_formula": "128 + (184 + k) * 8192 + 2768, 0 <= k < 72",
+            "first_row_start_byte": 1510224,
+            "final_row_start_byte": 2091856,
+            "final_row_end_exclusive_byte": 2093296,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 3,
+          "source": "TUNED",
+          "korean": "튜닝",
+          "sprite": "sprite_399",
+          "hd_cell": [
+            1412,
+            184,
+            360,
+            72
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 72,
+            "row_slice_bytes": 1440,
+            "row_k_byte_offset_formula": "128 + (184 + k) * 8192 + 5648, 0 <= k < 72",
+            "first_row_start_byte": 1513104,
+            "final_row_start_byte": 2094736,
+            "final_row_end_exclusive_byte": 2096176,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 4,
+          "source": "TOP Ghost Car!!",
+          "korean": "최고 고스트 카!!",
+          "sprite": "sprite_405",
+          "hd_cell": [
+            560,
+            272,
+            840,
+            120
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 120,
+            "row_slice_bytes": 3360,
+            "row_k_byte_offset_formula": "128 + (272 + k) * 8192 + 2240, 0 <= k < 120",
+            "first_row_start_byte": 2230592,
+            "final_row_start_byte": 3205440,
+            "final_row_end_exclusive_byte": 3208800,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 5,
+          "source": "Double!",
+          "korean": "더블!",
+          "sprite": "sprite_384",
+          "hd_cell": [
+            0,
+            392,
+            504,
+            144
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 144,
+            "row_slice_bytes": 2016,
+            "row_k_byte_offset_formula": "128 + (392 + k) * 8192 + 0, 0 <= k < 144",
+            "first_row_start_byte": 3211392,
+            "final_row_start_byte": 4382848,
+            "final_row_end_exclusive_byte": 4384864,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 6,
+          "source": "Strike!",
+          "korean": "스트라이크!",
+          "sprite": "sprite_409",
+          "hd_cell": [
+            504,
+            392,
+            504,
+            144
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 144,
+            "row_slice_bytes": 2016,
+            "row_k_byte_offset_formula": "128 + (392 + k) * 8192 + 2016, 0 <= k < 144",
+            "first_row_start_byte": 3213408,
+            "final_row_start_byte": 4384864,
+            "final_row_end_exclusive_byte": 4386880,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 7,
+          "source": "GOAL!",
+          "korean": "골!",
+          "sprite": "sprite_415",
+          "hd_cell": [
+            560,
+            544,
+            504,
+            144
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 144,
+            "row_slice_bytes": 2016,
+            "row_k_byte_offset_formula": "128 + (544 + k) * 8192 + 2240, 0 <= k < 144",
+            "first_row_start_byte": 4458816,
+            "final_row_start_byte": 5630272,
+            "final_row_end_exclusive_byte": 5632288,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 8,
+          "source": "Spare!",
+          "korean": "스페어!",
+          "sprite": "sprite_416",
+          "hd_cell": [
+            1064,
+            544,
+            504,
+            144
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 144,
+            "row_slice_bytes": 2016,
+            "row_k_byte_offset_formula": "128 + (544 + k) * 8192 + 4256, 0 <= k < 144",
+            "first_row_start_byte": 4460832,
+            "final_row_start_byte": 5632288,
+            "final_row_end_exclusive_byte": 5634304,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 9,
+          "source": "Shift up!!",
+          "korean": "시프트 업!!",
+          "sprite": "sprite_382",
+          "hd_cell": [
+            0,
+            688,
+            1064,
+            200
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 200,
+            "row_slice_bytes": 4256,
+            "row_k_byte_offset_formula": "128 + (688 + k) * 8192 + 0, 0 <= k < 200",
+            "first_row_start_byte": 5636224,
+            "final_row_start_byte": 7266432,
+            "final_row_end_exclusive_byte": 7270688,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 10,
+          "source": "Rank",
+          "korean": "랭크",
+          "sprite": "sprite_420",
+          "hd_cell": [
+            1064,
+            704,
+            360,
+            184
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 184,
+            "row_slice_bytes": 1440,
+            "row_k_byte_offset_formula": "128 + (704 + k) * 8192 + 4256, 0 <= k < 184",
+            "first_row_start_byte": 5771552,
+            "final_row_start_byte": 7270688,
+            "final_row_end_exclusive_byte": 7272128,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 11,
+          "source": "Turkey!",
+          "korean": "터키!",
+          "sprite": "sprite_429",
+          "hd_cell": [
+            1544,
+            984,
+            504,
+            168
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 168,
+            "row_slice_bytes": 2016,
+            "row_k_byte_offset_formula": "128 + (984 + k) * 8192 + 6176, 0 <= k < 168",
+            "first_row_start_byte": 8067232,
+            "final_row_start_byte": 9435296,
+            "final_row_end_exclusive_byte": 9437312,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        },
+        {
+          "occurrence": 12,
+          "source": "Go!",
+          "korean": "출발!",
+          "sprite": "sprite_380",
+          "hd_cell": [
+            0,
+            1152,
+            840,
+            376
+          ],
+          "raw_dds_payload": {
+            "header_bytes": 128,
+            "bytes_per_pixel": 4,
+            "row_stride_bytes": 8192,
+            "rows": 376,
+            "row_slice_bytes": 3360,
+            "row_k_byte_offset_formula": "128 + (1152 + k) * 8192 + 0, 0 <= k < 376",
+            "first_row_start_byte": 9437312,
+            "final_row_start_byte": 12509312,
+            "final_row_end_exclusive_byte": 12512672,
+            "file_bytes": 16777344,
+            "in_file_bounds": true
+          },
+          "edit_guard": {
+            "permitted_scope": "MEASURE_SOURCE_TEXT_EFFECT_MASK_ONLY_WITHIN_HD_CELL",
+            "whole_cell_clear_forbidden": true,
+            "candidate_render_permitted": false,
+            "blocked_on": [
+              "exact_source_full_effect_bbox",
+              "raw_readable_orientation",
+              "signed_slant",
+              "text_only_clean_plate"
+            ]
+          }
+        }
+      ],
+      "next_action": "Read only the listed row slices from the exact Release DDS; derive per-occurrence English glyph+outline+shadow/glow mask and bbox without clearing non-text pixels. Keep candidate generation fail-closed until orientation/slant and exact source bbox are measured."
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_35_43_49",
+    "c_consumed_basis": "PASS_A00058_CONSUMED_BY_Q00002_C00063_C104",
+    "reused_heavy_qa": "PASS_A00058_SOURCE_AND_SEMANTIC_MAPPING_UNCHANGED",
+    "release_dds_size_geometry": "PASS_3_OF_3_128_PLUS_WxHx4",
+    "cell_bounds": "PASS_18_OF_18_ROW_SLICES_WITHIN_EXACT_RELEASE_DDS",
+    "mapped_cell_overlap_pairs": 0,
+    "byte_spec_determinism": "PASS_ROW_K_OFFSET_FORMULA_AND_EXCLUSIVE_END_RECORDED_PER_OCCURRENCE",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "raw_readable_orientation": "HOLD_STRICT_RECHECK",
+    "signed_slant": "HOLD_STRICT_RECHECK",
+    "clean_plate": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
