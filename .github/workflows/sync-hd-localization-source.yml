@@ -71,7 +71,8 @@ jobs:
             --output-dir "KOREAN_PNG_REVIEW/43B07A77" \
             --asset-id "43B07A77" \
             --git-blob-sha "$PRE_BLOB" \
-            --cell 0 8 1496 248
+            --cell 0 8 1496 248 \
+            --display-transform flip_y
 
           mkdir -p "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
           printf '%s\n' \
