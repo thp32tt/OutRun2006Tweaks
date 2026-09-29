@@ -1489,3 +1489,303 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: continue visual-first.
+
+
+## Cycle 0081 — hosted CI pending
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Exact repair-head hosted workflows remain in progress; do not convert pending into PASS.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue independent static review.
+
+
+## Cycle 0082 — selector texture0 evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Selector car texture0 must be observed at the exact world draw boundary before deciding texture loss.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact draw resource.
+
+
+## Cycle 0083 — selector shader/material evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Shader/material state can mimic missing texture; distinguish before changing upload or stage state.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: collect exact selector shader/material evidence.
+
+
+## Cycle 0084 — HUD alpha stage evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Primary blend restoration does not prove texture-stage alpha is correct; inspect exact HUD stage only, not global state.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace owned HUD stage.
+
+
+## Cycle 0085 — menu anchor evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu head-lock and menu translucency are separate dimensions; one fix must not be used as evidence for the other.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact menu anchor.
+
+
+## Cycle 0086 — checkpoint temporal identity
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Timer update duplication needs producer identity across queue/frame epochs, not only draw count.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace temporal producer.
+
+
+## Cycle 0087 — result temporal identity
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Final results split may involve two legitimate surfaces; identify producer/epoch before dedup.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact result surfaces.
+
+
+## Cycle 0088 — marker depth evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Rival marker world anchor requires positive depth evidence; projected marker path must not absorb it.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: retain route separation.
+
+
+## Cycle 0089 — SkyGlow strength guard
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Do not tune 0.38 glow strength until HMD confirms ordering fix; static brightness guesses are insufficient.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: await HMD evidence.
+
+
+## Cycle 0090 — performance pause
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- No copy/wait/frame pacing behavior changes while visual correctness remains unresolved and telemetry is absent.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue P0 visuals.
+
+
+## Cycle 0091 — hosted CI pending
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Exact repair-head hosted workflows remain in progress; do not convert pending into PASS.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue independent static review.
+
+
+## Cycle 0092 — selector texture0 evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Selector car texture0 must be observed at the exact world draw boundary before deciding texture loss.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact draw resource.
+
+
+## Cycle 0093 — selector shader/material evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Shader/material state can mimic missing texture; distinguish before changing upload or stage state.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: collect exact selector shader/material evidence.
+
+
+## Cycle 0094 — HUD alpha stage evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Primary blend restoration does not prove texture-stage alpha is correct; inspect exact HUD stage only, not global state.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace owned HUD stage.
+
+
+## Cycle 0095 — menu anchor evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Menu head-lock and menu translucency are separate dimensions; one fix must not be used as evidence for the other.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact menu anchor.
+
+
+## Cycle 0096 — checkpoint temporal identity
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Timer update duplication needs producer identity across queue/frame epochs, not only draw count.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace temporal producer.
+
+
+## Cycle 0097 — result temporal identity
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Final results split may involve two legitimate surfaces; identify producer/epoch before dedup.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace exact result surfaces.
+
+
+## Cycle 0098 — marker depth evidence
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Rival marker world anchor requires positive depth evidence; projected marker path must not absorb it.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: retain route separation.
+
+
+## Cycle 0099 — SkyGlow strength guard
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Do not tune 0.38 glow strength until HMD confirms ordering fix; static brightness guesses are insufficient.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: await HMD evidence.
+
+
+## Cycle 0100 — performance pause
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- No copy/wait/frame pacing behavior changes while visual correctness remains unresolved and telemetry is absent.
+- Evidence: current R71 static boundary review; hosted CI for repair head remains pending where applicable.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / CI_PENDING_WHERE_APPLICABLE`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: continue P0 visuals.
