@@ -1,0 +1,1394 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00079",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "wave_id": "P00017",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T15:39:01+09:00",
+  "precommit_head_sha": "1e0a08bd613a8e107c2bc36cc51470ba43ab5ea7",
+  "precommit_head_message": "localization(C): merge Q00005 independent QA [AUTO:LOCALIZATION-LOCALIZATION_C-00078]",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "reused_a72_mapping_blob_sha": "0e591af4506d4d9022b8bf95b1a415b47c05aea2",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "selection": {
+    "selected_indices": [
+      95,
+      101
+    ],
+    "selected_assets": [
+      "37759842",
+      "560FA536"
+    ],
+    "basis": "Q00004/C106 already consumed A00072 as PASS. A00074 indices 35/43/49 remain later QA input and are not touched. Advance only the C-consumed direct mappings to deterministic exact Release DDS mapped-cell byte extraction."
+  },
+  "material_advance": {
+    "fallback_step": 4,
+    "type": "TWO_ODD_EXACT_RELEASE_MAPPED_CELL_PAYLOAD_EXTRACTION_SPECS",
+    "assets": 2,
+    "canonical_semantics": 32,
+    "mapped_physical_occurrences": 41,
+    "exact_cell_extraction_specs": 41,
+    "exact_size_equation_linear32_cells": 41,
+    "mapped_cell_overlap_pairs": 0,
+    "out_of_file_or_canvas_failures": 0,
+    "candidate_dds_written": false,
+    "significance": "Adds byte-accurate row-slice extraction for every C106-accepted mapped HD cell without repeating immutable source/mapping QA. This narrows the next reconstruction pass from whole-atlas search to exact mapped payload regions while failing closed on binary-header fields and orientation."
+  },
+  "assets": [
+    {
+      "queue_index": 95,
+      "asset": "37759842",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+        "git_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+        "file_size": 67108992,
+        "atlas_canvas": [
+          4096,
+          4096
+        ],
+        "legacy_header_bytes_used_for_size_equation": 128,
+        "payload_bytes_after_128": 67108864,
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL",
+        "expected_file_size_from_equation": 67108992,
+        "size_equation_match": true,
+        "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_TEXT_CONNECTOR",
+        "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+      },
+      "source_mapping_evidence": {
+        "reused_task": "LOCALIZATION-LOCALIZATION_A-00072",
+        "release_dds_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+        "decoded_stock_png_blob_sha": "02534e3285537142581a06bb5b4dc4d76a32925e",
+        "stock_atlas_blob_sha": "85d0c4d980c537e16170c51724433cbeeaf202bd",
+        "hd4_atlas_blob_sha": "581d42b49da9b882f2a54cdfef7675d147afacaa",
+        "canonical_semantics_count": 20,
+        "mapped_physical_occurrences": 28
+      },
+      "derived_mapped_cell_extraction": {
+        "occurrence_count": 28,
+        "overlap_pairs_within_selected_cells": 0,
+        "cells": [
+          {
+            "source": "For Expert Drivers : The car is difficult to control.",
+            "korean": "상급자용: 조작이 어려운 차량입니다.",
+            "sprite": "sprite_465",
+            "hd_4x_cell": [
+              0,
+              40,
+              1624,
+              120
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 655488,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 6496,
+            "row_count": 120,
+            "file_offset_last_row_exclusive": 2611680,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "For Experts : Gear changes are required.",
+            "korean": "상급자용: 기어 변속이 필요합니다.",
+            "sprite": "sprite_466",
+            "hd_4x_cell": [
+              1624,
+              40,
+              1352,
+              120
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 661984,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 5408,
+            "row_count": 120,
+            "file_offset_last_row_exclusive": 2617088,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Tuned",
+            "korean": "튜닝",
+            "sprite": "sprite_467",
+            "hd_4x_cell": [
+              2976,
+              40,
+              392,
+              120
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 667392,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1568,
+            "row_count": 120,
+            "file_offset_last_row_exclusive": 2618656,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Manual",
+            "korean": "수동",
+            "sprite": "sprite_464",
+            "hd_4x_cell": [
+              2800,
+              208,
+              552,
+              136
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 3419200,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2208,
+            "row_count": 136,
+            "file_offset_last_row_exclusive": 5633248,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Please stand by.",
+            "korean": "잠시 기다려 주세요.",
+            "sprite": "sprite_445",
+            "hd_4x_cell": [
+              0,
+              528,
+              1544,
+              200
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 8650880,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 6176,
+            "row_count": 200,
+            "file_offset_last_row_exclusive": 11917472,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Waiting for entries.",
+            "korean": "참가자를 기다리는 중입니다.",
+            "sprite": "sprite_443",
+            "hd_4x_cell": [
+              0,
+              728,
+              1560,
+              216
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 11927680,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 6240,
+            "row_count": 216,
+            "file_offset_last_row_exclusive": 15456480,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Entry has been closed.",
+            "korean": "참가 접수가 종료되었습니다.",
+            "sprite": "sprite_444",
+            "hd_4x_cell": [
+              1560,
+              744,
+              1840,
+              200
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 12196064,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 7360,
+            "row_count": 200,
+            "file_offset_last_row_exclusive": 15463840,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Manual Transmission",
+            "korean": "수동 변속",
+            "sprite": "sprite_446",
+            "hd_4x_cell": [
+              1544,
+              528,
+              360,
+              200
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 8657056,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1440,
+            "row_count": 200,
+            "file_offset_last_row_exclusive": 11918912,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Automatic Transmission",
+            "korean": "자동 변속",
+            "sprite": "sprite_447",
+            "hd_4x_cell": [
+              1904,
+              528,
+              360,
+              200
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 8658496,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1440,
+            "row_count": 200,
+            "file_offset_last_row_exclusive": 11920352,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Real Player Only",
+            "korean": "실제 플레이어 전용",
+            "sprite": "sprite_448",
+            "hd_4x_cell": [
+              2264,
+              528,
+              360,
+              200
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 8659936,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1440,
+            "row_count": 200,
+            "file_offset_last_row_exclusive": 11921792,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "操作が難しい車です。",
+            "korean": "조작이 어려운 차량입니다.",
+            "sprite": "sprite_441",
+            "hd_4x_cell": [
+              1048,
+              968,
+              1024,
+              256
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 15864032,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 256,
+            "file_offset_last_row_exclusive": 20046048,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "上級者向け",
+            "korean": "상급자용",
+            "sprite": "sprite_442",
+            "hd_4x_cell": [
+              2072,
+              968,
+              1024,
+              256
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 15868128,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 256,
+            "file_offset_last_row_exclusive": 20050144,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Heart Attack Mode",
+            "korean": "하트 어택 모드",
+            "sprite": "sprite_389",
+            "hd_4x_cell": [
+              2336,
+              3216,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 52700416,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 59895328,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Heart Attack Mode",
+            "korean": "하트 어택 모드",
+            "sprite": "sprite_392",
+            "hd_4x_cell": [
+              1752,
+              3656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 59907040,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 67101952,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "OutRun Mode",
+            "korean": "아웃런 모드",
+            "sprite": "sprite_390",
+            "hd_4x_cell": [
+              584,
+              3656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 59902368,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 67097280,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "OutRun Mode",
+            "korean": "아웃런 모드",
+            "sprite": "sprite_393",
+            "hd_4x_cell": [
+              2336,
+              3656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 59909376,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 67104288,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode",
+            "korean": "타임 어택 모드",
+            "sprite": "sprite_429",
+            "hd_4x_cell": [
+              3640,
+              2496,
+              392,
+              280
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 40909152,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1568,
+            "row_count": 280,
+            "file_offset_last_row_exclusive": 45481856,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode",
+            "korean": "타임 어택 모드",
+            "sprite": "sprite_388",
+            "hd_4x_cell": [
+              1752,
+              3216,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 52698080,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 59892992,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode",
+            "korean": "타임 어택 모드",
+            "sprite": "sprite_391",
+            "hd_4x_cell": [
+              1168,
+              3656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 59904704,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 67099616,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "YES",
+            "korean": "예",
+            "sprite": "sprite_425",
+            "hd_4x_cell": [
+              2664,
+              1648,
+              392,
+              280
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 27011616,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1568,
+            "row_count": 280,
+            "file_offset_last_row_exclusive": 31584320,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "YES",
+            "korean": "예",
+            "sprite": "sprite_384",
+            "hd_4x_cell": [
+              3504,
+              3656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 59914048,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 67108960,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "NO",
+            "korean": "아니오",
+            "sprite": "sprite_426",
+            "hd_4x_cell": [
+              3056,
+              1648,
+              392,
+              280
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 27013184,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1568,
+            "row_count": 280,
+            "file_offset_last_row_exclusive": 31585888,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "NO",
+            "korean": "아니오",
+            "sprite": "sprite_385",
+            "hd_4x_cell": [
+              0,
+              3216,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 52691072,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 59885984,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "RANDOM",
+            "korean": "무작위",
+            "sprite": "sprite_411",
+            "hd_4x_cell": [
+              2080,
+              2352,
+              520,
+              424
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 38543616,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2080,
+            "row_count": 424,
+            "file_offset_last_row_exclusive": 45476128,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode 15 continuous course",
+            "korean": "타임 어택 모드 15코스 연속",
+            "sprite": "sprite_427",
+            "hd_4x_cell": [
+              3448,
+              1648,
+              392,
+              280
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 27014752,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1568,
+            "row_count": 280,
+            "file_offset_last_row_exclusive": 31587456,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode 15 continuous course",
+            "korean": "타임 어택 모드 15코스 연속",
+            "sprite": "sprite_386",
+            "hd_4x_cell": [
+              584,
+              3216,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 52693408,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 59888320,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "OutRun Mode 15 continuous course",
+            "korean": "아웃런 모드 15코스 연속",
+            "sprite": "sprite_428",
+            "hd_4x_cell": [
+              3640,
+              2072,
+              392,
+              280
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 33962336,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 1568,
+            "row_count": 280,
+            "file_offset_last_row_exclusive": 38535040,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "OutRun Mode 15 continuous course",
+            "korean": "아웃런 모드 15코스 연속",
+            "sprite": "sprite_387",
+            "hd_4x_cell": [
+              1168,
+              3216,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 52695744,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 59890656,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          }
+        ]
+      },
+      "candidate_dds_modified": false,
+      "next_gate": "USE_ONLY_THE_LISTED_EXACT_RELEASE_ROW_SLICES_TO_DERIVE_SOURCE_FULL_EFFECT_BBOX_RAW_TRANSFORM_CLEAN_PLATE_AND_SIGNED_SLANT; DO_NOT_RENDER_KOREAN_BEFORE_THOSE_FACTS_EXIST"
+    },
+    {
+      "queue_index": 101,
+      "asset": "560FA536",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "exact_hd_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+        "git_blob_sha": "1e95df72109411fb1f9c398445db583ed31de2a1",
+        "file_size": 67108992,
+        "atlas_canvas": [
+          4096,
+          4096
+        ],
+        "legacy_header_bytes_used_for_size_equation": 128,
+        "payload_bytes_after_128": 67108864,
+        "layout_size_equation": "EXACT_SIZE_MATCH_LEGACY128_PLUS_LINEAR32_TOP_LEVEL",
+        "expected_file_size_from_equation": 67108992,
+        "size_equation_match": true,
+        "format_header_status": "HOLD_EXACT_BINARY_HEADER_FIELDS_NOT_EXPOSED_BY_TEXT_CONNECTOR",
+        "raw_orientation_status": "HOLD_ORIENTATION_UNRESOLVED"
+      },
+      "source_mapping_evidence": {
+        "reused_task": "LOCALIZATION-LOCALIZATION_A-00072",
+        "release_dds_blob_sha": "1e95df72109411fb1f9c398445db583ed31de2a1",
+        "decoded_stock_png_blob_sha": "a746ee3dd7bfe917f11a204ac4beba46b62e88d8",
+        "stock_atlas_blob_sha": "274d4c51c5ae7ece7f182f24009f32e217c1d005",
+        "hd4_atlas_blob_sha": "90b0122b7fdc44a553eff3f3e83278725ad0f24b",
+        "canonical_semantics_count": 12,
+        "mapped_physical_occurrences": 13
+      },
+      "derived_mapped_cell_extraction": {
+        "occurrence_count": 13,
+        "overlap_pairs_within_selected_cells": 0,
+        "cells": [
+          {
+            "source": "Every player must participate at the same time to play this mode.",
+            "korean": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+            "sprite": "sprite_116",
+            "hd_4x_cell": [
+              2896,
+              8,
+              1048,
+              168
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 142784,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4192,
+            "row_count": 168,
+            "file_offset_last_row_exclusive": 2883104,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode",
+            "korean": "타임 어택 모드",
+            "sprite": "sprite_118",
+            "hd_4x_cell": [
+              2896,
+              224,
+              808,
+              120
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 3681728,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3232,
+            "row_count": 120,
+            "file_offset_last_row_exclusive": 5634656,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Time Attack Mode",
+            "korean": "타임 어택 모드",
+            "sprite": "sprite_119",
+            "hd_4x_cell": [
+              2896,
+              392,
+              808,
+              120
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 6434240,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3232,
+            "row_count": 120,
+            "file_offset_last_row_exclusive": 8387168,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "中級者向けの車です。",
+            "korean": "중급자용 차량입니다.",
+            "sprite": "sprite_107",
+            "hd_4x_cell": [
+              0,
+              512,
+              1024,
+              256
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 8388736,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 256,
+            "file_offset_last_row_exclusive": 12570752,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "To switch to \"Single Player Mode\", press the \"View Change Button\" and the \"Brake Pedal\" at the same time.",
+            "korean": "싱글 플레이 모드로 전환하려면 시점 변경 버튼과 브레이크 페달을 동시에 누르세요.",
+            "sprite": "sprite_109",
+            "hd_4x_cell": [
+              1272,
+              584,
+              1848,
+              184
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 9573472,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 7392,
+            "row_count": 184,
+            "file_offset_last_row_exclusive": 12579136,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "You will run 15 courses continuously.",
+            "korean": "15코스를 연속으로 달립니다.",
+            "sprite": "sprite_122",
+            "hd_4x_cell": [
+              3120,
+              664,
+              936,
+              104
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 10891584,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 3744,
+            "row_count": 104,
+            "file_offset_last_row_exclusive": 12582880,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "The distance to the final goal will be very long.",
+            "korean": "최종 골까지의 거리가 매우 깁니다.",
+            "sprite": "sprite_121",
+            "hd_4x_cell": [
+              2200,
+              832,
+              1160,
+              104
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 13640416,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4640,
+            "row_count": 104,
+            "file_offset_last_row_exclusive": 15332608,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Steering Wheel :",
+            "korean": "스티어링 휠:",
+            "sprite": "sprite_129",
+            "hd_4x_cell": [
+              3360,
+              864,
+              552,
+              72
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 14169344,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2208,
+            "row_count": 72,
+            "file_offset_last_row_exclusive": 15334816,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "初級者向けの車です。",
+            "korean": "초급자용 차량입니다.",
+            "sprite": "sprite_106",
+            "hd_4x_cell": [
+              2200,
+              936,
+              1024,
+              256
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 15344352,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 4096,
+            "row_count": 256,
+            "file_offset_last_row_exclusive": 19526368,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "Versus Special Course has been selected.",
+            "korean": "대전 스페셜 코스가 선택되었습니다.",
+            "sprite": "sprite_117",
+            "hd_4x_cell": [
+              1400,
+              1504,
+              2216,
+              136
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 24647264,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 8864,
+            "row_count": 136,
+            "file_offset_last_row_exclusive": 26867968,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "TUNED",
+            "korean": "튜닝",
+            "sprite": "sprite_96",
+            "hd_4x_cell": [
+              3304,
+              2656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 43529248,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 50724160,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "NORMAL",
+            "korean": "일반",
+            "sprite": "sprite_97",
+            "hd_4x_cell": [
+              2800,
+              3656,
+              584,
+              440
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 59911232,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2336,
+            "row_count": 440,
+            "file_offset_last_row_exclusive": 67106144,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          },
+          {
+            "source": "RANDOM",
+            "korean": "무작위",
+            "sprite": "sprite_99",
+            "hd_4x_cell": [
+              0,
+              768,
+              520,
+              424
+            ],
+            "atlas_rotated": false,
+            "extraction_profile": "LINEAR32_SIZE_EQUATION",
+            "file_offset_first_row": 12583040,
+            "row_pitch_bytes": 16384,
+            "row_bytes": 2080,
+            "row_count": 424,
+            "file_offset_last_row_exclusive": 19515552,
+            "in_file_bounds": true,
+            "edit_guard": {
+              "permitted_scope": "MEASURE_SOURCE_GLYPH_OUTLINE_SHADOW_GLOW_ALPHA_FRINGE_ONLY_WITHIN_MAPPED_CELL",
+              "whole_cell_clear_forbidden": true,
+              "candidate_render_permitted": false,
+              "blocked_on": [
+                "exact_source_full_effect_bbox",
+                "raw_readable_orientation",
+                "signed_slant",
+                "text_only_clean_plate"
+              ]
+            }
+          }
+        ]
+      },
+      "candidate_dds_modified": false,
+      "next_gate": "USE_ONLY_THE_LISTED_EXACT_RELEASE_ROW_SLICES_TO_DERIVE_SOURCE_FULL_EFFECT_BBOX_RAW_TRANSFORM_CLEAN_PLATE_AND_SIGNED_SLANT; DO_NOT_RENDER_KOREAN_BEFORE_THOSE_FACTS_EXIST"
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_95_101",
+    "work_steal": "NONE",
+    "c_consumed_basis": "PASS_A00072_CONSUMED_BY_Q00004_C106",
+    "qa_pending_dedup": "PASS_A00074_35_43_49_NOT_TOUCHED",
+    "reused_heavy_qa": "PASS_A00072_SOURCE_SEMANTIC_AND_CELL_MAPPING_FINGERPRINT_UNCHANGED",
+    "exact_release_identity": "PASS_2_OF_2_BLOB_AND_SIZE_EQUATIONS",
+    "mapped_cell_range_checks": "PASS_41_OF_41",
+    "mapped_cell_overlap_pairs": 0,
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "raw_readable_orientation": "HOLD_STRICT_RECHECK",
+    "signed_slant": "HOLD_STRICT_RECHECK",
+    "clean_plate": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "HOLD_HEADER_FIELDS_NO_DDS_WRITE",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_TWO_ODD_EXACT_RELEASE_MAPPED_CELL_PAYLOAD_EXTRACTION_SPECS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

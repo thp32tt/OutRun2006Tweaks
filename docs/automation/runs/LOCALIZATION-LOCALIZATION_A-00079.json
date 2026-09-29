@@ -1,0 +1,71 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00079",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00017",
+  "recorded_at_kst": "2026-09-29T15:39:01+09:00",
+  "base_sha": "1e0a08bd613a8e107c2bc36cc51470ba43ab5ea7",
+  "result": "PASS_MATERIAL_FALLBACK4_TWO_ODD_EXACT_RELEASE_MAPPED_CELL_PAYLOAD_EXTRACTION_SPECS",
+  "summary": "Advanced C106-consumed odd indices 95/101 by pinning exact Release DDS row-slice extraction for all 41 A00072-mapped HD cells. Both GitHub Release objects exactly satisfy 128 + 4096x4096x4 bytes, all mapped ranges are in-file, and selected-cell overlap pairs are 0. No candidate DDS or shared state changed; exact source-effect bbox/orientation/slant/clean-plate and candidate-only containment/comparison remain fail-closed HOLD.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1539-A00079-P00017/A00079_P00017_ODD_RELEASE_PAYLOAD_CELL_EXTRACTION_SPEC.json"
+  ],
+  "material_deliverable": {
+    "type": "TWO_ODD_EXACT_RELEASE_MAPPED_CELL_PAYLOAD_EXTRACTION_SPECS",
+    "indices": [
+      95,
+      101
+    ],
+    "assets": [
+      "37759842",
+      "560FA536"
+    ],
+    "canonical_semantics": 32,
+    "physical_occurrences": 41,
+    "exact_cell_extraction_specs": 41,
+    "exact_release_size_equations_passed": 2,
+    "in_file_range_checks_passed": 41,
+    "mapped_cell_overlap_pairs": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00072",
+    "producer_mapping_blob_sha": "0e591af4506d4d9022b8bf95b1a415b47c05aea2",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00075",
+    "c_batch": "Q00004/C106",
+    "reason": "same source/translation/cell-mapping fingerprint; no duplicate heavy QA"
+  },
+  "skipped_qa_pending": {
+    "A00074": {
+      "result_sha": "6cf9089ed5039b0e997893ccce4d50d90d090643",
+      "assets": [
+        35,
+        43,
+        49
+      ]
+    }
+  },
+  "dependency_blocked_rework_indices": [
+    51,
+    53,
+    111,
+    121
+  ],
+  "self_qa": "PASS_ODD_ONLY_95_101__2_OF_2_RELEASE_SIZE_EQUATIONS__41_OF_41_BYTE_RANGES_IN_BOUNDS__0_TARGET_CELL_OVERLAPS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "No Korean DDS candidate was written. Exact English glyph/effect bbox, raw/readable orientation, signed slant and text-only clean plate remain mandatory before rendering; zero-pixel containment and ENGLISH SOURCE vs KOREAN CANDIDATE remain candidate-only HOLD gates.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
