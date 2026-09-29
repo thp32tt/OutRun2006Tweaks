@@ -2508,3 +2508,41 @@ Next:
 - Consume exact-head `4c4f0b6` Build/OpenXR/HUD Inspector.
 - Inspect exact final-result clips `0x97BB7/0x97DA7` and GOAL/time composite ownership for the same deferred-node lifetime class.
 - Keep selector resource policy unchanged until a new HMD log correlates the same companion pointer from R14 fallback to R13 LockRect failure.
+
+
+## Cycle 0144 — rival marker projected-anchor queue lifetime
+
+Finding: `DX9EX-RIVAL-MARKER-NODE-ANCHOR-LIFETIME-001`
+
+Falsification first:
+- Exact OutRun final-result clips `0x97BB7/0x97DA7` already use `R70ExactScreenHud_putClipSprite`, which directly registers the appended node as `ScreenHud`.
+- GOAL/time helpers `0xBE020/0xBE150` already snapshot queue tails and tag every appended node as `ScreenHud`.
+- Those paths therefore do not share the producer-only lifetime gap fixed in cycle 143.
+
+Rival-marker evidence:
+- Exact Calc3D2D return `0xBB6F5` recovers `RivalMarkerProjectedInfo` including view-space X/Y/Z.
+- Exact draw call `0xBB796` previously wrapped `sprani_play_ae_auth_alpha` only with temporary `ScopedProducerSemantic(ProjectedWorldMarker2D)`.
+- sprani output is deferred through the SpriteNode queue, so temporary producer metadata can expire before final D3D draw.
+
+Fix:
+- Snapshot the recovered projected marker before the exact sprani call.
+- Snapshot all SpritePriority tails.
+- After the call, bounded-walk only nodes appended by this exact producer and register them as `ProjectedWorldMarker2D` with the full marker snapshot.
+- Added `R71RivalMarkerTaggedNodes` evidence log including the preserved view-space anchor.
+- If the Calc3D2D anchor is invalid, keep stock sprani behavior and do not fabricate world depth.
+
+Commits:
+- `6d8ca3803ae224aeaa3bad04ee692afe0f27393d`
+- `069c6f26ec68d50018deda8ba2b52c3452575525`
+
+Validation:
+- Baseline verifier now requires direct projected-node anchor persistence for the exact R71 rival marker.
+- Exact-head Build/OpenXR/HUD Inspector workflows are registered and queued.
+- AUTOMATION_VALIDATION: `EXACT_PROJECTED_NODE_ANCHOR_CONTRACT_COMMITTED / CI_QUEUED`
+- RUNTIME_VALIDATION: `UNTESTED`
+
+Next:
+- Consume `069c6f26` hosted CI.
+- Review lens-flare exact projected-screen producer/node lifetime and double-display symptom.
+- Review pre-race start-grid shadow split/corruption.
+- Keep selector resource-policy changes blocked until new HMD pointer-correlated evidence exists.
