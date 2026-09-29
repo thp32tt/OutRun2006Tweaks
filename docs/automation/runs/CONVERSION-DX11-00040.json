@@ -5,12 +5,12 @@
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
   "recorded_kst": "2026-09-29T13:02:00+09:00",
-  "checkpoint": "C3_VALIDATE",
-  "status": "CI_QUEUED",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
   "base_sha": "799ac1853286920ec292ccea2d679906231a6a46",
   "code_result_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2",
   "result_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
@@ -53,26 +53,26 @@
   "validation_runs": {
     "backend_conversion_gate": {
       "run_id": 36519623989,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
     },
     "build": {
       "run_id": 36519629883,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
     },
     "openxr_vr_architecture": {
       "run_id": 36519629884,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
     },
     "hud_inspector": {
       "run_id": 36519629906,
-      "status": "queued",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "validated_sha": "8f192799068c199741a2e49ae05c4de60eb78ac2"
     },
     "pc_fast": {
@@ -83,16 +83,19 @@
   },
   "evidence": [
     "Implementation commit contains exact marker [AUTO:CONVERSION-DX11-00040].",
-    "Manual diff review confirms only hosted probe/build graph/workflow/verifier paths changed; native_backend/runtime renderer/transport/OpenXR source was not modified.",
-    "GitHub Actions runs were created for the exact implementation SHA.",
-    "Repository Actions inspection shows multiple older R71 candidate Windows jobs ahead of these runs; all four required 00040 hosted validation runs remain queued rather than failed."
+    "Backend Conversion Gate 36519623989 PASS on exact code SHA 8f192799068c199741a2e49ae05c4de60eb78ac2, including Build/Run DX11 shader object probe R91.",
+    "Build 36519629883 PASS on exact code SHA.",
+    "OpenXR VR architecture 36519629884 PASS on exact code SHA.",
+    "HUD Inspector 36519629906 PASS on exact code SHA.",
+    "PC Fast 36519623979 skipped; no Quest3/VDXR or in-game runtime validation was performed."
   ],
-  "blocker": "GitHub Actions Windows runner backlog. Required exact-SHA hosted runs are queued behind older repository jobs; no unrelated jobs were cancelled.",
+  "blocker": null,
   "production_change_ledger": {
     "issue": 14,
     "status": "WRITTEN",
     "implementation_comment_id": 5883381700
   },
-  "resume_cursor": "Read runs 36519623989, 36519629883, 36519629884 and 36519629906. If Backend Conversion Gate starts and R91 fails, inspect the exact failed step and repair within ATTEMPT 2 without weakening the gate. If all exact-SHA runs pass, set AUTOMATION_VALIDATION=PASS, keep RUNTIME_VALIDATION=UNTESTED, and append Issue #14 validation evidence.",
-  "next_action": "Consume exact-SHA hosted CI when runners execute it. Do not enable NativeDrawPathActivationAllowed or claim HMD/game runtime correctness from R91."
+  "resume_cursor": "R91 exact-SHA hosted validation is complete. Preserve NativeDrawPathActivationAllowed=false and shaderTranslationExact=false; continue the next bounded F21 prerequisite.",
+  "next_action": "Continue F21 shader translation readiness with a non-routing prerequisite; Quest3/VDXR remains required before native runtime promotion.",
+  "finalized_kst": "2026-09-29T18:19:27+09:00"
 }
