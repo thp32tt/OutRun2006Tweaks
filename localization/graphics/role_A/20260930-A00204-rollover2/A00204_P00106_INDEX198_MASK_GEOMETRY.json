@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-index198-mask-cleanplate-geometry-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00106",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T04:33:25+09:00",
+  "base_head_sha": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+  "asset": {
+    "index": 198,
+    "id": "9FC88069",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds"
+  },
+  "exact_source": {
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+    "member_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+    "canonical_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+    "exact_identity": "PASS_RELEASE_MEMBER_EQUALS_C142_CANONICAL",
+    "canvas": [
+      4096,
+      2048
+    ],
+    "raw_format": "RGBA32",
+    "mip_count": 1,
+    "dds_header_128_sha256": "25620ea389d11b2cb525fb8b688455fe97cedab100a22b93850d41686143e82e",
+    "decoded_raw_rgba_sha256": "bb68541b2b9b800d145271d42b0cf5b8b982a1f4f7777fb81c16620eef4c346f",
+    "decoded_display_rgba_sha256": "209403bbeccee76c82b691cc9d770e1edf6d04eda007e0e000a6e4d0caa1671e"
+  },
+  "orientation": {
+    "source_text_transform": "flip_y",
+    "raw_to_readable_display": "FLIP_Y",
+    "readable_to_raw": "FLIP_Y",
+    "orientation_gate": "PASS_EXACT_SOURCE_PIXELS",
+    "bbox_convention": "xyxy half-open; local to each mapped cell"
+  },
+  "lineage": {
+    "c142_result": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
+    "a00200_result": "1623d022d5ffcdfe54130cec3b39e69d1387eed2",
+    "exact_lineage_mapping_source": "localization/graphics/role_B/20260929-1635-B126-P00027/B126_P00027_EVEN_RELEASE_32BPP_PAYLOAD_EXTRACTION_SCOPE.json",
+    "semantic_cell_binding": "PASS_7_OF_7_REUSED_ONLY_ON_EXACT_CANONICAL_LINEAGE"
+  },
+  "regions": [
+    {
+      "sprite": "sprite_789",
+      "atlas_rect_raw_top_left": [
+        0,
+        0,
+        544,
+        504
+      ],
+      "source": "RANDOM",
+      "korean": "무작위",
+      "display_local_source_effect_bbox": [
+        116,
+        378,
+        434,
+        440
+      ],
+      "raw_local_source_effect_bbox": [
+        116,
+        64,
+        434,
+        126
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        118,
+        380,
+        432,
+        438
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        118,
+        66,
+        432,
+        124
+      ],
+      "removal_mask_pixels": 11581,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "search_band_xyxy_half_open": [
+          100,
+          365,
+          440,
+          440
+        ],
+        "modal_background_rgba": [
+          57,
+          140,
+          203,
+          255
+        ],
+        "rule": "inside search band, mask pixels whose exact RGBA differs from modal_background_rgba; the band is confined to the RANDOM lettering strip and excludes the question-mark/card artwork"
+      },
+      "clean_plate_operation": "set masked pixels to exact modal_background_rgba",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    },
+    {
+      "sprite": "sprite_790",
+      "atlas_rect_raw_top_left": [
+        544,
+        0,
+        1604,
+        80
+      ],
+      "source": "- RANDOM PLAY -",
+      "korean": "- 무작위 재생 -",
+      "display_local_source_effect_bbox": [
+        4,
+        16,
+        584,
+        68
+      ],
+      "raw_local_source_effect_bbox": [
+        4,
+        12,
+        584,
+        64
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        6,
+        18,
+        582,
+        66
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        6,
+        14,
+        582,
+        62
+      ],
+      "removal_mask_pixels": 12160,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "rule": "alpha > 0 within the exact mapped semantic cell"
+      },
+      "clean_plate_operation": "set alpha=0 on removal mask while preserving RGB byte-for-byte",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    },
+    {
+      "sprite": "sprite_791",
+      "atlas_rect_raw_top_left": [
+        2148,
+        0,
+        1376,
+        80
+      ],
+      "source": "(GUITAR MIX)",
+      "korean": "(기타 믹스)",
+      "display_local_source_effect_bbox": [
+        8,
+        16,
+        456,
+        68
+      ],
+      "raw_local_source_effect_bbox": [
+        8,
+        12,
+        456,
+        64
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        10,
+        18,
+        454,
+        66
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        10,
+        14,
+        454,
+        62
+      ],
+      "removal_mask_pixels": 10624,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "rule": "alpha > 0 within the exact mapped semantic cell"
+      },
+      "clean_plate_operation": "set alpha=0 on removal mask while preserving RGB byte-for-byte",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    },
+    {
+      "sprite": "sprite_799",
+      "atlas_rect_raw_top_left": [
+        1376,
+        744,
+        1376,
+        80
+      ],
+      "source": "(INSTRUMENTAL)",
+      "korean": "(연주곡)",
+      "display_local_source_effect_bbox": [
+        8,
+        16,
+        536,
+        68
+      ],
+      "raw_local_source_effect_bbox": [
+        8,
+        12,
+        536,
+        64
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        10,
+        18,
+        534,
+        66
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        10,
+        14,
+        534,
+        62
+      ],
+      "removal_mask_pixels": 13088,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "rule": "alpha > 0 within the exact mapped semantic cell"
+      },
+      "clean_plate_operation": "set alpha=0 on removal mask while preserving RGB byte-for-byte",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    },
+    {
+      "sprite": "sprite_828",
+      "atlas_rect_raw_top_left": [
+        0,
+        1944,
+        1372,
+        80
+      ],
+      "source": "(PROTOTYPE)",
+      "korean": "(프로토타입)",
+      "display_local_source_effect_bbox": [
+        4,
+        16,
+        416,
+        68
+      ],
+      "raw_local_source_effect_bbox": [
+        4,
+        12,
+        416,
+        64
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        6,
+        18,
+        414,
+        66
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        6,
+        14,
+        414,
+        62
+      ],
+      "removal_mask_pixels": 9584,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "rule": "alpha > 0 within the exact mapped semantic cell"
+      },
+      "clean_plate_operation": "set alpha=0 on removal mask while preserving RGB byte-for-byte",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    },
+    {
+      "sprite": "sprite_829",
+      "atlas_rect_raw_top_left": [
+        1372,
+        1944,
+        640,
+        80
+      ],
+      "source": "INTERMEDIATE B",
+      "korean": "중급 B",
+      "display_local_source_effect_bbox": [
+        189,
+        19,
+        612,
+        60
+      ],
+      "raw_local_source_effect_bbox": [
+        189,
+        20,
+        612,
+        61
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        191,
+        21,
+        610,
+        58
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        191,
+        22,
+        610,
+        59
+      ],
+      "removal_mask_pixels": 10549,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "rule": "alpha > 0 within the exact mapped semantic cell"
+      },
+      "clean_plate_operation": "set alpha=0 on removal mask while preserving RGB byte-for-byte",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    },
+    {
+      "sprite": "sprite_830",
+      "atlas_rect_raw_top_left": [
+        2012,
+        1944,
+        640,
+        80
+      ],
+      "source": "INTERMEDIATE A",
+      "korean": "중급 A",
+      "display_local_source_effect_bbox": [
+        186,
+        19,
+        612,
+        60
+      ],
+      "raw_local_source_effect_bbox": [
+        186,
+        20,
+        612,
+        61
+      ],
+      "display_local_candidate_safe_bbox_inset2": [
+        188,
+        21,
+        610,
+        58
+      ],
+      "raw_local_candidate_safe_bbox_inset2": [
+        188,
+        22,
+        610,
+        59
+      ],
+      "removal_mask_pixels": 10389,
+      "removal_mask_derivation": {
+        "coordinate_system": "readable_display_after_FLIP_Y",
+        "rule": "alpha > 0 within the exact mapped semantic cell"
+      },
+      "clean_plate_operation": "set alpha=0 on removal mask while preserving RGB byte-for-byte",
+      "protected_mask_rule": "all pixels in mapped cell not in removal mask are protected; all pixels outside mapped cell are globally protected"
+    }
+  ],
+  "aggregate": {
+    "semantic_cells": 7,
+    "removal_mask_pixels": 77975,
+    "candidate_safe_bbox_inset_px": 2,
+    "source_effect_bbox_cells": 7,
+    "protected_mask_policy": "complement within each exact semantic cell plus all pixels outside every mapped cell",
+    "generator_rule": "source-derived deterministic mask geometry; no OCR rectangle is used directly as an edit mask"
+  },
+  "self_qa": {
+    "source_archive_hash": "PASS",
+    "source_member_hash": "PASS_EXACT_CANONICAL",
+    "orientation": "PASS_FLIP_Y",
+    "semantic_cells": "PASS_7_OF_7",
+    "source_effect_bboxes": "PASS_7_OF_7",
+    "removal_masks": "PASS_7_OF_7",
+    "protected_masks": "PASS_7_OF_7",
+    "safe_bbox": "PASS_2PX_7_OF_7",
+    "candidate_dds": "HOLD_NOT_GENERATED",
+    "runtime_validation": "UNTESTED"
+  }
+}

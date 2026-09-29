@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-index198-cleanplate-deterministic-patch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
+  "recorded_at_kst": "2026-09-30T04:33:25+09:00",
+  "base_head_sha": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+  "asset": {
+    "index": 198,
+    "id": "9FC88069"
+  },
+  "exact_source": {
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+    "member_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+    "canonical_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+    "exact_identity": "PASS_RELEASE_MEMBER_EQUALS_C142_CANONICAL",
+    "canvas": [
+      4096,
+      2048
+    ],
+    "raw_format": "RGBA32",
+    "mip_count": 1,
+    "dds_header_128_sha256": "25620ea389d11b2cb525fb8b688455fe97cedab100a22b93850d41686143e82e",
+    "decoded_raw_rgba_sha256": "bb68541b2b9b800d145271d42b0cf5b8b982a1f4f7777fb81c16620eef4c346f",
+    "decoded_display_rgba_sha256": "209403bbeccee76c82b691cc9d770e1edf6d04eda007e0e000a6e4d0caa1671e"
+  },
+  "input_coordinate_system": "readable_display_after_FLIP_Y",
+  "output_rule": "apply only the listed removal masks to the exact source; all other RGBA bytes remain unchanged; FLIP_Y the finished display image back to raw DDS coordinates for later encoding",
+  "operations": [
+    {
+      "sprite": "sprite_789",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_789",
+      "operation": "set_rgba_constant",
+      "rgba": [
+        57,
+        140,
+        203,
+        255
+      ]
+    },
+    {
+      "sprite": "sprite_790",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_790",
+      "operation": "set_alpha_constant_preserve_rgb",
+      "alpha": 0
+    },
+    {
+      "sprite": "sprite_791",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_791",
+      "operation": "set_alpha_constant_preserve_rgb",
+      "alpha": 0
+    },
+    {
+      "sprite": "sprite_799",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_799",
+      "operation": "set_alpha_constant_preserve_rgb",
+      "alpha": 0
+    },
+    {
+      "sprite": "sprite_828",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_828",
+      "operation": "set_alpha_constant_preserve_rgb",
+      "alpha": 0
+    },
+    {
+      "sprite": "sprite_829",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_829",
+      "operation": "set_alpha_constant_preserve_rgb",
+      "alpha": 0
+    },
+    {
+      "sprite": "sprite_830",
+      "mask_rule_ref": "A00204_P00106_INDEX198_MASK_GEOMETRY.json#sprite_830",
+      "operation": "set_alpha_constant_preserve_rgb",
+      "alpha": 0
+    }
+  ],
+  "expected_clean_plate": {
+    "changed_pixels": 77975,
+    "changed_pixels_outside_removal_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_pixels_outside_removal_mask": 0,
+    "raw_rgba_sha256": "c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7",
+    "display_rgba_sha256": "d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320"
+  },
+  "promotion_policy": {
+    "c_independent_clean_plate_qa_required": true,
+    "korean_candidate_generated": false,
+    "reason": "Producer pre-candidate clean plate is deterministic and self-QA-clean, but independent C clean-plate QA and source-style lettering gate remain mandatory before Korean DDS generation/promotion."
+  },
+  "runtime_validation": "UNTESTED"
+}

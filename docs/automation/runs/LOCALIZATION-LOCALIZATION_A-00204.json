@@ -1,0 +1,77 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00204",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00106",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T04:33:25+09:00",
+  "base_head_sha": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+  "base_sha": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX198_PREPRODUCTION_RESULT_AND_DURABLE_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_A_MOD3_INDEX198_EXACT_MASK_CLEAN_PLATE_SAFE_BBOX_SPEC_CANDIDATE_HOLD_RUNTIME_UNTESTED",
+  "summary": "Resumed A00204 from latest GitHub HEAD without repeating completed source acquisition. For A-owned index198/9FC88069, the pinned OR2-HD-GUI-v0.25.10a Release member reverified byte-identical to C142 canonical RGBA32 source. Exact source pixels prove FLIP_Y readable orientation. The already-authorized 7/7 semantic-cell bindings were reused on this exact lineage only. Producer pixel work then derived source-effect removal/protected-mask geometry, deterministic CLEAN_PLATE reconstruction rules and 2px v2 candidate-safe bboxes for all seven cells. Reconstructed clean-plate self-QA measured zero changed pixels outside removal masks, zero protected-mask changes and zero alpha changes outside removal masks. No Korean candidate DDS is promoted in this result: independent C clean-plate QA and source-letterform/style render proof remain required. RUNTIME_VALIDATION=UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_MOD3_INDEX198_PREFLIGHT.json",
+    "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_INDEX198_MASK_GEOMETRY.json",
+    "localization/graphics/role_A/20260930-A00204-rollover2/A00204_P00106_INDEX198_CLEAN_PLATE_PATCH.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX198_EXACT_SOURCE_MASK_CLEAN_PLATE_DELTA_AND_SAFE_BBOX_PREPRODUCTION_GATES",
+    "indices": [
+      198
+    ],
+    "assets": [
+      "9FC88069"
+    ],
+    "exact_source_identity_gates_closed": 1,
+    "orientation_gates_closed": 1,
+    "semantic_cell_bindings_reused": 7,
+    "source_effect_bboxes_derived": 7,
+    "removal_masks_derived": 7,
+    "protected_masks_derived": 7,
+    "deterministic_clean_plate_rules": 7,
+    "candidate_safe_bboxes_inset2": 7,
+    "removal_mask_pixels": 77975,
+    "clean_plate_raw_rgba_sha256": "c210abb5fcdc41c8d1425ea19e5cd63a741b8a815a0e693f5be781ea640c32f7",
+    "clean_plate_display_rgba_sha256": "d9d044a670c170ddfab215d51f4cb91799bc1142478a03793a5abcad5956d320",
+    "clean_plate_changed_outside_mask": 0,
+    "clean_plate_changed_in_protected_mask": 0,
+    "clean_plate_alpha_changed_outside_mask": 0,
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true,
+    "next_gate": "C_INDEPENDENT_CLEAN_PLATE_QA_THEN_SOURCE_STYLE_KOREAN_RENDER"
+  },
+  "readiness_audit": {
+    "fresh_base_head": "7e4e565ad99e99ff4eedd9afc78e9cd5060a83c5",
+    "readiness_before": {
+      "198": "PREFLIGHT_ONLY_EXACT_SOURCE_7_OF_7_SEMANTIC_CELL_BINDINGS__MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED"
+    },
+    "readiness_after": {
+      "198": "PRE_CANDIDATE_GATES_PRODUCED__MASKS_CLEAN_PLATE_RECONSTRUCTION_SAFE_BBOX__C_INDEPENDENT_QA_AND_STYLE_RENDER_PENDING"
+    },
+    "candidate_rendered": false,
+    "static_candidate_qa": "NOT_APPLICABLE_NO_CANDIDATE"
+  },
+  "self_qa": "PASS_A_MOD3_INDEX198__PINNED_RELEASE_EXACT__FLIP_Y__7_OF_7_BINDINGS__MASKS_7_OF_7__CLEAN_PLATE_ZERO_OUTSIDE_MASK_ZERO_PROTECTED_ZERO_ALPHA_OUTSIDE__2PX_SAFE_BBOX_7_OF_7__NO_CANDIDATE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_C_INDEPENDENT_CLEAN_PLATE_QA_PENDING",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
