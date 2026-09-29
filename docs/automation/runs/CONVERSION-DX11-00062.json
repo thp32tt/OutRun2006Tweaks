@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00062",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T23:09:24+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "dd8bc80c24b42dbe6ff2325f941e56f54f6fd962",
+  "initial_code_result_sha": "47cbd8efaa7c885c494448edf50f328bf658f79a",
+  "validation_bearing_result_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+  "result_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R102 dormant MANAGED Texture2D CPU-shadow/reset lifetime storage for Set 05 F18.",
+  "summary": "Added a dormant CPU-shadow owner for bounded single-mip uncompressed D3D9 MANAGED textures. Full-row writes/readback are stored independently of the D3D11 device generation; successful Reset preserves CPU shadow data/version while invalidating mirror readiness until a future reupload is explicitly acknowledged. Native draw remains dormant.",
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "Added NativeManagedTextureShadow with CPU byte storage, ManagedMirrorLifetimeState ownership and explicit write/read/reset/mirror-ack lifecycle."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Implemented bounded MANAGED format/behavior validation, overflow-safe shadow allocation, full-row read/write, shadow-version transitions, Reset generation invalidation and mirror acknowledgment."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Added R102 positive content/readback/reset/reupload-state coverage plus short-pitch, partial-row and compressed-format fail-closed cases; repair added direct namespace import."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R102 header/source/probe guards including the direct NativeManagedTextureShadow probe import."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R102 owns CPU storage/lifetime evidence only. No live D3D9 LockRect source bridge, D3D11 managed mirror creation/upload, SRV binding, native game draw routing or Quest3/VDXR visual evidence exists."
+  },
+  "failure_context": {
+    "failed_run_id": 36578740066,
+    "failed_job_id": 109441026108,
+    "failed_result_sha": "47cbd8efaa7c885c494448edf50f328bf658f79a",
+    "failure": "OpenXR production game-x86 compiled native_backend.cpp but dx11_constant_buffer_probe.cpp referenced NativeManagedTextureShadow without importing the dx11 namespace type, producing C2065/C2146.",
+    "repair_result_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+    "repair": "Added using outrun::vr::dx11::NativeManagedTextureShadow in the probe and a source-graph guard requiring the direct import."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36579424571,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+      "completed_utc": "2026-09-29T14:06:53Z",
+      "evidence": "Production Win32 build and all DX11 semantic/object/linkage probes PASS; hosted WARP constant-buffer probe emitted DX11 managed texture shadow lifetime R102: PASS."
+    },
+    "build": {
+      "run_id": 36579437093,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+      "completed_utc": "2026-09-29T14:07:17Z"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36579437772,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+      "completed_utc": "2026-09-29T14:08:55Z",
+      "evidence": "All six jobs PASS: host-x64, game-x86, safe-draw comparison, R26 HUD safe, C1 and C2."
+    },
+    "hud_inspector": {
+      "run_id": 36579437675,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+      "completed_utc": "2026-09-29T14:05:33Z",
+      "evidence": "build-hud-inspector and static-exe-analysis PASS."
+    },
+    "pc_fast": {
+      "run_id": 36579424756,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+      "completed_utc": "2026-09-29T14:00:51Z"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 0081496886a9aea22aec1819ea2f8639648d8735 contains [AUTO:CONVERSION-DX11-00062] and no CI-skip directive.",
+    "Fail-before OpenXR run 36578740066 exposed the missing probe namespace import; repair commit added a direct import plus verifier guard.",
+    "Backend Conversion Gate 36579424571 PASS on exact result SHA and emitted DX11 managed texture shadow lifetime R102: PASS.",
+    "Build 36579437093 PASS, OpenXR VR architecture 36579437772 PASS across all six jobs, and HUD Inspector 36579437675 PASS across both jobs.",
+    "VR PC Fast Test Build 36579424756 SKIPPED; no N100 workspace, Quest3/VDXR or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5891756477,
+    "repair_comment_id": 5891845408,
+    "validation_comment_id": 5891995339,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R102 is automation-validated but runtime-untested. Native draw remains dormant. F18 now has concrete DEFAULT dynamic upload and MANAGED CPU-shadow/reset storage, but still lacks a live source LockRect content bridge and an actual D3D11 DEFAULT managed mirror recreation/upload path.",
+  "next_action": "Continue Set 05 F18 with one bounded non-routing prerequisite: create/upload a D3D11 DEFAULT mirror from the R102 managed shadow for the acknowledged device generation, or connect proven source LockRect content into R102 storage. Do not enable native draw until remaining exactness and exact-build Quest3/VDXR evidence close.",
+  "in_task_repairs": 1
+}
