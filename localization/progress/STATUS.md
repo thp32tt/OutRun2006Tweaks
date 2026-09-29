@@ -1,6 +1,6 @@
 # Korean Localization Status
 
-Updated: 2026-09-29T18:34:47+09:00
+Updated: 2026-09-29T19:01:20+09:00
 
 ## Active branch
 `korean-localization-clean`
@@ -995,3 +995,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text **76**; canonical segments **753**. Newer A00112/B00113/A00114/B00115 producer work is disjoint and preserved.
 - Shared state merged once. Report: `localization/graphics/role_C/20260929-1834-C115/C115_Q00013_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 
+
+### C116 Q00014 independent QA batch — 2026-09-29T19:01:20+09:00
+- Immutable inputs: B00110 `705ecdb282f48c594a6347aa1837bc320b7254e3`, A00112 `9214bd9b00df6e4695a5edef27266a22699c1908`, B00113 `b4a5e837880d830adc6bd44cbc1a55693ecd8d80`, A00114 `b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e`. All four dispositions are **REWORK_REQUIRED**; no input is superseded by a newer candidate.
+- B00110: manifest semantics **4/4** and reused 2px geometry formulas **4/4** are internally consistent, but the manifest uses Sonic-TV Release **DXT5/BC3** sources instead of current canonical user-HD inventory. Canonical inventory is RGBA for all three reviewed assets and index 92 is **512x64** versus manifest **2048x256**. Under the current source-of-truth rule this source lineage is not promotable; indices 92/98/112 must be rebuilt from exact canonical HD bytes.
+- A00112 material content QA passes: C directly re-fetched and decoded the three pinned stock DXT5 sources and reproduced **77/77** alpha>0 bboxes/counts and **77/77** alpha>=128 counts using round-nearest BC3 alpha interpolation; canonical translations are **77/77** and two structural regions remain preserve-only. Stock evidence remains reconstruction prior only. Exact RESULT_SHA `9214bd9...` has no durable task record, so the producer result must be re-emitted under one durable SHA.
+- B00113: canonical wording/guard arithmetic is **6/6**, but current canonical inventory dimensions disagree for index 26 (**2048x2047 vs 2048x2048**), 28 (**2047x2048 vs 2048x2048**) and 30 (**1024x512 vs 4096x2048**); index 32 has matching dimensions but no canonical-inventory source identity proof in this work order. Exact RESULT_SHA also lacks its durable task record. Rebuild all four work orders from canonical HD sources and emit one durable result.
+- A00114 material work-order QA passes its limited claim: canonical inventory identity/canvas **4/4**, translations **24/24**, and no pixel geometry/candidate was fabricated while source bytes are absent. Exact RESULT_SHA lacks the durable task record (record appears only in child `0b6b886a...`), so re-emit material+record under one durable SHA.
+- No input or C changed Korean candidate DDS bytes. Candidate clipping/1px containment, final DDS format/mipmap/alpha/compression, exact canonical-HD orientation/slant/style, protected artwork/background and ENGLISH SOURCE vs KOREAN CANDIDATE gates remain **HOLD_STRICT_RECHECK** until corrected source/candidate fingerprints exist. New static artwork passes 0; runtime approvals 0.
+- Queue remains **137 = 93 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 3 preserve-only**; pending production localize_text **76**; canonical segments **753**. Newer B00115/A00117/A00118/B00119 producer work is preserved.
+- Shared state merged once. Report: `localization/graphics/role_C/20260929-1901-C116/C116_Q00014_INDEPENDENT_QA_BATCH.json`. No N100/local clone/worktree, GPT Library, game build, VR/FFB/DX work, or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

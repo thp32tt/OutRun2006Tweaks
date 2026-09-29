@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-c-batch-independent-qa-v1",
+  "recorded_at_kst": "2026-09-29T19:01:20+09:00",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+  "qa_batch_id": "Q00014",
+  "run": "C116",
+  "result": "PASS_Q00014_FOUR_PRODUCER_INPUTS_REWORK_REQUIRED_NO_DDS_RUNTIME_UNTESTED",
+  "base_head": "5f2bf20c43babd88a5abca9b2fb8430a6a97cdb4",
+  "qa_batch_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00110@705ecdb282f48c594a6347aa1837bc320b7254e3",
+    "LOCALIZATION-LOCALIZATION_A-00112@9214bd9b00df6e4695a5edef27266a22699c1908",
+    "LOCALIZATION-LOCALIZATION_B-00113@b4a5e837880d830adc6bd44cbc1a55693ecd8d80",
+    "LOCALIZATION-LOCALIZATION_A-00114@b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e"
+  ],
+  "reviewed_indices": [
+    26,
+    28,
+    30,
+    32,
+    92,
+    98,
+    112,
+    133,
+    135,
+    139,
+    143,
+    147,
+    161,
+    163
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00110",
+      "result_sha": "705ecdb282f48c594a6347aa1837bc320b7254e3",
+      "status": "REWORK_REQUIRED",
+      "reason": "B00110's exact RESULT_SHA contains its durable task record, and the new execution-manifest arithmetic is internally consistent (4/4 canonical source/Korean pairs and 4/4 reused exact-2px safe-bbox formulas). However its three exact_hd_source entries are Sonic-TV/OR2006Sprites Release DXT5/BC3 sources, while the current canonical user-HD inventory is localization/graphics/inventory.csv@5a3d3b09d97063c65e2b2e356a20878e4c0a83df and records RGBA source identities for all three assets; index92 is also 512x64 in the canonical inventory versus 2048x256 in the manifest. Current contract requires the user HD source when present. Therefore B00083/C109 Release geometry cannot be reused as canonical source-mask/CLEAN_PLATE geometry. Rebuild indices 92/98/112 from exact canonical HD source bytes; semantic text may be reused, pixel geometry may not."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00112",
+      "result_sha": "9214bd9b00df6e4695a5edef27266a22699c1908",
+      "status": "REWORK_REQUIRED",
+      "reason": "A00112 material content passes independent C content QA: C re-fetched all three pinned stock DXT5 DDS blobs from GitHub and reproduced 77/77 alpha>0 bboxes/counts and 77/77 alpha>=128 counts using the report's round-nearest BC3 alpha decode convention; all 77 source/Korean pairs match current canonical transcriptions and two structural regions remain preserve-only. The stock measurements remain reconstruction priors only and do not replace canonical HD Release/source gates. The immutable RESULT_SHA 9214bd9b00df6e4695a5edef27266a22699c1908 contains only the material report and no docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00112.json; the durable task record appears only in later child commits. Re-emit the accepted material evidence and its task record together under one new immutable RESULT_SHA."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00113",
+      "result_sha": "b4a5e837880d830adc6bd44cbc1a55693ecd8d80",
+      "status": "REWORK_REQUIRED",
+      "reason": "B00113's material report has 6/6 current Total Rank -> 종합 랭크 semantics and 6/6 internally valid 2px inspection-guard formulas, but it is not valid against the current canonical HD source baseline. Its work-order dimensions are 2048x2048, 2048x2048, 4096x2048 and 2048x1024 for indices 26/28/30/32, while canonical inventory.csv records 2048x2047, 2047x2048, 1024x512 and 2048x1024 respectively; index32's dimensions match but its canonical source identity is still not proven by the Release work order. In addition, immutable RESULT_SHA b4a5e837880d830adc6bd44cbc1a55693ecd8d80 contains only the material report and no durable task record. Rebuild the four work orders from exact canonical HD inventory sources and emit material+task record under one durable RESULT_SHA."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00114",
+      "result_sha": "b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e",
+      "status": "REWORK_REQUIRED",
+      "reason": "A00114 material content is valid as a source-gated reconstruction work order: 4/4 reported inventory SHA-256 identities and canvas dimensions match canonical inventory.csv and all 24/24 translations match current transcriptions. It correctly fabricates no pixel geometry or candidate while exact source bytes are absent from the Git tree. However immutable RESULT_SHA b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e contains only the material report and no docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00114.json; the durable record appears only in child 0b6b886a152ccc004399e27f75f23040425a6dcc. Re-emit the accepted material work order and task record together under one new immutable RESULT_SHA; source/pixel/candidate gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "source_identity_validation": "REWORK_B00110_CANONICAL_USER_HD_SOURCE_DIVERGENCE__PASS_A00112_EXACT_STOCK_PRIOR_3_OF_3_BLOBS_77_OF_77_GEOMETRY__REWORK_B00113_CANONICAL_HD_DIMENSIONS_DIVERGE_3_OF_4_AND_INDEX32_IDENTITY_UNPROVEN__PASS_A00114_4_OF_4_CANONICAL_INVENTORY_IDENTITIES",
+  "canonical_semantic_validation": "PASS_B00110_4_OF_4__A00112_77_OF_77__B00113_6_OF_6__A00114_24_OF_24",
+  "geometry_mapping_validation": "B00110_INTERNAL_4_OF_4_BUT_NONCANONICAL_SOURCE_REWORK__A00112_77_OF_77_STOCK_ALPHA_BBOX_COUNTS_REPRODUCED_ROUND_NEAREST__B00113_6_OF_6_GUARDS_INTERNAL_PASS_BUT_NONCANONICAL_SOURCE_REWORK__A00114_NO_PIXEL_GEOMETRY_FABRICATED",
+  "current_contract_compatibility": "REWORK_B00110_AND_B00113_CANONICAL_HD_SOURCE_RULE__REWORK_A00112_A00113_A00114_EXACT_PRODUCER_DURABLE_RECORD_RULE__NO_CANDIDATE_PROMOTION",
+  "metadata_reconciled_segments": 0,
+  "canonical_transcribed_segments_after_merge": 753,
+  "actionable_localize_text_after": 93,
+  "pending_production_localize_text_after": 76,
+  "superseded_inputs": [],
+  "newer_disjoint_producers": [
+    "LOCALIZATION-LOCALIZATION_B-00115",
+    "LOCALIZATION-LOCALIZATION_A-00117",
+    "LOCALIZATION-LOCALIZATION_A-00118",
+    "LOCALIZATION-LOCALIZATION_B-00119"
+  ],
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20260929-1901-C116/C116_Q00014_INDEPENDENT_QA_BATCH.json",
+  "rework_required_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00110@705ecdb282f48c594a6347aa1837bc320b7254e3",
+    "LOCALIZATION-LOCALIZATION_A-00112@9214bd9b00df6e4695a5edef27266a22699c1908",
+    "LOCALIZATION-LOCALIZATION_B-00113@b4a5e837880d830adc6bd44cbc1a55693ecd8d80",
+    "LOCALIZATION-LOCALIZATION_A-00114@b09b6a4acc2d870b2ae5d1e8cb35809a5fa5e74e"
+  ],
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00014",
+  "source_policy": "GITHUB_SSOT_ONLY_NO_N100_CLONE_WORKTREE_GPT_LIBRARY",
+  "canonical_hd_inventory": {
+    "path": "localization/graphics/inventory.csv",
+    "blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "b00110_mismatch": {
+      "92": "canonical 512x64 RGBA vs manifest 2048x256 DXT5_BC3",
+      "98": "canonical 2048x128 RGBA vs manifest 2048x128 DXT5_BC3; source identity differs",
+      "112": "canonical 2048x256 RGBA vs manifest 2048x256 DXT5_BC3; source identity differs"
+    },
+    "b00113_mismatch": {
+      "26": "canonical 2048x2047 vs work-order 2048x2048",
+      "28": "canonical 2047x2048 vs work-order 2048x2048",
+      "30": "canonical 1024x512 vs work-order 4096x2048",
+      "32": "dimensions 2048x1024 match, but work-order Release source is not hash-gated to canonical inventory identity"
+    }
+  },
+  "material_content_qa": {
+    "B00110": {
+      "canonical_pairs": "4/4",
+      "safe_bbox_formula": "4/4 exact 2px reuse",
+      "content_result": "INTERNALLY_CONSISTENT_BUT_WRONG_CANONICAL_SOURCE_BASELINE"
+    },
+    "A00112": {
+      "exact_stock_sources": "3/3 Git blob identities",
+      "dds": "3/3 DXT5 base payloads",
+      "semantic_pairs": "77/77",
+      "alpha_gt0_bboxes_counts": "77/77",
+      "alpha_ge128_counts": "77/77 with round-nearest BC3 alpha interpolation",
+      "structural_preserve_regions": 2,
+      "content_result": "PASS_LIMITED_STOCK_PRIOR_ONLY"
+    },
+    "B00113": {
+      "canonical_pairs": "6/6",
+      "inspection_guard_formulas": "6/6",
+      "content_result": "REWORK_CANONICAL_HD_SOURCE_BASELINE"
+    },
+    "A00114": {
+      "inventory_identities": "4/4",
+      "inventory_canvas": "4/4",
+      "canonical_pairs": "24/24",
+      "candidate_dds_created": 0,
+      "content_result": "PASS_LIMITED_SOURCE_GATED_WORK_ORDER_ONLY"
+    }
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified_by_c": false,
+  "input_candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
