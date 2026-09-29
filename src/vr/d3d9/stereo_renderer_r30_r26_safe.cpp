@@ -955,10 +955,18 @@ namespace OutRunVRStereo
         bool R30FirstSkyGlowFailureLogged = false;
         OutRunVR::FrameState::FrameContext R69FrameContext{};
         constexpr int R68StageHoldPresents = 3;
+        // R72 runtime quick-fix: exact R71 result edges were tagged correctly,
+        // but the companion checkpoint/result sprites remained generic queue 2D.
+        // Promote only generic ScreenOverlay2D during a short stage-transition
+        // window, never world/rival/projected semantics.
+        int R72OutRunTransientHudPresents = 0;
+        bool R72FirstTransientHudLogged = false;
 
         void R67GuardStageTransitionPresent() noexcept
         {
             auto& frame = R69FrameContext;
+            if (R72OutRunTransientHudPresents > 0)
+                --R72OutRunTransientHudPresents;
             if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
             {
                 frame.stageHoldRemaining = 0;
@@ -979,6 +987,17 @@ namespace OutRunVRStereo
                 frame.lastStageIdentity = stage;
                 frame.stageHoldRemaining = R68StageHoldPresents;
                 ++frame.stageTransitionHolds;
+                // Checkpoint "+TIME" overlays appear immediately after a stage
+                // identity change. The final-result overlay starts several
+                // seconds after stage 14, so keep a longer bounded window there.
+                R72OutRunTransientHudPresents =
+                    stage == 14 ? 1200 : 240;
+                if (!R72FirstTransientHudLogged)
+                {
+                    R72FirstTransientHudLogged = true;
+                    spdlog::info(
+                        "VR R72 OUTRUN HUD WINDOW: generic ScreenOverlay2D -> finite SCREEN_HUD only during bounded stage-transition/result windows");
+                }
                 R30SkyGlowSceneCaptureEpoch = 0;
                 R30SkyGlowAppliedEpoch = 0;
                 R30SkyGlowPreHudAttemptEpoch = 0;
@@ -1558,7 +1577,10 @@ namespace OutRunVRStereo
                         compositeSource = R30SkyGlow.temp[eye];
                 }
 
-                const float composite[4]{ 0.38f, 0, 0, 0 };
+                // R72 HMD correction: current full-res factor=1 run is still
+                // visibly overexposed. Preserve the pre-HUD stereo ordering but
+                // halve only the additive bloom energy.
+                const float composite[4]{ 0.20f, 0, 0, 0 };
                 if (ok)
                     ok = R30DrawSkyGlowPass(
                         device, eyeSurface[eye],
@@ -2107,17 +2129,22 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::EffectiveScope();
             const auto semanticRoute =
                 OutRunVR::RenderPolicy::RouteFor(semanticScope);
-            const bool semanticHud =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud;
-            const bool semanticWorld =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::World;
             const auto directScreenKind =
                 OutRunVR::ScreenSpacePolicy::DirectKind(semanticRoute);
+            const bool transientOutRunHud =
+                R72OutRunTransientHudPresents > 0 &&
+                directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D;
+            const bool semanticHud =
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud ||
+                transientOutRunHud;
+            const bool semanticWorld =
+                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::World;
 
-            // Exact producer-owned screen routes bypass heuristic projection
-            // classification. Their semantics were established by the canonical
-            // EXE producer/queue mapping before reaching this renderer.
-            if (directScreenKind != R30ScreenSpaceKind::None)
+            // Exact producer-owned routes still win. R72 only withholds the
+            // generic ScreenOverlay2D direct return during the bounded OutRun
+            // checkpoint/result window so it can take the proven finite HUD path.
+            if (directScreenKind != R30ScreenSpaceKind::None &&
+                !transientOutRunHud)
                 return directScreenKind;
 
             // R65: exact lens-flare producer has already converted its world
@@ -3975,20 +4002,33 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
-                // R69 HMD evidence: the exact flare producer is a centre-eye
-                // Calc3D2D screen effect. Reprojecting it independently for
-                // left/right creates two visible flares. Preserve the game's
-                // head-tracked centre-eye placement but use the same WVP in
-                // both eyes so the effect fuses into one image.
-                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
-                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
-                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
-                static bool firstFlareMonoFusionLogged = false;
-                if (!firstFlareMonoFusionLogged)
+                // R72 HMD evidence: copying one stock WVP into both eyes still
+                // leaves different angular placement because the OpenXR eyes
+                // have asymmetric FOVs. Align the authored centre-eye screen
+                // effect into the common angular frustum without adding IPD.
+                // Lens flare remains an optical/screen effect, so zero disparity
+                // is intentional; the fix target is one fused flare, not a
+                // false world-depth billboard.
+                for (int eye = 0; eye < 2; ++eye)
                 {
-                    firstFlareMonoFusionLogged = true;
+                    D3DMATRIX clipAffine = IdentityMatrix();
+                    clipAffine._11 = eyeScale[eye];
+                    clipAffine._41 = eyeOffset[eye];
+                    const D3DMATRIX corrected =
+                        MultiplyMatrix(stockWvp, clipAffine);
+                    if (!MatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        TransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                static bool firstFlareFovFusionLogged = false;
+                if (!firstFlareFovFusionLogged)
+                {
+                    firstFlareFovFusionLogged = true;
                     spdlog::info(
-                        "VR R69 FLARE FUSION: exact Calc3D2D centre-eye WVP copied identically to L/R; per-eye flare reprojection disabled");
+                        "VR R72 FLARE FUSION: exact Calc3D2D effect aligned to common angular FOV in L/R; zero-disparity optical flare");
                 }
                 return true;
             }
@@ -4378,7 +4418,7 @@ namespace OutRunVRStereo
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
-                        "VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes");
+                        "VR R72 FLARE FIX: exact projected-screen effect uses common-angular-FOV zero-disparity fusion");
                 }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
