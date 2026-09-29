@@ -1,0 +1,79 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00080",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00018",
+  "recorded_at_kst": "2026-09-29T15:40:24+09:00",
+  "base_sha": "bad79d413b6d07aa034efb06fc7c358b099ee3dd",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_EXACT_RELEASE_PAYLOAD_REGION_EXTRACTION_SPECS",
+  "summary": "Advanced C-consumed even indices 34/44/52/172 from accepted 4x atlas-cell mappings to deterministic exact Release-DDS payload extraction specs for 18 unique sprite regions / 21 physical semantic occurrences. Reused unchanged B00033/C00034 heavy source/semantic QA; all extraction ranges are in-file/in-canvas, all 3 DXT5 regions are 4x4-block aligned, and unique region overlap is zero. Exact decoded glyph/effect masks, orientation/slant, clean plates and Korean candidate gates remain fail-closed HOLD. No Korean DDS or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1540-B121-P00018/B121_P00018_EVEN_RELEASE_PAYLOAD_REGION_EXTRACTION_SPEC.json"
+  ],
+  "evidence_blob_sha": "f69be8e252cf0d1240db6e701ed770cde5f2d6f7",
+  "material_deliverable": {
+    "type": "FOUR_EVEN_EXACT_RELEASE_PAYLOAD_REGION_EXTRACTION_SPECS",
+    "indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "assets": [
+      "B7E25BAD",
+      "19CEDB9",
+      "A8CE339F",
+      "6C9B3611"
+    ],
+    "canonical_semantics": 19,
+    "physical_semantic_occurrences": 21,
+    "exact_region_extraction_specs": 18,
+    "rgba32_regions": 15,
+    "dxt5_bc3_regions": 3,
+    "region_overlap_pairs": 0,
+    "out_of_bounds_ranges": 0,
+    "block_unaligned_regions": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00033",
+    "producer_record_blob_sha": "bf6bc8e6bd88ef4613acdfcbb0048694fd792ca3",
+    "producer_report_blob_sha": "ef240ea76f1e7966f2e0ef9fcc09203edd51b21a",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00034",
+    "c_acceptance_record_blob_sha": "04fcb05db815e7d0b5b7f29e48181324e5e4aa05",
+    "qa_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "reason": "Unchanged source/atlas/translation fingerprint; duplicate heavy QA intentionally reused."
+  },
+  "queue_snapshot_blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00062": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00077": [
+      132,
+      176,
+      220,
+      222
+    ]
+  },
+  "self_qa": "PASS_EVEN_ONLY_34_44_52_172__18_OF_18_REGION_RANGES_IN_BOUNDS__3_OF_3_BC3_BLOCK_ALIGNED__0_OVERLAPS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Payload/cell extraction geometry is now executable, but cell rectangles are not glyph masks. Exact decoded raw orientation, pixel-level source glyph/effect masks, full-effect bboxes, clean plates, signed slant, alpha/style and Korean candidate comparison are still required before rendering or static promotion.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,694 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00080",
+  "wave_id": "P00018",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T15:40:24+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "bad79d413b6d07aa034efb06fc7c358b099ee3dd",
+  "base_tree_sha": "a0d578ca48a2026cd3423592df702859d2211f8c",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "queue_snapshot": {
+    "path": "localization/graphics/asset_queue.csv",
+    "blob_sha": "5c1db82b13fbf506f22778b84a213cfb797e2b74",
+    "selected_even_indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "shared_queue_modified": false
+  },
+  "reused_heavy_qa": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00033",
+    "producer_record_blob_sha": "bf6bc8e6bd88ef4613acdfcbb0048694fd792ca3",
+    "producer_report_blob_sha": "ef240ea76f1e7966f2e0ef9fcc09203edd51b21a",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00034",
+    "c_acceptance_record_blob_sha": "04fcb05db815e7d0b5b7f29e48181324e5e4aa05",
+    "qa_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "reason": "Source/atlas/translation fingerprint is unchanged and C already accepted B00033 source identities/canonical mappings. Heavy source identity/semantic QA is reused rather than repeated."
+  },
+  "material_advance": {
+    "type": "FOUR_EVEN_EXACT_RELEASE_PAYLOAD_REGION_EXTRACTION_SPECS",
+    "purpose": "Convert previously accepted 4x HD atlas-cell mappings into deterministic byte/block-row extraction coordinates for exact Release DDS decoding without guessing or whole-cell editing.",
+    "unique_sprite_regions": 18,
+    "physical_semantic_occurrences": 21,
+    "localizable_physical_occurrences": 20,
+    "preserve_original_occurrences": 1,
+    "rgba32_regions": 15,
+    "dxt5_bc3_regions": 3,
+    "out_of_bounds_or_file_ranges": 0,
+    "block_unaligned_regions": 0,
+    "overlap_pairs": 0,
+    "canonical_semantics": 19,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "extraction_contract": {
+    "dds_header_bytes": 128,
+    "rgba32_formula": "row_offset = 128 + ((y + row) * width + x) * 4; row_bytes = w * 4",
+    "bc3_formula": "block_offset = 128 + (((y/4 + block_row) * (width/4)) + x/4) * 16; row_bytes = (w/4) * 16",
+    "scope": "Cell/payload extraction only. These ranges are not glyph masks and MUST NOT be erased or overwritten wholesale.",
+    "next_required_steps": [
+      "Decode only from the exact pinned Release DDS blob and confirm header FourCC/channel masks/mips against the accepted source fingerprint.",
+      "Resolve raw/readable orientation from exact decoded pixels before lettering.",
+      "Derive pixel-level source glyph/effect masks inside these extracted cells; detector/cell rectangles are not edit masks.",
+      "Measure full-effect source bboxes, alpha/style and signed slant, then create clean plates constrained by protected artwork.",
+      "Render Korean only after fit-before-render succeeds and retain exact ENGLISH SOURCE vs KOREAN CANDIDATE proof.",
+      "Run decoded-final zero-pixel containment/protected-mask/alpha/compression QA before static promotion."
+    ]
+  },
+  "assets": [
+    {
+      "queue_index": 34,
+      "asset": "B7E25BAD",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+        "git_blob_sha": "9ca9aa7e2e2528a101379257035533ea9d175b17",
+        "bytes": 33554560,
+        "width": 4096,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "size_equation_bytes": 33554560,
+        "size_equation_matches_file": true
+      },
+      "regions": [
+        {
+          "sprite": "sprite_9",
+          "rect": [
+            1280,
+            1032,
+            2048,
+            1016
+          ],
+          "semantics": [
+            {
+              "source": "Total Rank",
+              "korean": "종합 랭크",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 16384,
+          "row_bytes": 8192,
+          "row_count": 1016,
+          "first_row_offset": 16913536,
+          "last_row_start_offset": 33543296,
+          "last_byte_offset": 33551487,
+          "in_canvas": true,
+          "in_file": true
+        }
+      ],
+      "protected": [
+        "A/B/C/D/E rank-grade letters",
+        "Holly character artwork",
+        "lens flare",
+        "orange burst background"
+      ]
+    },
+    {
+      "queue_index": 44,
+      "asset": "19CEDB9",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+        "git_blob_sha": "2c7fd312717fc7a8a8681ef112f32756f85e0ec3",
+        "bytes": 16777344,
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "size_equation_bytes": 16777344,
+        "size_equation_matches_file": true
+      },
+      "regions": [
+        {
+          "sprite": "sprite_247",
+          "rect": [
+            0,
+            96,
+            200,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Sector2",
+              "korean": "섹터 2",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 800,
+          "row_count": 72,
+          "first_row_offset": 786560,
+          "last_row_start_offset": 1368192,
+          "last_byte_offset": 1368991,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_250",
+          "rect": [
+            200,
+            96,
+            200,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Sector1",
+              "korean": "섹터 1",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 800,
+          "row_count": 72,
+          "first_row_offset": 787360,
+          "last_row_start_offset": 1368992,
+          "last_byte_offset": 1369791,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_251",
+          "rect": [
+            400,
+            96,
+            120,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "WIN",
+              "korean": "승리",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 480,
+          "row_count": 72,
+          "first_row_offset": 788160,
+          "last_row_start_offset": 1369792,
+          "last_byte_offset": 1370271,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_252",
+          "rect": [
+            520,
+            96,
+            120,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "LOSE",
+              "korean": "패배",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 480,
+          "row_count": 72,
+          "first_row_offset": 788640,
+          "last_row_start_offset": 1370272,
+          "last_byte_offset": 1370751,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_246",
+          "rect": [
+            0,
+            168,
+            280,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Result",
+              "korean": "결과",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1120,
+          "row_count": 104,
+          "first_row_offset": 1376384,
+          "last_row_start_offset": 2220160,
+          "last_byte_offset": 2221279,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_261",
+          "rect": [
+            280,
+            168,
+            280,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Ranking",
+              "korean": "랭킹",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1120,
+          "row_count": 104,
+          "first_row_offset": 1377504,
+          "last_row_start_offset": 2221280,
+          "last_byte_offset": 2222399,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_262",
+          "rect": [
+            560,
+            168,
+            216,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Stage",
+              "korean": "스테이지",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 864,
+          "row_count": 104,
+          "first_row_offset": 1378624,
+          "last_row_start_offset": 2222400,
+          "last_byte_offset": 2223263,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_263",
+          "rect": [
+            776,
+            168,
+            200,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Rank1",
+              "korean": "랭크 1",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 800,
+          "row_count": 104,
+          "first_row_offset": 1379488,
+          "last_row_start_offset": 2223264,
+          "last_byte_offset": 2224063,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_272",
+          "rect": [
+            1728,
+            184,
+            200,
+            88
+          ],
+          "semantics": [
+            {
+              "source": "You",
+              "korean": "나",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 800,
+          "row_count": 88,
+          "first_row_offset": 1514368,
+          "last_row_start_offset": 2227072,
+          "last_byte_offset": 2227871,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_282",
+          "rect": [
+            1840,
+            304,
+            136,
+            88
+          ],
+          "semantics": [
+            {
+              "source": "Diff",
+              "korean": "차이",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 544,
+          "row_count": 88,
+          "first_row_offset": 2497856,
+          "last_row_start_offset": 3210560,
+          "last_byte_offset": 3211103,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_336",
+          "rect": [
+            1824,
+            1176,
+            200,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Sector3",
+              "korean": "섹터 3",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 800,
+          "row_count": 72,
+          "first_row_offset": 9641216,
+          "last_row_start_offset": 10222848,
+          "last_byte_offset": 10223647,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_352",
+          "rect": [
+            288,
+            1408,
+            208,
+            144
+          ],
+          "semantics": [
+            {
+              "source": "TOP",
+              "korean": "TOP",
+              "action": "PRESERVE_ORIGINAL"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 832,
+          "row_count": 144,
+          "first_row_offset": 11535616,
+          "last_row_start_offset": 12707072,
+          "last_byte_offset": 12707903,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_353",
+          "rect": [
+            496,
+            1412,
+            208,
+            140
+          ],
+          "semantics": [
+            {
+              "source": "Rival",
+              "korean": "라이벌",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 832,
+          "row_count": 140,
+          "first_row_offset": 11569216,
+          "last_row_start_offset": 12707904,
+          "last_byte_offset": 12708735,
+          "in_canvas": true,
+          "in_file": true
+        }
+      ],
+      "protected": [
+        "mph/km/h unit labels",
+        "numeric glyphs",
+        "1P/2P/3P markers",
+        "cars",
+        "rank digits/ordinals not selected for localization",
+        "bowling/checkered-flag/icons"
+      ]
+    },
+    {
+      "queue_index": 52,
+      "asset": "A8CE339F",
+      "queue_path": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+        "git_blob_sha": "53f75d347682c7b5f436a6d45dc3e1950a42b5eb",
+        "bytes": 2097280,
+        "width": 2048,
+        "height": 1024,
+        "format": "DXT5",
+        "mipmaps": 1,
+        "size_equation_bytes": 2097280,
+        "size_equation_matches_file": true
+      },
+      "regions": [
+        {
+          "sprite": "sprite_26",
+          "rect": [
+            0,
+            200,
+            504,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Extra Time",
+              "korean": "추가 시간",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "BC3_DXT5_4X4_BLOCK_ROW_STRIDED",
+          "block_rect": [
+            0,
+            50,
+            126,
+            26
+          ],
+          "row_pitch_bytes": 8192,
+          "row_bytes": 2016,
+          "row_count": 26,
+          "first_row_offset": 409728,
+          "last_row_start_offset": 614528,
+          "last_byte_offset": 616543,
+          "block_aligned": true,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_24",
+          "rect": [
+            0,
+            304,
+            776,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Start",
+              "korean": "시작",
+              "action": "LOCALIZE"
+            },
+            {
+              "source": "Goal",
+              "korean": "골",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "BC3_DXT5_4X4_BLOCK_ROW_STRIDED",
+          "block_rect": [
+            0,
+            76,
+            194,
+            26
+          ],
+          "row_pitch_bytes": 8192,
+          "row_bytes": 3104,
+          "row_count": 26,
+          "first_row_offset": 622720,
+          "last_row_start_offset": 827520,
+          "last_byte_offset": 830623,
+          "block_aligned": true,
+          "in_canvas": true,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_25",
+          "rect": [
+            776,
+            304,
+            776,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Start",
+              "korean": "시작",
+              "action": "LOCALIZE"
+            },
+            {
+              "source": "Goal",
+              "korean": "골",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "BC3_DXT5_4X4_BLOCK_ROW_STRIDED",
+          "block_rect": [
+            194,
+            76,
+            194,
+            26
+          ],
+          "row_pitch_bytes": 8192,
+          "row_bytes": 3104,
+          "row_count": 26,
+          "first_row_offset": 625824,
+          "last_row_start_offset": 830624,
+          "last_byte_offset": 833727,
+          "block_aligned": true,
+          "in_canvas": true,
+          "in_file": true
+        }
+      ],
+      "protected": [
+        "6P/5P/4P/3P/2P/1P markers",
+        "1st/2nd/3rd/4th tokens",
+        "digits 0-9",
+        "ruler/tick artwork"
+      ]
+    },
+    {
+      "queue_index": 172,
+      "asset": "6C9B3611",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+      "hd_release": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+        "git_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800",
+        "bytes": 4194432,
+        "width": 1024,
+        "height": 1024,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "size_equation_bytes": 4194432,
+        "size_equation_matches_file": true
+      },
+      "regions": [
+        {
+          "sprite": "sprite_788",
+          "rect": [
+            0,
+            136,
+            748,
+            888
+          ],
+          "semantics": [
+            {
+              "source": "START",
+              "korean": "시작",
+              "action": "LOCALIZE"
+            },
+            {
+              "source": "GOAL",
+              "korean": "골",
+              "action": "LOCALIZE"
+            }
+          ],
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 4096,
+          "row_bytes": 2992,
+          "row_count": 888,
+          "first_row_offset": 557184,
+          "last_row_start_offset": 4190336,
+          "last_byte_offset": 4193327,
+          "in_canvas": true,
+          "in_file": true
+        }
+      ],
+      "protected": [
+        "OutRun2SP logo",
+        "course montage/path artwork"
+      ]
+    }
+  ],
+  "strict_holds": {
+    "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "raw_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "full_effect_bboxes": "HOLD_EXACT_DECODE_REQUIRED",
+    "glyph_effect_masks": "HOLD_EXACT_DECODE_REQUIRED",
+    "clean_plates": "HOLD_EXACT_DECODE_REQUIRED",
+    "signed_slant": "HOLD_EXACT_DECODE_REQUIRED",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00062": [
+      188,
+      212,
+      226,
+      232
+    ],
+    "LOCALIZATION-LOCALIZATION_B-00077": [
+      132,
+      176,
+      220,
+      222
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_34_44_52_172",
+    "queue_state": "PASS_ALL_FOUR_CURRENT_PENDING_ARTWORK_AND_C_CONSUMED_PREVIOUS_INPUT",
+    "heavy_qa_dedup": "PASS_REUSED_B00033_C00034_UNCHANGED_FINGERPRINT",
+    "size_equations": "PASS_4_OF_4_EXACT_FILE_SIZES",
+    "extraction_ranges": "PASS_18_OF_18_IN_CANVAS_AND_IN_FILE",
+    "bc3_alignment": "PASS_3_OF_3_4X4_BLOCK_ALIGNED",
+    "region_overlap_pairs": 0,
+    "candidate_write": "NONE_FAIL_CLOSED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00018 materially advances four C-consumed even-shard unfinished assets by adding exact deterministic Release-DDS payload extraction coordinates for 18 unique mapped HD sprite regions. No candidate pixels are guessed; source-effect/orientation/style/candidate gates remain fail-closed. Runtime remains UNTESTED."
+}
