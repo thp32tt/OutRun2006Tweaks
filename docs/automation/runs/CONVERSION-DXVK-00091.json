@@ -1,0 +1,111 @@
+{
+  "task_id": "CONVERSION-DXVK-00091",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
+  "base_sha": "525731494ed826044aa211ba59e2ae9bc94a7113",
+  "initial_result_sha": "9b6b41c16c9bdc66f7dd3290112fe468c3e798f1",
+  "result_sha": "89b42fc855fab494d57f0396f88f36de4c734236",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE17_R13",
+  "summary": "Completed F04 phase 17 by extracting the unchanged R13 ACK/backpressure, unsafe MRT/occlusion single-execution, mono-shadow fail-closed and transactional-installation body into include-free stereo_renderer_r13_overlay.inc. The default production stereo facade now directly composes r13_bridge.hpp + canonical stereo_renderer.cpp (R9/R7 base) + R13 overlay + runtime eligibility + R20/R21/R22/R23/R26/R29-R34 overlays. Historical R13 and later wrappers remain compatibility/build-graph owners; diagnostic comparison branches are unchanged. One stale DXVK transport verifier owner was repaired without runtime-source changes.",
+  "evidence": [
+    "CONVERSION-DXVK-00089 explicitly left R13 -> stereo_renderer.cpp as the next bounded F04 source-graph candidate.",
+    "Base 525731494ed826044aa211ba59e2ae9bc94a7113 stereo_renderer_r13.cpp content from namespace OutRunVRStereo through EOF equals result stereo_renderer_r13_overlay.inc after CRLF/LF and terminal-newline normalization: 752 lines / 31956 characters.",
+    "Initial result 9b6b41c16c9bdc66f7dd3290112fe468c3e798f1 failed Backend Conversion Gate 36631755792 only because tools/verify_dxvk_host_owned_transport_contract.py still looked for R13ReadGpuCompletedFrame in the now-body-free historical wrapper.",
+    "Repair 89b42fc855fab494d57f0396f88f36de4c734236 retargeted that verifier to stereo_renderer_r13_overlay.inc only; no runtime source was changed.",
+    "Backend Conversion Gate 36631901624 PASS on exact final result SHA, including facade phase-17, semantic/session/shared-handle/host-owned-transport/pinned-acquisition/SAFE/recenter checks plus Win32 build, binary verification and artifact upload.",
+    "Build 36631907218 PASS.",
+    "OpenXR VR architecture 36631907233 PASS across host-x64 and all five Win32 game/comparison jobs.",
+    "OutRun EXE HUD Inspector CI 36631907182 PASS; static-exe-analysis and build-hud-inspector both PASS.",
+    "VR Hosted Test Package 36631907244 (PR) PASS and 36631901621 (push) PASS.",
+    "VR PC Fast Test Build 36631901574 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/stereo_pipeline.cpp",
+    "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "src/vr/d3d9/stereo_renderer_r13_overlay.inc",
+    "tools/verify_dxvk_host_owned_transport_contract.py",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "9b6b41c16c9bdc66f7dd3290112fe468c3e798f1",
+      "message": "Extract R13 stereo hardening overlay from production facade [AUTO:CONVERSION-DXVK-00091]",
+      "role": "initial_validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "FAIL",
+      "failure": "Stale DXVK transport verifier ownership expected R13ReadGpuCompletedFrame in stereo_renderer_r13.cpp."
+    },
+    {
+      "sha": "89b42fc855fab494d57f0396f88f36de4c734236",
+      "message": "Retarget R13 transport guard to overlay [AUTO:CONVERSION-DXVK-00091]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "initial_backend_conversion_gate_run_id": 36631755792,
+    "initial_backend_conversion_gate_result": "FAIL",
+    "initial_failure_step": "Verify DXVK host-owned transport synchronization contract",
+    "initial_failure_reason": "Verifier-only owner drift after R13 implementation moved to stereo_renderer_r13_overlay.inc.",
+    "backend_conversion_gate_run_id": 36631901624,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36631907218,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36631907233,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36631907182,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36631907244,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36631901621,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36631901574,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5899012065,
+    "issue_14_repair_comment_id": 5899034018,
+    "issue_14_validation_comment_id": 5899193946
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001",
+      "VR-DXVK-D3D9EX-SHARED-HANDLE-001"
+    ],
+    "note": "Source-graph and verifier ownership changed only. Exact-source equivalence, R13 ACK/MRT/mono-fallback structural checks, DXVK host-owned transport contract, hosted compile/architecture/package guards passed. No runtime-visible correctness or performance claim is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
+    "C1_CONFIRM_F04_PHASE17_FROM_PRIOR_NEXT_ACTION",
+    "C2_EXTRACT_R13_OVERLAY_AND_FLATTEN_STEREO_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C3_R13_ACK_MRT_MONO_SAFETY_GUARD_OWNER_MOVED_TO_OVERLAY",
+    "C4_INITIAL_VALIDATION_BEARING_RESULT_COMMIT",
+    "C5_INITIAL_GATE_FAIL_VERIFIER_OWNER_DRIFT",
+    "C2_REPAIR_DXVK_TRANSPORT_VERIFIER_OWNER",
+    "C4_FINAL_VALIDATION_BEARING_RESULT_COMMIT",
+    "C5_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 1,
+  "infrastructure_retries": 0,
+  "blocker": "No software blocker remains for F04 phase 17. Runtime correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
+  "next_action": "Perform a bounded F04 closure review. The default production stereo facade no longer includes any historical stereo_renderer_rNN.cpp wrapper and bottoms out at canonical stereo_renderer.cpp (R9/R7 base). Do not flatten the canonical R9 base further without a separately justified finding. If closure review passes, update docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and select the next executable DXVK finding. Do not claim runtime correctness without Quest3/VDXR evidence."
+}
