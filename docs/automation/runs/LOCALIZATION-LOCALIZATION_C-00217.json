@@ -191,7 +191,7 @@
   "candidate_dds_modified": false,
   "new_static_artwork_passes": 1,
   "new_runtime_approvals": 0,
-  "shared_state_modified": false,
+  "shared_state_modified": true,
   "peer_candidate_files_modified": false,
   "runtime_test_performed": false,
   "build_performed": false,
@@ -202,10 +202,20 @@
   "google_drive_write_performed": false,
   "uploaded_archive_used": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": "PENDING_POST_COMMIT",
-  "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-  "bookkeeping_note": "This AUTO result commit is the Q00046 validation owner. Do not add CI-skip. After the Localization Automation Gate completes, record its result and update shared progress/worklog/queue in separate bookkeeping commits without changing validation ownership."
+  "result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
+  "validation_bearing_result_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
+  "bookkeeping_note": "Q00046 Gate result recorded after the validation-bearing C result commit. This bookkeeping commit is separate and does not replace the validation owner. Shared queue/progress/resume/worklog now reflect index226 STATIC_QA re-promotion; runtime remains UNTESTED.",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36631638860,
+    "run_attempt": 1,
+    "head_sha": "b562b57de350fce90397ac9bbcab0c9fbd04db92",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T06:12:14+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-09-30T06:12:14+09:00"
 }
