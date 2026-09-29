@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 38,
+  "completedCycles": 39,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "83984086dd658daaab9920d70317e9b5347e8249",
+  "currentHead": "32bd27b484ddf1309634b3e516b9192b502c627f",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1128,12 +1128,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "review SkyGlow failure fallback ordering"
+    },
+    {
+      "cycle": 39,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Cycle 30's pre-HUD composite marks an attempt before capture/apply; if it fails, Present must not retry additive glow over HUD. This fail-safe trades missing glow for avoiding UI washout and should remain until HMD evidence says otherwise."
+      ],
+      "evidence": [
+        "R30CompositeSkyGlowBeforeHud preHudAttempt epoch and failure comment"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "32bd27b484ddf1309634b3e516b9192b502c627f"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "consume current CI and review exact visual evidence"
     }
   ],
   "nextCycle": {
-    "cycle": 39,
+    "cycle": 40,
     "priority": [
-      "review SkyGlow failure fallback ordering"
+      "consume current CI and review exact visual evidence"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
