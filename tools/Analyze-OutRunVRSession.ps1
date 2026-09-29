@@ -279,6 +279,18 @@ if($backend -match 'dxvk'){
 }
 $dxvkDirectEvidenceTrusted=($backend -match 'dxvk' -and $dxvkDirectEvidenceBlockers.Count -eq 0)
 
+$dxvkPerformanceEvidenceBlockers=@()
+if($backend -match 'dxvk'){
+    if($profile -ne 'PERFORMANCE'){$dxvkPerformanceEvidenceBlockers+='PROFILE_NOT_PERFORMANCE'}
+    if(-not $dxvkDirectEvidenceTrusted){$dxvkPerformanceEvidenceBlockers+='DIRECT_EVIDENCE_UNTRUSTED'}
+    if($hostCaptureBudget.WindowCount -le 0){$dxvkPerformanceEvidenceBlockers+='HOST_CAPTURE_BUDGET_MISSING'}
+    if($hostCommitBudget.WindowCount -le 0){$dxvkPerformanceEvidenceBlockers+='HOST_COMMIT_BUDGET_MISSING'}
+    if($hostRenderBudget.WindowCount -le 0){$dxvkPerformanceEvidenceBlockers+='HOST_RENDER_BUDGET_MISSING'}
+    if($hostEndFrameBudget.WindowCount -le 0){$dxvkPerformanceEvidenceBlockers+='HOST_ENDFRAME_BUDGET_MISSING'}
+    if($r32PerfWindows -le 0){$dxvkPerformanceEvidenceBlockers+='GAME_PRODUCER_BUDGET_MISSING'}
+}
+$dxvkPerformanceEvidenceReady=($backend -match 'dxvk' -and $dxvkPerformanceEvidenceBlockers.Count -eq 0)
+
 $flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
@@ -298,6 +310,8 @@ if($backend -match 'dxvk'){
     if($dxvkHostGenerationMismatch){$flags+='DXVK_HOST_GENERATION_MISMATCH'}
     if($dxvkDirectEvidenceTrusted){$flags+='DXVK_DIRECT_EVIDENCE_TRUSTED'}
     elseif($dxvkHostPathActive -and $directFrames -gt 0){$flags+='DXVK_DIRECT_EVIDENCE_UNTRUSTED'}
+    if($dxvkPerformanceEvidenceReady){$flags+='DXVK_PERFORMANCE_EVIDENCE_READY'}
+    elseif($profile -eq 'PERFORMANCE'){$flags+='DXVK_PERFORMANCE_EVIDENCE_INCOMPLETE'}
 }
 if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
 if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
@@ -338,6 +352,8 @@ $result=[ordered]@{
     PackageIntegrityManifestSha256=$packageIntegrityManifestSha
     DxvkDirectEvidenceTrusted=$dxvkDirectEvidenceTrusted
     DxvkDirectEvidenceBlockers=@($dxvkDirectEvidenceBlockers)
+    DxvkPerformanceEvidenceReady=$dxvkPerformanceEvidenceReady
+    DxvkPerformanceEvidenceBlockers=@($dxvkPerformanceEvidenceBlockers)
     DxvkHostGenerationMismatch=$dxvkHostGenerationMismatch
     Provider=$provider
     SBSDesktopDupFallback=$sbsFallback
@@ -456,6 +472,8 @@ $lines=@(
     ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
     ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
     "frameBudgetEvidenceAvailable=$frameBudgetEvidenceAvailable"
+    "dxvkPerformanceEvidenceReady=$dxvkPerformanceEvidenceReady"
+    "dxvkPerformanceEvidenceBlockers=$($dxvkPerformanceEvidenceBlockers -join ',')"
     "hostPipelineWindowCount=$hostPipelineWindowCount"
     ("hostCaptureAvgMs="+$(if($null -ne $hostCaptureBudget.AverageOfWindowAverages){'{0:F3}' -f $hostCaptureBudget.AverageOfWindowAverages}else{'n/a'}))
     ("hostCaptureMaxMs="+$(if($null -ne $hostCaptureBudget.MaxObserved){'{0:F3}' -f $hostCaptureBudget.MaxObserved}else{'n/a'}))
@@ -493,6 +511,13 @@ elseif($status -eq 'DXVK_HOST_OWNED_IMPORT_NOT_ESTABLISHED'){
 }
 elseif($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
     $lines+='interpretation=DXVK loaded, but DirectGPU shared-eye transport did not activate; runtime fell back to SBS/Desktop Duplication.'
+}
+if($backend -match 'dxvk' -and $profile -eq 'PERFORMANCE'){
+    if($dxvkPerformanceEvidenceReady){
+        $lines+='interpretation_performance=DXVK PERFORMANCE evidence is decision-ready for bottleneck attribution: exact-build/package/direct-path trust plus host capture/commit/render/xrEndFrame and game producer budget windows are present. This is evidence readiness, not a performance PASS.'
+    } else {
+        $lines+="interpretation_performance=DXVK PERFORMANCE evidence is incomplete; do not change waits/copies/draw policy from this bundle. Blockers=$($dxvkPerformanceEvidenceBlockers -join ',')"
+    }
 }
 if($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){
     $lines+='interpretation_camera=Driver-seat camera code activated during a non-cockpit test slot.'

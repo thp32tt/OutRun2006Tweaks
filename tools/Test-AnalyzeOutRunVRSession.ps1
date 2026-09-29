@@ -12,6 +12,7 @@ function Invoke-AnalyzerCase {
         [Parameter(Mandatory=$true)][string]$GameLog,
         [Parameter(Mandatory=$true)][string]$DxvkLog,
         [Parameter(Mandatory=$true)][AllowEmptyString()][string]$HostLog,
+        [string]$TestProfile='CORRECTNESS',
         [Parameter(Mandatory=$true)][bool]$ExpectedSharedFailure,
         [string[]]$ExpectedReasons=@(),
         [Parameter(Mandatory=$true)][int64]$ExpectedDirectFrames,
@@ -28,6 +29,8 @@ function Invoke-AnalyzerCase {
         [bool]$ExpectedBuildIdentityMismatch=$false,
         [bool]$ExpectedDirectEvidenceTrusted=$false,
         [string[]]$ExpectedDirectEvidenceBlockers=@(),
+        [bool]$ExpectedPerformanceEvidenceReady=$false,
+        [string[]]$ExpectedPerformanceEvidenceBlockers=@(),
         [int]$ExpectedHostPipelineWindows=0,
         [int]$ExpectedProducerPerfWindows=0,
         [int64]$ExpectedProducerFenceOk=0,
@@ -46,7 +49,7 @@ function Invoke-AnalyzerCase {
         SchemaVersion=3
         VariantId='E_DXVK_SAFE'
         Backend='dxvk-safe'
-        TestProfile='CORRECTNESS'
+        TestProfile=$TestProfile
         SourceSha='fixture-source'
     } | ConvertTo-Json | Set-Content (Join-Path $caseRoot 'session_manifest.json') -Encoding UTF8
 
@@ -125,6 +128,15 @@ function Invoke-AnalyzerCase {
     }
     if([bool]$summary.DxvkDirectEvidenceTrusted -ne $ExpectedDirectEvidenceTrusted){
         throw "${Name}: DxvkDirectEvidenceTrusted=$($summary.DxvkDirectEvidenceTrusted), expected $ExpectedDirectEvidenceTrusted"
+    }
+    if([bool]$summary.DxvkPerformanceEvidenceReady -ne $ExpectedPerformanceEvidenceReady){
+        throw "${Name}: DxvkPerformanceEvidenceReady=$($summary.DxvkPerformanceEvidenceReady), expected $ExpectedPerformanceEvidenceReady"
+    }
+    $actualPerformanceBlockers=@($summary.DxvkPerformanceEvidenceBlockers)
+    foreach($blocker in $ExpectedPerformanceEvidenceBlockers){
+        if($actualPerformanceBlockers -notcontains $blocker){
+            throw "${Name}: missing performance-evidence blocker $blocker; actual=$($actualPerformanceBlockers -join ',')"
+        }
     }
     if([int]$summary.FrameBudget.HostPipelineWindowCount -ne $ExpectedHostPipelineWindows){
         throw "${Name}: HostPipelineWindowCount=$($summary.FrameBudget.HostPipelineWindowCount), expected $ExpectedHostPipelineWindows"
@@ -258,6 +270,23 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedDirectPathActive $true -ExpectedGenerationMatches $true `
         -ExpectedDirectEvidenceTrusted $true
 
+    # Performance decisions require exact-build/package/direct-path trust plus
+    # both host stage budgets and game producer windows in a PERFORMANCE run.
+    Invoke-AnalyzerCase -Name 'dxvk-performance-evidence-ready' `
+        -TestProfile 'PERFORMANCE' `
+        -GameLog "VR DXVK native transport: imported host-owned D3D11 KMT 4-slot eye ring 2124x2284 generation=12345`nVR stereo: path=DXVK host-owned D3D11 KMT import`ndirect[frames=240,fallbacks=1,fenceTimeout=0]`nVR R32 PERF 5s: liveWvpCheck=1 liveReject=0 stateBlock[record=0,apply=0] batchWvp[ok=4,fail=0] safety[stateReadFail=0,forcedZero=0] direct[probeCacheHit=5,producerFenceOk=7,producerBudgetFallback=1,backpressure=2,pendingDrain=3,pendingBlock=4,pendingError=0] reset[rearm=0,fail=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog "DXVK host-owned shared-eye bridge ready: 2124x2284 x2, slots=4, generation=12345`n[R23 pipeline] captureMs=1 commitCopyMs=0.5 renderMs=2 xrWaitFrameMs=3 xrFrameIntervalMs=13.8 cadenceSerialWaitMs=0.2 gamePresentToConsumeMs=4 xrEndFrameMs=5 captureAvgMaxP95=1.0/3.0/2.0 commitAvgMaxP95=0.5/1.5/1.0 renderAvgMaxP95=2.0/4.0/3.0 endAvgMaxP95=5.0/8.0/7.0" `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 240 -ExpectedFallbacks 1 `
+        -ExpectedStatus 'DXVK_HOST_OWNED_DIRECTGPU_ACTIVE' `
+        -ExpectedBridgeReady $true -ExpectedImportReady $true -ExpectedDirectPathActive $true `
+        -ExpectedGenerationMatches $true -ExpectedDirectEvidenceTrusted $true `
+        -ExpectedPerformanceEvidenceReady $true `
+        -ExpectedHostPipelineWindows 1 -ExpectedProducerPerfWindows 1 `
+        -ExpectedProducerFenceOk 7 -ExpectedProducerBudgetFallback 1 `
+        -ExpectedCaptureMaxMs 3.0 -ExpectedEndFrameP95MaxMs 7.0
+
     # Direct frames alone are not promotion evidence when exact-build identity
     # is incomplete.
     Invoke-AnalyzerCase -Name 'direct-active-identity-incomplete' `
@@ -352,7 +381,22 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedProducerFenceOk 18 -ExpectedProducerBudgetFallback 3 `
         -ExpectedCaptureMaxMs 5.0 -ExpectedEndFrameP95MaxMs 9.0
 
-    Write-Host 'OutRun VR session analyzer shared-probe regression tests: PASS'
+    $queuePath = Join-Path $PSScriptRoot '..\docs\VR_WORK_QUEUE.json'
+    $workQueue = Get-Content $queuePath -Raw | ConvertFrom-Json
+    $perfItems = @($workQueue.items | Where-Object { $_.id -eq 'VR-PERF-COMMON-001' })
+    if($perfItems.Count -ne 1){ throw "VR-PERF-COMMON-001 queue item must be unique" }
+    $perfItem = $perfItems[0]
+    if([string]$perfItem.status -ne 'NEED_HMD_TEST'){
+        throw "VR-PERF-COMMON-001 status=$($perfItem.status), expected NEED_HMD_TEST"
+    }
+    if([string]$perfItem.dxvkPerformanceEvidenceGate -ne 'DxvkPerformanceEvidenceReady'){
+        throw "VR-PERF-COMMON-001 must name DxvkPerformanceEvidenceReady as its DXVK decision gate"
+    }
+    if([string]$perfItem.runtimeValidation -ne 'UNTESTED'){
+        throw "VR-PERF-COMMON-001 runtimeValidation=$($perfItem.runtimeValidation), expected UNTESTED"
+    }
+
+    Write-Host 'OutRun VR session analyzer shared-probe/performance-evidence regression tests: PASS'
 } finally {
     if(Test-Path $script:TestRoot){
         Remove-Item $script:TestRoot -Recurse -Force -ErrorAction SilentlyContinue
