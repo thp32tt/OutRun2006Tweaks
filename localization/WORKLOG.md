@@ -1917,3 +1917,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Q00050 dispositions remain **PASS / PASS / PASS** for A00221, B00223 and A00225. Index222 remains **STATIC_QA PASS / RUNTIME_UNTESTED**; index193/217/135 retain their recorded PREFLIGHT_ONLY scopes.
 - Earlier results `a5be20d8...` and `aea1ee13...` failed only on stale verifier behavior and are non-authoritative; heavy QA was not repeated.
 - Pending production **69**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-09-30 07:43 KST - C153 Q00051 INDEPENDENT QA BATCH
+- Consumed immutable B00226 `57cfaa82...`, A00227 `23f0c10f...`, B00229 `22f5884a...`, A00230 `d1d65c1e...` once; dispositions **PASS / PASS / PASS / PASS**.
+- Pinned bundle `76f85ed2...` verified once. Index163 exact source passes. Index175 pinned `93143725...` conflicts with canonical `e6965d05...`; fail-closed mismatch stays sticky.
+- C150/Q00048 heavy QA for index231 reused; desc_online -> `친구나 다른 플레이어와 온라인 아웃런을 즐기세요!`, desc_lan -> `LAN 아웃런 게임에 참가하거나 만들어 보세요!` accepted with exact bindings. Canonical metadata now **755** segments; index231 **RENDER_READY**.
+- C152/Q00050 heavy QA for index222 unchanged candidate `c2938974...` reused; A00230 adds only DDS_ONLY isolation input. No DDS/runtime approval.
+- Order: **RENDER_READY 231 -> ONE_STAGE none -> candidate QA 159/198/201 -> PREFLIGHT_ONLY 163/193/133/232**; blocked 175/217/135 remain behind runnable work.
+- No build, N100/local clone/worktree, GPT Library state, Drive write, VR/FFB/DX changes or real-game test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
