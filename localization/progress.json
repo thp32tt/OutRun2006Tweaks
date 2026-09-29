@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T03:20:00+09:00",
+  "updated_at_kst": "2026-09-30T03:26:12+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C140/Q00038: B00190 indices46/100/106 PASS as PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED after independent Drive exact-parent 3/3 miss, pinned direct/current inventory recheck and unchanged C136 bundle fingerprint reuse. Pending production remains 71; actionable localize_text 93; canonical segments 753. No candidate/static/runtime approval; producer results outside Q00038 remain separate QA backlog.",
+  "next_checkpoint": "C140/Q00038 attempt2 Gate PASS: B00190 indices46/100/106 remain HOLD_STRICT_RECHECK because immutable result 5969fd31 fails current exact-result lane contract (unique task record absent from exact result diff). Independent source evidence is not promoted. Pending production remains 71; actionable localize_text 93; canonical segments 753. B must re-emit current-contract evidence; later producer results remain separate C backlog.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -648,7 +648,7 @@
       "task_id": "LOCALIZATION-LOCALIZATION_C-00194",
       "attempt": "2/3",
       "qa_batch_id": "Q00038",
-      "run": "C140",
+      "run": "C140-A2",
       "result": "REWORK_REQUIRED_Q00038_B00190_IMMUTABLE_RESULT_MISSING_DURABLE_TASK_RECORD_RUNTIME_UNTESTED",
       "base_head": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
       "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
@@ -755,13 +755,21 @@
       "n100_used": false,
       "local_clone_used": false,
       "gpt_library_used": false,
-      "google_drive_used": false,
+      "google_drive_used": true,
       "google_drive_write_performed": false,
       "uploaded_archive_used": false,
       "vr_ffb_dx_changes": false,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "validation_mode": "C_BATCH_GATE",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "automation_gate": {
+        "workflow": "Localization Automation Gate",
+        "run_id": 36611801924,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "validated_at_kst": "2026-09-30T03:24:46+09:00"
+      }
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -910,7 +918,7 @@
     "task_id": "LOCALIZATION-LOCALIZATION_C-00194",
     "attempt": "2/3",
     "qa_batch_id": "Q00038",
-    "run": "C140",
+    "run": "C140-A2",
     "result": "REWORK_REQUIRED_Q00038_B00190_IMMUTABLE_RESULT_MISSING_DURABLE_TASK_RECORD_RUNTIME_UNTESTED",
     "base_head": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
     "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
@@ -1017,12 +1025,20 @@
     "n100_used": false,
     "local_clone_used": false,
     "gpt_library_used": false,
-    "google_drive_used": false,
+    "google_drive_used": true,
     "google_drive_write_performed": false,
     "uploaded_archive_used": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36611801924,
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T03:24:46+09:00"
+    }
   }
 }
