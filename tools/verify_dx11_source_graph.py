@@ -25,6 +25,9 @@ INPUT_LAYOUT_OBJECT_PROBE = (
 SHADER_OBJECT_PROBE = (
     ROOT / "tools" / "dx11_shader_object_probe.cpp"
 ).read_text(encoding="utf-8")
+SHADER_LINKAGE_PROBE = (
+    ROOT / "tools" / "dx11_shader_linkage_probe.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -686,6 +689,55 @@ def main() -> None:
         if token not in BACKEND_GATE:
             raise SystemExit(
                 "DX11 R91 shader-object probe missing from Backend Conversion Gate: "
+                + token
+            )
+
+    r92_linkage_contract = {
+        "D3DReflect": "R92 compiled shader reflection",
+        "GetInputParameterDesc": "R92 pixel-shader input signature inspection",
+        "GetOutputParameterDesc": "R92 vertex-shader output signature inspection",
+        "generate_fixed_function_pixel_shader_prototype": "R92 R84 pixel-shader consumption",
+        "COLOR0": "R92 COLOR0 stage linkage",
+        "TEXCOORD0": "R92 TEXCOORD0 stage linkage",
+        "UINT COLOR0 mismatch did not fail closed": "R92 deliberate component-type mismatch rejection",
+        "DX11 shader linkage probe R92: PASS": "R92 probe completion marker",
+    }
+    missing_r92_linkage = [
+        meaning
+        for token, meaning in r92_linkage_contract.items()
+        if token not in SHADER_LINKAGE_PROBE
+    ]
+    if missing_r92_linkage:
+        raise SystemExit(
+            "DX11 R92 shader-linkage probe drift: "
+            + ", ".join(missing_r92_linkage)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_shader_linkage_probe" not in graph:
+            raise SystemExit(
+                f"DX11 R92 shader-linkage target missing from {graph_name}"
+            )
+        if "tools/dx11_shader_linkage_probe.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R92 shader-linkage source missing from {graph_name}"
+            )
+        if "dxguid.lib" not in graph:
+            raise SystemExit(
+                f"DX11 R92 shader reflection link contract missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 shader linkage probe",
+        "Run DX11 shader linkage probe",
+        "dx11_shader_linkage_probe",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R92 shader-linkage probe missing from Backend Conversion Gate: "
                 + token
             )
 

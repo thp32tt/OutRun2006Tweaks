@@ -887,3 +887,35 @@ target_link_libraries(dx11_shader_object_probe PUBLIC
     d3dcompiler.lib
     d3d11.lib
 )
+
+# Target: dx11_shader_linkage_probe
+set(dx11_shader_linkage_probe_SOURCES
+    "tools/dx11_shader_linkage_probe.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_shader_linkage_probe)
+
+target_sources(dx11_shader_linkage_probe PRIVATE ${dx11_shader_linkage_probe_SOURCES})
+
+target_compile_features(dx11_shader_linkage_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_shader_linkage_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_shader_linkage_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_shader_linkage_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+    dxguid.lib
+)

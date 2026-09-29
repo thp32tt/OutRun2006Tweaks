@@ -126,6 +126,17 @@ jobs:
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 shader object probe failed with exit code $LASTEXITCODE" }
 
+      - name: Build DX11 shader linkage probe
+        run: cmake --build build-auto --config Release --target dx11_shader_linkage_probe
+
+      - name: Run DX11 shader linkage probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_shader_linkage_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 shader linkage probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 shader linkage probe failed with exit code $LASTEXITCODE" }
+
       - name: Verify binary exists
         shell: pwsh
         run: |
