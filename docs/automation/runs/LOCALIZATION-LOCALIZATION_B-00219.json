@@ -73,7 +73,7 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "PENDING_POST_COMMIT",
-  "authoritative_result_sha": "PENDING_POST_COMMIT",
-  "bookkeeping_note": "Producer does not wait for an individual Actions Gate. Final automatic validation authority belongs to a later C batch Gate. Runtime remains UNTESTED."
+  "result_sha": "e15a33cae69671ea6325d95b94a221d8b5a779ae",
+  "authoritative_result_sha": "e15a33cae69671ea6325d95b94a221d8b5a779ae",
+  "bookkeeping_note": "Durable producer result SHA recorded after the atomic AUTO result commit. This bookkeeping commit is not the producer result and does not own automatic validation. automation_validation remains PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
 }
