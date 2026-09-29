@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 120,
+  "completedCycles": 140,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "935ac256d50ffda9f13fc77a33d36f23833bd0b4",
+  "currentHead": "cabe5654827c6c8bdba95d2ea5658c3d40acba09",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -3260,15 +3260,536 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "RUNTIME_VALIDATION stays UNTESTED"
+    },
+    {
+      "cycle": 121,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Repair-head Build run 36516730663 completed success; this supports compile/build integrity but does not substitute for OpenXR architecture completion."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "PARTIAL_HOSTED_GATE_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "keep OpenXR pending"
+    },
+    {
+      "cycle": 122,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Repair-head HUD Inspector run 36516730697 completed success; canonical HUD inspection remains green."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "PARTIAL_HOSTED_GATE_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "keep runtime untested"
+    },
+    {
+      "cycle": 123,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Both repair-head OpenXR runs remain in progress; architecture validation cannot yet be promoted to PASS."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue static review"
+    },
+    {
+      "cycle": 124,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Selector regression still needs exact world-draw texture/material/stage evidence; no speculative mutation."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "instrument only after owner proof"
+    },
+    {
+      "cycle": 125,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "HUD translucency diagnosis remains owner-first and state-second; alpha must never become an ownership heuristic."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "PARTIAL_HOSTED_GATE_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "preserve canonical HUD contract"
+    },
+    {
+      "cycle": 126,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu head-lock and alpha remain independent; collect exact anchor and blend evidence separately."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "avoid coupled fix"
+    },
+    {
+      "cycle": 127,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Mode-specific duplicate UI requires producer+epoch evidence; generic dedup remains unsafe."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace temporal identity"
+    },
+    {
+      "cycle": 128,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "WorldBillboard and ProjectedWorldMarker2D remain separate; no broad promotion or flattening."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "preserve per-eye/world semantics"
+    },
+    {
+      "cycle": 129,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Ordering fix is statically contained, but glow factor/intensity tuning remains blocked on HMD evidence."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "do not tune 0.38"
+    },
+    {
+      "cycle": 130,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Across the requested batch no evidence justified performance-only or broad visual behavior changes; next work should turn the narrowed selector hypothesis into bounded diagnostics once CI architecture is green."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "consume OpenXR then diagnostics"
+    },
+    {
+      "cycle": 131,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Repair-head Build run 36516730663 completed success; this supports compile/build integrity but does not substitute for OpenXR architecture completion."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "PARTIAL_HOSTED_GATE_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "keep OpenXR pending"
+    },
+    {
+      "cycle": 132,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Repair-head HUD Inspector run 36516730697 completed success; canonical HUD inspection remains green."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "PARTIAL_HOSTED_GATE_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "keep runtime untested"
+    },
+    {
+      "cycle": 133,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Both repair-head OpenXR runs remain in progress; architecture validation cannot yet be promoted to PASS."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "continue static review"
+    },
+    {
+      "cycle": 134,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Selector regression still needs exact world-draw texture/material/stage evidence; no speculative mutation."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "instrument only after owner proof"
+    },
+    {
+      "cycle": 135,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "HUD translucency diagnosis remains owner-first and state-second; alpha must never become an ownership heuristic."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "PARTIAL_HOSTED_GATE_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "preserve canonical HUD contract"
+    },
+    {
+      "cycle": 136,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Menu head-lock and alpha remain independent; collect exact anchor and blend evidence separately."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "avoid coupled fix"
+    },
+    {
+      "cycle": 137,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Mode-specific duplicate UI requires producer+epoch evidence; generic dedup remains unsafe."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "trace temporal identity"
+    },
+    {
+      "cycle": 138,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "WorldBillboard and ProjectedWorldMarker2D remain separate; no broad promotion or flattening."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "preserve per-eye/world semantics"
+    },
+    {
+      "cycle": 139,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Ordering fix is statically contained, but glow factor/intensity tuning remains blocked on HMD evidence."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "do not tune 0.38"
+    },
+    {
+      "cycle": 140,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Across the requested batch no evidence justified performance-only or broad visual behavior changes; next work should turn the narrowed selector hypothesis into bounded diagnostics once CI architecture is green."
+      ],
+      "evidence": [
+        "repair-head hosted CI observation and bounded current-R71 static review"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "cabe5654827c6c8bdba95d2ea5658c3d40acba09"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS / OPENXR_PENDING",
+      "runtimeValidation": "UNTESTED",
+      "next": "consume OpenXR then diagnostics"
     }
   ],
   "nextCycle": {
-    "cycle": 121,
+    "cycle": 141,
     "priority": [
-      "consume hosted CI",
-      "bounded selector diagnostics only if exact owner is proven"
+      "consume repair-head OpenXR completion",
+      "if green add bounded exact selector texture/material diagnostics",
+      "keep performance-only work paused"
     ],
-    "guard": "visual-first; no speculative behavior; frozen package immutable"
+    "guard": "frozen 34eef500 package immutable; RUNTIME_VALIDATION remains UNTESTED until HMD test"
   },
   "updatedKst": "2026-09-29T12:29:00+09:00",
   "workPolicy": {
