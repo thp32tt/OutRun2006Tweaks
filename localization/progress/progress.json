@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T03:26:12+09:00",
+  "updated_at_kst": "2026-09-30T03:31:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C140/Q00038 attempt2 Gate PASS: B00190 indices46/100/106 remain HOLD_STRICT_RECHECK because immutable result 5969fd31 fails current exact-result lane contract (unique task record absent from exact result diff). Independent source evidence is not promoted. Pending production remains 71; actionable localize_text 93; canonical segments 753. B must re-emit current-contract evidence; later producer results remain separate C backlog.",
+  "next_checkpoint": "C140/Q00038 ATTEMPT2 authoritative Gate PASS: B00190@5969fd31 is REWORK_REQUIRED because its exact material result commit lacks the unique durable B00190 task record required by current producer validation. Independent source evidence remains internally consistent but indices46/100/106 receive no readiness/static/runtime promotion. Pending production remains 71; actionable localize_text 93; canonical segments 753. B must atomically re-emit current-contract evidence; later producer results remain separate C backlog.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -764,11 +764,11 @@
       "runtime_validation": "UNTESTED",
       "automation_gate": {
         "workflow": "Localization Automation Gate",
-        "run_id": 36611801924,
+        "run_id": 36612087138,
         "run_attempt": 1,
         "status": "completed",
         "conclusion": "success",
-        "validated_at_kst": "2026-09-30T03:24:46+09:00"
+        "validated_at_kst": "2026-09-30T03:27:03+09:00"
       }
     },
     "generation_contract": {
@@ -1034,11 +1034,11 @@
     "runtime_validation": "UNTESTED",
     "automation_gate": {
       "workflow": "Localization Automation Gate",
-      "run_id": 36611801924,
+      "run_id": 36612087138,
       "run_attempt": 1,
       "status": "completed",
       "conclusion": "success",
-      "validated_at_kst": "2026-09-30T03:24:46+09:00"
+      "validated_at_kst": "2026-09-30T03:27:03+09:00"
     }
   }
 }
