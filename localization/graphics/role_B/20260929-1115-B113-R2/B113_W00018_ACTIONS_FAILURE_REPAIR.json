@@ -1,0 +1,77 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00057",
+  "attempt": "2/3",
+  "wave_id": "W00018",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA_RETRY_ACTIONS_FAILURE_REPAIR",
+  "recorded_at_kst": "2026-09-29T11:15:34+09:00",
+  "target_branch": "korean-localization-clean",
+  "retry_base_head_sha": "4c13da32c82f8aa0fe57d7ddd9c210e04b2c3e7a",
+  "original_attempt": {
+    "result_sha": "a6d4c9fb716eff955f7c59b810d0333db24aa0b2",
+    "material_commit_sha": "c897b9dc9859a5dc82a483fc99239f046354d602",
+    "material_report": "localization/graphics/role_B/20260929-0830-B113/B113_W00018_EVEN_EXACT_HD_RECONSTRUCTION_INPUT.json",
+    "even_indices": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "duplicate_production_required": false
+  },
+  "failure_context": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36498476464,
+    "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/36498476464",
+    "failed_head_sha": "a6d4c9fb716eff955f7c59b810d0333db24aa0b2",
+    "job_id": 109183472363,
+    "failed_step": "Verify changed localization payload structure",
+    "command": "python tools/localization/verify_automation_commit.py",
+    "root_cause": "Repository verifier SyntaxError, not B localization payload failure. Commit 47f97d9f inserted literal backslash-n sequences into Python source around prompt_contract/prompt hash checks, causing 'unexpected character after line continuation character' before payload validation could run.",
+    "broken_verifier_blob_sha": "f6fe5ab106ef9eff2fe44605eb2944fb93b20cd3"
+  },
+  "repair_verification": {
+    "repair_commit_sha": "1ba2c36a9374419804909e7f6cfc623e9446c357",
+    "repair_commit_message": "localization: enforce signed slant and nonempty PNG review set in automation gate",
+    "repair_effect": "Replaced literal escaped \\\\n text with real Python newlines/indentation and retained prompt provenance checks; also added signed_slant_gate/asset_id requirements.",
+    "current_verifier_blob_sha": "c96f50960ebe0148cf8d5c0dcb64788db2089943",
+    "current_script_syntax_defect_present": false,
+    "current_head_success_gate": {
+      "head_sha": "4c13da32c82f8aa0fe57d7ddd9c210e04b2c3e7a",
+      "run_id": 36509346834,
+      "conclusion": "success"
+    },
+    "stale_failed_run_rerun": "NOT_RERUN",
+    "stale_failed_run_rerun_reason": "Run 36498476464 is bound to the old broken head a6d4c9f; rerunning it would execute the same broken verifier snapshot. Retry is performed on current fixed HEAD instead."
+  },
+  "lane_scope": {
+    "parity_shard": "EVEN_ONLY",
+    "work_steal": "NONE",
+    "new_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "peer_a_current_head_preserved": true,
+    "duplicate_even_asset_production": false
+  },
+  "validation": {
+    "queue_contract": "PASS_CURRENT_HEAD_CONTRACT_READ",
+    "required_state_files": "PASS_CURRENT_HEAD_REQUIRED_FILES_READ",
+    "original_material_evidence": "RETAINED_NO_REWRITE",
+    "root_cause_reproduced_from_exact_actions_log": "PASS",
+    "root_cause_fixed_in_current_head": "PASS",
+    "current_head_automation_gate": "PASS_RUN_36509346834",
+    "retry_commit_automation_gate": "PENDING_AFTER_COMMIT",
+    "runtime_validation": "UNTESTED"
+  },
+  "result": "PASS_RETRY_ROOT_CAUSE_FIXED_ON_CURRENT_HEAD_NO_DUPLICATE_PRODUCTION_REMOTE_GATE_PENDING",
+  "automation_validation": "PASS_ROOT_CAUSE_VERIFIED_CURRENT_HEAD_GATE_SUCCESS__RETRY_COMMIT_REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Attempt 1 production material remains valid. The exact failed Actions run was diagnosed as a repository verifier SyntaxError unrelated to B payload. Current HEAD contains the syntax repair and has a successful Localization Automation Gate. Retry records that repair without duplicating already-produced even-shard work; the new retry commit will be validated by its own exact Actions run."
+}

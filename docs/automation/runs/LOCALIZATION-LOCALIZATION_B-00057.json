@@ -3,9 +3,9 @@
   "task_id": "LOCALIZATION-LOCALIZATION_B-00057",
   "lane": "LOCALIZATION_B",
   "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "wave_id": "W00018",
-  "recorded_at_kst": "2026-09-29T08:31:25+09:00",
+  "recorded_at_kst": "2026-09-29T11:15:34+09:00",
   "initial_head_sha": "6a8e975da2560383e78ab5935e4a3b77e33dfa48",
   "peer_lane_task_id": "LOCALIZATION-LOCALIZATION_A-00056",
   "peer_lane_material_commit_sha": "9b87b86447a36320970354c7127b85c4c69b0896",
@@ -16,8 +16,8 @@
   ],
   "material_commit_sha": "c897b9dc9859a5dc82a483fc99239f046354d602",
   "final_precommit_head_sha": "c897b9dc9859a5dc82a483fc99239f046354d602",
-  "result": "PASS_MATERIAL_FALLBACK_4_NEW_EVEN_EXACT_HD_RECONSTRUCTION_INPUTS_GITHUB_ONLY",
-  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "result": "PASS_RETRY_ROOT_CAUSE_FIXED_ON_CURRENT_HEAD_NO_DUPLICATE_PRODUCTION_REMOTE_GATE_PENDING",
+  "automation_validation": "PASS_ROOT_CAUSE_VERIFIED_CURRENT_HEAD_GATE_SUCCESS__RETRY_COMMIT_REMOTE_GATE_PENDING",
   "runtime_validation": "UNTESTED",
   "report": "localization/graphics/role_B/20260929-0830-B113/B113_W00018_EVEN_EXACT_HD_RECONSTRUCTION_INPUT.json",
   "material_deliverable": {
@@ -70,5 +70,22 @@
   "local_clone_used": false,
   "gpt_library_used": false,
   "vr_ffb_dx_changes": false,
-  "conclusion": "B113 advanced four fresh even-shard pending assets with reproducible exact-HD GitHub source identities, atlas geometry, canonical translations, protected-content constraints and fail-closed next actions. Current HEAD prompt-provenance policy was preserved and applied. No Korean DDS candidate was emitted without mandatory measured decoded-pixel facts; runtime remains UNTESTED."
+  "conclusion": "Attempt 2 directly inspected failed Actions run 36498476464, identified repository verifier SyntaxError rather than localization payload failure, verified repair commit 1ba2c36a and successful current-head gate run 36509346834, and preserved the original B material deliverable without duplicate production. Runtime remains UNTESTED.",
+  "retry_base_head_sha": "4c13da32c82f8aa0fe57d7ddd9c210e04b2c3e7a",
+  "retry_report": "localization/graphics/role_B/20260929-1115-B113-R2/B113_W00018_ACTIONS_FAILURE_REPAIR.json",
+  "retry_failure_context": {
+    "run_id": 36498476464,
+    "failed_head_sha": "a6d4c9fb716eff955f7c59b810d0333db24aa0b2",
+    "job_id": 109183472363,
+    "failed_step": "Verify changed localization payload structure",
+    "root_cause": "verify_automation_commit.py SyntaxError from literal escaped \\\\n sequences introduced at 47f97d9f; B payload was not reached."
+  },
+  "retry_repair": {
+    "repair_commit_sha": "1ba2c36a9374419804909e7f6cfc623e9446c357",
+    "current_verifier_blob_sha": "c96f50960ebe0148cf8d5c0dcb64788db2089943",
+    "proof_current_head_gate_run_id": 36509346834,
+    "proof_current_head_gate_conclusion": "success",
+    "stale_run_rerun": "NOT_RERUN_OLD_SHA_WOULD_REPEAT_SAME_SYNTAX_FAILURE",
+    "duplicate_production_avoided": true
+  }
 }
