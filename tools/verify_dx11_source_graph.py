@@ -184,9 +184,20 @@ def main() -> None:
         "FixedFunctionShaderCompileFailedSignatures": "R85 failed unique-signature compile probes",
         "FixedFunctionShaderCompileSkippedSignatureCap": "R85 bounded instrumentation cap",
         "compile_fixed_function_pixel_shader_prototype": "R85 census compiler probe invocation",
-        "unique <= 64": "R85 compile instrumentation remains bounded to detailed-signature cap",
+        "SignatureHashCap = 512u": "R114 bounded unique-signature hash cap",
+        "DetailedSignatureLogCap = 64u": "R114 bounded detailed-signature log cap",
+        "SignatureHashCapHitSamples": "R114 signature hash-cap saturation evidence",
+        "DetailedSignatureLogSkippedSignatures": "R114 detailed-log saturation evidence",
+        "mix_sample_ordinal": "R114 hashed draw-ordinal sampler",
+        "(sampleKey & (SampleStride - 1u)) != 0u": "R114 hashed 1/64 sampling gate",
+        "unique <= DetailedSignatureLogCap": "R114 compile instrumentation uses named detail cap",
         "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
+    if "(++stride % SampleStride)" in census:
+        raise SystemExit(
+            "DX11 R114 fixed-phase modulo sampler must not reappear"
+        )
+
     missing_contract = [
         meaning for token, meaning in census_contract.items() if token not in census
     ]
@@ -455,6 +466,16 @@ def main() -> None:
             "R113 zero-unsupported but non-exact sampled status",
         'latest["exact"] == latest["samples"]':
             "R113 exact status requires every sampled draw to be exact",
+        '"SamplingCoverage": sampling_coverage':
+            "R114 sampling/cap coverage evidence object",
+        '"HASHED_ORDINAL_V1"':
+            "R114 hashed ordinal sampling identity",
+        '"SignatureHashCapSaturated"':
+            "R114 hash-cap saturation evidence",
+        '"DetailedSignatureLogCapSaturated"':
+            "R114 detail-cap saturation evidence",
+        '"OBSERVED_SAMPLED_TRANSLATION_EXACT_COVERAGE_SATURATED"':
+            "R114 exact sampled evidence fails closed when the signature hash cap saturates",
         "introspectionFailure": "resource introspection failure evidence",
         "behaviorUnsupported": "descriptor behavior evidence",
         "mutationTelemetryRequired": "lock/update blocker evidence",
