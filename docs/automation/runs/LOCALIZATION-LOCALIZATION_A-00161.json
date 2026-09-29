@@ -1,0 +1,77 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00078",
+  "recorded_at_kst": "2026-09-29T23:09:24+09:00",
+  "commit_mode": "ATOMIC_LANE_LOCAL_MATERIAL_AND_TASK_RECORD",
+  "base_head_sha": "8d6edebd57f38da3f393159d5425119caf1ee413",
+  "result": "PASS_MATERIAL_FALLBACK3_ODD_INDEX197_SINGLE_DDS_ISOLATION_INPUT_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD A scan skips A00157/index99 because it is still C-QA pending and does not repeat dependency-blocked direct rework indices 51/53/111/121. No other C-accepted RENDER_READY/ONE_STAGE_TO_RENDER handoff is available to A. Fallback ladder step 3 therefore adds a deterministic DDS_ONLY isolation input for odd index197/9F060EC1. The current candidate Git blob is byte-identical by Git blob identity to the C82-era candidate, so C82 static strict QA is reused without repeating heavy header/alpha/orientation/containment/visual checks. This task creates no candidate/shared-state/build/runtime/N100/Drive/local-clone/Library/VR/FFB/DX changes; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-2309-A00161-P00078/A00161_P00078_9F060EC1_SINGLE_DDS_ISOLATION_INPUT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "ODD_INDEX197_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "indices": [
+      197
+    ],
+    "assets": [
+      "9F060EC1"
+    ],
+    "report_path": "localization/graphics/role_A/20260929-2309-A00161-P00078/A00161_P00078_9F060EC1_SINGLE_DDS_ISOLATION_INPUT.json",
+    "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+    "candidate_git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+    "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "package_mode": "DDS_ONLY",
+    "expected_dds_count": 1,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "explicit_render_ready_count": 0,
+    "explicit_one_stage_to_render_count": 0,
+    "qa_pending_skip": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00157",
+      "index": 99
+    },
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "selected_fallback_index": 197,
+    "selection_reason": "No runnable candidate-completion tier after fresh A-shard scan; create a non-duplicate single-DDS runtime-isolation input for an unchanged static-PASS odd candidate.",
+    "conclusion": "ZERO_NEW_CANDIDATE_EXCEPTION_VALID__FALLBACK3_SINGLE_DDS_ISOLATION_MATERIAL_EXECUTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "candidate_current_git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+    "candidate_c82_git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+    "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+    "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60"
+  },
+  "self_qa": "PASS_ODD_197_ONLY__CURRENT_CANDIDATE_BLOB_EQUALS_C82_BLOB__C82_HEAVY_QA_REUSED__NO_DUPLICATE_9F060EC1_ISOLATION__NO_SHARED_STATE__NO_CANDIDATE_FALSE_PROMOTION",
+  "candidate_static_qa": "REUSED_C82_STATIC_STRICT_QA_PASS_UNCHANGED_CANDIDATE_BLOB_AND_SOURCE_SHA256_FINGERPRINT",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

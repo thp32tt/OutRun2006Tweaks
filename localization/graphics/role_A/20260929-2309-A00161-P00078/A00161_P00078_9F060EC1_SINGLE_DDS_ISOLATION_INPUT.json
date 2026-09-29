@@ -1,0 +1,180 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-single-dds-isolation-input-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00161",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00078",
+  "recorded_at_kst": "2026-09-29T23:09:24+09:00",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "base_head_sha": "8d6edebd57f38da3f393159d5425119caf1ee413",
+  "selection": {
+    "selected_index": 197,
+    "selected_asset": "9F060EC1",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+    "artwork_status": "c85_pixel_visual_pass_pending_ingame",
+    "reason": "Fresh A-shard scan finds no C-accepted RENDER_READY/ONE_STAGE_TO_RENDER handoff available to this lane: A00157/index99 is producer-QA pending and excluded; direct rework indices 51/53/111/121 retain unchanged dependency blockers. Fallback ladder step 3 advances odd index197, an existing C82 static strict-QA PASS candidate with unchanged candidate blob and no prior single-DDS isolation input.",
+    "qa_pending_skips": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00157",
+        "index": 99,
+        "asset": "4F68708E",
+        "reason": "QA_PENDING_SKIP_UNTIL_C_DISPOSITION"
+      }
+    ],
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "duplicate_search": "No 9F060EC1 single-DDS isolation input is present in current GitHub state; C128 shared-state notes still list only D6DC1380/C4A2937B shared manifests and A00154 adds 48DEBE77 lane-local input."
+  },
+  "asset": {
+    "id": "9F060EC1",
+    "queue_index": 197,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+    "translations": [
+      {
+        "source": "OUTRUN LICENSE",
+        "korean": "아웃런 라이선스"
+      },
+      {
+        "source": "COMPLETE",
+        "korean": "달성률"
+      },
+      {
+        "source": "VS RANK",
+        "korean": "VS 랭크"
+      },
+      {
+        "source": "WIN RATIO",
+        "korean": "승률"
+      },
+      {
+        "source": "DRIVE TIME",
+        "korean": "주행 시간"
+      }
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "source": {
+    "canonical_bundle": "OR2-HD-GUI-v0.25.10a",
+    "sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "current_repository_blob": null,
+    "authority": "A88/B89/C82 accepted canonical source fingerprint; no source DDS is currently committed under the canonical source path, so no repository-path blob is invented."
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+    "git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+    "historical_c82_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+    "blob_unchanged_since_c82": true,
+    "sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "qa_evidence": {
+    "producer_report": "localization/graphics/role_A/20260927-2030-A88/A88_9F060EC1_PRODUCTION_REPORT.json",
+    "first_qa_report": "localization/graphics/role_B/20260927-2055-B89/B89_9F060EC1_FIRST_QA_REPORT.json",
+    "c82_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+    "c82_status": "C82_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME",
+    "semantic_entries": 5,
+    "physical_regions": 5,
+    "header_128_exact": true,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "outside_cells_changed_pixels": 0,
+    "alpha_changes_outside_cells": 0,
+    "introduced_alpha_outside_cells": 0,
+    "min_bbox_margin": 4,
+    "visual_qa": "C82 PASS",
+    "current_candidate_heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "fingerprint_basis": {
+      "source_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+      "candidate_git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+      "raw_orientation": "mirror_y",
+      "semantic_layout": "5 C82-accepted localized regions",
+      "qa_authority": "C82 exact static strict QA PASS"
+    },
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+    "candidate_git_blob_sha": "9101e1b286a56dcad4bd34b88ea3aeee32ca2769",
+    "candidate_sha256": "39d917ca74552a86b459d1110ddcc351a07705e078d75160aabae49c7de20a60",
+    "expected_dds_count": 1,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Test 9F060EC1 as the only replacement DDS.",
+    "Open the license/statistics screen containing OUTRUN LICENSE, COMPLETE, VS RANK, WIN RATIO and DRIVE TIME.",
+    "Capture readable/game-orientation evidence and verify mirror_y storage renders in the expected orientation.",
+    "Verify native runtime size/scaling, alpha/transparency, cell alignment, clipping, protected watermark/legal artwork and zero-pixel overflow.",
+    "Do not promote or approve the DDS until isolated runtime behavior is correct."
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 3,
+    "type": "SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_ODD_INDEX_197_ONLY",
+    "work_steal": "NONE",
+    "candidate_blob_current": "PASS_9101E1B2",
+    "candidate_blob_unchanged_since_c82": true,
+    "c82_heavy_qa_reuse": "PASS_UNCHANGED_CANDIDATE_BLOB_AND_RECORDED_SOURCE_SHA256_FINGERPRINT",
+    "duplicate_isolation_manifest": "PASS_NONE_FOUND_FOR_9F060EC1",
+    "candidate_false_promotion": "PASS_NONE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
