@@ -287,16 +287,18 @@ class ReplaceGameUpdateLoop : public Hook
 
 	static int __cdecl R81FileLoadPerfDest()
 	{
-		LARGE_INTEGER before{}, after{}, frequency{};
+		LARGE_INTEGER before{}, after{};
 		QueryPerformanceCounter(&before);
 		const int busy = R81FileLoadPerfHook.ccall<int>();
 		QueryPerformanceCounter(&after);
-		QueryPerformanceFrequency(&frequency);
+		// FramelimiterFrequency is QPC ticks per millisecond and is initialized
+		// before this hook is installed. Reuse it so telemetry does not call
+		// QueryPerformanceFrequency in the asset loader hot path.
 		const std::uint64_t elapsedUs =
-			frequency.QuadPart > 0
+			FramelimiterFrequency > 0.0
 				? static_cast<std::uint64_t>(
-					(after.QuadPart - before.QuadPart) * 1000000ll /
-					frequency.QuadPart)
+					(static_cast<double>(after.QuadPart - before.QuadPart) /
+						FramelimiterFrequency) * 1000.0)
 				: 0;
 		OutRunVR::PerfHitch::NoteFileLoad(elapsedUs, busy != 0);
 		return busy;
