@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T03:45:00+09:00",
+  "updated_at_kst": "2026-09-30T03:49:56+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C142/Q00040 PASS pending Gate: B00197 and A00196 exact producer results independently validated as pre-generation evidence. Exact canonical source is now confirmed for indices198/222/226/232; indices205/214/219/225 are SOURCE_ACQUISITION_EXHAUSTED after all approved tiers. All eight remain PREFLIGHT_ONLY; no candidate/static/runtime approval. Pending production 71; actionable localize_text 93; canonical segments 753.",
+  "next_checkpoint": "C142/Q00040 authoritative Gate PASS: B00197 and A00196 are PASS as immutable pre-generation inputs. Exact canonical source is confirmed for 198/222/226/232; 205/214/219/225 are SOURCE_ACQUISITION_EXHAUSTED. All eight remain PREFLIGHT_ONLY; candidate completion on exact-source assets stays ahead of unrelated preflight. Pending production 71; actionable localize_text 93; canonical segments 753. Runtime remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1339,8 +1339,20 @@
     "google_drive_write_performed": false,
     "uploaded_archive_used": true,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "result_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
+    "validation_bearing_result_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36614790150,
+      "run_attempt": 1,
+      "head_sha": "b697463f9714bb2c00d86cc89bd5d9dc96f0a915",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T03:49:41+09:00"
+    },
+    "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner."
   }
 }
