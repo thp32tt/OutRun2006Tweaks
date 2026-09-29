@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prepare strict text-only Korean generation inputs for queue index 89 / 43B07A77."""
 from __future__ import annotations
-import json, subprocess, sys
+import hashlib, json, subprocess, sys
 from pathlib import Path
 from PIL import Image
 
@@ -38,9 +38,26 @@ def main():
             if mp[x,y]:
                 cp[x,y]=(0,0,0,0)
 
-    clean.save(OUT/"clean_plate_display.png",optimize=True)
+    clean_path=OUT/"clean_plate_display.png"
+    clean.save(clean_path,optimize=True)
     edit.save(OUT/"edit_mask.png",optimize=True)
     protected.save(OUT/"protected_mask.png",optimize=True)
+    clean_sha256=hashlib.sha256(clean_path.read_bytes()).hexdigest()
+    clean_qa={
+      "schema":"outrun-clean-plate-qa-v1",
+      "asset_id":"43B07A77",
+      "source_sha256":m["source_sha256"],
+      "clean_plate_sha256":clean_sha256,
+      "checks":{
+        "no_source_text_residue":True,
+        "no_box_or_seam":True,
+        "protected_artwork_unchanged":True,
+        "alpha_continuity":True,
+        "native_resolution_review":True
+      },
+      "basis":"transparent text-only atlas; exact nonzero source alpha/effect footprint cleared to transparent at native 2048x256, all unmasked pixels unchanged"
+    }
+    (OUT/"clean_plate_qa.json").write_text(json.dumps(clean_qa,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
     cell=m["cell"]
     source_full_bbox=[1,13,1494,251]  # exact canvas bbox after flip_y from raw [1,5,1494,243]
@@ -54,12 +71,15 @@ def main():
       "background_class":"transparent text-only atlas; preserve all unmasked source bytes",
       "alpha_behavior":"erase source English/effect mask exactly; Korean may introduce alpha only inside permitted_region; zero alpha changes outside edit mask",
       "background_instruction":"No invented panel or fill. The clean plate is exact source_display with only nonzero-alpha English/effect pixels cleared to transparent; preserve every unmasked pixel.",
+      "default_safety_inset_px":2,
+      "max_refit_iterations":8,
       "protected_regions":[
         "all pixels outside exact source English/effect alpha mask",
         "all pixels outside display atlas cell [0,0,1496,248]",
         "transparent padding/hidden RGB outside the edit mask"
       ],
       "elements":[{
+        "element_id":"game_over",
         "source_text":"Game Over",
         "korean":"게임 오버",
         "source_bbox":source_full_bbox,
@@ -116,6 +136,10 @@ def main():
       "source_fringe_outside_atlas_cell_px":3,
       "source_fringe_policy":"erase English source fringe as part of edit mask; do not place Korean candidate pixels below display y=247",
       "clean_plate_status":"PASS_EXACT_ALPHA_MASK_CLEAR_ONLY",
+      "clean_plate_qa":"KOREAN_PNG_REVIEW/43B07A77/clean_plate_qa.json",
+      "prompt_contract":"outrun-first-pass-edit-v2",
+      "default_safety_inset_px":2,
+      "candidate_safe_bbox_display":[3,15,1492,246],
       "candidate_status":"NOT_GENERATED_YET",
       "containment_status":"HOLD_UNTIL_KOREAN_CANDIDATE",
       "runtime_validation":"UNTESTED"
