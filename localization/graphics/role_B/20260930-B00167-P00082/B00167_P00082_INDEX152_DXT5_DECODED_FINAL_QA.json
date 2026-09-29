@@ -1,0 +1,375 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-b00167-index152-dxt5-decoded-final-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+  "wave_id": "P00082",
+  "lane": "LOCALIZATION_B",
+  "recorded_at_kst": "2026-09-30T00:36:11+09:00",
+  "status": "PASS",
+  "result": "PASS_INDEX152_49BB5FE5_KOREAN_DXT5_CANDIDATE_MACHINE_SELF_QA_PENDING_C_RUNTIME_UNTESTED",
+  "source_transport": {
+    "google_drive_exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "google_drive_outcome": "SOURCE_TRANSPORT_MISS",
+    "fallback": "PINNED_UPSTREAM_DIRECT_FILE",
+    "fallback_result": "PASS_EXACT_BLOB_AND_SHA256"
+  },
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+    "sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "bytes": 65664,
+    "width": 512,
+    "height": 128,
+    "fourcc": "DXT5",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y"
+  },
+  "translations": [
+    {
+      "source": "PRO.",
+      "korean": "프로",
+      "sprite": "sprite_832"
+    },
+    {
+      "source": "INS.",
+      "korean": "연주",
+      "sprite": "sprite_833"
+    },
+    {
+      "source": "G.M.",
+      "korean": "기타",
+      "sprite": "sprite_834"
+    },
+    {
+      "source": "E.R.",
+      "korean": "유로",
+      "sprite": "sprite_835"
+    }
+  ],
+  "mask_lineage": {
+    "accepted_input": "LOCALIZATION-LOCALIZATION_B-00152 + C127/Q00025",
+    "rule": "inside accepted full-effect bbox AND alpha>16 AND Euclidean RGB distance from accepted dominant background >=10",
+    "per_element": [
+      {
+        "source": "PRO.",
+        "korean": "프로",
+        "pixels": 1688,
+        "bbox_raw": [
+          18,
+          7,
+          104,
+          41
+        ]
+      },
+      {
+        "source": "INS.",
+        "korean": "연주",
+        "pixels": 1546,
+        "bbox_raw": [
+          136,
+          6,
+          214,
+          41
+        ]
+      },
+      {
+        "source": "G.M.",
+        "korean": "기타",
+        "pixels": 1449,
+        "bbox_raw": [
+          252,
+          7,
+          333,
+          41
+        ]
+      },
+      {
+        "source": "E.R.",
+        "korean": "유로",
+        "pixels": 1193,
+        "bbox_raw": [
+          374,
+          8,
+          444,
+          40
+        ]
+      }
+    ],
+    "union_pixels": 5876,
+    "union_expected": 5876
+  },
+  "clean_plate": {
+    "method": "replace accepted removal-mask pixels with each cell's independently measured dominant background, then patch only original BC3 color indices while preserving endpoints+alpha",
+    "decoded_changed_pixels_outside_removal_union": 0,
+    "accepted_rle_reuse": "PASS_B00152_C127_UNCHANGED_FINGERPRINT_5876_PIXELS_556_RUNS",
+    "background_palette_gate_by_element": {
+      "PRO.": {
+        "checked_pixels": 1688,
+        "non_background_palette_index_pixels": 0
+      },
+      "INS.": {
+        "checked_pixels": 1546,
+        "non_background_palette_index_pixels": 0
+      },
+      "G.M.": {
+        "checked_pixels": 1449,
+        "non_background_palette_index_pixels": 0
+      },
+      "E.R.": {
+        "checked_pixels": 1193,
+        "non_background_palette_index_pixels": 0
+      }
+    },
+    "bc3_patch_stats": {
+      "touched_blocks": 532,
+      "changed_color_index_pixels": 5660
+    },
+    "status": "PASS"
+  },
+  "style": {
+    "font_identifier": "NotoSansCJK-Black.ttc#1",
+    "fill": "white core antialiased into canonical cell background",
+    "outline_shadow": "none invented; source family is opaque white core with BC3 transition into flat colored cell background",
+    "slant_lock": "UPRIGHT_0_DEG",
+    "stable_measurement_median_deg": 0.0,
+    "source_measurement_note": "PRO bowl-biased edge excluded; accepted stable C127 component measurements center at 0 degrees",
+    "placements": [
+      {
+        "source": "PRO.",
+        "korean": "프로",
+        "font_size": 34,
+        "precompression_bbox_readable": [
+          30,
+          90,
+          91,
+          118
+        ]
+      },
+      {
+        "source": "INS.",
+        "korean": "연주",
+        "font_size": 29,
+        "precompression_bbox_readable": [
+          149,
+          90,
+          201,
+          119
+        ]
+      },
+      {
+        "source": "G.M.",
+        "korean": "기타",
+        "font_size": 28,
+        "precompression_bbox_readable": [
+          266,
+          90,
+          318,
+          118
+        ]
+      },
+      {
+        "source": "E.R.",
+        "korean": "유로",
+        "font_size": 27,
+        "precompression_bbox_readable": [
+          384,
+          91,
+          433,
+          117
+        ]
+      }
+    ]
+  },
+  "dds": {
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "candidate_sha256": "da8cf41d8416c50780e6264457b3a2ab08b28d84265b10754f0e550bf97deca3",
+    "bytes": 65664,
+    "header_128_exact": true,
+    "bc3_alpha_bytes_exact_all_blocks": true,
+    "bc3_color_endpoints_exact_all_blocks": true,
+    "patch_strategy": "preserve source BC3 endpoints/alpha; modify only 2-bit color indices for pixels whose clean/render target differs",
+    "patch_stats": {
+      "touched_blocks": 461,
+      "changed_color_index_pixels": 4150
+    }
+  },
+  "decoded_final": {
+    "changed_pixels_outside_removal_or_safe_union": 0,
+    "alpha_changed_pixels": 0,
+    "protected_pixels_exact": 55875,
+    "per_element": [
+      {
+        "source": "PRO.",
+        "korean": "프로",
+        "sprite": "sprite_832",
+        "removal_pixels": 1688,
+        "source_effect_bbox_raw": [
+          18,
+          7,
+          104,
+          41
+        ],
+        "candidate_safe_bbox_raw": [
+          20,
+          9,
+          102,
+          39
+        ],
+        "candidate_safe_bbox_readable": [
+          20,
+          89,
+          102,
+          119
+        ],
+        "decoded_korean_change_bbox_raw": [
+          30,
+          10,
+          90,
+          38
+        ],
+        "decoded_korean_change_pixels": 815,
+        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
+          "checked_pixels": 987,
+          "decoded_mismatch_pixels": 0,
+          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
+        },
+        "containment": "PASS"
+      },
+      {
+        "source": "INS.",
+        "korean": "연주",
+        "sprite": "sprite_833",
+        "removal_pixels": 1546,
+        "source_effect_bbox_raw": [
+          136,
+          6,
+          214,
+          41
+        ],
+        "candidate_safe_bbox_raw": [
+          138,
+          8,
+          212,
+          39
+        ],
+        "candidate_safe_bbox_readable": [
+          138,
+          89,
+          212,
+          120
+        ],
+        "decoded_korean_change_bbox_raw": [
+          149,
+          9,
+          201,
+          38
+        ],
+        "decoded_korean_change_pixels": 568,
+        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
+          "checked_pixels": 1031,
+          "decoded_mismatch_pixels": 0,
+          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
+        },
+        "containment": "PASS"
+      },
+      {
+        "source": "G.M.",
+        "korean": "기타",
+        "sprite": "sprite_834",
+        "removal_pixels": 1449,
+        "source_effect_bbox_raw": [
+          252,
+          7,
+          333,
+          41
+        ],
+        "candidate_safe_bbox_raw": [
+          254,
+          9,
+          331,
+          39
+        ],
+        "candidate_safe_bbox_readable": [
+          254,
+          89,
+          331,
+          119
+        ],
+        "decoded_korean_change_bbox_raw": [
+          267,
+          10,
+          316,
+          38
+        ],
+        "decoded_korean_change_pixels": 549,
+        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
+          "checked_pixels": 1079,
+          "decoded_mismatch_pixels": 0,
+          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
+        },
+        "containment": "PASS"
+      },
+      {
+        "source": "E.R.",
+        "korean": "유로",
+        "sprite": "sprite_835",
+        "removal_pixels": 1193,
+        "source_effect_bbox_raw": [
+          374,
+          8,
+          444,
+          40
+        ],
+        "candidate_safe_bbox_raw": [
+          376,
+          10,
+          442,
+          38
+        ],
+        "candidate_safe_bbox_readable": [
+          376,
+          90,
+          442,
+          118
+        ],
+        "decoded_korean_change_bbox_raw": [
+          385,
+          11,
+          433,
+          37
+        ],
+        "decoded_korean_change_pixels": 597,
+        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
+          "checked_pixels": 836,
+          "decoded_mismatch_pixels": 0,
+          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
+        },
+        "containment": "PASS"
+      }
+    ],
+    "preserve_year_cells": "'89 and '86 untouched because all final changes are confined to removal_union OR four safe bboxes",
+    "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "containment": "PASS_ZERO_PIXEL_OUTSIDE_EDIT_UNION"
+  },
+  "comparison_evidence": [
+    "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/comparison_full_readable.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/comparison_textrow_readable.png"
+  ],
+  "visual_validation": "SOURCE_VS_KOREAN_PROOF_RETAINED__INDEPENDENT_C_VISUAL_PENDING",
+  "candidate_static_qa": "PASS_MACHINE_DECODED_FINAL_PENDING_INDEPENDENT_C_VISUAL",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_probe_attempted": true,
+  "gpt_library_used": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_role": "NON_AUTHORITATIVE_LOCAL_VISUAL_PREVIEW_ONLY; final candidate source reacquired from pinned upstream direct file",
+  "vr_ffb_dx_changes": false
+}
