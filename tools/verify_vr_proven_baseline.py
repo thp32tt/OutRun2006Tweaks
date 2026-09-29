@@ -332,6 +332,12 @@ forbid("src/vr/d3d9/stereo_pipeline.cpp",
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r34.cpp"',
        "P11_R70_STEREO_NO_R34_NESTING")
+require_all("src/vr/d3d9/stereo_renderer.cpp", [
+    '#include "stereo_renderer_r7.inc"',
+    'R9BuildId',
+    'R9InstallState',
+    'R9PresentCallbackHook',
+], "P11_R70_STEREO_CANONICAL_BASE_FLOOR")
 require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
     '#include "r13_bridge.hpp"',
     '#include "ex_device_upgrade.cpp"',
@@ -438,6 +444,12 @@ forbid("src/vr/d3d9/stereo_pipeline.cpp",
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r34.cpp"',
        "P11_R70_STEREO_NO_R34_NESTING")
+require_all("src/vr/d3d9/stereo_renderer.cpp", [
+    '#include "stereo_renderer_r7.inc"',
+    'R9BuildId',
+    'R9InstallState',
+    'R9PresentCallbackHook',
+], "P11_R70_STEREO_CANONICAL_BASE_FLOOR")
 require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
     '#include "r13_bridge.hpp"',
     '#include "ex_device_upgrade.cpp"',

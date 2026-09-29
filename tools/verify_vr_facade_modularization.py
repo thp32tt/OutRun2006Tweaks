@@ -6,8 +6,10 @@ Phase 1 extracted renderer R13 into an include-free overlay. Phase 2 did the sam
 for renderer R23/R27/R28. Phases 3-5 flattened the production D3D9Ex R15/R14/R13
 wrapper edges. Phases 6-17 flatten the default stereo R34/R33/R32/R31/R30/R29/R26/R23/R22/R21/R20/R13 wrapper edges
 into include-free overlays while preserving the historical translation-unit
-wrappers for compatibility/build-graph ownership. These steps change source
-ownership only; runtime policy must remain unchanged.
+wrappers for compatibility/build-graph ownership. Phase 18 closes F04 by
+pinning the production facade floor at the canonical R9/R7 stereo_renderer.cpp
+base and rejecting any reintroduced versioned stereo wrapper below that floor.
+These steps change source ownership only; runtime policy must remain unchanged.
 """
 
 from pathlib import Path
@@ -58,6 +60,7 @@ ex_r14_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc"
 ex_r15_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r15.cpp"
 ex_r15_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc"
 ex_facade_rel = "src/vr/d3d9/ex_device_pipeline.cpp"
+stereo_base_rel = "src/vr/d3d9/stereo_renderer.cpp"
 stereo_r13_wrapper_rel = "src/vr/d3d9/stereo_renderer_r13.cpp"
 stereo_r13_overlay_rel = "src/vr/d3d9/stereo_renderer_r13_overlay.inc"
 stereo_r20_wrapper_rel = "src/vr/d3d9/stereo_renderer_r20.cpp"
@@ -97,6 +100,7 @@ ex_r14_overlay = read(ex_r14_overlay_rel)
 ex_r15_wrapper = read(ex_r15_wrapper_rel)
 ex_r15_overlay = read(ex_r15_overlay_rel)
 ex_facade = read(ex_facade_rel)
+stereo_base = read(stereo_base_rel)
 stereo_r13_wrapper = read(stereo_r13_wrapper_rel)
 stereo_r13_overlay = read(stereo_r13_overlay_rel)
 stereo_r20_wrapper = read(stereo_r20_wrapper_rel)
@@ -610,6 +614,57 @@ require(
     "R34PresentR33Hook.stdcall<HRESULT>",
     "stereo remains fail-closed",
 )
+# F04 closure floor: the production facade intentionally bottoms out at the
+# canonical R9/R7 renderer. Historical R13-R34 wrappers remain available only
+# to compatibility/diagnostic paths and must never re-enter the default branch.
+require(
+    stereo_base,
+    stereo_base_rel,
+    '#include "stereo_renderer_r7.inc"',
+    'R9BuildId',
+    'R9InstallState',
+    'R9PresentCallbackHook',
+)
+if stereo_base.count('#include "stereo_renderer_r7.inc"') != 1:
+    raise SystemExit("canonical stereo base must include stereo_renderer_r7.inc exactly once")
+for stale_base_owner in (
+    '#include "stereo_renderer_r13.cpp"',
+    '#include "stereo_renderer_r20.cpp"',
+    '#include "stereo_renderer_r21.cpp"',
+    '#include "stereo_renderer_r22.cpp"',
+    '#include "stereo_renderer_r23.cpp"',
+    '#include "stereo_renderer_r26.cpp"',
+    '#include "stereo_renderer_r29.cpp"',
+    '#include "stereo_renderer_r30.cpp"',
+    '#include "stereo_renderer_r31.cpp"',
+    '#include "stereo_renderer_r32.cpp"',
+    '#include "stereo_renderer_r33.cpp"',
+    '#include "stereo_renderer_r34.cpp"',
+):
+    if stale_base_owner in stereo_base:
+        raise SystemExit(
+            f"canonical stereo base regressed to historical wrapper inclusion: {stale_base_owner}"
+        )
+
+production_marker = '#else\n#include "r32_policy.hpp"'
+production_start = stereo_facade.find(production_marker)
+production_end = stereo_facade.rfind("#endif")
+if production_start < 0 or production_end <= production_start:
+    raise SystemExit("could not isolate production stereo facade branch")
+production_stereo = stereo_facade[production_start:production_end]
+if production_stereo.count('#include "stereo_renderer.cpp"') != 1:
+    raise SystemExit("production stereo facade must include canonical stereo_renderer.cpp exactly once")
+for diagnostic_owner in (
+    '#include "stereo_renderer_r26_compare.cpp"',
+    '#include "stereo_renderer_r29_c1_compare.cpp"',
+    '#include "stereo_renderer_r30_c2_compare.cpp"',
+    '#include "stereo_renderer_r30_r26_safe.cpp"',
+):
+    if diagnostic_owner in production_stereo:
+        raise SystemExit(
+            f"production stereo facade leaked diagnostic comparison owner: {diagnostic_owner}"
+        )
+
 for stale_stereo_owner in (
     '#include "stereo_renderer_r13.cpp"',
     '#include "stereo_renderer_r20.cpp"',
@@ -812,4 +867,4 @@ for stale_guard in (
             f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
         )
 
-print("VR facade modularization F04 phase 17: PASS")
+print("VR facade modularization F04 phase 18 closure: PASS")
