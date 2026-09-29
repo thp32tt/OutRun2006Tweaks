@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T18:22:00+09:00",
+  "updatedKst": "2026-09-29T18:29:43+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -433,7 +433,12 @@
       "runtimeValidation": "UNTESTED",
       "validationRunId": 36521949422,
       "implementationProgress": "CONVERSION-DXVK-00039 statically seals application-space LOCAL recenter ordering/fallback semantics; CONVERSION-DXVK-00041 executes the named-mapping/event request/received/applied IPC round-trip in Windows OpenXR CI. No recenter runtime behavior was changed.",
-      "nextAction": "Quest3/VDXR exact-build CORRECTNESS test: trigger recenter in menu and gameplay, verify the visual transition is stable and recenters once without head-follow/double response, preserve startup progression and road/background/vehicle stereo, and confirm VIEW emergency fallback does not falsely acknowledge the request."
+      "nextAction": "Quest3/VDXR exact-build CORRECTNESS test: trigger recenter in menu and gameplay, verify the visual transition is stable and recenters once without head-follow/double response, preserve startup progression and road/background/vehicle stereo, and confirm VIEW emergency fallback does not falsely acknowledge the request.",
+      "reconciliationTaskId": "CONVERSION-DXVK-00043",
+      "reconciliationResultSha": "ebc079e072868450c15e896efa9e0486a0534220",
+      "reconciliationAutomationValidation": "PASS",
+      "reconciliationValidationRunId": 36548811439,
+      "reconciliationCompletedAtKst": "2026-09-29T18:29:43+09:00"
     },
     {
       "id": "L3-DX9EX-001",
