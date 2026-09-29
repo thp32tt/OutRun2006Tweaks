@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 37,
+  "completedCycles": 38,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "dc1a64dd83b1604706207b8b105f64abef1c3157",
+  "currentHead": "83984086dd658daaab9920d70317e9b5347e8249",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -1102,12 +1102,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "inspect rival marker vehicle/world anchor"
+    },
+    {
+      "cycle": 38,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "WorldBillboard and ProjectedWorldMarker2D are separate exact scopes; rival-car/world anchors must remain world/depth-aware while already-projected markers receive only the projected route. No static evidence supports merging these paths."
+      ],
+      "evidence": [
+        "render_semantics.hpp exact scopes + R30 semanticWorld path"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "83984086dd658daaab9920d70317e9b5347e8249"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "review SkyGlow failure fallback ordering"
     }
   ],
   "nextCycle": {
-    "cycle": 38,
+    "cycle": 39,
     "priority": [
-      "inspect rival marker vehicle/world anchor"
+      "review SkyGlow failure fallback ordering"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
