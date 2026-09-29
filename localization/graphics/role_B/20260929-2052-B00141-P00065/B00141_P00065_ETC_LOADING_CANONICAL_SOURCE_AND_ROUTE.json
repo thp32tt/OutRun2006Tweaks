@@ -1,0 +1,338 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-family-template-canonical-source-route-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00141",
+  "wave_id": "P00065",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T20:54:19.399+09:00",
+  "precommit_head_sha": "4202064ee1b45656ace1d98f6d9f844e65840a51",
+  "precommit_tree_sha": "d4fc719444d10a57191607f8bf5275fa983b83ec",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_SCHEMA9_ZERO_CANDIDATE_EXCEPTION_FOUR_EVEN_CANONICAL_SOURCE_REACQUISITION_AND_ROUTE_CLASSIFICATION",
+  "selection": {
+    "selected_indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "selected_assets": [
+      "AA04D779",
+      "B1696633",
+      "CBF8ECBF",
+      "33491F83"
+    ],
+    "families": {
+      "spr_sprani_etc_cvt_Exst": [
+        46,
+        48,
+        50
+      ],
+      "spr_sprani_loading_cvt_Exst": [
+        62
+      ]
+    },
+    "basis": "Fresh Q00019/C121 HEAD consumes B00134/B00136 as PREFLIGHT_ONLY and leaves B00138 QA-pending. No current B-even direct material rework, RENDER_READY, ONE_STAGE_TO_RENDER or non-QA-pending existing-candidate rewrite is available. C113 previously accepted B00100 Release-based v2 scope arithmetic for 46/48/50/62, but current canonical inventory proves all four are distinct 4x-smaller RGBA sources. This single fallback-4 batch converts those stale Release construction assumptions into exact canonical-source gates and family-route classifications."
+  },
+  "candidate_first_audit": {
+    "direct_rework_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "existing_candidate_material_rework_runnable": [],
+    "qa_pending_skipped": {
+      "LOCALIZATION-LOCALIZATION_B-00138": [
+        140,
+        152,
+        154,
+        164
+      ]
+    },
+    "c_consumed_preflight_only": {
+      "LOCALIZATION-LOCALIZATION_B-00134": [
+        212,
+        220,
+        222
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00136": [
+        34,
+        44,
+        52,
+        172
+      ]
+    },
+    "existing_candidate_runtime_or_dependency_backlog": [
+      12,
+      54,
+      60,
+      94,
+      102,
+      104,
+      116
+    ],
+    "zero_candidate_exception_applies": true,
+    "preflight_only_batches_this_invocation": 1
+  },
+  "acceleration_route": {
+    "mode": "QUALITY_PRESERVING_FAMILY_TEMPLATE_FAST_PATH",
+    "current_route": "EXCEPTION_QUEUE",
+    "family_clusters": {
+      "etc_common_ui": {
+        "indices": [
+          46,
+          48,
+          50
+        ],
+        "status": "HOLD_CANONICAL_ASSET_SPECIFIC_GEOMETRY_REQUIRED_BEFORE_TEMPLATE_STYLE_REUSE"
+      },
+      "loading_route_ui": {
+        "indices": [
+          62
+        ],
+        "status": "QUALITY_PATH_PREFERRED_AFTER_CANONICAL_SOURCE_DUE_PROTECTED_ROAD_ARROW_ARTWORK"
+      }
+    },
+    "semantic_translation_reuse": "CURRENT_CANONICAL_TRANSCRIPTIONS_REUSED_WITHOUT_RETRANSLATION",
+    "style_template_reuse_status": "HOLD_UNTIL_EXACT_CANONICAL_SOURCE_MASK_CLEAN_PLATE_SAFE_BBOX_AND_STYLE_COMPATIBILITY_PROVEN",
+    "asset_specific_geometry_required": true,
+    "quality_threshold_reduced": false
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "4d7b9dce5beaed4c8dd7fdf33794a288ca372ba7",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "e323daf9dba540cac5dd788bed79b1223a2bf055",
+    "resume_state_blob_sha": "8d66904b729bdd201d8859ad516ebc0ccedcaa12",
+    "worklog_blob_sha": "085a9578668d5d4fb31d646eb6bb0c38df6e88c6",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "b00100_task_record_blob_sha": "aab1006149ba741b4e0ebe6f0f14c79c66148b45",
+    "b00100_material_report_blob_sha": "33ed68198b6f90c6731bcfa2bd3dfd249c9b5962",
+    "c00106_q00011_task_record_blob_sha": "64878729481d9246bd7f000775892e006faad26a",
+    "c00106_q00011_report_blob_sha": "98ced09dbd3572e6a529e1eefed6445e9cd9ecc6",
+    "c00137_q00019_task_record_blob_sha": "0c707628e796d5a65af98adb26716df29ec77d96",
+    "b00138_qa_pending_task_record_blob_sha": "ca066a6ae2370cc9f9744dd09e71cd562d66e5f6"
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_PLUS_FAMILY_ROUTE_CLASSIFICATION",
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "current_canonical_semantic_entries_reused": 42,
+    "c113_mapped_physical_occurrences_reused": 40,
+    "unresolved_index50_semantics_retained": 4,
+    "release_geometry_sets_demoted_from_canonical_authority": 4,
+    "exact_hash_gated_acquisition_pipelines_created": 4,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_asset_named_candidate_or_source_hits": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "schema9_zero_candidate_exception_proven": true
+  },
+  "assets": [
+    {
+      "queue_index": 46,
+      "asset": "AA04D779",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "canonical": {
+        "sha256": "5a4ca513da3545b7da91e62fd27692f39fc211a93983122a193db79c254f28b0",
+        "dimensions": [
+          512,
+          512
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mip_count": 1
+      },
+      "source_relation": "CANVAS_MISMATCH_CANONICAL_512x512_VS_RELEASE_2048x2048",
+      "canonical_semantic_entries": 21,
+      "c113_mapped_physical_occurrences": 21,
+      "unresolved_semantics": [],
+      "protected_artwork": [
+        "REV/TOP/player-number labels and non-text course icons/artwork"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "future_route": "EVALUATE_FAST_PATH_VS_QUALITY_PATH_AFTER_CANONICAL_ASSET_SPECIFIC_GEOMETRY"
+    },
+    {
+      "queue_index": 48,
+      "asset": "B1696633",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
+      "canonical": {
+        "sha256": "b06b18fe33b53b3af87a9c7ae185febf86dcaa7e6b365ba41f20235fa3526a2b",
+        "dimensions": [
+          512,
+          512
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "cf1c92d295191bf955b9bb1614860614965529f2",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mip_count": 1
+      },
+      "source_relation": "CANVAS_MISMATCH_CANONICAL_512x512_VS_RELEASE_2048x2048",
+      "canonical_semantic_entries": 9,
+      "c113_mapped_physical_occurrences": 9,
+      "unresolved_semantics": [],
+      "protected_artwork": [
+        "numeric/rank glyphs, arrows/icons, bars and non-text UI artwork"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "future_route": "EVALUATE_FAST_PATH_VS_QUALITY_PATH_AFTER_CANONICAL_ASSET_SPECIFIC_GEOMETRY"
+    },
+    {
+      "queue_index": 50,
+      "asset": "CBF8ECBF",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "canonical": {
+        "sha256": "9fa88fb50e7f81d27adac4fddee532b7513ba7e07cfa08e210e0c6e9b8b1bc8e",
+        "dimensions": [
+          1024,
+          512
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "8aa143bb3518713687bdaf565101bc0a437fc2ed",
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "mip_count": 1
+      },
+      "source_relation": "CANVAS_MISMATCH_CANONICAL_1024x512_VS_RELEASE_4096x2048",
+      "canonical_semantic_entries": 7,
+      "c113_mapped_physical_occurrences": 3,
+      "unresolved_semantics": [
+        [
+          "PLEASE WAIT",
+          "잠시만요"
+        ],
+        [
+          "PLAYERS",
+          "플레이어"
+        ],
+        [
+          "YOUR FRIENDS",
+          "내 친구"
+        ],
+        [
+          "FRIEND REQUEST",
+          "친구 요청"
+        ]
+      ],
+      "protected_artwork": [
+        "controller/steering-wheel art, rank ordinals, Ferrari/logo artwork and all non-target UI panels"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "future_route": "EVALUATE_FAST_PATH_VS_QUALITY_PATH_AFTER_CANONICAL_ASSET_SPECIFIC_GEOMETRY"
+    },
+    {
+      "queue_index": 62,
+      "asset": "33491F83",
+      "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+      "canonical": {
+        "sha256": "b7c391e5edfef06dd5dc15d3028ce76edfdda70d8137b32e863e76228e9037ca",
+        "dimensions": [
+          512,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "00a94c32cc35fc773ceed0ece6d1f2f64da841f5",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "format": "RGBA32",
+        "mip_count": 1
+      },
+      "source_relation": "CANVAS_MISMATCH_CANONICAL_512x256_VS_RELEASE_2048x1024",
+      "canonical_semantic_entries": 5,
+      "c113_mapped_physical_occurrences": 7,
+      "unresolved_semantics": [],
+      "protected_artwork": [
+        "road geometry, arrows, signals and all non-text loading artwork"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "future_route": "QUALITY_PATH_PREFERRED_AFTER_CANONICAL_SOURCE_DUE_PROTECTED_ROAD_ARROW_ARTWORK"
+    }
+  ],
+  "canonical_reacquisition_gate": [
+    "Acquire/import the exact canonical user-HD DDS matching canonical SHA-256.",
+    "Verify exact SHA-256 equality before using any header, orientation, cell, mask or prior Release geometry.",
+    "Decode canonical DDS dimensions, format/compression, alpha/transparency and mip behavior.",
+    "Rebind semantics against canonical pixels; prior Release coordinates are conditional reconstruction evidence only.",
+    "Measure canonical effect-inclusive source bboxes and asset-specific removal/protected-art masks.",
+    "Create CLEAN_PLATE only inside measured removal masks with zero outside-mask/protected-art/alpha collateral.",
+    "Derive v2 candidate_safe_bbox from canonical geometry, then classify FAST_PATH vs QUALITY_PATH from evidence-backed style compatibility.",
+    "Render, native-resolution measure and refit in the same invocation; never resize flattened Korean text to force fit.",
+    "Run final DDS/header/alpha/orientation, zero-pixel containment, residual-English and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+    "Keep runtime_validation UNTESTED until user real-game evidence exists."
+  ],
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_ONLY_46_48_50_62",
+    "current_queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_inventory": "PASS_4_OF_4_CURRENT_SHA256_CANVAS_RGBA_IDENTITIES",
+    "canonical_semantics": "PASS_42_CURRENT_TRANSLATION_ENTRIES",
+    "c113_prior_scope_reuse": "PASS_40_MAPPED_PHYSICAL_OCCURRENCES_REUSED_WITHOUT_REPEATING_HEAVY_QA",
+    "unresolved_bindings": "HOLD_4_INDEX50_SEMANTICS_FAIL_CLOSED",
+    "canonical_vs_release": "PASS_4_OF_4_RELEASE_CANVASES_ARE_4X_CURRENT_CANONICAL_AND_DEMOTED_FROM_AUTHORITY",
+    "family_fast_path": "PASS_ROUTE_CLASSIFICATION_ONLY__NO_STYLE_OR_GEOMETRY_COPY_WITHOUT_CANONICAL_PROOF",
+    "current_git_source_presence": "PASS_4_OF_4_QUEUE_PATHS_ABSENT_AND_ZERO_ASSET_NAMED_TREE_HITS",
+    "heavy_qa_repeated": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS__INDEX50_FOUR_BINDINGS_UNRESOLVED",
+    "source_effect_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "removal_and_protected_masks": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "style_template_compatibility": "HOLD_ASSET_SPECIFIC_PROOF_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

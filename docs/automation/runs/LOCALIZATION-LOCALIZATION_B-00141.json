@@ -1,0 +1,112 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00141",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00065",
+  "recorded_at_kst": "2026-09-29T20:54:19.399+09:00",
+  "base_sha": "4202064ee1b45656ace1d98f6d9f844e65840a51",
+  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_SCHEMA9_ZERO_CANDIDATE_EXCEPTION_FOUR_EVEN_CANONICAL_SOURCE_REACQUISITION_AND_ROUTE_CLASSIFICATION",
+  "summary": "Applied current schema9 candidate-completion-first plus quality-preserving family/template routing at fresh Q00019/C121 HEAD. B00138 is still QA-pending and was skipped. No B-even direct rework, RENDER_READY, ONE_STAGE_TO_RENDER or non-QA-pending candidate rewrite can legally advance from current Git evidence. This single fallback-4 batch advances indices 46/48/50/62 by pinning current canonical user-HD SHA-256/canvas/RGBA identities, retiring C113-accepted Release geometry as construction authority because all four Release canvases are 4x the canonical inventory, retaining 42 current translation entries with 40 previously mapped physical occurrences and four index50 unresolved bindings, and recording family-route decisions without copying style/geometry. Exact canonical sources are absent, so no DDS/shared-state/build/runtime changes.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-2052-B00141-P00065/B00141_P00065_ETC_LOADING_CANONICAL_SOURCE_AND_ROUTE.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_PLUS_FAMILY_ROUTE_CLASSIFICATION",
+    "indices": [
+      46,
+      48,
+      50,
+      62
+    ],
+    "assets": [
+      "AA04D779",
+      "B1696633",
+      "CBF8ECBF",
+      "33491F83"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "current_canonical_semantic_entries_reused": 42,
+    "c113_mapped_physical_occurrences_reused": 40,
+    "unresolved_index50_semantics_retained": 4,
+    "release_geometry_sets_demoted_from_canonical_authority": 4,
+    "exact_hash_gated_acquisition_pipelines_created": 4,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_asset_named_candidate_or_source_hits": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "schema9_zero_candidate_exception_proven": true
+  },
+  "acceleration_route": {
+    "mode": "QUALITY_PRESERVING_FAMILY_TEMPLATE_FAST_PATH",
+    "current_route": "EXCEPTION_QUEUE",
+    "family_clusters": {
+      "spr_sprani_etc_cvt_Exst": [
+        46,
+        48,
+        50
+      ],
+      "spr_sprani_loading_cvt_Exst": [
+        62
+      ]
+    },
+    "semantic_translation_reuse": "CURRENT_CANONICAL_TRANSCRIPTIONS_REUSED_WITHOUT_RETRANSLATION",
+    "style_template_reuse_status": "HOLD_UNTIL_EXACT_CANONICAL_SOURCE_MASK_CLEAN_PLATE_SAFE_BBOX_AND_STYLE_COMPATIBILITY_PROVEN",
+    "asset_specific_geometry_required": true,
+    "quality_threshold_reduced": false
+  },
+  "reused_immutable_evidence": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "4d7b9dce5beaed4c8dd7fdf33794a288ca372ba7",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "e323daf9dba540cac5dd788bed79b1223a2bf055",
+    "resume_state_blob_sha": "8d66904b729bdd201d8859ad516ebc0ccedcaa12",
+    "worklog_blob_sha": "085a9578668d5d4fb31d646eb6bb0c38df6e88c6",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "b00100_task_record_blob_sha": "aab1006149ba741b4e0ebe6f0f14c79c66148b45",
+    "b00100_material_report_blob_sha": "33ed68198b6f90c6731bcfa2bd3dfd249c9b5962",
+    "c00106_q00011_task_record_blob_sha": "64878729481d9246bd7f000775892e006faad26a",
+    "c00106_q00011_report_blob_sha": "98ced09dbd3572e6a529e1eefed6445e9cd9ecc6",
+    "c00137_q00019_task_record_blob_sha": "0c707628e796d5a65af98adb26716df29ec77d96",
+    "b00138_qa_pending_task_record_blob_sha": "ca066a6ae2370cc9f9744dd09e71cd562d66e5f6"
+  },
+  "self_qa": "PASS_SCHEMA9_FRESH_Q00019_SCAN__EVEN_ONLY_46_48_50_62__4_CANONICAL_IDENTITIES__42_TRANSLATION_ENTRIES__40_C113_MAPPED_PHYSICAL_OCCURRENCES_REUSED__4_INDEX50_BINDINGS_HELD__4_RELEASE_4X_CANVASES_DEMOTED__FAMILY_ROUTE_CLASSIFICATION_ONLY__ATOMIC_REPORT_AND_TASK_RECORD__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CURRENT_CANONICAL_V2_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Exact canonical user-HD DDS bytes matching the current inventory SHA-256 identities are absent from current Git HEAD. All four prior Release sources are 4x the canonical inventory canvas, so C113's accepted Release payload/cell arithmetic remains historical/conditional reconstruction evidence only and cannot authorize canonical pixel masks, CLEAN_PLATE, safe bboxes or Korean rendering. Index50 also retains four unresolved semantic bindings. The schema9 family fast path cannot waive asset-specific canonical source and final QA gates.",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS__INDEX50_FOUR_BINDINGS_UNRESOLVED",
+    "source_effect_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "removal_and_protected_masks": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "style_template_compatibility": "HOLD_ASSET_SPECIFIC_PROOF_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
