@@ -243,6 +243,10 @@ require_all("src/hooks_uiscaling.cpp", [
     '0x975EE, 0x97727, 0x977FB',
     'R71OutRunPrintEnter',
     'R71OutRunPrintLeave',
+    'R71OutRunPrintTailsBefore',
+    'R70TagAppendedSpriteNodes(',
+    'R71OutRunStageTaggedNodes',
+    'exact Sumo_Printf queue nodes pinned SCREEN_HUD',
 ], "P8_R71_RIVAL_AND_OUTRUN_STAGE_TEXT")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
