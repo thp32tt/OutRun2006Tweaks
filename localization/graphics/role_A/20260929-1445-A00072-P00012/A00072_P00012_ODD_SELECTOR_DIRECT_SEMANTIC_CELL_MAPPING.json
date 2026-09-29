@@ -1,0 +1,1000 @@
+{
+  "schema_version": 10,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00072",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "attempt": "1/3",
+  "wave_id": "P00012",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T14:45:27+09:00",
+  "selection_head_sha": "c279b702e6284933710094132ce0a00d5b471109",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "automation_contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "79a97c8ed6aa5fedee71f1f405483fa737e77306",
+    "transcriptions_blob_sha": "7e3400fa7453abf41d1a5af20825c76ebe46af73",
+    "artwork_plan_blob_sha": "a853cb8b2d872c9863f9f8ce2e0c76ec502f591c",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "selection": {
+    "selected_indices": [
+      95,
+      101
+    ],
+    "selected_assets": [
+      "37759842",
+      "560FA536"
+    ],
+    "reason": "Both are odd-shard pending localize_text assets already consumed by Q00001/C103 from A00056. This advances the unresolved semantic-to-cell stage without repeating candidate-only heavy QA."
+  },
+  "prior_heavy_qa_reuse": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00056",
+    "producer_result_sha": "f6f1646a9369ebab33691b45a5df496993758b8f",
+    "reused": [
+      "exact Release DDS identity",
+      "decoded stock PNG identity",
+      "stock/4x atlas identity",
+      "canonical translation review"
+    ],
+    "candidate_heavy_checks_repeated": false
+  },
+  "assets": [
+    {
+      "queue_index": 95,
+      "asset": "37759842",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "source_objects": {
+        "release_dds": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+        "decoded_stock_png": "02534e3285537142581a06bb5b4dc4d76a32925e",
+        "stock_atlas": "85d0c4d980c537e16170c51724433cbeeaf202bd",
+        "hd4_atlas": "581d42b49da9b882f2a54cdfef7675d147afacaa"
+      },
+      "atlas_regions_total": 87,
+      "canonical_semantics_count": 20,
+      "mapped_physical_occurrences": 28,
+      "mapping_status": "PASS_20_OF_20_CANONICAL__28_PHYSICAL_OCCURRENCES",
+      "mapping_basis": "DIRECT_DECODED_STOCK_ENGLISH_SOURCE_VISUAL_PLUS_EXACT_STOCK_TO_4X_ATLAS_GEOMETRY",
+      "evidence_png": "localization/graphics/role_A/20260929-1445-A00072-P00012/A00072_95_37759842_ENGLISH_SOURCE.png",
+      "mappings": [
+        {
+          "source": "For Expert Drivers : The car is difficult to control.",
+          "korean": "상급자용: 조작이 어려운 차량입니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_465",
+              "stock_cell": [
+                0,
+                10,
+                406,
+                30
+              ],
+              "hd_4x_cell": [
+                0,
+                40,
+                1624,
+                120
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "For Experts : Gear changes are required.",
+          "korean": "상급자용: 기어 변속이 필요합니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_466",
+              "stock_cell": [
+                406,
+                10,
+                338,
+                30
+              ],
+              "hd_4x_cell": [
+                1624,
+                40,
+                1352,
+                120
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Tuned",
+          "korean": "튜닝",
+          "occurrences": [
+            {
+              "sprite": "sprite_467",
+              "stock_cell": [
+                744,
+                10,
+                98,
+                30
+              ],
+              "hd_4x_cell": [
+                2976,
+                40,
+                392,
+                120
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Manual",
+          "korean": "수동",
+          "occurrences": [
+            {
+              "sprite": "sprite_464",
+              "stock_cell": [
+                700,
+                52,
+                138,
+                34
+              ],
+              "hd_4x_cell": [
+                2800,
+                208,
+                552,
+                136
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Please stand by.",
+          "korean": "잠시 기다려 주세요.",
+          "occurrences": [
+            {
+              "sprite": "sprite_445",
+              "stock_cell": [
+                0,
+                132,
+                386,
+                50
+              ],
+              "hd_4x_cell": [
+                0,
+                528,
+                1544,
+                200
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Waiting for entries.",
+          "korean": "참가자를 기다리는 중입니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_443",
+              "stock_cell": [
+                0,
+                182,
+                390,
+                54
+              ],
+              "hd_4x_cell": [
+                0,
+                728,
+                1560,
+                216
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Entry has been closed.",
+          "korean": "참가 접수가 종료되었습니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_444",
+              "stock_cell": [
+                390,
+                186,
+                460,
+                50
+              ],
+              "hd_4x_cell": [
+                1560,
+                744,
+                1840,
+                200
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Manual Transmission",
+          "korean": "수동 변속",
+          "occurrences": [
+            {
+              "sprite": "sprite_446",
+              "stock_cell": [
+                386,
+                132,
+                90,
+                50
+              ],
+              "hd_4x_cell": [
+                1544,
+                528,
+                360,
+                200
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Automatic Transmission",
+          "korean": "자동 변속",
+          "occurrences": [
+            {
+              "sprite": "sprite_447",
+              "stock_cell": [
+                476,
+                132,
+                90,
+                50
+              ],
+              "hd_4x_cell": [
+                1904,
+                528,
+                360,
+                200
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Real Player Only",
+          "korean": "실제 플레이어 전용",
+          "occurrences": [
+            {
+              "sprite": "sprite_448",
+              "stock_cell": [
+                566,
+                132,
+                90,
+                50
+              ],
+              "hd_4x_cell": [
+                2264,
+                528,
+                360,
+                200
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "操作が難しい車です。",
+          "korean": "조작이 어려운 차량입니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_441",
+              "stock_cell": [
+                262,
+                242,
+                256,
+                64
+              ],
+              "hd_4x_cell": [
+                1048,
+                968,
+                1024,
+                256
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "上級者向け",
+          "korean": "상급자용",
+          "occurrences": [
+            {
+              "sprite": "sprite_442",
+              "stock_cell": [
+                518,
+                242,
+                256,
+                64
+              ],
+              "hd_4x_cell": [
+                2072,
+                968,
+                1024,
+                256
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Heart Attack Mode",
+          "korean": "하트 어택 모드",
+          "occurrences": [
+            {
+              "sprite": "sprite_389",
+              "stock_cell": [
+                584,
+                804,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                2336,
+                3216,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_392",
+              "stock_cell": [
+                438,
+                914,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                1752,
+                3656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "occurrences": [
+            {
+              "sprite": "sprite_390",
+              "stock_cell": [
+                146,
+                914,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                584,
+                3656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_393",
+              "stock_cell": [
+                584,
+                914,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                2336,
+                3656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드",
+          "occurrences": [
+            {
+              "sprite": "sprite_429",
+              "stock_cell": [
+                910,
+                624,
+                98,
+                70
+              ],
+              "hd_4x_cell": [
+                3640,
+                2496,
+                392,
+                280
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_388",
+              "stock_cell": [
+                438,
+                804,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                1752,
+                3216,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_391",
+              "stock_cell": [
+                292,
+                914,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                1168,
+                3656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "YES",
+          "korean": "예",
+          "occurrences": [
+            {
+              "sprite": "sprite_425",
+              "stock_cell": [
+                666,
+                412,
+                98,
+                70
+              ],
+              "hd_4x_cell": [
+                2664,
+                1648,
+                392,
+                280
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_384",
+              "stock_cell": [
+                876,
+                914,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                3504,
+                3656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "NO",
+          "korean": "아니오",
+          "occurrences": [
+            {
+              "sprite": "sprite_426",
+              "stock_cell": [
+                764,
+                412,
+                98,
+                70
+              ],
+              "hd_4x_cell": [
+                3056,
+                1648,
+                392,
+                280
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_385",
+              "stock_cell": [
+                0,
+                804,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                0,
+                3216,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "RANDOM",
+          "korean": "무작위",
+          "occurrences": [
+            {
+              "sprite": "sprite_411",
+              "stock_cell": [
+                520,
+                588,
+                130,
+                106
+              ],
+              "hd_4x_cell": [
+                2080,
+                2352,
+                520,
+                424
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Time Attack Mode 15 continuous course",
+          "korean": "타임 어택 모드 15코스 연속",
+          "occurrences": [
+            {
+              "sprite": "sprite_427",
+              "stock_cell": [
+                862,
+                412,
+                98,
+                70
+              ],
+              "hd_4x_cell": [
+                3448,
+                1648,
+                392,
+                280
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_386",
+              "stock_cell": [
+                146,
+                804,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                584,
+                3216,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "OutRun Mode 15 continuous course",
+          "korean": "아웃런 모드 15코스 연속",
+          "occurrences": [
+            {
+              "sprite": "sprite_428",
+              "stock_cell": [
+                910,
+                518,
+                98,
+                70
+              ],
+              "hd_4x_cell": [
+                3640,
+                2072,
+                392,
+                280
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_387",
+              "stock_cell": [
+                292,
+                804,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                1168,
+                3216,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        }
+      ],
+      "preserve_original": [
+        "Ferrari/model names",
+        "song/music titles",
+        "brand logos",
+        "non-text artwork outside future exact text/effect masks"
+      ],
+      "exact_hd_full_effect_bbox": "HOLD_STRICT_RECHECK",
+      "raw_orientation_slant": "HOLD_EXACT_HD_DECODED_SOURCE",
+      "candidate_dds_written": false
+    },
+    {
+      "queue_index": 101,
+      "asset": "560FA536",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "source_objects": {
+        "release_dds": "1e95df72109411fb1f9c398445db583ed31de2a1",
+        "decoded_stock_png": "a746ee3dd7bfe917f11a204ac4beba46b62e88d8",
+        "stock_atlas": "274d4c51c5ae7ece7f182f24009f32e217c1d005",
+        "hd4_atlas": "90b0122b7fdc44a553eff3f3e83278725ad0f24b"
+      },
+      "atlas_regions_total": 48,
+      "canonical_semantics_count": 12,
+      "mapped_physical_occurrences": 13,
+      "mapping_status": "PASS_12_OF_12_CANONICAL__13_PHYSICAL_OCCURRENCES",
+      "mapping_basis": "DIRECT_DECODED_STOCK_ENGLISH_SOURCE_VISUAL_PLUS_EXACT_STOCK_TO_4X_ATLAS_GEOMETRY",
+      "evidence_png": "localization/graphics/role_A/20260929-1445-A00072-P00012/A00072_101_560FA536_ENGLISH_SOURCE.png",
+      "mappings": [
+        {
+          "source": "Every player must participate at the same time to play this mode.",
+          "korean": "이 모드를 플레이하려면 모든 플레이어가 동시에 참가해야 합니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_116",
+              "stock_cell": [
+                724,
+                2,
+                262,
+                42
+              ],
+              "hd_4x_cell": [
+                2896,
+                8,
+                1048,
+                168
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Time Attack Mode",
+          "korean": "타임 어택 모드",
+          "occurrences": [
+            {
+              "sprite": "sprite_118",
+              "stock_cell": [
+                724,
+                56,
+                202,
+                30
+              ],
+              "hd_4x_cell": [
+                2896,
+                224,
+                808,
+                120
+              ],
+              "atlas_rotated": false
+            },
+            {
+              "sprite": "sprite_119",
+              "stock_cell": [
+                724,
+                98,
+                202,
+                30
+              ],
+              "hd_4x_cell": [
+                2896,
+                392,
+                808,
+                120
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "中級者向けの車です。",
+          "korean": "중급자용 차량입니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_107",
+              "stock_cell": [
+                0,
+                128,
+                256,
+                64
+              ],
+              "hd_4x_cell": [
+                0,
+                512,
+                1024,
+                256
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "To switch to \"Single Player Mode\", press the \"View Change Button\" and the \"Brake Pedal\" at the same time.",
+          "korean": "싱글 플레이 모드로 전환하려면 시점 변경 버튼과 브레이크 페달을 동시에 누르세요.",
+          "occurrences": [
+            {
+              "sprite": "sprite_109",
+              "stock_cell": [
+                318,
+                146,
+                462,
+                46
+              ],
+              "hd_4x_cell": [
+                1272,
+                584,
+                1848,
+                184
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "You will run 15 courses continuously.",
+          "korean": "15코스를 연속으로 달립니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_122",
+              "stock_cell": [
+                780,
+                166,
+                234,
+                26
+              ],
+              "hd_4x_cell": [
+                3120,
+                664,
+                936,
+                104
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "The distance to the final goal will be very long.",
+          "korean": "최종 골까지의 거리가 매우 깁니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_121",
+              "stock_cell": [
+                550,
+                208,
+                290,
+                26
+              ],
+              "hd_4x_cell": [
+                2200,
+                832,
+                1160,
+                104
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Steering Wheel :",
+          "korean": "스티어링 휠:",
+          "occurrences": [
+            {
+              "sprite": "sprite_129",
+              "stock_cell": [
+                840,
+                216,
+                138,
+                18
+              ],
+              "hd_4x_cell": [
+                3360,
+                864,
+                552,
+                72
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "初級者向けの車です。",
+          "korean": "초급자용 차량입니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_106",
+              "stock_cell": [
+                550,
+                234,
+                256,
+                64
+              ],
+              "hd_4x_cell": [
+                2200,
+                936,
+                1024,
+                256
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "Versus Special Course has been selected.",
+          "korean": "대전 스페셜 코스가 선택되었습니다.",
+          "occurrences": [
+            {
+              "sprite": "sprite_117",
+              "stock_cell": [
+                350,
+                376,
+                554,
+                34
+              ],
+              "hd_4x_cell": [
+                1400,
+                1504,
+                2216,
+                136
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "TUNED",
+          "korean": "튜닝",
+          "occurrences": [
+            {
+              "sprite": "sprite_96",
+              "stock_cell": [
+                826,
+                664,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                3304,
+                2656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "NORMAL",
+          "korean": "일반",
+          "occurrences": [
+            {
+              "sprite": "sprite_97",
+              "stock_cell": [
+                700,
+                914,
+                146,
+                110
+              ],
+              "hd_4x_cell": [
+                2800,
+                3656,
+                584,
+                440
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        },
+        {
+          "source": "RANDOM",
+          "korean": "무작위",
+          "occurrences": [
+            {
+              "sprite": "sprite_99",
+              "stock_cell": [
+                0,
+                192,
+                130,
+                106
+              ],
+              "hd_4x_cell": [
+                0,
+                768,
+                520,
+                424
+              ],
+              "atlas_rotated": false
+            }
+          ]
+        }
+      ],
+      "preserve_original": [
+        "song titles",
+        "speed values",
+        "course imagery/icons",
+        "OutRun2 logo",
+        "non-text artwork outside future exact text/effect masks"
+      ],
+      "exact_hd_full_effect_bbox": "HOLD_STRICT_RECHECK",
+      "raw_orientation_slant": "HOLD_EXACT_HD_DECODED_SOURCE",
+      "candidate_dds_written": false
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_95_101",
+    "work_steal": "NONE",
+    "prior_producer_qa_pending_dedup": "PASS_A00056_ALREADY_CONSUMED_Q00001__CURRENT_A64_A68_A70_NOT_SELECTED",
+    "canonical_translation_match": "PASS_32_OF_32_CURRENT_TRANSCRIPTION_EQUALS_ARTWORK_PLAN",
+    "direct_visual_mapping": "PASS_41_PHYSICAL_OCCURRENCES",
+    "immutable_source_identity": "PASS_8_OF_8_GITHUB_OBJECTS",
+    "atlas_geometry": "PASS_135_OF_135_STOCK_TO_4X_REGIONS",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_EXACT_HD_PER_ELEMENT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_ODD_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "next_safe_action": [
+    "Decode only the 41 mapped exact-HD Release occurrences and measure full glyph/effect bboxes including outline/shadow/alpha fringe.",
+    "Record raw DDS orientation/slant per occurrence without inferring it from normalized PNG evidence.",
+    "Build exact-HD text-only clean plates while protecting model/song/logo/icon artwork.",
+    "Only then render Korean and run zero-pixel containment plus identical-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA."
+  ],
+  "material_advance": {
+    "fallback_step": 4,
+    "deliverable_type": "TWO_ODD_SELECTOR_DIRECT_SEMANTIC_TO_CELL_MAPPING_INPUTS",
+    "assets_advanced": 2,
+    "canonical_semantics_mapped": 32,
+    "physical_occurrences_mapped": 41,
+    "exact_atlas_regions_verified": 135,
+    "candidate_dds_written": false
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_TWO_ODD_SELECTOR_DIRECT_SEMANTIC_CELL_MAPPINGS",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
