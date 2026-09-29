@@ -12,7 +12,7 @@ CONTRACT = ROOT / "src" / "vr" / "game" / "disasm_render_contract.hpp"
 HUD = ROOT / "src" / "vr" / "hud_semantics.hpp"
 RUNTIME_SEMANTICS = ROOT / "src" / "vr" / "game" / "render_semantics.hpp"
 OUTRUN_RENDERER = ROOT / "src" / "vr" / "game" / "outrun_renderer.cpp"
-R30_RENDERER = ROOT / "src" / "vr" / "d3d9" / "stereo_renderer_r30.cpp"
+R30_RENDERER = ROOT / "src" / "vr" / "d3d9" / "stereo_renderer_r30_overlay.inc"
 ANALYZER = ROOT / "tools" / "analyze_outrun_exe.py"
 
 ENTRY_RE = re.compile(
