@@ -1,0 +1,56 @@
+name: Localization A00182 Index237 Producer
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00182.dispatch.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-a00182-index237
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+      - name: Refresh branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --ff-only origin korean-localization-clean
+      - name: Install deterministic dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig fonts-noto-cjk-extra
+          python -m pip install --disable-pip-version-check pillow numpy
+      - name: Produce index237 candidate
+        run: python tools/localization/a00182_index237.py
+      - name: Commit result and remove helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/localization-a00182-index237.yml
+          git rm tools/localization/a00182_index237.py
+          git rm docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00182.dispatch.json
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00182.json
+          git add localization/graphics/role_A/20260930-A00182-P00092
+          git add localization/graphics/KOREAN_PNG_REVIEW/FF514CEB
+          git add localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds
+          git commit -m "localization(A): complete index237 RGBA32 Korean candidate [AUTO:LOCALIZATION-LOCALIZATION_A-00182]"
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
