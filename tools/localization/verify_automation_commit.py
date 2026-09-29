@@ -69,8 +69,15 @@ if dds:
     for rel,d in records:
         if all(k in d for k in required_post_reset):
             seen_post_reset=True
-            if d.get("prompt_contract")!="outrun-first-pass-edit-v1":
+            prompt_contract=str(d.get("prompt_contract",""))
+            if prompt_contract not in {"outrun-first-pass-edit-v1","outrun-first-pass-edit-v2"}:
                 bad.append(f"{rel}:invalid_prompt_contract")
+            try:
+                schema_version=int(d.get("schema_version",0) or 0)
+            except Exception:
+                schema_version=0
+            if schema_version >= 10 and prompt_contract != "outrun-first-pass-edit-v2":
+                bad.append(f"{rel}:schema_v{schema_version}_requires_v2_prompt_contract")
             if len(str(d.get("prompt_sha256","")))!=64 or len(str(d.get("prompt_json_sha256","")))!=64:
                 bad.append(f"{rel}:invalid_prompt_hash")
             if d.get("signed_slant_gate")!="PASS":
