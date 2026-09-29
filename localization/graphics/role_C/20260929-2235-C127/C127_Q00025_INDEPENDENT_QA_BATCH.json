@@ -1,0 +1,258 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-independent-c-batch-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00156",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_RECONCILIATION",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00025",
+  "qa_batch_id": "Q00025",
+  "run": "C127",
+  "recorded_at_kst": "2026-09-29T22:35:10+09:00",
+  "base_head_sha": "438a8a52c80faec5953a8246158b7b0ee29cbcfe",
+  "base_head_message": "localization: align queue contract with current controller schema",
+  "result": "PASS_Q00025_TWO_INPUTS_PASS_INDEX99_EFFECT_BOUNDARY_REPRODUCED_INDEX152_EXACT_RLE_REPRODUCED_NO_DDS_RUNTIME_UNTESTED",
+  "summary": "Independent C batch consumed A00151/index99 and B00152/index152 exactly once. Both immutable producer inputs PASS for limited PREFLIGHT_ONLY_NARROWED material: index99 threshold-18 effect boundary plus its alpha-positive 1px protected ring and index152 four per-pixel removal masks plus exact RLE/protection complements are independently reproduced from exact canonical pinned BC3 sources. No Korean DDS candidate exists, so CLEAN_PLATE/style/render/candidate gates remain held and runtime remains untested. Shared state is reconciled once at the refreshed HEAD; newer producer work is preserved as disjoint.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00151",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "72376e0e16fc667be2b4a5fdc39ed867c92adbd5",
+      "result_message": "localization(A): narrow index99 effect mask boundary [AUTO:LOCALIZATION-LOCALIZATION_A-00151]",
+      "completed_at": "2026-09-29T22:14:48.927751+09:00",
+      "producer_id": "P00071",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00152",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "e6121711fa1ecf28ef47155796485183e88f0292",
+      "result_message": "localization(B): materialize index152 masks and style preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00152]",
+      "completed_at": "2026-09-29T22:22:05.002640+09:00",
+      "producer_id": "P00072",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00151",
+      "result_sha": "72376e0e16fc667be2b4a5fdc39ed867c92adbd5",
+      "status": "PASS",
+      "reason": "Durable exact producer record/evidence exists at immutable A00151@72376e0. C independently re-fetched pinned blob eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8 for index99 and confirmed DDS 2048x256 DXT5/BC3 mip1, 524416 bytes, matching the C125-accepted canonical source fingerprint. Round-nearest BC3 color decode independently reproduces the threshold-18 rule exactly: protected 10px panel-edge max luminance 17.482; 42774 selected effect pixels; line1 24228 bbox [527,52,1601,120]; line2 18546 bbox [542,136,1340,208]. The alpha-positive 8-neighbor 1px outside ring reproduces 13263 pixels with RGB4 003=13255, 002=5, 000=3 and max luminance 17.482. PASS is limited to effect-boundary preflight. Final materialized removal/protected masks, CLEAN_PLATE, style, Korean DDS and candidate-only containment/source-comparison gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00152",
+      "result_sha": "e6121711fa1ecf28ef47155796485183e88f0292",
+      "status": "PASS",
+      "reason": "Durable exact producer record plus both lane-local artifacts exist at immutable B00152@e612171. C independently re-fetched pinned blob 0288babbb9c70e8f092bdd15561db4cadc19dcb3 for index152 and confirmed DDS 512x128 DXT5/BC3 mip1, 65664 bytes, matching the C125-accepted canonical source fingerprint. Direct BC3 decode plus the producer rule reproduces all four masks exactly: PRO. 1688 bbox [18,7,104,41], INS. 1546 [136,6,214,41], G.M. 1449 [252,7,333,41], E.R. 1193 [374,8,444,40]. The union is exactly 5876 pixels and 556 RLE runs and matches the stored removal_union; clean-plate protected complement totals 59660 pixels, candidate-allowed union 8912, final protected complement 56624, with '89/'86 explicitly edit-forbidden. PASS is limited to mask/protection/style preflight; CLEAN_PLATE, final signed-slant lock, Korean DDS and candidate-only gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "current_qa_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+  "current_controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+  "independent_source_rechecks": {
+    "index99": {
+      "asset": "4F68708E",
+      "upstream_path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+      "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+      "bytes": 524416,
+      "dds": {
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "effect_boundary": {
+        "threshold_luminance": 18,
+        "protected_panel_edge_max_luminance": 17.482,
+        "selected_pixels": 42774,
+        "line1": {
+          "pixels": 24228,
+          "bbox_ltrb_exclusive": [
+            527,
+            52,
+            1601,
+            120
+          ]
+        },
+        "line2": {
+          "pixels": 18546,
+          "bbox_ltrb_exclusive": [
+            542,
+            136,
+            1340,
+            208
+          ]
+        },
+        "outside_ring_connectivity": 8,
+        "outside_ring_alpha_filter": "alpha>0",
+        "outside_ring_pixels": 13263,
+        "outside_ring_rgb4": {
+          "003": 13255,
+          "002": 5,
+          "000": 3
+        },
+        "outside_ring_max_luminance": 17.482,
+        "result": "PASS_EXACT_PRODUCER_RULE_REPRODUCTION"
+      }
+    },
+    "index152": {
+      "asset": "49BB5FE5",
+      "upstream_path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+      "bytes": 65664,
+      "dds": {
+        "width": 512,
+        "height": 128,
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "elements": [
+        {
+          "source": "PRO.",
+          "korean": "프로",
+          "pixels": 1688,
+          "bbox_ltrb_exclusive": [
+            18,
+            7,
+            104,
+            41
+          ]
+        },
+        {
+          "source": "INS.",
+          "korean": "연주",
+          "pixels": 1546,
+          "bbox_ltrb_exclusive": [
+            136,
+            6,
+            214,
+            41
+          ]
+        },
+        {
+          "source": "G.M.",
+          "korean": "기타",
+          "pixels": 1449,
+          "bbox_ltrb_exclusive": [
+            252,
+            7,
+            333,
+            41
+          ]
+        },
+        {
+          "source": "E.R.",
+          "korean": "유로",
+          "pixels": 1193,
+          "bbox_ltrb_exclusive": [
+            374,
+            8,
+            444,
+            40
+          ]
+        }
+      ],
+      "union": {
+        "pixels": 5876,
+        "rle_runs": 556,
+        "exact_stored_rle_match": true
+      },
+      "clean_plate_protected_complement_pixels": 59660,
+      "candidate_allowed_union_pixels": 8912,
+      "final_candidate_protected_complement_pixels": 56624,
+      "preserve_original": [
+        "'89",
+        "'86"
+      ],
+      "result": "PASS_EXACT_PRODUCER_MASK_REPRODUCTION"
+    }
+  },
+  "source_identity_validation": "PASS_INDEX99_EB8C2DDA_2048X256_DXT5_MIP1_EXACT_C125_CANONICAL__PASS_INDEX152_0288BABB_512X128_DXT5_MIP1_EXACT_C125_CANONICAL",
+  "canonical_semantic_validation": "PASS_REUSED_UNCHANGED_C125_CURRENT_CANONICAL_SEMANTICS__5_LOCALIZABLE_PLUS_2_PRESERVE_ORIGINAL",
+  "geometry_mapping_validation": "PASS_INDEX99_THRESHOLD18_EFFECT_MASK_42774_LINE1_24228_LINE2_18546_ALPHA_POSITIVE_RING_13263__PASS_INDEX152_4_OF_4_PIXEL_MASKS_EXACT_UNION_5876_556_RLE_RUNS_AND_PROTECTION_COMPLEMENTS",
+  "current_contract_compatibility": "PASS_CURRENT_E8731043_Q00025_GITHUB_ONLY__NO_CANDIDATE_PROMOTION__RUNTIME_UNTESTED",
+  "readiness_reconciliation": {
+    "classification": "PREFLIGHT_ONLY_NARROWED",
+    "indices": [
+      99,
+      152
+    ],
+    "per_index": {
+      "99": "Exact canonical source plus threshold-18 full-effect boundary and alpha-positive 1px protected ring are independently reproduced. Next materialize exact removal/protected-panel masks, validate CLEAN_PLATE at native resolution, measure source typography/slant, then render/refit Korean and run exact candidate QA.",
+      "152": "Exact canonical source and four per-pixel removal masks are independently reproduced exactly, including the 5876-pixel/556-run union and protection complements. Next generate/validate CLEAN_PLATE, finish signed-slant/style lock, render/refit Korean and run exact DDS candidate QA."
+    }
+  },
+  "source_acquisition_policy": {
+    "contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
+    "q00025_execution_override": "GITHUB_ONLY_PER_USER_DISPATCH__GOOGLE_DRIVE_NOT_USED",
+    "pinned_repository": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+    "pinned_release_asset_id": 306630789,
+    "pinned_zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "typed_transport_policy": "EXACT_PINNED_GIT_BLOBS_REUSED_ONLY_WHERE_CURRENT_CANONICAL_IDENTITY_WAS_ALREADY_INDEPENDENTLY_ACCEPTED__NO_SOURCE_SUBSTITUTION"
+  },
+  "heavy_qa_reuse": {
+    "repeated_heavy_candidate_pixel_qa": false,
+    "index99_reused_c125_source_header_core_fingerprint": true,
+    "index99_new_effect_boundary_rule_independently_reproduced": true,
+    "index152_reused_c125_source_header_and_c115_geometry_fingerprint": true,
+    "index152_new_pixel_mask_rule_independently_reproduced": true,
+    "index152_exact_removal_union_rle_match": true,
+    "reason": "No Korean candidate DDS exists. C reused unchanged source/header/orientation/accepted geometry evidence, then independently recomputed only the newly introduced A00151 effect-boundary and B00152 pixel-mask dependencies once each."
+  },
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_same_asset_candidate_or_source_fingerprints": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00154",
+      "LOCALIZATION-LOCALIZATION_B-00155"
+    ],
+    "merge_head": "438a8a52c80faec5953a8246158b7b0ee29cbcfe"
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      99,
+      152
+    ],
+    "reviewed_assets": 2,
+    "producer_inputs_strict_pass": 2,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "canonical_semantic_entries_checked": 7,
+    "localizable_semantic_entries_checked": 5,
+    "preserve_original_semantic_entries_checked": 2,
+    "exact_current_canonical_sources_reused_and_reverified": 2,
+    "new_effect_boundary_assets_reproduced": 1,
+    "exact_pixel_mask_assets_reproduced": 1,
+    "exact_removal_union_rle_matches": 1,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-2235-C127/C127_Q00025_INDEPENDENT_QA_BATCH.json"
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

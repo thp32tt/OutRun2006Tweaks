@@ -1082,3 +1082,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00148/index112: exact canonical blob `278a518f...` / SHA-256 `524de4c0...`, 2048x256 DXT5 mip1 is independently reverified. Direct BC3 alpha decode reproduces 132,006 hard-limit positives, 126,684 seed positives, 7 components all intersecting the seed, selected bbox `[435,19,1356,237]`, and hard-limit edge contact. The legacy alpha-connectivity removal recipe is therefore rejected fail-closed.
 - Canonical transcription matches **5/5** localizable semantic entries across the batch. No metadata segment, candidate DDS, static artwork approval or runtime approval changed.
 - Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2210-C126/C126_Q00024_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C127 Q00025 — 2026-09-29T22:35:10+09:00
+- QA inputs: A00151 `72376e0` (99), B00152 `e612171` (152). Dispositions: **PASS / PASS**, limited **PREFLIGHT_ONLY_NARROWED**; no Korean candidate DDS is approved.
+- Index99 exact canonical `eb8c2dda...` 2048x256 DXT5 mip1 source and threshold-18 effect boundary reproduce **42,774** pixels; alpha-positive 1px protected ring **13,263**, max luminance 17.482.
+- Index152 exact canonical `0288babb...` 512x128 DXT5 mip1 source and 4/4 removal masks reproduce **5,876 pixels / 556 RLE runs** exactly; protection complements are consistent and `'89`/`'86` remain preserve-original.
+- CLEAN_PLATE/style/render/candidate containment/source-comparison gates remain **HOLD_STRICT_RECHECK**; runtime **UNTESTED**. Counts unchanged: **93** actionable localize_text, **76** pending production, **753** canonical segments. Report: `localization/graphics/role_C/20260929-2235-C127/C127_Q00025_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
