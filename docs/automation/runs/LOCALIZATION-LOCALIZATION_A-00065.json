@@ -1,0 +1,79 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00065",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00006",
+  "recorded_at_kst": "2026-09-29T14:02:18+09:00",
+  "base_sha": "0e105d24d7ffadfe42469c28cc2da51aa5ab92df",
+  "material_commit_sha": "3598fe85ab5ee4728e26c6b9396936ff9e9e2289",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_RELEASE_ATLAS_GEOMETRY_INPUTS",
+  "summary": "Advanced odd indices 147/159/161/163 with exact immutable Release DDS identities, 94 verified stock-to-4x atlas regions, and 92 canonical Korean semantics. Semantic-to-sprite assignment was deliberately left HOLD rather than inferred by order; no Korean DDS candidate was written.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1401-A00065-P00006/A00065_P00006_ODD_UPSTREAM_ATLAS_GEOMETRY.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_ODD_EXACT_RELEASE_AND_ATLAS_GEOMETRY_RECONSTRUCTION_INPUTS",
+    "indices": [
+      147,
+      159,
+      161,
+      163
+    ],
+    "assets": [
+      "39BCA907",
+      "4EDA9DE3",
+      "55B57CDE",
+      "59A79158"
+    ],
+    "exact_release_dds_identities": 4,
+    "atlas_pairs": 4,
+    "atlas_regions_total": 94,
+    "canonical_semantics_total": 92,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "A00061": {
+      "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+      "assets": [
+        137,
+        217,
+        219,
+        241
+      ]
+    },
+    "A00064": {
+      "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+      "assets": [
+        133,
+        135,
+        139,
+        143
+      ]
+    }
+  },
+  "prior_producer_gate_reconciliation": {
+    "task_id": "LOCALIZATION-LOCALIZATION_A-00064",
+    "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+    "workflow_run_id": 36523169697,
+    "workflow_conclusion": "skipped",
+    "policy": "EXPECTED_SKIPPED_NO_RUNNER_FOR_A_B_AUTO_PUSH",
+    "status": "NOT_A_FAILURE_AND_NOT_A_RETRY_BLOCKER"
+  },
+  "self_qa": "PASS_SOURCE_LINEAGE_AND_ATLAS_GEOMETRY_94_REGIONS",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
