@@ -1,0 +1,395 @@
+{
+  "schema_version": 8,
+  "schema": "outrun-canonical-hd-source-reacquisition-manifest-v2-candidate-first",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00134",
+  "wave_id": "P00060",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T20:08:44+09:00",
+  "precommit_head_sha": "a947b6a627862d620a9954581b30c783a8a0f688",
+  "precommit_tree_sha": "d4397643e3e564121e7b1a67ccab24978d1c71ab",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_SCHEMA8_ZERO_CANDIDATE_EXCEPTION_THREE_EVEN_CANONICAL_SOURCE_REACQUISITION",
+  "selection": {
+    "selected_indices": [
+      212,
+      220,
+      222
+    ],
+    "selected_assets": [
+      "BA0147DA",
+      "D657C2EB",
+      "DDF0392A"
+    ],
+    "priority": "PREFLIGHT_ONLY_AFTER_FRESH_CANDIDATE_FIRST_READINESS_AUDIT",
+    "basis": "Current HEAD adds B00133 only; no shared readiness state or candidate bytes changed. B00133 itself is QA-pending and excluded. Current shared state plus the B00133 fresh scan contains no B-even RENDER_READY, ONE_STAGE_TO_RENDER, or runnable existing-candidate material rework. This invocation therefore uses its one schema8 zero-candidate exception to repair canonical-source lineage for three older pre-generation assets instead of repeating candidate/runtime backlog."
+  },
+  "production_strategy": {
+    "mode": "candidate_completion_first_schema8",
+    "hard_candidate_success_condition": true,
+    "fresh_scan_head": "a947b6a627862d620a9954581b30c783a8a0f688",
+    "readiness_audit": {
+      "runnable_direct_rework_even_indices": [],
+      "render_ready_even_indices": [],
+      "one_stage_to_render_even_indices": [],
+      "runnable_existing_candidate_rework_even_indices": [],
+      "qa_pending_or_newer_disjoint": {
+        "LOCALIZATION-LOCALIZATION_B-00129": [
+          188,
+          226,
+          232
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00133": [
+          92,
+          98,
+          112
+        ]
+      },
+      "c_consumed_prefight_only": {
+        "LOCALIZATION-LOCALIZATION_B-00122": [
+          198,
+          214,
+          230,
+          236
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00125": [
+          26,
+          28,
+          30,
+          32
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00127": [
+          36,
+          38,
+          128,
+          206
+        ]
+      },
+      "candidate_or_runtime_backlog_not_material_rework": [
+        12,
+        54,
+        60,
+        94,
+        102,
+        104,
+        116
+      ],
+      "notes": [
+        "No current shared-state B-even RENDER_READY/ONE_STAGE_TO_RENDER classification exists.",
+        "B00133 is an immutable producer result awaiting C and its 92/98/112 assets are not reselected.",
+        "Existing candidate rows are unchanged C/runtime/dependency backlog, not safe material rewrites.",
+        "The selected 212/220/222 have accepted semantics/pre-generation evidence but lack current canonical-source identity gates under the current source policy."
+      ],
+      "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_B_SHARD"
+    },
+    "zero_candidate_exception_applies": true,
+    "preflight_only_batches_this_invocation": 1,
+    "max_preflight_only_batches_when_no_ready_assets": 1
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+    "controller_roles_blob_sha": "fea2e41c3000905d479e43b923d0f0f42126523b",
+    "queue_blob_sha": "c22a6a3b9a4890bd1c5bae959542b40da78d6b1b",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "d6e463c67fd3c73cba910002bb1efc744f4c7425",
+    "resume_state_blob_sha": "5d27b2d0462a23782edd4e5a59802fed9ade018c",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_validator_blob_sha": "9b6b1d083321b45511f6272ca3366612821f7a02",
+    "b00133_task_record_blob_sha": "f261f46f3e9a90722786436fa7e86c9afc9195b5",
+    "b00062_task_record_blob_sha": "7625aa44c37d33b120b85dcc76491b2abb09705b",
+    "b00062_material_report_blob_sha": "ef841b7d1a562d1068c8b470a8776d4af4e71e9b",
+    "b00108_task_record_blob_sha": "5667c9210d610fed209830c1ba3e67ffd7cc90f3",
+    "b00108_material_report_blob_sha": "714b9dacbb097ea0cd3ba26dbb1b5014b3113538",
+    "c00116_task_record_blob_sha": "f24eacd1c00a808db4771ea6f7caa5e35892ae50"
+  },
+  "canonical_source_policy": {
+    "authoritative_source": "localization/graphics/inventory.csv current user-HD SHA-256/canvas/mode identities",
+    "exact_sha256_match_required_before_pixel_geometry": true,
+    "release_identity_role": "historical reconstruction/semantic prior only unless exact canonical SHA-256 equality is proven",
+    "matching_dimensions_prove_identity": false,
+    "filename_suffix_dimensions_authoritative": false
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_AND_RELEASE_GEOMETRY_RETIREMENT_MANIFESTS",
+    "indices": [
+      212,
+      220,
+      222
+    ],
+    "assets": [
+      "BA0147DA",
+      "D657C2EB",
+      "DDF0392A"
+    ],
+    "canonical_inventory_identities_pinned": 3,
+    "canonical_inventory_canvases_pinned": 3,
+    "canonical_modes_pinned_rgba": 3,
+    "current_semantic_entries_reused": 22,
+    "expected_physical_occurrences": 24,
+    "release_geometry_sets_retired_as_canonical_authority": 3,
+    "exact_hash_gated_acquisition_pipelines_created": 3,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_candidate_dds_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "schema8_zero_candidate_exception_proven": true,
+    "description": "Moves 212/220/222 from Release-lineage pre-generation evidence to exact current canonical user-HD source gates so their next legal pixel step is deterministic canonical import/hash verification rather than another generic work order."
+  },
+  "assets": [
+    {
+      "queue_index": 212,
+      "asset": "BA0147DA",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BA0147DA_512x512.dds",
+      "canonical_sha256": "72ff2132066dd32950a8dbf698c62305aa02cff8b3cd6089172f49582cef75ce",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 10,
+      "expected_physical_occurrences": 12,
+      "prior_evidence": "LOCALIZATION-LOCALIZATION_B-00062 / B115_P00004_EVEN_SEMANTIC_CELL_MAPPING",
+      "prior_geometry": "Release expected 2048x2048 plus stock-DXT5 semantic mapping/4x atlas",
+      "canonical_relation": "CANVAS_MISMATCH_512x512_CANONICAL_VS_2048x2048_RELEASE",
+      "preserved_evidence": "10/10 current source/Korean semantics and 12 physical-occurrence semantic identities only",
+      "retired_evidence": "Release/4x pixel coordinates, orientation, effect bounds, removal-mask assumptions and any derived safe-bbox geometry",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "semantics": [
+        [
+          "DONE",
+          "완료"
+        ],
+        [
+          "PROFESSIONAL",
+          "프로"
+        ],
+        [
+          "ENTER NAME",
+          "이름 입력"
+        ],
+        [
+          "SELECT NATIONALITY",
+          "국적 선택"
+        ],
+        [
+          "SELECT PHOTO",
+          "사진 선택"
+        ],
+        [
+          "SELECT STAR SIGN",
+          "별자리 선택"
+        ],
+        [
+          "COAST 2 COAST",
+          "코스트 2 코스트"
+        ],
+        [
+          "SHOWROOM",
+          "쇼룸"
+        ],
+        [
+          "HEART ATTACK",
+          "하트 어택"
+        ],
+        [
+          "OUTRUN",
+          "아웃런"
+        ]
+      ],
+      "preserve": [
+        "character names including SAM/JENNIFER/HOLLY/CLARISSA/ALBERTO",
+        "VERDE MUGELLO vehicle color name",
+        "zodiac symbols/icons",
+        "unrelated UI bars/artwork"
+      ],
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting any header, orientation or pixel geometry; filename suffix and matching canvas are not identity proof.",
+        "Read the canonical DDS header and preserve actual dimensions, compression/format, mip behavior and alpha/transparency semantics.",
+        "Determine raw/readable orientation from canonical pixels; do not inherit Release transforms unless revalidated.",
+        "Rebind semantic occurrences against the canonical decoded pixels while retaining the current source/Korean text pairs.",
+        "Measure effect-inclusive English bboxes and construct removal/protected-art masks from canonical pixels only.",
+        "Create CLEAN_PLATE and require independent zero-outside-mask/protected-art/alpha/residue checks.",
+        "Derive first-pass-v2 candidate_safe_bbox with the required inset, then measure typography/baseline/slant and render Korean natively.",
+        "Run decoded-final DDS/header/alpha/orientation/zero-pixel containment and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 220,
+      "asset": "D657C2EB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "canonical_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "canonical_dimensions": [
+        2048,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 6,
+      "expected_physical_occurrences": 6,
+      "prior_evidence": "LOCALIZATION-LOCALIZATION_B-00108 / C00116 PASS limited pre-generation guards",
+      "prior_geometry": "Release 2048x512 linear32 regions/2px inspection guards",
+      "canonical_relation": "CANVAS_AND_MODE_CLASS_MATCH_BUT_EXACT_CANONICAL_SHA256_EQUIVALENCE_UNPROVEN",
+      "preserved_evidence": "6/6 current source/Korean semantics; C00116-accepted guard arithmetic as historical inspection evidence only",
+      "retired_evidence": "Release pixel coordinates/guards as canonical edit geometry until exact canonical SHA-256 source is imported and revalidated",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "semantics": [
+        [
+          "REMOVE FRIEND",
+          "친구 삭제"
+        ],
+        [
+          "SEND GAME INVITE",
+          "게임 초대 보내기"
+        ],
+        [
+          "TIME ATTACK",
+          "타임 어택"
+        ],
+        [
+          "COAST 2 COAST",
+          "코스트 2 코스트"
+        ],
+        [
+          "OUTRUN",
+          "아웃런"
+        ],
+        [
+          "HEART ATTACK",
+          "하트 어택"
+        ]
+      ],
+      "preserve": [
+        "all non-text menu artwork/background",
+        "all pixels outside future canonical source removal masks"
+      ],
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting any header, orientation or pixel geometry; filename suffix and matching canvas are not identity proof.",
+        "Read the canonical DDS header and preserve actual dimensions, compression/format, mip behavior and alpha/transparency semantics.",
+        "Determine raw/readable orientation from canonical pixels; do not inherit Release transforms unless revalidated.",
+        "Rebind semantic occurrences against the canonical decoded pixels while retaining the current source/Korean text pairs.",
+        "Measure effect-inclusive English bboxes and construct removal/protected-art masks from canonical pixels only.",
+        "Create CLEAN_PLATE and require independent zero-outside-mask/protected-art/alpha/residue checks.",
+        "Derive first-pass-v2 candidate_safe_bbox with the required inset, then measure typography/baseline/slant and render Korean natively.",
+        "Run decoded-final DDS/header/alpha/orientation/zero-pixel containment and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 222,
+      "asset": "DDF0392A",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "canonical_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "canonical_dimensions": [
+        1024,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 6,
+      "expected_physical_occurrences": 6,
+      "prior_evidence": "LOCALIZATION-LOCALIZATION_B-00108 / C00116 PASS limited pre-generation guards",
+      "prior_geometry": "Release 1024x2048 DXT5/BC3 regions/2px inspection guards",
+      "canonical_relation": "CANVAS_MATCH_BUT_MODE_MISMATCH_RGBA_CANONICAL_VS_DXT5_BC3_RELEASE_AND_SHA256_EQUIVALENCE_UNPROVEN",
+      "preserved_evidence": "6/6 current source/Korean semantics; C00116-accepted guard arithmetic as historical inspection evidence only",
+      "retired_evidence": "BC3 Release pixel/header/orientation/effect geometry as canonical edit input",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "semantics": [
+        [
+          "Rush A Difficulty",
+          "난이도에 도전"
+        ],
+        [
+          "Shake The Street",
+          "거리를 뒤흔들어라"
+        ],
+        [
+          "Who Are You?",
+          "당신은 누구?"
+        ],
+        [
+          "Journey Mode / Random",
+          "저니 모드 / 무작위"
+        ],
+        [
+          "OutRun 1986",
+          "아웃런 1986"
+        ],
+        [
+          "OutRun Mode / 15 C.",
+          "아웃런 모드 / 15코스"
+        ]
+      ],
+      "preserve": [
+        "Ferrari model names",
+        "song titles Passing Breeze/Risky Ride/Shiny World/Splash Wave",
+        "other proper-title rows not in canonical localization segments"
+      ],
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify exact SHA-256 before interpreting any header, orientation or pixel geometry; filename suffix and matching canvas are not identity proof.",
+        "Read the canonical DDS header and preserve actual dimensions, compression/format, mip behavior and alpha/transparency semantics.",
+        "Determine raw/readable orientation from canonical pixels; do not inherit Release transforms unless revalidated.",
+        "Rebind semantic occurrences against the canonical decoded pixels while retaining the current source/Korean text pairs.",
+        "Measure effect-inclusive English bboxes and construct removal/protected-art masks from canonical pixels only.",
+        "Create CLEAN_PLATE and require independent zero-outside-mask/protected-art/alpha/residue checks.",
+        "Derive first-pass-v2 candidate_safe_bbox with the required inset, then measure typography/baseline/slant and render Korean natively.",
+        "Run decoded-final DDS/header/alpha/orientation/zero-pixel containment and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    }
+  ],
+  "git_tree_probe": {
+    "tree_sha": "d4397643e3e564121e7b1a67ccab24978d1c71ab",
+    "canonical_queue_path_sources_present": 0,
+    "current_candidate_dds_named_for_assets_present": 0,
+    "evidence_only_paths_present": [
+      "localization/graphics/role_B/20260929-1344-B115-P00004/B115_212_BA0147DA_ENGLISH_SOURCE.png"
+    ],
+    "evidence_policy": "Historical PNG/source previews are evidence only and MUST NOT be used as canonical construction pixels."
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_ONLY_212_220_222",
+    "current_queue_state": "PASS_3_OF_3_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "candidate_first_selection": "PASS_SCHEMA8_ZERO_CANDIDATE_EXCEPTION_AFTER_FRESH_B_SHARD_SCAN",
+    "canonical_inventory": "PASS_3_OF_3_SHA256_CANVAS_RGBA_IDENTITIES",
+    "canonical_semantics": "PASS_22_OF_22_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "physical_semantic_expectations": "PASS_24_EXPECTED_OCCURRENCES_FROM_PRIOR_ACCEPTED_MAPPING_EVIDENCE",
+    "source_lineage": "PASS_3_RELEASE_GEOMETRY_SETS_EXPLICITLY_RETIRED_AS_CANONICAL_AUTHORITY",
+    "current_git_source_presence": "PASS_3_OF_3_QUEUE_PATHS_ABSENT_FAIL_CLOSED",
+    "heavy_qa_repeated": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "exact_dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_EXACT_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
