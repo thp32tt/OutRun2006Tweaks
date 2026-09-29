@@ -1322,3 +1322,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - A00225 index135: **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**; verified Release `dafe21ec...` mismatches canonical `7cb768c6...`, no substitution.
 - Order: **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate QA 159/198/201 -> out-of-batch pending A00227@index231, B00226@index163 -> PREFLIGHT_ONLY 193/133/232 -> blocked 217/135**. Pending production **69**, actionable **93**, canonical segments **753**.
 - `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C152 Q00050 AUTHORITATIVE GATE PASS — 2026-09-30T07:29:26+09:00
+- Validation-bearing result `648cfaab4a7bd5c01ca2a6aa21d775291235a942`; Localization Automation Gate `36639832928` — **success**.
+- A00221@index222 remains **STATIC_QA PASS / RUNTIME_UNTESTED**. B00223@index193/217 and A00225@index135 retain the Q00050 PASS/PREFLIGHT_ONLY dispositions.
+- Attempt1 `a5be20d8...` and attempt2 `aea1ee13...` are non-authoritative verifier-failure results.
+- Pending production **69**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

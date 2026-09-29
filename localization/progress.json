@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T07:21:51+09:00",
+  "updated_at_kst": "2026-09-30T07:29:46+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C152/Q00050 pre-Gate: A00221@index222 PASS STATIC_QA on unchanged candidate c2938974.../Git blob e3f4488f... with exact source/6 semantics, mandatory visual review and zero decoded-final 1px/outside/protected/alpha violations; B00223 PASS pre-generation with index193 PREFLIGHT_ONLY exact source but final masks/CLEAN_PLATE pending and index217 PREFLIGHT_ONLY SOURCE_IDENTITY_MISMATCH; A00225@index135 PASS PREFLIGHT_ONLY SOURCE_ACQUISITION_EXHAUSTED. Candidate QA 159/198/201 remains first. Out-of-batch A00227@index231 and B00226@index163 await their own C disposition. Pending production localize_text 69; actionable 93; canonical segments 753. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C152/Q00050 AUTHORITATIVE GATE PASS: validation-bearing result 648cfaab4a7bd5c01ca2a6aa21d775291235a942 passed Localization Automation Gate 36639832928. A00221@index222 remains STATIC_QA_PASS_RUNTIME_UNTESTED; B00223@index193/217 and A00225@index135 retain their recorded PASS/PREFLIGHT_ONLY dispositions. Candidate QA 159/198/201 remains first; out-of-batch producer results require separate C batches. Pending production localize_text 69; actionable 93; canonical segments 753. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -950,12 +950,22 @@
       "heavy_qa_repeated": false,
       "heavy_qa_note": "Unique source fingerprints were checked once; candidate-heavy QA only for A00221.",
       "vr_ffb_dx_changes": false,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "validation_mode": "C_BATCH_GATE",
       "runtime_validation": "UNTESTED",
-      "result_sha": "PENDING_POST_COMMIT",
-      "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-      "bookkeeping_note": "This AUTO result commit is Q00050 validation owner and contains no CI-skip. Gate outcome is recorded later in a separate bookkeeping/checkpoint commit."
+      "result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+      "validation_bearing_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+      "bookkeeping_note": "Q00050 authoritative Gate PASS is owned by validation-bearing result 648cfaab4a7bd5c01ca2a6aa21d775291235a942. Runtime remains UNTESTED.",
+      "automation_gate": {
+        "workflow": "Localization Automation Gate",
+        "run_id": 36639832928,
+        "run_attempt": 1,
+        "head_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+        "status": "completed",
+        "conclusion": "success",
+        "validated_at_kst": "2026-09-30T07:29:26+09:00"
+      },
+      "bookkeeping_recorded_at_kst": "2026-09-30T07:29:46+09:00"
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -1406,11 +1416,21 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "Unique source fingerprints were checked once; candidate-heavy QA only for A00221.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": "PENDING_POST_COMMIT",
-    "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-    "bookkeeping_note": "This AUTO result commit is Q00050 validation owner and contains no CI-skip. Gate outcome is recorded later in a separate bookkeeping/checkpoint commit."
+    "result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "validation_bearing_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "bookkeeping_note": "Q00050 authoritative Gate PASS is owned by validation-bearing result 648cfaab4a7bd5c01ca2a6aa21d775291235a942. Runtime remains UNTESTED.",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36639832928,
+      "run_attempt": 1,
+      "head_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T07:29:26+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-09-30T07:29:46+09:00"
   }
 }

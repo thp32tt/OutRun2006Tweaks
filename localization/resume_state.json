@@ -11,7 +11,8 @@
     "ONE_STAGE_TO_RENDER: none currently accepted at Q00050.",
     "QA_BACKLOG: candidate-bearing indices159/198/201 remain first. Out-of-batch A00227@index231 semantic handoff and B00226@index163 exact-source preflight await their own C disposition; do not repeat while pending.",
     "PREFLIGHT_ONLY actionable after candidate QA: newly accepted index193, then existing index133/232. Index217 remains SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; do not reprobe until dependency/fingerprint changes.",
-    "Index222 is C152/Q00050 STATIC_QA_PASS_RUNTIME_UNTESTED on candidate SHA-256 c2938974...; do not rerender unchanged content."
+    "Index222 is C152/Q00050 STATIC_QA_PASS_RUNTIME_UNTESTED on candidate SHA-256 c2938974...; do not rerender unchanged content.",
+    "Q00050 Gate PASS: validation-bearing result 648cfaab... / Gate 36639832928. Do not re-review the same TASK_ID@RESULT_SHA inputs."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2671,11 +2672,21 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "Unique source fingerprints were checked once; candidate-heavy QA only for A00221.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": "PENDING_POST_COMMIT",
-    "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-    "bookkeeping_note": "This AUTO result commit is Q00050 validation owner and contains no CI-skip. Gate outcome is recorded later in a separate bookkeeping/checkpoint commit."
+    "result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "validation_bearing_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+    "bookkeeping_note": "Q00050 authoritative Gate PASS is owned by validation-bearing result 648cfaab4a7bd5c01ca2a6aa21d775291235a942. Runtime remains UNTESTED.",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36639832928,
+      "run_attempt": 1,
+      "head_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T07:29:26+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-09-30T07:29:46+09:00"
   }
 }
