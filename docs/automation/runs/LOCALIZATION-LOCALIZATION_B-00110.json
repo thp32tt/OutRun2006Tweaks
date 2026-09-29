@@ -1,0 +1,112 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00110",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00042",
+  "recorded_at_kst": "2026-09-29T17:58:30+09:00",
+  "base_sha": "f5237c1590b1c844853e69a126be1a6ab1e1116f",
+  "material_commit_sha": "2460d2984c752299c943c33cc7ada20ff197d5e0",
+  "pre_task_record_head_sha": "2460d2984c752299c943c33cc7ada20ff197d5e0",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_EVEN_SELECTOR_REMOVAL_MASK_CLEAN_PLATE_EXECUTION_MANIFESTS",
+  "summary": "Advanced even indices 92/98/112 after B00083 had been independently consumed PASS by C00086. Reused accepted exact-HD effect/fill bboxes, flip_y transforms and v2 2px candidate-safe bboxes, and added four deterministic per-element removal-mask/CLEAN_PLATE execution recipes with exact seed/limit geometry, connectivity, mutation rules, fail-closed conditions and render permissions. No Korean DDS, actual per-pixel mask, clean plate pixels, shared state or peer-lane files were modified.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1758-B134-P00042/B134_P00042_SELECTOR_REMOVAL_MASK_CLEAN_PLATE_EXECUTION_MANIFEST.json"
+  ],
+  "evidence_blob_sha": "f034994e7aa9516c1fa3faa24f23d573ea2f436a",
+  "material_deliverable": {
+    "type": "THREE_EVEN_DETERMINISTIC_REMOVAL_MASK_AND_CLEAN_PLATE_EXECUTION_MANIFESTS",
+    "indices": [
+      92,
+      98,
+      112
+    ],
+    "assets": [
+      "1A43E9D9",
+      "42E618FD",
+      "D41D0B1"
+    ],
+    "physical_text_elements": 4,
+    "deterministic_removal_mask_recipes": 4,
+    "deterministic_clean_plate_recipes": 4,
+    "accepted_candidate_safe_bboxes_reused": 4,
+    "geometry_self_qa_pass": 4,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "orientation_layout_task": "LOCALIZATION-LOCALIZATION_B-00073",
+    "orientation_layout_report_blob_sha": "f4ec7539abe10664101feb8d1f6fbdf88d40dc4f",
+    "safe_fit_task": "LOCALIZATION-LOCALIZATION_B-00083",
+    "safe_fit_result_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+    "safe_fit_report_blob_sha": "c87cad81e700ae557dd815058e7d82e6997faa89",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00086",
+    "c_acceptance_record_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "d000d952a7bdb95a3d60a0b9877352a4a6d47213",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "reason": "B00083/C00086 already established immutable source identity, effect/fill geometry, flip_y transforms and exact 2px v2 safe bboxes. P00042 adds only the missing deterministic source-removal-mask/CLEAN_PLATE execution specification; heavy checks are intentionally not repeated."
+  },
+  "skipped_or_deferred": {
+    "qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00101": [
+        198,
+        214,
+        230,
+        236
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00103": [
+        140,
+        154,
+        164
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00104": [
+        152
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00108": [
+        132,
+        176,
+        220,
+        222
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ],
+    "source_pixel_execution_pending": [
+      92,
+      98,
+      112
+    ]
+  },
+  "self_qa": "PASS_EVEN_ONLY_92_98_112__B00083_CONSUMED_BY_C00086__4_OF_4_FILL_BBOX_INSIDE_EFFECT_BBOX__4_OF_4_EXACT_2PX_SAFE_INSET__4_OF_4_FLIP_Y_RAW_MAPPING__3_OF_3_ASSETS_EFFECT_REGIONS_NONOVERLAPPING__ZERO_OUTSIDE_MASK_MUTATION_ALLOWED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "This task creates executable reconstruction manifests, not source-derived mask pixels. Actual removal-mask pixels, protected-art masks, CLEAN_PLATE pixels/QA, signed style/slant metrics, Korean rendering, BC3 final decode, zero-pixel containment and exact English-source-vs-Korean comparison remain mandatory and HOLD until exact source-pixel execution produces them.",
+  "strict_hold": {
+    "actual_removal_masks": "HOLD_NOT_YET_MATERIALIZED_FROM_EXACT_SOURCE_PIXELS",
+    "protected_non_text_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_pixels": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_YET_EXECUTED",
+    "signed_slant_style_metrics": "HOLD_EXACT_PIXEL_MEASUREMENT_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "decoded_final_bc3_qa": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
