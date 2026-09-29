@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T21:58:00+09:00",
+  "updated_at_kst": "2026-09-29T22:10:05+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "Q00023 C125 consumed immutable B00144@8b4f5ce and A00146@b1d6aa1. Both dispositions PASS for limited PREFLIGHT_ONLY_NARROWED evidence. Index152 exact canonical source is independently reverified and unchanged C115 4/4 effect/safe-bbox heavy QA is reused; index99 exact canonical source and two-line segmentation are independently reproduced; index215 pinned source mismatch is independently reproduced and the stale A00053 clean-plate lineage is retired for current construction. Concurrent A00149/B00148 are disjoint and preserved for their own C batches. No Korean DDS candidate/static/runtime approval added. Candidate-completion work on 152/99 and exact canonical source acquisition for 215 take priority. Queue remains 93 actionable localize_text, pending production 76, canonical segments 753; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "Q00024 C126 consumed immutable A00149@e136d3f and B00148@40ddc5b. Both producer dispositions PASS for limited preflight/source-guard evidence. Indices65/89/241 pinned stock-direct bytes independently reproduce their producer hashes but mismatch current canonical inventory, so stale 4x/current-incompatible geometry remains retired and exact canonical source acquisition is still required. Index112 exact canonical source is independently reverified; its legacy alpha-connectivity removal recipe reproduces 132006 selected pixels across all 7 seed-intersecting components, fills the hard-limit bbox and touches its edge, so the recipe remains rejected. Newer disjoint A00151/index99 is preserved for its own C batch. No Korean DDS candidate/static/runtime approval added. Queue remains 93 actionable localize_text, pending production 76, canonical segments 753; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -841,73 +841,76 @@
     ]
   },
   "latest_c_batch_qa": {
-    "recorded_at_kst": "2026-09-29T21:58:00+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00150",
-    "qa_batch_id": "Q00023",
-    "run": "C125",
-    "result": "PASS_Q00023_TWO_INPUTS_PASS_INDEX152_SOURCE_GEOMETRY_REQUALIFIED_INDEX99_SEGMENTATION_REPRODUCED_INDEX215_STALE_CLEAN_PLATE_RETIRED_NO_DDS_RUNTIME_UNTESTED",
-    "base_head": "40ddc5bece0c62c1973e5297e7831d958c45bb3b",
+    "recorded_at_kst": "2026-09-29T22:10:05+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00153",
+    "qa_batch_id": "Q00024",
+    "run": "C126",
+    "result": "PASS_Q00024_TWO_INPUTS_PASS_THREE_STOCK_IDENTITY_GUARDS_INDEX112_CANONICAL_MASK_RECIPE_REJECTED_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "72376e0e16fc667be2b4a5fdc39ed867c92adbd5",
     "current_qa_contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
     "current_controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00144@8b4f5ce719ef813b9efe2d786067149e2452fccd",
-      "LOCALIZATION-LOCALIZATION_A-00146@b1d6aa128d62094b08bbeb08158d667b4332d4da"
+      "LOCALIZATION-LOCALIZATION_A-00149@e136d3f70d60534c63b0845b47ccfb17826a8418",
+      "LOCALIZATION-LOCALIZATION_B-00148@40ddc5bece0c62c1973e5297e7831d958c45bb3b"
     ],
     "reviewed_indices": [
-      99,
-      152,
-      215
+      65,
+      89,
+      112,
+      241
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00144",
-        "result_sha": "8b4f5ce719ef813b9efe2d786067149e2452fccd",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00149",
+        "result_sha": "e136d3f70d60534c63b0845b47ccfb17826a8418",
         "status": "PASS",
-        "reason": "Durable exact producer result and lane-local report exist at the immutable RESULT_SHA. C independently re-fetched envido32/OR2006Sprites@55f67a813dd3603d201d0be0da47c071965f53a4 Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds and reproduced Git blob 0288babbb9c70e8f092bdd15561db4cadc19dcb3, 65,664 bytes, SHA-256 de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77, DDS 512x128 DXT5 mip1, exactly matching current canonical inventory. The same immutable source blob underlies B00104 and its independent C115/Q00013 PASS, so the previously reproduced 4/4 full-effect bboxes and 4/4 v2 2px safe-bbox formulas may be reused without repeating unchanged heavy geometry QA. Current contract changes since B00144 only clarify typed source-transport misses and do not invalidate that geometry evidence. PRO./INS./G.M./E.R. translations and '89/'86 preserve-original semantics match the current canonical transcription. PASS is limited PREFLIGHT_ONLY_NARROWED: per-pixel removal/protected masks, independently validated CLEAN_PLATE, source typography/slant, Korean render, exact candidate DDS, zero-pixel containment and English-source-vs-Korean-candidate gates remain HOLD_STRICT_RECHECK."
+        "reason": "Durable exact producer task record exists at the immutable RESULT_SHA and contains the material evidence. C independently re-fetched all three pinned-tag stock direct DDS objects at envido32/OR2006Sprites@55f67a813dd3603d201d0be0da47c071965f53a4 and reproduced the producer Git blob/SHA-256/header facts exactly: index65 EBEF6D20 a79f5847 / 78fdc0d8..., 512x512 DXT5; index89 43B07A77 9c521d62 / 6db8e656..., 512x64 DXT5; index241 E1639D2E 91f2a3f3 / 3277d046..., 256x64 DXT5. All three obtained byte streams mismatch the current canonical inventory identities 1ee491be..., 0a2c9a32..., 0af7362f... respectively, so they are correctly SOURCE_IDENTITY_MISMATCH and cannot authorize source masks/CLEAN_PLATE/geometry. C reused unchanged prior C-accepted historical 4x lineage evidence rather than repeating it; given current inventory canvases, retiring those old 4x construction assumptions remains fail-closed and correct. Current canonical transcription matches 4/4 localizable semantic entries across indices65/89/241. No Korean candidate exists, so candidate DDS/header/alpha/orientation/zero-pixel/English-source comparison gates are not promoted. PASS is limited to the source-identity guard and stale-lineage retirement."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00146",
-        "result_sha": "b1d6aa128d62094b08bbeb08158d667b4332d4da",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00148",
+        "result_sha": "40ddc5bece0c62c1973e5297e7831d958c45bb3b",
         "status": "PASS",
-        "reason": "Durable exact producer result and lane-local report exist at the immutable RESULT_SHA. For index99/4F68708E, C independently re-fetched pinned Git blob eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8, 524,416 bytes, SHA-256 d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2, DDS 2048x256 DXT5 mip1, exactly matching current inventory; direct BC3 decode independently reproduced line1 core 18,531 px bbox [527,53,1600,119], line2 core 14,332 px bbox [547,139,1340,205], bright190 line1 15,144 px bbox [528,53,1600,119], and line2 11,867 px bbox [548,139,1339,205]. These are text-core segmentation seeds only and are not promoted to final effect/removal masks or safe bboxes. For index215/C05E67EF, C independently re-fetched pinned Git blob 6109bf8757aff5aeb11654e94356e303ed2179d4 and reproduced SHA-256 c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff, 512x256 RGBA32 mip1, which does not match current canonical inventory SHA-256 69e5a72b51d6a6a1b2dda1d115713c74dca1792564e703f43d8bb4c39b9cf2ac. A00053 used that same stale 6109bf... lineage, so retiring its old CLEAN_PLATE as current-canonical construction input is correct. Current translations for index99 and index215 match canonical transcription. No new Korean DDS exists, so candidate-only DDS/alpha/orientation/zero-pixel/source-comparison gates remain HOLD_STRICT_RECHECK."
+        "reason": "Durable exact producer result and lane-local report exist at the immutable RESULT_SHA. C independently re-fetched Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds from envido32/OR2006Sprites@55f67a813dd3603d201d0be0da47c071965f53a4 and reproduced Git blob 278a518f5151f0759dfcfdc78e129a7a7cb55cf0, 524,416 bytes, SHA-256 524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617, DDS 2048x256 DXT5 mip1, exactly matching current canonical inventory. Direct BC3 alpha decode in readable flip_y orientation reproduces the producer's legacy alpha>0 8-connected recipe: 132,006 alpha-positive pixels in the hard limit, 126,684 in the seed, 7 components, all 7 intersecting the seed, selected bbox [435,19,1356,237], and hard-limit edge contact. Therefore the old recipe is correctly rejected fail-closed and cannot be used as a removal mask/CLEAN_PLATE edit mask. The 1/1 canonical translation matches. No Korean candidate exists; final mask/protected-art/CLEAN_PLATE/style/render/DDS containment/source-comparison gates remain HOLD_STRICT_RECHECK."
       }
     ],
-    "source_identity_validation": "PASS_INDEX152_PINNED_BLOB_0288BABB_SHA256_DE306CB4_512X128_DXT5_MIP1_EXACT_CANONICAL__PASS_INDEX99_PINNED_BLOB_EB8C2DDA_SHA256_D97206D8_2048X256_DXT5_MIP1_EXACT_CANONICAL__INDEX215_OBTAINED_BLOB_6109BF87_SHA256_C2BD35E7_NE_CURRENT_CANONICAL_69E5A72B_FAIL_CLOSED",
-    "canonical_semantic_validation": "PASS_13_OF_13_CURRENT_SEMANTIC_ENTRIES__11_LOCALIZABLE_PLUS_2_YEAR_LABELS_PRESERVE_ORIGINAL",
-    "geometry_mapping_validation": "PASS_INDEX152_REUSE_UNCHANGED_C115_4_OF_4_EFFECT_BBOX_AND_4_OF_4_V2_SAFE_BBOX_FINGERPRINT__PASS_INDEX99_DIRECT_BC3_REPRODUCTION_2_CORE_BANDS_AND_2_BRIGHT190_BANDS__INDEX215_A00053_CLEAN_PLATE_RETIRED_DUE_SOURCE_IDENTITY_MISMATCH",
-    "current_contract_compatibility": "PASS_CURRENT_E8731043_TYPED_TRANSPORT_DELTA_DOES_NOT_INVALIDATE_UNCHANGED_SOURCE_GEOMETRY__NO_CANDIDATE_PROMOTION__Q00023_EXECUTION_GITHUB_ONLY",
+    "source_identity_validation": "PASS_A00149_INDEX65_A79F5847_SHA78FDC0D8_DXT5_NE_CANONICAL_1EE491BE__INDEX89_9C521D62_SHA6DB8E656_DXT5_NE_CANONICAL_0A2C9A32__INDEX241_91F2A3F3_SHA3277D046_DXT5_NE_CANONICAL_0AF7362F__PASS_B00148_INDEX112_278A518F_SHA524DE4C0_2048X256_DXT5_MIP1_EXACT_CANONICAL",
+    "canonical_semantic_validation": "PASS_5_OF_5_CURRENT_LOCALIZABLE_SEMANTIC_ENTRIES__65_LOADING__89_GAME_OVER__112_GIRLFRIEND_GOAL__241_PLEASE_WAIT_AND_LOADING",
+    "geometry_mapping_validation": "PASS_A00149_STALE_4X_AND_A00056_GEOMETRY_RETIREMENT_REMAINS_FAIL_CLOSED__PASS_B00148_BC3_ALPHA_RECIPE_REPRODUCED_132006_SELECTED_7_COMPONENTS_FULL_HARD_LIMIT_BOUNDARY_TOUCH_AND_REJECTED",
+    "current_contract_compatibility": "PASS_CURRENT_E8731043_Q00024_GITHUB_ONLY__NO_CANDIDATE_PROMOTION__DIRECT_OBTAINED_MISMATCHES_TYPED_CORRECTLY__RUNTIME_UNTESTED",
     "readiness_reconciliation": {
       "classification": "PREFLIGHT_ONLY_NARROWED",
       "indices": [
-        99,
-        152,
-        215
+        65,
+        89,
+        112,
+        241
       ],
       "per_index": {
-        "99": "Exact canonical source and two-line text-core segmentation proven; HOLD final full-effect/removal/protected-panel masks, independently validated CLEAN_PLATE, final safe bbox, source typography/slant, Korean render and candidate QA.",
-        "152": "Exact canonical source plus unchanged C115 effect/safe geometry proven; HOLD per-pixel removal/protected masks, independently validated CLEAN_PLATE, typography/slant, Korean render and candidate QA.",
-        "215": "Pinned-tag source is an obtained SOURCE_IDENTITY_MISMATCH against current canonical inventory; old A00053 masks/CLEAN_PLATE are retired for current construction. Acquire exact canonical bytes before new mask/CLEAN_PLATE/render work."
+        "65": "Pinned stock direct bytes mismatch canonical inventory; historical 4x lineage is nonauthoritative. Acquire exact canonical 512x512 RGBA bytes through the next approved GitHub tier before masks/CLEAN_PLATE/render work.",
+        "89": "Pinned stock direct bytes mismatch canonical inventory; historical 2048x256 A00056 geometry/style source is retired against current 512x64 inventory. Acquire exact canonical bytes and remeasure source effect/slant/safe region.",
+        "112": "Exact canonical 2048x256 DXT5 source is proven, but the inherited alpha-connectivity removal recipe is unsafe because it selects the entire hard limit and touches its boundary. Derive a deterministic protected-art-aware effect mask before CLEAN_PLATE/rendering.",
+        "241": "Pinned stock direct bytes mismatch canonical inventory; historical 4x lineage is nonauthoritative. Acquire exact canonical 256x64 RGBA bytes and bind both PLEASE WAIT and Loading from exact pixels before masks/CLEAN_PLATE/rendering."
       }
     },
     "source_acquisition_policy": {
       "contract_blob_sha": "e8731043bb018eae9a2d2b8fefbe68ce7a7ac56f",
-      "q00023_execution_override": "GITHUB_ONLY_PER_USER_DISPATCH__GOOGLE_DRIVE_NOT_USED",
+      "q00024_execution_override": "GITHUB_ONLY_PER_USER_DISPATCH__GOOGLE_DRIVE_NOT_USED",
       "pinned_repository": "envido32/OR2006Sprites",
       "pinned_tag": "v0.25.10a",
       "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
       "pinned_release_asset": "OR2-HD-GUI-v0.25.10a.zip",
       "pinned_release_asset_id": 306630789,
       "pinned_zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-      "typed_transport_policy": "OPTIONAL_DIRECT_FILE_MISS_IS_SOURCE_TRANSPORT_MISS_AND_MUST_FALL_THROUGH__SOURCE_IDENTITY_MISMATCH_ONLY_FOR_OBTAINED_BYTES_THAT_FAIL_CANONICAL_IDENTITY"
+      "typed_transport_policy": "OBTAINED_MISMATCH_IS_SOURCE_IDENTITY_MISMATCH__DIRECT_MISMATCH_DOES_NOT_PROVE_RELEASE_BUNDLE_ABSENCE__GITHUB_ONLY_NEXT_TIER_REQUIRED_BY_DISPATCH"
     },
     "heavy_qa_reuse": {
       "repeated_heavy_candidate_pixel_qa": false,
-      "index152_reused_existing_c_pass": true,
-      "index152_reused_c_task": "LOCALIZATION-LOCALIZATION_C-00116",
-      "index152_reused_source_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
-      "index99_new_source_and_segmentation_recheck": true,
-      "index215_source_identity_guard_recheck": true,
-      "reason": "No producer input contains a new Korean candidate DDS. C reused only the unchanged index152 source/geometry PASS fingerprint and directly reproduced the new index99 segmentation and index215 source mismatch; candidate-only containment/alpha/source-comparison work was not repeated or falsely passed."
+      "a00149_stock_direct_source_identity_rechecks": 3,
+      "a00149_historical_4x_geometry_qa_reused": true,
+      "b00148_canonical_source_identity_rechecked": true,
+      "b00148_bc3_alpha_mask_recipe_reproduced": true,
+      "b00148_exploratory_luminance_metrics_repeated": false,
+      "reason": "Neither producer input contains a Korean candidate DDS. C independently repeated only the new/changed source identity and index112 mask-recipe dependencies; unchanged historical 4x lineage evidence was reused, and non-authoritative exploratory luminance thresholds were not repeated."
     },
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
@@ -916,18 +919,17 @@
     "superseded_inputs": [],
     "newer_same_asset_candidate_or_source_fingerprints": [],
     "newer_disjoint_producers": [
-      "LOCALIZATION-LOCALIZATION_A-00149",
-      "LOCALIZATION-LOCALIZATION_B-00148"
+      "LOCALIZATION-LOCALIZATION_A-00151"
     ],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-2158-C125/C125_Q00023_INDEPENDENT_QA_BATCH.json",
+    "report": "localization/graphics/role_C/20260929-2210-C126/C126_Q00024_INDEPENDENT_QA_BATCH.json",
     "rework_required_inputs": [],
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00144@8b4f5ce719ef813b9efe2d786067149e2452fccd",
-      "LOCALIZATION-LOCALIZATION_A-00146@b1d6aa128d62094b08bbeb08158d667b4332d4da"
+      "LOCALIZATION-LOCALIZATION_A-00149@e136d3f70d60534c63b0845b47ccfb17826a8418",
+      "LOCALIZATION-LOCALIZATION_B-00148@40ddc5bece0c62c1973e5297e7831d958c45bb3b"
     ]
   }
 }
