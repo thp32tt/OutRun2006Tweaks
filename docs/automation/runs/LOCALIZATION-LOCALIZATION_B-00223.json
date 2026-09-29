@@ -1,0 +1,296 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00223-p00118-exact-source-replay-index217-mismatch-index193-source-native-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00223",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "wave_id": "P00118",
+  "recorded_at_kst": "2026-09-30T06:57:38+09:00",
+  "base_head_sha": "1451ceb2ce8a452b69588eeed48ad19cd3647a02",
+  "commit_mode": "SINGLE_FILE_EMBEDDED_MATERIAL_TASK_RECORD",
+  "result": "PASS_MATERIAL_INDEX217_PINNED_SOURCE_IDENTITY_MISMATCH_AND_INDEX193_EXACT_CANONICAL_SOURCE_HEADER_ORIENTATION_ALPHA_SCOPE_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Fresh B-shard scan retains no C-accepted B RENDER_READY/ONE_STAGE_TO_RENDER item. Continuation first closes B00219 index217 transport uncertainty using the exact pinned v0.25.10a archive: the exact D1039D6F member and pinned-tag Git blob are byte-identical but SHA-256 d3d2d155... does not match current inventory 035714f9..., so index217 is SOURCE_IDENTITY_MISMATCH and remains fail-closed. The task then advances independent B-shard index193/97E863AD: exact pinned archive bytes reproduce current inventory SHA-256 d308bf05..., prior pinned Git blob 71c99619..., RGBA32 2048x1024 mip1 header and FLIP_Y readable orientation. Replaying all 18 C-accepted inherited inspection scopes on the exact canonical source yields 15 nonempty / 3 transparent scopes; 14 of 15 nonempty scopes have source alpha touching an inherited scope edge, proving those 2px cell guards are only upper-bound inspection scopes and cannot be promoted to final source-effect/removal or candidate-safe bboxes. No Korean DDS is emitted until semantic-specific exact effect masks/CLEAN_PLATE are derived from the canonical full canvas. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_queue_blob_sha": "a96e983ebde2c5e81da142dea682a5f8cba8dc27",
+    "fresh_ready_scan": {
+      "b_render_ready_indices": [],
+      "b_one_stage_to_render_indices": [],
+      "direct_rework_runnable_indices": [],
+      "skipped_qa_pending_indices": [
+        133,
+        220,
+        232
+      ],
+      "skipped_static_pass_indices": [
+        226
+      ],
+      "skipped_unchanged_dependency_blocked_rework_indices": [
+        94,
+        121
+      ]
+    },
+    "continued_prior_preflight": {
+      "index": 217,
+      "asset": "D1039D6F",
+      "prior_task": "LOCALIZATION-LOCALIZATION_B-00219"
+    },
+    "independent_material_target": {
+      "index": 193,
+      "asset": "97E863AD",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds"
+    }
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "a96e983ebde2c5e81da142dea682a5f8cba8dc27",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "b00219_task_record_blob_sha": "012b002c081cd46f3fdd3e4bb5e1eec3f031742c",
+    "a00098_work_order_blob_sha": "4d732c7f42e99dec7efa5c7e9d325d9bf09a1da8"
+  },
+  "pinned_archive": {
+    "name": "OR2-HD-GUI-v0.25.10a.zip",
+    "bytes": 306223257,
+    "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "digest_status": "PASS_EXACT_PINNED_RELEASE_DIGEST"
+  },
+  "index217_source_replay": {
+    "index": 217,
+    "asset": "D1039D6F",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds",
+    "inventory_expected_sha256": "035714f910d608da4542ce7d52508d940559ce2ef25b1efb3108665fe5477caf",
+    "inventory_expected_canvas": [
+      2048,
+      2048
+    ],
+    "inventory_expected_mode": "RGBA",
+    "pinned_archive_member": {
+      "bytes": 16777344,
+      "sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "git_blob_sha1": "544b638f755c2c1615ff1882853635bfd438e4c2",
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "pinned_tag_locator": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "git_blob_sha": "544b638f755c2c1615ff1882853635bfd438e4c2",
+      "byte_identity_with_release_member": "PASS_BY_GIT_BLOB_SHA1"
+    },
+    "approved_google_drive_exact_name_search": "SOURCE_TRANSPORT_MISS",
+    "classification": "SOURCE_IDENTITY_MISMATCH",
+    "mismatch_rule": "Pinned approved source bytes were obtained but fail current inventory raw SHA-256 identity. Do not reinterpret path/size/canvas agreement as identity proof.",
+    "candidate_attempted": false,
+    "required_next": "C/shared-state owner must reconcile whether current inventory SHA 035714f9... or pinned release/tag identity d3d2d155... is canonical before any index217 source-effect mask, CLEAN_PLATE, render or DDS candidate work."
+  },
+  "index193_exact_source_preflight": {
+    "index": 193,
+    "asset": "97E863AD",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "source_identity": {
+      "inventory_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "pinned_archive_member_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "sha256_identity": "PASS",
+      "bytes": 8388736,
+      "git_blob_sha1": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+      "prior_a00098_pinned_git_blob_sha1": "71c9961992b6718cd3da0222c83a88bd9cd22d7f",
+      "git_blob_identity": "PASS"
+    },
+    "dds_header": {
+      "width": 2048,
+      "height": 1024,
+      "flags_hex": "0x2100f",
+      "pitch_bytes": 8192,
+      "mipmaps": 1,
+      "pixel_format_size": 32,
+      "pixel_format_flags_hex": "0x41",
+      "fourcc": "NONE",
+      "rgb_bits": 32,
+      "r_mask_hex": "0x000000ff",
+      "g_mask_hex": "0x0000ff00",
+      "b_mask_hex": "0x00ff0000",
+      "a_mask_hex": "0xff000000",
+      "caps_hex": "0x1000",
+      "status": "PASS_RGBA32_MIP1"
+    },
+    "orientation": {
+      "raw_to_readable": "flip_y",
+      "decoded_raw_rgba_sha256": "201761d1360a14cee6acb9ef560a519a3557ce5290583616117ed8aba990f76b",
+      "decoded_readable_rgba_sha256": "20b369027f602f4226ef27984bf174f8b8cae6bee6ea0affd2e54764ff7ca4bf",
+      "evidence": "Direct decoded inspection: raw atlas lettering is vertically inverted; FLIP_Y yields legible canonical English labels without X mirroring.",
+      "status": "PASS"
+    },
+    "canonical_semantics": {
+      "status": "PASS_13_OF_13_CURRENT_REVIEWED_TRANSLATIONS_REUSED",
+      "count": 13,
+      "pairs": [
+        [
+          "WELCOME TO THE",
+          "환영합니다"
+        ],
+        [
+          "MULTIPLAYER",
+          "멀티플레이"
+        ],
+        [
+          "View the online multiplayer rankings!",
+          "온라인 멀티플레이 랭킹 보기"
+        ],
+        [
+          "View OutRun2SP arcade rankings!",
+          "아웃런2 SP 아케이드 랭킹 보기"
+        ],
+        [
+          "View OutRun single player rankings!",
+          "아웃런 싱글 플레이 랭킹 보기"
+        ],
+        [
+          "Goal A",
+          "골 A"
+        ],
+        [
+          "Goal B",
+          "골 B"
+        ],
+        [
+          "Goal C",
+          "골 C"
+        ],
+        [
+          "Goal D",
+          "골 D"
+        ],
+        [
+          "Goal E",
+          "골 E"
+        ],
+        [
+          "15 Cont.",
+          "15코스"
+        ],
+        [
+          "ONLINE",
+          "온라인"
+        ],
+        [
+          "OUTRUN SHOWROOM",
+          "아웃런 쇼룸"
+        ]
+      ]
+    },
+    "inherited_scope_replay": {
+      "source": "A00098_P00032_V2_DIRECT_INSPECTION_WORK_ORDER_REPORT.json",
+      "scope_count": 18,
+      "metric_rule": "For each inherited raw atlas region, evaluate exact canonical source alpha>0 only. These are inspection diagnostics, NOT source-effect/removal masks.",
+      "source_alpha_total_pixels": 252084,
+      "source_alpha_binary_mask_sha256": "ac01e282de04cd332d11610b7fbc771b3d900fbc20d101c34f7cfadbe5a820c9",
+      "scope_union_alpha_pixels": 158153,
+      "scope_union_alpha_binary_mask_sha256": "38fb91b0a3d4ee494b29d19877b56c7c7914b26872aac31cdf1138cc405b1512",
+      "source_alpha_outside_scope_union_pixels": 93931,
+      "source_alpha_outside_scope_union_mask_sha256": "99f304484b18b4c5b88a3eabafcbf8c630952f2e9c1fb212667715ae241ba558",
+      "scope_union_coverage_percent_of_source_alpha": 62.738214,
+      "alpha_pixels_by_work_unit": [
+        8797,
+        39983,
+        37943,
+        25334,
+        0,
+        14139,
+        695,
+        4000,
+        4172,
+        4953,
+        1757,
+        543,
+        374,
+        0,
+        12589,
+        1499,
+        1375,
+        0
+      ],
+      "transparent_work_units": [
+        5,
+        14,
+        18
+      ],
+      "nonempty_work_units": 15,
+      "nonempty_edge_touch_work_units": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17
+      ],
+      "nonempty_edge_touch_count": 14,
+      "only_nonempty_scope_without_alpha_edge_contact": [
+        4
+      ],
+      "conclusion": "The inherited 2px cell guards remain upper-bound inspection scopes only. Exact canonical alpha already touches one or more scope edges in 14/15 nonempty units, so those guards cannot be treated as final source-effect/removal or candidate-safe bboxes. Semantic-specific full-canvas effect segmentation is required."
+    },
+    "readiness_before": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_DECODE_NOT_YET_REPLAYED",
+    "readiness_after": "PREFLIGHT_ONLY_EXACT_SOURCE_IDENTITY_HEADER_ORIENTATION_RESOLVED__INHERITED_SCOPE_EDGE_COLLISIONS_MEASURED__SEMANTIC_EFFECT_MASK_AND_CLEAN_PLATE_PENDING",
+    "render_ready": false,
+    "one_stage_to_render": false,
+    "candidate_attempted": false,
+    "candidate_attempt_reason": "Exact source is now proven, but 14/15 nonempty inherited scopes have alpha edge contact and no semantic-specific exact source-effect/removal masks or independently QA-passed CLEAN_PLATE yet. Rendering would violate the zero-pixel/whole-cell-clear rules.",
+    "required_next": [
+      "Segment exact localizable English effects from the full 2048x1024 canonical source rather than inheriting old cell guards.",
+      "Separate protected TESTAROSSA/OUTRUN2SP and other non-localizable artwork from localizable text pixels.",
+      "Bind every visible localizable effect cluster to the 13 reviewed semantics, including all Goal A-E occurrences.",
+      "Create exact removal/protected masks, deterministic CLEAN_PLATE and measured 2px-inset candidate_safe_bbox; if that completes readiness, continue through Korean render in the same producer invocation."
+    ]
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "EXACT_PINNED_SOURCE_IDENTITY_REPLAY_PLUS_SOURCE_NATIVE_HEADER_ORIENTATION_AND_ALPHA_SCOPE_DIAGNOSTICS",
+    "reviewed_indices": [
+      217,
+      193
+    ],
+    "primary_advanced_index": 193,
+    "index217_transport_uncertainty_closed": true,
+    "index217_new_typed_identity_mismatch": true,
+    "index193_exact_source_identity_newly_proven": true,
+    "index193_header_orientation_newly_proven": true,
+    "index193_inherited_scope_alpha_diagnostics_newly_produced": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3__NO_READY_TIER_SKIPPED__INDEX217_PINNED_TAG_RELEASE_BYTE_IDENTITY_PROVEN_BUT_CURRENT_INVENTORY_SHA_MISMATCH_FAIL_CLOSED__INDEX193_CANONICAL_SHA_D308BF05_AND_GIT_BLOB_71C99619_EXACT__RGBA32_2048X1024_MIP1__FLIP_Y__18_SCOPE_REPLAY_15_NONEMPTY_3_TRANSPARENT_14_OF_15_NONEMPTY_EDGE_TOUCH__NO_GUARD_PROMOTION__NO_CANDIDATE",
+  "candidate_static_qa": "HOLD_NO_KOREAN_CANDIDATE",
+  "evidence_embedded_in_task_record": true,
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Exact immutable pinned v0.25.10a source replay only; GitHub branch remains state/progress/QA SSOT.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null
+}
