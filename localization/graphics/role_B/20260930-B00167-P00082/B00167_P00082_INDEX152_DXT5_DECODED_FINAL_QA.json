@@ -4,9 +4,10 @@
   "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
   "wave_id": "P00082",
   "lane": "LOCALIZATION_B",
-  "recorded_at_kst": "2026-09-30T00:36:11+09:00",
+  "recorded_at_kst": "2026-09-30T00:44:02+09:00",
   "status": "PASS",
-  "result": "PASS_INDEX152_49BB5FE5_KOREAN_DXT5_CANDIDATE_MACHINE_SELF_QA_PENDING_C_RUNTIME_UNTESTED",
+  "result": "PASS_INDEX152_49BB5FE5_KOREAN_DXT5_REWORK_MACHINE_QA_PENDING_B_VISUAL_C_RUNTIME_UNTESTED",
+  "supersedes_rejected_machine_only_commit": "47031bd5b9d3aa0646d5419a12e5685eeda2824d",
   "source_transport": {
     "google_drive_exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
     "google_drive_outcome": "SOURCE_TRANSPORT_MISS",
@@ -101,30 +102,40 @@
     "union_expected": 5876
   },
   "clean_plate": {
-    "method": "replace accepted removal-mask pixels with each cell's independently measured dominant background, then patch only original BC3 color indices while preserving endpoints+alpha",
-    "decoded_changed_pixels_outside_removal_union": 0,
+    "method": "accepted B00152 RLE pixels flattened to measured cell background; touched BC3 color blocks fully re-encoded while preserving alpha bytes exactly",
+    "decoded_changed_pixels_outside_touched_bc3_blocks": 0,
+    "alpha_changed_pixels": 0,
     "accepted_rle_reuse": "PASS_B00152_C127_UNCHANGED_FINGERPRINT_5876_PIXELS_556_RUNS",
-    "background_palette_gate_by_element": {
+    "visible_residue_gate_by_element": {
       "PRO.": {
-        "checked_pixels": 1688,
-        "non_background_palette_index_pixels": 0
+        "protected_source_background_max_distance": 8.774964387392123,
+        "clean_removed_max_background_distance": 5.385164807134504,
+        "contrast_limit": 36.0,
+        "white_core_pixels_on_removed": 0
       },
       "INS.": {
-        "checked_pixels": 1546,
-        "non_background_palette_index_pixels": 0
+        "protected_source_background_max_distance": 9.643650760992955,
+        "clean_removed_max_background_distance": 3.1622776601683795,
+        "contrast_limit": 36.0,
+        "white_core_pixels_on_removed": 0
       },
       "G.M.": {
-        "checked_pixels": 1449,
-        "non_background_palette_index_pixels": 0
+        "protected_source_background_max_distance": 8.831760866327848,
+        "clean_removed_max_background_distance": 3.7416573867739413,
+        "contrast_limit": 36.0,
+        "white_core_pixels_on_removed": 0
       },
       "E.R.": {
-        "checked_pixels": 1193,
-        "non_background_palette_index_pixels": 0
+        "protected_source_background_max_distance": 10.44030650891055,
+        "clean_removed_max_background_distance": 3.605551275463989,
+        "contrast_limit": 36.0,
+        "white_core_pixels_on_removed": 0
       }
     },
     "bc3_patch_stats": {
-      "touched_blocks": 532,
-      "changed_color_index_pixels": 5660
+      "touched_color_blocks": 532,
+      "block_aligned_permitted_pixels": 8512,
+      "logical_edit_pixels": 5876
     },
     "status": "PASS"
   },
@@ -184,21 +195,27 @@
   },
   "dds": {
     "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
-    "candidate_sha256": "da8cf41d8416c50780e6264457b3a2ab08b28d84265b10754f0e550bf97deca3",
+    "candidate_sha256": "f1f1d28eb56445bcaa5d93ff38703c7a3b9963720f528a766dd2dbf8c897575f",
     "bytes": 65664,
     "header_128_exact": true,
     "bc3_alpha_bytes_exact_all_blocks": true,
-    "bc3_color_endpoints_exact_all_blocks": true,
-    "patch_strategy": "preserve source BC3 endpoints/alpha; modify only 2-bit color indices for pixels whose clean/render target differs",
-    "patch_stats": {
-      "touched_blocks": 461,
-      "changed_color_index_pixels": 4150
+    "bc3_color_endpoints_reencoded_on_touched_blocks": true,
+    "patch_strategy": "CLEAN_PLATE and Korean touched blocks fully re-encode BC1 color endpoints+indices; BC3 alpha half remains byte-identical",
+    "clean_patch_stats": {
+      "touched_color_blocks": 532,
+      "block_aligned_permitted_pixels": 8512,
+      "logical_edit_pixels": 5876
+    },
+    "korean_patch_stats": {
+      "touched_color_blocks": 333,
+      "block_aligned_permitted_pixels": 5328,
+      "logical_edit_pixels": 3304
     }
   },
   "decoded_final": {
-    "changed_pixels_outside_removal_or_safe_union": 0,
+    "changed_pixels_outside_block_aligned_permitted_region": 0,
     "alpha_changed_pixels": 0,
-    "protected_pixels_exact": 55875,
+    "protected_pixels_exact": 55936,
     "per_element": [
       {
         "source": "PRO.",
@@ -223,18 +240,19 @@
           102,
           119
         ],
-        "decoded_korean_change_bbox_raw": [
+        "decoded_korean_foreground_bbox_raw": [
           30,
           10,
           90,
           38
         ],
-        "decoded_korean_change_pixels": 815,
-        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
-          "checked_pixels": 987,
-          "decoded_mismatch_pixels": 0,
-          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
-        },
+        "decoded_korean_foreground_pixels": 1045,
+        "decoded_korean_white_core_pixels": 814,
+        "requested_text_pixels": 1071,
+        "requested_text_changed_coverage": 0.9794584500466853,
+        "high_contrast_pixels_outside_safe": 0,
+        "old_english_high_contrast_residue_outside_korean": 0,
+        "contrast_threshold": 60.0,
         "containment": "PASS"
       },
       {
@@ -260,18 +278,19 @@
           212,
           120
         ],
-        "decoded_korean_change_bbox_raw": [
+        "decoded_korean_foreground_bbox_raw": [
           149,
           9,
           201,
           38
         ],
-        "decoded_korean_change_pixels": 568,
-        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
-          "checked_pixels": 1031,
-          "decoded_mismatch_pixels": 0,
-          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
-        },
+        "decoded_korean_foreground_pixels": 747,
+        "decoded_korean_white_core_pixels": 578,
+        "requested_text_pixels": 807,
+        "requested_text_changed_coverage": 0.9405204460966543,
+        "high_contrast_pixels_outside_safe": 0,
+        "old_english_high_contrast_residue_outside_korean": 0,
+        "contrast_threshold": 60.0,
         "containment": "PASS"
       },
       {
@@ -297,18 +316,19 @@
           331,
           119
         ],
-        "decoded_korean_change_bbox_raw": [
+        "decoded_korean_foreground_bbox_raw": [
           267,
           10,
-          316,
+          318,
           38
         ],
-        "decoded_korean_change_pixels": 549,
-        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
-          "checked_pixels": 1079,
-          "decoded_mismatch_pixels": 0,
-          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
-        },
+        "decoded_korean_foreground_pixels": 635,
+        "decoded_korean_white_core_pixels": 454,
+        "requested_text_pixels": 713,
+        "requested_text_changed_coverage": 0.9509116409537167,
+        "high_contrast_pixels_outside_safe": 0,
+        "old_english_high_contrast_residue_outside_korean": 0,
+        "contrast_threshold": 60.0,
         "containment": "PASS"
       },
       {
@@ -334,31 +354,32 @@
           442,
           118
         ],
-        "decoded_korean_change_bbox_raw": [
+        "decoded_korean_foreground_bbox_raw": [
           385,
           11,
           433,
           37
         ],
-        "decoded_korean_change_pixels": 597,
-        "old_english_pixels_outside_korean_decoded_clean_plate_gate": {
-          "checked_pixels": 836,
-          "decoded_mismatch_pixels": 0,
-          "rule": "final decoded RGBA equals decoded clean plate on accepted source-removal pixels not occupied by Korean lettering"
-        },
+        "decoded_korean_foreground_pixels": 680,
+        "decoded_korean_white_core_pixels": 512,
+        "requested_text_pixels": 713,
+        "requested_text_changed_coverage": 0.9803646563814866,
+        "high_contrast_pixels_outside_safe": 0,
+        "old_english_high_contrast_residue_outside_korean": 0,
+        "contrast_threshold": 60.0,
         "containment": "PASS"
       }
     ],
-    "preserve_year_cells": "'89 and '86 untouched because all final changes are confined to removal_union OR four safe bboxes",
+    "preserve_year_cells": "PASS_'89_AND_'86_DECODED_RGBA_EXACT",
     "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
-    "containment": "PASS_ZERO_PIXEL_OUTSIDE_EDIT_UNION"
+    "containment": "PASS_NO_CHANGE_OUTSIDE_TOUCHED_BC3_BLOCKS"
   },
   "comparison_evidence": [
     "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/comparison_full_readable.png",
     "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/comparison_textrow_readable.png"
   ],
-  "visual_validation": "SOURCE_VS_KOREAN_PROOF_RETAINED__INDEPENDENT_C_VISUAL_PENDING",
-  "candidate_static_qa": "PASS_MACHINE_DECODED_FINAL_PENDING_INDEPENDENT_C_VISUAL",
+  "visual_validation": "SOURCE_VS_CLEAN_VS_KOREAN_PROOF_RETAINED__B_VISUAL_PENDING__INDEPENDENT_C_VISUAL_PENDING",
+  "candidate_static_qa": "PASS_MACHINE_DECODED_FINAL_PENDING_B_VISUAL_AND_INDEPENDENT_C_VISUAL",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
