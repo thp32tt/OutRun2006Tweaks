@@ -1,0 +1,60 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00066",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00007",
+  "recorded_at_kst": "2026-09-29T14:04:39+09:00",
+  "base_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+  "result": "PASS_MATERIAL_FALLBACK4_COMPLETE_EVEN_CELL_MAPPING_35_CANONICAL_3_OMISSIONS",
+  "summary": "Advanced four even-shard pending assets without touching B62 QA-pending work: completed all 7 canonical cell mappings for 9FC88069, mapped START/GOAL to BF229CF4 sprite_307, completed all 12 canonical category/status mappings for E95DA5, and mapped all 14 FEF70E85 course names. Three additional English source strings were discovered and fail-closed for C translation reconciliation. No Korean DDS or shared state was modified.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1400-B116-P00007/B116_P00007_EVEN_SEMANTIC_CELL_MAPPING.json",
+    "localization/graphics/role_B/20260929-1400-B116-P00007/B116_198_9FC88069_STOCK_DXT5_ALPHA_RAW.png",
+    "localization/graphics/role_B/20260929-1400-B116-P00007/B116_214_BF229CF4_ENGLISH_SOURCE.png",
+    "localization/graphics/role_B/20260929-1400-B116-P00007/B116_230_E95DA5_STOCK_DXT5_ALPHA_RAW.png",
+    "localization/graphics/role_B/20260929-1400-B116-P00007/B116_236_FEF70E85_STOCK_DXT5_ALPHA_RAW.png"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_EVEN_SEMANTIC_CELL_RECONSTRUCTION_INPUTS",
+    "indices": [
+      198,
+      214,
+      230,
+      236
+    ],
+    "assets": [
+      "9FC88069",
+      "BF229CF4",
+      "E95DA5",
+      "FEF70E85"
+    ],
+    "canonical_semantics_mapped": 35,
+    "canonical_physical_text_occurrences_mapped": 35,
+    "newly_mapped_canonical_semantics": 27,
+    "source_text_omissions_detected": 3,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "task_result": "LOCALIZATION-LOCALIZATION_B-00062@2579efe87a6f20d7a9c12c930dec122d125d04d8",
+    "assets": [
+      188,
+      212,
+      226,
+      232
+    ]
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
