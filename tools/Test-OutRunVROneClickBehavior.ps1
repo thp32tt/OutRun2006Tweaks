@@ -64,8 +64,10 @@ try{
     Write-FakePe (Join-Path $root 'backends/d3d9/dinput8.dll') 0x014C 2
     Write-FakePe (Join-Path $root 'backends/d3d9/outrun-vr-host.exe') 0x8664 3
     Set-Content (Join-Path $root 'backends/d3d9/SOURCE_SHA.txt') 'test-source-sha' -Encoding ascii
+    Set-Content (Join-Path $root 'backends/d3d9/VARIANT_ID.txt') 'R69_FIXPACK' -Encoding ascii
     Write-FakePe (Join-Path $root 'backends/dxvk/d3d9.dll') 0x014C 4
     Set-Content (Join-Path $root 'backends/dxvk/DXVK_VERSION.txt') '3.1.1' -Encoding ascii
+    Set-Content (Join-Path $root 'backends/dxvk/VARIANT_ID.txt') 'R69_FIXPACK' -Encoding ascii
     $providerHash=(Get-FileHash (Join-Path $root 'backends/dxvk/d3d9.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
     Set-Content (Join-Path $root 'backends/dxvk/DXVK_D3D9_SHA256.txt') $providerHash -Encoding ascii
 
@@ -91,6 +93,7 @@ try{
     if(-not [bool]$report.PackageIntegrity.Verified){throw 'Valid preflight did not verify package integrity.'}
     if(-not [bool]$report.SlotPayload.MatchesCanonicalPayload){throw 'Valid preflight did not attest target slot precedence.'}
     if([string]$report.SourceSha -ne 'test-source-sha'){throw "Valid preflight source mismatch: $($report.SourceSha)"}
+    if([string]$report.VariantId -ne 'R69_FIXPACK'){throw "Valid preflight variant mismatch: $($report.VariantId)"}
     if([string]$report.Dxvk.Version -ne '3.1.1'){throw "Valid preflight DXVK version mismatch: $($report.Dxvk.Version)"}
 
     # A target-named slot can outrank the canonical backend only while its
@@ -111,6 +114,22 @@ try{
     } 'Package source mismatch'
     $buildInputs.IntegrationSha='test-source-sha'
     $buildInputs|ConvertTo-Json -Depth 4|Set-Content (Join-Path $root 'BUILD_INPUTS.json') -Encoding UTF8
+
+    $buildInputs.VariantId='ACTIVE_R26_HUD_R69'
+    $buildInputs|ConvertTo-Json -Depth 4|Set-Content (Join-Path $root 'BUILD_INPUTS.json') -Encoding UTF8
+    Write-PackageManifest $root
+    Expect-Failure 'package-variant' {
+        & (Join-Path $root 'Test-OutRunVROneClickPreflight.ps1') -Backend dxvk-safe
+    } 'Package variant mismatch: BUILD_INPUTS='
+    $buildInputs.VariantId='R69_FIXPACK'
+    $buildInputs|ConvertTo-Json -Depth 4|Set-Content (Join-Path $root 'BUILD_INPUTS.json') -Encoding UTF8
+
+    Set-Content (Join-Path $root 'backends/dxvk/VARIANT_ID.txt') 'DXVK_SAFE_R71' -Encoding ascii
+    Write-PackageManifest $root
+    Expect-Failure 'backend-variant' {
+        & (Join-Path $root 'Test-OutRunVROneClickPreflight.ps1') -Backend dxvk-safe
+    } 'Package variant mismatch: backends/dxvk'
+    Set-Content (Join-Path $root 'backends/dxvk/VARIANT_ID.txt') 'R69_FIXPACK' -Encoding ascii
 
     Set-Content (Join-Path $root 'backends/dxvk/DXVK_D3D9_SHA256.txt') ('0'*64) -Encoding ascii
     Write-PackageManifest $root

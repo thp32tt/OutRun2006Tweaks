@@ -217,10 +217,16 @@ Write-Host 'PC fast binary proven-baseline markers PASS.'
 $hostExe = Join-Path $hostBuild 'bin/outrun-vr-host.exe'
 if (-not (Test-Path $hostExe)) { throw 'outrun-vr-host.exe missing after incremental build.' }
 
+$oneClickTarget = Get-Content 'tools/VR_ONE_CLICK_TARGET.json' -Raw | ConvertFrom-Json
+$canonicalVariantId = [string]$oneClickTarget.VariantId
+if ([string]::IsNullOrWhiteSpace($canonicalVariantId)) {
+    throw 'VR_ONE_CLICK_TARGET.json has no canonical VariantId.'
+}
+
 Copy-Item $dll.FullName (Join-Path $backendDir 'dinput8.dll')
 Copy-Item $hostExe (Join-Path $backendDir 'outrun-vr-host.exe')
 Set-Content (Join-Path $backendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
-Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69' -Encoding ascii
+Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') $canonicalVariantId -Encoding ascii
 Assert-R66ProvenBuildContract -BuildDir $gameBuild
 Set-Content (Join-Path $backendDir 'CMAKE_FLAGS.txt') $canonicalGameFlagString -Encoding ascii
 Set-Content (Join-Path $backendDir 'BUILD_CONTRACT.txt') $buildContractVersion -Encoding ascii
@@ -233,7 +239,7 @@ Copy-Item $dxvkProvider (Join-Path $dxvkBackendDir 'd3d9.dll')
 Set-Content (Join-Path $dxvkBackendDir 'SOURCE_SHA.txt') $sourceSha -Encoding ascii
 Set-Content (Join-Path $dxvkBackendDir 'DXVK_VERSION.txt') $dxvkVersion -Encoding ascii
 Set-Content (Join-Path $dxvkBackendDir 'DXVK_D3D9_SHA256.txt') $dxvkProviderSha -Encoding ascii
-Set-Content (Join-Path $dxvkBackendDir 'VARIANT_ID.txt') 'DXVK_SAFE_R71' -Encoding ascii
+Set-Content (Join-Path $dxvkBackendDir 'VARIANT_ID.txt') $canonicalVariantId -Encoding ascii
 
 Copy-Item 'OutRun2006Tweaks.ini' (Join-Path $packageDir 'OutRun2006Tweaks.ini')
 Copy-Item 'OutRun2006Tweaks.lods.ini' (Join-Path $packageDir 'OutRun2006Tweaks.lods.ini')
@@ -286,7 +292,6 @@ $matrixId = "PC-FAST-$stamp-$shortSha"
 Set-Content (Join-Path $packageDir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
 Set-Content (Join-Path $packageDir 'PC_FAST_BUILD.txt') "PC_FAST_${buildMode}_NOT_FINAL_CI" -Encoding ascii
 
-$oneClickTarget = Get-Content 'tools/VR_ONE_CLICK_TARGET.json' -Raw | ConvertFrom-Json
 $buildInputs = [ordered]@{
     SchemaVersion = 1
     BuildMatrixId = $matrixId
@@ -295,7 +300,7 @@ $buildInputs = [ordered]@{
     RendererTarget = [string]$oneClickTarget.RendererTarget
     DevelopmentStage = [string]$oneClickTarget.Stage
     LaunchBackend = [string]$oneClickTarget.LaunchBackend
-    VariantId = 'ACTIVE_R26_HUD_R69'
+    VariantId = $canonicalVariantId
     DefaultTestProfile = 'CORRECTNESS'
     Profiles = @('CONTROL', 'CORRECTNESS', 'PERFORMANCE')
     UserRuntimeVerified = $false

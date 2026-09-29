@@ -96,6 +96,8 @@ preflight = require(
     "DXVK_VERSION.txt",
     "DXVK_D3D9_SHA256.txt",
     "DXVK d3d9.dll hash mismatch",
+    "Package variant mismatch",
+    "VARIANT_ID.txt",
     "MultiviewEnabled = ($resolvedBackend -eq 'dxvk')",
 )
 
@@ -108,6 +110,7 @@ package = require(
     "DXVK_VERSION.txt",
     "DXVK_D3D9_SHA256.txt",
     "LaunchBackend = [string]$oneClickTarget.LaunchBackend",
+    "VariantId = $canonicalVariantId",
     "SHA256SUMS.txt",
 )
 if "multiviewpatcher.dll" not in package or "$badExperimental" not in package:

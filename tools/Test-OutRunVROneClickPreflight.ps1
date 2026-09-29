@@ -102,6 +102,20 @@ $sourceShaPath = Require-File (Join-Path $d3d9Backend 'SOURCE_SHA.txt') 'Backend
 $sourceSha = (Get-Content $sourceShaPath -Raw).Trim()
 if ([string]::IsNullOrWhiteSpace($sourceSha)) { throw 'Backend SOURCE_SHA.txt is empty.' }
 
+$canonicalVariantId = [string]$target.VariantId
+$d3d9VariantPath = Require-File (Join-Path $d3d9Backend 'VARIANT_ID.txt') 'D3D9 backend variant identity'
+$d3d9VariantId = (Get-Content $d3d9VariantPath -Raw).Trim()
+if ($d3d9VariantId -ne $canonicalVariantId) {
+    throw "Package variant mismatch: backends/d3d9 VARIANT_ID=$d3d9VariantId target=$canonicalVariantId"
+}
+if ($resolvedBackend -eq 'dxvk-safe' -or $resolvedBackend -eq 'dxvk') {
+    $dxvkVariantPath = Require-File (Join-Path $dxvkBackend 'VARIANT_ID.txt') 'DXVK backend variant identity'
+    $dxvkVariantId = (Get-Content $dxvkVariantPath -Raw).Trim()
+    if ($dxvkVariantId -ne $canonicalVariantId) {
+        throw "Package variant mismatch: backends/dxvk VARIANT_ID=$dxvkVariantId target=$canonicalVariantId"
+    }
+}
+
 # One-click must not allow an old variant slot to silently outrank the
 # package payload that was just verified above. A target-named slot is allowed
 # only when its source identity and executable bytes exactly match the
@@ -153,6 +167,9 @@ if ([string]$buildInputs.RendererTarget -ne [string]$target.RendererTarget) {
 }
 if ([string]$buildInputs.LaunchBackend -ne [string]$target.LaunchBackend) {
     throw "Package launch backend mismatch: BUILD_INPUTS=$($buildInputs.LaunchBackend) target=$($target.LaunchBackend)"
+}
+if ([string]$buildInputs.VariantId -ne $canonicalVariantId) {
+    throw "Package variant mismatch: BUILD_INPUTS=$($buildInputs.VariantId) target=$canonicalVariantId"
 }
 
 $report = [ordered]@{

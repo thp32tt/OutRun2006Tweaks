@@ -161,7 +161,8 @@ foreach ($requiredText in @(
     'DevelopmentBranch = [string]$oneClickTarget.DevelopmentBranch',
     'RendererTarget = [string]$oneClickTarget.RendererTarget',
     'DevelopmentStage = [string]$oneClickTarget.Stage',
-    'LaunchBackend = [string]$oneClickTarget.LaunchBackend'
+    'LaunchBackend = [string]$oneClickTarget.LaunchBackend',
+    'VariantId = $canonicalVariantId'
 )) {
     if ($package -notmatch [regex]::Escape($requiredText)) {
         throw "Package source/branch identity contract missing: $requiredText"
@@ -174,6 +175,7 @@ foreach ($requiredText in @(
     'Package branch mismatch',
     'Package renderer mismatch',
     'Package launch backend mismatch',
+    'Package variant mismatch',
     'One-click slot source mismatch',
     'One-click slot payload mismatch',
     'SlotPayload',
