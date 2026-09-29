@@ -676,3 +676,37 @@ Rules:
 - Do not tune waits/fences/copies/cadence/resource budgets unless a proven visual/functional/stability defect directly requires it.
 - Preserve frozen user-test source `34eef500b2f79e7e68477d7ffe675f803e809e01` and user-confirmed menu `< >` fix.
 - Build/static success remains `UNTESTED/NEED_HMD_TEST` for visible defects.
+
+
+## Cycle 0030 — SkyGlow composite ordering vs HUD/menu
+
+Finding: `DX9EX-SKYGLOW-HUD-COMPOSITE-ORDER-001`
+
+Evidence:
+- The stereo path captured completed world eyes before the first recognized HUD draw.
+- However, the actual additive SkyGlow composite was deferred to `PresentDestR30`, after HUD/menu pixels were already on the eye surfaces.
+- The composite uses additive ONE+ONE RGB blending. Therefore UI was not a bloom source, but bloom still overlaid the UI afterward, which can make HUD/menu appear washed out or translucent.
+
+Fix:
+- Added `R30CompositeSkyGlowBeforeHud`.
+- Composite at the first recognized HUD boundary in both screen-space HUD and non-world XYZRHW paths.
+- Track `R30SkyGlowAppliedEpoch` to avoid double composite.
+- Track `R30SkyGlowPreHudAttemptEpoch`; after a pre-HUD attempt, Present never falls back to post-HUD additive composite. Failure means no glow for that frame rather than UI wash.
+- Stage transition and Reset clear the new epochs.
+- Kept the R71 final-blur-source fix and composite strength `0.38` unchanged.
+
+Commits:
+- `eac77f71bdac188d8436a1481b612ae055d11b0b`
+- `a23353e9c66f81897f78a84a33633dee6b74d254`
+- `56135e92a140c9753c558a7aff98c1759a6ff9bd`
+
+Validation:
+- Added `P8_R71_SKYGLOW_PRE_HUD_COMPOSITE` structural regression guard.
+- AUTOMATION_VALIDATION: `EXACT_HEAD_CI_PENDING`
+- RUNTIME_VALIDATION: `UNTESTED`
+- Visual PASS is not claimed until Quest3/VDXR testing.
+
+Next:
+- Validate exact head.
+- Then review HUD/menu blend/alpha state as an independent cause.
+- Do not resume performance-only optimization.
