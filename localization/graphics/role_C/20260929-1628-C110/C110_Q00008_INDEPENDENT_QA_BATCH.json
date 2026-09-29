@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00089",
+  "wave_id": "Q00008",
+  "qa_batch_id": "Q00008",
+  "run": "C110",
+  "lane": "LOCALIZATION_C",
+  "recorded_at_kst": "2026-09-29T16:28:15+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "d7a3cb3200bdc658423745a55701f5e00ac05d4d",
+  "result": "PASS_Q00008_TWO_INPUTS_8_ASSETS_53_CANONICAL_SEMANTICS_49_PAYLOAD_SCOPES_NO_DDS_RUNTIME_UNTESTED",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00085",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "7dca0c99022e0938102b8fc9e7bc27ccd0a301fd",
+      "producer_id": "P00022"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00084",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "d3f775d7a6f3ce2cb1247d25d0c7789828a26890",
+      "producer_id": "P00021"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00085",
+      "result_sha": "7dca0c99022e0938102b8fc9e7bc27ccd0a301fd",
+      "status": "PASS",
+      "reason": "B00085 exact Release RGBA32 payload-extraction evidence accepted as a pre-generation deliverable. All 4 pinned upstream Release DDS blob identities/sizes match Sonic-TV/OR2006Sprites@a95efe01; current canonical transcription/artwork-plan semantics match 42/42 (38 mapped unique pairs plus 4 explicitly unmapped index-50 pairs). Independent recheck passes 4/4 RGBA32 size equations, 37/37 bottom-left-to-raw coordinate transforms, row-slice formulas and file/canvas bounds, with zero region overlap. No Korean candidate DDS or clean plate exists, so source full-effect masks/orientation/slant and all candidate-only DDS/alpha/containment/English-source comparison gates remain HOLD_STRICT_RECHECK."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00084",
+      "result_sha": "d3f775d7a6f3ce2cb1247d25d0c7789828a26890",
+      "status": "PASS",
+      "reason": "A00084 exact HD payload-scope evidence accepted as a first-pass-v2 source-mask/CLEAN_PLATE input. All 4 pinned upstream Release DDS blob identities/sizes match; current canonical semantics match 11/11. Independent recheck passes 4/4 source size equations and 12/12 payload extraction formulas, file/canvas bounds and exact 2px cell inner guards: 7 semantic-occurrence scopes plus 5 index-175 inspection-cell scopes. Index 175 semantic-to-sprite binding remains explicitly unresolved and the 2px cell guards are upper bounds only, not candidate_safe_bbox. No Korean candidate DDS or clean plate exists, so downstream candidate gates remain HOLD_STRICT_RECHECK."
+    }
+  ],
+  "immutable_input_validation": {
+    "exact_upstream_repository": "Sonic-TV/OR2006Sprites",
+    "exact_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "exact_release_objects": [
+      {
+        "asset": "AA04D779",
+        "blob_sha": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
+        "bytes": 16777344,
+        "status": "PASS"
+      },
+      {
+        "asset": "B1696633",
+        "blob_sha": "cf1c92d295191bf955b9bb1614860614965529f2",
+        "bytes": 16777344,
+        "status": "PASS"
+      },
+      {
+        "asset": "CBF8ECBF",
+        "blob_sha": "8aa143bb3518713687bdaf565101bc0a437fc2ed",
+        "bytes": 33554560,
+        "status": "PASS"
+      },
+      {
+        "asset": "33491F83",
+        "blob_sha": "00a94c32cc35fc773ceed0ece6d1f2f64da841f5",
+        "bytes": 8388736,
+        "status": "PASS"
+      },
+      {
+        "asset": "7CE1CFC5",
+        "blob_sha": "8e79a14a4453c7e015144c1c2e25a4aacc633645",
+        "bytes": 1048704,
+        "status": "PASS"
+      },
+      {
+        "asset": "EBEF6D20",
+        "blob_sha": "f05e35654433b4ce010d119d4a705f505cdd80c2",
+        "bytes": 16777344,
+        "status": "PASS"
+      },
+      {
+        "asset": "841E796B",
+        "blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+        "bytes": 4194432,
+        "status": "PASS"
+      },
+      {
+        "asset": "754F0599",
+        "blob_sha": "60cbe90be5765b4ade3ce80916d9b2c7ed23e589",
+        "bytes": 8388736,
+        "status": "PASS"
+      }
+    ],
+    "exact_release_identity_pass": "8/8"
+  },
+  "heavy_qa_reuse": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "reused_evidence": [
+      {
+        "task": "LOCALIZATION-LOCALIZATION_B-00045",
+        "blob_sha": "af1518bf979a40319cc767fb5963db11ed6e64f0",
+        "status": "EXACT"
+      },
+      {
+        "task": "LOCALIZATION-LOCALIZATION_C-00046",
+        "blob_sha": "6deb8ccf9007ca996c59a373e237a15533e06263",
+        "status": "EXACT"
+      },
+      {
+        "task": "LOCALIZATION-LOCALIZATION_B-00073",
+        "blob_sha": "f4ec7539abe10664101feb8d1f6fbdf88d40dc4f",
+        "status": "EXACT"
+      },
+      {
+        "task": "LOCALIZATION-LOCALIZATION_A-00047",
+        "blob_sha": "4e7afbbd1befe2696ce8ee95eb7d3787e46baf6f",
+        "status": "EXACT"
+      },
+      {
+        "task": "LOCALIZATION-LOCALIZATION_A-00056",
+        "blob_sha": "03ae1dc055b3aee39f7410190cf6048db597b732",
+        "status": "EXACT"
+      },
+      {
+        "task": "LOCALIZATION-LOCALIZATION_A-00068",
+        "blob_sha": "1be098334c00c541fadebe65ffdedf3ca0e391fa",
+        "status": "EXACT"
+      }
+    ]
+  },
+  "independent_checks": {
+    "B00085": {
+      "reviewed_indices": [
+        46,
+        48,
+        50,
+        62
+      ],
+      "current_canonical_semantics": "42/42 PASS",
+      "mapped_unique_semantics": 38,
+      "mapped_physical_occurrences": 40,
+      "explicit_unmapped_index50_semantics": 4,
+      "rgba32_size_equations": "4/4 PASS",
+      "bottom_left_to_raw_coordinate_maps": "37/37 PASS",
+      "row_slice_formulas": "37/37 PASS",
+      "canvas_and_file_bounds": "37/37 PASS",
+      "region_overlap_pairs": 0,
+      "candidate_dds": "NONE",
+      "downstream_gate": "HOLD_STRICT_RECHECK"
+    },
+    "A00084": {
+      "reviewed_indices": [
+        59,
+        65,
+        107,
+        175
+      ],
+      "current_canonical_semantics": "11/11 PASS",
+      "source_size_equations": "4/4 PASS",
+      "payload_scopes": "12/12 PASS",
+      "payload_scope_bounds": "12/12 PASS",
+      "exact_2px_cell_inner_guards": "12/12 PASS",
+      "semantic_occurrence_scopes": 7,
+      "index175_inspection_cell_scopes": 5,
+      "index175_semantic_to_sprite_binding": "HOLD_STRICT_RECHECK",
+      "candidate_dds": "NONE",
+      "clean_plate": "NONE",
+      "downstream_gate": "HOLD_STRICT_RECHECK"
+    }
+  },
+  "supersession_check": {
+    "current_base_head": "d7a3cb3200bdc658423745a55701f5e00ac05d4d",
+    "superseded_inputs": [],
+    "newer_disjoint_producers": [
+      "LOCALIZATION-LOCALIZATION_B-00087",
+      "LOCALIZATION-LOCALIZATION_A-00088",
+      "LOCALIZATION-LOCALIZATION_B-00090"
+    ],
+    "result": "PASS_NO_OVERLAP_WITH_Q00008_REVIEWED_INDICES"
+  },
+  "candidate_gate": {
+    "candidate_dds_modified_by_inputs": false,
+    "candidate_dds_modified_by_c": false,
+    "clean_plate_produced": false,
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "dds_format_mipmap_alpha_compression": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "orientation_slant_style_final": "HOLD_NO_NEW_CANDIDATE",
+    "protected_artwork_final_comparison": "HOLD_NO_NEW_CANDIDATE",
+    "candidate_promotion_granted": false
+  },
+  "shared_state": {
+    "merged_once": true,
+    "canonical_segments": 753,
+    "actionable_queue_total": 137,
+    "actionable_localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_only": 3,
+    "pending_production_localize_text": 76,
+    "metadata_reconciled_segments": 0
+  },
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "conclusion": "PASS: both immutable producer inputs are accepted for the limited pre-generation deliverables they claim. This does not approve any Korean DDS candidate; exact source-effect removal masks, validated CLEAN_PLATEs, final candidate-safe bboxes and decoded-final candidate QA remain required."
+}
