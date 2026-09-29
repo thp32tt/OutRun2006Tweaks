@@ -31,13 +31,13 @@
     {
       "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
       "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
-      "disposition": "PASS",
+      "status": "PASS",
       "reason": "Metadata/reconstruction result accepted: 12/12 pinned upstream objects for three assets plus 3/3 lane ENGLISH_SOURCE blobs match, 17/17 canonical semantics match, and 18 physical occurrences are mapped. Korean candidate-only gates remain HOLD because no candidate DDS was written."
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
       "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
-      "disposition": "PASS",
+      "status": "PASS",
       "reason": "Metadata/reconstruction result accepted: 16/16 pinned upstream objects for four assets plus 4/4 lane ENGLISH_SOURCE blobs match, 32/32 canonical semantics match, 17 physical occurrences are mapped, and index 182 preserve-original classification is confirmed. Korean candidate-only gates remain HOLD because no candidate DDS was written."
     }
   ],
@@ -291,5 +291,16 @@
   "result": "PASS_Q00002_RECONSTRUCTION_MAPPING_EVIDENCE_7_ASSETS_49_SEGMENTS_35_OCCURRENCES_1_PRESERVE_RECLASS_NO_DDS_RUNTIME_UNTESTED",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "gate_retry": {
+    "attempt": "2/3",
+    "failed_run_id": 36523568076,
+    "failed_head_sha": "0e105d24d7ffadfe42469c28cc2da51aa5ab92df",
+    "failure": "verify_state canonical progress counts were overwritten with asset_queue counts",
+    "correction": "canonical progress restored to visual_review/artwork_plan domain counts 95 localize_text / 33 preserve_brand_song_credit; asset_queue remains 94 / 2; qa_dispositions key normalized to status",
+    "heavy_qa_repeated": false,
+    "qa_dispositions_changed": false,
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  }
 }

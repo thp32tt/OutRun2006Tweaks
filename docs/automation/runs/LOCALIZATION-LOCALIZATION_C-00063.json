@@ -3,7 +3,7 @@
   "task_id": "LOCALIZATION-LOCALIZATION_C-00063",
   "lane": "LOCALIZATION_C",
   "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "wave_id": "Q00002",
   "qa_batch_id": "Q00002",
   "recorded_at_kst": "2026-09-29T13:50:47+09:00",
@@ -31,13 +31,13 @@
     {
       "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
       "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
-      "disposition": "PASS",
+      "status": "PASS",
       "reason": "Metadata/reconstruction result accepted: 12/12 pinned upstream objects for three assets plus 3/3 lane ENGLISH_SOURCE blobs match, 17/17 canonical semantics match, and 18 physical occurrences are mapped. Korean candidate-only gates remain HOLD because no candidate DDS was written."
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
       "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
-      "disposition": "PASS",
+      "status": "PASS",
       "reason": "Metadata/reconstruction result accepted: 16/16 pinned upstream objects for four assets plus 4/4 lane ENGLISH_SOURCE blobs match, 32/32 canonical semantics match, 17 physical occurrences are mapped, and index 182 preserve-original classification is confirmed. Korean candidate-only gates remain HOLD because no candidate DDS was written."
     }
   ],
@@ -76,5 +76,40 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "retry_failure_context": {
+    "workflow": "Localization Automation Gate",
+    "exact_run_id": 36523568076,
+    "exact_run_head_sha": "0e105d24d7ffadfe42469c28cc2da51aa5ab92df",
+    "exact_run_conclusion": "failure",
+    "failed_job_id": 109261536106,
+    "failed_step": "Verify localization state",
+    "observed_errors": [
+      "artwork-plan count 95 != localize_text target 94",
+      "visual_review action counts localize_text=95,preserve_brand_song_credit=33 did not match progress localize_text=94,preserve_brand_song_credit=2"
+    ]
+  },
+  "retry_root_cause": {
+    "classification": "C104_SHARED_STATE_COUNT_DOMAIN_MIXUP_PLUS_QA_DISPOSITION_SCHEMA_MISMATCH",
+    "detail": "C104 correctly reclassified index 182 only in the actionable asset queue, but copied queue action counts into canonical progress graphics classification counts. Canonical visual_review/artwork_plan/transcriptions remain 95 localize_text / 33 preserve-brand-song-credit, while asset_queue remains 94 localize_text / 2 preserve-only. The C batch validator also requires qa_dispositions[].status rather than disposition."
+  },
+  "retry_resolution": {
+    "action": "RESTORE_CANONICAL_PROGRESS_COUNTS_AND_FIX_C_BATCH_DISPOSITION_SCHEMA",
+    "duplicate_heavy_qa_performed": false,
+    "qa_result_changed": false,
+    "producer_inputs_changed": false,
+    "canonical_progress_counts": {
+      "localize_text": 95,
+      "preserve_brand_song_credit": 33
+    },
+    "actionable_queue_counts_preserved": {
+      "localize_text": 94,
+      "preserve_brand_song_credit": 2
+    },
+    "index_182_queue_disposition": "PRESERVE_ORIGINAL",
+    "prior_result_sha": "0e105d24d7ffadfe42469c28cc2da51aa5ab92df",
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "retry_report": "localization/graphics/role_C/20260929-1350-C104/C104_Q00002_ATTEMPT2_GATE_REPAIR.json"
 }

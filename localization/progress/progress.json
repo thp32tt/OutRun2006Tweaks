@@ -159,8 +159,8 @@
   "graphics": {
     "total_dds": 243,
     "visually_reviewed": 243,
-    "localize_text": 94,
-    "preserve_brand_song_credit": 2,
+    "localize_text": 95,
+    "preserve_brand_song_credit": 33,
     "font_pipeline": 9,
     "hangul_name_entry": 1,
     "zoom_review": 31,

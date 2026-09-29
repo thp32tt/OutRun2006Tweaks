@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00063",
+  "lane": "LOCALIZATION_C",
+  "wave_id": "Q00002",
+  "attempt": "2/3",
+  "target_branch": "korean-localization-clean",
+  "retry_base_head_sha": "380f4e237c9ceeb12923044f9192f4d9a5c96b8c",
+  "failed_gate": {
+    "run_id": 36523568076,
+    "head_sha": "0e105d24d7ffadfe42469c28cc2da51aa5ab92df",
+    "job_id": 109261536106,
+    "conclusion": "failure",
+    "failed_step": "Verify localization state",
+    "errors": [
+      "artwork-plan count 95 != localize_text target 94",
+      "graphics action counts visual_review=95 localize_text/33 preserve != progress=94 localize_text/2 preserve"
+    ]
+  },
+  "diagnosis": {
+    "canonical_domain": {
+      "visual_review_localize_text": 95,
+      "visual_review_preserve_brand_song_credit": 33,
+      "artwork_plan_assets": 95,
+      "transcription_assets": 95
+    },
+    "actionable_queue_domain": {
+      "rows": 137,
+      "localize_text": 94,
+      "preserve_brand_song_credit": 2,
+      "index_182": "preserve_original"
+    },
+    "root_cause": "C104 mixed actionable asset_queue action counts into canonical graphics classification counters.",
+    "secondary_contract_issue": "qa_dispositions must use top-level status field; attempt 1 used disposition."
+  },
+  "resolution": {
+    "canonical_progress_restored": true,
+    "progress_compatibility_mirror_identical": true,
+    "actionable_queue_changed": false,
+    "index_182_queue_reclassification_preserved": true,
+    "qa_dispositions_status_schema_fixed": true,
+    "source_identity_rechecked": false,
+    "semantic_mapping_rechecked": false,
+    "candidate_dds_rechecked": false,
+    "reason_heavy_qa_not_repeated": "No producer SHA, source/candidate fingerprint, QA evidence, or contract material relevant to the accepted mapping evidence changed."
+  },
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00058",
+      "result_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+      "status": "PASS"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+      "result_sha": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "status": "PASS"
+    }
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false
+}

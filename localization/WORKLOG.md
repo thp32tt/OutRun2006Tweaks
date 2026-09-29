@@ -1332,3 +1332,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Supersession: none at merge base `2579efe87a6f20d7a9c12c930dec122d125d04d8`; A00064/B00062 explicitly skip these qa_pending inputs.
 - Queue: 137 total; 94 localize_text; 31 zoom_review; 9 font; 1 Hangul name-entry; 2 preserve-only; pending localize_text 77.
 - Report: `localization/graphics/role_C/20260929-1350-C104/C104_Q00002_INDEPENDENT_QA_BATCH.json`. Runtime: UNTESTED. VR/FFB/build: untouched.
+
+### C104 Q00002 attempt 2 Gate repair
+- Failed Gate run `36523568076` stopped at `Verify localization state`: C104 had copied actionable queue counts into canonical graphics classification counts.
+- Canonical classification is restored to **95 localize_text + 33 preserve_brand_song_credit** to match `visual_review.csv`, `transcriptions.jsonl`, and `artwork_plan.jsonl`. The actionable queue intentionally remains **94 localize_text + 2 preserve-only** after index 182 was excluded from Korean raster production.
+- `qa_dispositions` is normalized to the required `status` field for the exact immutable inputs A00058@`6e2d340cf2707382573bdff69a6c6d154f5fba65` and B00059@`785a08e4a90e3345610bb850e6c486e17bf43553`; both dispositions remain PASS.
+- Heavy QA was not repeated because producer/source/candidate/evidence fingerprints did not change. No DDS bytes were modified.
+- Attempt 2 task record remains `AUTOMATION_VALIDATION=PENDING` until this C repair commit's single batch Gate completes. `RUNTIME_VALIDATION=UNTESTED`.
+
