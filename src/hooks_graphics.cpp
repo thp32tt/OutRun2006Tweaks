@@ -304,9 +304,62 @@ RestoreCarBaseShadow RestoreCarBaseShadow::instance;
 // Wrap only that callsite so unrelated alpha objects keep their existing path.
 class VRLensFlareProjected2D : public Hook
 {
+	static constexpr std::uint32_t R79FlareParentCalls[] = {
+		0xD5F5, 0xD624, 0xD641, 0xD65E, 0xD68E, 0xD6BA,
+		0xD6E6, 0xD712, 0xD73E, 0xD76A, 0xD796, 0xD7B4
+	};
+	inline static std::array<std::atomic<std::uint64_t>,
+		std::size(R79FlareParentCalls)> R79FlareParentHits{};
+	inline static thread_local std::uint32_t R79CurrentFlareParent = 0;
+	inline static SafetyHookMid R79FlareHelperEntry_hk{};
+
+	static std::uint32_t R79ExeCallRva(const void* returnAddress) noexcept
+	{
+		const auto base = reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+		const auto value = reinterpret_cast<std::uintptr_t>(returnAddress);
+		if (!base || value < base + 5)
+			return 0;
+		const auto returnRva = value - base;
+		return returnRva >= 5 && returnRva <= 0xFFFFFFFFu
+			? static_cast<std::uint32_t>(returnRva - 5) : 0;
+	}
+
+	static void R79FlareHelperEntry(safetyhook::Context& ctx)
+	{
+		// Hooked at RVA 0xC9A6 after PUSH EBP / MOV EBP,ESP / AND ESP,-16.
+		// The caller return address is therefore stable at [EBP+4].
+		const auto* returnAddress = reinterpret_cast<const void*>(
+			*reinterpret_cast<const std::uintptr_t*>(ctx.ebp + 4));
+		R79CurrentFlareParent = R79ExeCallRva(returnAddress);
+	}
+
 	static void __cdecl DrawObjectAlphaProjected(
 		int objectId, float alpha, void* work, int flags)
 	{
+		std::size_t index = std::size(R79FlareParentCalls);
+		for (std::size_t i = 0; i < std::size(R79FlareParentCalls); ++i)
+		{
+			if (R79FlareParentCalls[i] == R79CurrentFlareParent)
+			{
+				index = i;
+				break;
+			}
+		}
+		if (index != std::size(R79FlareParentCalls))
+		{
+			const auto hit = R79FlareParentHits[index].fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+			{
+				spdlog::info(
+					"VR R79 FLARE COMPONENT: parent=0x{:X} hit={} tick={} objectId={} alpha={:.6f} work=0x{:08x} flags=0x{:X}",
+					R79CurrentFlareParent, hit,
+					Game::power_on_timer ? *Game::power_on_timer : 0,
+					objectId, alpha,
+					reinterpret_cast<std::uintptr_t>(work), flags);
+			}
+		}
+
 		OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
 			OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
@@ -320,10 +373,15 @@ public:
 
 	bool apply() override
 	{
+		R79FlareHelperEntry_hk = safetyhook::create_mid(
+			Module::exe_ptr(0xC9A6), R79FlareHelperEntry);
+		if (!R79FlareHelperEntry_hk)
+			return false;
+
 		Memory::VP::InjectHook(
 			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
 			Memory::HookType::Call);
-		spdlog::info("VR R67 FLARE: exact EXE+0xCABE semantic installed; Calc3D2D view anchor will be reprojected per eye");
+		spdlog::info("VR R79 FLARE COMPONENT TRACE: 12 parent callsites + exact EXE+0xCABE semantic ACTIVE; rendering unchanged");
 		return true;
 	}
 
