@@ -2,13 +2,13 @@
   "task_id": "CONVERSION-DXVK-00033",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 1,
+  "attempt": 2,
   "base_sha": "bd8a729f85f7a49fcd7dfbfd08bfae07afd13987",
   "result_sha": "3d95696e65aff8a2a374dc9c126199428b763e9f",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "selected_work_item": "VR_BACKEND_100_REVIEW_SET_06-F25-DXVK-PLAN-TRANSACTION-RECONCILIATION",
-  "summary": "Reconciled the DXVK R71 plan's historical atomic-activation wording with the selector's current bounded transaction semantics and strengthened the DXVK SAFE reactivation verifier to require selector transaction functions plus executable rollback/success-attestation behavior. Hosted validation has not started because repository Actions runners are saturated, so F25 is implemented but not yet closed.",
+  "summary": "Reconciled Set 06 F25 as before. Attempt 2 investigated Backend Conversion Gate 36499169322 and proved it was cancelled before any job step because the later C6 state commit c7f340e539f20195f3da302681101debb369498c created a newer same-branch run under cancel-in-progress concurrency. No source repair is required. The queue contract now prevents this self-cancellation pattern, and validation continues on the unchanged-source descendant c7f340e5.",
   "changed_paths": [
     "docs/VR_DXVK_R71_PLAN.md",
     "tools/verify_dxvk_reactivation_contract.py"
@@ -30,29 +30,48 @@
     "HUD Inspector 36499173751 is QUEUED on exact source SHA 3d95696e65aff8a2a374dc9c126199428b763e9f.",
     "PC Fast 36499169338 skipped as required for scheduled automation.",
     "Repository Actions observation at checkpoint: 9 runs in progress and 94 queued, dominated by unrelated R71-STATIC-1000/localization automation. No 00033 hosted job had started; this is capacity backlog, not a validation failure.",
-    "Issue #14 implementation comment 5880779818 records the production transaction."
+    "Issue #14 implementation comment 5880779818 records the production transaction.",
+    "Attempt 2 inspected cancelled Backend Conversion Gate 36499169322 directly: validate job 109185684647 concluded cancelled with zero steps started. It was cancelled at 23:46:11Z as the C6 state commit c7f340e539f20195f3da302681101debb369498c created Backend Conversion Gate 36499723553 at 23:46:10Z.",
+    "Compare 3d95696e..c7f340e5 shows only three documentation/state paths changed: the task run record, Set 06 review, and review index. No source/verifier implementation changed.",
+    "Workflow .github/workflows/backend-conversion-gate.yml uses group backend-conversion-gate-${{ github.ref }} with cancel-in-progress: true, confirming supersession rather than code/test failure.",
+    "Queue controller contract updated in attempt 2 to prevent ordinary state-only commits from self-cancelling queued/in-progress exact-source validation and to treat zero-step supersession cancellation as PENDING rather than FAIL."
   ],
   "completed_work_items": [
     "F25-DOCUMENTATION-AND-CONTRACT-IMPLEMENTATION"
   ],
   "pending_validation_items": [
-    "Backend Conversion Gate 36499169322",
-    "Build 36499173742",
-    "OpenXR VR architecture 36499173709",
-    "HUD Inspector 36499173751"
+    "Backend Conversion Gate 36499723553 on c7f340e539f20195f3da302681101debb369498c",
+    "Build 36499727135 on c7f340e539f20195f3da302681101debb369498c",
+    "OpenXR VR architecture 36499727145 on c7f340e539f20195f3da302681101debb369498c",
+    "HUD Inspector 36499727138 on c7f340e539f20195f3da302681101debb369498c"
   ],
-  "next_action": "Do not recreate the F25 change. Resume by inspecting the exact queued run IDs for source 3d95696e65aff8a2a374dc9c126199428b763e9f. If Backend Conversion Gate and standard Build/OpenXR/HUD workflows pass, change AUTOMATION_VALIDATION to PASS and mark F25 CLOSED. If a run fails, inspect that failure before any repair. Runtime remains UNTESTED because this task changes no HMD-visible behavior.",
+  "next_action": "Track the existing c7f340e5 exact-descendant runs without creating another ordinary push. If Backend Conversion Gate 36499723553 and Build/OpenXR/HUD runs pass, update AUTOMATION_VALIDATION=PASS and close F25. If a run fails after executing steps, inspect that concrete failure before repair. Runtime remains UNTESTED.",
   "validation": {
-    "backend_conversion_gate_run_id": 36499169322,
+    "backend_conversion_gate_run_id": 36499723553,
     "backend_conversion_gate_result": "QUEUED",
-    "build_workflow_run_id": 36499173742,
+    "build_workflow_run_id": 36499727135,
     "build_result": "QUEUED",
-    "openxr_workflow_run_id": 36499173709,
+    "openxr_workflow_run_id": 36499727145,
     "openxr_result": "QUEUED",
-    "hud_workflow_run_id": 36499173751,
+    "hud_workflow_run_id": 36499727138,
     "hud_result": "QUEUED",
-    "pc_fast_run_id": 36499169338,
-    "pc_fast_result": "SKIPPED"
+    "pc_fast_run_id": 36499723550,
+    "pc_fast_result": "SKIPPED",
+    "superseded_cancelled_backend_gate_run_id": 36499169322,
+    "superseded_cancelled_source_sha": "3d95696e65aff8a2a374dc9c126199428b763e9f"
   },
-  "recorded_at_kst": "2026-09-29T08:44:00+09:00"
+  "recorded_at_kst": "2026-09-29T09:00:00+09:00",
+  "failure_context": {
+    "reported_run_id": 36499169322,
+    "reported_conclusion": "cancelled",
+    "job_id": 109185684647,
+    "job_steps_started": 0,
+    "source_sha": "3d95696e65aff8a2a374dc9c126199428b763e9f",
+    "superseding_state_sha": "c7f340e539f20195f3da302681101debb369498c",
+    "superseding_backend_gate_run_id": 36499723553,
+    "cause": "Backend Conversion Gate uses concurrency group backend-conversion-gate-${{ github.ref }} with cancel-in-progress=true. The C6 state commit was pushed at the same moment the earlier queued source run was cancelled.",
+    "source_relation": "c7f340e5 is one commit ahead of 3d95696e and changes only docs/automation/runs/CONVERSION-DXVK-00033.json plus Set 06/index state documentation.",
+    "repair": "Do not rerun the cancelled ancestor or create further ordinary branch commits while the descendant validation is queued. Added queue-controller protocol rules for superseded queued/in-progress validation."
+  },
+  "validation_sha": "c7f340e539f20195f3da302681101debb369498c"
 }

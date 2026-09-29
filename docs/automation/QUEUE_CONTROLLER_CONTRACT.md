@@ -24,6 +24,8 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - Do not claim visual, HMD, GPU synchronization, in-game clipping, or crash-free runtime behavior without actual runtime evidence.
 - Runtime-untested work may continue when the next task is independent.
 - Runtime-dependent follow-up work must be marked BLOCKED_RUNTIME and skipped in favor of another runnable task.
+- When an exact-source validation run is queued or in progress under a same-branch workflow with `cancel-in-progress: true`, do not publish another ordinary state-only commit that would supersede and cancel that validation. Finish validation first. If a durability checkpoint is mandatory before validation can start, use a CI-skipped state-only commit and record the validated ancestor/descendant relationship explicitly.
+- A GitHub Actions run cancelled before any step starts solely because a newer same-branch run superseded it is not an automatic-validation failure. Keep `automation_validation=PENDING`, inspect the superseding run, and validate the unchanged source through that exact descendant instead of retrying the cancelled run blindly.
 
 ## Scope
 - One modifying task at a time per controller.
