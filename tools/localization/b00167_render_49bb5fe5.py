@@ -118,7 +118,9 @@ def alpha_palette(a0: int, a1: int):
 def color_palette(c0: int, c1: int):
     p0 = rgb565(c0).astype(np.int32)
     p1 = rgb565(c1).astype(np.int32)
-    return np.stack([p0, p1, (2*p0+p1)//3, (p0+2*p1)//3], axis=0)
+    p2 = np.rint((2.0*p0 + p1) / 3.0).astype(np.int32)
+    p3 = np.rint((p0 + 2.0*p1) / 3.0).astype(np.int32)
+    return np.stack([p0, p1, p2, p3], axis=0)
 
 def decode_bc3(data: bytes):
     info = dds_info(data)
