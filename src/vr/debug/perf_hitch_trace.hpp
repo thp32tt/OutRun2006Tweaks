@@ -13,6 +13,10 @@ namespace OutRunVR::PerfHitch
         std::uint64_t textureUploads = 0;
         std::uint64_t textureUploadBytes = 0;
         std::uint64_t textureUploadUs = 0;
+        std::uint64_t fileLoadCalls = 0;
+        std::uint64_t fileLoadBusyCalls = 0;
+        std::uint64_t fileLoadUs = 0;
+        std::uint64_t fileLoadMaxUs = 0;
         std::uint64_t vertexBufferCreates = 0;
         std::uint64_t vertexBufferCreateBytes = 0;
         std::uint64_t indexBufferCreates = 0;
@@ -29,6 +33,10 @@ namespace OutRunVR::PerfHitch
     inline std::atomic<std::uint64_t> TextureUploads{ 0 };
     inline std::atomic<std::uint64_t> TextureUploadBytes{ 0 };
     inline std::atomic<std::uint64_t> TextureUploadUs{ 0 };
+    inline std::atomic<std::uint64_t> FileLoadCalls{ 0 };
+    inline std::atomic<std::uint64_t> FileLoadBusyCalls{ 0 };
+    inline std::atomic<std::uint64_t> FileLoadUs{ 0 };
+    inline std::atomic<std::uint64_t> FileLoadMaxUs{ 0 };
     inline std::atomic<std::uint64_t> VertexBufferCreates{ 0 };
     inline std::atomic<std::uint64_t> VertexBufferCreateBytes{ 0 };
     inline std::atomic<std::uint64_t> IndexBufferCreates{ 0 };
@@ -55,6 +63,23 @@ namespace OutRunVR::PerfHitch
         TextureUploads.fetch_add(1, std::memory_order_relaxed);
         TextureUploadBytes.fetch_add(bytes, std::memory_order_relaxed);
         TextureUploadUs.fetch_add(elapsedUs, std::memory_order_relaxed);
+    }
+
+    inline void NoteFileLoad(
+        std::uint64_t elapsedUs, bool busy) noexcept
+    {
+        FileLoadCalls.fetch_add(1, std::memory_order_relaxed);
+        if (busy)
+            FileLoadBusyCalls.fetch_add(1, std::memory_order_relaxed);
+        FileLoadUs.fetch_add(elapsedUs, std::memory_order_relaxed);
+        auto current = FileLoadMaxUs.load(std::memory_order_relaxed);
+        while (elapsedUs > current &&
+            !FileLoadMaxUs.compare_exchange_weak(
+                current, elapsedUs,
+                std::memory_order_relaxed,
+                std::memory_order_relaxed))
+        {
+        }
     }
 
     inline void NoteVertexBufferCreate(std::uint64_t bytes) noexcept
@@ -95,6 +120,14 @@ namespace OutRunVR::PerfHitch
             TextureUploadBytes.exchange(0, std::memory_order_acq_rel);
         out.textureUploadUs =
             TextureUploadUs.exchange(0, std::memory_order_acq_rel);
+        out.fileLoadCalls =
+            FileLoadCalls.exchange(0, std::memory_order_acq_rel);
+        out.fileLoadBusyCalls =
+            FileLoadBusyCalls.exchange(0, std::memory_order_acq_rel);
+        out.fileLoadUs =
+            FileLoadUs.exchange(0, std::memory_order_acq_rel);
+        out.fileLoadMaxUs =
+            FileLoadMaxUs.exchange(0, std::memory_order_acq_rel);
         out.vertexBufferCreates =
             VertexBufferCreates.exchange(0, std::memory_order_acq_rel);
         out.vertexBufferCreateBytes =
