@@ -1634,3 +1634,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion-first order preserved: current A00173 index99 clean-plate v3, newer B00167 index152 candidate, newer index112 handoff, then B00174 preflight requeue/re-emission. Concurrent A00178 result and B00176 staging are preserved without disposition. Counts remain 137 queue, 93 localize_text, 76 pending production, 753 canonical segments.
 - No C candidate DDS modification, new static approval, runtime approval, build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0126-C134/C134_Q00032_INDEPENDENT_QA_BATCH.json`.
+
+## 2026-09-30 01:52 KST - C135 Q00033 INDEPENDENT CANDIDATE QA BATCH
+
+- Immutable inputs: A00173@fb686bf12710ef3e02d31427a39fa8e1150fab45 (index99/4F68708E), B00160@bf650709edf84d1923544a497be2267f93578197 (index112/D41D0B1), B00167@1d0c05d29118192c5c10f40ee857fb26ae366622 (index152/49BB5FE5), B00176@e57374e3735c3568b5e9f584d59a189fef58f356 (index130/1762489B).
+- Dispositions: **REWORK_REQUIRED / PASS / PASS / PASS**. A00173 numeric alpha/containment checks are consistent, but independent native/readable CLEAN PLATE review still shows recognizable dark-blue English ghost silhouettes across both lines, so it is not render-ready.
+- B00160, B00167 and B00176 current candidate blobs are unchanged at merge HEAD 2af61fc8fd41e5ee6d8e4524914107682c591149; independent source-vs-Korean visual review plus exact-result DDS/header/mip/alpha/protected-region/zero-pixel containment evidence passes. They are promoted to **STATIC_QA PASS / RUNTIME_UNTESTED** only.
+- Queue reconciliation: actionable localize_text **93**, pending_artwork production **73**, canonical segments **753**. C modifies no DDS candidate bytes; new static passes **3**, runtime approvals **0**.
+- Newer disjoint A00179@7548b44b and B00180@2af61fc8 are preserved for later C consumption and receive no Q00033 disposition. No N100/local clone/worktree, GPT Library, Google Drive write, build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json`.

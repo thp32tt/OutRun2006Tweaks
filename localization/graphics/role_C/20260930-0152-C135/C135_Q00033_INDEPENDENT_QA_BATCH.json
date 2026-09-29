@@ -1,0 +1,163 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-c135-q00033-independent-candidate-qa-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00181",
+  "qa_batch_id": "Q00033",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T01:52:18+09:00",
+  "base_head_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00173",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "fb686bf12710ef3e02d31427a39fa8e1150fab45",
+      "result_message": "localization(A): rework index99 transparent clean plate v3 [AUTO:LOCALIZATION-LOCALIZATION_A-00173]",
+      "completed_at": "2026-09-30T01:02:35+09:00",
+      "producer_id": "P00086",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "result_message": "localization(B): strict-clean rework index152 DXT5 [AUTO:LOCALIZATION-LOCALIZATION_B-00167]",
+      "completed_at": "2026-09-30T00:49:31+09:00",
+      "producer_id": "P00082",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "bf650709edf84d1923544a497be2267f93578197",
+      "result_message": "localization(B): complete index112 Korean DXT5 rework [AUTO:LOCALIZATION-LOCALIZATION_B-00160]",
+      "completed_at": "2026-09-29T23:30:00+09:00",
+      "producer_id": "P00077",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00176",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
+      "result_message": "localization(B): complete index130 RGBA32 Korean candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00176]",
+      "completed_at": "2026-09-30T01:26:32+09:00",
+      "producer_id": "P00088",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00173",
+      "result_sha": "fb686bf12710ef3e02d31427a39fa8e1150fab45",
+      "status": "REWORK_REQUIRED",
+      "reason": "Exact-result numeric gates preserve alpha/transparency and confine all 114,540 changed pixels to the 114,566-pixel effect mask, but independent C native/readable comparison of A00173 CLEAN PLATE v3 still shows clearly recognizable dark-blue English letter silhouettes across both lines. This fails the mandatory no-source-language-residue / source-faithful CLEAN_PLATE visual gate. Do not render Korean from this plate; expand/reconstruct the full source effect envelope without introducing opaque rectangles or changing source-transparent pixels. RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+      "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "status": "PASS",
+      "reason": "Current HEAD retains exact candidate blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17. Exact canonical 512x128 DXT5 source, mip/header structure, 8,646-pixel residue-closed removal envelope, zero decoded change outside edit blocks/safe bboxes, zero alpha change, exact '89/'86 preservation and flip-Y orientation are consistent. Independent C review of ENGLISH SOURCE / CLEAN PLATE / KOREAN CANDIDATE shows no English ghost residue, clipping, overlap, opaque box or protected-year damage. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00160",
+      "result_sha": "bf650709edf84d1923544a497be2267f93578197",
+      "status": "PASS",
+      "reason": "Current HEAD retains exact candidate blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1. Exact canonical 2048x256 DXT5 source, mip/header structure, decoded allowed-region containment, zero alpha introduction outside permitted region and zero English-only residual alpha are consistent. Independent readable crop review shows the two Korean lines fully contained, source-direction slant preserved and no visible source-language ghosting or clipping. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00176",
+      "result_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
+      "status": "PASS",
+      "reason": "Current HEAD retains the exact e57374e3 candidate blob 905f0d05db3f094aeb93448548df1091238109cf / SHA-256 823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8. Exact canonical 2048x512 RGBA32 source/header/mip identity, five per-element safe-bbox containments, zero change/alpha change outside allowed regions and exact protected numeric marker are consistent. Independent C review of full and 2x text comparisons finds Korean MIX/OUTRUN/AVERAGE RANK labels legible with no English residue, clipping, overlap, seam or opaque box. STATIC_QA=PASS; RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "reviewed_assets": [
+    {
+      "index": 99,
+      "asset": "4F68708E",
+      "input": "LOCALIZATION-LOCALIZATION_A-00173@fb686bf12710ef3e02d31427a39fa8e1150fab45",
+      "candidate_present": false,
+      "clean_plate_visual": "FAIL_VISIBLE_ENGLISH_GHOST_SILHOUETTES_BOTH_LINES",
+      "containment_numeric": "PASS",
+      "disposition": "REWORK_REQUIRED"
+    },
+    {
+      "index": 112,
+      "asset": "D41D0B1",
+      "input": "LOCALIZATION-LOCALIZATION_B-00160@bf650709edf84d1923544a497be2267f93578197",
+      "candidate_blob": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+      "candidate_sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
+      "dds": "DXT5_2048x256_MIP1_HEADER_EXACT",
+      "containment": "PASS",
+      "english_residue": "PASS_NONE_VISIBLE",
+      "visual": "PASS",
+      "disposition": "PASS_STATIC_RUNTIME_UNTESTED"
+    },
+    {
+      "index": 130,
+      "asset": "1762489B",
+      "input": "LOCALIZATION-LOCALIZATION_B-00176@e57374e3735c3568b5e9f584d59a189fef58f356",
+      "candidate_blob": "905f0d05db3f094aeb93448548df1091238109cf",
+      "candidate_sha256": "823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8",
+      "dds": "RGBA32_2048x512_MIP1_HEADER_EXACT",
+      "containment": "PASS_5_OF_5",
+      "protected_numeric_marker": "PASS_EXACT",
+      "english_residue": "PASS_NONE_VISIBLE",
+      "visual": "PASS",
+      "disposition": "PASS_STATIC_RUNTIME_UNTESTED"
+    },
+    {
+      "index": 152,
+      "asset": "49BB5FE5",
+      "input": "LOCALIZATION-LOCALIZATION_B-00167@1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "candidate_blob": "5d938fd663669715cdebcbff675b3499c888d200",
+      "candidate_sha256": "0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17",
+      "dds": "DXT5_512x128_MIP1_HEADER_EXACT",
+      "containment": "PASS_4_OF_4",
+      "protected_years": "PASS_EXACT",
+      "english_residue": "PASS_NONE_VISIBLE",
+      "visual": "PASS",
+      "disposition": "PASS_STATIC_RUNTIME_UNTESTED"
+    }
+  ],
+  "shared_state": {
+    "metadata_segments_changed": 0,
+    "canonical_segments": 753,
+    "actionable_localize_text": 93,
+    "pending_production_localize_text": 73,
+    "static_pass_added": 3,
+    "runtime_approvals_added": 0,
+    "candidate_dds_modified_by_c": false
+  },
+  "concurrent_preservation": [
+    "LOCALIZATION-LOCALIZATION_A-00179@7548b44b7364504c248341cce0771969f0793160",
+    "LOCALIZATION-LOCALIZATION_B-00180@2af61fc8fd41e5ee6d8e4524914107682c591149"
+  ],
+  "validation": {
+    "mandatory_english_source_comparison": "RUN_FOR_ALL_VISUAL_MATERIAL__A00173_FAIL__THREE_CANDIDATES_PASS",
+    "zero_pixel_overflow": "PASS_THREE_CANDIDATES__A00173_NOT_PROMOTED",
+    "dds_header_format_mip": "PASS_THREE_CANDIDATES_FROM_EXACT_RESULT_EVIDENCE",
+    "alpha_transparency": "PASS_THREE_CANDIDATES__A00173_ALPHA_NUMERIC_PASS_BUT_VISUAL_RESIDUE_FAIL",
+    "protected_artwork": "PASS_THREE_CANDIDATES",
+    "orientation": "PASS_THREE_CANDIDATES",
+    "runtime_validation": "UNTESTED"
+  },
+  "environment": {
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false,
+    "google_drive_used": false,
+    "google_drive_write_performed": false,
+    "uploaded_archive_used": false,
+    "build_performed": false,
+    "runtime_test_performed": false,
+    "vr_ffb_dx_changes": false
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
