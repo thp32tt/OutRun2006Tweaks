@@ -2371,61 +2371,53 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-29T22:56:21+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00159",
-    "qa_batch_id": "Q00026",
-    "run": "C128",
-    "result": "PASS_Q00026_A00154_PASS_B00155_REWORK_REQUIRED_CURRENT_CONTRACT_AND_CLEAN_PLATE_METHOD_MISMATCH_RUNTIME_UNTESTED",
-    "base_head": "2a209832432936a6026ecae12c21b9253c7c4b0b",
+    "recorded_at_kst": "2026-09-29T23:23:46+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00162",
+    "qa_batch_id": "Q00027",
+    "run": "C129",
+    "result": "PASS_Q00027_B00158_PASS_A00157_REWORK_REQUIRED_CLEAN_PLATE_VISUAL_RESIDUE_RUNTIME_UNTESTED",
+    "base_head": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
     "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
     "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00154@0091b5eaf55e361f6f73932762401b832960cce3",
-      "LOCALIZATION-LOCALIZATION_B-00155@8cd826cb3ff6be55a86aff1ac2194aef3affa5af"
+      "LOCALIZATION-LOCALIZATION_B-00158@2a209832432936a6026ecae12c21b9253c7c4b0b",
+      "LOCALIZATION-LOCALIZATION_A-00157@789083b3a143fa9d3c3e2d0c76ed75edb94368b1"
     ],
     "reviewed_indices": [
-      63,
-      112
+      104,
+      116,
+      99
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00154",
-        "result_sha": "0091b5eaf55e361f6f73932762401b832960cce3",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
+        "result_sha": "2a209832432936a6026ecae12c21b9253c7c4b0b",
         "status": "PASS",
-        "reason": "PASS limited to the runtime-isolation deliverable. At immutable A00154@0091b5e the lane-local input binds index63/48DEBE77 to source blob 3eb59ab402a87a4a38787d37eaaff6e263f1ffe0 / SHA-256 5f6cc668... and candidate blob 9c5711130c1fd37d218bc404f9abaac6f1c182c0 / SHA-256 fa0f6e27..., with mirror_y and START x2->출발, GOAL x1->골. Current HEAD has no candidate-path change after A00154, so the exact fingerprint is unchanged. C85 heavy QA for the same source/candidate fingerprint is reused rather than repeated: 3/3 effect-inclusive bboxes PASS, raw 3/3 PASS, outside declared cells changed nontransparent pixels 0, candidate status PASS pending runtime. The current single_dds directory still contains only D6DC1380 and C4A2937B manifests, so A00154's deterministic DDS_ONLY input is non-duplicate. This does not promote runtime status; RUNTIME_VALIDATION remains UNTESTED."
+        "reason": "PASS limited to B00158's dual DDS_ONLY runtime-isolation deliverable for index104/62BEBF33 and index116/E3FD08BE; no runtime promotion. C independently re-fetched and decoded current/result DXT5 source/candidate bytes under the current contract. 62BEBF33 remains source/candidate blobs 1cc92c914687546fbef9b47dd1134659c2f1f0f6 / a5cd9697dec6ea04a1c67fa31619a28e86b5acb2, 2048x256 DXT5 mip1, header-128 diff 0; readable source/candidate alpha bboxes [392,52,1356,200] / [565,52,1185,199] lie inside declared [392,52,1357,201], with 0 outside alpha changes/introductions. E3FD08BE remains 9cd996ed8f5e8c059492893617e4ff2006c525a2 / 96a9aa5d3d99a97bf4b386102ef8d43ee537f1c1, same DDS structure/header equality; bboxes [393,54,1627,199] / [632,54,1387,198] lie inside [393,54,1628,200], again with 0 outside alpha changes/introductions. Readable mirror-Y visual review shows correctly oriented '아웃런 모드' and '하트 어택 모드' without visible clipping. Both remain edge-touch/high-risk and require isolated real-game testing; RUNTIME_VALIDATION=UNTESTED."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00155",
-        "result_sha": "8cd826cb3ff6be55a86aff1ac2194aef3affa5af",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00157",
+        "result_sha": "789083b3a143fa9d3c3e2d0c76ed75edb94368b1",
         "status": "REWORK_REQUIRED",
-        "reason": "REWORK_REQUIRED. Material subchecks are partly valid: C independently re-fetched canonical pinned blob 278a518f5151f0759dfcfdc78e129a7a7cb55cf0 (2048x256 DXT5 mip1, 524416 bytes). With round-nearest BC3 alpha interpolation, full-canvas alpha>0 reproduces exactly 132035 pixels, bbox [435,19,1357,238], and the stored 1291-run removal-mask RLE byte-for-byte logically; the prior hard limit contains 132006 and omits exactly 29 effect pixels. However the CLEAN_PLATE report claims synchronous 8-neighbor diffusion and iterations_to_converge=49, while independent propagation on the exact canonical mask converges in 42 iterations for 8-neighbor and exactly 49 only for 4-neighbor, so the recorded generation method is internally inconsistent and the CLEAN_PLATE lineage is not independently reproducible from its own contract. More importantly, current contract 8b7a840f adds the mandatory Candidate completion requirement: a producer whose own readiness_after is CLEAN_PLATE_READY/KOREAN_RENDER_NEXT must continue in the same invocation through Korean render, exact DDS encode, decoded-final QA and candidate persistence whenever deterministic inputs are available. B00155 explicitly stops at CLEAN_PLATE_READY_STYLE_SLANT_MEASURED__KOREAN_RENDER_NEXT with no candidate attempt. Therefore this immutable producer result cannot PASS under the current contract. Rework should correct/lock the CLEAN_PLATE generation algorithm record, regenerate/verify if needed, and continue index112 through Korean render + BC3/DDS decoded-final static QA in the same producer invocation. Runtime remains UNTESTED."
+        "reason": "REWORK_REQUIRED for index99/4F68708E CLEAN_PLATE. Exact pinned canonical source blob eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8 re-fetch matches 2048x256 DXT5 mip1 / 524416 bytes. Embedded removal mask is internally consistent at 42,774 pixels / 3,450 RLE runs and patch payload is exactly 171,096 RGBA bytes. Applying the patch changes 0 pixels/alpha outside the mask and leaves 0 alpha-positive pixels at luminance>=18 inside the mask. But independent native/readable mirror-Y visual review fails the contract's no-source-language-residue rule: both English lines remain clearly legible as dark-blue ghost/shadow silhouettes. Rework must expand/rederive the full effect mask, rebuild a visually clean plate with protected artwork unchanged, and only then continue style/render/DXT5 work. No Korean candidate/runtime approval; RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_INDEX63_UNCHANGED_C85_SOURCE_3EB59AB4_CANDIDATE_9C571113_FINGERPRINT__PASS_INDEX112_PINNED_278A518F_2048X256_DXT5_MIP1_EXACT_CANONICAL",
-    "canonical_semantic_validation": "PASS_INDEX63_START_X2_TO_출발_GOAL_TO_골_REUSED_C85__PASS_INDEX112_GIRLFRIEND_GOAL_TRANSLATION_REUSED_C126",
-    "geometry_mapping_validation": "PASS_INDEX63_REUSED_C85_3_OF_3_BBOX_RAW_CONTAINMENT_AND_ZERO_OUTSIDE_CELL_CHANGE__PASS_INDEX112_FULL_ALPHA_132035_BBOX_435_19_1357_238_EXACT_1291_RLE__FAIL_INDEX112_CLEAN_PLATE_METHOD_8_NEIGHBOR_VS_49_ITERATION_REPRODUCIBILITY",
-    "current_contract_compatibility": "MIXED_PASS_A00154_FALLBACK3_RUNTIME_ISOLATION__REWORK_B00155_CANDIDATE_COMPLETION_REQUIREMENT_AND_CLEAN_PLATE_METHOD_MISMATCH",
+    "source_identity_validation": "PASS_B00158_EXACT_CURRENT_AND_RESULT_SOURCE_CANDIDATE_BLOBS_UNCHANGED__PASS_A00157_PINNED_EB8C2DDA_DXT5_SOURCE_IDENTITY",
+    "canonical_semantic_validation": "PASS_INDEX104_OutRun_Mode_TO_아웃런_모드__PASS_INDEX116_Heart_Attack_Mode_TO_하트_어택_모드__PASS_INDEX99_GHOST_CAR_TWO_LINE_KOREAN_LAYOUT_SEMANTICS_BUT_NO_CANDIDATE",
+    "geometry_mapping_validation": "PASS_B00158_CURRENT_CONTRACT_DECODED_DXT5_HEADER_ALPHA_ORIENTATION_AND_DECLARED_BBOX_CONTAINMENT__FAIL_A00157_CLEAN_PLATE_NATIVE_VISUAL_ENGLISH_GHOST_RESIDUE",
+    "current_contract_compatibility": "MIXED_PASS_B00158_FALLBACK3_RUNTIME_ISOLATION__REWORK_A00157_CLEAN_PLATE_NO_SOURCE_LANGUAGE_RESIDUE_GATE",
     "readiness_reconciliation": {
       "classification": "MIXED_PASS_AND_REWORK",
       "indices": [
-        63,
-        112
+        104,
+        116,
+        99
       ],
       "per_index": {
-        "63": "A00154 isolation input PASS. Exact C85-passed source/candidate fingerprint remains unchanged and a deterministic DDS_ONLY isolation input now exists. Runtime/game test is still required before final approval; RUNTIME_VALIDATION=UNTESTED.",
-        "112": "B00155 source full-alpha ownership/RLE sub-evidence reproduces, but producer result is REWORK_REQUIRED: CLEAN_PLATE method says 8-neighbor while recorded convergence matches 4-neighbor, and current same-task candidate-completion contract forbids stopping at KOREAN_RENDER_NEXT. Correct/lock CLEAN_PLATE lineage and continue through Korean render, exact BC3/DDS encode, decoded-final containment/source-comparison QA in the same producer invocation."
+        "99": "A00157 CLEAN_PLATE REWORK_REQUIRED because readable native review shows dark-blue English ghost text on both lines; rebuild full-effect removal mask/CLEAN_PLATE before Korean render.",
+        "104": "B00158 isolation input PASS only; edge-touch/high-risk isolated runtime test remains required.",
+        "116": "B00158 isolation input PASS only; edge-touch/high-risk isolated runtime test remains required."
       }
-    },
-    "heavy_qa_reuse": {
-      "repeated_heavy_candidate_pixel_qa": false,
-      "index63_reused_c85_exact_source_candidate_fingerprint": true,
-      "index63_source_blob": "3eb59ab402a87a4a38787d37eaaff6e263f1ffe0",
-      "index63_candidate_blob": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
-      "index112_reused_c126_source_identity_header_orientation": true,
-      "index112_full_alpha_mask_independently_recomputed": true,
-      "index112_exact_stored_rle_match": true,
-      "index112_clean_plate_lineage_reproducibility": "FAIL_RECORDED_8_NEIGHBOR_49_ITERS_INCONSISTENT__8_NEIGHBOR_REPRODUCES_42__4_NEIGHBOR_REPRODUCES_49",
-      "reason": "A00154 introduces no candidate bytes, so unchanged C85 heavy candidate QA is reused. B00155 introduces new mask/CLEAN_PLATE/style evidence; C independently recomputed only the new full-alpha mask and generation-lineage consistency checks. No nonexistent Korean candidate was subjected to false candidate QA."
     },
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
@@ -2437,12 +2429,12 @@
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260929-2256-C128/C128_Q00026_INDEPENDENT_QA_BATCH.json",
+    "report": "localization/graphics/role_C/20260929-2323-C129/C129_Q00027_INDEPENDENT_QA_BATCH.json",
     "rework_required_inputs": [
-      "LOCALIZATION-LOCALIZATION_B-00155@8cd826cb3ff6be55a86aff1ac2194aef3affa5af"
+      "LOCALIZATION-LOCALIZATION_A-00157@789083b3a143fa9d3c3e2d0c76ed75edb94368b1"
     ],
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00154@0091b5eaf55e361f6f73932762401b832960cce3"
+      "LOCALIZATION-LOCALIZATION_B-00158@2a209832432936a6026ecae12c21b9253c7c4b0b"
     ]
   }
 }

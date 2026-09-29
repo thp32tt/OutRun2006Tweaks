@@ -1,0 +1,213 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-schema9-independent-c-batch-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00162",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_RECONCILIATION",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00027",
+  "qa_batch_id": "Q00027",
+  "run": "C129",
+  "recorded_at_kst": "2026-09-29T23:23:46+09:00",
+  "base_head_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+  "base_head_message": "localization(A): add 9CE4E175 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00163]",
+  "result": "PASS_Q00027_B00158_PASS_A00157_REWORK_REQUIRED_CLEAN_PLATE_VISUAL_RESIDUE_RUNTIME_UNTESTED",
+  "summary": "Q00027 independently consumed immutable B00158 dual runtime-isolation inputs and A00157 index99 CLEAN_PLATE material. B00158 PASSes only for its two deterministic DDS_ONLY isolation inputs after current-contract direct GitHub source/candidate decode, containment and readable-orientation visual recheck; runtime remains untested. A00157 is REWORK_REQUIRED: its threshold-18 mask/patch is numerically self-consistent and out-of-mask safe, but the resulting CLEAN_PLATE visibly preserves readable dark-blue English ghost/shadow lettering across both source lines, failing the contract's native visual/no-source-language-residue gate. No Korean candidate or runtime approval is granted for index99.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "2a209832432936a6026ecae12c21b9253c7c4b0b",
+      "result_message": "localization(B): add dual DDS isolation inputs [AUTO:LOCALIZATION-LOCALIZATION_B-00158]",
+      "completed_at": "2026-09-29T22:58:17.395265+09:00",
+      "producer_id": "P00076",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00157",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "789083b3a143fa9d3c3e2d0c76ed75edb94368b1",
+      "result_message": "localization(A): materialize index99 clean plate input [AUTO:LOCALIZATION-LOCALIZATION_A-00157]",
+      "completed_at": "2026-09-29T23:01:10.912703+09:00",
+      "producer_id": "P00075",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00158",
+      "result_sha": "2a209832432936a6026ecae12c21b9253c7c4b0b",
+      "status": "PASS",
+      "reason": "PASS limited to B00158's dual DDS_ONLY runtime-isolation deliverable for index104/62BEBF33 and index116/E3FD08BE; no runtime promotion. C independently re-fetched and decoded current/result DXT5 source/candidate bytes under the current contract. 62BEBF33 remains source/candidate blobs 1cc92c914687546fbef9b47dd1134659c2f1f0f6 / a5cd9697dec6ea04a1c67fa31619a28e86b5acb2, 2048x256 DXT5 mip1, 524416 bytes, header-128 diff 0; readable source/candidate alpha bboxes [392,52,1356,200] / [565,52,1185,199] lie inside declared [392,52,1357,201], with 0 outside alpha changes/introductions. E3FD08BE remains 9cd996ed8f5e8c059492893617e4ff2006c525a2 / 96a9aa5d3d99a97bf4b386102ef8d43ee537f1c1, same DDS structure/header equality; bboxes [393,54,1627,199] / [632,54,1387,198] lie inside [393,54,1628,200], again with 0 outside alpha changes/introductions. Readable mirror-Y visual review shows correctly oriented '아웃런 모드' and '하트 어택 모드' without visible clipping. Both remain edge-touch/high-risk and require isolated real-game testing; RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00157",
+      "result_sha": "789083b3a143fa9d3c3e2d0c76ed75edb94368b1",
+      "status": "REWORK_REQUIRED",
+      "reason": "REWORK_REQUIRED for index99/4F68708E CLEAN_PLATE. Exact pinned canonical source blob eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8 re-fetch matches 2048x256 DXT5 mip1 / 524416 bytes. Embedded removal mask is internally consistent at 42,774 pixels / 3,450 RLE runs and patch payload is exactly 171,096 RGBA bytes. Applying the patch changes 0 pixels/alpha outside the mask and leaves 0 alpha-positive pixels at luminance>=18 inside the mask. But independent native/readable mirror-Y visual review fails the contract's no-source-language-residue rule: both English lines remain clearly legible as dark-blue ghost/shadow silhouettes. Rework must expand/rederive the full effect mask, rebuild a visually clean plate with protected artwork unchanged, and only then continue style/render/DXT5 work. No Korean candidate/runtime approval; RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+  "independent_checks": {
+    "B00158": {
+      "contract_fingerprint_reason": "Historical C86 used contract blob c299a398ebf8d66bfff1494c2ee2294864ba9f00; current contract is 8b7a840fcd756185761bbc39aafff255a7b3aefc, so current-contract checks were rerun.",
+      "62BEBF33": {
+        "source_blob": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+        "candidate_blob": "a5cd9697dec6ea04a1c67fa31619a28e86b5acb2",
+        "bytes": 524416,
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5",
+        "mipmaps": 1,
+        "header_128_diff_bytes": 0,
+        "raw_orientation": "mirror_y",
+        "source_alpha_bbox_readable": [
+          392,
+          52,
+          1356,
+          200
+        ],
+        "candidate_alpha_bbox_readable": [
+          565,
+          52,
+          1185,
+          199
+        ],
+        "declared_effect_bbox_readable": [
+          392,
+          52,
+          1357,
+          201
+        ],
+        "containment": "PASS",
+        "alpha_changes_outside_declared_effect_bbox": 0,
+        "introduced_alpha_outside_declared_effect_bbox": 0,
+        "readable_visual": "PASS_KOREAN_아웃런_모드_ORIENTATION_AND_NO_VISIBLE_CLIPPING",
+        "runtime": "UNTESTED"
+      },
+      "E3FD08BE": {
+        "source_blob": "9cd996ed8f5e8c059492893617e4ff2006c525a2",
+        "candidate_blob": "96a9aa5d3d99a97bf4b386102ef8d43ee537f1c1",
+        "bytes": 524416,
+        "width": 2048,
+        "height": 256,
+        "format": "DXT5",
+        "mipmaps": 1,
+        "header_128_diff_bytes": 0,
+        "raw_orientation": "mirror_y",
+        "source_alpha_bbox_readable": [
+          393,
+          54,
+          1627,
+          199
+        ],
+        "candidate_alpha_bbox_readable": [
+          632,
+          54,
+          1387,
+          198
+        ],
+        "declared_effect_bbox_readable": [
+          393,
+          54,
+          1628,
+          200
+        ],
+        "containment": "PASS",
+        "alpha_changes_outside_declared_effect_bbox": 0,
+        "introduced_alpha_outside_declared_effect_bbox": 0,
+        "readable_visual": "PASS_KOREAN_하트_어택_모드_ORIENTATION_AND_NO_VISIBLE_CLIPPING",
+        "runtime": "UNTESTED"
+      }
+    },
+    "A00157": {
+      "canonical_source_blob": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+      "bytes": 524416,
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y",
+      "removal_mask_pixels": 42774,
+      "removal_mask_rle_runs": 3450,
+      "patch_rgba_bytes": 171096,
+      "expected_patch_rgba_bytes": 171096,
+      "changed_pixels_outside_mask": 0,
+      "alpha_changes_outside_mask": 0,
+      "remaining_alpha_positive_luminance_ge18_inside_mask": 0,
+      "native_readable_visual": "FAIL_CLEAR_DARK_BLUE_ENGLISH_GHOST_SHADOW_RESIDUE_ON_BOTH_LINES",
+      "contract_gate": "FAIL_CLEAN_PLATE_NO_SOURCE_LANGUAGE_RESIDUE",
+      "candidate_exists": false,
+      "runtime": "UNTESTED"
+    }
+  },
+  "source_identity_validation": "PASS_B00158_EXACT_CURRENT_AND_RESULT_SOURCE_CANDIDATE_BLOBS_UNCHANGED__PASS_A00157_PINNED_EB8C2DDA_DXT5_SOURCE_IDENTITY",
+  "canonical_semantic_validation": "PASS_INDEX104_OutRun_Mode_TO_아웃런_모드__PASS_INDEX116_Heart_Attack_Mode_TO_하트_어택_모드__PASS_INDEX99_GHOST_CAR_TWO_LINE_KOREAN_LAYOUT_SEMANTICS_BUT_NO_CANDIDATE",
+  "geometry_mapping_validation": "PASS_B00158_CURRENT_CONTRACT_DECODED_DXT5_HEADER_ALPHA_ORIENTATION_AND_DECLARED_BBOX_CONTAINMENT__FAIL_A00157_CLEAN_PLATE_NATIVE_VISUAL_ENGLISH_GHOST_RESIDUE",
+  "current_contract_compatibility": "MIXED_PASS_B00158_FALLBACK3_RUNTIME_ISOLATION__REWORK_A00157_CLEAN_PLATE_NO_SOURCE_LANGUAGE_RESIDUE_GATE",
+  "readiness_reconciliation": {
+    "classification": "MIXED_PASS_AND_REWORK",
+    "indices": [
+      104,
+      116,
+      99
+    ],
+    "per_index": {
+      "99": "A00157 CLEAN_PLATE REWORK_REQUIRED because readable native review shows dark-blue English ghost text on both lines; rebuild full-effect removal mask/CLEAN_PLATE before Korean render.",
+      "104": "B00158 isolation input PASS only; edge-touch/high-risk isolated runtime test remains required.",
+      "116": "B00158 isolation input PASS only; edge-touch/high-risk isolated runtime test remains required."
+    }
+  },
+  "heavy_qa_reuse": {
+    "repeated_unchanged_fingerprint_heavy_qa": false,
+    "b00158_heavy_rerun_reason": "QA contract fingerprint changed since C86 (c299a398... -> 8b7a840f...), so current-contract binary/visual checks were independently rerun once per unique asset.",
+    "b00158_unique_asset_checks": 2,
+    "a00157_reused_c127_source_identity_and_effect_boundary": true,
+    "a00157_new_clean_plate_visual_result": "FAIL_SOURCE_LANGUAGE_RESIDUE",
+    "reason": "No heavy check was repeated for an unchanged current-contract fingerprint. New contract fingerprint for B assets and new CLEAN_PLATE material for index99 justified the performed checks."
+  },
+  "supersession": {
+    "superseded_inputs": [],
+    "newer_same_asset_candidate_or_source_fingerprints": [],
+    "merge_head": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+    "preserved_disjoint_head_message": "localization(A): add 9CE4E175 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00163]"
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      104,
+      116,
+      99
+    ],
+    "reviewed_assets": 3,
+    "producer_inputs_pass": 1,
+    "producer_inputs_rework_required": 1,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260929-2323-C129/C129_Q00027_INDEPENDENT_QA_BATCH.json"
+  },
+  "shared_state_modified": true,
+  "candidate_dds_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
