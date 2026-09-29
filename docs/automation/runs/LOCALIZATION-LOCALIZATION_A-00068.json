@@ -1,0 +1,91 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00068",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00009",
+  "recorded_at_kst": "2026-09-29T14:27:13+09:00",
+  "selection_base_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+  "material_commit_sha": "0079a23976f73df6027551e298e687997c02f0b5",
+  "pre_task_record_head_sha": "0079a23976f73df6027551e298e687997c02f0b5",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_ODD_EXACT_RELEASE_ATLAS_RECONSTRUCTION_INPUTS",
+  "summary": "Advanced fresh odd indices 175/205/227/231 with 20 immutable GitHub source objects, exact stock-to-4x atlas geometry for 123 regions, and 41 canonical Korean semantics matching transcription/artwork-plan state. Exact decoded semantic-to-sprite mapping, source glyph/effect bboxes, orientation/slant and Korean candidate-only gates remain fail-closed HOLD; no Korean DDS or shared state was modified.",
+  "evidence": [
+    "localization/graphics/role_A/20260929-1427-A00068-P00009/A00068_P00009_ODD_ATLAS_RECONSTRUCTION_INPUTS.json"
+  ],
+  "material_deliverable": {
+    "type": "FOUR_ODD_EXACT_RELEASE_AND_ATLAS_GEOMETRY_RECONSTRUCTION_INPUTS",
+    "indices": [
+      175,
+      205,
+      227,
+      231
+    ],
+    "assets": [
+      "754F0599",
+      "ACF61D7C",
+      "E596B7AC",
+      "EBE401C8"
+    ],
+    "exact_github_objects_pinned": 20,
+    "atlas_regions_total": 123,
+    "canonical_semantics_total": 41,
+    "stock_to_4x_geometry": "PASS_123_OF_123_EXACT_X4",
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "A00061": {
+      "result_sha": "e989cdc5cafa9146054dc9fe6c8bd13efe08fab2",
+      "assets": [
+        137,
+        217,
+        219,
+        241
+      ]
+    },
+    "A00064": {
+      "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+      "assets": [
+        133,
+        135,
+        139,
+        143
+      ]
+    },
+    "A00065": {
+      "result_sha": "144838b1bf57c52f18cb924f1f8e7e5db1548a27",
+      "assets": [
+        147,
+        159,
+        161,
+        163
+      ]
+    },
+    "A00067": {
+      "result_sha": "e2be75d74860d3794f02fc56f0d94d7e93f307e0",
+      "assets": [
+        173,
+        193,
+        201,
+        225
+      ]
+    }
+  },
+  "self_qa": "PASS_SOURCE_LINEAGE_20_OBJECTS_ATLAS_GEOMETRY_123_REGIONS_CANONICAL_41",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CANDIDATE",
+  "fail_closed_reason": "No Korean DDS candidate was written. Exact decoded source-pixel semantic-to-sprite binding, full glyph/effect bboxes, raw per-element orientation/slant, zero-pixel containment and English-source-vs-Korean-candidate visual proof remain required before raster production or static approval.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
