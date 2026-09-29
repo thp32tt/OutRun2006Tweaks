@@ -749,3 +749,19 @@ Changed files: `vrhost/tests/r41_skipped_release_smoke.cpp`, `docs/VR_R71_STATIC
 AUTOMATION_VALIDATION: `CI_CONTRACT_REPAIRED / EXACT_HEAD_REVALIDATION_PENDING`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: consume repaired-head Build/OpenXR/HUD; then continue P0 visual review without performance-only changes.
+
+
+## Cycle 0032 — SkyGlow state restoration and HUD alpha isolation
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- SkyGlow pre-HUD path saves and restores ALPHABLENDENABLE, SRCBLEND, DESTBLEND, BLENDOP, COLORWRITE, alpha-test, shaders, texture0, stream0, sampler state, viewport and render targets. Static evidence therefore does not support forcing HUD alpha/blend state globally; that could break intentional translucent UI. Keep HUD alpha diagnosis independent and telemetry-led.
+- Evidence: R30RestoreSkyGlowState exact state restoration.
+- No additional production/runtime behavior changed in this cycle.
+- Frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged; performance-only work remains paused.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: trace selector white/colorless car resource/material state.
