@@ -1,0 +1,117 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00175",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00031",
+  "qa_batch_id": "Q00031",
+  "recorded_at_kst": "2026-09-30T01:06:00+09:00",
+  "base_head_sha": "327a79797eee5bfb2e692dc1bd721f92a18f7b30",
+  "commit_mode": "ATOMIC_EMBEDDED_C_BATCH_TASK_RECORD_AND_SHARED_STATE",
+  "result": "PASS_Q00031_A00170_SOURCE_ACQUISITION_EXHAUSTED_B00171_SUPERSEDED_RUNTIME_UNTESTED",
+  "summary": "Q00031 independently accepts A00170 only for final source-acquisition exhaustion on indices43/49/107 and marks B00171 SUPERSEDED because its old 49BB5FE5 lineage is replaced by current blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17. A00170 production_readiness is PREFLIGHT_ONLY; no Korean candidate/static/runtime approval is added. Shared state is merged once from HEAD 327a79797eee5bfb2e692dc1bd721f92a18f7b30.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00170",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "3e17daba50605b1c533ed061d20c63426a8bd851",
+      "result_message": "localization(A): exhaust source tiers for odd preflight cohort [AUTO:LOCALIZATION-LOCALIZATION_A-00170]",
+      "completed_at": "2026-09-30T00:41:02.910718+09:00",
+      "producer_id": "P00084",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00171",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "56b2166042ddce9714a526051d59bb9bd8fba52d",
+      "result_message": "localization(B): reconcile B00171 rollover with index152 completion [AUTO:LOCALIZATION-LOCALIZATION_B-00171]",
+      "completed_at": "2026-09-30T00:41:03.997457+09:00",
+      "producer_id": "P00085",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00170",
+      "result_sha": "3e17daba50605b1c533ed061d20c63426a8bd851",
+      "status": "PASS",
+      "reason": "PASS is limited to A00170 source-acquisition evidence for indices 43/49/107; it does not approve Korean artwork. C independently confirmed approved Drive exact-path misses 3/3, immutable pinned-direct DDS identities 3/3 mismatch the unchanged current canonical inventory, and the exact pinned v0.25.10a release archive SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958 with exact member hashes/dimensions ce5d3610... 2048x2048 RGBA32, b5c0a868... 2048x2048 RGBA32, 112f47e7... 2048x512 RGBA32. These mismatch canonical inventory e0e4f56d... 512x512 RGBA, b8d5716d... 512x512 RGBA, 872a6a93... 512x128 RGBA. All approved tiers are exhausted for the immutable fingerprints. production_readiness=PREFLIGHT_ONLY for 43/49/107. RUNTIME_VALIDATION=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00171",
+      "result_sha": "56b2166042ddce9714a526051d59bb9bd8fba52d",
+      "status": "SUPERSEDED",
+      "reason": "B00171@56b21660 carried the old 49BB5FE5 candidate lineage (Git blob 92b467032702ca62f0887058b646515c0f08cc30, SHA-256 da8cf41d8416c50780e6264457b3a2ab08b28d84265b10754f0e550bf97deca3). Current HEAD 327a7979 carries newer B00167 candidate blob 5d938fd663669715cdebcbff675b3499c888d200, SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17; current B00167 explicitly supersedes the old lineage after visual review found pixelated English ghost residue and English/Korean overlap. Therefore B00171 is SUPERSEDED and must not overwrite newer state. Its index92 transport preflight remains historical evidence only and is not promoted by Q00031. RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+  "source_identity_validation": "PASS_A00170_DRIVE_MISS_3_OF_3__PINNED_DIRECT_IDENTITY_MISMATCH_3_OF_3__PINNED_RELEASE_EXACT_BUNDLE_MEMBER_MISMATCH_3_OF_3",
+  "canonical_semantic_validation": "NO_NEW_SEMANTIC_OR_TRANSLATION_CHANGE__A00170_SOURCE_ACQUISITION_ONLY__B00171_SUPERSEDED",
+  "geometry_mapping_validation": "A00170_NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE__B00171_SUPERSEDED_OLD_CANDIDATE_NOT_REVALIDATED",
+  "current_contract_compatibility": "PASS_FAIL_CLOSED_SOURCE_ACQUISITION_EXHAUSTION__SUPERSEDED_CANDIDATE_NOT_PROMOTED__CURRENT_HEAD_PRESERVED",
+  "readiness_reconciliation": {
+    "classification": "A00170_PREFLIGHT_PASS_SOURCE_ACQUISITION_EXHAUSTED__B00171_SUPERSEDED",
+    "production_readiness": {
+      "43": "PREFLIGHT_ONLY",
+      "49": "PREFLIGHT_ONLY",
+      "107": "PREFLIGHT_ONLY"
+    },
+    "source_acquisition_exhausted": [
+      43,
+      49,
+      107
+    ],
+    "candidate_completion_priority": [
+      "Candidate completion first: independently QA current A00173 index99/4F68708E transparent CLEAN_PLATE v3 before unrelated preflight; if accepted, continue the Korean candidate render path.",
+      "Independently QA the exact newer B00167 index152/49BB5FE5 result carrying blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17; never reuse B00171's superseded old lineage.",
+      "Preserve the newer index112/D41D0B1 producer-result C-QA handoff already pending; do not regress it to an older candidate.",
+      "Indices43/49/107 remain PREFLIGHT_ONLY and SOURCE_ACQUISITION_EXHAUSTED; do not repeat Drive/direct/Release probes until source/inventory fingerprint changes."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+    "reviewed_indices": [
+      43,
+      49,
+      107,
+      92,
+      152
+    ],
+    "reviewed_assets": 5,
+    "producer_inputs_pass": 1,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 1,
+    "source_acquisition_exhausted": 3,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 753,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 76,
+    "candidate_dds_modified_by_c": false,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "report": "localization/graphics/role_C/20260930-0106-C133/C133_Q00031_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

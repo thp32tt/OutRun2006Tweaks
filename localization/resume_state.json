@@ -1,5 +1,5 @@
 {
-  "schema_version": 85,
+  "schema_version": 86,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C133/Q00031 candidate-completion-first: independently QA current A00173 index99/4F68708E transparent CLEAN_PLATE v3 before unrelated preflight; if accepted, continue toward Korean candidate render.",
+    "C133/Q00031 marks B00171@56b21660 SUPERSEDED. Independently QA the exact newer B00167 index152/49BB5FE5 candidate blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17; never reuse old da8cf41d lineage.",
+    "C133/Q00031 accepts A00170 indices43/49/107 only as PASS PREFLIGHT_ONLY for final approved source-acquisition exhaustion; skip repeated source probes until source/inventory fingerprint changes.",
+    "Q00031 adds no Korean candidate DDS, static artwork approval, or runtime approval. RUNTIME_VALIDATION remains UNTESTED.",
     "C132/Q00030 accepts A00168 indices65/89/241 only as PASS for final canonical-source acquisition exhaustion. All three are production_readiness=PREFLIGHT_ONLY and must skip repeated Drive/pinned-direct/pinned-Release probes until source/inventory fingerprint changes.",
     "Keep candidate completion ahead of unrelated preflight: C131 index99/4F68708E remains direct REWORK_REQUIRED for a source-effect-aware transparent CLEAN_PLATE; finish that rework path before expanding preflight.",
     "Queue the exact newer D41D0B1 producer result carrying current candidate blob 30971e83bebe619520f27dfece37f8ebdc02ff28 / SHA-256 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1 for independent C QA; do not reuse the superseded 7ec8a1c2 input.",
@@ -2375,65 +2379,76 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "recorded_at_kst": "2026-09-30T00:43:54+09:00",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00172",
-    "qa_batch_id": "Q00030",
-    "run": "C132",
-    "result": "PASS_Q00030_A00168_FINAL_SOURCE_ACQUISITION_EXHAUSTED_65_89_241_RUNTIME_UNTESTED",
-    "base_head": "d6fbe37406b026658b76397d2858d3a0ed184ef7",
+    "recorded_at_kst": "2026-09-30T01:06:00+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00175",
+    "qa_batch_id": "Q00031",
+    "run": "C133",
+    "result": "PASS_Q00031_A00170_SOURCE_ACQUISITION_EXHAUSTED_B00171_SUPERSEDED_RUNTIME_UNTESTED",
+    "base_head": "327a79797eee5bfb2e692dc1bd721f92a18f7b30",
     "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
     "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
     "qa_batch_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00168@9792d4abe76555792a93150de8f7d1d46e976339"
+      "LOCALIZATION-LOCALIZATION_A-00170@3e17daba50605b1c533ed061d20c63426a8bd851",
+      "LOCALIZATION-LOCALIZATION_B-00171@56b2166042ddce9714a526051d59bb9bd8fba52d"
     ],
     "reviewed_indices": [
-      65,
-      89,
-      241
+      43,
+      49,
+      107,
+      92,
+      152
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
-        "result_sha": "9792d4abe76555792a93150de8f7d1d46e976339",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00170",
+        "result_sha": "3e17daba50605b1c533ed061d20c63426a8bd851",
         "status": "PASS",
-        "reason": "PASS is limited to A00168's final pinned-Release source-acquisition audit for indices 65/89/241; it does not approve any Korean candidate or static artwork. C independently verified the immutable producer record/report at 9792d4ab..., the current contract/inventory fingerprints, and the pinned v0.25.10a tag -> commit 55f67a813dd3603d201d0be0da47c071965f53a4. GitHub Release asset 306630789 is exactly 306,223,257 bytes with SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958. An independently hashed copy of that exact bundle reproduced all three producer member hashes and DDS dimensions: EBEF6D20 8d832df2... 2048x2048 RGBA32, 43B07A77 906a17ef... 2048x256 RGBA32, E1639D2E e250a41e... 1024x256 RGBA32. Each differs from current canonical inventory SHA/dimensions (1ee491be... 512x512, 0a2c9a32... 512x64, 0af7362f... 256x64). C126 already accepted the pinned-direct mismatches and C131 accepted the Drive transport misses. Therefore all approved acquisition tiers are exhausted for these exact inventory fingerprints. production_readiness=PREFLIGHT_ONLY; skip repeated source acquisition until the source/inventory fingerprint changes. RUNTIME_VALIDATION=UNTESTED."
+        "reason": "PASS is limited to A00170 source-acquisition evidence for indices 43/49/107; it does not approve Korean artwork. C independently confirmed approved Drive exact-path misses 3/3, immutable pinned-direct DDS identities 3/3 mismatch the unchanged current canonical inventory, and the exact pinned v0.25.10a release archive SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958 with exact member hashes/dimensions ce5d3610... 2048x2048 RGBA32, b5c0a868... 2048x2048 RGBA32, 112f47e7... 2048x512 RGBA32. These mismatch canonical inventory e0e4f56d... 512x512 RGBA, b8d5716d... 512x512 RGBA, 872a6a93... 512x128 RGBA. All approved tiers are exhausted for the immutable fingerprints. production_readiness=PREFLIGHT_ONLY for 43/49/107. RUNTIME_VALIDATION=UNTESTED."
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00171",
+        "result_sha": "56b2166042ddce9714a526051d59bb9bd8fba52d",
+        "status": "SUPERSEDED",
+        "reason": "B00171@56b21660 carried the old 49BB5FE5 candidate lineage (Git blob 92b467032702ca62f0887058b646515c0f08cc30, SHA-256 da8cf41d8416c50780e6264457b3a2ab08b28d84265b10754f0e550bf97deca3). Current HEAD 327a7979 carries newer B00167 candidate blob 5d938fd663669715cdebcbff675b3499c888d200, SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17; current B00167 explicitly supersedes the old lineage after visual review found pixelated English ghost residue and English/Korean overlap. Therefore B00171 is SUPERSEDED and must not overwrite newer state. Its index92 transport preflight remains historical evidence only and is not promoted by Q00031. RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_PINNED_RELEASE_ASSET_306630789_SIZE306223257_SHA76F85ED2__TAG_V0_25_10A_COMMIT55F67A81__MEMBER_HASH_DIMENSIONS_REPRODUCED_3_OF_3__ALL_NE_CURRENT_CANONICAL_INVENTORY",
-    "prior_tier_validation": "REUSE_C126_A00149_PINNED_DIRECT_SOURCE_IDENTITY_MISMATCH_3_OF_3__REUSE_C131_A00166_DRIVE_SOURCE_TRANSPORT_MISS_3_OF_3",
-    "canonical_semantic_validation": "NO_NEW_SEMANTIC_OR_TRANSLATION_CHANGE__SOURCE_ACQUISITION_ONLY",
-    "geometry_mapping_validation": "NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE",
-    "current_contract_compatibility": "PASS_FAIL_CLOSED_SOURCE_ACQUISITION_EXHAUSTION__NO_STALE_4X_SUBSTITUTION__NO_FALSE_CANDIDATE_PROMOTION",
+    "source_identity_validation": "PASS_A00170_DRIVE_MISS_3_OF_3__PINNED_DIRECT_IDENTITY_MISMATCH_3_OF_3__PINNED_RELEASE_EXACT_BUNDLE_MEMBER_MISMATCH_3_OF_3",
+    "canonical_semantic_validation": "NO_NEW_SEMANTIC_OR_TRANSLATION_CHANGE__A00170_SOURCE_ACQUISITION_ONLY__B00171_SUPERSEDED",
+    "geometry_mapping_validation": "A00170_NOT_APPLICABLE_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE__B00171_SUPERSEDED_OLD_CANDIDATE_NOT_REVALIDATED",
+    "current_contract_compatibility": "PASS_FAIL_CLOSED_SOURCE_ACQUISITION_EXHAUSTION__SUPERSEDED_CANDIDATE_NOT_PROMOTED__CURRENT_HEAD_PRESERVED",
     "readiness_reconciliation": {
-      "classification": "PREFLIGHT_PASS_SOURCE_ACQUISITION_EXHAUSTED",
+      "classification": "A00170_PREFLIGHT_PASS_SOURCE_ACQUISITION_EXHAUSTED__B00171_SUPERSEDED",
       "production_readiness": {
-        "65": "PREFLIGHT_ONLY",
-        "89": "PREFLIGHT_ONLY",
-        "241": "PREFLIGHT_ONLY"
+        "43": "PREFLIGHT_ONLY",
+        "49": "PREFLIGHT_ONLY",
+        "107": "PREFLIGHT_ONLY"
       },
       "source_acquisition_exhausted": [
-        65,
-        89,
-        241
+        43,
+        49,
+        107
       ],
       "candidate_completion_priority": [
-        "Preserve C131 direct REWORK_REQUIRED index99/4F68708E as higher-priority candidate-completion work; rebuild source-effect-aware transparent CLEAN_PLATE before unrelated preflight.",
-        "Preserve current D41D0B1 candidate 30971e83bebe619520f27dfece37f8ebdc02ff28 / 5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1 for exact newer producer-result C QA.",
-        "Indices65/89/241 remain PREFLIGHT_ONLY but source-acquisition-exhausted; do not repeat Drive/direct/Release probes unless source/inventory fingerprint changes."
+        "Candidate completion first: independently QA current A00173 index99/4F68708E transparent CLEAN_PLATE v3 before unrelated preflight; if accepted, continue the Korean candidate render path.",
+        "Independently QA the exact newer B00167 index152/49BB5FE5 result carrying blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17; never reuse B00171's superseded old lineage.",
+        "Preserve the newer index112/D41D0B1 producer-result C-QA handoff already pending; do not regress it to an older candidate.",
+        "Indices43/49/107 remain PREFLIGHT_ONLY and SOURCE_ACQUISITION_EXHAUSTED; do not repeat Drive/direct/Release probes until source/inventory fingerprint changes."
       ]
     },
     "metadata_reconciled_segments": 0,
     "canonical_transcribed_segments_after_merge": 753,
     "actionable_localize_text_after": 93,
     "pending_production_localize_text_after": 76,
-    "superseded_inputs": [],
+    "superseded_inputs": [
+      "LOCALIZATION-LOCALIZATION_B-00171@56b2166042ddce9714a526051d59bb9bd8fba52d"
+    ],
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
     "runtime_validation": "UNTESTED",
-    "report": "localization/graphics/role_C/20260930-0043-C132/C132_Q00030_INDEPENDENT_QA_BATCH.json",
+    "report": "localization/graphics/role_C/20260930-0106-C133/C133_Q00031_INDEPENDENT_QA_BATCH.json",
     "passed_inputs": [
-      "LOCALIZATION-LOCALIZATION_A-00168@9792d4abe76555792a93150de8f7d1d46e976339"
+      "LOCALIZATION-LOCALIZATION_A-00170@3e17daba50605b1c533ed061d20c63426a8bd851"
     ]
   }
 }

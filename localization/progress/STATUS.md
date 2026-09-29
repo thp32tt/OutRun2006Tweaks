@@ -1124,3 +1124,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - production_readiness 65/89/241: **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**. Do not repeat source probes until source/inventory fingerprint changes.
 - Preserve candidate-completion priorities: index99 direct REWORK_REQUIRED; current index112 D41D0B1 newer result requires exact C QA.
 - No candidate DDS/static/runtime approval. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+## 2026-09-30 01:06 KST - C133 Q00031 INDEPENDENT QA BATCH
+
+- Immutable inputs: A00170 `3e17daba50605b1c533ed061d20c63426a8bd851` and B00171 `56b2166042ddce9714a526051d59bb9bd8fba52d`. Dispositions: **PASS / SUPERSEDED**.
+- A00170 PASS is source-acquisition evidence only: approved Drive exact-path misses 3/3, pinned-direct identity mismatches 3/3, and exact pinned v0.25.10a bundle/member identity mismatches 3/3 are independently reproduced. Indices43/49/107 = **PREFLIGHT_ONLY / SOURCE_ACQUISITION_EXHAUSTED**; no Korean candidate approval.
+- B00171 is **SUPERSEDED**: old 49BB5FE5 blob `92b46703...` / SHA `da8cf41d...` is replaced by current blob `5d938fd6...` / SHA `0a92b614...`; current B00167 records the old visual false positive (English ghost residue/overlap). The old input is not promoted and cannot overwrite current state.
+- Candidate-completion-first order: current A00173 index99 clean-plate v3, exact newer B00167 index152 candidate, and newer index112 handoff precede unrelated preflight. Counts unchanged: 137 queue, 93 localize_text, 76 pending production, 753 segments.
+- No C candidate DDS modification, new static approval, runtime approval, build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0106-C133/C133_Q00031_INDEPENDENT_QA_BATCH.json`.
