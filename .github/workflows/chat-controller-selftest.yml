@@ -148,6 +148,7 @@ jobs:
           grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'def github_actions_skip_directive' /tmp/controller.py
+          grep -Fq 'if github_actions_skip_directive(message):' /tmp/controller.py
           grep -Fq 'async def recover_missing_gate_run' /tmp/controller.py
           grep -Fq 'contains GitHub Actions skip directive' /tmp/controller.py
           grep -Fq 'Treating the missing run as a repairable automation failure instead of waiting forever.' /tmp/controller.py
