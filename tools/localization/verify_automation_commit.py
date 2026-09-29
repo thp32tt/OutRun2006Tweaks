@@ -85,12 +85,13 @@ if dds:
             rv=str(d.get("runtime_validation","")).upper()
             if rv not in {"UNTESTED","PASS"}:
                 bad.append(f"{rel}:runtime_validation={rv}")
-        for k in zero_keys:
-            if k in d:
-                seen_zero_gate=True
-                try:
-                    if int(d[k]) != 0: bad.append(f"{rel}:{k}={d[k]}")
-                except Exception: bad.append(f"{rel}:{k}=INVALID")
+        for metric_obj in walk(d):
+            for k in zero_keys:
+                if k in metric_obj:
+                    seen_zero_gate=True
+                    try:
+                        if int(metric_obj[k]) != 0: bad.append(f"{rel}:{k}={metric_obj[k]}")
+                    except Exception: bad.append(f"{rel}:{k}=INVALID")
     if bad:
         raise SystemExit("post-reset zero-pixel QA failed: "+"; ".join(bad))
     if not seen_zero_gate:
