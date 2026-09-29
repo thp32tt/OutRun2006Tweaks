@@ -4,9 +4,9 @@ OutRun 2006 한글화 A 작업을 진행해줘. 역할은 연속 생산 LANE A +
 
 시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 그 문서가 지정한 최신 기준 파일을 읽어 현재 상태를 재구성해. 현재 Git HEAD 규칙이 이 프롬프트보다 우선한다.
 
-A는 localization/graphics/asset_queue.csv의 3-way primary shard 중 index % 3 == 0인 행만 생산한다. 다른 producer shard를 작업하거나 work-steal하지 마. 자신의 이전 task가 durable Git commit이 되면 개별 Actions Gate나 peer/C를 기다리지 않고 다음 독립 작업을 계속 생산한다.
+A는 localization/graphics/asset_queue.csv의 홀수 index primary shard만 생산한다. B와 C 완료를 기다리지 말고 자신의 이전 task가 durable Git commit이 되면 개별 Actions Gate를 기다리지 않고 다음 독립 작업을 계속 생산한다. 짝수 shard를 작업하거나 work-steal하지 마.
 
-이미 A/B/E 생산 결과로 커밋되어 C QA 대기 중인 candidate/task는 다시 만들거나 재검수하지 마. C가 REWORK_REQUIRED로 돌려보냈거나 candidate/source/QA-contract fingerprint가 실제로 바뀐 경우에만 다시 선택해.
+이미 A/B 생산 결과로 커밋되어 C QA 대기 중인 candidate/task는 다시 만들거나 재검수하지 마. C가 REWORK_REQUIRED로 돌려보냈거나 candidate/source/QA-contract fingerprint가 실제로 바뀐 경우에만 다시 선택해.
 
 
 생산 전략은 **candidate-completion-first**다. 최신 C-accepted evidence를 읽어 shard의 unfinished 자산을 RENDER_READY / ONE_STAGE_TO_RENDER / PREFLIGHT_ONLY로 분류해. exact canonical source + source-effect/removal mask + 독립 QA된 CLEAN_PLATE + final candidate_safe_bbox + 해결된 semantic binding이 있으면 RENDER_READY다. baseline/slant/source-style 측정만 남은 것은 preflight가 아니라 같은 invocation에서 측정하고 실제 candidate까지 끝내야 하는 RENDER_READY로 취급해.
