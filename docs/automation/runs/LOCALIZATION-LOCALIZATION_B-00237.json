@@ -132,7 +132,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "result_commit_message": "localization(B): produce index163 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00237]"
+  "result_sha": "b138928bfc031026d37573c7055685460131d7d7",
+  "authoritative_result_sha": "b138928bfc031026d37573c7055685460131d7d7",
+  "result_commit_message": "localization(B): produce index163 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00237]",
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:18:00+09:00",
+  "bookkeeping_base_head_sha": "b138928bfc031026d37573c7055685460131d7d7",
+  "bookkeeping_note": "Authoritative producer RESULT_SHA recorded after verifying the exact result commit carries the required AUTO marker, only lane-local B00237 review/evidence/task paths, automation_validation=PENDING with validation_mode=C_BATCH_GATE, and runtime_validation=UNTESTED. This bookkeeping commit is separate from and does not replace the producer result commit."
 }
