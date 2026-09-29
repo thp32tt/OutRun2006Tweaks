@@ -19,6 +19,8 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - vr-nightly-r59-final-hud-rank-20260927
+      - vr-nightly-r62-fixedfn-kind0-20260927
 
 concurrency:
   group: outrun-pc-fast-test
@@ -39,10 +41,10 @@ jobs:
           "TMP=$env:RUNNER_TEMP" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "TEMP/TMP -> $env:RUNNER_TEMP"
 
-      - name: Checkout current VR integration branch without deleting build cache
+      - name: Checkout exact triggered VR source without deleting build cache
         uses: actions/checkout@v4
         with:
-          ref: vr-d3d9ex-focus
+          ref: ${{ github.sha }}
           submodules: recursive
           fetch-depth: 1
           clean: false
@@ -54,7 +56,7 @@ jobs:
           $checkedOut = (git rev-parse HEAD).Trim()
           $triggerSha = '${{ github.sha }}'
           if ($checkedOut -ne $triggerSha) {
-            Write-Host "Queued trigger $triggerSha is stale; current vr-d3d9ex-focus is $checkedOut."
+            Write-Host "Checked out $checkedOut but trigger is $triggerSha; refusing mismatched source."
             "OUTRUN_PC_STALE=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           }
 

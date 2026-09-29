@@ -312,6 +312,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             DirectAckState->structSize = sizeof(*DirectAckState);
             DirectAckState->hostPid = GetCurrentProcessId();
             DirectAckState->transportGeneration = 0;
+            DirectAckState->clientPid = 0;
+            DirectAckState->runGeneration = 0;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
             EndAckWrite();
@@ -495,23 +497,38 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool FrameRunIdentityCurrent(
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        return EnsureFrameRing() &&
+            OutRunVR::RenderFrameRunIdentityMatches(*FrameRing, frame);
+    }
+
     inline bool PublishCompletedFrame(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!EnsureDirectAckState())
+        if (!EnsureDirectAckState() || !FrameRunIdentityCurrent(frame))
             return false;
         const std::uint32_t slot =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t generation =
             frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
         if (slot >= OutRunVR::R13::DirectGpuAckRingSize || !generation ||
-            !frame.frameId)
+            !frame.frameId || !frame.clientPid || !runGeneration)
             return false;
 
         BeginAckWrite();
-        if (DirectAckState->transportGeneration != generation)
+        const bool identityChanged =
+            DirectAckState->transportGeneration != generation ||
+            DirectAckState->clientPid != frame.clientPid ||
+            DirectAckState->runGeneration != runGeneration;
+        if (identityChanged)
         {
             DirectAckState->transportGeneration = generation;
+            DirectAckState->clientPid = frame.clientPid;
+            DirectAckState->runGeneration = runGeneration;
             std::memset(DirectAckState->completedFrameId, 0,
                 sizeof(DirectAckState->completedFrameId));
         }
