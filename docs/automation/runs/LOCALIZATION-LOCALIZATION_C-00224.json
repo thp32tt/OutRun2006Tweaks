@@ -236,10 +236,20 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "No candidate/header/containment/visual gate was rerun for the superseded B00219 input. Only the source-identity equivalence needed to establish material supersession was checked once.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": "PENDING_POST_COMMIT",
-  "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-  "bookkeeping_note": "This AUTO result commit is the Q00049 validation owner and must not contain CI-skip. Gate outcome is recorded later in a separate bookkeeping commit."
+  "result_sha": "bcc3832eb2af1be7c9d7b5cfe3d8d3470162b52c",
+  "validation_bearing_result_sha": "bcc3832eb2af1be7c9d7b5cfe3d8d3470162b52c",
+  "bookkeeping_note": "Q00049 Gate result recorded after the validation-bearing C result commit. This bookkeeping commit is separate, uses CI skip, and does not replace validation ownership. RUNTIME_VALIDATION remains UNTESTED.",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36637371112,
+    "run_attempt": 1,
+    "head_sha": "bcc3832eb2af1be7c9d7b5cfe3d8d3470162b52c",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T07:05:05+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-09-30T07:05:39+09:00"
 }
