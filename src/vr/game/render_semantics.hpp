@@ -84,7 +84,7 @@ namespace OutRunVR::GameSemantic
         return HudExperimentMode.load(std::memory_order_acquire);
     }
 
-    inline bool IsExactHudScope(RenderScope scope) noexcept
+    [[nodiscard]] constexpr bool IsExactHudScope(RenderScope scope) noexcept
     {
         // R59: ProjectedWorldMarker2D is also an exact queue owner. R58 HMD
         // telemetry proved kind-0 rank nodes were tagged correctly but helper
@@ -93,6 +93,46 @@ namespace OutRunVR::GameSemantic
         return scope == RenderScope::ScreenHud ||
             scope == RenderScope::WorldBillboard ||
             scope == RenderScope::ProjectedWorldMarker2D;
+    }
+
+    // R71 DXVK visual ownership: c64/WVP classification happens before the
+    // final D3D draw consumes the queue semantic. Production mode 2 already
+    // keeps exact queue ownership sticky for ConsumeForDraw(), but the generic
+    // EffectiveScope() intentionally waits until mode 3. Expose only the exact
+    // queue tag to the c64 boundary at mode 2; never widen untagged
+    // ScreenOverlay2D into finite HUD ownership.
+    [[nodiscard]] constexpr RenderScope ResolveWvpUploadScope(
+        int mode, RenderScope currentScope,
+        RenderScope queueExactScope) noexcept
+    {
+        if (mode >= 2 && IsExactHudScope(queueExactScope))
+            return queueExactScope;
+        if (mode >= 4 && currentScope == RenderScope::ScreenOverlay2D)
+            return RenderScope::ScreenHud;
+        return currentScope;
+    }
+
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D, RenderScope::ScreenHud) ==
+        RenderScope::ScreenHud);
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D, RenderScope::WorldBillboard) ==
+        RenderScope::WorldBillboard);
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D,
+        RenderScope::ProjectedWorldMarker2D) ==
+        RenderScope::ProjectedWorldMarker2D);
+    static_assert(ResolveWvpUploadScope(
+        2, RenderScope::ScreenOverlay2D, RenderScope::None) ==
+        RenderScope::ScreenOverlay2D);
+    static_assert(ResolveWvpUploadScope(
+        1, RenderScope::ScreenOverlay2D, RenderScope::ScreenHud) ==
+        RenderScope::ScreenOverlay2D);
+
+    inline RenderScope EffectiveWvpUploadScope() noexcept
+    {
+        return ResolveWvpUploadScope(
+            GetHudExperimentMode(), CurrentScope, CurrentQueueExactScope);
     }
 
     inline RenderScope EffectiveScope() noexcept

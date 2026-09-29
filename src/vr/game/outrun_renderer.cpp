@@ -1634,16 +1634,16 @@ namespace OutRunVRRenderer
 					device, startRegister, constantData, vector4fCount);
 			}
 
-			// R51 ownership split: the canonical EXE sprite queue and exact
-			// original-mod world-marker tags identify overlays before this c64
-			// upload. Leave SCREEN_OVERLAY_2D / SCREEN_HUD / WORLD_BILLBOARD
-			// game WVP completely raw here. R30 is then the single owner that
-			// places queue HUD on the finite world-fixed plane or keeps rival
-			// markers in world space. Without this split,
-			// renderer head injection can happen first and R30 applies a second
-			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
+			// R71 exact queue ownership handoff: R51 proved producer tags reach
+			// R30 draw ownership but mode-2 exact queue scope was not visible at
+			// this earlier c64 boundary because helper scopes can overwrite
+			// CurrentScope. Read only the sticky exact queue tag here. Generic
+			// SCREEN_OVERLAY_2D remains generic and is never promoted by this
+			// path. Leave exact HUD/world-marker game WVP raw so R30 remains the
+			// single owner of final placement instead of stacking renderer head
+			// injection underneath the later semantic draw transform.
 			const auto semanticScope =
-				OutRunVR::GameSemantic::EffectiveScope();
+				OutRunVR::GameSemantic::EffectiveWvpUploadScope();
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(

@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "src" / "vr" / "game" / "disasm_render_contract.hpp"
 HUD = ROOT / "src" / "vr" / "hud_semantics.hpp"
 RUNTIME_SEMANTICS = ROOT / "src" / "vr" / "game" / "render_semantics.hpp"
+OUTRUN_RENDERER = ROOT / "src" / "vr" / "game" / "outrun_renderer.cpp"
 ANALYZER = ROOT / "tools" / "analyze_outrun_exe.py"
 
 ENTRY_RE = re.compile(
@@ -96,6 +97,31 @@ def main() -> int:
             raise AssertionError(
                 f"F15 shared-to-runtime projected policy bridge missing {policy}"
             )
+
+    # R71 c64 ownership-lifetime bridge: production mode 2 may surface only
+    # an exact queue semantic at WVP-upload time. Generic queue overlays must
+    # remain ScreenOverlay2D until the draw path consumes them.
+    for marker in (
+        "ResolveWvpUploadScope(",
+        "mode >= 2 && IsExactHudScope(queueExactScope)",
+        "EffectiveWvpUploadScope()",
+        "2, RenderScope::ScreenOverlay2D, RenderScope::None",
+        "1, RenderScope::ScreenOverlay2D, RenderScope::ScreenHud",
+    ):
+        if marker not in runtime_source:
+            raise AssertionError(
+                f"R71 c64 exact-queue ownership contract missing marker: {marker}"
+            )
+
+    renderer_source = OUTRUN_RENDERER.read_text(encoding="utf-8")
+    if "OutRunVR::GameSemantic::EffectiveWvpUploadScope()" not in renderer_source:
+        raise AssertionError(
+            "R71 renderer c64 path does not consume exact queue ownership"
+        )
+    if "SCREEN_OVERLAY_2D remains generic and is never promoted" not in renderer_source:
+        raise AssertionError(
+            "R71 renderer c64 guard lost generic-overlay non-promotion rationale"
+        )
 
     expected_f14 = {
         (0x060900, 0x061100, "ctrl_icon_work", "HUD_CTRL_ICON", "SCREEN_HUD"),
