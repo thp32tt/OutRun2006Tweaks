@@ -1,0 +1,478 @@
+{
+  "schema_version": 8,
+  "schema": "outrun-canonical-hd-source-reacquisition-manifest-v2-candidate-first",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00136",
+  "wave_id": "P00061",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T20:21:15+09:00",
+  "precommit_head_sha": "a45fb07b70af23ddad693145926abd821b685502",
+  "precommit_tree_sha": "6c2ea21a1483a8b88a4ea6b130534019ffbb7c0d",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_SCHEMA8_ZERO_CANDIDATE_EXCEPTION_FOUR_EVEN_CANONICAL_SOURCE_REACQUISITION",
+  "selection": {
+    "selected_indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "selected_assets": [
+      "B7E25BAD",
+      "19CEDB9",
+      "A8CE339F",
+      "6C9B3611"
+    ],
+    "priority": "PREFLIGHT_ONLY_AFTER_FRESH_CANDIDATE_FIRST_READINESS_AUDIT",
+    "basis": "Q00018/C120 landed immediately before commit and was re-read. It accepted B00129/B00133 only as PREFLIGHT_ONLY, produced no candidate bytes, and explicitly preserved B00134 pending its own C batch. Shared next_actions contain no B-even RENDER_READY or ONE_STAGE_TO_RENDER item. Existing candidate backlog remains runtime/dependency/revalidation work. These four C112-accepted pre-generation assets still lack current canonical user-HD source identity gates under the active source policy, so one fallback-4 preflight batch is legal and materially advances them."
+  },
+  "production_strategy": {
+    "mode": "candidate_completion_first_schema8",
+    "fresh_scan_head": "a45fb07b70af23ddad693145926abd821b685502",
+    "q00018_reconciled": true,
+    "readiness_audit": {
+      "runnable_direct_rework_even_indices": [],
+      "render_ready_even_indices": [],
+      "one_stage_to_render_even_indices": [],
+      "runnable_existing_candidate_rework_even_indices": [],
+      "qa_pending_or_newer_disjoint": {
+        "LOCALIZATION-LOCALIZATION_B-00134": [
+          212,
+          220,
+          222
+        ]
+      },
+      "c_consumed_preflight_only": {
+        "LOCALIZATION-LOCALIZATION_B-00129": [
+          188,
+          226,
+          232
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00133": [
+          92,
+          98,
+          112
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00127": [
+          36,
+          38,
+          128,
+          206
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00125": [
+          26,
+          28,
+          30,
+          32
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00122": [
+          198,
+          214,
+          230,
+          236
+        ]
+      },
+      "candidate_or_runtime_backlog_not_material_rework": [
+        12,
+        54,
+        60,
+        94,
+        102,
+        104,
+        116
+      ],
+      "notes": [
+        "Q00018/C120 changed shared state but did not create any Korean candidate or B-even ready-tier classification.",
+        "B00134 is newer disjoint producer evidence awaiting C and its assets are excluded.",
+        "Selected indices 34/44/52/172 are unchanged pending_artwork/transcribed_reviewed rows whose older C112 PASS covered Release-derived pre-generation arithmetic only.",
+        "Current canonical queue paths for all four selected assets are absent from Git HEAD."
+      ],
+      "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_B_SHARD_AFTER_Q00018_REFRESH"
+    },
+    "zero_candidate_exception_applies": true,
+    "preflight_only_batches_this_invocation": 1,
+    "max_preflight_only_batches_when_no_ready_assets": 1
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+    "controller_roles_blob_sha": "fea2e41c3000905d479e43b923d0f0f42126523b",
+    "queue_blob_sha": "f88386e1484054f2f6efb39e59d556ee6809067e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "a206e5f0c6364ca6d55dc50cb860da0847253b06",
+    "resume_state_blob_sha": "18ee8946b19e47b3cec3709520594c035eca4cb5",
+    "worklog_blob_sha": "02bb240fc358360e6ba8d04280eb835f35218c00",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_validator_blob_sha": "9b6b1d083321b45511f6272ca3366612821f7a02",
+    "b00095_task_record_blob_sha": "25d9d49537be43c7929493a68258293575666253",
+    "b00095_material_report_blob_sha": "9f1157671946c4cf08ee95cb71998403287b5c96",
+    "c00099_task_record_blob_sha": "69ac83cb995e2db69563eacbc657fe2d5b6a0d24",
+    "c00135_task_record_blob_sha": "8e07a604e4bc91cb191c3c207fcf28a21ec3b2fa",
+    "c00135_report_blob_sha": "dbc8dcaaaa9cef53b1fd20c1097f6655e690f823",
+    "b00134_task_record_blob_sha": "233c7beb1a5ca95c1ba3e0c7705d08e80b390ce4"
+  },
+  "canonical_source_policy": {
+    "authoritative_source": "localization/graphics/inventory.csv current user-HD SHA-256/canvas/mode identities",
+    "exact_sha256_match_required_before_pixel_geometry": true,
+    "release_identity_role": "historical reconstruction prior only unless exact canonical SHA-256 equality is proven",
+    "matching_dimensions_prove_identity": false,
+    "filename_suffix_dimensions_authoritative": false
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_CANONICAL_HD_SOURCE_REACQUISITION_AND_RELEASE_GEOMETRY_RETIREMENT_MANIFESTS",
+    "indices": [
+      34,
+      44,
+      52,
+      172
+    ],
+    "assets": [
+      "B7E25BAD",
+      "19CEDB9",
+      "A8CE339F",
+      "6C9B3611"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "current_localizable_semantic_entries_reused": 18,
+    "preserve_original_semantics_reused": 1,
+    "expected_localizable_physical_occurrences": 20,
+    "prior_release_geometry_sets_demoted_from_canonical_authority": 4,
+    "exact_hash_gated_acquisition_pipelines_created": 4,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_candidate_dds_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "schema8_zero_candidate_exception_proven": true,
+    "description": "Reclassifies C112's Release-derived work-order geometry as conditional prior and pins exact current canonical user-HD identities, making exact source import/hash verification the next legal pixel-stage action for four B-even assets."
+  },
+  "assets": [
+    {
+      "queue_index": 34,
+      "asset": "B7E25BAD",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+      "canonical_sha256": "fe6b18a80918b8ede35d0603faa271accfd178f68da96209984c8f9b551591b9",
+      "canonical_dimensions": [
+        1024,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "current_semantics": [
+        [
+          "Total Rank",
+          "종합 랭크"
+        ]
+      ],
+      "localizable_semantic_entries": 1,
+      "expected_physical_occurrences": 1,
+      "preserve_entries": 0,
+      "prior_release": {
+        "width": 4096,
+        "height": 2048,
+        "format": "RGBA32",
+        "git_blob_sha": "9ca9aa7e2e2528a101379257035533ea9d175b17"
+      },
+      "canonical_vs_prior_relation": "CANVAS_MISMATCH_1024x512_CANONICAL_VS_4096x2048_RELEASE",
+      "protected_artwork": [
+        "A/B/C/D/E rank-grade letters",
+        "Holly character artwork",
+        "lens flare",
+        "orange burst background"
+      ],
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "inherited_evidence": {
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00095",
+        "producer_result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00099",
+        "c_disposition": "PASS_PREGEN_ONLY",
+        "preserved_scope": "Current semantic identities and C112-accepted arithmetic/guard structure only; Release pixels are conditional reconstruction prior, not canonical construction authority."
+      },
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before any header, orientation, region or mask interpretation; filename suffix and canvas similarity are not source identity proof.",
+        "Decode the exact canonical source and record actual DDS dimensions, pixel/compression format, alpha/transparency and mip behavior.",
+        "Re-establish raw/readable orientation and semantic-to-region binding from canonical pixels; prior Release transforms/coordinates are conditional evidence only.",
+        "Measure effect-inclusive source text bboxes and construct removal/protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and independently require zero changes outside the removal mask, zero protected-art changes, zero alpha changes outside the mask, and no residue/seams/boxes.",
+        "Derive first-pass-v2 candidate_safe_bbox using the required inset from measured canonical geometry.",
+        "Measure typography/baseline/slant and render Korean at native canonical resolution; refit via fresh render rather than flattened resampling.",
+        "Run decoded-final DDS/header/alpha/orientation, zero-pixel containment, and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 44,
+      "asset": "19CEDB9",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "canonical_sha256": "f3cb7e79c303fbe25a9b8b41ffe5a5363f7f8be52164481f34822dc11ea97701",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "current_semantics": [
+        [
+          "Sector2",
+          "섹터 2"
+        ],
+        [
+          "Sector1",
+          "섹터 1"
+        ],
+        [
+          "WIN",
+          "승리"
+        ],
+        [
+          "LOSE",
+          "패배"
+        ],
+        [
+          "Result",
+          "결과"
+        ],
+        [
+          "Ranking",
+          "랭킹"
+        ],
+        [
+          "Stage",
+          "스테이지"
+        ],
+        [
+          "Rank1",
+          "랭크 1"
+        ],
+        [
+          "You",
+          "나"
+        ],
+        [
+          "Diff",
+          "차이"
+        ],
+        [
+          "Sector3",
+          "섹터 3"
+        ],
+        [
+          "Rival",
+          "라이벌"
+        ]
+      ],
+      "preserve_semantics": [
+        [
+          "TOP",
+          "TOP"
+        ]
+      ],
+      "localizable_semantic_entries": 12,
+      "expected_physical_occurrences": 12,
+      "preserve_entries": 1,
+      "prior_release": {
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "git_blob_sha": "2c7fd312717fc7a8a8681ef112f32756f85e0ec3"
+      },
+      "canonical_vs_prior_relation": "CANVAS_MISMATCH_512x512_CANONICAL_VS_2048x2048_RELEASE",
+      "protected_artwork": [
+        "mph/km/h unit labels",
+        "numeric glyphs",
+        "1P/2P/3P markers",
+        "cars",
+        "rank digits/ordinals not selected for localization",
+        "bowling/checkered-flag/icons"
+      ],
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "inherited_evidence": {
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00095",
+        "producer_result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00099",
+        "c_disposition": "PASS_PREGEN_ONLY",
+        "preserved_scope": "Current semantic identities and C112-accepted arithmetic/guard structure only; Release pixels are conditional reconstruction prior, not canonical construction authority."
+      },
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before any header, orientation, region or mask interpretation; filename suffix and canvas similarity are not source identity proof.",
+        "Decode the exact canonical source and record actual DDS dimensions, pixel/compression format, alpha/transparency and mip behavior.",
+        "Re-establish raw/readable orientation and semantic-to-region binding from canonical pixels; prior Release transforms/coordinates are conditional evidence only.",
+        "Measure effect-inclusive source text bboxes and construct removal/protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and independently require zero changes outside the removal mask, zero protected-art changes, zero alpha changes outside the mask, and no residue/seams/boxes.",
+        "Derive first-pass-v2 candidate_safe_bbox using the required inset from measured canonical geometry.",
+        "Measure typography/baseline/slant and render Korean at native canonical resolution; refit via fresh render rather than flattened resampling.",
+        "Run decoded-final DDS/header/alpha/orientation, zero-pixel containment, and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 52,
+      "asset": "A8CE339F",
+      "queue_path": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+      "canonical_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "canonical_dimensions": [
+        2048,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "current_semantics": [
+        [
+          "Extra Time",
+          "추가 시간"
+        ],
+        [
+          "Start",
+          "시작"
+        ],
+        [
+          "Goal",
+          "골"
+        ]
+      ],
+      "localizable_semantic_entries": 3,
+      "expected_physical_occurrences": 5,
+      "preserve_entries": 0,
+      "prior_release": {
+        "width": 2048,
+        "height": 1024,
+        "format": "DXT5",
+        "git_blob_sha": "53f75d347682c7b5f436a6d45dc3e1950a42b5eb"
+      },
+      "canonical_vs_prior_relation": "CANVAS_MATCH_BUT_MODE_MISMATCH_RGBA_CANONICAL_VS_DXT5_BC3_RELEASE_AND_SHA256_EQUIVALENCE_UNPROVEN",
+      "protected_artwork": [
+        "6P/5P/4P/3P/2P/1P markers",
+        "1st/2nd/3rd/4th tokens",
+        "digits 0-9",
+        "ruler/tick artwork"
+      ],
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "inherited_evidence": {
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00095",
+        "producer_result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00099",
+        "c_disposition": "PASS_PREGEN_ONLY",
+        "preserved_scope": "Current semantic identities and C112-accepted arithmetic/guard structure only; Release pixels are conditional reconstruction prior, not canonical construction authority."
+      },
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before any header, orientation, region or mask interpretation; filename suffix and canvas similarity are not source identity proof.",
+        "Decode the exact canonical source and record actual DDS dimensions, pixel/compression format, alpha/transparency and mip behavior.",
+        "Re-establish raw/readable orientation and semantic-to-region binding from canonical pixels; prior Release transforms/coordinates are conditional evidence only.",
+        "Measure effect-inclusive source text bboxes and construct removal/protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and independently require zero changes outside the removal mask, zero protected-art changes, zero alpha changes outside the mask, and no residue/seams/boxes.",
+        "Derive first-pass-v2 candidate_safe_bbox using the required inset from measured canonical geometry.",
+        "Measure typography/baseline/slant and render Korean at native canonical resolution; refit via fresh render rather than flattened resampling.",
+        "Run decoded-final DDS/header/alpha/orientation, zero-pixel containment, and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 172,
+      "asset": "6C9B3611",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+      "canonical_sha256": "fe650e676c8bda421c353158044792ba566f97524e7de8f7ff6a86d0df60e572",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "current_semantics": [
+        [
+          "START",
+          "시작"
+        ],
+        [
+          "GOAL",
+          "골"
+        ]
+      ],
+      "localizable_semantic_entries": 2,
+      "expected_physical_occurrences": 2,
+      "preserve_entries": 0,
+      "prior_release": {
+        "width": 1024,
+        "height": 1024,
+        "format": "RGBA32",
+        "git_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800"
+      },
+      "canonical_vs_prior_relation": "CANVAS_AND_MODE_CLASS_MATCH_BUT_EXACT_CANONICAL_SHA256_EQUIVALENCE_UNPROVEN",
+      "protected_artwork": [
+        "OutRun2SP logo",
+        "course montage/path artwork"
+      ],
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "inherited_evidence": {
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00095",
+        "producer_result_sha": "718c1abdacd279131e62e7a8b665e209790866cc",
+        "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00099",
+        "c_disposition": "PASS_PREGEN_ONLY",
+        "preserved_scope": "Current semantic identities and C112-accepted arithmetic/guard structure only; Release pixels are conditional reconstruction prior, not canonical construction authority."
+      },
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before any header, orientation, region or mask interpretation; filename suffix and canvas similarity are not source identity proof.",
+        "Decode the exact canonical source and record actual DDS dimensions, pixel/compression format, alpha/transparency and mip behavior.",
+        "Re-establish raw/readable orientation and semantic-to-region binding from canonical pixels; prior Release transforms/coordinates are conditional evidence only.",
+        "Measure effect-inclusive source text bboxes and construct removal/protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and independently require zero changes outside the removal mask, zero protected-art changes, zero alpha changes outside the mask, and no residue/seams/boxes.",
+        "Derive first-pass-v2 candidate_safe_bbox using the required inset from measured canonical geometry.",
+        "Measure typography/baseline/slant and render Korean at native canonical resolution; refit via fresh render rather than flattened resampling.",
+        "Run decoded-final DDS/header/alpha/orientation, zero-pixel containment, and exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE QA.",
+        "Keep runtime_validation UNTESTED until real in-game evidence exists."
+      ]
+    }
+  ],
+  "git_tree_probe": {
+    "tree_sha": "6c2ea21a1483a8b88a4ea6b130534019ffbb7c0d",
+    "selected_asset_named_paths_present": 0,
+    "canonical_queue_path_sources_present": 0,
+    "current_candidate_dds_named_for_assets_present": 0,
+    "evidence_policy": "No selected asset bytes exist at current queue/candidate paths; historical reports remain evidence only and are not canonical construction pixels."
+  },
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_ONLY_34_44_52_172",
+    "current_queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "q00018_refresh": "PASS_CURRENT_HEAD_C120_READ_AND_PRESERVED",
+    "candidate_first_selection": "PASS_SCHEMA8_ZERO_CANDIDATE_EXCEPTION_AFTER_FRESH_B_SHARD_SCAN",
+    "canonical_inventory": "PASS_4_OF_4_SHA256_CANVAS_RGBA_IDENTITIES",
+    "canonical_semantics": "PASS_18_LOCALIZABLE_PLUS_1_PRESERVE_ORIGINAL_CURRENT_METADATA",
+    "physical_occurrences": "PASS_20_LOCALIZABLE_PHYSICAL_OCCURRENCES_REUSED_FROM_C112_ACCEPTED_PREGEN_EVIDENCE",
+    "release_lineage_retirement": "PASS_4_PRIOR_RELEASE_GEOMETRY_SETS_DEMOTED_FROM_CANONICAL_AUTHORITY",
+    "current_git_source_presence": "PASS_4_OF_4_QUEUE_PATHS_ABSENT_FAIL_CLOSED",
+    "heavy_qa_repeated": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "exact_dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_EXACT_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
