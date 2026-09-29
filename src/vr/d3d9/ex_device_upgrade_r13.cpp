@@ -89,7 +89,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                     const LONG right = rect ? rect->right : -1;
                     const LONG bottom = rect ? rect->bottom : -1;
                     spdlog::error(
-                        "VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED hr=0x{:08X} level={} flags=0x{:08X} rect=[{},{},{},{}] descHr=0x{:08X} size={}x{} fmt={} levels={}; compare against selector/car atlas DirectOnly fallback before changing budgets or material state",
+                        "VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED ptr=0x{:08X} hr=0x{:08X} level={} flags=0x{:08X} rect=[{},{},{},{}] descHr=0x{:08X} size={}x{} fmt={} levels={}; correlate exact pointer with R14 companion DirectOnly fallback before changing resource or material policy",
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(texture)),
                         static_cast<unsigned>(hr), level,
                         static_cast<unsigned>(flags),
                         left, top, right, bottom,
