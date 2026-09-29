@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T10:15:00+09:00",
+  "updatedKst": "2026-09-29T12:01:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -366,13 +366,20 @@
     {
       "id": "L1-VIS-002",
       "priority": 8,
-      "status": "READY",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock semantics.",
       "testLevel": "LEVEL1",
       "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
+      "attempts": 1,
+      "runtimeCandidate": true,
+      "lastCandidateSha": "ebb37652f034746fa1c264133e9f5063fdb6e39e",
+      "lastCandidateBranch": "vr-dxvk-r71-disasm",
+      "automationValidation": "PASS",
+      "runtimeValidation": "UNTESTED",
+      "validationRunId": 36514745469,
+      "implementationProgress": "CONVERSION-DXVK-00037 moves stereo SkyGlow additive composite from Present to the first recognized HUD/non-world XYZRHW boundary, tracks applied/pre-HUD-attempt epochs, and suppresses Present retry after a failed pre-HUD attempt. Blur source selection and strength remain unchanged.",
+      "nextAction": "Quest3/VDXR exact-build CORRECTNESS test of ebb37652f034746fa1c264133e9f5063fdb6e39e. Verify sky/cloud detail and overall haze, HUD/menu opacity, preserve road/background/vehicle stereo, and also exercise cumulative CONVERSION-DXVK-00035 white-HUD ownership changes. If pre-HUD SkyGlow still looks wrong, do not tune 0.38 until runtime evidence separates ordering from intensity."
     },
     {
       "id": "DX9EX-PERF-PRODUCER-FENCE-001",

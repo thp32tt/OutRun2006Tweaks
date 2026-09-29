@@ -593,6 +593,66 @@
         "runtime_performance_effect": "UNTESTED",
         "runtime_problem_status_unchanged": true
       }
+    },
+    {
+      "key": "DX9EX-SKYGLOW-HUD-COMPOSITE-ORDER-001",
+      "title": "Stereo SkyGlow additive composite can wash over HUD/menu when deferred to Present",
+      "status": "CANDIDATE_AUTOMATION_VERIFIED_NEED_HMD_TEST",
+      "severity": "visual-major",
+      "firstKnownWindowKst": "2026-09-29",
+      "lastObservedKst": "2026-09-29T11:30:00+09:00",
+      "evidenceLevel": "USER_RUNTIME_SYMPTOM_PLUS_BOUNDED_STATIC_CAUSE",
+      "symptoms": [
+        "sky excessively bright / cloud detail nearly disappears",
+        "overall scene appears hazy or washed",
+        "HUD/menu can look translucent"
+      ],
+      "hypothesis": "World-only glow extraction occurs before HUD, but additive ONE+ONE composite at Present overlays already-drawn HUD/menu pixels.",
+      "constraints": [
+        "preserve final blur source selection",
+        "preserve composite strength 0.38 until HMD evidence",
+        "preserve protected road/background/vehicle stereo",
+        "do not widen generic HUD ownership"
+      ],
+      "nextAction": "Quest3/VDXR exact-build CORRECTNESS test of ebb37652f034746fa1c264133e9f5063fdb6e39e; verify sky/cloud detail, haze, HUD/menu opacity and protected world stereo.",
+      "testLevel": 1,
+      "recurrenceCount": 0,
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to SkyGlow capture/composite order",
+        "changes to SkyGlow ping-pong source selection or composite intensity",
+        "changes to first-HUD/non-world overlay boundary"
+      ],
+      "verifier": {
+        "static": [
+          "require pre-HUD composite helper and applied/pre-HUD-attempt epochs",
+          "require Present fallback only when no pre-HUD attempt occurred",
+          "require both non-world XYZRHW and recognized HUD paths call the pre-HUD composite helper"
+        ],
+        "runtime": [
+          "Quest3/VDXR: sky/cloud detail and overall haze improve without dimming intended world lighting",
+          "HUD/menu remain opaque as intended and are not glow-washed",
+          "road/background/vehicle world stereo remains correct"
+        ]
+      },
+      "candidate": {
+        "task_id": "CONVERSION-DXVK-00037",
+        "source_sha": "ebb37652f034746fa1c264133e9f5063fdb6e39e",
+        "automation_validation": "PASS",
+        "runtime_validation": "UNTESTED",
+        "backend_gate_run_id": 36514745469,
+        "bounded_static_cause": "World-only SkyGlow extraction could still be additively composited at Present after HUD/menu pixels were drawn.",
+        "change": "R30CompositeSkyGlowBeforeHud applies glow at first recognized HUD/non-world XYZRHW boundary; Present fallback is suppressed after any pre-HUD attempt and failed pre-HUD attempt fails dark for glow.",
+        "preserved": [
+          "ping-pong final source selection",
+          "SkyGlow composite strength 0.38",
+          "exact HUD ownership",
+          "world stereo classification"
+        ]
+      }
     }
   ],
   "userRuntimeVerifiedBaseline": {

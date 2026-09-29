@@ -155,3 +155,12 @@ Task `CONVERSION-DXVK-00035` produced runtime candidate `82029d12159fbaf2a386a0c
 The candidate adds a dedicated c64 resolver. In mode 2 it accepts only exact `ScreenHud`, `WorldBillboard`, or `ProjectedWorldMarker2D` queue ownership. Untagged `ScreenOverlay2D` stays generic; normal draw-time `EffectiveScope()` and R30 classification are unchanged. Compile-time assertions cover exact mode-2 handoff, generic non-promotion, and mode-1 preservation.
 
 Backend Conversion Gate `36506475246`, Build `36506479302`, OpenXR architecture `36506479284`, and HUD Inspector `36506479286` all passed on the exact source SHA. This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. It explains the telemetry lifetime gap but does not yet prove the visible white-HUD defect is fixed. Quest 3 / VDXR must verify `semanticOverlayBypass>0`, HUD convergence/head-lock removal, and the protected road/background/vehicle world stereo invariant. Vehicle-rank anchoring remains separately open because this change does not restore missing Calc3D2D anchor metadata.
+
+
+## 2026-09-29 — DXVK SkyGlow composite moved before HUD
+
+Task `CONVERSION-DXVK-00037` produced cumulative DXVK visual candidate `ebb37652f034746fa1c264133e9f5063fdb6e39e`. The bounded cause matches the existing SkyGlow regression key: stereo world pixels were captured before HUD, but additive glow was still applied at Present after HUD/menu pixels existed. The DXVK branch now applies the glow immediately before the first recognized HUD or non-world XYZRHW draw, tracks whether glow was already applied or a pre-HUD attempt occurred, and never retries a failed pre-HUD attempt at Present.
+
+The existing blur ping-pong result selection and composite strength `0.38` were intentionally left unchanged. Initial Backend Gate `36514602393` exposed only a verifier initialization-order bug; repair SHA `ebb37652...` passed Backend Gate `36514745469`, Build `36514749636`, OpenXR architecture `36514749555`, and HUD Inspector `36514749597`.
+
+This remains **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. Quest 3 / VDXR must verify sky/cloud detail, haze, HUD/menu opacity, protected world stereo, startup/recenter safety, and the cumulative white-HUD ownership candidate from `CONVERSION-DXVK-00035`.
