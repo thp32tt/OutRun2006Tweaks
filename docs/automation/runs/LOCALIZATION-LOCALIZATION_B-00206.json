@@ -1,0 +1,67 @@
+{
+  "schema_version": 13,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00206",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00107",
+  "recorded_at_kst": "2026-09-30T04:36:18+09:00",
+  "base_head_sha": "fbbf13f927f8c169379cbef94d76b793ecf01c6c",
+  "base_sha": "fbbf13f927f8c169379cbef94d76b793ecf01c6c",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_AUDIT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX133_EXACT_SOURCE_SEMANTIC_CONFLICT_1_BOUND_8_ABSENT_NO_CANDIDATE_RUNTIME_UNTESTED",
+  "summary": "Current Git contract overrides the stale even-index prompt: B owns index % 3 == 1. C144 has no B-owned RENDER_READY/ONE_STAGE_TO_RENDER; B00202 indices226/232 are already QA-pending and skipped. Index133 exact canonical source was therefore advanced. Approved Drive exact path misses, then the pinned v0.25.10a fallback source SHA is verified. Exact readable/raw inspection proves only ANCIENT RUINS of the nine current transcription strings exists in 25F697C6; the other eight are absent even when raw RGB is inspected ignoring alpha. Rendering those eight would be a wrong-image substitution, so B fails closed, does not emit a partial production DDS, and records a C-shared-metadata reconciliation blocker.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00206-P00107/B00206_P00107_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_AUDIT.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00205.json",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "material_deliverable": {
+    "type": "B_MOD3_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_CONFLICT_AUDIT",
+    "reviewed_indices": [
+      133
+    ],
+    "reviewed_assets": [
+      "25F697C6"
+    ],
+    "exact_source_semantic_bindings_resolved": 1,
+    "current_transcription_absences_proven": 8,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_c_gate": "C144/Q00042",
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      133
+    ],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00202": [
+        226,
+        232
+      ]
+    },
+    "readiness_after": {
+      "133": "PREFLIGHT_ONLY_EXACT_SOURCE_BOUND_1_OF_9__TRANSCRIPTION_MISASSIGNMENT_BLOCKER"
+    }
+  },
+  "self_qa": "PASS_INDEX133_MOD3_EQ_1__C144_ZERO_B_READY_TIERS__B00202_226_232_NOT_REPEATED__DRIVE_FAST_PATH_MISS__PINNED_RELEASE_SOURCE_SHA_EXACT__FLIP_Y_ORIENTATION_PROVEN__ANCIENT_RUINS_BOUND_EXACT__8_OF_9_CURRENT_TRANSCRIPTION_STRINGS_ABSENT_FROM_EXACT_SOURCE__NO_GUESSED_OR_PARTIAL_PRODUCTION_DDS__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_SEMANTIC_METADATA_CONFLICT_REQUIRES_C_RECONCILIATION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

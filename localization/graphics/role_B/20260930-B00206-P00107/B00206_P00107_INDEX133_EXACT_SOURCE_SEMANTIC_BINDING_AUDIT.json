@@ -1,0 +1,235 @@
+{
+  "schema_version": 13,
+  "schema": "outrun-b00206-p00107-index133-exact-source-semantic-binding-audit-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00206",
+  "wave_id": "P00107",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T04:36:18+09:00",
+  "base_head_sha": "fbbf13f927f8c169379cbef94d76b793ecf01c6c",
+  "shard_rule": "asset_queue.index % 3 == 1",
+  "selection": {
+    "selected_indices": [
+      133
+    ],
+    "selected_assets": [
+      "25F697C6"
+    ],
+    "priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_C_ACCEPTED_READY_TIERS",
+    "current_c_gate": "C144/Q00042",
+    "reason": "C144 exposes no B-owned RENDER_READY or ONE_STAGE_TO_RENDER asset. B00202 indices226/232 are already durable producer outputs awaiting C and are not repeated. Index133 is the remaining C-accepted B-shard exact-source candidate-completion preflight target."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "6d15268dc37bb42ab5418012c4630b947341736f",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "canonical_source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_release_archive_bytes": 306223257
+  },
+  "source_transport": {
+    "approved_drive_account": "ezflash557",
+    "approved_drive_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "drive_parent_observed_files": [
+      "9F060EC1_512x512.dds"
+    ],
+    "drive_exact_filename": "25F697C6_512x512.dds",
+    "drive_exact_outcome": "SOURCE_TRANSPORT_MISS",
+    "fallback": "PINNED_V0.25.10A_RELEASE_ARCHIVE_ALREADY_PROVIDED_TO_SESSION",
+    "fallback_archive_identity": "PASS_EXACT_SIZE_AND_SHA256",
+    "read_only": true,
+    "write_performed": false
+  },
+  "source_dds": {
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+    "asset": "25F697C6",
+    "queue_index": 133,
+    "bytes": 16777344,
+    "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "width": 2048,
+    "height": 2048,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "dds_header_size": 124,
+    "pitch": 8192,
+    "pixel_masks": {
+      "r": "0x00ff0000",
+      "g": "0x0000ff00",
+      "b": "0x000000ff",
+      "a": "0xff000000"
+    },
+    "source_text_transform": "flip_y",
+    "raw_orientation": "VERTICAL_MIRROR_RELATIVE_TO_READABLE_VIEW"
+  },
+  "semantic_binding_audit": {
+    "method": [
+      "Decode exact canonical source DDS to RGBA without resizing.",
+      "Inspect raw pixel order and flip_y readable display view.",
+      "Inspect RGB ignoring alpha to rule out hidden zero-alpha glyph data.",
+      "Compare every current index133 transcription source string against exact-source visible glyphs.",
+      "Do not infer missing labels from list order or neighboring assets."
+    ],
+    "expected_transcription_count": 9,
+    "present_expected_count": 1,
+    "absent_expected_count": 8,
+    "bindings": [
+      {
+        "source": "ALPINE",
+        "korean": "알파인",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "ANCIENT RUINS",
+        "korean": "고대 유적",
+        "status": "PRESENT_BOUND",
+        "display_bbox": [
+          549,
+          1220,
+          1390,
+          1314
+        ],
+        "raw_bbox": [
+          549,
+          733,
+          1390,
+          827
+        ],
+        "baseline_direction": "left_to_right_horizontal",
+        "display_slant_direction": "none",
+        "approx_text_height_px": 95,
+        "median_rgba": [
+          46,
+          53,
+          57,
+          255
+        ],
+        "protected": false
+      },
+      {
+        "source": "BLU MIRABEAU",
+        "korean": "블루 미라보",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "ARGENTO NURBURGRING",
+        "korean": "아르젠토 뉘르부르크링",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "BIANCO AVUS",
+        "korean": "비앙코 아부스",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "NERO",
+        "korean": "네로",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "ROSSO SCUDERIA",
+        "korean": "로쏘 스쿠데리아",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "GRIGIO ALLOY",
+        "korean": "그리지오 알로이",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      },
+      {
+        "source": "GIALLO MODENA",
+        "korean": "지알로 모데나",
+        "status": "ABSENT_FROM_EXACT_SOURCE"
+      }
+    ],
+    "exact_source_visible_text": [
+      "F430",
+      "ANCIENT RUINS",
+      "512BB",
+      "328 GTS",
+      "F50",
+      "F40",
+      "DINO 246 GTS",
+      "250 GTO",
+      "288 GTO",
+      "365 GTS/4 DAYTONA",
+      "360 SPIDER",
+      "SUPERAMERICA",
+      "ENZO FERRARI",
+      "550 BARCHETTA",
+      "F355 SPIDER",
+      "TESTAROSSA"
+    ],
+    "protected_original_text": [
+      "F430",
+      "512BB",
+      "328 GTS",
+      "F50",
+      "F40",
+      "DINO 246 GTS",
+      "250 GTO",
+      "288 GTO",
+      "365 GTS/4 DAYTONA",
+      "360 SPIDER",
+      "SUPERAMERICA",
+      "ENZO FERRARI",
+      "550 BARCHETTA",
+      "F355 SPIDER",
+      "TESTAROSSA"
+    ],
+    "raw_rgb_ignore_alpha_checked": true,
+    "result": "SEMANTIC_METADATA_CONFLICT_8_OF_9_CURRENT_TRANSCRIPTION_STRINGS_ABSENT_FROM_EXACT_SOURCE"
+  },
+  "candidate_completion": {
+    "candidate_generated": false,
+    "candidate_dds_modified": false,
+    "reason": "The exact source proves only ANCIENT RUINS from the current 9-string transcription belongs to this DDS. Rendering the other eight would require inventing placements or altering unrelated Ferrari model artwork. Producer B cannot correct shared transcriptions/asset_queue; fail closed and hand the exact-source conflict to C for shared-state reconciliation.",
+    "ancient_ruins_partial_candidate_attempted": false,
+    "partial_candidate_reason": "A partial production DDS would leave the asset's current authoritative semantic contract unresolved and could falsely imply all nine reviewed mappings were handled.",
+    "next_required_action": "C_SHARED_METADATA_RECONCILIATION_FOR_INDEX133_THEN_RECLASSIFY_READINESS",
+    "readiness_after": "PREFLIGHT_ONLY_EXACT_SOURCE_BOUND_1_OF_9__TRANSCRIPTION_MISASSIGNMENT_BLOCKER"
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_INDEX133_MOD3_EQ_1",
+    "anti_duplication": "PASS_B00202_226_232_QA_PENDING_NOT_REPEATED",
+    "drive_fast_path": "PASS_EXACT_MISS_RECORDED_ON_APPROVED_PARENT",
+    "release_fallback_identity": "PASS_EXACT_PINNED_ARCHIVE_AND_SOURCE_SHA",
+    "orientation": "PASS_FLIP_Y_PROVEN_FROM_EXACT_SOURCE",
+    "semantic_binding": "FAIL_CLOSED_1_PRESENT_8_ABSENT",
+    "wrong_image_replacement_guard": "PASS_NO_GUESSED_RENDER",
+    "candidate_static_qa": "HOLD_NO_CANDIDATE",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "type": "B_MOD3_INDEX133_EXACT_SOURCE_SEMANTIC_BINDING_CONFLICT_AUDIT",
+    "reviewed_indices": [
+      133
+    ],
+    "reviewed_assets": [
+      "25F697C6"
+    ],
+    "exact_source_semantic_bindings_resolved": 1,
+    "current_transcription_absences_proven": 8,
+    "source_orientation_proven": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "shared_state_change_required_by_c": true
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
