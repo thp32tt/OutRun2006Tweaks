@@ -152,10 +152,10 @@ If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each 
 
 When `LOCALIZATION_PARALLEL=true`, localization no longer serializes C behind completion of an A/B production pair.
 
-1. Lane A continuously produces the odd-index shard. After its exact task commit passes Automation Gate, the slot becomes available for the next A task immediately.
-2. Lane B does the same for the even-index shard.
+1. Lane A continuously produces the odd-index shard. After its exact durable task commit exists, the slot becomes available for the next A task immediately; A does not wait for a per-producer Actions Gate.
+2. Lane B does the same for the even-index shard and also does not wait for a per-producer Actions Gate.
 3. Each successful A/B task result is appended to persistent `qa_pending` as an immutable `TASK_ID + RESULT_SHA` input. Production does not wait for C.
-4. Lane C is an independent QA consumer. It coalesces up to `LOCALIZATION_QA_BATCH_SIZE` producer results (default 4) for up to `LOCALIZATION_QA_COALESCE_SECONDS` (default 30s), reviews them in one task, and reconciles shared state once for the whole batch.
+4. Lane C is an independent QA consumer. It coalesces up to `LOCALIZATION_QA_BATCH_SIZE` producer results (default 4) for up to `LOCALIZATION_QA_COALESCE_SECONDS` (default 30s), reviews them in one task, reconciles shared state once, and its single commit is the only Actions Gate that consumes a runner for that batch.
 5. QA de-duplication key is the exact producer `TASK_ID@RESULT_SHA`. The C prompt additionally requires heavy source/DDS/visual checks to be reused for identical source SHA + candidate SHA + QA-contract fingerprints.
 6. A/B must skip candidates still awaiting C QA unless C later records `REWORK_REQUIRED` or the relevant fingerprint changed.
 7. A C failure never stops A/B production. Exhausted C batches move to `qa_blocked` for later diagnosis while producers continue.
@@ -195,4 +195,12 @@ When redeploying in Portainer, retain the existing localization /data volume so 
 On localization stack restart/redeploy, a persisted lane can still contain the result SHA from an older failed attempt even though a newer commit with the same `[AUTO:TASK_ID]` already exists on `korean-localization-clean`.
 
 The controller now force-refreshes branch history during startup reconciliation and rebinds every persisted `WAIT_ACTIONS` record to the newest durable commit carrying that exact TASK_ID. When the SHA changes it clears the stale gate-run binding/status/jobs metadata before Actions discovery. The watchdog repeats this rebinding for stale or still-pending startup records, so an old failed attempt cannot pin a producer lane after redeploy.
+
+
+
+### C-batch-only Actions validation
+
+Localization producer A/B commits do not wait for individual GitHub Actions jobs. Their durable task records remain `automation_validation=PENDING` with `validation_mode=C_BATCH_GATE`, and the controller immediately queues the immutable TASK_ID@RESULT_SHA for C and releases that producer slot.
+
+The localization workflow skips its runner-backed validate job for A/B AUTO commits. A C AUTO commit runs the one real batch Gate. That Gate validates the C reconciliation and the exact producer SHAs declared in the C batch. This reduces hosted-runner demand while keeping producer commits immutable and traceable.
 

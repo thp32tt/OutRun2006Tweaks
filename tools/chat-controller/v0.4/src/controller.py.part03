@@ -440,6 +440,30 @@ async def localization_send_lane_task(
     return True
 
 
+def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
+    """Release A/B on durable commit; validation is deferred to the C batch gate."""
+    active["result_sha"] = task_commit["sha"]
+    active["result_message"] = task_commit.get("message")
+    active["automation_validation"] = "PENDING"
+    active["validation_mode"] = "C_BATCH_GATE"
+    active["batch_validation_pending"] = True
+    active["runtime_validation"] = "UNTESTED"
+    active["completed_at"] = now.isoformat()
+    active["terminal"] = "PRODUCED"
+    active["phase"] = "DONE"
+    for key in (
+        "gate_run",
+        "last_gate_poll_at",
+        "last_gate_status",
+        "last_gate_status_changed_at",
+        "gate_jobs",
+        "last_jobs_refresh_at",
+        "startup_reconcile_pending",
+    ):
+        active.pop(key, None)
+    q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+
+
 async def localization_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -483,10 +507,13 @@ async def localization_process_lane(
             text = await last_assistant_text(page)
             if not text:
                 if task_commit:
-                    active["result_sha"] = task_commit["sha"]
-                    active["result_message"] = task_commit["message"]
-                    active["phase"] = "WAIT_ACTIONS"
-                    active["last_gate_poll_at"] = None
+                    if lane_key in {"A", "B"}:
+                        finalize_localization_producer_commit(q, active, task_commit, now)
+                    else:
+                        active["result_sha"] = task_commit["sha"]
+                        active["result_message"] = task_commit["message"]
+                        active["phase"] = "WAIT_ACTIONS"
+                        active["last_gate_poll_at"] = None
                     save_queue_state(q)
                     return
                 sent_at = _parse_iso(active.get("sent_at")) or now
@@ -512,16 +539,25 @@ async def localization_process_lane(
 
             task_commit = task_commit or github_find_task_commit(active["branch"], active["task_id"])
             if task_commit:
-                active["result_sha"] = task_commit["sha"]
-                active["result_message"] = task_commit["message"]
-                active["phase"] = "WAIT_ACTIONS"
-                active["last_gate_poll_at"] = None
-                save_queue_state(q)
-                write_runtime(
-                    status="parallel_wait_actions",
-                    last_action=f"{active['task_id']} -> {active['result_sha']} (task commit, not branch HEAD)",
-                    queue=q,
-                )
+                if lane_key in {"A", "B"}:
+                    finalize_localization_producer_commit(q, active, task_commit, now)
+                    save_queue_state(q)
+                    write_runtime(
+                        status="producer_commit_ready",
+                        last_action=f"{active['task_id']} -> {active['result_sha']} queued for C batch validation; producer released",
+                        queue=q,
+                    )
+                else:
+                    active["result_sha"] = task_commit["sha"]
+                    active["result_message"] = task_commit["message"]
+                    active["phase"] = "WAIT_ACTIONS"
+                    active["last_gate_poll_at"] = None
+                    save_queue_state(q)
+                    write_runtime(
+                        status="qa_wait_actions",
+                        last_action=f"{active['task_id']} -> {active['result_sha']} C batch Gate pending",
+                        queue=q,
+                    )
                 return
 
             sent_at = _parse_iso(active.get("sent_at")) or now
@@ -541,8 +577,19 @@ async def localization_process_lane(
             active["phase"] = "BLOCKED"
 
         if active["phase"] == "WAIT_ACTIONS":
-            # Persisted state may still point at an older failed attempt. Rebind by TASK_ID
-            # before trusting a stored result SHA or gate run.
+            if lane_key in {"A", "B"}:
+                task_commit = github_find_task_commit(active["branch"], active["task_id"])
+                if task_commit:
+                    finalize_localization_producer_commit(q, active, task_commit, now)
+                    save_queue_state(q)
+                    write_runtime(
+                        status="producer_wait_actions_migrated",
+                        last_action=f"{active['task_id']} migrated from legacy WAIT_ACTIONS to C batch validation",
+                        queue=q,
+                    )
+                return
+            # C alone waits for the batched GitHub Actions Gate. Persisted C state
+            # may still point at an older failed attempt, so rebind by TASK_ID.
             rebound = refresh_wait_actions_task_binding(
                 active,
                 force_refresh=bool(active.get("startup_reconcile_pending")),
@@ -647,7 +694,7 @@ def _qa_completed_input_keys(q: dict) -> set[str]:
 
 
 def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
-    if task.get("terminal") != "PASS" or not task.get("result_sha"):
+    if task.get("terminal") not in {"PRODUCED", "PASS"} or not task.get("result_sha"):
         return False
     item = {
         "task_id": task.get("task_id"),
@@ -656,6 +703,8 @@ def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
         "result_message": task.get("result_message"),
         "completed_at": task.get("completed_at"),
         "producer_id": task.get("wave_id"),
+        "automation_validation": task.get("automation_validation", "PENDING"),
+        "validation_mode": task.get("validation_mode", "C_BATCH_GATE"),
     }
     key = _qa_item_key(item)
     pending_keys = {_qa_item_key(x) for x in q.get("qa_pending", [])}
@@ -679,6 +728,13 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
     }
     if task.get("terminal") == "PASS":
         q["qa_completed"] = (q.get("qa_completed", []) + [record])[-100:]
+        input_key_set = set(input_keys)
+        for producer in q.get("completed", []):
+            if _qa_item_key(producer) in input_key_set:
+                producer["automation_validation"] = "PASS"
+                producer["batch_validation_pending"] = False
+                producer["validated_by_qa_task_id"] = task.get("task_id")
+                producer["validated_by_qa_result_sha"] = task.get("result_sha")
     else:
         q["qa_blocked"] = (q.get("qa_blocked", []) + [record])[-100:]
     consumed = set(input_keys)
@@ -1188,6 +1244,13 @@ def startup_reconcile_queue_state() -> None:
     rebounds = []
     for task in records:
         if task.get("phase") == "WAIT_ACTIONS":
+            if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
+                _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
+                commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
+                if commit:
+                    finalize_localization_producer_commit(q, task, commit, now)
+                    rebounds.append(f"producer-release:{task.get('task_id')}->{commit.get('sha','')[:8]}")
+                continue
             task["last_gate_poll_at"] = None
             task["startup_reconcile_pending"] = True
             rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
@@ -1220,6 +1283,14 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
     rearmed = []
     for task in records:
         if task.get("phase") != "WAIT_ACTIONS":
+            continue
+        if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
+            _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
+            commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
+            if commit:
+                finalize_localization_producer_commit(q, task, commit, now)
+                rearmed.append(f"producer-release:{task.get('task_id')}")
+                changed = True
             continue
         if task.get("startup_reconcile_pending"):
             rebound = refresh_wait_actions_task_binding(task, force_refresh=True)

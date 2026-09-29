@@ -657,11 +657,17 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
+    if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
+        lines += [
+            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
+            "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
+        ]
     if qa_batch:
         lines += [
             "이 C 작업은 독립 QA 소비자다. 아래 생산 결과들을 하나의 배치로 중복 없이 검수하고 공용 상태를 한 번만 병합해.",
             "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
             "각 입력의 TASK_ID + RESULT_SHA를 고정 기준으로 사용하고, 동일 candidate/source/contract fingerprint의 무거운 검증은 한 번만 수행해.",
+            "각 input에 대해 qa_dispositions를 기록해: PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, SUPERSEDED 중 하나. C commit 하나의 Localization Automation Gate가 이 batch 전체의 자동 검증이다.",
         ]
     if failure:
         lines += [
