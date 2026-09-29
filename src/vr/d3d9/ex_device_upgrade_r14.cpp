@@ -70,23 +70,20 @@ namespace OutRunVRD3D9ExUpgradeR13
         };
 
         thread_local std::uint32_t R14InternalReleaseDepth = 0;
-        // Keep the total MANAGED CPU-shadow budget at the established 384 MiB.
-        // R68 HMD evidence showed raising the process budget to 448 MiB caused
-        // a start-grid shadow regression while a later 2048x2048 selector atlas
-        // could still miss its CPU shadow. Reserve 16 MiB *inside* the 384 MiB
-        // ceiling: ordinary shadows stop at 368 MiB, while one exact-size
-        // uncompressed selector/car atlas may consume the reserved headroom.
+        // R72 user HMD evidence isolates the remaining car-selector corruption
+        // to MANAGED texture compatibility: a 2048x1024 A8R8G8B8 companion was
+        // forced DirectOnly at 378 MiB total, and a 128x64 DXT1 mip chain later
+        // failed LockRect(level=1). Keep the proven 368 MiB general budget, but
+        // add only 16 MiB of tightly classified selector reserve. This is far
+        // below the rejected 448 MiB experiment.
         constexpr std::uint64_t R14GeneralShadowBudgetBytes =
             368ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14ShadowBudgetBytes =
-            384ull * 1024ull * 1024ull;
+            400ull * 1024ull * 1024ull;
         constexpr std::uint64_t R14EmergencyAtlasMaxBytes =
             16ull * 1024ull * 1024ull;
-        // The reserve is a class budget, not merely a per-texture size test.
-        // Without a cumulative counter, multiple exact 2048x2048 atlases can
-        // consume more than the intended 16 MiB emergency headroom.
         constexpr std::uint64_t R14EmergencyShadowBudgetBytes =
-            16ull * 1024ull * 1024ull;
+            32ull * 1024ull * 1024ull;
 
         bool R69IsSelectorAtlasReserveCandidate(
             const D3DSURFACE_DESC& desc, UINT levels,
@@ -117,6 +114,23 @@ namespace OutRunVRD3D9ExUpgradeR13
                 estimate > 0 && estimate <= 8ull * 1024ull * 1024ull &&
                 (desc.Format == D3DFMT_A8R8G8B8 ||
                  desc.Format == D3DFMT_X8R8G8B8);
+        }
+
+        bool R72IsSelectorReserveCandidate(
+            const D3DSURFACE_DESC& desc, UINT levels,
+            std::uint64_t estimate) noexcept
+        {
+            const bool companion =
+                levels == 1 && desc.Width == 2048 &&
+                desc.Height == 1024 &&
+                estimate > 0 && estimate <= 8ull * 1024ull * 1024ull &&
+                (desc.Format == D3DFMT_A8R8G8B8 ||
+                 desc.Format == D3DFMT_X8R8G8B8);
+            const bool compressedMaterial =
+                levels == 4 && desc.Width == 128 &&
+                desc.Height == 64 && desc.Format == D3DFMT_DXT1 &&
+                estimate > 0 && estimate <= 128ull * 1024ull;
+            return companion || compressedMaterial;
         }
 
         // R70: track the 368 MiB general class separately from the exact
@@ -523,8 +537,10 @@ namespace OutRunVRD3D9ExUpgradeR13
                 const UINT levels = gpu->GetLevelCount();
                 const bool emergencyReserve =
                     SUCCEEDED(gpu->GetLevelDesc(0, &level0)) &&
-                    R69IsSelectorAtlasReserveCandidate(
-                        level0, levels, entry->shadowBytes);
+                    (R69IsSelectorAtlasReserveCandidate(
+                         level0, levels, entry->shadowBytes) ||
+                     R72IsSelectorReserveCandidate(
+                         level0, levels, entry->shadowBytes));
                 if (!R14ReserveShadowBytes(
                         entry->shadowBytes, emergencyReserve))
                 {
@@ -616,12 +632,16 @@ namespace OutRunVRD3D9ExUpgradeR13
             const std::uint64_t currentEmergency =
                 R14EmergencyShadowBytes.load(std::memory_order_acquire);
 
-            const bool emergencyAtlasEligible =
-                R69IsSelectorAtlasReserveCandidate(
-                    desc, levels, estimate);
             const bool selectorCompanion =
                 R71IsSelectorCompanionDiagnosticCandidate(
                     desc, levels, estimate);
+            const bool r72SelectorReserve =
+                R72IsSelectorReserveCandidate(
+                    desc, levels, estimate);
+            const bool emergencyAtlasEligible =
+                R69IsSelectorAtlasReserveCandidate(
+                    desc, levels, estimate) ||
+                r72SelectorReserve;
 
             const bool totalBudgetReject =
                 !estimate || estimate > R14ShadowBudgetBytes ||
@@ -663,7 +683,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 !R14FirstEmergencyReserveLogged.exchange(true))
             {
                 spdlog::info(
-                    "VR R71 STATIC: isolated MANAGED selector reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}; emergency class is cumulatively capped at 16 MiB, general stays capped at 368 MiB, total at 384 MiB",
+                    "VR R72 SELECTOR RESERVE: MANAGED CPU-shadow reserve ACTIVE size={}x{} fmt={} bytes={} totalMiB={:.1f} generalMiB={:.1f} emergencyMiB={:.1f}; emergency class capped at 32 MiB, general at 368 MiB, total at 400 MiB",
                     desc.Width, desc.Height, static_cast<unsigned>(desc.Format),
                     estimate,
                     static_cast<double>(currentTotal) / (1024.0 * 1024.0),
