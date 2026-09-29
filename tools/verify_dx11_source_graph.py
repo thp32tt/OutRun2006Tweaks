@@ -399,6 +399,27 @@ def main() -> None:
             "DX11 R85 compiler probe requires d3dcompiler.lib in the checked-in CMake graph"
         )
 
+    r89_link_contract = {
+        "target_link_libraries(dx11_input_signature_semantics PUBLIC":
+            "R89 input-signature smoke target link block",
+        "dxguid.lib":
+            "R89 D3DReflect IID_ID3D11ShaderReflection GUID provider",
+    }
+    missing_r89_link = [
+        meaning
+        for token, meaning in r89_link_contract.items()
+        if token not in CMAKE
+    ]
+    if missing_r89_link:
+        raise SystemExit(
+            "DX11 R89 input-signature link contract drift: "
+            + ", ".join(missing_r89_link)
+        )
+    if "dxguid.lib" not in CMAKE_TOML:
+        raise SystemExit(
+            "DX11 R89 input-signature smoke requires dxguid.lib in cmake.toml"
+        )
+
     r87_smoke_contract = {
         "D3DTOP_SELECTARG1": "R86/R87 SELECTARG1 semantic case",
         "D3DTOP_SELECTARG2": "R87 SELECTARG2 semantic case",

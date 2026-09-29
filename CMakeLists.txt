@@ -823,4 +823,5 @@ target_include_directories(dx11_input_signature_semantics PUBLIC
 target_link_libraries(dx11_input_signature_semantics PUBLIC
     d3dcompiler.lib
     d3d11.lib
+    dxguid.lib
 )
