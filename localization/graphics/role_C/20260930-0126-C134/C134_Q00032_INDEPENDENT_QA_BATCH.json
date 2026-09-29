@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-independent-c-qa-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00177",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00032",
+  "qa_batch_id": "Q00032",
+  "run": "C134",
+  "recorded_at_kst": "2026-09-30T01:26:36+09:00",
+  "base_head_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00174",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "48e4ab764402f96c9ae71e55ad68d0706cdbf3b1",
+      "result_message": "localization(B): remove duplicate rollover preflight artifact [AUTO:LOCALIZATION-LOCALIZATION_B-00174]",
+      "completed_at": "2026-09-30T01:11:23.007332+09:00",
+      "producer_id": "P00087",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00174",
+      "result_sha": "48e4ab764402f96c9ae71e55ad68d0706cdbf3b1",
+      "status": "REWORK_REQUIRED",
+      "reason": "Exact QA identity LOCALIZATION-LOCALIZATION_B-00174@48e4ab764402f96c9ae71e55ad68d0706cdbf3b1 carries the required AUTO marker and is an ancestor of this C result, but its own diff removes only the duplicate rollover artifact localization/graphics/role_B/20260930-0105-B00174-P00087/B00174_P00087_EVEN_TOTAL_RANK_SOURCE_ACQUISITION_EXHAUSTION.json and does not change docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00174.json. Current verify_c_batch_inputs.py reruns verify_parallel_lane_commit.py for every PASS producer SHA, and that verifier requires the durable producer task record to be changed in the same A/B result commit. Therefore this exact input cannot receive PASS and is REWORK_REQUIRED on immutable result-SHA structure. Content precheck is otherwise consistent: approved Drive exact-parent filename miss and pinned-direct exact-path 404 were independently reproduced; unchanged C116/C120 evidence establishes current canonical index98 2048x128 RGBA c735efbd... versus retired Release DXT5 lineage; unchanged C133 evidence establishes the exact pinned v0.25.10a bundle identity 76f85ed2.... Existing 53088f239c2bb1972e462e00a641d7bd14a5fbd5 adds the B00174 task record and index98 audit together and is the contract-compliant producer-result candidate, but Q00032 does not substitute a different RESULT_SHA. No index98 readiness/source-exhaustion promotion is made. RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "current_qa_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "current_controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+  "immutable_fingerprints": {
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "input_sha": "48e4ab764402f96c9ae71e55ad68d0706cdbf3b1",
+    "contract_compliant_existing_result_sha": "53088f239c2bb1972e462e00a641d7bd14a5fbd5",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "content_precheck": {
+    "index": 98,
+    "asset": "42E618FD",
+    "source": "Challenge the course record.",
+    "korean": "코스 기록에 도전하세요.",
+    "canonical_sha256": "c735efbd27a6d41d697de11d3df7ba73543a8324f34690957d3a1099d47275f0",
+    "canonical_dimensions": [
+      2048,
+      128
+    ],
+    "canonical_mode": "RGBA",
+    "drive_exact_parent_search": "SOURCE_TRANSPORT_MISS_REPRODUCED",
+    "pinned_direct_exact_path": "SOURCE_TRANSPORT_MISS_404_REPRODUCED",
+    "release_lineage": "NONCANONICAL_DXT5_REUSED_FROM_C116_C120",
+    "pinned_release_bundle_identity": "PASS_EXACT_REUSED_FROM_C133",
+    "source_acquisition_exhausted_content_level": true,
+    "production_readiness_if_valid_result_sha": "PREFLIGHT_ONLY",
+    "promoted_to_shared_state": false
+  },
+  "source_identity_validation": "CONTENT_PRECHECK_PASS_DRIVE_EXACT_PARENT_MISS__PINNED_DIRECT_404__REUSE_C116_C120_CANONICAL_RGBA_VS_RELEASE_DXT5_DIVERGENCE__REUSE_C133_PINNED_RELEASE_BUNDLE_IDENTITY",
+  "canonical_semantic_validation": "PASS_CONTENT_PRECHECK_INDEX98_BINDING_UNCHANGED__NO_PROMOTION_DUE_RESULT_SHA_STRUCTURE",
+  "geometry_mapping_validation": "NOT_APPLICABLE_NO_CURRENT_CANONICAL_SOURCE_BYTES_OR_KOREAN_CANDIDATE__REJECTED_RELEASE_GEOMETRY_REMAINS_NONAUTHORITATIVE",
+  "current_contract_compatibility": "REWORK_EXACT_PRODUCER_RESULT_SHA_STRUCTURE__CONTENT_PRECHECK_NOT_PROMOTED__CURRENT_HEAD_PRESERVED",
+  "readiness_reconciliation": {
+    "classification": "B00174_INPUT_REWORK_REQUIRED_RESULT_SHA_STRUCTURE",
+    "production_readiness": {},
+    "provisional_not_promoted": {
+      "98": "PREFLIGHT_ONLY"
+    },
+    "source_acquisition_exhausted_not_promoted": [
+      98
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY/REWORK candidate completion first: independently QA current A00173 index99/4F68708E transparent CLEAN_PLATE v3 before unrelated preflight; if accepted continue toward Korean render.",
+      "Candidate completion next: independently QA the newer B00167 index152/49BB5FE5 candidate blob 5d938fd663669715cdebcbff675b3499c888d200 / SHA-256 0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17.",
+      "Candidate completion next: preserve the newer index112/D41D0B1 producer-result C-QA handoff and do not regress to an older candidate.",
+      "PREFLIGHT only after candidate priorities: requeue LOCALIZATION-LOCALIZATION_B-00174@53088f239c2bb1972e462e00a641d7bd14a5fbd5 or re-emit equivalent material+task together; do not promote cleanup-only 48e4ab76."
+    ],
+    "note": "Index98 content would remain PREFLIGHT_ONLY if consumed under a valid producer result SHA; Q00032 does not promote it from cleanup-only 48e4ab76."
+  },
+  "heavy_qa_reuse": {
+    "repeated_unchanged_fingerprint_heavy_qa": false,
+    "drive": "INDEPENDENTLY_REPRODUCED_EXACT_PARENT_FILENAME_MISS",
+    "pinned_direct": "INDEPENDENTLY_REPRODUCED_EXACT_PATH_404",
+    "release_source_lineage": "REUSED_C116_C120_UNCHANGED_CANONICAL_RGBA_VS_RELEASE_DXT5_DIVERGENCE",
+    "release_bundle": "REUSED_C133_EXACT_V0_25_10A_BUNDLE_IDENTITY",
+    "candidate_qa": "NOT_RUN_NO_CANDIDATE"
+  },
+  "structural_validation": {
+    "exact_input_sha": "48e4ab764402f96c9ae71e55ad68d0706cdbf3b1",
+    "exact_input_changed_paths": [
+      "localization/graphics/role_B/20260930-0105-B00174-P00087/B00174_P00087_EVEN_TOTAL_RANK_SOURCE_ACQUISITION_EXHAUSTION.json"
+    ],
+    "exact_input_change_kind": "DELETE_DUPLICATE_ROLLOVER_PREFLIGHT_ARTIFACT_ONLY",
+    "exact_task_record_changed_in_input": false,
+    "strict_pass_gate_expected": "FAIL_VERIFY_PARALLEL_LANE_COMMIT_MISSING_CHANGED_TASK_RECORD",
+    "contract_compliant_existing_result_sha": "53088f239c2bb1972e462e00a641d7bd14a5fbd5",
+    "substitution_performed": false
+  },
+  "newer_disjoint_producers_preserved": [
+    "LOCALIZATION-LOCALIZATION_A-00178@8df78c6c",
+    "LOCALIZATION-LOCALIZATION_B-00176_STAGING_INDEX130_AT_BASE_HEAD"
+  ],
+  "counts_after": {
+    "queue_total": 137,
+    "actionable_localize_text": 93,
+    "zoom_review": 31,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_only": 3,
+    "pending_production_localize_text": 76,
+    "canonical_transcribed_segments": 753
+  },
+  "candidate_dds_modified": false,
+  "new_static_artwork_passes": 0,
+  "new_runtime_approvals": 0,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result": "PASS_Q00032_B00174_REWORK_REQUIRED_CLEANUP_ONLY_RESULT_SHA_RUNTIME_UNTESTED",
+  "summary": "Q00032 consumed LOCALIZATION-LOCALIZATION_B-00174@48e4ab764402f96c9ae71e55ad68d0706cdbf3b1 exactly once and returns REWORK_REQUIRED because the immutable input is cleanup-only and fails the producer same-commit durable-task-record rule required for PASS. Index98 source-acquisition content is consistent but not promoted. Concurrent A00178/B00176 work is preserved without disposition. RUNTIME_VALIDATION=UNTESTED."
+}

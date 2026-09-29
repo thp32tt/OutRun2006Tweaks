@@ -1625,3 +1625,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion-first order: current A00173 index99 clean-plate v3, exact newer B00167 index152 candidate, and newer index112 handoff precede unrelated preflight. Counts unchanged: 137 queue, 93 localize_text, 76 pending production, 753 segments.
 - No C candidate DDS modification, new static approval, runtime approval, build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0106-C133/C133_Q00031_INDEPENDENT_QA_BATCH.json`.
+
+## 2026-09-30 01:26 KST - C134 Q00032 INDEPENDENT QA BATCH
+
+- Immutable input: LOCALIZATION-LOCALIZATION_B-00174 `48e4ab764402f96c9ae71e55ad68d0706cdbf3b1`. Disposition: **REWORK_REQUIRED** because this exact cleanup-only SHA removes a duplicate rollover preflight artifact but does not change its durable task record; PASS would fail the exact producer lane-isolation Gate.
+- Index98/42E618FD content-level checks are consistent but not promoted: Drive exact-parent miss and pinned-direct 404 independently reproduced; unchanged C116/C120 current canonical 2048x128 RGBA vs retired Release DXT5 divergence and C133 exact v0.25.10a bundle identity reused without duplicate heavy pixel QA.
+- Existing `53088f239c2bb1972e462e00a641d7bd14a5fbd5` carries B00174 task record + index98 audit together and is the contract-compliant producer-result candidate. Q00032 keeps the controller-supplied TASK_ID+RESULT_SHA immutable and does not substitute it.
+- Candidate-completion-first order preserved: current A00173 index99 clean-plate v3, newer B00167 index152 candidate, newer index112 handoff, then B00174 preflight requeue/re-emission. Concurrent A00178 result and B00176 staging are preserved without disposition. Counts remain 137 queue, 93 localize_text, 76 pending production, 753 canonical segments.
+- No C candidate DDS modification, new static approval, runtime approval, build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0126-C134/C134_Q00032_INDEPENDENT_QA_BATCH.json`.

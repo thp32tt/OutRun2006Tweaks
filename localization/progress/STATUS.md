@@ -1132,3 +1132,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate-completion-first order: current A00173 index99 clean-plate v3, exact newer B00167 index152 candidate, and newer index112 handoff precede unrelated preflight. Counts unchanged: 137 queue, 93 localize_text, 76 pending production, 753 segments.
 - No C candidate DDS modification, new static approval, runtime approval, build/N100/local clone/GPT Library/Drive write/VR/FFB/DX work. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 - Report: `localization/graphics/role_C/20260930-0106-C133/C133_Q00031_INDEPENDENT_QA_BATCH.json`.
+
+### C134 Q00032 — 2026-09-30T01:26:36+09:00
+- Immutable input LOCALIZATION-LOCALIZATION_B-00174 `48e4ab76`: **REWORK_REQUIRED** on exact result-SHA structure. The commit deletes only a duplicate rollover preflight artifact and does not change its durable task record; PASS would fail the exact producer lane Gate.
+- Index98/42E618FD content precheck is consistent but not promoted: Drive exact-parent miss and pinned-direct 404 reproduced; unchanged C116/C120 canonical RGBA vs retired Release DXT5 divergence and C133 exact v0.25.10a bundle identity reused.
+- Existing `53088f23` is the contract-compliant B00174 material+task producer result candidate. Q00032 does not substitute it for the immutable controller input.
+- Candidate-completion priorities remain index99 clean-plate v3, newer index152 candidate, newer index112 handoff before unrelated preflight. Concurrent A00178/B00176 work is preserved without disposition. No candidate/static/runtime approval. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0126-C134/C134_Q00032_INDEPENDENT_QA_BATCH.json`.
