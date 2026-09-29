@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+def read(rel: str) -> str:
+    return (ROOT / rel).read_text(encoding="utf-8")
+
+def require(text: str, marker: str, label: str) -> None:
+    if marker not in text:
+        raise SystemExit(f"FAIL: {label}: missing marker {marker!r}")
+
+def require_before(text: str, first: str, second: str, label: str) -> None:
+    a = text.find(first)
+    b = text.find(second)
+    if a < 0 or b < 0 or a >= b:
+        raise SystemExit(
+            f"FAIL: {label}: expected {first!r} before {second!r}"
+        )
+
+recenter = read("vrhost/src/runtime/r26_recenter_hardening.hpp")
+host = read("vrhost/src/main_r23.cpp")
+cmake = read("vrhost/CMakeLists.txt")
+
+require(
+    cmake,
+    '"/FI${CMAKE_CURRENT_LIST_DIR}/src/runtime/r26_recenter_hardening.hpp"',
+    "host forced-include",
+)
+
+for marker, label in [
+    ("PendingApplicationRecenter.store(true", "pending recenter queue"),
+    ("OutRunVrFinalTest::BaseLocalSpace", "immutable runtime LOCAL base"),
+    ("::xrLocateSpace(viewSpace, base, displayTime, &location)", "current HMD pose locate"),
+    ("create.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL", "LOCAL reference-space creation"),
+    ("create.poseInReferenceSpace = location.pose", "current-pose application origin"),
+    ("localSpace = recentered", "host local-space replacement"),
+    ("OutRunVrFinalTest::LocalSpace = recentered", "fallback local-space replacement"),
+    ("if (previous != XR_NULL_HANDLE && previous != base)", "immutable base lifetime guard"),
+]:
+    require(recenter, marker, label)
+
+require_before(
+    host,
+    "OutRunVrR26RecenterHardening::ApplyPendingApplicationRecenter(",
+    "xrLocateSpace(viewSpace, localSpace, fs.predictedDisplayTime, &head)",
+    "recenter-before-head-locate",
+)
+require_before(
+    host,
+    "OutRunVrR26RecenterHardening::ApplyPendingApplicationRecenter(",
+    "vl.space = localSpace",
+    "recenter-before-view-locate",
+)
+
+for marker, label in [
+    ("quad.space = OutRunVrFinalTest::LocalSpace", "LOCAL startup fallback"),
+    ("const bool r24ViewFallback =", "R24 VIEW fallback detection"),
+    ("XR_SUCCEEDED(result) && !r24ViewFallback", "successful non-VIEW completion gate"),
+    ("ApplicationRecenterAppliedForPendingGameRequest()", "generation completion gate"),
+    ("PendingGameTargetGeneration.store(0", "generation target clear after completion"),
+]:
+    require(recenter, marker, label)
+
+for marker, label in [
+    ("PendingGameTargetGeneration.store(", "game request target generation"),
+    ("QueueApplicationRecenter();", "game request queues application recenter"),
+    ("WriteSyntheticLocalChange(eventData, XR_NULL_HANDLE)", "synthetic LOCAL change"),
+    ("change->referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL", "runtime change normalization"),
+]:
+    require(recenter, marker, label)
+
+print("PASS: application-space recenter contract is wired and fail-closed")
