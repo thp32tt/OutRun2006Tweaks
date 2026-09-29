@@ -1,0 +1,577 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-v2-selector-removal-mask-clean-plate-execution-manifest-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00110",
+  "wave_id": "P00042",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T17:58:30+09:00",
+  "selection_head_sha": "f5237c1590b1c844853e69a126be1a6ab1e1116f",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_policy": "GITHUB_SSOT_ONLY_NO_N100_CLONE_WORKTREE_GPT_LIBRARY",
+  "selection": {
+    "indices": [
+      92,
+      98,
+      112
+    ],
+    "assets": [
+      "1A43E9D9",
+      "42E618FD",
+      "D41D0B1"
+    ],
+    "reason": "B00083 was independently consumed PASS by C00086/Q00007. These three assets are no longer QA-pending and already have accepted exact-HD effect/fill geometry, flip_y orientation and v2 2px candidate-safe bboxes. This task adds the missing deterministic removal-mask/CLEAN_PLATE execution contract without repeating heavy QA."
+  },
+  "reused_immutable_evidence": {
+    "orientation_layout_task": "LOCALIZATION-LOCALIZATION_B-00073",
+    "orientation_layout_report_blob_sha": "f4ec7539abe10664101feb8d1f6fbdf88d40dc4f",
+    "safe_fit_task": "LOCALIZATION-LOCALIZATION_B-00083",
+    "safe_fit_result_sha": "20d9271a96f9000a024ada8ecde4c9b5cf7a56e5",
+    "safe_fit_report_blob_sha": "c87cad81e700ae557dd815058e7d82e6997faa89",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00086",
+    "c_acceptance_record_blob_sha": "7035a6ffc28059ea950773ba10fd5326f8dea91f",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_queue_blob_sha": "d000d952a7bdb95a3d60a0b9877352a4a6d47213",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_EVEN_DETERMINISTIC_REMOVAL_MASK_AND_CLEAN_PLATE_EXECUTION_MANIFESTS",
+    "assets_advanced": 3,
+    "physical_text_elements": 4,
+    "deterministic_removal_mask_recipes": 4,
+    "deterministic_clean_plate_recipes": 4,
+    "accepted_candidate_safe_bboxes_reused": 4,
+    "candidate_dds_written": false,
+    "clean_plate_pixels_written": false,
+    "significance": "Converts already accepted geometry into exact per-element mask seed/limit, connectivity, fail-closed, clean-plate mutation and QA rules. This removes ambiguity from the next source-pixel execution step while preserving the requirement to derive actual per-pixel masks from the exact immutable source."
+  },
+  "assets": [
+    {
+      "queue_index": 92,
+      "asset": "1A43E9D9",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+        "git_blob_sha": "2a2019d5af833424e72c0cc6b0169f1b0699d897",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "element_count": 2,
+      "elements": [
+        {
+          "element_id": "1A43E9D9:0",
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "accepted_geometry": {
+            "source_effect_bbox_readable": [
+              391,
+              17,
+              1062,
+              128
+            ],
+            "source_effect_bbox_raw": [
+              391,
+              127,
+              1062,
+              238
+            ],
+            "source_fill_bbox_readable": [
+              410,
+              36,
+              1043,
+              109
+            ],
+            "source_fill_bbox_raw": [
+              410,
+              146,
+              1043,
+              219
+            ],
+            "candidate_safe_bbox_readable": [
+              393,
+              19,
+              1060,
+              126
+            ],
+            "candidate_safe_bbox_raw": [
+              393,
+              129,
+              1060,
+              236
+            ],
+            "source_height_px": 256,
+            "raw_to_readable_transform": "flip_y"
+          },
+          "deterministic_removal_mask_recipe": {
+            "schema": "outrun-source-effect-removal-mask-v1",
+            "decode_source": "exact immutable HD DDS named by exact_hd_source",
+            "working_orientation": "readable",
+            "seed_bbox": [
+              410,
+              36,
+              1043,
+              109
+            ],
+            "hard_limit_bbox": [
+              391,
+              17,
+              1062,
+              128
+            ],
+            "connectivity": "8-connected",
+            "seed_rule": "Start from decoded source pixels with alpha > 0 inside seed_bbox.",
+            "growth_rule": "Within hard_limit_bbox only, include alpha > 0 pixels belonging to 8-connected components that intersect a seed pixel; include outline/shadow/glow/antialias fringe only through connected source pixels.",
+            "forbidden_rule": "Never include any pixel outside hard_limit_bbox. If a selected component touches hard_limit_bbox edge, intersects independently identified protected artwork, or cannot be distinguished from non-text artwork, stop with HOLD_STRICT_RECHECK.",
+            "output_coordinate_system": "readable",
+            "raw_mapping": "flip_y after mask completion",
+            "required_output": "binary per-pixel mask + SHA-256 + nonzero-pixel bbox/count"
+          },
+          "deterministic_clean_plate_recipe": {
+            "schema": "outrun-clean-plate-qa-v1",
+            "source_basis": "decoded exact HD source",
+            "editable_pixels": "removal mask only",
+            "transparent_text_only_fast_path": "Allowed only when every selected mask pixel belongs to source text/effect and underlying region is proven transparent/text-only; write transparent RGBA inside mask.",
+            "reconstruction_fallback": "If any non-text/background signal exists inside mask, transparent clear is forbidden; require source-constrained background reconstruction and keep HOLD until independently validated.",
+            "immutable_outside_mask": true,
+            "required_qa": {
+              "changed_pixels_outside_removal_mask": 0,
+              "alpha_changes_outside_removal_mask": 0,
+              "protected_artwork_changes": 0,
+              "source_language_residue_pixels": 0,
+              "seam_box_patch_artifacts": "NONE",
+              "native_resolution_review": "REQUIRED"
+            },
+            "candidate_render_permission": "DENIED_UNTIL_CLEAN_PLATE_QA_PASS"
+          },
+          "korean_render_contract": {
+            "prompt_contract": "outrun-first-pass-edit-v2",
+            "lettering_bbox": [
+              393,
+              19,
+              1060,
+              126
+            ],
+            "fit_iterations_max": 8,
+            "flattened_raster_rescale_forbidden": true,
+            "render_from_source_parameters": true,
+            "final_effect_bbox_must_be_inside_lettering_bbox": true
+          },
+          "geometry_self_qa": {
+            "fill_bbox_inside_effect_bbox": "PASS",
+            "exact_2px_safe_inset": "PASS",
+            "readable_to_raw_flip_y_mapping": "PASS",
+            "overall": "PASS"
+          }
+        },
+        {
+          "element_id": "1A43E9D9:1",
+          "source": "15 continuous course",
+          "korean": "15코스 연속",
+          "accepted_geometry": {
+            "source_effect_bbox_readable": [
+              522,
+              130,
+              1584,
+              241
+            ],
+            "source_effect_bbox_raw": [
+              522,
+              14,
+              1584,
+              125
+            ],
+            "source_fill_bbox_readable": [
+              541,
+              149,
+              1565,
+              222
+            ],
+            "source_fill_bbox_raw": [
+              541,
+              33,
+              1565,
+              106
+            ],
+            "candidate_safe_bbox_readable": [
+              524,
+              132,
+              1582,
+              239
+            ],
+            "candidate_safe_bbox_raw": [
+              524,
+              16,
+              1582,
+              123
+            ],
+            "source_height_px": 256,
+            "raw_to_readable_transform": "flip_y"
+          },
+          "deterministic_removal_mask_recipe": {
+            "schema": "outrun-source-effect-removal-mask-v1",
+            "decode_source": "exact immutable HD DDS named by exact_hd_source",
+            "working_orientation": "readable",
+            "seed_bbox": [
+              541,
+              149,
+              1565,
+              222
+            ],
+            "hard_limit_bbox": [
+              522,
+              130,
+              1584,
+              241
+            ],
+            "connectivity": "8-connected",
+            "seed_rule": "Start from decoded source pixels with alpha > 0 inside seed_bbox.",
+            "growth_rule": "Within hard_limit_bbox only, include alpha > 0 pixels belonging to 8-connected components that intersect a seed pixel; include outline/shadow/glow/antialias fringe only through connected source pixels.",
+            "forbidden_rule": "Never include any pixel outside hard_limit_bbox. If a selected component touches hard_limit_bbox edge, intersects independently identified protected artwork, or cannot be distinguished from non-text artwork, stop with HOLD_STRICT_RECHECK.",
+            "output_coordinate_system": "readable",
+            "raw_mapping": "flip_y after mask completion",
+            "required_output": "binary per-pixel mask + SHA-256 + nonzero-pixel bbox/count"
+          },
+          "deterministic_clean_plate_recipe": {
+            "schema": "outrun-clean-plate-qa-v1",
+            "source_basis": "decoded exact HD source",
+            "editable_pixels": "removal mask only",
+            "transparent_text_only_fast_path": "Allowed only when every selected mask pixel belongs to source text/effect and underlying region is proven transparent/text-only; write transparent RGBA inside mask.",
+            "reconstruction_fallback": "If any non-text/background signal exists inside mask, transparent clear is forbidden; require source-constrained background reconstruction and keep HOLD until independently validated.",
+            "immutable_outside_mask": true,
+            "required_qa": {
+              "changed_pixels_outside_removal_mask": 0,
+              "alpha_changes_outside_removal_mask": 0,
+              "protected_artwork_changes": 0,
+              "source_language_residue_pixels": 0,
+              "seam_box_patch_artifacts": "NONE",
+              "native_resolution_review": "REQUIRED"
+            },
+            "candidate_render_permission": "DENIED_UNTIL_CLEAN_PLATE_QA_PASS"
+          },
+          "korean_render_contract": {
+            "prompt_contract": "outrun-first-pass-edit-v2",
+            "lettering_bbox": [
+              524,
+              132,
+              1582,
+              239
+            ],
+            "fit_iterations_max": 8,
+            "flattened_raster_rescale_forbidden": true,
+            "render_from_source_parameters": true,
+            "final_effect_bbox_must_be_inside_lettering_bbox": true
+          },
+          "geometry_self_qa": {
+            "fill_bbox_inside_effect_bbox": "PASS",
+            "exact_2px_safe_inset": "PASS",
+            "readable_to_raw_flip_y_mapping": "PASS",
+            "overall": "PASS"
+          }
+        }
+      ],
+      "asset_fail_closed_gate": "No source DDS bytes, clean plate, or Korean candidate are written by this task. The manifest is executable reconstruction input only; actual per-pixel mask/clean-plate outputs remain HOLD until generated from exact source."
+    },
+    {
+      "queue_index": 98,
+      "asset": "42E618FD",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+        "git_blob_sha": "04af6f19533c54e84f6bca3cd29e53aa1abf98d6",
+        "dimensions": [
+          2048,
+          128
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "element_count": 1,
+      "elements": [
+        {
+          "element_id": "42E618FD:0",
+          "source": "Challenge the course record.",
+          "korean": "코스 기록에 도전하세요.",
+          "accepted_geometry": {
+            "source_effect_bbox_readable": [
+              431,
+              6,
+              1673,
+              122
+            ],
+            "source_effect_bbox_raw": [
+              431,
+              5,
+              1673,
+              121
+            ],
+            "source_fill_bbox_readable": [
+              445,
+              19,
+              1659,
+              107
+            ],
+            "source_fill_bbox_raw": [
+              445,
+              20,
+              1659,
+              108
+            ],
+            "candidate_safe_bbox_readable": [
+              433,
+              8,
+              1671,
+              120
+            ],
+            "candidate_safe_bbox_raw": [
+              433,
+              7,
+              1671,
+              119
+            ],
+            "source_height_px": 128,
+            "raw_to_readable_transform": "flip_y"
+          },
+          "deterministic_removal_mask_recipe": {
+            "schema": "outrun-source-effect-removal-mask-v1",
+            "decode_source": "exact immutable HD DDS named by exact_hd_source",
+            "working_orientation": "readable",
+            "seed_bbox": [
+              445,
+              19,
+              1659,
+              107
+            ],
+            "hard_limit_bbox": [
+              431,
+              6,
+              1673,
+              122
+            ],
+            "connectivity": "8-connected",
+            "seed_rule": "Start from decoded source pixels with alpha > 0 inside seed_bbox.",
+            "growth_rule": "Within hard_limit_bbox only, include alpha > 0 pixels belonging to 8-connected components that intersect a seed pixel; include outline/shadow/glow/antialias fringe only through connected source pixels.",
+            "forbidden_rule": "Never include any pixel outside hard_limit_bbox. If a selected component touches hard_limit_bbox edge, intersects independently identified protected artwork, or cannot be distinguished from non-text artwork, stop with HOLD_STRICT_RECHECK.",
+            "output_coordinate_system": "readable",
+            "raw_mapping": "flip_y after mask completion",
+            "required_output": "binary per-pixel mask + SHA-256 + nonzero-pixel bbox/count"
+          },
+          "deterministic_clean_plate_recipe": {
+            "schema": "outrun-clean-plate-qa-v1",
+            "source_basis": "decoded exact HD source",
+            "editable_pixels": "removal mask only",
+            "transparent_text_only_fast_path": "Allowed only when every selected mask pixel belongs to source text/effect and underlying region is proven transparent/text-only; write transparent RGBA inside mask.",
+            "reconstruction_fallback": "If any non-text/background signal exists inside mask, transparent clear is forbidden; require source-constrained background reconstruction and keep HOLD until independently validated.",
+            "immutable_outside_mask": true,
+            "required_qa": {
+              "changed_pixels_outside_removal_mask": 0,
+              "alpha_changes_outside_removal_mask": 0,
+              "protected_artwork_changes": 0,
+              "source_language_residue_pixels": 0,
+              "seam_box_patch_artifacts": "NONE",
+              "native_resolution_review": "REQUIRED"
+            },
+            "candidate_render_permission": "DENIED_UNTIL_CLEAN_PLATE_QA_PASS"
+          },
+          "korean_render_contract": {
+            "prompt_contract": "outrun-first-pass-edit-v2",
+            "lettering_bbox": [
+              433,
+              8,
+              1671,
+              120
+            ],
+            "fit_iterations_max": 8,
+            "flattened_raster_rescale_forbidden": true,
+            "render_from_source_parameters": true,
+            "final_effect_bbox_must_be_inside_lettering_bbox": true
+          },
+          "geometry_self_qa": {
+            "fill_bbox_inside_effect_bbox": "PASS",
+            "exact_2px_safe_inset": "PASS",
+            "readable_to_raw_flip_y_mapping": "PASS",
+            "overall": "PASS"
+          }
+        }
+      ],
+      "asset_fail_closed_gate": "No source DDS bytes, clean plate, or Korean candidate are written by this task. The manifest is executable reconstruction input only; actual per-pixel mask/clean-plate outputs remain HOLD until generated from exact source."
+    },
+    {
+      "queue_index": 112,
+      "asset": "D41D0B1",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+        "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "element_count": 1,
+      "elements": [
+        {
+          "element_id": "D41D0B1:0",
+          "source": "Try to reach the goal with your girlfriend.",
+          "korean": "여자친구와 함께 골에 도착하세요.",
+          "accepted_geometry": {
+            "source_effect_bbox_readable": [
+              435,
+              19,
+              1356,
+              237
+            ],
+            "source_effect_bbox_raw": [
+              435,
+              18,
+              1356,
+              236
+            ],
+            "source_fill_bbox_readable": [
+              448,
+              33,
+              1341,
+              223
+            ],
+            "source_fill_bbox_raw": [
+              448,
+              32,
+              1341,
+              222
+            ],
+            "candidate_safe_bbox_readable": [
+              437,
+              21,
+              1354,
+              235
+            ],
+            "candidate_safe_bbox_raw": [
+              437,
+              20,
+              1354,
+              234
+            ],
+            "source_height_px": 256,
+            "raw_to_readable_transform": "flip_y"
+          },
+          "deterministic_removal_mask_recipe": {
+            "schema": "outrun-source-effect-removal-mask-v1",
+            "decode_source": "exact immutable HD DDS named by exact_hd_source",
+            "working_orientation": "readable",
+            "seed_bbox": [
+              448,
+              33,
+              1341,
+              223
+            ],
+            "hard_limit_bbox": [
+              435,
+              19,
+              1356,
+              237
+            ],
+            "connectivity": "8-connected",
+            "seed_rule": "Start from decoded source pixels with alpha > 0 inside seed_bbox.",
+            "growth_rule": "Within hard_limit_bbox only, include alpha > 0 pixels belonging to 8-connected components that intersect a seed pixel; include outline/shadow/glow/antialias fringe only through connected source pixels.",
+            "forbidden_rule": "Never include any pixel outside hard_limit_bbox. If a selected component touches hard_limit_bbox edge, intersects independently identified protected artwork, or cannot be distinguished from non-text artwork, stop with HOLD_STRICT_RECHECK.",
+            "output_coordinate_system": "readable",
+            "raw_mapping": "flip_y after mask completion",
+            "required_output": "binary per-pixel mask + SHA-256 + nonzero-pixel bbox/count"
+          },
+          "deterministic_clean_plate_recipe": {
+            "schema": "outrun-clean-plate-qa-v1",
+            "source_basis": "decoded exact HD source",
+            "editable_pixels": "removal mask only",
+            "transparent_text_only_fast_path": "Allowed only when every selected mask pixel belongs to source text/effect and underlying region is proven transparent/text-only; write transparent RGBA inside mask.",
+            "reconstruction_fallback": "If any non-text/background signal exists inside mask, transparent clear is forbidden; require source-constrained background reconstruction and keep HOLD until independently validated.",
+            "immutable_outside_mask": true,
+            "required_qa": {
+              "changed_pixels_outside_removal_mask": 0,
+              "alpha_changes_outside_removal_mask": 0,
+              "protected_artwork_changes": 0,
+              "source_language_residue_pixels": 0,
+              "seam_box_patch_artifacts": "NONE",
+              "native_resolution_review": "REQUIRED"
+            },
+            "candidate_render_permission": "DENIED_UNTIL_CLEAN_PLATE_QA_PASS"
+          },
+          "korean_render_contract": {
+            "prompt_contract": "outrun-first-pass-edit-v2",
+            "lettering_bbox": [
+              437,
+              21,
+              1354,
+              235
+            ],
+            "fit_iterations_max": 8,
+            "flattened_raster_rescale_forbidden": true,
+            "render_from_source_parameters": true,
+            "final_effect_bbox_must_be_inside_lettering_bbox": true
+          },
+          "geometry_self_qa": {
+            "fill_bbox_inside_effect_bbox": "PASS",
+            "exact_2px_safe_inset": "PASS",
+            "readable_to_raw_flip_y_mapping": "PASS",
+            "overall": "PASS"
+          }
+        }
+      ],
+      "asset_fail_closed_gate": "No source DDS bytes, clean plate, or Korean candidate are written by this task. The manifest is executable reconstruction input only; actual per-pixel mask/clean-plate outputs remain HOLD until generated from exact source."
+    }
+  ],
+  "integrated_self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_92_98_112",
+    "c_consumption": "PASS_B00083_CONSUMED_BY_C00086_Q00007",
+    "heavy_qa_dedup": "PASS_REUSED_B00073_B00083_C00086_UNCHANGED_GEOMETRY_AND_ORIENTATION",
+    "geometry_units": "PASS_4_OF_4",
+    "pairwise_effect_bbox_separation": "PASS_3_OF_3_ASSETS",
+    "mask_bounds": "PASS_ALL_RECIPES_HARD_LIMITED_TO_C_ACCEPTED_SOURCE_EFFECT_BBOX",
+    "clean_plate_outside_mask_mutation_policy": "PASS_ZERO_ALLOWED",
+    "candidate_safe_bbox_claim": "PASS_REUSED_ONLY_NO_NEW_BBOX_FABRICATION",
+    "source_pixels_materialized": "NO",
+    "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "strict_holds": {
+    "actual_removal_masks": "HOLD_NOT_YET_MATERIALIZED_FROM_EXACT_SOURCE_PIXELS",
+    "protected_non_text_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_pixels": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate_qa": "HOLD_NOT_YET_EXECUTED",
+    "signed_slant_style_metrics": "HOLD_EXACT_PIXEL_MEASUREMENT_REQUIRED_BEFORE_RENDER",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "decoded_final_bc3_qa": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Three C-consumed even selector assets advance from accepted source-effect/safe-fit geometry to deterministic per-element removal-mask and CLEAN_PLATE execution manifests. Actual per-pixel masks/clean plates and Korean DDS remain fail-closed HOLD until generated from exact source bytes."
+}
