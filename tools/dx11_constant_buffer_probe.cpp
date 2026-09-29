@@ -16,10 +16,12 @@ namespace
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
+    using outrun::vr::dx11::TextureMutationUpdateKind;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_sampler;
+    using outrun::vr::dx11::translate_texture_mutation;
     using outrun::vr::dx11::translate_vertex_input_layout;
 
     void require(bool condition, const char* message)
@@ -351,6 +353,58 @@ int main()
             D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
         "R99 texture view recovery after fail-closed reset");
 
+    const auto dynamicDiscardTexture = translate_texture_mutation(
+        D3DPOOL_DEFAULT, D3DUSAGE_DYNAMIC, D3DLOCK_DISCARD, true);
+    require(
+        dynamicDiscardTexture.planExact &&
+        dynamicDiscardTexture.kind ==
+            TextureMutationUpdateKind::DynamicMapWriteDiscard &&
+        dynamicDiscardTexture.mapType == D3D11_MAP_WRITE_DISCARD &&
+        dynamicDiscardTexture.requiresFullSubresource &&
+        !dynamicDiscardTexture.requiresCpuShadow,
+        "R100 full dynamic texture discard maps exactly");
+
+    const auto partialDiscardTexture = translate_texture_mutation(
+        D3DPOOL_DEFAULT, D3DUSAGE_DYNAMIC, D3DLOCK_DISCARD, false);
+    require(
+        !partialDiscardTexture.planExact &&
+        partialDiscardTexture.kind == TextureMutationUpdateKind::Unsupported &&
+        partialDiscardTexture.requiresFullSubresource,
+        "R100 partial dynamic texture discard must fail closed");
+
+    const auto plainDynamicTexture = translate_texture_mutation(
+        D3DPOOL_DEFAULT, D3DUSAGE_DYNAMIC, 0, true);
+    require(
+        !plainDynamicTexture.planExact &&
+        plainDynamicTexture.kind == TextureMutationUpdateKind::Unsupported &&
+        plainDynamicTexture.requiresFullSubresource,
+        "R100 plain dynamic texture write must fail closed");
+
+    const auto noOverwriteTexture = translate_texture_mutation(
+        D3DPOOL_DEFAULT, D3DUSAGE_DYNAMIC, D3DLOCK_NOOVERWRITE, true);
+    require(
+        !noOverwriteTexture.planExact &&
+        noOverwriteTexture.kind == TextureMutationUpdateKind::Unsupported,
+        "R100 texture NOOVERWRITE must fail closed");
+
+    const auto managedTextureWrite = translate_texture_mutation(
+        D3DPOOL_MANAGED, 0, 0, true);
+    require(
+        !managedTextureWrite.planExact &&
+        managedTextureWrite.kind ==
+            TextureMutationUpdateKind::ManagedCpuShadowWrite &&
+        managedTextureWrite.requiresCpuShadow,
+        "R100 managed texture write requires CPU shadow");
+
+    const auto managedTextureRead = translate_texture_mutation(
+        D3DPOOL_MANAGED, 0, D3DLOCK_READONLY, true);
+    require(
+        !managedTextureRead.planExact &&
+        managedTextureRead.kind ==
+            TextureMutationUpdateKind::ManagedCpuShadowRead &&
+        managedTextureRead.requiresCpuShadow,
+        "R100 managed texture read requires CPU shadow");
+
     ID3D11VertexShader* vertexShader = nullptr;
     require(
         SUCCEEDED(d3d.device->CreateVertexShader(
@@ -512,5 +566,6 @@ int main()
     std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
+    std::cout << "DX11 texture mutation readiness R100: PASS\n";
     return 0;
 }

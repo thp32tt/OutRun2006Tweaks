@@ -58,6 +58,28 @@ namespace outrun::vr::dx11
         bool requiresCpuShadow = false;
     };
 
+    // R100 models the conservative update contract for a future D3D11
+    // Texture2D mirror. Only a full-subresource DISCARD write to a DEFAULT
+    // D3D9 dynamic texture is currently exact enough to map to
+    // D3D11_MAP_WRITE_DISCARD. Partial writes, plain writes and NOOVERWRITE
+    // remain fail-closed until preservation semantics are implemented.
+    enum class TextureMutationUpdateKind : std::uint8_t
+    {
+        Unsupported = 0,
+        DynamicMapWriteDiscard,
+        ManagedCpuShadowRead,
+        ManagedCpuShadowWrite,
+    };
+
+    struct TextureMutationTranslation
+    {
+        TextureMutationUpdateKind kind = TextureMutationUpdateKind::Unsupported;
+        D3D11_MAP mapType = D3D11_MAP_WRITE;
+        bool planExact = false;
+        bool requiresCpuShadow = false;
+        bool requiresFullSubresource = false;
+    };
+
     // R77 models the lifetime contract a future MANAGED D3D11 mirror must obey.
     // CPU shadow contents survive a successful D3D9 Reset; the GPU mirror is
     // generation-bound and must be recreated/reuploaded before use.
@@ -154,4 +176,13 @@ namespace outrun::vr::dx11
         D3DPOOL pool,
         DWORD usage,
         DWORD lockFlags) noexcept;
+
+    // R100 translates observed Texture2D LockRect intent into a future mirror
+    // update plan. The returned plan is readiness evidence only; it does not
+    // map, copy, upload or bind a D3D11 texture.
+    [[nodiscard]] TextureMutationTranslation translate_texture_mutation(
+        D3DPOOL pool,
+        DWORD usage,
+        DWORD lockFlags,
+        bool fullSubresource) noexcept;
 }

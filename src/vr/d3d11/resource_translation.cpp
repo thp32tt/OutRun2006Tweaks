@@ -221,4 +221,56 @@ namespace outrun::vr::dx11
         out.planExact = true;
         return out;
     }
+
+    TextureMutationTranslation translate_texture_mutation(
+        D3DPOOL pool,
+        DWORD usage,
+        DWORD lockFlags,
+        bool fullSubresource) noexcept
+    {
+        constexpr DWORD classifiedFlags =
+            D3DLOCK_READONLY | D3DLOCK_DISCARD | D3DLOCK_NOOVERWRITE;
+        if ((lockFlags & ~classifiedFlags) != 0)
+            return {};
+
+        const bool readOnly = (lockFlags & D3DLOCK_READONLY) != 0;
+        const bool discard = (lockFlags & D3DLOCK_DISCARD) != 0;
+        const bool noOverwrite = (lockFlags & D3DLOCK_NOOVERWRITE) != 0;
+        if ((readOnly && (discard || noOverwrite)) ||
+            (discard && noOverwrite))
+            return {};
+
+        const auto behavior = translate_resource_behavior(
+            ResourceRole::Texture, pool, usage);
+        if (!behavior.descriptorExact)
+            return {};
+
+        TextureMutationTranslation out{};
+        if (pool == D3DPOOL_MANAGED)
+        {
+            if (discard || noOverwrite)
+                return {};
+            out.kind = readOnly
+                ? TextureMutationUpdateKind::ManagedCpuShadowRead
+                : TextureMutationUpdateKind::ManagedCpuShadowWrite;
+            out.requiresCpuShadow = true;
+            return out;
+        }
+
+        if (pool != D3DPOOL_DEFAULT ||
+            behavior.usage != D3D11_USAGE_DYNAMIC ||
+            readOnly || noOverwrite)
+            return {};
+
+        // WRITE_DISCARD invalidates prior contents. Without a full-subresource
+        // source lock, untouched texels cannot be preserved exactly.
+        out.requiresFullSubresource = true;
+        if (!discard || !fullSubresource)
+            return out;
+
+        out.kind = TextureMutationUpdateKind::DynamicMapWriteDiscard;
+        out.mapType = D3D11_MAP_WRITE_DISCARD;
+        out.planExact = true;
+        return out;
+    }
 }

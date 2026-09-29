@@ -43,6 +43,12 @@ NATIVE_BACKEND_HPP = (
 NATIVE_BACKEND_CPP = (
     ROOT / "src" / "vr" / "d3d11" / "native_backend.cpp"
 ).read_text(encoding="utf-8")
+RESOURCE_TRANSLATION_HPP = (
+    ROOT / "src" / "vr" / "d3d11" / "resource_translation.hpp"
+).read_text(encoding="utf-8")
+RESOURCE_TRANSLATION_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "resource_translation.cpp"
+).read_text(encoding="utf-8")
 CONSTANT_BUFFER_CONTRACT_TEXT = (
     CONSTANT_BUFFER_PROBE + "\n" + NATIVE_BACKEND_CPP
 )
@@ -1230,6 +1236,65 @@ def main() -> None:
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(
                 "DX11 R99 texture-view probe drift: " + meaning
+            )
+
+    r100_texture_mutation_header = {
+        "TextureMutationUpdateKind": "R100 texture mutation operation identity",
+        "TextureMutationTranslation": "R100 texture mutation readiness result",
+        "requiresFullSubresource": "R100 DISCARD preservation boundary",
+        "translate_texture_mutation": "R100 texture mutation translation entrypoint",
+    }
+    missing_r100_header = [
+        meaning
+        for token, meaning in r100_texture_mutation_header.items()
+        if token not in RESOURCE_TRANSLATION_HPP
+    ]
+    if missing_r100_header:
+        raise SystemExit(
+            "DX11 R100 texture-mutation header drift: "
+            + ", ".join(missing_r100_header)
+        )
+
+    for token, meaning in {
+        "D3DLOCK_READONLY | D3DLOCK_DISCARD | D3DLOCK_NOOVERWRITE":
+            "R100 bounded D3D9 LockRect flag classification",
+        "ResourceRole::Texture": "R100 texture behavior translation reuse",
+        "behavior.usage != D3D11_USAGE_DYNAMIC":
+            "R100 dynamic D3D11 mirror gate",
+        "TextureMutationUpdateKind::ManagedCpuShadowWrite":
+            "R100 managed write remains CPU-shadow dependent",
+        "TextureMutationUpdateKind::ManagedCpuShadowRead":
+            "R100 managed read remains CPU-shadow dependent",
+        "if (!discard || !fullSubresource)":
+            "R100 partial/plain dynamic write fail-closed gate",
+        "TextureMutationUpdateKind::DynamicMapWriteDiscard":
+            "R100 exact full-discard update kind",
+        "D3D11_MAP_WRITE_DISCARD": "R100 exact D3D11 map operation",
+    }.items():
+        if token not in RESOURCE_TRANSLATION_CPP:
+            raise SystemExit(
+                "DX11 R100 texture-mutation source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R100 full dynamic texture discard maps exactly":
+            "R100 positive DEFAULT dynamic full-discard case",
+        "R100 partial dynamic texture discard must fail closed":
+            "R100 partial-write preservation negative case",
+        "R100 plain dynamic texture write must fail closed":
+            "R100 plain-write preservation negative case",
+        "R100 texture NOOVERWRITE must fail closed":
+            "R100 no-overwrite negative case",
+        "R100 managed texture write requires CPU shadow":
+            "R100 managed write dependency",
+        "R100 managed texture read requires CPU shadow":
+            "R100 managed read dependency",
+        "DX11 texture mutation readiness R100: PASS":
+            "R100 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R100 texture-mutation probe drift: " + meaning
             )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
