@@ -65,7 +65,7 @@ If the runtime cannot launch two conversations/workers concurrently, retain queu
 This file is a controller entry map only. The automation contract is authoritative.
 
 ## Runtime scheduler values
-The controller must load schema-v4 runtime values from `localization/controller_roles.json` before scheduling.
+The controller must load the current schema version from `localization/controller_roles.json` before scheduling; do not hard-code an older schema version.
 
 ```text
 queue loop              15s
