@@ -1,0 +1,417 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-family-template-canonical-source-route-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00138",
+  "wave_id": "P00062",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T20:28:52+09:00",
+  "precommit_head_sha": "23af3e8e08a360303c36e81c655a20b79bd209d9",
+  "precommit_tree_sha": "e5a7a2c2aa0d8c6c4f703e5724d3c2fe4a1cb339",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FAST_PATH_POLICY_FOUR_EVEN_CANONICAL_SOURCE_REACQUISITION_AND_ROUTE_CLASSIFICATION",
+  "selection": {
+    "selected_indices": [
+      140,
+      152,
+      154,
+      164
+    ],
+    "selected_assets": [
+      "31C58963",
+      "49BB5FE5",
+      "4D38BBB0",
+      "5B65E08C"
+    ],
+    "family": "spr_sprani_sumo_fe_cvt_Exst",
+    "basis": "Fresh HEAD includes the quality-preserving family/template fast-path contract and peer A00131 only. B00134/B00136 remain producer outputs awaiting C and are excluded. Shared state contains no B-even RENDER_READY/ONE_STAGE_TO_RENDER item. Existing candidate backlog is runtime/dependency/revalidation work. These four older C-consumed pre-generation assets share a front-end family but still lack exact current canonical source bytes, so they are advanced by one legal fallback-4 batch."
+  },
+  "candidate_first_audit": {
+    "direct_rework_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "existing_candidate_material_rework_runnable": [],
+    "qa_pending_skipped": {
+      "LOCALIZATION-LOCALIZATION_B-00134": [
+        212,
+        220,
+        222
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00136": [
+        34,
+        44,
+        52,
+        172
+      ]
+    },
+    "existing_candidate_runtime_or_dependency_backlog": [
+      12,
+      54,
+      60,
+      94,
+      102,
+      104,
+      116
+    ],
+    "zero_candidate_exception_applies": true,
+    "preflight_only_batches_this_invocation": 1
+  },
+  "acceleration_route": {
+    "mode": "QUALITY_PRESERVING_FAMILY_TEMPLATE_FAST_PATH",
+    "current_route": "EXCEPTION_QUEUE",
+    "reason": "Exact canonical source geometry is unavailable for all four; family similarity cannot authorize geometry/style copying.",
+    "semantic_translation_reuse": {
+      "SHOWROOM": {
+        "korean": "쇼룸",
+        "members": [
+          140,
+          154
+        ]
+      },
+      "SELECT LICENSE": {
+        "korean": "라이선스 선택",
+        "members": [
+          154,
+          164
+        ]
+      }
+    },
+    "style_template_reuse_status": "HOLD_UNTIL_CANONICAL_ASSET_SPECIFIC_GEOMETRY_AND_STYLE_COMPATIBILITY_PROVEN",
+    "asset_specific_geometry_required": true,
+    "future_route_after_source_acquisition": "Evaluate each asset independently for FAST_PATH vs QUALITY_PATH after canonical masks/CLEAN_PLATE/safe bbox exist.",
+    "quality_threshold_reduced": false
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "f88386e1484054f2f6efb39e59d556ee6809067e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "a206e5f0c6364ca6d55dc50cb860da0847253b06",
+    "resume_state_blob_sha": "18ee8946b19e47b3cec3709520594c035eca4cb5",
+    "worklog_blob_sha": "02bb240fc358360e6ba8d04280eb835f35218c00",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_validator_blob_sha": "9b6b1d083321b45511f6272ca3366612821f7a02",
+    "b00103_task_record_blob_sha": "9ad57827a64af206788582f3c6cefc77dc564a99",
+    "b00103_material_report_blob_sha": "145b2328fcd0c15fce96ac3b0aa4479c42c66ad5",
+    "b00104_task_record_blob_sha": "40b124090dff58dfef748e4381e5ec3fbd946f7d",
+    "b00104_material_report_blob_sha": "4eba6995902acea9e75e98eda7034031ab2911c8",
+    "c00111_task_record_blob_sha": "a4aac27a882ab38eecc6d844b002e938da8332a5",
+    "c00116_task_record_blob_sha": "f24eacd1c00a808db4771ea6f7caa5e35892ae50",
+    "b00136_task_record_blob_sha": "399ca52f486e98d9fbf7e7db43685b3443836962"
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_SUMO_FE_CANONICAL_SOURCE_REACQUISITION_PLUS_FAST_PATH_ROUTE_CLASSIFICATION",
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "localizable_semantic_entries_reused": 16,
+    "expected_localizable_physical_occurrences": 18,
+    "preserve_original_regions_or_semantics_reused": 6,
+    "semantic_family_reuses_pinned": 2,
+    "prior_release_geometry_sets_demoted_from_canonical_authority": 4,
+    "exact_hash_gated_acquisition_pipelines_created": 4,
+    "current_git_queue_path_sources_present": 0,
+    "current_git_candidate_dds_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1
+  },
+  "assets": [
+    {
+      "queue_index": 140,
+      "asset": "31C58963",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+      "canonical": {
+        "sha256": "03bc159749f4a20168a21c4ad62c5c7d0e1b13dcdfb1bb7b7f7b2f6b6982b0f8",
+        "dimensions": [
+          512,
+          256
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "git_blob_sha": "b0079384796e645d2a7b759a017d071f041457b9",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "format": "RGBA32"
+      },
+      "source_relation": "CANVAS_MISMATCH_4X_RELEASE_GEOMETRY_NONAUTHORITATIVE",
+      "semantics": [
+        [
+          "PRESS START",
+          "START 버튼"
+        ],
+        [
+          "SHOWROOM",
+          "쇼룸"
+        ],
+        [
+          "SELECT MODE",
+          "모드 선택"
+        ],
+        [
+          "SELECT RACE",
+          "레이스 선택"
+        ],
+        [
+          "SELECT STAGE",
+          "스테이지 선택"
+        ]
+      ],
+      "localizable_semantics": 5,
+      "expected_physical_occurrences": 5,
+      "preserve_regions": 0,
+      "unresolved_variant": "canonical PRESS START vs historical observed PRESS ENTER; must resolve from exact canonical pixels",
+      "reusable_semantic_family": [
+        "SHOWROOM"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "canonical_reacquisition_gate": [
+        "Acquire/import exact canonical user-HD DDS and verify canonical.sha256 before interpreting pixel geometry.",
+        "Decode canonical DDS header/alpha/mips/orientation; filename/canvas similarity is not identity proof.",
+        "Rebind each semantic occurrence against canonical pixels; historical Release coordinates are conditional prior only.",
+        "Measure canonical effect-inclusive source bbox and create asset-specific removal/protected-art masks.",
+        "Create and independently QA CLEAN_PLATE with zero outside-mask/protected-art/alpha collateral.",
+        "Derive v2 candidate_safe_bbox from measured canonical geometry.",
+        "Only after canonical geometry passes, select FAST_PATH when family style compatibility is evidence-backed; otherwise QUALITY_PATH.",
+        "Render -> native-resolution measure -> refit within the same invocation; never resize a flattened text raster.",
+        "Encode exact DDS and run asset-specific header/alpha/orientation/zero-pixel/residual-English/English-source comparison QA.",
+        "Keep runtime validation UNTESTED until real game evidence."
+      ]
+    },
+    {
+      "queue_index": 152,
+      "asset": "49BB5FE5",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "canonical": {
+        "sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+        "dimensions": [
+          512,
+          128
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+        "dimensions": [
+          512,
+          128
+        ],
+        "format": "DXT5/BC3"
+      },
+      "source_relation": "CANVAS_MATCH_MODE_MISMATCH_RGBA_CANONICAL_VS_DXT5_BC3_RELEASE",
+      "semantics": [
+        [
+          "PRO.",
+          "프로"
+        ],
+        [
+          "INS.",
+          "연주"
+        ],
+        [
+          "G.M.",
+          "기타"
+        ],
+        [
+          "E.R.",
+          "유로"
+        ]
+      ],
+      "preserve_semantics": [
+        [
+          "'89",
+          "'89"
+        ],
+        [
+          "'86",
+          "'86"
+        ]
+      ],
+      "localizable_semantics": 4,
+      "expected_physical_occurrences": 4,
+      "preserve_regions": 2,
+      "prior_effect_geometry_status": "C115 PASS only for old BC3 source; 4 effect bboxes/safe-bbox formulas retained as historical reconstruction prior, not canonical geometry",
+      "reusable_semantic_family": [],
+      "route": "EXCEPTION_QUEUE",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "canonical_reacquisition_gate": [
+        "Acquire/import exact canonical user-HD DDS and verify canonical.sha256 before interpreting pixel geometry.",
+        "Decode canonical DDS header/alpha/mips/orientation; filename/canvas similarity is not identity proof.",
+        "Rebind each semantic occurrence against canonical pixels; historical Release coordinates are conditional prior only.",
+        "Measure canonical effect-inclusive source bbox and create asset-specific removal/protected-art masks.",
+        "Create and independently QA CLEAN_PLATE with zero outside-mask/protected-art/alpha collateral.",
+        "Derive v2 candidate_safe_bbox from measured canonical geometry.",
+        "Only after canonical geometry passes, select FAST_PATH when family style compatibility is evidence-backed; otherwise QUALITY_PATH.",
+        "Render -> native-resolution measure -> refit within the same invocation; never resize a flattened text raster.",
+        "Encode exact DDS and run asset-specific header/alpha/orientation/zero-pixel/residual-English/English-source comparison QA.",
+        "Keep runtime validation UNTESTED until real game evidence."
+      ]
+    },
+    {
+      "queue_index": 154,
+      "asset": "4D38BBB0",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "canonical": {
+        "sha256": "666511c591d3b15f400934c43c089ff4636942918d6fc9554171675d0d6cea00",
+        "dimensions": [
+          4096,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "git_blob_sha": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "dimensions": [
+          4096,
+          1024
+        ],
+        "format": "RGBA32"
+      },
+      "source_relation": "CANVAS_AND_MODE_CLASS_MATCH_EXACT_CANONICAL_SHA256_EQUIVALENCE_UNPROVEN",
+      "semantics": [
+        [
+          "MULTIPLAYER",
+          "멀티플레이"
+        ],
+        [
+          "SINGLE PLAYER",
+          "싱글 플레이"
+        ],
+        [
+          "DEFAULT LICENSE",
+          "기본 라이선스"
+        ],
+        [
+          "CREATE NEW LICENSE",
+          "새 라이선스 만들기"
+        ],
+        [
+          "SELECT LICENSE",
+          "라이선스 선택"
+        ],
+        [
+          "SHOWROOM",
+          "쇼룸"
+        ]
+      ],
+      "localizable_semantics": 6,
+      "expected_physical_occurrences": 8,
+      "preserve_regions": 2,
+      "reusable_semantic_family": [
+        "SHOWROOM",
+        "SELECT LICENSE"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "canonical_reacquisition_gate": [
+        "Acquire/import exact canonical user-HD DDS and verify canonical.sha256 before interpreting pixel geometry.",
+        "Decode canonical DDS header/alpha/mips/orientation; filename/canvas similarity is not identity proof.",
+        "Rebind each semantic occurrence against canonical pixels; historical Release coordinates are conditional prior only.",
+        "Measure canonical effect-inclusive source bbox and create asset-specific removal/protected-art masks.",
+        "Create and independently QA CLEAN_PLATE with zero outside-mask/protected-art/alpha collateral.",
+        "Derive v2 candidate_safe_bbox from measured canonical geometry.",
+        "Only after canonical geometry passes, select FAST_PATH when family style compatibility is evidence-backed; otherwise QUALITY_PATH.",
+        "Render -> native-resolution measure -> refit within the same invocation; never resize a flattened text raster.",
+        "Encode exact DDS and run asset-specific header/alpha/orientation/zero-pixel/residual-English/English-source comparison QA.",
+        "Keep runtime validation UNTESTED until real game evidence."
+      ]
+    },
+    {
+      "queue_index": 164,
+      "asset": "5B65E08C",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+      "canonical": {
+        "sha256": "08f6dbf599bca9f3df6f92015d88917d06565b5d476b39b961865701445931d6",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA"
+      },
+      "prior_release": {
+        "git_blob_sha": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "format": "RGBA32"
+      },
+      "source_relation": "CANVAS_AND_MODE_CLASS_MATCH_EXACT_CANONICAL_SHA256_EQUIVALENCE_UNPROVEN",
+      "semantics": [
+        [
+          "SELECT LICENSE",
+          "라이선스 선택"
+        ]
+      ],
+      "localizable_semantics": 1,
+      "expected_physical_occurrences": 1,
+      "preserve_regions": 2,
+      "reusable_semantic_family": [
+        "SELECT LICENSE"
+      ],
+      "route": "EXCEPTION_QUEUE",
+      "current_git_queue_path_source_present": false,
+      "current_git_candidate_present": false,
+      "canonical_reacquisition_gate": [
+        "Acquire/import exact canonical user-HD DDS and verify canonical.sha256 before interpreting pixel geometry.",
+        "Decode canonical DDS header/alpha/mips/orientation; filename/canvas similarity is not identity proof.",
+        "Rebind each semantic occurrence against canonical pixels; historical Release coordinates are conditional prior only.",
+        "Measure canonical effect-inclusive source bbox and create asset-specific removal/protected-art masks.",
+        "Create and independently QA CLEAN_PLATE with zero outside-mask/protected-art/alpha collateral.",
+        "Derive v2 candidate_safe_bbox from measured canonical geometry.",
+        "Only after canonical geometry passes, select FAST_PATH when family style compatibility is evidence-backed; otherwise QUALITY_PATH.",
+        "Render -> native-resolution measure -> refit within the same invocation; never resize a flattened text raster.",
+        "Encode exact DDS and run asset-specific header/alpha/orientation/zero-pixel/residual-English/English-source comparison QA.",
+        "Keep runtime validation UNTESTED until real game evidence."
+      ]
+    }
+  ],
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_ONLY_140_152_154_164",
+    "queue_state": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "canonical_inventory": "PASS_4_OF_4_CURRENT_SHA256_CANVAS_RGBA_IDENTITIES",
+    "canonical_semantics": "PASS_16_LOCALIZABLE_CURRENT_PAIRS_PLUS_PRESERVE_ENTRIES",
+    "physical_occurrences": "PASS_18_EXPECTED_LOCALIZABLE_OCCURRENCES_FROM_PRIOR_C_ACCEPTED_PREGEN",
+    "source_lineage": "PASS_PRIOR_RELEASE_GEOMETRY_EXPLICITLY_CONDITIONAL_ONLY",
+    "family_fast_path": "PASS_SEMANTIC_REUSE_ONLY__STYLE_GEOMETRY_REUSE_HELD",
+    "current_git_source_presence": "PASS_4_OF_4_QUEUE_PATH_SOURCES_ABSENT_FAIL_CLOSED",
+    "heavy_qa_repeated": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_REVALIDATE_FROM_CANONICAL_SOURCE",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "removal_and_protected_masks": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_CANONICAL_MEASUREMENT_REQUIRED",
+    "style_template_compatibility": "HOLD_ASSET_SPECIFIC_PROOF_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CURRENT_CANONICAL_V2_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
