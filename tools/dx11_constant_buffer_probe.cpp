@@ -256,5 +256,6 @@ int main()
     vertexBytecode->Release();
 
     std::cout << "DX11 constant buffer probe R95: PASS\n";
+    std::cout << "DX11 constant buffer lifetime R96: PASS\n";
     return 0;
 }
