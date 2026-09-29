@@ -273,6 +273,15 @@ require_all("src/hooks_uiscaling.cpp", [
     'R71OutRunStageTaggedNodes',
     'exact Sumo_Printf queue nodes pinned SCREEN_HUD',
 ], "P8_R71_RIVAL_AND_OUTRUN_STAGE_TEXT")
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'VR R71 HUD ALPHA DIAG:',
+    'D3DRS_SEPARATEALPHABLENDENABLE',
+    'D3DRS_SRCBLENDALPHA',
+    'D3DRS_DESTBLENDALPHA',
+    'D3DRS_BLENDOPALPHA',
+    'D3DRS_ALPHAREF',
+    'D3DRS_ALPHAFUNC',
+], "P8_R71_HUD_ALPHA_DIAGNOSTIC")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
     'callRva == 0x0975EE || callRva == 0x097727',
