@@ -229,3 +229,21 @@ Effective 2026-09-29. This section supersedes the earlier one-pass fitting behav
 - `tools/localization/build_clean_graphics_candidate.py` accepts legacy v1 evidence for history, but any new/reworked production candidate must use v2 plus `outrun-clean-plate-qa-v1` evidence.
 - C must reject a new candidate whose report lacks v2 stage metrics, measured per-element safe bboxes, or required clean-plate QA. This is `REWORK_REQUIRED`, not a warning.
 - Runtime remains separate: `RUNTIME_VALIDATION=UNTESTED` until a real game test is supplied.
+
+
+## Family/template fast path with unchanged quality gates
+
+Effective 2026-09-29. This accelerates graphics production by reusing already-proven visual structure; it MUST NOT relax candidate or C QA requirements.
+
+- Producers SHOULD cluster repeated/localization-equivalent UI elements into semantic families and visual style families when current Git evidence proves that the reusable geometry/style relationship is valid. Exact-byte identity is not required, but reuse must be evidence-backed; visual similarity alone never authorizes blind pixel copying.
+- A family/template is a production accelerator, not approval evidence. Every generated DDS remains an independent candidate and MUST pass the same v2 safe-fit, CLEAN_PLATE, protected-artwork, DDS/alpha/orientation, residual-source-language, and exact English-source comparison gates.
+- Reuse canonical semantic translations through stable semantic IDs. Do not retranslate identical UI meaning per asset unless context changes the meaning.
+- Reuse accepted style parameters (font choice, fill/gradient, outline, shadow/glow, slant, tracking and alignment) only within a compatible style family. Per-asset geometry, source/removal mask, safe region, orientation and protected artwork remain asset-specific unless exact evidence proves identity.
+- Prefer deterministic renderers and deterministic background reconstruction. Route background cleanup in increasing-cost order: transparent/text-only removal -> flat-color reconstruction -> analytic gradient reconstruction -> repeatable texture/patch reconstruction -> constrained inpainting. Generative reconstruction is fallback-only and never bypasses protected-region QA.
+- Producers MUST perform render -> native-resolution effect-inclusive measure -> refit inside the same invocation. A fit failure must be corrected locally up to the v2 iteration limit instead of creating a new analysis-only task when deterministic correction is possible.
+- Producers SHOULD batch compatible family members in one invocation, up to the existing candidate target/capacity, so one accepted semantic/style analysis can yield multiple independently QA'd DDS candidates.
+- Use a three-route production decision: FAST_PATH for evidence-backed deterministic template reuse; QUALITY_PATH for asset-specific reconstruction/style work; EXCEPTION_QUEUE for unresolved assets. An exception MUST NOT block independent FAST_PATH or QUALITY_PATH assets in the same lane.
+- FAST_PATH and QUALITY_PATH share identical pass/fail thresholds. There is no reduced-quality fast-path disposition.
+- Any template-derived candidate that fails containment, protected-art preservation, residual-English detection, structural DDS checks, or source-faithful visual review is removed from FAST_PATH and returned to QUALITY_PATH/REWORK_REQUIRED; do not weaken thresholds to preserve throughput.
+- C SHOULD reuse unchanged family evidence by fingerprint, but MUST independently validate each candidate's asset-specific geometry and final bytes. Family membership can eliminate repeated analysis, never final candidate validation.
+- Throughput accounting counts actual new/materially reworked Korean DDS candidates reaching C QA, not family definitions, clusters, template manifests, OCR batches, or analysis reports.
