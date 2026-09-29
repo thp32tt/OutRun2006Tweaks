@@ -42,9 +42,16 @@ policy = require(
     "ClassifyPendingFence",
 )
 
-r32 = require(
+r32_wrapper = require(
     "src/vr/d3d9/stereo_renderer_r32.cpp",
+    '#include "r32_policy.hpp"',
     '#include "stereo_renderer_r31.cpp"',
+    '#include "stereo_renderer_r32_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in r32_wrapper:
+    raise SystemExit("R32 compatibility wrapper regained implementation body")
+r32 = require(
+    "src/vr/d3d9/stereo_renderer_r32_overlay.inc",
     "R32ResetR22Hook",
     "reinterpret_cast<void*>(&ResetDestR22)",
     "R32ResetAfterGameReset",
@@ -70,6 +77,8 @@ r32 = require(
     "VR R32 PERF 5s",
     "VR R32 REVIEW2",
 )
+if "#include" in r32:
+    raise SystemExit("R32 overlay must remain include-free")
 if "R32ResetR13Hook" in r32:
     raise SystemExit("R32 must no longer install a competing ResetDestR13 hook")
 if "R22ShadowState = {};" in r32[r32.find("void R32ResetAfterGameReset"):]:

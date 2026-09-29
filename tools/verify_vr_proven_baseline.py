@@ -272,11 +272,16 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r26_compare.cpp"',
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
-    '#include "stereo_renderer_r32.cpp"',
+    '#include "r32_policy.hpp"',
+    '#include "stereo_renderer_r31.cpp"',
+    '#include "stereo_renderer_r32_overlay.inc"',
     '#include "stereo_renderer_r33_overlay.inc"',
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r32.cpp"',
+       "P11_R70_STEREO_NO_R32_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r33.cpp"',
        "P11_R70_STEREO_NO_R33_NESTING")
@@ -332,11 +337,16 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r26_compare.cpp"',
     '#include "stereo_renderer_r29_c1_compare.cpp"',
     '#include "stereo_renderer_r30_c2_compare.cpp"',
-    '#include "stereo_renderer_r32.cpp"',
+    '#include "r32_policy.hpp"',
+    '#include "stereo_renderer_r31.cpp"',
+    '#include "stereo_renderer_r32_overlay.inc"',
     '#include "stereo_renderer_r33_overlay.inc"',
     '#include "vr/game/render_semantics.hpp"',
     '#include "stereo_renderer_r34_overlay.inc"',
 ], "P11_R70_STEREO_FACADE")
+forbid("src/vr/d3d9/stereo_pipeline.cpp",
+       '#include "stereo_renderer_r32.cpp"',
+       "P11_R70_STEREO_NO_R32_NESTING")
 forbid("src/vr/d3d9/stereo_pipeline.cpp",
        '#include "stereo_renderer_r33.cpp"',
        "P11_R70_STEREO_NO_R33_NESTING")

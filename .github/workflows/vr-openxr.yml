@@ -95,7 +95,7 @@ jobs:
               'GetR28VerifiedProjection',
               'R31 fast left-eye c64 rollback'
             )
-            'src/vr/d3d9/stereo_renderer_r32.cpp' = @(
+            'src/vr/d3d9/stereo_renderer_r32_overlay.inc' = @(
               'R32ResetR22Hook',
               'ResetDestR22',
               'R32ResetAfterGameReset',
