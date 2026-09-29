@@ -1,0 +1,688 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00221-index222-render-ready-v2-production-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00221",
+  "wave_id": "P00117",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T06:52:35+09:00",
+  "base_head_sha": "cdd3462ba888134b7069fd538c3eb1b5a7ff51c5",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX222_RENDER_READY_V2_KOREAN_DXT5_CANDIDATE_STATIC_SELF_QA_RUNTIME_UNTESTED",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_index": 222,
+    "asset": "DDF0392A",
+    "priority": "RENDER_READY_CANDIDATE_COMPLETION",
+    "accepted_c_gate": "C149/Q00047 authoritative 149ce00855248574d0813d34ba34da2a1e336f17 / run 36633937501",
+    "skipped_qa_pending_indices": [
+      159,
+      198,
+      201,
+      231
+    ]
+  },
+  "source_identity": {
+    "transport": "pinned_release_exact_canonical_source",
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "bytes": 2097280,
+    "header_128_sha256": "f4404b58360c1104a2d2e05adaf3607fd3cf386e9ff8f980d7a07edc7acd75af",
+    "decoded_raw_rgba_sha256": "6b053c75c6074d6ebb16bfe0a38b3a770923c223beb281ab1611872cf271659f",
+    "decoded_display_rgba_sha256": "8d2de43a8575aa0661f1013fbd8929964c44c3cabb31b2e09b2b7779b75ab5c3",
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "DXT5",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "canonical_inventory_match": true
+  },
+  "accepted_precandidate_lineage": {
+    "a00215_result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+    "c149_q00047_result_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+    "production_readiness": "RENDER_READY"
+  },
+  "render": {
+    "contract": "outrun-first-pass-edit-v2",
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "source_transform": "flip_y",
+    "source_baseline_vector_readable": [
+      1,
+      0
+    ],
+    "candidate_baseline_vector_readable": [
+      1,
+      0
+    ],
+    "source_signed_slant_angle_deg": 0.0,
+    "candidate_signed_slant_angle_deg": 0.0,
+    "source_slant_direction": "none",
+    "candidate_slant_direction": "none",
+    "flattened_raster_resize": "NOT_USED",
+    "metrics": [
+      {
+        "region_index": 0,
+        "sprite": "sprite_401",
+        "source": "OutRun Mode / 15 C.",
+        "korean": "아웃런 모드 / 15코스",
+        "atlas_rect_bl": [
+          0,
+          1972,
+          960,
+          76
+        ],
+        "source_effect_bbox_readable_local": [
+          6,
+          14,
+          548,
+          66
+        ],
+        "candidate_safe_bbox_readable_local": [
+          8,
+          16,
+          546,
+          64
+        ],
+        "render_box_readable_local": [
+          9,
+          17,
+          545,
+          63
+        ],
+        "localized_bbox_readable_local_preencode": [
+          9,
+          17,
+          396,
+          63
+        ],
+        "safe_margins_ltrb_preencode": [
+          1,
+          1,
+          150,
+          1
+        ],
+        "font_role": "sans",
+        "font_size_px": 45,
+        "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+        "candidate_fill_rgb": [
+          46,
+          53,
+          57
+        ],
+        "native_glyph_canvas": [
+          388,
+          47
+        ],
+        "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow",
+        "source_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "candidate_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "source_slant_dx_per_dy": 0.0,
+        "candidate_slant_dx_per_dy": 0.0,
+        "source_signed_slant_angle_deg": 0.0,
+        "candidate_signed_slant_angle_deg": 0.0,
+        "source_slant_direction": "none",
+        "candidate_slant_direction": "none",
+        "flattened_raster_resize": "NOT_USED",
+        "containment_preencode": "PASS",
+        "localized_bbox_readable_local_decoded_final": [
+          9,
+          17,
+          396,
+          63
+        ],
+        "safe_margins_ltrb_decoded_final": [
+          1,
+          1,
+          150,
+          1
+        ],
+        "containment_decoded_final": "PASS",
+        "decoded_final_alpha_pixels": 6043
+      },
+      {
+        "region_index": 1,
+        "sprite": "sprite_402",
+        "source": "OutRun 1986",
+        "korean": "아웃런 1986",
+        "atlas_rect_bl": [
+          0,
+          1896,
+          960,
+          76
+        ],
+        "source_effect_bbox_readable_local": [
+          4,
+          17,
+          333,
+          61
+        ],
+        "candidate_safe_bbox_readable_local": [
+          6,
+          19,
+          331,
+          59
+        ],
+        "render_box_readable_local": [
+          7,
+          20,
+          330,
+          58
+        ],
+        "localized_bbox_readable_local_preencode": [
+          7,
+          20,
+          217,
+          58
+        ],
+        "safe_margins_ltrb_preencode": [
+          1,
+          1,
+          114,
+          1
+        ],
+        "font_role": "sans",
+        "font_size_px": 40,
+        "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+        "candidate_fill_rgb": [
+          57,
+          61,
+          65
+        ],
+        "native_glyph_canvas": [
+          211,
+          39
+        ],
+        "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow",
+        "source_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "candidate_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "source_slant_dx_per_dy": 0.0,
+        "candidate_slant_dx_per_dy": 0.0,
+        "source_signed_slant_angle_deg": 0.0,
+        "candidate_signed_slant_angle_deg": 0.0,
+        "source_slant_direction": "none",
+        "candidate_slant_direction": "none",
+        "flattened_raster_resize": "NOT_USED",
+        "containment_preencode": "PASS",
+        "localized_bbox_readable_local_decoded_final": [
+          7,
+          20,
+          217,
+          58
+        ],
+        "safe_margins_ltrb_decoded_final": [
+          1,
+          1,
+          114,
+          1
+        ],
+        "containment_decoded_final": "PASS",
+        "decoded_final_alpha_pixels": 3596
+      },
+      {
+        "region_index": 2,
+        "sprite": "sprite_403",
+        "source": "Journey Mode / Random",
+        "korean": "저니 모드 / 무작위",
+        "atlas_rect_bl": [
+          0,
+          1820,
+          960,
+          76
+        ],
+        "source_effect_bbox_readable_local": [
+          2,
+          10,
+          627,
+          68
+        ],
+        "candidate_safe_bbox_readable_local": [
+          4,
+          12,
+          625,
+          66
+        ],
+        "render_box_readable_local": [
+          5,
+          13,
+          624,
+          65
+        ],
+        "localized_bbox_readable_local_preencode": [
+          5,
+          13,
+          373,
+          64
+        ],
+        "safe_margins_ltrb_preencode": [
+          1,
+          1,
+          252,
+          2
+        ],
+        "font_role": "sans",
+        "font_size_px": 50,
+        "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+        "candidate_fill_rgb": [
+          46,
+          53,
+          57
+        ],
+        "native_glyph_canvas": [
+          369,
+          52
+        ],
+        "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow",
+        "source_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "candidate_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "source_slant_dx_per_dy": 0.0,
+        "candidate_slant_dx_per_dy": 0.0,
+        "source_signed_slant_angle_deg": 0.0,
+        "candidate_signed_slant_angle_deg": 0.0,
+        "source_slant_direction": "none",
+        "candidate_slant_direction": "none",
+        "flattened_raster_resize": "NOT_USED",
+        "containment_preencode": "PASS",
+        "localized_bbox_readable_local_decoded_final": [
+          5,
+          13,
+          373,
+          64
+        ],
+        "safe_margins_ltrb_decoded_final": [
+          1,
+          1,
+          252,
+          2
+        ],
+        "containment_decoded_final": "PASS",
+        "decoded_final_alpha_pixels": 6460
+      },
+      {
+        "region_index": 3,
+        "sprite": "sprite_404",
+        "source": "Who Are You?",
+        "korean": "당신은 누구?",
+        "atlas_rect_bl": [
+          0,
+          1744,
+          960,
+          76
+        ],
+        "source_effect_bbox_readable_local": [
+          2,
+          17,
+          342,
+          60
+        ],
+        "candidate_safe_bbox_readable_local": [
+          4,
+          19,
+          340,
+          58
+        ],
+        "render_box_readable_local": [
+          5,
+          20,
+          339,
+          57
+        ],
+        "localized_bbox_readable_local_preencode": [
+          5,
+          20,
+          209,
+          57
+        ],
+        "safe_margins_ltrb_preencode": [
+          1,
+          1,
+          131,
+          1
+        ],
+        "font_role": "sans",
+        "font_size_px": 39,
+        "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+        "candidate_fill_rgb": [
+          66,
+          65,
+          66
+        ],
+        "native_glyph_canvas": [
+          205,
+          38
+        ],
+        "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow",
+        "source_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "candidate_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "source_slant_dx_per_dy": 0.0,
+        "candidate_slant_dx_per_dy": 0.0,
+        "source_signed_slant_angle_deg": 0.0,
+        "candidate_signed_slant_angle_deg": 0.0,
+        "source_slant_direction": "none",
+        "candidate_slant_direction": "none",
+        "flattened_raster_resize": "NOT_USED",
+        "containment_preencode": "PASS",
+        "localized_bbox_readable_local_decoded_final": [
+          5,
+          20,
+          209,
+          57
+        ],
+        "safe_margins_ltrb_decoded_final": [
+          1,
+          1,
+          131,
+          1
+        ],
+        "containment_decoded_final": "PASS",
+        "decoded_final_alpha_pixels": 3019
+      },
+      {
+        "region_index": 6,
+        "sprite": "sprite_407",
+        "source": "Shake The Street",
+        "korean": "거리를 뒤흔들어라",
+        "atlas_rect_bl": [
+          0,
+          1516,
+          960,
+          76
+        ],
+        "source_effect_bbox_readable_local": [
+          3,
+          17,
+          419,
+          60
+        ],
+        "candidate_safe_bbox_readable_local": [
+          5,
+          19,
+          417,
+          58
+        ],
+        "render_box_readable_local": [
+          6,
+          20,
+          416,
+          57
+        ],
+        "localized_bbox_readable_local_preencode": [
+          6,
+          20,
+          300,
+          57
+        ],
+        "safe_margins_ltrb_preencode": [
+          1,
+          1,
+          117,
+          1
+        ],
+        "font_role": "sans",
+        "font_size_px": 39,
+        "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+        "candidate_fill_rgb": [
+          66,
+          65,
+          66
+        ],
+        "native_glyph_canvas": [
+          295,
+          38
+        ],
+        "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow",
+        "source_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "candidate_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "source_slant_dx_per_dy": 0.0,
+        "candidate_slant_dx_per_dy": 0.0,
+        "source_signed_slant_angle_deg": 0.0,
+        "candidate_signed_slant_angle_deg": 0.0,
+        "source_slant_direction": "none",
+        "candidate_slant_direction": "none",
+        "flattened_raster_resize": "NOT_USED",
+        "containment_preencode": "PASS",
+        "localized_bbox_readable_local_decoded_final": [
+          6,
+          20,
+          300,
+          57
+        ],
+        "safe_margins_ltrb_decoded_final": [
+          1,
+          1,
+          117,
+          1
+        ],
+        "containment_decoded_final": "PASS",
+        "decoded_final_alpha_pixels": 5184
+      },
+      {
+        "region_index": 7,
+        "sprite": "sprite_408",
+        "source": "Rush A Difficulty",
+        "korean": "난이도에 도전",
+        "atlas_rect_bl": [
+          0,
+          1440,
+          960,
+          76
+        ],
+        "source_effect_bbox_readable_local": [
+          6,
+          17,
+          421,
+          70
+        ],
+        "candidate_safe_bbox_readable_local": [
+          8,
+          19,
+          419,
+          68
+        ],
+        "render_box_readable_local": [
+          9,
+          20,
+          418,
+          67
+        ],
+        "localized_bbox_readable_local_preencode": [
+          9,
+          20,
+          283,
+          66
+        ],
+        "safe_margins_ltrb_preencode": [
+          1,
+          1,
+          136,
+          2
+        ],
+        "font_role": "sans",
+        "font_size_px": 49,
+        "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+        "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+        "candidate_fill_rgb": [
+          66,
+          65,
+          66
+        ],
+        "native_glyph_canvas": [
+          275,
+          47
+        ],
+        "source_style": "upright condensed heavy sans; flat dark gray; no outline/shadow/glow",
+        "source_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "candidate_baseline_vector_readable": [
+          1,
+          0
+        ],
+        "source_slant_dx_per_dy": 0.0,
+        "candidate_slant_dx_per_dy": 0.0,
+        "source_signed_slant_angle_deg": 0.0,
+        "candidate_signed_slant_angle_deg": 0.0,
+        "source_slant_direction": "none",
+        "candidate_slant_direction": "none",
+        "flattened_raster_resize": "NOT_USED",
+        "containment_preencode": "PASS",
+        "localized_bbox_readable_local_decoded_final": [
+          9,
+          20,
+          283,
+          66
+        ],
+        "safe_margins_ltrb_decoded_final": [
+          1,
+          1,
+          136,
+          2
+        ],
+        "containment_decoded_final": "PASS",
+        "decoded_final_alpha_pixels": 5419
+      }
+    ]
+  },
+  "candidate": {
+    "repo_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "bytes": 2097280,
+    "header_128_exact": true,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "changed_bc3_blocks": 5991,
+    "total_bc3_blocks": 131072,
+    "changed_pixels": 69882,
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_total": 64536,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_regions": 0,
+    "candidate_letter_pixels_decoded": 29721,
+    "decoded_raw_rgba_sha256": "5f287e411947d84a86e7412f2d688f90a9a32fbedd5b13c787f079d089a4aa37",
+    "decoded_display_rgba_sha256": "58d12077c2b50bb094f35ae5eb673d53ecebe6e2b2a26201f8f81930680f8ca7",
+    "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "safe_bbox_containment": "PASS_2PX_INSET_ALL_6",
+    "one_pixel_overflow": 0,
+    "raster_resampling": "NOT_USED"
+  },
+  "visual_review_contract": {
+    "full_atlas": "comparison.png",
+    "per_element_readable_zoom": "element_comparison.png",
+    "source_clean_candidate_set": [
+      "source_display.png",
+      "clean_plate_display.png",
+      "candidate_display.png"
+    ],
+    "source_mask": "source_text_mask_display.png",
+    "protected_mask": "protected_mask_display.png",
+    "lettering": "lettering_display.png",
+    "diff": "diff_display.png",
+    "status": "PRODUCER_VISUAL_REVIEW_PASS_REUSED_EXACT_DETERMINISTIC_FINGERPRINT_PENDING_INDEPENDENT_C",
+    "manual_review_fingerprint": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "manual_review_findings": {
+      "source_vs_candidate": "PASS_ALL_6_TRANSLATIONS_VISIBLE_AND_CORRECT",
+      "broken_hangul": "NONE_OBSERVED",
+      "clipping_or_overlap": "NONE_OBSERVED",
+      "source_english_residue_localized_regions": "NONE_OBSERVED",
+      "protected_song_and_model_text_damage": "NONE_OBSERVED",
+      "wrong_image_replacement": "NONE_OBSERVED",
+      "resolution_loss": "NONE_OBSERVED",
+      "raw_orientation": "PASS_VERTICAL_FLIP_MATCHES_SOURCE_STORAGE",
+      "style": "PASS_UPRIGHT_HEAVY_SANS_FLAT_DARK_GRAY_NO_ADDED_EFFECTS"
+    }
+  },
+  "material_deliverable": {
+    "type": "INDEX222_DDF0392A_RENDER_READY_V2_KOREAN_DXT5_CANDIDATE_WITH_MANDATORY_REVIEW_SET",
+    "reviewed_indices": [
+      222
+    ],
+    "reviewed_assets": [
+      "DDF0392A"
+    ],
+    "candidate_dds_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "candidate_dds_modified": true,
+    "translated_regions": 6,
+    "protected_original_regions": 19,
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_regions": 0,
+    "one_pixel_overflow": 0,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_INDEX222_MOD3_EQ_0__C149_Q00047_RENDER_READY__EXACT_PINNED_ARCHIVE_AND_MEMBER__DXT5_1024X2048_MIP1__FLIP_Y__6_OF_6_KOREAN_SAFE_BBOX__NATIVE_FONT_NO_FLATTEN_RESIZE__SOURCE_SLANT_NONE_CANDIDATE_NONE__HEADER128_EXACT__BC3_TOUCHED_BLOCK_PATCH__ZERO_OUTSIDE_EDIT__ZERO_PROTECTED__MANDATORY_GITHUB_REVIEW_SET__RUNTIME_UNTESTED",
+  "candidate_static_qa": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00221-P00117/A00221_P00117_INDEX222_V2_PRODUCTION.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/source_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/source_text_mask_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/protected_mask_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/clean_plate_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/lettering_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/candidate_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/diff_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/element_comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/generation_prompt.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/qa_report.json",
+    "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds"
+  ]
+}
