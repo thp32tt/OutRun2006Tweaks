@@ -631,21 +631,72 @@ class UIScaling : public Hook
 	}
 
 	// R71: exact runtime-observed gameplay rival indicator. It already has a
-	// real vehicle-relative Calc3D2D anchor; preserve that depth and let the
-	// existing projected-marker renderer reproject it independently per eye.
+	// real vehicle-relative Calc3D2D anchor. The sprite itself is deferred through
+	// the SpriteNode queue, so producer scope alone is not enough: persist the
+	// exact projected anchor onto every node appended by this one proven callsite.
+	inline static std::atomic<std::uint64_t> R71RivalMarkerTaggedNodes{ 0 };
 	static int __cdecl R71RivalMarker_sprani(
 		std::uint32_t spriteId, float x, float y,
 		int a4, int a5, float alpha)
 	{
-		const auto* marker = RivalMarkerProjectedInfo.valid
-			? &RivalMarkerProjectedInfo : nullptr;
-		OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-			marker
-				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-				: OutRunVR::GameSemantic::RenderScope::None,
-			marker);
-		return Game::sprani_play_ae_auth_alpha(
-			spriteId, x, y, a4, a5, alpha);
+		const auto markerSnapshot = RivalMarkerProjectedInfo;
+		if (!markerSnapshot.valid)
+		{
+			return Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+		}
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D,
+				&markerSnapshot);
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+		}
+
+		std::uint64_t tagged = 0;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+				continue;
+
+			SpriteNode* node = tailsBefore[prio]
+				? tailsBefore[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < 0x230; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node,
+					OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D,
+					&markerSnapshot);
+				++tagged;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+
+		const auto total = R71RivalMarkerTaggedNodes.fetch_add(
+			tagged, std::memory_order_relaxed) + tagged;
+		if (tagged && (total & (total - 1)) == 0)
+		{
+			spdlog::info(
+				"VR R71 RIVAL MARKER: exact 0xBB796 nodes pinned PROJECTED_WORLD_MARKER_2D tagged={} total={} view=({:.3f},{:.3f},{:.3f})",
+				tagged, total,
+				markerSnapshot.viewX,
+				markerSnapshot.viewY,
+				markerSnapshot.viewZ);
+		}
+		return result;
 	}
 
 	// R71: exact OutRun stage/checkpoint/result text uses Sumo_Printf instead
