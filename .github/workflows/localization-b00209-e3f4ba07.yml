@@ -1,0 +1,58 @@
+name: Localization B00209 E3F4BA07 Corrected Candidate
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00209.dispatch.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-b00209-e3f4ba07
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Refresh branch before production
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --ff-only origin korean-localization-clean
+
+      - name: Install deterministic image dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig fonts-noto-cjk
+          python -m pip install --disable-pip-version-check 'pillow==12.3.0' 'numpy==2.3.5'
+
+      - name: Produce corrected index226 RGBA32 candidate and review set
+        run: python localization/graphics/role_B/20260930-B00209-P00108/generate_index226.py
+
+      - name: Commit atomic lane-local B00209 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00209.json \
+            localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds \
+            localization/graphics/role_B/20260930-B00209-P00108 \
+            localization/graphics/KOREAN_PNG_REVIEW/E3F4BA07
+          git commit -m "localization(B): persist index226 corrected candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00209]"
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
