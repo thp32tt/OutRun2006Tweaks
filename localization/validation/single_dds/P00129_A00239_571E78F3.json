@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-a00239-p00129-index102-single-dds-isolation-v1",
+  "case_id": "P00129_A00239_571E78F3",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00239",
+  "wave_id": "P00129",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-09-30T08:17:00+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "12df461ec970f16aea9202d528f0c96cdacd37a4",
+  "active": true,
+  "purpose": "Provide an exact single-DDS runtime-isolation input for the unchanged C81/D83 static-QA-passed 571E78F3 candidate without rerendering or repeating heavy QA. Runtime remains untested until a real game test.",
+  "asset": {
+    "id": "571E78F3",
+    "queue_index": 102,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "translations": [
+      "Time Attack Mode -> 타임 어택 모드",
+      "15 continuous course -> 15코스 연속"
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+    "sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "git_blob_sha": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+    "sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "d83_base_ref": "0fcfce0de6f95cb57296e7e65f5978544487dd08",
+      "source_blob_at_d83": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+      "candidate_blob_at_d83": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+      "current_source_blob": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+      "current_candidate_blob": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "producer_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+    "independent_c_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+    "final_static_reconcile_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
+    "c81_status": "C81_STATIC_STRICT_QA_PASS_PENDING_D_RECONCILE_INGAME_REAPPROVAL",
+    "d83_status": "D83_FINAL_STATIC_QA_PASS_PENDING_INGAME_REAPPROVAL",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "structure": "2048x256 DXT5 / mip1 / source header exact / mirror_y",
+    "localized_regions": 2,
+    "outside_declared_cells_decoded_pixels_changed": 0,
+    "outside_declared_cells_dxt5_blocks_changed": 0,
+    "introduced_alpha_outside_declared_cells": 0,
+    "source_language_residue": "NONE_OBSERVED",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping_overlap_box_escape": "NONE_OBSERVED",
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 571E78F3 replacement DDS and confirm the affected selector screen renders without a crash.",
+    "Capture readable/game-orientation evidence for both localized regions.",
+    "Check mirror-Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling and any 1-pixel overflow.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
