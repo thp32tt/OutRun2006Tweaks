@@ -79,8 +79,9 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "36ec04de640b93527b15f1923b486be9a718f761",
+  "authoritative_result_sha": "36ec04de640b93527b15f1923b486be9a718f761",
   "result_commit_message": "localization(A): add index237 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00232]",
-  "bookkeeping_note": "Immutable producer result commit must atomically contain the isolation input and durable task record. RESULT_SHA is filled only in a later bookkeeping commit. Producer automation_validation remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION=UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA recorded after verifying the exact AUTO result commit contains only the A lane-local FF514CEB isolation input and this task record. This bookkeeping commit is separate, does not own automatic validation, and does not modify candidate/shared state. automation_validation remains PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T07:37:04+09:00"
 }
