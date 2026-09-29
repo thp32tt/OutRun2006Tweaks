@@ -71,7 +71,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "bookkeeping_note": "The immutable producer result commit atomically contains the exact AUTO marker, lane-local material report and durable task record. RESULT_SHA is filled only by a later bookkeeping commit; producer automation_validation remains PENDING for C_BATCH_GATE and runtime_validation remains UNTESTED."
+  "result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+  "authoritative_result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
+  "bookkeeping_note": "Result SHA recorded after the tagged atomic producer result commit. The immutable producer result remains automation_validation=PENDING under C_BATCH_GATE; no producer-owned Actions Gate is claimed. RUNTIME_VALIDATION=UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T06:07:00+09:00"
 }
