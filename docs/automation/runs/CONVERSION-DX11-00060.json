@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00060",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "chat_rollover": 1,
+  "recorded_kst": "2026-09-29T22:37:24+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "9152a6212594f6e01558383195b8d711ead4283f",
+  "initial_code_result_sha": "e5a734877c6ac65a4470128b3d25374e426d8a0b",
+  "validation_bearing_result_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+  "result_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R101 dormant concrete Texture2D full-discard upload path for Set 05 F18.",
+  "summary": "Added a dormant concrete full-subresource WRITE_DISCARD upload path around the R99 D3D11 Texture2D/SRV mirror, consuming the R100 mutation translation contract. The first result exposed a Windows max-macro build collision; the validation-bearing repair uses macro-safe numeric_limits syntax and adds a regression guard. Native draw remains dormant.",
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "R101 texture owner now exposes bounded upload_full_discard plus content readiness/upload generation without binding the SRV."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "R101 validates exact DEFAULT+DYNAMIC single-mip uncompressed mirror semantics, same-device context, full row coverage and pitch, then Map(WRITE_DISCARD)/row copy/Unmap; repair made the UINT overflow guard Windows max-macro-safe."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Added positive WARP upload/readback/repeat-generation coverage and fail-closed short-pitch, partial-row and foreign-context cases."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R101 API/source/probe guards, including the Windows max-macro-safe overflow spelling."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R101 has no D3D9 LockRect source-capture caller, no runtime mirror mutation routing, no PSSetShaderResources binding, no native game draw activation and no Quest3/VDXR visual evidence."
+  },
+  "failure_context": {
+    "failed_run_id": 36574650266,
+    "failed_job_id": 109427027629,
+    "failed_result_sha": "e5a734877c6ac65a4470128b3d25374e426d8a0b",
+    "failure": "Win32 compilation failed in native_backend.cpp because the Windows max macro expanded std::numeric_limits<UINT>::max(), producing C2589/C2059.",
+    "repair_result_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+    "repair": "Changed the overflow bound to (std::numeric_limits<UINT>::max)() and added a source-graph verifier guard requiring the macro-safe spelling."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36575327023,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+      "completed_utc": "2026-09-29T13:32:56Z",
+      "evidence": "Production Win32 build and all DX11 semantic/object/linkage probes PASS; constant-buffer/WARP probe emitted DX11 fixed-function texture upload R101: PASS."
+    },
+    "build": {
+      "run_id": 36575334931,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+      "completed_utc": "2026-09-29T13:33:09Z"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36575334865,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+      "completed_utc": "2026-09-29T13:36:36Z",
+      "evidence": "All six jobs PASS: host-x64, game-x86, safe-draw comparison, R26 HUD safe, C1 and C2."
+    },
+    "hud_inspector": {
+      "run_id": 36575335002,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927",
+      "completed_utc": "2026-09-29T13:33:29Z",
+      "evidence": "build-hud-inspector and static-exe-analysis PASS."
+    },
+    "pc_fast": {
+      "run_id": 36575327011,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 50dff723a5e4ebc7c772a4a9bf5a2cd3ca43a927 contains [AUTO:CONVERSION-DX11-00060] and no CI-skip directive.",
+    "Backend Conversion Gate 36575327023 PASS on exact result SHA after fail-before run 36574650266 exposed the Windows max-macro collision.",
+    "The hosted constant-buffer/WARP probe emitted DX11 fixed-function texture upload R101: PASS and staging readback verified copied row bytes.",
+    "Build 36575334931 PASS, OpenXR VR architecture 36575334865 PASS across all six jobs, and HUD Inspector 36575335002 PASS across both jobs.",
+    "VR PC Fast Test Build 36575327011 SKIPPED; no N100 workspace, Quest3/VDXR or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5891190460,
+    "repair_comment_id": 5891279125,
+    "validation_comment_id": 5891430985,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R101 is automation-validated but runtime-untested. Native draw remains dormant. F18 still lacks a live source-content/lifetime bridge from D3D9 texture mutation into the dormant mirror path, and MANAGED CPU-shadow/reset storage remains incomplete.",
+  "next_action": "Continue Set 05 F18 with one bounded non-routing prerequisite: connect proven source texture content/lifetime evidence to the dormant mirror path or implement MANAGED CPU-shadow/reset storage. Do not enable native draw until remaining exactness gates and exact-build Quest3/VDXR evidence close.",
+  "in_task_repairs": 1
+}
