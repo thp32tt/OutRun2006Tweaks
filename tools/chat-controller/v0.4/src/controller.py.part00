@@ -65,8 +65,6 @@ PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINC
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
 LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", "4")))
 LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "30")))
-LOCALIZATION_E_QA_PAUSE_THRESHOLD = max(1, int(os.getenv("LOCALIZATION_E_QA_PAUSE_THRESHOLD", "8")))
-LOCALIZATION_E_QA_RESUME_THRESHOLD = max(0, min(LOCALIZATION_E_QA_PAUSE_THRESHOLD - 1, int(os.getenv("LOCALIZATION_E_QA_RESUME_THRESHOLD", "6"))))
 LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "15")))
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
@@ -247,8 +245,6 @@ runtime = {
     "heartbeat_seconds": HEARTBEAT_SECONDS,
     "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
     "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
-    "localization_e_qa_pause_threshold": LOCALIZATION_E_QA_PAUSE_THRESHOLD,
-    "localization_e_qa_resume_threshold": LOCALIZATION_E_QA_RESUME_THRESHOLD,
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
@@ -653,7 +649,7 @@ def queue_target_for_slot(slot_name: str) -> dict:
             "branch": "vr-dx11-native-r71",
             "workflow": "Backend Conversion Gate",
         }
-    role = {"A": "A", "B": "B", "C": "C", "D": "E"}.get(slot_name, "A")
+    role = slot_name if slot_name in {"A", "B", "C"} else "A"
     return {
         "lane": f"LOCALIZATION_{role}",
         "branch": "korean-localization-clean",
@@ -683,9 +679,9 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
-    if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
+    if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
         lines += [
-            "A/B/E producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
+            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
             "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
             "생산 우선순위는 candidate-completion-first다. C가 받아들인 RENDER_READY 또는 ONE_STAGE_TO_RENDER 자산이 shard에 있으면 새 unrelated preflight/work-order를 시작하지 말고 그 자산을 실제 Korean DDS candidate까지 완료해.",
             "baseline/slant/style 측정만 남았다면 같은 invocation에서 측정하고 render -> measure/refit -> DDS encode -> decoded-final self-QA까지 이어가. ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
