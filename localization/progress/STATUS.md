@@ -1290,3 +1290,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Canonical/legacy progress drift repaired by writing identical Q00047 bytes to both paths.
 - Pending production **70**, actionable localize_text **93**, canonical segments **753**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 
+### C149 Q00047 ATTEMPT2 AUTHORITATIVE GATE PASS — 2026-09-30T06:32:45+09:00
+- Validation-bearing result `149ce00855248574d0813d34ba34da2a1e336f17`; Localization Automation Gate `36633937501` completed **success**.
+- Attempt1 `7e4f97b3...` / Gate `36633656775` is non-authoritative and failed only on pre-existing progress mirror drift.
+- A00215@index222 remains **PASS / RENDER_READY**. B00216@index226 remains **SUPERSEDED for Q00047 de-dup only** while its earlier C148 STATIC_QA PASS remains authoritative.
+- Canonical and compatibility progress paths are byte-identical after repair. Pending production **70**, actionable localize_text **93**, canonical segments **753**.
+- `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+

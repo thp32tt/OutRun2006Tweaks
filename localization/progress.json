@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T06:31:19+09:00",
+  "updated_at_kst": "2026-09-30T06:32:45+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C149/Q00047 ATTEMPT2: A00215@index222 PASS -> RENDER_READY; B00216@index226 SUPERSEDED in this batch only because exact input was already consumed by authoritative C148/Q00046, leaving index226 STATIC_QA PASS. Attempt1 failed only on canonical/legacy progress mirror drift; ATTEMPT2 repairs both paths to identical bytes. Pending production remains 70; actionable localize_text 93; canonical segments 753. Candidate QA 159/198/201 remains ahead of unrelated preflight. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C149/Q00047 ATTEMPT2 authoritative Gate PASS on 149ce00855248574d0813d34ba34da2a1e336f17 (run 36633937501). A00215@index222 is PASS / RENDER_READY after independent exact-source binding/mask/CLEAN_PLATE/safe-bbox replay. B00216@index226 is SUPERSEDED for Q00047 de-dup only because authoritative C148/Q00046 already consumed the exact input; index226 remains STATIC_QA_PASS_RUNTIME_UNTESTED. Canonical/legacy progress mirror is repaired and byte-identical. Pending production 70; actionable localize_text 93; canonical segments 753. Candidate QA 159/198/201 remains ahead of unrelated preflight. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -966,12 +966,12 @@
       "uploaded_archive_used": true,
       "uploaded_archive_purpose": "independent exact-source replay only; GitHub branch remains state/progress/QA SSOT",
       "vr_ffb_dx_changes": false,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "validation_mode": "C_BATCH_GATE",
       "runtime_validation": "UNTESTED",
-      "result_sha": "PENDING_POST_COMMIT",
-      "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-      "bookkeeping_note": "ATTEMPT2 is the replacement validation-bearing AUTO result after attempt1 failed only on pre-existing progress mirror drift. Do not add CI-skip. After this result Gate completes, record the authoritative SHA/Gate in a separate bookkeeping commit.",
+      "result_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+      "validation_bearing_result_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+      "bookkeeping_note": "Q00047 ATTEMPT2 Gate result recorded after the validation-bearing result commit. Attempt1 is non-authoritative due progress-mirror verify_state failure. This bookkeeping commit is separate, uses CI skip, and does not replace validation ownership. RUNTIME_VALIDATION remains UNTESTED.",
       "prior_failed_attempt": {
         "result_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
         "gate_run_id": 36633656775,
@@ -987,8 +987,20 @@
         "compatibility_path": "localization/progress.json",
         "compatibility_blob_sha_before": "8de512aeca28aafb12be845b9ed39611c7b54d0d",
         "byte_identical_before": false,
-        "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT"
-      }
+        "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT",
+        "byte_identical_after": true,
+        "authoritative_result_sha": "149ce00855248574d0813d34ba34da2a1e336f17"
+      },
+      "automation_gate": {
+        "workflow": "Localization Automation Gate",
+        "run_id": 36633937501,
+        "run_attempt": 1,
+        "head_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+        "status": "completed",
+        "conclusion": "success",
+        "validated_at_kst": "2026-09-30T06:32:45+09:00"
+      },
+      "bookkeeping_recorded_at_kst": "2026-09-30T06:32:45+09:00"
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -1455,12 +1467,12 @@
     "uploaded_archive_used": true,
     "uploaded_archive_purpose": "independent exact-source replay only; GitHub branch remains state/progress/QA SSOT",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": "PENDING_POST_COMMIT",
-    "validation_bearing_result_sha": "PENDING_POST_COMMIT",
-    "bookkeeping_note": "ATTEMPT2 is the replacement validation-bearing AUTO result after attempt1 failed only on pre-existing progress mirror drift. Do not add CI-skip. After this result Gate completes, record the authoritative SHA/Gate in a separate bookkeeping commit.",
+    "result_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+    "validation_bearing_result_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+    "bookkeeping_note": "Q00047 ATTEMPT2 Gate result recorded after the validation-bearing result commit. Attempt1 is non-authoritative due progress-mirror verify_state failure. This bookkeeping commit is separate, uses CI skip, and does not replace validation ownership. RUNTIME_VALIDATION remains UNTESTED.",
     "prior_failed_attempt": {
       "result_sha": "7e4f97b3af23c09f86c63e4570e70e84b5cf0f93",
       "gate_run_id": 36633656775,
@@ -1476,7 +1488,19 @@
       "compatibility_path": "localization/progress.json",
       "compatibility_blob_sha_before": "8de512aeca28aafb12be845b9ed39611c7b54d0d",
       "byte_identical_before": false,
-      "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT"
-    }
+      "repair": "WRITE_IDENTICAL_Q00047_PROGRESS_BYTES_TO_BOTH_PATHS_IN_ATTEMPT2_RESULT",
+      "byte_identical_after": true,
+      "authoritative_result_sha": "149ce00855248574d0813d34ba34da2a1e336f17"
+    },
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36633937501,
+      "run_attempt": 1,
+      "head_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T06:32:45+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-09-30T06:32:45+09:00"
   }
 }
