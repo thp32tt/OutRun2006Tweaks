@@ -56,7 +56,7 @@ def start_status_server():
 
 def queue_rollover_prompt(active: dict) -> str:
     rollover = int(active.get("chat_rollovers", 0)) + 1
-    return "\n".join([
+    lines = [
         "[대화 자동 롤오버 재개]",
         f"TASK_ID={active['task_id']}",
         f"LANE={active['lane']}",
@@ -71,7 +71,10 @@ def queue_rollover_prompt(active: dict) -> str:
         "반드시 GitHub만 직접 사용하고 N100 로컬 clone/worktree로 우회하지 마.",
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
         "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
-    ])
+    ]
+    if CONTROLLER_MODE == "conversion":
+        lines = [GAME_MOD_CONTEXT, ""] + lines
+    return "\n".join(lines)
 
 
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
