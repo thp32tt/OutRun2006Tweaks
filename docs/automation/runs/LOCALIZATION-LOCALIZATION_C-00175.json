@@ -111,7 +111,18 @@
   "uploaded_archive_used": true,
   "uploaded_archive_identity_verified": true,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "validation_bearing_result_sha": "7fbe69817b8e2ee633b3dae50d3a977ec43db02d",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36595623614,
+    "run_attempt": 1,
+    "head_sha": "7fbe69817b8e2ee633b3dae50d3a977ec43db02d",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T01:09:42+09:00"
+  },
+  "bookkeeping_note": "Gate result recorded after the validation-bearing C result commit; this checkpoint is not the batch validation owner."
 }
