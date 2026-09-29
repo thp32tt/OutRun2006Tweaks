@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-schema9-canonical-source-reacquisition-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00143",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00066",
+  "recorded_at_kst": "2026-09-29T21:03:38.549+09:00",
+  "base_head_sha": "1375021e32b5bdcb3c06ef28186240682860f856",
+  "selection_policy": "CANDIDATE_COMPLETION_FIRST__ZERO_CANDIDATE_EXCEPTION_ONE_PREFLIGHT_BATCH",
+  "readiness_audit": {
+    "odd_localize_text_rows": 46,
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_or_newer_producer_indices": [
+      55,
+      57,
+      95,
+      97,
+      101,
+      119,
+      137,
+      159,
+      163,
+      173,
+      201,
+      217
+    ],
+    "runtime_validation_backlog_not_material_rework": [
+      61,
+      63,
+      195,
+      197
+    ],
+    "index215_status": "DEPENDENCY_BLOCKED_SOURCE_FAITHFUL_HANGUL_STYLE_GLYPH_INPUT_UNCHANGED",
+    "durable_c00142_present_at_scan": false,
+    "explicit_current_render_ready_indices": [],
+    "explicit_current_one_stage_to_render_runnable_indices": [],
+    "existing_candidate_material_rework_runnable_indices": [],
+    "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_A_SHARD_WITH_CURRENT_GITHUB_EVIDENCE__ONE_NEW_PREFLIGHT_ONLY_BATCH_ALLOWED"
+  },
+  "material_deliverable": {
+    "type": "FOUR_ODD_CURRENT_CANONICAL_SOURCE_IDENTITY_AND_LEGACY_4X_GEOMETRY_RETIREMENT",
+    "indices": [
+      35,
+      43,
+      49,
+      107
+    ],
+    "assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6",
+      "841E796B"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_inventory_canvases_pinned": 4,
+    "canonical_modes_pinned_rgba": 4,
+    "canonical_semantic_entries": 18,
+    "expected_physical_occurrences": 19,
+    "prior_release_geometry_sets_retired": 4,
+    "exact_current_queue_path_sources_present": 0,
+    "current_hd_candidates_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "materially_reduces_unresolved_work": true
+  },
+  "assets": [
+    {
+      "index": 35,
+      "asset": "E989E3B7",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "canonical_sha256": "224398b53b16475afa5a3d7c37365eb83643506edb8bc4bfe14aa0e8e18784a0",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크"
+        }
+      ],
+      "expected_physical_occurrences": 2,
+      "prior_report_blob_sha": "802feec1ab740aaea582c9f7fee5fb2b5612c58a",
+      "prior_release_git_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+      "prior_release_dimensions": [
+        4096,
+        4096
+      ],
+      "exact_current_queue_path_source_present": false,
+      "exact_current_repo_hd_source_present": false,
+      "current_v2_candidate_present": false,
+      "legacy_to_current_linear_scale_ratio": [
+        4,
+        4
+      ],
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "semantic_reuse_status": "CURRENT_TRANSLATION_RETAINED",
+      "geometry_style_route": "EXCEPTION_QUEUE_UNTIL_EXACT_CANONICAL_SOURCE_BYTES_MATCH_INVENTORY_SHA256"
+    },
+    {
+      "index": 43,
+      "asset": "455717B2",
+      "queue_path": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "canonical_sha256": "e0e4f56d22808b8fece7e86997e173e41244466c83b6fe8bc405a579d85cac5f",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": [
+        {
+          "source": "CONTINUE",
+          "korean": "계속하기"
+        },
+        {
+          "source": "PERFECT!",
+          "korean": "완벽!"
+        },
+        {
+          "source": "CONGRATULATIONS!",
+          "korean": "축하합니다!"
+        },
+        {
+          "source": "PASSED!",
+          "korean": "통과!"
+        }
+      ],
+      "expected_physical_occurrences": 4,
+      "prior_report_blob_sha": "86ee54208edaa3fc6c31dabf0f696a72ed9dc42d",
+      "prior_release_git_blob_sha": "92a3cb717afb6ea10aa76df23941353fd0a04148",
+      "prior_release_dimensions": [
+        2048,
+        2048
+      ],
+      "exact_current_queue_path_source_present": false,
+      "exact_current_repo_hd_source_present": false,
+      "current_v2_candidate_present": false,
+      "legacy_to_current_linear_scale_ratio": [
+        4,
+        4
+      ],
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "semantic_reuse_status": "CURRENT_TRANSLATION_RETAINED",
+      "geometry_style_route": "EXCEPTION_QUEUE_UNTIL_EXACT_CANONICAL_SOURCE_BYTES_MATCH_INVENTORY_SHA256"
+    },
+    {
+      "index": 49,
+      "asset": "BF3EE5C6",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+      "canonical_sha256": "b8d5716d1e8d555ed839fc8bbe80aaf02b21c44f203f73d57278bd0533e9fc8a",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": [
+        {
+          "source": "Rank for this stage",
+          "korean": "이 스테이지 랭크"
+        },
+        {
+          "source": "NORMAL",
+          "korean": "일반"
+        },
+        {
+          "source": "TUNED",
+          "korean": "튜닝"
+        },
+        {
+          "source": "TOP Ghost Car!!",
+          "korean": "최고 고스트 카!!"
+        },
+        {
+          "source": "Double!",
+          "korean": "더블!"
+        },
+        {
+          "source": "Strike!",
+          "korean": "스트라이크!"
+        },
+        {
+          "source": "GOAL!",
+          "korean": "골!"
+        },
+        {
+          "source": "Spare!",
+          "korean": "스페어!"
+        },
+        {
+          "source": "Shift up!!",
+          "korean": "시프트 업!!"
+        },
+        {
+          "source": "Rank",
+          "korean": "랭크"
+        },
+        {
+          "source": "Turkey!",
+          "korean": "터키!"
+        },
+        {
+          "source": "Go!",
+          "korean": "출발!"
+        }
+      ],
+      "expected_physical_occurrences": 12,
+      "prior_report_blob_sha": "20e3716ed0056ac9fd451f3bf2cc3843ba042c57",
+      "prior_release_git_blob_sha": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+      "prior_release_dimensions": [
+        2048,
+        2048
+      ],
+      "exact_current_queue_path_source_present": false,
+      "exact_current_repo_hd_source_present": false,
+      "current_v2_candidate_present": false,
+      "legacy_to_current_linear_scale_ratio": [
+        4,
+        4
+      ],
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "semantic_reuse_status": "CURRENT_TRANSLATION_RETAINED",
+      "geometry_style_route": "EXCEPTION_QUEUE_UNTIL_EXACT_CANONICAL_SOURCE_BYTES_MATCH_INVENTORY_SHA256"
+    },
+    {
+      "index": 107,
+      "asset": "841E796B",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "canonical_sha256": "872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da",
+      "canonical_dimensions": [
+        512,
+        128
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": [
+        {
+          "source": "No Handicap",
+          "korean": "핸디캡 없음"
+        }
+      ],
+      "expected_physical_occurrences": 1,
+      "preserve_policy": "Preserve nine Ferrari/model cards, vehicle pictograms, model names, brand/model artwork and non-text art exactly; localize only No Handicap after exact canonical pixel binding.",
+      "prior_report_blob_sha": "69b350934321607524faee7556b7735f6150a4fc",
+      "prior_release_git_blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+      "prior_release_dimensions": [
+        2048,
+        512
+      ],
+      "exact_current_queue_path_source_present": false,
+      "exact_current_repo_hd_source_present": false,
+      "current_v2_candidate_present": false,
+      "legacy_to_current_linear_scale_ratio": [
+        4,
+        4
+      ],
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "semantic_reuse_status": "CURRENT_TRANSLATION_RETAINED",
+      "geometry_style_route": "EXCEPTION_QUEUE_UNTIL_EXACT_CANONICAL_SOURCE_BYTES_MATCH_INVENTORY_SHA256"
+    }
+  ],
+  "canonical_reacquisition_gate": [
+    "Acquire exact DDS bytes matching each current inventory SHA-256 and canonical canvas; do not treat prior 4x Release geometry as current-canonical geometry.",
+    "Verify DDS header/format/alpha/mips and raw/readable orientation from those exact canonical bytes before measuring pixels.",
+    "Bind every current semantic occurrence to canonical decoded pixels; historical sprite/cell mappings are priors only until revalidated against the exact source.",
+    "Derive asset-specific source-effect/removal/protected masks and independently passing CLEAN_PLATE evidence.",
+    "Derive v2 candidate_safe_bbox with nonzero safety inset, then render/measure/refit at native resolution; do not shrink flattened rasters.",
+    "Require zero-pixel containment and exact ENGLISH SOURCE vs KOREAN CANDIDATE proof for any future DDS candidate.",
+    "Keep runtime_validation UNTESTED until a real game test exists."
+  ],
+  "self_qa": {
+    "all_selected_indices_odd": true,
+    "peer_lane_work_stolen": false,
+    "selected_assets_overlap_a00131_a00139_a00140": false,
+    "selected_assets_current_producer_qa_pending": false,
+    "canonical_identity_fields_complete": true,
+    "legacy_canvas_is_exactly_4x_linear_for_all_four": true,
+    "legacy_geometry_not_promoted": true,
+    "semantic_entries_match_current_transcriptions": true,
+    "protected_artwork_guard_recorded_for_841E796B": true,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "build_performed": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "4d7b9dce5beaed4c8dd7fdf33794a288ca372ba7",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "e323daf9dba540cac5dd788bed79b1223a2bf055",
+    "resume_state_blob_sha": "8d66904b729bdd201d8859ad516ebc0ccedcaa12",
+    "worklog_blob_sha": "085a9578668d5d4fb31d646eb6bb0c38df6e88c6",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00131_task_record_blob_sha": "66f91f49e8af6e649e9bd4cfea0d26f20e2c6c93",
+    "a00139_task_record_blob_sha": "ef54ff23adb60ec513e59da66d10b976e37c898b",
+    "a00140_task_record_blob_sha": "c1e85cdbfbbfb4abb3450bd375abc08103c1acd5",
+    "b00141_task_record_blob_sha": "fdf736f0817a66a20c046e956d7bd6c36e13830d"
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

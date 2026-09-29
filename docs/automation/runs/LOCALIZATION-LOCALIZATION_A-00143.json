@@ -1,0 +1,198 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00143",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00066",
+  "recorded_at_kst": "2026-09-29T21:03:38.549+09:00",
+  "base_sha": "1375021e32b5bdcb3c06ef28186240682860f856",
+  "commit_mode": "ATOMIC_EMBEDDED_MATERIAL_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_SCHEMA9_ZERO_CANDIDATE_EXCEPTION_FOUR_ODD_CANONICAL_SOURCE_REACQUISITION_AND_LEGACY_4X_GEOMETRY_RETIREMENT",
+  "summary": "Fresh HEAD candidate-first audit found A direct REWORK indices 51/53/111/121 still dependency-blocked, A00131/A00139/A00140 plus existing candidate rows still QA-pending or otherwise excluded from duplicate production, runtime-validation-only rows excluded from material rework, and index215's source-faithful Hangul-style dependency unchanged. No current A-side RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rewrite is runnable from GitHub evidence. This invocation therefore uses its single legal preflight-only fallback batch on new odd indices 35/43/49/107. Current inventory pins 1024x1024, 512x512, 512x512 and 512x128 RGBA canonical identities, while the prior C-accepted construction evidence uses 4096x4096, 2048x2048, 2048x2048 and 2048x512 Release sources respectively. All four old geometry sets are exactly 4x linear and are explicitly retired as current-canonical construction authority. Eighteen current semantic entries / nineteen expected physical occurrences are retained, including a strict preserve-original guard for nine Ferrari/model cards in index107. Exact current canonical source bytes and current v2 candidates are absent, so DDS/header/orientation/mask/CLEAN_PLATE/containment/source-comparison gates remain fail-closed. No shared-state, DDS, build, runtime, N100, local clone or GPT Library changes.",
+  "evidence_embedded_in_task_record": true,
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_ODD_CURRENT_CANONICAL_SOURCE_IDENTITY_AND_LEGACY_4X_GEOMETRY_RETIREMENT",
+    "report_path": "localization/graphics/role_A/20260929-2101-A00143-P00066/A00143_P00066_FOUR_ODD_CANONICAL_SOURCE_REACQUISITION.json",
+    "report_blob_sha": "5a75f463786390f5af4a6f3688f6a26a2bfc8a18",
+    "indices": [
+      35,
+      43,
+      49,
+      107
+    ],
+    "assets": [
+      "E989E3B7",
+      "455717B2",
+      "BF3EE5C6",
+      "841E796B"
+    ],
+    "canonical_inventory_identities_pinned": 4,
+    "canonical_semantic_entries": 18,
+    "expected_physical_occurrences": 19,
+    "prior_release_geometry_sets_retired": 4,
+    "exact_current_sources_present": 0,
+    "current_v2_candidates_present": 0,
+    "candidate_dds_modified": false,
+    "preflight_only_batch_count": 1,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true
+  },
+  "readiness_audit": {
+    "fresh_scan_head": "1375021e32b5bdcb3c06ef28186240682860f856",
+    "dependency_blocked_direct_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_or_newer_producer_indices": [
+      55,
+      57,
+      95,
+      97,
+      101,
+      119,
+      137,
+      159,
+      163,
+      173,
+      201,
+      217
+    ],
+    "runtime_or_validation_backlog_not_material_rework": [
+      61,
+      63,
+      195,
+      197
+    ],
+    "index215_status": "DEPENDENCY_BLOCKED_SOURCE_FAITHFUL_HANGUL_STYLE_GLYPH_INPUT_UNCHANGED",
+    "durable_c00142_present_at_scan": false,
+    "explicit_current_render_ready_indices": [],
+    "explicit_current_one_stage_to_render_runnable_indices": [],
+    "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_A_SHARD_WITH_CURRENT_GITHUB_EVIDENCE__ONE_PREFLIGHT_ONLY_BATCH_ALLOWED"
+  },
+  "assets": [
+    {
+      "index": 35,
+      "asset": "E989E3B7",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "canonical_sha256": "224398b53b16475afa5a3d7c37365eb83643506edb8bc4bfe14aa0e8e18784a0",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 1,
+      "expected_physical_occurrences": 2,
+      "prior_release_git_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+      "prior_release_dimensions": [
+        4096,
+        4096
+      ],
+      "prior_report_blob_sha": "802feec1ab740aaea582c9f7fee5fb2b5612c58a",
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "exact_current_source_present": false,
+      "current_v2_candidate_present": false
+    },
+    {
+      "index": 43,
+      "asset": "455717B2",
+      "queue_path": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "canonical_sha256": "e0e4f56d22808b8fece7e86997e173e41244466c83b6fe8bc405a579d85cac5f",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 4,
+      "expected_physical_occurrences": 4,
+      "prior_release_git_blob_sha": "92a3cb717afb6ea10aa76df23941353fd0a04148",
+      "prior_release_dimensions": [
+        2048,
+        2048
+      ],
+      "prior_report_blob_sha": "86ee54208edaa3fc6c31dabf0f696a72ed9dc42d",
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "exact_current_source_present": false,
+      "current_v2_candidate_present": false
+    },
+    {
+      "index": 49,
+      "asset": "BF3EE5C6",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+      "canonical_sha256": "b8d5716d1e8d555ed839fc8bbe80aaf02b21c44f203f73d57278bd0533e9fc8a",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 12,
+      "expected_physical_occurrences": 12,
+      "prior_release_git_blob_sha": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+      "prior_release_dimensions": [
+        2048,
+        2048
+      ],
+      "prior_report_blob_sha": "20e3716ed0056ac9fd451f3bf2cc3843ba042c57",
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "exact_current_source_present": false,
+      "current_v2_candidate_present": false
+    },
+    {
+      "index": 107,
+      "asset": "841E796B",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "canonical_sha256": "872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da",
+      "canonical_dimensions": [
+        512,
+        128
+      ],
+      "canonical_mode": "RGBA",
+      "semantic_entries": 1,
+      "expected_physical_occurrences": 1,
+      "prior_release_git_blob_sha": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+      "prior_release_dimensions": [
+        2048,
+        512
+      ],
+      "prior_report_blob_sha": "69b350934321607524faee7556b7735f6150a4fc",
+      "legacy_geometry_authority": "RETIRED_NONAUTHORITATIVE_FOR_CURRENT_CANONICAL_CONSTRUCTION",
+      "exact_current_source_present": false,
+      "current_v2_candidate_present": false
+    }
+  ],
+  "reused_current_fingerprints": {
+    "automation_contract_blob_sha": "94fa49c934b59db867d02069bbff298b083a4acf",
+    "controller_roles_blob_sha": "a8362dcc521dccc4eeecbaae1c791373595b4d51",
+    "queue_blob_sha": "4d7b9dce5beaed4c8dd7fdf33794a288ca372ba7",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "progress_blob_sha": "e323daf9dba540cac5dd788bed79b1223a2bf055",
+    "resume_state_blob_sha": "8d66904b729bdd201d8859ad516ebc0ccedcaa12",
+    "worklog_blob_sha": "085a9578668d5d4fb31d646eb6bb0c38df6e88c6",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "a00131_task_record_blob_sha": "66f91f49e8af6e649e9bd4cfea0d26f20e2c6c93",
+    "a00139_task_record_blob_sha": "ef54ff23adb60ec513e59da66d10b976e37c898b",
+    "a00140_task_record_blob_sha": "c1e85cdbfbbfb4abb3450bd375abc08103c1acd5",
+    "b00141_task_record_blob_sha": "fdf736f0817a66a20c046e956d7bd6c36e13830d"
+  },
+  "self_qa": "PASS_ODD_ONLY_35_43_49_107__4_OF_4_CURRENT_CANONICAL_SHA256_CANVAS_RGBA_IDENTITIES__18_CURRENT_SEMANTIC_ENTRIES__19_EXPECTED_PHYSICAL_OCCURRENCES__4_OF_4_LEGACY_RELEASE_CANVASES_EXACTLY_4X_LINEAR_AND_RETIRED__0_OF_4_CURRENT_CANONICAL_SOURCES__0_OF_4_CURRENT_V2_CANDIDATES__NO_STYLE_GEOMETRY_PROMOTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_CURRENT_CANONICAL_V2_KOREAN_CANDIDATE",
+  "fail_closed_reason": "All four exact current canonical queue-path DDS sources and current v2 Korean candidates are absent from GitHub. Prior Release evidence uses 4x-linear canvases and cannot authorize current-canonical masks, CLEAN_PLATE, style/geometry, DDS emission, zero-pixel containment PASS, or English-source comparison.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
