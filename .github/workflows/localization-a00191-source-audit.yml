@@ -1,0 +1,78 @@
+name: Localization A00191 canonical source audit
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00191.dispatch.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-a00191-source-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Refresh SSOT before selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin korean-localization-clean
+          git reset --hard origin/korean-localization-clean
+          echo "A00191_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Audit approved source tiers
+        run: python tools/localization/a00191_source_audit.py
+
+      - name: Commit authoritative producer result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00191.json \
+                  localization/graphics/role_A/20260930-A00191-rollover1/A00191_MOD3_CANONICAL_SOURCE_AUDIT.json
+          git commit -m "localization(A): audit indices135/147/159/201 source tiers [AUTO:LOCALIZATION-LOCALIZATION_A-00191]"
+          for n in 1 2 3; do
+            git fetch origin korean-localization-clean
+            git rebase origin/korean-localization-clean
+            if git push origin HEAD:korean-localization-clean; then break; fi
+            test "$n" -lt 3
+            sleep 5
+          done
+          echo "A00191_RESULT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Bookkeep exact result SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path("docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00191.json")
+          j=json.loads(p.read_text(encoding="utf-8"))
+          j["result_sha"]=os.environ["A00191_RESULT_SHA"]
+          j["authoritative_result_sha"]=os.environ["A00191_RESULT_SHA"]
+          j["bookkeeping_note"]="Result SHA recorded after the tagged producer result commit; producer result remains automation_validation=PENDING for C_BATCH_GATE and runtime_validation=UNTESTED."
+          p.write_text(json.dumps(j, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+          PY
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00191.json
+          git commit -m "localization(A): record A00191 result sha [skip ci]"
+          for n in 1 2 3; do
+            git fetch origin korean-localization-clean
+            git rebase origin/korean-localization-clean
+            if git push origin HEAD:korean-localization-clean; then break; fi
+            test "$n" -lt 3
+            sleep 5
+          done
