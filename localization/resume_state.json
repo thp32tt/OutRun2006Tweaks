@@ -7,12 +7,12 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: index231/EBE401C8 accepted by C153/Q00051; measure exact source typography/baseline/signed slant then render/refit/encode with decoded-final QA in the same producer invocation.",
+    "RENDER_READY: index231/EBE401C8 is authoritative C153/Q00051 PASS; measure exact source typography/baseline/signed slant then render/refit/encode with decoded-final QA in the same producer invocation.",
     "ONE_STAGE_TO_RENDER: none currently accepted at Q00051.",
     "QA_BACKLOG: candidate-bearing indices159/198/201 remain ahead of unrelated preflight.",
     "PREFLIGHT_ONLY after candidate completion: index163, then index193/133/232. Index175/217 remain SOURCE_IDENTITY_MISMATCH; index135 remains SOURCE_ACQUISITION_EXHAUSTED; do not reprobe unchanged dependencies.",
     "STATIC_QA: index222 remains C152 STATIC_QA_PASS_RUNTIME_UNTESTED and A00230 supplies DDS_ONLY isolation input; do not rerender unchanged content.",
-    "Q00051 Gate belongs only to the C153 validation-bearing result; RUNTIME_VALIDATION=UNTESTED until real-game evidence."
+    "Q00051 Gate PASS: validation-bearing result ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5 / Gate 36641607563. Do not re-review the same TASK_ID@RESULT_SHA inputs. RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2628,13 +2628,22 @@
     "uploaded_archive_purpose": "one-time exact pinned-release source identity/header replay; GitHub remains state/progress/QA SSOT",
     "heavy_qa_repeated": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null,
-    "bookkeeping_note": "This C result commit is the sole Q00051 Localization Automation Gate target. Result SHA and Gate outcome are recorded only in a later bookkeeping commit."
+    "result_sha": "ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5",
+    "authoritative_result_sha": "ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5",
+    "validation_bearing_result_sha": "ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36641607563,
+      "run_attempt": 1,
+      "head_sha": "ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T07:47:42+09:00"
+    },
+    "bookkeeping_note": "Q00051 authoritative Gate PASS is owned by validation-bearing result ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-09-30T07:47:50+09:00"
   }
 }
