@@ -28,6 +28,9 @@ SHADER_OBJECT_PROBE = (
 SHADER_LINKAGE_PROBE = (
     ROOT / "tools" / "dx11_shader_linkage_probe.cpp"
 ).read_text(encoding="utf-8")
+CONSTANT_BUFFER_PROBE = (
+    ROOT / "tools" / "dx11_constant_buffer_probe.cpp"
+).read_text(encoding="utf-8")
 PIPELINE_TRANSLATION_HPP = (
     ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.hpp"
 ).read_text(encoding="utf-8")
@@ -840,6 +843,58 @@ def main() -> None:
         if token not in SHADER_LINKAGE_PROBE:
             raise SystemExit(
                 "DX11 R94 transform regression drift: " + meaning
+            )
+
+    r95_constant_buffer_contract = {
+        "D3D11_BIND_CONSTANT_BUFFER": "R95 D3D11 constant-buffer object contract",
+        "D3D11_USAGE_DYNAMIC": "R95 dynamic upload usage",
+        "D3D11_CPU_ACCESS_WRITE": "R95 CPU upload access",
+        "D3D11_MAP_WRITE_DISCARD": "R95 discard upload path",
+        "GetResourceBindingDescByName": "R95 compiled R93 b0 reflection",
+        "FixedFunctionTransform": "R95 R93 constant-buffer name",
+        "binding.BindPoint == 0": "R95 b0 slot contract",
+        "reflectedBufferDesc.Size == expectedConstantBytes": "R95 64-byte reflected payload",
+        "VSSetConstantBuffers(0, 1": "R95 b0 binding operation",
+        "VSGetConstantBuffers(0, 1": "R95 b0 binding verification",
+        "DX11 constant buffer probe R95: PASS": "R95 probe completion marker",
+    }
+    missing_r95_probe = [
+        meaning
+        for token, meaning in r95_constant_buffer_contract.items()
+        if token not in CONSTANT_BUFFER_PROBE
+    ]
+    if missing_r95_probe:
+        raise SystemExit(
+            "DX11 R95 constant-buffer probe drift: "
+            + ", ".join(missing_r95_probe)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_constant_buffer_probe" not in graph:
+            raise SystemExit(
+                f"DX11 R95 constant-buffer target missing from {graph_name}"
+            )
+        if "tools/dx11_constant_buffer_probe.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R95 constant-buffer source missing from {graph_name}"
+            )
+        if "dxguid.lib" not in graph:
+            raise SystemExit(
+                f"DX11 R95 reflection link contract missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 constant buffer probe",
+        "Run DX11 constant buffer probe",
+        "dx11_constant_buffer_probe",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R95 constant-buffer probe missing from Backend Conversion Gate: "
+                + token
             )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

@@ -919,3 +919,35 @@ target_link_libraries(dx11_shader_linkage_probe PUBLIC
     d3d11.lib
     dxguid.lib
 )
+
+# Target: dx11_constant_buffer_probe
+set(dx11_constant_buffer_probe_SOURCES
+    "tools/dx11_constant_buffer_probe.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_constant_buffer_probe)
+
+target_sources(dx11_constant_buffer_probe PRIVATE ${dx11_constant_buffer_probe_SOURCES})
+
+target_compile_features(dx11_constant_buffer_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_constant_buffer_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_constant_buffer_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_constant_buffer_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+    dxguid.lib
+)
