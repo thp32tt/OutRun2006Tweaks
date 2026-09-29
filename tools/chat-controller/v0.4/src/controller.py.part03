@@ -420,9 +420,15 @@ async def localization_send_lane_task(
             write_runtime(status="ui_changed", last_action=f"Wave {wave_id} lane {slot_name}: composer unavailable")
             return False
 
+    # A stale/transient "Too many requests" surface can remain visible while the
+    # current turn is still generating successfully. Do not stall the whole
+    # localization queue on banner text alone. Only a Retry surface represents
+    # an actionable failed generation; handle that through the queue retry path.
     if await detect_rate_limit(page):
-        mark_rate_limit(reg, datetime.now(TZ), f"parallel-dispatch:{slot_name}")
-        return False
+        if await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None and not await detect_busy(page):
+            mark_rate_limit(reg, datetime.now(TZ), f"parallel-dispatch:{slot_name}")
+            return False
+        write_runtime(last_action=f"Wave {wave_id} lane {slot_name}: transient rate-limit surface ignored while work remains active")
     if await detect_limit(page):
         write_runtime(status="limit_detected", last_action=f"Wave {wave_id} lane {slot_name}: usage limit detected")
         return False
@@ -454,11 +460,14 @@ async def localization_send_lane_task(
             slot.url = new_url
 
     if await detect_rate_limit(page):
-        slot.last_sent_at = sent_at.isoformat()
-        slot.last_result = "rate_limited_after_send"
-        save_registry(reg)
-        mark_rate_limit(reg, sent_at, f"parallel-send:{slot_name}")
-        return False
+        if await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None and not await detect_busy(page):
+            slot.last_sent_at = sent_at.isoformat()
+            slot.last_result = "rate_limited_after_send"
+            save_registry(reg)
+            mark_rate_limit(reg, sent_at, f"parallel-send:{slot_name}")
+            return False
+        # The request was accepted and work is active; record it normally even
+        # if a transient/stale rate-limit banner is still visible.
 
     note_successful_request(reg, sent_at, slot.name)
     slot.runs += 1
