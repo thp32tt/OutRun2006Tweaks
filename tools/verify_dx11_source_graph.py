@@ -2350,6 +2350,71 @@ def main() -> None:
                 "DX11 R112 pipeline-identity probe drift: " + meaning
             )
 
+    r115_activation_header = {
+        "struct NativeFixedFunctionActivationReadiness":
+            "R115 composite activation readiness",
+        "bool componentSnapshotsPresent{}":
+            "R115 explicit component snapshot evidence",
+        "std::uint32_t requiredTextureMask{}":
+            "R115 texture requirement identity",
+        "compose_fixed_function_activation_readiness(":
+            "R115 fail-closed readiness composition API",
+        "validate_fixed_function_activation_snapshot(":
+            "R115 composite snapshot validator",
+    }
+    missing_r115_header = [
+        meaning
+        for token, meaning in r115_activation_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r115_header:
+        raise SystemExit(
+            "DX11 R115 activation-composition header drift: "
+            + ", ".join(missing_r115_header)
+        )
+
+    for token, meaning in {
+        "textureStages.readyMask == textureStages.requiredMask":
+            "R115 exact required-stage mask gate",
+        "textureStages.pendingMask == 0":
+            "R115 no-pending-stage gate",
+        "pipeline.ready && pipeline.snapshotToken != 0":
+            "R115 pipeline snapshot prerequisite",
+        "(!texturesRequired || textureStages.snapshotToken != 0)":
+            "R115 texture snapshot prerequisite",
+        "out.componentSnapshotsPresent =":
+            "R115 explicit component-token aggregation",
+        "out.ready =":
+            "R115 composite activation-candidate readiness",
+        "activationToken, out.pipelineSnapshotToken":
+            "R115 pipeline identity in composite token",
+        "activationToken, out.textureSnapshotToken":
+            "R115 texture identity in composite token",
+        "static_cast<std::uint64_t>(out.requiredTextureMask)":
+            "R115 required-mask identity in composite token",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R115 activation-composition source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R115 composite activation readiness accepts exact untextured evidence":
+            "R115 untextured positive composition proof",
+        "R115 composite activation readiness requires both exact component snapshots":
+            "R115 textured positive composition proof",
+        "R115 composite activation readiness fails closed on missing component evidence":
+            "R115 missing-evidence fail-closed proof",
+        "R115 composite activation snapshot changes with component identity":
+            "R115 component-identity invalidation proof",
+        "DX11 fixed-function activation evidence composition R115: PASS":
+            "R115 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R115 activation-composition probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census

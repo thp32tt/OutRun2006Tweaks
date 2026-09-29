@@ -1355,6 +1355,96 @@ int main()
             pipelineIdentityReady.snapshotToken),
         "R112 exact fixed-function pipeline translation identity issues a valid snapshot");
 
+    NativeManagedTextureStageReadiness untexturedStageReady{};
+    untexturedStageReady.inputValid = true;
+    untexturedStageReady.allRequiredReady = true;
+    const auto untexturedActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineIdentityReady, untexturedStageReady);
+    require(
+        untexturedActivation.inputValid &&
+        untexturedActivation.pipelineReady &&
+        untexturedActivation.textureStagesReady &&
+        untexturedActivation.componentSnapshotsPresent &&
+        untexturedActivation.ready &&
+        untexturedActivation.requiredTextureMask == 0 &&
+        untexturedActivation.pipelineSnapshotToken ==
+            pipelineIdentityReady.snapshotToken &&
+        untexturedActivation.textureSnapshotToken == 0 &&
+        untexturedActivation.snapshotToken != 0 &&
+        validate_fixed_function_activation_snapshot(
+            pipelineIdentityReady, untexturedStageReady,
+            untexturedActivation.snapshotToken),
+        "R115 composite activation readiness accepts exact untextured evidence");
+
+    NativeManagedTextureStageReadiness texturedStageReady{};
+    texturedStageReady.inputValid = true;
+    texturedStageReady.allRequiredReady = true;
+    texturedStageReady.requiredMask = 0x1u;
+    texturedStageReady.readyMask = 0x1u;
+    texturedStageReady.snapshotToken = 0x115001ull;
+    const auto texturedActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineIdentityReady, texturedStageReady);
+    require(
+        texturedActivation.inputValid &&
+        texturedActivation.pipelineReady &&
+        texturedActivation.textureStagesReady &&
+        texturedActivation.componentSnapshotsPresent &&
+        texturedActivation.ready &&
+        texturedActivation.requiredTextureMask == 0x1u &&
+        texturedActivation.textureSnapshotToken ==
+            texturedStageReady.snapshotToken &&
+        texturedActivation.snapshotToken != 0 &&
+        validate_fixed_function_activation_snapshot(
+            pipelineIdentityReady, texturedStageReady,
+            texturedActivation.snapshotToken),
+        "R115 composite activation readiness requires both exact component snapshots");
+
+    auto missingTextureSnapshot = texturedStageReady;
+    missingTextureSnapshot.snapshotToken = 0;
+    const auto missingTextureActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineIdentityReady, missingTextureSnapshot);
+    auto pendingTextureStage = texturedStageReady;
+    pendingTextureStage.allRequiredReady = false;
+    pendingTextureStage.readyMask = 0;
+    pendingTextureStage.pendingMask = 0x1u;
+    pendingTextureStage.snapshotToken = 0;
+    const auto pendingTextureActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineIdentityReady, pendingTextureStage);
+    auto pipelineNotReady = pipelineIdentityReady;
+    pipelineNotReady.ready = false;
+    const auto pipelinePendingActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineNotReady, texturedStageReady);
+    require(
+        !missingTextureActivation.ready &&
+        missingTextureActivation.snapshotToken == 0 &&
+        !pendingTextureActivation.ready &&
+        pendingTextureActivation.snapshotToken == 0 &&
+        !pipelinePendingActivation.ready &&
+        pipelinePendingActivation.snapshotToken == 0,
+        "R115 composite activation readiness fails closed on missing component evidence");
+
+    auto changedPipelineIdentity = pipelineIdentityReady;
+    changedPipelineIdentity.snapshotToken ^= 0x100000001b3ull;
+    const auto changedActivation =
+        compose_fixed_function_activation_readiness(
+            changedPipelineIdentity, texturedStageReady);
+    require(
+        changedActivation.ready &&
+        changedActivation.snapshotToken != 0 &&
+        changedActivation.snapshotToken != texturedActivation.snapshotToken &&
+        !validate_fixed_function_activation_snapshot(
+            changedPipelineIdentity, texturedStageReady,
+            texturedActivation.snapshotToken) &&
+        validate_fixed_function_activation_snapshot(
+            changedPipelineIdentity, texturedStageReady,
+            changedActivation.snapshotToken),
+        "R115 composite activation snapshot changes with component identity");
+
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
     changedLayout.elements[0].SemanticIndex ^= 1u;
@@ -1589,5 +1679,6 @@ int main()
     std::cout << "DX11 managed Texture2D readiness snapshot token R110: PASS\n";
     std::cout << "DX11 managed Texture2D mirror descriptor exactness R111: PASS\n";
     std::cout << "DX11 fixed-function pipeline translation identity R112: PASS\n";
+    std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     return 0;
 }

@@ -393,6 +393,31 @@ struct NativeFixedFunctionPipelineReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R115 composes the independently proven R112 pipeline snapshot and R110/R111
+// managed-texture stage snapshot into one fail-closed activation-candidate
+// identity. This is evidence only: it does not bind state or route a game draw.
+struct NativeFixedFunctionActivationReadiness {
+    bool inputValid{};
+    bool pipelineReady{};
+    bool textureStagesReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint64_t pipelineSnapshotToken{};
+    std::uint64_t textureSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionActivationReadiness
+compose_fixed_function_activation_readiness(
+    const NativeFixedFunctionPipelineReadiness& pipeline,
+    const NativeManagedTextureStageReadiness& textureStages) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_activation_snapshot(
+    const NativeFixedFunctionPipelineReadiness& pipeline,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t snapshotToken) noexcept;
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.

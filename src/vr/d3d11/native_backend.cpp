@@ -1310,6 +1310,60 @@ bool NativeFixedFunctionPipelineBundle::validate_translation_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionActivationReadiness
+compose_fixed_function_activation_readiness(
+    const NativeFixedFunctionPipelineReadiness& pipeline,
+    const NativeManagedTextureStageReadiness& textureStages) noexcept {
+    NativeFixedFunctionActivationReadiness out{};
+    out.requiredTextureMask = textureStages.requiredMask;
+    out.pipelineSnapshotToken = pipeline.snapshotToken;
+    out.textureSnapshotToken = textureStages.snapshotToken;
+
+    const bool texturesRequired = textureStages.requiredMask != 0;
+    const bool textureMaskReady =
+        textureStages.readyMask == textureStages.requiredMask &&
+        textureStages.pendingMask == 0;
+
+    out.inputValid = pipeline.inputValid && textureStages.inputValid;
+    out.pipelineReady = pipeline.ready && pipeline.snapshotToken != 0;
+    out.textureStagesReady =
+        textureStages.allRequiredReady &&
+        textureMaskReady &&
+        (!texturesRequired || textureStages.snapshotToken != 0);
+    out.componentSnapshotsPresent =
+        pipeline.snapshotToken != 0 &&
+        (!texturesRequired || textureStages.snapshotToken != 0);
+    out.ready =
+        out.inputValid &&
+        out.pipelineReady &&
+        out.textureStagesReady &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t activationToken = 0xcbf29ce484222325ull;
+        activationToken = mix_readiness_snapshot_token(
+            activationToken, out.pipelineSnapshotToken);
+        activationToken = mix_readiness_snapshot_token(
+            activationToken, out.textureSnapshotToken);
+        activationToken = mix_readiness_snapshot_token(
+            activationToken,
+            static_cast<std::uint64_t>(out.requiredTextureMask));
+        out.snapshotToken = activationToken == 0 ? 1 : activationToken;
+    }
+    return out;
+}
+
+bool validate_fixed_function_activation_snapshot(
+    const NativeFixedFunctionPipelineReadiness& pipeline,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_activation_readiness(
+        pipeline, textureStages);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
     transform_buffer_.shutdown();
     input_layout_.Reset();
