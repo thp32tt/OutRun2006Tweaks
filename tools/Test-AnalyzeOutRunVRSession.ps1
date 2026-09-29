@@ -41,7 +41,9 @@ function Invoke-AnalyzerCase {
         [Nullable[double]]$ExpectedEndFrameP95MaxMs=$null,
         [int]$ExpectedDrawFingerprintCount=0,
         [int64]$ExpectedDrawFingerprintDropped=0,
-        [string]$ExpectedFirstDrawFingerprintScope=''
+        [string]$ExpectedFirstDrawFingerprintScope='',
+        [bool]$ExpectedRankProjectedMarkerDrawEvidence=$false,
+        [int]$ExpectedRankProjectedMarkerDrawFingerprintCount=0
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -186,6 +188,12 @@ function Invoke-AnalyzerCase {
         if([string]$summary.DrawFingerprints[0].Scope -ne $ExpectedFirstDrawFingerprintScope){
             throw "${Name}: first draw fingerprint scope=$($summary.DrawFingerprints[0].Scope), expected $ExpectedFirstDrawFingerprintScope"
         }
+    }
+    if([bool]$summary.RankProjectedMarkerDrawEvidenceAvailable -ne $ExpectedRankProjectedMarkerDrawEvidence){
+        throw "${Name}: RankProjectedMarkerDrawEvidenceAvailable=$($summary.RankProjectedMarkerDrawEvidenceAvailable), expected $ExpectedRankProjectedMarkerDrawEvidence"
+    }
+    if([int]$summary.RankProjectedMarkerDrawFingerprintCount -ne $ExpectedRankProjectedMarkerDrawFingerprintCount){
+        throw "${Name}: RankProjectedMarkerDrawFingerprintCount=$($summary.RankProjectedMarkerDrawFingerprintCount), expected $ExpectedRankProjectedMarkerDrawFingerprintCount"
     }
     $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
     foreach($blocker in $ExpectedDirectEvidenceBlockers){
@@ -374,13 +382,15 @@ D3D9: Failed to write shared resource info for a texture
     # R71 bounded semantic draw fingerprints are parsed without granting any
     # render ownership. The runtime emits first-seen unique fingerprints only.
     Invoke-AnalyzerCase -Name 'semantic-draw-fingerprint-aggregation' `
-        -GameLog "direct[frames=0,fallbacks=2,fenceTimeout=0]`nVR DRAW FP: id=1111222233334444 scope=SCREEN_HUD owner=NONE api=DIP prim=4 primCount=2 arg0=4 arg1=0 arg2=0 vsHash=aaaaaaaaaaaaaaaa psHash=bbbbbbbbbbbbbbbb vsBytes=128 psBytes=96 exact=1 marker=0`nVR DRAW FP: id=5555666677778888 scope=SCREEN_OVERLAY_2D owner=NONE api=DPUP prim=5 primCount=2 arg0=24 arg1=0 arg2=0 vsHash=0000000000000000 psHash=cccccccccccccccc vsBytes=0 psBytes=64 exact=0 marker=0`nVR R30.9: drawFp[unique=2,hits=7,dropped=1]" `
+        -GameLog "direct[frames=0,fallbacks=2,fenceTimeout=0]`nVR DRAW FP: id=1111222233334444 scope=SCREEN_HUD owner=NONE api=DIP prim=4 primCount=2 arg0=4 arg1=0 arg2=0 vsHash=aaaaaaaaaaaaaaaa psHash=bbbbbbbbbbbbbbbb vsBytes=128 psBytes=96 exact=1 marker=0`nVR DRAW FP: id=5555666677778888 scope=SCREEN_OVERLAY_2D owner=NONE api=DPUP prim=5 primCount=2 arg0=24 arg1=0 arg2=0 vsHash=0000000000000000 psHash=cccccccccccccccc vsBytes=0 psBytes=64 exact=0 marker=0`nVR DRAW FP: id=9999aaaabbbbcccc scope=PROJECTED_WORLD_MARKER_2D owner=NONE api=DIP prim=4 primCount=2 arg0=4 arg1=0 arg2=0 vsHash=dddddddddddddddd psHash=eeeeeeeeeeeeeeee vsBytes=128 psBytes=96 exact=1 marker=1`nVR R30.9: drawFp[unique=3,hits=8,dropped=1]" `
         -DxvkLog "DXVK: v3.1.1" -HostLog "" `
         -ExpectedSharedFailure $false -ExpectedReasons @() `
         -ExpectedDirectFrames 0 -ExpectedFallbacks 2 `
         -ExpectedStatus 'DIRECT_GPU_UNAVAILABLE' `
-        -ExpectedDrawFingerprintCount 2 -ExpectedDrawFingerprintDropped 1 `
-        -ExpectedFirstDrawFingerprintScope 'SCREEN_HUD'
+        -ExpectedDrawFingerprintCount 3 -ExpectedDrawFingerprintDropped 1 `
+        -ExpectedFirstDrawFingerprintScope 'SCREEN_HUD' `
+        -ExpectedRankProjectedMarkerDrawEvidence $true `
+        -ExpectedRankProjectedMarkerDrawFingerprintCount 1
 
     # Existing game/host telemetry is promoted into a structured common
     # frame-budget summary without changing runtime instrumentation.

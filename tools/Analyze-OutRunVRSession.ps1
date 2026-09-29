@@ -144,6 +144,16 @@ $drawFingerprintUniqueCount=if($null -ne $drawFpSummary){[int]$drawFpSummary.Gro
 $drawFingerprintHits=if($null -ne $drawFpSummary){[int64]$drawFpSummary.Groups[2].Value}else{[int64]$drawFingerprints.Count}
 $drawFingerprintDropped=if($null -ne $drawFpSummary){[int64]$drawFpSummary.Groups[3].Value}else{0}
 $drawFingerprintEvidenceAvailable=($drawFingerprints.Count -gt 0 -or $null -ne $drawFpSummary)
+$rankProjectedMarkerDrawFingerprints=@(
+    $drawFingerprints | Where-Object {
+        $_.Scope -eq 'PROJECTED_WORLD_MARKER_2D' -and
+        $_.ExactQueueScope -and $_.ProjectedMarker
+    }
+)
+$rankProjectedMarkerDrawFingerprintCount=
+    [int]$rankProjectedMarkerDrawFingerprints.Count
+$rankProjectedMarkerDrawEvidenceAvailable=
+    ($rankProjectedMarkerDrawFingerprintCount -gt 0)
 
 $directFrames=0
 $directFallbacks=0
@@ -401,6 +411,8 @@ $result=[ordered]@{
     DrawFingerprintHits=$drawFingerprintHits
     DrawFingerprintDropped=$drawFingerprintDropped
     DrawFingerprints=@($drawFingerprints)
+    RankProjectedMarkerDrawEvidenceAvailable=$rankProjectedMarkerDrawEvidenceAvailable
+    RankProjectedMarkerDrawFingerprintCount=$rankProjectedMarkerDrawFingerprintCount
     SemanticRegistered=$semanticRegistered
     SemanticConsumed=$semanticConsumed
     SemanticStaleCleared=$semanticStaleCleared
@@ -481,6 +493,8 @@ $lines=@(
     "drawFingerprintUniqueCount=$drawFingerprintUniqueCount"
     "drawFingerprintHits=$drawFingerprintHits"
     "drawFingerprintDropped=$drawFingerprintDropped"
+    "rankProjectedMarkerDrawEvidenceAvailable=$rankProjectedMarkerDrawEvidenceAvailable"
+    "rankProjectedMarkerDrawFingerprintCount=$rankProjectedMarkerDrawFingerprintCount"
     "semanticRegistered=$semanticRegistered"
     "semanticConsumed=$semanticConsumed"
     "semanticStaleCleared=$semanticStaleCleared"

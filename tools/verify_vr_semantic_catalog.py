@@ -172,6 +172,70 @@ def main() -> int:
                 f"R71 bounded draw-fingerprint contract missing marker: {marker}"
             )
 
+
+    # DXVK/R71 rank-marker provenance: do not regress to the older generic
+    # WORLD_BILLBOARD sidecar. The current path reconstructs the exact
+    # Calc3D2D rank view point, carries it with the SpriteNode exact semantic,
+    # and reaches the per-eye ProjectedWorldMarker2D draw path. Runtime visual
+    # correctness is still a Quest3/VDXR gate.
+    ui_source = (ROOT / "src" / "hooks_uiscaling.cpp").read_text(encoding="utf-8")
+    for marker in (
+        "Module::exe_ptr(0xBAEE7)",
+        "recoverViewPoint(RankMarkerProjectedInfo)",
+        "R57RankProducerScope(true)",
+        "R57RankProducerScope(false)",
+        "RenderScope::ProjectedWorldMarker2D",
+        "ScopedProducerSemantic producer(",
+        "RegisterSpriteNodeScope(",
+        "node, r57Scope, r57Marker",
+    ):
+        if marker not in ui_source:
+            raise AssertionError(
+                f"DXVK rank projected-marker producer contract missing marker: {marker}"
+            )
+
+    for marker in (
+        "ProjectedMarkerInfo projectedMarker{}",
+        "CurrentQueueProjectedMarker",
+        "CurrentProjectedMarker()",
+        "projectedMarker ? *projectedMarker : ProjectedMarkerInfo{}",
+    ):
+        if marker not in runtime_source:
+            raise AssertionError(
+                f"DXVK rank projected-marker queue contract missing marker: {marker}"
+            )
+
+    r30_safe_source = (
+        ROOT / "src" / "vr" / "d3d9" / "stereo_renderer_r30_r26_safe.cpp"
+    ).read_text(encoding="utf-8")
+    for marker in (
+        "CorroboratesProjectedWorldMarker(",
+        "R57BuildProjectedMarkerDelta(",
+        "state.projectedWorldMarker2D = semanticProjectedWorld",
+        "const bool applyHeadCorrection =",
+        "explicitMarker == nullptr",
+        "(R57Mode() == 6 || R57Mode() == 8)",
+        "VR R68 PROJECTED MARKER:",
+    ):
+        if marker not in r30_safe_source:
+            raise AssertionError(
+                f"DXVK rank projected-marker draw contract missing marker: {marker}"
+            )
+
+    analyzer_source = (
+        ROOT / "tools" / "Analyze-OutRunVRSession.ps1"
+    ).read_text(encoding="utf-8")
+    for marker in (
+        "RankProjectedMarkerDrawEvidenceAvailable",
+        "RankProjectedMarkerDrawFingerprintCount",
+        "'PROJECTED_WORLD_MARKER_2D'",
+        "$_.ExactQueueScope -and $_.ProjectedMarker",
+    ):
+        if marker not in analyzer_source:
+            raise AssertionError(
+                f"DXVK rank projected-marker analyzer contract missing marker: {marker}"
+            )
+
     expected_f14 = {
         (0x060900, 0x061100, "ctrl_icon_work", "HUD_CTRL_ICON", "SCREEN_HUD"),
         (0x0BBA00, 0x0BBC00, "DispTempHeartNum", "HUD_TEMP_HEART", "SCREEN_HUD"),

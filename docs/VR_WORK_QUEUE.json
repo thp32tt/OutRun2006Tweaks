@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T19:15:09+09:00",
+  "updatedKst": "2026-09-29T19:33:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -105,13 +105,13 @@
     {
       "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
       "priority": 13,
-      "status": "VALIDATING",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Reconstruct rival rank-marker anchor propagation from Calc3D2D/vehicle source through sprani/put_clip SpriteNode and per-eye WORLD_BILLBOARD projection; current exact-callsite tags still leave markers head-locked/detached.",
       "testLevel": "LEVEL0",
       "dependencies": [],
-      "attempts": 1,
-      "runtimeCandidate": false,
+      "attempts": 2,
+      "runtimeCandidate": true,
       "sourceEvidence": {
         "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
         "sessionId": "20260923T164207853Z-2202b186",
@@ -122,8 +122,14 @@
       "candidateSha": "bdfcea9b40d461fb6f043a9f5da73b61332d2570",
       "validationRunId": 36009907829,
       "validationResult": "IN_PROGRESS",
-      "implementationProgress": "Calc3D2D original 3D anchor + stock projected anchor are now preserved per rank SpriteNode via a sidecar; R30 telemetry confirms reachability at WORLD_BILLBOARD draw once runtime-exercised. Visual reprojection behavior is intentionally unchanged in this candidate.",
-      "nextAction": "Complete exact-SHA CI, then HMD-run this anchor-provenance candidate. If VR R51 RANK ANCHOR telemetry proves sidecar reachability, implement per-eye reprojection from the preserved world anchor rather than screen-space coordinates."
+      "implementationProgress": "The legacy DX9Ex sidecar candidate bdfcea9b40d461fb6f043a9f5da73b61332d2570 passed CI, but the current DXVK branch has superseding R57/R68 ProjectedWorldMarker2D logic. CONVERSION-DXVK-00049 statically seals the current exact Calc3D2D -> ProjectedMarkerInfo -> SpriteNode -> per-eye projected path and teaches the session analyzer to recognize a final exact projected-marker draw from existing bounded VR DRAW FP telemetry. No visual placement behavior changed.",
+      "nextAction": "Quest3/VDXR exact-build DXVK CORRECTNESS test. Require RankProjectedMarkerDrawEvidenceAvailable=true (at least one exact PROJECTED_WORLD_MARKER_2D draw with marker=1), then visually verify rival 1st/2nd/3rd/4th+ markers remain attached to vehicles during head rotation while road/background/vehicle stereo stays unchanged. If visual anchoring still fails despite positive draw evidence, debug the per-eye delta math; do not fall back to generic HUD or old WORLD_BILLBOARD sidecar ownership.",
+      "automationValidation": "PENDING",
+      "runtimeValidation": "UNTESTED",
+      "lastAutomationTaskId": "CONVERSION-DXVK-00049",
+      "dxvkEvidenceGate": "RankProjectedMarkerDrawEvidenceAvailable",
+      "legacyCandidateValidationRunId": 36009907829,
+      "legacyCandidateValidationResult": "PASS"
     },
     {
       "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
