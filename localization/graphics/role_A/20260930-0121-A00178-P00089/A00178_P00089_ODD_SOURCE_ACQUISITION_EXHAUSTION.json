@@ -1,0 +1,282 @@
+{
+  "schema_version": 9,
+  "schema": "outrun-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00178",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00089",
+  "recorded_at_kst": "2026-09-30T01:21:50+09:00",
+  "base_head_sha": "0ba0e995f6d1b5b06db0492d3788104bfac14be2",
+  "selection": {
+    "shard": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+    "policy": "CANDIDATE_COMPLETION_FIRST__ZERO_READY_EXCEPTION_ONE_PREFLIGHT_BATCH",
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "qa_pending_skip": {
+      "index": 99,
+      "asset": "4F68708E",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00173",
+      "reason": "current transparent CLEAN_PLATE v3 awaits independent C native visual QA; producer must not duplicate or self-promote"
+    },
+    "latest_c_task": "LOCALIZATION-LOCALIZATION_C-00175",
+    "latest_c_candidate_priority": "independently QA A00173 index99 before unrelated candidate construction",
+    "explicit_render_ready_count": 0,
+    "explicit_one_stage_to_render_count": 0,
+    "selected_indices": [
+      35,
+      95,
+      101,
+      137
+    ],
+    "selected_assets": [
+      "E989E3B7",
+      "37759842",
+      "560FA536",
+      "30CF0D"
+    ],
+    "reason": "No runnable direct REWORK, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework exists in the odd shard on latest C-accepted evidence. One preflight-only batch is therefore permitted; select four prior canonical-source-gated odd assets whose approved source ladder was not yet exhausted."
+  },
+  "acquisition_contract": {
+    "order": [
+      "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+      "PINNED_UPSTREAM_DIRECT_FILE",
+      "PINNED_V0.25.10A_RELEASE"
+    ],
+    "drive_account": "ezflash557",
+    "release_asset_id": 306630789,
+    "release_size_bytes": 306223257,
+    "release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "release_identity": "PASS_EXACT_PINNED_DIGEST",
+    "pinned_upstream_commit": "55f67a813dd3603d201d0be0da47c071965f53a4"
+  },
+  "assets": [
+    {
+      "index": 35,
+      "asset": "E989E3B7",
+      "queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+      "canonical_sha256": "224398b53b16475afa5a3d7c37365eb83643506edb8bc4bfe14aa0e8e18784a0",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "direct_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+      "release_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "release_dimensions": [
+        4096,
+        4096
+      ],
+      "canonical_mode": "RGBA",
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "exact_name_results": 0,
+        "account": "ezflash557"
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+        "git_blob_sha": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "asset_id": 306630789,
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds",
+        "member_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "git_blob_sha_from_exact_member": "eae5175b79369b02ea36ef084cc1e0820f765da2",
+        "direct_blob_equals_release_member": true,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "index": 95,
+      "asset": "37759842",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+      "canonical_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "direct_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+      "release_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "release_dimensions": [
+        4096,
+        4096
+      ],
+      "canonical_mode": "RGBA",
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "exact_name_results": 0,
+        "account": "ezflash557"
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+        "git_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "asset_id": 306630789,
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+        "member_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "git_blob_sha_from_exact_member": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+        "direct_blob_equals_release_member": true,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "index": 101,
+      "asset": "560FA536",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+      "canonical_sha256": "98f7fdf7e45408d8669741bb1620decf1f4ceea610183d9f2dc10e6cdd764377",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "direct_blob_sha": "1e95df72109411fb1f9c398445db583ed31de2a1",
+      "release_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "release_dimensions": [
+        4096,
+        4096
+      ],
+      "canonical_mode": "RGBA",
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "exact_name_results": 0,
+        "account": "ezflash557"
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+        "git_blob_sha": "1e95df72109411fb1f9c398445db583ed31de2a1",
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "asset_id": 306630789,
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_selector_cvt_Exst/560FA536_1024x1024.dds",
+        "member_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "git_blob_sha_from_exact_member": "1e95df72109411fb1f9c398445db583ed31de2a1",
+        "direct_blob_equals_release_member": true,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "index": 137,
+      "asset": "30CF0D",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+      "canonical_sha256": "ad19e8dc4fb5da0defe4d2702bd73ab874a4bd321176fbade7b09c6a1271c9ff",
+      "canonical_dimensions": [
+        512,
+        256
+      ],
+      "direct_blob_sha": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+      "release_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "release_dimensions": [
+        2048,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "exact_name_results": 0,
+        "account": "ezflash557"
+      },
+      "pinned_direct": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+        "git_blob_sha": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "asset_id": 306630789,
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds",
+        "member_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "mode": "RGBA32",
+        "mip_count": 1,
+        "git_blob_sha_from_exact_member": "a17e3caff8610356d70ddc52e89a7533aa99b98c",
+        "direct_blob_equals_release_member": true,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final": "SOURCE_ACQUISITION_EXHAUSTED",
+      "production_readiness": "PREFLIGHT_ONLY"
+    }
+  ],
+  "conclusion": {
+    "source_acquisition_exhausted_count": 4,
+    "exact_canonical_source_count": 0,
+    "candidate_dds_modified": false,
+    "korean_render_attempted": false,
+    "fail_closed_reason": "All approved source tiers are exhausted for the selected immutable inventory fingerprints. Drive exact-name search returns no file; pinned upstream direct files are exactly the same Git blobs as exact pinned Release members, but each is a 4x-linear RGBA32 canvas and does not match current canonical inventory dimensions/SHA-256. Pixel geometry from these noncanonical 4x sources must not be promoted.",
+    "repeat_policy": "Do not repeat Drive/direct/Release acquisition for these four exact source/inventory fingerprints until source transport or canonical inventory fingerprint changes.",
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": {
+    "all_selected_indices_odd": true,
+    "work_steal": false,
+    "drive_exact_search_4_of_4_miss": true,
+    "pinned_direct_tree_entries_4_of_4_exact": true,
+    "release_bundle_exact_digest": true,
+    "direct_git_blob_equals_release_member_4_of_4": true,
+    "release_member_dds_header_parsed_4_of_4": true,
+    "canonical_identity_mismatch_4_of_4": true,
+    "rejected_4x_pixel_geometry_reused": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "queue_blob_sha": "a6c50d7b4248d114ca4f068a71a5cc1e180373e0",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "a00140_task_blob_sha": "c1e85cdbfbbfb4abb3450bd375abc08103c1acd5",
+    "a00143_task_blob_sha": "62f1b9749bd1482d90313175abfc39f72f14bcac",
+    "a00173_task_blob_sha": "1d8d51d58e06584ea1fc23958f867b9b64bfb1f1",
+    "c00175_task_blob_sha": "139e750ab96031862885b05ca0886e50cca0f949"
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
