@@ -1,0 +1,80 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00087",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00023",
+  "recorded_at_kst": "2026-09-29T16:18:04+09:00",
+  "base_sha": "8639998fec0b9fa7475d93be56c070d8fe144d29",
+  "result": "PASS_MATERIAL_FALLBACK4_THREE_EVEN_EXACT_RELEASE_PAYLOAD_EXTRACTION_SCOPES",
+  "summary": "Advanced C-consumed even indices 86/100/106 from accepted semantic-to-cell mappings to deterministic exact Release payload extraction scopes for 42 physical regions: 31 BC3 regions on C598919A and 11 RGBA32 regions across 53CE39D5/788CE557. Reused unchanged B00051/B00076/C00078 heavy source/mapping evidence. All scopes are in-canvas/in-file, all BC3 regions are 4x4-block aligned, region overlap is zero, and the OutRun2SP wordmark remains preserve-original. No Korean DDS or shared state changed.",
+  "evidence": [
+    "localization/graphics/role_B/20260929-1618-B124-P00023/B124_P00023_EVEN_RELEASE_PAYLOAD_EXTRACTION_SCOPE.json"
+  ],
+  "evidence_blob_sha": "13a928a94557bbf7548c98b1e116e7ec5add1dc9",
+  "material_deliverable": {
+    "type": "THREE_EVEN_EXACT_RELEASE_PAYLOAD_EXTRACTION_SCOPES",
+    "indices": [
+      86,
+      100,
+      106
+    ],
+    "assets": [
+      "C598919A",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "unique_extraction_regions": 42,
+    "mapped_physical_occurrences": 42,
+    "localizable_physical_occurrences": 41,
+    "preserve_original_occurrences": 1,
+    "bc3_regions": 31,
+    "rgba32_regions": 11,
+    "out_of_bounds_ranges": 0,
+    "block_unaligned_regions": 0,
+    "region_overlap_pairs": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "reused_immutable_evidence": {
+    "source_manifest_task": "LOCALIZATION-LOCALIZATION_B-00051",
+    "source_manifest_report_blob_sha": "cd4b075f16f6a1c354b67e25584bd4266adb2485",
+    "mapping_task": "LOCALIZATION-LOCALIZATION_B-00076",
+    "mapping_report_blob_sha": "46bb9e2e7361ab66f3a5583f0c780826eb62dd2f",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00078",
+    "c_acceptance_record_blob_sha": "218e6c1c60d91e9598a124da33049c68d96a1f36",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "reason": "Unchanged source/translation/mapping fingerprint; duplicate heavy QA intentionally reused. New work is exact Release byte/block extraction geometry."
+  },
+  "skipped_qa_pending": {
+    "LOCALIZATION-LOCALIZATION_B-00085": [
+      46,
+      48,
+      50,
+      62
+    ]
+  },
+  "strict_hold": {
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_full_effect_bboxes": "HOLD_EXACT_DECODE_REQUIRED",
+    "glyph_effect_masks": "HOLD_EXACT_DECODE_REQUIRED",
+    "clean_plates": "HOLD_EXACT_DECODE_REQUIRED",
+    "generation_v2_safe_bboxes": "HOLD_UNTIL_FULL_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE"
+  },
+  "self_qa": "PASS_EVEN_ONLY_86_100_106__3_OF_3_SIZE_EQUATIONS__42_OF_42_RANGES_IN_BOUNDS__31_OF_31_BC3_BLOCK_ALIGNED__0_OVERLAPS__1_PROTECTED_WORDMARK_PRESERVED__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "fail_closed_reason": "Payload extraction scopes are cell byte ranges only, not text edit masks. Exact raw/readable orientation, effect-inclusive text masks/bboxes, clean plates, generation-v2 safe-fit geometry and final decoded candidate comparison remain required before any Korean DDS promotion.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

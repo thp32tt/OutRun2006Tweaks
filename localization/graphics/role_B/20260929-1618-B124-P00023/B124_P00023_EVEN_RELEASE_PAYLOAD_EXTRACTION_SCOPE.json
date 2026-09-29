@@ -1,0 +1,1689 @@
+{
+  "schema_version": 6,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00087",
+  "attempt": "1/3",
+  "wave_id": "P00023",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T16:18:04+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "8639998fec0b9fa7475d93be56c070d8fe144d29",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_even_indices": [
+      86,
+      100,
+      106
+    ],
+    "queue_blob_sha": "502d879acf3a3a61c49bfad2cd79a1d504f8bf2c",
+    "reason": "B00076 was consumed and accepted by C Q00005. Current newer B00085 targets 46/48/50/62 and is QA-pending, so it is skipped. These three disjoint even assets still lack deterministic Release payload extraction geometry.",
+    "skipped_current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00085": [
+        46,
+        48,
+        50,
+        62
+      ]
+    }
+  },
+  "source_policy": {
+    "ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "immutable_upstream": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "fingerprint": {
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "queue_blob_sha": "502d879acf3a3a61c49bfad2cd79a1d504f8bf2c",
+    "reused_mapping_task": "LOCALIZATION-LOCALIZATION_B-00076",
+    "reused_mapping_report_blob_sha": "46bb9e2e7361ab66f3a5583f0c780826eb62dd2f",
+    "reused_source_manifest_task": "LOCALIZATION-LOCALIZATION_B-00051",
+    "reused_source_manifest_report_blob_sha": "cd4b075f16f6a1c354b67e25584bd4266adb2485",
+    "reused_c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00078",
+    "reused_c_acceptance_record_blob_sha": "218e6c1c60d91e9598a124da33049c68d96a1f36",
+    "atlas_coordinate_convention": "4x atlas bottom-left rectangles; raw top-left y = H - atlas_y - h",
+    "reuse_note": "Immutable source, translation and semantic-to-cell mapping evidence is reused. This task adds exact byte/block extraction geometry only."
+  },
+  "extraction_contract": {
+    "dds_header_bytes": 128,
+    "atlas_coordinate_space": "BOTTOM_LEFT_4X_ATLAS",
+    "raw_coordinate_space": "TOP_LEFT_DDS_PAYLOAD",
+    "rgba32_formula": "row_offset = 128 + ((raw_y + row) * width + x) * 4",
+    "bc3_formula": "block_row_offset = 128 + ((raw_y/4 + block_row) * (width/4) + x/4) * 16",
+    "warning": "Mapped cells are extraction scopes, not glyph/effect edit masks. Never erase or overwrite a whole cell.",
+    "next_required_steps": [
+      "Decode the exact pinned Release DDS and reconfirm raw/readable orientation from source pixels.",
+      "Derive text-only full-effect masks/bboxes inside each extracted cell and protect logos/models/songs/artwork.",
+      "Apply generation-v2 safety inset only after a valid full-effect permitted region exists.",
+      "Build and independently QA a CLEAN_PLATE before Korean lettering.",
+      "Run decoded-final zero-pixel containment, alpha/compression/header and ENGLISH SOURCE vs KOREAN CANDIDATE proof before promotion."
+    ]
+  },
+  "assets": [
+    {
+      "queue_index": 86,
+      "asset": "C598919A",
+      "queue_path": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+      "exact_hd_release": {
+        "git_blob_sha": "3ab34d5fcd66b5b8cb3d59e02d0d199e2e6b5456",
+        "width": 4096,
+        "height": 4096,
+        "format": "DXT5_BC3",
+        "mipmaps": 1,
+        "bytes": 16777344,
+        "size_equation_bytes": 16777344,
+        "size_equation_matches_file": true
+      },
+      "canonical_semantics": 24,
+      "mapped_physical_occurrences": 31,
+      "localizable_physical_occurrences": 31,
+      "preserve_original_occurrences": 0,
+      "regions": [
+        {
+          "sprite": "sprite_90",
+          "atlas_rect_bl": [
+            0,
+            608,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            0,
+            3416,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Giant Statues",
+              "korean": "자이언트 스태추",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 0,
+          "block_y": 854,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13992064,
+          "last_row_start_offset": 14270592,
+          "last_byte_offset": 14272031,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_81",
+          "atlas_rect_bl": [
+            1536,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            1536,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Cape Way",
+              "korean": "케이프 웨이",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 384,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13637760,
+          "last_row_start_offset": 13916288,
+          "last_byte_offset": 13917727,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_82",
+          "atlas_rect_bl": [
+            1896,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            1896,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Imperial Avenue",
+              "korean": "임페리얼 애비뉴",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 474,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13639200,
+          "last_row_start_offset": 13917728,
+          "last_byte_offset": 13919167,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_83",
+          "atlas_rect_bl": [
+            2256,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            2256,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Ancient Ruins",
+              "korean": "고대 유적",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 564,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13640640,
+          "last_row_start_offset": 13919168,
+          "last_byte_offset": 13920607,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_84",
+          "atlas_rect_bl": [
+            2616,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            2616,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Metropolis",
+              "korean": "메트로폴리스",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 654,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13642080,
+          "last_row_start_offset": 13920608,
+          "last_byte_offset": 13922047,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_85",
+          "atlas_rect_bl": [
+            2976,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            2976,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Tulip Garden",
+              "korean": "튤립 가든",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 744,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13643520,
+          "last_row_start_offset": 13922048,
+          "last_byte_offset": 13923487,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_86",
+          "atlas_rect_bl": [
+            3336,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            3336,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Skyscrapers",
+              "korean": "스카이스크레이퍼",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 834,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13644960,
+          "last_row_start_offset": 13923488,
+          "last_byte_offset": 13924927,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_87",
+          "atlas_rect_bl": [
+            3696,
+            696,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            3696,
+            3328,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Milky Way",
+              "korean": "밀키 웨이",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 924,
+          "block_y": 832,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13646400,
+          "last_row_start_offset": 13924928,
+          "last_byte_offset": 13926367,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_88",
+          "atlas_rect_bl": [
+            3600,
+            784,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            3600,
+            3240,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Floral Village",
+              "korean": "플로럴 빌리지",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 900,
+          "block_y": 810,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 13285568,
+          "last_row_start_offset": 13564096,
+          "last_byte_offset": 13565535,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_89",
+          "atlas_rect_bl": [
+            3656,
+            904,
+            360,
+            72
+          ],
+          "raw_top_left_rect": [
+            3656,
+            3120,
+            360,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Legend",
+              "korean": "레전드",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 914,
+          "block_y": 780,
+          "block_width": 90,
+          "block_height": 18,
+          "row_bytes": 1440,
+          "row_count": 18,
+          "first_row_offset": 12794272,
+          "last_row_start_offset": 13072800,
+          "last_byte_offset": 13074239,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_46",
+          "atlas_rect_bl": [
+            0,
+            976,
+            1240,
+            120
+          ],
+          "raw_top_left_rect": [
+            0,
+            3000,
+            1240,
+            120
+          ],
+          "semantics": [
+            {
+              "source": "OutRun MODE",
+              "korean": "아웃런 모드",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 0,
+          "block_y": 750,
+          "block_width": 310,
+          "block_height": 30,
+          "row_bytes": 4960,
+          "row_count": 30,
+          "first_row_offset": 12288128,
+          "last_row_start_offset": 12763264,
+          "last_byte_offset": 12768223,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_47",
+          "atlas_rect_bl": [
+            1240,
+            976,
+            1240,
+            120
+          ],
+          "raw_top_left_rect": [
+            1240,
+            3000,
+            1240,
+            120
+          ],
+          "semantics": [
+            {
+              "source": "Time Attack MODE",
+              "korean": "타임 어택 모드",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 310,
+          "block_y": 750,
+          "block_width": 310,
+          "block_height": 30,
+          "row_bytes": 4960,
+          "row_count": 30,
+          "first_row_offset": 12293088,
+          "last_row_start_offset": 12768224,
+          "last_byte_offset": 12773183,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_48",
+          "atlas_rect_bl": [
+            2480,
+            976,
+            1080,
+            120
+          ],
+          "raw_top_left_rect": [
+            2480,
+            3000,
+            1080,
+            120
+          ],
+          "semantics": [
+            {
+              "source": "15 Continuous Course Ranking",
+              "korean": "15코스 연속 랭킹",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 620,
+          "block_y": 750,
+          "block_width": 270,
+          "block_height": 30,
+          "row_bytes": 4320,
+          "row_count": 30,
+          "first_row_offset": 12298048,
+          "last_row_start_offset": 12773184,
+          "last_byte_offset": 12777503,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_42",
+          "atlas_rect_bl": [
+            0,
+            1096,
+            1288,
+            168
+          ],
+          "raw_top_left_rect": [
+            0,
+            2832,
+            1288,
+            168
+          ],
+          "semantics": [
+            {
+              "source": "Top Runners of Each Goal",
+              "korean": "각 골별 최고 기록",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 0,
+          "block_y": 708,
+          "block_width": 322,
+          "block_height": 42,
+          "row_bytes": 5152,
+          "row_count": 42,
+          "first_row_offset": 11600000,
+          "last_row_start_offset": 12271744,
+          "last_byte_offset": 12276895,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_45",
+          "atlas_rect_bl": [
+            2472,
+            1144,
+            1240,
+            120
+          ],
+          "raw_top_left_rect": [
+            2472,
+            2832,
+            1240,
+            120
+          ],
+          "semantics": [
+            {
+              "source": "Heart Attack MODE",
+              "korean": "하트 어택 모드",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 618,
+          "block_y": 708,
+          "block_width": 310,
+          "block_height": 30,
+          "row_bytes": 4960,
+          "row_count": 30,
+          "first_row_offset": 11609888,
+          "last_row_start_offset": 12085024,
+          "last_byte_offset": 12089983,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_66",
+          "atlas_rect_bl": [
+            656,
+            888,
+            600,
+            88
+          ],
+          "raw_top_left_rect": [
+            656,
+            3120,
+            600,
+            88
+          ],
+          "semantics": [
+            {
+              "source": "NORMAL",
+              "korean": "일반",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 164,
+          "block_y": 780,
+          "block_width": 150,
+          "block_height": 22,
+          "row_bytes": 2400,
+          "row_count": 22,
+          "first_row_offset": 12782272,
+          "last_row_start_offset": 13126336,
+          "last_byte_offset": 13128735,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_50",
+          "atlas_rect_bl": [
+            3712,
+            1144,
+            360,
+            120
+          ],
+          "raw_top_left_rect": [
+            3712,
+            2832,
+            360,
+            120
+          ],
+          "semantics": [
+            {
+              "source": "NORMAL",
+              "korean": "일반",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 928,
+          "block_y": 708,
+          "block_width": 90,
+          "block_height": 30,
+          "row_bytes": 1440,
+          "row_count": 30,
+          "first_row_offset": 11614848,
+          "last_row_start_offset": 12089984,
+          "last_byte_offset": 12091423,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_67",
+          "atlas_rect_bl": [
+            1256,
+            888,
+            600,
+            88
+          ],
+          "raw_top_left_rect": [
+            1256,
+            3120,
+            600,
+            88
+          ],
+          "semantics": [
+            {
+              "source": "TUNED",
+              "korean": "튜닝",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 314,
+          "block_y": 780,
+          "block_width": 150,
+          "block_height": 22,
+          "row_bytes": 2400,
+          "row_count": 22,
+          "first_row_offset": 12784672,
+          "last_row_start_offset": 13128736,
+          "last_byte_offset": 13131135,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_68",
+          "atlas_rect_bl": [
+            1856,
+            888,
+            600,
+            88
+          ],
+          "raw_top_left_rect": [
+            1856,
+            3120,
+            600,
+            88
+          ],
+          "semantics": [
+            {
+              "source": "TUNED",
+              "korean": "튜닝",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 464,
+          "block_y": 780,
+          "block_width": 150,
+          "block_height": 22,
+          "row_bytes": 2400,
+          "row_count": 22,
+          "first_row_offset": 12787072,
+          "last_row_start_offset": 13131136,
+          "last_byte_offset": 13133535,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_27",
+          "atlas_rect_bl": [
+            2400,
+            1464,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            2400,
+            2432,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL A",
+              "korean": "골 A",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 600,
+          "block_y": 608,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9971200,
+          "last_row_start_offset": 10774016,
+          "last_byte_offset": 10776415,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_22",
+          "atlas_rect_bl": [
+            3096,
+            2112,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            3096,
+            1784,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL A",
+              "korean": "골 A",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 774,
+          "block_y": 446,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 7319776,
+          "last_row_start_offset": 8122592,
+          "last_byte_offset": 8124991,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_26",
+          "atlas_rect_bl": [
+            1800,
+            1464,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            1800,
+            2432,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL B",
+              "korean": "골 B",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 450,
+          "block_y": 608,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9968800,
+          "last_row_start_offset": 10771616,
+          "last_byte_offset": 10774015,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_21",
+          "atlas_rect_bl": [
+            3040,
+            1664,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            3040,
+            2232,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL B",
+              "korean": "골 B",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 760,
+          "block_y": 558,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9154560,
+          "last_row_start_offset": 9957376,
+          "last_byte_offset": 9959775,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_25",
+          "atlas_rect_bl": [
+            1200,
+            1464,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            1200,
+            2432,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL C",
+              "korean": "골 C",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 300,
+          "block_y": 608,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9966400,
+          "last_row_start_offset": 10769216,
+          "last_byte_offset": 10771615,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_20",
+          "atlas_rect_bl": [
+            2440,
+            1664,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            2440,
+            2232,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL C",
+              "korean": "골 C",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 610,
+          "block_y": 558,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9152160,
+          "last_row_start_offset": 9954976,
+          "last_byte_offset": 9957375,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_24",
+          "atlas_rect_bl": [
+            600,
+            1464,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            600,
+            2432,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL D",
+              "korean": "골 D",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 150,
+          "block_y": 608,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9964000,
+          "last_row_start_offset": 10766816,
+          "last_byte_offset": 10769215,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_19",
+          "atlas_rect_bl": [
+            1840,
+            1664,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            1840,
+            2232,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL D",
+              "korean": "골 D",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 460,
+          "block_y": 558,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9149760,
+          "last_row_start_offset": 9952576,
+          "last_byte_offset": 9954975,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_23",
+          "atlas_rect_bl": [
+            0,
+            1464,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            0,
+            2432,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL E",
+              "korean": "골 E",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 0,
+          "block_y": 608,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9961600,
+          "last_row_start_offset": 10764416,
+          "last_byte_offset": 10766815,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_18",
+          "atlas_rect_bl": [
+            1240,
+            1664,
+            600,
+            200
+          ],
+          "raw_top_left_rect": [
+            1240,
+            2232,
+            600,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "GOAL E",
+              "korean": "골 E",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 310,
+          "block_y": 558,
+          "block_width": 150,
+          "block_height": 50,
+          "row_bytes": 2400,
+          "row_count": 50,
+          "first_row_offset": 9147360,
+          "last_row_start_offset": 9950176,
+          "last_byte_offset": 9952575,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_17",
+          "atlas_rect_bl": [
+            0,
+            1664,
+            1240,
+            200
+          ],
+          "raw_top_left_rect": [
+            0,
+            2232,
+            1240,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "OutRun2SP 15 Continuous Course",
+              "korean": "아웃런2 SP 15코스 연속",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 0,
+          "block_y": 558,
+          "block_width": 310,
+          "block_height": 50,
+          "row_bytes": 4960,
+          "row_count": 50,
+          "first_row_offset": 9142400,
+          "last_row_start_offset": 9945216,
+          "last_byte_offset": 9950175,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_16",
+          "atlas_rect_bl": [
+            2740,
+            1864,
+            1240,
+            200
+          ],
+          "raw_top_left_rect": [
+            2740,
+            2032,
+            1240,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "OutRun2 15 Continuous Course",
+              "korean": "아웃런2 15코스 연속",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "BC3_4X4_BLOCK_ROWS",
+          "block_aligned": true,
+          "block_pitch_bytes": 16384,
+          "block_x": 685,
+          "block_y": 508,
+          "block_width": 310,
+          "block_height": 50,
+          "row_bytes": 4960,
+          "row_count": 50,
+          "first_row_offset": 8334160,
+          "last_row_start_offset": 9136976,
+          "last_byte_offset": 9141935,
+          "in_file": true
+        }
+      ],
+      "region_overlap_pairs": []
+    },
+    {
+      "queue_index": 100,
+      "asset": "53CE39D5",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+      "exact_hd_release": {
+        "git_blob_sha": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 16777344,
+        "size_equation_bytes": 16777344,
+        "size_equation_matches_file": true
+      },
+      "canonical_semantics": 7,
+      "mapped_physical_occurrences": 7,
+      "localizable_physical_occurrences": 7,
+      "preserve_original_occurrences": 0,
+      "regions": [
+        {
+          "sprite": "sprite_472",
+          "atlas_rect_bl": [
+            1108,
+            4,
+            360,
+            280
+          ],
+          "raw_top_left_rect": [
+            1108,
+            1764,
+            360,
+            280
+          ],
+          "semantics": [
+            {
+              "source": "RANDOM",
+              "korean": "무작위",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 280,
+          "first_row_offset": 14455248,
+          "last_row_start_offset": 16740816,
+          "last_byte_offset": 16742255,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_495",
+          "atlas_rect_bl": [
+            4,
+            1444,
+            360,
+            200
+          ],
+          "raw_top_left_rect": [
+            4,
+            404,
+            360,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "TimeAttack Mode OutRun2",
+              "korean": "타임 어택 모드 아웃런2",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 200,
+          "first_row_offset": 3309712,
+          "last_row_start_offset": 4939920,
+          "last_byte_offset": 4941359,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_496",
+          "atlas_rect_bl": [
+            372,
+            1444,
+            360,
+            200
+          ],
+          "raw_top_left_rect": [
+            372,
+            404,
+            360,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "HeartAttack Mode OutRun2",
+              "korean": "하트 어택 모드 아웃런2",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 200,
+          "first_row_offset": 3311184,
+          "last_row_start_offset": 4941392,
+          "last_byte_offset": 4942831,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_497",
+          "atlas_rect_bl": [
+            740,
+            1412,
+            360,
+            200
+          ],
+          "raw_top_left_rect": [
+            740,
+            436,
+            360,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "OutRun Mode OutRun2",
+              "korean": "아웃런 모드 아웃런2",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 200,
+          "first_row_offset": 3574800,
+          "last_row_start_offset": 5205008,
+          "last_byte_offset": 5206447,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_498",
+          "atlas_rect_bl": [
+            1108,
+            1332,
+            360,
+            200
+          ],
+          "raw_top_left_rect": [
+            1108,
+            516,
+            360,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "TimeAttack Mode SPECIAL TOURS",
+              "korean": "타임 어택 모드 스페셜 투어",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 200,
+          "first_row_offset": 4231632,
+          "last_row_start_offset": 5861840,
+          "last_byte_offset": 5863279,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_499",
+          "atlas_rect_bl": [
+            1476,
+            1284,
+            360,
+            200
+          ],
+          "raw_top_left_rect": [
+            1476,
+            564,
+            360,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "HeartAttack Mode SPECIAL TOURS",
+              "korean": "하트 어택 모드 스페셜 투어",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 200,
+          "first_row_offset": 4626320,
+          "last_row_start_offset": 6256528,
+          "last_byte_offset": 6257967,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_505",
+          "atlas_rect_bl": [
+            1012,
+            1828,
+            360,
+            200
+          ],
+          "raw_top_left_rect": [
+            1012,
+            20,
+            360,
+            200
+          ],
+          "semantics": [
+            {
+              "source": "OutRun Mode SPECIAL TOURS",
+              "korean": "아웃런 모드 스페셜 투어",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1440,
+          "row_count": 200,
+          "first_row_offset": 168016,
+          "last_row_start_offset": 1798224,
+          "last_byte_offset": 1799663,
+          "in_file": true
+        }
+      ],
+      "region_overlap_pairs": []
+    },
+    {
+      "queue_index": 106,
+      "asset": "788CE557",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+      "exact_hd_release": {
+        "git_blob_sha": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "bytes": 8388736,
+        "size_equation_bytes": 8388736,
+        "size_equation_matches_file": true
+      },
+      "canonical_semantics": 4,
+      "mapped_physical_occurrences": 4,
+      "localizable_physical_occurrences": 3,
+      "preserve_original_occurrences": 1,
+      "regions": [
+        {
+          "sprite": "sprite_343",
+          "atlas_rect_bl": [
+            0,
+            88,
+            440,
+            104
+          ],
+          "raw_top_left_rect": [
+            0,
+            832,
+            440,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "For Experts",
+              "korean": "상급자용",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1760,
+          "row_count": 104,
+          "first_row_offset": 6815872,
+          "last_row_start_offset": 7659648,
+          "last_byte_offset": 7661407,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_344",
+          "atlas_rect_bl": [
+            440,
+            104,
+            408,
+            88
+          ],
+          "raw_top_left_rect": [
+            440,
+            832,
+            408,
+            88
+          ],
+          "semantics": [
+            {
+              "source": "OutRun2SP",
+              "korean": "아웃런2 SP",
+              "disposition": "PRESERVE_ORIGINAL_RECOMMENDED_LOGO_WORDMARK"
+            }
+          ],
+          "disposition": "PRESERVE_ORIGINAL",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 1632,
+          "row_count": 88,
+          "first_row_offset": 6817632,
+          "last_row_start_offset": 7530336,
+          "last_byte_offset": 7531967,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_345",
+          "atlas_rect_bl": [
+            848,
+            120,
+            552,
+            72
+          ],
+          "raw_top_left_rect": [
+            848,
+            832,
+            552,
+            72
+          ],
+          "semantics": [
+            {
+              "source": "Music Change",
+              "korean": "음악 변경",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 2208,
+          "row_count": 72,
+          "first_row_offset": 6819264,
+          "last_row_start_offset": 7400896,
+          "last_byte_offset": 7403103,
+          "in_file": true
+        },
+        {
+          "sprite": "sprite_342",
+          "atlas_rect_bl": [
+            1136,
+            208,
+            696,
+            104
+          ],
+          "raw_top_left_rect": [
+            1136,
+            712,
+            696,
+            104
+          ],
+          "semantics": [
+            {
+              "source": "Time remaining :",
+              "korean": "남은 시간:",
+              "disposition": "LOCALIZE"
+            }
+          ],
+          "disposition": "LOCALIZE",
+          "in_canvas": true,
+          "payload_layout": "LINEAR_RGBA32_ROW_STRIDED",
+          "row_pitch_bytes": 8192,
+          "row_bytes": 2784,
+          "row_count": 104,
+          "first_row_offset": 5837376,
+          "last_row_start_offset": 6681152,
+          "last_byte_offset": 6683935,
+          "in_file": true
+        }
+      ],
+      "region_overlap_pairs": []
+    }
+  ],
+  "material_advance": {
+    "type": "THREE_EVEN_EXACT_RELEASE_PAYLOAD_EXTRACTION_SCOPES",
+    "indices": [
+      86,
+      100,
+      106
+    ],
+    "assets": [
+      "C598919A",
+      "53CE39D5",
+      "788CE557"
+    ],
+    "unique_extraction_regions": 42,
+    "mapped_physical_occurrences": 42,
+    "localizable_physical_occurrences": 41,
+    "preserve_original_occurrences": 1,
+    "bc3_regions": 31,
+    "rgba32_regions": 11,
+    "out_of_bounds_ranges": 0,
+    "block_unaligned_regions": 0,
+    "region_overlap_pairs": 0,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "strict_holds": {
+    "raw_readable_orientation": "HOLD_EXACT_DECODE_REQUIRED",
+    "source_full_effect_bboxes": "HOLD_EXACT_DECODE_REQUIRED",
+    "glyph_effect_masks": "HOLD_EXACT_DECODE_REQUIRED",
+    "clean_plates": "HOLD_EXACT_DECODE_REQUIRED",
+    "generation_v2_safe_bboxes": "HOLD_UNTIL_FULL_EFFECT_BBOX",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_86_100_106",
+    "anti_duplication": "PASS_B00076_CONSUMED_BY_C_Q00005__CURRENT_B00085_QA_PENDING_ASSETS_SKIPPED",
+    "source_mapping_reuse": "PASS_B00051_B00076_C00078_UNCHANGED",
+    "release_size_equations": "PASS_3_OF_3",
+    "extraction_ranges": "PASS_42_OF_42_IN_CANVAS_AND_IN_FILE",
+    "bc3_alignment": "PASS_31_OF_31_4X4_BLOCK_ALIGNED",
+    "region_overlap_pairs": 0,
+    "candidate_write": "NONE_FAIL_CLOSED",
+    "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00023 materially advances three C-consumed even-shard assets by adding exact Release payload extraction scopes for 42 mapped physical regions (31 BC3, 11 RGBA32), including one protected OutRun2SP wordmark region. All scopes are in-bounds, BC3-aligned where applicable, and non-overlapping. No candidate pixels are guessed; orientation/effect-mask/clean-plate/v2/candidate/runtime gates remain fail-closed."
+}
