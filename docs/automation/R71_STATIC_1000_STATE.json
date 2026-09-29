@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 143,
+  "completedCycles": 144,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "4c4f0b603c0eb68686633532cd86fc937151bd2f",
+  "currentHead": "069c6f26ec68d50018deda8ba2b52c3452575525",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -3906,20 +3906,61 @@
       "automationValidation": "SOURCE_AND_STRUCTURAL_GUARD_COMMITTED; exact-head GitHub CI registration pending at checkpoint",
       "runtimeValidation": "UNTESTED",
       "next": "Cycle 144: consume 4c4f0b6 exact-head Build/OpenXR/HUD results. Then inspect the two exact OutRun final-result clip producers 0x97BB7/0x97DA7 and GOAL/time composite ownership for any remaining node-lifetime gap; keep selector policy unchanged until new HMD pointer evidence."
+    },
+    {
+      "cycle": 144,
+      "lenses": [
+        "final-result/GOAL ownership falsification",
+        "rival Calc3D2D anchor lifetime",
+        "SpriteNode queue metadata persistence",
+        "per-eye projected-marker semantics",
+        "adversarial: no generic HUD/world promotion"
+      ],
+      "findingKeys": [
+        "DX9EX-RIVAL-MARKER-NODE-ANCHOR-LIFETIME-001"
+      ],
+      "findings": [
+        "The two exact OutRun final-result clip producers 0x97BB7/0x97DA7 already pin their appended SpriteNode directly as ScreenHud, and GOAL/time helpers BE020/BE150 already tag every appended node. They do not share the R71 Sumo producer-only gap.",
+        "The exact gameplay rival marker 0xBB796 did share that gap: Calc3D2D recovered a valid vehicle-relative view anchor, but R71RivalMarker_sprani only exposed it through temporary ScopedProducerSemantic during the synchronous call.",
+        "Because sprani output is deferred through the SpriteNode queue, the projected anchor could be lost before draw, leaving the marker to fall back toward flat/head-relative screen behavior.",
+        "R71RivalMarker_sprani now snapshots the exact Calc3D2D marker, snapshots queue tails, and registers only nodes appended by 0xBB796 as ProjectedWorldMarker2D with the full marker snapshot.",
+        "No generic rank marker, HUD range, world geometry, menu arrow, SkyGlow intensity, resource budget, or performance behavior changed."
+      ],
+      "evidence": [
+        "hooks_uiscaling.cpp 0x97BB7/0x97DA7 R70ExactScreenHud_putClipSprite direct node registration",
+        "GoalTime_TagHelper exact BE020/BE150 bounded appended-node registration",
+        "Calc3D2D return 0xBB6F5 recovers RivalMarkerProjectedInfo viewX/viewY/viewZ",
+        "old R71RivalMarker_sprani used temporary ScopedProducerSemantic only",
+        "new R71RivalMarkerTaggedNodes + RegisterSpriteNodeScope(...ProjectedWorldMarker2D,&markerSnapshot)",
+        "069c6f26 exact-head Build/OpenXR/HUD workflows registered; queued at checkpoint"
+      ],
+      "changedFiles": [
+        "src/hooks_uiscaling.cpp",
+        "tools/verify_vr_proven_baseline.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "6d8ca3803ae224aeaa3bad04ee692afe0f27393d",
+        "069c6f26ec68d50018deda8ba2b52c3452575525"
+      ],
+      "automationValidation": "EXACT_PROJECTED_NODE_ANCHOR_CONTRACT_COMMITTED; GitHub Build/OpenXR/HUD CI queued; no PASS claimed",
+      "runtimeValidation": "UNTESTED",
+      "next": "Cycle 145: consume 069c6f26 exact-head CI. Then inspect lens-flare exact projected-screen producer/node lifetime and pre-race shadow corruption. Keep selector resource changes gated on new HMD pointer-correlated evidence."
     }
   ],
   "nextCycle": {
-    "cycle": 144,
+    "cycle": 145,
     "priority": [
-      "consume 4c4f0b6 exact-head Build/OpenXR/HUD results",
-      "inspect exact final-result clip 0x97BB7/0x97DA7 node lifetime",
-      "inspect GOAL/time helper ownership and stage-mark double/head-follow",
-      "then rival marker vehicle/world anchor depth",
-      "return to selector resource policy only with new HMD pointer-correlated log"
+      "consume 069c6f26 exact-head Build/OpenXR/HUD results",
+      "inspect lens-flare exact Calc3D2D/projected-screen node lifetime and double display",
+      "inspect pre-race start-grid shadow split/corruption exact pass ownership",
+      "inspect remaining HUD/menu alpha state only if independent evidence exists",
+      "return to selector CPU-shadow policy only with HMD pointer-correlated evidence"
     ],
-    "guard": "Performance optimization remains paused. Do not widen HUD ranges, force material/color, increase total MANAGED shadow budget, or alter sampled world stereo. Frozen 34eef500 package remains immutable."
+    "guard": "No performance-only work. Do not flatten projected world markers into ScreenHud, widen HUD ranges, force vehicle material/color, or increase global MANAGED shadow budget."
   },
-  "updatedKst": "2026-09-29T14:04:19+09:00",
+  "updatedKst": "2026-09-29T14:07:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
