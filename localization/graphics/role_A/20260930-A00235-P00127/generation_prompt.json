@@ -1,0 +1,188 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "asset_id": "EBE401C8",
+  "queue_index": 231,
+  "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+  "source_dimensions": [
+    2048,
+    1024
+  ],
+  "source_text_transform": "flip_y",
+  "source_baseline_vector_readable": [
+    1,
+    0
+  ],
+  "source_signed_slant_angle_deg": 0,
+  "source_style_family": "FF514CEB-compatible upright condensed heavy sans; flat red/grey; no outline/shadow/glow",
+  "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "rules": [
+    "EDIT, DO NOT REDESIGN. Exact HD source is authoritative.",
+    "Use the C150-accepted six-element source-effect removal mask and transparent CLEAN_PLATE.",
+    "Restore preserve-original LAN source pixels exactly; render only approved Korean wording for the other four physical elements.",
+    "Use exact readable-space candidate_safe_bbox values with at least the accepted 2px source inset; measure final effect-inclusive Hangul bbox before encoding.",
+    "No flattened raster resize; adjust font size/placement and rerender.",
+    "Restore raw FLIP_Y orientation before DDS encoding; reuse the exact 128-byte source DDS header/channel masks/mipmap policy.",
+    "Fail if any changed pixel/alpha escapes allowed source regions or if preserve-source LAN pixels change."
+  ],
+  "elements": [
+    {
+      "id": "desc_online",
+      "source": "Play OutRun Online with Friends or other players!",
+      "korean": "친구나 다른 플레이어와 온라인 아웃런을 즐기세요!",
+      "bbox": [
+        7,
+        371,
+        1446,
+        437
+      ],
+      "safe": [
+        9,
+        373,
+        1444,
+        435
+      ],
+      "color": [
+        63,
+        71,
+        74
+      ],
+      "role": "localize",
+      "font_size_px": 56,
+      "source_style": "upright condensed heavy sans; flat fill; no outline/shadow/glow",
+      "source_signed_slant_angle_deg": 0,
+      "candidate_signed_slant_angle_deg": 0
+    },
+    {
+      "id": "desc_lan",
+      "source": "Join or Create a LAN game of OutRun!",
+      "korean": "LAN 아웃런 게임에 참가하거나 만들어 보세요!",
+      "bbox": [
+        2,
+        531,
+        1122,
+        597
+      ],
+      "safe": [
+        4,
+        533,
+        1120,
+        595
+      ],
+      "color": [
+        63,
+        71,
+        74
+      ],
+      "role": "localize",
+      "font_size_px": 56,
+      "source_style": "upright condensed heavy sans; flat fill; no outline/shadow/glow",
+      "source_signed_slant_angle_deg": 0,
+      "candidate_signed_slant_angle_deg": 0
+    },
+    {
+      "id": "lan_large",
+      "source": "LAN",
+      "korean": "LAN",
+      "bbox": [
+        6,
+        696,
+        335,
+        834
+      ],
+      "safe": [
+        8,
+        698,
+        333,
+        832
+      ],
+      "color": [
+        186,
+        0,
+        0
+      ],
+      "role": "preserve_source",
+      "source_signed_slant_angle_deg": 0,
+      "candidate_signed_slant_angle_deg": 0
+    },
+    {
+      "id": "lan_small",
+      "source": "LAN",
+      "korean": "LAN",
+      "bbox": [
+        1295,
+        780,
+        1436,
+        839
+      ],
+      "safe": [
+        1297,
+        782,
+        1434,
+        837
+      ],
+      "color": [
+        63,
+        71,
+        74
+      ],
+      "role": "preserve_source",
+      "source_signed_slant_angle_deg": 0,
+      "candidate_signed_slant_angle_deg": 0
+    },
+    {
+      "id": "online_large",
+      "source": "ONLINE",
+      "korean": "온라인",
+      "bbox": [
+        6,
+        867,
+        640,
+        1012
+      ],
+      "safe": [
+        8,
+        869,
+        638,
+        1010
+      ],
+      "color": [
+        186,
+        0,
+        0
+      ],
+      "role": "localize",
+      "font_size_px": 141,
+      "source_style": "upright condensed heavy sans; flat fill; no outline/shadow/glow",
+      "source_signed_slant_angle_deg": 0,
+      "candidate_signed_slant_angle_deg": 0
+    },
+    {
+      "id": "online_small",
+      "source": "ONLINE",
+      "korean": "온라인",
+      "bbox": [
+        1298,
+        949,
+        1560,
+        1011
+      ],
+      "safe": [
+        1300,
+        951,
+        1558,
+        1009
+      ],
+      "color": [
+        63,
+        71,
+        74
+      ],
+      "role": "localize",
+      "font_size_px": 52,
+      "source_style": "upright condensed heavy sans; flat fill; no outline/shadow/glow",
+      "source_signed_slant_angle_deg": 0,
+      "candidate_signed_slant_angle_deg": 0
+    }
+  ]
+}

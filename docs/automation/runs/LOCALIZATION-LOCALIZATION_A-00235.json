@@ -1,0 +1,163 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00235-p00127-index231-v2-production-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00235",
+  "wave_id": "P00127",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T08:06:23+09:00",
+  "base_head_sha": "324e53ec0ff0e8886e45e10d123766b2fc4afb9e",
+  "base_sha": "324e53ec0ff0e8886e45e10d123766b2fc4afb9e",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX231_V2_CANDIDATE_METADATA_REVIEW_EVIDENCE_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX231_V2_KOREAN_RGBA32_CANDIDATE_STATIC_QA_RUNTIME_UNTESTED",
+  "summary": "Consumed authoritative C153/Q00051 RENDER_READY index231/EBE401C8, retained as first RENDER_READY by C154/Q00052. Reused C150/Q00048 exact canonical source, six effect masks, transparent CLEAN_PLATE and six 2px safe bboxes plus C153-reconciled semantics. Measured upright horizontal zero-slant source typography, reused the independently accepted FF514CEB-compatible flat red/grey heavy-sans style, preserved both LAN occurrences pixel-exact, rendered four Korean physical elements at native resolution, restored FLIP_Y raw orientation and exact RGBA32 header/mip policy, and passed decoded-final zero-pixel/alpha/protected self-QA plus exact English-source comparison. Exact 8,388,736-byte DDS SHA ba9e0c73... and review proofs are persisted under approved Drive CURRENT_PIPELINE with IDs/hashes registered in Git. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "selected_priority": "RENDER_READY_CANDIDATE_COMPLETION",
+    "selected_index": 231,
+    "accepted_c_gate": "C153/Q00051 ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5 / Gate 36641607563 success",
+    "latest_c_gate": "C154/Q00052 fb585c580e37476ed77ae3734b7f511e56852c06 / Gate 36642122523 success",
+    "policy_reason": "Q00052 retains index231 as first RENDER_READY A-shard work; candidate-completion-first preempts unrelated preflight."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00235-P00127/A00235_P00127_INDEX231_V2_PRODUCTION.json",
+    "localization/graphics/role_A/20260930-A00235-P00127/generation_prompt.json",
+    "localization/graphics/role_A/20260930-A00235-P00127/qa_report.json"
+  ],
+  "external_material_evidence": {
+    "root_policy": "OutRun2006_Korean_Artifacts/CURRENT_PIPELINE (outside historical snapshot)",
+    "folder_id": "1V2ixcxpegBqfCShVpJgwU9IaRilWJcQO",
+    "candidate_zip": {
+      "file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+      "name": "A00235_INDEX231_CANDIDATE.zip",
+      "sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+      "bytes": 45594,
+      "inner_member": "EBE401C8_512x256.dds",
+      "inner_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+      "inner_bytes": 8388736
+    },
+    "source_display": {
+      "file_id": "1gd73Al0iW8DNq_EMzcPw-f6InJxGjtK6",
+      "name": "source_display.png",
+      "sha256": "7caa120e9f3036570d3d741af937afae47f22d0b91635b30c67e882a3054e4fe",
+      "bytes": 60485
+    },
+    "clean_plate_display": {
+      "file_id": "1oSqDVaEMOtr4YU0yaGNll1fl3lWpOKAs",
+      "name": "clean_plate_display.png",
+      "sha256": "d8f31d026aba172514dc3f6379245a1617dea53f14ab2cdd580e6f6145d440fc",
+      "bytes": 9553
+    },
+    "candidate_display": {
+      "file_id": "1Eg6wDK7ozXQC1fN8UauIEvsX3_H6LkAu",
+      "name": "candidate_display.png",
+      "sha256": "903295b15316d5e9d89f53be99fde8b263987b1d475211f87f685870942b10a9",
+      "bytes": 52293
+    },
+    "comparison": {
+      "file_id": "13Oskub9aRmCwx50ysrR6t4wBtjipkdk-",
+      "name": "comparison.png",
+      "sha256": "c7cd074a24cb0134b367e728e3e8667c9bd5c9ad664538a6c0955cf05895229e",
+      "bytes": 108896
+    },
+    "element_comparison": {
+      "file_id": "1vsdOR0DswrCpj3P080GNGWhs0exmkDbC",
+      "name": "element_comparison.png",
+      "sha256": "c93585668784a1050bcc0f20609da12d086da429b9db4ee827a1d4b6b8566098",
+      "bytes": 160959
+    }
+  },
+  "material_deliverable": {
+    "type": "INDEX231_EBE401C8_V2_KOREAN_RGBA32_DDS_CANDIDATE_WITH_DECODED_FINAL_QA_AND_ENGLISH_COMPARISON",
+    "reviewed_indices": [
+      231
+    ],
+    "reviewed_assets": [
+      "EBE401C8"
+    ],
+    "candidate_dds_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+    "candidate_dds_bytes": 8388736,
+    "candidate_dds_modified": true,
+    "translated_regions": 4,
+    "preserve_source_occurrences": 2,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "one_pixel_overflow": 0,
+    "drive_candidate_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+    "drive_candidate_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "material_payload_persisted": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "selected_priority": "RENDER_READY_CANDIDATE_COMPLETION",
+    "selected_indices": [
+      231
+    ],
+    "accepted_c_gate": "C153/Q00051",
+    "latest_c_gate": "C154/Q00052",
+    "completed_work_not_repeated": [
+      "A00218/C150 exact source, mask, CLEAN_PLATE and safe-bbox heavy QA",
+      "A00227/C153 semantic handoff and canonical reconciliation",
+      "A00230/A00232/A00234 isolation inputs"
+    ],
+    "readiness_before": {
+      "231": "RENDER_READY"
+    },
+    "readiness_after": {
+      "231": "CANDIDATE_PERSISTED_PRODUCER_STATIC_PASS_PENDING_INDEPENDENT_C"
+    }
+  },
+  "self_qa": "PASS_A_MOD3_INDEX231__C153_RENDER_READY__C150_SOURCE_MASK_CLEANPLATE_SAFE_BBOX_REUSED__4_LOCALIZED_PLUS_2_LAN_PRESERVE__ZERO_PIXEL_ESCAPE__RGBA32_HEADER_EXACT__FLIP_Y__SOURCE_STYLE_ZERO_SLANT__MANDATORY_DRIVE_REVIEW_SET__RUNTIME_UNTESTED",
+  "candidate_static_qa": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Verified exact pinned v0.25.10a source input; newly generated candidate/review binaries stored outside historical snapshot under CURRENT_PIPELINE.",
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(A): persist index231 v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_A-00235]",
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "asset_queue_blob_sha": "1f55cfdd2167d215f11915baae3a91634cb97a8c",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "c00233_blob_sha": "82dd33fcc9e8ee5f053637822b74fd1aefae89e6",
+    "c00236_blob_sha": "f3d255b73749fa3ce7bb8a27c4d9ee5fc35510ca"
+  },
+  "drive_material_registration": {
+    "producer_task_id": "LOCALIZATION-LOCALIZATION_A-00235",
+    "producing_result_sha": null,
+    "role": "LOCALIZATION_A",
+    "validation_state": "PENDING_C_BATCH_GATE",
+    "runtime_validation": "UNTESTED",
+    "drive_folder_id": "1V2ixcxpegBqfCShVpJgwU9IaRilWJcQO",
+    "candidate_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+    "candidate_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "candidate_inner_dds_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594"
+  },
+  "bookkeeping_note": "RESULT_SHA and producing_result_sha are filled only after verifying the immutable AUTO result commit. Producer automation_validation remains PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED."
+}

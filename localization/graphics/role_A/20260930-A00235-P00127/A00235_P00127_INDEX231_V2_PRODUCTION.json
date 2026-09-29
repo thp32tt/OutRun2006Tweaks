@@ -1,0 +1,396 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00235-p00127-index231-v2-production-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00235",
+  "wave_id": "P00127",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T08:06:23+09:00",
+  "base_head_sha": "324e53ec0ff0e8886e45e10d123766b2fc4afb9e",
+  "queue_index": 231,
+  "asset": "EBE401C8",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX231_V2_KOREAN_RGBA32_CANDIDATE_STATIC_QA_RUNTIME_UNTESTED",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "prompt_odd_index_rule_overridden_by_current_git_contract": true,
+    "selected_priority": "RENDER_READY_CANDIDATE_COMPLETION",
+    "selected_index": 231,
+    "accepted_c_gate": "C153/Q00051 ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5 / Gate 36641607563 success",
+    "latest_c_gate": "C154/Q00052 fb585c580e37476ed77ae3734b7f511e56852c06 / Gate 36642122523 success",
+    "policy_reason": "Q00052 retains index231 as first RENDER_READY A-shard work; candidate-completion-first preempts unrelated preflight."
+  },
+  "source": {
+    "transport": "verified uploaded exact pinned v0.25.10a Release archive",
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds",
+    "sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "bytes": 8388736,
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "decoded_raw_rgba_sha256": "e4db10759fa035d1435fdfb6b3e1a003fddc706a5058b486f463c20347faa31e",
+    "decoded_display_rgba_sha256": "555b84e402ce01a6028e5df9d944308ee738e9a5ee7dbf6da8676bac0060ae79"
+  },
+  "accepted_precandidate_lineage": {
+    "a00218_result_sha": "f0e94bd55b8b3a3c94f8b442934277a95b764f40",
+    "c150_q00048_result_sha": "bd354484bd976ec11a67036a66bd102ba797107d",
+    "a00227_result_sha": "23f0c10f7799e440ac71e10f3105ac31e161fecc",
+    "c153_q00051_result_sha": "ef3b8e3628dfdb7a361b0febbba9cb7ac83c29c5",
+    "c154_q00052_result_sha": "fb585c580e37476ed77ae3734b7f511e56852c06",
+    "production_readiness": "RENDER_READY"
+  },
+  "clean_plate": {
+    "accepted_c_replay": "PASS_C150_Q00048",
+    "removal_mask_pixels": 150173,
+    "removal_mask_sha256": "2d1ee0e64f653d440960abaffabf36fe997ba0daefac9be3ab28869175f14ae2",
+    "clean_plate_display_rgba_sha256": "f6a66a70b9a1f775f43219d28b6caa3453290766a09bfdb5eb249723def07f01",
+    "clean_plate_raw_rgba_sha256": "a8f863fefc33e69de96f58b48f2dba4937e85a7b48d82479866365564254b509",
+    "changed_pixels_outside_removal_mask": 0,
+    "alpha_changed_pixels_outside_removal_mask": 0,
+    "visible_alpha_after_clean_plate": 0,
+    "preserve_source_restoration": [
+      "lan_large",
+      "lan_small"
+    ]
+  },
+  "production": {
+    "semantic_bindings": 4,
+    "preserve_source_occurrences": 2,
+    "source_style": "upright condensed heavy sans; flat red/grey; no outline/shadow/glow; transparent atlas",
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "source_slant_direction": "none",
+    "candidate_slant_direction": "none",
+    "signed_slant_gate": "PASS",
+    "raster_resampling": "NOT_USED",
+    "safe_fit": "PASS_2PX_INSET_ALL_4_LOCALIZED",
+    "metrics": [
+      {
+        "id": "desc_online",
+        "source": "Play OutRun Online with Friends or other players!",
+        "korean": "친구나 다른 플레이어와 온라인 아웃런을 즐기세요!",
+        "source_effect_bbox_readable": [
+          7,
+          371,
+          1446,
+          437
+        ],
+        "candidate_safe_bbox_readable": [
+          9,
+          373,
+          1444,
+          435
+        ],
+        "source_effect_pixels": 35514,
+        "source_mask_sha256": "836a36dc48590cb90e3c9f968c83e83563be4cdde7aed117209f4c06f8c893e6",
+        "role": "localize",
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ],
+        "font_size_px": 56,
+        "localized_bbox_readable": [
+          15,
+          377,
+          1174,
+          431
+        ],
+        "safe_margins_ltrb": [
+          6,
+          4,
+          270,
+          4
+        ],
+        "containment": "PASS"
+      },
+      {
+        "id": "desc_lan",
+        "source": "Join or Create a LAN game of OutRun!",
+        "korean": "LAN 아웃런 게임에 참가하거나 만들어 보세요!",
+        "source_effect_bbox_readable": [
+          2,
+          531,
+          1122,
+          597
+        ],
+        "candidate_safe_bbox_readable": [
+          4,
+          533,
+          1120,
+          595
+        ],
+        "source_effect_pixels": 26651,
+        "source_mask_sha256": "1419cfbf526e198bf81197688a0eef27e809ef42aa7ec36d5efe6459234a961a",
+        "role": "localize",
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ],
+        "font_size_px": 56,
+        "localized_bbox_readable": [
+          13,
+          537,
+          1073,
+          591
+        ],
+        "safe_margins_ltrb": [
+          9,
+          4,
+          47,
+          4
+        ],
+        "containment": "PASS"
+      },
+      {
+        "id": "lan_large",
+        "source": "LAN",
+        "korean": "LAN",
+        "source_effect_bbox_readable": [
+          6,
+          696,
+          335,
+          834
+        ],
+        "candidate_safe_bbox_readable": [
+          8,
+          698,
+          333,
+          832
+        ],
+        "source_effect_pixels": 24266,
+        "source_mask_sha256": "e38291bc29a552b231b402096527e6a537ae1b6eabb214e057e90a0df281c2f2",
+        "role": "preserve_source",
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ],
+        "preserve_source_exact": true
+      },
+      {
+        "id": "lan_small",
+        "source": "LAN",
+        "korean": "LAN",
+        "source_effect_bbox_readable": [
+          1295,
+          780,
+          1436,
+          839
+        ],
+        "candidate_safe_bbox_readable": [
+          1297,
+          782,
+          1434,
+          837
+        ],
+        "source_effect_pixels": 4619,
+        "source_mask_sha256": "26b150d9cd398bb4752fb169ecbd98ba456d4f5035e257dc816aca5411b054ec",
+        "role": "preserve_source",
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ],
+        "preserve_source_exact": true
+      },
+      {
+        "id": "online_large",
+        "source": "ONLINE",
+        "korean": "온라인",
+        "source_effect_bbox_readable": [
+          6,
+          867,
+          640,
+          1012
+        ],
+        "candidate_safe_bbox_readable": [
+          8,
+          869,
+          638,
+          1010
+        ],
+        "source_effect_pixels": 49596,
+        "source_mask_sha256": "1035cecb21c898ebc6e91ecd55f0d7bf801660878bacf7b1468db285d0d8ad61",
+        "role": "localize",
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ],
+        "font_size_px": 141,
+        "localized_bbox_readable": [
+          17,
+          873,
+          389,
+          1006
+        ],
+        "safe_margins_ltrb": [
+          9,
+          4,
+          249,
+          4
+        ],
+        "containment": "PASS"
+      },
+      {
+        "id": "online_small",
+        "source": "ONLINE",
+        "korean": "온라인",
+        "source_effect_bbox_readable": [
+          1298,
+          949,
+          1560,
+          1011
+        ],
+        "candidate_safe_bbox_readable": [
+          1300,
+          951,
+          1558,
+          1009
+        ],
+        "source_effect_pixels": 9527,
+        "source_mask_sha256": "3a93056222517f5f1ce55d46864b3984ca6309511e802bc4fef4b5ece1c2c69c",
+        "role": "localize",
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ],
+        "font_size_px": 52,
+        "localized_bbox_readable": [
+          1306,
+          955,
+          1444,
+          1005
+        ],
+        "safe_margins_ltrb": [
+          6,
+          4,
+          114,
+          4
+        ],
+        "containment": "PASS"
+      }
+    ]
+  },
+  "candidate": {
+    "sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+    "bytes": 8388736,
+    "header_128_exact": true,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "changed_pixels": 134953,
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_total": 134952,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_regions": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "orientation": "PASS_FLIP_Y_RAW_TO_READABLE",
+    "safe_bbox_containment": "PASS_2PX_INSET_ALL_4_LOCALIZED_ELEMENTS",
+    "one_pixel_overflow": 0,
+    "raster_resampling": "NOT_USED",
+    "decoded_raw_rgba_sha256": "233f4afec10151b3f06a9680eb7ab1c9bd52cb17ad0eeca647917e69bfa89285",
+    "decoded_display_rgba_sha256": "2568786752e02aea2f11572445b571c0a7ac840f4c60742c92af4a89de8257b7",
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "drive_folder_id": "1V2ixcxpegBqfCShVpJgwU9IaRilWJcQO",
+    "drive_file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+    "storage_archive_sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+    "storage_archive_bytes": 45594,
+    "storage_inner_member": "EBE401C8_512x256.dds"
+  },
+  "drive_artifacts": {
+    "root_policy": "OutRun2006_Korean_Artifacts/CURRENT_PIPELINE (outside historical snapshot)",
+    "folder_id": "1V2ixcxpegBqfCShVpJgwU9IaRilWJcQO",
+    "candidate_zip": {
+      "file_id": "1vOoeMYNXVLZ3elK0xuzSx8k75_wFU4rC",
+      "name": "A00235_INDEX231_CANDIDATE.zip",
+      "sha256": "9c373ce866ad05c667f76c345e69f54abe1d1ad4050fbe721799ad87dc326550",
+      "bytes": 45594,
+      "inner_member": "EBE401C8_512x256.dds",
+      "inner_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+      "inner_bytes": 8388736
+    },
+    "source_display": {
+      "file_id": "1gd73Al0iW8DNq_EMzcPw-f6InJxGjtK6",
+      "name": "source_display.png",
+      "sha256": "7caa120e9f3036570d3d741af937afae47f22d0b91635b30c67e882a3054e4fe",
+      "bytes": 60485
+    },
+    "clean_plate_display": {
+      "file_id": "1oSqDVaEMOtr4YU0yaGNll1fl3lWpOKAs",
+      "name": "clean_plate_display.png",
+      "sha256": "d8f31d026aba172514dc3f6379245a1617dea53f14ab2cdd580e6f6145d440fc",
+      "bytes": 9553
+    },
+    "candidate_display": {
+      "file_id": "1Eg6wDK7ozXQC1fN8UauIEvsX3_H6LkAu",
+      "name": "candidate_display.png",
+      "sha256": "903295b15316d5e9d89f53be99fde8b263987b1d475211f87f685870942b10a9",
+      "bytes": 52293
+    },
+    "comparison": {
+      "file_id": "13Oskub9aRmCwx50ysrR6t4wBtjipkdk-",
+      "name": "comparison.png",
+      "sha256": "c7cd074a24cb0134b367e728e3e8667c9bd5c9ad664538a6c0955cf05895229e",
+      "bytes": 108896
+    },
+    "element_comparison": {
+      "file_id": "1vsdOR0DswrCpj3P080GNGWhs0exmkDbC",
+      "name": "element_comparison.png",
+      "sha256": "c93585668784a1050bcc0f20609da12d086da429b9db4ee827a1d4b6b8566098",
+      "bytes": 160959
+    }
+  },
+  "review_proof": {
+    "english_source_vs_korean_candidate": "PASS",
+    "whole_atlas_and_6_physical_elements_reviewed": true,
+    "source_display_sha256": "7caa120e9f3036570d3d741af937afae47f22d0b91635b30c67e882a3054e4fe",
+    "clean_plate_display_sha256": "d8f31d026aba172514dc3f6379245a1617dea53f14ab2cdd580e6f6145d440fc",
+    "candidate_display_sha256": "903295b15316d5e9d89f53be99fde8b263987b1d475211f87f685870942b10a9",
+    "comparison_sha256": "c7cd074a24cb0134b367e728e3e8667c9bd5c9ad664538a6c0955cf05895229e",
+    "element_comparison_sha256": "c93585668784a1050bcc0f20609da12d086da429b9db4ee827a1d4b6b8566098",
+    "preserve_source_lan": "PASS_2_OF_2_PIXEL_EXACT"
+  },
+  "readiness_after": "CANDIDATE_PERSISTED_PRODUCER_STATIC_PASS_PENDING_INDEPENDENT_C",
+  "self_qa": "PASS_A_MOD3_INDEX231__C153_RENDER_READY__C150_SOURCE_MASK_CLEANPLATE_SAFE_BBOX_REUSED__4_LOCALIZED_PLUS_2_LAN_PRESERVE__ZERO_PIXEL_ESCAPE__RGBA32_HEADER_EXACT__FLIP_Y__SOURCE_STYLE_ZERO_SLANT__MANDATORY_DRIVE_REVIEW_SET__RUNTIME_UNTESTED",
+  "candidate_static_qa": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "asset_queue_blob_sha": "1f55cfdd2167d215f11915baae3a91634cb97a8c",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "c00233_blob_sha": "82dd33fcc9e8ee5f053637822b74fd1aefae89e6",
+    "c00236_blob_sha": "f3d255b73749fa3ce7bb8a27c4d9ee5fc35510ca"
+  }
+}
