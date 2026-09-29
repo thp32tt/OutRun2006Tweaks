@@ -1,0 +1,293 @@
+{
+  "schema_version": 7,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00113",
+  "wave_id": "P00044",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T18:19:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "base_head_sha": "9214bd9b00df6e4695a5edef27266a22699c1908",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_FALLBACK4_FOUR_EVEN_TOTAL_RANK_V2_HEADER_GATED_SOURCE_MASK_CLEAN_PLATE_WORK_ORDERS_6_UNITS",
+  "runtime_validation": "UNTESTED",
+  "source_policy": {
+    "source_repo": "Sonic-TV/OR2006Sprites",
+    "source_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "semantic_reference_task": "LOCALIZATION-LOCALIZATION_B-00027",
+    "semantic_reference_report_blob_sha": "bb6e15a7099fd9507b2948259076cf8094441eb6",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00028",
+    "translation": {
+      "Total Rank": "종합 랭크"
+    },
+    "rule": "Exact HD Release DDS is the construction source. Stock/decoded PNG and atlas data are semantic/layout evidence only. No prior Korean candidate pixels may be reused."
+  },
+  "current_fingerprints": {
+    "queue_controller_contract_blob_sha": "194fd6c64cafede90b537446fddf96934dc9ea37",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "asset_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "binary_access_probe": {
+    "attempted_git_blob_sha": "7f8f0d10f2ac8a19bda1933d6a324a37123b48c0",
+    "connector_result": "BLOCKED_UTF8_DECODE",
+    "observed_error_class": "UnicodeDecodeError",
+    "consequence": "Do not claim exact DDS channel masks, source-effect pixels, CLEAN_PLATE pixels or candidate containment. This report advances deterministic work orders only."
+  },
+  "assets": [
+    {
+      "queue_index": 26,
+      "asset": "63C91067",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+      "hd_release_blob_sha": "9f41fe44ecb17a4daba096ddbb9d2c73fa28e8f9",
+      "hd_bytes": 16777344,
+      "expected_dimensions": [
+        2048,
+        2048
+      ],
+      "size_equation": "16777344 = 128 + 2048*2048*4",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_PITCH_MIPCOUNT_32BPP_CHANNEL_MASKS_BEFORE_PIXEL_INTERPRETATION",
+      "elements": [
+        {
+          "sprite": "sprite_15",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrence": 1,
+          "hd_sprite_rect": [
+            0,
+            16,
+            1720,
+            1016
+          ],
+          "inspection_guard_2px": [
+            2,
+            18,
+            1716,
+            1012
+          ]
+        },
+        {
+          "sprite": "sprite_14",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrence": 1,
+          "hd_sprite_rect": [
+            0,
+            1032,
+            2048,
+            1016
+          ],
+          "inspection_guard_2px": [
+            2,
+            1034,
+            2044,
+            1012
+          ]
+        }
+      ],
+      "protected_artwork": [
+        "speech-bubble/background artwork",
+        "rank letters",
+        "character artwork",
+        "lens flare"
+      ],
+      "raw_orientation": "RECONFIRM_FROM_EXACT_DECODE; current canonical queue notes mirror-Y preflight",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "hd_release_blob_sha": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+      "hd_bytes": 16777344,
+      "expected_dimensions": [
+        2048,
+        2048
+      ],
+      "size_equation": "16777344 = 128 + 2048*2048*4",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_PITCH_MIPCOUNT_32BPP_CHANNEL_MASKS_BEFORE_PIXEL_INTERPRETATION",
+      "elements": [
+        {
+          "sprite": "sprite_16",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrence": 1,
+          "hd_sprite_rect": [
+            0,
+            1032,
+            1640,
+            1016
+          ],
+          "inspection_guard_2px": [
+            2,
+            1034,
+            1636,
+            1012
+          ]
+        }
+      ],
+      "protected_artwork": [
+        "green speech-bubble/background artwork",
+        "lens flare"
+      ],
+      "raw_orientation": "RECONFIRM_FROM_EXACT_DECODE; current canonical queue notes mirror-Y preflight",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 30,
+      "asset": "8215FD25",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "hd_release_blob_sha": "64a92104d3158614283d0d63baee7ec29ca45316",
+      "hd_bytes": 33554560,
+      "expected_dimensions": [
+        4096,
+        2048
+      ],
+      "size_equation": "33554560 = 128 + 4096*2048*4",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_PITCH_MIPCOUNT_32BPP_CHANNEL_MASKS_BEFORE_PIXEL_INTERPRETATION",
+      "elements": [
+        {
+          "sprite": "sprite_10",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrence": 1,
+          "hd_sprite_rect": [
+            1088,
+            16,
+            1720,
+            1016
+          ],
+          "inspection_guard_2px": [
+            1090,
+            18,
+            1716,
+            1012
+          ]
+        },
+        {
+          "sprite": "sprite_9",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrence": 1,
+          "hd_sprite_rect": [
+            1088,
+            1032,
+            2048,
+            1016
+          ],
+          "inspection_guard_2px": [
+            1090,
+            1034,
+            2044,
+            1012
+          ]
+        }
+      ],
+      "protected_artwork": [
+        "pink/brown bubble backgrounds",
+        "flagman character",
+        "rank letters B/C/D/E",
+        "lens flare"
+      ],
+      "raw_orientation": "RECONFIRM_FROM_EXACT_DECODE; current canonical queue notes mirror-Y preflight",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 32,
+      "asset": "DCC7B488",
+      "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+      "hd_release_blob_sha": "7f8f0d10f2ac8a19bda1933d6a324a37123b48c0",
+      "hd_bytes": 8388736,
+      "expected_dimensions": [
+        2048,
+        1024
+      ],
+      "size_equation": "8388736 = 128 + 2048*1024*4",
+      "header_gate": "CONFIRM_DDS_MAGIC_WIDTH_HEIGHT_PITCH_MIPCOUNT_32BPP_CHANNEL_MASKS_BEFORE_PIXEL_INTERPRETATION",
+      "elements": [
+        {
+          "sprite": "sprite_16",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "physical_occurrence": 1,
+          "hd_sprite_rect": [
+            0,
+            8,
+            1640,
+            1016
+          ],
+          "inspection_guard_2px": [
+            2,
+            10,
+            1636,
+            1012
+          ]
+        }
+      ],
+      "protected_artwork": [
+        "green speech-bubble/background artwork",
+        "non-text atlas artwork"
+      ],
+      "raw_orientation": "RECONFIRM_FROM_EXACT_DECODE; current canonical queue notes mirror-Y preflight",
+      "candidate_dds_modified": false
+    }
+  ],
+  "deterministic_v2_work_order": {
+    "physical_text_elements": 6,
+    "new_two_px_inspection_guards": 6,
+    "inspection_guard_semantics": "Upper bound for exact decoded-source analysis only; never treat the guard rectangle as a removal mask or final candidate_safe_bbox.",
+    "stage_1_header_and_decode": [
+      "Fetch the exact pinned HD Release DDS binary.",
+      "Verify DDS magic, dimensions, pitch/linear-size, mip count and 32bpp channel masks against the expected source identity before interpreting pixels.",
+      "Decode without normalizing raw atlas orientation."
+    ],
+    "stage_2_source_effect_mask": [
+      "Within only the listed HD sprite rect, isolate the complete English Total Rank glyph/effect footprint from the exact source, including antialias fringe, outline and shadow.",
+      "Keep bubble/background, character, rank letters, flare and all non-text artwork edit-forbidden.",
+      "The measured source-effect bbox must be fully contained inside the listed 2px inspection guard; if it touches or exceeds the guard, stop as HOLD_STRICT_RECHECK rather than relaxing the guard.",
+      "Record a per-element source-effect-mask hash, pixel count and effect-inclusive bbox."
+    ],
+    "stage_3_clean_plate": [
+      "Remove only pixels belonging to the source-effect mask.",
+      "Reconstruct the former English glyph area exclusively from the same exact HD source neighborhood/artwork; no old Korean pixels, overlays, boxes, blurs or cross-asset background copies.",
+      "Machine QA: zero mutation outside the source removal mask, zero introduced alpha outside the mask, no residual English stroke/shadow/fringe, and no protected-art mutation.",
+      "If source-faithful reconstruction cannot be established, stop as MANUAL_RECONSTRUCTION_REQUIRED."
+    ],
+    "stage_4_candidate_safe_bbox": [
+      "After exact source-effect measurement, derive the v2 final safe region using the required default 2px inset from the effect-inclusive permitted region and the actual sprite/cell constraints.",
+      "Do not promote the precomputed inspection guard itself as candidate_safe_bbox.",
+      "Render/measure/refit Korean lettering at native resolution; never resize a flattened Korean raster."
+    ],
+    "final_candidate_gate": [
+      "All Korean/effect pixels contained with zero-pixel overflow.",
+      "DDS dimensions/header/format/mip/alpha behavior preserved.",
+      "Raw orientation retained per element.",
+      "Mandatory identical-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof passes.",
+      "Runtime remains UNTESTED until user game evidence exists."
+    ]
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_26_28_30_32",
+    "current_queue_action": "PASS_4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK",
+    "size_equations": "PASS_4_OF_4_EXACT_FILE_SIZE_FORMULAS_FROM_PINNED_IMMUTABLE_HD_IDENTITIES",
+    "geometry": "PASS_6_OF_6_PARENT_SPRITE_RECTS_IN_CANVAS__6_OF_6_2PX_GUARDS_NONEMPTY_AND_STRICTLY_INSIDE_PARENT__ZERO_SAME_ASSET_RECT_OVERLAP",
+    "canonical_semantics": "PASS_6_OF_6_TOTAL_RANK_TO_종합_랭크",
+    "source_effect_masks": "HOLD_NOT_MATERIALIZED",
+    "clean_plates": "HOLD_NOT_MATERIALIZED",
+    "candidate_safe_bboxes": "HOLD_MUST_DERIVE_FROM_EXACT_SOURCE_EFFECT_PIXELS",
+    "candidate_dds": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00044 advances four even primary-shard Total Rank assets from source-identification/preflight into six explicit first-pass-v2 header-gated source-effect-mask/CLEAN_PLATE work orders with strict 2px decoded-source inspection guards. Exact binary pixel materialization is fail-closed because the GitHub blob connector cannot decode these binary DDS blobs as UTF-8; no candidate/static/runtime PASS is fabricated."
+}
