@@ -331,6 +331,61 @@ namespace outrun::vr::dx11
         return true;
     }
 
+    bool NativeSharedEyeRing::snapshot_published_frame(
+        std::uint32_t slot,
+        std::uint64_t frame_id,
+        NativeSharedEyePublication& out) const noexcept
+    {
+        out = {};
+        if (!activation_ready() || slot >= slots_.size() || frame_id == 0)
+            return false;
+
+        const auto& entry = slots_[slot];
+        if (entry.state != SharedEyeSlotState::Published ||
+            entry.frame_id != frame_id ||
+            !entry.shared_handle[0] || !entry.shared_handle[1] ||
+            width_ == 0 || height_ == 0 || format_ == DXGI_FORMAT_UNKNOWN)
+            return false;
+
+        out.identity = identity_;
+        out.slot = slot;
+        out.frame_id = frame_id;
+        out.left_handle = entry.shared_handle[0];
+        out.right_handle = entry.shared_handle[1];
+        out.width = width_;
+        out.height = height_;
+        out.format = format_;
+        return true;
+    }
+
+    bool NativeSharedEyeRing::validate_publication_snapshot(
+        const NativeSharedEyePublication& publication) const noexcept
+    {
+        if (!activation_ready() ||
+            publication.identity != identity_ ||
+            publication.slot >= slots_.size() ||
+            publication.frame_id == 0 ||
+            !publication.left_handle || !publication.right_handle ||
+            publication.width != width_ ||
+            publication.height != height_ ||
+            publication.format != format_)
+            return false;
+
+        NativeSharedEyePublication current{};
+        if (!snapshot_published_frame(
+                publication.slot, publication.frame_id, current))
+            return false;
+
+        return current.identity == publication.identity &&
+            current.slot == publication.slot &&
+            current.frame_id == publication.frame_id &&
+            current.left_handle == publication.left_handle &&
+            current.right_handle == publication.right_handle &&
+            current.width == publication.width &&
+            current.height == publication.height &&
+            current.format == publication.format;
+    }
+
     bool NativeSharedEyeRing::retire_acknowledged(
         const OutRunVR::Core::FrameAck& ack) noexcept
     {
