@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -54,8 +54,11 @@
   },
   "queue_source": "localization/graphics/asset_queue.csv",
   "priorities": [
-    "REWORK_REQUIRED",
-    "unfinished_localize_text",
+    "DIRECT_REWORK_REQUIRED",
+    "RENDER_READY",
+    "ONE_STAGE_TO_RENDER",
+    "EXISTING_CANDIDATE_REWORK",
+    "unfinished_localize_text_preflight",
     "zoom_review_localizable_text",
     "other_pending"
   ],
@@ -229,5 +232,35 @@
       "SUPERSEDED"
     ],
     "runtime_validation_separate": true
+  },
+  "production_strategy": {
+    "mode": "candidate_completion_first",
+    "readiness_tiers": [
+      "RENDER_READY",
+      "ONE_STAGE_TO_RENDER",
+      "PREFLIGHT_ONLY"
+    ],
+    "selection_order": [
+      "DIRECT_REWORK_REQUIRED",
+      "RENDER_READY",
+      "ONE_STAGE_TO_RENDER",
+      "EXISTING_CANDIDATE_REWORK",
+      "PREFLIGHT_ONLY"
+    ],
+    "render_ready_definition": {
+      "exact_canonical_source": true,
+      "source_effect_or_removal_mask": true,
+      "clean_plate_independent_pass": true,
+      "final_candidate_safe_bbox": true,
+      "semantic_binding_resolved": true,
+      "baseline_slant_style_may_be_measured_in_same_task": true
+    },
+    "one_stage_to_render_definition": "one deterministic reconstruction/style stage remains and can be completed before rendering",
+    "forbid_new_preflight_while_ready_exists": true,
+    "max_new_preflight_only_batches_when_no_ready_assets": 1,
+    "candidate_target_per_invocation_when_ready_exists": 1,
+    "continue_to_next_ready_asset_after_fail_closed": true,
+    "primary_throughput_metric": "NEW_OR_MATERIALLY_REWORKED_V2_KOREAN_DDS_CANDIDATES_TO_C_QA",
+    "qa_strictness_unchanged": true
   }
 }
