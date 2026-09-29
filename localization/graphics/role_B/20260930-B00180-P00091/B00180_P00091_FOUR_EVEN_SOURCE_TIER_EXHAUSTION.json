@@ -1,0 +1,308 @@
+{
+  "schema_version": 10,
+  "schema": "outrun-b00180-four-even-source-tier-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00180",
+  "wave_id": "P00091",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T01:42:10+09:00",
+  "base_head_sha": "7548b44b7364504c248341cce0771969f0793160",
+  "result": "PASS_MATERIAL_FOUR_EVEN_SOURCE_ACQUISITION_EXHAUSTED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh candidate-completion-first audit found no B-even runnable direct REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or current-candidate material rework: indices 112/130/152 already have newer producer candidates awaiting independent C, while index94 safe-repair attempts remain exhausted on an unchanged fingerprint. The single allowed preflight batch therefore completes source acquisition for indices 154/164/172/228. Approved ezflash557 Drive exact-parent probes return zero exact filename matches. At pinned v0.25.10a commit 55f67a8, each Release path resolves to the exact Git blob also contained in the pinned release bundle; the exact bundle SHA-256 is 76f85ed2.... Those four immutable member SHA-256 values all differ from current inventory canonical SHA-256, including indices154/164/172 where dimensions and RGBA class happen to match. All approved source tiers are therefore exhausted for these unchanged inventory fingerprints. No pixel geometry, CLEAN_PLATE, Korean candidate, shared state, build, or runtime claim is produced.",
+  "selection": {
+    "priority": "ONE_PREFLIGHT_ONLY_BATCH_AFTER_FRESH_ZERO_READY_AUDIT",
+    "selected_indices": [
+      154,
+      164,
+      172,
+      228
+    ],
+    "selected_assets": [
+      "4D38BBB0",
+      "5B65E08C",
+      "6C9B3611",
+      "E7F6E9B7"
+    ],
+    "shard_check": "PASS_EVEN_ONLY",
+    "ready_assets_skipped_as_qa_pending": [
+      112,
+      130,
+      152
+    ],
+    "exhausted_unchanged_direct_rework_skipped": [
+      94
+    ],
+    "preflight_only_batches_this_invocation": 1
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "asset_queue_blob_sha": "3466c79d3303333e9381a7f80a1a67378faeda96",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820"
+  },
+  "immutable_source_lineage": {
+    "pinned_repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_tree_sha": "cb5be88fe8df75bd150c7c9b6704fde8446216fc",
+    "pinned_release_tag": "v0.25.10a",
+    "pinned_release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "direct_to_bundle_identity_method": "Git blob SHA equality proves exact byte identity; bundle member SHA-256 is therefore also the direct-file SHA-256.",
+    "heavy_bundle_validation_reused": "Existing C132/C133 pinned-release identity evidence reused; provided exact bundle was read-only digest/member crosschecked, not used as canonical source."
+  },
+  "assets": [
+    {
+      "index": 154,
+      "asset": "4D38BBB0",
+      "file": "4D38BBB0_1024x256.dds",
+      "canonical_sha256": "666511c591d3b15f400934c43c089ff4636942918d6fc9554171675d0d6cea00",
+      "canonical_dimensions": [
+        4096,
+        1024
+      ],
+      "direct_blob": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+      "release_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "release_dimensions": [
+        4096,
+        1024
+      ],
+      "semantics": 6,
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "drive_tier": {
+        "account": "ezflash557",
+        "approved_root_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+        "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_matches": 0,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      "pinned_direct_tier": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+        "git_blob_sha": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "release_bundle_member_git_blob_sha": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "exact_byte_identity_with_pinned_release_member": true,
+        "sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release_tier": {
+        "bundle_tag": "v0.25.10a",
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+        "member_git_blob_sha": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+        "member_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+        "member_dimensions": [
+          4096,
+          1024
+        ],
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_status": "SOURCE_ACQUISITION_EXHAUSTED_NO_EXACT_CANONICAL_BYTES",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "index": 164,
+      "asset": "5B65E08C",
+      "file": "5B65E08C_512x256.dds",
+      "canonical_sha256": "08f6dbf599bca9f3df6f92015d88917d06565b5d476b39b961865701445931d6",
+      "canonical_dimensions": [
+        2048,
+        1024
+      ],
+      "direct_blob": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+      "release_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+      "release_dimensions": [
+        2048,
+        1024
+      ],
+      "semantics": 1,
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+      "drive_tier": {
+        "account": "ezflash557",
+        "approved_root_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+        "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_matches": 0,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      "pinned_direct_tier": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+        "git_blob_sha": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "release_bundle_member_git_blob_sha": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "exact_byte_identity_with_pinned_release_member": true,
+        "sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release_tier": {
+        "bundle_tag": "v0.25.10a",
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+        "member_git_blob_sha": "d730c69c3c8ac6108fd3c980be292cabc03f8dff",
+        "member_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+        "member_dimensions": [
+          2048,
+          1024
+        ],
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_status": "SOURCE_ACQUISITION_EXHAUSTED_NO_EXACT_CANONICAL_BYTES",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "index": 172,
+      "asset": "6C9B3611",
+      "file": "6C9B3611_256x256.dds",
+      "canonical_sha256": "fe650e676c8bda421c353158044792ba566f97524e7de8f7ff6a86d0df60e572",
+      "canonical_dimensions": [
+        1024,
+        1024
+      ],
+      "direct_blob": "56a60db00d93f2371ba480510e9086d20c5b5800",
+      "release_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+      "release_dimensions": [
+        1024,
+        1024
+      ],
+      "semantics": 2,
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+      "drive_tier": {
+        "account": "ezflash557",
+        "approved_root_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+        "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_matches": 0,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      "pinned_direct_tier": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+        "git_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800",
+        "release_bundle_member_git_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800",
+        "exact_byte_identity_with_pinned_release_member": true,
+        "sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release_tier": {
+        "bundle_tag": "v0.25.10a",
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/6C9B3611_256x256.dds",
+        "member_git_blob_sha": "56a60db00d93f2371ba480510e9086d20c5b5800",
+        "member_sha256": "d5f4a36d5ef1285555ca8fc045e54d160876d1b3e33c6fbc45668c24566c2cf8",
+        "member_dimensions": [
+          1024,
+          1024
+        ],
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_status": "SOURCE_ACQUISITION_EXHAUSTED_NO_EXACT_CANONICAL_BYTES",
+      "production_readiness": "PREFLIGHT_ONLY"
+    },
+    {
+      "index": 228,
+      "asset": "E7F6E9B7",
+      "file": "E7F6E9B7_512x512.dds",
+      "canonical_sha256": "bbbc44543042527a1c4f80156ddbf4f0f26b9130d8eca0a78012fb79ee3f38b2",
+      "canonical_dimensions": [
+        512,
+        512
+      ],
+      "direct_blob": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+      "release_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "release_dimensions": [
+        2048,
+        2048
+      ],
+      "semantics": 13,
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+      "drive_tier": {
+        "account": "ezflash557",
+        "approved_root_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+        "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "exact_filename_matches": 0,
+        "result": "SOURCE_TRANSPORT_MISS"
+      },
+      "pinned_direct_tier": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+        "git_blob_sha": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+        "release_bundle_member_git_blob_sha": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+        "exact_byte_identity_with_pinned_release_member": true,
+        "sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release_tier": {
+        "bundle_tag": "v0.25.10a",
+        "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+        "member_git_blob_sha": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+        "member_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+        "member_dimensions": [
+          2048,
+          2048
+        ],
+        "canonical_sha256_match": false,
+        "result": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_status": "SOURCE_ACQUISITION_EXHAUSTED_NO_EXACT_CANONICAL_BYTES",
+      "production_readiness": "PREFLIGHT_ONLY"
+    }
+  ],
+  "material_deliverable": {
+    "type": "FOUR_EVEN_APPROVED_SOURCE_TIER_EXHAUSTION_MANIFEST",
+    "reviewed_indices": [
+      154,
+      164,
+      172,
+      228
+    ],
+    "drive_exact_filename_misses": 4,
+    "pinned_direct_paths_resolved": 4,
+    "direct_equals_release_member_git_blob": 4,
+    "direct_or_release_exact_canonical_sha_matches": 0,
+    "source_acquisition_exhausted": 4,
+    "production_readiness_after": {
+      "154": "PREFLIGHT_ONLY",
+      "164": "PREFLIGHT_ONLY",
+      "172": "PREFLIGHT_ONLY",
+      "228": "PREFLIGHT_ONLY"
+    },
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false
+  },
+  "self_qa": "PASS_EVEN_ONLY__FRESH_ZERO_READY_AUDIT__ONE_PREFLIGHT_BATCH__DRIVE_4_OF_4_EXACT_NAME_MISS__PINNED_DIRECT_4_OF_4_RESOLVED__DIRECT_BLOB_EQUALS_PINNED_RELEASE_MEMBER_4_OF_4__CANONICAL_SHA256_MISMATCH_4_OF_4__NO_PIXEL_CONSTRUCTION_WITHOUT_EXACT_SOURCE__NO_SHARED_STATE",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_SOURCE_ACQUISITION_EXHAUSTED_UNTIL_INVENTORY_OR_APPROVED_SOURCE_FINGERPRINT_CHANGES",
+    "pixel_geometry": "HOLD_NO_EXACT_CANONICAL_SOURCE",
+    "clean_plate": "HOLD_NO_EXACT_CANONICAL_SOURCE",
+    "korean_candidate": "HOLD_NO_EXACT_CANONICAL_SOURCE",
+    "decoded_final_qa": "NOT_APPLICABLE_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_role": "READ_ONLY_PINNED_V0.25.10A_DIGEST_AND_MEMBER_GIT_BLOB_CROSSCHECK",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
