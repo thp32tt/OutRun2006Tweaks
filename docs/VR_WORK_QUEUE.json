@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T19:10:00+09:00",
+  "updatedKst": "2026-09-29T19:15:09+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -425,11 +425,16 @@
       "dxvkCopyBudgetValidationRunId": 36493723474,
       "dxvkCopyBudgetValidation": "AUTOMATION_VALIDATION_PASS",
       "nextAction": "Run exact-build Quest3/VDXR DXVK PERFORMANCE. Require DxvkPerformanceEvidenceReady=true, inspect DxvkHostDominantBudgetStage/P95 together with producer fence/backpressure counters, and change the hold pair only if measured commit/copy timing is actually material. Otherwise optimize the measured dominant stage. Do not treat host-stage ranking as a performance PASS.",
-      "automationValidation": "PENDING",
+      "automationValidation": "PASS",
       "runtimeValidation": "UNTESTED",
       "lastAutomationTaskId": "CONVERSION-DXVK-00047",
       "dxvkPerformanceEvidenceGate": "DxvkPerformanceEvidenceReady",
-      "dxvkHostDominantBudgetField": "DxvkHostDominantBudgetStage"
+      "dxvkHostDominantBudgetField": "DxvkHostDominantBudgetStage",
+      "dxvkHostDominantBudgetResultSha": "4aa21f88eb5016cb3f6cfd35810f088bb780d953",
+      "dxvkHostDominantBudgetValidationRunId": 36553813262,
+      "dxvkHostDominantBudgetValidation": "AUTOMATION_VALIDATION_PASS",
+      "reconciliationTaskId": "CONVERSION-DXVK-00047",
+      "reconciliationCompletedAtKst": "2026-09-29T19:15:09+09:00"
     },
     {
       "id": "L1-RECENTER-001",
