@@ -1272,3 +1272,7 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Prior C result `57d5d423...` Gate `36628278526` failed at exact producer replay. B00209 `a7c5725b...` is **REWORK_REQUIRED** because its result changed DDS but changed QA JSON lacks verifier-recognized machine-readable PASS.
 - Candidate content remains independently verified/reusable (`8ab49a70...` / blob `11260e86...`, 8/8 containment, zero outside/protected/alpha escape), but no STATIC_QA promotion is accepted from this immutable result. Pending production restored to **71**.
 - Re-emit unchanged index226 candidate + compliant PASS QA + durable task record under a fresh producer SHA. A00208@index198 and B00211/B00213/B00214 remain out-of-batch QA-pending. Runtime remains **UNTESTED**.
+## 2026-09-30 05:49 KST - C147 Q00045 ATTEMPT2 AUTHORITATIVE GATE PASS
+- Validation-bearing result: `5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527`; Localization Automation Gate `36628996001` completed **success**.
+- Q00045 authoritative disposition is **REWORK_REQUIRED** for B00209 `a7c5725b...` because the immutable producer result fails the exact-result machine-readable PASS contract. Candidate content-level QA remains reusable but is not STATIC_QA-promoted.
+- Index226 remains pending producer-result re-emission; pending production **71**. Runtime remains **UNTESTED**. The earlier failed C result `57d5d423...` is non-authoritative.

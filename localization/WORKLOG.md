@@ -1850,3 +1850,8 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Index226 STATIC_QA promotion is withdrawn; pending production returns **70 -> 71**. Re-emit the unchanged candidate/review set with verifier-recognized machine-readable PASS QA plus durable task record atomically under a fresh producer SHA. No rerender is required if bytes/dependencies remain unchanged.
 - Refreshed HEAD preserves out-of-batch A00208@index198 candidate and B00211@index232, B00213@index133, B00214@index220 producer results for later C batches. No DDS/runtime approval is changed by Q00045 ATTEMPT2.
 - Report: `localization/graphics/role_C/20260930-0545-C147-A2/C147_Q00045_ATTEMPT2_GATE_REPAIR.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+## 2026-09-30 05:49 KST - C147 Q00045 ATTEMPT2 AUTHORITATIVE GATE PASS
+- Authoritative validation-bearing C result: `5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527`.
+- Localization Automation Gate run `36628996001` completed **success**, including exact producer-SHA verification with B00209 dispositioned **REWORK_REQUIRED**. This bookkeeping checkpoint is separate and does not replace the validation-bearing result SHA.
+- The prior attempt `57d5d423...` / Gate `36628278526` failed and is non-authoritative. Index226's independently verified candidate bytes may be reused, but shared STATIC_QA remains withdrawn until B re-emits compliant machine-readable PASS evidence under a fresh result SHA.
+- Counts remain actionable localize_text **93**, pending production **71**, canonical segments **753**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

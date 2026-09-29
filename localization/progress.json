@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T05:45:26+09:00",
+  "updated_at_kst": "2026-09-30T05:49:14+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C147/Q00045 ATTEMPT2 Gate repair: B00209@a7c5725 is REWORK_REQUIRED at immutable-result contract level because exact producer replay reports 'DDS changed but no machine-readable PASS record exists in changed QA JSON'. Independent candidate content QA remains reusable and unchanged, but Q00045 attempt-1 index226 STATIC_QA promotion is withdrawn. Pending production restored to 71; actionable localize_text 93; canonical segments 753. Re-emit unchanged verified index226 candidate with verifier-recognized machine-readable PASS evidence under a fresh producer SHA. A00208@index198 candidate, B00211@index232, B00213@index133 and B00214@index220 are out-of-batch QA-pending. Runtime remains UNTESTED.",
+  "next_checkpoint": "C147/Q00045 ATTEMPT2 authoritative Gate PASS on 5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527. Immutable B00209@a7c5725 is REWORK_REQUIRED at producer-result contract level: its candidate content remains independently verified/reusable, but exact producer replay fails because changed DDS lacks a verifier-recognized machine-readable PASS record in changed QA JSON. Index226 STATIC_QA promotion remains withdrawn; pending production 71, actionable localize_text 93, canonical segments 753. Re-emit unchanged verified index226 candidate/review bytes with compliant PASS QA under a fresh producer SHA. A00208@index198, B00211@index232, B00213@index133 and B00214@index220 remain out-of-batch QA-pending. Runtime remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1192,7 +1192,7 @@
     "google_drive_write_performed": false,
     "uploaded_archive_used": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
     "prior_failed_attempt": {
@@ -1202,6 +1202,17 @@
       "failed_step": "Verify exact producer SHAs in C batch",
       "error": "B00209 exact result: DDS changed but no machine-readable PASS record exists in changed QA JSON"
     },
-    "bookkeeping_note": "ATTEMPT2 pre-Gate task record. This C AUTO result commit is the sole Localization Automation Gate owner for Q00045 attempt2; the prior failed attempt does not own authoritative validation."
+    "bookkeeping_note": "Q00045 ATTEMPT2 Gate result recorded after the validation-bearing C result commit. The prior attempt failed; this checkpoint is not the batch validation owner.",
+    "result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+    "validation_bearing_result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36628996001,
+      "run_attempt": 1,
+      "head_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T05:49:14+09:00"
+    }
   }
 }

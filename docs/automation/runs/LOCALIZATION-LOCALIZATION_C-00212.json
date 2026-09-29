@@ -210,7 +210,7 @@
   "google_drive_write_performed": false,
   "uploaded_archive_used": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "prior_failed_attempt": {
@@ -220,5 +220,16 @@
     "failed_step": "Verify exact producer SHAs in C batch",
     "error": "B00209 exact result: DDS changed but no machine-readable PASS record exists in changed QA JSON"
   },
-  "bookkeeping_note": "ATTEMPT2 pre-Gate task record. This C AUTO result commit is the sole Localization Automation Gate owner for Q00045 attempt2; the prior failed attempt does not own authoritative validation."
+  "bookkeeping_note": "Q00045 ATTEMPT2 Gate result recorded after the validation-bearing C result commit. The prior attempt failed; this checkpoint is not the batch validation owner.",
+  "result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+  "validation_bearing_result_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36628996001,
+    "run_attempt": 1,
+    "head_sha": "5da3e7c516e2324a6a91a2dc9e3fd8abcbe7a527",
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T05:49:14+09:00"
+  }
 }
