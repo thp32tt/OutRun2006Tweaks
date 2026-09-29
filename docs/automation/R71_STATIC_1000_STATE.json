@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 33,
+  "completedCycles": 34,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "9e6d9445834df2e980ababe88257ae2a6065b9ee",
+  "currentHead": "098061f0752181586d4a20cf01fe346b6dc8bca8",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -998,12 +998,38 @@
       "automationValidation": "STATIC_REVIEW_PASS",
       "runtimeValidation": "UNTESTED",
       "next": "inspect exact selector producer/resource upload path"
+    },
+    {
+      "cycle": 34,
+      "lenses": [
+        "architecture/control-flow",
+        "lifetime/reset/sync",
+        "stereo/HUD/visual correctness",
+        "hot path/frame pacing/copies/waits",
+        "adversarial/falsification"
+      ],
+      "findings": [
+        "Canonical semantic routing separates ScreenHud/ScreenOverlay2D/WorldBillboard/ProjectedWorldMarker2D and rejects unowned passes. A selector vehicle is world geometry and must not be fixed by widening ScreenHud or generic queue ownership; such widening would risk the known preview-car corruption class."
+      ],
+      "evidence": [
+        "RenderScope/EffectiveScope and R30ClassifyScreenSpacePass exact producer-owned routing"
+      ],
+      "changedFiles": [
+        "docs/VR_R71_STATIC_1000_LOG.md",
+        "docs/automation/R71_STATIC_1000_STATE.json"
+      ],
+      "commits": [
+        "098061f0752181586d4a20cf01fe346b6dc8bca8"
+      ],
+      "automationValidation": "STATIC_REVIEW_PASS",
+      "runtimeValidation": "UNTESTED",
+      "next": "inspect HUD/menu translucency without semantic widening"
     }
   ],
   "nextCycle": {
-    "cycle": 34,
+    "cycle": 35,
     "priority": [
-      "inspect exact selector producer/resource upload path"
+      "inspect HUD/menu translucency without semantic widening"
     ],
     "guard": "performance-only work paused; frozen 34eef500 package immutable"
   },
