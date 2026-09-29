@@ -536,3 +536,18 @@ Changed files:
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review deferred EVENT poison/reset lifetime.
+
+
+## Cycle 0024 — deferred EVENT poison lifetime
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- Failed EVENT query quarantines the transport generation and keeps the exact producer slot blocked; no safe evidence supports publishing an ACK on unknown completion.
+- Evidence: R23PollDeferredReferenceAcks FAILED(hr) path.
+- Production/runtime behavior unchanged; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review reference-space/session reset cache invalidation.
