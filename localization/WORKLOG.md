@@ -1306,3 +1306,18 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Report: `localization/graphics/role_C/20260929-0814-C102/C102_W00017_SYNC_FINAL_QA.json`.
 - `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
 - `RUNTIME_VALIDATION=UNTESTED`
+
+### C103 Q00001 independent QA batch — 2026-09-29T13:19:37+09:00
+- Consumed exactly `LOCALIZATION-LOCALIZATION_A-00056@f6f1646a9369ebab33691b45a5df496993758b8f` and `LOCALIZATION-LOCALIZATION_B-00057@bbe1202f2f59d23409d5baaf0c4ce9c29856a75d`; both exact result commits have completed `validate=success`.
+- De-duplicated repeated A56 reconstruction/mapping/spec evidence by immutable source lineage. Neither input contains Korean candidate DDS bytes, so candidate-only heavy QA was not redundantly run and remains HOLD rather than false PASS.
+- Exact source/evidence identities: **27/27 PASS** (A upstream 12/12, B upstream 12/12, index 89 local HD/display/preflight 3/3). Canonical translation + artwork-plan comparison: **55/55 PASS**.
+- Visual source mapping confirms index 65 `Loading -> 로딩` at `sprite_11` + `sprite_12`, and index 107 `No Handicap -> 핸디캡 없음` at `sprite_516`; nine Ferrari/model cards are preserve-original.
+- Index 89 `43B07A77`: source-side generation input accepted — 2048x256 RGBA32 mip1, readable `flip_y`, right slant 0.35 / 19.29°, source full-effect bbox [1,13,1494,251], candidate permitted region [1,13,1494,248]. No Korean raster/DDS exists yet.
+- No Q00001 asset is superseded. Newer A00058/P00001 and B00059/P00002 explicitly record these exact A56/B57 identities as QA-pending skips and work on disjoint assets; their production results remain unconsumed by this batch.
+- Therefore Hangul-glyph integrity, clipping, zero-pixel containment, candidate DDS format/mipmap/alpha/transparency, compression round-trip, background/protected-artwork final pixel comparison, and exact ENGLISH SOURCE vs KOREAN CANDIDATE stay `HOLD_STRICT_RECHECK`. New static artwork approvals: 0; new runtime approvals: 0.
+- Queue unchanged: **137 = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only**; pending production localize_text 78; unresolved zoom-review 0.
+- Canonical `localization/progress/progress.json` and legacy `localization/progress.json` are written from identical bytes.
+- No N100/local clone/GPT Library, game build, VR/FFB/DX work, or real-game test. `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json`
+- `AUTOMATION_VALIDATION=PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING`
+- `RUNTIME_VALIDATION=UNTESTED`

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-29T08:14:06+09:00",
+  "updated_at_kst": "2026-09-29T13:19:37+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "W00017 C102 reconciliation: A00053/B00054 durable terminal commits remain in current HEAD ancestry after newer localization safeguard commits. A index 215 C05E67EF source-derived GOAL A-E clean plate is accepted as material reconstruction input: 18497 source alpha pixels removed, RGB changes 0, changes outside source text mask 0, introduced alpha 0; no Korean GOAL raster was emitted, so full-asset completion is not claimed and the prior 15코스 touched-segment static evidence remains historical only. B indices 130/140/154/164 retain exact-HD reconstruction inputs; C independently matched all 17 actually enumerated B upstream references (12 core + 5 working), correcting B00054's summary overcount of 6 working sources, and matched all 16/16 B canonical translations. Across new W00017 reconstruction semantics 21/21 match canonical data; index 215 full canonical set remains 6/6. No W00017 Korean DDS candidate bytes changed, so glyph/clipping/zero-pixel/DDS/alpha/orientation/compression-roundtrip/background/protected-artwork/English-vs-Korean raster gates stay HOLD until candidates exist. Queue remains 137 rows = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; pending production localize_text remains 78; runtime UNTESTED.",
+  "next_checkpoint": "Q00001 C103 independently consumed LOCALIZATION-LOCALIZATION_A-00056@f6f1646a9369ebab33691b45a5df496993758b8f and LOCALIZATION-LOCALIZATION_B-00057@bbe1202f2f59d23409d5baaf0c4ce9c29856a75d without waiting for newer producers. Exact GitHub source/evidence identities passed 27/27 and canonical translation/artwork-plan pairs passed 55/55 across indices 65/89/95/101/107/132/176/220/222. A56 cell mappings for EBEF6D20 Loading -> sprite_11+sprite_12 and 841E796B No Handicap -> sprite_516 were independently source-visual confirmed. Index 89 43B07A77 exact-HD generation input passed source-side preflight: 2048x256 RGBA32 mip1, readable flip_y, right slant 0.35/19.29deg, candidate permitted region [1,13,1494,248]. Neither immutable producer result contains Korean candidate DDS bytes, so Hangul integrity, clipping, zero-pixel containment, candidate DDS format/mipmap/alpha, compression round-trip, background/preserve-artwork and English-source-vs-Korean-candidate gates remain HOLD_STRICT_RECHECK; no static artwork or runtime approval was added. Current newer producer results A00058/P00001 and B00059/P00002 explicitly skipped these QA-pending assets and are preserved for later QA. Queue remains 137 rows = 95 localize_text + 31 zoom_review + 9 font + 1 Hangul name-entry + 1 preserve-only; pending production localize_text 78; runtime UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

@@ -1,5 +1,5 @@
 {
-  "schema_version": 72,
+  "schema_version": 73,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,10 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "Continue index 215 C05E67EF from A00053's exact-English-HD source-derived GOAL A-E clean plate. The prior 15con. -> 15코스 partial segment is historical static evidence only; do not reuse old Korean candidate pixels. Pin an approved source-faithful yellow-mask Hangul treatment, fit-before-render, then require per-element zero-pixel containment and exact ENGLISH SOURCE comparison before full-asset completion.",
-    "Continue W00017 B00054 indices 130/140/154/164 from the 17/17 actually enumerated and independently matched upstream references (12 core HD/original/atlas + 5 working-source files) and 16/16 canonical translation matches. B00054's summary count of 6 working-source identities is a metadata overcount; the report enumerates 5. Resolve exact semantic-to-cell/text-effect masks before any DDS render.",
-    "For index 140 31C58963, keep canonical PRESS START -> START 버튼 but do not guess source-cell mapping: upstream references expose a PRESS START/PRESS ENTER variant, so inspect/decode exact Release HD DDS before lettering. Other W00017 B assets remain fail-closed reconstruction inputs.",
-    "Queue remains 137 rows with 95 localize_text and 78 pending_artwork localize_text rows; unresolved zoom_review remains 0. Runtime remains separate: C102 performed no real-game test and RUNTIME_VALIDATION=UNTESTED."
+    "Render index 89 43B07A77 only from the C103-accepted exact-HD generation spec: Game Over -> 게임 오버, 2048x256 RGBA32 mip1, readable flip_y, right slant 19.29 degrees, candidate permitted region [1,13,1494,248]. Then require clean plate, zero-pixel containment, protected-mask, exact-source comparison and DDS round-trip QA.",
+    "Continue exact-HD glyph/effect extraction for index 65 EBEF6D20 Loading -> 로딩 in sprite_11 + sprite_12 and index 107 841E796B No Handicap -> 핸디캡 없음 in sprite_516; preserve all logos, route artwork and nine Ferrari/model cards.",
+    "Continue source-faithful mapping/mask work for Q00001 indices 95/101/132/176/220/222. C103 validated their immutable source identities and canonical semantics, but no Korean candidate DDS exists; keep raster/DDS gates HOLD_STRICT_RECHECK.",
+    "A00058/P00001 and B00059/P00002 are newer producer results preserved on current HEAD and were intentionally not consumed by Q00001. They remain for a later independent C QA batch."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -98,9 +98,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-29T08:14:06+09:00",
+      "updated_at_kst": "2026-09-29T13:19:37+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20260929-0814-C102/C102_W00017_SYNC_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 203,
@@ -129,7 +129,7 @@
       "pending_production_localize_text": 78,
       "hold_strict_recheck_zoom_review": 0,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "W00017 produced no new Korean DDS candidate bytes. A00053 advances C05E67EF with a source-derived GOAL clean plate but GOAL Korean lettering remains blocked; B00054 advances four assets with exact-HD reconstruction identities but no final candidate. Raster containment, glyph/clipping, DDS/alpha/orientation, compression-roundtrip, protected-artwork and ENGLISH SOURCE vs KOREAN CANDIDATE gates are not promoted to PASS. Runtime is UNTESTED.",
+      "promotion_hold_reason": "Q00001 consumed A00056/B00057 metadata/reconstruction results. Exact source identities and 55 canonical segments pass, but neither producer result contains Korean candidate DDS bytes. Candidate glyph/clipping/zero-pixel/DDS/alpha/compression/source-vs-candidate gates remain HOLD; index 89 has source-side orientation/slant/DDS preflight only.",
       "user_approved_locked": 0,
       "zoom_review_resolved_preserve_original": 31,
       "queue_reconciled_at_kst": "2026-09-29T08:14:06+09:00",
@@ -149,7 +149,23 @@
       "w00017_upstream_identity_validation": "PASS_A_1_OF_1_PLUS_B_17_OF_17_ENUMERATED__B_WORKING_SOURCE_COUNT_CORRECTED_6_TO_5",
       "w00017_canonical_semantic_validation": "PASS_21_OF_21_NEW_WAVE__INDEX215_FULL_6_OF_6",
       "w00017_candidate_dds_modified": false,
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "q00001_reviewed_indices": [
+        65,
+        89,
+        95,
+        101,
+        107,
+        132,
+        176,
+        220,
+        222
+      ],
+      "q00001_source_identity_validation": "PASS_27_OF_27_EXACT_GITHUB_BLOB_IDENTITIES",
+      "q00001_semantic_validation": "PASS_55_OF_55_CANONICAL",
+      "q00001_superseded_inputs": [],
+      "q00001_candidate_dds_modified": false,
+      "q00001_new_static_artwork_passes": 0
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -741,7 +757,41 @@
       "runtime_validation": "UNTESTED"
     },
     "zoom_review_unresolved": 6,
-    "zoom_review_resolved_preserve_original": 28
+    "zoom_review_resolved_preserve_original": 28,
+    "latest_c_qa_batch": {
+      "recorded_at_kst": "2026-09-29T13:19:37+09:00",
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00060",
+      "qa_batch_id": "Q00001",
+      "result": "PASS_Q00001_INDEPENDENT_QA_RECONSTRUCTION_INPUTS_9_ASSETS_55_SEGMENTS_NO_DDS_RUNTIME_UNTESTED",
+      "base_head": "785a08e4a90e3345610bb850e6c486e17bf43553",
+      "qa_batch_inputs": [
+        "LOCALIZATION-LOCALIZATION_A-00056@f6f1646a9369ebab33691b45a5df496993758b8f",
+        "LOCALIZATION-LOCALIZATION_B-00057@bbe1202f2f59d23409d5baaf0c4ce9c29856a75d"
+      ],
+      "reviewed_indices": [
+        65,
+        89,
+        95,
+        101,
+        107,
+        132,
+        176,
+        220,
+        222
+      ],
+      "source_identity_validation": "PASS_27_OF_27_EXACT_GITHUB_BLOB_IDENTITIES",
+      "semantic_validation": "PASS_55_OF_55_CANONICAL",
+      "superseded_inputs": [],
+      "newer_unconsumed_producers": [
+        "LOCALIZATION-LOCALIZATION_A-00058",
+        "LOCALIZATION-LOCALIZATION_B-00059"
+      ],
+      "new_static_artwork_passes": 0,
+      "new_runtime_approvals": 0,
+      "candidate_dds_modified": false,
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json"
+    }
   },
   "runtime_packages": {
     "k1": {
@@ -2049,5 +2099,39 @@
     "approved_dds_count": 0,
     "runtime_validation": "UNTESTED",
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
+  },
+  "latest_qa_batch": {
+    "recorded_at_kst": "2026-09-29T13:19:37+09:00",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00060",
+    "qa_batch_id": "Q00001",
+    "result": "PASS_Q00001_INDEPENDENT_QA_RECONSTRUCTION_INPUTS_9_ASSETS_55_SEGMENTS_NO_DDS_RUNTIME_UNTESTED",
+    "base_head": "785a08e4a90e3345610bb850e6c486e17bf43553",
+    "qa_batch_inputs": [
+      "LOCALIZATION-LOCALIZATION_A-00056@f6f1646a9369ebab33691b45a5df496993758b8f",
+      "LOCALIZATION-LOCALIZATION_B-00057@bbe1202f2f59d23409d5baaf0c4ce9c29856a75d"
+    ],
+    "reviewed_indices": [
+      65,
+      89,
+      95,
+      101,
+      107,
+      132,
+      176,
+      220,
+      222
+    ],
+    "source_identity_validation": "PASS_27_OF_27_EXACT_GITHUB_BLOB_IDENTITIES",
+    "semantic_validation": "PASS_55_OF_55_CANONICAL",
+    "superseded_inputs": [],
+    "newer_unconsumed_producers": [
+      "LOCALIZATION-LOCALIZATION_A-00058",
+      "LOCALIZATION-LOCALIZATION_B-00059"
+    ],
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "candidate_dds_modified": false,
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20260929-1319-C103/C103_Q00001_INDEPENDENT_QA_BATCH.json"
   }
 }
