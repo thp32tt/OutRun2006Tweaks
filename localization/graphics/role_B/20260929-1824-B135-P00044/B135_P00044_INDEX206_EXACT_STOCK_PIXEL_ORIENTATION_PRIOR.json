@@ -18,7 +18,7 @@
   "reused_immutable_evidence": {
     "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
     "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
-    "b00039_report_blob_sha": "250dc735b808b837177e4046d678190489b446d1",
+    "b00039_report_blob_sha": "a71c5d8bb0da2ace8028a7fd68b0894f49978ffe",
     "upstream_repo": "Sonic-TV/OR2006Sprites",
     "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
     "stock_dds_blob_sha": "451beb7b8bc53c6e2c16725726192d9ee87b5ec6",
@@ -176,5 +176,6 @@
   "n100_used": false,
   "local_clone_used": false,
   "gpt_library_used": false,
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "correction_note": "Corrected B00039 report blob identity before durable task record; prior value 250dc735... belonged to unrelated B00030 Total Rank preflight."
 }
