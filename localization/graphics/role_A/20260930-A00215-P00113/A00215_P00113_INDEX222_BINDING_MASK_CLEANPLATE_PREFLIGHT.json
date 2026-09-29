@@ -1,0 +1,386 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00215-index222-exact-binding-cleanplate-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+  "wave_id": "P00113",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T06:04:17+09:00",
+  "base_head_sha": "49a03e1a06dde02f0ebbe709f3dcbe0c25f70617",
+  "work_started_head_sha": "9e6fcc1d565c913e7b0417be3a97b7ba05c1fa23",
+  "result": "PASS_INDEX222_EXACT_6_OF_6_BINDING_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_PREFLIGHT_C_QA_REQUIRED_RUNTIME_UNTESTED",
+  "summary": "Fresh A-shard scan skips QA-pending candidates 159/198/201 and finds no C-accepted RENDER_READY or ONE_STAGE_TO_RENDER item. Index222 DDF0392A is the remaining A-owned PREFLIGHT_ONLY candidate-completion item. Approved Drive exact path was checked first and missed; the pinned OR2-HD-GUI-v0.25.10a Release archive digest and DDF0392A member identity exactly match current inventory. Exact decoded pixels prove FLIP_Y readable orientation, bind all 6 canonical localizable strings to regions 0/1/2/3/6/7, and preserve the 4 song titles plus 15 Ferrari model names in the other 19 regions. Each localized region is transparent text-only in decoded RGBA, so alpha>0 is an exact source-effect mask. The six masks total 56,615 pixels; deterministic transparent CLEAN_PLATE replay changes zero pixels/alpha outside that union and zero protected regions. Final 2px v2 candidate-safe bboxes are derived for all 6. No Korean DDS is emitted before independent C replay of binding/mask/CLEAN_PLATE/safe-bbox evidence; runtime remains UNTESTED.",
+  "source_identity": {
+    "queue_index": 222,
+    "asset_id": "DDF0392A",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "drive_fast_path": {
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "result": "MISS_FOLDER_CONTAINS_ONLY_9F060EC1_512x512.dds"
+    },
+    "release_fallback": {
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+      "member_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "file_bytes": 2097280
+    },
+    "canonical_inventory_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "canvas": [
+      1024,
+      2048
+    ],
+    "dds_format": "DXT5",
+    "mipmaps": 1,
+    "decoded_mode": "RGBA",
+    "raw_to_readable": "flip_y",
+    "decoded_raw_rgba_sha256": "6b053c75c6074d6ebb16bfe0a38b3a770923c223beb281ab1611872cf271659f",
+    "decoded_readable_rgba_sha256": "8d2de43a8575aa0661f1013fbd8929964c44c3cabb31b2e09b2b7779b75ab5c3"
+  },
+  "canonical_binding": {
+    "status": "PASS_6_OF_6_EXACT_PIXEL_BOUND",
+    "regions": [
+      {
+        "region_index": 0,
+        "sprite": "sprite_401",
+        "source": "OutRun Mode / 15 C.",
+        "korean": "아웃런 모드 / 15코스",
+        "atlas_rect_bl": [
+          0,
+          1972,
+          960,
+          76
+        ],
+        "source_effect_pixel_count": 11883,
+        "source_effect_bbox_local_xyxy": [
+          6,
+          14,
+          548,
+          66
+        ],
+        "candidate_safe_bbox_inset2_local_xyxy": [
+          8,
+          16,
+          546,
+          64
+        ],
+        "alpha_nonzero_mask_sha256": "2ce842e4548201e2c50e088f709f14b5ac2a35e80ea8fbdb5f2784056858f1f7"
+      },
+      {
+        "region_index": 1,
+        "sprite": "sprite_402",
+        "source": "OutRun 1986",
+        "korean": "아웃런 1986",
+        "atlas_rect_bl": [
+          0,
+          1896,
+          960,
+          76
+        ],
+        "source_effect_pixel_count": 7402,
+        "source_effect_bbox_local_xyxy": [
+          4,
+          17,
+          333,
+          61
+        ],
+        "candidate_safe_bbox_inset2_local_xyxy": [
+          6,
+          19,
+          331,
+          59
+        ],
+        "alpha_nonzero_mask_sha256": "349ff963d0aebf0ae1fe6909cd4d9ce18d7909dde19be119220e81660c4a78d5"
+      },
+      {
+        "region_index": 2,
+        "sprite": "sprite_403",
+        "source": "Journey Mode / Random",
+        "korean": "저니 모드 / 무작위",
+        "atlas_rect_bl": [
+          0,
+          1820,
+          960,
+          76
+        ],
+        "source_effect_pixel_count": 14349,
+        "source_effect_bbox_local_xyxy": [
+          2,
+          10,
+          627,
+          68
+        ],
+        "candidate_safe_bbox_inset2_local_xyxy": [
+          4,
+          12,
+          625,
+          66
+        ],
+        "alpha_nonzero_mask_sha256": "b8f773f47536dfa3917eece034fed358323d2f15a87cbfbb09f34bade3bf4dbe"
+      },
+      {
+        "region_index": 3,
+        "sprite": "sprite_404",
+        "source": "Who Are You?",
+        "korean": "당신은 누구?",
+        "atlas_rect_bl": [
+          0,
+          1744,
+          960,
+          76
+        ],
+        "source_effect_pixel_count": 6407,
+        "source_effect_bbox_local_xyxy": [
+          2,
+          17,
+          342,
+          60
+        ],
+        "candidate_safe_bbox_inset2_local_xyxy": [
+          4,
+          19,
+          340,
+          58
+        ],
+        "alpha_nonzero_mask_sha256": "72051598ae3662c21e347666deb6bc825e13e1c3099ec9cf8e0e10fdea2f32c5"
+      },
+      {
+        "region_index": 6,
+        "sprite": "sprite_407",
+        "source": "Shake The Street",
+        "korean": "거리를 뒤흔들어라",
+        "atlas_rect_bl": [
+          0,
+          1516,
+          960,
+          76
+        ],
+        "source_effect_pixel_count": 8102,
+        "source_effect_bbox_local_xyxy": [
+          3,
+          17,
+          419,
+          60
+        ],
+        "candidate_safe_bbox_inset2_local_xyxy": [
+          5,
+          19,
+          417,
+          58
+        ],
+        "alpha_nonzero_mask_sha256": "669eb0c12e6b6a3e4e4c3b3828a7afa4e50dc7751a535a4d2f36ed214403bbc1"
+      },
+      {
+        "region_index": 7,
+        "sprite": "sprite_408",
+        "source": "Rush A Difficulty",
+        "korean": "난이도에 도전",
+        "atlas_rect_bl": [
+          0,
+          1440,
+          960,
+          76
+        ],
+        "source_effect_pixel_count": 8472,
+        "source_effect_bbox_local_xyxy": [
+          6,
+          17,
+          421,
+          70
+        ],
+        "candidate_safe_bbox_inset2_local_xyxy": [
+          8,
+          19,
+          419,
+          68
+        ],
+        "alpha_nonzero_mask_sha256": "e435df981046fe8ebe4bc7355473dfb29010699f6d947f7e6944de5f508146d5"
+      }
+    ]
+  },
+  "protected_original": {
+    "status": "PASS_19_OF_19_PRESERVE_ORIGINAL",
+    "regions": [
+      {
+        "region_index": 4,
+        "sprite": "sprite_405",
+        "source": "Splash Wave"
+      },
+      {
+        "region_index": 5,
+        "sprite": "sprite_406",
+        "source": "Shiny World"
+      },
+      {
+        "region_index": 8,
+        "sprite": "sprite_409",
+        "source": "Risky Ride"
+      },
+      {
+        "region_index": 9,
+        "sprite": "sprite_410",
+        "source": "Passing Breeze"
+      },
+      {
+        "region_index": 10,
+        "sprite": "sprite_411",
+        "source": "TESTAROSSA"
+      },
+      {
+        "region_index": 11,
+        "sprite": "sprite_412",
+        "source": "F50"
+      },
+      {
+        "region_index": 12,
+        "sprite": "sprite_413",
+        "source": "F430"
+      },
+      {
+        "region_index": 13,
+        "sprite": "sprite_414",
+        "source": "F40"
+      },
+      {
+        "region_index": 14,
+        "sprite": "sprite_415",
+        "source": "F355 SPIDER"
+      },
+      {
+        "region_index": 15,
+        "sprite": "sprite_416",
+        "source": "ENZO FERRARI"
+      },
+      {
+        "region_index": 16,
+        "sprite": "sprite_417",
+        "source": "DINO 246 GTS"
+      },
+      {
+        "region_index": 17,
+        "sprite": "sprite_418",
+        "source": "SUPERAMERICA"
+      },
+      {
+        "region_index": 18,
+        "sprite": "sprite_419",
+        "source": "550 BARCHETTA"
+      },
+      {
+        "region_index": 19,
+        "sprite": "sprite_420",
+        "source": "512 BB"
+      },
+      {
+        "region_index": 20,
+        "sprite": "sprite_421",
+        "source": "365 GTS/4 DAYTONA"
+      },
+      {
+        "region_index": 21,
+        "sprite": "sprite_422",
+        "source": "360 SPIDER"
+      },
+      {
+        "region_index": 22,
+        "sprite": "sprite_423",
+        "source": "328 GTS"
+      },
+      {
+        "region_index": 23,
+        "sprite": "sprite_424",
+        "source": "288 GTO"
+      },
+      {
+        "region_index": 24,
+        "sprite": "sprite_425",
+        "source": "250 GTO"
+      }
+    ]
+  },
+  "clean_plate_spec": {
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "mask_rule": "READABLE_RGBA_ALPHA_GT_0_WITHIN_EXACT_LOCALIZED_ATLAS_REGION_ONLY",
+    "localized_region_indices": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      7
+    ],
+    "removal_mask_pixels": 56615,
+    "removal_mask_sha256": "f2c2cfb1c5b743005692433719db60fee56597a3d11368b35d8902deff642408",
+    "deterministic_operation": "SET_RGBA_0_0_0_0_ON_REMOVAL_MASK_ONLY",
+    "clean_plate_readable_rgba_sha256": "ecf8d502b699cb94af1d2af1563c8c7e630afd926dbe8ed37c54e903ea7608e1",
+    "clean_plate_raw_rgba_sha256": "c75279677800c75db338aaa5285b6e64dded5f4b4c7f67452e7686aaef21447f",
+    "changed_pixels": 56615,
+    "changed_pixels_outside_removal_mask": 0,
+    "alpha_changed_pixels_outside_removal_mask": 0,
+    "changed_pixels_in_protected_regions": 0,
+    "localized_cells_nonzero_alpha_after_clean_plate": 0,
+    "clean_plate_persistence": "DETERMINISTIC_HASHED_PIXEL_REPLAY_SPEC_ONLY_NO_DDS_CANDIDATE",
+    "independent_c_replay_required": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "qa_pending_not_repeated": {
+      "159": "A00196@1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+      "198": "A00208@b874d64204539123c7c3e13d35a26a5ff3511a77",
+      "201": "A00196@1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb"
+    },
+    "latest_c_gate": "C147/Q00045 ATTEMPT2",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      222
+    ],
+    "readiness_before": {
+      "222": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE_DXT5_MIP1__DIRECT_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED"
+    },
+    "readiness_after": {
+      "222": "PRE_CANDIDATE_GATES_PRODUCED__6_OF_6_BINDING_MASKS_DETERMINISTIC_CLEAN_PLATE_2PX_SAFE_BBOX__C_INDEPENDENT_REPLAY_REQUIRED_BEFORE_RENDER"
+    }
+  },
+  "material_deliverable": {
+    "type": "INDEX222_EXACT_SEMANTIC_BINDING_EFFECT_MASK_DETERMINISTIC_CLEAN_PLATE_AND_2PX_SAFE_BBOX_HANDOFF",
+    "reviewed_indices": [
+      222
+    ],
+    "reviewed_assets": [
+      "DDF0392A"
+    ],
+    "semantic_bindings": 6,
+    "protected_original_regions": 19,
+    "source_effect_masks": 6,
+    "candidate_safe_bboxes": 6,
+    "removal_mask_pixels": 56615,
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_INDEX222_MOD3_EQ_0__DRIVE_EXACT_MISS_FALLTHROUGH__PINNED_RELEASE_SHA_EXACT__CANONICAL_MEMBER_SHA_EXACT__DXT5_1024X2048_MIP1__FLIP_Y__6_OF_6_DIRECT_PIXEL_BINDINGS__19_OF_19_PRESERVE_ORIGINAL__56615_PIXEL_ALPHA_EFFECT_MASK__ZERO_CLEANPLATE_OUTSIDE_MASK__ZERO_ALPHA_ESCAPE__ZERO_PROTECTED_CHANGE__2PX_SAFE_BBOX_6_OF_6__NO_CANDIDATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_C_INDEPENDENT_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REPLAY_REQUIRED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 14,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00215",
+  "wave_id": "P00113",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T06:04:17+09:00",
+  "base_head_sha": "49a03e1a06dde02f0ebbe709f3dcbe0c25f70617",
+  "base_sha": "49a03e1a06dde02f0ebbe709f3dcbe0c25f70617",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX222_BINDING_MASK_CLEANPLATE_SAFE_BBOX_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX222_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Fresh A-shard scan skips QA-pending candidates 159/198/201 and finds no C-accepted RENDER_READY or ONE_STAGE_TO_RENDER item. Index222 DDF0392A is the remaining A-owned PREFLIGHT_ONLY candidate-completion item. Approved Drive exact path was checked first and missed; the pinned OR2-HD-GUI-v0.25.10a Release archive digest and DDF0392A member identity exactly match current inventory. Exact decoded pixels prove FLIP_Y readable orientation, bind all 6 canonical localizable strings to regions 0/1/2/3/6/7, and preserve the 4 song titles plus 15 Ferrari model names in the other 19 regions. Each localized region is transparent text-only in decoded RGBA, so alpha>0 is an exact source-effect mask. The six masks total 56,615 pixels; deterministic transparent CLEAN_PLATE replay changes zero pixels/alpha outside that union and zero protected regions. Final 2px v2 candidate-safe bboxes are derived for all 6. No Korean DDS is emitted before independent C replay of binding/mask/CLEAN_PLATE/safe-bbox evidence; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00215-P00113/A00215_P00113_INDEX222_BINDING_MASK_CLEANPLATE_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX222_EXACT_SEMANTIC_BINDING_EFFECT_MASK_DETERMINISTIC_CLEAN_PLATE_AND_2PX_SAFE_BBOX_HANDOFF",
+    "reviewed_indices": [
+      222
+    ],
+    "reviewed_assets": [
+      "DDF0392A"
+    ],
+    "semantic_bindings": 6,
+    "protected_original_regions": 19,
+    "source_effect_masks": 6,
+    "candidate_safe_bboxes": 6,
+    "removal_mask_pixels": 56615,
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "qa_pending_not_repeated": {
+      "159": "A00196@1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+      "198": "A00208@b874d64204539123c7c3e13d35a26a5ff3511a77",
+      "201": "A00196@1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb"
+    },
+    "latest_c_gate": "C147/Q00045 ATTEMPT2",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "selected_priority": "PREFLIGHT_ONLY_CANDIDATE_COMPLETION_AFTER_ZERO_READY_TIERS",
+    "selected_indices": [
+      222
+    ],
+    "readiness_before": {
+      "222": "PREFLIGHT_ONLY_EXACT_SOURCE_ACTIVE_DXT5_MIP1__DIRECT_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REQUIRED"
+    },
+    "readiness_after": {
+      "222": "PRE_CANDIDATE_GATES_PRODUCED__6_OF_6_BINDING_MASKS_DETERMINISTIC_CLEAN_PLATE_2PX_SAFE_BBOX__C_INDEPENDENT_REPLAY_REQUIRED_BEFORE_RENDER"
+    }
+  },
+  "self_qa": "PASS_INDEX222_MOD3_EQ_0__DRIVE_EXACT_MISS_FALLTHROUGH__PINNED_RELEASE_SHA_EXACT__CANONICAL_MEMBER_SHA_EXACT__DXT5_1024X2048_MIP1__FLIP_Y__6_OF_6_DIRECT_PIXEL_BINDINGS__19_OF_19_PRESERVE_ORIGINAL__56615_PIXEL_ALPHA_EFFECT_MASK__ZERO_CLEANPLATE_OUTSIDE_MASK__ZERO_ALPHA_ESCAPE__ZERO_PROTECTED_CHANGE__2PX_SAFE_BBOX_6_OF_6__NO_CANDIDATE",
+  "candidate_static_qa": "HOLD_NO_CANDIDATE_C_INDEPENDENT_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_REPLAY_REQUIRED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "bookkeeping_note": "The immutable producer result commit atomically contains the exact AUTO marker, lane-local material report and durable task record. RESULT_SHA is filled only by a later bookkeeping commit; producer automation_validation remains PENDING for C_BATCH_GATE and runtime_validation remains UNTESTED."
+}
