@@ -1,8 +1,8 @@
-OutRun 2006 한글화 C 작업을 진행해줘. 역할은 A/B와 독립적으로 계속 동작하는 배치 QA consumer + 공용 상태 병합이다.
+OutRun 2006 한글화 C 작업을 진행해줘. 역할은 A/B/E와 독립적으로 계속 동작하는 배치 QA consumer + 공용 상태 병합이다.
 
 작업 기준은 GitHub 저장소 thp32tt/OutRun2006Tweaks의 korean-localization-clean 최신 HEAD 하나뿐이다. N100 로컬 clone/worktree/작업파일, GPT Library, 과거 대화 진행률을 사용하지 마.
 
-시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 최신 기준 파일을 읽어. 컨트롤러가 제공한 QA_BATCH_INPUTS의 각 TASK_ID + RESULT_SHA를 immutable 검수 기준으로 사용하고, A/B가 현재 무엇을 생산 중인지 기다리지 마.
+시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 최신 기준 파일을 읽어. 컨트롤러가 제공한 QA_BATCH_INPUTS의 각 TASK_ID + RESULT_SHA를 immutable 검수 기준으로 사용하고, A/B/E가 현재 무엇을 생산 중인지 기다리지 마.
 
 
 Candidate-completion-first 정책을 지원해. pre-generation input을 PASS할 때 충분한 증거가 있으면 report에 `production_readiness`를 RENDER_READY / ONE_STAGE_TO_RENDER / PREFLIGHT_ONLY 중 하나로 기록해. RENDER_READY는 exact canonical source, source-effect/removal mask, 독립 QA된 CLEAN_PLATE, final candidate_safe_bbox, resolved semantic binding이 있고 실제 한글 렌더를 시작할 수 있는 상태다. baseline/slant/style 측정만 남은 경우에도 producer가 같은 invocation에서 측정 후 렌더할 수 있으므로 RENDER_READY로 분류할 수 있다. shared next_actions는 항상 RENDER_READY -> ONE_STAGE_TO_RENDER -> PREFLIGHT_ONLY 순으로 배치하고, unrelated preflight 확장을 candidate 완성보다 앞에 두지 마.
@@ -13,4 +13,4 @@ Candidate-completion-first 정책을 지원해. pre-generation input을 PASS할 
 
 공용 상태는 이 QA batch 전체에 대해 마지막에 한 번만 병합한다. 최신 HEAD를 다시 읽은 뒤 localization/resume_state.json, localization/WORKLOG.md, canonical localization/progress/progress.json, localization/progress/STATUS.md, asset_queue.csv 및 필요한 공용 QA 상태를 충돌 없이 갱신해. canonical progress를 변경했다면 legacy localization/progress.json도 byte-for-byte 동일하게 갱신해.
 
-C가 검수하는 동안 A/B 생산은 계속된다. C는 A/B 완료를 barrier로 기다리거나 다음 생산을 막지 않는다. 실제 결과를 docs/automation/runs/<TASK_ID>에 기록하고 commit 메시지에 [AUTO:TASK_ID]를 정확히 포함해. C commit 전 task record의 automation_validation은 PENDING으로 기록한다. C commit 하나가 batch 전체를 위한 유일한 Localization Automation Gate 대상이다. producer A/B commit에는 별도 runner Gate가 없다. 실기 테스트가 없으면 RUNTIME_VALIDATION=UNTESTED를 유지해. VR/FFB 및 빌드는 하지 마.
+C가 검수하는 동안 A/B/E 생산은 계속된다. C는 A/B/E 완료를 barrier로 기다리거나 다음 생산을 막지 않는다. 실제 결과를 docs/automation/runs/<TASK_ID>에 기록하고 commit 메시지에 [AUTO:TASK_ID]를 정확히 포함해. C commit 전 task record의 automation_validation은 PENDING으로 기록한다. C commit 하나가 batch 전체를 위한 유일한 Localization Automation Gate 대상이다. producer A/B/E commit에는 별도 runner Gate가 없다. 실기 테스트가 없으면 RUNTIME_VALIDATION=UNTESTED를 유지해. VR/FFB 및 빌드는 하지 마.
