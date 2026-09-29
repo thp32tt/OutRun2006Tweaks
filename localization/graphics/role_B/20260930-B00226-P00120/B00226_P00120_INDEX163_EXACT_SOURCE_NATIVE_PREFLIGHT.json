@@ -1,0 +1,434 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00226-p00120-index163-exact-source-native-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00226",
+  "wave_id": "P00120",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T07:11:38+09:00",
+  "base_head_sha": "346f0c1a1acaed710dacaf8e33d1c7871a8dc382",
+  "shard_rule": "asset_queue.index % 3 == 1",
+  "selection": {
+    "accepted_ready_scan_source": "C151/Q00049 current shared readiness",
+    "accepted_render_ready_indices": [],
+    "accepted_one_stage_to_render_indices": [],
+    "skipped_existing_static_pass_indices": [
+      226
+    ],
+    "skipped_qa_pending_producer_results": [
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+        "result_sha": "a265c5b4d2"
+      },
+      {
+        "index": 220,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00214",
+        "result_sha": "e607e79b45"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "result_sha": "a6a12ad507"
+      },
+      {
+        "index": 193,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00223",
+        "result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663"
+      },
+      {
+        "index": 217,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00223",
+        "result_sha": "37b579a9f850ccb4f5f1a347133851d875fac663"
+      }
+    ],
+    "skipped_unchanged_dependency_blocked_or_source_exhausted_examples": [
+      28,
+      34,
+      46,
+      52,
+      94,
+      100,
+      103,
+      106,
+      121,
+      172,
+      205,
+      214,
+      241
+    ],
+    "selected_index": 163,
+    "selected_asset": "59A79158",
+    "selected_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "selected_priority": "SINGLE_ALLOWED_PREFLIGHT_ONLY_BATCH_AFTER_ZERO_RUNNABLE_READY_TIERS"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "asset_queue_blob_sha": "a7d72949b0167bc6c69bbf96489b2bc1ff78d7de",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "latest_c_task_record_blob_sha": "1026c0f9e3c34e6783adc2266c23410661fa2840"
+  },
+  "source_transport": {
+    "approved_drive": {
+      "account": "ezflash557",
+      "canonical_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "parent_listing_count": 1,
+      "observed_only_child": "9F060EC1_512x512.dds",
+      "result": "SOURCE_TRANSPORT_MISS"
+    },
+    "pinned_tag_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "git_blob_sha1": "693548c2c4ec53a4b75adbfe2868328896a115de",
+      "bytes": 8388736,
+      "result": "PASS_IMMUTABLE_BLOB_LOCATOR"
+    },
+    "pinned_release_fallback": {
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_bytes": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "member_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "member_bytes": 8388736,
+      "member_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "computed_git_blob_sha1": "693548c2c4ec53a4b75adbfe2868328896a115de",
+      "byte_identity_with_pinned_tag_direct": "PASS_BY_GIT_BLOB_SHA1",
+      "inventory_expected_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "inventory_identity": "PASS_EXACT_SHA256"
+    }
+  },
+  "exact_source": {
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "bytes": 8388736,
+    "dds_header": {
+      "magic": "DDS ",
+      "header_size": 124,
+      "flags_hex": "0x0000100f",
+      "width": 1024,
+      "height": 2048,
+      "pitch_bytes": 4096,
+      "mipmaps": 1,
+      "pixel_format_size": 32,
+      "pixel_format_flags_hex": "0x00000041",
+      "fourcc": "NONE",
+      "rgb_bits": 32,
+      "r_mask_hex": "0x00ff0000",
+      "g_mask_hex": "0x0000ff00",
+      "b_mask_hex": "0x000000ff",
+      "a_mask_hex": "0xff000000",
+      "caps_hex": "0x00001000",
+      "status": "PASS_RGBA32_MIP1_EXACT_INVENTORY_CANVAS"
+    },
+    "orientation": {
+      "source_text_transform": "flip_y",
+      "raw_observation": "raw DDS decoded text is vertically inverted; FLIP_Y produces readable English stage names",
+      "raw_to_readable": "flip_y",
+      "decoded_raw_rgba_sha256": "3ec849f30ac6bf4c8bcde40de53b1c576fd029fabc495d1ea32c0e17f23da5d2",
+      "decoded_readable_rgba_sha256": "1fe9b664b6c5da8a2ac1b343df9c4e695cf0d9ae9fe171d277d7baf14f6a43a9",
+      "status": "PASS_SOURCE_PIXEL_PROVEN"
+    },
+    "alpha_geometry": {
+      "total_alpha_nonzero_pixels": 171748,
+      "raw_alpha_bbox_xyxy": [
+        3,
+        12,
+        485,
+        1808
+      ],
+      "readable_alpha_bbox_xyxy": [
+        3,
+        240,
+        485,
+        2036
+      ],
+      "physical_text_row_count": 24,
+      "physical_rows": [
+        {
+          "physical_row": 1,
+          "bbox_readable_xyxy": [
+            6,
+            240,
+            281,
+            289
+          ],
+          "alpha_nonzero_pixels": 6782
+        },
+        {
+          "physical_row": 2,
+          "bbox_readable_xyxy": [
+            6,
+            316,
+            313,
+            365
+          ],
+          "alpha_nonzero_pixels": 6914
+        },
+        {
+          "physical_row": 3,
+          "bbox_readable_xyxy": [
+            6,
+            390,
+            388,
+            447
+          ],
+          "alpha_nonzero_pixels": 9446
+        },
+        {
+          "physical_row": 4,
+          "bbox_readable_xyxy": [
+            6,
+            464,
+            446,
+            513
+          ],
+          "alpha_nonzero_pixels": 9894
+        },
+        {
+          "physical_row": 5,
+          "bbox_readable_xyxy": [
+            5,
+            540,
+            262,
+            598
+          ],
+          "alpha_nonzero_pixels": 6111
+        },
+        {
+          "physical_row": 6,
+          "bbox_readable_xyxy": [
+            5,
+            620,
+            164,
+            667
+          ],
+          "alpha_nonzero_pixels": 3943
+        },
+        {
+          "physical_row": 7,
+          "bbox_readable_xyxy": [
+            5,
+            693,
+            333,
+            751
+          ],
+          "alpha_nonzero_pixels": 7873
+        },
+        {
+          "physical_row": 8,
+          "bbox_readable_xyxy": [
+            6,
+            768,
+            318,
+            817
+          ],
+          "alpha_nonzero_pixels": 7364
+        },
+        {
+          "physical_row": 9,
+          "bbox_readable_xyxy": [
+            6,
+            848,
+            348,
+            897
+          ],
+          "alpha_nonzero_pixels": 8004
+        },
+        {
+          "physical_row": 10,
+          "bbox_readable_xyxy": [
+            5,
+            922,
+            250,
+            980
+          ],
+          "alpha_nonzero_pixels": 5525
+        },
+        {
+          "physical_row": 11,
+          "bbox_readable_xyxy": [
+            5,
+            998,
+            419,
+            1056
+          ],
+          "alpha_nonzero_pixels": 9225
+        },
+        {
+          "physical_row": 12,
+          "bbox_readable_xyxy": [
+            5,
+            1077,
+            485,
+            1134
+          ],
+          "alpha_nonzero_pixels": 11071
+        },
+        {
+          "physical_row": 13,
+          "bbox_readable_xyxy": [
+            5,
+            1150,
+            172,
+            1208
+          ],
+          "alpha_nonzero_pixels": 4028
+        },
+        {
+          "physical_row": 14,
+          "bbox_readable_xyxy": [
+            5,
+            1222,
+            188,
+            1280
+          ],
+          "alpha_nonzero_pixels": 4496
+        },
+        {
+          "physical_row": 15,
+          "bbox_readable_xyxy": [
+            5,
+            1302,
+            231,
+            1360
+          ],
+          "alpha_nonzero_pixels": 5009
+        },
+        {
+          "physical_row": 16,
+          "bbox_readable_xyxy": [
+            7,
+            1380,
+            273,
+            1438
+          ],
+          "alpha_nonzero_pixels": 6635
+        },
+        {
+          "physical_row": 17,
+          "bbox_readable_xyxy": [
+            6,
+            1450,
+            268,
+            1508
+          ],
+          "alpha_nonzero_pixels": 6624
+        },
+        {
+          "physical_row": 18,
+          "bbox_readable_xyxy": [
+            7,
+            1530,
+            350,
+            1578
+          ],
+          "alpha_nonzero_pixels": 8084
+        },
+        {
+          "physical_row": 19,
+          "bbox_readable_xyxy": [
+            5,
+            1605,
+            304,
+            1653
+          ],
+          "alpha_nonzero_pixels": 7029
+        },
+        {
+          "physical_row": 20,
+          "bbox_readable_xyxy": [
+            4,
+            1682,
+            305,
+            1740
+          ],
+          "alpha_nonzero_pixels": 7082
+        },
+        {
+          "physical_row": 21,
+          "bbox_readable_xyxy": [
+            4,
+            1757,
+            401,
+            1806
+          ],
+          "alpha_nonzero_pixels": 9101
+        },
+        {
+          "physical_row": 22,
+          "bbox_readable_xyxy": [
+            3,
+            1832,
+            336,
+            1890
+          ],
+          "alpha_nonzero_pixels": 7626
+        },
+        {
+          "physical_row": 23,
+          "bbox_readable_xyxy": [
+            5,
+            1909,
+            324,
+            1967
+          ],
+          "alpha_nonzero_pixels": 7479
+        },
+        {
+          "physical_row": 24,
+          "bbox_readable_xyxy": [
+            6,
+            1988,
+            269,
+            2036
+          ],
+          "alpha_nonzero_pixels": 6403
+        }
+      ],
+      "interpretation": "Exact source-native physical alpha row envelopes only. These are not yet semantic bindings, source-effect/removal masks, candidate-safe bboxes, or production lettering regions."
+    }
+  },
+  "semantic_state": {
+    "canonical_translation_count": 24,
+    "shared_state_prior": "Q00020/C122 retained 24 current stage-name semantics but explicitly forbade family/atlas-order/style/geometry inference without asset-specific proof.",
+    "exact_physical_row_count_matches_translation_count": true,
+    "semantic_to_physical_row_binding": "HOLD_STRICT_RECHECK",
+    "rationale": "This producer intentionally does not infer ordered semantic binding from count/order alone. Exact row-to-segment binding, pixel-level effect masks, protected masks, CLEAN_PLATE and final candidate_safe_bbox remain independent prerequisites."
+  },
+  "readiness": {
+    "before": "PREFLIGHT_ONLY_CANONICAL_IDENTITY_AND_24_SEMANTICS_CURRENT__EXACT_SOURCE_BYTES_NOT_SOURCE_NATIVE_REPLAYED",
+    "after": "PREFLIGHT_ONLY_EXACT_SOURCE_BYTES_HEADER_FLIP_Y_ORIENTATION_AND_24_PHYSICAL_ALPHA_ROWS_RESOLVED__SEMANTIC_BINDING_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_PENDING",
+    "render_ready": false,
+    "one_stage_to_render": false,
+    "candidate_attempted": false,
+    "candidate_attempt_reason": "No C-accepted semantic-to-physical-row binding or final removal/protected masks/CLEAN_PLATE/candidate_safe_bbox exists. Rendering now would guess atlas binding and violate fail-closed generation rules.",
+    "required_next": [
+      "Independently bind the 24 exact physical rows to the 24 reviewed canonical semantics from exact readable source pixels, without assuming transcription order.",
+      "Derive per-row source-effect/removal masks and protected masks at native resolution and independently validate CLEAN_PLATE with zero outside-mask/protected/alpha escape.",
+      "Derive final v2 candidate_safe_bbox with >=2 px inset where geometry supports it.",
+      "If those steps make index163 RENDER_READY, continue through source typography/baseline/signed-slant measurement, Korean render, measure/refit, exact RGBA32 DDS encode, decoded-final self-QA and English-source comparison in the same producer invocation."
+    ]
+  },
+  "self_qa": {
+    "status": "PASS_PREFLIGHT_ONLY",
+    "checks": [
+      "B modulo-3 ownership PASS (163 % 3 == 1)",
+      "no accepted B RENDER_READY/ONE_STAGE_TO_RENDER skipped at selection HEAD",
+      "existing producer QA-pending assets not repeated",
+      "Drive exact-path tier attempted first and typed as SOURCE_TRANSPORT_MISS",
+      "pinned tag immutable blob locator PASS",
+      "pinned release bundle digest/size PASS",
+      "release member SHA-256 exactly matches canonical inventory",
+      "pinned tag blob and release member byte identity PASS by Git blob SHA1",
+      "DDS header/canvas/RGBA32/mip1 PASS",
+      "raw/readable orientation source-pixel proven as FLIP_Y",
+      "no source DDS committed; no candidate emitted; no shared state modified"
+    ]
+  },
+  "runtime_validation": "UNTESTED"
+}

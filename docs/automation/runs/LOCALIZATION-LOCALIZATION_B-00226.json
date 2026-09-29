@@ -1,0 +1,85 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00226-p00120-index163-exact-source-native-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00226",
+  "wave_id": "P00120",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T07:11:38+09:00",
+  "base_head_sha": "346f0c1a1acaed710dacaf8e33d1c7871a8dc382",
+  "base_sha": "346f0c1a1acaed710dacaf8e33d1c7871a8dc382",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX163_EXACT_SOURCE_NATIVE_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX163_EXACT_CANONICAL_SOURCE_NATIVE_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Fresh current-head scan found no C-accepted B RENDER_READY or ONE_STAGE_TO_RENDER asset. Existing B00211/B00213/B00214/B00223 outputs remain producer QA-pending and were not repeated; index226 remains STATIC_QA PASS. Under the single legal PREFLIGHT_ONLY expansion, index163/59A79158 is materially advanced. Approved Drive exact path is a typed SOURCE_TRANSPORT_MISS; immutable pinned tag resolves blob 693548c2... (8,388,736 bytes); the verified v0.25.10a release fallback reproduces the same Git blob and exact canonical inventory SHA-256 7cf4f4c6.... Native replay proves RGBA32 1024x2048 mip1, FLIP_Y readable orientation, 171,748 nonzero-alpha pixels and 24 physical text-row envelopes. Shared C state previously retained 24 semantics but forbids atlas-order inference, so semantic-to-row binding plus final effect/removal masks, protected masks, CLEAN_PLATE and v2 safe bboxes remain HOLD; no Korean candidate is guessed. Runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00226-P00120/B00226_P00120_INDEX163_EXACT_SOURCE_NATIVE_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX163_EXACT_CANONICAL_SOURCE_BYTES_HEADER_ORIENTATION_AND_PHYSICAL_ALPHA_ROW_GEOMETRY",
+    "reviewed_indices": [
+      163
+    ],
+    "reviewed_assets": [
+      "59A79158"
+    ],
+    "drive_exact_tier_closed_as_transport_miss": true,
+    "immutable_pinned_tag_blob_locator_verified": true,
+    "pinned_release_inventory_sha256_identity_verified": true,
+    "pinned_tag_release_byte_identity_verified": true,
+    "exact_header_orientation_verified": true,
+    "physical_text_rows_measured": 24,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      163
+    ],
+    "qa_pending_not_repeated": {
+      "LOCALIZATION-LOCALIZATION_B-00211": [
+        232
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00213": [
+        133
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00214": [
+        220
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00223": [
+        193,
+        217
+      ]
+    },
+    "static_pass_not_repeated": [
+      226
+    ],
+    "readiness_after": {
+      "163": "PREFLIGHT_ONLY_EXACT_SOURCE_HEADER_ORIENTATION_24_PHYSICAL_ROWS_RESOLVED__SEMANTIC_BINDING_MASK_CLEAN_PLATE_SAFE_BBOX_PENDING"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX163__ZERO_ACCEPTED_READY_TIER_SKIPPED__QA_PENDING_NOT_REPEATED__DRIVE_EXACT_MISS__PINNED_TAG_BLOB_693548C2__RELEASE_SHA_EQUALS_CANONICAL_7CF4F4C6__RGBA32_1024X2048_MIP1__FLIP_Y_SOURCE_PIXEL_PROVEN__24_PHYSICAL_ALPHA_ROWS__FAIL_CLOSED_NO_SEMANTIC_ORDER_INFERENCE_NO_CANDIDATE",
+  "candidate_static_qa": "HOLD_NO_KOREAN_CANDIDATE_SEMANTIC_BINDING_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_INCOMPLETE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Verified exact pinned v0.25.10a release fallback only after Drive exact-path miss and pinned-tag locator; GitHub remains state/progress/QA SSOT.",
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_POST_COMMIT",
+  "authoritative_result_sha": "PENDING_POST_COMMIT"
+}
