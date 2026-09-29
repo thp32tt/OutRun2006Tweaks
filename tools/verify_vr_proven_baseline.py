@@ -197,11 +197,18 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'bool selectorAtlas = false',
     'R14FirstSelectorUploadLogged',
     'exact 2048x2048 selector/car atlas CPU-shadow upload succeeded',
+    'R71IsSelectorCompanionDiagnosticCandidate',
+    'desc.Height == 512 || desc.Height == 1024',
+    'companion CPU-shadow budget reject',
+    'companion SYSTEMMEM CreateTexture failed',
+    'companion entered DirectOnly',
+    'correlate this pointer with later R13 LockRect failure',
 ], "P8_SELECTOR_ATLAS_RESERVE")
 require_all("src/vr/d3d9/ex_device_upgrade_r13.cpp", [
-    'VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED',
+    'VR R71 SELECTOR DIAG: translated MANAGED LockRect FAILED ptr=0x{:08X}',
     'rect=[{},{},{},{}]',
     'size={}x{} fmt={} levels={}',
+    'correlate exact pointer with R14 companion DirectOnly fallback',
 ], "P8_SELECTOR_LOCK_DIAG")
 require_all("src/hooks_uiscaling.cpp", [
     'Module::exe_ptr(0xBA9D0)',
