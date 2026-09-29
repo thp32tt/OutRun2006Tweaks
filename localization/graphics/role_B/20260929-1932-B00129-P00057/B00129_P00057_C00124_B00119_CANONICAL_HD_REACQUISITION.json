@@ -1,0 +1,474 @@
+{
+  "schema_version": 8,
+  "schema": "outrun-canonical-hd-source-reacquisition-manifest-v2-candidate-first",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00129",
+  "wave_id": "P00057",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T19:39:00+09:00",
+  "precommit_head_sha": "a7bfe3d65f160376040f78c9f020410cbfe172f5",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "result": "PASS_MATERIAL_SCHEMA8_ZERO_CANDIDATE_EXCEPTION_ONE_PREFLIGHT_BATCH_C00124_B00119_CANONICAL_SOURCE_REACQUISITION",
+  "selection": {
+    "selected_indices": [
+      188,
+      226,
+      232
+    ],
+    "selected_assets": [
+      "8C259C68",
+      "E3F4BA07",
+      "EBFC709F"
+    ],
+    "priority": "RUNNABLE_REWORK_REQUIRED",
+    "basis": "Q00015/C00124 returned B00119 REWORK_REQUIRED. C117 independently accepted 16/16 canonical pairs, 3/3 atlas identities and 22/22 atlas bounds/guards/payload formulas as internally consistent, but same canvas/format was insufficient because Release bytes were not hash-gated to current canonical inventory SHA-256 identities. This task retires Release identity as canonical proof and adds exact canonical source acquisition gates without repeating accepted heavy arithmetic.",
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00124",
+    "c_run": "C117",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_B-00119",
+    "candidate_first_policy": "schema7_candidate_completion_first",
+    "readiness_audit_required": true,
+    "reason": "Current schema7 candidate-completion-first policy was introduced at precommit HEAD 2ada3acd. Before selecting B00119, this task audited B-even current shared/C-accepted evidence. No RENDER_READY or ONE_STAGE_TO_RENDER B asset can safely advance with current GitHub evidence: the only shared-state CLEAN_PLATE-ready index is 215 (odd/A); B pre-generation evidence retains CLEAN_PLATE/source-identity HOLD; existing B candidates are C/runtime-only or dependency-blocked rather than missing-render candidates. Therefore one preflight-only batch is permitted. Q00015/C00124 returned B00119 REWORK_REQUIRED because Release bytes are not hash-gated to canonical user-HD inventory SHA-256."
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "e6feafaf6c0719e59c1bae4dc7b92610e5beb411",
+    "queue_blob_sha": "9dd86d58d6b61558115cbe5bcb2ff3aae70d388f",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "c00124_task_record_blob_sha": "558fbc42a55e01c01eb75fee4f9ceaaf1099d050",
+    "c117_report_blob_sha": "663fb381bece3c45613dca2340362c757a8a4a4c",
+    "b00119_task_record_blob_sha": "314618b75f6942062078eae382e46c0fef922d0e",
+    "b00119_material_report_blob_sha": "a8147a2f1bfd41f9ce2fc09300c0856d835c2589",
+    "controller_roles_blob_sha": "fea2e41c3000905d479e43b923d0f0f42126523b",
+    "progress_blob_sha": "7228466ecc82a4eb028d0525c887ad9ba2e37382",
+    "resume_state_blob_sha": "a4b76fe5f4df7ff4c6f8579fe1e5237e3642ff67",
+    "precommit_tree_sha": "58e01de2b260fed23a09fd8492659ea4dc77812c"
+  },
+  "canonical_source_policy": {
+    "authoritative_source": "localization/graphics/inventory.csv current user-HD SHA-256 identities",
+    "release_identity_role": "conditional reconstruction prior only",
+    "matching_dimensions_or_format_class_proves_identity": false,
+    "exact_sha256_match_required_before_pixel_geometry_reuse": true,
+    "filename_suffix_dimensions_authoritative": false
+  },
+  "direct_github_binary_recheck": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "attempted_release_blobs": [
+      {
+        "asset": "8C259C68",
+        "git_blob_sha": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+        "result": "BLOCKED_UTF8_UNICODEDECODEERROR"
+      },
+      {
+        "asset": "E3F4BA07",
+        "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+        "result": "BLOCKED_UTF8_UNICODEDECODEERROR"
+      },
+      {
+        "asset": "EBFC709F",
+        "git_blob_sha": "f95c09096c948738efc477a2577513151b3179f7",
+        "result": "BLOCKED_UTF8_UNICODEDECODEERROR"
+      }
+    ],
+    "successful_binary_bodies": 0,
+    "conclusion": "Current GitHub connector cannot return these binary DDS bodies as UTF-8, so canonical SHA-256 equivalence cannot be computed here. Fail closed; do not infer equality from Git blob identity, canvas or format class."
+  },
+  "c117_rework_resolution": {
+    "defect": "B00119 proved only Sonic-TV Release blobs, while current contract requires exact canonical user-HD source identity when present.",
+    "resolved_now": [
+      "Pins 3/3 current canonical user-HD SHA-256 identities, dimensions and RGBA inventory mode.",
+      "Reclassifies all B00119 Release geometry/atlas work as conditional prior only, not canonical construction evidence.",
+      "Preserves C117-accepted 16/16 canonical semantics and 22/22 internal atlas/guard/payload arithmetic without recomputation.",
+      "Defines exact hash-gated source acquisition, canonical decode, CLEAN_PLATE and v2 render gates for each asset.",
+      "Proves canonical queue-path source files are absent on current Git HEAD and records the connector binary-read blocker explicitly."
+    ],
+    "unresolved_dependency": "Acquire/import exact canonical user-HD DDS bytes matching the pinned inventory SHA-256 identities."
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_EVEN_CANDIDATE_FIRST_ALLOWED_CANONICAL_HD_SOURCE_REACQUISITION_AND_RELEASE_IDENTITY_RETIREMENT_MANIFESTS",
+    "indices": [
+      188,
+      226,
+      232
+    ],
+    "assets": [
+      "8C259C68",
+      "E3F4BA07",
+      "EBFC709F"
+    ],
+    "canonical_inventory_identities_pinned": 3,
+    "canonical_inventory_canvases_pinned": 3,
+    "canonical_semantic_entries_reused": 16,
+    "c117_internal_atlas_scope_checks_reused": 22,
+    "release_identities_retired_as_canonical_proof": 3,
+    "exact_hash_gated_acquisition_pipelines_created": 3,
+    "candidate_dds_modified": false,
+    "description": "Converts the C117 source-identity failure into deterministic executable input: every future pixel-stage step must first obtain a DDS matching the current inventory SHA-256, after which prior atlas geometry is revalidated rather than assumed.",
+    "candidate_first_readiness_audit": "PASS_NO_EVEN_RENDER_READY_OR_ONE_STAGE_TO_RENDER",
+    "preflight_only_batch_count": 1,
+    "preflight_only_batch_limit": 1,
+    "schema8_zero_candidate_exception_proven": true,
+    "preflight_advancement": "B00119 moves from Release-only identity evidence to exact current canonical SHA-256 acquisition gates; next stage is deterministic exact-source import/hash verification, not another generic work order."
+  },
+  "assets": [
+    {
+      "queue_index": 188,
+      "asset": "8C259C68",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+      "canonical_sha256": "a51db4153e03f6646eeda2936ff55b8a3dea256586e74fbca8772b1f52d522a2",
+      "canonical_dimensions": [
+        2048,
+        2048
+      ],
+      "canonical_mode": "RGBA",
+      "canonical_semantic_count": 6,
+      "semantics": [
+        {
+          "source": "Online and LAN OutRun for up to 6 players",
+          "korean": "온라인/LAN 아웃런 최대 6인 플레이"
+        },
+        {
+          "source": "Complete Race and Heart Attack missions to win OR Miles!",
+          "korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!"
+        },
+        {
+          "source": "Try to win Hearts by meeting your girlfriend's demands!",
+          "korean": "여자친구의 요구를 들어주고 하트를 획득하세요!"
+        },
+        {
+          "source": "Try to reach the goal with your girlfriend!",
+          "korean": "여자친구와 함께 골에 도착하세요!"
+        },
+        {
+          "source": "Buy your OutRun items here!",
+          "korean": "여기서 아웃런 아이템을 구매하세요!"
+        },
+        {
+          "source": "Drive against the Ghost Cars and go for the course records!",
+          "korean": "고스트 카와 달리며 코스 기록에 도전하세요!"
+        }
+      ],
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "4a95a48c9c34f2ddd786340e4323d6779b7a103b",
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "atlas_blob_sha": "6061128430caeb04773ac8caa7918629eeef8ba8",
+        "atlas_regions": 6
+      },
+      "current_git_queue_path_source_present": false,
+      "release_binary_fetch_recheck": "BLOCKED_UTF8_UNICODEDECODEERROR",
+      "release_equals_canonical_sha256": "UNPROVEN_DO_NOT_ASSUME",
+      "prior_atlas_geometry_use": "CONDITIONAL_RECONSTRUCTION_PRIOR_ONLY; MAY_NOT_DRIVE_MASK_CLEAN_PLATE_OR_CANDIDATE_UNTIL_EXACT_CANONICAL_SOURCE_SHA256_MATCHES",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before interpreting header or pixels; matching canvas/format class is insufficient.",
+        "Read the exact canonical DDS header and preserve width/height/format/compression/mips/alpha behavior.",
+        "Determine raw/readable orientation from exact canonical pixels; do not promote Release orientation as canonical proof.",
+        "Only after canonical SHA-256 match, compare prior atlas regions against canonical pixels and revalidate semantic occupancy/bounds.",
+        "Measure effect-inclusive English source bboxes from canonical pixels.",
+        "Build source-removal and protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and require zero changes outside removal mask, zero protected-art mutation, zero alpha change outside mask, no residue/seam/box.",
+        "Derive first-pass-v2 candidate_safe_bbox with default 2px inset from measured canonical source geometry.",
+        "Render Korean deterministically at native resolution; refit by fresh render only.",
+        "Require zero-pixel containment plus exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof before static promotion.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 226,
+      "asset": "E3F4BA07",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+      "canonical_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "canonical_dimensions": [
+        2048,
+        512
+      ],
+      "canonical_mode": "RGBA",
+      "canonical_semantic_count": 8,
+      "semantics": [
+        {
+          "source": "GOAL",
+          "korean": "골"
+        },
+        {
+          "source": "GOAL A",
+          "korean": "골 A"
+        },
+        {
+          "source": "GOAL B",
+          "korean": "골 B"
+        },
+        {
+          "source": "GOAL C",
+          "korean": "골 C"
+        },
+        {
+          "source": "GOAL D",
+          "korean": "골 D"
+        },
+        {
+          "source": "GOAL E",
+          "korean": "골 E"
+        },
+        {
+          "source": "15 STAGE CONTINUOUS",
+          "korean": "15코스 연속"
+        },
+        {
+          "source": "STAGE",
+          "korean": "스테이지"
+        }
+      ],
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "0ac26331b6c2765b9c46b867ff1f2151fd7a15b1",
+        "dimensions": [
+          2048,
+          512
+        ],
+        "atlas_blob_sha": "50256e8d4d5af1335249993d44abc5d18a4c5672",
+        "atlas_regions": 10
+      },
+      "current_git_queue_path_source_present": false,
+      "release_binary_fetch_recheck": "BLOCKED_UTF8_UNICODEDECODEERROR",
+      "release_equals_canonical_sha256": "UNPROVEN_DO_NOT_ASSUME",
+      "prior_atlas_geometry_use": "CONDITIONAL_RECONSTRUCTION_PRIOR_ONLY; MAY_NOT_DRIVE_MASK_CLEAN_PLATE_OR_CANDIDATE_UNTIL_EXACT_CANONICAL_SOURCE_SHA256_MATCHES",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before interpreting header or pixels; matching canvas/format class is insufficient.",
+        "Read the exact canonical DDS header and preserve width/height/format/compression/mips/alpha behavior.",
+        "Determine raw/readable orientation from exact canonical pixels; do not promote Release orientation as canonical proof.",
+        "Only after canonical SHA-256 match, compare prior atlas regions against canonical pixels and revalidate semantic occupancy/bounds.",
+        "Measure effect-inclusive English source bboxes from canonical pixels.",
+        "Build source-removal and protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and require zero changes outside removal mask, zero protected-art mutation, zero alpha change outside mask, no residue/seam/box.",
+        "Derive first-pass-v2 candidate_safe_bbox with default 2px inset from measured canonical source geometry.",
+        "Render Korean deterministically at native resolution; refit by fresh render only.",
+        "Require zero-pixel containment plus exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof before static promotion.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    },
+    {
+      "queue_index": 232,
+      "asset": "EBFC709F",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "canonical_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "canonical_dimensions": [
+        2048,
+        1024
+      ],
+      "canonical_mode": "RGBA",
+      "canonical_semantic_count": 2,
+      "semantics": [
+        {
+          "source": "JOIN GAME",
+          "korean": "게임 참가"
+        },
+        {
+          "source": "CREATE GAME",
+          "korean": "게임 만들기"
+        }
+      ],
+      "prior_release": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "git_blob_sha": "f95c09096c948738efc477a2577513151b3179f7",
+        "dimensions": [
+          2048,
+          1024
+        ],
+        "atlas_blob_sha": "0792142ed98c7ae16c47834daf8a4095799faf17",
+        "atlas_regions": 6
+      },
+      "current_git_queue_path_source_present": false,
+      "release_binary_fetch_recheck": "BLOCKED_UTF8_UNICODEDECODEERROR",
+      "release_equals_canonical_sha256": "UNPROVEN_DO_NOT_ASSUME",
+      "prior_atlas_geometry_use": "CONDITIONAL_RECONSTRUCTION_PRIOR_ONLY; MAY_NOT_DRIVE_MASK_CLEAN_PLATE_OR_CANDIDATE_UNTIL_EXACT_CANONICAL_SOURCE_SHA256_MATCHES",
+      "canonical_reacquisition_gate": [
+        "Acquire/import the exact canonical user-HD DDS matching canonical_sha256.",
+        "Verify SHA-256 equality before interpreting header or pixels; matching canvas/format class is insufficient.",
+        "Read the exact canonical DDS header and preserve width/height/format/compression/mips/alpha behavior.",
+        "Determine raw/readable orientation from exact canonical pixels; do not promote Release orientation as canonical proof.",
+        "Only after canonical SHA-256 match, compare prior atlas regions against canonical pixels and revalidate semantic occupancy/bounds.",
+        "Measure effect-inclusive English source bboxes from canonical pixels.",
+        "Build source-removal and protected-art masks only from canonical pixels.",
+        "Create CLEAN_PLATE and require zero changes outside removal mask, zero protected-art mutation, zero alpha change outside mask, no residue/seam/box.",
+        "Derive first-pass-v2 candidate_safe_bbox with default 2px inset from measured canonical source geometry.",
+        "Render Korean deterministically at native resolution; refit by fresh render only.",
+        "Require zero-pixel containment plus exact-crop ENGLISH SOURCE vs KOREAN CANDIDATE proof before static promotion.",
+        "Keep runtime_validation UNTESTED until real game evidence exists."
+      ]
+    }
+  ],
+  "one_pass_self_qa": {
+    "parity": "PASS_EVEN_ONLY_188_226_232",
+    "queue_state": "PASS_3_OF_3_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED_C117_REWORK_REQUIRED",
+    "canonical_inventory": "PASS_3_OF_3_SHA256_WIDTH_HEIGHT_MODE_PINNED",
+    "current_semantics": "PASS_16_OF_16_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN_REUSED",
+    "c117_heavy_qa_reuse": "PASS_REUSE_22_OF_22_INTERNAL_ATLAS_GUARD_PAYLOAD_ARITHMETIC_NO_REPEAT",
+    "release_identity_status": "PASS_FAIL_CLOSED_3_OF_3_UNPROVEN_AS_CANONICAL",
+    "current_git_source_presence": "PASS_3_OF_3_QUEUE_PATHS_ABSENT_FAIL_CLOSED",
+    "source_effect_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bbox": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "candidate_dds": "HOLD_NO_CANDIDATE",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_CHANGE",
+    "runtime_validation": "UNTESTED",
+    "candidate_first_selection": "PASS_SCHEMA8_ZERO_CANDIDATE_EXCEPTION__NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK__ONE_PREFLIGHT_ONLY_BATCH_ALLOWED",
+    "contract_schema7": "PASS_CANDIDATE_COMPLETION_FIRST_POLICY_APPLIED",
+    "precommit_head_preservation": "PASS_HEAD_A7BFE3D6_PRESERVED_AS_PARENT_PLANNED",
+    "contract_schema8": "PASS_HARD_CANDIDATE_SUCCESS_CONDITION_AND_ZERO_CANDIDATE_EXCEPTION_APPLIED"
+  },
+  "heavy_qa_reuse": {
+    "repeated": false,
+    "reused": [
+      "C117 B00119 canonical semantic validation 16/16",
+      "C117 B00119 three atlas identities/counts",
+      "C117 B00119 22/22 atlas bounds, strict 2px guard arithmetic and linear-RGBA payload formulas"
+    ],
+    "intentionally_not_reused_as_canonical": [
+      "B00119 Sonic-TV Release Git blob identities",
+      "Release-derived source/header/orientation claims not proven equal to inventory SHA-256",
+      "Release atlas rectangles as removal masks or final candidate_safe_bbox",
+      "any source-effect/removal/protected/CLEAN_PLATE/candidate pixel geometry"
+    ]
+  },
+  "skipped_or_deferred": {
+    "other_runnable_rework_after_batch": {
+      "LOCALIZATION-LOCALIZATION_B-00110": [
+        92,
+        98,
+        112
+      ]
+    },
+    "qa_pending_or_newer_producer_results": {
+      "LOCALIZATION-LOCALIZATION_B-00122": [
+        198,
+        214,
+        230,
+        236
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00125": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00127": [
+        36,
+        38,
+        128,
+        206
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      94,
+      102
+    ],
+    "separate_runtime_validation_backlog": [
+      12,
+      54,
+      60,
+      104,
+      116
+    ]
+  },
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_KOREAN_CANDIDATE",
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_NOT_PRESENT_AT_CURRENT_QUEUE_PATHS",
+    "release_to_canonical_sha256_equivalence": "HOLD_UNPROVEN_BINARY_BODY_NOT_READABLE_VIA_CURRENT_GITHUB_CONNECTOR",
+    "exact_dds_header_format_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "raw_readable_orientation": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "semantic_to_region_binding": "HOLD_REVALIDATE_AGAINST_EXACT_CANONICAL_PIXELS",
+    "source_effect_bboxes": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "production_strategy": {
+    "mode": "candidate_completion_first_schema8",
+    "readiness_tiers": [
+      "RENDER_READY",
+      "ONE_STAGE_TO_RENDER",
+      "PREFLIGHT_ONLY"
+    ],
+    "readiness_audit": {
+      "render_ready_even_indices": [],
+      "one_stage_to_render_even_indices": [],
+      "evidence": [
+        "localization/progress/progress.json strict_qa_current.w00017_clean_plate_ready_indices = [215]; index215 is odd and belongs to lane A.",
+        "C109/B00083 indices 92/98/112: CLEAN_PLATE removal masks and candidate bytes remain HOLD.",
+        "C110/C111/C112/C113 B-even pre-generation groups: CLEAN_PLATE/source-effect/candidate gates remain HOLD.",
+        "C115/B00104 index152: exact effect bboxes/safe-bbox formulas accepted, but canonical inventory is RGBA SHA-256 de306c... while accepted source is Release DXT5/BC3; removal/protected masks and CLEAN_PLATE remain HOLD, so it is PREFLIGHT_ONLY under current canonical-source rule.",
+        "C117/B00115 and B00119: canonical source identity is REWORK_REQUIRED.",
+        "Existing B candidates indices 12/54/60/94/102/104/116 are runtime/C revalidation/dependency-blocked or already candidate-bearing; no missing v2 render can be safely completed from current GitHub evidence.",
+        "Schema8 fresh scan: B00110/B00115/B00119 direct reworks all require exact canonical user-HD bytes absent from current Git queue paths, so they are dependency-blocked rather than runnable.",
+        "Schema8 fresh scan: existing candidate rework indices 94/102 have unchanged runtime/source dependencies and safe-repair exhaustion/isolated-game evidence requirements; they are not runnable material reworks.",
+        "Even existing candidates 12/54/60/104/116 are candidate-bearing C/runtime/revalidation backlog, not missing-render or material-rework work under current queue evidence."
+      ],
+      "conclusion": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_IN_EVEN_SHARD_AFTER_FRESH_SCAN",
+      "runnable_direct_rework_even_indices": [],
+      "runnable_existing_candidate_rework_even_indices": [],
+      "dependency_blocked_direct_rework": {
+        "LOCALIZATION-LOCALIZATION_B-00110": [
+          92,
+          98,
+          112
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00115": [
+          36,
+          38,
+          128,
+          206
+        ],
+        "LOCALIZATION-LOCALIZATION_B-00119": [
+          188,
+          226,
+          232
+        ]
+      },
+      "dependency_blocked_existing_candidate_rework": [
+        94,
+        102
+      ]
+    },
+    "preflight_only_batch_allowed": true,
+    "preflight_only_batches_this_invocation": 1,
+    "max_preflight_only_batches_when_no_ready_assets": 1,
+    "next_invocation_requirement": "Attempt candidate completion/readiness audit again before any additional preflight-only expansion.",
+    "hard_candidate_success_condition": true,
+    "preflight_fallback_requires_no_runnable_ready_tier": true,
+    "preflight_evidence_not_success_when_ready_exists": true,
+    "zero_candidate_exception": "ONLY_WHEN_NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_AFTER_FRESH_SCAN"
+  },
+  "git_tree_probe": {
+    "precommit_tree_sha": "58e01de2b260fed23a09fd8492659ea4dc77812c",
+    "canonical_queue_path_sources_present": 0
+  }
+}
