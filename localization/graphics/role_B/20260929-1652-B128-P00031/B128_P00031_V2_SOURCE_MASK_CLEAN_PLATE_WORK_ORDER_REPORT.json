@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-v2-source-mask-clean-plate-work-order-batch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00097",
+  "wave_id": "P00031",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T16:52:40+09:00",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      86,
+      100,
+      106,
+      130
+    ],
+    "selected_assets": [
+      "C598919A",
+      "53CE39D5",
+      "788CE557",
+      "1762489B"
+    ],
+    "basis": "C111/Q00009 consumed B00087 and B00090 as PASS; advance four even assets from accepted exact Release payload scopes to v2 source-effect-mask/CLEAN_PLATE work orders.",
+    "skipped_current_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00092": [
+        198,
+        214,
+        230,
+        236
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00095": [
+        34,
+        44,
+        52,
+        172
+      ]
+    },
+    "deferred": {
+      "140": "PRESS START canonical vs PRESS ENTER source variant remains HOLD_STRICT_RECHECK",
+      "154": "eligible after C111; deferred by four-asset cap",
+      "164": "eligible after C111; deferred by four-asset cap"
+    }
+  },
+  "reused_immutable_evidence": {
+    "b00087_report": {
+      "path": "localization/graphics/role_B/20260929-1618-B124-P00023/B124_P00023_EVEN_RELEASE_PAYLOAD_EXTRACTION_SCOPE.json",
+      "blob_sha": "13a928a94557bbf7548c98b1e116e7ec5add1dc9"
+    },
+    "b00090_report": {
+      "path": "localization/graphics/role_B/20260929-1625-B125-P00025/B125_P00025_EVEN_RELEASE_RGBA32_PAYLOAD_EXTRACTION_SCOPE.json",
+      "blob_sha": "aac64cf281aeb4bbd9c1fbec412a4a8b815d8698"
+    },
+    "c111_acceptance": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00093",
+      "blob_sha": "ff61539273f7e1e467e2d71fa6ed6429c7aca6ab",
+      "disposition_for_b00087": "PASS",
+      "disposition_for_b00090": "PASS"
+    }
+  },
+  "qa_contract": {
+    "generation_contract": "outrun-first-pass-edit-v2",
+    "clean_plate_qa_schema": "outrun-clean-plate-qa-v1",
+    "default_safety_inset_px": 2,
+    "flattened_raster_resize_forbidden": true,
+    "candidate_safe_bbox_formula": "intersection(inset(measured source_effect_bbox,2px), permitted_inner_guard_ltrb_2px)"
+  },
+  "deterministic_unit_selector": [
+    {
+      "queue_index": 86,
+      "asset": "C598919A",
+      "source_report": "B00087",
+      "select": "all 31 regions with disposition LOCALIZE",
+      "expected_work_units": 31,
+      "payload_profile": "BC3_DXT5_4X4_BLOCK_ROW_STRIDED",
+      "preserve_regions": 0
+    },
+    {
+      "queue_index": 100,
+      "asset": "53CE39D5",
+      "source_report": "B00087",
+      "select": "all 7 regions with disposition LOCALIZE",
+      "expected_work_units": 7,
+      "payload_profile": "LINEAR_RGBA32_ROW_STRIDED",
+      "preserve_regions": 0
+    },
+    {
+      "queue_index": 106,
+      "asset": "788CE557",
+      "source_report": "B00087",
+      "select": "3 regions with disposition LOCALIZE; exclude protected OutRun2SP wordmark sprite_344",
+      "expected_work_units": 3,
+      "payload_profile": "LINEAR_RGBA32_ROW_STRIDED",
+      "preserve_regions": 1
+    },
+    {
+      "queue_index": 130,
+      "asset": "1762489B",
+      "source_report": "B00090",
+      "select": "5 regions with disposition LOCALIZE; exclude preserve-original numeric rank marker sprite_1085",
+      "expected_work_units": 5,
+      "payload_profile": "LINEAR_RGBA32_ROW_STRIDED",
+      "preserve_regions": 1
+    }
+  ],
+  "work_order_template": {
+    "coordinate_source": "Use each selected region's exact raw_top_left_rect and accepted payload offsets verbatim from the referenced immutable producer report.",
+    "permitted_inner_guard": "inset raw_top_left_rect by exactly 2 pixels on all four sides; guard is an upper bound only and never a final candidate_safe_bbox.",
+    "whole_cell_clear_forbidden": true,
+    "candidate_render_permitted": false,
+    "derive": [
+      "confirm exact pinned Release DDS header/compression/mip/alpha before decoding the accepted payload scope",
+      "derive raw-to-readable transform per sprite from decoded source; do not infer from neighboring regions",
+      "measure exact source effect-inclusive bbox including fill, outline, shadow, glow and antialias fringe",
+      "derive source glyph/effect removal mask containing zero protected non-text pixels",
+      "measure baseline vector and signed slant",
+      "derive protected non-text mask",
+      "reconstruct CLEAN_PLATE only inside the removal mask"
+    ],
+    "required_outputs": [
+      "source_effect_bbox_ltrb",
+      "removal_mask_sha256",
+      "raw_to_readable_transform",
+      "baseline_vector",
+      "slant_dx_per_dy",
+      "slant_angle_deg",
+      "slant_direction",
+      "protected_non_text_mask_sha256",
+      "clean_plate_sha256",
+      "outrun-clean-plate-qa-v1 PASS",
+      "non-empty candidate_safe_bbox after 2px inset intersection"
+    ],
+    "fail_closed": "HOLD_STRICT_RECHECK"
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "FOUR_EVEN_V2_SOURCE_MASK_AND_CLEAN_PLATE_WORK_ORDERS",
+    "assets_advanced": 4,
+    "accepted_payload_scopes_reused": 48,
+    "deterministic_localize_work_units": 46,
+    "localizable_physical_semantic_occurrences": 46,
+    "preserve_original_regions": 2,
+    "bc3_work_units": 31,
+    "rgba32_work_units": 15,
+    "two_px_inner_guards_required": 46,
+    "candidate_dds_written": false
+  },
+  "integrated_self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_86_100_106_130",
+    "c_acceptance": "PASS_B00087_AND_B00090_CONSUMED_BY_C111_Q00009",
+    "accepted_payload_scopes": "PASS_48_OF_48_REUSED",
+    "localize_work_units": "PASS_46_OF_46",
+    "preserve_original_regions": "PASS_2_OF_2",
+    "guard_derivation": "PASS_46_NONEMPTY_BY_ACCEPTED_REGION_GEOMETRY",
+    "bc3_scopes": "PASS_31_C111_ACCEPTED_BLOCK_ALIGNED",
+    "rgba32_scopes": "PASS_15_C111_ACCEPTED_IN_FILE",
+    "source_removal_masks": "HOLD_NOT_YET_MATERIALIZED",
+    "clean_plate": "HOLD_NOT_YET_MATERIALIZED",
+    "final_candidate_qa": "HOLD_NO_KOREAN_CANDIDATE",
+    "shared_state_isolation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "c111_acceptance_blob_sha": "ff61539273f7e1e467e2d71fa6ed6429c7aca6ab"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
