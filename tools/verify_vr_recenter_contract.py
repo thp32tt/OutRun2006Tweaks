@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +24,7 @@ host = read("vrhost/src/main_r23.cpp")
 cmake = read("vrhost/CMakeLists.txt")
 workflow = read(".github/workflows/vr-openxr.yml")
 ipc_smoke = read("vrhost/tests/recenter_ipc_smoke.cpp")
+work_queue = json.loads(read("docs/VR_WORK_QUEUE.json"))
 
 require(
     cmake,
@@ -93,4 +95,23 @@ for marker, label in [
 ]:
     require(ipc_smoke, marker, label)
 
-print("PASS: application-space recenter contract and IPC smoke are wired and fail-closed")
+recenter_items = [item for item in work_queue.get("items", []) if item.get("id") == "L1-RECENTER-001"]
+if len(recenter_items) != 1:
+    raise SystemExit("FAIL: expected exactly one L1-RECENTER-001 work-queue item")
+recenter_item = recenter_items[0]
+for key, expected in [
+    ("status", "NEED_HMD_TEST"),
+    ("automationValidation", "PASS"),
+    ("runtimeValidation", "UNTESTED"),
+    ("lastAutomationTaskId", "CONVERSION-DXVK-00041"),
+    ("lastAutomationResultSha", "9fba9fe1e54f1d2f474820560d42546f00051106"),
+]:
+    actual = recenter_item.get(key)
+    if actual != expected:
+        raise SystemExit(
+            f"FAIL: recenter queue reconciliation: {key}={actual!r}, expected {expected!r}"
+        )
+if recenter_item.get("attempts", 0) < 1:
+    raise SystemExit("FAIL: recenter queue reconciliation: attempts must record automated coverage")
+
+print("PASS: application-space recenter contract, IPC smoke, and HMD queue gate are wired and fail-closed")

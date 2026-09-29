@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-29T12:01:00+09:00",
+  "updatedKst": "2026-09-29T18:22:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -420,13 +420,20 @@
     {
       "id": "L1-RECENTER-001",
       "priority": 7,
-      "status": "READY",
+      "status": "NEED_HMD_TEST",
       "preferredRole": "B_RENDER_REVIEW",
       "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
       "testLevel": "LEVEL1",
       "dependencies": [],
-      "attempts": 0,
-      "runtimeCandidate": true
+      "attempts": 1,
+      "runtimeCandidate": true,
+      "lastAutomationResultSha": "9fba9fe1e54f1d2f474820560d42546f00051106",
+      "lastAutomationTaskId": "CONVERSION-DXVK-00041",
+      "automationValidation": "PASS",
+      "runtimeValidation": "UNTESTED",
+      "validationRunId": 36521949422,
+      "implementationProgress": "CONVERSION-DXVK-00039 statically seals application-space LOCAL recenter ordering/fallback semantics; CONVERSION-DXVK-00041 executes the named-mapping/event request/received/applied IPC round-trip in Windows OpenXR CI. No recenter runtime behavior was changed.",
+      "nextAction": "Quest3/VDXR exact-build CORRECTNESS test: trigger recenter in menu and gameplay, verify the visual transition is stable and recenters once without head-follow/double response, preserve startup progression and road/background/vehicle stereo, and confirm VIEW emergency fallback does not falsely acknowledge the request."
     },
     {
       "id": "L3-DX9EX-001",
