@@ -923,6 +923,7 @@ target_link_libraries(dx11_shader_linkage_probe PUBLIC
 # Target: dx11_constant_buffer_probe
 set(dx11_constant_buffer_probe_SOURCES
     "tools/dx11_constant_buffer_probe.cpp"
+    "src/vr/d3d11/native_backend.cpp"
     "src/vr/d3d11/pipeline_translation.cpp"
     "src/vr/d3d11/state_translation.cpp"
 )
@@ -949,5 +950,6 @@ target_include_directories(dx11_constant_buffer_probe PUBLIC
 target_link_libraries(dx11_constant_buffer_probe PUBLIC
     d3dcompiler.lib
     d3d11.lib
+    dxgi.lib
     dxguid.lib
 )

@@ -7,6 +7,8 @@
 
 namespace outrun::vr::dx11 {
 
+struct FixedFunctionTransformConstants;
+
 struct NativeBackendConfig {
     std::uint32_t width = 0;
     std::uint32_t height = 0;
@@ -15,6 +17,39 @@ struct NativeBackendConfig {
     bool adapter_luid_valid = false;
     bool require_adapter_luid = false;
     LUID adapter_luid{};
+};
+
+// R96 dormant owner for the R94/R95 fixed-function transform constant
+// payload. No game draw path constructs this owner yet.
+class NativeFixedFunctionTransformBuffer final {
+public:
+    NativeFixedFunctionTransformBuffer() = default;
+    ~NativeFixedFunctionTransformBuffer() = default;
+    NativeFixedFunctionTransformBuffer(
+        const NativeFixedFunctionTransformBuffer&) = delete;
+    NativeFixedFunctionTransformBuffer& operator=(
+        const NativeFixedFunctionTransformBuffer&) = delete;
+
+    bool initialize(ID3D11Device* device) noexcept;
+    bool upload_and_bind(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && buffer_;
+    }
+    [[nodiscard]] ID3D11Buffer* buffer() const noexcept {
+        return buffer_.Get();
+    }
+    [[nodiscard]] std::uint64_t upload_generation() const noexcept {
+        return upload_generation_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_;
+    std::uint64_t upload_generation_ = 0;
 };
 
 class NativeBackend final {

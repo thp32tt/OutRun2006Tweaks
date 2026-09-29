@@ -6,10 +6,12 @@
 #include <d3d11.h>
 #include <d3d11shader.h>
 
+#include "vr/d3d11/native_backend.hpp"
 #include "vr/d3d11/pipeline_translation.hpp"
 
 namespace
 {
+    using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
 
@@ -171,21 +173,15 @@ int main()
         "CreateVertexShader R93");
     d3d.context->VSSetShader(vertexShader, nullptr, 0);
 
-    D3D11_BUFFER_DESC bufferDesc{};
-    bufferDesc.ByteWidth = expectedConstantBytes;
-    bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-    ID3D11Buffer* constantBuffer = nullptr;
-    require(
-        SUCCEEDED(d3d.device->CreateBuffer(
-            &bufferDesc, nullptr, &constantBuffer)) &&
-        constantBuffer != nullptr,
-        "CreateBuffer D3D11_BIND_CONSTANT_BUFFER");
+    NativeFixedFunctionTransformBuffer owner;
+    require(!owner.ready(), "R96 owner must start dormant");
+    require(owner.upload_generation() == 0,
+            "R96 owner generation must start at zero");
+    require(owner.initialize(d3d.device),
+            "R96 owner initialize");
 
     D3D11_BUFFER_DESC observedDesc{};
-    constantBuffer->GetDesc(&observedDesc);
+    owner.buffer()->GetDesc(&observedDesc);
     require(
         observedDesc.ByteWidth == expectedConstantBytes &&
         observedDesc.Usage == D3D11_USAGE_DYNAMIC &&
@@ -193,44 +189,66 @@ int main()
         observedDesc.CPUAccessFlags == D3D11_CPU_ACCESS_WRITE,
         "constant-buffer descriptor contract");
 
-    D3D11_MAPPED_SUBRESOURCE mapped{};
+    DevicePair otherDevice = create_warp_device();
     require(
-        SUCCEEDED(d3d.context->Map(
-            constantBuffer,
-            0,
-            D3D11_MAP_WRITE_DISCARD,
-            0,
-            &mapped)) &&
-        mapped.pData != nullptr,
-        "Map D3D11_MAP_WRITE_DISCARD");
+        !owner.upload_and_bind(otherDevice.context, transform),
+        "R96 foreign device context must fail closed");
+    require(owner.upload_generation() == 0,
+            "R96 failed upload must not advance generation");
 
-    std::memcpy(
-        mapped.pData,
-        transform.worldViewProjection.data(),
-        expectedConstantBytes);
+    const auto incompleteTransform =
+        generate_fixed_function_transform_constants(
+            identity, identity, identity, false);
     require(
-        std::memcmp(
-            mapped.pData,
-            transform.worldViewProjection.data(),
-            expectedConstantBytes) == 0,
-        "uploaded R94 WVP payload mismatch");
-    d3d.context->Unmap(constantBuffer, 0);
+        !owner.upload_and_bind(d3d.context, incompleteTransform),
+        "R96 inexact transform must fail closed");
+    require(owner.upload_generation() == 0,
+            "R96 inexact upload must not advance generation");
 
-    d3d.context->VSSetConstantBuffers(0, 1, &constantBuffer);
+    require(
+        owner.upload_and_bind(d3d.context, transform),
+        "R96 owner upload and b0 bind");
+    require(owner.upload_generation() == 1,
+            "R96 successful upload generation");
+
     ID3D11Buffer* boundBuffer = nullptr;
     d3d.context->VSGetConstantBuffers(0, 1, &boundBuffer);
     require(
-        boundBuffer != nullptr && boundBuffer == constantBuffer,
+        boundBuffer != nullptr && boundBuffer == owner.buffer(),
         "VS b0 constant-buffer binding");
-
     if (boundBuffer)
         boundBuffer->Release();
+
+    D3DMATRIX translatedWorld = world;
+    translatedWorld._42 = 4.0f;
+    const auto transform2 =
+        generate_fixed_function_transform_constants(
+            translatedWorld, view, identity, true);
+    require(transform2.exact(), "R96 second transform prerequisite");
+    require(
+        owner.upload_and_bind(d3d.context, transform2),
+        "R96 second owner upload");
+    require(owner.upload_generation() == 2,
+            "R96 upload generation must advance monotonically");
 
     ID3D11Buffer* nullBuffer = nullptr;
     d3d.context->VSSetConstantBuffers(0, 1, &nullBuffer);
     d3d.context->VSSetShader(nullptr, nullptr, 0);
 
-    constantBuffer->Release();
+    owner.shutdown();
+    require(!owner.ready(), "R96 shutdown must release owner resources");
+    require(owner.buffer() == nullptr,
+            "R96 shutdown must clear constant buffer");
+    require(owner.upload_generation() == 0,
+            "R96 shutdown must reset generation");
+
+    require(owner.initialize(d3d.device),
+            "R96 owner reinitialize after shutdown");
+    require(owner.ready(), "R96 owner must be ready after reinitialize");
+    owner.shutdown();
+
+    otherDevice.context->Release();
+    otherDevice.device->Release();
     vertexShader->Release();
     d3d.context->Release();
     d3d.device->Release();

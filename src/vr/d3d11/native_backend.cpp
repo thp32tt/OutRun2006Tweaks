@@ -1,6 +1,9 @@
 #include "native_backend.hpp"
 
+#include "pipeline_translation.hpp"
+
 #include <array>
+#include <cstring>
 #include <dxgi1_2.h>
 #include <utility>
 
@@ -102,6 +105,68 @@ HRESULT create_device(
 }
 
 } // namespace
+
+bool NativeFixedFunctionTransformBuffer::initialize(
+    ID3D11Device* device) noexcept {
+
+    shutdown();
+    if (!device) return false;
+
+    D3D11_BUFFER_DESC desc{};
+    desc.ByteWidth = static_cast<UINT>(16u * sizeof(float));
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
+    if (FAILED(device->CreateBuffer(
+            &desc, nullptr, buffer.ReleaseAndGetAddressOf())) ||
+        !buffer)
+        return false;
+
+    device_ = device;
+    buffer_ = std::move(buffer);
+    upload_generation_ = 0;
+    return true;
+}
+
+bool NativeFixedFunctionTransformBuffer::upload_and_bind(
+    ID3D11DeviceContext* context,
+    const FixedFunctionTransformConstants& constants) noexcept {
+
+    if (!ready() || !context || !constants.exact())
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != device_.Get())
+        return false;
+
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    if (FAILED(context->Map(
+            buffer_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)) ||
+        !mapped.pData)
+        return false;
+
+    constexpr std::size_t kTransformBytes = 16u * sizeof(float);
+    static_assert(kTransformBytes == 64u);
+    std::memcpy(
+        mapped.pData,
+        constants.worldViewProjection.data(),
+        kTransformBytes);
+    context->Unmap(buffer_.Get(), 0);
+
+    ID3D11Buffer* buffer = buffer_.Get();
+    context->VSSetConstantBuffers(0, 1, &buffer);
+    ++upload_generation_;
+    return true;
+}
+
+void NativeFixedFunctionTransformBuffer::shutdown() noexcept {
+    buffer_.Reset();
+    device_.Reset();
+    upload_generation_ = 0;
+}
 
 bool NativeBackend::initialize(const NativeBackendConfig& config) noexcept {
     shutdown();

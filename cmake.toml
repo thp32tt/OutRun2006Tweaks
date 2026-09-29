@@ -440,10 +440,11 @@ link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxguid.lib"]
 type = "executable"
 sources = [
     "tools/dx11_constant_buffer_probe.cpp",
+    "src/vr/d3d11/native_backend.cpp",
     "src/vr/d3d11/pipeline_translation.cpp",
     "src/vr/d3d11/state_translation.cpp"
 ]
 include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
-link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxguid.lib"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]

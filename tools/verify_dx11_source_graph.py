@@ -37,6 +37,12 @@ PIPELINE_TRANSLATION_HPP = (
 PIPELINE_TRANSLATION_CPP = (
     ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.cpp"
 ).read_text(encoding="utf-8")
+NATIVE_BACKEND_HPP = (
+    ROOT / "src" / "vr" / "d3d11" / "native_backend.hpp"
+).read_text(encoding="utf-8")
+NATIVE_BACKEND_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "native_backend.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -895,6 +901,64 @@ def main() -> None:
             raise SystemExit(
                 "DX11 R95 constant-buffer probe missing from Backend Conversion Gate: "
                 + token
+            )
+
+    r96_constant_owner_contract = {
+        "NativeFixedFunctionTransformBuffer": "R96 dormant transform-buffer owner type",
+        "upload_and_bind": "R96 explicit upload/bind API",
+        "upload_generation": "R96 monotonic successful-upload generation",
+        "Microsoft::WRL::ComPtr<ID3D11Device> device_": "R96 owning device lifetime",
+        "Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_": "R96 owned constant buffer lifetime",
+    }
+    missing_r96_header = [
+        meaning
+        for token, meaning in r96_constant_owner_contract.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r96_header:
+        raise SystemExit(
+            "DX11 R96 constant-owner header drift: "
+            + ", ".join(missing_r96_header)
+        )
+
+    for token, meaning in {
+        "contextDevice.Get() != device_.Get()": "R96 foreign-device context rejection",
+        "D3D11_MAP_WRITE_DISCARD": "R96 dynamic transform upload",
+        "VSSetConstantBuffers(0, 1": "R96 b0 binding",
+        "++upload_generation_": "R96 successful-upload generation advance",
+        "buffer_.Reset()": "R96 shutdown buffer release",
+        "device_.Reset()": "R96 shutdown device release",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R96 constant-owner source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R96 owner must start dormant": "R96 dormant initial state",
+        "R96 foreign device context must fail closed": "R96 device ownership negative case",
+        "R96 inexact transform must fail closed": "R96 transform exactness negative case",
+        "R96 successful upload generation": "R96 successful upload lifecycle",
+        "R96 shutdown must release owner resources": "R96 shutdown lifecycle",
+        "R96 owner reinitialize after shutdown": "R96 recreate lifecycle",
+        "DX11 constant buffer lifetime R96: PASS": "R96 probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R96 constant-owner probe drift: " + meaning
+            )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "src/vr/d3d11/native_backend.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R96 constant-owner implementation missing from {graph_name}"
+            )
+        if "dxgi.lib" not in graph:
+            raise SystemExit(
+                f"DX11 R96 native backend link contract missing from {graph_name}"
             )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
