@@ -354,6 +354,28 @@ def main() -> None:
                 + ", ".join(missing_bridge)
             )
 
+        # R104 is a dormant transaction prerequisite only. The live R30
+        # Texture2D hooks still provide census telemetry, but they must not
+        # construct, mutate, upload, or bind the managed DX11 shadow owner
+        # until a later task explicitly closes the production lifetime model.
+        r104_forbidden_renderer_tokens = {
+            "NativeManagedTextureShadow": "managed shadow owner construction",
+            "begin_source_lock(": "R104 source-lock capture activation",
+            "commit_source_unlock(": "R104 source-unlock commit activation",
+            "recreate_and_upload_mirror(": "R104 managed mirror upload activation",
+            "mirror_srv()": "R104 managed SRV binding surface",
+        }
+        active_r104_tokens = [
+            meaning
+            for token, meaning in r104_forbidden_renderer_tokens.items()
+            if token in renderer
+        ]
+        if active_r104_tokens:
+            raise SystemExit(
+                f"DX11 R104 dormant bridge activated early in {renderer_name}: "
+                + ", ".join(active_r104_tokens)
+            )
+
     analyzer = (ROOT / "tools" / "analyze_dx11_census.py").read_text(
         encoding="utf-8"
     )
