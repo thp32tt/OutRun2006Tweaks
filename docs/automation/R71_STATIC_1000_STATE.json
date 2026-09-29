@@ -3,10 +3,10 @@
   "seriesId": "R71-STATIC-1000-20260929",
   "branch": "vr-d3d9ex-candidate/R71-STATIC-1000-20260929",
   "targetCycles": 1000,
-  "completedCycles": 141,
+  "completedCycles": 142,
   "baseR71Sha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
   "testedParentSha": "cb993af654ea6251e31f4a5e91aec973b0b85dde",
-  "currentHead": "9e43c84d9b066578d2381581a1bc621302832a00",
+  "currentHead": "878f891371243a88f3be307bc5af794ffe3e0ae2",
   "frozenUserTestPackage": {
     "sourceSha": "34eef500b2f79e7e68477d7ffe675f803e809e01",
     "file": "OutRun2_VR_R71_DX9EX_STANDALONE_34eef500b2f7.zip",
@@ -3822,20 +3822,63 @@
       "automationValidation": "SELECTOR_RESOURCE_DIAGNOSTIC_CONTRACT_ADDED; exact-head GitHub CI queued; no PASS claimed",
       "runtimeValidation": "USER_REPORTED_DX9EX_BAD_DXVK_GOOD / NEED_HMD_LOG",
       "next": "Cycle 142: consume exact-head CI. Then use the new HMD log to determine whether the 2048x2048 selector atlas upload succeeds and identify the failing DirectOnly texture. If failure is the 2048x1024 single-level texture, implement a bounded CPU backing/direct upload fallback for that proven resource class instead of increasing global budgets or forcing material color."
+    },
+    {
+      "cycle": 142,
+      "lenses": [
+        "R70 user-runtime selector regression comparison",
+        "DX9Ex MANAGED CPU-shadow admission vs allocation",
+        "resource identity correlation",
+        "selector companion 2048x512/1024 bounded diagnostics",
+        "adversarial: no speculative budget/material mutation"
+      ],
+      "findingKeys": [
+        "DX9EX-SELECTOR-WHITE-CAR-001"
+      ],
+      "findings": [
+        "R70 runtime evidence is stronger than R69: exact 2048x2048 selector reserve activated at total/general ~30.1 MiB, then a 2048x512 fmt21 single-level MANAGED resource fell DirectOnly, and a translated MANAGED LockRect later failed with 0x8876086C while the user still reported abnormal vehicle-selection graphics.",
+        "This means the white/colorless selector regression survives the R70 separate-general-budget fix and cannot be attributed solely to the old R69 total-vs-general accounting bug.",
+        "Added diagnostic-only selector companion classification for exact single-level 2048x512/1024 A8R8G8B8/X8R8G8B8 resources; it does not change allocation policy.",
+        "CPU-shadow failure now distinguishes budget admission failure from actual SYSTEMMEM CreateTexture failure and reports current total/general/emergency usage.",
+        "R14 DirectOnly fallback and R13 LockRect failure now log the exact texture pointer, allowing creation->fallback->lock failure identity correlation on the next HMD run.",
+        "No resource budget, material, texture-stage state, HUD semantics or rendering behavior changed."
+      ],
+      "evidence": [
+        "R70 user runtime log: selector reserve ACTIVE size=2048x2048 fmt21 at totalMiB=30.1 generalMiB=30.1",
+        "R70 user runtime log: CPU shadow unavailable size=2048x512 fmt21 levels=1 -> DirectOnly",
+        "R70 user runtime log: later translated MANAGED LockRect FAILED 0x8876086C",
+        "R69 user runtime log showed analogous 2048x1024 fmt21 DirectOnly fallback before a later LockRect failure",
+        "exact-head CI queued: Build 36521683004; HUD Inspector 36521683010; OpenXR 36521683025"
+      ],
+      "changedFiles": [
+        "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+        "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+        "tools/verify_vr_proven_baseline.py",
+        "docs/automation/R71_STATIC_1000_STATE.json",
+        "docs/VR_R71_STATIC_1000_LOG.md"
+      ],
+      "commits": [
+        "83ca24b54d4a0ee063fae018a6737836d62b6359",
+        "12ec779d533d41914e5ead3f359f01b9a40cb590",
+        "878f891371243a88f3be307bc5af794ffe3e0ae2"
+      ],
+      "automationValidation": "SELECTOR_COMPANION_FAILURE_CAUSE_AND_IDENTITY_DIAGNOSTICS_ADDED; exact-head CI queued; no PASS claimed",
+      "runtimeValidation": "USER_REPORTED_DX9EX_BAD_DXVK_GOOD / NEED_HMD_LOG",
+      "next": "Cycle 143: consume exact-head CI. On next HMD run correlate identical ptr across companion DirectOnly fallback and R13 LockRect failure. If budget admission passes but SYSTEMMEM CreateTexture itself fails for the same 2048x512/1024 resource, design a bounded single-level CPU surface/backing upload fallback. If budget is the cause, alter only the proven selector companion class while preserving the 384 MiB total cap."
     }
   ],
   "nextCycle": {
-    "cycle": 142,
+    "cycle": 143,
     "priority": [
-      "consume 9e43c84 exact-head Build/OpenXR/HUD results",
-      "on next HMD run inspect R71 SELECTOR DIAG exact 2048x2048 upload success",
-      "identify failed DirectOnly LockRect dimensions/flags/rect",
-      "if 2048x1024 single-level A8R8G8B8 is confirmed, design bounded CPU backing fallback",
-      "only inspect material/texture-stage state if texture upload path proves clean"
+      "consume 878f891 exact-head Build/OpenXR/HUD results",
+      "correlate selector companion pointer from R14 fallback to R13 LockRect failure",
+      "distinguish budget reject from SYSTEMMEM allocator/device failure",
+      "if allocator/device failure is proven, design bounded single-level CPU surface/backing fallback",
+      "if budget rejection is proven, adjust only proven companion class under unchanged 384 MiB total cap"
     ],
-    "guard": "Performance-only work paused. Do not increase global shadow budget, force car color, or widen HUD semantics. Frozen 34eef500 package remains immutable."
+    "guard": "Do not force vehicle color/material, increase total MANAGED shadow budget, widen HUD semantics, or resume performance-only work."
   },
-  "updatedKst": "2026-09-29T13:20:00+09:00",
+  "updatedKst": "2026-09-29T13:27:00+09:00",
   "workPolicy": {
     "mode": "VISUAL_AND_FUNCTIONAL_CORRECTNESS_FIRST",
     "performanceOptimization": "PAUSED_BY_USER_2026-09-29",
