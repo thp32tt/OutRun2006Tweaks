@@ -151,7 +151,7 @@ bridge = require(
 )
 
 ex_r13 = require(
-    "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13_overlay.inc",
     "ResetCompatDevice",
     "deviceEx->ResetEx",
     "UpdateCompatPresentationState(device, params)",

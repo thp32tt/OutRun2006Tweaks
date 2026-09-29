@@ -50,6 +50,8 @@ r23_wrapper_rel = "src/vr/game/outrun_renderer_r23.cpp"
 r23_overlay_rel = "src/vr/game/outrun_renderer_r23_overlay.inc"
 r29_rel = "src/vr/game/outrun_renderer_r29.cpp"
 facade_rel = "src/vr/d3d9/renderer_pipeline.cpp"
+ex_r13_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r13.cpp"
+ex_r13_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r13_overlay.inc"
 ex_r14_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r14.cpp"
 ex_r14_overlay_rel = "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc"
 ex_r15_wrapper_rel = "src/vr/d3d9/ex_device_upgrade_r15.cpp"
@@ -62,6 +64,8 @@ r23_wrapper = read(r23_wrapper_rel)
 r23_overlay = read(r23_overlay_rel)
 r29 = read(r29_rel)
 facade = read(facade_rel)
+ex_r13_wrapper = read(ex_r13_wrapper_rel)
+ex_r13_overlay = read(ex_r13_overlay_rel)
 ex_r14_wrapper = read(ex_r14_wrapper_rel)
 ex_r14_overlay = read(ex_r14_overlay_rel)
 ex_r15_wrapper = read(ex_r15_wrapper_rel)
@@ -141,6 +145,34 @@ require(
 )
 
 require_order(
+    ex_r13_wrapper,
+    ex_r13_wrapper_rel,
+    "#include <array>",
+    "#include <atomic>",
+    "#include <cstdint>",
+    '#include "r13_bridge.hpp"',
+    '#pragma optimize("", off)',
+    '#include "ex_device_upgrade.cpp"',
+    '#pragma optimize("", on)',
+    '#include "ex_device_upgrade_r13_overlay.inc"',
+)
+if "namespace OutRunVRD3D9ExUpgradeR13" in ex_r13_wrapper:
+    raise SystemExit("Ex R13 compatibility wrapper regained implementation body")
+if "#include" in ex_r13_overlay:
+    raise SystemExit("Ex R13 overlay must remain include-free")
+require(
+    ex_r13_overlay,
+    ex_r13_overlay_rel,
+    "namespace OutRunVRD3D9ExUpgradeR13",
+    "TextureLockRectR13",
+    "InstallManagedResourceCompatR13",
+    "OpenXRVRD3D9ExR13Hardening",
+    "ResetCompatDevice",
+    "NormalizeLegacyPresentResult",
+    "legacy ResetEx shim retained through final R15 validation",
+)
+
+require_order(
     ex_r14_wrapper,
     ex_r14_wrapper_rel,
     "#include <algorithm>",
@@ -194,6 +226,7 @@ require(
     "LastResetStateReplaySucceeded",
 )
 for stale_ex_owner in (
+    '#include "ex_device_upgrade_r13.cpp"',
     '#include "ex_device_upgrade_r14.cpp"',
     '#include "ex_device_upgrade_r15.cpp"',
 ):
@@ -212,7 +245,11 @@ require_order(
     "#include <mutex>",
     "#include <unordered_map>",
     "#include <vector>",
-    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "r13_bridge.hpp"',
+    '#pragma optimize("", off)',
+    '#include "ex_device_upgrade.cpp"',
+    '#pragma optimize("", on)',
+    '#include "ex_device_upgrade_r13_overlay.inc"',
     '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
@@ -247,6 +284,10 @@ require(
     "R23RenderThreadCleanupRequested",
     "R23ServiceRenderThreadCleanup",
     "recovery pose warmup is stock-visible",
+    "'src/vr/d3d9/ex_device_upgrade_r13_overlay.inc' = @(",
+    "TextureLockRectR13",
+    "ResetCompatDevice",
+    "legacy ResetEx shim retained through final R15 validation",
     "'src/vr/d3d9/ex_device_upgrade_r14_overlay.inc' = @(",
     "std::unordered_map<IDirect3DTexture9*, R14EntryPtr>",
     "R14CopyWholeLevelByLock",
@@ -258,6 +299,7 @@ require(
 for stale_guard in (
     "'src/vr/game/outrun_renderer_r13.cpp' = @(",
     "'src/vr/game/outrun_renderer_r23.cpp' = @(",
+    "'src/vr/d3d9/ex_device_upgrade_r13.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(",
     "'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(",
 ):
@@ -266,4 +308,4 @@ for stale_guard in (
             f"OpenXR hardening guard regressed to compatibility wrapper: {stale_guard}"
         )
 
-print("VR facade modularization F04 phase 4: PASS")
+print("VR facade modularization F04 phase 5: PASS")

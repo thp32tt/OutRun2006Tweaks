@@ -274,11 +274,16 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r30_c2_compare.cpp"',
 ], "P11_R70_STEREO_FACADE")
 require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
-    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "r13_bridge.hpp"',
+    '#include "ex_device_upgrade.cpp"',
+    '#include "ex_device_upgrade_r13_overlay.inc"',
     '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
 ], "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r13.cpp"',
+       "P11_R70_EX_DEVICE_NO_R13_NESTING")
 forbid("src/vr/d3d9/ex_device_pipeline.cpp",
        '#include "ex_device_upgrade_r14.cpp"',
        "P11_R70_EX_DEVICE_NO_R14_NESTING")
@@ -319,11 +324,16 @@ require_all("src/vr/d3d9/stereo_pipeline.cpp", [
     '#include "stereo_renderer_r30_c2_compare.cpp"',
 ], "P11_R70_STEREO_FACADE")
 require_all("src/vr/d3d9/ex_device_pipeline.cpp", [
-    '#include "ex_device_upgrade_r13.cpp"',
+    '#include "r13_bridge.hpp"',
+    '#include "ex_device_upgrade.cpp"',
+    '#include "ex_device_upgrade_r13_overlay.inc"',
     '#include "ex_device_upgrade_r14_overlay.inc"',
     '#include "../runtime_eligibility.hpp"',
     '#include "ex_device_upgrade_r15_overlay.inc"',
 ], "P11_R70_EX_DEVICE_FACADE")
+forbid("src/vr/d3d9/ex_device_pipeline.cpp",
+       '#include "ex_device_upgrade_r13.cpp"',
+       "P11_R70_EX_DEVICE_NO_R13_NESTING")
 forbid("src/vr/d3d9/ex_device_pipeline.cpp",
        '#include "ex_device_upgrade_r14.cpp"',
        "P11_R70_EX_DEVICE_NO_R14_NESTING")

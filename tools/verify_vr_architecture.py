@@ -41,6 +41,7 @@ required = [
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     "src/vr/d3d9/ex_device_upgrade.cpp",
     "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13_overlay.inc",
     "src/vr/d3d9/ex_device_upgrade_r14.cpp",
     "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "src/vr/d3d9/r13_bridge.hpp",

@@ -114,6 +114,11 @@ jobs:
               'R33ResetR32Hook.stdcall<HRESULT>',
               'top-level telemetry counted once'
             )
+            'src/vr/d3d9/ex_device_upgrade_r13_overlay.inc' = @(
+              'TextureLockRectR13',
+              'ResetCompatDevice',
+              'legacy ResetEx shim retained through final R15 validation'
+            )
             'src/vr/d3d9/ex_device_upgrade_r14_overlay.inc' = @(
               'std::unordered_map<IDirect3DTexture9*, R14EntryPtr>',
               'R14CopyWholeLevelByLock',
