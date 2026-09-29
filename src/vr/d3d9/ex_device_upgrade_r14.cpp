@@ -34,6 +34,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         constexpr std::size_t R14DeviceUpdateTextureVtableIndex = 31;
         constexpr std::size_t R14DeviceStretchRectVtableIndex = 34;
         constexpr std::size_t R14DeviceColorFillVtableIndex = 35;
+        constexpr std::size_t R80DeviceSetTextureVtableIndex = 65;
         constexpr std::size_t R14SurfaceLockRectVtableIndex = 13;
         constexpr std::size_t R14SurfaceGetDCVtableIndex = 15;
 
@@ -49,6 +50,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         SafetyHookInline R14DeviceUpdateTextureHook{};
         SafetyHookInline R14DeviceStretchRectHook{};
         SafetyHookInline R14DeviceColorFillHook{};
+        SafetyHookInline R80DeviceSetTextureHook{};
         SafetyHookInline R14SurfaceLockRectHook{};
         SafetyHookInline R14SurfaceGetDCHook{};
 
@@ -60,6 +62,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         void* R14DeviceUpdateTextureTarget = nullptr;
         void* R14DeviceStretchRectTarget = nullptr;
         void* R14DeviceColorFillTarget = nullptr;
+        void* R80DeviceSetTextureTarget = nullptr;
         void* R14SurfaceLockRectTarget = nullptr;
         void* R14SurfaceGetDCTarget = nullptr;
 
@@ -142,6 +145,7 @@ namespace OutRunVRD3D9ExUpgradeR13
         std::atomic<std::uint64_t> R14EmergencyShadowBytes{0};
         std::atomic<std::uint64_t> R73SelectorAuxShadowBytes{0};
         std::atomic<std::uint64_t> R14ShadowBudgetRejects{0};
+        std::atomic<std::uint64_t> R80NextTraceSerial{1};
 
         struct R14ShadowEntry
         {
@@ -163,6 +167,9 @@ namespace OutRunVRD3D9ExUpgradeR13
             bool countsAgainstEmergencyBudget = false;
             bool countsAgainstSelectorAuxBudget = false;
             bool selectorAtlas = false;
+            std::uint64_t traceSerial = 0;
+            std::uint64_t traceLockCount = 0;
+            std::uint64_t traceBindCount = 0;
 
             ~R14ShadowEntry()
             {
@@ -565,6 +572,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 auto entry = std::make_shared<R14ShadowEntry>();
                 entry->gpu = gpu;
                 entry->device = device;
+                entry->traceSerial = R80NextTraceSerial.fetch_add(
+                    1, std::memory_order_relaxed);
                 entry->shadowBytes = R14EstimateShadowBytes(gpu);
                 D3DSURFACE_DESC level0{};
                 const UINT levels = gpu->GetLevelCount();
@@ -629,6 +638,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 auto entry = std::make_shared<R14ShadowEntry>();
                 entry->gpu = gpu;
                 entry->device = device;
+                entry->traceSerial = R80NextTraceSerial.fetch_add(
+                    1, std::memory_order_relaxed);
                 entry->mode = R14ShadowMode::DirectOnly;
                 entry->validMask = 0;
                 device->AddRef();
@@ -946,6 +957,69 @@ namespace OutRunVRD3D9ExUpgradeR13
             return hr;
         }
 
+        bool R80IsSelectorTraceCandidate(
+            IDirect3DTexture9* texture, D3DSURFACE_DESC& desc,
+            UINT& levels) noexcept
+        {
+            if (!texture)
+                return false;
+            desc = {};
+            levels = texture->GetLevelCount();
+            if (levels == 0 || FAILED(texture->GetLevelDesc(0, &desc)))
+                return false;
+            const std::uint64_t estimate = R14EstimateShadowBytes(texture);
+            return R69IsSelectorAtlasReserveCandidate(desc, levels, estimate) ||
+                R71IsSelectorCompanionDiagnosticCandidate(
+                    desc, levels, estimate) ||
+                R72IsSelectorReserveCandidate(desc, levels, estimate);
+        }
+
+        HRESULT __stdcall SetTextureDestR80(
+            IDirect3DDevice9* device, DWORD stage,
+            IDirect3DBaseTexture9* baseTexture)
+        {
+            const HRESULT hr = R80DeviceSetTextureHook.stdcall<HRESULT>(
+                device, stage, baseTexture);
+            if (FAILED(hr) || !baseTexture)
+                return hr;
+
+            IDirect3DTexture9* texture = nullptr;
+            if (FAILED(baseTexture->QueryInterface(
+                    __uuidof(IDirect3DTexture9),
+                    reinterpret_cast<void**>(&texture))) || !texture)
+                return hr;
+
+            const R14EntryPtr entry = R14Find(texture);
+            D3DSURFACE_DESC desc{};
+            UINT levels = 0;
+            if (entry && R80IsSelectorTraceCandidate(texture, desc, levels))
+            {
+                std::uint64_t serial = 0;
+                std::uint64_t bindCount = 0;
+                R14ShadowMode mode = R14ShadowMode::DirectOnly;
+                {
+                    std::lock_guard<std::mutex> lock(entry->mutex);
+                    serial = entry->traceSerial;
+                    bindCount = ++entry->traceBindCount;
+                    mode = entry->mode;
+                }
+                if ((bindCount & (bindCount - 1)) == 0)
+                {
+                    spdlog::info(
+                        "VR R80 SELECTOR BIND: serial={} ptr=0x{:08x} stage={} bind={} mode={} size={}x{} fmt={} levels={}",
+                        serial,
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(texture)),
+                        stage, bindCount,
+                        mode == R14ShadowMode::Shadow ? "Shadow" : "DirectOnly",
+                        desc.Width, desc.Height,
+                        static_cast<unsigned>(desc.Format), levels);
+                }
+            }
+            texture->Release();
+            return hr;
+        }
+
         bool InstallManagedResourceCompatR14(IDirect3DDevice9Ex* deviceEx)
         {
             const bool installed =
@@ -974,7 +1048,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                 R14TextureGetSurfaceLevelHook &&
                 R14TextureAddDirtyRectHook && R14DeviceUpdateSurfaceHook &&
                 R14DeviceUpdateTextureHook && R14DeviceStretchRectHook &&
-                R14DeviceColorFillHook)
+                R14DeviceColorFillHook && R80DeviceSetTextureHook)
             {
                 // A replacement device may be supplied by a wrapper with a
                 // different implementation vtable. Never claim coverage from
@@ -995,7 +1069,9 @@ namespace OutRunVRD3D9ExUpgradeR13
                     R14DeviceStretchRectTarget ==
                         deviceVtable[R14DeviceStretchRectVtableIndex] &&
                     R14DeviceColorFillTarget ==
-                        deviceVtable[R14DeviceColorFillVtableIndex];
+                        deviceVtable[R14DeviceColorFillVtableIndex] &&
+                    R80DeviceSetTextureTarget ==
+                        deviceVtable[R80DeviceSetTextureVtableIndex];
             }
 
             const auto disabled = safetyhook::InlineHook::StartDisabled;
@@ -1023,6 +1099,9 @@ namespace OutRunVRD3D9ExUpgradeR13
             R14DeviceColorFillHook = safetyhook::create_inline(
                 deviceVtable[R14DeviceColorFillVtableIndex],
                 ColorFillDestR14, disabled);
+            R80DeviceSetTextureHook = safetyhook::create_inline(
+                deviceVtable[R80DeviceSetTextureVtableIndex],
+                SetTextureDestR80, disabled);
 
             SafetyHookInline* hooks[]{
                 &R14TextureReleaseHook,
@@ -1032,12 +1111,14 @@ namespace OutRunVRD3D9ExUpgradeR13
                 &R14DeviceUpdateSurfaceHook,
                 &R14DeviceUpdateTextureHook,
                 &R14DeviceStretchRectHook,
-                &R14DeviceColorFillHook
+                &R14DeviceColorFillHook,
+                &R80DeviceSetTextureHook
             };
             for (auto* hook : hooks)
             {
                 if (!*hook || !hook->enable().has_value())
                 {
+                    R80DeviceSetTextureHook = {};
                     R14DeviceColorFillHook = {};
                     R14DeviceStretchRectHook = {};
                     R14DeviceUpdateTextureHook = {};
@@ -1054,6 +1135,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     R14DeviceUpdateTextureTarget = nullptr;
                     R14DeviceStretchRectTarget = nullptr;
                     R14DeviceColorFillTarget = nullptr;
+                    R80DeviceSetTextureTarget = nullptr;
                     return false;
                 }
             }
@@ -1073,6 +1155,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 deviceVtable[R14DeviceStretchRectVtableIndex];
             R14DeviceColorFillTarget =
                 deviceVtable[R14DeviceColorFillVtableIndex];
+            R80DeviceSetTextureTarget =
+                deviceVtable[R80DeviceSetTextureVtableIndex];
             return true;
         }
 
@@ -1096,6 +1180,20 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (SUCCEEDED(shadowHr) && shadow && hooksReady &&
                 R14Track(device, *texture, shadow))
             {
+                const auto entry = R14Find(*texture);
+                D3DSURFACE_DESC desc{};
+                UINT traceLevels = 0;
+                if (entry &&
+                    R80IsSelectorTraceCandidate(*texture, desc, traceLevels))
+                {
+                    spdlog::info(
+                        "VR R80 SELECTOR CREATE: serial={} ptr=0x{:08x} mode=Shadow size={}x{} fmt={} levels={}",
+                        entry->traceSerial,
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(*texture)),
+                        desc.Width, desc.Height,
+                        static_cast<unsigned>(desc.Format), traceLevels);
+                }
                 return hr; // registry owns shadow on success
             }
 
@@ -1137,6 +1235,22 @@ namespace OutRunVRD3D9ExUpgradeR13
                         static_cast<unsigned>(desc.Format), fallbackLevels,
                         fallbackEstimate);
                 }
+                const auto entry = R14Find(*texture);
+                D3DSURFACE_DESC traceDesc{};
+                UINT traceLevels = 0;
+                if (entry &&
+                    R80IsSelectorTraceCandidate(
+                        *texture, traceDesc, traceLevels))
+                {
+                    spdlog::warn(
+                        "VR R80 SELECTOR CREATE: serial={} ptr=0x{:08x} mode=DirectOnly shadowHr=0x{:08x} size={}x{} fmt={} levels={}",
+                        entry->traceSerial,
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(*texture)),
+                        static_cast<unsigned>(shadowHr),
+                        traceDesc.Width, traceDesc.Height,
+                        static_cast<unsigned>(traceDesc.Format), traceLevels);
+                }
                 return hr;
             }
 
@@ -1174,6 +1288,27 @@ namespace OutRunVRD3D9ExUpgradeR13
             HRESULT shadowHr = D3DERR_INVALIDCALL;
             {
                 std::unique_lock<std::mutex> lock(entry->mutex);
+                D3DSURFACE_DESC traceDesc{};
+                UINT traceLevels = 0;
+                const bool traceSelector =
+                    R80IsSelectorTraceCandidate(
+                        texture, traceDesc, traceLevels);
+                const auto traceLockCount = ++entry->traceLockCount;
+                if (traceSelector &&
+                    ((traceLockCount & (traceLockCount - 1)) == 0))
+                {
+                    spdlog::info(
+                        "VR R80 SELECTOR LOCK: serial={} ptr=0x{:08x} level={} lock={} mode={} flags=0x{:08x} base={}x{} fmt={} levels={}",
+                        entry->traceSerial,
+                        static_cast<unsigned>(
+                            reinterpret_cast<std::uintptr_t>(texture)),
+                        level, traceLockCount,
+                        entry->mode == R14ShadowMode::Shadow
+                            ? "Shadow" : "DirectOnly",
+                        static_cast<unsigned>(flags),
+                        traceDesc.Width, traceDesc.Height,
+                        static_cast<unsigned>(traceDesc.Format), traceLevels);
+                }
                 if (entry->mode == R14ShadowMode::DirectOnly)
                 {
                     lock.unlock();
