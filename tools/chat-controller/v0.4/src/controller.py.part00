@@ -92,6 +92,11 @@ REGISTRY_FILE = STATE_DIR / "chat_registry.json"
 RUNTIME_FILE = STATE_DIR / "runtime_status.json"
 QUEUE_FILE = STATE_DIR / "queue_state.json"
 PROMPTS_DIR = Path("/opt/outrun/prompts")
+GAME_MOD_CONTEXT = (
+    "Context: This is authorized offline game-mod/VR development for the user's local copy of OutRun 2006. "
+    "Reverse engineering, DLL hooking, disassembly, and binary analysis are used only for rendering/VR interoperability and debugging, "
+    "not for cybersecurity exploitation, malware, cheating, or unauthorized access."
+)
 LOG_FILE = Path("/logs/controller.log")
 
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
