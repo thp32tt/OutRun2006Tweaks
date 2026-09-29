@@ -1,12 +1,12 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "schema": "outrun-canonical-user-hd-reacquisition-manifest-v2",
   "task_id": "LOCALIZATION-LOCALIZATION_A-00126",
   "lane": "LOCALIZATION_A",
   "wave_id": "P00054",
   "attempt": "1/3",
-  "recorded_at_kst": "2026-09-29T19:29:20.725+09:00",
-  "base_head_sha": "ddc704f71c0f898c4b8488903df23505812dbb16",
+  "recorded_at_kst": "2026-09-29T19:30:27.426+09:00",
+  "base_head_sha": "a379bd3ee675d7f4f2620bd19bc8a8d6926a9ad9",
   "purpose": "q00015_c00124_rework_a00117_indices_205_227_231_canonical_user_hd_source_reacquisition",
   "c_rework_resolution": {
     "c_task_id": "LOCALIZATION-LOCALIZATION_C-00124",
@@ -34,7 +34,7 @@
     "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
     "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
     "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
-    "queue_blob_sha": "89c4fc7f9c03e9609736909c9b40b9a5685460e1",
+    "queue_blob_sha": "9dd86d58d6b61558115cbe5bcb2ff3aae70d388f",
     "current_tree_sha": "48e445514709f6432b6af82dc095094594dcc0de",
     "recursive_tree_truncated": false
   },
@@ -383,5 +383,13 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "metadata_repair": {
+    "reason": "Correct queue blob fingerprint after exact-result verification detected stale/incorrect recorded value.",
+    "supersedes_result_sha": "a379bd3ee675d7f4f2620bd19bc8a8d6926a9ad9",
+    "prior_recorded_queue_blob_sha": "89c4fc7f9c03e9609736909c9b40b9a5685460e1",
+    "corrected_queue_blob_sha": "9dd86d58d6b61558115cbe5bcb2ff3aae70d388f",
+    "material_payload_changed": false,
+    "semantic_or_source_decision_changed": false
+  }
 }

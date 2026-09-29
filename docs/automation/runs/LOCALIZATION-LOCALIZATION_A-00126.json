@@ -1,16 +1,16 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "task_id": "LOCALIZATION-LOCALIZATION_A-00126",
   "lane": "LOCALIZATION_A",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
   "wave_id": "P00054",
-  "recorded_at_kst": "2026-09-29T19:29:20.725+09:00",
-  "base_sha": "ddc704f71c0f898c4b8488903df23505812dbb16",
-  "commit_mode": "ATOMIC_MATERIAL_REPORT_AND_TASK_RECORD",
+  "recorded_at_kst": "2026-09-29T19:30:27.426+09:00",
+  "base_sha": "a379bd3ee675d7f4f2620bd19bc8a8d6926a9ad9",
+  "commit_mode": "ATOMIC_REPORT_FINGERPRINT_REPAIR_AND_TASK_RECORD",
   "preserved_peer_head": true,
   "result": "PASS_MATERIAL_REWORK_C00124_A00117_THREE_ODD_CANONICAL_HD_SOURCE_REACQUISITION_MANIFESTS",
-  "summary": "Resolved the runnable Q00015/C00124 source-lineage REWORK for odd indices 205/227/231 by retiring A00117's noncanonical Release pixel geometry/identity and pinning the three current canonical user-HD inventory SHA-256/canvas/mode identities plus deterministic reacquisition gates. Index159 accepted submaterial is preserved unchanged. Current Git tree contains no path matching any of the three asset IDs, so header/orientation/mask/CLEAN_PLATE/candidate gates remain fail-closed. Current 36 source/Korean semantic pairs are reused without repeating C00124 heavy QA. No DDS/shared-state/build/runtime changes.",
+  "summary": "Resolved the runnable Q00015/C00124 source-lineage REWORK for odd indices 205/227/231 by retiring A00117's noncanonical Release pixel geometry/identity and pinning the three current canonical user-HD inventory SHA-256/canvas/mode identities plus deterministic reacquisition gates. Index159 accepted submaterial is preserved unchanged. Current Git tree contains no path matching any of the three asset IDs, so header/orientation/mask/CLEAN_PLATE/candidate gates remain fail-closed. Current 36 source/Korean semantic pairs are reused without repeating C00124 heavy QA. No DDS/shared-state/build/runtime changes. Exact-result self-verification then corrected the report's queue blob fingerprint to the actual current Git blob without changing material/source/semantic decisions.",
   "evidence": [
     "localization/graphics/role_A/202609291929-A00126-P00054/A00126_P00054_C00124_A00117_CANONICAL_HD_REACQUISITION.json"
   ],
@@ -92,5 +92,11 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "supersedes_result_sha": "a379bd3ee675d7f4f2620bd19bc8a8d6926a9ad9",
+  "metadata_repair": {
+    "corrected_queue_blob_sha": "9dd86d58d6b61558115cbe5bcb2ff3aae70d388f",
+    "material_payload_changed": false,
+    "reason": "Exact-result self-verification found report queue fingerprint mismatch; corrected before terminal handoff."
+  }
 }
