@@ -3,7 +3,7 @@
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": 1,
-  "chat_rollover": 1,
+  "chat_rollover": 2,
   "base_sha": "a9ed117537f6adc3b80dfb4097e1755184489575",
   "result_sha": "888cda6918e5e9639969cfde1a2ed344015eccdd",
   "automation_validation": "PASS",
