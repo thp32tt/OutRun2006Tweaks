@@ -1,0 +1,92 @@
+{
+  "schema_version": 8,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00123",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00052",
+  "recorded_at_kst": "2026-09-29T19:12:40.037+09:00",
+  "base_sha": "9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+  "commit_mode": "ATOMIC_C_ACCEPTED_MATERIAL_REEMIT_AND_TASK_RECORD",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_REWORK_A00112_DURABLE_REEMIT_3_ODD_77_BINDINGS",
+  "summary": "Resolved Q00014/C00120's producer-contract REWORK for A00112 by re-emitting the independently C-content-QA-accepted odd-shard stock semantic-binding/orientation prior for indices 147/161/163 in the same atomic commit as this A00123 task record. C00120 reproduced 77/77 stock alpha>0 bboxes/counts, 77/77 alpha>=128 counts, confirmed all 77 current source/Korean pairs and the 2 preserve-only structural regions. No heavy QA was repeated, accepted material was not altered, and all canonical-HD/CLEAN_PLATE/candidate gates remain HOLD_STRICT_RECHECK. No DDS/shared-state/build/runtime changes were made.",
+  "evidence": [
+    "localization/graphics/role_A/202609291912-A00123-P00052/A00123_P00052_C00120_A00112_DURABLE_REEMIT.json"
+  ],
+  "material_deliverable": {
+    "type": "C_ACCEPTED_A00112_STOCK_BINDING_ORIENTATION_PRIOR_DURABLE_REEMIT",
+    "indices": [
+      147,
+      161,
+      163
+    ],
+    "assets": [
+      "39BCA907",
+      "55B57CDE",
+      "59A79158"
+    ],
+    "semantic_bindings_reemitted": 77,
+    "stock_effect_bboxes_reemitted": 77,
+    "structural_preserve_regions_reemitted": 2,
+    "stock_edge_risk_regions_reemitted": 28,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "c_result_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00112",
+    "prior_result_sha": "9214bd9b00df6e4695a5edef27266a22699c1908",
+    "prior_evidence_path": "localization/graphics/role_A/20260929-1823-A00112-P00043/A00112_P00043_THREE_ODD_EXACT_STOCK_BINDING_ORIENTATION_PRIOR.json",
+    "prior_evidence_blob_sha": "95be09ce529b39e97d18c412a73f7fdbd9f6cb36",
+    "disposition_defect": "MISSING_DURABLE_TASK_RECORD_IN_IMMUTABLE_PRODUCER_RESULT_SHA",
+    "content_qa_repeated": false,
+    "accepted_material_changed": false,
+    "c_content_acceptance": "PASS_77_OF_77_ALPHA_GT0_BBOX_COUNTS__PASS_77_OF_77_ALPHA_GE128_COUNTS__PASS_77_OF_77_CURRENT_SOURCE_KOREAN_PAIRS__PASS_2_STRUCTURAL_PRESERVE_REGIONS"
+  },
+  "reused_immutable_evidence": {
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00112",
+    "prior_result_sha": "9214bd9b00df6e4695a5edef27266a22699c1908",
+    "prior_evidence_blob_sha": "95be09ce529b39e97d18c412a73f7fdbd9f6cb36",
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "c_result_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+    "current_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "current_queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "current_orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "reason": "C00120 accepted A00112 material content and requested only same-immutable-SHA durable re-emission with its task record."
+  },
+  "self_qa": "PASS_ODD_ONLY_147_161_163__C00120_CONTENT_ACCEPTED__77_OF_77_SEMANTIC_BINDINGS_REEMITTED__77_OF_77_STOCK_EFFECT_BBOXES_REEMITTED__2_PRESERVE_REGIONS__MATERIAL_UNCHANGED__REPORT_AND_TASK_RECORD_ATOMIC__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_CANDIDATE",
+  "strict_hold": {
+    "canonical_hd_exact_source_pixels": "HOLD_NOT_ESTABLISHED_BY_STOCK_PRIOR",
+    "release_dds_header_decode": "HOLD_EXACT_CANONICAL_HD_BINARY_REQUIRED",
+    "release_orientation": "HOLD_EXACT_CANONICAL_HD_PIXEL_CONFIRMATION",
+    "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+    "release_removal_masks": "HOLD_NOT_MATERIALIZED",
+    "release_protected_non_text_masks": "HOLD_NOT_MATERIALIZED",
+    "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+    "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+    "signed_slant_style_metrics": "HOLD_EXACT_CANONICAL_HD_MEASUREMENT_REQUIRED",
+    "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_payload_in_result_commit": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

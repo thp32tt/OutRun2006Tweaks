@@ -1,0 +1,2599 @@
+{
+  "schema_version": 2,
+  "schema": "outrun-v2-stock-semantic-binding-orientation-prior-durable-reemit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00123",
+  "wave_id": "P00052",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T19:12:40.037+09:00",
+  "precommit_head_sha": "9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      147,
+      161,
+      163
+    ],
+    "selected_assets": [
+      "39BCA907",
+      "55B57CDE",
+      "59A79158"
+    ],
+    "basis": "Q00014/C00120 independently accepted A00112 material content (77/77 source/Korean semantic pairs, 77/77 stock decoded-alpha metrics, 2 preserve-only structural regions) and returned only the immutable-producer durability defect. This run re-emits that accepted material unchanged with the A00123 task record in the same commit; no heavy stock QA is repeated.",
+    "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+    "c_returned_rework": true
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_ODD_EXACT_STOCK_DIRECT_SEMANTIC_BINDING_AND_ORIENTATION_PRIORS",
+    "assets_advanced": 3,
+    "stock_sprite_regions_inspected": 79,
+    "semantic_bindings_resolved": 77,
+    "stock_effect_bboxes_measured": 77,
+    "structural_preserve_regions_classified": 2,
+    "stock_edge_risk_regions_flagged": 28,
+    "candidate_dds_written": false,
+    "description": "Directly decoded three exact pinned stock DXT5 DDS blobs and exact stock atlases from GitHub. Readable Y-reconciled decoded alpha resolves every visible localizable source label to its sprite without list-order inference, measures stock effect-inclusive alpha bboxes/counts, and classifies the two non-text regions in index147 for preservation. Stock metrics are reconstruction priors only; canonical 4x Release binary bodies remain unavailable through the GitHub connector and all Release/CLEAN_PLATE/candidate gates remain fail-closed."
+  },
+  "assets": [
+    {
+      "queue_index": 147,
+      "asset": "39BCA907",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "canonical_translation_status": "PASS_REUSED_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+        "git_blob_sha": "af08fdb692c84d4008248e3f2a3600876525b91c",
+        "bytes": 131200,
+        "direct_dds_decode": {
+          "magic": "DDS ",
+          "width": 512,
+          "height": 256,
+          "fourcc": "DXT5",
+          "format": "BC3",
+          "mip_count_header": 0,
+          "payload_bytes": 131072,
+          "header_bytes": 128,
+          "result": "PASS_EXACT_PINNED_STOCK_BLOB_AND_FULL_BASE_PAYLOAD"
+        }
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256_atlas.json",
+        "git_blob_sha": "76491b0aa09781eb76eb07beed1f89d825b0bd56",
+        "regions": 17
+      },
+      "exact_release_4x": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+        "git_blob_sha": "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+        "bytes": 8388736,
+        "expected_dimensions": [
+          2048,
+          1024
+        ],
+        "exact_binary_decode_status": "HOLD_CONNECTOR_LARGE_BINARY_BODY_EMPTY",
+        "connector_body_chars": 0,
+        "note": "C113 accepted immutable Release identity and region arithmetic; this task does not infer final Release pixel geometry from stock pixels."
+      },
+      "stock_orientation_evidence": {
+        "atlas_coordinate_convention": "bottom_left_y",
+        "decoded_dds_memory_view": "top_left_row_order",
+        "readable_mapping_from_atlas_region": "raw_y = 256-1-(atlas_y+local_y); x unchanged",
+        "exact_stock_source_text_transform": "flip_y",
+        "x_mirror_required": false,
+        "direct_readability_result": "PASS_ALL_BOUND_SOURCE_LABELS_READABLE_WITH_X_UNCHANGED",
+        "release_4x_orientation_status": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION"
+      },
+      "semantic_bindings": [
+        {
+          "sprite": "sprite_265",
+          "classification": "localizable_text",
+          "source": "TULIP GARDEN",
+          "korean": "튤립 가든",
+          "stock_region_xywh": [
+            0,
+            200,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            134,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            37,
+            134,
+            53
+          ],
+          "alpha_gt0_pixels": 1289,
+          "alpha_ge128_pixels": 1112,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_266",
+          "classification": "localizable_text",
+          "source": "SNOW MOUNTAIN",
+          "korean": "스노 마운틴",
+          "stock_region_xywh": [
+            245,
+            200,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            159,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            245,
+            37,
+            404,
+            53
+          ],
+          "alpha_gt0_pixels": 1714,
+          "alpha_ge128_pixels": 1349,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_267",
+          "classification": "localizable_text",
+          "source": "PALM BEACH",
+          "korean": "팜 비치",
+          "stock_region_xywh": [
+            0,
+            178,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            116,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            59,
+            116,
+            75
+          ],
+          "alpha_gt0_pixels": 1140,
+          "alpha_ge128_pixels": 960,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_268",
+          "classification": "localizable_text",
+          "source": "METROPOLIS",
+          "korean": "메트로폴리스",
+          "stock_region_xywh": [
+            245,
+            178,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            118,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            246,
+            59,
+            363,
+            76
+          ],
+          "alpha_gt0_pixels": 1197,
+          "alpha_ge128_pixels": 1004,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_269",
+          "classification": "localizable_text",
+          "source": "INDUSTRIAL COMPLEX",
+          "korean": "인더스트리얼 컴플렉스",
+          "stock_region_xywh": [
+            0,
+            156,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            208,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            81,
+            208,
+            98
+          ],
+          "alpha_gt0_pixels": 2013,
+          "alpha_ge128_pixels": 1660,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_270",
+          "classification": "localizable_text",
+          "source": "IMPERIAL AVENUE",
+          "korean": "임페리얼 애비뉴",
+          "stock_region_xywh": [
+            245,
+            156,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            172,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            246,
+            81,
+            417,
+            97
+          ],
+          "alpha_gt0_pixels": 1830,
+          "alpha_ge128_pixels": 1521,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_271",
+          "classification": "localizable_text",
+          "source": "GHOST FOREST",
+          "korean": "고스트 포레스트",
+          "stock_region_xywh": [
+            0,
+            134,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            3,
+            140,
+            20
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            102,
+            140,
+            119
+          ],
+          "alpha_gt0_pixels": 1398,
+          "alpha_ge128_pixels": 1086,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_272",
+          "classification": "localizable_text",
+          "source": "DESERT",
+          "korean": "사막",
+          "stock_region_xywh": [
+            245,
+            134,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            73,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            245,
+            103,
+            318,
+            120
+          ],
+          "alpha_gt0_pixels": 752,
+          "alpha_ge128_pixels": 620,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_273",
+          "classification": "localizable_text",
+          "source": "DEEP LAKE",
+          "korean": "딥 레이크",
+          "stock_region_xywh": [
+            0,
+            112,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            4,
+            102,
+            20
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            124,
+            102,
+            140
+          ],
+          "alpha_gt0_pixels": 1033,
+          "alpha_ge128_pixels": 802,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_274",
+          "classification": "localizable_text",
+          "source": "CONIFEROUS FOREST",
+          "korean": "침엽수림",
+          "stock_region_xywh": [
+            245,
+            112,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            195,
+            20
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            245,
+            124,
+            440,
+            142
+          ],
+          "alpha_gt0_pixels": 1983,
+          "alpha_ge128_pixels": 1619,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_275",
+          "classification": "localizable_text",
+          "source": "CLOUDY HIGHLAND",
+          "korean": "클라우디 하이랜드",
+          "stock_region_xywh": [
+            0,
+            90,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            172,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            147,
+            172,
+            163
+          ],
+          "alpha_gt0_pixels": 1751,
+          "alpha_ge128_pixels": 1433,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_276",
+          "classification": "localizable_text",
+          "source": "CASTLE WALL",
+          "korean": "캐슬 월",
+          "stock_region_xywh": [
+            245,
+            90,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            128,
+            20
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            245,
+            146,
+            373,
+            163
+          ],
+          "alpha_gt0_pixels": 1154,
+          "alpha_ge128_pixels": 950,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_277",
+          "classification": "localizable_text",
+          "source": "CAPE WAY",
+          "korean": "케이프 웨이",
+          "stock_region_xywh": [
+            0,
+            68,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            4,
+            96,
+            20
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            168,
+            96,
+            184
+          ],
+          "alpha_gt0_pixels": 893,
+          "alpha_ge128_pixels": 737,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_278",
+          "classification": "localizable_text",
+          "source": "ANCIENT RUINS",
+          "korean": "고대 유적",
+          "stock_region_xywh": [
+            245,
+            68,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            145,
+            20
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            245,
+            168,
+            390,
+            185
+          ],
+          "alpha_gt0_pixels": 1470,
+          "alpha_ge128_pixels": 1228,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_279",
+          "classification": "localizable_text",
+          "source": "ALPINE",
+          "korean": "알파인",
+          "stock_region_xywh": [
+            0,
+            46,
+            245,
+            22
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            68,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            192,
+            68,
+            207
+          ],
+          "alpha_gt0_pixels": 653,
+          "alpha_ge128_pixels": 564,
+          "edge_touch": []
+        }
+      ],
+      "preserve_regions": [
+        {
+          "sprite": "sprite_264",
+          "classification": "structural_non_text_preserve",
+          "source": null,
+          "korean": null,
+          "stock_region_xywh": [
+            0,
+            222,
+            351,
+            34
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            0,
+            351,
+            34
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            0,
+            351,
+            34
+          ],
+          "alpha_gt0_pixels": 11930,
+          "alpha_ge128_pixels": 11930,
+          "edge_touch": [
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ]
+        },
+        {
+          "sprite": "sprite_280",
+          "classification": "structural_non_text_preserve",
+          "source": null,
+          "korean": null,
+          "stock_region_xywh": [
+            0,
+            44,
+            395,
+            2
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            0,
+            395,
+            2
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            210,
+            395,
+            212
+          ],
+          "alpha_gt0_pixels": 790,
+          "alpha_ge128_pixels": 790,
+          "edge_touch": [
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ]
+        }
+      ],
+      "binding_result": "PASS_15_OF_15_EXACT_STOCK_VISIBLE_LABELS_BOUND_TO_SPRITES",
+      "stock_effect_bbox_result": "PASS_15_OF_15_DECODED_ALPHA_GT0_BBOXES_MEASURED",
+      "edge_risk_stock_regions": [
+        "sprite_265",
+        "sprite_266",
+        "sprite_267",
+        "sprite_272",
+        "sprite_274",
+        "sprite_276",
+        "sprite_277",
+        "sprite_278"
+      ],
+      "remaining_holds": {
+        "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_REQUIRED",
+        "release_raw_to_readable_transform": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+        "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+        "release_source_removal_masks": "HOLD_NOT_MATERIALIZED",
+        "release_protected_non_text_masks": "HOLD_NOT_MATERIALIZED",
+        "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+        "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+        "signed_slant_style_metrics": "HOLD_EXACT_RELEASE_MEASUREMENT_REQUIRED",
+        "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+        "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+        "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+        "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "queue_index": 161,
+      "asset": "55B57CDE",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+      "canonical_translation_status": "PASS_REUSED_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+        "git_blob_sha": "c18995f91772a163704c66578c0c37b1432d2436",
+        "bytes": 262272,
+        "direct_dds_decode": {
+          "magic": "DDS ",
+          "width": 512,
+          "height": 512,
+          "fourcc": "DXT5",
+          "format": "BC3",
+          "mip_count_header": 0,
+          "payload_bytes": 262144,
+          "header_bytes": 128,
+          "result": "PASS_EXACT_PINNED_STOCK_BLOB_AND_FULL_BASE_PAYLOAD"
+        }
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512_atlas.json",
+        "git_blob_sha": "88a53b701a4becf26dc7d1f5415cba5b2697050e",
+        "regions": 38
+      },
+      "exact_release_4x": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds",
+        "git_blob_sha": "0b12c672224ce05acb9470af895bbda335cc5543",
+        "bytes": 4194432,
+        "expected_dimensions": [
+          2048,
+          2048
+        ],
+        "exact_binary_decode_status": "HOLD_CONNECTOR_LARGE_BINARY_BODY_EMPTY",
+        "connector_body_chars": 0,
+        "note": "C113 accepted immutable Release identity and region arithmetic; this task does not infer final Release pixel geometry from stock pixels."
+      },
+      "stock_orientation_evidence": {
+        "atlas_coordinate_convention": "bottom_left_y",
+        "decoded_dds_memory_view": "top_left_row_order",
+        "readable_mapping_from_atlas_region": "raw_y = 512-1-(atlas_y+local_y); x unchanged",
+        "exact_stock_source_text_transform": "flip_y",
+        "x_mirror_required": false,
+        "direct_readability_result": "PASS_ALL_BOUND_SOURCE_LABELS_READABLE_WITH_X_UNCHANGED",
+        "release_4x_orientation_status": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION"
+      },
+      "semantic_bindings": [
+        {
+          "sprite": "sprite_73",
+          "classification": "localizable_text",
+          "source": "VIRGO",
+          "korean": "처녀자리",
+          "stock_region_xywh": [
+            0,
+            496,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            46,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            1,
+            46,
+            14
+          ],
+          "alpha_gt0_pixels": 371,
+          "alpha_ge128_pixels": 242,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_74",
+          "classification": "localizable_text",
+          "source": "TAURUS",
+          "korean": "황소자리",
+          "stock_region_xywh": [
+            179,
+            496,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            59,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            181,
+            1,
+            238,
+            14
+          ],
+          "alpha_gt0_pixels": 452,
+          "alpha_ge128_pixels": 290,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_75",
+          "classification": "localizable_text",
+          "source": "SCORPIO",
+          "korean": "전갈자리",
+          "stock_region_xywh": [
+            0,
+            480,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            63,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            16,
+            63,
+            30
+          ],
+          "alpha_gt0_pixels": 534,
+          "alpha_ge128_pixels": 354,
+          "edge_touch": [
+            "bottom"
+          ]
+        },
+        {
+          "sprite": "sprite_76",
+          "classification": "localizable_text",
+          "source": "SAGITTARIUS",
+          "korean": "사수자리",
+          "stock_region_xywh": [
+            179,
+            480,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            96,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            17,
+            275,
+            30
+          ],
+          "alpha_gt0_pixels": 771,
+          "alpha_ge128_pixels": 487,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_77",
+          "classification": "localizable_text",
+          "source": "PISCES",
+          "korean": "물고기자리",
+          "stock_region_xywh": [
+            0,
+            464,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            54,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            33,
+            54,
+            46
+          ],
+          "alpha_gt0_pixels": 419,
+          "alpha_ge128_pixels": 264,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_78",
+          "classification": "localizable_text",
+          "source": "LIBRA",
+          "korean": "천칭자리",
+          "stock_region_xywh": [
+            179,
+            464,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            44,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            34,
+            223,
+            46
+          ],
+          "alpha_gt0_pixels": 342,
+          "alpha_ge128_pixels": 225,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_79",
+          "classification": "localizable_text",
+          "source": "LEO",
+          "korean": "사자자리",
+          "stock_region_xywh": [
+            0,
+            448,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            28,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            49,
+            28,
+            62
+          ],
+          "alpha_gt0_pixels": 208,
+          "alpha_ge128_pixels": 142,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_80",
+          "classification": "localizable_text",
+          "source": "GEMINI",
+          "korean": "쌍둥이자리",
+          "stock_region_xywh": [
+            179,
+            448,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            54,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            181,
+            49,
+            233,
+            62
+          ],
+          "alpha_gt0_pixels": 452,
+          "alpha_ge128_pixels": 304,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_81",
+          "classification": "localizable_text",
+          "source": "CAPRICORN",
+          "korean": "염소자리",
+          "stock_region_xywh": [
+            0,
+            432,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            83,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            65,
+            83,
+            78
+          ],
+          "alpha_gt0_pixels": 684,
+          "alpha_ge128_pixels": 432,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_82",
+          "classification": "localizable_text",
+          "source": "CANCER",
+          "korean": "게자리",
+          "stock_region_xywh": [
+            179,
+            432,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            58,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            179,
+            65,
+            237,
+            78
+          ],
+          "alpha_gt0_pixels": 462,
+          "alpha_ge128_pixels": 316,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_83",
+          "classification": "localizable_text",
+          "source": "ARIES",
+          "korean": "양자리",
+          "stock_region_xywh": [
+            0,
+            416,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            45,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            81,
+            45,
+            94
+          ],
+          "alpha_gt0_pixels": 358,
+          "alpha_ge128_pixels": 233,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_84",
+          "classification": "localizable_text",
+          "source": "AQUARIUS",
+          "korean": "물병자리",
+          "stock_region_xywh": [
+            179,
+            416,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            75,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            81,
+            254,
+            94
+          ],
+          "alpha_gt0_pixels": 608,
+          "alpha_ge128_pixels": 406,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_85",
+          "classification": "localizable_text",
+          "source": "THAILAND",
+          "korean": "태국",
+          "stock_region_xywh": [
+            0,
+            400,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            74,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            98,
+            74,
+            110
+          ],
+          "alpha_gt0_pixels": 561,
+          "alpha_ge128_pixels": 406,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_86",
+          "classification": "localizable_text",
+          "source": "SWITZERLAND",
+          "korean": "스위스",
+          "stock_region_xywh": [
+            179,
+            400,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            109,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            97,
+            288,
+            110
+          ],
+          "alpha_gt0_pixels": 860,
+          "alpha_ge128_pixels": 606,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_87",
+          "classification": "localizable_text",
+          "source": "SWEDEN",
+          "korean": "스웨덴",
+          "stock_region_xywh": [
+            0,
+            384,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            65,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            113,
+            65,
+            126
+          ],
+          "alpha_gt0_pixels": 529,
+          "alpha_ge128_pixels": 379,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_88",
+          "classification": "localizable_text",
+          "source": "SPAIN",
+          "korean": "스페인",
+          "stock_region_xywh": [
+            179,
+            384,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            44,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            113,
+            223,
+            126
+          ],
+          "alpha_gt0_pixels": 371,
+          "alpha_ge128_pixels": 256,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_89",
+          "classification": "localizable_text",
+          "source": "SOUTH KOREA",
+          "korean": "대한민국",
+          "stock_region_xywh": [
+            0,
+            368,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            104,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            129,
+            104,
+            142
+          ],
+          "alpha_gt0_pixels": 802,
+          "alpha_ge128_pixels": 551,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_90",
+          "classification": "localizable_text",
+          "source": "SINGAPORE",
+          "korean": "싱가포르",
+          "stock_region_xywh": [
+            179,
+            368,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            85,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            129,
+            264,
+            142
+          ],
+          "alpha_gt0_pixels": 699,
+          "alpha_ge128_pixels": 489,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_91",
+          "classification": "localizable_text",
+          "source": "OTHER",
+          "korean": "기타",
+          "stock_region_xywh": [
+            0,
+            352,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            48,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            145,
+            48,
+            158
+          ],
+          "alpha_gt0_pixels": 371,
+          "alpha_ge128_pixels": 253,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_92",
+          "classification": "localizable_text",
+          "source": "NORWAY",
+          "korean": "노르웨이",
+          "stock_region_xywh": [
+            179,
+            352,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            0,
+            66,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            145,
+            245,
+            160
+          ],
+          "alpha_gt0_pixels": 535,
+          "alpha_ge128_pixels": 382,
+          "edge_touch": [
+            "top"
+          ]
+        },
+        {
+          "sprite": "sprite_93",
+          "classification": "localizable_text",
+          "source": "NORTH KOREA",
+          "korean": "북한",
+          "stock_region_xywh": [
+            0,
+            336,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            104,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            161,
+            104,
+            174
+          ],
+          "alpha_gt0_pixels": 813,
+          "alpha_ge128_pixels": 583,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_94",
+          "classification": "localizable_text",
+          "source": "NEW ZEALAND",
+          "korean": "뉴질랜드",
+          "stock_region_xywh": [
+            179,
+            336,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            109,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            162,
+            288,
+            174
+          ],
+          "alpha_gt0_pixels": 827,
+          "alpha_ge128_pixels": 596,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_95",
+          "classification": "localizable_text",
+          "source": "MEXICO",
+          "korean": "멕시코",
+          "stock_region_xywh": [
+            0,
+            320,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            59,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            177,
+            59,
+            190
+          ],
+          "alpha_gt0_pixels": 483,
+          "alpha_ge128_pixels": 350,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_96",
+          "classification": "localizable_text",
+          "source": "JAPAN",
+          "korean": "일본",
+          "stock_region_xywh": [
+            179,
+            320,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            46,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            179,
+            177,
+            225,
+            190
+          ],
+          "alpha_gt0_pixels": 371,
+          "alpha_ge128_pixels": 262,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_97",
+          "classification": "localizable_text",
+          "source": "ITALY",
+          "korean": "이탈리아",
+          "stock_region_xywh": [
+            0,
+            304,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            2,
+            43,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            194,
+            43,
+            206
+          ],
+          "alpha_gt0_pixels": 289,
+          "alpha_ge128_pixels": 210,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_98",
+          "classification": "localizable_text",
+          "source": "HONG KONG",
+          "korean": "홍콩",
+          "stock_region_xywh": [
+            179,
+            304,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            83,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            193,
+            262,
+            206
+          ],
+          "alpha_gt0_pixels": 689,
+          "alpha_ge128_pixels": 480,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_99",
+          "classification": "localizable_text",
+          "source": "GERMANY",
+          "korean": "독일",
+          "stock_region_xywh": [
+            0,
+            288,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            75,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            209,
+            75,
+            222
+          ],
+          "alpha_gt0_pixels": 607,
+          "alpha_ge128_pixels": 435,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_100",
+          "classification": "localizable_text",
+          "source": "FRANCE",
+          "korean": "프랑스",
+          "stock_region_xywh": [
+            179,
+            288,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            59,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            209,
+            238,
+            222
+          ],
+          "alpha_gt0_pixels": 470,
+          "alpha_ge128_pixels": 332,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_101",
+          "classification": "localizable_text",
+          "source": "FINLAND",
+          "korean": "핀란드",
+          "stock_region_xywh": [
+            0,
+            272,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            64,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            226,
+            64,
+            238
+          ],
+          "alpha_gt0_pixels": 494,
+          "alpha_ge128_pixels": 362,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_102",
+          "classification": "localizable_text",
+          "source": "NETHERLANDS",
+          "korean": "네덜란드",
+          "stock_region_xywh": [
+            179,
+            272,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            108,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            225,
+            287,
+            238
+          ],
+          "alpha_gt0_pixels": 861,
+          "alpha_ge128_pixels": 607,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_103",
+          "classification": "localizable_text",
+          "source": "DENMARK",
+          "korean": "덴마크",
+          "stock_region_xywh": [
+            0,
+            256,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            73,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            242,
+            73,
+            254
+          ],
+          "alpha_gt0_pixels": 627,
+          "alpha_ge128_pixels": 456,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_104",
+          "classification": "localizable_text",
+          "source": "CHINA",
+          "korean": "중국",
+          "stock_region_xywh": [
+            179,
+            256,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            46,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            241,
+            225,
+            254
+          ],
+          "alpha_gt0_pixels": 371,
+          "alpha_ge128_pixels": 261,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_105",
+          "classification": "localizable_text",
+          "source": "CANADA",
+          "korean": "캐나다",
+          "stock_region_xywh": [
+            0,
+            240,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            60,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            257,
+            60,
+            270
+          ],
+          "alpha_gt0_pixels": 486,
+          "alpha_ge128_pixels": 347,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_106",
+          "classification": "localizable_text",
+          "source": "BRITAIN",
+          "korean": "영국",
+          "stock_region_xywh": [
+            179,
+            240,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            60,
+            14
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            258,
+            239,
+            270
+          ],
+          "alpha_gt0_pixels": 504,
+          "alpha_ge128_pixels": 361,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_107",
+          "classification": "localizable_text",
+          "source": "BELGIUM",
+          "korean": "벨기에",
+          "stock_region_xywh": [
+            0,
+            224,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            67,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            273,
+            67,
+            286
+          ],
+          "alpha_gt0_pixels": 556,
+          "alpha_ge128_pixels": 397,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_108",
+          "classification": "localizable_text",
+          "source": "AUSTRIA",
+          "korean": "오스트리아",
+          "stock_region_xywh": [
+            179,
+            224,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            66,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            179,
+            273,
+            245,
+            286
+          ],
+          "alpha_gt0_pixels": 517,
+          "alpha_ge128_pixels": 365,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_109",
+          "classification": "localizable_text",
+          "source": "AUSTRALIA",
+          "korean": "호주",
+          "stock_region_xywh": [
+            0,
+            208,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            2,
+            85,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            289,
+            85,
+            302
+          ],
+          "alpha_gt0_pixels": 640,
+          "alpha_ge128_pixels": 455,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_110",
+          "classification": "localizable_text",
+          "source": "USA",
+          "korean": "미국",
+          "stock_region_xywh": [
+            179,
+            208,
+            179,
+            16
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            2,
+            31,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            180,
+            289,
+            210,
+            302
+          ],
+          "alpha_gt0_pixels": 240,
+          "alpha_ge128_pixels": 181,
+          "edge_touch": []
+        }
+      ],
+      "preserve_regions": [],
+      "binding_result": "PASS_38_OF_38_EXACT_STOCK_VISIBLE_LABELS_BOUND_TO_SPRITES",
+      "stock_effect_bbox_result": "PASS_38_OF_38_DECODED_ALPHA_GT0_BBOXES_MEASURED",
+      "edge_risk_stock_regions": [
+        "sprite_75",
+        "sprite_82",
+        "sprite_85",
+        "sprite_92",
+        "sprite_96",
+        "sprite_108",
+        "sprite_109"
+      ],
+      "remaining_holds": {
+        "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_REQUIRED",
+        "release_raw_to_readable_transform": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+        "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+        "release_source_removal_masks": "HOLD_NOT_MATERIALIZED",
+        "release_protected_non_text_masks": "HOLD_NOT_MATERIALIZED",
+        "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+        "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+        "signed_slant_style_metrics": "HOLD_EXACT_RELEASE_MEASUREMENT_REQUIRED",
+        "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+        "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+        "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+        "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "queue_index": 163,
+      "asset": "59A79158",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "canonical_translation_status": "PASS_REUSED_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+      "exact_stock_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+        "git_blob_sha": "ded707827ee64453b3f254e6ed32d9f9cfb93599",
+        "bytes": 131200,
+        "direct_dds_decode": {
+          "magic": "DDS ",
+          "width": 256,
+          "height": 512,
+          "fourcc": "DXT5",
+          "format": "BC3",
+          "mip_count_header": 0,
+          "payload_bytes": 131072,
+          "header_bytes": 128,
+          "result": "PASS_EXACT_PINNED_STOCK_BLOB_AND_FULL_BASE_PAYLOAD"
+        }
+      },
+      "exact_stock_atlas": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512_atlas.json",
+        "git_blob_sha": "a8eb3d2bf8251bd779c32684b9c6f59e3a9a0155",
+        "regions": 24
+      },
+      "exact_release_4x": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+        "git_blob_sha": "693548c2c4ec53a4b75adbfe2868328896a115de",
+        "bytes": 8388736,
+        "expected_dimensions": [
+          1024,
+          2048
+        ],
+        "exact_binary_decode_status": "HOLD_CONNECTOR_LARGE_BINARY_BODY_EMPTY",
+        "connector_body_chars": 0,
+        "note": "C113 accepted immutable Release identity and region arithmetic; this task does not infer final Release pixel geometry from stock pixels."
+      },
+      "stock_orientation_evidence": {
+        "atlas_coordinate_convention": "bottom_left_y",
+        "decoded_dds_memory_view": "top_left_row_order",
+        "readable_mapping_from_atlas_region": "raw_y = 512-1-(atlas_y+local_y); x unchanged",
+        "exact_stock_source_text_transform": "flip_y",
+        "x_mirror_required": false,
+        "direct_readability_result": "PASS_ALL_BOUND_SOURCE_LABELS_READABLE_WITH_X_UNCHANGED",
+        "release_4x_orientation_status": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION"
+      },
+      "semantic_bindings": [
+        {
+          "sprite": "sprite_426",
+          "classification": "localizable_text",
+          "source": "Waterfalls",
+          "korean": "워터폴스",
+          "stock_region_xywh": [
+            0,
+            493,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            4,
+            69,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            3,
+            69,
+            15
+          ],
+          "alpha_gt0_pixels": 553,
+          "alpha_ge128_pixels": 380,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_427",
+          "classification": "localizable_text",
+          "source": "Tulip Garden",
+          "korean": "튤립 가든",
+          "stock_region_xywh": [
+            0,
+            474,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            87,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            20,
+            87,
+            35
+          ],
+          "alpha_gt0_pixels": 613,
+          "alpha_ge128_pixels": 419,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_428",
+          "classification": "localizable_text",
+          "source": "Sunny Beach",
+          "korean": "서니 비치",
+          "stock_region_xywh": [
+            0,
+            455,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            84,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            39,
+            84,
+            54
+          ],
+          "alpha_gt0_pixels": 635,
+          "alpha_ge128_pixels": 459,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_429",
+          "classification": "localizable_text",
+          "source": "Snow Mountain",
+          "korean": "스노 마운틴",
+          "stock_region_xywh": [
+            0,
+            436,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            103,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            60,
+            103,
+            73
+          ],
+          "alpha_gt0_pixels": 746,
+          "alpha_ge128_pixels": 569,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_430",
+          "classification": "localizable_text",
+          "source": "Skyscrapers",
+          "korean": "스카이스크레이퍼",
+          "stock_region_xywh": [
+            0,
+            417,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            4,
+            79,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            77,
+            79,
+            91
+          ],
+          "alpha_gt0_pixels": 592,
+          "alpha_ge128_pixels": 449,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_431",
+          "classification": "localizable_text",
+          "source": "Palm Beach",
+          "korean": "팜 비치",
+          "stock_region_xywh": [
+            0,
+            398,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            76,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            98,
+            76,
+            111
+          ],
+          "alpha_gt0_pixels": 583,
+          "alpha_ge128_pixels": 424,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_432",
+          "classification": "localizable_text",
+          "source": "National Park",
+          "korean": "내셔널 파크",
+          "stock_region_xywh": [
+            0,
+            379,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            90,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            117,
+            90,
+            130
+          ],
+          "alpha_gt0_pixels": 678,
+          "alpha_ge128_pixels": 506,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_433",
+          "classification": "localizable_text",
+          "source": "Milky Way",
+          "korean": "밀키 웨이",
+          "stock_region_xywh": [
+            0,
+            360,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            3,
+            70,
+            17
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            135,
+            70,
+            149
+          ],
+          "alpha_gt0_pixels": 562,
+          "alpha_ge128_pixels": 420,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_434",
+          "classification": "localizable_text",
+          "source": "Metropolis",
+          "korean": "메트로폴리스",
+          "stock_region_xywh": [
+            0,
+            341,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            72,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            152,
+            72,
+            168
+          ],
+          "alpha_gt0_pixels": 578,
+          "alpha_ge128_pixels": 412,
+          "edge_touch": [
+            "left",
+            "bottom"
+          ]
+        },
+        {
+          "sprite": "sprite_435",
+          "classification": "localizable_text",
+          "source": "Lost City",
+          "korean": "로스트 시티",
+          "stock_region_xywh": [
+            0,
+            322,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            59,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            172,
+            59,
+            187
+          ],
+          "alpha_gt0_pixels": 419,
+          "alpha_ge128_pixels": 303,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_436",
+          "classification": "localizable_text",
+          "source": "Legend",
+          "korean": "레전드",
+          "stock_region_xywh": [
+            0,
+            303,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            47,
+            17
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            192,
+            47,
+            206
+          ],
+          "alpha_gt0_pixels": 372,
+          "alpha_ge128_pixels": 257,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_437",
+          "classification": "localizable_text",
+          "source": "Jungle",
+          "korean": "정글",
+          "stock_region_xywh": [
+            0,
+            284,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            4,
+            42,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            210,
+            42,
+            224
+          ],
+          "alpha_gt0_pixels": 299,
+          "alpha_ge128_pixels": 182,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_438",
+          "classification": "localizable_text",
+          "source": "Industrial Complex",
+          "korean": "인더스트리얼 컴플렉스",
+          "stock_region_xywh": [
+            0,
+            265,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            4,
+            124,
+            19
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            228,
+            124,
+            243
+          ],
+          "alpha_gt0_pixels": 926,
+          "alpha_ge128_pixels": 703,
+          "edge_touch": [
+            "bottom"
+          ]
+        },
+        {
+          "sprite": "sprite_439",
+          "classification": "localizable_text",
+          "source": "Imperial Avenue",
+          "korean": "임페리얼 애비뉴",
+          "stock_region_xywh": [
+            0,
+            246,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            3,
+            106,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            248,
+            106,
+            263
+          ],
+          "alpha_gt0_pixels": 787,
+          "alpha_ge128_pixels": 535,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_440",
+          "classification": "localizable_text",
+          "source": "Ice Scape",
+          "korean": "아이스 스케이프",
+          "stock_region_xywh": [
+            0,
+            227,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            64,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            267,
+            64,
+            282
+          ],
+          "alpha_gt0_pixels": 480,
+          "alpha_ge128_pixels": 319,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_441",
+          "classification": "localizable_text",
+          "source": "Giant Statues",
+          "korean": "자이언트 스태추",
+          "stock_region_xywh": [
+            0,
+            208,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            90,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            288,
+            90,
+            301
+          ],
+          "alpha_gt0_pixels": 684,
+          "alpha_ge128_pixels": 478,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_442",
+          "classification": "localizable_text",
+          "source": "Ghost Forest",
+          "korean": "고스트 포레스트",
+          "stock_region_xywh": [
+            0,
+            189,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            82,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            308,
+            82,
+            320
+          ],
+          "alpha_gt0_pixels": 610,
+          "alpha_ge128_pixels": 465,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_443",
+          "classification": "localizable_text",
+          "source": "Floral Village",
+          "korean": "플로럴 빌리지",
+          "stock_region_xywh": [
+            0,
+            170,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            87,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            324,
+            87,
+            339
+          ],
+          "alpha_gt0_pixels": 669,
+          "alpha_ge128_pixels": 476,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_444",
+          "classification": "localizable_text",
+          "source": "Desert",
+          "korean": "사막",
+          "stock_region_xywh": [
+            0,
+            151,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            2,
+            3,
+            43,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            2,
+            345,
+            43,
+            358
+          ],
+          "alpha_gt0_pixels": 326,
+          "alpha_ge128_pixels": 239,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_445",
+          "classification": "localizable_text",
+          "source": "Deep Lake",
+          "korean": "딥 레이크",
+          "stock_region_xywh": [
+            0,
+            132,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            3,
+            66,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            362,
+            66,
+            377
+          ],
+          "alpha_gt0_pixels": 516,
+          "alpha_ge128_pixels": 378,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_446",
+          "classification": "localizable_text",
+          "source": "Coniferous Forest",
+          "korean": "침엽수림",
+          "stock_region_xywh": [
+            0,
+            113,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            3,
+            116,
+            15
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            384,
+            116,
+            396
+          ],
+          "alpha_gt0_pixels": 825,
+          "alpha_ge128_pixels": 607,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_447",
+          "classification": "localizable_text",
+          "source": "Cloudy Highland",
+          "korean": "클라우디 하이랜드",
+          "stock_region_xywh": [
+            0,
+            94,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            4,
+            106,
+            18
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            400,
+            106,
+            414
+          ],
+          "alpha_gt0_pixels": 845,
+          "alpha_ge128_pixels": 628,
+          "edge_touch": []
+        },
+        {
+          "sprite": "sprite_448",
+          "classification": "localizable_text",
+          "source": "Casino Town",
+          "korean": "카지노 타운",
+          "stock_region_xywh": [
+            0,
+            75,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            0,
+            4,
+            82,
+            17
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            0,
+            420,
+            82,
+            433
+          ],
+          "alpha_gt0_pixels": 574,
+          "alpha_ge128_pixels": 428,
+          "edge_touch": [
+            "left"
+          ]
+        },
+        {
+          "sprite": "sprite_449",
+          "classification": "localizable_text",
+          "source": "Castle Wall",
+          "korean": "캐슬 월",
+          "stock_region_xywh": [
+            0,
+            56,
+            240,
+            19
+          ],
+          "stock_readable_effect_bbox_local_ltrb": [
+            1,
+            4,
+            73,
+            16
+          ],
+          "stock_raw_effect_bbox_ltrb": [
+            1,
+            440,
+            73,
+            452
+          ],
+          "alpha_gt0_pixels": 575,
+          "alpha_ge128_pixels": 408,
+          "edge_touch": []
+        }
+      ],
+      "preserve_regions": [],
+      "binding_result": "PASS_24_OF_24_EXACT_STOCK_VISIBLE_LABELS_BOUND_TO_SPRITES",
+      "stock_effect_bbox_result": "PASS_24_OF_24_DECODED_ALPHA_GT0_BBOXES_MEASURED",
+      "edge_risk_stock_regions": [
+        "sprite_426",
+        "sprite_428",
+        "sprite_430",
+        "sprite_431",
+        "sprite_432",
+        "sprite_434",
+        "sprite_435",
+        "sprite_438",
+        "sprite_440",
+        "sprite_441",
+        "sprite_443",
+        "sprite_445",
+        "sprite_448"
+      ],
+      "remaining_holds": {
+        "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_REQUIRED",
+        "release_raw_to_readable_transform": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+        "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+        "release_source_removal_masks": "HOLD_NOT_MATERIALIZED",
+        "release_protected_non_text_masks": "HOLD_NOT_MATERIALIZED",
+        "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+        "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+        "signed_slant_style_metrics": "HOLD_EXACT_RELEASE_MEASUREMENT_REQUIRED",
+        "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+        "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+        "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+        "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+        "runtime_validation": "UNTESTED"
+      }
+    }
+  ],
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00096",
+    "producer_result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+    "producer_report_blob_sha": "1add8700513c68255a90e4e84500c9dde32997dd",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00106",
+    "c_acceptance_batch": "Q00011/C113",
+    "c_acceptance_record_blob_sha": "64878729481d9246bd7f000775892e006faad26a",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_policy_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b"
+  },
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_147_161_163",
+    "c00120_content_qa": "PASS_REUSED_NO_HEAVY_RECHECK",
+    "accepted_material_payload_changed": false,
+    "semantic_bindings_reemitted": 77,
+    "stock_effect_bboxes_reemitted": 77,
+    "structural_preserve_regions_reemitted": 2,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED",
+    "result": "PASS_DURABLE_REEMIT_ONLY"
+  },
+  "qa_fingerprint_components": {
+    "canonical_source_stock_blobs": [
+      "af08fdb692c84d4008248e3f2a3600876525b91c",
+      "c18995f91772a163704c66578c0c37b1432d2436",
+      "ded707827ee64453b3f254e6ed32d9f9cfb93599"
+    ],
+    "stock_atlas_blobs": [
+      "76491b0aa09781eb76eb07beed1f89d825b0bd56",
+      "88a53b701a4becf26dc7d1f5415cba5b2697050e",
+      "a8eb3d2bf8251bd779c32684b9c6f59e3a9a0155"
+    ],
+    "release_identity_blobs": [
+      "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+      "0b12c672224ce05acb9470af895bbda335cc5543",
+      "693548c2c4ec53a4b75adbfe2868328896a115de"
+    ],
+    "translation_or_layout_input": [
+      "60f66aefae9a2454e9ae795f9570405ac742883e",
+      "6164d63d074233203b1f620dc73100bd192da820"
+    ],
+    "orientation_contract": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "qa_contract_version": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "generation_v2_policy": "83d44db67e482d729c4c69c6814509e08d4af88b"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "c_rework_resolution": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00120",
+    "c_result_sha": "6623a622b9d7fe30ada5bb4353a2e8c796fc0956",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00112",
+    "prior_result_sha": "9214bd9b00df6e4695a5edef27266a22699c1908",
+    "prior_evidence_path": "localization/graphics/role_A/20260929-1823-A00112-P00043/A00112_P00043_THREE_ODD_EXACT_STOCK_BINDING_ORIENTATION_PRIOR.json",
+    "prior_evidence_blob_sha": "95be09ce529b39e97d18c412a73f7fdbd9f6cb36",
+    "disposition_defect": "MISSING_DURABLE_TASK_RECORD_IN_IMMUTABLE_PRODUCER_RESULT_SHA",
+    "content_qa_repeated": false,
+    "accepted_material_changed": false,
+    "c_content_acceptance": "PASS_77_OF_77_ALPHA_GT0_BBOX_COUNTS__PASS_77_OF_77_ALPHA_GE128_COUNTS__PASS_77_OF_77_CURRENT_SOURCE_KOREAN_PAIRS__PASS_2_STRUCTURAL_PRESERVE_REGIONS"
+  },
+  "current_snapshot_validation": {
+    "head_at_precommit": "9c22d25f4f5b73cfd3a2c472fe3b0655947a136e",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "asset_queue_blob_sha": "63ed564daace652449f44530ddf0a097c91e63c8",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "transcriptions_unchanged_from_a00112": true,
+    "artwork_plan_unchanged_from_a00112": true,
+    "orientation_contract_unchanged_from_a00112": true,
+    "automation_contract_unchanged_from_a00112": true
+  },
+  "accepted_prior_integrated_self_qa": {
+    "parity_shard": "PASS_ODD_ONLY_147_161_163",
+    "c_acceptance": "PASS_A00096_CONSUMED_BY_Q00011_C113",
+    "exact_stock_dds_identity": "PASS_3_OF_3_PINNED_GIT_BLOBS",
+    "stock_dds_decode": "PASS_3_OF_3_DXT5_BASE_PAYLOADS_EXACT",
+    "exact_stock_atlas_identity": "PASS_3_OF_3_PINNED_GIT_BLOBS",
+    "semantic_binding": "PASS_77_OF_77_DIRECT_VISIBLE_SOURCE_LABELS",
+    "stock_effect_geometry": "PASS_77_OF_77_ALPHA_GT0_BBOXES",
+    "structural_preservation": "PASS_2_OF_2_NON_TEXT_REGIONS_CLASSIFIED_PRESERVE",
+    "stock_orientation": "PASS_FLIP_Y_NO_X_MIRROR_ALL_3",
+    "release_orientation": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
