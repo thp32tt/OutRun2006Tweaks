@@ -2157,14 +2157,88 @@ def main() -> None:
                 "DX11 R110 readiness-snapshot probe drift: " + meaning
             )
 
+    r111_descriptor_header = {
+        "bool descriptorExact{}":
+            "R111 single-mirror descriptor exactness evidence",
+        "std::uint32_t descriptorExactMask{}":
+            "R111 per-stage descriptor exactness evidence",
+        "mirror_descriptor_exact(":
+            "R111 concrete Texture2D/SRV descriptor verifier",
+    }
+    missing_r111_header = [
+        meaning
+        for token, meaning in r111_descriptor_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r111_header:
+        raise SystemExit(
+            "DX11 R111 managed-mirror descriptor header drift: "
+            + ", ".join(missing_r111_header)
+        )
+
+    for token, meaning in {
+        "mirror_device_.Get() != expectedDevice":
+            "R111 exact expected-device ownership",
+        "textureDesc.Width != width_":
+            "R111 source-width descriptor check",
+        "textureDesc.Height != height_":
+            "R111 source-height descriptor check",
+        "textureDesc.MipLevels != 1":
+            "R111 single-mip descriptor check",
+        "textureDesc.ArraySize != 1":
+            "R111 single-array-slice descriptor check",
+        "textureDesc.Format != format.format":
+            "R111 translated format descriptor check",
+        "textureDesc.SampleDesc.Count != 1":
+            "R111 single-sample descriptor check",
+        "textureDesc.Usage != behavior.usage":
+            "R111 D3D11 usage descriptor check",
+        "textureDesc.BindFlags != behavior.bindFlags":
+            "R111 bind-flags descriptor check",
+        "textureDesc.CPUAccessFlags != behavior.cpuAccessFlags":
+            "R111 CPU-access descriptor check",
+        "srvDesc.ViewDimension != D3D11_SRV_DIMENSION_TEXTURE2D":
+            "R111 SRV dimension check",
+        "srvDesc.Texture2D.MostDetailedMip != 0":
+            "R111 SRV base-mip check",
+        "srvDesc.Texture2D.MipLevels != 1":
+            "R111 SRV mip-count check",
+        "mirror_srv_->GetResource(":
+            "R111 SRV-to-resource identity query",
+        "viewTexture.Get() != mirror_texture_.Get()":
+            "R111 SRV resource identity match",
+        "out.descriptorExact =":
+            "R111 single readiness descriptor gate",
+        "out.descriptorExactMask |= bit":
+            "R111 stage readiness descriptor gate",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R111 managed-mirror descriptor source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R111 managed mirror descriptor and SRV view identity are exact-device bound":
+            "R111 direct descriptor/device proof",
+        "descriptorExactMask == 0x1u":
+            "R111 ready-stage descriptor mask proof",
+        "DX11 managed Texture2D mirror descriptor exactness R111: PASS":
+            "R111 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R111 managed-mirror descriptor probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census
         or "mirror_readiness_for_stages(" in census
         or "validate_mirror_readiness_snapshot_for_stages(" in census
+        or "mirror_descriptor_exact(" in census
     ):
         raise SystemExit(
-            "DX11 R108-R110 observation-only registry mirror API gained a runtime census caller"
+            "DX11 R108-R111 observation-only registry mirror API gained a runtime census caller"
         )
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
