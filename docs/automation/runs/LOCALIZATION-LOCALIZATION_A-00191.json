@@ -150,5 +150,8 @@
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE"
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "24f31efd3a2cee34c238ba322caf36af5db9955b",
+  "authoritative_result_sha": "24f31efd3a2cee34c238ba322caf36af5db9955b",
+  "bookkeeping_note": "Result SHA recorded after the tagged producer result commit; producer result remains automation_validation=PENDING for C_BATCH_GATE and runtime_validation=UNTESTED."
 }
