@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00191",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "action": "AUDIT_CURRENT_MOD3_A_CANONICAL_SOURCE_TIERS",
+  "selected_indices": [
+    135,
+    147,
+    159,
+    201
+  ],
+  "google_drive_prechecked_exact_filename_misses": 4,
+  "runtime_validation": "UNTESTED"
+}
