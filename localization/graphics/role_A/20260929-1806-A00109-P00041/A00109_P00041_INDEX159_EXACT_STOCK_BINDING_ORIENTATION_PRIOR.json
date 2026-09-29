@@ -1,0 +1,589 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-v2-stock-semantic-binding-orientation-prior-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00109",
+  "wave_id": "P00041",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T18:06:57+09:00",
+  "precommit_head_sha": "705ecdb282f48c594a6347aa1837bc320b7254e3",
+  "shard_rule": "ODD_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      159
+    ],
+    "selected_assets": [
+      "4EDA9DE3"
+    ],
+    "basis": "Q00011/C113 consumed A00096 as PASS. Index 159 is odd-shard pending artwork with 15 C-accepted direct-inspection work regions and 15 canonical semantics. A00102/A00105/A00107 remain newer QA-pending and were not repeated.",
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_A-00102": [
+        137,
+        217,
+        219,
+        241
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00105": [
+        119
+      ],
+      "LOCALIZATION-LOCALIZATION_A-00107": [
+        55
+      ]
+    },
+    "dependency_blocked_rework_indices": [
+      51,
+      53,
+      111,
+      121
+    ]
+  },
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX159_EXACT_STOCK_DIRECT_SEMANTIC_BINDING_AND_ORIENTATION_PRIOR",
+    "assets_advanced": 1,
+    "stock_sprite_regions_inspected": 15,
+    "semantic_bindings_resolved": 15,
+    "stock_effect_bboxes_measured": 15,
+    "stale_orientation_hint_challenged": true,
+    "candidate_dds_written": false,
+    "description": "Directly decoded the exact immutable stock DXT5 DDS from GitHub, used the exact stock atlas regions, and resolved all 15 visible English labels to sprite identities. Exact stock pixels show readable text after Y-axis atlas/raw reconciliation with no X mirror; applying X mirror reverses the glyphs, so the historical mirror_x draft hint is not accepted as current source truth. Stock decoded-alpha effect bboxes/counts are retained as reconstruction priors only. Exact 4x Release DDS decode remains required before final source-effect/removal-mask/CLEAN_PLATE/orientation promotion."
+  },
+  "asset": {
+    "queue_index": 159,
+    "asset": "4EDA9DE3",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+    "canonical_translation_status": "PASS_REUSED_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "exact_stock_source": {
+      "repository": "Sonic-TV/OR2006Sprites",
+      "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "git_blob_sha": "00f40e8b7b2c1e8c77442bb2a2e50270fff388dd",
+      "bytes": 131200,
+      "direct_dds_decode": {
+        "magic": "DDS ",
+        "width": 512,
+        "height": 256,
+        "fourcc": "DXT5",
+        "format": "BC3",
+        "mip_count_header": 0,
+        "payload_bytes": 131072,
+        "header_bytes": 128,
+        "size_equation": "128 + (512/4)*(256/4)*16 = 131200",
+        "result": "PASS_EXACT_PINNED_STOCK_BLOB_AND_FULL_BASE_PAYLOAD"
+      }
+    },
+    "exact_stock_atlas": {
+      "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256_atlas.json",
+      "git_blob_sha": "471c9e7c64cdce948d00fe5cfcc70754da72b0a2",
+      "regions": 15
+    },
+    "exact_release_4x": {
+      "repository": "Sonic-TV/OR2006Sprites",
+      "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4EDA9DE3_512x256.dds",
+      "git_blob_sha": "8685dc0122bff16243faca3ca3cbc1308b241b08",
+      "bytes": 8388736,
+      "expected_dimensions": [
+        2048,
+        1024
+      ],
+      "exact_binary_decode_status": "HOLD_CONNECTOR_LARGE_BINARY_BODY_NOT_EXPOSED",
+      "note": "A00065/C00071 and A00096/C113 immutable identity/4x-region arithmetic remain accepted. This task does not infer final Release pixel geometry from stock pixels."
+    },
+    "stock_orientation_evidence": {
+      "atlas_coordinate_convention": "bottom_left_y",
+      "decoded_dds_memory_view": "top_left_row_order",
+      "readable_mapping_from_atlas_region": "raw_y = 255 - atlas_y; x unchanged",
+      "x_mirror_test": "FAIL_READABILITY_GLYPHS_REVERSED",
+      "exact_stock_source_text_transform": "flip_y",
+      "historical_mirror_x_hint_status": "STALE_HINT_NOT_ACCEPTED_AGAINST_EXACT_STOCK_PIXELS",
+      "release_4x_orientation_status": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION"
+    },
+    "semantic_bindings": [
+      {
+        "sprite": "sprite_344",
+        "source": "WATERFALLS",
+        "korean": "워터폴스",
+        "stock_region_xywh": [
+          0,
+          234,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          3,
+          123,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          0,
+          2,
+          123,
+          19
+        ],
+        "alpha_gt0_pixels": 1206,
+        "alpha_ge128_pixels": 961,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_345",
+        "source": "SUNNY BEACH",
+        "korean": "서니 비치",
+        "stock_region_xywh": [
+          245,
+          234,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          4,
+          133,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          245,
+          2,
+          378,
+          18
+        ],
+        "alpha_gt0_pixels": 1368,
+        "alpha_ge128_pixels": 1073,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_346",
+        "source": "SKYSCRAPERS",
+        "korean": "스카이스크레이퍼",
+        "stock_region_xywh": [
+          0,
+          212,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          0,
+          245,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          0,
+          24,
+          245,
+          44
+        ],
+        "alpha_gt0_pixels": 1380,
+        "alpha_ge128_pixels": 1026,
+        "edge_touch": [
+          "left",
+          "right",
+          "top"
+        ]
+      },
+      {
+        "sprite": "sprite_347",
+        "source": "NATIONAL PARK",
+        "korean": "내셔널 파크",
+        "stock_region_xywh": [
+          245,
+          212,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          4,
+          146,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          245,
+          24,
+          391,
+          40
+        ],
+        "alpha_gt0_pixels": 1431,
+        "alpha_ge128_pixels": 1170,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_348",
+        "source": "MILKY WAY",
+        "korean": "밀키 웨이",
+        "stock_region_xywh": [
+          0,
+          190,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          4,
+          106,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          1,
+          46,
+          106,
+          62
+        ],
+        "alpha_gt0_pixels": 1038,
+        "alpha_ge128_pixels": 741,
+        "edge_touch": []
+      },
+      {
+        "sprite": "sprite_349",
+        "source": "LOST CITY",
+        "korean": "로스트 시티",
+        "stock_region_xywh": [
+          245,
+          190,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          3,
+          96,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          246,
+          46,
+          341,
+          63
+        ],
+        "alpha_gt0_pixels": 827,
+        "alpha_ge128_pixels": 644,
+        "edge_touch": []
+      },
+      {
+        "sprite": "sprite_350",
+        "source": "LEGEND",
+        "korean": "레전드",
+        "stock_region_xywh": [
+          0,
+          168,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          3,
+          76,
+          19
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          0,
+          69,
+          76,
+          85
+        ],
+        "alpha_gt0_pixels": 764,
+        "alpha_ge128_pixels": 631,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_351",
+        "source": "JUNGLE",
+        "korean": "정글",
+        "stock_region_xywh": [
+          245,
+          168,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          3,
+          72,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          245,
+          68,
+          317,
+          85
+        ],
+        "alpha_gt0_pixels": 712,
+        "alpha_ge128_pixels": 594,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_352",
+        "source": "ICE SCAPE",
+        "korean": "아이스 스케이프",
+        "stock_region_xywh": [
+          0,
+          146,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          3,
+          98,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          0,
+          90,
+          98,
+          107
+        ],
+        "alpha_gt0_pixels": 939,
+        "alpha_ge128_pixels": 773,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_353",
+        "source": "GIANT STATUES",
+        "korean": "자이언트 스태추",
+        "stock_region_xywh": [
+          245,
+          146,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          0,
+          245,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          246,
+          90,
+          490,
+          110
+        ],
+        "alpha_gt0_pixels": 1388,
+        "alpha_ge128_pixels": 1049,
+        "edge_touch": [
+          "right",
+          "top"
+        ]
+      },
+      {
+        "sprite": "sprite_354",
+        "source": "FLORAL VILLAGE",
+        "korean": "플로럴 빌리지",
+        "stock_region_xywh": [
+          0,
+          124,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          4,
+          155,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          1,
+          112,
+          155,
+          128
+        ],
+        "alpha_gt0_pixels": 1457,
+        "alpha_ge128_pixels": 1101,
+        "edge_touch": []
+      },
+      {
+        "sprite": "sprite_355",
+        "source": "CASINO TOWN",
+        "korean": "카지노 타운",
+        "stock_region_xywh": [
+          245,
+          124,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          4,
+          128,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          246,
+          112,
+          373,
+          128
+        ],
+        "alpha_gt0_pixels": 1388,
+        "alpha_ge128_pixels": 1073,
+        "edge_touch": []
+      },
+      {
+        "sprite": "sprite_356",
+        "source": "CANYON",
+        "korean": "캐니언",
+        "stock_region_xywh": [
+          0,
+          102,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          3,
+          76,
+          20
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          1,
+          134,
+          76,
+          151
+        ],
+        "alpha_gt0_pixels": 789,
+        "alpha_ge128_pixels": 644,
+        "edge_touch": []
+      },
+      {
+        "sprite": "sprite_357",
+        "source": "BIG FOREST",
+        "korean": "빅 포레스트",
+        "stock_region_xywh": [
+          245,
+          102,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          0,
+          2,
+          109,
+          18
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          245,
+          136,
+          354,
+          152
+        ],
+        "alpha_gt0_pixels": 1158,
+        "alpha_ge128_pixels": 889,
+        "edge_touch": [
+          "left"
+        ]
+      },
+      {
+        "sprite": "sprite_358",
+        "source": "BAY AREA",
+        "korean": "베이 에어리어",
+        "stock_region_xywh": [
+          0,
+          80,
+          245,
+          22
+        ],
+        "stock_readable_effect_bbox_local_ltrb": [
+          1,
+          3,
+          94,
+          19
+        ],
+        "stock_raw_effect_bbox_ltrb": [
+          1,
+          157,
+          94,
+          173
+        ],
+        "alpha_gt0_pixels": 865,
+        "alpha_ge128_pixels": 726,
+        "edge_touch": []
+      }
+    ],
+    "binding_result": "PASS_15_OF_15_EXACT_STOCK_VISIBLE_LABELS_BOUND_TO_SPRITES",
+    "stock_effect_bbox_result": "PASS_15_OF_15_DECODED_ALPHA_GT0_BBOXES_MEASURED",
+    "edge_risk_stock_regions": [
+      "sprite_344",
+      "sprite_345",
+      "sprite_346",
+      "sprite_347",
+      "sprite_350",
+      "sprite_351",
+      "sprite_352",
+      "sprite_353",
+      "sprite_357"
+    ],
+    "remaining_holds": {
+      "release_dds_header_decode": "HOLD_EXACT_RELEASE_BINARY_BODY_REQUIRED",
+      "release_raw_to_readable_transform": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+      "release_source_effect_bboxes": "HOLD_NOT_MATERIALIZED",
+      "release_source_removal_masks": "HOLD_NOT_MATERIALIZED",
+      "release_protected_non_text_masks": "HOLD_NOT_MATERIALIZED",
+      "release_clean_plates": "HOLD_NOT_MATERIALIZED",
+      "release_candidate_safe_bboxes": "HOLD_NOT_MATERIALIZED",
+      "signed_slant_style_metrics": "HOLD_EXACT_RELEASE_MEASUREMENT_REQUIRED",
+      "korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+      "decoded_final_qa": "HOLD_NO_NEW_CANDIDATE",
+      "zero_pixel_containment": "HOLD_NO_NEW_CANDIDATE",
+      "english_source_vs_korean_candidate": "HOLD_NO_NEW_CANDIDATE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "reused_immutable_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00096",
+    "producer_result_sha": "e3004e5c658ab5df4b2be73d75fc2fbf0c4fd399",
+    "producer_report_blob_sha": "1add8700513c68255a90e4e84500c9dde32997dd",
+    "c_acceptance_task": "LOCALIZATION-LOCALIZATION_C-00106",
+    "c_acceptance_batch": "Q00011/C113",
+    "c_acceptance_record_blob_sha": "64878729481d9246bd7f000775892e006faad26a",
+    "earlier_source_geometry_task": "LOCALIZATION-LOCALIZATION_A-00065",
+    "earlier_source_geometry_blob_sha": "25e8f4037603fd843a7d8770b29fd233a4367a81",
+    "current_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "current_queue_blob_sha": "d000d952a7bdb95a3d60a0b9877352a4a6d47213",
+    "current_transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "current_artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3"
+  },
+  "integrated_self_qa": {
+    "parity_shard": "PASS_ODD_INDEX_159",
+    "c_acceptance": "PASS_A00096_CONSUMED_BY_Q00011_C113",
+    "exact_stock_dds_identity": "PASS_GIT_BLOB_00F40E8B7B2C1E8C77442BB2A2E50270FFF388DD",
+    "stock_dds_decode": "PASS_512x256_DXT5_BASE_PAYLOAD_EXACT",
+    "exact_stock_atlas_identity": "PASS_GIT_BLOB_471C9E7C64CDCE948D00FE5CFCC70754DA72B0A2",
+    "semantic_binding": "PASS_15_OF_15_DIRECT_VISIBLE_SOURCE_LABELS",
+    "stock_effect_geometry": "PASS_15_OF_15_ALPHA_GT0_BBOXES",
+    "stock_orientation": "PASS_FLIP_Y_NO_X_MIRROR",
+    "release_orientation": "HOLD_EXACT_RELEASE_PIXEL_CONFIRMATION",
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
