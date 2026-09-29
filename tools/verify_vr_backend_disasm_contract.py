@@ -129,6 +129,10 @@ def main() -> None:
             "VR R121 GOAL TIME HUD: shared producer-map",
             "C2CTestSlipstream_AdjustPositionAndHud<0x000BD32Eu>",
             "VR R122 SLIPSTREAM HUD: shared producer-map handoff",
+            "C2CDontLoseGF_AdjustPositionAndHud<0x000BD397u>",
+            "C2CDontLoseGF_AdjustPositionAndHud<0x000BD414u>",
+            "C2CDontLoseGF_AdjustPositionAndHud<0x000BD472u>",
+            "VR R123 GF WARNING HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -158,6 +162,10 @@ def main() -> None:
     if "C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BD32E, put_scroll_AdjustPositionRight);" in hooks_text:
         raise SystemExit(
             "F13 C2CTestSlipstream ownership regressed to spacing-only callback"
+        )
+    if "put_scroll_AdjustPositionRight" in hooks_text:
+        raise SystemExit(
+            "F13 C2CDontLoseGF ownership regressed to legacy spacing-only callback"
         )
     require(
         "tools/analyze_outrun_exe.py",

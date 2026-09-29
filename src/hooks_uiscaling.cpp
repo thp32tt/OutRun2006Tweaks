@@ -928,9 +928,24 @@ class UIScaling : public Hook
 			*value = T(float(*value) + spacing);
 	}
 
-	static void put_scroll_AdjustPositionRight(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void C2CDontLoseGF_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CDontLoseGF callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R123 GF WARNING HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	template<std::uintptr_t CallerRva>
@@ -1377,10 +1392,18 @@ public:
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid((void*)0x4FCA51, C2CSpeechBubble_AdjustPositionESP0);
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid((void*)0x4FCB20, C2CSpeechBubble_AdjustPositionESP4);
 
-		// "don't lose your girlfriend" UI sprites
-		C2CDontLoseGF_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4BD397, put_scroll_AdjustPositionRight);
-		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BD414, put_scroll_AdjustPositionRight);
-		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BD472, put_scroll_AdjustPositionRight);
+		// R123/F13: the three exact C2CDontLoseGF producer edges are all
+		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
+		// original spacing correction and source only next-draw ownership there.
+		C2CDontLoseGF_AdjustPosition_hk1 = safetyhook::create_mid(
+			(void*)0x4BD397,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD397u>);
+		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid(
+			(void*)0x4BD414,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD414u>);
+		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid(
+			(void*)0x4BD472,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD472u>);
 
 		// R122/F13: exact C2CTestSlipstream producer is already canonical
 		// SCREEN_HUD in the shared disassembly map. Preserve the original spacing
