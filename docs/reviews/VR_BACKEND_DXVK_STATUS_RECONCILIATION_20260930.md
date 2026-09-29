@@ -1,14 +1,18 @@
 # DXVK Status Reconciliation Review — CONVERSION-DXVK-00095
 
-Status: RESULT_REVIEW_PENDING_AUTOMATION_VALIDATION
+Status: SUPERSEDED_BY_VALIDATED_SOURCE_RESULT
 Branch: vr-dxvk-r71-disasm
 Base SHA: 8d8275951ce2da04c4eb41acd559d6e01e1f9dff
 Runtime validation: UNTESTED
-Runtime source change: none
+This review note's own runtime source change: none
+Task source result: f5374416de2db3c77be7da787320cdae47de1a8e
+Validation-bearing descendant: 0a9471b603623e77ec51ac0a85d11341690b1d58
 
 ## Scope
 
 This bounded C1 review follows the CONVERSION-DXVK-00093 handoff. It does not tune copy/wait/cadence behavior and does not claim Quest 3/VDXR runtime correctness. Its purpose is to reconcile historical review-set statements with the current DXVK software-closure evidence so later automated runs do not reopen already-closed work.
+
+> Post-validation reconciliation: this document was authored concurrently and landed as a docs-only child of source result `f5374416de2db3c77be7da787320cdae47de1a8e`. Its original "no renderer/runtime source change" conclusion applied only to this review note, not to the whole task. The actual selected work for `CONVERSION-DXVK-00095` is the bounded Set 04/F13 live adoption of the shared producer map for 15 exact `DispTimeAttack2D` callsites. The child changes only this review document, so the source blobs are unchanged and were validated through the exact descendant.
 
 ## Five-lens review
 
@@ -61,6 +65,6 @@ The remaining DXVK lane gates are hardware/runtime evidence, not an invitation f
 
 ## Decision
 
-CONVERSION-DXVK-00095 makes no renderer, transport, selector, package or runtime-policy change. The correct autonomous action is to keep the above software findings closed, keep RUNTIME_VALIDATION=UNTESTED, and avoid copy/wait/cadence or multiview changes until exact-build HMD evidence exists.
+This concurrent review note itself makes no renderer, transport, selector, package or runtime-policy change. However, the task source result `f5374416de2db3c77be7da787320cdae47de1a8e` does make one bounded behavior-preserving source change: the 15 already-proven `DispTimeAttack2D` exact callsites now derive their existing `SCREEN_HUD` handoff from the centralized disassembly producer map. No producer range was widened.
 
-Automation validation of this exact result commit is required before the task is recorded complete.
+The docs-only child `0a9471b603623e77ec51ac0a85d11341690b1d58` preserved those source blobs and passed Backend Conversion Gate `36639004847`, Build `36639011795`, OpenXR architecture `36639011760` (6/6 jobs), HUD Inspector `36639011771`, and hosted-package runs `36639011911`/`36639004952`. Therefore the original no-source-change conclusion is superseded. `RUNTIME_VALIDATION=UNTESTED` remains mandatory because no Quest 3/VDXR or in-game run was performed.
