@@ -104,6 +104,17 @@ jobs:
           & $smoke.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 input-signature semantic smoke failed with exit code $LASTEXITCODE" }
 
+      - name: Build DX11 input-layout object probe
+        run: cmake --build build-auto --config Release --target dx11_input_layout_object_probe
+
+      - name: Run DX11 input-layout object probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_input_layout_object_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 input-layout object probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 input-layout object probe failed with exit code $LASTEXITCODE" }
+
       - name: Verify binary exists
         shell: pwsh
         run: |

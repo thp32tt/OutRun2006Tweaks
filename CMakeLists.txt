@@ -825,3 +825,35 @@ target_link_libraries(dx11_input_signature_semantics PUBLIC
     d3d11.lib
     dxguid.lib
 )
+
+# Target: dx11_input_layout_object_probe
+set(dx11_input_layout_object_probe_SOURCES
+    "tools/dx11_input_layout_object_probe.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_input_layout_object_probe)
+
+target_sources(dx11_input_layout_object_probe PRIVATE ${dx11_input_layout_object_probe_SOURCES})
+
+target_compile_features(dx11_input_layout_object_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_input_layout_object_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_input_layout_object_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_input_layout_object_probe PUBLIC
+    d3dcompiler.lib
+    d3d11.lib
+)
+

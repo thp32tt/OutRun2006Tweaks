@@ -19,6 +19,9 @@ INPUT_LAYOUT_SMOKE = (
 INPUT_SIGNATURE_SMOKE = (
     ROOT / "tools" / "dx11_input_signature_semantics.cpp"
 ).read_text(encoding="utf-8")
+INPUT_LAYOUT_OBJECT_PROBE = (
+    ROOT / "tools" / "dx11_input_layout_object_probe.cpp"
+).read_text(encoding="utf-8")
 
 
 def main() -> None:
@@ -593,6 +596,50 @@ def main() -> None:
         if token not in BACKEND_GATE:
             raise SystemExit(
                 "DX11 R89 input-signature semantic smoke missing from Backend Conversion Gate: "
+                + token
+            )
+
+    r90_smoke_contract = {
+        "D3D11CreateDevice": "R90 hosted D3D11 device creation",
+        "D3D_DRIVER_TYPE_WARP": "R90 deterministic hosted WARP device",
+        "CreateInputLayout": "R90 real D3D11 input-layout object creation",
+        "D3DFVF_XYZB5": "R90 split BLENDWEIGHT0/1 object case",
+        "D3DFVF_LASTBETA_UBYTE4": "R90 UINT BLENDINDICES object case",
+        "D3DFVF_NORMAL": "R90 blended NORMAL object case",
+        "DX11 input layout object probe R90: PASS": "R90 probe completion marker",
+    }
+    missing_r90_smoke = [
+        meaning
+        for token, meaning in r90_smoke_contract.items()
+        if token not in INPUT_LAYOUT_OBJECT_PROBE
+    ]
+    if missing_r90_smoke:
+        raise SystemExit(
+            "DX11 R90 input-layout object probe drift: "
+            + ", ".join(missing_r90_smoke)
+        )
+
+    for graph_name, graph in (
+        ("checked-in CMake", CMAKE),
+        ("cmake.toml", CMAKE_TOML),
+    ):
+        if "dx11_input_layout_object_probe" not in graph:
+            raise SystemExit(
+                f"DX11 R90 input-layout object target missing from {graph_name}"
+            )
+        if "tools/dx11_input_layout_object_probe.cpp" not in graph:
+            raise SystemExit(
+                f"DX11 R90 input-layout object source missing from {graph_name}"
+            )
+
+    for token in (
+        "Build DX11 input-layout object probe",
+        "Run DX11 input-layout object probe",
+        "dx11_input_layout_object_probe",
+    ):
+        if token not in BACKEND_GATE:
+            raise SystemExit(
+                "DX11 R90 input-layout object probe missing from Backend Conversion Gate: "
                 + token
             )
 
