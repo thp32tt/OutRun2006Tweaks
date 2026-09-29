@@ -120,8 +120,19 @@ if ($allowed -notcontains [string]$target.LaunchBackend) {
 }
 
 $startHere = Get-Content (Join-Path $toolsRoot 'START_HERE_VR_TEST.cmd') -Raw
-if ($startHere -notmatch 'Invoke-OutRunVROneClick\.ps1') {
-    throw 'START_HERE_VR_TEST.cmd does not route through the one-click launcher.'
+if ($startHere -notmatch 'OutRunVR-Test-Selector\.ps1') {
+    throw 'START_HERE_VR_TEST.cmd does not route through the evening selector.'
+}
+$startupSelector = Get-Content (Join-Path $toolsRoot 'OutRunVR-Test-Selector.ps1') -Raw
+foreach ($requiredText in @(
+    'Invoke-OutRunVROneClick.ps1',
+    '& $launcher -Backend $backendValue -TestProfile $profileValue -VariantId AUTO -AllowTargetOverride',
+    'DXVK SAFE - 오늘 밤 기본 테스트',
+    'CORRECTNESS - 화면/HUD/렌즈플레어 우선'
+)) {
+    if ($startupSelector -notmatch [regex]::Escape($requiredText)) {
+        throw "Evening selector one-click routing contract missing: $requiredText"
+    }
 }
 
 $launcherText = Get-Content (Join-Path $toolsRoot 'Invoke-OutRunVROneClick.ps1') -Raw
