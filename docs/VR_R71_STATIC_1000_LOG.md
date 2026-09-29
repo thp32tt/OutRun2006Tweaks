@@ -829,3 +829,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: inspect stage marker/head-follow ownership.
+
+
+## Cycle 0037 — stage marker/head-follow exact scope
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- ProjectedWorldMarker2D is intentionally an exact queue owner distinct from ScreenHud and WorldBillboard. Head-follow/stereo errors in stage/rank markers should preserve that distinction; collapsing them into ScreenHud would destroy world-anchor semantics.
+- Evidence: RenderScope::ProjectedWorldMarker2D and IsExactHudScope.
+- No production/runtime behavior changed; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: inspect rival marker vehicle/world anchor.
