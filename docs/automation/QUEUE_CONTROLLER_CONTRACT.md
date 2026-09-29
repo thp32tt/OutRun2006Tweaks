@@ -51,7 +51,9 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - Maximum automatic repair attempts: 3 per asset for the same dependency/input fingerprint.
 - After 3 failed attempts, record the blocker and immediately move to another independent runnable asset in the same lane/run.
 - Do not retry that blocker in later waves until its dependency fingerprint changes (source/candidate bytes, runtime evidence, relevant QA input/contract, or explicit user instruction).
-- A/B should batch up to 4 newly created or materially reworked DDS candidates per lane per invocation and MUST produce at least one material deliverable while unfinished graphics work remains.
+- A/B should batch up to 4 newly created or materially reworked DDS candidates per lane per invocation. While unfinished localizable graphics work remains, a non-DDS material deliverable is only a fallback when a fresh post-evidence scan proves no candidate-completion path is runnable.
+- Before dispatch/selection, the controller MUST consume explicit render handoffs from the latest producer/C evidence (`RENDER_READY`, `KOREAN_RENDER_NEXT`, `CLEAN_PLATE_READY...KOREAN_RENDER_NEXT`, or equivalent) ahead of unrelated preflight or runtime-isolation fallback. A C-accepted render-next handoff is sticky until a candidate is attempted or a new deterministic blocker is recorded.
+- If an A/B invocation itself creates the final prerequisite and reaches render-ready, it MUST continue in that invocation rather than relying on a future queue cycle.
 - Zero-output terminals such as NO_ACTION/BLOCKED_NO_ACTION are invalid while unfinished graphics work remains.
 - If no safe DDS rewrite is currently possible, create a material fallback deliverable: resolve a zoom-review classification, create a single-DDS isolation manifest/input set with exact hashes, create new per-element reconstruction metrics/specs, or add deterministic asset-specific rebuild/QA tooling plus new machine-readable output.
 - Generic blocker prose, an unchanged task record, timestamps, worklog-only edits, and empty commits do not count as progress.
