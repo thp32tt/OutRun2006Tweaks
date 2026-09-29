@@ -2389,3 +2389,38 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS / OPENXR_PENDING`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: consume OpenXR then diagnostics.
+
+
+## Cycle 0141 — DX9EX-SELECTOR-WHITE-CAR-001 resource-path isolation
+
+User symptom:
+- DX9Ex vehicle-selection 3D car is white/colorless.
+- The same selection content is reported normal on DXVK.
+
+Runtime evidence recovered from the R69 user log:
+- exact 2048x2048 selector reserve became active;
+- a separate 2048x1024 A8R8G8B8 single-level MANAGED texture then failed SYSTEMMEM CPU-shadow allocation with `0x8876017C` and fell back to DirectOnly;
+- later in the same pre-game/menu-selection interval a translated MANAGED `LockRect` failed with `0x8876086C`.
+This proves that the existing 2048x2048 reserve alone cannot close the selector color regression.
+
+Changes:
+- `ex_device_upgrade_r13.cpp`: first translated-MANAGED LockRect failure now logs exact level, flags, rect, desc size/format and level count.
+- `ex_device_upgrade_r14.cpp`: reserved 2048x2048 selector/car atlas identity is retained in the shadow entry and the first successful CPU-shadow upload is logged explicitly.
+- `verify_vr_proven_baseline.py`: guards both diagnostics.
+- No rendering/material/color/budget behavior changed.
+
+Commits:
+- `460d37f9ae4b2c464d16f0010fe12b30445fbe27`
+- `f6b9ac4b2574c427aeaa249551745d7548ec5c69`
+- `9e43c84d9b066578d2381581a1bc621302832a00`
+
+Validation:
+- Build: `36520937261 / 36520936853` queued
+- OpenXR architecture: `36520937270 / 36520936857` queued
+- HUD Inspector: `36520937302 / 36520936795` queued
+- AUTOMATION_VALIDATION: `SELECTOR_RESOURCE_DIAGNOSTIC_CONTRACT_ADDED / EXACT_HEAD_CI_QUEUED`
+- RUNTIME_VALIDATION: `USER_REPORTED_DX9EX_BAD_DXVK_GOOD / NEED_HMD_LOG`
+
+Next:
+- If the next log proves the exact 2048x2048 upload succeeds while the failing LockRect is the 2048x1024 single-level texture, fix that proven resource class with bounded CPU backing/direct upload semantics.
+- Do not increase global budgets or force material/color values.
