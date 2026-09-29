@@ -1,0 +1,649 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-index152-pixel-mask-style-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00152",
+  "wave_id": "P00072",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-29T22:16:00+09:00",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_indices": [
+      152
+    ],
+    "selected_assets": [
+      "49BB5FE5"
+    ],
+    "basis": "C125/Q00023 passed B00144 index152 as PREFLIGHT_ONLY_NARROWED and explicitly prioritized per-pixel removal/protected masks, CLEAN_PLATE, typography/slant, render/refit and exact candidate QA. This invocation advances the first deterministic unresolved stage only.",
+    "qa_pending_skipped": [
+      112
+    ],
+    "odd_shards_touched": [],
+    "work_steal": "NONE"
+  },
+  "exact_source": {
+    "repository": "envido32/OR2006Sprites",
+    "ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+    "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+    "canonical_sha256_from_C125": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+    "dimensions": [
+      512,
+      128
+    ],
+    "format": "DXT5_BC3",
+    "mip_count": 1,
+    "source_text_transform": "flip_y"
+  },
+  "reused_accepted_geometry": {
+    "producer": "LOCALIZATION-LOCALIZATION_B-00104",
+    "c_acceptance": "LOCALIZATION-LOCALIZATION_C-00116",
+    "c125_requalification": "LOCALIZATION-LOCALIZATION_C-00150",
+    "effect_bboxes": "REUSED_UNCHANGED_4_OF_4",
+    "safe_bboxes": "REUSED_UNCHANGED_4_OF_4",
+    "heavy_qa_recomputed": false
+  },
+  "pixel_mask_materialization": {
+    "mask_artifact_path": "localization/graphics/role_B/20260929-2216-B00152-P00072/B00152_P00072_INDEX152_MASKS_RLE.json",
+    "mask_artifact_git_blob_sha": "8741d01415e2d1333222c3e982a9e6e402967e23",
+    "rule": "Per element, exact raw decoded pixels inside accepted full-effect bbox; alpha>16; RGB-distance from accepted dominant background >=10. No dilation applied because C115 bbox stability plus connected-component structure captures full visible effect footprint without crossing the effect envelope.",
+    "removal_union_pixels": 5876,
+    "per_element_removal_pixels": [
+      1688,
+      1546,
+      1449,
+      1193
+    ],
+    "connected_component_expected_structure": "PASS_4_OF_4; PRO=3 groups (P / connected R-O / period), INS=4, G.M.=4, E.R.=4",
+    "removal_bbox_equals_accepted_effect_bbox": "PASS_4_OF_4",
+    "clean_plate_protected_mask": "MATERIALIZED_AS_COMPLEMENT_OF_REMOVAL_UNION",
+    "candidate_allowed_mask": "MATERIALIZED_AS_UNION_OF_FOUR_C115_V2_SAFE_BBOXES",
+    "final_candidate_protected_mask": "MATERIALIZED_AS_COMPLEMENT_OF_CANDIDATE_ALLOWED",
+    "preserve_original_year_cells": "PASS_EXPLICIT_EDIT_FORBIDDEN_2_OF_2"
+  },
+  "typography_and_style_measurement": {
+    "fill_family": "opaque white core with BC3 antialias/effect transition into flat colored cell background",
+    "alpha": "effect bboxes decode fully opaque alpha=255; no alpha gradient may be invented",
+    "elements": [
+      {
+        "source": "PRO.",
+        "korean": "프로",
+        "sprite": "sprite_832",
+        "dominant_bg_rgb": [
+          143,
+          62,
+          120
+        ],
+        "raw_cell_ltrb_exclusive": [
+          0,
+          0,
+          116,
+          48
+        ],
+        "raw_effect_bbox_ltrb_exclusive": [
+          18,
+          7,
+          104,
+          41
+        ],
+        "readable_effect_bbox_ltrb_exclusive": [
+          18,
+          87,
+          104,
+          121
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          20,
+          9,
+          102,
+          39
+        ],
+        "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+          20,
+          89,
+          102,
+          119
+        ],
+        "removal_rule": "inside C115/C125-approved effect bbox AND alpha>16 AND euclidean RGB distance from dominant cell background >=10",
+        "removal_pixels": 1688,
+        "removal_bbox_raw_ltrb_exclusive": [
+          18,
+          7,
+          104,
+          41
+        ],
+        "white_core_pixels_rgb_distance_to_255_le_15": 1277,
+        "white_core_bbox_raw_ltrb_exclusive": [
+          19,
+          7,
+          103,
+          40
+        ],
+        "connected_components_8": [
+          {
+            "pixels": 1146,
+            "bbox_raw_ltrb_exclusive": [
+              45,
+              7,
+              93,
+              41
+            ]
+          },
+          {
+            "pixels": 482,
+            "bbox_raw_ltrb_exclusive": [
+              18,
+              8,
+              42,
+              40
+            ]
+          },
+          {
+            "pixels": 60,
+            "bbox_raw_ltrb_exclusive": [
+              96,
+              8,
+              104,
+              16
+            ]
+          }
+        ],
+        "signed_slant_component_measurements_readable": [
+          {
+            "area": 1146,
+            "readable_bbox": [
+              45,
+              87,
+              93,
+              121
+            ],
+            "top_left": 45,
+            "bottom_left": 45,
+            "top_right": 91,
+            "bottom_right": 91,
+            "dx_left": 0,
+            "dx_right": 0,
+            "slant_dx_per_dy": 0,
+            "slant_angle_deg": 0
+          },
+          {
+            "area": 482,
+            "readable_bbox": [
+              18,
+              88,
+              42,
+              120
+            ],
+            "top_left": 18,
+            "bottom_left": 18,
+            "top_right": 40,
+            "bottom_right": 25,
+            "dx_left": 0,
+            "dx_right": 15,
+            "slant_dx_per_dy": 0.234375,
+            "slant_angle_deg": 13.19061071220685
+          }
+        ],
+        "alpha_observed_in_effect_bbox": "255_ONLY",
+        "typography_status": "MEASURED_CORE_EFFECT_GEOMETRY; FAMILY_SLANT_NEAR_UPRIGHT_WITH_PRO_SHAPE_BIAS_REQUIRES_VISUAL_CONFIRMATION_BEFORE_RENDER"
+      },
+      {
+        "source": "INS.",
+        "korean": "연주",
+        "sprite": "sprite_833",
+        "dominant_bg_rgb": [
+          107,
+          161,
+          77
+        ],
+        "raw_cell_ltrb_exclusive": [
+          116,
+          0,
+          232,
+          48
+        ],
+        "raw_effect_bbox_ltrb_exclusive": [
+          136,
+          6,
+          214,
+          41
+        ],
+        "readable_effect_bbox_ltrb_exclusive": [
+          136,
+          87,
+          214,
+          122
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          138,
+          8,
+          212,
+          39
+        ],
+        "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+          138,
+          89,
+          212,
+          120
+        ],
+        "removal_rule": "inside C115/C125-approved effect bbox AND alpha>16 AND euclidean RGB distance from dominant cell background >=10",
+        "removal_pixels": 1546,
+        "removal_bbox_raw_ltrb_exclusive": [
+          136,
+          6,
+          214,
+          41
+        ],
+        "white_core_pixels_rgb_distance_to_255_le_15": 1246,
+        "white_core_bbox_raw_ltrb_exclusive": [
+          137,
+          7,
+          214,
+          40
+        ],
+        "connected_components_8": [
+          {
+            "pixels": 632,
+            "bbox_raw_ltrb_exclusive": [
+              154,
+              7,
+              178,
+              40
+            ]
+          },
+          {
+            "pixels": 506,
+            "bbox_raw_ltrb_exclusive": [
+              182,
+              6,
+              205,
+              41
+            ]
+          },
+          {
+            "pixels": 352,
+            "bbox_raw_ltrb_exclusive": [
+              136,
+              7,
+              152,
+              40
+            ]
+          },
+          {
+            "pixels": 56,
+            "bbox_raw_ltrb_exclusive": [
+              207,
+              7,
+              214,
+              15
+            ]
+          }
+        ],
+        "signed_slant_component_measurements_readable": [
+          {
+            "area": 632,
+            "readable_bbox": [
+              154,
+              88,
+              178,
+              121
+            ],
+            "top_left": 154,
+            "bottom_left": 154,
+            "top_right": 177,
+            "bottom_right": 177,
+            "dx_left": 0,
+            "dx_right": 0,
+            "slant_dx_per_dy": 0,
+            "slant_angle_deg": 0
+          },
+          {
+            "area": 506,
+            "readable_bbox": [
+              182,
+              87,
+              205,
+              122
+            ],
+            "top_left": 183,
+            "bottom_left": 184,
+            "top_right": 200,
+            "bottom_right": 203,
+            "dx_left": -1,
+            "dx_right": -3,
+            "slant_dx_per_dy": -0.05714285714285714,
+            "slant_angle_deg": -3.2704879231835657
+          },
+          {
+            "area": 352,
+            "readable_bbox": [
+              136,
+              88,
+              152,
+              121
+            ],
+            "top_left": 140,
+            "bottom_left": 136,
+            "top_right": 147,
+            "bottom_right": 151,
+            "dx_left": 4,
+            "dx_right": -4,
+            "slant_dx_per_dy": 0,
+            "slant_angle_deg": 0
+          }
+        ],
+        "alpha_observed_in_effect_bbox": "255_ONLY",
+        "typography_status": "MEASURED_CORE_EFFECT_GEOMETRY; FAMILY_SLANT_NEAR_UPRIGHT_WITH_PRO_SHAPE_BIAS_REQUIRES_VISUAL_CONFIRMATION_BEFORE_RENDER"
+      },
+      {
+        "source": "G.M.",
+        "korean": "기타",
+        "sprite": "sprite_834",
+        "dominant_bg_rgb": [
+          244,
+          104,
+          46
+        ],
+        "raw_cell_ltrb_exclusive": [
+          232,
+          0,
+          348,
+          48
+        ],
+        "raw_effect_bbox_ltrb_exclusive": [
+          252,
+          7,
+          333,
+          41
+        ],
+        "readable_effect_bbox_ltrb_exclusive": [
+          252,
+          87,
+          333,
+          121
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          254,
+          9,
+          331,
+          39
+        ],
+        "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+          254,
+          89,
+          331,
+          119
+        ],
+        "removal_rule": "inside C115/C125-approved effect bbox AND alpha>16 AND euclidean RGB distance from dominant cell background >=10",
+        "removal_pixels": 1449,
+        "removal_bbox_raw_ltrb_exclusive": [
+          252,
+          7,
+          333,
+          41
+        ],
+        "white_core_pixels_rgb_distance_to_255_le_15": 1066,
+        "white_core_bbox_raw_ltrb_exclusive": [
+          253,
+          7,
+          332,
+          40
+        ],
+        "connected_components_8": [
+          {
+            "pixels": 770,
+            "bbox_raw_ltrb_exclusive": [
+              290,
+              8,
+              321,
+              40
+            ]
+          },
+          {
+            "pixels": 570,
+            "bbox_raw_ltrb_exclusive": [
+              252,
+              7,
+              276,
+              41
+            ]
+          },
+          {
+            "pixels": 60,
+            "bbox_raw_ltrb_exclusive": [
+              324,
+              8,
+              333,
+              15
+            ]
+          },
+          {
+            "pixels": 49,
+            "bbox_raw_ltrb_exclusive": [
+              279,
+              8,
+              286,
+              15
+            ]
+          }
+        ],
+        "signed_slant_component_measurements_readable": [
+          {
+            "area": 770,
+            "readable_bbox": [
+              290,
+              88,
+              321,
+              120
+            ],
+            "top_left": 290,
+            "bottom_left": 290,
+            "top_right": 320,
+            "bottom_right": 320,
+            "dx_left": 0,
+            "dx_right": 0,
+            "slant_dx_per_dy": 0,
+            "slant_angle_deg": 0
+          },
+          {
+            "area": 570,
+            "readable_bbox": [
+              252,
+              87,
+              276,
+              121
+            ],
+            "top_left": 254,
+            "bottom_left": 253,
+            "top_right": 273,
+            "bottom_right": 275,
+            "dx_left": 1,
+            "dx_right": -2,
+            "slant_dx_per_dy": -0.014705882352941176,
+            "slant_angle_deg": -0.8425242607404146
+          }
+        ],
+        "alpha_observed_in_effect_bbox": "255_ONLY",
+        "typography_status": "MEASURED_CORE_EFFECT_GEOMETRY; FAMILY_SLANT_NEAR_UPRIGHT_WITH_PRO_SHAPE_BIAS_REQUIRES_VISUAL_CONFIRMATION_BEFORE_RENDER"
+      },
+      {
+        "source": "E.R.",
+        "korean": "유로",
+        "sprite": "sprite_835",
+        "dominant_bg_rgb": [
+          192,
+          60,
+          63
+        ],
+        "raw_cell_ltrb_exclusive": [
+          348,
+          0,
+          464,
+          48
+        ],
+        "raw_effect_bbox_ltrb_exclusive": [
+          374,
+          8,
+          444,
+          40
+        ],
+        "readable_effect_bbox_ltrb_exclusive": [
+          374,
+          88,
+          444,
+          120
+        ],
+        "candidate_safe_bbox_raw_ltrb_exclusive_2px": [
+          376,
+          10,
+          442,
+          38
+        ],
+        "candidate_safe_bbox_readable_ltrb_exclusive_2px": [
+          376,
+          90,
+          442,
+          118
+        ],
+        "removal_rule": "inside C115/C125-approved effect bbox AND alpha>16 AND euclidean RGB distance from dominant cell background >=10",
+        "removal_pixels": 1193,
+        "removal_bbox_raw_ltrb_exclusive": [
+          374,
+          8,
+          444,
+          40
+        ],
+        "white_core_pixels_rgb_distance_to_255_le_15": 940,
+        "white_core_bbox_raw_ltrb_exclusive": [
+          375,
+          8,
+          443,
+          40
+        ],
+        "connected_components_8": [
+          {
+            "pixels": 579,
+            "bbox_raw_ltrb_exclusive": [
+              410,
+              8,
+              434,
+              40
+            ]
+          },
+          {
+            "pixels": 505,
+            "bbox_raw_ltrb_exclusive": [
+              374,
+              8,
+              397,
+              40
+            ]
+          },
+          {
+            "pixels": 60,
+            "bbox_raw_ltrb_exclusive": [
+              436,
+              8,
+              444,
+              16
+            ]
+          },
+          {
+            "pixels": 49,
+            "bbox_raw_ltrb_exclusive": [
+              400,
+              8,
+              407,
+              15
+            ]
+          }
+        ],
+        "signed_slant_component_measurements_readable": [
+          {
+            "area": 579,
+            "readable_bbox": [
+              410,
+              88,
+              434,
+              120
+            ],
+            "top_left": 410,
+            "bottom_left": 410,
+            "top_right": 432,
+            "bottom_right": 431,
+            "dx_left": 0,
+            "dx_right": 1,
+            "slant_dx_per_dy": 0.015625,
+            "slant_angle_deg": 0.8951737102110744
+          },
+          {
+            "area": 505,
+            "readable_bbox": [
+              374,
+              88,
+              397,
+              120
+            ],
+            "top_left": 374,
+            "bottom_left": 374,
+            "top_right": 395,
+            "bottom_right": 396,
+            "dx_left": 0,
+            "dx_right": -1,
+            "slant_dx_per_dy": -0.015625,
+            "slant_angle_deg": -0.8951737102110744
+          }
+        ],
+        "alpha_observed_in_effect_bbox": "255_ONLY",
+        "typography_status": "MEASURED_CORE_EFFECT_GEOMETRY; FAMILY_SLANT_NEAR_UPRIGHT_WITH_PRO_SHAPE_BIAS_REQUIRES_VISUAL_CONFIRMATION_BEFORE_RENDER"
+      }
+    ],
+    "family_slant_assessment": {
+      "status": "PARTIAL_PASS_NEAR_UPRIGHT_FAMILY__PRO_COMPONENT_SHAPE_BIAS_PREVENTS_FINAL_SIGN_LOCK",
+      "interpretation": "Most stable paired-edge component measurements are near 0 degrees; PRO.'s P-like component has asymmetric right-edge movement caused by glyph bowl/shape and is not treated as an independent slant stem. Do not render until a visual source comparison confirms final signed-slant sign/magnitude.",
+      "production_gate": "HOLD_SIGNED_SLANT_VISUAL_CONFIRMATION"
+    }
+  },
+  "clean_plate": {
+    "status": "HOLD_NOT_GENERATED",
+    "reason": "This task materializes exact source/removal/protection masks only. Background reconstruction is an image edit and must be independently produced/validated against the exact source; no guessed flat-color fill is emitted."
+  },
+  "korean_candidate": {
+    "status": "HOLD_NO_CANDIDATE",
+    "reason": "CLEAN_PLATE and final signed-slant/style confirmation remain prerequisites. No DDS/PNG candidate bytes are changed."
+  },
+  "self_qa": {
+    "parity": "PASS_EVEN_ONLY_INDEX152",
+    "source_identity": "PASS_SAME_IMMUTABLE_GIT_BLOB_0288BABB_ACCEPTED_BY_C125",
+    "removal_masks": "PASS_4_OF_4_PER_PIXEL_MATERIALIZED",
+    "protected_masks": "PASS_CLEAN_PLATE_AND_FINAL_PROTECTION_MATERIALIZED",
+    "removal_bbox_containment": "PASS_4_OF_4_EXACTLY_WITHIN_ACCEPTED_EFFECT_BBOX",
+    "candidate_safe_regions": "PASS_4_OF_4_REUSED_C115_2PX_SAFE_BBOX",
+    "preserve_years": "PASS_2_OF_2_EDIT_FORBIDDEN",
+    "candidate_write": "NONE_FAIL_CLOSED",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "Index152 now has exact per-pixel source-removal and protected-mask material plus measured core/effect/style evidence tied to the C125-accepted canonical source. CLEAN_PLATE, final signed-slant lock, Korean render, BC3 round-trip candidate QA and runtime remain fail-closed.",
+  "precommit_head_sha": "ee7c19d3deb372155ba430de3874b0856992ef99",
+  "preserved_peer_head": true,
+  "preserved_peer_commit": {
+    "sha": "ee7c19d3deb372155ba430de3874b0856992ef99",
+    "message": "localization(C): QA Q00024 batch and reconcile shared state [AUTO:LOCALIZATION-LOCALIZATION_C-00153]"
+  }
+}
