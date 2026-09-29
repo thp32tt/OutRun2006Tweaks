@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T03:09:00+09:00",
+  "updated_at_kst": "2026-09-30T03:20:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -644,12 +644,13 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_c_batch_qa": {
-      "recorded_at_kst": "2026-09-30T03:09:00+09:00",
+      "recorded_at_kst": "2026-09-30T03:20:00+09:00",
       "task_id": "LOCALIZATION-LOCALIZATION_C-00194",
+      "attempt": "2/3",
       "qa_batch_id": "Q00038",
       "run": "C140",
-      "result": "PASS_Q00038_B00190_INDICES46_100_106_PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_RUNTIME_UNTESTED",
-      "base_head": "fb77355a1222d612da79d8da92c805128598d435",
+      "result": "REWORK_REQUIRED_Q00038_B00190_IMMUTABLE_RESULT_MISSING_DURABLE_TASK_RECORD_RUNTIME_UNTESTED",
+      "base_head": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
       "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
       "current_controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
       "qa_batch_inputs": [
@@ -668,20 +669,20 @@
         {
           "task_id": "LOCALIZATION-LOCALIZATION_B-00190",
           "result_sha": "5969fd310d7d1311977effb967d24c31354d6811",
-          "status": "PASS",
-          "reason": "Exact B00190 pre-generation evidence is accepted as PREFLIGHT_ONLY source-acquisition exhaustion for indices46/AA04D779,100/53CE39D5,106/788CE557. C independently listed the approved ezflash557 Drive exact parents: the index46 parent contains only FF2462BB_1024x512.dds and the selector parent contains FD90AA9_1024x1024.dds, C075FB49_512x512.dds, 411827E_512x512.dds and 2DA43E41_1024x1024.dds, so all three requested exact files are absent. Current inventory fingerprint 5a3d3b09... requires 512x512 RGBA SHA 5a4ca513..., 512x512 RGBA SHA 3bfea388..., and 512x256 RGBA SHA b9e7d15a.... Pinned v0.25.10a commit 55f67a8 independently resolves blobs 7779ac9b..., d891aca5..., and 42a0d3f1...; their exact byte sizes reproduce the previously C-accepted 2048x2048, 2048x2048, and 2048x1024 RGBA32 single-mip lineages, all 4x canvas mismatches versus canonical inventory. C136's verified 306223257-byte / SHA-256 76f85ed2... pinned bundle identity is reused because source/contract/inventory fingerprints are unchanged. Current semantics remain 21/21, 7/7, and 3 localizable strings with OutRun2SP protected original. No exact canonical source or Korean candidate exists, so candidate-only gates are not promoted. production_readiness=PREFLIGHT_ONLY for all three; RUNTIME_VALIDATION=UNTESTED."
+          "status": "REWORK_REQUIRED",
+          "reason": "REWORK_REQUIRED: immutable producer result 5969fd310d7d1311977effb967d24c31354d6811 carries the exact B00190 AUTO marker and lane-local source-exhaustion material report, but it does not contain docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00190.json in the same result commit. The durable task record was staged separately in parent dc1694e42af30a422614b31cd9b7038a11de5b29. Localization Automation Gate run 36611016649 failed at 'Verify exact producer SHAs in C batch' when strict PASS validation invoked the producer commit checks. Prior source/semantic heavy-QA fingerprints are unchanged and may be reused after B00190 is atomically re-emitted with its durable task record; no Q00038 readiness/static/runtime promotion is accepted from this malformed result. RUNTIME_VALIDATION=UNTESTED."
         }
       ],
-      "source_identity_validation": "PASS_CURRENT_INVENTORY_5A3D3B09__DRIVE_EXACT_PARENT_MISS_3_OF_3__PINNED_DIRECT_BLOBS_7779AC9B_D891ACA5_42A0D3F1__CANONICAL_CANVAS_MISMATCH_3_OF_3",
-      "canonical_semantic_validation": "PASS_INDEX46_21_OF_21__INDEX100_7_OF_7__INDEX106_3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE__NO_METADATA_CHANGE",
-      "geometry_mapping_validation": "NOT_PROMOTED_INDICES46_100_106_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE",
-      "current_contract_compatibility": "PASS_B00190_EXACT_RESULT_PREFLIGHT_EVIDENCE_NO_DDS__EXACT_PRODUCER_SHA_GATE_ELIGIBLE",
+      "source_identity_validation": "REUSED_UNCHANGED_PRIOR_C_SOURCE_FINGERPRINT__NOT_PROMOTED_BECAUSE_PRODUCER_RESULT_CONTRACT_FAILS",
+      "canonical_semantic_validation": "REUSED_UNCHANGED_INDEX46_21_OF_21__INDEX100_7_OF_7__INDEX106_3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE__NOT_PROMOTED",
+      "geometry_mapping_validation": "NOT_PROMOTED_NO_CANDIDATE_DDS_AND_PRODUCER_RESULT_REWORK_REQUIRED",
+      "current_contract_compatibility": "FAIL_B00190_RESULT_SHA_MISSING_SAME_COMMIT_DURABLE_TASK_RECORD",
       "readiness_reconciliation": {
-        "classification": "THREE_PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_NO_CANDIDATES",
+        "classification": "PRODUCER_RESULT_CONTRACT_REWORK_REQUIRED_NO_Q00038_READINESS_PROMOTION",
         "production_readiness": {
-          "46": "PREFLIGHT_ONLY",
-          "100": "PREFLIGHT_ONLY",
-          "106": "PREFLIGHT_ONLY"
+          "46": "NOT_PROMOTED_REWORK_REQUIRED",
+          "100": "NOT_PROMOTED_REWORK_REQUIRED",
+          "106": "NOT_PROMOTED_REWORK_REQUIRED"
         },
         "render_ready_indices": [],
         "one_stage_to_render_indices": [],
@@ -689,11 +690,8 @@
           30,
           34,
           36,
-          46,
           48,
           52,
-          100,
-          106,
           132,
           154,
           164,
@@ -708,39 +706,33 @@
           237
         ],
         "candidate_completion_priority": [
-          "RENDER_READY: none newly created by Q00038. Recent indices99/112/130/152/237 are already rendered STATIC_QA PASS candidates; do not rerender them. Runtime/final approval remains separate and requires real-game evidence.",
-          "ONE_STAGE_TO_RENDER: none proven by Q00038. Preserve and consume any newer candidate-bearing or direct REWORK_REQUIRED producer results before unrelated source-acquisition preflight; producer results outside QA_BATCH_INPUTS receive no implicit disposition.",
-          "PREFLIGHT_ONLY: indices46/100/106 are now source-acquisition-exhausted on unchanged approved Drive/direct/Release/inventory fingerprints. Together with existing 30/34/36/48/52/132/154/164/172/228, do not repeat source probes until approved source/inventory fingerprints change. Newer producer results after B00190 remain separate QA backlog items."
+          "RENDER_READY: none newly promoted by Q00038 ATTEMPT2. Indices99/112/130/152/237 remain already-rendered STATIC_QA PASS candidates; runtime/final approval remains separate and requires real-game evidence.",
+          "ONE_STAGE_TO_RENDER: none proven by this batch. B00190 requires producer-result contract repair before C may consume its unchanged pre-generation evidence; newer candidate-bearing/direct-rework producer results remain ahead of unrelated preflight.",
+          "PREFLIGHT_ONLY: keep accepted source-exhausted indices30/34/36/48/52/132/154/164/172/228 unchanged. Indices46/100/106 are NOT newly promoted by Q00038 ATTEMPT2; re-emit B00190 atomically with its durable task record, then reuse unchanged source/semantic evidence without repeating heavy source probes."
         ]
       },
       "heavy_qa_reuse": {
-        "b00190_drive_check": {
-          "index46_parent_folder_id": "1XcE9G3jb9V8mx-aLyQqyJL7uc_mKT5tu",
-          "selector_parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
-          "exact_path_misses": 3,
-          "result": "PASS_INDEPENDENT_EXACT_PARENT_MISS_3_OF_3"
-        },
-        "b00190_pinned_direct": {
-          "index46_blob": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
-          "index100_blob": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
-          "index106_blob": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
-          "result": "PASS_INDEPENDENT_PINNED_COMMIT_METADATA_3_OF_3"
-        },
-        "pinned_release_bundle": "REUSED_C136_Q00034_EXACT_BUNDLE_306223257_SHA256_76F85ED2_UNCHANGED_FINGERPRINT",
-        "prior_payload_lineage": "REUSED_C110_INDEX46_AND_C111_INDEX100_106_PREGEN_ACCEPTANCE_WITH_CURRENT_PINNED_BLOB_METADATA_RECHECK",
-        "repeated_candidate_pixel_qa": false,
-        "repeated_candidate_visual_qa": false
+        "source_and_semantic_fingerprint": "UNCHANGED_FROM_Q00038_ATTEMPT1",
+        "prior_drive_direct_release_checks": "REUSED_NOT_REPEATED",
+        "prior_candidate_pixel_qa": "NOT_APPLICABLE_NO_CANDIDATE",
+        "repeated_heavy_checks": false,
+        "failed_gate_run_id": 36611016649,
+        "failed_gate_step": "Verify exact producer SHAs in C batch",
+        "producer_result_files": [
+          "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json"
+        ],
+        "producer_task_record_staged_separately_at": "dc1694e42af30a422614b31cd9b7038a11de5b29"
       },
       "material_deliverable": {
-        "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+        "type": "INDEPENDENT_C_QA_BATCH_GATE_REPAIR_SHARED_STATE_RECONCILIATION",
         "reviewed_indices": [
           46,
           100,
           106
         ],
         "reviewed_assets": 3,
-        "producer_inputs_pass": 1,
-        "producer_inputs_rework_required": 0,
+        "producer_inputs_pass": 0,
+        "producer_inputs_rework_required": 1,
         "producer_inputs_hold_strict_recheck": 0,
         "producer_inputs_superseded": 0,
         "metadata_segments_changed": 0,
@@ -750,9 +742,9 @@
         "candidate_dds_modified_by_c": false,
         "new_static_artwork_passes": 0,
         "new_runtime_approvals": 0,
-        "report": "localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json"
+        "report": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json"
       },
-      "report": "localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json",
+      "report": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
       "candidate_dds_modified": false,
       "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
@@ -763,7 +755,7 @@
       "n100_used": false,
       "local_clone_used": false,
       "gpt_library_used": false,
-      "google_drive_used": true,
+      "google_drive_used": false,
       "google_drive_write_performed": false,
       "uploaded_archive_used": false,
       "vr_ffb_dx_changes": false,
@@ -914,12 +906,13 @@
     ]
   },
   "latest_c_batch_qa": {
-    "recorded_at_kst": "2026-09-30T03:09:00+09:00",
+    "recorded_at_kst": "2026-09-30T03:20:00+09:00",
     "task_id": "LOCALIZATION-LOCALIZATION_C-00194",
+    "attempt": "2/3",
     "qa_batch_id": "Q00038",
     "run": "C140",
-    "result": "PASS_Q00038_B00190_INDICES46_100_106_PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_RUNTIME_UNTESTED",
-    "base_head": "fb77355a1222d612da79d8da92c805128598d435",
+    "result": "REWORK_REQUIRED_Q00038_B00190_IMMUTABLE_RESULT_MISSING_DURABLE_TASK_RECORD_RUNTIME_UNTESTED",
+    "base_head": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
     "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
     "current_controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
     "qa_batch_inputs": [
@@ -938,20 +931,20 @@
       {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00190",
         "result_sha": "5969fd310d7d1311977effb967d24c31354d6811",
-        "status": "PASS",
-        "reason": "Exact B00190 pre-generation evidence is accepted as PREFLIGHT_ONLY source-acquisition exhaustion for indices46/AA04D779,100/53CE39D5,106/788CE557. C independently listed the approved ezflash557 Drive exact parents: the index46 parent contains only FF2462BB_1024x512.dds and the selector parent contains FD90AA9_1024x1024.dds, C075FB49_512x512.dds, 411827E_512x512.dds and 2DA43E41_1024x1024.dds, so all three requested exact files are absent. Current inventory fingerprint 5a3d3b09... requires 512x512 RGBA SHA 5a4ca513..., 512x512 RGBA SHA 3bfea388..., and 512x256 RGBA SHA b9e7d15a.... Pinned v0.25.10a commit 55f67a8 independently resolves blobs 7779ac9b..., d891aca5..., and 42a0d3f1...; their exact byte sizes reproduce the previously C-accepted 2048x2048, 2048x2048, and 2048x1024 RGBA32 single-mip lineages, all 4x canvas mismatches versus canonical inventory. C136's verified 306223257-byte / SHA-256 76f85ed2... pinned bundle identity is reused because source/contract/inventory fingerprints are unchanged. Current semantics remain 21/21, 7/7, and 3 localizable strings with OutRun2SP protected original. No exact canonical source or Korean candidate exists, so candidate-only gates are not promoted. production_readiness=PREFLIGHT_ONLY for all three; RUNTIME_VALIDATION=UNTESTED."
+        "status": "REWORK_REQUIRED",
+        "reason": "REWORK_REQUIRED: immutable producer result 5969fd310d7d1311977effb967d24c31354d6811 carries the exact B00190 AUTO marker and lane-local source-exhaustion material report, but it does not contain docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00190.json in the same result commit. The durable task record was staged separately in parent dc1694e42af30a422614b31cd9b7038a11de5b29. Localization Automation Gate run 36611016649 failed at 'Verify exact producer SHAs in C batch' when strict PASS validation invoked the producer commit checks. Prior source/semantic heavy-QA fingerprints are unchanged and may be reused after B00190 is atomically re-emitted with its durable task record; no Q00038 readiness/static/runtime promotion is accepted from this malformed result. RUNTIME_VALIDATION=UNTESTED."
       }
     ],
-    "source_identity_validation": "PASS_CURRENT_INVENTORY_5A3D3B09__DRIVE_EXACT_PARENT_MISS_3_OF_3__PINNED_DIRECT_BLOBS_7779AC9B_D891ACA5_42A0D3F1__CANONICAL_CANVAS_MISMATCH_3_OF_3",
-    "canonical_semantic_validation": "PASS_INDEX46_21_OF_21__INDEX100_7_OF_7__INDEX106_3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE__NO_METADATA_CHANGE",
-    "geometry_mapping_validation": "NOT_PROMOTED_INDICES46_100_106_NO_EXACT_CANONICAL_SOURCE_OR_KOREAN_CANDIDATE",
-    "current_contract_compatibility": "PASS_B00190_EXACT_RESULT_PREFLIGHT_EVIDENCE_NO_DDS__EXACT_PRODUCER_SHA_GATE_ELIGIBLE",
+    "source_identity_validation": "REUSED_UNCHANGED_PRIOR_C_SOURCE_FINGERPRINT__NOT_PROMOTED_BECAUSE_PRODUCER_RESULT_CONTRACT_FAILS",
+    "canonical_semantic_validation": "REUSED_UNCHANGED_INDEX46_21_OF_21__INDEX100_7_OF_7__INDEX106_3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE__NOT_PROMOTED",
+    "geometry_mapping_validation": "NOT_PROMOTED_NO_CANDIDATE_DDS_AND_PRODUCER_RESULT_REWORK_REQUIRED",
+    "current_contract_compatibility": "FAIL_B00190_RESULT_SHA_MISSING_SAME_COMMIT_DURABLE_TASK_RECORD",
     "readiness_reconciliation": {
-      "classification": "THREE_PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_NO_CANDIDATES",
+      "classification": "PRODUCER_RESULT_CONTRACT_REWORK_REQUIRED_NO_Q00038_READINESS_PROMOTION",
       "production_readiness": {
-        "46": "PREFLIGHT_ONLY",
-        "100": "PREFLIGHT_ONLY",
-        "106": "PREFLIGHT_ONLY"
+        "46": "NOT_PROMOTED_REWORK_REQUIRED",
+        "100": "NOT_PROMOTED_REWORK_REQUIRED",
+        "106": "NOT_PROMOTED_REWORK_REQUIRED"
       },
       "render_ready_indices": [],
       "one_stage_to_render_indices": [],
@@ -959,11 +952,8 @@
         30,
         34,
         36,
-        46,
         48,
         52,
-        100,
-        106,
         132,
         154,
         164,
@@ -978,39 +968,33 @@
         237
       ],
       "candidate_completion_priority": [
-        "RENDER_READY: none newly created by Q00038. Recent indices99/112/130/152/237 are already rendered STATIC_QA PASS candidates; do not rerender them. Runtime/final approval remains separate and requires real-game evidence.",
-        "ONE_STAGE_TO_RENDER: none proven by Q00038. Preserve and consume any newer candidate-bearing or direct REWORK_REQUIRED producer results before unrelated source-acquisition preflight; producer results outside QA_BATCH_INPUTS receive no implicit disposition.",
-        "PREFLIGHT_ONLY: indices46/100/106 are now source-acquisition-exhausted on unchanged approved Drive/direct/Release/inventory fingerprints. Together with existing 30/34/36/48/52/132/154/164/172/228, do not repeat source probes until approved source/inventory fingerprints change. Newer producer results after B00190 remain separate QA backlog items."
+        "RENDER_READY: none newly promoted by Q00038 ATTEMPT2. Indices99/112/130/152/237 remain already-rendered STATIC_QA PASS candidates; runtime/final approval remains separate and requires real-game evidence.",
+        "ONE_STAGE_TO_RENDER: none proven by this batch. B00190 requires producer-result contract repair before C may consume its unchanged pre-generation evidence; newer candidate-bearing/direct-rework producer results remain ahead of unrelated preflight.",
+        "PREFLIGHT_ONLY: keep accepted source-exhausted indices30/34/36/48/52/132/154/164/172/228 unchanged. Indices46/100/106 are NOT newly promoted by Q00038 ATTEMPT2; re-emit B00190 atomically with its durable task record, then reuse unchanged source/semantic evidence without repeating heavy source probes."
       ]
     },
     "heavy_qa_reuse": {
-      "b00190_drive_check": {
-        "index46_parent_folder_id": "1XcE9G3jb9V8mx-aLyQqyJL7uc_mKT5tu",
-        "selector_parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
-        "exact_path_misses": 3,
-        "result": "PASS_INDEPENDENT_EXACT_PARENT_MISS_3_OF_3"
-      },
-      "b00190_pinned_direct": {
-        "index46_blob": "7779ac9b572b59f2e54adbcb35f87f60909c6fbb",
-        "index100_blob": "d891aca5a69f17ee9f1f358c3d0a3c8d6fd7c991",
-        "index106_blob": "42a0d3f18d5b2af75a7a4e9bfaa7f10139efe73c",
-        "result": "PASS_INDEPENDENT_PINNED_COMMIT_METADATA_3_OF_3"
-      },
-      "pinned_release_bundle": "REUSED_C136_Q00034_EXACT_BUNDLE_306223257_SHA256_76F85ED2_UNCHANGED_FINGERPRINT",
-      "prior_payload_lineage": "REUSED_C110_INDEX46_AND_C111_INDEX100_106_PREGEN_ACCEPTANCE_WITH_CURRENT_PINNED_BLOB_METADATA_RECHECK",
-      "repeated_candidate_pixel_qa": false,
-      "repeated_candidate_visual_qa": false
+      "source_and_semantic_fingerprint": "UNCHANGED_FROM_Q00038_ATTEMPT1",
+      "prior_drive_direct_release_checks": "REUSED_NOT_REPEATED",
+      "prior_candidate_pixel_qa": "NOT_APPLICABLE_NO_CANDIDATE",
+      "repeated_heavy_checks": false,
+      "failed_gate_run_id": 36611016649,
+      "failed_gate_step": "Verify exact producer SHAs in C batch",
+      "producer_result_files": [
+        "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json"
+      ],
+      "producer_task_record_staged_separately_at": "dc1694e42af30a422614b31cd9b7038a11de5b29"
     },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_QA_BATCH_SHARED_STATE_RECONCILIATION",
+      "type": "INDEPENDENT_C_QA_BATCH_GATE_REPAIR_SHARED_STATE_RECONCILIATION",
       "reviewed_indices": [
         46,
         100,
         106
       ],
       "reviewed_assets": 3,
-      "producer_inputs_pass": 1,
-      "producer_inputs_rework_required": 0,
+      "producer_inputs_pass": 0,
+      "producer_inputs_rework_required": 1,
       "producer_inputs_hold_strict_recheck": 0,
       "producer_inputs_superseded": 0,
       "metadata_segments_changed": 0,
@@ -1020,9 +1004,9 @@
       "candidate_dds_modified_by_c": false,
       "new_static_artwork_passes": 0,
       "new_runtime_approvals": 0,
-      "report": "localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json"
+      "report": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json"
     },
-    "report": "localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json",
+    "report": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
     "candidate_dds_modified": false,
     "new_static_artwork_passes": 0,
     "new_runtime_approvals": 0,
@@ -1033,7 +1017,7 @@
     "n100_used": false,
     "local_clone_used": false,
     "gpt_library_used": false,
-    "google_drive_used": true,
+    "google_drive_used": false,
     "google_drive_write_performed": false,
     "uploaded_archive_used": false,
     "vr_ffb_dx_changes": false,

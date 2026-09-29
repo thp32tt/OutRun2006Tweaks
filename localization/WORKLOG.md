@@ -1705,3 +1705,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Q00038 disposition is corrected from **PASS** to **HOLD_STRICT_RECHECK**. Independent Drive/direct/inventory evidence remains useful but is not promoted to shared source-exhausted status from this immutable producer SHA.
 - B must re-emit current-contract evidence. No DDS/runtime changes; `RUNTIME_VALIDATION=UNTESTED`. Attempt-2 report: `localization/graphics/role_C/20260930-0320-C140-A2/C140_Q00038_ATTEMPT2_INDEPENDENT_QA_BATCH.json`.
 
+## 2026-09-30 03:20 KST - C140 Q00038 ATTEMPT2 GATE REPAIR
+
+- Previous Q00038 Gate run `36611016649` failed at **Verify exact producer SHAs in C batch**; this is a producer result-contract failure, not a new source/pixel finding.
+- Immutable B00190 result `5969fd310d7d1311977effb967d24c31354d6811` contains the AUTO marker and lane-local material report, but its durable task record was staged separately in parent `dc1694e42af30a422614b31cd9b7038a11de5b29`; exact RESULT_SHA therefore cannot receive PASS.
+- ATTEMPT2 disposition: **REWORK_REQUIRED**. Prior source/semantic heavy-QA fingerprints are unchanged and reused, not recomputed.
+- Q00038 PASS readiness promotion for indices46/100/106 is withdrawn. Existing accepted PREFLIGHT_ONLY indices remain 30/34/36/48/52/132/154/164/172/228. Pending production **71**, actionable localize_text **93**, canonical segments **753**.
+- Required repair: re-emit B00190 material payload + durable task record atomically under the exact AUTO marker. No DDS bytes/build/runtime test. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+- Report: `localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json`.

@@ -1,17 +1,13 @@
 {
   "schema_version": 10,
+  "schema": "outrun-c140-q00038-attempt2-gate-repair-v1",
   "task_id": "LOCALIZATION-LOCALIZATION_C-00194",
+  "attempt": "2/3",
+  "qa_batch_id": "Q00038",
   "lane": "LOCALIZATION_C",
   "target_branch": "korean-localization-clean",
-  "attempt": "2/3",
-  "wave_id": "Q00038",
-  "qa_batch_id": "Q00038",
   "recorded_at_kst": "2026-09-30T03:20:00+09:00",
   "base_head_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
-  "base_sha": "fdeaa9b4e98f5919f8f1615eeb9db32580065d85",
-  "commit_mode": "ATOMIC_C_BATCH_ATTEMPT2_GATE_REPAIR_AND_SHARED_STATE",
-  "result": "REWORK_REQUIRED_Q00038_B00190_IMMUTABLE_RESULT_MISSING_DURABLE_TASK_RECORD_RUNTIME_UNTESTED",
-  "summary": "Q00038 ATTEMPT2 repairs the failed C Gate instead of repeating source QA. B00190 source/semantic evidence remains internally consistent on the unchanged fingerprint, but the immutable result SHA cannot receive a PASS disposition because its durable task record is in a separate parent commit rather than the exact producer result commit. B00190 is returned REWORK_REQUIRED for atomic re-emission; Q00038 readiness promotion for indices46/100/106 is withdrawn. No DDS bytes, static approvals, or runtime approvals are created; runtime remains UNTESTED.",
   "qa_batch_inputs": [
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00190",
@@ -32,12 +28,69 @@
       "reason": "REWORK_REQUIRED: immutable producer result 5969fd310d7d1311977effb967d24c31354d6811 carries the exact B00190 AUTO marker and lane-local source-exhaustion material report, but it does not contain docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00190.json in the same result commit. The durable task record was staged separately in parent dc1694e42af30a422614b31cd9b7038a11de5b29. Localization Automation Gate run 36611016649 failed at 'Verify exact producer SHAs in C batch' when strict PASS validation invoked the producer commit checks. Prior source/semantic heavy-QA fingerprints are unchanged and may be reused after B00190 is atomically re-emitted with its durable task record; no Q00038 readiness/static/runtime promotion is accepted from this malformed result. RUNTIME_VALIDATION=UNTESTED."
     }
   ],
-  "current_qa_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
-  "current_controller_roles_blob_sha": "1f5bfe82a72fb902d1862dadd4e62ec7ad62a67e",
-  "source_identity_validation": "REUSED_UNCHANGED_PRIOR_C_SOURCE_FINGERPRINT__NOT_PROMOTED_BECAUSE_PRODUCER_RESULT_CONTRACT_FAILS",
-  "canonical_semantic_validation": "REUSED_UNCHANGED_INDEX46_21_OF_21__INDEX100_7_OF_7__INDEX106_3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE__NOT_PROMOTED",
-  "geometry_mapping_validation": "NOT_PROMOTED_NO_CANDIDATE_DDS_AND_PRODUCER_RESULT_REWORK_REQUIRED",
-  "current_contract_compatibility": "FAIL_B00190_RESULT_SHA_MISSING_SAME_COMMIT_DURABLE_TASK_RECORD",
+  "failure_context": {
+    "previous_gate_run_id": 36611016649,
+    "previous_gate_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/36611016649",
+    "previous_gate_conclusion": "failure",
+    "failed_step": "Verify exact producer SHAs in C batch",
+    "exact_producer_result_sha": "5969fd310d7d1311977effb967d24c31354d6811",
+    "exact_producer_result_files": [
+      "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json"
+    ],
+    "required_same_commit_task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00190.json",
+    "actual_task_record_commit": "dc1694e42af30a422614b31cd9b7038a11de5b29",
+    "diagnosis": "B00190 material result and durable task record were split across two commits, so strict PASS validation of the exact producer RESULT_SHA fails the producer durable-record contract."
+  },
+  "reviewed_assets": [
+    {
+      "index": 46,
+      "asset": "AA04D779",
+      "input": "LOCALIZATION-LOCALIZATION_B-00190@5969fd310d7d1311977effb967d24c31354d6811",
+      "candidate_exists": false,
+      "prior_source_identity": "CANONICAL_512x512_RGBA_VS_PINNED_2048x2048_RGBA32_MISMATCH",
+      "prior_semantics": "21_OF_21",
+      "heavy_qa_fingerprint": "UNCHANGED_REUSED",
+      "producer_contract_gate": "FAIL_RESULT_SHA_MISSING_DURABLE_TASK_RECORD",
+      "production_readiness": "NOT_PROMOTED_REWORK_REQUIRED",
+      "disposition": "REWORK_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 100,
+      "asset": "53CE39D5",
+      "input": "LOCALIZATION-LOCALIZATION_B-00190@5969fd310d7d1311977effb967d24c31354d6811",
+      "candidate_exists": false,
+      "prior_source_identity": "CANONICAL_512x512_RGBA_VS_PINNED_2048x2048_RGBA32_MISMATCH",
+      "prior_semantics": "7_OF_7",
+      "heavy_qa_fingerprint": "UNCHANGED_REUSED",
+      "producer_contract_gate": "FAIL_RESULT_SHA_MISSING_DURABLE_TASK_RECORD",
+      "production_readiness": "NOT_PROMOTED_REWORK_REQUIRED",
+      "disposition": "REWORK_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 106,
+      "asset": "788CE557",
+      "input": "LOCALIZATION-LOCALIZATION_B-00190@5969fd310d7d1311977effb967d24c31354d6811",
+      "candidate_exists": false,
+      "prior_source_identity": "CANONICAL_512x256_RGBA_VS_PINNED_2048x1024_RGBA32_MISMATCH",
+      "prior_semantics": "3_LOCALIZE_PLUS_OUTRUN2SP_PRESERVE",
+      "heavy_qa_fingerprint": "UNCHANGED_REUSED",
+      "producer_contract_gate": "FAIL_RESULT_SHA_MISSING_DURABLE_TASK_RECORD",
+      "production_readiness": "NOT_PROMOTED_REWORK_REQUIRED",
+      "disposition": "REWORK_REQUIRED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "validation": {
+    "producer_auto_marker": "PASS_EXACT_B00190",
+    "producer_lane_local_material_payload": "PASS_PRESENT_IN_RESULT_SHA",
+    "producer_durable_task_record_same_commit": "FAIL",
+    "heavy_source_semantic_checks": "REUSED_UNCHANGED_NOT_REPEATED",
+    "candidate_static_qa": "NOT_APPLICABLE_NO_CANDIDATE",
+    "current_contract_compatibility": "REWORK_REQUIRED",
+    "runtime_validation": "UNTESTED"
+  },
   "readiness_reconciliation": {
     "classification": "PRODUCER_RESULT_CONTRACT_REWORK_REQUIRED_NO_Q00038_READINESS_PROMOTION",
     "production_readiness": {
@@ -72,18 +125,6 @@
       "PREFLIGHT_ONLY: keep accepted source-exhausted indices30/34/36/48/52/132/154/164/172/228 unchanged. Indices46/100/106 are NOT newly promoted by Q00038 ATTEMPT2; re-emit B00190 atomically with its durable task record, then reuse unchanged source/semantic evidence without repeating heavy source probes."
     ]
   },
-  "heavy_qa_reuse": {
-    "source_and_semantic_fingerprint": "UNCHANGED_FROM_Q00038_ATTEMPT1",
-    "prior_drive_direct_release_checks": "REUSED_NOT_REPEATED",
-    "prior_candidate_pixel_qa": "NOT_APPLICABLE_NO_CANDIDATE",
-    "repeated_heavy_checks": false,
-    "failed_gate_run_id": 36611016649,
-    "failed_gate_step": "Verify exact producer SHAs in C batch",
-    "producer_result_files": [
-      "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json"
-    ],
-    "producer_task_record_staged_separately_at": "dc1694e42af30a422614b31cd9b7038a11de5b29"
-  },
   "material_deliverable": {
     "type": "INDEPENDENT_C_QA_BATCH_GATE_REPAIR_SHARED_STATE_RECONCILIATION",
     "reviewed_indices": [
@@ -105,34 +146,16 @@
     "new_runtime_approvals": 0,
     "report": "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json"
   },
-  "evidence": [
-    "localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json",
-    "localization/graphics/role_B/20260930-B00190-P00097/B00190_P00097_MOD3_SOURCE_ACQUISITION_EXHAUSTION.json",
-    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00190.json",
-    "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/36611016649"
-  ],
+  "next_required_producer_action": "Re-emit B00190 material result and docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00190.json atomically in one immutable producer result commit carrying [AUTO:LOCALIZATION-LOCALIZATION_B-00190]. C may then reuse unchanged heavy source/semantic evidence without re-running it.",
   "candidate_dds_modified": false,
-  "new_static_artwork_passes": 0,
-  "new_runtime_approvals": 0,
   "shared_state_modified": true,
-  "peer_candidate_files_modified": false,
   "runtime_test_performed": false,
   "build_performed": false,
   "n100_used": false,
   "local_clone_used": false,
-  "gpt_library_used": false,
   "google_drive_used": false,
-  "google_drive_write_performed": false,
-  "uploaded_archive_used": false,
+  "gpt_library_used": false,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE",
-  "runtime_validation": "UNTESTED",
-  "prior_failed_attempt": {
-    "result_sha": "9d7e6d8f0e444bcbd0c52753d5583719b8a28c43",
-    "gate_run_id": 36610798833,
-    "conclusion": "failure",
-    "failed_step": "Verify exact producer SHAs in C batch",
-    "error": "B00190 exact result: missing unique durable task record under docs/automation/runs/"
-  }
+  "runtime_validation": "UNTESTED"
 }

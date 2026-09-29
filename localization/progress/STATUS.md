@@ -1168,3 +1168,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Independent source recheck: approved Drive exact-parent **3/3 miss**; pinned v0.25.10a blobs `7779ac9b` / `d891aca5` / `42a0d3f1` remain 4x RGBA32 canvas lineages versus current 1x RGBA inventory. C136 bundle fingerprint is unchanged and reused.
 - Semantics unchanged: 46=21/21, 100=7/7, 106=3 localize + OutRun2SP protected original. No candidate DDS/static/runtime approval; pending production **71**, actionable localize_text **93**, canonical segments **753**.
 - Candidate-completion-first remains active; producer results outside Q00038 remain separate QA backlog. Report: `localization/graphics/role_C/20260930-0309-C140/C140_Q00038_INDEPENDENT_QA_BATCH.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C140 Q00038 ATTEMPT2 — 2026-09-30T03:20:00+09:00
+- Gate run `36611016649` failed at **Verify exact producer SHAs in C batch**.
+- B00190 `5969fd31` — **REWORK_REQUIRED**: material result and durable task record are split across result/parent commits.
+- Unchanged source/semantic heavy QA is reused; indices46/100/106 receive no Q00038 readiness/static/runtime promotion.
+- Accepted PREFLIGHT_ONLY remains 30/34/36/48/52/132/154/164/172/228; pending production **71**, actionable localize_text **93**, canonical segments **753**.
+- Producer must atomically re-emit B00190 result + task record. Report: `localization/graphics/role_C/20260930-0320-C140/C140_Q00038_ATTEMPT2_GATE_REPAIR.json`. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
