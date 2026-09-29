@@ -1,22 +1,25 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("2d","d3d9","dx11","dxvk-safe","dxvk","dx12")]
+    [ValidateSet("2d","d3d9","dxvk-safe","dxvk","dx12")]
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS",
-    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","X_BASE","X_SCREEN_HUD","X_WORLD_RANK","X_COMBINED","R54_A_NEXTDRAW","R54_B_STICKY","R54_C_FULL_OWNER","R54_D_HUD_PLANE","R55_A_ZERO","R55_B_SCALE35","R55_C_WORLD35","R55_D_RANKZERO","R56_01_ZERO","R56_02_SCALE35","R56_03_WORLD35","R56_04_RANKZERO","R56_05_POSITION_XP96","R56_06_POSITION_XM96","R56_07_POSITION_XS35","R56_08_POSITION_XCENTER","R56_09_RANK13_XP96","R56_10_RANK13_XM96","R56_11_RANK13_YM72","R56_12_RANK13_CENTER","R56_13_RANK46_XP96","R56_14_RANK46_YM72","R56_15_RANK46_CENTER","R56_16_RANK13_AS_HUD","R56_17_RANK46_AS_HUD","R56_18_RANK46_NEXTDRAW","R56_19_POSITION_NEXTDRAW","R56_20_ALLSCREEN_RAW","R57_01_POSITION_KIND1_HUD35","R57_02_POSITION_KIND0_HUD35","R57_03_POSITION_ALL_WORLD35","R57_04_RANK_ALL_AS_HUD","R57_05_RANK_PROJECTED_IPD","R57_06_RANK_PROJECTED_HEAD","R57_07_RANK_PROJECTED_13","R57_08_RANK_PROJECTED_46","R57_09_RANK_PROJECTED_ZERO","R57_10_RANK_PROJECTED_TRACE","R67_EYE_REPROJECT","R68_FIXPACK","R69_FIXPACK","R71_HUD_FLARE","R71_HUD_MENU")]
+    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT","R71_HUD_FLARE","R71_HUD_MENU")]
     [string]$VariantId = "AUTO"
 )
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backendRoot = Join-Path $root "backends"
-$contractScript = Join-Path $root 'OutRunVR-BackendContract.ps1'
-if (-not (Test-Path $contractScript)) { throw "Backend contract missing: $contractScript" }
-. $contractScript
-$backendContract = Get-OutRunVRBackendContract -Backend $Backend
-$payloadBackend = [string]$backendContract.PayloadBackend
-$defaultVariant = [string]$backendContract.DefaultVariant
+$payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" } else { $Backend }
+
+$defaultVariant = switch ($Backend) {
+    "2d"        { "CONTROL_2D" }
+    "d3d9"      { "A_CONTROL" }
+    "dxvk-safe" { "E_DXVK_SAFE" }
+    "dxvk"      { "E_DXVK_MULTIVIEW" }
+    "dx12"      { "F_DX12_STRICT" }
+}
 $variant = if ($VariantId -eq "AUTO") { $defaultVariant } else { $VariantId }
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
@@ -26,6 +29,56 @@ if (-not (Test-Path $src)) { throw "Test payload not found for variant=$variant 
 
 $sourceFile = Join-Path $src "SOURCE_SHA.txt"
 $sourceSha = if (Test-Path $sourceFile) { (Get-Content $sourceFile -Raw).Trim() } else { "unknown" }
+
+function Get-PeMachine([string]$Path) {
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -lt 256) { throw "PE file is too small: $Path" }
+    if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "Missing MZ header: $Path" }
+    $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+    if ($peOffset -lt 0 -or $peOffset + 6 -gt $bytes.Length) { throw "Invalid PE header offset: $Path" }
+    if ($bytes[$peOffset] -ne 0x50 -or $bytes[$peOffset + 1] -ne 0x45 -or
+        $bytes[$peOffset + 2] -ne 0 -or $bytes[$peOffset + 3] -ne 0) {
+        throw "Missing PE signature: $Path"
+    }
+    return [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+}
+
+function Assert-X86Pe([string]$Path,[string]$Label) {
+    if (-not (Test-Path $Path)) { throw "$Label missing: $Path" }
+    $machine = Get-PeMachine $Path
+    if ($machine -ne 0x014C) {
+        throw ("$Label must be x86 PE32 for OR2006C2C.EXE; machine=0x{0:X4}: {1}" -f $machine,$Path)
+    }
+}
+
+function Get-Sha256Lower([string]$Path) {
+    return (Get-FileHash $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+
+$backendProvider = switch ($Backend) {
+    "2d"        { "D3D9_NATIVE_2D" }
+    "d3d9"      { "D3D9EX_NATIVE" }
+    "dxvk-safe" { "DXVK_X86_SAFE" }
+    "dxvk"      { "DXVK_X86_MULTIVIEW" }
+    "dx12"      { "D3D9ON12_OS" }
+}
+$dxvkD3D9Source = $null
+$dxvkD3D9Sha256 = ""
+$multiviewPatcherSource = $null
+$multiviewPatcherSha256 = ""
+
+if ($Backend -eq "dxvk-safe") {
+    $dxvkD3D9Source = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"
+    Assert-X86Pe $dxvkD3D9Source "DXVK d3d9.dll"
+    $dxvkD3D9Sha256 = Get-Sha256Lower $dxvkD3D9Source
+} elseif ($Backend -eq "dxvk") {
+    $dxvkD3D9Source = Join-Path $src "d3d9.dll"
+    $multiviewPatcherSource = Join-Path $src "multiviewpatcher.dll"
+    Assert-X86Pe $dxvkD3D9Source "DXVK d3d9.dll"
+    Assert-X86Pe $multiviewPatcherSource "DXVK multiviewpatcher.dll"
+    $dxvkD3D9Sha256 = Get-Sha256Lower $dxvkD3D9Source
+    $multiviewPatcherSha256 = Get-Sha256Lower $multiviewPatcherSource
+}
 
 $logPatterns=@(
     'OutRun2006Tweaks*.log',
@@ -159,9 +212,7 @@ if ($Backend -eq "2d") {
         Copy-Required "d3d9.dll"
         Copy-Required "multiviewpatcher.dll"
     } elseif ($Backend -eq "dxvk-safe") {
-        $dxvkProvider = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"
-        if (-not (Test-Path $dxvkProvider)) { throw "DXVK provider missing: $dxvkProvider" }
-        Copy-Item $dxvkProvider (Join-Path $root "d3d9.dll") -Force
+        Copy-Item $dxvkD3D9Source (Join-Path $root "d3d9.dll") -Force
         Remove-RootVerified "multiviewpatcher.dll"
     } else {
         Remove-RootVerified "d3d9.dll"
@@ -169,6 +220,23 @@ if ($Backend -eq "2d") {
         if (Test-Path (Join-Path $root "d3d9.dll")) {
             throw "Local d3d9.dll is still present; refusing $Backend mode."
         }
+    }
+}
+
+if ($dxvkD3D9Sha256) {
+    $installedDxvk = Join-Path $root "d3d9.dll"
+    if (-not (Test-Path $installedDxvk)) { throw "DXVK installation verification failed: d3d9.dll missing" }
+    $installedDxvkHash = Get-Sha256Lower $installedDxvk
+    if ($installedDxvkHash -ne $dxvkD3D9Sha256) {
+        throw "DXVK installation verification failed: d3d9.dll SHA256 mismatch"
+    }
+}
+if ($multiviewPatcherSha256) {
+    $installedPatcher = Join-Path $root "multiviewpatcher.dll"
+    if (-not (Test-Path $installedPatcher)) { throw "DXVK multiview verification failed: multiviewpatcher.dll missing" }
+    $installedPatcherHash = Get-Sha256Lower $installedPatcher
+    if ($installedPatcherHash -ne $multiviewPatcherSha256) {
+        throw "DXVK multiview verification failed: multiviewpatcher.dll SHA256 mismatch"
     }
 }
 
@@ -190,7 +258,7 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
@@ -204,17 +272,6 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
-    } elseif ($Backend -eq "dx11") {
-        # Explicitly exercise the x64 D3D11 OpenXR DirectGPU host. The game side
-        # remains D3D9Ex; DirectGPU-only prevents a desktop-duplication fallback
-        # from hiding ACK/run-identity failures.
-        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
-        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
-        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
-        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
-        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
-        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
-        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
     } else {
         $value = switch ($Backend) {
             "dxvk" { "2" }
@@ -252,6 +309,9 @@ $activeText = @(
     "variant=$variant"
     "profile=$TestProfile"
     "sourceSha=$sourceSha"
+    "provider=$backendProvider"
+    "dxvkD3D9Sha256=$dxvkD3D9Sha256"
+    "multiviewPatcherSha256=$multiviewPatcherSha256"
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
@@ -262,10 +322,13 @@ Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding asci
 $configHash = "missing"
 if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
 $sessionManifest = [ordered]@{
-    SchemaVersion = 3
+    SchemaVersion = 4
     BuildMatrixId = $matrix
     VariantId = $variant
     Backend = $Backend
+    BackendProvider = $backendProvider
+    DxvkD3D9Sha256 = $dxvkD3D9Sha256
+    MultiviewPatcherSha256 = $multiviewPatcherSha256
     TestProfile = $TestProfile
     SourceSha = $sourceSha
     SessionId = $session
@@ -291,13 +354,15 @@ Write-Host "OutRun renderer mode activated: $Backend"
 Write-Host "Test variant: $variant"
 Write-Host "Test profile: $TestProfile"
 Write-Host "Source SHA: $sourceSha"
+Write-Host "Backend provider: $backendProvider"
+if ($dxvkD3D9Sha256) { Write-Host "DXVK d3d9.dll SHA256: $dxvkD3D9Sha256" }
+if ($multiviewPatcherSha256) { Write-Host "Multiview patcher SHA256: $multiviewPatcherSha256" }
 Write-Host "Diagnostic session prepared before launch: $session"
 Write-Host "Any previous root logs were archived before this session was created."
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
-    "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
-    "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
     "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
 }
