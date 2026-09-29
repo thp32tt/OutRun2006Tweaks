@@ -69,6 +69,7 @@ jobs:
           grep -Fq 'GITHUB_POLL_SECONDS: "60"' "$compose"
           grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' "$compose"
           grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' "$compose"
+          grep -Fq 'WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"' "$compose"
           grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "15"' "$compose"
           grep -Fq 'QUEUE_IDLE_REARM_SECONDS: "90"' "$compose"
           grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
@@ -139,4 +140,24 @@ jobs:
           assert "producer-release:" in src
           assert "refresh_wait_actions_task_binding(" in src[src.index("async def localization_process_lane"):src.index("async def localization_parallel_cycle")]
           print("queue recovery runs before UI stall timing")
+          PY
+
+      - name: Verify missing Actions run recovery
+        run: |
+          grep -Fq 'WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'def github_actions_skip_directive' /tmp/controller.py
+          grep -Fq 'async def recover_missing_gate_run' /tmp/controller.py
+          grep -Fq 'contains GitHub Actions skip directive' /tmp/controller.py
+          grep -Fq 'Treating the missing run as a repairable automation failure instead of waiting forever.' /tmp/controller.py
+          grep -Fq 'CI-skip 지시어를 넣지 마.' /tmp/controller.py
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("/tmp/controller.py").read_text(encoding="utf-8")
+          assert 'r"\\[(?:skip ci|ci skip|no ci|skip actions|actions skip)\\]"' in src
+          assert 'r"(?im)^skip-checks:\\s*true\\s*$"' in src
+          assert 'active["wait_actions_started_at"] = now.isoformat()' in src
+          assert 'recovery = await recover_missing_gate_run(context, pages, active, now)' in src
+          print("missing Actions run recovery verified")
           PY
