@@ -551,3 +551,18 @@ Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_100
 AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
 RUNTIME_VALIDATION: `UNTESTED`
 Next: review reference-space/session reset cache invalidation.
+
+
+## Cycle 0025 — session/reference-space invalidation
+
+Review lenses: architecture/control flow; lifetime/reset/sync; stereo/HUD/visual correctness; hot path/frame pacing/copies/waits; adversarial/falsification.
+
+Finding/evidence:
+- STOPPING and LOCAL reference-space changes clear view/projection matching state before advancing the selection watermark; transition ACK enumeration remains intentionally unwired without positive sampled-history proof.
+- Evidence: STOPPING/ReferenceSpaceChanged invalidation paths.
+- Production/runtime behavior unchanged; frozen `34eef500b2f79e7e68477d7ffe675f803e809e01` unchanged.
+
+Changed files: `docs/VR_R71_STATIC_1000_LOG.md`, `docs/automation/R71_STATIC_1000_STATE.json`.
+AUTOMATION_VALIDATION: `STATIC_REVIEW_PASS`
+RUNTIME_VALIDATION: `UNTESTED`
+Next: review projection cache freshness counters.
