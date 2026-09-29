@@ -4,13 +4,24 @@ on:
       - 'localization/**'
       - 'docs/**'
       - 'tools/localization/**'
+      - 'KOREAN_PNG_REVIEW/**'
+      - '.github/workflows/localization-automation-gate.yml'
+      - '.github/workflows/localization-state.yml'
+      - '.github/workflows/domain-isolation.yml'
+      - '.github/workflows/build.yml'
       - '**/*.md'
   pull_request:
     paths-ignore:
       - 'localization/**'
       - 'docs/**'
       - 'tools/localization/**'
+      - 'KOREAN_PNG_REVIEW/**'
+      - '.github/workflows/localization-automation-gate.yml'
+      - '.github/workflows/localization-state.yml'
+      - '.github/workflows/domain-isolation.yml'
+      - '.github/workflows/build.yml'
       - '**/*.md'
+  workflow_dispatch:
 
 jobs:
   build:
