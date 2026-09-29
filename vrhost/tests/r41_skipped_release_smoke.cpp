@@ -126,7 +126,8 @@ int main()
     if (sampledHistory.Query(sampledExact) != SampleEvidence::Unknown)
         return 25;
     if (!sampledHistory.ObserveSampled(sampledExact)) return 26;
-    if (!sampledHistory.ExactSampled(sampledExact)) return 27;
+    if (sampledHistory.Query(sampledExact) != SampleEvidence::ExactSampled) return 27;
+    if (!sampledHistory.ExactSampled(sampledExact)) return 38;
 
     const Identity sameProducerNewFrame{ 90, 91, 92, 0, 901 };
     if (sampledHistory.Query(sameProducerNewFrame) !=
