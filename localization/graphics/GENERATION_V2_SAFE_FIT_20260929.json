@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "recorded_at_kst": "2026-09-29T15:41:30+09:00",
+  "branch": "korean-localization-clean",
+  "change": "ACTIVATE_FIRST_PASS_GENERATION_V2",
+  "contract": "outrun-first-pass-edit-v2",
+  "evidence": {
+    "strict_reset": {
+      "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
+      "scanned": 32,
+      "strict_pass": 0,
+      "rework_required": 24,
+      "zoom_manual_required": 8
+    },
+    "c85": {
+      "report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+      "candidates": 16,
+      "pixel_visual_pass": 4,
+      "rework_required": 12,
+      "failed_elements": 93
+    },
+    "recurring_failure_classes": [
+      "effect_inclusive_bbox_overflow",
+      "alpha_or_changed_pixels_outside_permitted_region",
+      "source_english_or_erasure_residue",
+      "flattened_raster_resampling_artifacts",
+      "collateral_changes_to_preexisting_pass_regions"
+    ]
+  },
+  "v2_rules": {
+    "clean_plate_and_lettering_are_separate_stages": true,
+    "default_safety_inset_px": 2,
+    "minimum_safety_inset_px": 1,
+    "effect_inclusive_native_resolution_measurement": true,
+    "render_measure_refit_loop": true,
+    "max_refit_iterations_default": 8,
+    "flattened_raster_resize_forbidden": true,
+    "deterministic_lettering_required_for_transparent_text_only_assets": true,
+    "clean_plate_machine_qa_required": true,
+    "source_removal_mask_separate_from_korean_lettering_regions": true,
+    "containment_precedes_style": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "tools": [
+    "tools/localization/build_image_generation_prompt.py",
+    "tools/localization/build_clean_graphics_candidate.py",
+    "tools/localization/verify_generation_contract_v2.py"
+  ],
+  "expected_effect": "reduce first-pass REWORK while keeping the zero-pixel strict QA gate unchanged"
+}

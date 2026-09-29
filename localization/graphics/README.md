@@ -65,3 +65,15 @@ All pre-reset Korean graphics candidates are historical evidence only and must n
 
 Production must not cover English with boxes or render Korean over English. Remove the complete English glyph/effect footprint, faithfully reconstruct the original background, then typeset Korean. If clean reconstruction is not possible, redraw the affected source element faithfully or stop as `MANUAL_RECONSTRUCTION_REQUIRED`; never retain a visibly patched candidate.
 
+
+
+## Mandatory first-pass generation v2
+
+New/reworked Korean DDS candidates use `outrun-first-pass-edit-v2`.
+
+Pipeline:
+`EXACT_HD_SOURCE -> SOURCE_REMOVAL_MASK -> VERIFIED_CLEAN_PLATE -> DETERMINISTIC_KOREAN_LETTERING -> NATIVE_MEASURE -> REFIT/RE-RENDER -> DDS -> C QA`.
+
+The removal mask and Korean lettering region are intentionally different: Hangul is not required to occupy the exact English glyph pixels. Clean-plate edits stay inside the source removal mask; Korean/effect pixels stay inside the measured permitted region and, by default, at least 2 px inside both the source full-effect bbox and permitted region. A 1 px inset is allowed only when explicitly justified by small geometry. A zero-margin first-pass target is forbidden.
+
+Do not resize a flattened Korean raster after rendering. If measured Korean effects do not fit, re-render from font/effect parameters at a smaller size or adjusted position and measure again. Transparent/text-only atlases require deterministic lettering.

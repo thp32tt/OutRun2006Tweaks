@@ -173,3 +173,21 @@ Controller liveness and batch-validation values are defined in `localization/con
 - A C AUTO commit is the only runner-backed Gate for that batch. For each PASS disposition, CI re-runs domain-isolation, changed-localization-payload, and A/B lane-isolation checks against the exact historical producer SHA, not current HEAD bytes.
 - REWORK_REQUIRED/HOLD_STRICT_RECHECK/SUPERSEDED inputs are not promoted and therefore do not need to pass candidate-promotion checks; their exact task/SHA identity is still verified.
 - A passing C batch Gate is the durable automatic-validation authority covering the listed producer SHAs. Runtime/in-game validation remains separate.
+
+
+## First-pass generation v2 — measured safe-fit pipeline
+
+Effective 2026-09-29. This section supersedes the earlier one-pass fitting behavior for every newly created or materially reworked Korean graphics candidate. Existing QA strictness is unchanged.
+
+- Mandatory prompt contract: `outrun-first-pass-edit-v2`.
+- **Containment precedes style.** Each element derives `candidate_safe_bbox` from the intersection of the source full-effect bbox and permitted region after an inset. Default inset is **2 px on every side**. If geometry cannot support 2 px, a producer may explicitly use **1 px** and must record the reason. New v2 production must not use a zero-pixel target margin.
+- Source removal and Korean lettering are separate coordinate permissions. The source glyph/effect removal mask is used only to build the CLEAN_PLATE. Korean lettering may use its measured permitted region even when Hangul pixels do not coincide with the English glyph mask.
+- CLEAN_PLATE must pass independently before Korean lettering: zero changes outside the removal mask, zero protected-artwork changes, zero alpha change outside the removal mask, native-resolution review, no source-language residue and no seam/box/patch.
+- Final Korean candidate must be the approved CLEAN_PLATE plus Korean lettering/effects only. Candidate-vs-clean changes outside the declared lettering regions are forbidden.
+- For each element, measure the native-resolution **effect-inclusive** Korean bbox (fill + outline + shadow + glow + antialias fringe) relative to the CLEAN_PLATE. It must be wholly inside `candidate_safe_bbox`.
+- Generation is iterative: render -> measure -> translate/refit -> re-render -> re-measure. Default maximum is 8 iterations. If oversized, change font/effect geometry and re-render from source parameters. **Never shrink/resample a flattened text raster** to force a pass.
+- Transparent/text-only atlases require deterministic lettering. Other assets prefer deterministic lettering and may use source-constrained reconstruction only for the clean plate/background when deterministic recovery is not possible.
+- The fit order is: safety-inset containment -> source-faithful spacing/line break -> uniform font/effect reduction with fresh render -> approved shorter wording. Style matching is optimized only after containment is satisfied.
+- `tools/localization/build_clean_graphics_candidate.py` accepts legacy v1 evidence for history, but any new/reworked production candidate must use v2 plus `outrun-clean-plate-qa-v1` evidence.
+- C must reject a new candidate whose report lacks v2 stage metrics, measured per-element safe bboxes, or required clean-plate QA. This is `REWORK_REQUIRED`, not a warning.
+- Runtime remains separate: `RUNTIME_VALIDATION=UNTESTED` until a real game test is supplied.

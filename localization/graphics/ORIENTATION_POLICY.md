@@ -626,3 +626,16 @@ Required files:
 
 These PNGs are review artifacts, not DDS construction inputs. They must be generated from the exact source/candidate lineage. A changed production DDS without this review set is not promotable.
 
+
+
+## First-pass generation v2 safe-fit rule
+
+Effective 2026-09-29:
+
+- All newly created or materially reworked candidates use prompt contract `outrun-first-pass-edit-v2`.
+- Source glyph/effect **removal mask** and Korean **lettering region** are separate. The clean plate may change only the removal mask. Korean may occupy its permitted region even where the source English glyph mask was transparent.
+- Derive a `candidate_safe_bbox` by insetting both the source full-effect bbox and permitted region; use 2 px per side by default, 1 px only with an explicit small-geometry justification, never 0 px for a new v2 first pass.
+- Measure the final Korean fill/outline/shadow/glow/antialias bbox against the approved clean plate at native resolution.
+- If measurement fails, reposition or re-render font/effect geometry and measure again. Resampling/shrinking a flattened lettering raster is forbidden because prior QA showed ragged-stroke degradation after this shortcut.
+- Clean-plate QA and final lettering QA are independent gates. A clean-plate defect cannot be hidden by Korean lettering.
+- Containment is solved before style optimization. Style matching must not consume the safety margin.
