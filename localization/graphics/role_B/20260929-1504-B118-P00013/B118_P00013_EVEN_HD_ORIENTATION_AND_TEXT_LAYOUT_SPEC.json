@@ -1,0 +1,583 @@
+{
+  "schema_version": 5,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00073",
+  "attempt": "1/3",
+  "wave_id": "P00013",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCTION_LANE_B_SELF_QA",
+  "recorded_at_kst": "2026-09-29T15:06:29+09:00",
+  "target_branch": "korean-localization-clean",
+  "initial_head_sha": "c279b702e6284933710094132ce0a00d5b471109",
+  "final_precommit_head_sha": "6cf9089ed5039b0e997893ccce4d50d90d090643",
+  "preserved_peer_head": {
+    "sha": "6cf9089ed5039b0e997893ccce4d50d90d090643",
+    "message": "localization(A): record P00014 extraction specs [AUTO:LOCALIZATION-LOCALIZATION_A-00074]",
+    "required_as_parent": true
+  },
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "selection": {
+    "selected_even_indices": [
+      92,
+      98,
+      112,
+      152
+    ],
+    "queue_blob_sha": "79a97c8ed6aa5fedee71f1f405483fa737e77306",
+    "queue_state": "4_OF_4_LOCALIZE_TEXT_PENDING_ARTWORK_TRANSCRIBED_REVIEWED",
+    "skipped_qa_pending": {
+      "LOCALIZATION-LOCALIZATION_B-00062": [
+        188,
+        212,
+        226,
+        232
+      ],
+      "LOCALIZATION-LOCALIZATION_B-00069": [
+        130,
+        140,
+        154,
+        164
+      ]
+    }
+  },
+  "source_policy": {
+    "ssot": "thp32tt/OutRun2006Tweaks@korean-localization-clean",
+    "upstream_exact_source": "Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "retrieval": "GitHub fetch_file base64; exact HD DXT5 decoded in-memory only",
+    "git_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "fingerprint": {
+    "contract_blob_sha": "583ed51e5e7062d4d686cec74c48488d9b19a603",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "transcription_blob_sha": "7e3400fa7453abf41d1a5af20825c76ebe46af73",
+    "artwork_plan_blob_sha": "a853cb8b2d872c9863f9f8ce2e0c76ec502f591c",
+    "reused_heavy_qa_report_blob_sha": "28e92e1278c7098950877a35c25544b8422f1572",
+    "reuse_note": "B110 header/format/mipmap/source identity and prior alpha-envelope PASS evidence reused. Exact HD DXT5 was decoded again only because raw orientation and semantic/text-fill layout evidence were previously HOLD/missing."
+  },
+  "assets": [
+    {
+      "queue_index": 92,
+      "asset": "1A43E9D9",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+        "git_blob_sha": "2a2019d5af833424e72c0cc6b0169f1b0699d897",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "transform_proof": "Exact HD raw decode is vertically inverted; flip_y yields readable OutRun Mode above 15 continuous course with source baseline/order restored.",
+      "elements": [
+        {
+          "source": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "raw_effect_bbox": [
+            391,
+            127,
+            1062,
+            238
+          ],
+          "readable_effect_bbox": [
+            391,
+            17,
+            1062,
+            128
+          ],
+          "raw_fill_bbox": [
+            410,
+            146,
+            1043,
+            219
+          ],
+          "readable_fill_bbox": [
+            410,
+            36,
+            1043,
+            109
+          ],
+          "fill_pixels": 21393
+        },
+        {
+          "source": "15 continuous course",
+          "korean": "15코스 연속",
+          "raw_effect_bbox": [
+            522,
+            14,
+            1584,
+            125
+          ],
+          "readable_effect_bbox": [
+            522,
+            130,
+            1584,
+            241
+          ],
+          "raw_fill_bbox": [
+            541,
+            33,
+            1565,
+            106
+          ],
+          "readable_fill_bbox": [
+            541,
+            149,
+            1565,
+            222
+          ],
+          "fill_pixels": 30384
+        }
+      ],
+      "next_safe_action": "Render both Korean lines in readable coordinates inside the exact source effect envelopes, preserve orange/navy source styling, map the finished lettering back with flip_y, BC3-encode, then run decoded-final containment/residue/comparison QA."
+    },
+    {
+      "queue_index": 98,
+      "asset": "42E618FD",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+        "git_blob_sha": "04af6f19533c54e84f6bca3cd29e53aa1abf98d6",
+        "dimensions": [
+          2048,
+          128
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "transform_proof": "Exact HD raw decode is vertically inverted relative to the readable English line; flip_y restores the readable baseline.",
+      "elements": [
+        {
+          "source": "Challenge the course record.",
+          "korean": "코스 기록에 도전하세요.",
+          "raw_effect_bbox": [
+            431,
+            5,
+            1673,
+            121
+          ],
+          "readable_effect_bbox": [
+            431,
+            6,
+            1673,
+            122
+          ],
+          "raw_fill_bbox": [
+            445,
+            20,
+            1659,
+            108
+          ],
+          "readable_fill_bbox": [
+            445,
+            19,
+            1659,
+            107
+          ],
+          "fill_pixels": 25869
+        }
+      ],
+      "next_safe_action": "Use the exact readable effect/fill bounds as the render envelope, reproduce white/navy italic styling, map to raw with flip_y, then BC3 final-decode QA."
+    },
+    {
+      "queue_index": 112,
+      "asset": "D41D0B1",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+        "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+        "dimensions": [
+          2048,
+          256
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "transform_proof": "Exact HD raw decode is vertically inverted; flip_y restores the two readable English lines and baseline.",
+      "elements": [
+        {
+          "source": "Try to reach the goal with your girlfriend.",
+          "korean": "여자친구와 함께 골에 도착하세요.",
+          "raw_effect_bbox": [
+            435,
+            18,
+            1356,
+            236
+          ],
+          "readable_effect_bbox": [
+            435,
+            19,
+            1356,
+            237
+          ],
+          "raw_fill_bbox": [
+            448,
+            32,
+            1341,
+            222
+          ],
+          "readable_fill_bbox": [
+            448,
+            33,
+            1341,
+            223
+          ],
+          "fill_pixels": 35894
+        }
+      ],
+      "next_safe_action": "Reconstruct the two-line Korean layout wholly inside the readable effect envelope, preserve white/navy italic styling, apply flip_y to raw storage, and BC3-validate the decoded result."
+    },
+    {
+      "queue_index": 152,
+      "asset": "49BB5FE5",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "exact_hd_source": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+        "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+        "dimensions": [
+          512,
+          128
+        ],
+        "format": "DXT5_BC3",
+        "mip_count": 1
+      },
+      "source_text_transform": "flip_y",
+      "transform_proof": "Exact HD raw decode places the four mix labels upside-down on raw top and the two year labels upside-down below; flip_y restores readable years above mix labels.",
+      "atlas_coordinate_note": "4x atlas rect Y is bottom-left style; raw top-left rectangle is y_raw = H - y_atlas - h.",
+      "elements": [
+        {
+          "source": "PRO.",
+          "korean": "프로",
+          "sprite": "sprite_832",
+          "atlas_rect_bl": [
+            0,
+            80,
+            116,
+            48
+          ],
+          "raw_cell": [
+            0,
+            0,
+            115,
+            47
+          ],
+          "readable_cell": [
+            0,
+            80,
+            115,
+            127
+          ],
+          "raw_fill_bbox": [
+            19,
+            7,
+            102,
+            40
+          ],
+          "readable_fill_bbox": [
+            19,
+            87,
+            102,
+            120
+          ],
+          "fill_pixels": 1470
+        },
+        {
+          "source": "INS.",
+          "korean": "연주",
+          "sprite": "sprite_833",
+          "atlas_rect_bl": [
+            116,
+            80,
+            116,
+            48
+          ],
+          "raw_cell": [
+            116,
+            0,
+            231,
+            47
+          ],
+          "readable_cell": [
+            116,
+            80,
+            231,
+            127
+          ],
+          "raw_fill_bbox": [
+            137,
+            7,
+            213,
+            40
+          ],
+          "readable_fill_bbox": [
+            137,
+            87,
+            213,
+            120
+          ],
+          "fill_pixels": 1359
+        },
+        {
+          "source": "G.M.",
+          "korean": "기타",
+          "sprite": "sprite_834",
+          "atlas_rect_bl": [
+            232,
+            80,
+            116,
+            48
+          ],
+          "raw_cell": [
+            232,
+            0,
+            347,
+            47
+          ],
+          "readable_cell": [
+            232,
+            80,
+            347,
+            127
+          ],
+          "raw_fill_bbox": [
+            253,
+            7,
+            331,
+            40
+          ],
+          "readable_fill_bbox": [
+            253,
+            87,
+            331,
+            120
+          ],
+          "fill_pixels": 1259
+        },
+        {
+          "source": "E.R.",
+          "korean": "유로",
+          "sprite": "sprite_835",
+          "atlas_rect_bl": [
+            348,
+            80,
+            116,
+            48
+          ],
+          "raw_cell": [
+            348,
+            0,
+            463,
+            47
+          ],
+          "readable_cell": [
+            348,
+            80,
+            463,
+            127
+          ],
+          "raw_fill_bbox": [
+            374,
+            8,
+            442,
+            39
+          ],
+          "readable_fill_bbox": [
+            374,
+            88,
+            442,
+            119
+          ],
+          "fill_pixels": 1066
+        },
+        {
+          "source": "'89",
+          "korean": "'89",
+          "preserve": true,
+          "sprite": "sprite_836",
+          "atlas_rect_bl": [
+            0,
+            32,
+            116,
+            48
+          ],
+          "raw_cell": [
+            0,
+            48,
+            115,
+            95
+          ],
+          "readable_cell": [
+            0,
+            32,
+            115,
+            79
+          ],
+          "raw_fill_bbox": [
+            24,
+            55,
+            81,
+            87
+          ],
+          "readable_fill_bbox": [
+            24,
+            40,
+            81,
+            72
+          ],
+          "fill_pixels": 948
+        },
+        {
+          "source": "'86",
+          "korean": "'86",
+          "preserve": true,
+          "sprite": "sprite_837",
+          "atlas_rect_bl": [
+            116,
+            32,
+            116,
+            48
+          ],
+          "raw_cell": [
+            116,
+            48,
+            231,
+            95
+          ],
+          "readable_cell": [
+            116,
+            32,
+            231,
+            79
+          ],
+          "raw_fill_bbox": [
+            140,
+            55,
+            196,
+            87
+          ],
+          "readable_fill_bbox": [
+            140,
+            40,
+            196,
+            72
+          ],
+          "fill_pixels": 939
+        }
+      ],
+      "next_safe_action": "Localize only sprite_832..835 inside their measured text fill/effect regions, preserve sprite_836/837 year labels and all pill artwork, map candidate lettering back with flip_y, BC3-encode, and final-decode QA."
+    }
+  ],
+  "evidence": [
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_92_1A43E9D9_RAW_HD_ORIENTATION_PREVIEW.png",
+      "git_blob_sha": "9c63e19f53e1d9bff869ffb5db5a3133778a63fc",
+      "kind": "exact_hd_raw_orientation_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_92_1A43E9D9_READABLE_HD_SOURCE_PREVIEW.png",
+      "git_blob_sha": "cf30af5573553fb81c477317d18056799dba06b4",
+      "kind": "exact_hd_flip_y_readable_source_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_98_42E618FD_RAW_HD_ORIENTATION_PREVIEW.png",
+      "git_blob_sha": "2c959485c2eedb235b7c8d5673e289861f92c0a4",
+      "kind": "exact_hd_raw_orientation_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_98_42E618FD_READABLE_HD_SOURCE_PREVIEW.png",
+      "git_blob_sha": "a7c8d90191a2458b9fde9e4a9f353b1183135a14",
+      "kind": "exact_hd_flip_y_readable_source_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_112_D41D0B1_RAW_HD_ORIENTATION_PREVIEW.png",
+      "git_blob_sha": "39b35a0da8d308bb1a30980d6840e094816a7325",
+      "kind": "exact_hd_raw_orientation_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_112_D41D0B1_READABLE_HD_SOURCE_PREVIEW.png",
+      "git_blob_sha": "4133450b4d433b6308ce95d867386a0599450450",
+      "kind": "exact_hd_flip_y_readable_source_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_152_49BB5FE5_RAW_HD_ORIENTATION_PREVIEW.png",
+      "git_blob_sha": "dc677a72a7c3d76c526366cef735ed05281ff2b5",
+      "kind": "exact_hd_raw_orientation_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    },
+    {
+      "path": "localization/graphics/role_B/20260929-1504-B118-P00013/B118_152_49BB5FE5_READABLE_HD_SOURCE_PREVIEW.png",
+      "git_blob_sha": "2f9437e7645e841c54aa980fdd3d13279fd16a38",
+      "kind": "exact_hd_flip_y_readable_source_preview",
+      "preview_scale": "nearest 1/4; evidence only, not construction input"
+    }
+  ],
+  "material_advance": {
+    "type": "FOUR_EVEN_EXACT_HD_ORIENTATION_AND_TEXT_LAYOUT_SPECS",
+    "indices": [
+      92,
+      98,
+      112,
+      152
+    ],
+    "assets": [
+      "1A43E9D9",
+      "42E618FD",
+      "D41D0B1",
+      "49BB5FE5"
+    ],
+    "source_text_transform_proven": 4,
+    "semantic_regions_resolved": 10,
+    "localizable_regions": 8,
+    "preserve_regions": 2,
+    "fill_metric_regions": 10,
+    "semantic_to_atlas_cells_resolved_index_152": 6,
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "self_qa": {
+    "parity_shard": "PASS_EVEN_ONLY_92_98_112_152",
+    "work_steal": "NONE",
+    "canonical_translation_match": "PASS_10_OF_10_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "exact_hd_source_identity": "PASS_4_OF_4_IMMUTABLE_DDS_BLOBS",
+    "source_text_transform": "PASS_FLIP_Y_4_OF_4_FROM_EXACT_HD_RAW_PIXELS",
+    "semantic_layout_mapping": "PASS_10_OF_10_REGIONS; 8_LOCALIZE + 2_PRESERVE",
+    "heavy_qa_dedup": "PASS_B110_HEADER_FORMAT_MIP_AND_EXISTING_ALPHA_EVIDENCE_REUSED",
+    "one_pixel_containment": "HOLD_STRICT_RECHECK_NO_NEW_KOREAN_HD_CANDIDATE",
+    "candidate_dds_header_alpha_compression": "NOT_APPLICABLE_NO_CANDIDATE_BYTES_TOUCHED",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_NEW_OR_REWORKED_KOREAN_DDS",
+    "historical_lowres_candidate_policy": "PASS_NOT_REUSED_NOT_UPSCALED",
+    "shared_state_isolation": "PASS_NO_SHARED_STATE_FILES_TOUCHED",
+    "peer_lane_isolation": "PASS_LATEST_HEAD_PRESERVED_AS_PARENT",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "conclusion": "P00013 advances four unfinished even-shard DXT5 assets by proving exact-HD raw flip_y orientation, resolving semantic/readable regions, and recording source fill/layout metrics without reusing historical low-resolution Korean candidates. No Korean DDS is promoted; final containment/compression/comparison and runtime remain pending."
+}
