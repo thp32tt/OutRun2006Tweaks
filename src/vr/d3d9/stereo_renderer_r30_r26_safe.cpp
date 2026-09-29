@@ -965,6 +965,7 @@ namespace OutRunVRStereo
         void R67GuardStageTransitionPresent() noexcept
         {
             auto& frame = R69FrameContext;
+            OutRunVR::GameSemantic::TickTransientOutRunHudFrame();
             if (R72OutRunTransientHudPresents > 0)
                 --R72OutRunTransientHudPresents;
             if (!Game::stg_stage_num || !Game::is_vr_gameplay_presentation())
@@ -990,8 +991,8 @@ namespace OutRunVRStereo
                 // Checkpoint "+TIME" overlays appear immediately after a stage
                 // identity change. The final-result overlay starts several
                 // seconds after stage 14, so keep a longer bounded window there.
-                R72OutRunTransientHudPresents =
-                    stage == 14 ? 1200 : 240;
+                R72OutRunTransientHudPresents = 240;
+                OutRunVR::GameSemantic::ArmTransientOutRunHudFrames(240);
                 if (!R72FirstTransientHudLogged)
                 {
                     R72FirstTransientHudLogged = true;
@@ -4002,13 +4003,65 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
-                // R72 HMD evidence: copying one stock WVP into both eyes still
-                // leaves different angular placement because the OpenXR eyes
-                // have asymmetric FOVs. Align the authored centre-eye screen
-                // effect into the common angular frustum without adding IPD.
-                // Lens flare remains an optical/screen effect, so zero disparity
-                // is intentional; the fix target is one fused flare, not a
-                // false world-depth billboard.
+                // R73 HMD evidence: both centre-eye mono fusion (R69) and
+                // common-FOV zero-disparity fusion (R72) still produced two
+                // visible flares. Use the exact Calc3D2D view anchor as a light
+                // direction instead: push that ray to virtual infinity, then
+                // project it through each real OpenXR eye. This preserves one
+                // world direction while making IPD parallax negligible.
+                const auto* captured =
+                    OutRunVR::GameSemantic::ProjectedScreenAnchor();
+                if (captured && captured->valid &&
+                    std::isfinite(captured->viewX) &&
+                    std::isfinite(captured->viewY) &&
+                    std::isfinite(captured->viewZ) &&
+                    std::fabs(captured->viewZ) > 1.0e-4f)
+                {
+                    constexpr float FarFlareDepth = 10000.0f;
+                    const float scale =
+                        FarFlareDepth / std::fabs(captured->viewZ);
+                    OutRunVR::GameSemantic::ProjectedMarkerInfo farRay{
+                        true,
+                        captured->viewX * scale,
+                        captured->viewY * scale,
+                        captured->viewZ * scale
+                    };
+                    float deltaX[2]{}, deltaY[2]{};
+                    if (R57BuildProjectedMarkerDelta(
+                            stereo, baseProjection, deltaX, deltaY,
+                            nullptr, nullptr, &farRay))
+                    {
+                        for (int eye = 0; eye < 2; ++eye)
+                        {
+                            D3DMATRIX clipShift = IdentityMatrix();
+                            clipShift._41 = deltaX[eye];
+                            clipShift._42 = deltaY[eye];
+                            const D3DMATRIX corrected =
+                                MultiplyMatrix(stockWvp, clipShift);
+                            if (!MatrixFinite(corrected))
+                                return false;
+                            const D3DMATRIX correctedT =
+                                TransposeMatrix(corrected);
+                            std::memcpy(eyeConstants[eye], &correctedT,
+                                sizeof(correctedT));
+                        }
+                        static bool firstFarFlareLogged = false;
+                        if (!firstFarFlareLogged)
+                        {
+                            firstFarFlareLogged = true;
+                            spdlog::info(
+                                "VR R73 FLARE FAR-RAY: Calc3D2D direction reprojected at virtual infinity view=({:.3f},{:.3f},{:.3f}) deltaL=({:.6f},{:.6f}) deltaR=({:.6f},{:.6f})",
+                                captured->viewX, captured->viewY,
+                                captured->viewZ,
+                                deltaX[0], deltaY[0],
+                                deltaX[1], deltaY[1]);
+                        }
+                        return true;
+                    }
+                }
+
+                // Fail soft to R72 angular-FOV alignment if the exact anchor
+                // is unavailable on a transient frame.
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     D3DMATRIX clipAffine = IdentityMatrix();
@@ -4022,13 +4075,6 @@ namespace OutRunVRStereo
                         TransposeMatrix(corrected);
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
-                }
-                static bool firstFlareFovFusionLogged = false;
-                if (!firstFlareFovFusionLogged)
-                {
-                    firstFlareFovFusionLogged = true;
-                    spdlog::info(
-                        "VR R72 FLARE FUSION: exact Calc3D2D effect aligned to common angular FOV in L/R; zero-disparity optical flare");
                 }
                 return true;
             }
@@ -4418,7 +4464,7 @@ namespace OutRunVRStereo
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
-                        "VR R72 FLARE FIX: exact projected-screen effect uses common-angular-FOV zero-disparity fusion");
+                        "VR R73 FLARE FIX: exact projected-screen effect uses far-ray eye reprojection with R72 FOV fallback");
                 }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
