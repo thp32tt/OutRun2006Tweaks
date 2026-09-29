@@ -228,7 +228,7 @@ runtime = {
     "controller_mode": CONTROLLER_MODE,
     "queue_mode": QUEUE_MODE,
     "queue_check_seconds": QUEUE_CHECK_SECONDS,
-    "queue_stable_seconds": QUEUE_STABLE_SECONDS,
+    "queue_stable_seconds": QUEUE_STABLE_SECONDS,\n    "queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS,
     "github_poll_seconds": GITHUB_POLL_SECONDS,
     "github_bound_run_poll_seconds": GITHUB_BOUND_RUN_POLL_SECONDS,
     "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
