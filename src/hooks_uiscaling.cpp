@@ -153,6 +153,13 @@ class UIScaling : public Hook
 		0x975EE, 0x97727, 0x977FB
 	};
 
+	// R74 runtime+Ghidra proof: these two exact calls are the only callers
+	// of FUN_0042D200 inside the final-result producer FUN_004979E0.
+	// R73 hudtrace observed their lower 0x2D26C enqueue path as UNKNOWN while
+	// arg5 animated 0 -> 98.59, matching the result progress/percentage.
+	static constexpr int R74OutRunResultProgressCallA = 0x97BE4;
+	static constexpr int R74OutRunResultProgressCallB = 0x97DEC;
+
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
 	static int __stdcall D3DXMatrixTransformation2D_dest(D3DMATRIX* pOut, D3DXVECTOR2* pScalingCenter, float pScalingRotation,
@@ -767,6 +774,72 @@ class UIScaling : public Hook
 			R71OutRunPrintPreviousScope;
 		OutRunVR::GameSemantic::CurrentProducerMarker =
 			R71OutRunPrintPreviousMarker;
+	}
+
+	// R74 final-result progress companion ownership. Do not hook FUN_0042D200
+	// globally: canonical Ghidra proves 0x97BE4/0x97DEC are the exact result
+	// producer edges, and R73 runtime evidence binds their 0x2D26C queue path
+	// to the animated percentage/progress element.
+	inline static thread_local unsigned R74ResultProgressDepth = 0;
+	inline static thread_local
+		std::array<SpriteNode*, Game::SpritePriorityCount>
+			R74ResultProgressTailsBefore{};
+	inline static thread_local OutRunVR::GameSemantic::RenderScope
+		R74ResultProgressPreviousScope =
+			OutRunVR::GameSemantic::RenderScope::None;
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo
+			R74ResultProgressPreviousMarker{};
+	inline static std::atomic<std::uint64_t>
+		R74ResultProgressTaggedNodes{ 0 };
+	static inline SafetyHookMid R74ResultProgressEnterA{};
+	static inline SafetyHookMid R74ResultProgressLeaveA{};
+	static inline SafetyHookMid R74ResultProgressEnterB{};
+	static inline SafetyHookMid R74ResultProgressLeaveB{};
+
+	static void R74ResultProgressEnter(safetyhook::Context&)
+	{
+		if (R74ResultProgressDepth++ != 0)
+			return;
+
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			R74ResultProgressTailsBefore[prio] =
+				root ? root->tail_4 : nullptr;
+		}
+
+		R74ResultProgressPreviousScope =
+			OutRunVR::GameSemantic::CurrentProducerScope;
+		R74ResultProgressPreviousMarker =
+			OutRunVR::GameSemantic::CurrentProducerMarker;
+		OutRunVR::GameSemantic::CurrentProducerScope =
+			OutRunVR::GameSemantic::RenderScope::ScreenHud;
+		OutRunVR::GameSemantic::CurrentProducerMarker = {};
+	}
+
+	static void R74ResultProgressLeave(safetyhook::Context&)
+	{
+		if (R74ResultProgressDepth == 0 ||
+			--R74ResultProgressDepth != 0)
+			return;
+
+		const auto tagged = R70TagAppendedSpriteNodes(
+			R74ResultProgressTailsBefore,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		const auto total = R74ResultProgressTaggedNodes.fetch_add(
+			tagged, std::memory_order_relaxed) + tagged;
+		if (tagged && (total & (total - 1)) == 0)
+		{
+			spdlog::info(
+				"VR R74 OUTRUN RESULT PROGRESS: exact 0x97BE4/0x97DEC queue nodes pinned SCREEN_HUD tagged={} total={}",
+				tagged, total);
+		}
+
+		OutRunVR::GameSemantic::CurrentProducerScope =
+			R74ResultProgressPreviousScope;
+		OutRunVR::GameSemantic::CurrentProducerMarker =
+			R74ResultProgressPreviousMarker;
 	}
 
 	using DispRankSpraniFn =
@@ -1441,6 +1514,20 @@ public:
 			Module::exe_ptr(R71OutRunStagePrintfCalls[2]), R71OutRunPrintEnter);
 		R71OutRunPrintLeave3 = safetyhook::create_mid(
 			Module::exe_ptr(R71OutRunStagePrintfCalls[2] + 5), R71OutRunPrintLeave);
+
+		// R74 exact final-result percentage/progress companion nodes.
+		R74ResultProgressEnterA = safetyhook::create_mid(
+			Module::exe_ptr(R74OutRunResultProgressCallA),
+			R74ResultProgressEnter);
+		R74ResultProgressLeaveA = safetyhook::create_mid(
+			Module::exe_ptr(R74OutRunResultProgressCallA + 5),
+			R74ResultProgressLeave);
+		R74ResultProgressEnterB = safetyhook::create_mid(
+			Module::exe_ptr(R74OutRunResultProgressCallB),
+			R74ResultProgressEnter);
+		R74ResultProgressLeaveB = safetyhook::create_mid(
+			Module::exe_ptr(R74OutRunResultProgressCallB + 5),
+			R74ResultProgressLeave);
 
 		// R71 gameplay rival indicator: exact world projection + exact sprani.
 		Memory::VP::InjectHook(Module::exe_ptr(R71RivalMarkerSpraniCall),
