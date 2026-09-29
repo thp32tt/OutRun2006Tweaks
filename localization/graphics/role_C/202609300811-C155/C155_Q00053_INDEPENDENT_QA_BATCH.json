@@ -276,7 +276,19 @@
     "conclusion": "success",
     "validated_at_kst": "2026-09-30T08:12:18+09:00"
   },
-  "bookkeeping_note": "Q00053 authoritative Gate PASS is owned by validation-bearing result cf375f6695e2d933c420002a6476f1c081b29b75. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "bookkeeping_note": "Q00053 authoritative Gate PASS is owned by validation-bearing result cf375f6695e2d933c420002a6476f1c081b29b75. This bookkeeping commit is separate and does not replace validation ownership. Newer out-of-batch B00237@index163 remains QA_PENDING and is not dispositioned by Q00053. Runtime remains UNTESTED.",
   "report_kind": "INDEPENDENT_BATCH_QA_REPORT",
-  "bookkeeping_recorded_at_kst": "2026-09-30T08:13:59.714+09:00"
+  "bookkeeping_recorded_at_kst": "2026-09-30T08:14:32+09:00",
+  "bookkeeping_base_head_sha": "7b1bb8246eef6dbc2c5f7a567eb28d480a25d4d4",
+  "bookkeeping_concurrent_head_reconciliation": {
+    "observed_head": "7b1bb8246eef6dbc2c5f7a567eb28d480a25d4d4",
+    "newer_out_of_batch_producer": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00237",
+      "result_sha": "b138928bfc031026d37573c7055685460131d7d7",
+      "bookkeeping_sha": "646514025dae8e8a5db1c286b5b498945793609c",
+      "index": 163,
+      "asset": "59A79158",
+      "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00053"
+    }
+  }
 }
