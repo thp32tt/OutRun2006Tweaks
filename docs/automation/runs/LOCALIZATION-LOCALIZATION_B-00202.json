@@ -87,7 +87,7 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "bookkeeping_note": "Tagged producer result commit must remain the immutable C_BATCH_GATE input. A later bookkeeping-only commit may backlink result_sha without changing producer evidence."
+  "result_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
+  "authoritative_result_sha": "a35266ef074dea4b8e84ca95806928384298f4ea",
+  "bookkeeping_note": "Result SHA recorded after the tagged producer result commit. The immutable producer result remains automation_validation=PENDING for C_BATCH_GATE; runtime_validation remains UNTESTED. Candidate DDS bytes were not persisted to the branch and are not claimed as modified."
 }
