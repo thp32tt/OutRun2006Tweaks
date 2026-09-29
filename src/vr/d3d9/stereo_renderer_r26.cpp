@@ -92,6 +92,81 @@ namespace OutRunVRStereo
                 effect.zEnabled ? 1 : 0);
         }
 
+        // R71 visual-only diagnostic for the remaining start-grid shadow split.
+        // The known-bad restored console base shadow is already disabled in VR,
+        // so identify the stock-PC fragile draw before changing stereo policy.
+        // This is deliberately bounded: first 32 matching draws, then powers of
+        // two only. It never changes render state or draw ownership.
+        std::uint64_t R71StartShadowDiagHits = 0;
+        void R71TraceStartGridShadowCandidate(
+            IDirect3DDevice9* device,
+            const R13EffectSnapshot& effect) noexcept
+        {
+            if (!Settings::VRTelemetry || !device ||
+                !Game::is_vr_gameplay_presentation() ||
+                !StereoWanted() || !R9StereoSeeded ||
+                !effect.zKnown || !effect.zEnabled)
+                return;
+
+            DWORD alphaBlend = FALSE;
+            DWORD alphaTest = FALSE;
+            DWORD zWrite = TRUE;
+            DWORD zEnable = D3DZB_TRUE;
+            DWORD stencilEnable = FALSE;
+            DWORD cullMode = D3DCULL_CCW;
+            DWORD colorWrite = 0xFFFFFFFFu;
+            if (!ReadTrackedRenderState(
+                    device, D3DRS_ALPHABLENDENABLE, alphaBlend) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_ALPHATESTENABLE, alphaTest) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_ZWRITEENABLE, zWrite) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_ZENABLE, zEnable) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_STENCILENABLE, stencilEnable) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_CULLMODE, cullMode) ||
+                !ReadTrackedRenderState(
+                    device, D3DRS_COLORWRITEENABLE, colorWrite))
+                return;
+
+            const bool fragileCandidate =
+                alphaBlend != FALSE || alphaTest != FALSE ||
+                zWrite == FALSE || stencilEnable != FALSE ||
+                cullMode == D3DCULL_NONE;
+            if (!fragileCandidate || zEnable == D3DZB_FALSE)
+                return;
+
+            const auto hit = ++R71StartShadowDiagHits;
+            if (hit > 32 && (hit & (hit - 1)) != 0)
+                return;
+
+            IDirect3DPixelShader9* pixelShader = nullptr;
+            const HRESULT pixelHr = device->GetPixelShader(&pixelShader);
+            const std::uintptr_t pixelIdentity =
+                SUCCEEDED(pixelHr)
+                    ? reinterpret_cast<std::uintptr_t>(pixelShader) : 0;
+            if (pixelShader)
+                pixelShader->Release();
+
+            spdlog::info(
+                "VR R71 START SHADOW DIAG: hit={} present={} draw={} scope={} vs=0x{:x} ps=0x{:x} effect={} alphaBlend={} alphaTest={} zWrite={} zEnable={} stencil={} cull={} colorWrite=0x{:08X}",
+                hit, PresentEpoch, R23GameDrawSerial,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentScope),
+                CurrentVertexShaderIdentity.load(std::memory_order_acquire),
+                pixelIdentity,
+                static_cast<unsigned>(effect.classification),
+                alphaBlend != FALSE ? 1 : 0,
+                alphaTest != FALSE ? 1 : 0,
+                zWrite != FALSE ? 1 : 0,
+                zEnable != D3DZB_FALSE ? 1 : 0,
+                stencilEnable != FALSE ? 1 : 0,
+                static_cast<unsigned>(cullMode),
+                static_cast<unsigned>(colorWrite));
+        }
+
 
         bool R26TrackedOcclusionNeedsSingleExecution(
             IDirect3DDevice9* device) noexcept
@@ -382,6 +457,7 @@ namespace OutRunVRStereo
         {
             const R13EffectSnapshot effect = R13CaptureDrawTimeEffect(device);
             R46TraceShaderFingerprint(device, effect);
+            R71TraceStartGridShadowCandidate(device, effect);
             auto legacyWithSnapshot = [&]() {
                 R13EffectOverrideScope reuse(effect);
                 return legacyR13Draw();
