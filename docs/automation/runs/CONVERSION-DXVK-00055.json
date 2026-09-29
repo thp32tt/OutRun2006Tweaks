@@ -2,7 +2,7 @@
   "task_id": "CONVERSION-DXVK-00055",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 1,
+  "attempt": 3,
   "base_sha": "91ccca5992f1be0c243fd7d51f75f6f82bde33d2",
   "result_sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
   "automation_validation": "PASS",
@@ -65,7 +65,8 @@
   "durable_ledger": {
     "issue_14_implementation_comment_id": 5889808409,
     "issue_14_repair_comment_id": 5889831204,
-    "issue_14_validation_comment_id": 5889954806
+    "issue_14_validation_comment_id": 5889954806,
+    "bookkeeping_correction_comment_id": 5889973784
   },
   "completed_checkpoints": [
     "C0_RECOVER",
@@ -78,5 +79,28 @@
     "C6_STATE"
   ],
   "blocker": "No software blocker remains for F02. Existing DXVK visual, host-owned DirectGPU transport and performance gates remain hardware-dependent.",
-  "next_action": "Do not reopen F02 unless package/preflight identity checks regress. Continue existing exact-build Quest3/VDXR DXVK visual, transport and performance validation; keep those runtime conclusions unproven until matching HMD evidence exists."
+  "next_action": "Do not reopen F02 unless package/preflight identity checks regress. Continue existing exact-build Quest3/VDXR DXVK visual, transport and performance validation; keep those runtime conclusions unproven until matching HMD evidence exists.",
+  "attempt_history": [
+    {
+      "attempt": 1,
+      "result": "FAIL",
+      "result_sha": "634ac6593f22e8ec982ee5814c9213dc1f9c35f7",
+      "validation_run_id": 36565147831,
+      "note": "Initial implementation exposed stale P9_PC_FAST_CONTRACT verifier literals before the new F02 behavior tests could run."
+    },
+    {
+      "attempt": 2,
+      "result": "REPAIR_VALIDATION_STARTED",
+      "result_sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
+      "validation_run_id": 36565326204,
+      "note": "Verifier drift repaired without weakening the canonical R69_FIXPACK baseline guard; exact-SHA CI launched."
+    },
+    {
+      "attempt": 3,
+      "result": "PASS",
+      "result_sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
+      "validation_run_id": 36565326204,
+      "note": "Resumed from the same validation-bearing result, consumed successful exact-SHA CI, and finalized durable bookkeeping without repeating the implementation."
+    }
+  ]
 }
