@@ -552,6 +552,66 @@ bool NativeManagedTextureShadow::recreate_and_upload_mirror(
     return true;
 }
 
+bool NativeManagedTextureShadow::mirror_descriptor_exact(
+    ID3D11Device* expectedDevice) const noexcept {
+    if (!expectedDevice ||
+        mirror_device_.Get() != expectedDevice ||
+        !mirror_texture_ || !mirror_srv_)
+        return false;
+
+    const auto format = translate_resource_format(
+        source_format_, ResourceRole::Texture);
+    const auto behavior = translate_resource_behavior(
+        ResourceRole::Texture, D3DPOOL_MANAGED, 0);
+    if (!format.exact || !behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.cpuAccessFlags != 0 ||
+        behavior.bindFlags != D3D11_BIND_SHADER_RESOURCE)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> textureDevice;
+    mirror_texture_->GetDevice(textureDevice.ReleaseAndGetAddressOf());
+    if (!textureDevice || textureDevice.Get() != expectedDevice)
+        return false;
+
+    D3D11_TEXTURE2D_DESC textureDesc{};
+    mirror_texture_->GetDesc(&textureDesc);
+    if (textureDesc.Width != width_ ||
+        textureDesc.Height != height_ ||
+        textureDesc.MipLevels != 1 ||
+        textureDesc.ArraySize != 1 ||
+        textureDesc.Format != format.format ||
+        textureDesc.SampleDesc.Count != 1 ||
+        textureDesc.SampleDesc.Quality != 0 ||
+        textureDesc.Usage != behavior.usage ||
+        textureDesc.BindFlags != behavior.bindFlags ||
+        textureDesc.CPUAccessFlags != behavior.cpuAccessFlags ||
+        textureDesc.MiscFlags != 0)
+        return false;
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    mirror_srv_->GetDesc(&srvDesc);
+    if (srvDesc.Format != textureDesc.Format ||
+        srvDesc.ViewDimension != D3D11_SRV_DIMENSION_TEXTURE2D ||
+        srvDesc.Texture2D.MostDetailedMip != 0 ||
+        srvDesc.Texture2D.MipLevels != 1)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Resource> viewResource;
+    mirror_srv_->GetResource(viewResource.ReleaseAndGetAddressOf());
+    if (!viewResource)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> viewTexture;
+    if (FAILED(viewResource.As(&viewTexture)) ||
+        !viewTexture || viewTexture.Get() != mirror_texture_.Get())
+        return false;
+
+    return true;
+}
+
 bool NativeManagedTextureShadow::begin_source_lock(
     UINT level,
     const RECT* sourceRect,
@@ -837,11 +897,14 @@ NativeManagedTextureRegistry::mirror_readiness(
     out.deviceMatches =
         expectedDevice != nullptr &&
         shadow->mirror_device() == expectedDevice;
+    out.descriptorExact =
+        shadow->mirror_descriptor_exact(expectedDevice);
     out.ready =
         shadow->mirror_ready() &&
         out.resourcesOwned &&
         out.lifetimeCurrent &&
-        out.deviceMatches;
+        out.deviceMatches &&
+        out.descriptorExact;
     return out;
 }
 
@@ -906,6 +969,8 @@ NativeManagedTextureRegistry::mirror_readiness_for_stages(
         const bool lifetimeCurrent = managed_mirror_ready(lifetime);
         const bool deviceMatches =
             shadow->mirror_device() == expectedDevice;
+        const bool descriptorExact =
+            shadow->mirror_descriptor_exact(expectedDevice);
 
         if (resourcesOwned)
             out.resourcesOwnedMask |= bit;
@@ -913,10 +978,13 @@ NativeManagedTextureRegistry::mirror_readiness_for_stages(
             out.lifetimeCurrentMask |= bit;
         if (deviceMatches)
             out.deviceMatchesMask |= bit;
+        if (descriptorExact)
+            out.descriptorExactMask |= bit;
         if (shadow->mirror_ready() &&
             resourcesOwned &&
             lifetimeCurrent &&
-            deviceMatches)
+            deviceMatches &&
+            descriptorExact)
             out.readyMask |= bit;
 
         snapshotToken = mix_readiness_snapshot_token(
