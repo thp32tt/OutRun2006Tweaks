@@ -2079,6 +2079,10 @@ def main() -> None:
             "R110 mirror-instance generation storage",
         "validate_mirror_readiness_snapshot_for_stages(":
             "R110 snapshot validation API",
+        "advance_membership_generation_locked() noexcept":
+            "R110 registry-membership generation helper",
+        "std::uint64_t membership_generation_ = 1":
+            "R110 registry-membership generation storage",
     }
     missing_r110_header = [
         meaning
@@ -2098,6 +2102,12 @@ def main() -> None:
             "R110 successful mirror recreation generation",
         "reinterpret_cast<std::uintptr_t>(expectedDevice)":
             "R110 expected-device token binding",
+        "reinterpret_cast<std::uintptr_t>(this)":
+            "R110 registry-instance token binding",
+        "membership_generation_":
+            "R110 registry-membership token binding",
+        "advance_membership_generation_locked();":
+            "R110 membership-change invalidation",
         "reinterpret_cast<std::uintptr_t>(textureKeys[stage])":
             "R110 texture-identity token binding",
         "lifetime.deviceGeneration":
@@ -2127,6 +2137,10 @@ def main() -> None:
             "R110 token identity binding proof",
         "R110 mirror instance recreation invalidates stale readiness token":
             "R110 same-shadow recreation invalidation proof",
+        "R110 registry membership change invalidates prior snapshot token":
+            "R110 registry-membership invalidation proof",
+        "R110 refreshed membership snapshot issues a fresh valid token":
+            "R110 membership-refresh token proof",
         "R110 external mutation invalidates prior readiness snapshot token":
             "R110 mutation invalidation proof",
         "R110 recapture and mirror recreation issue a fresh valid token":

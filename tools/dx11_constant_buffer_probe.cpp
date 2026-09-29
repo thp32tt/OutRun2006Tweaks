@@ -1049,8 +1049,35 @@ int main()
             0x1u, d3d.device,
             registryStageAfterSameShadowRecreate.snapshotToken),
         "R110 mirror instance recreation invalidates stale readiness token");
-    const auto registryStageBeforeExternalMutationToken =
+    const auto registryStageBeforeMembershipChangeToken =
         registryStageAfterSameShadowRecreate.snapshotToken;
+    require(
+        managedRegistry.register_texture(
+            &registryTextureB, D3DFMT_A8R8G8B8, 4, 4, 1, 0,
+            D3DPOOL_MANAGED),
+        "R110 registry membership generation change prerequisite");
+    require(
+        !managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device, registryStageBeforeMembershipChangeToken),
+        "R110 registry membership change invalidates prior snapshot token");
+    managedRegistry.forget_texture(&registryTextureB);
+    const auto registryStageAfterMembershipRefresh =
+        managedRegistry.mirror_readiness_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device);
+    require(
+        registryStageAfterMembershipRefresh.allRequiredReady &&
+        registryStageAfterMembershipRefresh.snapshotToken != 0 &&
+        registryStageAfterMembershipRefresh.snapshotToken !=
+            registryStageBeforeMembershipChangeToken &&
+        managedRegistry.validate_mirror_readiness_snapshot_for_stages(
+            registryStageKeys.data(), registryStageKeys.size(),
+            0x1u, d3d.device,
+            registryStageAfterMembershipRefresh.snapshotToken),
+        "R110 refreshed membership snapshot issues a fresh valid token");
+    const auto registryStageBeforeExternalMutationToken =
+        registryStageAfterMembershipRefresh.snapshotToken;
     const auto registryStageMissingRequired =
         managedRegistry.mirror_readiness_for_stages(
             registryStageKeys.data(), registryStageKeys.size(),

@@ -735,6 +735,7 @@ bool NativeManagedTextureRegistry::register_texture(
 
         std::lock_guard<std::mutex> lock(mutex_);
         shadows_[textureKey] = std::move(shadow);
+        advance_membership_generation_locked();
         return true;
     } catch (...) {
         return false;
@@ -751,6 +752,12 @@ const NativeManagedTextureShadow* NativeManagedTextureRegistry::find_locked(
     const void* textureKey) const noexcept {
     const auto it = shadows_.find(textureKey);
     return it == shadows_.end() ? nullptr : it->second.get();
+}
+
+void NativeManagedTextureRegistry::advance_membership_generation_locked() noexcept {
+    ++membership_generation_;
+    if (membership_generation_ == 0)
+        ++membership_generation_;
 }
 
 bool NativeManagedTextureRegistry::begin_source_lock(
@@ -872,6 +879,12 @@ NativeManagedTextureRegistry::mirror_readiness_for_stages(
             reinterpret_cast<std::uintptr_t>(expectedDevice)));
 
     std::lock_guard<std::mutex> lock(mutex_);
+    snapshotToken = mix_readiness_snapshot_token(
+        snapshotToken,
+        static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(this)));
+    snapshotToken = mix_readiness_snapshot_token(
+        snapshotToken, membership_generation_);
     for (std::size_t stage = 0; stage < textureCount; ++stage) {
         const auto bit = static_cast<std::uint32_t>(1u << stage);
         if ((requiredMask & bit) == 0)
@@ -967,15 +980,19 @@ void NativeManagedTextureRegistry::forget_texture(
     if (it->second)
         it->second->shutdown();
     shadows_.erase(it);
+    advance_membership_generation_locked();
 }
 
 void NativeManagedTextureRegistry::clear() noexcept {
     std::lock_guard<std::mutex> lock(mutex_);
+    if (shadows_.empty())
+        return;
     for (auto& entry : shadows_) {
         if (entry.second)
             entry.second->shutdown();
     }
     shadows_.clear();
+    advance_membership_generation_locked();
 }
 
 std::size_t NativeManagedTextureRegistry::size() const noexcept {

@@ -362,11 +362,13 @@ private:
     NativeManagedTextureShadow* find_locked(const void* textureKey) noexcept;
     const NativeManagedTextureShadow* find_locked(
         const void* textureKey) const noexcept;
+    void advance_membership_generation_locked() noexcept;
 
     mutable std::mutex mutex_;
     std::unordered_map<
         const void*,
         std::unique_ptr<NativeManagedTextureShadow>> shadows_;
+    std::uint64_t membership_generation_ = 1;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
