@@ -83,3 +83,17 @@ jobs:
             echo "legacy observe-only queue watchdog remains"
             exit 1
           fi
+
+
+      - name: Verify queue recovery ordering
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("/tmp/controller.py").read_text(encoding="utf-8")
+          a = src.index("async def watchdog_cycle")
+          b = src.index("async def run_cycle", a)
+          body = src[a:b]
+          assert body.index("watchdog_rearm_queue_state(now)") < body.index("candidates =")
+          assert body.index("watchdog_rearm_queue_state(now)") < body.index("stale_min =")
+          print("queue recovery runs before UI stall timing")
+          PY
