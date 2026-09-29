@@ -4,7 +4,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 2,
+  "chat_rollover": 1,
   "recorded_kst": "2026-09-30T06:06:49+09:00",
   "checkpoint": "C6_STATE",
   "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
