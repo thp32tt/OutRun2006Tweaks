@@ -710,3 +710,26 @@ Next:
 - Validate exact head.
 - Then review HUD/menu blend/alpha state as an independent cause.
 - Do not resume performance-only optimization.
+
+
+## User priority update — DX9Ex vehicle selector white/colorless car
+
+Runtime-visible symptom:
+- Vehicle-selection 3D car loses its intended color/material and appears white or colorless on the DX9Ex path.
+- The same vehicle-selection content renders with normal color on DXVK, making DXVK a useful read-only control for this defect.
+- Stable key: `DX9EX-SELECTOR-WHITE-CAR-001`.
+
+Current evidence / constraints:
+- The R69/R70 exact 2048x2048 selector MANAGED CPU-shadow reserve exists and can be ACTIVE, so reserve allocation alone is not sufficient evidence that this visual defect is fixed.
+- DX9Ex translates legacy `D3DPOOL_MANAGED` 2D textures to DEFAULT/DYNAMIC plus R14/R15 CPU-shadow upload/coherency handling; DXVK does not depend on this Ex compatibility overlay in the same way.
+- R15 already captures/restores fixed-function material and texture transforms across ResetEx, while R13 captures render/texture-stage/sampler state. Remaining investigation must therefore distinguish actual selector resource upload/mip/coherency failure from selector draw-time texture binding/material/light/texture-stage state.
+- Do not broaden HUD semantics, force a global color, or enlarge the MANAGED budget speculatively.
+
+Next visual investigation:
+1. confirm exact selector atlas/resource types and LockRect/UnlockRect/upload success;
+2. inspect selector draw-time SetTexture + COLOROP/COLORARG/ALPHAOP/TEXTUREFACTOR/material/light state;
+3. inspect MANAGED cube/volume/environment-map usage and mip generation/retirement;
+4. compare DX9Ex state/resource behavior against DXVK only as a read-only control;
+5. add bounded selector-specific telemetry/verifiers before a behavior change if static evidence is not decisive.
+
+RUNTIME_VALIDATION: `USER_REPORTED_DX9EX_BAD_DXVK_GOOD`.
