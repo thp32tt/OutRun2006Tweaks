@@ -100,13 +100,18 @@
     "OpenXR VR architecture 36558423736 PASS across all six jobs on exact result SHA.",
     "HUD Inspector 36558423649 PASS on exact result SHA.",
     "Failure-context Gate 36558289780 was inspected directly and its exact failure signature was repaired rather than retried unchanged.",
-    "No N100 workspace, self-hosted PC fast runner, Quest3/VDXR, or in-game runtime execution was used."
+    "No N100 workspace, self-hosted PC fast runner, Quest3/VDXR, or in-game runtime execution was used.",
+    "Issue #14 validation comment 5888900691 written after exact-SHA PASS."
   ],
   "production_change_ledger": {
     "issue": 14,
-    "implementation_comment_ids": [5888729331, 5888740663, 5888764130],
-    "validation_comment_id": null,
-    "status": "IMPLEMENTATION_WRITTEN_VALIDATION_PENDING_COMMENT"
+    "implementation_comment_ids": [
+      5888729331,
+      5888740663,
+      5888764130
+    ],
+    "validation_comment_id": 5888900691,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
   },
   "blocker": null,
   "resume_cursor": "R96 is automation-validated but runtime-untested. Continue Set 05 F21 only with another bounded non-routing prerequisite. Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false until exact runtime evidence closes the remaining activation gates.",
