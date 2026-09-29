@@ -140,6 +140,8 @@ foreach ($required in @(
     '[switch]$AllowTargetOverride',
     'One-click backend override blocked',
     'One-click variant override blocked',
+    'Restore-PackagedBaselineIni',
+    'package-baseline/OutRun2006Tweaks.ini',
     'Write-OneClickPreflightFailureDiagnostic',
     '_preflight_failures',
     'VR_PREFLIGHT_FAILURE_',
@@ -201,6 +203,8 @@ foreach ($requiredText in @(
     }
 }
 foreach ($required in @(
+    "packageBaselineDir = Join-Path `$packageDir 'package-baseline'",
+    "Copy-Item 'OutRun2006Tweaks.ini' (Join-Path `$packageBaselineDir 'OutRun2006Tweaks.ini')",
     'Invoke-OutRunVROneClick.ps1',
     'VR_ONE_CLICK_TARGET.json',
     'ONE_RUN_VISUAL_CHECKLIST.txt',
