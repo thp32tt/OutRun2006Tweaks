@@ -1197,7 +1197,17 @@ def main() -> None:
     )[-1].split(")", 1)[0]
     if '"src/vr/d3d11/resource_translation.cpp"' not in constant_probe_source_block:
         raise SystemExit(
-            "DX11 R99 constant-buffer probe must link resource_translation.cpp"
+            "DX11 R99 constant-buffer probe generated CMake must link "
+            "resource_translation.cpp"
+        )
+
+    constant_probe_toml_block = CMAKE_TOML.split(
+        "[target.dx11_constant_buffer_probe]", 1
+    )[-1].split("[target.", 1)[0]
+    if '"src/vr/d3d11/resource_translation.cpp"' not in constant_probe_toml_block:
+        raise SystemExit(
+            "DX11 R99 constant-buffer probe cmake.toml must link "
+            "resource_translation.cpp"
         )
 
     for token, meaning in {
