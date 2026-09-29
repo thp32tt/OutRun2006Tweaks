@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00170",
+  "lane": "LOCALIZATION_A",
+  "wave_id": "P00084",
+  "recorded_at_kst": "2026-09-30T00:37:00+09:00",
+  "target_branch": "korean-localization-clean",
+  "audit_type": "CURRENT_CANONICAL_SOURCE_ACQUISITION_FULL_LADDER",
+  "selection": {
+    "parity": "ODD",
+    "indices": [
+      43,
+      49,
+      107
+    ],
+    "rationale": "Fresh candidate-first scan has no runnable A-shard DIRECT_REWORK/RENDER_READY/ONE_STAGE_TO_RENDER/current-candidate rewrite. Index99/A00164 remains independent-C-QA pending; 51/53/111/121 remain dependency-blocked. A00168 already exhausted 65/89/241 and those assets are not repeated."
+  },
+  "source_contract": {
+    "drive_account": "ezflash557",
+    "drive_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "drive_allowed_subtree": "textures/load",
+    "pinned_upstream_repo": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "release_asset_id": 306630789,
+    "release_zip_sha256_expected": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "release_zip_sha256_observed": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "release_bundle_identity": "PASS"
+  },
+  "assets": [
+    {
+      "index": 43,
+      "asset": "455717B2",
+      "queue_path": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "current_inventory": {
+        "sha256": "e0e4f56d22808b8fece7e86997e173e41244466c83b6fe8bc405a579d85cac5f",
+        "width": 512,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "detail": "Exact spr_sprani_congrats_cvt_Exst folder/file not present under approved Drive textures/load subtree."
+      },
+      "pinned_direct": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+        "git_blob_sha": "95cf5b669afdff12d12ebb8d1b1ab70ced87a6cc",
+        "bytes": 262272,
+        "sha256": "645536f60208d35274cc7bd4b8edc041eda81a761a34603ed1e8be9af20583eb",
+        "width": 512,
+        "height": 512,
+        "format": "DXT5",
+        "mipmaps": 0,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "zip_entry": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+        "bytes": 16777344,
+        "sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 49,
+      "asset": "BF3EE5C6",
+      "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+      "current_inventory": {
+        "sha256": "b8d5716d1e8d555ed839fc8bbe80aaf02b21c44f203f73d57278bd0533e9fc8a",
+        "width": 512,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "detail": "Approved spr_sprani_etc_cvt_Exst folder exists, but exact BF3EE5C6_512x512.dds does not."
+      },
+      "pinned_direct": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+        "git_blob_sha": "c274b085a99f96d4a177f66a4a95627006ff37ca",
+        "bytes": 262272,
+        "sha256": "ea435a2f782e0554e26370de5fa315d1ebb4b46f050d8b1e77f5d788a8fd086e",
+        "width": 512,
+        "height": 512,
+        "format": "DXT3",
+        "mipmaps": 0,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "zip_entry": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+        "bytes": 16777344,
+        "sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 107,
+      "asset": "841E796B",
+      "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+      "current_inventory": {
+        "sha256": "872a6a93c711e82f43171ac1469f2216c5e27e7bd6dc11db500fb14c4814b6da",
+        "width": 512,
+        "height": 128,
+        "mode": "RGBA"
+      },
+      "drive": {
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "detail": "Approved spr_sprani_selector_cvt_Exst folder exists, but exact 841E796B_512x128.dds does not."
+      },
+      "pinned_direct": {
+        "path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+        "git_blob_sha": "ce4c0934fe28ab88ac2af1d100c487d47ae1a93a",
+        "bytes": 65664,
+        "sha256": "6ef72644f1fd975e45c5d2aa79fb1df495f9a2d51e9c6209b3e6e1cd38fc8b34",
+        "width": 512,
+        "height": 128,
+        "format": "DXT5",
+        "mipmaps": 0,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "pinned_release": {
+        "zip_entry": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+        "bytes": 4194432,
+        "sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+        "width": 2048,
+        "height": 512,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "outcome": "SOURCE_IDENTITY_MISMATCH"
+      },
+      "preserve_original_guard": "Nine Ferrari/model cards, pictograms, model names remain preserve-original.",
+      "final_source_outcome": "SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  ],
+  "aggregate": {
+    "selected_assets": 3,
+    "drive_transport_miss": 3,
+    "pinned_direct_identity_mismatch": 3,
+    "pinned_release_identity_mismatch": 3,
+    "exact_canonical_source_acquired": 0,
+    "source_acquisition_exhausted": 3,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false
+  },
+  "qa": {
+    "stale_or_4x_geometry_reused": false,
+    "guessed_source_used": false,
+    "candidate_containment": "NOT_APPLICABLE_NO_NEW_CANDIDATE",
+    "english_source_vs_korean_candidate": "NOT_APPLICABLE_NO_NEW_CANDIDATE",
+    "dds_alpha_orientation_candidate_gate": "HOLD_NO_NEW_CANDIDATE",
+    "peer_lane_isolation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_safe_action": "C may reconcile these three producer results into shared queue state. A should skip these exact source-acquisition ladders unless canonical inventory/source policy changes or new exact bytes are supplied."
+}

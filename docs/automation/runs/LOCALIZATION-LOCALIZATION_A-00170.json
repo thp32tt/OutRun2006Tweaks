@@ -1,0 +1,129 @@
+{
+  "schema_version": 9,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00170",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "wave_id": "P00084",
+  "recorded_at_kst": "2026-09-30T00:37:00+09:00",
+  "commit_mode": "GITHUB_ATOMIC_LANE_LOCAL_MATERIAL_AND_TASK_RECORD",
+  "base_head_sha": "56b2166042ddce9714a526051d59bb9bd8fba52d",
+  "result": "PASS_MATERIAL_PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_43_49_107_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD A scan finds no runnable odd-shard candidate-completion tier. It skips A00164/index99 while independent C QA is pending, retains dependency-blocked direct rework indices 51/53/111/121, and does not repeat A00168's already exhausted 65/89/241. This task therefore uses the single legal PREFLIGHT_ONLY batch on odd indices 43/49/107 and executes the complete approved canonical-source ladder. Approved Drive exact-relative-path probes are transport misses; pinned-tag stock DDS objects are acquired but mismatch current RGBA inventory; the pinned v0.25.10a Release ZIP identity is verified exactly, but its default DDS entries are 4x RGBA assets and also mismatch current inventory. All three assets are SOURCE_ACQUISITION_EXHAUSTED. No guessed source, Korean candidate, shared state, runtime/build, N100/local clone, or VR/FFB/DX change is made.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00170-P00084/A00170_P00084_CURRENT_SOURCE_ACQUISITION_AUDIT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "THREE_ODD_FULL_CANONICAL_SOURCE_LADDER_EXHAUSTION",
+    "indices": [
+      43,
+      49,
+      107
+    ],
+    "assets": [
+      "455717B2",
+      "BF3EE5C6",
+      "841E796B"
+    ],
+    "google_drive_transport_misses": 3,
+    "pinned_direct_identity_mismatches": 3,
+    "pinned_release_identity_mismatches": 3,
+    "source_acquisition_exhausted": 3,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true,
+    "report_path": "localization/graphics/role_A/20260930-A00170-P00084/A00170_P00084_CURRENT_SOURCE_ACQUISITION_AUDIT.json"
+  },
+  "readiness_audit": {
+    "selected_priority": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_AFTER_FRESH_CANDIDATE_COMPLETION_SCAN",
+    "qa_pending_skip": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00164",
+      "index": 99,
+      "asset": "4F68708E"
+    },
+    "direct_rework_dependency_blocked_indices": [
+      51,
+      53,
+      111,
+      121
+    ],
+    "previously_exhausted_not_repeated": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00168",
+      "indices": [
+        65,
+        89,
+        241
+      ]
+    },
+    "explicit_render_ready_count": 0,
+    "explicit_one_stage_to_render_count": 0,
+    "selected_indices": [
+      43,
+      49,
+      107
+    ],
+    "post_evidence_render_ready_count": 0,
+    "conclusion": "ZERO_NEW_CANDIDATE_EXCEPTION_VALID__FULL_APPROVED_SOURCE_LADDER_EXHAUSTED_FOR_SELECTED_BATCH"
+  },
+  "source_results": [
+    {
+      "index": 43,
+      "asset": "455717B2",
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 49,
+      "asset": "BF3EE5C6",
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    {
+      "index": 107,
+      "asset": "841E796B",
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "controller_roles_blob_sha": "1479ad52b3e2e36b5dcfef9f10be865638c732fa",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "queue_blob_sha": "807148089ee74581d401aed015c179add6aa0ee3",
+    "a00168_task_blob_sha": "e0aabbb7495d49014a1c1fd46cc6ec8bd00c16b7",
+    "pinned_upstream_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "self_qa": "PASS_ODD_43_49_107_FULL_SOURCE_LADDER__3_DRIVE_TRANSPORT_MISS__3_PINNED_DIRECT_IDENTITY_MISMATCH__3_PINNED_RELEASE_IDENTITY_MISMATCH__3_SOURCE_ACQUISITION_EXHAUSTED__NO_A00168_REPEAT__NO_STALE_SOURCE_RENDER__NO_SHARED_STATE__NO_FALSE_CANDIDATE_PROMOTION",
+  "candidate_static_qa": "HOLD_NO_NEW_CANDIDATE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "precommit_refresh": {
+    "head_sha": "56b2166042ddce9714a526051d59bb9bd8fba52d",
+    "concurrent_changes_reviewed": "B00167/B00171 lane-B completion/reconciliation only; selected A indices 43/49/107 and A readiness conditions unchanged.",
+    "stale_state_overwrite": false
+  }
+}
