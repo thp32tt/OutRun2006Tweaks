@@ -88,7 +88,7 @@ The schema-v6 values in `localization/controller_roles.json` are mandatory contr
 ## C-batch-only hosted-runner policy
 - A/B AUTO pushes may create a workflow-run shell, but the runner-backed validate job MUST be skipped server-side; the controller never waits for it.
 - Only C AUTO commits consume a Localization Automation Gate runner for normal automation.
-- Each C task record MUST enumerate `qa_batch_inputs` and one matching `qa_dispositions` entry per input.
+- Each C task record MUST enumerate top-level `qa_batch_inputs` and one matching top-level `qa_dispositions` entry per input; before the remote Gate completes its `automation_validation` remains `PENDING`.
 - The C Gate validates the current C reconciliation plus the exact historical producer commits with PASS dispositions.
 - Producer task records remain `automation_validation=PENDING` until covered by a passing C batch; C's batch record + Gate is the durable validation authority.
 - A failed C Gate retries/repairs the C batch and may return only the implicated producer inputs as REWORK_REQUIRED; unrelated producers continue.

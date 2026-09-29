@@ -169,7 +169,7 @@ Controller liveness and batch-validation values are defined in `localization/con
 - A/B producer commits do not consume runner-backed Localization Automation Gate jobs. The workflow's validate job is skipped for A/B AUTO commits.
 - A/B task records use `automation_validation=PENDING` and `validation_mode=C_BATCH_GATE`; this is expected, not a failure.
 - The controller releases A/B immediately after locating the exact durable `[AUTO:TASK_ID]` commit and appends that immutable TASK_ID@RESULT_SHA to `qa_pending`.
-- C must record `qa_batch_inputs` and a one-to-one `qa_dispositions` array. Each disposition is PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, or SUPERSEDED.
+- C must record `qa_batch_inputs` and a one-to-one `qa_dispositions` array as top-level fields in `docs/automation/runs/<C_TASK_ID>.json`. The pre-Gate C task record uses `automation_validation=PENDING`. Each disposition is PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, or SUPERSEDED.
 - A C AUTO commit is the only runner-backed Gate for that batch. For each PASS disposition, CI re-runs domain-isolation, changed-localization-payload, and A/B lane-isolation checks against the exact historical producer SHA, not current HEAD bytes.
 - REWORK_REQUIRED/HOLD_STRICT_RECHECK/SUPERSEDED inputs are not promoted and therefore do not need to pass candidate-promotion checks; their exact task/SHA identity is still verified.
 - A passing C batch Gate is the durable automatic-validation authority covering the listed producer SHAs. Runtime/in-game validation remains separate.
