@@ -169,7 +169,7 @@ require_all("src/hooks_graphics.cpp", [
 ], "P7_FLARE_EXACT_PRODUCER")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R30ScreenSpaceKind::ProjectedScreenEffect2D',
-    'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes',
+    'VR R72 FLARE FIX: exact projected-screen effect uses common-angular-FOV zero-disparity fusion',
 ], "P7_FLARE_R26HUD_PATH")
 require_all("src/vr/game/render_semantics.hpp", [
     'CorroboratesProjectedScreenEffect',
@@ -217,7 +217,10 @@ require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'currentEmergency >',
     'emergency class is cumulatively capped at 16 MiB',
     'general stays capped at 368 MiB',
-    'total at 384 MiB',
+    'total at 400 MiB',
+    'R72IsSelectorReserveCandidate',
+    'D3DFMT_DXT1',
+    'emergency class capped at 32 MiB',
     'bool selectorAtlas = false',
     'R14FirstSelectorUploadLogged',
     'exact 2048x2048 selector/car atlas CPU-shadow upload succeeded',
@@ -285,6 +288,15 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'D3DRS_ALPHAREF',
     'D3DRS_ALPHAFUNC',
 ], "P8_R71_HUD_ALPHA_DIAGNOSTIC")
+
+require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
+    'R72OutRunTransientHudPresents',
+    'stage == 14 ? 1200 : 240',
+    'directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D',
+    'VR R72 OUTRUN HUD WINDOW:',
+    'const float composite[4]{ 0.20f, 0, 0, 0 }',
+    'VR R72 FLARE FUSION:',
+], "P8_R72_RUNTIME_QUICKFIX")
 require_all("src/vr/hud_semantics.hpp", [
     '"HUD_OUTRUN_STAGE"',
     'callRva == 0x0975EE || callRva == 0x097727',
@@ -332,8 +344,8 @@ require_all("tools/Build-OutRunPCFast.ps1", [
     "'-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'",
     "'-DOUTRUN_VR_R26_HUD_COMPARE=ON'",
     "R66-PROVEN-R26HUD-v1",
-    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R69'",
-    "VariantId = 'R71_HUD_FLARE_EVENING'",
+    "Set-Content (Join-Path $backendDir 'VARIANT_ID.txt') 'ACTIVE_R26_HUD_R72'",
+    "VariantId = 'R72_PC_QUICKFIX'",
 ], "P9_PC_FAST_CONTRACT")
 forbid("tools/Build-OutRunPCFast.ps1",
        "VariantId = 'ACTIVE_FULL_R34'",
