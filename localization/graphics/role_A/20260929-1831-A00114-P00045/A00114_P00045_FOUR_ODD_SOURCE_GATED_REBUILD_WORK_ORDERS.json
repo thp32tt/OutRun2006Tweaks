@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00114",
+  "lane": "LOCALIZATION_A",
+  "wave_id": "P00045",
+  "recorded_at_kst": "2026-09-29T18:31:39+09:00",
+  "base_head_sha": "f613376ff184a6493794475644783250ba703a9d",
+  "purpose": "fallback4_source_gated_reconstruction_work_orders",
+  "policy": {
+    "automation_contract_blob_sha": "d13502ab4bfdcd6a5fd5e7a3f4fd088460bdc32b",
+    "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+    "generation_v2_blob_sha": "83d44db67e482d729c4c69c6814509e08d4af88b",
+    "generation_contract": "outrun-first-pass-edit-v2",
+    "clean_plate_contract": "outrun-clean-plate-qa-v1",
+    "default_safety_inset_px": 2,
+    "max_render_refit_iterations": 8
+  },
+  "immutable_inputs": {
+    "asset_queue_blob_sha": "31e3e94f9a31942fa5cbe6ce93d083755dbc68bf",
+    "transcriptions_blob_sha": "60f66aefae9a2454e9ae795f9570405ac742883e",
+    "artwork_plan_blob_sha": "6164d63d074233203b1f620dc73100bd192da820",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "current_tree_sha": "4541fca0c865f367bb11e08d3f8563110df75d17"
+  },
+  "selection": {
+    "parity": "ODD_ONLY",
+    "indices": [
+      133,
+      135,
+      139,
+      143
+    ],
+    "selection_reason": "unfinished localize_text pending_artwork rows with reviewed transcription but without a current structured v2 source-gated reconstruction work order; excludes dependency-blocked REWORK and all current producer QA-pending assets",
+    "shared_state_modified": false
+  },
+  "github_binary_availability": {
+    "recursive_tree_truncated": false,
+    "exact_asset_id_path_matches": 0,
+    "ids": [
+      "25F697C6",
+      "2B0863D6",
+      "313DB8CB",
+      "34923C8A"
+    ],
+    "result": "ABSENT_FROM_CURRENT_GIT_TREE",
+    "rule": "Do not synthesize DDS bytes. A future producer must first obtain the exact source matching inventory_sha256 through an authorized GitHub-visible path or a newer source commit, then re-run the new-fingerprint gates."
+  },
+  "assets": [
+    {
+      "index": 133,
+      "asset": "25F697C6",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "inventory_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "inventory_canvas": [
+        2048,
+        2048
+      ],
+      "filename_nominal_canvas": [
+        512,
+        512
+      ],
+      "exact_scale_equation": "2048x2048 = 4x(512x512)",
+      "segment_count": 9,
+      "translations": [
+        [
+          "ALPINE",
+          "알파인"
+        ],
+        [
+          "ANCIENT RUINS",
+          "고대 유적"
+        ],
+        [
+          "BLU MIRABEAU",
+          "블루 미라보"
+        ],
+        [
+          "ARGENTO NURBURGRING",
+          "아르젠토 뉘르부르크링"
+        ],
+        [
+          "BIANCO AVUS",
+          "비앙코 아부스"
+        ],
+        [
+          "NERO",
+          "네로"
+        ],
+        [
+          "ROSSO SCUDERIA",
+          "로쏘 스쿠데리아"
+        ],
+        [
+          "GRIGIO ALLOY",
+          "그리지오 알로이"
+        ],
+        [
+          "GIALLO MODENA",
+          "지알로 모데나"
+        ]
+      ],
+      "preserve": [
+        "Ferrari/model-name branding not listed as localizable segments",
+        "logos, icons, artwork and all non-text pixels outside measured removal masks"
+      ],
+      "next_executable_steps": [
+        "hash-gate exact source to inventory_sha256 and decode DDS header/alpha/mips",
+        "bind each of 9 reviewed source labels to exact raw sprite region from decoded source; no list-order inference",
+        "measure effect-inclusive source bbox and permitted region, then derive 2px-inset candidate_safe_bbox per element",
+        "build source-effect removal mask and independently PASS CLEAN_PLATE before Hangul",
+        "fresh-render Korean lettering/effects, measure native-resolution effect bbox, and enforce zero-pixel containment"
+      ]
+    },
+    {
+      "index": 135,
+      "asset": "2B0863D6",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+      "inventory_sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521",
+      "inventory_canvas": [
+        2048,
+        256
+      ],
+      "filename_nominal_canvas": [
+        512,
+        64
+      ],
+      "exact_scale_equation": "2048x256 = 4x(512x64)",
+      "segment_count": 10,
+      "translations": [
+        [
+          "INTERMEDIATE A",
+          "중급 A"
+        ],
+        [
+          "OUTRUN",
+          "아웃런"
+        ],
+        [
+          "PROFESSIONAL",
+          "프로"
+        ],
+        [
+          "CHANGE CLASS",
+          "클래스 변경"
+        ],
+        [
+          "CLASS",
+          "클래스"
+        ],
+        [
+          "ACCELERATION",
+          "가속"
+        ],
+        [
+          "MAX SPEED",
+          "최고 속도"
+        ],
+        [
+          "INTERMEDIATE B",
+          "중급 B"
+        ],
+        [
+          "HANDLING",
+          "핸들링"
+        ],
+        [
+          "NOVICE",
+          "초급"
+        ]
+      ],
+      "preserve": [
+        "vehicle artwork, class icons and non-text art",
+        "all pixels outside measured source removal masks"
+      ],
+      "historical_risk_note": "SOURCE_FAITHFUL_CURRENT strict-reset history lists 2B0863D6 as rework-required; that historical status is not reused as a v2 pass and does not authorize candidate promotion.",
+      "next_executable_steps": [
+        "hash-gate exact source to inventory_sha256 and decode DDS header/alpha/mips",
+        "bind all 10 labels to decoded raw regions and confirm per-sprite orientation",
+        "measure source full-effect bboxes and derive 2px-inset safe bboxes",
+        "produce clean plates with zero outside-mask/protected-art/alpha changes",
+        "render each Korean label from source parameters; never resize a flattened text raster"
+      ]
+    },
+    {
+      "index": 139,
+      "asset": "313DB8CB",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "inventory_sha256": "45cd9acffa98e79079774c4af41f90471627f7531fa33c12ff16dc4ed9292209",
+      "inventory_canvas": [
+        512,
+        256
+      ],
+      "filename_nominal_canvas": [
+        512,
+        256
+      ],
+      "exact_scale_equation": "512x256 = 1x(512x256)",
+      "segment_count": 2,
+      "translations": [
+        [
+          "TUNED",
+          "튜닝"
+        ],
+        [
+          "NORMAL",
+          "일반"
+        ]
+      ],
+      "preserve": [
+        "Ferrari/model names",
+        "flags",
+        "MT/AT legends",
+        "logos and non-text artwork"
+      ],
+      "next_executable_steps": [
+        "hash-gate exact source to inventory_sha256 and decode DDS header/alpha/mips",
+        "positively locate TUNED and NORMAL only; preserve model names/flags/MT/AT regardless of proximity",
+        "measure full effects and protected-art masks before any removal",
+        "derive per-element 2px-inset safe bboxes and independently QA clean plates",
+        "render Korean only inside declared lettering regions and run exact English-source comparison"
+      ]
+    },
+    {
+      "index": 143,
+      "asset": "34923C8A",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/34923C8A_512x128.dds",
+      "inventory_sha256": "e1461c131037d9cd347fb59af5208b55eaf621dce2edc42e752f66a040676c7c",
+      "inventory_canvas": [
+        2048,
+        512
+      ],
+      "filename_nominal_canvas": [
+        512,
+        128
+      ],
+      "exact_scale_equation": "2048x512 = 4x(512x128)",
+      "segment_count": 3,
+      "translations": [
+        [
+          "RUSH A DIFFICULTY",
+          "난이도에 도전"
+        ],
+        [
+          "SHAKE THE STREET",
+          "거리를 뒤흔들어라"
+        ],
+        [
+          "WHO ARE YOU",
+          "당신은 누구?"
+        ]
+      ],
+      "preserve": [
+        "stylized heading artwork outside measured text/effect masks",
+        "all non-text background"
+      ],
+      "semantic_context_risk": "MEDIUM: transcription notes say final tone may change after in-game context; retain current reviewed mapping as production input but do not use runtime context as validated evidence.",
+      "next_executable_steps": [
+        "hash-gate exact source to inventory_sha256 and decode DDS header/alpha/mips",
+        "bind the 3 stylized headings to exact decoded raw regions and confirm raw/readable orientation",
+        "measure effect-inclusive source bboxes, baseline/slant/style and protected-art masks",
+        "derive 2px-inset candidate_safe_bbox per heading and PASS clean-plate QA independently",
+        "render/refit Korean at native resolution; runtime wording confirmation remains separate"
+      ]
+    }
+  ],
+  "integrated_self_qa": {
+    "odd_indices_only": true,
+    "queue_rows_verified": 4,
+    "queue_action_all_localize_text": true,
+    "queue_artwork_status_all_pending_artwork": true,
+    "transcription_status_all_transcribed_reviewed": true,
+    "inventory_fingerprints_verified": 4,
+    "artwork_plan_translation_ready_verified": 4,
+    "total_localizable_segments": 24,
+    "exact_scale_equations_verified": 4,
+    "candidate_dds_created": 0,
+    "fabricated_pixel_geometry": 0,
+    "shared_state_modified": false,
+    "result": "PASS_MATERIAL_RECONSTRUCTION_INPUT_ONLY"
+  },
+  "strict_hold": {
+    "exact_source_bytes": "HOLD_SOURCE_NOT_PRESENT_IN_CURRENT_GIT_TREE",
+    "dds_header_format_alpha_mips": "HOLD_EXACT_SOURCE_REQUIRED",
+    "raw_orientation": "HOLD_EXACT_SOURCE_REQUIRED",
+    "per_element_source_effect_bboxes": "HOLD_EXACT_SOURCE_REQUIRED",
+    "removal_and_protected_masks": "HOLD_EXACT_SOURCE_REQUIRED",
+    "clean_plate_pixels_and_qa": "HOLD_EXACT_SOURCE_REQUIRED",
+    "candidate_safe_bboxes": "HOLD_MEASURED_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CANDIDATE",
+    "zero_pixel_containment": "HOLD_NO_CANDIDATE",
+    "english_source_vs_korean_candidate": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  }
+}
