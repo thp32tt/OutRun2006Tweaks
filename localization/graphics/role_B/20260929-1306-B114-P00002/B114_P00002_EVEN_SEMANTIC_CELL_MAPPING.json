@@ -1,0 +1,734 @@
+{
+  "schema_version": 4,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+  "wave_id": "P00002",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "attempt": "1/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-29T13:06:00+09:00",
+  "precommit_head_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+  "precommit_head_message": "localization(A): map P00001 odd source cells [AUTO:LOCALIZATION-LOCALIZATION_A-00058]",
+  "shard_rule": "EVEN_INDEX_PRIMARY_ONLY_NO_WORK_STEAL",
+  "source_of_truth": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-clean",
+    "contract_blob_sha": "2fc9de46e3545714ab40a41e839d9fdcfdfeb56f",
+    "orientation_policy_blob_sha": "a860e3a7f1a5ecb771803d7da7dc5ee908f5e91f",
+    "queue_blob_sha": "fdce9105501da896cf97a4dfdc09c3fa009b75c9",
+    "transcriptions_blob_sha": "ecf93bcd3eb9f3a4b3dab0fb1be232d582a28760",
+    "artwork_plan_blob_sha": "6111b595e520270842005f478298ef3a6cc56646",
+    "upstream_repository": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "exact_release_dds_is_construction_authority": true,
+    "stock_png_is_semantic_mapping_evidence_only": true,
+    "github_only": true,
+    "n100_used": false,
+    "local_clone_used": false,
+    "gpt_library_used": false
+  },
+  "continuous_producer_rules": {
+    "previous_b_task_gate": {
+      "task": "LOCALIZATION-LOCALIZATION_B-00057",
+      "result_sha": "bbe1202f2f59d23409d5baaf0c4ce9c29856a75d",
+      "actions_run_id": 36511874286,
+      "conclusion": "success"
+    },
+    "skipped_qa_pending_task": "LOCALIZATION-LOCALIZATION_B-00057@bbe1202f2f59d23409d5baaf0c4ce9c29856a75d",
+    "skipped_assets_from_pending_result": [
+      132,
+      176,
+      220,
+      222
+    ],
+    "peer_lane_head_preserved": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+    "heavy_qa_dedup": "No unchanged candidate heavy-QA rerun; no candidate DDS write. Only new classification/semantic-cell reconstruction evidence was added."
+  },
+  "selection": {
+    "selected_indices": [
+      182,
+      198,
+      228,
+      230
+    ],
+    "reason": "Untouched even pending_artwork rows selected after excluding B00057 QA-pending assets. Only directly visible semantic cells are mapped; ambiguous semantics remain HOLD and are not inferred by atlas order."
+  },
+  "assets": [
+    {
+      "queue_index": 182,
+      "asset": "7D747BED",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/7D747BED_512x128.dds",
+      "classification": "PRESERVE_ORIGINAL_TRANSLATION_EXCLUSION",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/7D747BED_512x128.dds",
+        "git_blob_sha": "edbd096e4faa6fdb205b277fb092613ba849ba59",
+        "expected_canvas": [
+          2048,
+          512
+        ]
+      },
+      "original_png": {
+        "git_blob_sha": "f79d0e9d20088bd7786d1225ec5d546af2f7048e",
+        "evidence_path": "localization/graphics/role_B/20260929-1306-B114-P00002/B114_182_7D747BED_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "063cb21a5ee5999cf620767f80fce683659b468c",
+        "canvas": [
+          512,
+          128
+        ],
+        "regions": 21
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "72912a1098f0a8fbb35c5850c25080b7c5ae7d5b",
+        "canvas": [
+          2048,
+          512
+        ],
+        "regions": 21,
+        "rotations": false
+      },
+      "canonical_segment_count": 0,
+      "visual_finding": "Reviewed source/transcription contains Ferrari model-name artwork and AT/MT indicators only; no Korean-localizable segment.",
+      "preserve": [
+        "Ferrari vehicle/model names",
+        "AT/MT indicators",
+        "selector bars/icons",
+        "all original artwork"
+      ],
+      "material_advance": "Creates machine-readable preserve-original evidence for a shared queue row still labeled localize_text; C can reconcile it without raster rewrite.",
+      "candidate_dds_modified": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 198,
+      "asset": "9FC88069",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+      "classification": "LOCALIZABLE_TEXT_PARTIAL_CELL_MAPPING",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+        "git_blob_sha": "e97d852a905aa8a219b786b843089e0998037f52",
+        "expected_canvas": [
+          4096,
+          2048
+        ]
+      },
+      "original_png": {
+        "git_blob_sha": "d892585f6d441e2a093d7f5def8ffb4459fd3734",
+        "evidence_path": "localization/graphics/role_B/20260929-1306-B114-P00002/B114_198_9FC88069_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "8ef430efe883ea9a1133e66c00451047f65f2ab4",
+        "canvas": [
+          1024,
+          512
+        ],
+        "regions": 43,
+        "metadata_width_field": 512
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "77904226ad9347044c4c091575efbe0aba72717a",
+        "canvas": [
+          4096,
+          2048
+        ],
+        "regions": 43,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_2_OF_7_DIRECT_ENGLISH_SOURCE_VISUAL_PLUS_ATLAS_GEOMETRY",
+      "mappings": [
+        {
+          "source": "RANDOM",
+          "korean": "무작위",
+          "sprite": "sprite_789",
+          "stock_cell": [
+            0,
+            386,
+            136,
+            126
+          ],
+          "hd_cell": [
+            0,
+            1544,
+            544,
+            504
+          ],
+          "visual_role": "random-card artwork; future edit is text-mask only",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "- RANDOM PLAY -",
+          "korean": "- 무작위 재생 -",
+          "sprite": "sprite_790",
+          "stock_cell": [
+            136,
+            492,
+            401,
+            20
+          ],
+          "hd_cell": [
+            544,
+            1968,
+            1604,
+            80
+          ],
+          "visual_role": "standalone random-play caption",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "unresolved_semantics": [
+        "(PROTOTYPE)",
+        "INTERMEDIATE B",
+        "INTERMEDIATE A",
+        "(GUITAR MIX)",
+        "(INSTRUMENTAL)"
+      ],
+      "preserve": [
+        "song titles",
+        "numbered TBD/work labels",
+        "random-card artwork outside future RANDOM glyph/effect mask",
+        "all unmapped sprites"
+      ],
+      "caution": "Do not infer the five unresolved cells from atlas array order.",
+      "next_action": "Decode exact HD mapped cells and determine raw/readable transform, signed slant and exact full-effect bboxes before any clean-plate/Korean render."
+    },
+    {
+      "queue_index": 228,
+      "asset": "E7F6E9B7",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+      "classification": "LOCALIZABLE_TEXT_FULL_CELL_MAPPING",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+        "git_blob_sha": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+        "expected_canvas": [
+          2048,
+          2048
+        ]
+      },
+      "original_png": {
+        "git_blob_sha": "4f3bda150b2fbef62a8496eaf4908da267e9ee7a",
+        "evidence_path": "localization/graphics/role_B/20260929-1306-B114-P00002/B114_228_E7F6E9B7_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "2cfcf168489e843e7062c6967d12ea378e9ed982",
+        "canvas": [
+          512,
+          512
+        ],
+        "regions": 13
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "17334e7e52c6f9f1848f0753eb22e35e2f04b1af",
+        "canvas": [
+          2048,
+          2048
+        ],
+        "regions": 13,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_13_OF_13_DIRECT_ENGLISH_SOURCE_VISUAL_PLUS_ATLAS_GEOMETRY",
+      "mappings": [
+        {
+          "source": "coast 2 coast",
+          "korean": "코스트 2 코스트",
+          "sprite": "sprite_506",
+          "stock_cell": [
+            0,
+            5,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            20,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "car select",
+          "korean": "차량 선택",
+          "sprite": "sprite_505",
+          "stock_cell": [
+            0,
+            44,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            176,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "license select",
+          "korean": "라이선스 선택",
+          "sprite": "sprite_504",
+          "stock_cell": [
+            0,
+            83,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            332,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "game lobby",
+          "korean": "게임 로비",
+          "sprite": "sprite_503",
+          "stock_cell": [
+            0,
+            122,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            488,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "main menu",
+          "korean": "메인 메뉴",
+          "sprite": "sprite_502",
+          "stock_cell": [
+            0,
+            161,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            644,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "multiplayer",
+          "korean": "멀티플레이",
+          "sprite": "sprite_501",
+          "stock_cell": [
+            0,
+            200,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            800,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "music select",
+          "korean": "음악 선택",
+          "sprite": "sprite_500",
+          "stock_cell": [
+            0,
+            239,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            956,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "options",
+          "korean": "옵션",
+          "sprite": "sprite_499",
+          "stock_cell": [
+            0,
+            278,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            1112,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "network",
+          "korean": "네트워크",
+          "sprite": "sprite_498",
+          "stock_cell": [
+            0,
+            317,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            1268,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "rankings",
+          "korean": "랭킹",
+          "sprite": "sprite_497",
+          "stock_cell": [
+            0,
+            356,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            1424,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "game select",
+          "korean": "게임 선택",
+          "sprite": "sprite_496",
+          "stock_cell": [
+            0,
+            395,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            1580,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "mode select",
+          "korean": "모드 선택",
+          "sprite": "sprite_495",
+          "stock_cell": [
+            0,
+            434,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            1736,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "race select",
+          "korean": "레이스 선택",
+          "sprite": "sprite_494",
+          "stock_cell": [
+            0,
+            473,
+            512,
+            39
+          ],
+          "hd_cell": [
+            0,
+            1892,
+            2048,
+            156
+          ],
+          "visual_role": "dedicated menu-name strip",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "preserve": [
+        "all pixels outside future measured English glyph/effect masks",
+        "strip alpha/transparency outside edit masks"
+      ],
+      "next_action": "Decode all 13 exact HD strips and measure orientation, signed slant, full-effect bboxes, alpha/style samples; clean-plate and Korean lettering remain blocked until those measurements pass."
+    },
+    {
+      "queue_index": 230,
+      "asset": "E95DA5",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+      "upstream_original_name": "00E95DA5_512x256",
+      "classification": "LOCALIZABLE_TEXT_PARTIAL_CELL_MAPPING",
+      "exact_release_dds": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+        "git_blob_sha": "ee939d33fd363be135e681b076021c92cddcb489",
+        "expected_canvas": [
+          2048,
+          1024
+        ]
+      },
+      "original_png": {
+        "git_blob_sha": "84fb9a6e50025e71d7e8d8ee471f5eecaa93cf12",
+        "evidence_path": "localization/graphics/role_B/20260929-1306-B114-P00002/B114_230_E95DA5_ENGLISH_SOURCE.png"
+      },
+      "stock_atlas": {
+        "git_blob_sha": "f42158960fb7bef28560c9f3ba659e041bd337a1",
+        "canvas": [
+          512,
+          256
+        ],
+        "regions": 27,
+        "metadata_width_field": 256
+      },
+      "hd_4x_atlas": {
+        "git_blob_sha": "d1cbe695add81e599424c29aa40539bb6875ef5a",
+        "canvas": [
+          2048,
+          1024
+        ],
+        "regions": 27,
+        "rotations": false
+      },
+      "physical_mapping_status": "PASS_2_OF_12_DIRECT_ENGLISH_SOURCE_VISUAL_PLUS_ATLAS_GEOMETRY",
+      "mappings": [
+        {
+          "source": "UNAVAILABLE",
+          "korean": "이용 불가",
+          "sprite": "sprite_398",
+          "stock_cell": [
+            0,
+            10,
+            134,
+            15
+          ],
+          "hd_cell": [
+            0,
+            40,
+            536,
+            60
+          ],
+          "visual_role": "availability label",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        },
+        {
+          "source": "SOLD",
+          "korean": "판매 완료",
+          "sprite": "sprite_399",
+          "stock_cell": [
+            134,
+            10,
+            75,
+            15
+          ],
+          "hd_cell": [
+            536,
+            40,
+            300,
+            60
+          ],
+          "visual_role": "sold label",
+          "original_bbox": null,
+          "localized_bbox": null,
+          "delta_left": null,
+          "delta_right": null,
+          "delta_top": null,
+          "delta_bottom": null,
+          "containment": "HOLD_STRICT_RECHECK_EXACT_HD_TEXT_BBOX_PENDING",
+          "rework_status": "CELL_MAPPING_READY"
+        }
+      ],
+      "unresolved_semantics": [
+        "BONUS MATERIAL",
+        "COURSES",
+        "GAME MODES",
+        "BGMUSIC",
+        "CAR COLOURS",
+        "FERRARI'S",
+        "SHOWROOM ITEMS",
+        "CAR COLORS",
+        "BGM",
+        "FERRARI CARS"
+      ],
+      "preserve": [
+        "named unlock/item titles including Alberto's Antics variants",
+        "all non-target item artwork",
+        "all unmapped sprites"
+      ],
+      "caution": "Only UNAVAILABLE and SOLD are directly resolved; the remaining ten labels are not assigned by list order.",
+      "next_action": "Decode exact HD sprite_398/sprite_399 and measure orientation/slant/full-effect bboxes; resolve remaining cells independently before further edits."
+    }
+  ],
+  "integrated_self_qa": {
+    "material_new_assets": 4,
+    "preserve_original_classifications": 1,
+    "material_new_mapping_occurrences": 17,
+    "canonical_semantics_mapped": 17,
+    "unresolved_semantics_left_unmapped": 15,
+    "parity_shard": "PASS_EVEN_ONLY_182_198_228_230",
+    "work_steal": "NONE",
+    "qa_pending_dedup": "PASS_B00057_132_176_220_222_SKIPPED",
+    "peer_lane_preservation": "PASS_CURRENT_HEAD_USED_AS_PARENT",
+    "immutable_git_source_identity": "PASS_16_GITHUB_BLOB_IDENTITIES_PINNED_4_ASSETS_X_RELEASE_PNG_STOCK_ATLAS_4X_ATLAS",
+    "direct_visual_mapping": "PASS_17_PHYSICAL_OCCURRENCES_NO_ARRAY_ORDER_GUESSING",
+    "translation_exclusion": "PASS_182_ZERO_LOCALIZABLE_SEGMENTS_PRESERVE_ONLY",
+    "exact_hd_text_bbox": "HOLD_STRICT_RECHECK_FOR_198_228_230",
+    "one_pixel_containment": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "dds_header_format_mips_alpha": "UNCHANGED_NO_DDS_WRITE",
+    "orientation_signed_slant": "HOLD_PER_MAPPED_EXACT_HD_ELEMENT",
+    "english_source_vs_korean_candidate": "HOLD_NO_KOREAN_CANDIDATE_WRITTEN",
+    "shared_state_isolation": "PASS",
+    "peer_lane_isolation": "PASS_EVEN_ONLY",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "vr_ffb_dx_changes": false,
+  "result": "PASS_MATERIAL_FALLBACK4_EVEN_PRESERVE_CLASSIFICATION_AND_SEMANTIC_CELL_MAPS",
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}

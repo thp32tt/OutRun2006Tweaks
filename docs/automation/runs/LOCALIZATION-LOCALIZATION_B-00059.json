@@ -1,0 +1,63 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00059",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "P00002",
+  "recorded_at_kst": "2026-09-29T13:06:00+09:00",
+  "precommit_head_sha": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+  "preserved_peer_head": true,
+  "result": "PASS_MATERIAL_FALLBACK4_EVEN_PRESERVE_CLASSIFICATION_AND_SEMANTIC_CELL_MAPS",
+  "material_deliverable": {
+    "type": "ONE_PRESERVE_CLASSIFICATION_PLUS_THREE_EVEN_SEMANTIC_CELL_MAPPING_ASSETS",
+    "indices": [
+      182,
+      198,
+      228,
+      230
+    ],
+    "assets": [
+      "7D747BED",
+      "9FC88069",
+      "E7F6E9B7",
+      "E95DA5"
+    ],
+    "preserve_original_assets": [
+      182
+    ],
+    "physical_occurrences_mapped": 17,
+    "canonical_semantics_mapped": 17,
+    "unresolved_semantics_left_unmapped": 15,
+    "report": "localization/graphics/role_B/20260929-1306-B114-P00002/B114_P00002_EVEN_SEMANTIC_CELL_MAPPING.json",
+    "evidence_pngs": [
+      "localization/graphics/role_B/20260929-1306-B114-P00002/B114_182_7D747BED_ENGLISH_SOURCE.png",
+      "localization/graphics/role_B/20260929-1306-B114-P00002/B114_198_9FC88069_ENGLISH_SOURCE.png",
+      "localization/graphics/role_B/20260929-1306-B114-P00002/B114_228_E7F6E9B7_ENGLISH_SOURCE.png",
+      "localization/graphics/role_B/20260929-1306-B114-P00002/B114_230_E95DA5_ENGLISH_SOURCE.png"
+    ],
+    "candidate_dds_modified": false,
+    "fallback_ladder_step": 4
+  },
+  "skipped_qa_pending": {
+    "task_result": "LOCALIZATION-LOCALIZATION_B-00057@bbe1202f2f59d23409d5baaf0c4ce9c29856a75d",
+    "assets": [
+      132,
+      176,
+      220,
+      222
+    ]
+  },
+  "peer_lane_head_preserved": "6e2d340cf2707382573bdff69a6c6d154f5fba65",
+  "fail_closed_reason": "Direct source evidence resolves preserve status/cells, but exact HD decoded per-text bboxes, orientation and signed slant remain mandatory before Korean raster/DDS writes. Ambiguous cells remain unmapped.",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PASS_STATIC_PRECOMMIT__REMOTE_GATE_PENDING",
+  "runtime_validation": "UNTESTED"
+}
