@@ -1,0 +1,187 @@
+{
+  "schema_version": 12,
+  "schema": "outrun-b00185-current-contract-qa-reemission-batch-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00185",
+  "lane": "LOCALIZATION_B",
+  "wave_id": "P00094",
+  "attempt": "1/3",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T02:21:30+09:00",
+  "base_head_sha": "c218bdadc351f32933b6b2b1f4246285f78da76f",
+  "selection": {
+    "priority": "DIRECT_REWORK_REQUIRED_CURRENT_RESULT_CONTRACT",
+    "shard_rule": "asset_queue.index % 2 == 0",
+    "shard_check": "PASS_INDEX130_AND_INDEX152_EVEN",
+    "trigger": "C135/Q00033 returned indices 130/1762489B and 152/49BB5FE5 as REWORK_REQUIRED solely because their immutable historical producer result commits lacked current post-reset machine-readable zero-pixel/protected-mask PASS structure. Index112 is not repeated because B00183 already re-emitted it and is pending independent C consumption.",
+    "candidate_content_rewrite_required": false,
+    "bundled_same_invocation": true
+  },
+  "assets": [
+    {
+      "index": 130,
+      "asset_id": "1762489B",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+      "source_lineage": {
+        "repository": "envido32/OR2006Sprites",
+        "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+        "git_blob_sha": "ce5158f8f3e78dc328227e4e76c7c71789b53060",
+        "source_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+        "canvas": [
+          2048,
+          512
+        ],
+        "format": "RGBA32",
+        "mip_count": 1,
+        "raw_to_readable": "flip_y"
+      },
+      "candidate_lineage": {
+        "current_git_blob_sha": "905f0d05db3f094aeb93448548df1091238109cf",
+        "candidate_dds_sha256": "823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8",
+        "bytes": 4194432,
+        "header_128_exact": true,
+        "localized_elements": 5,
+        "candidate_unchanged": true,
+        "candidate_dds_modified_in_this_task": false
+      },
+      "machine_readable_pass": {
+        "schema_version": 12,
+        "status": "PASS",
+        "result": "PASS_CURRENT_CONTRACT_QA_REEMISSION_UNCHANGED_CANDIDATE",
+        "asset_id": "1762489B",
+        "source_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+        "candidate_dds_sha256": "823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8",
+        "runtime_validation": "UNTESTED",
+        "signed_slant_gate": "PASS",
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_outside_source_region": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "introduced_alpha_outside_source_region": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "containment": "PASS_5_OF_5",
+        "english_residue": "PASS_NONE_VISIBLE",
+        "protected_numeric_marker": "PASS_EXACT",
+        "visual_content_precheck": "PASS_C135_EXACT_CURRENT_CANDIDATE",
+        "dds_structure": "PASS_RGBA32_2048x512_MIP1_HEADER_EXACT"
+      },
+      "metric_normalization": {
+        "prior_changed_pixels_outside_allowed_region": 0,
+        "prior_alpha_changed_pixels_outside_allowed": 0,
+        "prior_protected_numeric_marker_exact": true,
+        "prior_per_element_containment_pass": 5,
+        "rationale": "B00176 decoded-final QA confines all 127245 changed pixels to the declared removal-or-safe regions, records zero alpha changes outside allowed regions, preserves sprite_1085 numeric rank marker exactly, and passes 5/5 element containment. C135 independently reviewed the exact current blob and recorded no visible English residue or clipping."
+      },
+      "reused_exact_evidence": {
+        "prior_task_id": "LOCALIZATION-LOCALIZATION_B-00176",
+        "prior_result_sha": "e57374e3735c3568b5e9f584d59a189fef58f356",
+        "prior_task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00176.json",
+        "prior_static_qa": "localization/graphics/role_B/20260930-B00176-P00088/B00176_P00088_INDEX130_RGBA32_CANDIDATE_QA.json",
+        "source_vs_korean_comparison": "localization/graphics/KOREAN_PNG_REVIEW/1762489B/comparison.png",
+        "c135_report": "localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json",
+        "c135_content_precheck": "PASS",
+        "c135_disposition": "REWORK_REQUIRED_IMMUTABLE_RESULT_AUTOMATION_CONTRACT"
+      }
+    },
+    {
+      "index": 152,
+      "asset_id": "49BB5FE5",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+      "source_lineage": {
+        "repository": "envido32/OR2006Sprites",
+        "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+        "git_blob_sha": "0288babbb9c70e8f092bdd15561db4cadc19dcb3",
+        "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+        "canvas": [
+          512,
+          128
+        ],
+        "format": "DXT5",
+        "mip_count": 1,
+        "raw_to_readable": "flip_y"
+      },
+      "candidate_lineage": {
+        "current_git_blob_sha": "5d938fd663669715cdebcbff675b3499c888d200",
+        "candidate_dds_sha256": "0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17",
+        "bytes": 65664,
+        "header_128_exact": true,
+        "localized_elements": 4,
+        "candidate_unchanged": true,
+        "candidate_dds_modified_in_this_task": false
+      },
+      "machine_readable_pass": {
+        "schema_version": 12,
+        "status": "PASS",
+        "result": "PASS_CURRENT_CONTRACT_QA_REEMISSION_UNCHANGED_CANDIDATE",
+        "asset_id": "49BB5FE5",
+        "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+        "candidate_dds_sha256": "0a92b614b7eeb71f2304fbd50ffad6d11f882c63763e25131618dc6cf48a0b17",
+        "runtime_validation": "UNTESTED",
+        "signed_slant_gate": "PASS",
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_outside_source_region": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "introduced_alpha_outside_source_region": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "containment": "PASS_4_OF_4",
+        "english_residue": "PASS_NONE_VISIBLE",
+        "protected_years": "PASS_EXACT",
+        "visual_content_precheck": "PASS_C135_EXACT_CURRENT_CANDIDATE",
+        "dds_structure": "PASS_DXT5_512x128_MIP1_HEADER_EXACT"
+      },
+      "metric_normalization": {
+        "prior_clean_decoded_changed_outside_removal_block_region": 0,
+        "prior_clean_decoded_changed_outside_localizable_cells": 0,
+        "prior_final_decoded_changed_outside_edit_block_region": 0,
+        "prior_final_vs_clean_changed_outside_safe_union": 0,
+        "prior_preserve_year_changed_pixels": 0,
+        "prior_final_alpha_changed_vs_source": 0,
+        "prior_final_alpha_changed_vs_clean": 0,
+        "rationale": "B00167 decoded-final QA records zero changes outside the declared edit-block region, zero Korean changes outside safe bboxes, zero alpha change and zero changes in protected year cells. C135 independently reviewed the exact current blob and recorded 4/4 containment, protected years exact, no visible English residue and no clipping."
+      },
+      "reused_exact_evidence": {
+        "prior_task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+        "prior_result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+        "prior_task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00167.json",
+        "prior_static_qa": "localization/graphics/role_B/20260930-B00167-P00082/B00167_P00082_INDEX152_DXT5_DECODED_FINAL_QA.json",
+        "source_vs_korean_comparison": "localization/graphics/KOREAN_PNG_REVIEW/49BB5FE5/comparison.png",
+        "c135_report": "localization/graphics/role_C/20260930-0152-C135/C135_Q00033_INDEPENDENT_QA_BATCH.json",
+        "c135_content_precheck": "PASS",
+        "c135_disposition": "REWORK_REQUIRED_IMMUTABLE_RESULT_AUTOMATION_CONTRACT"
+      }
+    }
+  ],
+  "heavy_qa_reuse": {
+    "repeated_candidate_pixel_rewrite": false,
+    "repeated_dds_header_alpha_orientation_qa": false,
+    "reason": "Both candidate Git blobs and source/candidate SHA identities are unchanged from the exact evidence independently content-prechecked by C135. This task fixes only the historical result-contract blocker and does not upgrade any visual claim beyond C135."
+  },
+  "visual_qa": {
+    "new_candidate_rendered": false,
+    "new_visual_pixels_generated": false,
+    "exact_candidate_identities_unchanged": true,
+    "independent_c_visual_reuse": "PASS_C135_EXACT_BLOBS",
+    "clipping": "PASS_NONE_VISIBLE",
+    "source_language_residue": "PASS_NONE_VISIBLE",
+    "orientation": "PASS",
+    "note": "Existing exact ENGLISH SOURCE vs KOREAN CANDIDATE proofs are reused because candidate bytes are unchanged."
+  },
+  "self_qa": "PASS_EVEN_INDICES130_152__EXACT_CURRENT_CANDIDATE_BLOBS__CURRENT_NESTED_V2_ZERO_PIXEL_METRICS__ZERO_PROTECTED_CHANGES__C135_VISUAL_CONTENT_PRECHECK_PASS__NO_DDS_REWRITE__NO_SHARED_STATE",
+  "candidate_static_qa": "PASS_CONTENT_PRECHECK_REEMISSION_PENDING_INDEPENDENT_C_PROMOTION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
