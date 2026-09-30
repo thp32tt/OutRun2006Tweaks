@@ -104,8 +104,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__NO_QA_PENDING_REPEAT__NO_STICKY_SOURCE_REPROBE__INDEX12_UNCHANGED_C85_PIXEL_VISUAL_PASS__C00019_LEGACY_ISOLATION_READY__CURRENT_WORKFLOW_MANIFEST_ADDED__CURRENT_GIT_SOURCE_CANDIDATE_BLOBS_BOUND__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
+  "authoritative_result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): standardize index12 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00330]",
   "durable_task_record_in_result_commit": true,
@@ -115,5 +115,9 @@
     "head_message": "chore(localization): bind B00328 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00328] [skip ci]",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest branch refreshed immediately before commit. Only new A00330 lane-local report, standard single-DDS manifest and durable task record are added; shared/peer-lane files are untouched."
-  }
+  },
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate, owns no Localization Automation Gate, and does not alter candidate/shared state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T05:10:57+09:00",
+  "bookkeeping_base_head_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
+  "bookkeeping_preserved_head_message": "localization(A): standardize index12 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00330]"
 }
