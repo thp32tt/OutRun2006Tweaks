@@ -132,7 +132,7 @@ namespace OutRunVRStereo
         bool R29StableStereoBase(IDirect3DDevice9* device) noexcept
         {
             if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
+                !TargetIsBackBuffer() || !StereoWanted() || !IsStereoSeeded())
                 return false;
 
             if (!OutRunVR::RuntimeEligibility::MayInjectStereo() ||
@@ -164,16 +164,15 @@ namespace OutRunVRStereo
             StereoR7Draw&& stereoR7Draw, bool zeroDisparity,
             const char* site)
         {
-            ++R9DrawCalls;
+            NoteStereoLeftDraw();
 
             // This frame intentionally does not maintain a complete independent
-            // mono history. R9 must therefore never restore a stale/incomplete
-            // safety RT if a later hazard poisons the same Present.
-            R9MonoBackupGap = true;
+            // mono history. The neutral accounting API preserves the original
+            // mono-backup-gap side effect.
 
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
-                ++R9MainDepthContentSerial;
+                NoteMainDepthContentWrite();
 
             std::uintptr_t savedIdentity = 0;
             if (zeroDisparity)
