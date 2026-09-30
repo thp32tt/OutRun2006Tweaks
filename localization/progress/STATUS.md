@@ -1458,3 +1458,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Refreshed HEAD already contains fresh B00295@index121 and B00287@index163 candidates. Current candidate-first order is **RENDER_READY none -> ONE_STAGE none -> candidate QA 121/159/163/198/201 -> unrelated preflight**; these out-of-batch candidates are not implicitly approved.
 - Out-of-batch A00292@index132, A00294@index135, A00296@index51, B00287@index163, B00295@index121 and A00297@index24 remain **QA_PENDING**, not dispositioned by Q00063.
 - No candidate DDS rewrite, runtime test, build, N100/local clone/worktree, Drive write, GPT Library, VR/FFB/DX change. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 01:32 KST - C165 Q00063 AUTHORITATIVE GATE PASS
+- Validation-bearing result `a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76`; Localization Automation Gate `36744707866` completed **success** with validate job PASS.
+- Q00063 dispositions remain **A00286 PASS / A00289 PASS / A00290 PASS / A00291 PASS**. All four approvals are restricted to their pre-generation scopes; indices30/36/48/111 remain **PREFLIGHT_ONLY**, with no candidate/static/runtime promotion.
+- Candidate-first shared order remains **RENDER_READY none -> ONE_STAGE none -> candidate QA 121/159/163/198/201 -> unrelated preflight**. B00295@index121 and B00287@index163 remain out-of-batch QA_PENDING and are not implicitly approved.
+- Canonical and legacy progress remain byte-for-byte synchronized. No candidate bytes or runtime state changed in bookkeeping.
+- This bookkeeping checkpoint is separate from the Gate-owning result commit and does not replace `a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76` as authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

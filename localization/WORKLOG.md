@@ -2061,3 +2061,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Heavy checks were de-duplicated: reused unchanged C136 source-acquisition fingerprints for 30/36/48 and Q00061 exact-source RANDOM replay for 111; reviewed only new guard/model logic and current-head supersession/readiness state.
 - Shared state merged once from HEAD `3243f18d5b95`. Concurrent producer results B00295@index121 and B00287@index163 are fresh candidate QA inputs and stay ahead of unrelated preflight; Q00063 does not implicitly approve them.
 - Validation-bearing C result owns the only Localization Automation Gate for Q00063. Pre-Gate state: `AUTOMATION_VALIDATION=PENDING`, `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 01:32 KST - C165 / Q00063 authoritative Gate PASS
+- Validation-bearing result: `a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76`; Gate run: `36744707866`; conclusion: **success**.
+- Immutable batch dispositions remain PASS for A00286@1eabccbc, A00289@b5e6f9c9, A00290@2c86a9f3, A00291@0d21bd28. These remain pre-generation approvals only.
+- Bookkeeping is intentionally separate from the Gate-bearing result commit; authoritative/result/validation-bearing SHA stays `a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76`.
+- `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

@@ -268,7 +268,7 @@
       "RUNTIME_ISOLATION: accepted inputs remain 99/102/112/130/193/237; index51 A00296 isolation input and 226/231 isolation inputs remain QA_PENDING. Runtime remains UNTESTED.",
       "OUT_OF_BATCH_QA_PENDING: A00292@index132 source guard, A00294@index135 source guard, A00296@index51 isolation input, B00287@index163 candidate, B00295@index121 candidate and A00297@index24 runtime-trace binder are newer/disjoint and are not dispositioned by Q00063.",
       "DEPENDENCY_BLOCKED: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 remains source-acquisition blocked pending its own C disposition; unchanged source-exhaustion rows must not be reprobed.",
-      "Q00063 validation-bearing result commit owns the single Localization Automation Gate for this batch; AUTOMATION_VALIDATION=PENDING until that exact commit's Gate completes. RUNTIME_VALIDATION=UNTESTED."
+      "Q00063 validation-bearing result a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76 passed Localization Automation Gate 36744707866. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
     ]
   },
   "material_deliverable": {
@@ -307,12 +307,22 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "Reused unchanged C136 source-acquisition heavy QA for indices30/36/48 and Q00061 exact-source RANDOM replay for index111; independently validated only new guard/model logic, immutable identities and current-head supersession/readiness reconciliation.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_gate": null,
-  "bookkeeping_note": "Populate authoritative/result/Gate fields only after the validation-bearing C commit exists and its single Localization Automation Gate completes. Runtime remains UNTESTED."
+  "result_sha": "a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76",
+  "authoritative_result_sha": "a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76",
+  "validation_bearing_result_sha": "a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36744707866,
+    "head_sha": "a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-10-01T01:30:53+09:00"
+  },
+  "bookkeeping_note": "Q00063 authoritative Gate PASS is owned by validation-bearing result a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T01:32:00+09:00",
+  "bookkeeping_base_head_sha": "a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76"
 }
