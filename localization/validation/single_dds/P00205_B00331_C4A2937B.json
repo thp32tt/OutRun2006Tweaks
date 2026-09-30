@@ -1,0 +1,113 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00331-p00205-index61-standard-single-dds-isolation-v1",
+  "case_id": "P00205_B00331_C4A2937B",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00331",
+  "wave_id": "P00205",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-10-01T05:18:11+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Materialize the previously C00022-created and C85-static-QA-backed C4A2937B DDS_ONLY runtime-isolation input in the current schema16 localization/validation/single_dds format. Repository source/candidate blobs are unchanged; heavy pixel/visual QA is reused and runtime remains UNTESTED.",
+  "asset": {
+    "id": "C4A2937B",
+    "queue_index": 61,
+    "queue_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "raw_orientation": "mirror_y",
+    "localized_semantic_bindings": 20,
+    "localized_physical_occurrences": 21,
+    "runtime_context_hold": "Drift and / 드리프트하고 adjacent-sprite composition remains pending isolated in-game validation."
+  },
+  "source": {
+    "canonical_transport": "GITHUB_REPOSITORY_PINNED_HD_SOURCE",
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+    "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y"
+    }
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y"
+    },
+    "unchanged_fingerprint_proof": {
+      "legacy_isolation_task": "LOCALIZATION-LOCALIZATION_C-00022",
+      "legacy_manifest": "localization/validation/single_dds/W00006_C00022_C4A2937B.json",
+      "c85_status": "C85_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "current_source_blob_matches_legacy": true,
+      "current_candidate_blob_matches_legacy": true,
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "latest_static_pixel_visual_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "latest_static_pixel_visual_report_blob_sha": "1d28abd16cce18f15f999d4e390ad3c04b440f8a",
+    "legacy_isolation_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00022.json",
+    "legacy_isolation_task_blob_sha": "f1f7622f388d896066e7e8e2b294b73b566b7e49",
+    "legacy_isolation_manifest": "localization/validation/single_dds/W00006_C00022_C4A2937B.json",
+    "legacy_isolation_manifest_blob_sha": "8f6850cc7dd6b07dc511b397c616e8e3c2fb2314",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "text_elements": 21,
+    "containment_pass_count": 21,
+    "containment_fail_count": 0,
+    "guard_status": "PASS",
+    "collateral_count": 0,
+    "outside_declared_cells_changed_nontransparent_pixels": 0,
+    "visual_source_style_qa": "PASS",
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_input_location": "localization/validation/single_dds/W00006_C00022_C4A2937B.json",
+    "previous_input_schema_version": 1,
+    "current_schema_version": 16,
+    "current_aux_workflow_glob": "localization/validation/single_dds/*.json",
+    "new_current_workflow_consumable_manifest": true,
+    "source_repository_path_bound": true,
+    "candidate_repository_path_bound": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "relative_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "candidate_git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the C4A2937B replacement DDS and confirm affected Heart Attack mission sprites render without a crash.",
+    "Capture readable/game-orientation evidence and verify runtime dimensions/scaling, alpha/transparency, sprite position, clipping and zero-pixel overflow.",
+    "Explicitly verify the adjacent-sprite composition of Drift and / 드리프트하고.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
