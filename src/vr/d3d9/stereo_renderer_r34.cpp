@@ -99,8 +99,7 @@ namespace OutRunVRStereo
             InvalidateTrackedRasterShadow();
             InvalidateDepthStencilCache();
             ArmMonoSafety();
-            RightDepthSynchronized = false;
-            RightStencilSynchronized = false;
+            InvalidateRightDepthStencilSync();
 
             if (!R34ResetReplay.firstReplayBlockLogged)
             {
