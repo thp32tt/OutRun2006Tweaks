@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00157",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "a4808321869c8bc424e0d22c51edacd5cc984059",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R157_HELPER_28320_INSTRUCTION_PREFIX",
+  "selection_reason": "DXVK runtime promotion remains Quest 3/VDXR-dependent. CONVERSION-DXVK-00155 captured exact 0x28320 provenance and explicitly named complete-instruction decoding plus independent 0x28379->0x282B0 alignment proof as the next bounded F13 task. The 96-byte window contains complete instructions only through 0x2837D; the next instruction beginning at 0x2837E is truncated.",
+  "summary": "Add a fail-closed exact-EXE proof for complete instructions 0x28320..0x2837D. Pin the common range-fail target 0x28433, local fail/continue branches, RET at 0x2836F, and prove that 0x28379 is an instruction-aligned CALL rel32 targeting 0x282B0. Function-entry status, call semantics and render ownership remain unresolved.",
+  "evidence": [
+    "CONVERSION-DXVK-00155 validation-bearing result 1c12478c7ac3681d09864cffca5f52edd5c8241a captured a fresh 96-byte window at 0x28320 and found a raw 0x28379->0x282B0 rel32 candidate.",
+    "This task proves only complete instructions ending at exclusive RVA 0x2837E because the 96-byte provenance window ends inside the next instruction.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00157.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the instruction-prefix proof passes, persist the aligned 0x28379->0x282B0 call and branch targets while keeping function_entry_status=UNRESOLVED, call_semantics=UNRESOLVED and ownership_effect=NONE. A later bounded task may capture fresh bytes from 0x2837E before continuing."
+}

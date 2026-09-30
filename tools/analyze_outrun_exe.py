@@ -263,6 +263,48 @@ GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_ANCHOR = bytes.fromhex("83 ec 0c")
 GF_TARGET_C_HELPER_1_NEXT_CODE_RVA = 0x00028320
 GF_TARGET_C_HELPER_1_NEXT_CODE_PROBE_LEN = 96
 
+# R157/F13: instruction-aligned prefix recovered from the R155 0x28320 window.
+# Stop at 0x2837E because the 96-byte provenance window ends inside the next
+# instruction. This proves branch/call alignment only, not function semantics.
+GF_TARGET_C_HELPER_1_NEXT_CODE_PREFIX_END_RVA = 0x0002837E
+GF_TARGET_C_HELPER_1_NEXT_CODE_COMMON_RANGE_FAIL_RVA = 0x00028433
+GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_RVA = 0x00028379
+GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_TARGET_RVA = 0x000282B0
+GF_TARGET_C_HELPER_1_NEXT_CODE_PREFIX_INSTRUCTIONS = (
+    (0x00028320, "83 ec 0c", "sub esp, 0x0c"),
+    (0x00028323, "8b 44 24 10", "mov eax, [esp+0x10]"),
+    (0x00028327, "55", "push ebp"),
+    (0x00028328, "56", "push esi"),
+    (0x00028329, "57", "push edi"),
+    (0x0002832A, "8b f8", "mov edi, eax"),
+    (0x0002832C, "c1 ef 10", "shr edi, 0x10"),
+    (0x0002832F, "83 ff 20", "cmp edi, 0x20"),
+    (0x00028332, "c7 44 24 0c ff ff ff ff", "mov dword [esp+0x0c], -1"),
+    (0x0002833A, "0f 8c f3 00 00 00", "jl 0x28433"),
+    (0x00028340, "83 ff 4b", "cmp edi, 0x4b"),
+    (0x00028343, "0f 8d ea 00 00 00", "jge 0x28433"),
+    (0x00028349, "33 f6", "xor esi, esi"),
+    (0x0002834B, "25 ff ff 00 00", "and eax, 0xffff"),
+    (0x00028350, "3b fe", "cmp edi, esi"),
+    (0x00028352, "7c 12", "jl 0x28366"),
+    (0x00028354, "8b 0c bd b8 68 95 00", "mov ecx, [edi*4+0x9568b8]"),
+    (0x0002835B, "3b ce", "cmp ecx, esi"),
+    (0x0002835D, "74 07", "je 0x28366"),
+    (0x0002835F, "8b 2c 81", "mov ebp, [ecx+eax*4]"),
+    (0x00028362, "3b ee", "cmp ebp, esi"),
+    (0x00028364, "75 0a", "jne 0x28370"),
+    (0x00028366, "5f", "pop edi"),
+    (0x00028367, "5e", "pop esi"),
+    (0x00028368, "83 c8 ff", "or eax, -1"),
+    (0x0002836B, "5d", "pop ebp"),
+    (0x0002836C, "83 c4 0c", "add esp, 0x0c"),
+    (0x0002836F, "c3", "ret"),
+    (0x00028370, "8d 44 24 10", "lea eax, [esp+0x10]"),
+    (0x00028374, "50", "push eax"),
+    (0x00028375, "8b 44 24 24", "mov eax, [esp+0x24]"),
+    (0x00028379, "e8 32 ff ff ff", "call 0x282b0"),
+)
+
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_INSTRUCTIONS = (
     (0x000282B0, "8b 0c 85 58 65 95 00", "mov ecx, [eax*4+0x956558]"),
     (0x000282B7, "57", "push edi"),
@@ -1284,6 +1326,119 @@ def collect_guarded_gf_target_c_helper_1_next_code_provenance(pe: PE) -> dict:
     }
 
 
+def collect_guarded_gf_target_c_helper_1_next_code_prefix_proof(pe: PE) -> dict:
+    """Prove the complete 0x28320..0x2837D instruction prefix and aligned call.
+
+    R155 captured the exact 96-byte window. This proof pins every complete
+    instruction before the truncated next instruction, verifies branch targets,
+    and proves the 0x28379 rel32 call target. It does not claim a function entry
+    or assign render/HUD ownership.
+    """
+
+    provenance = collect_guarded_gf_target_c_helper_1_next_code_provenance(pe)
+    expected_next = GF_TARGET_C_HELPER_1_NEXT_CODE_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_NEXT_CODE_PREFIX_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    def rel8_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 2)
+        if len(raw) != 2:
+            return None
+        rel = struct.unpack_from("<b", raw, 1)[0]
+        return (rva + 2 + rel) & 0xFFFFFFFF
+
+    def rel32_target(rva: int, opcode_len: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, opcode_len + 4)
+        if len(raw) != opcode_len + 4:
+            return None
+        rel = struct.unpack_from("<i", raw, opcode_len)[0]
+        return (rva + opcode_len + 4 + rel) & 0xFFFFFFFF
+
+    lower_range_fail = rel32_target(0x0002833A, 2)
+    upper_range_fail = rel32_target(0x00028343, 2)
+    negative_index_fail = rel8_target(0x00028352)
+    null_table_fail = rel8_target(0x0002835D)
+    nonnull_entry_continue = rel8_target(0x00028364)
+    call_target = rel32_target(GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_RVA, 1)
+    branch_targets_match = (
+        lower_range_fail == GF_TARGET_C_HELPER_1_NEXT_CODE_COMMON_RANGE_FAIL_RVA
+        and upper_range_fail == GF_TARGET_C_HELPER_1_NEXT_CODE_COMMON_RANGE_FAIL_RVA
+        and negative_index_fail == 0x00028366
+        and null_table_fail == 0x00028366
+        and nonnull_entry_continue == 0x00028370
+    )
+    call_target_matches = (
+        call_target == GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_TARGET_RVA
+    )
+    raw_call_present = any(
+        item["call_rva"] == GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_RVA
+        and item["target_rva"] == GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_TARGET_RVA
+        for item in provenance["raw_outbound_rel32_candidates"]
+    )
+    prefix_end_matches = expected_next == GF_TARGET_C_HELPER_1_NEXT_CODE_PREFIX_END_RVA
+    predecessor_exact = (
+        provenance["status"] == "EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED"
+        and provenance["predecessor_exact"]
+        and provenance["target_section"] == ".text"
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    proven = bool(
+        predecessor_exact
+        and contiguous
+        and all_bytes_match
+        and prefix_end_matches
+        and branch_targets_match
+        and call_target_matches
+        and raw_call_present
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_RVA,
+        "prefix_end_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_PREFIX_END_RVA,
+        "predecessor_status": provenance["status"],
+        "predecessor_exact": predecessor_exact,
+        "target_section": provenance["target_section"],
+        "function_start_guess_rva": provenance["function_start_guess_rva"],
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "lower_range_fail_target_rva": lower_range_fail,
+        "upper_range_fail_target_rva": upper_range_fail,
+        "negative_index_fail_target_rva": negative_index_fail,
+        "null_table_fail_target_rva": null_table_fail,
+        "nonnull_entry_continue_target_rva": nonnull_entry_continue,
+        "branch_targets_match": branch_targets_match,
+        "failure_return_rva": 0x0002836F,
+        "aligned_call_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_CALL_RVA,
+        "aligned_call_target_rva": call_target,
+        "aligned_call_target_matches": call_target_matches,
+        "raw_call_candidate_present": raw_call_present,
+        "status": (
+            "EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN"
+            if proven
+            else "NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROOF_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "PARTIAL_CONTROL_FLOW_CALL_CHAIN_ONLY",
+        "call_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
 
@@ -2095,6 +2250,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_first_callee_continuation_provenance": collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe),
         "guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof": collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe),
         "guarded_gf_target_c_helper_1_next_code_provenance": collect_guarded_gf_target_c_helper_1_next_code_provenance(pe),
+        "guarded_gf_target_c_helper_1_next_code_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_prefix_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -2409,6 +2565,33 @@ def main() -> int:
         f"ownership_effect={helper_1_next_code['ownership_effect']} "
         f"bytes={helper_1_next_code['bytes']}"
     )
+    helper_1_next_prefix = report["guarded_gf_target_c_helper_1_next_code_prefix_proof"]
+    print(
+        f"gf_target_c_helper_1_next_code_prefix=0x{helper_1_next_prefix['target_rva']:08X} "
+        f"status={helper_1_next_prefix['status']} "
+        f"predecessor_status={helper_1_next_prefix['predecessor_status']} "
+        f"predecessor_exact={helper_1_next_prefix['predecessor_exact']} "
+        f"section={helper_1_next_prefix['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1_next_prefix['function_start_guess_rva'])} "
+        f"end={hexrva(helper_1_next_prefix['prefix_end_rva'])} "
+        f"layout_contiguous={helper_1_next_prefix['layout_contiguous']} "
+        f"bytes_match={helper_1_next_prefix['all_instruction_bytes_match']} "
+        f"range_fail_lo={hexrva(helper_1_next_prefix['lower_range_fail_target_rva'])} "
+        f"range_fail_hi={hexrva(helper_1_next_prefix['upper_range_fail_target_rva'])} "
+        f"negative_fail={hexrva(helper_1_next_prefix['negative_index_fail_target_rva'])} "
+        f"null_fail={hexrva(helper_1_next_prefix['null_table_fail_target_rva'])} "
+        f"nonnull_continue={hexrva(helper_1_next_prefix['nonnull_entry_continue_target_rva'])} "
+        f"branch_targets={helper_1_next_prefix['branch_targets_match']} "
+        f"failure_ret=0x{helper_1_next_prefix['failure_return_rva']:08X} "
+        f"call=0x{helper_1_next_prefix['aligned_call_rva']:08X}->"
+        f"{hexrva(helper_1_next_prefix['aligned_call_target_rva'])} "
+        f"call_target={helper_1_next_prefix['aligned_call_target_matches']} "
+        f"raw_call={helper_1_next_prefix['raw_call_candidate_present']} "
+        f"function_entry={helper_1_next_prefix['function_entry_status']} "
+        f"semantic_effect={helper_1_next_prefix['semantic_effect']} "
+        f"call_semantics={helper_1_next_prefix['call_semantics']} "
+        f"ownership_effect={helper_1_next_prefix['ownership_effect']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -2455,6 +2638,9 @@ def main() -> int:
     if helper_1_next_code["status"] != "EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_next_code_provenance=FAILED")
         return 13
+    if helper_1_next_prefix["status"] != "EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN":
+        print("guarded_gf_target_c_helper_1_next_code_prefix_proof=FAILED")
+        return 14
     return 0
 
 
