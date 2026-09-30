@@ -913,7 +913,11 @@ namespace OutRunVRStereo
             if (!query)
                 return false;
 
-            const LONGLONG qpcFrequency = R32PerfQpcFrequency();
+            static const LONGLONG qpcFrequency = []() noexcept {
+                LARGE_INTEGER value{};
+                return QueryPerformanceFrequency(&value) != FALSE
+                    ? value.QuadPart : 0;
+            }();
             LARGE_INTEGER start{};
             const bool highResolutionClock = qpcFrequency > 0 &&
                 QueryPerformanceCounter(&start) != FALSE;
@@ -1318,6 +1322,7 @@ namespace OutRunVRStereo
             R32Counters.pendingError = R32PendingFenceErrors;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;
+            R32DirectFenceWaitUsMax = 0;
             R32PerfWindowCounters = {};
         }
 
