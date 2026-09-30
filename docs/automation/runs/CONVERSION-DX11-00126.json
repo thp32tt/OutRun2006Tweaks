@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00126",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T21:12:32+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "46fa5383bbf1144e58446028a452f74065fa44c8",
+  "result_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd",
+  "validation_bearing_result_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R134_UNPROVEN_GF_SPEECH_NEGATIVE_GUARD",
+  "summary": "Added a verifier-only fail-closed negative guard requiring the five still-unproven C2CSpeechBubbleGF/GF-heart hooks at 0xFE8B1, 0xFD60C, 0xFD591, 0xFD5CD and 0xFD652 to remain on their existing spacing-only callbacks until exact immediate-draw provenance is separately established. No runtime source path changed.",
+  "changed_paths": [
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "architecture": "F13 adoption remains incremental. Range membership alone is not used to promote immediate next-draw ownership.",
+    "ownership": "All five guarded hooks retain legacy spacing-only callbacks; no ArmNextDraw ownership is introduced without exact producer evidence.",
+    "stereo_correctness": "The guard prevents accidental false ScreenHud ownership that could suppress or bypass world/stereo handling.",
+    "performance": "Verifier-only change; no hot-path runtime code, waits, copies, draws or logging added.",
+    "adversarial": "Canonical HUD range membership is treated as necessary but insufficient evidence. CI now fails if any guarded binding changes without a deliberate verifier update."
+  },
+  "guarded_hooks": [
+    "0xFE8B1 C2CSpeechBubbleGF_AdjustPositionESP0_hk7",
+    "0xFD60C C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk1",
+    "0xFD591 C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk2",
+    "0xFD5CD C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk3",
+    "0xFD652 C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk4"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "The remaining hooks sit inside canonical ScreenHud ranges but exact immediate-draw adjacency/effect is not proven. 0xFE8B1 is explicitly marked uncertain/no-effect and the four GF-heart hooks have not been independently traced. The safe executable change is therefore a verifier-only negative guard."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36712561751,
+      "conclusion": "success",
+      "validated_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd",
+      "artifact_id": 11095136486,
+      "artifact_digest": "sha256:74629f3e8490bff288241569651e62130094821834808d766bdf23fdee55445b"
+    },
+    "build": {
+      "run_id": 36712569855,
+      "conclusion": "success",
+      "validated_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd"
+    },
+    "hud_inspector": {
+      "run_id": 36712570011,
+      "conclusion": "success",
+      "validated_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd",
+      "evidence": "static-exe-analysis and build-hud-inspector both passed."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36712569937,
+      "conclusion": "success",
+      "validated_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd",
+      "evidence": "All six jobs passed: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify and game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36712561845,
+      "conclusion": "skipped",
+      "validated_sha": "1bd195413ceb1d38be72c08e344f457ddb217bbd"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5910952505,
+    "validation_comment_id": 5911080637,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00126] and no CI-skip directive.",
+    "The five guarded bindings remain exactly on C2CSpeechBubble_AdjustPositionESP0 spacing-only callbacks.",
+    "No source under src/ changed in this task.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R134 negative guard is automation-validated on the DX11 branch. Five unproven GF speech/heart hooks remain deliberately spacing-only.",
+  "next_action": "Do not convert 0xFE8B1 or GF-heart 0xFD60C/0xFD591/0xFD5CD/0xFD652 merely from range membership. Continue F13 only when exact immediate-draw ownership/effect is independently established; otherwise move to the next evidence-driven DX11 priority."
+}
