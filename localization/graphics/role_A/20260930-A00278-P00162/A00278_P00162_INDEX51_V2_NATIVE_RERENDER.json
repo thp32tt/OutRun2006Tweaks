@@ -1,0 +1,129 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00278-p00162-index51-native-v2-rerender-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00278",
+  "wave_id": "P00162",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T20:56:00+09:00",
+  "base_head_sha": "e9d64ccf45c7daad22901a0369052c35b5b30cdf",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_priority": "DIRECT_C_REWORK_REQUIRED_RUNNABLE",
+    "selected_index": 51,
+    "selected_asset": "FF2462BB",
+    "prior_c_batch": "LOCALIZATION-LOCALIZATION_C-00275 / Q00059",
+    "prior_c_disposition": "REWORK_REQUIRED",
+    "prior_c_reason": "Current f3210736 candidate used flattened-raster Lanczos/shrink/trim behavior forbidden by v2 and rendered START/GOAL materially undersized versus the exact English source.",
+    "qa_pending_not_repeated": [
+      111,
+      159,
+      198,
+      201
+    ]
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "git_blob_sha": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+    "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y",
+    "acquisition": {
+      "mode": "GOOGLE_DRIVE_APPROVED_CANONICAL_HD_SOURCE_FAST_PATH",
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_relative_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "drive_file_id": "1XDkT3UGOjlt6r7ulCx5XSduejEdzMTlC",
+      "bytes": 33554560,
+      "identity": "PASS_EXACT_CANONICAL_IDENTITY"
+    }
+  },
+  "previous_candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "git_blob_sha": "f3a1b7851e9e81e2b861764f574c166beffbc0d5",
+    "sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+    "acquisition": "Exact repository-backed bytes recovered from GitHub Actions single-DDS isolation artifact 11090772221 / run 36702521095."
+  },
+  "candidate": {
+    "sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+    "bytes": 33554560,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact_source": true,
+    "raw_orientation": "flip_y",
+    "candidate_dds_modified": true,
+    "production_method": "Native glyph rerender at final font size with iterative font-size refit; no flattened-raster scaling.",
+    "candidate_safe_inset_px": 2,
+    "source_elements_reworked": 21,
+    "storage": {
+      "mode": "GOOGLE_DRIVE_LARGE_BINARY_BUNDLE",
+      "current_pipeline_folder_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
+      "task_folder_id": "1gVkSx0u-3KupBuVlZRv9NTXC6CnP-gJU",
+      "drive_file_id": "1Rp4P_U_Aj_DOjkkIzrV3vqZ3HCFIO00f",
+      "bundle_name": "A00278_FF2462BB_Korean_candidate.zip",
+      "bundle_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d",
+      "bundle_bytes": 1206168,
+      "inner_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "upload_readback_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d",
+      "upload_readback_bytes": 1206168
+    }
+  },
+  "self_qa": {
+    "result": "PASS_STATIC_PRODUCER_SELF_QA_PENDING_INDEPENDENT_C",
+    "changed_pixels_outside_exact_source_bboxes_vs_previous": 0,
+    "candidate_vs_clean_outside_safe_bbox_changed_pixels": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "clean_plate_residue_total": 0,
+    "raster_resampling": "NOT_USED",
+    "english_source_comparison": "PASS_21_OF_21_PRODUCER_SELF_QA_PENDING_C",
+    "visual_review": "PASS_FULL_ATLAS_AND_21_ELEMENT_NEAREST_NEIGHBOR_SOURCE_CLEAN_CANDIDATE",
+    "clipping": "PASS_NONE",
+    "cover_box_or_invented_panel": "PASS_NONE",
+    "wrong_art_or_protected_art_damage": "PASS_NONE_OBSERVED"
+  },
+  "review_artifacts": {
+    "root": "localization/graphics/KOREAN_PNG_REVIEW/FF2462BB",
+    "source_display_git_blob_sha": "9a299eaa918f21f120b8ff8284d486799df3069d",
+    "clean_plate_display_git_blob_sha": "6ea3104d4818018c9db43cc4ba0a38eb1487bd8c",
+    "candidate_display_git_blob_sha": "b97495f13f9249b52543197f845757003ca3b4b3",
+    "comparison_git_blob_sha": "68843cdaa06a195be0176b8bb5709b8dddac6cc3",
+    "generation_prompt_git_blob_sha": "71dce7354166191083c0c249809871cea552e388",
+    "qa_report_git_blob_sha": "d548d244b6debabf002aba41d13eaecd396dbf4d",
+    "renderer_git_blob_sha": "409d85783c29dd3e306ffab5bc3939c0036ef37d"
+  },
+  "material_deliverable": {
+    "type": "INDEX51_MATERIALLY_REWORKED_V2_KOREAN_DDS_PLUS_CURRENT_POLICY_REVIEW_SET",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "materially_reduces_unresolved_work": true,
+    "readiness_before": "REWORK_REQUIRED_SOURCE_STYLE_ARTIFACT_AND_FLATTENED_RASTER_RESAMPLE",
+    "readiness_after": "KOREAN_V2_CANDIDATE_SELF_QA_PASS_PENDING_C_BATCH"
+  },
+  "candidate_dds_modified": true,
+  "candidate_binary_persisted": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
