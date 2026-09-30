@@ -42,8 +42,8 @@ namespace OutRunVRStereo
                 return;
 
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
-            R22FailClosedEligibility();
-            R22ResetBaselineTracking();
+            FailClosedStereoEligibility();
+            ResetStereoBaselineTracking();
             InvalidateTrackedRasterShadow();
             R33InvalidateDepthStencilCache();
             R29ArmMonoSafety();
@@ -83,10 +83,10 @@ namespace OutRunVRStereo
             // the final draw boundary. Flush a pending StateBlock resync first
             // so the scope never snapshots stale shadow state.
             FlushPendingStateBlockResync(device);
-            R22ReplayScope replay(device);
+            StereoRasterReplayScope replay(device);
             if (!replay.stateValid)
             {
-                R22FailClosedReplayState(device, site);
+                FailClosedRasterReplayState(device, site);
                 return drawCall();
             }
 

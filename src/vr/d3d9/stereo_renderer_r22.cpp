@@ -881,4 +881,22 @@ namespace OutRunVRStereo
     {
         return R22StateBlockTrackingReliable.load(std::memory_order_acquire);
     }
+
+    using StereoRasterReplayScope = R22ReplayScope;
+
+    void FailClosedStereoEligibility() noexcept
+    {
+        R22FailClosedEligibility();
+    }
+
+    void ResetStereoBaselineTracking() noexcept
+    {
+        R22ResetBaselineTracking();
+    }
+
+    void FailClosedRasterReplayState(
+        IDirect3DDevice9* device, const char* site) noexcept
+    {
+        R22FailClosedReplayState(device, site);
+    }
 }
