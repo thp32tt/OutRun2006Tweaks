@@ -1159,6 +1159,29 @@ class UIScaling : public Hook
 	static inline SafetyHookMid DispGhostGap_ForceRight_hk{};
 	static inline SafetyHookMid DispGhostGap_ForceRight2_hk{};
 
+	template<std::uintptr_t CallerRva, bool ForceLeft>
+	static void DispGhostGap_ForceSpacingAndHud(safetyhook::Context& ctx)
+	{
+		if constexpr (ForceLeft)
+			SpriteSpacingForceLeft(ctx);
+		else
+			SpriteSpacingForceRight(ctx);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispGhostGap callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R127 GHOST GAP FORCE HUD: shared producer-map handoff rva=0x{:x} side={} hits={}",
+				CallerRva, ForceLeft ? "left" : "right", hit);
+	}
+
 	// NaviPub_DispTimeAttackGoal
 	static inline SafetyHookMid NaviPub_DispTimeAttackGoal_DisableScaling_hk{};
 
@@ -1387,10 +1410,22 @@ public:
 		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid(
 			(void*)0x4BDE3A,
 			PutGhostGapInfo_AdjustPositionAndHud<0x000BDE3Au>);
-		DispGhostGap_ForceLeft_hk = safetyhook::create_mid((void*)0x4BE045, SpriteSpacingForceLeft);
-		DispGhostGap_ForceLeft2_hk = safetyhook::create_mid((void*)0x4BE083, SpriteSpacingForceLeft);
-		DispGhostGap_ForceRight_hk = safetyhook::create_mid((void*)0x4BE0A5, SpriteSpacingForceRight);
-		DispGhostGap_ForceRight2_hk = safetyhook::create_mid((void*)0x4BE067, SpriteSpacingForceRight);
+		// R127/F13: the remaining four GhostGap spacing-state edges are inside
+		// the canonical GhostGap SCREEN_HUD producer range. Preserve the exact
+		// ForceLeft/ForceRight state transitions and source only the immediate
+		// next-draw owner from the shared backend-neutral producer map.
+		DispGhostGap_ForceLeft_hk = safetyhook::create_mid(
+			(void*)0x4BE045,
+			DispGhostGap_ForceSpacingAndHud<0x000BE045u, true>);
+		DispGhostGap_ForceLeft2_hk = safetyhook::create_mid(
+			(void*)0x4BE083,
+			DispGhostGap_ForceSpacingAndHud<0x000BE083u, true>);
+		DispGhostGap_ForceRight_hk = safetyhook::create_mid(
+			(void*)0x4BE0A5,
+			DispGhostGap_ForceSpacingAndHud<0x000BE0A5u, false>);
+		DispGhostGap_ForceRight2_hk = safetyhook::create_mid(
+			(void*)0x4BE067,
+			DispGhostGap_ForceSpacingAndHud<0x000BE067u, false>);
 
 		// R126/F13: exact PutGhostGapInfo_sub edge 0xBDAE8 is canonical
 		// GhostGap SCREEN_HUD. Preserve its float spacing correction while
