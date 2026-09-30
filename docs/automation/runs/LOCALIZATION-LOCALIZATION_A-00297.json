@@ -1,0 +1,89 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00297-p00178-index24-name-entry-runtime-trace-contract-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00297",
+  "wave_id": "P00178",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T01:13:00+09:00",
+  "base_head_sha": "5d0208741ba7a6436e5d8c207dbe3366f9e7c1f4",
+  "result": "PASS_MATERIAL_FALLBACK5_INDEX24_RUNTIME_TRACE_BINDING_CONTRACT_RUNTIME_UNTESTED",
+  "summary": "Fresh C164/Q00062-aware A-shard scan finds no legal A-owned DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework. Cross-lane index163 RENDER_READY and index121 rework are not stolen. A-owned index51 isolation, index111 preflight, index147 source-acquisition evidence and candidates159/198/201 are QA-pending and are not repeated; accepted runtime-isolation assets are also skipped. The next non-duplicative special-pipeline blocker is index24/66743AA8, whose exact canonical 4096x4096 DXT5 48-glyph geometry was accepted by C163 but whose runtime selection-index/UV/composition mapping is explicitly unresolved. A00297 adds a deterministic fail-closed JSONL binder that maps only explicit observed runtime UV rectangles to the accepted 48-glyph geometry, rejects ambiguous/conflicting mappings, and separately requires an observed committed Hangul composition result. It never infers runtime order from visual row order and never authorizes a candidate by itself. No DDS/shared state/runtime/build/N100/local clone/Drive/Library/VR/FFB/DX changes.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "direct_rework_required_runnable": [],
+    "render_ready_runnable": [],
+    "one_stage_to_render_runnable": [],
+    "existing_candidate_material_rework_runnable": [],
+    "c164_cross_lane_render_ready_not_stolen": [
+      163
+    ],
+    "c164_cross_lane_rework_not_stolen": [
+      121
+    ],
+    "qa_pending_not_repeated": [
+      "A00296@index51 runtime-isolation input",
+      "A00289@index111 preflight evidence",
+      "A00242@index147 source-acquisition evidence",
+      "candidates@index159/198/201"
+    ],
+    "accepted_runtime_isolation_not_repeated": [
+      99,
+      102,
+      195,
+      222,
+      237
+    ],
+    "runtime_isolation_qa_pending_not_repeated": [
+      51,
+      231
+    ],
+    "selected_index": 24,
+    "selected_asset": "66743AA8",
+    "selected_priority": "SINGLE_SPECIAL_PIPELINE_PREFLIGHT_AFTER_ZERO_RUNNABLE_A_CANDIDATE_AND_FALLBACK_1_TO_3_TARGETS"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00297-P00178/bind_name_entry_runtime_trace.py",
+    "localization/graphics/role_A/20261001-A00297-P00178/A00297_P00178_INDEX24_NAME_ENTRY_RUNTIME_TRACE_CONTRACT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX24_RUNTIME_SLOT_UV_COMPOSITION_TRACE_VALIDATOR_AND_MACHINE_CONTRACT",
+    "executable": "localization/graphics/role_A/20261001-A00297-P00178/bind_name_entry_runtime_trace.py",
+    "machine_report": "localization/graphics/role_A/20261001-A00297-P00178/A00297_P00178_INDEX24_NAME_ENTRY_RUNTIME_TRACE_CONTRACT.json",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "new_executable_runtime_binding_input": true
+  },
+  "readiness_before": "PREFLIGHT_ONLY_RUNTIME_NAME_ENTRY_MAPPING_BLOCKED",
+  "readiness_after": "PREFLIGHT_ONLY_RUNTIME_TRACE_CONTRACT_READY_OBSERVATIONS_REQUIRED",
+  "self_qa": "PASS_INDEX24_C163_ACCEPTED_CANONICAL_GEOMETRY_REUSED__NO_ROW_ORDER_RUNTIME_INFERENCE__EXPLICIT_SLOT_UV_COMPOSITION_CONTRACT__48_UNIQUE_MAPPING_GATE__HANGUL_COMPOSITION_OBSERVATION_GATE__FAIL_CLOSED__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): bind index24 name-entry runtime trace [AUTO:LOCALIZATION-LOCALIZATION_A-00297]",
+  "precommit_refresh": {
+    "head_sha": "5d0208741ba7a6436e5d8c207dbe3366f9e7c1f4",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Current HEAD includes disjoint B00295 index121 blocked execution evidence after A00296; no shared-state or index24 payload is overwritten."
+  },
+  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00297 result SHA. RUNTIME_VALIDATION=UNTESTED."
+}
