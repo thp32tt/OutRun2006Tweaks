@@ -1,0 +1,94 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00314-p00191-duplicate-dispatch-suppression-receipt-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00314",
+  "wave_id": "P00191",
+  "lane": "LOCALIZATION_A",
+  "purpose": "A_LANE_DUPLICATE_DISPATCH_SUPPRESSION_RECEIPT",
+  "recorded_at_kst": "2026-10-01T03:38:00+09:00",
+  "base_head_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+  "inherited_frontier_fingerprint_sha256": "3f3a98086587c63cd4e79822fbdba46c5c29ae395f3e149397f2d14fd36e2466",
+  "fingerprint_inputs_verified_unchanged": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "asset_queue_blob_sha": "e18ae69c216b93facaf54bc0f3fe2ebcdb628727",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00308",
+    "latest_authoritative_c_record_blob_sha": "67ee4a0cff043ce5fdde592ef6b703e8087b558f",
+    "latest_authoritative_c_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "predecessor_suppression_task": "LOCALIZATION-LOCALIZATION_A-00313",
+    "predecessor_task_record_blob_sha": "5ef7699092f804b547132af15bfea6dc074a65b0"
+  },
+  "refreshed_a_shard_disposition": {
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "qa_pending_not_repeated": [
+      111,
+      147,
+      159,
+      198,
+      201
+    ],
+    "sticky_source_exhausted_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "legacy_pending_c_not_repeated": [
+      54,
+      57,
+      60
+    ],
+    "static_or_runtime_only_not_reworked": [
+      12,
+      51,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "cross_lane_rework_not_stolen": [
+      121
+    ]
+  },
+  "concurrent_peer_head": {
+    "head_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
+    "index": 121,
+    "effect_on_a_frontier": "NONE__CROSS_LANE_B_REWORK_ONLY"
+  },
+  "suppression_replay": {
+    "predecessor_contract_requires_suppression_while_fingerprint_unchanged": true,
+    "invalidation_trigger_observed": false,
+    "c00311_durable_record_observed": false,
+    "legal_new_a_preflight_batch_available": false,
+    "reason": "Every unfinished A-owned graphics row is already QA_PENDING, sticky source-blocked/runtime-blocked, static/runtime-only, or legacy pending-C. Starting a new analysis/candidate would duplicate or violate current C/producer ownership.",
+    "next_legal_a_action": "Wait for a new authoritative C disposition or another declared dependency fingerprint change; then recompute A shard from GitHub HEAD."
+  },
+  "material_deliverable": {
+    "type": "A_LANE_DUPLICATE_DISPATCH_SUPPRESSION_RECEIPT",
+    "resolves_controller_duplicate_dispatch_blocker": true,
+    "preserves_no_duplicate_work_contract": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_graphics": false,
+    "new_preflight_batches": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "shared_state_modified": false
+}
