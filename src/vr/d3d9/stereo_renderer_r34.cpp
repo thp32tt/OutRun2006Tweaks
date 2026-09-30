@@ -71,7 +71,7 @@ namespace OutRunVRStereo
                 drawSemanticValue);
 
             if (!device || !IsGameDevice(device) || InternalStereoPass ||
-                R31StateBlockRecording || !StereoWanted() ||
+                IsGameStateBlockRecording() || !StereoWanted() ||
                 !TargetIsBackBuffer())
             {
                 return drawCall();
@@ -82,7 +82,7 @@ namespace OutRunVRStereo
             // wrapper, so establish the already-validated R22 replay scope at
             // the final draw boundary. Flush a pending StateBlock resync first
             // so the scope never snapshots stale shadow state.
-            R31FlushPendingStateBlockResync(device);
+            FlushPendingStateBlockResync(device);
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {

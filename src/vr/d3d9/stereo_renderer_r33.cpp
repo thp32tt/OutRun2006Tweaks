@@ -96,7 +96,7 @@ namespace OutRunVRStereo
             {
                 next.valid = true;
                 next.depthGeneration = R9MainDepthGeneration;
-                next.stateBlockRecordings = R31StateBlockRecordings;
+                next.stateBlockRecordings = IsGameStateBlockRecording()s;
                 next.stateBlockApplies = R31StateBlockApplies;
                 R33DepthStencilState = next;
                 if (R33TelemetryEnabled())
@@ -143,7 +143,7 @@ namespace OutRunVRStereo
 
             next.valid = true;
             next.depthGeneration = R9MainDepthGeneration;
-            next.stateBlockRecordings = R31StateBlockRecordings;
+            next.stateBlockRecordings = IsGameStateBlockRecording()s;
             next.stateBlockApplies = R31StateBlockApplies;
             R33DepthStencilState = next;
             if (R33TelemetryEnabled())
@@ -162,7 +162,7 @@ namespace OutRunVRStereo
             return R33DepthStencilState.valid &&
                 R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
                 R33DepthStencilState.stateBlockRecordings ==
-                    R31StateBlockRecordings &&
+                    IsGameStateBlockRecording()s &&
                 R33DepthStencilState.stateBlockApplies == R31StateBlockApplies;
         }
 
@@ -174,7 +174,7 @@ namespace OutRunVRStereo
             if (!TrackedDepthStencil)
                 return true;
 
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (!IsStateBlockTrackingReliable())
             {
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilLiveFallbacks;
@@ -229,7 +229,7 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
-            if (R31StateBlockRecording)
+            if (IsGameStateBlockRecording())
             {
                 R33InvalidateDepthStencilCache();
                 return hr;
@@ -286,7 +286,7 @@ namespace OutRunVRStereo
         R31OwnedResult R33TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (R31StateBlockRecording || !R29StableStereoBase(device))
+            if (IsGameStateBlockRecording() || !R29StableStereoBase(device))
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
@@ -296,7 +296,7 @@ namespace OutRunVRStereo
 
             bool fragile = true;
             const bool stateBlocksReliable =
-                R31StateBlockTrackingReliable.load(std::memory_order_acquire);
+                IsStateBlockTrackingReliable();
             const bool effectKnown = stateBlocksReliable
                 ? R29FragileEffectCached(device, fragile)
                 : R32EffectIsFragileLive(device, fragile);
@@ -460,11 +460,11 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
+            if (IsGameStateBlockRecording() || !R29StableStereoBase(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
 
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (!IsStateBlockTrackingReliable())
             {
                 R31DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
@@ -621,13 +621,13 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
             const char* site) noexcept
         {
-            if (!R31StateBlockRecording)
-                R31FlushPendingStateBlockResync(device);
+            if (!IsGameStateBlockRecording())
+                FlushPendingStateBlockResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
                 R31ObserveDraw(device);
 
-            if (R31StateBlockRecording)
+            if (IsGameStateBlockRecording())
             {
                 if (telemetry)
                     ++R31Frame.fallback;
