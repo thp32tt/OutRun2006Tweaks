@@ -1,0 +1,202 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00342-p00214-index61-c4a2937b-semantic-rework-qa-v1",
+  "status": "PASS",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "wave_id": "P00214",
+  "lane": "LOCALIZATION_B",
+  "queue_index": 61,
+  "asset": "C4A2937B",
+  "asset_id": "C4A2937B",
+  "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "candidate_before_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+  "candidate_dds_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
+  "runtime_validation": "UNTESTED",
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_sha256": "e81650f865febbe931b8226e72339fbe5b592d6f1da579c065e5e37a0238296f",
+  "prompt_json_sha256": "342d3b27839aafe1c8a4618e427ca124785d790d85975e44d942af75b09912dd",
+  "signed_slant_gate": "PASS",
+  "render_method": "cairo_vector_outline_transform_before_rasterization",
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+    "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "mirror_y",
+    "header_128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "before_git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "before_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "after_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
+    "bytes": 67108992,
+    "header_128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+    "header_128_identical_to_source_and_before": true,
+    "dds_roundtrip_pixel_exact": true
+  },
+  "clean_plate": {
+    "lineage": "C85_CURRENT_CANDIDATE_LOCAL_TWO_ELEMENT_CLEAN_PLATE",
+    "unchanged_19_element_heavy_qa_reused": true,
+    "stale_glyph_footprints_cleared": [
+      [
+        2597,
+        1008,
+        3027,
+        1096
+      ],
+      [
+        3872,
+        1800,
+        4028,
+        1893
+      ]
+    ],
+    "changed_outside_stale_glyph_footprints": 0,
+    "alpha_changed_outside_stale_glyph_footprints": 0
+  },
+  "elements": [
+    {
+      "element_id": "cut_line",
+      "source_text": "Cut the line!",
+      "old_korean": "라인을 끊으세요!",
+      "approved_korean": "하트선을 통과하세요!",
+      "display_lines": [
+        "하트선을 통과하세요!"
+      ],
+      "source_effect_bbox_readable_xyxy": [
+        2596,
+        998,
+        3028,
+        1106
+      ],
+      "candidate_safe_bbox_readable_xyxy": [
+        2598,
+        1000,
+        3026,
+        1104
+      ],
+      "old_candidate_bbox_readable_xyxy": [
+        2597,
+        1008,
+        3027,
+        1096
+      ],
+      "candidate_effect_bbox_readable_xyxy": [
+        2603,
+        1014,
+        3020,
+        1089
+      ],
+      "font_size_px": 70,
+      "font_weight": "bold",
+      "xscale": 0.66,
+      "slant_dx_per_dy": 0.02,
+      "slant_angle_deg": 1.1458,
+      "slant_direction": "right",
+      "safe_margins_ltrb_px": [
+        5,
+        14,
+        6,
+        15
+      ],
+      "containment": "PASS",
+      "style_class": "instr_yellow_white_navy_outline"
+    },
+    {
+      "element_id": "stage_bonus",
+      "source_text": "STAGE BONUS",
+      "old_korean": "스테이지 / 보너스",
+      "approved_korean": "스테이지 보너스",
+      "display_lines": [
+        "스테이지",
+        "보너스"
+      ],
+      "source_effect_bbox_readable_xyxy": [
+        3814,
+        1799,
+        4075,
+        1894
+      ],
+      "candidate_safe_bbox_readable_xyxy": [
+        3816,
+        1801,
+        4073,
+        1892
+      ],
+      "old_candidate_bbox_readable_xyxy": [
+        3872,
+        1800,
+        4028,
+        1893
+      ],
+      "candidate_effect_bbox_readable_xyxy": [
+        3871,
+        1802,
+        4018,
+        1891
+      ],
+      "font_size_px": 41,
+      "font_weight": "normal",
+      "xscale": 0.95,
+      "slant_dx_per_dy": 0.12,
+      "slant_angle_deg": 6.8428,
+      "slant_direction": "right",
+      "safe_margins_ltrb_px": [
+        55,
+        1,
+        55,
+        1
+      ],
+      "containment": "PASS",
+      "style_class": "stage_bonus_white_navy_outline"
+    }
+  ],
+  "changed_pixels_total_vs_before": 45703,
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_outside_source_region": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "introduced_alpha_outside_source_region": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "one_pixel_overflow_count": 0,
+  "semantic_checks": {
+    "Cut the line!": "하트선을 통과하세요!",
+    "STAGE BONUS": "스테이지 보너스",
+    "stale_semantics_removed": true
+  },
+  "integrated_self_qa": {
+    "current_candidate_fingerprint_gate": "PASS_EXACT_C85_LINEAGE",
+    "source_identity": "PASS_EXACT_CANONICAL",
+    "two_target_elements_containment": "2/2 PASS",
+    "other_19_regions_preserved_by_delta_gate": true,
+    "readable_orientation_target_review_artifacts_generated": true,
+    "source_candidate_side_by_side_artifact_generated": true,
+    "opaque_cover_box_or_patch": "NONE_VECTOR_ON_TRANSPARENT_CLEAN_PLATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "review_artifacts": {
+    "source_display.png": {
+      "sha256": "537a12f4e0c13818621a70539c42f2842f0c59e3e949fe649f76fa1064ac636c"
+    },
+    "candidate_before_display.png": {
+      "sha256": "7f0ca65f81a1ea3066011dfed419d6b074768e932a4bb4270a4ffb33cde3c01b"
+    },
+    "candidate_display.png": {
+      "sha256": "c8b4342ae08b6804ca6b996503a62b456b0a92e7d7389278e9fedd93d45844e0"
+    },
+    "comparison.png": {
+      "sha256": "4b5eb768450c9de68991b853990fe65ce9fe150ffa1621fc1ccec5966817ffdb"
+    },
+    "diff_display.png": {
+      "sha256": "e7de3d409c3820bc51d012d47e08a660b85277a0ee3f63a929a3361caba80a87"
+    }
+  },
+  "final_approved": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

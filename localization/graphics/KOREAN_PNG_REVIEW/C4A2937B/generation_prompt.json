@@ -1,0 +1,161 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "contract_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "wave_id": "P00214",
+  "queue_index": 61,
+  "asset_id": "C4A2937B",
+  "source_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+  "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "source_dimensions": [
+    4096,
+    4096
+  ],
+  "raw_orientation": "mirror_y",
+  "display_transform": "flip_y_to_readable",
+  "background_class": "transparent Heart Attack instruction/result sprite atlas",
+  "font_identifier": "Noto Sans CJK KR Bold (system font; font bytes not distributed)",
+  "source_style": {
+    "cut_line": "yellow fill + white inner outline + navy outer outline, bold condensed right-slanted sans",
+    "stage_bonus": "white fill + navy outer outline, regular condensed two-line right-slanted sans"
+  },
+  "alpha_behavior": "reuse C85 current candidate as clean lineage; remove only two stale Korean glyph footprints and introduce fresh vector lettering only inside 2px safe bboxes",
+  "elements": [
+    {
+      "element_id": "cut_line",
+      "source_text": "Cut the line!",
+      "approved_korean": "하트선을 통과하세요!",
+      "display_lines": [
+        "하트선을 통과하세요!"
+      ],
+      "source_bbox": [
+        2596,
+        998,
+        3028,
+        1106
+      ],
+      "permitted_region": [
+        2596,
+        998,
+        3028,
+        1106
+      ],
+      "candidate_safe_bbox": [
+        2598,
+        1000,
+        3026,
+        1104
+      ],
+      "candidate_bbox": [
+        2603,
+        1014,
+        3020,
+        1089
+      ],
+      "safety_inset_px": 2,
+      "alignment": "center",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "source_text_transform": "flip_y raw / normal readable",
+      "display_transform": "flip_y_to_readable",
+      "style_traits": {
+        "weight": "bold",
+        "width": "condensed",
+        "outline": "source-family measured"
+      },
+      "slant_dx_per_dy": 0.02,
+      "slant_angle_deg": 1.1458,
+      "slant_direction": "right",
+      "font_size_used_hd_px": 70,
+      "lettering_method": "DETERMINISTIC_VECTOR_OUTLINE",
+      "refit_policy": {
+        "max_iterations": 8,
+        "fresh_vector_rerender_each_iteration": true
+      },
+      "style_class": "instr_yellow_white_navy_outline"
+    },
+    {
+      "element_id": "stage_bonus",
+      "source_text": "STAGE BONUS",
+      "approved_korean": "스테이지 보너스",
+      "display_lines": [
+        "스테이지",
+        "보너스"
+      ],
+      "source_bbox": [
+        3814,
+        1799,
+        4075,
+        1894
+      ],
+      "permitted_region": [
+        3814,
+        1799,
+        4075,
+        1894
+      ],
+      "candidate_safe_bbox": [
+        3816,
+        1801,
+        4073,
+        1892
+      ],
+      "candidate_bbox": [
+        3871,
+        1802,
+        4018,
+        1891
+      ],
+      "safety_inset_px": 2,
+      "alignment": "center",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "source_text_transform": "flip_y raw / normal readable",
+      "display_transform": "flip_y_to_readable",
+      "style_traits": {
+        "weight": "bold",
+        "width": "condensed",
+        "outline": "source-family measured"
+      },
+      "slant_dx_per_dy": 0.12,
+      "slant_angle_deg": 6.8428,
+      "slant_direction": "right",
+      "font_size_used_hd_px": 41,
+      "lettering_method": "DETERMINISTIC_VECTOR_OUTLINE",
+      "refit_policy": {
+        "max_iterations": 8,
+        "fresh_vector_rerender_each_iteration": true
+      },
+      "style_class": "stage_bonus_white_navy_outline"
+    }
+  ],
+  "stage_order": [
+    "CLEAN_PLATE",
+    "KOREAN_LETTERING",
+    "MEASURE_REFIT",
+    "FINAL_VALIDATE"
+  ],
+  "priority": [
+    "CONTAINMENT BEFORE STYLE",
+    "source-faithful spacing and effect family",
+    "fresh vector rerender if refit is needed"
+  ],
+  "protected_regions": [
+    "all pixels outside the two stale-glyph removal footprints and two 2px-safe lettering boxes",
+    "the other 19 C85-localized regions",
+    "DDS header bytes 0..127"
+  ],
+  "forbidden": [
+    "visible English/source residue",
+    "cover rectangles",
+    "changes outside target cells",
+    "cropping/padding/resizing DDS canvas",
+    "1px overflow beyond source-effect bbox"
+  ],
+  "single_pass_self_check": "preserve C85 candidate outside targets; encode exact RGBA32 header; decode exact roundtrip; zero outside/alpha delta",
+  "prompt_sha256": "e81650f865febbe931b8226e72339fbe5b592d6f1da579c065e5e37a0238296f"
+}
