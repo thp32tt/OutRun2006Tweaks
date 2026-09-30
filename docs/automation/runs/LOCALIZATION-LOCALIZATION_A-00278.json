@@ -68,8 +68,11 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "e32e1c27a2045d1eaef318bbc56379102b0572c2",
+  "authoritative_result_sha": "e32e1c27a2045d1eaef318bbc56379102b0572c2",
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(A): rerender index51 natively [AUTO:LOCALIZATION-LOCALIZATION_A-00278]"
+  "result_commit_message": "localization(A): rerender index51 natively [AUTO:LOCALIZATION-LOCALIZATION_A-00278]",
+  "bookkeeping_note": "Immutable producer result e32e1c27a2045d1eaef318bbc56379102b0572c2 recorded. A producer automation validation remains PENDING under C_BATCH_GATE; the result commit itself does not own a runner-backed Gate. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T20:58:00+09:00",
+  "bookkeeping_base_head_sha": "e32e1c27a2045d1eaef318bbc56379102b0572c2"
 }
