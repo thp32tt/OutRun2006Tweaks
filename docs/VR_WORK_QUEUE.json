@@ -2,9 +2,9 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-30T19:12:00+09:00",
+  "updatedKst": "2026-09-30T19:33:00+09:00",
   "policy": {
-    "maxIndependentUnvalidatedRuntimeCandidates": 1,
+    "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
     "productionWriter": "D_INTEGRATION_PLANNER",
     "candidateWriter": "D_INTEGRATION_PLANNER",
