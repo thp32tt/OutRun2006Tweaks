@@ -1,5 +1,5 @@
 {
-  "schema_version": 95,
+  "schema_version": 96,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,15 +7,15 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: index133/25F697C6. Q00071 independently accepts exact source, nine removal masks, CLEAN_PLATE, final safe geometry and 9/9 semantics; render/persist its Korean DDS candidate before unrelated preflight expansion.",
-    "ONE_STAGE_TO_RENDER: none authoritative after Q00071.",
-    "CANDIDATE_REWORK_REQUIRED: index61/C4A2937B. Re-render current canonical Cut the line!→하트선을 통과하세요! and STAGE BONUS→스테이지 보너스 on the unchanged C85 lineage, then fresh candidate-bound English-source comparison/C QA. Reuse valid 21/21 geometry where unchanged.",
-    "CANDIDATE_AWAITING_C: indices159/198/201 plus newer out-of-batch index232/B00332 candidate SHA-256 41334c7d.... Do not overwrite index232 with older RENDER_READY state; its candidate must be independently consumed by a later C batch.",
-    "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index54 remains sticky SOURCE_IDENTITY_MISMATCH; indices55/154 are normalized to sticky SOURCE_IDENTITY_MISMATCH because exact Release bytes exist but fail canonical identity; index94 retains Q00069 6/7-mask scope; index111 retains Q00067/A00309 authority until out-of-batch A00334 is C-consumed; index147 remains blocked.",
-    "RUNTIME ISOLATION READY: index63 joins indices99/222/237 on unchanged static-QA candidates. Index61 is explicitly removed from current isolation-ready authority due semantic drift. No real-game validation is implied.",
-    "OUT-OF-BATCH C QA: A00330@index12, A00334@index111, A00335@index195, A00336@index51, B00332@index232 and A00338@index102 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not implicitly promoted.",
-    "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=159/198/201/232; candidate_rework_required=61; runnable_production=133; blocked_exception=54/55/147/154; runtime_validated=none.",
-    "Q00071 validation-bearing result commit will own the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "RENDER_READY: none authoritative after Q00073 consumed the index133 and index232 Korean candidates.",
+    "ONE_STAGE_TO_RENDER: none authoritative.",
+    "CANDIDATE_AWAITING_C: index61/C4A2937B fresh B00342 semantic-rework candidate (SHA-256 e31487c2...) is the highest completion-tier pending C input; then indices159/198/201. Do not expand unrelated preflight ahead of candidate completion.",
+    "PREFLIGHT_ONLY ACCEPTED/BLOCKED: preserve Q00072 authority for index111 at 8,221 unresolved until A00346 is separately C-consumed; index54/55/147/154 remain blocked/accepted fail-closed as previously recorded. A00344@index147, A00345@index15/18/21 and A00348@index24 are newer out-of-batch QA_PENDING and are not implicitly promoted here.",
+    "RUNTIME ISOLATION READY: Q00073 accepts current-schema DDS_ONLY manifests for indices102 and231 on unchanged prior-static-QA candidates. Existing ready set is 12/51/63/99/102/195/222/231/237. No real-game validation is implied.",
+    "STATIC_QA PASS: index133/25F697C6 candidate 6e5ee22d... and index232/EBFC709F candidate 41334c7d... are newly accepted; runtime remains UNTESTED.",
+    "OUT-OF-BATCH C QA: B00342@index61, A00344@index147, A00345@index15/18/21, A00346@index111 and A00348@index24 remain QA_PENDING by exact TASK_ID@RESULT_SHA.",
+    "THROUGHPUT v16: production_complete new=2 (133/232); candidate_awaiting_c=61/159/198/201; candidate_rework_required=none; runnable_production=none; blocked_exception=54/55/147/154; runtime_validated=none.",
+    "Q00073 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2466,36 +2466,36 @@
   },
   "latest_qa_batch": {
     "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00343",
-    "wave_id": "Q00072",
-    "run": "C174",
-    "recorded_at_kst": "2026-10-01T06:53:00+09:00",
-    "result": "PASS_Q00072_INDEX12_195_51_ISOLATION_INDEX111_ATOMIC_REEMISSION_PREFLIGHT_RUNTIME_UNTESTED",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00349",
+    "wave_id": "Q00073",
+    "run": "C175",
+    "recorded_at_kst": "2026-10-01T07:50:21+09:00",
+    "result": "PASS_Q00073_INDEX232_133_STATIC_QA_INDEX102_231_SCHEMA16_ISOLATION_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
-        "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00332",
+        "result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
-        "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
+        "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
-        "result_sha": "868a0c8a6432a599d258783b6ca1ab8c8fbc24bf",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
+        "result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
-        "result_sha": "d61db69e66a3ebf266e43470c189b2691a079b4b",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+        "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
         "status": "PASS"
       }
     ],
     "throughput_kpis": {
       "production_complete": {
-        "new_this_batch": 0,
+        "new_this_batch": 2,
         "retained_authoritative_static_qa_indices": [
           51,
           97,
@@ -2504,6 +2504,7 @@
           112,
           121,
           130,
+          133,
           152,
           163,
           193,
@@ -2511,22 +2512,18 @@
           222,
           226,
           231,
+          232,
           237
         ]
       },
       "candidate_awaiting_c": [
-        133,
+        61,
         159,
         198,
-        201,
-        232
+        201
       ],
-      "candidate_rework_required": [
-        61
-      ],
-      "runnable_production": [
-        61
-      ],
+      "candidate_rework_required": [],
+      "runnable_production": [],
       "blocked_exception": [
         54,
         55,
@@ -2535,19 +2532,10 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
-    "authoritative_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
-    "validation_bearing_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36782428617,
-      "head_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T06:55:15+09:00"
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null
   }
 }
