@@ -1,0 +1,82 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00263-p00149-index163-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00263",
+  "wave_id": "P00149",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T18:38:08+09:00",
+  "base_head_sha": "d4a0fa44e3192ff5d95a1645101e82aaa9ffc82e",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "latest_c_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "runnable_render_ready_indices": [],
+    "runnable_one_stage_to_render_indices": [],
+    "unchanged_blockers_not_repeated": [
+      139,
+      175,
+      217
+    ],
+    "preflight_not_repeated": [
+      133,
+      232
+    ],
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION",
+    "selected_index": 163,
+    "selected_asset": "59A79158"
+  },
+  "fingerprint_reuse": {
+    "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "candidate_archive_sha256": "e79e4f5a3921f0064ad18df2ef650b1753b3cfc78c5ed99159b3b7e3fd677794",
+    "candidate_sha256": "0d9410e5c05d5819cd2c87426e9c4342c7d47d8c4f28ea0c4556ea9e546c0959",
+    "drive_file_id": "1XgLXgkewIw4wvtXkSXcQvwlO-yxlh1bC",
+    "drive_metadata_revalidated": {
+      "name": "B00237_59A79158_Korean_candidate.zip",
+      "bytes": 79200,
+      "modified_time": "2026-09-29T23:02:40.076Z"
+    },
+    "c_task_blob_sha": "a07ab745f06fb7d162b4e1215e5c57bf10dfbb40",
+    "fingerprint_changed": false,
+    "heavy_qa_repeated": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX163_59A79158_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      163
+    ],
+    "reviewed_assets": [
+      "59A79158"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX163__ZERO_RUNNABLE_READY_TIERS__UNCHANGED_C157_STATIC_PASS_REUSED__DRIVE_METADATA_REVALIDATED__NO_EXISTING_59A79158_ISOLATION_MANIFEST__NEW_DDS_ONLY_ISOLATION_INPUT__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "REUSED_C157_Q00055_STATIC_QA_PASS_UNCHANGED_FINGERPRINT",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00149_B00263_59A79158.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00237.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00244.json"
+  ]
+}

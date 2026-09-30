@@ -1,0 +1,78 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00263-p00149-index163-single-dds-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00263",
+  "wave_id": "P00149",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T18:38:08+09:00",
+  "base_head_sha": "d4a0fa44e3192ff5d95a1645101e82aaa9ffc82e",
+  "base_sha": "d4a0fa44e3192ff5d95a1645101e82aaa9ffc82e",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX163_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX163_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_RUNTIME_UNTESTED",
+  "summary": "Rollover 2 resumed B00263 from current GitHub SSOT; no prior durable B00263 record existed. Current three-producer contract assigns B index%3==1. Latest C157/Q00055 has no B-owned RENDER_READY or ONE_STAGE_TO_RENDER handoff; B00253@index139 SOURCE_ACQUISITION_EXHAUSTED and index175/217 source-identity blockers are unchanged and were not repeated. Index163/59A79158 is an unchanged C157 STATIC_QA_PASS_RUNTIME_UNTESTED candidate for which C157 explicitly requires isolated runtime evidence, and Git had no 59A79158 single-DDS isolation manifest. Fallback step 3 adds an exact DDS_ONLY isolation input pinned to the accepted source, Drive ZIP and candidate-member fingerprints. Candidate bytes/shared state are unchanged; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00263-P00149/B00263_P00149_INDEX163_SINGLE_DDS_ISOLATION_INPUT.json",
+    "localization/validation/single_dds/P00149_B00263_59A79158.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX163_59A79158_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      163
+    ],
+    "reviewed_assets": [
+      "59A79158"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "latest_c_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      163
+    ],
+    "unchanged_blockers_not_repeated": [
+      139,
+      175,
+      217
+    ],
+    "readiness_before": {
+      "163": "STATIC_QA_PASS_RUNTIME_UNTESTED_NO_SINGLE_DDS_ISOLATION_INPUT"
+    },
+    "readiness_after": {
+      "163": "STATIC_QA_PASS_RUNTIME_UNTESTED_SINGLE_DDS_ISOLATION_INPUT_READY_PENDING_C"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX163__C157_ZERO_RUNNABLE_READY_TIERS__UNCHANGED_BLOCKERS_NOT_RETRIED__UNCHANGED_C157_STATIC_PASS_REUSED__DRIVE_METADATA_REVALIDATED__NO_EXISTING_MANIFEST__NEW_DDS_ONLY_ISOLATION_INPUT__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "REUSED_C157_Q00055_STATIC_QA_PASS_UNCHANGED_FINGERPRINT",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(B): add index163 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00263]",
+  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created; producer automation validation remains PENDING for the later C batch gate."
+}

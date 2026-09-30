@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00263-p00149-index163-single-dds-isolation-v1",
+  "case_id": "P00149_B00263_59A79158",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00263",
+  "wave_id": "P00149",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T18:38:08+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "d4a0fa44e3192ff5d95a1645101e82aaa9ffc82e",
+  "active": true,
+  "purpose": "Exact DDS_ONLY runtime-isolation input for the unchanged C157/Q00055 STATIC_QA_PASS_RUNTIME_UNTESTED 59A79158 candidate; no rerender and no runtime claim.",
+  "asset": {
+    "id": "59A79158",
+    "queue_index": 163,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 24
+  },
+  "source": {
+    "transport": "PINNED_V0.25.10A_RELEASE",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "bytes": 8388736,
+    "dds": {
+      "width": 1024,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 4096
+    }
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "drive_file_id": "1XgLXgkewIw4wvtXkSXcQvwlO-yxlh1bC",
+    "archive_name": "B00237_59A79158_Korean_candidate.zip",
+    "archive_sha256": "e79e4f5a3921f0064ad18df2ef650b1753b3cfc78c5ed99159b3b7e3fd677794",
+    "archive_bytes": 79200,
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "member_sha256": "0d9410e5c05d5819cd2c87426e9c4342c7d47d8c4f28ea0c4556ea9e546c0959",
+    "member_bytes": 8388736,
+    "dds": {
+      "width": 1024,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 4096
+    },
+    "fingerprint": {
+      "producer_result_sha": "b138928bfc031026d37573c7055685460131d7d7",
+      "c_result_sha": "ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61",
+      "c_gate_run_id": 36647301188,
+      "drive_modified_time": "2026-09-29T23:02:40.076Z",
+      "no_newer_59a79158_record_observed": true
+    }
+  },
+  "qa_evidence": {
+    "status": "REUSED_C157_Q00055_STATIC_QA_PASS_UNCHANGED_FINGERPRINT",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "header_128_exact": true,
+    "semantic_binding": "PASS_24_OF_24",
+    "safe_bbox_containment": "PASS_24_OF_24",
+    "changed_rgba_outside_source_regions": 0,
+    "alpha_changed_outside_source_regions": 0,
+    "introduced_alpha_outside_source_regions": 0,
+    "english_residue": false,
+    "broken_hangul": false,
+    "clipping_or_overlap": false,
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "source_candidate_from_drive_zip": {
+      "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+      "drive_file_id": "1XgLXgkewIw4wvtXkSXcQvwlO-yxlh1bC",
+      "archive_name": "B00237_59A79158_Korean_candidate.zip",
+      "archive_sha256": "e79e4f5a3921f0064ad18df2ef650b1753b3cfc78c5ed99159b3b7e3fd677794",
+      "archive_bytes": 79200,
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+      "member_sha256": "0d9410e5c05d5819cd2c87426e9c4342c7d47d8c4f28ea0c4556ea9e546c0959",
+      "member_bytes": 8388736
+    },
+    "external_candidate_allowed_by_current_contract": true,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only 59A79158 and confirm the affected UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all 24 localized regions.",
+    "Verify FLIP_Y orientation, clipping, alpha/transparency, scaling, neighboring-row overlap and any 1-pixel overflow.",
+    "Do not promote runtime approval without isolated real-game evidence."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
