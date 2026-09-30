@@ -1561,3 +1561,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Validation-bearing result: `b0388771ec0f8835898c4300c061b16a0fca8af7`; Gate run: `36772955277` **success**.
 - Final dispositions: B00322 **PASS/RENDER_READY**, A00323 **PASS/PREFLIGHT_ONLY SOURCE_IDENTITY_MISMATCH**, A00325 **PASS**, A00326 **PASS**.
 - Runnable production: **index232**. Runtime remains **UNTESTED**.
+
+## C173 Q00071 — 2026-10-01 05:48 KST
+- B00324@index133: **PASS / RENDER_READY** after independent exact-source, 9-mask, CLEAN_PLATE, visual and safe-bbox replay.
+- A00327@index63: **PASS current-workflow DDS_ONLY isolation**, unchanged C85/C128 candidate and current semantics; runtime UNTESTED.
+- B00328@index55/154: **PASS / PREFLIGHT_ONLY**, fail-closed source mismatch; terminal type normalized to **SOURCE_IDENTITY_MISMATCH**.
+- B00331@index61: **REWORK_REQUIRED** — unchanged candidate has two stale current-canonical translations (`Cut the line!`, `STAGE BONUS`). Current isolation manifest is not accepted.
+- Current order after latest-HEAD reconciliation: **RENDER_READY 133 -> ONE_STAGE none -> candidate rework 61 -> candidate QA 159/198/201/232 -> PREFLIGHT_ONLY**. B00332@index232 is a newer out-of-batch candidate and is not overwritten by Q00071. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+- Concurrent A00336@index51 and B00332@index232 remain out-of-batch QA_PENDING and are not dispositioned by Q00071.
