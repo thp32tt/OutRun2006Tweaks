@@ -60,22 +60,6 @@ namespace OutRunVRStereo
         bool R23FirstColorBaselineLogged = false;
         bool R23FirstImplicitViewportResyncLogged = false;
 
-        bool R23SnapshotSame(const R22ScissorSnapshot& a,
-            const R22ScissorSnapshot& b) noexcept
-        {
-            if (!a.Valid() || !b.Valid())
-                return false;
-            return a.viewport.X == b.viewport.X &&
-                a.viewport.Y == b.viewport.Y &&
-                a.viewport.Width == b.viewport.Width &&
-                a.viewport.Height == b.viewport.Height &&
-                a.viewport.MinZ == b.viewport.MinZ &&
-                a.viewport.MaxZ == b.viewport.MaxZ &&
-                a.rect.left == b.rect.left && a.rect.top == b.rect.top &&
-                a.rect.right == b.rect.right && a.rect.bottom == b.rect.bottom &&
-                a.enabled == b.enabled;
-        }
-
         bool R23CaptureActualGameState(IDirect3DDevice9* device,
             R22ScissorSnapshot& out, const char* site, bool force) noexcept
         {
@@ -110,7 +94,7 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            if (R22ShadowState.Valid() && !R23SnapshotSame(actual, R22ShadowState))
+            if (R22ShadowState.Valid() && !OutRunVR::State::SameRasterSnapshot(actual, R22ShadowState))
             {
                 const bool implicitRenderTargetViewport =
                     site && std::strcmp(site, "SetRenderTarget") == 0;
