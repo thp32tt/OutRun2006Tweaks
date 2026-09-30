@@ -119,17 +119,8 @@ namespace OutRunVRStereo
         thread_local LONGLONG R32LastPresentEndQpc = 0;
         thread_local ULONGLONG R32LastSpikeLogMs = 0;
 
-        struct R32StereoWorkloadSnapshot
-        {
-            std::uint64_t main = 0;
-            std::uint64_t offscreen = 0;
-            std::uint64_t aux = 0;
-            std::uint64_t fastWorld = 0;
-            std::uint64_t hud = 0;
-            std::uint64_t fallback = 0;
-            std::uint64_t fragile = 0;
-            std::uint64_t unstable = 0;
-        };
+        using R32StereoWorkloadSnapshot =
+            OutRunVR::Telemetry::StereoWorkloadSnapshot;
 
         LONGLONG R32PerfQpcFrequency() noexcept
         {
