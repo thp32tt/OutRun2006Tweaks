@@ -127,6 +127,11 @@ def main() -> None:
             "C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC882u>",
             "C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC8B4u>",
             "VR R130 SPEECH RANK HUD: shared producer-map handoff",
+            "C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FC9EBu, 0>",
+            "C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA1Eu, 0>",
+            "C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA51u, 0>",
+            "C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCB20u, 4>",
+            "VR R131 GF SPEECH INITIAL HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -218,6 +223,20 @@ def main() -> None:
         raise SystemExit(
             "F13 C2CSpeechBubbleGF rank ownership regressed to spacing-only callbacks: "
             f"{stale_speech_rank_hooks}"
+        )
+    legacy_speech_initial_hooks = [
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid((void*)0x4FC9EB, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk12 = safetyhook::create_mid((void*)0x4FCA1E, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid((void*)0x4FCA51, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid((void*)0x4FCB20, C2CSpeechBubble_AdjustPositionESP4);",
+    ]
+    stale_speech_initial_hooks = [
+        hook for hook in legacy_speech_initial_hooks if hook in hooks_text
+    ]
+    if stale_speech_initial_hooks:
+        raise SystemExit(
+            "F13 C2CSpeechBubbleGF initial-position ownership regressed to spacing-only callbacks: "
+            f"{stale_speech_initial_hooks}"
         )
     require(
         "tools/analyze_outrun_exe.py",
