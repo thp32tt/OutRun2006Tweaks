@@ -1101,7 +1101,8 @@ class UIScaling : public Hook
 
 	// PutGhostGapInfo
 	static inline SafetyHookMid PutGhostGapInfo_AdjustPosition_hk{};
-	static void PutGhostGapInfo_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void PutGhostGapInfo_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		bool left = false;
 		int* val = (int*)&ctx.ebp;
@@ -1109,7 +1110,20 @@ class UIScaling : public Hook
 			left = true;
 
 		AddSpriteSpacing(val, left);
-	};
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"PutGhostGapInfo callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R125 GHOST GAP INFO HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
 
 	// Fix position of the "Ghost/You/Diff" sprites shown with ghost car info
 	// Online arcade doesn't seem to adjust this, maybe was left broken in that? (it's needed for 21:9 at least...)
@@ -1352,8 +1366,12 @@ public:
 			(void*)0x4B90F6,
 			DispGearPosition_AdjustPositionAndHud<0x000B90F6u>);
 
-		// Fix ghost car info text positions
-		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDE3A, PutGhostGapInfo_AdjustPosition);
+		// R125/F13: exact PutGhostGapInfo producer edge 0xBDE3A is canonical
+		// GhostGap SCREEN_HUD. Preserve the original conditional spacing and
+		// source only the immediate next-draw owner from the shared map.
+		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BDE3A,
+			PutGhostGapInfo_AdjustPositionAndHud<0x000BDE3Au>);
 		DispGhostGap_ForceLeft_hk = safetyhook::create_mid((void*)0x4BE045, SpriteSpacingForceLeft);
 		DispGhostGap_ForceLeft2_hk = safetyhook::create_mid((void*)0x4BE083, SpriteSpacingForceLeft);
 		DispGhostGap_ForceRight_hk = safetyhook::create_mid((void*)0x4BE0A5, SpriteSpacingForceRight);
