@@ -4,15 +4,19 @@
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "E_DXVK_SAFE package build-verified / HMD gate / HUD+PERF+DX12 parallel / no-PC-runner",
+  "phase": "DX9Ex stabilization / dense-scene performance telemetry / downstream DX11-DXVK deferred",
   "checkpoint": "C6_STATE",
   "policy": {
-    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
-    "blockedBackends": [],
-    "blockedBackendAction": "DXVK and DX12/D3D9On12 development, compile and smoke validation are re-enabled in isolated candidates after user acceptance of the R51 basic 3D reference. They may not replace the protected DX9Ex runtime baseline until backend-parity evidence is recorded.",
+    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host; vr-d3d9ex-focus is the active stabilization source of truth",
+    "blockedBackends": [
+      "DX11_NATIVE_DOWNSTREAM_PORT",
+      "DXVK_DOWNSTREAM_PORT",
+      "DX12_D3D9ON12_REFERENCE_ONLY"
+    ],
+    "blockedBackendAction": "Keep this project on DX9Ex correctness, stability, and performance until the stable DX9Ex reference is accepted. Port proven fixes to DX11 Native and DXVK afterward. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "genericBuildDisabled": true,
     "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
-    "runtimeTesting": "Quest 3/VDXR evening gate uses six independent slots: A DX9Ex control, B HUD, C flare, D performance, E DXVK, F DX12. No slot blocks development of another.",
+    "runtimeTesting": "Quest 3/VDXR DX9Ex gate: prioritize CORRECTNESS and D_PERF, including dense-building and sand/smoke/spray scenes. DX11/DXVK runtime validation is deferred until the DX9Ex reference is stable.",
     "profileModel": {
       "default": "A_CONTROL",
       "profiles": [
@@ -24,7 +28,7 @@
         "F_DX12"
       ],
       "sameBinaryPreferred": false,
-      "note": "Use one binary within a backend when practical. DXVK/DX12 have distinct backend payload identity. HUD completion is not a prerequisite for performance/backend work."
+      "note": "A_CONTROL/B_HUD/C_FLARE/D_PERF are the active DX9Ex stabilization profiles. E_DXVK/F_DX12 remain historical/dormant slots until downstream porting is explicitly resumed."
     },
     "eveningFreeze": {
       "reviewImplementWindow": "daytime / before evening HMD session",
@@ -35,8 +39,8 @@
       "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
       "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
       "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
-      "defaultSourceBuilds": "DX9Ex reference plus affected backend-specific build/smoke paths; DXVK/DX12 may run in isolated candidates in parallel.",
-      "comparisonMatrix": "Backend and performance validation is active work, not deferred behind HUD. Keep exact SHA/backend/profile identity."
+      "defaultSourceBuilds": "DX9Ex active game DLL + x64 OpenXR host and deterministic smoke/package gates. Downstream backend builds are deferred in this stabilization project.",
+      "comparisonMatrix": "Use exact-SHA DX9Ex correctness/performance evidence first. Carry proven fixes to DX11/DXVK only after the stable DX9Ex reference is established."
     },
     "userRuntimeBaseline": {
       "sourceOfTruth": "docs/VR_REGRESSION_KNOWLEDGE.json::userRuntimeVerifiedBaseline",
@@ -68,19 +72,18 @@
       "runtimeRegressionLedgerIssue": 13
     },
     "parallelBackendDevelopment": {
-      "enabled": true,
+      "enabled": false,
       "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-      "reason": "Basic 3D DX9Ex baseline is established. HUD is a separate visual defect track and must not serialize backend/performance development.",
+      "reason": "User direction 2026-09-30: stabilize DX9Ex first, then port the proven result to DX11 Native and DXVK.",
       "activeUserVisibleTracks": [
-        "HUD semantic lifetime",
-        "lens flare exact producer",
-        "dense-scene performance/frame pacing",
-        "DXVK SAFE compatibility then multiview optimization",
-        "DX12/D3D9On12 compatibility and transport"
+        "DX9Ex HUD semantic lifetime and visual correctness",
+        "DX9Ex lens flare / smoke / skid effect correctness",
+        "DX9Ex dense-scene performance and frame pacing",
+        "DX9Ex recenter/reset/direct-transport stability"
       ],
       "productionIntegrationWip": 1,
       "maxParallelHmdExperimentSlots": 6,
-      "nonBlockingRule": "HUD/FLARE delays must not block PERF/DXVK/DX12; backend failures must not block HUD/FLARE."
+      "nonBlockingRule": "DX9Ex HUD/visual/performance/stability lanes may proceed independently, but downstream DX11/DXVK/DX12 work must not displace DX9Ex stabilization."
     },
     "pcFastBuild": {
       "defaultMode": "INCREMENTAL",
@@ -136,7 +139,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "HMD-test E_DXVK_SAFE on Quest3/VDXR using CORRECTNESS and upload the analysis ZIP. Do not treat DXVK as runtime-verified or start multiview until SAFE passes. Continue DX12/PERF and existing HMD-only HUD/rank lanes independently.",
+  "nextAction": "Quest3/VDXR test the integrated DX9Ex build with VRTelemetry enabled through one dense-building section and one sand/smoke/spray section, upload the generated analysis ZIP, then use PERFORMANCE_SPIKES.csv plus frame/draw/primitive/particleLike/fenceWait evidence to choose the first optimization.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
@@ -313,11 +316,11 @@
     "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
   },
   "scheduledAutomationModel": {
-    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR/synchronization deep review, with DXVK/DX12 backend architecture and parity-boundary review now active.",
+    "A_00": "Hourly :00 DX9Ex architecture/state/lifetime/OpenXR/synchronization review; downstream DX11/DXVK porting is deferred until the stable DX9Ex reference is accepted.",
     "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6 and follows durable baseline policy.",
-    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review, prioritizing HUD/white-overlay/rank-marker correctness while protecting the R51 world owner.",
-    "C_35": "Hourly :35 post-fix/change-sanity/dedup/validation-prep review only. Review ready HUD, DXVK/DX12 and performance findings/candidates, publish exact evidence and D_IMPLEMENT_NEXT; never write production source or candidates.",
-    "D_45": "Hourly :45 sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker. May select one bounded ready item from HUD, backend or performance lanes; keep unrelated risky changes in separate candidate branches; backend promotion requires Quest3/VDXR parity evidence.",
+    "B_20": "Hourly :20 DX9Ex rendering/stereo/visual/performance/frame-pacing review, including dense-scene and effect-load spikes while protecting the runtime baseline.",
+    "C_35": "Hourly :35 post-fix/change-sanity/dedup/validation-prep for DX9Ex correctness/performance candidates only; downstream backend candidates are deferred.",
+    "D_45": "Hourly :45 sole DX9Ex production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker. Optimize only from deterministic or Quest3/VDXR evidence; keep downstream ports deferred.",
     "specialD": {
       "01:45": "nightly consolidation and architecture/regression/cache integrity review",
       "06:45": "overnight summary and daytime backlog reorder",
@@ -334,24 +337,18 @@
     "note": "Single-active/manual-matrix policy verifier repaired and passed. Additional AST parse coverage was added afterward and should be the next lightweight check."
   },
   "activeValidation": {
-    "workflow": "DXVK SAFE Candidate",
-    "runId": 36376927194,
-    "sourceSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
+    "workflow": "DX9Ex Active Validation",
+    "runId": 36702379390,
+    "sourceSha": "b91736973204c3712403ea774d8e02ad25e3dfb0",
     "status": "success",
     "policy": "success",
-    "dxvkSelectorIdentityContract": "success",
-    "provider": "success",
-    "providerReleaseTag": "v3.1.1",
-    "providerArchiveSha256": "40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608",
-    "providerD3D9Sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
     "host": "success",
     "game": "success",
     "package": "success",
-    "packageSelectorValidation": "success",
-    "artifactId": 10952070042,
-    "artifactDigest": "sha256:aab6cdbf5dc68aaeaa9e55577bd9af59c6b56a5431b37ac810d9669461fd5cb1",
-    "runtimeEvidence": "NEED_HMD_TEST",
-    "reason": "Exact-SHA E_DXVK_SAFE provider/package validation. No protected DX9Ex renderer/HUD source changed."
+    "artifactId": 11090492665,
+    "artifactDigest": "sha256:6959f261e6fa28f57d2e09c926cc1b4eb3f2c763e16a89df46d5cf96d4f0d4ee",
+    "runtimeEvidence": "UNTESTED_NEED_HMD_TEST",
+    "reason": "DX9Ex dense-scene/effect frame-spike telemetry is build/package verified; runtime correlation and performance impact still require Quest3/VDXR evidence."
   },
   "coordination": {
     "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
@@ -595,7 +592,7 @@
       "E_DXVK: DXVK SAFE first, multiview next",
       "F_DX12: D3D9On12 strict/device-resource compatibility"
     ],
-    "nextAction": "HMD-test E_DXVK_SAFE CORRECTNESS before multiview. Continue F_DX12/performance independently; rank/HUD candidates remain separate HMD gates.",
+    "nextAction": "Prioritize DX9Ex CORRECTNESS/D_PERF runtime evidence. Exercise dense buildings and sand/smoke/spray, upload the analysis ZIP, and defer E_DXVK/F_DX12 until DX9Ex stabilization is accepted.",
     "dxvkInfrastructureSha": "2bd7a28b9ecb0154315e0fbba7412d43ed2b3ae7",
     "dxvkInfrastructureRunId": 36375594746,
     "dxvkInfrastructureStatus": "BUILD_VERIFIED_INTEGRATED",
@@ -640,24 +637,25 @@
     "waitingPolicy": "If one cycle waits on CI/HMD/review or another live writer, advance another independent lane instead of idling."
   },
   "lastChatDirectTransaction": {
-    "recordedAtKst": "2026-09-28T13:24:10+09:00",
-    "findingId": "DXVK-REACTIVATE-001",
-    "baseSha": "bb4cdd87ff65f0555ce5cdb008e085e726ed3fd7",
-    "candidateBranch": "vr-d3d9ex-candidate/DXVK-SAFE-PROVIDER-20260928-A2",
-    "initialPackageCandidateSha": "2c04788b089570b5ef0cb3b847af675775e567b0",
-    "validatedCandidateSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
-    "validationRunId": 36376927194,
+    "recordedAtKst": "2026-09-30T19:34:00+09:00",
+    "findingIds": [
+      "VR-PERF-COMMON-001",
+      "DX9EX-PERF-PRODUCER-FENCE-001",
+      "L2-PERF-001"
+    ],
+    "baseSha": "55e9e9d4ba5430a8645abca6fc5d6f038063c3b8",
+    "candidateBranch": "vr-d3d9ex-candidate/PERF-SCENE-SPIKE-TELEMETRY-20260930",
+    "initialCandidateSha": "8cdf5785c6bfd17b07ffd1364ff7b52df5142747",
+    "validatedCandidateSha": "b91736973204c3712403ea774d8e02ad25e3dfb0",
+    "validationRunId": 36702379390,
     "validationResult": "SUCCESS",
-    "integrationSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
-    "providerReleaseTag": "v3.1.1",
-    "providerArchiveSha256": "40565b4a724aadc4433fa4e010b4b23916d9b1f1baeee64e17186db94f54e608",
-    "providerD3D9Sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
-    "artifactId": 10952070042,
-    "artifactDigest": "sha256:aab6cdbf5dc68aaeaa9e55577bd9af59c6b56a5431b37ac810d9669461fd5cb1",
+    "integrationRuntimeSha": "b91736973204c3712403ea774d8e02ad25e3dfb0",
+    "artifactId": 11090492665,
+    "artifactDigest": "sha256:6959f261e6fa28f57d2e09c926cc1b4eb3f2c763e16a89df46d5cf96d4f0d4ee",
     "runtimeVisibleChange": false,
+    "instrumentationChange": true,
     "runtimeTestRequired": true,
-    "hmdRequiredForDxvkViability": true,
-    "multiviewAuthorized": false,
+    "runtimeValidation": "UNTESTED",
     "pcRunnerUsed": false
   }
 }

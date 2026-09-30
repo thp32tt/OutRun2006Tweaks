@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-30T19:33:00+09:00",
+  "updatedKst": "2026-09-30T19:34:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -20,13 +20,13 @@
       "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
     },
     "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-    "parallelBackendDevelopment": true,
-    "backendReplacementGate": "DXVK/DX12 may be developed, built and HMD-tested in parallel; only promotion to protected/default backend requires Quest3/VDXR parity with R51.",
+    "parallelBackendDevelopment": false,
+    "backendReplacementGate": "DX11 Native and DXVK are downstream ports deferred until the stable DX9Ex reference is accepted. DX12/D3D9On12 remains reference-only unless explicitly reopened.",
     "parallelTracks": {
       "HUD": "B/C/D continue exact semantic-lifetime and world-marker work independently.",
-      "PERFORMANCE": "DX9Ex-first dense-scene/effect/frame-budget telemetry and optimization is active; validated findings may then be ported to DX11/DXVK.",
-      "DXVK": "Maintain isolated downstream port work without displacing DX9Ex as the current stabilization source of truth.",
-      "DX12": "A/C/D resume D3D9On12 device/resource compatibility and HMD test preparation independently of HUD."
+      "PERFORMANCE": "ACTIVE: DX9Ex-first dense-scene/effect/frame-budget telemetry and optimization; validated fixes become downstream port inputs later.",
+      "DXVK": "DEFERRED: retain existing evidence/package history only; resume as a downstream port after DX9Ex stabilization is accepted.",
+      "DX12": "FROZEN_REFERENCE_ONLY: do not schedule implementation/build/HMD work unless explicitly reopened."
     },
     "pcRunnerAuthorization": {
       "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
@@ -52,7 +52,7 @@
         "E_DXVK",
         "F_DX12"
       ],
-      "nonBlockingRule": "A failure or delay in HUD/FLARE must not block PERF, DXVK or DX12 implementation/build/test preparation. A backend failure must not block HUD/FLARE work."
+      "nonBlockingRule": "Within DX9Ex, HUD/FLARE/PERF work may proceed independently. E_DXVK/F_DX12 slots are dormant while DX9Ex stabilization is the active goal."
     },
     "automationCycle": {
       "mode": "TWO_FULL_CYCLES_PER_HOUR",
@@ -343,7 +343,7 @@
     {
       "id": "DXVK-REACTIVATE-001",
       "priority": 13,
-      "status": "NEED_HMD_TEST",
+      "status": "BLOCKED",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
       "testLevel": "LEVEL2",
@@ -364,7 +364,7 @@
         "Post-copy SHA256 verification detects installation mismatch.",
         "Hosted synthetic-PE contract test covers DXVK SAFE, DXVK MULTIVIEW and x64-provider rejection."
       ],
-      "nextAction": "Quest3/VDXR test E_DXVK_SAFE with CORRECTNESS: confirm logo/startup -> menu/gameplay, DXVK provider identity, classic DXVK/SBS/Desktop Duplication fail-open, no provider-local CreateDeviceEx stall, and reset/alt-tab stability. Upload the generated analysis ZIP. Proceed to DXVK multiview only after SAFE runtime passes.",
+      "nextAction": "No action in the DX9Ex stabilization project. Resume Quest3/VDXR DXVK SAFE validation only after the stable DX9Ex reference is accepted or the user explicitly reopens downstream porting.",
       "validationSha": "85e710d8c878a7db82a567a733b9797af4db7f6e",
       "providerReleaseTag": "v3.1.1",
       "providerSourceCommit": "b1a1c99ab52b687cf950d62c88bc2fa316b41663",
@@ -379,12 +379,13 @@
         "E_DXVK_SAFE package contains the pinned x86 provider, DXVK license, D3D9 game/host payload, selector, collector and exact build identities.",
         "Packaged selector activated DXVK_X86_SAFE and installed a d3d9.dll whose SHA256 exactly matches the pinned provider identity.",
         "SAFE package contains no multiviewpatcher.dll."
-      ]
+      ],
+      "blockReason": "Deferred by user direction on 2026-09-30: stabilize DX9Ex first, then use this already build-verified DXVK SAFE work as downstream port evidence."
     },
     {
       "id": "DX12-D3D9ON12-REACTIVATE-001",
       "priority": 13,
-      "status": "READY",
+      "status": "BLOCKED",
       "preferredRole": "D_INTEGRATION_PLANNER",
       "summary": "Resume DX12/D3D9On12 from the known Direct3DCreate9On12Ex/CreateDevice 0x8876086C boundary; isolate device parameters and translated MANAGED/LockRect compatibility before any renderer promotion.",
       "testLevel": "LEVEL2",
@@ -393,7 +394,9 @@
       "runtimeCandidate": false,
       "expectedFix": "First obtain deterministic device-creation/resource-compatibility diagnostics and a no-HMD smoke build; do not change R51 world/HUD ownership to make DX12 pass.",
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "blockReason": "DX12/D3D9On12 is reference-only under the 2026-09-30 user direction.",
+      "nextAction": "Do not schedule DX12 implementation/build/HMD work unless explicitly reopened."
     },
     {
       "id": "VR-PERF-COMMON-001",
@@ -495,7 +498,7 @@
   "hmdTestMatrix": {
     "status": "BASE_BUILD_VERIFIED",
     "testMatrixBaseRuntimeSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
-    "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+    "integrationSha": "b91736973204c3712403ea774d8e02ad25e3dfb0",
     "maxSlots": 6,
     "manifest": "docs/VR_HMD_TEST_MATRIX.json",
     "requiredSlots": [
@@ -506,6 +509,6 @@
       "E_DXVK",
       "F_DX12"
     ],
-    "nextAction": "Prepare B_HUD, C_FLARE, D_PERF, E_DXVK and F_DX12 in parallel from the protected baseline. Do not wait for HUD completion before backend/performance work."
+    "nextAction": "Prioritize DX9Ex D_PERF/CORRECTNESS runtime evidence on dense buildings and sand/smoke/spray. E_DXVK/F_DX12 are dormant until downstream porting is reopened."
   }
 }
