@@ -1,0 +1,125 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00327-p00202-index63-standard-single-dds-isolation-v1",
+  "case_id": "P00202_A00327_48DEBE77",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00327",
+  "wave_id": "P00202",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T05:08:00+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Materialize the previously C-accepted 48DEBE77 DDS_ONLY runtime-isolation input in the current localization/validation/single_dds manifest format so the auxiliary packaging workflow can directly package the unchanged repository-backed candidate. Existing C85 pixel/visual QA and C128/Q00026 isolation acceptance are reused; runtime remains UNTESTED.",
+  "asset": {
+    "id": "48DEBE77",
+    "queue_index": 63,
+    "queue_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "raw_orientation": "mirror_y",
+    "localized_semantic_bindings": 3,
+    "translations": [
+      {
+        "source": "START",
+        "korean": "출발",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "GOAL",
+        "korean": "골",
+        "physical_occurrences": 1
+      }
+    ]
+  },
+  "source": {
+    "canonical_transport": "GITHUB_REPOSITORY_PINNED_HD_SOURCE",
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "git_blob_sha": "3eb59ab402a87a4a38787d37eaaff6e263f1ffe0",
+    "sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+    "bytes": 1048704,
+    "dds": {
+      "width": 512,
+      "height": 512,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 2048,
+      "raw_orientation": "mirror_y"
+    }
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
+    "sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192,
+      "raw_orientation": "mirror_y"
+    },
+    "dimension_policy": "CREATE_NEW_HD_DIMENSION_CHANGE",
+    "unchanged_fingerprint_proof": {
+      "legacy_isolation_task": "LOCALIZATION-LOCALIZATION_A-00154",
+      "legacy_isolation_result_sha": "0091b5eaf55e361f6f73932762401b832960cce3",
+      "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00159",
+      "c_batch": "Q00026",
+      "c_run": "C128",
+      "c_status": "PASS_DDS_ONLY_ISOLATION_INPUT_RUNTIME_UNTESTED",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "legacy_isolation_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00154.json",
+    "legacy_isolation_task_blob_sha": "8bd49d1abb47a08c95df2cfe014b03b834a7b506",
+    "legacy_isolation_report": "localization/graphics/role_A/20260929-2221-A00154-P00073/A00154_P00073_48DEBE77_SINGLE_DDS_ISOLATION_INPUT.json",
+    "independent_c_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00159.json",
+    "independent_c_task_blob_sha": "af6db8d4dc17831ec6ed3f92dd98e34ebf935760",
+    "independent_c_report": "localization/graphics/role_C/20260929-2256-C128/C128_Q00026_INDEPENDENT_QA_BATCH.json",
+    "independent_c_report_blob_sha": "b559c9aeae3f4bb18c5072304399d1f078ff8106",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "c85_status": "C85_PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "text_elements": 3,
+    "containment_pass_count": 3,
+    "containment_fail_count": 0,
+    "outside_declared_cells_changed_nontransparent_pixels": 0,
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_input_location": "localization/graphics/role_A/20260929-2221-A00154-P00073/A00154_P00073_48DEBE77_SINGLE_DDS_ISOLATION_INPUT.json",
+    "previous_input_consumable_by_current_aux_workflow": false,
+    "current_aux_workflow_glob": "localization/validation/single_dds/*.json",
+    "new_current_workflow_consumable_manifest": true,
+    "candidate_repository_path_bound": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "relative_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "candidate_git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
+    "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 48DEBE77 replacement DDS and confirm the affected route/loading screens render without a crash.",
+    "Capture readable/game-orientation evidence for both START replacements and the GOAL replacement.",
+    "Confirm mirror_y raw storage is interpreted correctly in game.",
+    "Verify HD scaling, route-art alignment, alpha/transparency, sprite position, clipping, and zero-pixel overflow.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,100 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00327-p00202-index63-current-workflow-isolation-material-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00327",
+  "wave_id": "P00202",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-10-01T05:08:00+09:00",
+  "base_head_sha": "468e97f247debbdb717bf97183473cb6924d613b",
+  "target": {
+    "index": 63,
+    "asset": "48DEBE77",
+    "index_mod_3": 0,
+    "owned_by_lane": true
+  },
+  "readiness_scan": {
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00321",
+    "latest_authoritative_c_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      57,
+      60,
+      159,
+      198,
+      201
+    ],
+    "producer_preflight_qa_pending_not_repeated": [
+      54,
+      111
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "production_complete_not_rerendered": [
+      12,
+      51,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "selection_reason": "No candidate-completion tier is runnable in A's modulo-3 shard at the latest C-accepted frontier. New unrelated preflight is therefore not opened. Fallback step 3 standardizes index63's older A00154/C128 accepted isolation evidence into the current auxiliary workflow manifest directory; no existing localization/validation/single_dds 48DEBE77 manifest was present.",
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX63_CURRENT_WORKFLOW_CONSUMABLE_SINGLE_DDS_MANIFEST",
+    "manifest": "localization/validation/single_dds/P00202_A00327_48DEBE77.json",
+    "candidate_dds_modified": false,
+    "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "candidate_git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
+    "prior_static_qa": "C85 PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "prior_legacy_isolation": "A00154/C128 Q00026 accepted",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "new_executable_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "candidate_git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
+    "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
+    "source_git_blob_sha": "3eb59ab402a87a4a38787d37eaaff6e263f1ffe0",
+    "source_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635"
+  },
+  "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__NO_QA_PENDING_REPEAT__NO_STICKY_SOURCE_REPROBE__INDEX63_UNCHANGED_C85_STATIC_PIXEL_VISUAL_PASS__A00154_C128_ISOLATION_ACCEPTED__CURRENT_WORKFLOW_MANIFEST_ADDED__CURRENT_GIT_SOURCE_CANDIDATE_BLOBS_BOUND__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
