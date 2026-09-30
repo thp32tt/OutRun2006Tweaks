@@ -1450,3 +1450,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Validation-bearing result `b47185be7eb14acfbdfb99407d8ffbeb474a8fe9`; Localization Automation Gate `36734942838` completed **success**.
 - Q00062 dispositions remain **B00283 PASS / A00281 PASS / A00285 PASS / B00284 PASS**. Index97 is **STATIC_QA_PASS_RUNTIME_UNTESTED**; index163 remains **RENDER_READY** for fresh two-row native rerender.
 - Order remains **RENDER_READY 163 -> ONE_STAGE none -> rework 121 -> candidate QA 159/198/201 -> unrelated preflight**. Pending production **65**, actionable **93**, canonical segments **755**. This bookkeeping commit is separate from the Gate-owning result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 01:30 KST - C165 Q00063 independent batch QA
+- Consumed immutable A00286 `1eabccbc...`, A00289 `b5e6f9c9...`, A00290 `2c86a9f3...`, A00291 `0d21bd28...` once; dispositions **PASS / PASS / PASS / PASS**.
+- Indices30/36/48 PASS only as fail-closed source-reactivation/source-identity guards. Unchanged C136/A00179 heavy source-acquisition evidence is reused; all remain **PREFLIGHT_ONLY** and no source probe or candidate promotion is authorized.
+- Index111/C075FB49 PASSes the source-only RANDOM protected-art model: 30 radius-1 visible protected conflicts (25 light-blue + 5 white) and 31 source text-fill pixels inside the protected envelope. Simple dilation remains forbidden; CLEAN_PLATE is still required, so **PREFLIGHT_ONLY**.
+- Refreshed HEAD already contains fresh B00295@index121 and B00287@index163 candidates. Current candidate-first order is **RENDER_READY none -> ONE_STAGE none -> candidate QA 121/159/163/198/201 -> unrelated preflight**; these out-of-batch candidates are not implicitly approved.
+- Out-of-batch A00292@index132, A00294@index135, A00296@index51, B00287@index163, B00295@index121 and A00297@index24 remain **QA_PENDING**, not dispositioned by Q00063.
+- No candidate DDS rewrite, runtime test, build, N100/local clone/worktree, Drive write, GPT Library, VR/FFB/DX change. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
