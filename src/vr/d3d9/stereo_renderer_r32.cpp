@@ -1507,4 +1507,18 @@ namespace OutRunVRStereo
             device, savedRt, savedDepth, savedViewport,
             originalConstants, restoreWvp);
     }
+
+    template <typename LowerDraw>
+    HRESULT LowerFailClosed(
+        IDirect3DDevice9* device, LowerDraw&& lowerDraw) noexcept
+    {
+        return R32LowerFailClosed(
+            device, std::forward<LowerDraw>(lowerDraw));
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    DispatchSupportInstallState() noexcept
+    {
+        return R32InstallState.load(std::memory_order_acquire);
+    }
 }

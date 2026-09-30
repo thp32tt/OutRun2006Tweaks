@@ -629,7 +629,7 @@ namespace OutRunVRStereo
             DiscardUnreliableDrawCaches();
             if (telemetry)
                 NoteTelemetryFallback();
-            return R32LowerFailClosed(device,
+            return LowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
 
@@ -807,7 +807,7 @@ namespace OutRunVRStereo
             R33InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r32 = R32InstallState.load(std::memory_order_acquire);
+                const auto r32 = DispatchSupportInstallState();
                 if (r32 == State::Failed)
                 {
                     R33InstallState.store(State::Failed, std::memory_order_release);
