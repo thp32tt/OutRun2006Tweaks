@@ -20,9 +20,19 @@
     "render_ready_runnable_a": [],
     "one_stage_to_render_runnable_a": [],
     "existing_candidate_material_rework_runnable_a": [],
-    "cross_lane_rework_not_stolen": [121],
-    "candidate_qa_pending_not_repeated": [159,198,201],
-    "current_a_preflight_qa_pending": {"index":111,"task_id":"LOCALIZATION-LOCALIZATION_A-00301","result_sha":"fc703ce0c4616d26807a1fd408bd9ee21a50a281"},
+    "cross_lane_rework_not_stolen": [
+      121
+    ],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "current_a_preflight_qa_pending": {
+      "index": 111,
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
+      "result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281"
+    },
     "selected_index": 111,
     "selected_asset": "C075FB49",
     "selected_priority": "FALLBACK_STEP_4_AFTER_FRESH_A_COMPLETION_TIER_SCAN",
@@ -72,8 +82,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_SCHEMA16__NO_A_COMPLETION_TIER__B121_NOT_STOLEN__QA_PENDING_159_198_201_NOT_REPEATED__INDEX111_QA_CONTRACT_CHANGE_RESELECTION_VALID__EXACT_PINNED_TARGET_AND_ENGLISH_DONORS__DETERMINISTIC_RERUN_IDENTICAL__25111_OF_37292_SOURCE_COVERAGE__NO_CANDIDATE_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd",
+  "authoritative_result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): advance index111 source-only reconstruction coverage [AUTO:LOCALIZATION-LOCALIZATION_A-00309]",
   "precommit_refresh": {
@@ -81,5 +91,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Q00065 Gate PASS/bookkeeping was incorporated before staging. Three A00309 lane-local evidence files were staged as [skip ci] support commits; latest HEAD was re-read after those writes and no peer-lane commit intervened. The result commit adds only the unique A00309 task record."
   },
-  "bookkeeping_note": "Producer immutable result SHA may be recorded in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Producer immutable result SHA recorded in this separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T03:10:35+09:00",
+  "bookkeeping_base_head_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd"
 }
