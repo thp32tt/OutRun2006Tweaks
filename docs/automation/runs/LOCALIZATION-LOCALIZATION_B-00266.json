@@ -1,0 +1,84 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00266-p00152-index112-single-dds-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00266",
+  "wave_id": "P00152",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T19:03:52+09:00",
+  "base_head_sha": "cb9e75d4ab3730bde64205acb8f4d9d78ef6610c",
+  "base_sha": "cb9e75d4ab3730bde64205acb8f4d9d78ef6610c",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX112_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX112_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD schema15 scan finds no B-owned RENDER_READY, ONE_STAGE_TO_RENDER, direct candidate rework, or unresolved zoom_review work. Candidate-QA indices159/198/201 are outside B shard. B-owned existing producer results at indices133/163/193/226/232 are not repeated, and sticky source blockers are not reprobed. C137/Q00035 already promotes B-owned index112/D41D0B1 to STATIC_QA_PASS_RUNTIME_UNTESTED on current repository candidate blob 30971e83... / SHA-256 5bb92bce..., with pinned source SHA-256 524de4c0... and Gate 36605636843 success. No D41D0B1 single-DDS isolation manifest existed at selection. Fallback step 3 therefore adds an exact repository-backed DDS_ONLY isolation input without changing candidate bytes or shared state. Runtime remains UNTESTED and automation validation remains PENDING for C_BATCH_GATE.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00266-P00152/B00266_P00152_INDEX112_SINGLE_DDS_ISOLATION_INPUT.json",
+    "localization/validation/single_dds/P00152_B00266_D41D0B1.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX112_D41D0B1_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      112
+    ],
+    "reviewed_assets": [
+      "D41D0B1"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "unresolved_zoom_review_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION",
+    "selected_indices": [
+      112
+    ],
+    "qa_pending_or_own_durable_not_repeated": [
+      133,
+      163,
+      193,
+      226,
+      232
+    ],
+    "dependency_blocked_not_repeated": [
+      139,
+      175,
+      217
+    ],
+    "readiness_before": {
+      "112": "STATIC_QA_PASS_RUNTIME_UNTESTED_NO_SINGLE_DDS_ISOLATION_INPUT"
+    },
+    "readiness_after": {
+      "112": "STATIC_QA_PASS_RUNTIME_UNTESTED_SINGLE_DDS_ISOLATION_INPUT_READY_PENDING_C"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX112__C157_ZERO_RUNNABLE_READY_TIERS__ZERO_UNRESOLVED_ZOOM_REVIEW__NO_DUPLICATE_PENDING_B_WORK__UNCHANGED_C137_STATIC_PASS_REUSED__CURRENT_CANDIDATE_BLOB_EXACT__NO_EXISTING_MANIFEST__NEW_DDS_ONLY_INPUT__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "REUSED_C137_Q00035_STATIC_QA_PASS_UNCHANGED_CANDIDATE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(B): add index112 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00266]",
+  "bookkeeping_note": "RESULT_SHA will be populated only after the immutable AUTO result commit is created. This producer does not own final automation validation; C batch Gate does. Runtime remains UNTESTED."
+}

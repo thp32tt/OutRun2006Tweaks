@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00266-p00152-index112-single-dds-isolation-v1",
+  "case_id": "P00152_B00266_D41D0B1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00266",
+  "wave_id": "P00152",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T19:03:52+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "cb9e75d4ab3730bde64205acb8f4d9d78ef6610c",
+  "active": true,
+  "purpose": "Provide an exact DDS_ONLY runtime-isolation input for the unchanged C137/Q00035 STATIC_QA_PASS_RUNTIME_UNTESTED D41D0B1 candidate without rerendering it. Runtime remains UNTESTED until an isolated real-game test is performed.",
+  "asset": {
+    "id": "D41D0B1",
+    "queue_index": 112,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "translation": "Try to reach the goal with your girlfriend. -> 여자친구와 함께 골에 도착하세요.",
+    "raw_orientation": "flip_y"
+  },
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "git_blob_sha": "278a518f5151f0759dfcfdc78e129a7a7cb55cf0",
+    "sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "git_blob_sha": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+    "sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00183",
+      "producer_result_sha": "8b7842b4d6903e3ad6b518a95daff9bc37893e0e",
+      "c_static_qa_task": "LOCALIZATION-LOCALIZATION_C-00186",
+      "c_static_qa_result_sha": "68aa068a82d17ea041f6d265c51ade59bc3e1f2a",
+      "c_gate_run_id": 36605636843,
+      "candidate_blob_at_c137": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+      "current_candidate_blob": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+      "current_head_checked": "cb9e75d4ab3730bde64205acb8f4d9d78ef6610c",
+      "no_existing_d41d0b1_single_dds_manifest_at_selection": true,
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00186",
+    "authoritative_c_result_sha": "68aa068a82d17ea041f6d265c51ade59bc3e1f2a",
+    "authoritative_c_gate_run_id": 36605636843,
+    "c137_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "current_shared_state_retains_static_pass": true,
+    "heavy_candidate_qa_rerun": false,
+    "source_candidate_fingerprint_unchanged": true,
+    "structure": "DXT5 2048x256 mip1 / header exact / flip_y",
+    "containment": "PASS",
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "source_language_residue": "NONE_VISIBLE",
+    "clipping": "NONE_VISIBLE",
+    "final_approved": false,
+    "note": "Current automation contract/controller topology changed after C137, but current Git shared state has not returned index112 for rework or withdrawn its static PASS. This manifest creates only runtime-isolation input; current-contract acceptance belongs to the subsequent C batch Gate."
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+    "candidate_git_blob_sha": "30971e83bebe619520f27dfece37f8ebdc02ff28",
+    "candidate_sha256": "5bb92bce5fae2fdcc9bfa0e60725b7125ac95bacb27d6ca0d13099d70408e4a1",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the D41D0B1 replacement DDS and confirm the selector/front-end screen renders without a crash.",
+    "Capture readable/game-orientation evidence for the localized girlfriend-goal message.",
+    "Confirm flip-Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring artwork and any 1-pixel overflow.",
+    "Do not promote runtime approval without isolated real-game evidence."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
