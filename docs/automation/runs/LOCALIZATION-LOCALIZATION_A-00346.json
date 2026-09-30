@@ -60,7 +60,8 @@
     "clean_plate_emitted": false,
     "new_reconstruction_input": true,
     "materially_reduces_unresolved_work": true,
-    "production_readiness": "PREFLIGHT_ONLY"
+    "production_readiness": "PREFLIGHT_ONLY",
+    "producing_result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800"
   },
   "evidence": [
     "localization/graphics/role_A/20261001-A00346-P00217/A00346_P00217_INDEX111_PANEL_INTERIOR_RECONSTRUCTION.json",
@@ -98,8 +99,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__C174_GATE_PASS_NO_A_COMPLETION_TIER__QA_PENDING_159_198_201_NOT_REPEATED__B61_133_232_NOT_STOLEN__INDEX111_C174_A00320_8221_REMAINDER_REUSED__PANEL_INTERIOR_STAGE2_2487_PROPOSAL_2223_ACTUAL__5734_REMAINING__ZERO_OUTSIDE_MASK__ZERO_ALPHA__ZERO_PROTECTED_GUARD_OVERLAP__RANDOM_FAIL_CLOSED__NO_CLEANPLATE_DDS__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
+  "authoritative_result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): advance index111 panel reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00346]",
   "durable_task_record_in_result_commit": true,
@@ -108,7 +109,13 @@
     "head_sha": "6501a3ebceb293f6b8b194df5dc57e062d393edd",
     "head_message": "chore(localization): bind A00345 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00345] [skip ci]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Current branch HEAD was refreshed immediately before blob/tree preparation. Only A00346 lane-local evidence/analyzer and durable task-record paths are added; shared state and peer-lane files are untouched."
+    "concurrent_changes_reviewed": "Current branch HEAD was refreshed immediately before blob/tree preparation. Only A00346 lane-local evidence/analyzer and durable task-record paths are added; shared state and peer-lane files are untouched.",
+    "bookkeeping_head_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
+    "bookkeeping_concurrent_head_preserved": false
   },
-  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the immutable result SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA is bound here. The result commit atomically contains A00346 index111 reconstruction evidence, deterministic analyzer, and durable task record. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T07:15:00+09:00",
+  "bookkeeping_base_result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
+  "bookkeeping_preserved_head_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
+  "bookkeeping_preserved_head_message": "localization(A): advance index111 panel reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00346]"
 }
