@@ -1,0 +1,169 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-b00253-p00140-index139-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00253",
+  "wave_id": "P00140",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "recorded_at_kst": "2026-09-30T13:50:02+09:00",
+  "base_head_sha": "bfdb11840a9141df21cc96e3a0828974b8ca3796",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "stale_even_index_prompt_overridden_by_current_git_contract": true,
+    "selected_index": 139,
+    "asset": "313DB8CB",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+    "priority": "PREFLIGHT_ONLY_SOURCE_LADDER_AFTER_FRESH_SCAN_PROVED_ZERO_RUNNABLE_READY_OR_REWORK_TIERS",
+    "ready_tier_scan": {
+      "render_ready": [],
+      "one_stage_to_render": [],
+      "runnable_direct_rework": [],
+      "existing_candidate_material_rework_runnable": [],
+      "dependency_blocked_existing_candidate_rework": [
+        {
+          "index": 94,
+          "asset": "2DA43E41",
+          "reason": "prior safe-repair attempts exhausted; dependency fingerprint unchanged"
+        },
+        {
+          "index": 121,
+          "asset": "FD90AA9",
+          "reason": "source-faithful exact-bbox/collateral blocker unchanged"
+        }
+      ],
+      "candidate_qa_pending_not_producer_work": [
+        159,
+        198,
+        201
+      ],
+      "existing_b_producer_evidence_not_repeated": [
+        {
+          "index": 133,
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+          "result_sha": "a265c5b4d262b0e0abf944df75fe3c1b3b88cef6"
+        },
+        {
+          "index": 232,
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+          "result_sha": "a6a12ad5072f2ac9e0a71a2c70c28eb72d856837"
+        }
+      ]
+    }
+  },
+  "canonical_inventory": {
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+    "sha256": "45cd9acffa98e79079774c4af41f90471627f7531fa33c12ff16dc4ed9292209",
+    "width": 512,
+    "height": 256,
+    "mode": "RGBA"
+  },
+  "canonical_semantics": {
+    "transcription_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323",
+    "status": "PASS_REUSED_CURRENT_2_OF_2",
+    "segments": [
+      {
+        "source": "TUNED",
+        "korean": "튜닝"
+      },
+      {
+        "source": "NORMAL",
+        "korean": "일반"
+      }
+    ],
+    "protected_original": [
+      "Ferrari model names",
+      "flags",
+      "MT/AT"
+    ]
+  },
+  "source_acquisition": {
+    "policy": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md canonical HD source acquisition ladder",
+    "approved_drive_fast_path": {
+      "linked_account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "parent_listing_count": 1,
+      "only_observed_file": "9F060EC1_512x512.dds",
+      "outcome": "SOURCE_TRANSPORT_MISS"
+    },
+    "pinned_tag_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "git_blob_sha": "616eecec37dd04de4ee25f174e7453f6d2209f98",
+      "outcome": "SOURCE_IDENTITY_MISMATCH",
+      "proof": "Git blob SHA is identical to the verified pinned Release member below; the connector exposes the immutable blob identity but not inline bytes for this large binary."
+    },
+    "pinned_release_fallback": {
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_verified_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_identity": "PASS_EXACT_PINNED_BUNDLE",
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+      "member_git_blob_sha": "616eecec37dd04de4ee25f174e7453f6d2209f98",
+      "member_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+      "member_bytes": 8388736,
+      "dds_header_128_sha256": "2195f6a7c276e34259dcfa3a2af6b7424780c19478a08dc6ad597ba2753b3456",
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "channel_masks": [
+        "0x000000ff",
+        "0x0000ff00",
+        "0x00ff0000",
+        "0xff000000"
+      ],
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    },
+    "comparison": {
+      "sha256_match": false,
+      "dimensions_match": false,
+      "expected_dimensions": [
+        512,
+        256
+      ],
+      "acquired_dimensions": [
+        2048,
+        1024
+      ],
+      "substitution_forbidden": true
+    },
+    "final_outcome": "SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "readiness_after": {
+    "index139": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "blocker": "Approved Drive exact-path miss; immutable pinned-tag/release bytes are the same noncanonical 2048x1024 source and fail current 512x256 canonical inventory SHA/dimensions.",
+    "retry_policy": "STICKY_DO_NOT_REPROBE_UNTIL_CANONICAL_INVENTORY_OR_SOURCE_POLICY_OR_SOURCE_BYTES_FINGERPRINT_CHANGES",
+    "korean_candidate_generated": false
+  },
+  "material_deliverable": {
+    "type": "INDEX139_CANONICAL_SOURCE_THREE_TIER_LADDER_EXHAUSTION_WITH_TYPED_IDENTITY_EVIDENCE",
+    "materially_reduces_unresolved_work": true,
+    "previous_state": "PREFLIGHT_ONLY_EXACT_CANONICAL_SOURCE_ABSENT",
+    "new_state": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "candidate_dds_modified": false
+  },
+  "self_qa": "PASS_B_MOD3_INDEX139__FRESH_READY_TIER_SCAN_ZERO_RUNNABLE__APPROVED_DRIVE_EXACT_PATH_MISS__PINNED_TAG_BLOB_BOUND_TO_VERIFIED_RELEASE_MEMBER__PINNED_ZIP_DIGEST_EXACT__RELEASE_MEMBER_SHA_DIMENSIONS_MISMATCH_CANONICAL__NO_SUBSTITUTION__NO_SHARED_STATE",
+  "candidate_static_qa": "HOLD_NO_CANONICAL_SOURCE_NO_CANDIDATE",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
