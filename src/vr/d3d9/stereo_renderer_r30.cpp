@@ -3213,4 +3213,9 @@ namespace OutRunVRStereo
             device, stereo, screenKind, original,
             eyeConstants, eyeScale, eyeOffset);
     }
+
+    void NoteScreenSpaceFovDraw() noexcept
+    {
+        ++R30ScreenSpaceFovDraws;
+    }
 }

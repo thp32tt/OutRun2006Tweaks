@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T02:03:00+09:00",
+  "updatedKst": "2026-10-01T02:06:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "b8c1544cfd2b6d491345e180ec72a3a84586e4bd",
   "mode": "MANUAL_APPLY_1000_CYCLE_REVIEW_BRANCH",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 140,
+  "cycle": 145,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -33,9 +33,10 @@
     "VR-REFACTOR-DISPATCH-0004",
     "VR-REFACTOR-DISPATCH-0005",
     "VR-REFACTOR-DISPATCH-0006",
-    "VR-REFACTOR-HUD-0001"
+    "VR-REFACTOR-HUD-0001",
+    "VR-REFACTOR-PERF-0004"
   ],
-  "next": "Cycles 141-145: hide R30 screen-space telemetry counter from R33 and isolate HUD telemetry API; no build.",
+  "next": "Cycles 146-150: encapsulate R30 lower-draw trampolines behind neutral dispatch functions for R33; no build.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",

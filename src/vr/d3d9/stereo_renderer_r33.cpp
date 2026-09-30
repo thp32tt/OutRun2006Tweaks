@@ -566,7 +566,7 @@ namespace OutRunVRStereo
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
             NoteStableTwoEyeDraw();
-            ++R30ScreenSpaceFovDraws;
+            NoteScreenSpaceFovDraw();
             if (R33TelemetryEnabled())
             {
                 NoteTelemetryHud();
