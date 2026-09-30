@@ -225,7 +225,7 @@ namespace OutRunVRStereo
             const char* phase, const R81FrameSample& f) noexcept
         {
             spdlog::info(
-                "VR R81 FRAME {}: serial={} tick={} stage={} state={} frameUs={} presentUs={} skyGlowUs={} draw[calls={},prims={},indexed={},up={},sceneFx={},worldParticle={}] particles[live={},sources={},peak={}] stream[fileLoadCalls={},fileLoadBusy={},fileLoadUs={},fileLoadMaxUs={},texCreate={},texMiB={:.2f},texLocks={},uploads={},uploadMiB={:.2f},uploadUs={},vbCreate={},vbKiB={:.1f},ibCreate={},ibKiB={:.1f},bufLocks={},bufKiB={:.1f},discard={},noOverwrite={}]",
+                "VR R81 FRAME {}: serial={} tick={} stage={} state={} frameUs={} presentUs={} skyGlowUs={} draw[calls={},prims={},indexed={},up={},sceneFx={},worldParticle={}] particles[live={},sources={},peak={}] stream[fileLoadCalls={},fileLoadBusy={},fileLoadUs={},fileLoadMaxUs={},texCreate={},texMiB={:.2f},texLocks={},uploads={},uploadMiB={:.2f},uploadUs={},vbCreate={},vbKiB={:.1f},ibCreate={},ibKiB={:.1f},bufLocks={},bufKiB={:.1f},discard={},noOverwrite={},wholeLocks={}] interp[particleCalls={},particleUs={},poolSlots={},moved={}]",
                 phase, f.serial, f.tick, f.stage, f.state,
                 f.frameUs, f.presentUs, f.skyGlowUs,
                 f.draw.draws, f.draw.primitives, f.draw.indexedDraws,
@@ -250,7 +250,12 @@ namespace OutRunVRStereo
                 f.resource.bufferLocks,
                 static_cast<double>(f.resource.bufferLockBytes) / 1024.0,
                 f.resource.bufferDiscardLocks,
-                f.resource.bufferNoOverwriteLocks);
+                f.resource.bufferNoOverwriteLocks,
+                f.resource.bufferWholeLocks,
+                f.resource.particleInterpCalls,
+                f.resource.particleInterpUs,
+                f.resource.particlePoolSlots,
+                f.resource.particleMoved);
         }
 
         void R81PushHistory(const R81FrameSample& sample) noexcept
@@ -879,7 +884,7 @@ namespace OutRunVRStereo
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && Settings::VRTelemetry)
-                OutRunVR::PerfHitch::NoteBufferLock(size, flags);
+                OutRunVR::PerfHitch::NoteBufferLock(size, flags, size == 0);
             if (SUCCEEDED(hr) && data && *data &&
                 R30WaitForVertexRegistration(buffer))
             {
@@ -945,7 +950,7 @@ namespace OutRunVRStereo
             const HRESULT hr = R30IndexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
             if (SUCCEEDED(hr) && Settings::VRTelemetry)
-                OutRunVR::PerfHitch::NoteBufferLock(size, flags);
+                OutRunVR::PerfHitch::NoteBufferLock(size, flags, size == 0);
             if (SUCCEEDED(hr) && data && *data &&
                 R30WaitForIndexRegistration(buffer))
             {
