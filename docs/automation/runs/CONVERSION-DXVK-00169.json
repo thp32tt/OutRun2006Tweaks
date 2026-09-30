@@ -1,0 +1,33 @@
+{
+  "task_id": "CONVERSION-DXVK-00169",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "c43b4ea925f9f88df2697f2e8185526e46094c2d",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R169_CALLEE_8BD20_PROVENANCE",
+  "selection_reason": "CONVERSION-DXVK-00167 closed the 0x28320 structural function-entry boundary and explicitly left callee semantics unresolved. 0x282B0 already has detailed structural proof, while 0x8BD20 and 0x182194 lack callee provenance. 0x8BD20 is the higher-confidence next unit because two independent aligned calls already target it: 0x284D2 and 0x28390.",
+  "summary": "Add a bounded exact-EXE provenance capture for callee 0x8BD20. Require both existing aligned callers 0x284D2 and 0x28390 to resolve to the same .text target and appear in the raw inbound rel32 census, then capture a fresh 96-byte window plus raw outbound rel32 candidates. Function boundary, semantic effect and render ownership remain unresolved.",
+  "evidence": [
+    "Existing EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN proof resolves aligned CALL 0x284D2 to 0x8BD20 in .text.",
+    "Existing EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN proof resolves aligned CALL 0x28390 to 0x8BD20 in .text.",
+    "0x282B0 already has detailed bounded instruction/terminal proof; 0x8BD20 has no independent callee provenance yet.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00169.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the dual-call provenance capture passes, persist exact 0x8BD20 bytes/call census while keeping function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CALLEE_BYTES_ONLY and ownership_effect=NONE. A later bounded task may decode only complete instructions from that fresh window."
+}
