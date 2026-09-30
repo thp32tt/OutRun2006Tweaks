@@ -13,6 +13,7 @@
 // new current-frame full color/depth baseline are both proven.
 
 #include "stereo_renderer_r22.cpp"
+#include "../lifecycle/frame_lifecycle.hpp"
 
 namespace OutRunVRStereo
 {

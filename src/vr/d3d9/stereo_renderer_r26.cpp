@@ -12,6 +12,7 @@
 // unknown WVPs, and constant mismatches remain fail-closed through R13/R23/R9.
 
 #include "stereo_renderer_r23.cpp"
+#include "../lifecycle/frame_lifecycle.hpp"
 #include "shader_fingerprint_gpl.hpp"
 #include "../game/render_semantics.hpp"
 
