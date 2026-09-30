@@ -17,6 +17,7 @@
 #include "../render/screen_space_api.hpp"
 #include "../render/fast_path_support.hpp"
 #include "../render/lower_draw_api.hpp"
+#include "../state/right_depth_stencil_sync.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
@@ -250,9 +251,9 @@ namespace OutRunVRStereo
             bool mayWriteDepth, bool mayWriteStencil) noexcept
         {
             if (mayWriteDepth)
-                RightDepthSynchronized = false;
+                InvalidateRightDepthSync();
             if (mayWriteStencil)
-                RightStencilSynchronized = false;
+                InvalidateRightStencilSync();
         }
 
         HRESULT __stdcall SetRenderStateDestR33(IDirect3DDevice9* device,
@@ -346,12 +347,12 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+                (!IsRightDepthSynchronized() || !IsRightStencilSynchronized()))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (TrackedDepthStencil && !IsRightDepthSynchronized() &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (TrackedDepthStencil && !IsRightStencilSynchronized() &&
                 StencilTestActive(device))
                 return {};
 
@@ -509,12 +510,12 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencil &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+                (!IsRightDepthSynchronized() || !IsRightStencilSynchronized()))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (TrackedDepthStencil && !IsRightDepthSynchronized() &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (TrackedDepthStencil && !IsRightStencilSynchronized() &&
                 StencilTestActive(device))
                 return {};
 

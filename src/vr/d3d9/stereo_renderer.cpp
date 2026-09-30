@@ -953,9 +953,29 @@ namespace OutRunVRStereo
 			destWindowOverride, dirtyRegion);
 	}
 
-	void InvalidateRightDepthStencilSync() noexcept
+	bool IsRightDepthSynchronized() noexcept
+	{
+		return RightDepthSynchronized;
+	}
+
+	bool IsRightStencilSynchronized() noexcept
+	{
+		return RightStencilSynchronized;
+	}
+
+	void InvalidateRightDepthSync() noexcept
 	{
 		RightDepthSynchronized = false;
+	}
+
+	void InvalidateRightStencilSync() noexcept
+	{
 		RightStencilSynchronized = false;
+	}
+
+	void InvalidateRightDepthStencilSync() noexcept
+	{
+		InvalidateRightDepthSync();
+		InvalidateRightStencilSync();
 	}
 }
