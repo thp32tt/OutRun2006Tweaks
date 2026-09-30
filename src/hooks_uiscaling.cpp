@@ -1287,6 +1287,26 @@ class UIScaling : public Hook
 	}
 
 	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubble_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubble callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R132 C2C SPEECH HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
 	static void C2CSpeechBubbleRank_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((float*)(ctx.esp), false);
@@ -1528,14 +1548,31 @@ public:
 			(void*)0x4BBA89,
 			DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u>);
 
-		// C2C-specific speech bubbles
-		C2CSpeechBubble_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x496AC7, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x496B14, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x496B39, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x496B94, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk5 = safetyhook::create_mid((void*)0x496BE1, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk6 = safetyhook::create_mid((void*)0x496C10, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk7 = safetyhook::create_mid((void*)0x496C6A, C2CSpeechBubble_AdjustPositionESP0);
+		// R132/F13: exact C2CSpeechBubble position-correction edges are all
+		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
+		// original ESP0 spacing correction while sourcing only immediate
+		// next-draw ownership from the backend-neutral producer map.
+		C2CSpeechBubble_AdjustPositionESP0_hk1 = safetyhook::create_mid(
+			(void*)0x496AC7,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096AC7u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk2 = safetyhook::create_mid(
+			(void*)0x496B14,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B14u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk3 = safetyhook::create_mid(
+			(void*)0x496B39,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B39u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk4 = safetyhook::create_mid(
+			(void*)0x496B94,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B94u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk5 = safetyhook::create_mid(
+			(void*)0x496BE1,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096BE1u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk6 = safetyhook::create_mid(
+			(void*)0x496C10,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C10u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk7 = safetyhook::create_mid(
+			(void*)0x496C6A,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C6Au>);
 
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x4FCDC1, C2CSpeechBubble_AdjustPositionESP0);
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x4FCDEA, C2CSpeechBubble_AdjustPositionESP0);
