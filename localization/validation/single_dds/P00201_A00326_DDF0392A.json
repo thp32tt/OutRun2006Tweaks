@@ -1,0 +1,123 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00326-p00201-index222-standard-single-dds-isolation-v1",
+  "case_id": "P00201_A00326_DDF0392A",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00326",
+  "wave_id": "P00201",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T04:59:00+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Materialize the previously C-accepted DDF0392A runtime-isolation input in the current localization/validation/single_dds manifest format so the Korean single-DDS isolation payload workflow can directly validate and package the unchanged repository-backed candidate. Heavy candidate QA is reused; runtime remains UNTESTED.",
+  "asset": {
+    "id": "DDF0392A",
+    "queue_index": 222,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "raw_orientation": "flip_y",
+    "localized_semantic_bindings": 6
+  },
+  "source": {
+    "canonical_transport": "PINNED_RELEASE_ARCHIVE_EXACT_MEMBER",
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "git_blob_sha": "1ff7680eb71750d884b0e69fe058aef3a5cf5fa2",
+    "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+    "bytes": 2097280,
+    "repository_path": null,
+    "dds": {
+      "width": 1024,
+      "height": 2048,
+      "format": "DXT5",
+      "mipmaps": 1,
+      "raw_orientation": "flip_y"
+    },
+    "note": "Canonical source identity is retained from C152/Q00050. The source is not committed under a repository source path, so the auxiliary workflow validates the repository-backed candidate and retains source identity metadata without substituting source bytes."
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "bytes": 2097280,
+    "dds": {
+      "width": 1024,
+      "height": 2048,
+      "format": "DXT5",
+      "mipmaps": 1,
+      "header_128_exact": true,
+      "raw_orientation": "flip_y"
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00221",
+      "producer_result_sha": "adcd9f5a6a7373a1b31184cb6b1e889b64b28dcf",
+      "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00228",
+      "independent_c_result_sha": "648cfaab4a7bd5c01ca2a6aa21d775291235a942",
+      "c_batch": "Q00050",
+      "c_run": "C152",
+      "c_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "legacy_isolation_task": "LOCALIZATION-LOCALIZATION_A-00230",
+      "legacy_isolation_result_sha": "d1d65c1ebc6309ca98505d6011199beb1a553e25",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00221.json",
+    "producer_task_blob_sha": "72aeaf6a8c3590f8271d106b715041d2e18f9dbd",
+    "producer_report": "localization/graphics/role_A/20260930-A00221-P00117/A00221_P00117_INDEX222_V2_PRODUCTION.json",
+    "producer_report_blob_sha": "a991c6235d23938f2caca6c223d0d9e596cc70bb",
+    "independent_c_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00228.json",
+    "independent_c_task_blob_sha": "166cee891bf8fb636d664c46c6eb7ec7fc39a19e",
+    "legacy_isolation_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00230.json",
+    "legacy_isolation_task_blob_sha": "275e677cc422fbbad1504acb41d3d24ec5726cdf",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "safe_bbox_containment": "PASS_2PX_INSET_ALL_6",
+    "one_pixel_overflow": 0,
+    "changed_pixels_outside_allowed_edit_mask": 0,
+    "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+    "changed_pixels_in_protected_regions": 0,
+    "source_language_residue": "NONE_OBSERVED_BY_C152",
+    "broken_hangul": "NONE_OBSERVED_BY_C152",
+    "clipping_overlap_box_escape": "NONE_OBSERVED_BY_C152",
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_input_location": "localization/graphics/role_A/20260930-A00230-P00123/A00230_P00123_INDEX222_SINGLE_DDS_ISOLATION_INPUT.json",
+    "previous_input_consumable_by_current_aux_workflow": false,
+    "current_aux_workflow_glob": "localization/validation/single_dds/*.json",
+    "new_current_workflow_consumable_manifest": true,
+    "candidate_repository_path_bound": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "candidate_git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "candidate_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the DDF0392A replacement DDS and confirm the affected SUMO/front-end atlas screens render without a crash.",
+    "Capture readable/game-orientation evidence for all six localized regions.",
+    "Confirm flip_y raw storage is interpreted correctly in game.",
+    "Check clipping, position, DXT5 alpha/transparency, scaling, and any 1-pixel overflow.",
+    "Verify preserve-original model/song/proper-title regions remain visually unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

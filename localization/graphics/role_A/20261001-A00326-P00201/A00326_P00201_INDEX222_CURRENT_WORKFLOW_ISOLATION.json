@@ -1,0 +1,99 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00326-p00201-index222-current-workflow-isolation-material-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00326",
+  "wave_id": "P00201",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-10-01T04:59:00+09:00",
+  "base_head_sha": "f477ae9f1ea71511c3ab8f128e6c46cf0e0ba13e",
+  "target": {
+    "index": 222,
+    "asset": "DDF0392A",
+    "index_mod_3": 0,
+    "owned_by_lane": true
+  },
+  "readiness_scan": {
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00321",
+    "latest_authoritative_c_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      57,
+      60,
+      159,
+      198,
+      201
+    ],
+    "producer_preflight_qa_pending_not_repeated": [
+      54,
+      111
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "production_complete_not_rerendered": [
+      12,
+      51,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "selection_reason": "No candidate-completion tier or legal new preflight is runnable in A's modulo-3 shard. Fallback step 3 is used on production-complete index222 because its older A00230 isolation evidence predates the current auxiliary workflow manifest directory and no current localization/validation/single_dds DDF0392A manifest exists.",
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX222_CURRENT_WORKFLOW_CONSUMABLE_SINGLE_DDS_MANIFEST",
+    "manifest": "localization/validation/single_dds/P00201_A00326_DDF0392A.json",
+    "candidate_dds_modified": false,
+    "candidate_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "candidate_git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "prior_static_qa": "C152/Q00050 PASS",
+    "prior_legacy_isolation": "A00230/C153 accepted",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "new_executable_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "candidate_git_blob_sha": "e3f4488fbd966733ad58ea3c929511e23b0976a3",
+    "candidate_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+    "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72"
+  },
+  "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__NO_QA_PENDING_REPEAT__NO_STICKY_SOURCE_REPROBE__INDEX222_UNCHANGED_C152_STATIC_PASS__CURRENT_WORKFLOW_MANIFEST_ADDED__REPOSITORY_CANDIDATE_PATH_BOUND__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "uploaded_archive_used": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
