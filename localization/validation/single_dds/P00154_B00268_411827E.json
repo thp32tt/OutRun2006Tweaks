@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00268-p00154-index97-single-dds-isolation-v1",
+  "case_id": "P00154_B00268_411827E",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00268",
+  "wave_id": "P00154",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T19:14:32+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "66e4764f7987a6b6f030c79761d35b6ac001df6e",
+  "active": true,
+  "purpose": "Provide a concrete repository-backed DDS_ONLY runtime-isolation input for the unchanged index97/411827E candidate that the current queue still marks as C-visual + DDS_ONLY in-game pending. This does not promote static/final approval; runtime remains UNTESTED until a real-game test.",
+  "asset": {
+    "id": "411827E",
+    "queue_index": 97,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "raw_orientation": "mirror_y",
+    "localized_regions": 7,
+    "translations": [
+      "Automatic -> 자동",
+      "seconds -> 초",
+      "More Engine sound -> 엔진음 크게",
+      "TUNED -> 튜닝",
+      "NORMAL -> 일반",
+      "RANDOM -> 무작위",
+      "Recommendation -> 추천"
+    ],
+    "protected_original": [
+      "288GTO",
+      "Testarossa",
+      "F40",
+      "Enzo Ferrari",
+      "2P/4P/3P/1P",
+      "vehicle/control artwork"
+    ]
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "git_blob_sha": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+    "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "git_blob_sha": "34dd3b33440ceb4396336f62db21ba0110b2be8b",
+    "sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00004",
+      "producer_result_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088",
+      "asset_production_commit_sha": "bd28cb592c6c3180eef7d88497f7fa0ceb311657",
+      "candidate_blob_at_production": "34dd3b33440ceb4396336f62db21ba0110b2be8b",
+      "current_candidate_blob": "34dd3b33440ceb4396336f62db21ba0110b2be8b",
+      "source_blob_at_production": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+      "current_source_blob": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+      "current_head_checked": "66e4764f7987a6b6f030c79761d35b6ac001df6e",
+      "no_existing_411827e_single_dds_manifest_at_selection": true,
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00004",
+    "producer_result_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088",
+    "producer_report": "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json",
+    "producer_status": "A_SELF_QA_PASS_PENDING_C_VISUAL_INGAME",
+    "current_queue_status": "a00004_self_qa_pass_pending_c_visual_ingame",
+    "heavy_candidate_qa_rerun": false,
+    "source_candidate_fingerprint_unchanged": true,
+    "structure": "RGBA32 2048x2048 mip1 / header exact / mirror_y",
+    "producer_containment": "PASS_7_OF_7",
+    "changed_pixels_outside_touched_cells": 0,
+    "changed_pixels_outside_declared_cells": 0,
+    "introduced_alpha_outside_original_bboxes": 0,
+    "final_static_c_approval": false,
+    "final_approved": false,
+    "note": "A00004 exact final candidate self-QA is reused because the source/candidate Git blobs are unchanged. This manifest is only a runtime-isolation input; it does not substitute for the still-pending independent C visual/static disposition."
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "candidate_git_blob_sha": "34dd3b33440ceb4396336f62db21ba0110b2be8b",
+    "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 411827E replacement DDS and confirm the affected selector/options screen renders without a crash.",
+    "Capture readable/game-orientation evidence for all seven localized regions.",
+    "Confirm mirror-Y raw storage is interpreted correctly in game.",
+    "Check clipping, position, scaling, alpha/transparency and any 1-pixel overflow.",
+    "Confirm Recommendation badge border/background and protected vehicle/control artwork remain intact.",
+    "Do not promote runtime or final approval from this manifest alone; independent C visual/static disposition is still required."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00268-p00154-index97-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00268",
+  "wave_id": "P00154",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T19:14:32+09:00",
+  "base_head_sha": "66e4764f7987a6b6f030c79761d35b6ac001df6e",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "current_controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "latest_shared_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_backlog_outside_b_shard": [
+      159,
+      198,
+      201
+    ],
+    "existing_b_static_or_runtime_isolation_not_repeated": [
+      {
+        "index": 61,
+        "reason": "existing shared single-DDS isolation ready"
+      },
+      {
+        "index": 112,
+        "reason": "B00266 DDS_ONLY isolation durable pending C"
+      },
+      {
+        "index": 130,
+        "reason": "B00267 DDS_ONLY isolation durable pending C"
+      },
+      {
+        "index": 163,
+        "reason": "B00263 DDS_ONLY isolation durable pending C"
+      },
+      {
+        "index": 193,
+        "reason": "B00264 DDS_ONLY isolation durable pending C"
+      },
+      {
+        "index": 226,
+        "reason": "B00243 DDS_ONLY isolation durable pending C"
+      }
+    ],
+    "pregen_pending_c_not_repeated": [
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213"
+      },
+      {
+        "index": 220,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00214"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211"
+      }
+    ],
+    "dependency_blocked_or_exhausted_not_reprobed": [
+      28,
+      34,
+      43,
+      46,
+      49,
+      52,
+      55,
+      100,
+      103,
+      106,
+      139,
+      154,
+      172,
+      175,
+      205,
+      214,
+      217,
+      241
+    ],
+    "unresolved_zoom_review_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "selected_index": 97,
+    "selected_asset": "411827E",
+    "reason": "No current B candidate-completion tier is runnable and the normal static-QA isolation backlog is already covered. Index97 is B-owned, has an unchanged repository-backed A00004 candidate, current queue explicitly says C visual + DDS_ONLY in-game pending, and no single-DDS manifest existed."
+  },
+  "fingerprint_reuse": {
+    "source_git_blob_sha": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+    "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "candidate_git_blob_sha": "34dd3b33440ceb4396336f62db21ba0110b2be8b",
+    "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+    "producer_result_sha": "ade45761f638a34281d20a2d0d60c8bb672fe088",
+    "current_candidate_blob_verified_at_head": "66e4764f7987a6b6f030c79761d35b6ac001df6e",
+    "current_source_blob_verified_at_head": "66e4764f7987a6b6f030c79761d35b6ac001df6e",
+    "source_candidate_changed": false,
+    "heavy_qa_repeated": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX97_411827E_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      97
+    ],
+    "reviewed_assets": [
+      "411827E"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX97__ZERO_RUNNABLE_READY_TIERS__UNCHANGED_A00004_EXACT_CANDIDATE_AND_SOURCE_BLOBS__QUEUE_EXPLICIT_DDS_ONLY_INGAME_PENDING__NO_EXISTING_411827E_ISOLATION_MANIFEST__NO_CANDIDATE_WRITE__NO_SHARED_STATE__NO_STATIC_OR_RUNTIME_PROMOTION",
+  "candidate_static_qa": "A_SELF_QA_PASS_PENDING_INDEPENDENT_C_VISUAL_STATIC_DISPOSITION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00154_B00268_411827E.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00004.json",
+    "localization/graphics/role_A/20260928-A00004/A00004_411827E_REWORK_REPORT.json",
+    "localization/graphics/role_C/20260927-1826-C80/C80_411827E_rework_metrics.json"
+  ]
+}
