@@ -1,0 +1,307 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-c169-q00067-four-input-independent-batch-qa-v16",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00317",
+  "wave_id": "Q00067",
+  "qa_batch_id": "Q00067",
+  "run": "C169",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:00:39+09:00",
+  "base_head_sha": "82743b6358a2342cf591bcc501ef02a4f8dc4e19",
+  "base_sha": "82743b6358a2342cf591bcc501ef02a4f8dc4e19",
+  "commit_mode": "VALIDATION_BEARING_RESULT",
+  "result": "PASS_Q00067_A00307_B00306_A00309_A00312_SCOPED_QA_RUNTIME_UNTESTED",
+  "summary": "Q00067 consumes immutable A00307/B00306/A00309/A00312 once. A00307 and A00312 PASS only as historical frontier/duplicate-suppression evidence. B00306@index94 PASSes its seven-element v2 rebuild blueprint using unchanged C162 heavy evidence and remains PREFLIGHT_ONLY. A00309@index111 PASSes deterministic English-source-only reconstruction coverage (25,111/37,292 pixels covered; 12,181 unresolved) and remains PREFLIGHT_ONLY until protected-art CLEAN_PLATE QA passes. No candidate DDS is promoted or rewritten; runtime remains UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00307",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "0f58ce74120445c951286c6e2e317ee2d86e06c7",
+      "result_message": "localization(A): attest unchanged A-shard dependency frontier [AUTO:LOCALIZATION-LOCALIZATION_A-00307]",
+      "completed_at": "2026-10-01T02:39:09.447272+09:00",
+      "producer_id": "P00186",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00306",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "2edaf8eea143eda57b8a77994c8e900fd71632e8",
+      "result_message": "localization(B): blueprint index94 v2 rebuild execution [AUTO:LOCALIZATION-LOCALIZATION_B-00306]",
+      "completed_at": "2026-10-01T02:44:52.701904+09:00",
+      "producer_id": "P00185",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00309",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd",
+      "result_message": "localization(A): advance index111 source-only reconstruction coverage [AUTO:LOCALIZATION-LOCALIZATION_A-00309]",
+      "completed_at": "2026-10-01T03:11:11.504394+09:00",
+      "producer_id": "P00187",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00312",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "4156f601c2456790d070da7e9c07d549bc391601",
+      "result_message": "localization(A): record post-A00309 blocker frontier [AUTO:LOCALIZATION-LOCALIZATION_A-00312]",
+      "completed_at": "2026-10-01T03:17:38.205998+09:00",
+      "producer_id": "P00189",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00307",
+      "result_sha": "0f58ce74120445c951286c6e2e317ee2d86e06c7",
+      "status": "PASS",
+      "production_readiness": "FRONTIER_ATTESTATION_SCOPE_ONLY",
+      "reason": "PASS only for the immutable schema15 historical A-frontier/duplicate-suppression claim. No candidate bytes exist, and later schema16 A00312/A00313/A00314 records govern current dispatch state. No candidate/static/runtime approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00306",
+      "result_sha": "2edaf8eea143eda57b8a77994c8e900fd71632e8",
+      "status": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "reason": "Index94/2DA43E41 PASSes its claimed deterministic seven-element pre-generation blueprint. Q00060/C162 unchanged heavy source/candidate/header evidence is reused rather than repeated. Exact source-effect/removal masks, independently QA-passed CLEAN_PLATE, and current source-style measurement still remain; no candidate/static/runtime approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00309",
+      "result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd",
+      "status": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "reason": "Index111/C075FB49 PASSes its claimed deterministic English-source-only reconstruction coverage. Exact target/donor identities and accepted prior style/protected-art evidence are reused. The analyzer covers 25,111 of 37,292 proposal-scope pixels and explicitly leaves 12,181 unresolved across Tuned/Normal/Random; CLEAN_PLATE is not fabricated and a Korean candidate is not authorized. No static/runtime approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00312",
+      "result_sha": "4156f601c2456790d070da7e9c07d549bc391601",
+      "status": "PASS",
+      "production_readiness": "FRONTIER_ATTESTATION_SCOPE_ONLY",
+      "reason": "PASS only for the immutable schema16 post-A00309 historical blocker/frontier claim. It correctly suppresses duplicate QA-pending work and cross-lane stealing, while later A00313/A00314 govern current dispatch. No candidate/static/runtime approval."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "canonical_progress_blob_sha": "4433f0384a5a9a5a4d7a606f76d8902c0003d909",
+    "merge_head_sha": "82743b6358a2342cf591bcc501ef02a4f8dc4e19",
+    "concurrent_out_of_batch_seen": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
+        "durable_result_commit": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+        "scope": "index121 fresh current-v2 candidate/review evidence; not dispositioned by Q00067"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00316",
+        "result_sha": "eed179b15c215cee541678829fc1f91a2abbd498",
+        "scope": "index147 pinned-Release exact-member SOURCE_IDENTITY_MISMATCH evidence; not dispositioned by Q00067"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00315",
+        "result_sha": "476ab48d3471ca907645069847be3de782516e4f",
+        "scope": "index163 exact fcb75cef GitHub review-lineage re-emission; not dispositioned by Q00067"
+      }
+    ]
+  },
+  "independent_replay": {
+    "a00307_frontier": {
+      "scope": "PASS_HISTORICAL_ATTESTATION_ONLY",
+      "candidate_present": false,
+      "current_dispatch_evidence": [
+        "LOCALIZATION-LOCALIZATION_A-00313",
+        "LOCALIZATION-LOCALIZATION_A-00314"
+      ],
+      "old_snapshot_reasserted": false
+    },
+    "index94": {
+      "asset": "2DA43E41",
+      "reused_prior_c_batch": "Q00060/C162",
+      "reused_heavy_fingerprint": true,
+      "heavy_candidate_qa_repeated": false,
+      "canonical_source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "stale_candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+      "structure": "4096x4096 RGBA32 mip1 / readable flip_y",
+      "exact_drive_binding": {
+        "file_id": "1C8zRAuBRhKrklwE2cDCvsZclKLjWMm25",
+        "size_bytes": 67108992,
+        "path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds"
+      },
+      "blueprint_elements": 7,
+      "current_v2_safe_inset_px": 2,
+      "flattened_raster_resize_forbidden": true,
+      "clean_plate_ready": false,
+      "source_style_measured_current_policy": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED"
+    },
+    "index111": {
+      "asset": "C075FB49",
+      "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "donor53_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+      "canonical_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "source_only_method": true,
+      "deterministic_rerun_byte_identical": true,
+      "aggregate": {
+        "proposal_scope_pixels": 37292,
+        "source_covered_pixels": 25111,
+        "source_coverage_ratio": 0.673361578890915,
+        "unresolved_pixels": 12181
+      },
+      "unresolved_regions": {
+        "tuned_setting": {
+          "pixels": 3689,
+          "bbox": [
+            100,
+            1218,
+            220,
+            1258
+          ]
+        },
+        "normal_setting": {
+          "pixels": 3300,
+          "bbox": [
+            450,
+            1218,
+            555,
+            1258
+          ]
+        },
+        "random": {
+          "pixels": 5192,
+          "bbox": [
+            1761,
+            1448,
+            1943,
+            1481
+          ]
+        }
+      },
+      "clean_plate_ready_for_three_panel_elements": false,
+      "candidate_dds_authorized": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED"
+    },
+    "a00312_frontier": {
+      "scope": "PASS_HISTORICAL_ATTESTATION_ONLY",
+      "candidate_present": false,
+      "current_dispatch_evidence": [
+        "LOCALIZATION-LOCALIZATION_A-00313",
+        "LOCALIZATION-LOCALIZATION_A-00314"
+      ],
+      "old_snapshot_reasserted": false
+    }
+  },
+  "readiness_reconciliation": {
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_rework_indices": [],
+    "candidate_qa_pending_indices": [
+      121,
+      159,
+      163,
+      198,
+      201
+    ],
+    "preflight_only_accepted_indices": [
+      94,
+      111,
+      133,
+      232
+    ],
+    "preflight_only_out_of_batch_qa_pending_indices": [
+      147
+    ],
+    "production_complete_indices": [
+      51,
+      97,
+      99,
+      102,
+      112,
+      130,
+      152,
+      193,
+      195,
+      222,
+      226,
+      231,
+      237
+    ],
+    "out_of_batch_notes": [
+      "B00310@index121 current-v2 candidate/review evidence remains Q00067-out-of-batch C-QA-pending.",
+      "B00315@index163 repaired Q00066 review-lineage provenance on exact fcb75cef but remains Q00067-out-of-batch C-QA-pending.",
+      "A00316@index147 proved pinned Release member b913c967... mismatches canonical c52f48b1...; it remains Q00067-out-of-batch C-QA-pending and no source substitution is allowed."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_WITH_DEDUPED_PREFLIGHT_REVIEW_AND_SHARED_STATE_MERGE",
+    "reviewed_inputs": 4,
+    "producer_inputs_pass": 4,
+    "producer_inputs_rework_required": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 757,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00317.json",
+    "role_c_report": "localization/graphics/role_C/20261001-0400-C169/C169_Q00067_INDEPENDENT_QA_BATCH.json"
+  },
+  "throughput_kpis": {
+    "production_complete": {
+      "new_this_batch": 0,
+      "retained_authoritative_static_qa_indices": [
+        51,
+        97,
+        99,
+        102,
+        112,
+        130,
+        152,
+        193,
+        195,
+        222,
+        226,
+        231,
+        237
+      ]
+    },
+    "candidate_awaiting_c": [
+      121,
+      159,
+      163,
+      198,
+      201
+    ],
+    "runnable_production": [],
+    "blocked_exception": [],
+    "runtime_validated": []
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "heavy_qa_repeated": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "bookkeeping_note": "C169/Q00067 validation-bearing result commit is the only Localization Automation Gate owner for this batch. AUTOMATION_VALIDATION remains PENDING in the result commit; runtime remains UNTESTED."
+}

@@ -1504,3 +1504,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Validation-bearing result `fe6532b1f39325d664cb5aae2104a8ae6c64ac84` passed **Localization Automation Gate** run `36760411205` (attempt 1). This bookkeeping checkpoint is separate and does not replace that result as validation owner.
 - Q00066 dispositions remain **B00300 REWORK_REQUIRED / A00303 PASS / B00304 PASS / A00305 PASS**. Shared canonical segment count remains **757**; no candidate DDS is changed by bookkeeping.
 - Candidate-first order remains **REWORK 121/163 -> C QA 159/198/201 -> preflight**. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+## 2026-10-01 04:00 KST - C169 Q00067 independent batch QA
+- A00307/B00306/A00309/A00312 dispositions: **PASS / PASS / PASS / PASS**.
+- B00306@index94 and A00309@index111 are accepted only as **PREFLIGHT_ONLY** pre-generation evidence. Index94 still lacks removal-mask/CLEAN_PLATE/current-style completion; index111 retains **12,181** unresolved source-only reconstruction pixels and needs protected-art CLEAN_PLATE QA.
+- A00307/A00312 are historical frontier-scope PASS only. B00310@index121, B00315@index163 and A00316@index147 are out-of-batch QA_PENDING and are not implicitly approved.
+- Order: **RENDER_READY none -> ONE_STAGE none -> candidate QA 121/159/163/198/201 -> PREFLIGHT 94/111/133/147/232**. Canonical segments stay **757**; no new PRODUCTION_COMPLETE or runtime approval. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
