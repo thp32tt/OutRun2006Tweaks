@@ -113,24 +113,7 @@ namespace OutRunVRStereo
         using R32FrameWorkload = OutRunVR::Telemetry::FrameWorkload;
         thread_local R32FrameWorkload R32FrameWorkloadCounters{};
 
-        struct R32PerfWindow
-        {
-            std::uint64_t frames = 0;
-            std::uint64_t spikes = 0;
-            std::uint64_t frameUsTotal = 0;
-            std::uint64_t maxFrameUs = 0;
-            std::uint64_t presentUsTotal = 0;
-            std::uint64_t maxPresentUs = 0;
-            std::uint64_t drawsTotal = 0;
-            std::uint64_t maxDraws = 0;
-            std::uint64_t primitivesTotal = 0;
-            std::uint64_t maxPrimitives = 0;
-            std::uint64_t maxTriangles = 0;
-            std::uint64_t maxUpDraws = 0;
-            std::uint64_t maxAlphaBlendDraws = 0;
-            std::uint64_t maxParticleLikeDraws = 0;
-            std::uint64_t maxParticleLikePrimitives = 0;
-        };
+        using R32PerfWindow = OutRunVR::Telemetry::PerfWindow;
         thread_local R32PerfWindow R32PerfWindowCounters{};
         thread_local std::uint64_t R32PerfBaselineUs = 0;
         thread_local LONGLONG R32LastPresentEndQpc = 0;
