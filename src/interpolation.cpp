@@ -4,11 +4,13 @@
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/debug/perf_hitch_trace.hpp"
 
 #include <vector>
 #include <algorithm>
 #include <cstring>
 #include <cmath>
+#include <chrono>
 
 namespace Settings
 {
@@ -642,12 +644,15 @@ static void RestoreParticles()
 
 static void InterpolateParticles(float alpha)
 {
+	const auto perfStart = std::chrono::steady_clock::now();
+
 	// Applying twice without a Reset in between would shift an already shifted
 	// position.
 	RestoreParticles();
 
 	int sourcesSeen = 0;
 	int moved = 0;
+	int poolSlots = 0;
 	float lastShift = 0.0f;
 
 	if (Debug.doParticles && Game::nl_part_src)
@@ -676,6 +681,7 @@ static void InterpolateParticles(float alpha)
 			sourcesSeen++;
 
 			const int count = min(src.particleCount, NLPartMaxParticles);
+			poolSlots += count;
 			for (int i = 0; i < count; i++)
 			{
 				auto* particle = reinterpret_cast<NLPartParticle*>(
@@ -711,8 +717,16 @@ static void InterpolateParticles(float alpha)
 	Debug.carDispLag = std::sqrt(CarDispLag.x * CarDispLag.x
 		+ CarDispLag.y * CarDispLag.y + CarDispLag.z * CarDispLag.z);
 #else
-	(void)sourcesSeen; (void)moved; (void)lastShift;
+	(void)sourcesSeen; (void)lastShift;
 #endif
+
+	const auto perfEnd = std::chrono::steady_clock::now();
+	const auto perfUs = static_cast<std::uint64_t>(
+		std::chrono::duration_cast<std::chrono::microseconds>(
+			perfEnd - perfStart).count());
+	OutRunVR::PerfHitch::NoteParticleInterpolation(
+		perfUs, static_cast<std::uint64_t>((std::max)(0, poolSlots)),
+		static_cast<std::uint64_t>((std::max)(0, moved)));
 }
 
 // --- Heart Attack mission sprites (hit the ghosts etc) ---
