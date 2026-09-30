@@ -1,0 +1,130 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00340-p00212-producer-material-fallback-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
+  "wave_id": "P00212",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T05:58:43+09:00",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_A_MOD3_ZERO_RUNNABLE_COMPLETION_TIER_INDEX231_CURRENT_SCHEMA16_SINGLE_DDS_MANIFEST_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD/schema16 selection after authoritative C173/Q00071 Gate PASS finds no A-owned runnable completion tier. A candidate-bearing indices159/198/201 and recent A producer material are QA-pending and are not repeated; B-owned index133 render-ready, index61 rework and index232 candidate are not stolen. Fallback step 3 standardizes production-complete index231/EBE401C8's schema1 A00245 isolation input into a current schema16 manifest. Exact C156 source/candidate/static-QA fingerprints are unchanged and heavy QA is reused. No DDS/shared state/build/runtime validation is performed.",
+  "selection": {
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00337",
+    "latest_automation_validated_c_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "latest_c_gate_run_id": 36775721143,
+    "latest_c_gate_conclusion": "success",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_qa_pending_not_repeated": [
+      12,
+      51,
+      102,
+      111,
+      195
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      54,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "production_complete_not_rerendered": [
+      51,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "cross_lane_render_ready_not_stolen": [
+      133
+    ],
+    "cross_lane_rework_not_stolen": [
+      61
+    ],
+    "cross_lane_candidate_qa_not_stolen": [
+      232
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX231_CURRENT_SCHEMA16_SINGLE_DDS_ISOLATION_MANIFEST",
+    "manifest": "localization/validation/single_dds/P00212_A00340_EBE401C8.json",
+    "candidate_dds_modified": false,
+    "candidate_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594",
+    "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "prior_static_qa": "C156/Q00054 STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "prior_legacy_isolation": "A00245/P00133 schema1 DDS_ONLY isolation manifest",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "new_executable_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00340-P00212/A00340_P00212_INDEX231_CURRENT_WORKFLOW_ISOLATION.json",
+    "localization/validation/single_dds/P00212_A00340_EBE401C8.json",
+    "localization/validation/single_dds/P00133_A00245_EBE401C8.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00240.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00337.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "9e3bffc574a294d1d69946ae41d3630056ff58c8",
+    "latest_c_record_blob_sha": "5beb5b33fa57b191d8ffa21799674ca783fafae0",
+    "legacy_isolation_manifest_blob_sha": "1ec5b32906aa269aba2ae6193464fca0ff3c12f8",
+    "legacy_isolation_task_blob_sha": "d3195a792a1729be992f51967e763727f339b2be",
+    "c156_task_blob_sha": "30241d8536679ce18cd091be4c07f314c30266b1",
+    "source_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+    "candidate_sha256": "ba9e0c73e1e2df798918886c45093e5749566791b7037cd47e24521928552594"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA16__Q00071_GATE_PASS_NO_A_COMPLETION_TIER__NO_QA_PENDING_REPEAT__B_OWNED_133_61_232_NOT_STOLEN__INDEX231_C156_STATIC_PASS_FINGERPRINT_REUSED__LEGACY_SCHEMA1_TO_CURRENT_SCHEMA16_ISOLATION_INPUT__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): standardize index231 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00340]",
+  "durable_task_record_in_result_commit": true,
+  "base_head_sha": "6d647f5f23e4b95b72d5697071215686a2862414",
+  "precommit_refresh": {
+    "head_sha": "6d647f5f23e4b95b72d5697071215686a2862414",
+    "head_message": "chore(localization): record Q00071 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00337] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "No newer branch commit was present at the initial write-preparation refresh. Only A00340 lane-local report/manifest/task-record paths are planned."
+  }
+}
