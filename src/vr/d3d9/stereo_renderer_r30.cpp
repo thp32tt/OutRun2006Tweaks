@@ -3218,4 +3218,41 @@ namespace OutRunVRStereo
     {
         ++R30ScreenSpaceFovDraws;
     }
+
+    HRESULT LowerDrawPrimitive(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT startVertex, UINT primitiveCount) noexcept
+    {
+        return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+            device, type, startVertex, primitiveCount);
+    }
+
+    HRESULT LowerDrawIndexedPrimitive(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount) noexcept
+    {
+        return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(
+            device, type, baseVertexIndex, minVertexIndex,
+            numVertices, startIndex, primitiveCount);
+    }
+
+    HRESULT LowerDrawPrimitiveUP(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT primitiveCount, const void* data, UINT stride) noexcept
+    {
+        return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+            device, type, primitiveCount, data, stride);
+    }
+
+    HRESULT LowerDrawIndexedPrimitiveUP(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride) noexcept
+    {
+        return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(
+            device, type, minVertexIndex, numVertices, primitiveCount,
+            indexData, indexFormat, vertexData, stride);
+    }
 }
