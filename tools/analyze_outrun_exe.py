@@ -241,6 +241,43 @@ def find_calls(pe: PE) -> list[dict]:
     return found
 
 
+def collect_raw_rel32_call_candidates(
+    pe: PE, start_rva: int, size: int = 24
+) -> list[dict]:
+    """Decode raw E8 rel32 candidates from an exact byte window.
+
+    This is intentionally a byte-level candidate census, not an instruction-
+    boundary proof. A candidate is retained only when its rel32 target lands in
+    a mapped PE section. Later review must establish true instruction alignment
+    and call effect before using it for render ownership.
+    """
+
+    blob = pe.bytes_at_rva(start_rva, size)
+    out: list[dict] = []
+    for offset in range(0, max(0, len(blob) - 4)):
+        if blob[offset] != 0xE8:
+            continue
+        rel = struct.unpack_from("<i", blob, offset + 1)[0]
+        call_rva = start_rva + offset
+        target_rva = (call_rva + 5 + rel) & 0xFFFFFFFF
+        target_section = next(
+            (section.name for section in pe.sections if section.contains_rva(target_rva)),
+            "",
+        )
+        if not target_section:
+            continue
+        out.append(
+            {
+                "call_rva": call_rva,
+                "delta_from_hook": offset,
+                "target_rva": target_rva,
+                "target_section": target_section,
+                "known_target": KNOWN_TARGETS.get(target_rva, ""),
+            }
+        )
+    return out
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -269,6 +306,9 @@ def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
                 "hook_rva": hook_rva,
                 "label": label,
                 "bytes24": pe.bytes_at_rva(hook_rva, 24).hex(" "),
+                "raw_rel32_call_candidates": collect_raw_rel32_call_candidates(
+                    pe, hook_rva, 24
+                ),
                 "previous_known_call": (
                     {
                         "call_rva": prev_call["call_rva"],
@@ -359,8 +399,8 @@ def render_markdown(report: dict) -> str:
         "prove immediate next-draw ownership; guarded hooks remain spacing-only until "
         "a separate review establishes exact adjacency/effect.",
         "",
-        "| Hook RVA | Label | First 24 bytes | Previous known call | Next known call |",
-        "|---:|---|---|---|---|",
+        "| Hook RVA | Label | First 24 bytes | Raw E8 rel32 candidates | Previous known call | Next known call |",
+        "|---:|---|---|---|---|---|",
     ]
     for item in report["guarded_gf_hook_provenance"]:
         prev = item["previous_known_call"]
@@ -373,9 +413,15 @@ def render_markdown(report: dict) -> str:
             f"{hexrva(nxt['call_rva'])} {nxt['target']} (+0x{nxt['delta']:X})"
             if nxt else "-"
         )
+        raw_calls = item["raw_rel32_call_candidates"]
+        raw_text = "<br>".join(
+            f"{hexrva(call['call_rva'])}->{hexrva(call['target_rva'])}"
+            f" [{call['known_target'] or 'unknown'}] {call['target_section']}"
+            for call in raw_calls
+        ) or "-"
         lines.append(
             f"| {hexrva(item['hook_rva'])} | {item['label']} | "
-            f"{item['bytes24']} | {prev_text} | {next_text} |"
+            f"{item['bytes24']} | {raw_text} | {prev_text} | {next_text} |"
         )
 
     lines += [
@@ -488,6 +534,15 @@ def main() -> int:
         print(
             f"gf_hook_provenance=0x{item['hook_rva']:08X} "
             f"prev={prev_text} next={next_text}"
+        )
+        raw_calls = item["raw_rel32_call_candidates"]
+        raw_text = ",".join(
+            f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+            f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+            for call in raw_calls
+        ) or "none"
+        print(
+            f"gf_hook_rel32=0x{item['hook_rva']:08X} candidates={raw_text}"
         )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
