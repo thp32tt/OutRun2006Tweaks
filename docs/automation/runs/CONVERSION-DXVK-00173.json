@@ -1,0 +1,77 @@
+{
+  "task_id": "CONVERSION-DXVK-00173",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "1d622427347876a0a940606be2dd693437eff7d8",
+  "result_sha": "PENDING",
+  "validation_bearing_result_sha": "PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R173_182194_CALL_PROVENANCE",
+  "selection_reason": "CONVERSION-DXVK-00171 completed the independent 0x8BD20 bounded control-flow proof and explicitly left the separate 0x182194 callee untouched. The already-proven 0x2839D aligned rel32 CALL resolves to 0x182194, making a bounded exact-byte provenance capture the highest-priority independent F13 unit that does not require runtime/HMD evidence.",
+  "summary": "PENDING automatic validation. Adds a fail-closed exact-EXE provenance collector for the separate 0x182194 callee reached by the proven 0x2839D call. The collector requires the existing exact predecessor call proof, matching raw inbound rel32 evidence, .text residency, and a complete 96-byte capture. It records raw inbound/outbound rel32 candidates while keeping function-entry identity, callee semantics and render/HUD ownership unresolved.",
+  "evidence": [
+    "Current branch base before task: 1d622427347876a0a940606be2dd693437eff7d8.",
+    "Existing exact continuation proof pins 0x2839D bytes e8 f2 9d 15 00 and decodes the target as 0x00182194.",
+    "Implementation commit 0221acdfb229dece302f30da596e10eac66cf05d adds GF_TARGET_C_HELPER_1_THIRD_CALLEE_RVA=0x00182194, a 96-byte provenance collector, report/stdout output, and fail-closed analyzer return code 22.",
+    "Static-contract commit 20ea1d719e489f798aa9541538e18c8cbfd0a1fc requires the 0x182194 constant, collector/report marker, PASS marker, stdout marker and fail-closed failure marker.",
+    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00173.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "0221acdfb229dece302f30da596e10eac66cf05d",
+      "message": "vr: capture 0x182194 callee provenance [AUTO:CONVERSION-DXVK-00173]",
+      "role": "implementation",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "20ea1d719e489f798aa9541538e18c8cbfd0a1fc",
+      "message": "test: gate 0x182194 provenance capture [AUTO:CONVERSION-DXVK-00173]",
+      "role": "static_contract",
+      "validation_bearing": false,
+      "ci_skip": false
+    }
+  ],
+  "proof_contract": {
+    "call_rva": "0x0002839D",
+    "target_rva": "0x00182194",
+    "probe_len": 96,
+    "expected_status": "EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "UNRESOLVED_CALLEE_BYTES_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "No ScreenHud/world/render ownership is inferred from the call target or captured bytes.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "The collector fails closed unless the prior exact 0x2839D call proof is still PASS, the raw inbound rel32 census includes 0x2839D, target 0x182194 resides in .text, and all 96 bytes are readable."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_8BD20_BOUNDED_CONTROL_FLOW_PROVEN",
+    "after": "PENDING_182194_EXACT_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "0x182194 function-entry identity and instruction/semantic interpretation remain unresolved pending the captured exact bytes. Runtime behavior is not tested.",
+  "next_action": "Wait for exact-SHA automatic validation on the validation-bearing candidate. Do not publish another ordinary same-branch commit until the Backend Conversion Gate completes because cancel-in-progress is enabled.",
+  "validation": {
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  }
+}
