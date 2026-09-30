@@ -138,7 +138,7 @@ namespace OutRunVRStereo
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
-                R22FailClosedReplayState(device, site);
+                FailClosedRasterReplayState(device, site);
                 return drawCall();
             }
 

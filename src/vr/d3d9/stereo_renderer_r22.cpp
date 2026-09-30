@@ -892,4 +892,10 @@ namespace OutRunVRStereo
     {
         R22ResetBaselineTracking();
     }
+
+    void FailClosedRasterReplayState(
+        IDirect3DDevice9* device, const char* site) noexcept
+    {
+        R22FailClosedReplayState(device, site);
+    }
 }
