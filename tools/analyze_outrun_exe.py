@@ -2161,8 +2161,8 @@ def collect_guarded_gf_target_c_helper_1_second_callee_prefix_proof(pe: PE) -> d
     all_bytes_match = all(row["bytes_match"] for row in rows)
     terminal_shape = (
         expected_next == GF_TARGET_C_HELPER_1_SECOND_CALLEE_BODY_END_RVA
-        and rows[-4]["rva"] == 0x0008BD38
-        and rows[-4]["actual_bytes"] == "c3"
+        and rows[-3]["rva"] == 0x0008BD38
+        and rows[-3]["actual_bytes"] == "c3"
         and rows[-1]["rva"] == 0x0008BD3B
         and rows[-1]["actual_bytes"] == "c3"
     )
