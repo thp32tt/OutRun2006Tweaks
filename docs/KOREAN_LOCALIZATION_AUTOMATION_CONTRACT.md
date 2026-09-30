@@ -86,6 +86,13 @@ The controller prompt may be intentionally minimal. The following commands are s
 
 On any of those commands, first fetch the latest `korean-localization-clean`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
+## Controller schema freshness and auxiliary workflow isolation
+- Every initial dispatch, retry, and conversation rollover MUST refresh the latest branch HEAD and `localization/controller_roles.json`. Generated prompts carry the current controller schema version/config blob identity; cached prompts from an older config blob are invalid.
+- Current producer ownership is modulo-3 only: A=0, B=1, E=2. Historical A/B odd-even or two-producer instructions are superseded and MUST NOT be injected into new/retry/rollover prompts.
+- Repository permission checks use the authenticated GitHub connector/API first. Public web-search miss or upstream-only results are never evidence of missing access.
+- `Korean single-DDS isolation payload` is an auxiliary runtime-test artifact workflow. Its failure MUST NOT block A/B/E production or C batch QA and MUST NOT be mapped to GitHub permission denial.
+- A manifest whose candidate is intentionally stored only in the approved current-pipeline Drive area may be retained as runtime-isolation evidence without forcing GitHub Actions to download Drive content. The auxiliary workflow packages only repository-backed candidates and emits a typed skip for external candidates; runtime remains UNTESTED.
+
 ## Controller liveness and GitHub Actions authority
 - A lane in `WAIT_ACTIONS` MUST be driven by the exact GitHub Actions run bound to that lane's task/result commit. Generic workflow-run list/discovery cache is never authoritative after `gate_run.id` is known.
 - Exact run-by-ID polling MUST bypass the generic Actions cache. This prevents a stale cached `queued` or `in_progress` snapshot from pinning a completed run indefinitely.
