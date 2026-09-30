@@ -12,6 +12,7 @@
 
 #include "stereo_renderer_r32.cpp"
 #include "../state/depth_stencil_write_state.hpp"
+#include "../telemetry/depth_stencil_metrics.hpp"
 
 namespace OutRunVRStereo
 {
@@ -41,16 +42,7 @@ namespace OutRunVRStereo
         bool R33FirstDepthStencilCacheLogged = false;
         bool R33FirstResetLifecycleLogged = false;
 
-        struct R33PerfSnapshot
-        {
-            ULONGLONG lastLogMs = 0;
-            std::uint64_t syncs = 0;
-            std::uint64_t hits = 0;
-            std::uint64_t live = 0;
-            std::uint64_t readFail = 0;
-            std::uint64_t resetOk = 0;
-            std::uint64_t resetFail = 0;
-        };
+        using R33PerfSnapshot = OutRunVR::Telemetry::DepthStencilMetrics;
         R33PerfSnapshot R33Perf{};
 
         inline bool R33TelemetryEnabled() noexcept
