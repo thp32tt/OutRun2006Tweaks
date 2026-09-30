@@ -2,6 +2,17 @@
 
 This repository-side protocol matches the four Work scheduled roles. The schedule is external; this file defines durable coordination and ownership.
 
+## User direction override — 2026-09-30
+
+This section supersedes the 2026-09-29 backend-allocation override.
+
+- **DX9Ex on `vr-d3d9ex-focus` is the primary active stabilization/development lane again.**
+- Build the stable DX9Ex VR reference first: correctness, frame-time stability, dense-scene/effect performance telemetry, and regressions are active work.
+- DX11 Native and DXVK remain isolated downstream ports. Proven DX9Ex fixes/architecture/performance findings are carried to them after the DX9Ex behavior is stable enough to serve as the reference.
+- DX12/D3D9On12 remains reference-only unless explicitly reopened.
+- Performance work on DX9Ex is authorized. Instrument first, then optimize from Quest 3/VDXR runtime evidence; CI/build evidence alone must not claim a runtime performance win.
+- Preserve protected USER_RUNTIME_VERIFIED invariants while stabilizing DX9Ex.
+
 ## Backend allocation override — 2026-09-29
 
 This override supersedes older lane-priority statements in this protocol and any stale queue prose that still treats DX9Ex performance or DX12/D3D9On12 as active autonomous development.

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-09-28T13:24:10+09:00",
+  "updatedKst": "2026-09-30T19:12:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 1,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX9Ex remains the protected reference baseline; HUD, performance, DXVK and DX12 are independent parallel development/test tracks and none may block the others.",
+    "primaryBackend": "DX9Ex on vr-d3d9ex-focus is the primary active stabilization/development lane. DX11 Native and DXVK are downstream isolated ports that consume proven DX9Ex fixes after the stable reference is established.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -24,8 +24,8 @@
     "backendReplacementGate": "DXVK/DX12 may be developed, built and HMD-tested in parallel; only promotion to protected/default backend requires Quest3/VDXR parity with R51.",
     "parallelTracks": {
       "HUD": "B/C/D continue exact semantic-lifetime and world-marker work independently.",
-      "PERFORMANCE": "D/C continue dense-scene/frame-budget optimization without waiting for HUD completion.",
-      "DXVK": "A/C/D resume x86 DXVK SAFE compatibility first, then multiview optimization after SAFE evidence.",
+      "PERFORMANCE": "DX9Ex-first dense-scene/effect/frame-budget telemetry and optimization is active; validated findings may then be ported to DX11/DXVK.",
+      "DXVK": "Maintain isolated downstream port work without displacing DX9Ex as the current stabilization source of truth.",
       "DX12": "A/C/D resume D3D9On12 device/resource compatibility and HMD test preparation independently of HUD."
     },
     "pcRunnerAuthorization": {
@@ -398,16 +398,17 @@
     {
       "id": "VR-PERF-COMMON-001",
       "priority": 13,
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "preferredRole": "D_INTEGRATION_PLANNER",
-      "summary": "Create a common frame-budget telemetry and optimization lane covering game-thread producer fence wait, host copy/fence wait, draw amplification, capture/commit copy, render and xrEndFrame timing across backends.",
+      "summary": "DX9Ex-first frame-budget telemetry: correlate frame-time spikes with draw/primitive amplification, alpha/particle-like effect load, game-thread producer fence wait, host copy/fence wait, capture/render and xrEndFrame timing; port proven findings downstream to DX11/DXVK.",
       "testLevel": "LEVEL0",
       "dependencies": [],
       "attempts": 0,
       "runtimeCandidate": false,
       "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence.",
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "nextAction": "Collect Quest3/VDXR logs in dense-building and sand/smoke/spray scenes. Compare FRAME SPIKE workload fields against normal windows before changing rendering or synchronization policy."
     },
     {
       "id": "L1-VIS-002",
@@ -423,7 +424,7 @@
     {
       "id": "DX9EX-PERF-PRODUCER-FENCE-001",
       "priority": 8,
-      "status": "NEED_HMD_TEST",
+      "status": "IN_PROGRESS",
       "preferredRole": "C_PERF_REVIEW",
       "summary": "DirectGPU producer path issues D3D9 EVENT GetData(D3DGETDATA_FLUSH) then polls GetData with SwitchToThread up to ProducerFenceBudgetMs=2 on the game thread; quantify wait cost before changing synchronization semantics.",
       "testLevel": "LEVEL2",
@@ -436,20 +437,21 @@
       "candidateSha": "2d96a3117a6057bf66b7415c9cda959d80834fd5",
       "validationRunId": 36008667500,
       "validationResult": "BUILD_VERIFIED",
-      "nextAction": "Run D_PERF and use fenceSamples/fencePolls/fenceAvgUs/fenceMaxUs to decide whether producer wait is a real frame-time bottleneck."
+      "nextAction": "Use integrated per-frame fenceWaitUs/fencePolls together with FRAME SPIKE workload fields to determine whether DirectGPU producer waits correlate with dense-scene or particle-like stutters."
     },
     {
       "id": "L2-PERF-001",
       "priority": 12,
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "preferredRole": "C_PERF_REVIEW",
-      "summary": "Cross-backend frame-pacing optimization: quantify R29+ draw amplification, producer/consumer waits, copies and XR pacing without waiting for all visual cleanup. Correctness invariants remain hard gates.",
+      "summary": "DX9Ex frame-pacing optimization: quantify dense-scene draw/primitive amplification, alpha/particle-like workload, producer/consumer waits, copies and XR pacing while correctness invariants remain hard gates.",
       "testLevel": "LEVEL2",
       "dependencies": [],
       "attempts": 0,
       "runtimeCandidate": true,
       "parallelIndependent": true,
-      "blockedByHud": false
+      "blockedByHud": false,
+      "nextAction": "Runtime-log dense buildings and sand/smoke/spray transitions; optimize only after the spike telemetry identifies the dominant workload or wait source."
     },
     {
       "id": "L1-RECENTER-001",
