@@ -915,4 +915,9 @@ namespace OutRunVRStereo
     {
         return R22InstallState.load(std::memory_order_acquire);
     }
+
+    bool PrimeTrackedRasterShadow(IDirect3DDevice9* device) noexcept
+    {
+        return R22PrimeShadowState(device);
+    }
 }

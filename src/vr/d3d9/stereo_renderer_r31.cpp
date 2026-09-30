@@ -27,6 +27,8 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../lifecycle/frame_accounting.hpp"
 #include "../state/depth_target_state.hpp"
+#include "../state/raster_shadow_api.hpp"
+#include "../lifecycle/frame_lifecycle.hpp"
 #include "../game/renderer_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "../render/eye_tail_cache.hpp"
@@ -132,9 +134,10 @@ namespace OutRunVRStereo
         bool R31GetSavedViewport(IDirect3DDevice9* device,
             D3DVIEWPORT9& viewport) noexcept
         {
-            if (R22ShadowState.Valid())
+            const auto shadow = GetTrackedRasterShadow();
+            if (shadow.Valid())
             {
-                viewport = R22ShadowState.viewport;
+                viewport = shadow.viewport;
                 return true;
             }
             return device && SUCCEEDED(device->GetViewport(&viewport));
@@ -165,9 +168,8 @@ namespace OutRunVRStereo
             if (OutRunVR::State::StateBlockTracker::Reliable())
                 return;
             ResetCachedEffectState();
-            R22ShadowState = {};
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
+            InvalidateTrackedRasterShadow();
+            ResetRasterSampleHistory();
         }
 
         bool R31PrepareEyeTailCache(
@@ -741,9 +743,8 @@ namespace OutRunVRStereo
             R31BlockCurrentVerifiedGeneration();
             OutRunVRRenderer::InvalidateRendererStateAfterExternalRestore();
             ResetCachedEffectState();
-            R22ShadowState = {};
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
+            InvalidateTrackedRasterShadow();
+            ResetRasterSampleHistory();
             R31EyeCache.valid = false;
             OutRunVR::State::StateBlockTracker::RequireResync();
         }
@@ -753,7 +754,7 @@ namespace OutRunVRStereo
             if (!device || !OutRunVR::State::StateBlockTracker::ConsumeResync())
                 return;
             R31ResynchronizeShaderEpoch(device);
-            if (!R22PrimeShadowState(device))
+            if (!PrimeTrackedRasterShadow(device))
             {
                 OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
