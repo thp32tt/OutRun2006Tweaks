@@ -1,0 +1,359 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-c161-q00059-four-input-independent-batch-qa-current-policy-reconciliation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00275",
+  "wave_id": "Q00059",
+  "qa_batch_id": "Q00059",
+  "run": "C161",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T20:00:00+09:00",
+  "base_head_sha": "b1ec654040382cdef5b87ed851d159ff3748969f",
+  "base_sha": "b1ec654040382cdef5b87ed851d159ff3748969f",
+  "commit_mode": "VALIDATION_BEARING_RESULT",
+  "result": "PASS_Q00059_BATCH_WITH_B00267_PASS_B00268_B00269_A00265_REWORK_REQUIRED_RUNTIME_UNTESTED",
+  "summary": "Q00059 consumes four immutable producer results in one independent batch. B00267@index130 PASSes its exact DDS_ONLY isolation input by reusing unchanged C138 static-QA evidence. B00268@index97 is REWORK_REQUIRED because the exact current candidate fails current source-style/slant fidelity and includes flattened-raster Lanczos repair. B00269@index121 is REWORK_REQUIRED because current C85 evidence for the same candidate has 19 exact source-bbox failures. A00265@index51 is REWORK_REQUIRED because the current candidate retains the source-faithful/artifact blocker and flattened-raster shrink behavior forbidden by v2. No candidate DDS is rewritten; shared state is reconciled once; runtime remains UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00267",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "57f10477f8c3655b17bd9b1c63df653697d46cdd",
+      "result_message": "localization(B): add index130 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00267]",
+      "completed_at": "2026-09-30T19:08:47.195729+09:00",
+      "producer_id": "P00153",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00268",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "fe8a7742793be940554ea05eaa8929a4cd6227c3",
+      "result_message": "localization(B): add index97 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00268]",
+      "completed_at": "2026-09-30T19:16:03.452653+09:00",
+      "producer_id": "P00154",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00269",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "d8a1e66f7d636aef9f2020412e21ea6ab01947ce",
+      "result_message": "localization(B): add index121 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00269]",
+      "completed_at": "2026-09-30T19:18:15.715552+09:00",
+      "producer_id": "P00155",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00265",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "4f306e210eabb3900192ca7bd413c06e065ae744",
+      "result_message": "localization(A): add index51 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00265]",
+      "completed_at": "2026-09-30T19:30:47.581232+09:00",
+      "producer_id": "P00151",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00267",
+      "result_sha": "57f10477f8c3655b17bd9b1c63df653697d46cdd",
+      "status": "PASS",
+      "reason": "Index130/1762489B DDS_ONLY isolation input PASS. Current HEAD retains exact candidate Git blob 905f0d05... / SHA-256 823c7691... and the shared queue retains C138 STATIC_QA_PASS_RUNTIME_UNTESTED. Exact canonical source c64baefa..., RGBA32 2048x512 mip1/header, FLIP_Y, 5/5 semantics, CLEAN_PLATE/removal-mask evidence, zero outside-safe/source/alpha violations, protected marker and source-vs-Korean visual findings are unchanged. Heavy QA is reused; runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00268",
+      "result_sha": "fe8a7742793be940554ea05eaa8929a4cd6227c3",
+      "status": "REWORK_REQUIRED",
+      "reason": "Index97/411827E current candidate Git blob 34dd3b33... / SHA-256 5e769227... is unchanged and A00004 containment/header evidence is internally consistent, but independent current-policy English-source comparison fails source-style fidelity: TUNED/NORMAL/RANDOM source lettering is visibly right-slanted/condensed while current Korean lettering is materially upright/rounder, and the seconds repair records localized_patch_minimal_lanczos. Current v2/source-style rules require source-faithful signed slant/weight/effects and forbid shrinking/resampling a flattened lettering raster. Fresh native rerender plus decoded-final C QA is required; runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00269",
+      "result_sha": "d8a1e66f7d636aef9f2020412e21ea6ab01947ce",
+      "status": "REWORK_REQUIRED",
+      "reason": "Index121/FD90AA9 isolation manifest points to unchanged current candidate Git blob 066dd5b3... / SHA-256 72cbf2cc..., but current strict evidence is REWORK_REQUIRED. C85 evaluated this exact fingerprint as RGBA32 4096x4096 mip1/header-correct yet found 19/29 localized elements outside exact source bboxes; current queue plus A00014/C89 retain the source-faithful exact-bbox/collateral blocker. Historical C82 acceptance is stale under the current zero-pixel gate. Rebuild and repeat decoded-final QA; runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00265",
+      "result_sha": "4f306e210eabb3900192ca7bd413c06e065ae744",
+      "status": "REWORK_REQUIRED",
+      "reason": "Index51/FF2462BB isolation manifest points to unchanged current candidate Git blob f3a1b785... / SHA-256 f3210736.... A_AUTO_00001 reports zero outside/collateral/alpha escape after containment repair, but several edits use minimal_lanczos_fit/shrink/trim behavior and the current proof shows the START/GOAL family materially reduced relative to source. A00014/C89 retain the source-faithful rerender/artifact blocker. Current v2 forbids flattened-raster shrink/resample. Native source-faithful rerender and fresh C QA are required; runtime remains UNTESTED."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926",
+    "b00267_isolation_blob_sha": "6fceba26a7543a9187e9583e55046dd5dd240f06",
+    "b00268_isolation_blob_sha": "b52a757a517ad14d1954782d07636c40f0781f90",
+    "b00269_isolation_blob_sha": "a3160f3c78b2f74ff7da85bc23415514a424553b",
+    "a00265_isolation_blob_sha": "404f088e67d0197fe33377ccee34e0e1ea739102",
+    "index130_review_qa_blob_sha": "0614bfb2ebfa7c5d598f70d81f9aff2dc0a803ea",
+    "index97_a00004_report_blob_sha": "b6d752d3d890c98a70280647c5af1229de4b34f7",
+    "index51_a_auto_report_blob_sha": "43b11d5aa4649f7db7138c97688e8304f5aafbcc",
+    "current_c85_report_blob_sha": "1d28abd16cce18f15f999d4e390ad3c04b440f8a",
+    "a00014_blocker_blob_sha": "cad67fc5d7138d11be557d8df84e6693eb367b25",
+    "c89_barrier_blob_sha": "d95541edaaf79ee0d22318277b8e8f876ac83e2a",
+    "index130_source_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+    "index130_candidate_sha256": "823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8",
+    "index97_source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "index97_candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+    "index121_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "index121_candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "index51_source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "index51_candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb"
+  },
+  "policy_delta_review": {
+    "prior_q00058_orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926",
+    "current_orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926",
+    "policy_changed_since_q00058": false,
+    "current_rules_applied": [
+      "zero-pixel exact-source containment",
+      "mandatory English-source comparison",
+      "source-faithful signed-slant/style preservation",
+      "v2 no flattened-raster shrink/resample",
+      "DDS/header/mipmap/alpha/orientation/protected-art preservation"
+    ]
+  },
+  "independent_replay": {
+    "index130": {
+      "asset": "1762489B",
+      "source_candidate_unchanged": true,
+      "reused_from": "C138/Q00036 0128225e60b537b325aa047fafbc58e53c604b07 / Gate 36607542193",
+      "heavy_qa_repeated": false,
+      "package_mode": "DDS_ONLY",
+      "runtime_isolation_manifest_accepted": true,
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    "index97": {
+      "asset": "411827E",
+      "source_candidate_unchanged": true,
+      "reused_structure_containment_self_qa": true,
+      "heavy_pixel_qa_repeated": false,
+      "independent_current_candidate_visual_review": true,
+      "current_policy_result": "REWORK_REQUIRED_SOURCE_STYLE_SLANT_AND_FLATTENED_RASTER_RESAMPLE",
+      "runtime_isolation_manifest_accepted": false,
+      "production_readiness": "REWORK_REQUIRED_CURRENT_POLICY_SOURCE_STYLE",
+      "runtime_validation": "UNTESTED"
+    },
+    "index121": {
+      "asset": "FD90AA9",
+      "source_candidate_unchanged": true,
+      "reused_current_c85_failure_evidence": true,
+      "heavy_qa_repeated": false,
+      "current_strict_failed_elements": 19,
+      "current_policy_result": "REWORK_REQUIRED_ZERO_PIXEL_EXACT_SOURCE_BBOX_AND_COLLATERAL",
+      "runtime_isolation_manifest_accepted": false,
+      "production_readiness": "REWORK_REQUIRED_ZERO_PIXEL_OR_ARTIFACT",
+      "runtime_validation": "UNTESTED"
+    },
+    "index51": {
+      "asset": "FF2462BB",
+      "source_candidate_unchanged": true,
+      "reused_a_auto_containment_self_qa": true,
+      "reused_a00014_c89_current_blocker": true,
+      "heavy_qa_repeated": false,
+      "independent_current_candidate_visual_review": true,
+      "current_policy_result": "REWORK_REQUIRED_SOURCE_STYLE_ARTIFACT_AND_FLATTENED_RASTER_RESAMPLE",
+      "runtime_isolation_manifest_accepted": false,
+      "production_readiness": "REWORK_REQUIRED_SOURCE_STYLE_ARTIFACT",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "reviewed_assets": [
+    {
+      "index": 130,
+      "asset": "1762489B",
+      "disposition": "PASS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Use the accepted exact DDS_ONLY isolation input for isolated real-game validation; do not rerender unchanged content."
+    },
+    {
+      "index": 97,
+      "asset": "411827E",
+      "disposition": "REWORK_REQUIRED",
+      "production_readiness": "REWORK_REQUIRED_CURRENT_POLICY_SOURCE_STYLE",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Build/verify current CLEAN_PLATE and natively rerender from measured source style/effects, preserving right-slant where present; no flattened-raster shrink; then fresh decoded-final C QA."
+    },
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "disposition": "REWORK_REQUIRED",
+      "production_readiness": "REWORK_REQUIRED_ZERO_PIXEL_OR_ARTIFACT",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Reconstruct failing elements source-faithfully so all effect-inclusive Korean bboxes are within exact source-permitted regions with zero collateral/alpha/protected damage; then fresh C QA."
+    },
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "disposition": "REWORK_REQUIRED",
+      "production_readiness": "REWORK_REQUIRED_SOURCE_STYLE_ARTIFACT",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Rerender natively from source lettering/effect parameters under v2, replacing flattened-raster shrink/trim repairs; then fresh exact containment and English-source visual QA."
+    }
+  ],
+  "concurrent_head_reconciliation": {
+    "observed_head": "b1ec654040382cdef5b87ed851d159ff3748969f",
+    "index51_superseded": false,
+    "index97_superseded": false,
+    "index121_superseded": false,
+    "index130_superseded": false,
+    "note": "The refreshed merge HEAD includes newer out-of-batch B00274@index163 review/candidate evidence only; the four Q00059 batch candidate/source fingerprints remain unchanged and are not superseded.",
+    "out_of_batch_newer_inputs": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+        "index": 94,
+        "asset": "2DA43E41",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00059"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00273",
+        "index": 94,
+        "asset": "2DA43E41",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00059"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00271",
+        "index": 111,
+        "asset": "C075FB49",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00059"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00274",
+        "index": 163,
+        "asset": "59A79158",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00059"
+      },
+      {
+        "task_id": "OUT_OF_BATCH_EXISTING",
+        "index": 226,
+        "asset": "E3F4BA07",
+        "status": "QA_PENDING_RUNTIME_ISOLATION"
+      },
+      {
+        "task_id": "OUT_OF_BATCH_EXISTING",
+        "index": 231,
+        "asset": "EBE401C8",
+        "status": "QA_PENDING_RUNTIME_ISOLATION"
+      }
+    ]
+  },
+  "readiness_reconciliation": {
+    "production_readiness": {
+      "51": "REWORK_REQUIRED_SOURCE_STYLE_ARTIFACT",
+      "97": "REWORK_REQUIRED_CURRENT_POLICY_SOURCE_STYLE",
+      "111": "PREFLIGHT_ONLY",
+      "121": "REWORK_REQUIRED_ZERO_PIXEL_OR_ARTIFACT",
+      "130": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "163": "QA_PENDING_OUT_OF_BATCH_B00274_V2_CANDIDATE"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_rework_indices": [
+      51,
+      97,
+      121
+    ],
+    "candidate_qa_pending_indices": [
+      159,
+      163,
+      198,
+      201
+    ],
+    "preflight_only_actionable_indices": [
+      111,
+      133,
+      232
+    ],
+    "preflight_only_dependency_blocked_indices": [
+      175,
+      217,
+      135
+    ],
+    "static_qa_pass_runtime_untested_indices": [
+      99,
+      102,
+      112,
+      130,
+      152,
+      193,
+      195,
+      222,
+      226,
+      231,
+      237
+    ],
+    "runtime_isolation_ready_indices": [
+      99,
+      102,
+      112,
+      130,
+      193,
+      237
+    ],
+    "runtime_isolation_qa_pending_indices": [
+      94,
+      226,
+      231
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: none.",
+      "ONE_STAGE_TO_RENDER: none.",
+      "CANDIDATE_REWORK: indices51/FF2462BB, 97/411827E and 121/FD90AA9 remain ahead of unrelated preflight; native source-faithful/current-v2 rebuild is required before runtime promotion.",
+      "QA_BACKLOG: candidate-bearing indices159/198/201 plus out-of-batch B00274@index163 current-v2 candidate remain ahead of unrelated preflight; B00274 is QA_PENDING and is not implicitly approved by Q00059.",
+      "PREFLIGHT_ONLY: index111/C075FB49 keeps C160-accepted source style/slant evidence; newer A00271 protected-art registration is out-of-batch QA_PENDING. Indices133/232 follow candidate completion.",
+      "STATIC_QA: index130/1762489B retains C138 STATIC_QA_PASS_RUNTIME_UNTESTED and Q00059 accepts its exact DDS_ONLY isolation input; indices112/193 retain prior accepted fingerprints.",
+      "RUNTIME_ISOLATION: accepted indices99/102/112/130/193/237. Out-of-batch index94 plus indices226/231 remain QA_PENDING. Q00059 does not accept stale candidates 51/97/121 for runtime promotion.",
+      "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; do not reprobe until dependency/fingerprint changes.",
+      "Q00059 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_CURRENT_POLICY_RECONCILIATION_AND_SINGLE_SHARED_STATE_MERGE",
+    "reviewed_inputs": 4,
+    "reviewed_assets": 4,
+    "producer_inputs_pass": 1,
+    "producer_inputs_rework_required": 3,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "new_static_artwork_passes": 0,
+    "withdrawn_prior_static_artwork_passes": 0,
+    "new_pre_generation_passes": 0,
+    "new_runtime_isolation_inputs_accepted": 1,
+    "new_runtime_approvals": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 755,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 67,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00275.json",
+    "role_c_report": "localization/graphics/role_C/202609302000-C161/C161_Q00059_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "Index130 reuses unchanged authoritative C138 heavy QA. Index121 reuses current exact-fingerprint C85 REWORK evidence. Index51 reuses A_AUTO containment plus current A00014/C89 blocker and reviews its exact visual proof only for the source-style/v2 conflict. Index97 reuses A00004 structure/containment and independently reviews the exact current English-source comparison for source-style/v2 failure.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_gate": null,
+  "bookkeeping_note": "RESULT_SHA and authoritative Gate metadata are populated only after the immutable C AUTO result commit is created and its single Localization Automation Gate completes. Runtime remains UNTESTED."
+}

@@ -2004,3 +2004,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-completion order remains **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate rework 163 -> candidate QA 159/198/201 -> PREFLIGHT_ONLY 111/133/232**. Pending production **67**, actionable **93**, canonical segments **755**.
 - Concurrent producer B00273 advanced branch HEAD after the validation-bearing C result; this bookkeeping commit is based on that newer HEAD and does not overwrite producer payload. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
+## 2026-09-30 20:00 KST - C161 Q00059 independent batch QA
+- Immutable inputs: B00267 `57f10477...` index130, B00268 `fe8a7742...` index97, B00269 `d8a1e66f...` index121, A00265 `4f306e21...` index51. Dispositions: **PASS / REWORK_REQUIRED / REWORK_REQUIRED / REWORK_REQUIRED**; none is superseded at merge base `b1ec6540`.
+- Index130/1762489B: unchanged C138 static-QA fingerprint reused; DDS_ONLY isolation input **PASS**. Runtime **UNTESTED**.
+- Index97/411827E: exact current A00004 candidate remains bbox/header-consistent, but English-source comparison fails source-style/slant fidelity and the seconds repair uses flattened-raster Lanczos scaling. **REWORK_REQUIRED**.
+- Index121/FD90AA9: exact current candidate has **19/29** C85 exact source-bbox failures and the source-faithful/collateral blocker remains current. **REWORK_REQUIRED**.
+- Index51/FF2462BB: current candidate retains the A00014/C89 source-faithful/artifact blocker; A_AUTO uses flattened-raster shrink/Lanczos on START-family repairs. **REWORK_REQUIRED**.
+- Current HEAD also contains newer out-of-batch B00274@index163 v2 candidate evidence; it remains **QA_PENDING**, not implicitly approved. Order: **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate rework 51/97/121 -> candidate QA 159/163/198/201 -> PREFLIGHT_ONLY 111/133/232**. Runtime isolation accepted: **99/102/112/130/193/237**. Pending production **67**, actionable **93**, canonical segments **755**.
+- No runtime test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

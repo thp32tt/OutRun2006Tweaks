@@ -1404,3 +1404,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate-completion order remains **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate rework 163 -> candidate QA 159/198/201 -> PREFLIGHT_ONLY 111/133/232**. Pending production **67**, actionable **93**, canonical segments **755**.
 - Concurrent producer B00273 advanced branch HEAD after the validation-bearing C result; this bookkeeping commit is based on that newer HEAD and does not overwrite producer payload. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
+### C161 Q00059 — 2026-09-30 20:00 KST
+- B00267 `57f10477...`, B00268 `fe8a7742...`, B00269 `d8a1e66f...`, A00265 `4f306e21...` — dispositions **PASS / REWORK_REQUIRED / REWORK_REQUIRED / REWORK_REQUIRED**.
+- Index130/1762489B keeps **STATIC_QA_PASS_RUNTIME_UNTESTED** and its exact DDS_ONLY isolation input is accepted. Index97/411827E fails source-style/slant + flattened-raster repair; index121/FD90AA9 retains 19 current exact-bbox failures; index51/FF2462BB retains source-faithful/artifact + flattened-raster shrink blocker.
+- Newer B00274@index163 v2 candidate is out-of-batch **QA_PENDING**. Shared order: **RENDER_READY none -> ONE_STAGE_TO_RENDER none -> candidate rework 51/97/121 -> candidate QA 159/163/198/201 -> PREFLIGHT_ONLY 111/133/232**. Runtime isolation accepted: **99/102/112/130/193/237**.
+- Pending production **67**, actionable **93**, canonical segments **755**. Q00059 owns one C-batch Gate; `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
