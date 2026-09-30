@@ -219,6 +219,12 @@ GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_INSTRUCTIONS = (
     (0x000284DB, "8b 4c 24 18", "mov ecx, [esp+0x18]"),
 )
 
+# R147/F13: bounded exact-EXE provenance capture for the first callee reached by
+# helper 0x28460's proven success path. Raw bytes/call candidates are evidence
+# only; callee semantics and render ownership remain unresolved.
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_RVA = 0x000282B0
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_PROBE_LEN = 96
+
 
 # Mirrors the canonical producer catalog in
 # src/vr/game/disasm_render_contract.hpp. Keep this Python representation
@@ -566,6 +572,76 @@ def collect_guarded_gf_target_c_helper_1_provenance(pe: PE) -> dict:
         ),
         "raw_outbound_rel32_candidates": collect_raw_rel32_call_candidates(
             pe, target_rva, GF_TARGET_C_HELPER_PROBE_LEN
+        ),
+        "semantic_effect": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_first_callee_provenance(pe: PE) -> dict:
+    """Capture bounded raw provenance for helper 0x28460's first proven callee.
+
+    The preceding success-prefix proof already establishes the aligned
+    0x284BC -> 0x282B0 edge. This collector adds exact-EXE bytes plus raw
+    inbound/outbound rel32 candidates for 0x282B0 without inferring callee
+    semantics or render ownership.
+    """
+
+    predecessor = collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_FIRST_CALLEE_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(target_rva):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            target_rva - text_section.virtual_address,
+        )
+
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_FIRST_CALLEE_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_FIRST_CALLEE_PROBE_LEN
+    )
+    caller_link_present = any(
+        item["call_rva"] == GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_RVA
+        for item in inbound
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN"
+        and predecessor["first_call_target_rva"] == target_rva
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and caller_link_present
+        and len(probe) == GF_TARGET_C_HELPER_1_FIRST_CALLEE_PROBE_LEN
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "function_start_guess_rva": function_start_guess_rva,
+        "probe_len": GF_TARGET_C_HELPER_1_FIRST_CALLEE_PROBE_LEN,
+        "bytes": probe.hex(" "),
+        "predecessor_status": predecessor["status"],
+        "caller_rva": GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_RVA,
+        "caller_link_present": caller_link_present,
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_FIRST_CALLEE_PROVENANCE_CAPTURED"
+            if captured
+            else "FIRST_CALLEE_PROVENANCE_CAPTURE_FAILED"
         ),
         "semantic_effect": "UNRESOLVED",
         "ownership_effect": "NONE",
@@ -1638,6 +1714,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_provenance": collect_guarded_gf_target_c_helper_1_provenance(pe),
         "guarded_gf_target_c_helper_1_prefix_proof": collect_guarded_gf_target_c_helper_1_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_success_prefix_proof": collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_first_callee_provenance": collect_guarded_gf_target_c_helper_1_first_callee_provenance(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -1834,6 +1911,28 @@ def main() -> int:
         f"callee_semantics={helper_1_success['callee_semantics']} "
         f"ownership_effect={helper_1_success['ownership_effect']}"
     )
+    helper_1_callee = report["guarded_gf_target_c_helper_1_first_callee_provenance"]
+    helper_1_callee_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_callee["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_first_callee=0x{helper_1_callee['target_rva']:08X} "
+        f"status={helper_1_callee['status']} "
+        f"predecessor_status={helper_1_callee['predecessor_status']} "
+        f"caller=0x{helper_1_callee['caller_rva']:08X} "
+        f"caller_link={helper_1_callee['caller_link_present']} "
+        f"section={helper_1_callee['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1_callee['function_start_guess_rva'])} "
+        f"probe_len={helper_1_callee['probe_len']} "
+        f"inbound_raw={len(helper_1_callee['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_callee['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_callee_outbound} "
+        f"semantic_effect={helper_1_callee['semantic_effect']} "
+        f"ownership_effect={helper_1_callee['ownership_effect']} "
+        f"bytes={helper_1_callee['bytes']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -1865,6 +1964,9 @@ def main() -> int:
     if helper_1_success["status"] != "EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN":
         print("guarded_gf_target_c_helper_1_success_prefix_proof=FAILED")
         return 8
+    if helper_1_callee["status"] != "EXACT_EXE_FIRST_CALLEE_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_first_callee_provenance=FAILED")
+        return 9
     return 0
 
 

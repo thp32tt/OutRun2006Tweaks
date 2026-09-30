@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00147",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "df5f54d466eae175409199db334f935f3f4d5b4c",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R147_HELPER_282B0_PROVENANCE",
+  "selection_reason": "Current DXVK promotion/performance gates require Quest 3/VDXR runtime evidence and are not executable in automation. CONVERSION-DXVK-00145 explicitly left first-callee 0x282B0 semantics unresolved and named separate exact callee analysis as an independent next step. This task captures only bounded exact-EXE provenance for that first callee so a later proof can pin instruction/control-flow semantics without speculative runtime tuning.",
+  "summary": "Add a bounded exact-EXE provenance capture for helper 0x28460 first callee 0x282B0. The analyzer records a 96-byte window, .text/function-start context, raw inbound/outbound rel32 candidates, and verifies the already-proven 0x284BC caller link. Callee semantics and render/ScreenHud ownership remain unresolved.",
+  "evidence": [
+    "CONVERSION-DXVK-00145 validation-bearing result f1fad531f8dee31909a4550743188e9282e742d3 proved the aligned 0x284BC->0x282B0 call and explicitly left callee semantics UNRESOLVED.",
+    "DXVK status reconciliation says remaining promotion/performance gates require exact-build Quest 3/VDXR evidence; this task therefore avoids speculative renderer/transport tuning and advances only exact disassembly provenance.",
+    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00147.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the bounded 0x282B0 provenance capture passes, record its exact bytes/call census while keeping semantic_effect=UNRESOLVED and ownership_effect=NONE. A later independent task may pin an instruction-aligned prefix from those captured bytes."
+}
