@@ -1,0 +1,62 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00309-index111-multisource-source-only-reconstruction-coverage-v1",
+  "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "donor53_member": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+  "donor53_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+  "coordinate_space": "readable/display after raw mirror_y -> flip_y",
+  "purpose": "Quantify exact source-only clean-background coverage for the three panel-connected index111 elements before constructing CLEAN_PLATE bytes. No Korean/candidate pixels used.",
+  "method": "Map clean English HD sibling/donor pixels into target proposal scopes only when the mapped donor location lies outside that donor text-neighborhood mask; otherwise leave the pixel unresolved. Tuned/Normal may fall back to the aligned sibling target panel only when sibling location is outside sibling text-neighborhood.",
+  "elements": {
+    "tuned_setting": {
+      "label": "tuned_setting",
+      "target_panel_bbox": [35,1211,320,1352],
+      "donor_panel_bbox": [820,860,1143,1079],
+      "donor_to_target_affine": {"sx":0.8823529411764706,"sy":0.6438356164383562,"tx":-688.5294117647059,"ty":657.3013698630136},
+      "proposal_scope_pixels": 13301,
+      "donor_clean_coverage_pixels": 9601,
+      "sibling_clean_coverage_pixels": 11,
+      "covered_total_pixels": 9612,
+      "coverage_ratio": 0.7226524321479588,
+      "unresolved_pixels": 3689,
+      "unresolved_bbox": [100,1218,220,1258],
+      "scope_bbox": [44,1207,220,1305]
+    },
+    "normal_setting": {
+      "label": "normal_setting",
+      "target_panel_bbox": [395,1211,680,1352],
+      "donor_panel_bbox": [1212,861,1535,1080],
+      "donor_to_target_affine": {"sx":0.8823529411764706,"sy":0.6438356164383562,"tx":-674.4117647058824,"ty":656.6575342465753},
+      "proposal_scope_pixels": 14385,
+      "donor_clean_coverage_pixels": 9287,
+      "sibling_clean_coverage_pixels": 1798,
+      "covered_total_pixels": 11085,
+      "coverage_ratio": 0.7705943691345151,
+      "unresolved_pixels": 3300,
+      "unresolved_bbox": [450,1218,555,1258],
+      "scope_bbox": [404,1207,600,1305]
+    },
+    "random": {
+      "label": "random",
+      "target_panel_bbox": [1707,1451,1992,1592],
+      "donor411_panel_bbox": [1605,869,1889,1081],
+      "donor53_panel_bbox": [1145,41,1429,253],
+      "donor411_to_target_affine": {"sx":1.0035211267605635,"sy":0.6650943396226415,"tx":96.34859154929563,"ty":873.0330188679245},
+      "donor53_to_target_affine": {"sx":1.0035211267605635,"sy":0.6650943396226415,"tx":557.9683098591547,"ty":1423.7311320754718},
+      "proposal_scope_pixels": 9606,
+      "donor411_clean_coverage_pixels": 4414,
+      "donor53_clean_coverage_pixels": 0,
+      "covered_total_pixels": 4414,
+      "coverage_ratio": 0.4595044763689361,
+      "unresolved_pixels": 5192,
+      "unresolved_bbox": [1761,1448,1943,1481],
+      "scope_bbox": [1731,1447,1943,1496]
+    }
+  },
+  "aggregate": {"proposal_scope_pixels":37292,"source_covered_pixels":25111,"source_coverage_ratio":0.673361578890915,"unresolved_pixels":12181},
+  "readiness_after": "PREFLIGHT_ONLY_MULTISOURCE_RECONSTRUCTION_COVERAGE_LOCKED__UNRESOLVED_PIXELS_REQUIRE_SOURCE_CONSTRAINED_SYNTHESIS_AND_C_CLEANPLATE_QA",
+  "candidate_dds_authorized": false,
+  "runtime_validation": "UNTESTED"
+}
