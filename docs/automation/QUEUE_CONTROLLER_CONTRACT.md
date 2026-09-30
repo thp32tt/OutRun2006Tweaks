@@ -51,14 +51,14 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - The watchdog MUST actively recover stalled `WAIT_ACTIONS` slots by performing the uncached exact-run refresh. `watchdog_observe_only` is not sufficient for an Actions-wait stall.
 - Conversation rollover remains reserved for stale/missing/expired ChatGPT conversations or missing assistant generation. It is independent from GitHub Actions retry handling.
 - A, B, and E are independent continuous producers. A/B/E durable task commit releases that producer slot immediately and enqueues its exact TASK_ID + result SHA for C; the producer record remains automation-validation PENDING.
-- C consumes the persistent QA backlog independently; C completion or failure never gates A/B dispatch.
+- C consumes the persistent QA backlog independently; C completion or failure never gates A/B/E dispatch.
 
 ## Scope
 - Up to three candidate-modifying production tasks may run concurrently in lanes A, B, and E when their claimed queue indices/assets are disjoint.
 - Lane C may run concurrently as an independent QA consumer, but it reviews immutable producer RESULT_SHAs and MUST NOT rewrite candidate DDS bytes while producers are active. Candidate defects return to the owning A/B/E producer as REWORK_REQUIRED.
 - A/B/E must use stable modulo-3 queue sharding (`asset_queue.index % 3`: A=0, B=1, E=2) as the primary anti-duplication mechanism and must refresh GitHub HEAD immediately before target selection and immediately before commit.
 - If HEAD changed during a run, re-fetch current state and preserve the other lane's committed work. Never overwrite a newer state/report with a stale snapshot.
-- Work stealing across A/B/E shards is disabled while peer production lanes are active concurrently. It is allowed only when the other production lane is confirmed idle/completed and the target is unclaimed after a fresh GitHub check.
+- Work stealing across A/B/E shards is disabled while peer production lanes are active concurrently. It is allowed only when the owning peer production lane is confirmed idle/completed and the target is unclaimed after a fresh GitHub check.
 - A/B/E must not modify shared state files. Their commits are lane-local only; C alone reconciles `resume_state.json`, worklog, progress/status, asset_queue and shared queue summaries for the immutable producer results in its current QA batch.
 - Producer completion is exact-task-commit based, not branch-HEAD based. A/B/E do not wait for Actions on that SHA. C batch validation later verifies each immutable producer SHA listed in QA_BATCH_INPUTS.
 - Keep changes narrowly scoped.
@@ -87,7 +87,7 @@ The current-schema values in `localization/controller_roles.json` are mandatory 
 - Next-task delay: 15 seconds. A/B/E independent-slot stagger follows current `controller_roles.json`; do not pin a historical value.
 - A, B, or E durable commit -> same producer lane next-task target transition: <=30 seconds; it does not wait for an individual Actions Gate, the peer producer, or C.
 - C consumes up to 4 producer results per batch with a 30-second coalesce window; this wait applies only to QA batching and never pauses producers.
-- Localization producer same-slot send gap is 15 seconds and localization slot de-dup is 30 seconds after authoritative terminal completion. Rate-limit backoff 90/180/300/600 seconds begins only after an actual rate-limit signal.
+- Localization producer same-slot send gap and slot de-dup use the current values in `controller_roles.json` after authoritative terminal completion. Rate-limit backoff 90/180/300/600 seconds begins only after an actual rate-limit signal.
 - `active_by_lane` is authoritative. A null top-level active summary is valid only when no lane is nonterminal.
 - Runtime state must expose `queue_loop_heartbeat_at`, `last_scheduler_decision_at`, `last_scheduler_decision`, and `blocked_reason`.
 - Startup/restart must refresh branch HEAD, clear discovery cache, and reconcile every nonterminal lane from exact GitHub state before dispatch.
