@@ -174,8 +174,18 @@ namespace OutRunVRStereo
         std::uint64_t R81LastHitchLogUs = 0;
         std::uint64_t R81SkyGlowUs = 0;
         double R81FrameEmaUs = 0.0;
-        int R81PostHitchFrames = 0;
         std::uint64_t R81HitchCount = 0;
+
+        struct R82PendingHitch
+        {
+            bool active = false;
+            std::uint64_t event = 0;
+            double emaUs = 0.0;
+            double thresholdUs = 0.0;
+            std::array<R81FrameSample, 9> frames{};
+            std::size_t count = 0;
+        };
+        R82PendingHitch R82Pending{};
 
         std::uint64_t R81NowUs() noexcept
         {
@@ -267,18 +277,43 @@ namespace OutRunVRStereo
                 R81FrameHistoryCount + 1, R81FrameHistory.size());
         }
 
-        void R81LogHistory() noexcept
+        void R82CaptureHistory(R82PendingHitch& pending) noexcept
         {
             const std::size_t start =
                 (R81FrameHistoryNext + R81FrameHistory.size() -
                     R81FrameHistoryCount) % R81FrameHistory.size();
-            for (std::size_t i = 0; i < R81FrameHistoryCount; ++i)
+            for (std::size_t i = 0;
+                 i < R81FrameHistoryCount && pending.count < pending.frames.size();
+                 ++i)
             {
-                R81LogFrameSample(
-                    "PRE",
-                    R81FrameHistory[
-                        (start + i) % R81FrameHistory.size()]);
+                pending.frames[pending.count++] =
+                    R81FrameHistory[(start + i) % R81FrameHistory.size()];
             }
+        }
+
+        void R82FlushPendingHitch() noexcept
+        {
+            if (!R82Pending.active || R82Pending.count < R82Pending.frames.size())
+                return;
+
+            spdlog::warn(
+                "VR R82 FRAME HITCH: event={} serial={} frameUs={} emaUs={:.0f} thresholdUs={:.0f}; captured 4 pre + hit + 4 post before log flush",
+                R82Pending.event,
+                R82Pending.frames[4].serial,
+                R82Pending.frames[4].frameUs,
+                R82Pending.emaUs,
+                R82Pending.thresholdUs);
+
+            for (std::size_t i = 0; i < R82Pending.frames.size(); ++i)
+            {
+                const char* phase = i < 4 ? "PRE" : (i == 4 ? "HIT" : "POST");
+                R81LogFrameSample(phase, R82Pending.frames[i]);
+            }
+            R82Pending = {};
+            // The logger is synchronous and flushes every message. Rebase after
+            // the completed dump so diagnostic I/O cannot manufacture the next
+            // measured frame hitch.
+            R81LastPresentEndUs = R81NowUs();
         }
 
         void R81FinishFrame(
@@ -335,25 +370,27 @@ namespace OutRunVRStereo
                 R81LastHitchLogUs == 0 ||
                 frameEndUs - R81LastHitchLogUs >= 500000;
 
-            if (hitch && cooldown)
+            if (hitch && cooldown && !R82Pending.active)
             {
                 ++R81HitchCount;
                 R81LastHitchLogUs = frameEndUs;
-                spdlog::warn(
-                    "VR R81 FRAME HITCH: event={} serial={} frameUs={} emaUs={:.0f} thresholdUs={:.0f}; dumping 4 pre + hit + 4 post frames",
-                    R81HitchCount, sample.serial, sample.frameUs,
-                    baseline, hitchThreshold);
-                R81LogHistory();
-                R81LogFrameSample("HIT", sample);
-                R81PostHitchFrames = 4;
+                R82Pending = {};
+                R82Pending.active = true;
+                R82Pending.event = R81HitchCount;
+                R82Pending.emaUs = baseline;
+                R82Pending.thresholdUs = hitchThreshold;
+                R82CaptureHistory(R82Pending);
+                if (R82Pending.count < R82Pending.frames.size())
+                    R82Pending.frames[R82Pending.count++] = sample;
             }
-            else if (R81PostHitchFrames > 0)
+            else if (R82Pending.active &&
+                     R82Pending.count < R82Pending.frames.size())
             {
-                R81LogFrameSample("POST", sample);
-                --R81PostHitchFrames;
+                R82Pending.frames[R82Pending.count++] = sample;
             }
 
             R81PushHistory(sample);
+            R82FlushPendingHitch();
             const double capped = std::min(
                 static_cast<double>(sample.frameUs),
                 baseline * 1.50);
@@ -2035,7 +2072,7 @@ namespace OutRunVRStereo
             R81FrameHistoryNext = 0;
             R81LastPresentEndUs = 0;
             R81FrameEmaUs = 0.0;
-            R81PostHitchFrames = 0;
+            R82Pending = {};
             R81SkyGlowUs = 0;
             (void)OutRunVR::PerfHitch::Consume();
             return R30ResetR26Hook.stdcall<HRESULT>(device, params);
