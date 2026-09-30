@@ -1088,4 +1088,12 @@ namespace OutRunVRStereo
     }
 
     void NoteDispatchFallback() noexcept { ++R31Frame.fallback; }
+
+    bool BuildFastWorldConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        DrawStereoState& draw) noexcept
+    {
+        return R31BuildFastWorldConstants(device, stereo, draw);
+    }
 }

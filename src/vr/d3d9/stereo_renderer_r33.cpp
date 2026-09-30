@@ -370,7 +370,7 @@ namespace OutRunVRStereo
                 return {};
 
             DrawStereoState draw{};
-            if (!R31BuildFastWorldConstants(device, stereo, draw))
+            if (!BuildFastWorldConstants(device, stereo, draw))
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
