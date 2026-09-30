@@ -310,7 +310,17 @@ def main() -> None:
     require(
         "tools/analyze_outrun_exe.py",
         [
-            '0x049940: "Calc3D2D"',
+            'GF_HOOK_PROVENANCE_RVAS = {',
+            '0x0FE8B1: "C2CSpeechBubbleGF uncertain/no-effect spacing hook"',
+            '0x0FD60C: "C2CSpeechBubbleGFHeart spacing hook #1"',
+            '0x0FD591: "C2CSpeechBubbleGFHeart spacing hook #2"',
+            '0x0FD5CD: "C2CSpeechBubbleGFHeart spacing hook #3"',
+            '0x0FD652: "C2CSpeechBubbleGFHeart spacing hook #4"',
+            'def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:',
+            '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
+            '"## Guarded GF hook provenance census"',
+            'print(f"guarded_gf_provenance={len(provenance)}/{len(GF_HOOK_PROVENANCE_RVAS)}")',
+            "'0x049940: \"Calc3D2D\"',",
             '0x0BAD20: "RankMarker_sub_4BAD20"',
             '0x0BB0FB: "RankMarker sprani #1"',
             '0x0BB2D0: "RankMarker clip #5"',

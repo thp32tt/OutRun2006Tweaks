@@ -43,6 +43,19 @@ KNOWN_CALL_SITES = {
     0x0BB2D0: "RankMarker clip #5",
 }
 
+# R135/F13: exact hook RVAs that remain intentionally spacing-only until
+# direct-call adjacency/effect provenance is independently established.
+# The static analyzer records nearby known sprite/HUD calls from the exact
+# upstream EXE; this is evidence collection only and must not promote ownership.
+GF_HOOK_PROVENANCE_RVAS = {
+    0x0FE8B1: "C2CSpeechBubbleGF uncertain/no-effect spacing hook",
+    0x0FD60C: "C2CSpeechBubbleGFHeart spacing hook #1",
+    0x0FD591: "C2CSpeechBubbleGFHeart spacing hook #2",
+    0x0FD5CD: "C2CSpeechBubbleGFHeart spacing hook #3",
+    0x0FD652: "C2CSpeechBubbleGFHeart spacing hook #4",
+}
+
+
 # Mirrors the canonical producer catalog in
 # src/vr/game/disasm_render_contract.hpp. Keep this Python representation
 # mechanically checked by tools/verify_vr_semantic_catalog.py.
@@ -228,6 +241,54 @@ def find_calls(pe: PE) -> list[dict]:
     return found
 
 
+def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
+    """Record exact-EXE context around guarded GF speech/heart hook RVAs.
+
+    This deliberately does not infer draw ownership. It reports the hook bytes
+    plus the closest known direct CALL before/after each hook within 0x80 bytes,
+    so a later F13 task can require exact adjacency/effect evidence instead of
+    relying on producer-range membership alone.
+    """
+
+    out: list[dict] = []
+    for hook_rva, label in sorted(GF_HOOK_PROVENANCE_RVAS.items()):
+        previous = [
+            call for call in calls
+            if call["call_rva"] <= hook_rva
+            and hook_rva - call["call_rva"] <= 0x80
+        ]
+        following = [
+            call for call in calls
+            if call["call_rva"] >= hook_rva
+            and call["call_rva"] - hook_rva <= 0x80
+        ]
+        prev_call = max(previous, key=lambda item: item["call_rva"], default=None)
+        next_call = min(following, key=lambda item: item["call_rva"], default=None)
+        out.append(
+            {
+                "hook_rva": hook_rva,
+                "label": label,
+                "bytes24": pe.bytes_at_rva(hook_rva, 24).hex(" "),
+                "previous_known_call": (
+                    {
+                        "call_rva": prev_call["call_rva"],
+                        "target": prev_call["target"],
+                        "delta": hook_rva - prev_call["call_rva"],
+                    }
+                    if prev_call else None
+                ),
+                "next_known_call": (
+                    {
+                        "call_rva": next_call["call_rva"],
+                        "target": next_call["target"],
+                        "delta": next_call["call_rva"] - hook_rva,
+                    }
+                    if next_call else None
+                ),
+            }
+        )
+    return out
+
 def extract_hud_strings(pe: PE) -> list[dict]:
     results: list[dict] = []
     for section in pe.sections:
@@ -287,6 +348,33 @@ def render_markdown(report: dict) -> str:
     for sym in report["symbols"]:
         lines.append(
             f"| {hexrva(sym['rva'])} | {sym['name']} | {sym['bytes24']} |"
+        )
+
+    lines += [
+        "",
+        "## Guarded GF hook provenance census",
+        "",
+        "Diagnostic-only exact-EXE evidence. Nearby known calls do not by themselves "
+        "prove immediate next-draw ownership; guarded hooks remain spacing-only until "
+        "a separate review establishes exact adjacency/effect.",
+        "",
+        "| Hook RVA | Label | First 24 bytes | Previous known call | Next known call |",
+        "|---:|---|---|---|---|",
+    ]
+    for item in report["guarded_gf_hook_provenance"]:
+        prev = item["previous_known_call"]
+        nxt = item["next_known_call"]
+        prev_text = (
+            f"{hexrva(prev['call_rva'])} {prev['target']} (-0x{prev['delta']:X})"
+            if prev else "-"
+        )
+        next_text = (
+            f"{hexrva(nxt['call_rva'])} {nxt['target']} (+0x{nxt['delta']:X})"
+            if nxt else "-"
+        )
+        lines.append(
+            f"| {hexrva(item['hook_rva'])} | {item['label']} | "
+            f"{item['bytes24']} | {prev_text} | {next_text} |"
         )
 
     lines += [
@@ -362,6 +450,7 @@ def main() -> int:
         },
         "symbols": symbol_fingerprints(pe),
         "calls": calls,
+        "guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -382,6 +471,23 @@ def main() -> int:
         f"known_call_sites={report['known_call_sites_found']}/"
         f"{report['known_call_sites_expected']}"
     )
+    provenance = report["guarded_gf_hook_provenance"]
+    print(f"guarded_gf_provenance={len(provenance)}/{len(GF_HOOK_PROVENANCE_RVAS)}")
+    for item in provenance:
+        prev = item["previous_known_call"]
+        nxt = item["next_known_call"]
+        prev_text = (
+            f"0x{prev['call_rva']:08X}:{prev['target']}:delta=0x{prev['delta']:X}"
+            if prev else "none"
+        )
+        next_text = (
+            f"0x{nxt['call_rva']:08X}:{nxt['target']}:delta=0x{nxt['delta']:X}"
+            if nxt else "none"
+        )
+        print(
+            f"gf_hook_provenance=0x{item['hook_rva']:08X} "
+            f"prev={prev_text} next={next_text}"
+        )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
