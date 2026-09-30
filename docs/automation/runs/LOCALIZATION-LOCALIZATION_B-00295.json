@@ -44,9 +44,12 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "b3c130cc89f30176df42f6ebe68f39d57c2ff5ae",
+  "authoritative_result_sha": "b3c130cc89f30176df42f6ebe68f39d57c2ff5ae",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
-  "result_commit_message": "localization(B): produce index121 FD90AA9 source-only v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00295]"
+  "result_commit_message": "localization(B): produce index121 FD90AA9 source-only v2 candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00295]",
+  "bookkeeping_note": "Successful producer result is b3c130cc89f30176df42f6ebe68f39d57c2ff5ae. Candidate/proof are byte-readback verified in the approved current-pipeline Drive task folder. Producer self-QA PASS does not constitute final approval; C_BATCH_GATE must consume this exact RESULT_SHA. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T01:23:14+09:00",
+  "bookkeeping_base_head_sha": "b3c130cc89f30176df42f6ebe68f39d57c2ff5ae"
 }
