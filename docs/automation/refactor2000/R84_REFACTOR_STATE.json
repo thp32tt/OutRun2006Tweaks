@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 435,
+  "cycle": 440,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -59,10 +59,11 @@
     "R84-REF-STATE-0010",
     "R84-REF-DISPATCH-0005",
     "R84-REF-RENDER-0003",
-    "R84-REF-HUD-0001"
+    "R84-REF-HUD-0001",
+    "R84-REF-DISPATCH-0006"
   ],
-  "next": "Cycles 436-440: hide R32 fast-path helpers and effect-live query behind neutral dispatch support API.",
-  "updatedKst": "2026-10-01T08:16:00+09:00",
+  "next": "Cycles 441-445: hide R30 lower-draw hook handles behind neutral lower-draw trampoline API.",
+  "updatedKst": "2026-10-01T08:19:00+09:00",
   "batchStatus": "R84_MATRIX_CYCLE_400_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",

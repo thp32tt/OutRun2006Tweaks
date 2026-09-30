@@ -15,6 +15,7 @@
 #include "../core/dispatch_support.hpp"
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
+#include "../render/fast_path_support.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
@@ -285,7 +286,7 @@ namespace OutRunVRStereo
                 OutRunVR::State::StateBlockTracker::Reliable();
             const bool effectKnown = stateBlocksReliable
                 ? FragileEffectCached(device, fragile)
-                : R32EffectIsFragileLive(device, fragile);
+                : EffectIsFragileLive(device, fragile);
             if (!effectKnown)
                 return {};
             if (fragile)
@@ -320,7 +321,7 @@ namespace OutRunVRStereo
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
-            if (!R32GetSavedViewport(device, savedViewport))
+            if (!GetSavedViewport(device, savedViewport))
                 return {};
 
             bool mayWriteDepth = false;
@@ -331,14 +332,14 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
-                leftWvpOk = R32SetWvpBatch(device, draw.eyeConstants[0]);
+                leftWvpOk = SetWvpBatch(device, draw.eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
                     InternalPassScope guard;
-                    rolledBack = R32SetWvpBatch(device, draw.originalConstants);
+                    rolledBack = SetWvpBatch(device, draw.originalConstants);
                 }
                 if (!rolledBack)
                 {
@@ -365,7 +366,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     InternalPassScope guard;
-                    restored = R32SetWvpBatch(device, draw.originalConstants);
+                    restored = SetWvpBatch(device, draw.originalConstants);
                 }
                 if (!restored)
                     NoteRestoreFailure("R33 fast left draw c64");
@@ -389,7 +390,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
-                    !R32SetWvpBatch(device, draw.eyeConstants[1]))
+                    !SetWvpBatch(device, draw.eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -400,7 +401,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R32RestoreRightPassState(
+                restoreOk = RestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport,
                     draw.originalConstants, true);
             }
@@ -487,7 +488,7 @@ namespace OutRunVRStereo
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
-            if (!R32GetSavedViewport(device, savedViewport))
+            if (!GetSavedViewport(device, savedViewport))
                 return {};
 
             bool mayWriteDepth = false;
@@ -498,14 +499,14 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
-                leftWvpOk = R32SetWvpBatch(device, eyeConstants[0]);
+                leftWvpOk = SetWvpBatch(device, eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
                     InternalPassScope guard;
-                    rolledBack = R32SetWvpBatch(device, original);
+                    rolledBack = SetWvpBatch(device, original);
                 }
                 if (!rolledBack)
                 {
@@ -531,7 +532,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     InternalPassScope guard;
-                    restored = R32SetWvpBatch(device, original);
+                    restored = SetWvpBatch(device, original);
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, result.hr);
@@ -557,7 +558,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
-                    !R32SetWvpBatch(device, eyeConstants[1]))
+                    !SetWvpBatch(device, eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -568,7 +569,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R32RestoreRightPassState(
+                restoreOk = RestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport, original, true);
             }
 
@@ -639,7 +640,7 @@ namespace OutRunVRStereo
             DiscardUnreliableDrawCaches();
             if (telemetry)
                 NoteDispatchFallback();
-            return R32LowerFailClosed(device,
+            return LowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
 
@@ -817,7 +818,7 @@ namespace OutRunVRStereo
             R33InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r32 = R32InstallState.load(std::memory_order_acquire);
+                const auto r32 = ReviewInstallState();
                 if (r32 == State::Failed)
                 {
                     R33InstallState.store(State::Failed, std::memory_order_release);

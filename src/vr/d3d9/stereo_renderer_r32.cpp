@@ -1464,4 +1464,49 @@ namespace OutRunVRStereo
 
         VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;
     }
+
+    bool EffectIsFragileLive(
+        IDirect3DDevice9* device, bool& fragile) noexcept
+    {
+        return R32EffectIsFragileLive(device, fragile);
+    }
+
+    bool GetSavedViewport(
+        IDirect3DDevice9* device, D3DVIEWPORT9& viewport) noexcept
+    {
+        return R32GetSavedViewport(device, viewport);
+    }
+
+    bool SetWvpBatch(
+        IDirect3DDevice9* device, const float* constants) noexcept
+    {
+        return R32SetWvpBatch(device, constants);
+    }
+
+    bool RestoreRightPassState(
+        IDirect3DDevice9* device,
+        IDirect3DSurface9* savedRt,
+        IDirect3DSurface9* savedDepth,
+        const D3DVIEWPORT9& savedViewport,
+        const float* originalConstants,
+        bool restoreWvp) noexcept
+    {
+        return R32RestoreRightPassState(
+            device, savedRt, savedDepth, savedViewport,
+            originalConstants, restoreWvp);
+    }
+
+    template <typename LowerDraw>
+    HRESULT LowerFailClosed(
+        IDirect3DDevice9* device, LowerDraw&& lowerDraw) noexcept
+    {
+        return R32LowerFailClosed(
+            device, std::forward<LowerDraw>(lowerDraw));
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    ReviewInstallState() noexcept
+    {
+        return R32InstallState.load(std::memory_order_acquire);
+    }
 }
