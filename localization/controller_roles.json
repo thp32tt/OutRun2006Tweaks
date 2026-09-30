@@ -1,5 +1,5 @@
 {
-  "schema_version": 13,
+  "schema_version": 14,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -147,7 +147,8 @@
       "queue_idle_requires_unfinished_work": true,
       "wait_actions_stale_seconds": 75,
       "busy_stall_seconds": 1800,
-      "force_stop_active_generation": false
+      "force_stop_active_generation": false,
+      "config_blob_refresh_on_heartbeat_stale": true
     },
     "startup_reconcile": {
       "enabled": true,
@@ -159,7 +160,9 @@
       "refresh_branch_head_before_retry": true,
       "terminal_failure_with_attempts": "retry_same_task_id",
       "terminal_failure_without_attempts": "BLOCKED",
-      "never_wait_for_chat_expiry_after_terminal_action": true
+      "never_wait_for_chat_expiry_after_terminal_action": true,
+      "reload_controller_config": true,
+      "reject_stale_schema_prompt": true
     },
     "continuous_progression": {
       "producer_commit_releases_same_lane": true,
@@ -254,7 +257,17 @@
       "HOLD_STRICT_RECHECK",
       "SUPERSEDED"
     ],
-    "runtime_validation_separate": true
+    "runtime_validation_separate": true,
+    "single_dds_packaging": {
+      "purpose": "OPTIONAL_RUNTIME_TEST_ARTIFACT_ONLY",
+      "gates_producer_progress": false,
+      "gates_c_batch_progress": false,
+      "repository_candidate_mode": "PACKAGE_WHEN_REPOSITORY_PATH_EXISTS",
+      "external_candidate_mode": "SKIP_WITH_TYPED_NOTICE_EXTERNAL_CANDIDATE_NOT_IN_GIT",
+      "missing_repository_source_mode": "VERIFY_MANIFEST_METADATA_ONLY",
+      "failure_class": "AUXILIARY_PACKAGING_FAILURE",
+      "never_map_to_github_permission_denied": true
+    }
   },
   "production_strategy": {
     "mode": "candidate_completion_first",
@@ -414,5 +427,23 @@
       "LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"
     ],
     "generated_prompt_directive": "GitHub 접근/권한 판정에는 공개 웹 검색을 사용하지 마. authenticated GitHub connector/API로 thp32tt/OutRun2006Tweaks repository metadata와 korean-localization-clean HEAD를 먼저 직접 확인해. 공개 검색 miss 또는 upstream만 노출되는 결과는 권한 부족의 근거가 아니다. push/maintain/admin 중 하나가 true이면 즉시 현재 HEAD에서 작업을 계속해. fresh permission denial 또는 refresh 후 실제 write 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해."
+  },
+  "dispatch_freshness": {
+    "refresh_config_before": [
+      "INITIAL_DISPATCH",
+      "RETRY",
+      "CONVERSATION_ROLLOVER"
+    ],
+    "required_prompt_tokens": [
+      "CONTROLLER_SCHEMA_VERSION",
+      "CONTROLLER_CONFIG_BLOB_SHA"
+    ],
+    "reject_cached_prompt_after_config_blob_change": true,
+    "stale_prompt_behavior": "REFRESH_CURRENT_HEAD_AND_REGENERATE_PROMPT",
+    "historical_shard_rules_forbidden": [
+      "ODD_EVEN_A_B",
+      "TWO_PRODUCER_ONLY"
+    ],
+    "required_current_shard_rule": "asset_queue.index % 3: A=0, B=1, E=2"
   }
 }
