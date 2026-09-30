@@ -353,13 +353,23 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "Index111 receives only its new source-style/slant evidence review. Index112 and index193 reuse unchanged authoritative static-QA fingerprints. Index163 reuses unchanged pixel/DDS/semantic evidence but is re-evaluated against the new title-family sizing rule because the QA-policy fingerprint changed.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_gate": null,
-  "bookkeeping_note": "This C result commit is the sole Q00058 Localization Automation Gate target. RESULT_SHA and Gate outcome are recorded only in a later bookkeeping commit. Runtime remains UNTESTED.",
-  "report_scope": "ROLE_C_INDEPENDENT_QA_EVIDENCE"
+  "result_sha": "019b17c0f0d0d3489d4a6a537d2217c65af003bc",
+  "authoritative_result_sha": "019b17c0f0d0d3489d4a6a537d2217c65af003bc",
+  "validation_bearing_result_sha": "019b17c0f0d0d3489d4a6a537d2217c65af003bc",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36703945263,
+    "head_sha": "019b17c0f0d0d3489d4a6a537d2217c65af003bc",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T19:42:00+09:00"
+  },
+  "bookkeeping_note": "Q00058 authoritative Gate PASS is owned by validation-bearing result 019b17c0f0d0d3489d4a6a537d2217c65af003bc. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "report_scope": "ROLE_C_INDEPENDENT_QA_EVIDENCE",
+  "bookkeeping_recorded_at_kst": "2026-09-30T19:43:16+09:00",
+  "bookkeeping_base_head_sha": "61514792079dbfc15c8a8afa9102f8291fdca750"
 }
