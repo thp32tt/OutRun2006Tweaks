@@ -1,0 +1,221 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00287-p00170-index163-two-row-native-rerender-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00287",
+  "wave_id": "P00170",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "selected_index": 163,
+  "selected_asset": "59A79158",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX163_TWO_ROW_NATIVE_CONSERVATIVE_FIT_V2_CANDIDATE_SELF_QA_RUNTIME_UNTESTED",
+  "summary": "Latest Q00062/C164 promotes index163/59A79158 to RENDER_READY. B00287 preserves the 22 already-C-accepted rows byte-for-byte, fully resets only rows 10/20 to the transparent clean-plate state, then natively rerenders Ice Scape->빙원 and Skyscrapers->마천루 with system NanumSquare Bold at integer 56 px. Exact DDS header/format/orientation are preserved. No flattened-raster resize is used. Producer pre-gate PASS; runtime/in-game validation not performed.",
+  "selection_basis": {
+    "base_head_sha": "93f9639f90dbae5e33ac27d1798d39e8b329c8bc",
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00293",
+    "c_validation_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+    "c_gate_run_id": 36734942838,
+    "q_batch": "Q00062",
+    "readiness": "RENDER_READY_B00284_TWO_ROW_NATIVE_CONSERVATIVE_FIT"
+  },
+  "source": {
+    "pinned_release_name": "OR2-HD-GUI-v0.25.10a.zip",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "exact_member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "exact_member_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y",
+    "header_sha256": "68d8452d40fe2ba3922dd50187ef03aab9dafbc1a3dc98245283ea94c3284ab6"
+  },
+  "predecessor_candidate": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00274",
+    "candidate_sha256": "a9d5aacc840b158ef0335301c512387f423fffda2640e612aceb29a6bc8efbf0",
+    "bundle_sha256": "a827d4cd693e0721bfa000cba45959cdb52ec224c1561b3a9138f0f89d9a0f16",
+    "drive_file_id": "1VO-UCwS-z67IveMXgVtHtfmJctz2FFeG",
+    "use_scope": "IMMUTABLE_PRESERVATION_OF_22_C_ACCEPTED_ROWS_ONLY",
+    "reworked_row_old_pixels_reused": false
+  },
+  "generation": {
+    "input_spec": "localization/graphics/role_B/20260930-B00284-P00167/B00284_P00167_INDEX163_CONSERVATIVE_FIT_REWORK_SPEC.json",
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "font_identifier": "NanumSquare Bold (system font; bytes not redistributed)",
+    "family_target_font_size": 57,
+    "fill_rgb": [
+      46,
+      54,
+      57
+    ],
+    "outline": "none",
+    "shadow": "none",
+    "glow": "none",
+    "slant": "none",
+    "native_resolution_render": true,
+    "flattened_raster_resampling": false,
+    "rows": [
+      {
+        "physical_row": 10,
+        "source": "Ice Scape",
+        "korean": "빙원",
+        "font_size": 56,
+        "draw_origin_x": 3,
+        "baseline_y_readable": 968,
+        "source_effect_bbox_ltrb": [
+          5,
+          922,
+          250,
+          980
+        ],
+        "candidate_safe_bbox_ltrb": [
+          7,
+          924,
+          248,
+          978
+        ],
+        "candidate_alpha_bbox_ltrb": [
+          8,
+          924,
+          101,
+          978
+        ],
+        "safe_margins_ltrb": [
+          1,
+          0,
+          147,
+          0
+        ],
+        "source_effect_margins_ltrb": [
+          3,
+          2,
+          149,
+          2
+        ],
+        "one_pixel_overflow": 0,
+        "review_note": "candidate-safe top/bottom edge touch; exact source-effect margin remains 2px and 4x review passed"
+      },
+      {
+        "physical_row": 20,
+        "source": "Skyscrapers",
+        "korean": "마천루",
+        "font_size": 56,
+        "draw_origin_x": 3,
+        "baseline_y_readable": 1729,
+        "source_effect_bbox_ltrb": [
+          4,
+          1682,
+          305,
+          1740
+        ],
+        "candidate_safe_bbox_ltrb": [
+          6,
+          1684,
+          303,
+          1738
+        ],
+        "candidate_alpha_bbox_ltrb": [
+          7,
+          1684,
+          155,
+          1737
+        ],
+        "safe_margins_ltrb": [
+          1,
+          0,
+          148,
+          1
+        ],
+        "source_effect_margins_ltrb": [
+          3,
+          2,
+          150,
+          3
+        ],
+        "one_pixel_overflow": 0,
+        "review_note": "candidate-safe top edge touch; exact source-effect margin remains >=2px and 4x review passed"
+      }
+    ]
+  },
+  "candidate": {
+    "sha256": "fcb75cefe5600979172eb34741ead857156470dc8e044356c783aec0b88807bf",
+    "bytes": 8388736,
+    "exact_header_preserved": true,
+    "decoded_final_matches_preencode_pixels": true,
+    "storage_mode": "GOOGLE_DRIVE_LARGE_BINARY_BUNDLE",
+    "account": "ezflash557",
+    "current_pipeline_folder_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
+    "task_folder_id": "11XsgG8P44WoEYEIfQ5cjKBFT1TN1BV0e",
+    "drive_file_id": "1q0i4oSEy6Z52fYU-jtaol14-vkxcJqJT",
+    "drive_url": "https://drive.google.com/file/d/1q0i4oSEy6Z52fYU-jtaol14-vkxcJqJT/view?usp=drivesdk",
+    "bundle_name": "B00287_59A79158_Korean_candidate.zip",
+    "bundle_sha256": "f1e2e5267ef675fea49a17c7cc3c3b79270d0ba4f5c1dbebc2d119ba7e4b2b8c",
+    "bundle_bytes": 74020,
+    "upload_readback_sha256": "f1e2e5267ef675fea49a17c7cc3c3b79270d0ba4f5c1dbebc2d119ba7e4b2b8c",
+    "upload_readback_equal": true
+  },
+  "self_qa": {
+    "status": "PASS",
+    "producer_pre_gate": "PASS",
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "signed_slant_gate": "PASS",
+    "changed_pixels_vs_previous_candidate": 11857,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "one_pixel_overflow_total": 0,
+    "other_22_rows_preserved_byte_for_byte": true,
+    "source_comparison_gate": "PASS_TWO_REWORK_ROWS_ENGLISH_SOURCE_TO_KOREAN_CANDIDATE",
+    "visual_review": "PASS_TWO_ROW_4X_NEAREST_SOURCE_VS_KOREAN__NO_CLIPPING_RESIDUE_OR_WRONG_ART",
+    "raster_resampling": "NOT_USED",
+    "edge_touch_risk": "HIGH_ZOOM_REVIEWED__EXACT_SOURCE_EFFECT_MARGIN_MIN_2PX"
+  },
+  "review_evidence": {
+    "storage_mode": "GOOGLE_DRIVE_REVIEW_BUNDLE_WITH_GIT_HASH_RECORD",
+    "drive_file_id": "19D9Y8rjS2IL4Gg9vr0xcv5UQIR1VBK1s",
+    "drive_url": "https://drive.google.com/file/d/19D9Y8rjS2IL4Gg9vr0xcv5UQIR1VBK1s/view?usp=drivesdk",
+    "bundle_name": "B00287_59A79158_review_evidence.zip",
+    "bundle_sha256": "3a4fbf24c297cc2bef7a172157b6f1439539152c73b1dec9aff5d366460a66b5",
+    "bundle_bytes": 468572,
+    "upload_readback_sha256": "3a4fbf24c297cc2bef7a172157b6f1439539152c73b1dec9aff5d366460a66b5",
+    "file_sha256": {
+      "source_display_png": "670fd11194775a8830568e6a61713925637a37eb8f36d0c4c81af51356987553",
+      "candidate_display_png": "294557cf8932cc478b7c3291704fd77f774379296b598103dc9db702cebdf144",
+      "comparison_png": "337dc280e92261cbbfe21c26737943551076efe318e82e2efd582f35d49f464f",
+      "element_comparison_png": "e79fd056e7752197a3d655dde409b6e9fb3984041b8793ca22408a14b2d36043",
+      "two_row_change_mask_png": "23928bedefa8b7bb46f8a79e3f4d8c4cf82dcfaa2753c1ef3a930f66e713135c",
+      "self_qa_json": "1c940152eb92f6191abb8ed3a1df165d863dd5c08b554f6622197c1c88693da7"
+    }
+  },
+  "material_deliverable": {
+    "type": "INDEX163_TWO_ROW_NATIVE_CONSERVATIVE_FIT_KOREAN_DDS_PLUS_REVIEW_BUNDLE",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "production_readiness_before": "RENDER_READY_B00284_TWO_ROW_NATIVE_CONSERVATIVE_FIT",
+  "production_readiness_after": "KOREAN_V2_CANDIDATE_SELF_QA_PASS_PENDING_C_BATCH",
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null
+}
