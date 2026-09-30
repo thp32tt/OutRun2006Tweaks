@@ -760,4 +760,32 @@ namespace OutRunVRStereo
     {
         return CurrentPoseInjectionSnapshot().legacyMainBackbufferInvariant;
     }
+
+    bool IsDirectTransportOverlayReady() noexcept
+    {
+        return R13OverlayReady.load(std::memory_order_acquire);
+    }
+
+    bool ReadDirectTransportGpuCompletedFrame(
+        std::uint32_t slotIndex, std::uint32_t& completedFrame) noexcept
+    {
+        return R13ReadGpuCompletedFrame(slotIndex, completedFrame);
+    }
+
+    void NoteDirectTransportAckBackpressure() noexcept
+    {
+        ++R13SafeAckBackpressure;
+    }
+
+    bool IsDirectTransportInstallReady() noexcept
+    {
+        return R13InstallState.load(std::memory_order_acquire) ==
+            R13InstallReady;
+    }
+
+    bool IsDirectTransportInstallFailed() noexcept
+    {
+        return R13InstallState.load(std::memory_order_acquire) ==
+            R13InstallFailed;
+    }
 }

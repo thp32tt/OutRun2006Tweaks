@@ -15,6 +15,8 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../lifecycle/frame_accounting.hpp"
 #include "../state/depth_target_state.hpp"
+#include "../transport/direct_gpu_state.hpp"
+#include "../lifecycle/safety_overlay_state.hpp"
 #include "../lifecycle/frame_lifecycle.hpp"
 #include "../game/renderer_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
@@ -1015,7 +1017,7 @@ namespace OutRunVRStereo
         bool ResolveDirectTransportR32(IDirect3DDevice9* device,
             std::uint32_t frameId) noexcept
         {
-            if (!R13OverlayReady.load(std::memory_order_acquire))
+            if (!IsDirectTransportOverlayReady())
                 return R32ResolveDirectR13Hook.call<bool>(device, frameId);
             if (!frameId || !R32EnsureDirectResources(device) ||
                 !BackBuffer || !RightEyeSurface)
@@ -1036,10 +1038,10 @@ namespace OutRunVRStereo
             {
                 std::uint32_t gpuCompleted = 0;
                 const bool ackValid =
-                    R13ReadGpuCompletedFrame(slotIndex, gpuCompleted);
+                    ReadDirectTransportGpuCompletedFrame(slotIndex, gpuCompleted);
                 if (!ackValid || !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
                 {
-                    ++R13SafeAckBackpressure;
+                    NoteDirectTransportAckBackpressure();
                     ++DirectTransportRingBackpressure;
                     return false;
                 }
@@ -1380,17 +1382,17 @@ namespace OutRunVRStereo
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r31 = DispatchSupportInstallState();
-                const auto r22 = R22InstallState.load(std::memory_order_acquire);
-                const auto r13 = R13InstallState.load(std::memory_order_acquire);
+                const auto r22 = SafetyOverlayInstallState();
+                const bool r13Failed = IsDirectTransportInstallFailed();
                 if (r31 == State::Failed || r22 == State::Failed ||
-                    r13 == R13InstallFailed)
+                    r13Failed)
                 {
                     R32InstallState.store(State::Failed, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
                     return 0;
                 }
                 if (r31 == State::Ready && r22 == State::Ready &&
-                    r13 == R13InstallReady)
+                    IsDirectTransportInstallReady())
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R32ResetR22Hook = safetyhook::create_inline(

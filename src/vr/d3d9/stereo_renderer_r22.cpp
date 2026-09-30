@@ -909,4 +909,10 @@ namespace OutRunVRStereo
     {
         R22FailClosedReplayState(device, site);
     }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    SafetyOverlayInstallState() noexcept
+    {
+        return R22InstallState.load(std::memory_order_acquire);
+    }
 }
