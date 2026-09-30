@@ -119,6 +119,7 @@
     "concurrent_changes_reviewed": "Only the A00312 lane-local evidence support commit intervened; no peer-lane commit observed."
   },
   "bookkeeping_note": "Producer immutable result SHA recorded in this separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
-  "bookkeeping_recorded_at_kst": "2026-10-01T03:19:00+09:00",
-  "bookkeeping_base_head_sha": "4156f601c2456790d070da7e9c07d549bc391601"
+  "bookkeeping_recorded_at_kst": "2026-10-01T03:16:15+09:00",
+  "bookkeeping_base_head_sha": "4156f601c2456790d070da7e9c07d549bc391601",
+  "bookkeeping_timestamp_source_commit": "5a782b4616c996621a92260a587ccf909b17fd2e"
 }
