@@ -139,6 +139,8 @@ def main() -> None:
             "VR R124 GEAR REV HUD: shared producer-map handoff",
             "PutGhostGapInfo_AdjustPositionAndHud<0x000BDE3Au>",
             "VR R125 GHOST GAP INFO HUD: shared producer-map handoff",
+            "PutGhostGapInfo_sub_AdjustPositionAndHud<0x000BDAE8u>",
+            "VR R126 GHOST GAP SUB HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -180,6 +182,10 @@ def main() -> None:
     if "PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDE3A, PutGhostGapInfo_AdjustPosition);" in hooks_text:
         raise SystemExit(
             "F13 PutGhostGapInfo ownership regressed to spacing-only callback"
+        )
+    if "PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDAE8, PutGhostGapInfo_sub_AdjustPosition);" in hooks_text:
+        raise SystemExit(
+            "F13 PutGhostGapInfo_sub ownership regressed to spacing-only callback"
         )
     require(
         "tools/analyze_outrun_exe.py",
