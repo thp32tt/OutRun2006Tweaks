@@ -588,4 +588,20 @@ namespace OutRunVRStereo
     {
         R29ArmMonoSafety(extraPresents);
     }
+
+    bool StableStereoBase(IDirect3DDevice9* device) noexcept
+    {
+        return R29StableStereoBase(device);
+    }
+
+    bool FragileEffectCached(
+        IDirect3DDevice9* device, bool& fragile) noexcept
+    {
+        return R29FragileEffectCached(device, fragile);
+    }
+
+    void NoteStableTwoEyeDraw() noexcept
+    {
+        ++R29StableTwoEyeDraws;
+    }
 }

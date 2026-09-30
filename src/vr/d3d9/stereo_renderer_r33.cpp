@@ -13,6 +13,8 @@
 #include "stereo_renderer_r32.cpp"
 #include "../state/state_block_tracker.hpp"
 #include "../core/dispatch_support.hpp"
+#include "../render/stereo_base_policy.hpp"
+#include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
 
@@ -269,7 +271,7 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R33TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device))
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device))
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
@@ -281,7 +283,7 @@ namespace OutRunVRStereo
             const bool stateBlocksReliable =
                 OutRunVR::State::StateBlockTracker::Reliable();
             const bool effectKnown = stateBlocksReliable
-                ? R29FragileEffectCached(device, fragile)
+                ? FragileEffectCached(device, fragile)
                 : R32EffectIsFragileLive(device, fragile);
             if (!effectKnown)
                 return {};
@@ -342,7 +344,7 @@ namespace OutRunVRStereo
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R33/fast-left-WVP-rollback");
                     NoteRestoreFailure("R33 fast left-eye c64 rollback");
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -366,7 +368,7 @@ namespace OutRunVRStereo
                 }
                 if (!restored)
                     NoteRestoreFailure("R33 fast left draw c64");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
                 return result;
             }
 
@@ -406,7 +408,7 @@ namespace OutRunVRStereo
             FrameHadWorldStereo = true;
             ++DuplicatedDraws;
             ++WorldStereoDraws;
-            ++R29StableTwoEyeDraws;
+            NoteStableTwoEyeDraw();
             if (R33TelemetryEnabled())
             {
                 NoteDispatchFastWorld();
@@ -424,14 +426,14 @@ namespace OutRunVRStereo
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             if (!restoreOk)
             {
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 NoteRestoreFailure("R33 fast right-eye draw");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             return result;
         }
@@ -442,7 +444,7 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device) ||
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
 
@@ -509,7 +511,7 @@ namespace OutRunVRStereo
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R33/HUD-left-WVP-rollback");
                     NoteRestoreFailure("R33 HUD left-eye c64 rollback");
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -534,7 +536,7 @@ namespace OutRunVRStereo
                     site, result.hr);
                 if (!restored)
                     NoteRestoreFailure("R33 HUD left draw c64");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
                 return result;
             }
 
@@ -572,7 +574,7 @@ namespace OutRunVRStereo
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
-            ++R29StableTwoEyeDraws;
+            NoteStableTwoEyeDraw();
             ++R30ScreenSpaceFovDraws;
             if (R33TelemetryEnabled())
             {
@@ -585,14 +587,14 @@ namespace OutRunVRStereo
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             if (!restoreOk)
             {
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 NoteRestoreFailure("R33 HUD right-eye draw");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             return result;
         }
