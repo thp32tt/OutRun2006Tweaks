@@ -20,6 +20,7 @@
 //    work so stage-specific 300 -> 3000+ draw explosions can be diagnosed.
 
 #include "stereo_renderer_r30.cpp"
+#include "../render/eye_tail_cache.hpp"
 
 namespace OutRunVRStereo
 {
@@ -61,15 +62,7 @@ namespace OutRunVRStereo
         bool R31FirstAlternateStateBlockLogged = false;
         bool R31FirstHudLogged = false;
 
-        struct R31EyeTailCache
-        {
-            bool valid = false;
-            std::uint32_t poseSequence = 0;
-            float worldScale = 0.0f;
-            D3DMATRIX projection{};
-            D3DMATRIX inverseProjection{};
-            D3DMATRIX eyeTail[2]{};
-        };
+        using R31EyeTailCache = OutRunVR::Render::EyeTailCache;
         R31EyeTailCache R31EyeCache{};
 
         struct R31FramePerf
