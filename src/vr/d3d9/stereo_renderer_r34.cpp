@@ -45,7 +45,7 @@ namespace OutRunVRStereo
             FailClosedStereoEligibility();
             ResetStereoBaselineTracking();
             InvalidateTrackedRasterShadow();
-            R33InvalidateDepthStencilCache();
+            InvalidateDepthStencilCache();
             R29ArmMonoSafety();
             RightDepthSynchronized = false;
             RightStencilSynchronized = false;
