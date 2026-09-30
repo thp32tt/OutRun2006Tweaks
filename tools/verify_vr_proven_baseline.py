@@ -251,18 +251,22 @@ require_all("src/vr/hud_semantics.hpp", [
     'ClassifyCaller(0x0460F1)',
     'ClassifyCaller(0x097BB7)',
 ], "P8_R70_RUNTIME_SEMANTICS")
+# R84 intentionally replaces the R71/R73 experimental SkyGlow path with the
+# common DX9Ex baseline restored from b6c208bb. Guard that exact restoration
+# rather than requiring stale pre-HUD/bypass implementation markers.
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    'R71: the R70 HMD run proved the old "dead work"',
-    'R30SkyGlow.reduced[eye];',
+    'constexpr bool R73BypassStereoSkyGlow = false',
+    'R76SkyGlowBaselineSha',
+    '"b6c208bbc9a411b9c035be26f9e1e9c014028738"',
+    'R30CaptureSkyGlowSceneBeforeHud',
     'compositeSource = R30SkyGlow.temp[eye];',
-], "P8_R71_SKYGLOW_FINAL_BLUR_SOURCE")
-require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    'R30SkyGlowAppliedEpoch',
-    'R30SkyGlowPreHudAttemptEpoch',
-    'R30CompositeSkyGlowBeforeHud',
-    'R30SkyGlowPreHudAttemptEpoch != PresentEpoch',
-    'the additive glow no longer washes over HUD/menu pixels at Present',
-], "P8_R71_SKYGLOW_PRE_HUD_COMPOSITE")
+    'compositeSource = R30SkyGlow.reduced[eye];',
+    'const float composite[4]{ 0.38f, 0, 0, 0 };',
+    'VR R76 SKY GLOW BASELINE RESTORE:',
+], "P8_R84_SKYGLOW_BASELINE_RESTORE")
+forbid("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+       'constexpr bool R73BypassStereoSkyGlow = true',
+       "P8_R84_NO_STALE_SKYGLOW_BYPASS")
 require_all("src/hooks_uiscaling.cpp", [
     'R71RivalMarkerSpraniCall = 0xBB796',
     'Module::exe_ptr(0xBB6F5)',
@@ -297,7 +301,6 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'R73OutRunTransientHudPresents = 360',
     'directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D',
     'VR R73 OUTRUN HUD:',
-    'constexpr bool R73BypassStereoSkyGlow = true',
     'VR R73 FLARE:',
     'FlareStereoDepth = 0.20f',
 ], "P8_R73_RUNTIME_VISUALFIX")
