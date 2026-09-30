@@ -192,6 +192,7 @@
   "production_change_ledger": {
     "issue": 14,
     "implementation_comment_id": 5921687645,
-    "status": "IMPLEMENTATION_RECORDED; VALIDATION_EVENT_TO_FOLLOW_BOOKKEEPING"
+    "validation_comment_id": 5921784134,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
   }
 }
