@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00158",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "957a7795677c254ea569d303a0f6002ce9c940c7",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R158_HELPER_28320_INSTRUCTION_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00156 captured exact 0x28320 provenance and explicitly named complete-instruction decoding as the next bounded static unit. The 96-byte window contains complete instructions only through 0x2837D; the next instruction beginning at 0x2837E is truncated. The smallest runnable HMD-free task is therefore an exact prefix/control-flow proof through 0x2837D including independent alignment of 0x28379->0x282B0.",
+  "summary": "Add an independent DX11 fail-closed exact-EXE proof for complete instructions 0x28320..0x2837D. Pin the common range-fail target 0x28433, local fail/continue branches, RET at 0x2836F, and prove that 0x28379 is an instruction-aligned CALL rel32 targeting 0x282B0. Function-entry status, call semantics and render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00157",
+    "source_result_sha": "317211876f1fc4c4a540c216ec9fa845351904d8",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded prefix-proof design only. DX11 binds the proof to its own 00156 provenance predecessor and must independently pass exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00158.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00156 validation-bearing result fddb467f821ad981db58f3aa441d042f66ecb8fa captured a fresh exact 96-byte 0x28320 window and one raw outbound 0x28379->0x282B0 candidate.",
+    "This task proves only complete instructions ending at exclusive RVA 0x2837E because the 96-byte provenance window ends inside the next instruction.",
+    "DXVK-00157 independently selected the same bounded prefix and exact call-alignment proof on the same exact public EXE; DX11 validation remains independent.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If green, persist branch targets and aligned 0x28379->0x282B0 call in separate bookkeeping while keeping function_entry_status=UNRESOLVED, call_semantics=UNRESOLVED and ownership_effect=NONE. A later bounded task may capture fresh bytes from 0x2837E before continuing."
+}
