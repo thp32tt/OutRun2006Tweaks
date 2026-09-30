@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00178",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "56b4495ef8d5fbee0d67696f8e122bc5c231ebfe",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R178_1821F3_CONTINUATION_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00176 proved the complete 0x182194 instruction prefix through 0x1821F2 and left the next instruction at 0x1821F3 incomplete while two prior jumps converge at 0x182207. A fresh exact-EXE 96-byte capture beginning at the proven 0x1821F3 boundary is the smallest independent F13 continuation step and contains the 0x182207 common target without requiring HMD/runtime evidence. DXVK-00177 independently established the same bounded capture design but was still PENDING when this DX11 task began; DX11 validation is independent.",
+  "summary": "Add a fail-closed DX11 exact-EXE 96-byte continuation provenance capture starting at 0x1821F3. Require the R176 exact prefix proof, overlap the known 0x8B opcode, verify exact probe arithmetic through exclusive end 0x182253 and prove common target 0x182207 lies inside the window. Record raw inbound/outbound rel32 candidates only; do not instruction-decode the continuation or promote function identity, semantics, or render/HUD ownership.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00177",
+    "source_result_sha": "5ee24a81eb9c728b9bb57fcf2eab74d6edf345ec",
+    "source_validation_state_at_selection": "PENDING",
+    "source_expected_status": "EXACT_EXE_1821F3_CONTINUATION_PROVENANCE_CAPTURED",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded continuation capture design. DX11 relies on its own R176 exact prefix proof and independent exact-result validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00178.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00176 result 0e5494869178ca165ab706a2d58a9ef71bf83414 established EXACT_182194_PREFIX_CONTROL_FLOW_PROVEN through 0x1821F2 and preserved incomplete opcode 0x8B at 0x1821F3.",
+    "R176 exact proof established two prior JMPs converge at 0x182207, outside the original 96-byte probe but inside a fresh 96-byte window beginning at 0x1821F3.",
+    "DXVK-00177 implementation 5ee24a81eb9c728b9bb57fcf2eab74d6edf345ec used the same public-EXE bounded continuation design; its validation was PENDING at DX11 selection, so it is design reference rather than borrowed PASS evidence.",
+    "Regression/history review found no runtime-source change: no protected DX9Ex/HUD/world invariant or runtime problem state is modified by this analyzer/verifier-only task.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the continuation capture passes, persist EXACT_EXE_1821F3_CONTINUATION_PROVENANCE_CAPTURED with function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY, ownership_effect=NONE and continuation_scope=RAW_BYTES_AND_REL32_CENSUS_ONLY. A later independent task may instruction-decode this fresh window and close control flow around common target 0x182207."
+}

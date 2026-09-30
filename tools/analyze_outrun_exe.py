@@ -389,6 +389,15 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_PREFIX_INSTRUCTIONS = (
     (0x001821F1, "eb 14", "jmp 0x182207"),
 )
 
+# R178/F13: fresh exact-EXE continuation provenance starts at the proven
+# instruction boundary 0x1821F3, overlapping the lone 0x8B opcode from R176.
+# Capture bytes and raw rel32 candidates only. The 96-byte window contains the
+# already-proven common forward target 0x182207, but no instruction semantics,
+# terminal boundary, function identity, or render/HUD ownership are inferred.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_RVA = 0x001821F3
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_LEN = 96
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_END_RVA = 0x00182253
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -1333,6 +1342,88 @@ def collect_guarded_gf_target_c_helper_1_third_callee_prefix_proof(pe: PE) -> di
         "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
         "ownership_effect": "NONE",
         "continuation_status": "INCOMPLETE_OPCODE_AT_PROBE_END",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_provenance(pe: PE) -> dict:
+    """Capture a fresh exact-EXE continuation window from 0x1821F3.
+
+    R176 proves that 0x1821F3 is the next instruction boundary and that the
+    previous 96-byte probe exposes only its leading 0x8B opcode. This collector
+    overlaps that byte, requires the R176 proof, captures 96 fresh bytes, and
+    records raw rel32 candidates. It intentionally performs no instruction
+    decode and assigns no higher-level semantics or render/HUD ownership.
+    """
+
+    prefix = collect_guarded_gf_target_c_helper_1_third_callee_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe,
+        target_rva,
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_LEN,
+    )
+    predecessor_exact = (
+        prefix["status"] == "EXACT_182194_PREFIX_CONTROL_FLOW_PROVEN"
+        and prefix["prefix_end_rva"] == target_rva
+        and prefix["incomplete_instruction_rva"] == target_rva
+        and prefix["incomplete_opcode_matches"]
+        and prefix["target_section"] == ".text"
+    )
+    overlap_opcode = pe.bytes_at_rva(
+        target_rva, len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_INCOMPLETE_OPCODE)
+    )
+    overlap_matches = (
+        overlap_opcode == GF_TARGET_C_HELPER_1_THIRD_CALLEE_INCOMPLETE_OPCODE
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_END_RVA
+    )
+    common_target_within_probe = (
+        target_rva
+        <= GF_TARGET_C_HELPER_1_THIRD_CALLEE_COMMON_FORWARD_TARGET_RVA
+        < target_rva + len(probe)
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_LEN
+        and overlap_matches
+        and probe_end_matches
+        and common_target_within_probe
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": prefix["status"],
+        "predecessor_exact": predecessor_exact,
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "overlap_opcode": overlap_opcode.hex(" "),
+        "overlap_matches": overlap_matches,
+        "common_forward_target_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_COMMON_FORWARD_TARGET_RVA,
+        "common_forward_target_within_probe": common_target_within_probe,
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_1821F3_CONTINUATION_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_1821F3_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY",
     }
 
 
@@ -3139,6 +3230,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_second_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_second_callee_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_provenance": collect_guarded_gf_target_c_helper_1_third_callee_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -3642,6 +3734,36 @@ def main() -> int:
         f"ownership_effect={helper_1_third_callee_prefix['ownership_effect']} "
         f"continuation={helper_1_third_callee_prefix['continuation_status']}"
     )
+    helper_1_third_cont = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_provenance"
+    ]
+    helper_1_third_cont_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_third_cont["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation=0x{helper_1_third_cont['target_rva']:08X} "
+        f"status={helper_1_third_cont['status']} "
+        f"predecessor={helper_1_third_cont['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont['predecessor_exact']} "
+        f"section={helper_1_third_cont['target_section'] or 'none'} "
+        f"probe_len={helper_1_third_cont['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont['probe_end_rva']:08X} "
+        f"probe_end_match={helper_1_third_cont['probe_end_matches']} "
+        f"overlap={helper_1_third_cont['overlap_opcode']} "
+        f"overlap_match={helper_1_third_cont['overlap_matches']} "
+        f"common_target={hexrva(helper_1_third_cont['common_forward_target_rva'])} "
+        f"common_target_in_probe={helper_1_third_cont['common_forward_target_within_probe']} "
+        f"inbound_raw={len(helper_1_third_cont['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_third_cont['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_third_cont_outbound} "
+        f"function_entry={helper_1_third_cont['function_entry_status']} "
+        f"semantic_effect={helper_1_third_cont['semantic_effect']} "
+        f"ownership_effect={helper_1_third_cont['ownership_effect']} "
+        f"scope={helper_1_third_cont['continuation_scope']} "
+        f"bytes={helper_1_third_cont['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -3707,6 +3829,9 @@ def main() -> int:
     if helper_1_third_callee_prefix["status"] != "EXACT_182194_PREFIX_CONTROL_FLOW_PROVEN":
         print("guarded_gf_target_c_helper_1_third_callee_prefix_proof=FAILED")
         return 21
+    if helper_1_third_cont["status"] != "EXACT_EXE_1821F3_CONTINUATION_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_provenance=FAILED")
+        return 22
     return 0
 
 
