@@ -1,0 +1,62 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00289-p00171-index111-random-protected-art-model-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00289",
+  "wave_id": "P00171",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T23:20:00+09:00",
+  "base_head_sha": "1a75532cb09d2ff5038d98d6a66fba447a24a0dd",
+  "result": "PASS_MATERIAL_PREFLIGHT_INDEX111_RANDOM_PROTECTED_ART_MODEL_RUNTIME_UNTESTED",
+  "summary": "Current C163/Q00061 Gate PASS reports no RENDER_READY or ONE_STAGE_TO_RENDER assets and leaves A-owned candidates 159/198/201 in QA backlog. It accepts index111/C075FB49 only as PREFLIGHT_ONLY and explicitly requests an exact protected-art reconstruction/model because simple dilation damages RANDOM artwork. A00289 consumes that handoff as the single allowed preflight batch. Exact canonical source replay builds a source-only protected-art segmentation model: 3027 near-white English fill pixels, 1328 exact light-blue artwork pixels, 453 pure-white question-mark pixels, and 1591 panel-border white pixels. A radius-1 text neighborhood directly intersects 30 protected source pixels (25 light-blue + 5 white), while 31 source text-fill pixels lie inside the one-pixel protected envelope. The result therefore converts the prior generic dilation blocker into an executable protected-mask/occluded-corridor reconstruction input while refusing false CLEAN_PLATE or candidate promotion. No DDS/shared state/runtime/build/N100/local clone/Drive write/Library/VR/FFB/DX changes.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_A_RUNNABLE_CANDIDATE_TIERS",
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "preflight_batches_this_invocation": 1
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00289-P00171/analyze_index111_random_protected_art.py",
+    "localization/graphics/role_A/20260930-A00289-P00171/A00289_P00171_INDEX111_RANDOM_PROTECTED_ART_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_RANDOM_EXPLICIT_SOURCE_ONLY_PROTECTED_ART_SEGMENTATION_MODEL_AND_RECONSTRUCTION_CORRIDOR",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "new_reconstruction_input": true
+  },
+  "readiness_before": "PREFLIGHT_ONLY_RANDOM_SIMPLE_MASK_REJECTED",
+  "readiness_after": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "self_qa": "PASS_EXACT_CANONICAL_SOURCE__C00288_HANDOFF_CONSUMED__3027_TEXT_FILL__3372_HARD_PROTECTED_VISIBLE__30_RADIUS1_VISIBLE_CONFLICT_25_BLUE_5_WHITE__31_TEXT_FILL_PIXELS_IN_PROTECTED_ENVELOPE__SIMPLE_DILATION_REJECTED__NO_FALSE_CLEAN_PLATE_PROMOTION__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): model index111 RANDOM protected art [AUTO:LOCALIZATION-LOCALIZATION_A-00289]",
+  "bookkeeping_note": "RESULT_SHA is populated only after the immutable producer result commit exists. Producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED."
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00289-p00171-index111-random-protected-art-model-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00289",
+  "wave_id": "P00171",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T23:20:00+09:00",
+  "base_head_sha": "1a75532cb09d2ff5038d98d6a66fba447a24a0dd",
+  "controller_schema_version": 15,
+  "c_basis": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00288",
+    "qa_batch_id": "Q00061",
+    "validation_bearing_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "index111_disposition": "PASS_PREFLIGHT_ONLY_RANDOM_SIMPLE_MASK_REJECTED",
+    "required_next": "Use an explicit protected-art reconstruction/model for RANDOM and complete independent CLEAN_PLATE QA; simple dilation is forbidden."
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "direct_rework_required_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "existing_candidate_material_rework_runnable": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_A_RUNNABLE_CANDIDATE_TIERS",
+    "preflight_batches_this_invocation": 1
+  },
+  "source_identity": {
+    "state_authority": "GitHub current HEAD + C00288 exact-source replay",
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "canonical_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "decoded_size": [
+      2048,
+      2048
+    ],
+    "raw_orientation": "mirror_y",
+    "readable_transform": "flip_y",
+    "materialization_transport": "verified pinned archive already supplied to this task; not used as progress/QA SSOT"
+  },
+  "protected_art_model": {
+    "readable_cell_half_open": [
+      1710,
+      1410,
+      2008,
+      1515
+    ],
+    "text_fill": {
+      "rgba": [
+        245,
+        247,
+        247,
+        255
+      ],
+      "pixels": 3027,
+      "bbox_local_half_open": [
+        27,
+        43,
+        227,
+        80
+      ]
+    },
+    "light_blue_art": {
+      "rgba": [
+        103,
+        152,
+        220,
+        255
+      ],
+      "pixels": 1328,
+      "bbox_local_half_open": [
+        81,
+        50,
+        202,
+        105
+      ]
+    },
+    "question_mark_white": {
+      "rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "pixels": 453,
+      "bbox_local_half_open": [
+        108,
+        64,
+        181,
+        105
+      ]
+    },
+    "panel_border_white_pixels": 1591,
+    "hard_protected_visible_pixels": 3372,
+    "protected_envelope_rule": "Chebyshev radius 1 around exact visible light-blue + pure-white protected pixels",
+    "protected_envelope_pixels": 5169,
+    "radius1_text_to_visible_protected_conflict": {
+      "pixels": 30,
+      "palette": [
+        {
+          "rgba": [
+            103,
+            152,
+            220,
+            255
+          ],
+          "pixels": 25
+        },
+        {
+          "rgba": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "pixels": 5
+        }
+      ]
+    },
+    "text_fill_inside_protected_envelope": {
+      "pixels": 31,
+      "bbox_local_half_open": [
+        104,
+        52,
+        197,
+        80
+      ]
+    },
+    "model_result": "PASS_EXPLICIT_SOURCE_ONLY_PROTECTED_ART_SEGMENTATION_MODEL",
+    "simple_dilation": "REJECTED",
+    "clean_plate": "HOLD_NOT_GENERATED",
+    "candidate_dds": "HOLD_NOT_AUTHORIZED"
+  },
+  "readiness": {
+    "before": "PREFLIGHT_ONLY_RANDOM_SIMPLE_MASK_REJECTED",
+    "after": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS",
+    "render_ready_reached": false,
+    "next": "Construct RANDOM clean plate with edits constrained outside the hard protected visible mask and explicitly reconstruct the text-occluded protected-envelope corridor; require independent C CLEAN_PLATE QA before Korean render."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00289-P00171/analyze_index111_random_protected_art.py",
+    "localization/graphics/role_A/20260930-A00289-P00171/A00289_P00171_INDEX111_RANDOM_PROTECTED_ART_PREFLIGHT.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "6616452bcc12e85ce88a7c0be2f395518f579557",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "c00288_task_blob_sha": "a1582c7d64f3546e539d55c72b980fd1e0d243d2",
+    "c163_report_blob_sha": "9027c326a4d9bf01c7352f126128746a99b6c101",
+    "a00276_task_blob_sha": "08ee9d300156655df3d3a8179cd184f1182ea5c0"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_RANDOM_EXPLICIT_SOURCE_ONLY_PROTECTED_ART_SEGMENTATION_MODEL_AND_RECONSTRUCTION_CORRIDOR",
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false
+  },
+  "self_qa": "PASS_EXACT_CANONICAL_SOURCE__C00288_HANDOFF_CONSUMED__3027_TEXT_FILL__3372_HARD_PROTECTED_VISIBLE__30_RADIUS1_VISIBLE_CONFLICT_25_BLUE_5_WHITE__31_TEXT_FILL_PIXELS_IN_PROTECTED_ENVELOPE__SIMPLE_DILATION_REJECTED__NO_FALSE_CLEAN_PLATE_PROMOTION__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
