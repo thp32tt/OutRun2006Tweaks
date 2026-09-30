@@ -1,0 +1,83 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00264-p00150-index193-single-dds-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00264",
+  "wave_id": "P00150",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T18:50:30+09:00",
+  "base_head_sha": "0d45d28ebf4688170ba6280f52e59c6262028c31",
+  "base_sha": "0d45d28ebf4688170ba6280f52e59c6262028c31",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX193_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX193_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD B scan follows schema15 modulo-3 ownership (B=index%3==1). Shared C157/Q00055 has no B-owned RENDER_READY or ONE_STAGE_TO_RENDER asset. Candidate-QA indices159/198/201 are A-owned; B00213@index133, B00263@index163, B00243@index226 and B00211@index232 are already durable producer results awaiting C and are not repeated. All B zoom_review rows are already resolved preserve-original, and sticky source blockers 139/175/217 are not reprobed. Index193/97E863AD is an unchanged C155/Q00053 STATIC_QA_PASS_RUNTIME_UNTESTED candidate with no existing single-DDS isolation manifest; C155 explicitly names exact DDS_ONLY isolation as its next runtime-validation input. Fallback step 3 therefore adds a single-DDS manifest pinned to exact source/candidate/Drive fingerprints without rerendering or candidate/shared-state modification. Runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00264-P00150/B00264_P00150_INDEX193_SINGLE_DDS_ISOLATION_INPUT.json",
+    "localization/validation/single_dds/P00150_B00264_97E863AD.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX193_97E863AD_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      193
+    ],
+    "reviewed_assets": [
+      "97E863AD"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "unresolved_zoom_review_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "selected_indices": [
+      193
+    ],
+    "qa_pending_not_repeated": [
+      133,
+      163,
+      226,
+      232
+    ],
+    "dependency_blocked_not_repeated": [
+      139,
+      175,
+      217
+    ],
+    "readiness_before": {
+      "193": "STATIC_QA_PASS_RUNTIME_UNTESTED_NO_SINGLE_DDS_ISOLATION_INPUT"
+    },
+    "readiness_after": {
+      "193": "STATIC_QA_PASS_RUNTIME_UNTESTED_SINGLE_DDS_ISOLATION_INPUT_READY_PENDING_C"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX193__C157_ZERO_RUNNABLE_READY_TIERS__ZERO_UNRESOLVED_ZOOM_REVIEW__QA_PENDING_NOT_REPEATED__UNCHANGED_BLOCKERS_NOT_RETRIED__UNCHANGED_C155_STATIC_PASS_REUSED__DRIVE_METADATA_REVALIDATED__NO_EXISTING_MANIFEST__NEW_DDS_ONLY_ISOLATION_INPUT__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "REUSED_C155_Q00053_STATIC_QA_PASS_UNCHANGED_SOURCE_CANDIDATE_FINGERPRINT",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(B): add index193 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00264]",
+  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created; producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED."
+}

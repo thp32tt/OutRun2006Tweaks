@@ -1,0 +1,122 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00264-p00150-index193-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00264",
+  "wave_id": "P00150",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T18:50:30+09:00",
+  "base_head_sha": "0d45d28ebf4688170ba6280f52e59c6262028c31",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "latest_shared_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "runnable_render_ready_indices": [],
+    "runnable_one_stage_to_render_indices": [],
+    "candidate_qa_backlog_outside_b_shard": [
+      159,
+      198,
+      201
+    ],
+    "skipped_qa_pending": [
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213",
+        "kind": "PREGEN"
+      },
+      {
+        "index": 163,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00263",
+        "kind": "RUNTIME_ISOLATION"
+      },
+      {
+        "index": 226,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00243",
+        "kind": "RUNTIME_ISOLATION"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211",
+        "kind": "PREGEN"
+      }
+    ],
+    "skipped_dependency_blocked": [
+      {
+        "index": 139,
+        "asset": "313DB8CB",
+        "reason": "SOURCE_ACQUISITION_EXHAUSTED sticky from B00253"
+      },
+      {
+        "index": 175,
+        "asset": "754F0599",
+        "reason": "SOURCE_IDENTITY_MISMATCH sticky"
+      },
+      {
+        "index": 217,
+        "asset": "D1039D6F",
+        "reason": "SOURCE_IDENTITY_MISMATCH sticky"
+      }
+    ],
+    "zoom_review_unresolved_count": 0,
+    "selected_priority": "FALLBACK_STEP_3_SINGLE_DDS_RUNTIME_ISOLATION_AFTER_ZERO_RUNNABLE_READY_AND_ZERO_UNRESOLVED_ZOOM_REVIEW",
+    "selected_index": 193,
+    "selected_asset": "97E863AD"
+  },
+  "fingerprint_reuse": {
+    "source_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "candidate_archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+    "candidate_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+    "drive_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+    "drive_metadata_revalidated": {
+      "name": "B00231_INDEX193_CANDIDATE.zip",
+      "bytes": 68578,
+      "modified_time": "2026-09-29T22:43:58.863Z",
+      "parent_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh"
+    },
+    "qa_source": "C155/Q00053",
+    "c_result_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+    "source_candidate_changed": false,
+    "heavy_qa_repeated": false,
+    "note": "Current automation-contract changes after C155 are controller/topology changes; this producer does not modify candidate bytes and leaves final manifest validation to C_BATCH_GATE."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX193_97E863AD_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      193
+    ],
+    "reviewed_assets": [
+      "97E863AD"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX193__ZERO_RUNNABLE_READY_TIERS__ZERO_UNRESOLVED_ZOOM_REVIEW__UNCHANGED_C155_STATIC_PASS_SOURCE_CANDIDATE_FINGERPRINT_REUSED__DRIVE_METADATA_REVALIDATED__NO_EXISTING_97E863AD_ISOLATION_MANIFEST__NEW_DDS_ONLY_ISOLATION_INPUT__NO_CANDIDATE_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "REUSED_C155_Q00053_STATIC_QA_PASS_UNCHANGED_SOURCE_CANDIDATE_FINGERPRINT",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00150_B00264_97E863AD.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00231.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00238.json"
+  ]
+}

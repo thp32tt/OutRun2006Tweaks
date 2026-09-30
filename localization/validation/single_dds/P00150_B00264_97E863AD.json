@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00264-p00150-index193-single-dds-isolation-v1",
+  "case_id": "P00150_B00264_97E863AD",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00264",
+  "wave_id": "P00150",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T18:50:30+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "0d45d28ebf4688170ba6280f52e59c6262028c31",
+  "active": true,
+  "purpose": "Provide an exact DDS_ONLY runtime-isolation input for the unchanged C155/Q00053 STATIC_QA_PASS_RUNTIME_UNTESTED 97E863AD candidate without rerendering or repeating candidate heavy QA. Runtime remains untested until a real game test.",
+  "asset": {
+    "id": "97E863AD",
+    "queue_index": 193,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 13,
+    "protected_groups": [
+      "TESTAROSSA",
+      "OUTRUN2SP",
+      "SP OR",
+      "structural artwork"
+    ]
+  },
+  "source": {
+    "canonical_transport": "PINNED_V0.25.10A_RELEASE",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "bytes": 8388736,
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "drive_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+    "drive_folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+    "archive_name": "B00231_INDEX193_CANDIDATE.zip",
+    "archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+    "archive_bytes": 68578,
+    "member": "97E863AD_512x256.dds",
+    "member_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+    "member_bytes": 8388736,
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00231",
+      "producer_result_sha": "29c0f8f37786d025a3c9a4b168c6232860573745",
+      "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00238",
+      "c_static_qa_result_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+      "c_gate_run_id": 36643892797,
+      "candidate_sha256_at_c155": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+      "current_drive_metadata": {
+        "name": "B00231_INDEX193_CANDIDATE.zip",
+        "bytes": 68578,
+        "modified_time": "2026-09-29T22:43:58.863Z",
+        "parent_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh"
+      },
+      "no_existing_97e863ad_single_dds_manifest_at_selection": true,
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "status": "REUSED_C155_Q00053_STATIC_QA_PASS_UNCHANGED_SOURCE_CANDIDATE_FINGERPRINT",
+    "independent_c_result_sha": "cf375f6695e2d933c420002a6476f1c081b29b75",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "header_128_exact": true,
+    "header_sha256": "2195f6a7",
+    "semantic_binding": "PASS_13_OF_13",
+    "clean_plate_removal_mask_pixels": 152967,
+    "korean_letter_mask_pixels": 84738,
+    "safe_bbox_containment": "PASS_13_OF_13",
+    "changed_rgba_outside_source_effect_union": 0,
+    "alpha_changed_outside_source_effect_union": 0,
+    "introduced_alpha_outside_source_effect_union": 0,
+    "protected_artwork_damage": false,
+    "english_residue": false,
+    "broken_hangul": false,
+    "clipping_or_overlap": false,
+    "wrong_image_or_resolution_loss": false,
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds",
+    "source_candidate_from_drive_zip": {
+      "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+      "drive_file_id": "1RZ3KyxxPB6zE83syDdYewkessJEzUmo2",
+      "drive_folder_id": "1mWikwUl0XA-9oW6MDZe2q9ZCN9eDrOoh",
+      "archive_name": "B00231_INDEX193_CANDIDATE.zip",
+      "archive_sha256": "e05a6037a2db24ca6a2291acb7a13fcd2bb9c5c44371547f4bfee717c24e5702",
+      "archive_bytes": 68578,
+      "member": "97E863AD_512x256.dds",
+      "member_sha256": "3646e6b61430c1d7b6bc524e75c75ca6a65053b164d922260379819c8d84168d",
+      "member_bytes": 8388736
+    },
+    "external_candidate_allowed_by_current_contract": true,
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 97E863AD replacement DDS and confirm the affected front-end UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all 13 localized regions.",
+    "Confirm FLIP_Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring-region overlap and any 1-pixel overflow.",
+    "Confirm TESTAROSSA, OUTRUN2SP, SP OR and structural artwork remain visually unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
