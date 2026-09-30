@@ -98,8 +98,18 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_SCHEMA16__C170_RUNNABLE_PRODUCTION_EMPTY__NO_COMPLETION_TIER_REPEATED__ONE_NEW_PREFLIGHT_ONLY_BATCH__INDEX54_CURRENT_INVENTORY_F769_VS_APPROVED_TRANSPORT_61C_SOURCE_IDENTITY_MISMATCH__HISTORICAL_B95_LINEAGE_RETIRED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "d40716564a256cf6425b62dcf01038550769269f",
+  "authoritative_result_sha": "d40716564a256cf6425b62dcf01038550769269f",
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(A): gate index54 current source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00323]"
+  "result_commit_message": "localization(A): gate index54 current source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00323]",
+  "bookkeeping_note": "Producer durable material result SHA bound after the result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate from the material result and owns no Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:39:30+09:00",
+  "bookkeeping_base_head_sha": "d40716564a256cf6425b62dcf01038550769269f",
+  "precommit_refresh": {
+    "head_sha": "60a826a7db5665ebf28f22071a48f28e63dc3b81",
+    "preserved_peer_head_before_result": "60a826a7db5665ebf28f22071a48f28e63dc3b81",
+    "result_parent_sha": "60a826a7db5665ebf28f22071a48f28e63dc3b81",
+    "stale_state_overwrite": false,
+    "note": "A00323 result was created on the then-latest branch after B00322 bookkeeping; only new lane-local A00323 evidence/task paths were added."
+  }
 }
