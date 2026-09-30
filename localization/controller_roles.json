@@ -1,5 +1,5 @@
 {
-  "schema_version": 14,
+  "schema_version": 15,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -54,7 +54,7 @@
       "input_identity": "TASK_ID@RESULT_SHA",
       "batch_size": 4,
       "coalesce_seconds": 30,
-      "candidate_write_policy": "RETURN_REWORK_TO_A_OR_B",
+      "candidate_write_policy": "RETURN_REWORK_TO_OWNING_A_B_OR_E",
       "blocks_producers": false,
       "automation_validation": "C_BATCH_GATE"
     },
@@ -444,6 +444,17 @@
       "ODD_EVEN_A_B",
       "TWO_PRODUCER_ONLY"
     ],
-    "required_current_shard_rule": "asset_queue.index % 3: A=0, B=1, E=2"
+    "required_current_shard_rule": "asset_queue.index % 3: A=0, B=1, E=2",
+    "forbidden_prompt_fragments": [
+      "A: odd-index",
+      "B: even-index",
+      "A+B production wave",
+      "both A/B",
+      "odd/even queue shards"
+    ],
+    "authoritative_role_sources": [
+      "localization/controller_roles.json",
+      "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md"
+    ]
   }
 }
