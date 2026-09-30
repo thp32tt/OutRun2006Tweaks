@@ -325,6 +325,7 @@ namespace OutRunVR::GameSemantic
     inline std::atomic<std::uint64_t> SpriteNodeSemanticRegistered{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticConsumed{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticStaleCleared{ 0 };
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticOverflowRejected{ 0 };
     inline thread_local std::uint64_t SpriteQueueSemanticCutoff = 0;
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     inline thread_local unsigned SpriteQueueDepth = 0;
@@ -404,20 +405,13 @@ namespace OutRunVR::GameSemantic
             return;
         }
 
-        // This should never be hot: exact semantic producers are sparse.
-        // If a broken frame fills the table, replace the oldest entry rather
-        // than silently disabling semantic ownership for the rest of the run.
-        std::size_t oldest = 0;
-        for (std::size_t i = 1; i < SpriteNodeSemanticCount; ++i)
-            if (SpriteNodeSemanticTags[i].serial <
-                SpriteNodeSemanticTags[oldest].serial)
-                oldest = i;
-        SpriteNodeSemanticTags[oldest] =
-            { node, scope, serial,
-              projectedMarker ? *projectedMarker : ProjectedMarkerInfo{},
-              owner };
-        SpriteNodeSemanticRegistered.fetch_add(1, std::memory_order_relaxed);
-        SpriteNodeSemanticStaleCleared.fetch_add(1, std::memory_order_relaxed);
+        // F16: saturation must never evict a live exact tag. Preserving
+        // already-published queue ownership is safer than corrupting an older
+        // HUD/world node to admit a newer tag. The rejected node therefore
+        // falls back through ConsumeSpriteNodeScope to ScreenOverlay2D, while
+        // this counter makes abnormal pressure explicit instead of silent.
+        SpriteNodeSemanticOverflowRejected.fetch_add(
+            1, std::memory_order_relaxed);
     }
 
     inline RenderScope ConsumeSpriteNodeScope(

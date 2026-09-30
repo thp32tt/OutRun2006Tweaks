@@ -212,6 +212,23 @@ def main() -> None:
             "F13 DispGhostGap force ownership regressed to spacing-only callbacks: "
             f"{stale_ghost_gap_force_hooks}"
         )
+    semantic_text = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
+    register_block = re.search(
+        r"inline void RegisterSpriteNodeScope\(.*?"
+        r"inline RenderScope ConsumeSpriteNodeScope\(",
+        semantic_text,
+        re.S,
+    )
+    if not register_block:
+        raise SystemExit("F16 semantic tag registration block missing")
+    register_body = register_block.group(0)
+    if "SpriteNodeSemanticOverflowRejected.fetch_add" not in register_body:
+        raise SystemExit("F16 semantic tag overflow rejection counter missing")
+    if "std::size_t oldest = 0;" in register_body or "SpriteNodeSemanticTags[oldest]" in register_body:
+        raise SystemExit("F16 regression: semantic tag overflow evicts a live exact tag")
+    if "SpriteNodeSemanticStaleCleared.fetch_add" in register_body:
+        raise SystemExit("F16 regression: overflow is misreported as stale cleanup")
+
     require(
         "src/vr/hud_semantics.hpp",
         [
