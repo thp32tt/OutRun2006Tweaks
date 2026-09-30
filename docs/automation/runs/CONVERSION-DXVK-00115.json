@@ -1,0 +1,78 @@
+{
+  "task_id": "CONVERSION-DXVK-00115",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "7c0b8a9025d69ffd92e1e4c06ad26b5756186643",
+  "result_sha": "46cb80f9bebadea6c7526fb4f73023859d7a06e9",
+  "validation_bearing_result_sha": "46cb80f9bebadea6c7526fb4f73023859d7a06e9",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R129_CTRL_ICON_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for exact ctrl_icon_work/set_icon_work HUD position-correction callsites 0x60A21, 0x60D40 and 0x60FBC. Existing XMM0 AddSpriteSpacing behavior is preserved; 0x60A21 and 0x60FBC preserve the existing XMM0-to-[ESP] mirror while 0x60D40 remains without that mirror. Immediate next-draw ScreenHud ownership now derives from GameSemantic::ClassifyCriticalProducer(CallerRva), with compile-time and verifier guards. No producer range, world/stereo path, transport path or unrelated HUD family was changed.",
+  "evidence": [
+    "All three exact callers 0x60A21, 0x60D40 and 0x60FBC are listed as HUD_CTRL_ICON ScreenHud anchors and lie inside canonical ctrl_icon_work SCREEN_HUD range 0x60900-0x61100.",
+    "The R129 helper preserves AddSpriteSpacing(&ctx.xmm0.f32[0], false) for all three callsites.",
+    "The R129 helper preserves *(float*)(ctx.esp)=ctx.xmm0.f32[0] only for 0x60A21 and 0x60FBC, exactly matching the previous AdjustPosition2 behavior.",
+    "render_semantics.hpp compile-time asserts all three exact RVAs classify as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires all three exact R129 template instantiations and rejects restoration of the legacy ctrl_icon_work/set_icon_work bindings.",
+    "Validation-bearing source result 46cb80f9bebadea6c7526fb4f73023859d7a06e9 contains [AUTO:CONVERSION-DXVK-00115] and no CI-skip directive.",
+    "Backend Conversion Gate 36699775534 PASS; artifact 11089810756 digest sha256:4d259cabee9e6465c3fff3a6da15a68d0d4539cb41694e877af812d0e89454fc.",
+    "Build 36699781085 PASS after same-run failed-job rerun. The first job compiled and verified the payload successfully, then failed only because GitHub returned a Server Error page while downloading the upstream replacement EXE. Rerun job 109838180658 passed compile, payload verification, the same download, license collection and artifact uploads without any source change.",
+    "OpenXR VR architecture 36699781201 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36699781266 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36699775304 PASS and PR 36699781239 PASS.",
+    "VR PC Fast Test Build 36699775359 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "46cb80f9bebadea6c7526fb4f73023859d7a06e9",
+      "message": "vr: route control-icon HUD through shared producer map [AUTO:CONVERSION-DXVK-00115]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36699775534,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11089810756,
+    "backend_conversion_gate_artifact_digest": "sha256:4d259cabee9e6465c3fff3a6da15a68d0d4539cb41694e877af812d0e89454fc",
+    "build_run_id": 36699781085,
+    "build_result": "PASS",
+    "build_transient_failure": "Initial job failed only at upstream replacement EXE download because GitHub returned a Server Error page; same-run failed-job rerun succeeded with no source change.",
+    "build_rerun_job_id": 109838180658,
+    "openxr_run_id": 36699781201,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36699781266,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36699775304,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36699781239,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36699775359,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5908909518,
+    "validation_comment_id": 5909127799
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_DISPTEMPHEARTNUM_EXACT_EDGE",
+    "after": "PARTIAL_PLUS_CTRL_ICON_EXACT_EDGES",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded ctrl_icon_work/set_icon_work F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven producer sub-family. Do not widen producer ranges or convert state-toggle-only hooks unless immediate draw ownership is separately proven. Keep runtime validation distinct from hosted CI."
+}
