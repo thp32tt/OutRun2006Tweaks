@@ -9,14 +9,14 @@
   "next_actions": [
     "RENDER_READY: none.",
     "ONE_STAGE_TO_RENDER: none.",
-    "CANDIDATE_REWORK: indices121/FD90AA9 and 163/59A79158 remain ahead of unrelated preflight. Index163 retains Q00060 material-undersizing rework; newer B00284 conservative-fit spec is out-of-batch QA_PENDING and is not implicitly approved here.",
-    "QA_BACKLOG: candidate-bearing index97/411827E from out-of-batch B00283 plus indices159/198/201 remain ahead of unrelated preflight. Index51/FF2462BB leaves this backlog after Q00061 STATIC_QA PASS.",
-    "PREFLIGHT_ONLY: index94/2DA43E41, index111/C075FB49, indices133/232 remain localize-text preflight work. Q00061 additionally accepts special-pipeline preflight for index24 name-entry and font indices15/18/21, but all four remain runtime-mapping blocked and must stay behind candidate completion.",
+    "CANDIDATE_REWORK: indices121/FD90AA9 and 163/59A79158 remain ahead of unrelated preflight. Index163 retains Q00060 material-undersizing rework; newer B00284 conservative-fit spec is out-of-batch QA_PENDING and is not implicitly approved by Q00061.",
+    "QA_BACKLOG: candidate-bearing index97/411827E from out-of-batch B00283 plus indices159/198/201 remain ahead of unrelated preflight. Index51/FF2462BB is now STATIC_QA_PASS_RUNTIME_UNTESTED.",
+    "PREFLIGHT_ONLY: index94/2DA43E41, index111/C075FB49, indices133/232 remain localize-text preflight work. Q00061 also accepts runtime-blocked special preflight for index24 and font indices15/18/21; these remain behind candidate completion.",
     "STATIC_QA: index51/FF2462BB joins unchanged accepted static fingerprints 99/102/112/130/152/193/195/222/226/231/237. Runtime remains UNTESTED.",
     "RUNTIME_ISOLATION: accepted inputs remain 99/102/112/130/193/237. Index51 has no accepted isolation input yet; indices226/231 remain QA_PENDING isolation inputs.",
-    "OUT_OF_BATCH_QA_PENDING: A00281 font runtime-binding harness, A00285/A00286 guards, B00283 index97 candidate and B00284 index163 rework spec are preserved without implicit approval.",
+    "OUT_OF_BATCH_QA_PENDING: A00281 font runtime-binding harness, A00285/A00286 guards, B00283 index97 candidate and B00284 index163 rework spec remain preserved without implicit approval.",
     "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; unchanged source-exhaustion rows must not be reprobed.",
-    "Q00061 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+    "Q00061 validation-bearing result 7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a passed Localization Automation Gate 36726224927. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -104,7 +104,7 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-09-30T23:00:00+09:00",
+      "updated_at_kst": "2026-09-30T23:05:00+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
       "report": "localization/graphics/role_C/202609302300-C163/C163_Q00061_INDEPENDENT_QA_BATCH.json",
       "direct_queue_scope": 126,
@@ -428,7 +428,10 @@
       "q00061_candidate_dds_modified": false,
       "q00061_static_pass_candidate_sha256": {
         "51": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0"
-      }
+      },
+      "q00061_automation_validation": "PASS",
+      "q00061_validation_bearing_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+      "q00061_automation_gate_run_id": 36726224927
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -2894,11 +2897,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "All four inputs add distinct scope/fingerprints. A00278 new candidate receives fresh source/candidate/previous-byte/current-policy visual QA. A00276 and A00279 are independently replayed against exact source bytes. A00280 is replayed against exact static stock-map/inventory/manifest blobs. No unchanged PASS candidate QA is recomputed.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "authoritative_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "validation_bearing_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36726224927,
+      "head_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T23:04:00+09:00"
+    },
+    "bookkeeping_note": "Q00061 authoritative Gate PASS is owned by validation-bearing result 7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-09-30T23:05:00+09:00",
+    "bookkeeping_base_head_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a"
   }
 }

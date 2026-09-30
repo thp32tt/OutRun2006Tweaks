@@ -1432,3 +1432,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Font indices15/18/21: exact stock descriptor/resource-handle crosswalk independently matches stock map/inventory/505-glyph manifest. **PASS / PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED**; A00281 is separate QA_PENDING.
 - Order after reconciliation: **RENDER_READY none -> ONE_STAGE none -> rework 121/163 -> candidate QA 97/159/198/201 -> PREFLIGHT_ONLY 94/111/133/232 -> runtime-blocked special preflight 15/18/21/24**. Pending production **66**, actionable **93**, canonical segments **755**.
 - Newer B00283@index97 candidate, B00284@index163 spec and A00281/A00285/A00286 remain out-of-batch QA_PENDING. No C candidate rewrite, runtime test, build, N100/local clone/worktree, GPT Library, Drive write, or VR/FFB/DX change. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C163 Q00061 authoritative Gate PASS — 2026-09-30 23:05 KST
+- Validation-bearing result `7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a`; Localization Automation Gate `36726224927` completed **success**.
+- Q00061 dispositions remain **A00276 PASS / A00278 PASS / A00279 PASS / A00280 PASS**. Index51/FF2462BB is authoritative **STATIC_QA_PASS_RUNTIME_UNTESTED** on candidate `907350cd...`; index111/index24/font15/18/21 remain accepted only for their PREFLIGHT_ONLY scopes.
+- Order remains **RENDER_READY none -> ONE_STAGE none -> rework 121/163 -> candidate QA 97/159/198/201 -> PREFLIGHT_ONLY 94/111/133/232 -> runtime-blocked special preflight 15/18/21/24**. Pending production **66**, actionable **93**, canonical segments **755**.
+- Canonical and legacy progress files remain byte-for-byte identical. This bookkeeping checkpoint is separate from the Gate-owning result commit. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

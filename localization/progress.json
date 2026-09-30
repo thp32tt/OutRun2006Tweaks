@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-09-30T23:00:00+09:00",
+  "updated_at_kst": "2026-09-30T23:05:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C163/Q00061 RESULT PENDING GATE: A00276@index111 PASS PREFLIGHT_ONLY exact RANDOM protected-art fail-closed guard; A00278@index51 PASS STATIC_QA_PASS_RUNTIME_UNTESTED on Drive candidate 907350cd... after independent source/candidate/previous-byte/current-policy replay; A00279@index24 PASS PREFLIGHT_ONLY name-entry geometry with runtime mapping blocked; A00280 font15/18/21 PASS PREFLIGHT_ONLY static descriptor crosswalk with runtime handle usage blocked. Order RENDER_READY none -> ONE_STAGE none -> candidate rework 121/163 -> candidate QA 97/159/198/201 -> PREFLIGHT_ONLY 94/111/133/232 -> special runtime-blocked preflight 15/18/21/24. Pending production 66; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C163/Q00061 AUTHORITATIVE GATE PASS: validation-bearing result 7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a passed Localization Automation Gate 36726224927. A00276@index111 PASS PREFLIGHT_ONLY RANDOM protected-art guard; A00278@index51 PASS STATIC_QA_PASS_RUNTIME_UNTESTED on candidate 907350cd...; A00279@index24 PASS PREFLIGHT_ONLY name-entry geometry; A00280 font15/18/21 PASS PREFLIGHT_ONLY static crosswalk. Order RENDER_READY none -> ONE_STAGE none -> candidate rework 121/163 -> candidate QA 97/159/198/201 -> PREFLIGHT_ONLY 94/111/133/232 -> special runtime-blocked preflight 15/18/21/24. Pending production 66; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1626,11 +1626,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "All four inputs add distinct scope/fingerprints. A00278 new candidate receives fresh source/candidate/previous-byte/current-policy visual QA. A00276 and A00279 are independently replayed against exact source bytes. A00280 is replayed against exact static stock-map/inventory/manifest blobs. No unchanged PASS candidate QA is recomputed.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "authoritative_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "validation_bearing_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36726224927,
+      "head_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T23:04:00+09:00"
+    },
+    "bookkeeping_note": "Q00061 authoritative Gate PASS is owned by validation-bearing result 7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-09-30T23:05:00+09:00",
+    "bookkeeping_base_head_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a"
   }
 }

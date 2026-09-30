@@ -480,10 +480,22 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "All four inputs add distinct scope/fingerprints. A00278 new candidate receives fresh source/candidate/previous-byte/current-policy visual QA. A00276 and A00279 are independently replayed against exact source bytes. A00280 is replayed against exact static stock-map/inventory/manifest blobs. No unchanged PASS candidate QA is recomputed.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null
+  "result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+  "authoritative_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+  "validation_bearing_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36726224927,
+    "head_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T23:04:00+09:00"
+  },
+  "bookkeeping_note": "Q00061 authoritative Gate PASS is owned by validation-bearing result 7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T23:05:00+09:00",
+  "bookkeeping_base_head_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a"
 }
