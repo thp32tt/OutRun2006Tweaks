@@ -1,0 +1,38 @@
+{
+  "task_id": "CONVERSION-DXVK-00139",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "69fec3046397c37d626ca19e2bd9c3beb69c9521",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R140_TARGET_65970_SECOND_CALL_ALIGNMENT",
+  "selection_reason": "All current priority-13/12 DXVK queue items are NEED_HMD_TEST. QUEUE_CONTROLLER_CONTRACT requires runtime-dependent work to be skipped in favor of an independent runnable task. CONVERSION-DXVK-00135 explicitly left 0x659AC and 0x659C1 for bounded independent provenance proof.",
+  "summary": "Add a bounded exact-EXE instruction-alignment proof for guarded-GF target C's second outbound CALL at 0x659AC. The proof is anchored to the already-proven first-call prefix, requires an exact contiguous byte map from 0x6599F through 0x659B0, decodes the E8 to 0x28320 in .text, and leaves helper semantics/ownership unresolved. No renderer, transport, cadence, HUD ownership, or OpenXR runtime behavior changes.",
+  "evidence": [
+    "CONVERSION-DXVK-00135 exact result 28bb8d3e proved 0x65997->0x28460 and left 0x659AC->0x28320 / 0x659C1->0x28800 unresolved.",
+    "HUD Inspector static-exe-analysis run 36725622562 on the exact replacement EXE reported target-C bytes64 through the 0x659AC E8 prefix and raw outbound candidate 0x659AC->0x28320 in .text.",
+    "The exact rel32 for 0x659AC->0x28320 is 0xFFFC296F, encoded little-endian as 6f 29 fc ff; the new proof verifies those bytes directly against the exact EXE in CI rather than trusting the earlier raw candidate census.",
+    "Issue #81 P0 DXVK gameplay pacing remains runtime-dependent after CONVERSION-DXVK-00137; no runtime policy is changed by this independent provenance task."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00139.json"
+  ],
+  "target_c_second_call_expected": {
+    "entry_rva": "0x00065970",
+    "continuation_anchor_rva": "0x0006599F",
+    "second_call_rva": "0x000659AC",
+    "expected_target_rva": "0x00028320",
+    "expected_target_section": ".text",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "remaining_raw_call": "0x000659C1"
+  },
+  "next_action": "Run exact-result GitHub Actions. Require Backend Conversion Gate and OutRun EXE HUD Inspector static-exe-analysis PASS; then finalize this record in a separate CI-skipped bookkeeping commit. RUNTIME_VALIDATION remains UNTESTED."
+}
