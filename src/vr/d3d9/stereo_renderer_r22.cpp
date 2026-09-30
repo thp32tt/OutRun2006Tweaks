@@ -882,4 +882,14 @@ namespace OutRunVRStereo
     {
         return R22StateBlockTrackingReliable.load(std::memory_order_acquire);
     }
+
+    void FailClosedStereoEligibility() noexcept
+    {
+        R22FailClosedEligibility();
+    }
+
+    void ResetStereoBaselineTracking() noexcept
+    {
+        R22ResetBaselineTracking();
+    }
 }

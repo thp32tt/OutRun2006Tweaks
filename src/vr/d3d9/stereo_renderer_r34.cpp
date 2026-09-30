@@ -10,6 +10,7 @@
 #include "stereo_renderer_r33.cpp"
 #include "vr/game/render_semantics.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
+#include "../lifecycle/recovery_api.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -39,8 +40,8 @@ namespace OutRunVRStereo
                 return;
 
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
-            R22FailClosedEligibility();
-            R22ResetBaselineTracking();
+            FailClosedStereoEligibility();
+            ResetStereoBaselineTracking();
             R22ShadowState = {};
             R33InvalidateDepthStencilCache();
             R29ArmMonoSafety();
