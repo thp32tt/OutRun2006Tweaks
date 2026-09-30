@@ -10,6 +10,7 @@
 #include "stereo_renderer_r33.cpp"
 #include "vr/game/render_semantics.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
+#include "../telemetry/raster_guard_metrics.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -29,10 +30,9 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R34InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
         OutRunVR::Lifecycle::ResetReplayState R34ResetReplay{};
-        std::uint64_t R34RasterGuardDraws = 0;
+        OutRunVR::Telemetry::RasterGuardMetrics R34RasterGuardMetrics{};
         bool R34FirstReplayBlockLogged = false;
         bool R34FirstLostDeviceBypassLogged = false;
-        bool R34FirstRasterGuardLogged = false;
 
         void R34ForceResetReplayFailClosed(IDirect3DDevice9* device,
             const char* site) noexcept
@@ -89,10 +89,10 @@ namespace OutRunVRStereo
                 return drawCall();
             }
 
-            ++R34RasterGuardDraws;
-            if (!R34FirstRasterGuardLogged)
+            ++R34RasterGuardMetrics.draws;
+            if (!R34RasterGuardMetrics.firstLogged)
             {
-                R34FirstRasterGuardLogged = true;
+                R34RasterGuardMetrics.firstLogged = true;
                 spdlog::info(
                     "VR R34 RASTER GUARD: final draw boundary now preserves viewport/scissor across R33 fast and R29 fallback eye-target switches");
             }
