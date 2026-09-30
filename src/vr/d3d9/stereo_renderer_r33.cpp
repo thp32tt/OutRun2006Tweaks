@@ -826,6 +826,32 @@ namespace OutRunVRStereo
             return true;
         }
 
+        void R33CreateDisabledHooks() noexcept
+        {
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R33ResetR32Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&ResetDestR32),
+                ResetDestR33, disabled);
+            R33PresentR32Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&PresentDestR32),
+                PresentDestR33, disabled);
+            R33SetRenderStateR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&SetRenderStateDestR29),
+                SetRenderStateDestR33, disabled);
+            R33DrawPrimitiveR32Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveDestR32),
+                DrawPrimitiveDestR33, disabled);
+            R33DrawIndexedPrimitiveR32Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR32),
+                DrawIndexedPrimitiveDestR33, disabled);
+            R33DrawPrimitiveUPR32Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveUPDestR32),
+                DrawPrimitiveUPDestR33, disabled);
+            R33DrawIndexedPrimitiveUPR32Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR32),
+                DrawIndexedPrimitiveUPDestR33, disabled);
+        }
+
         DWORD WINAPI R33InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
@@ -842,28 +868,7 @@ namespace OutRunVRStereo
                 }
                 if (r32 == State::Ready)
                 {
-                    const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R33ResetR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDestR32),
-                        ResetDestR33, disabled);
-                    R33PresentR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&PresentDestR32),
-                        PresentDestR33, disabled);
-                    R33SetRenderStateR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&SetRenderStateDestR29),
-                        SetRenderStateDestR33, disabled);
-                    R33DrawPrimitiveR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR32),
-                        DrawPrimitiveDestR33, disabled);
-                    R33DrawIndexedPrimitiveR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR32),
-                        DrawIndexedPrimitiveDestR33, disabled);
-                    R33DrawPrimitiveUPR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR32),
-                        DrawPrimitiveUPDestR33, disabled);
-                    R33DrawIndexedPrimitiveUPR32Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR32),
-                        DrawIndexedPrimitiveUPDestR33, disabled);
+                    R33CreateDisabledHooks();
 
                     if (!R33EnableHooks())
                     {
