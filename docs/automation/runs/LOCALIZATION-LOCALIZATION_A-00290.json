@@ -67,7 +67,7 @@
   "authoritative_result_sha": "2c86a9f3a0a5fef5990fc7adffc18be73310660f",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): guard index36 exact-name source [AUTO:LOCALIZATION-LOCALIZATION_A-00290]",
-  "bookkeeping_note": "Immutable producer result 2c86a9f3a0a5fef5990fc7adffc18be73310660f contains only A lane-local index36 exact-name source reactivation tooling/output plus the durable task record and required AUTO marker. This bookkeeping commit only records the producer result SHA; automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED.",
-  "bookkeeping_recorded_at_kst": "2026-09-30T23:37:00+09:00",
+  "bookkeeping_note": "Immutable producer result 2c86a9f3a0a5fef5990fc7adffc18be73310660f contains only A lane-local index36 exact-name source reactivation tooling/output plus the durable task record and required AUTO marker. Bookkeeping records the producer result SHA only; automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T23:34:39+09:00",
   "bookkeeping_base_head_sha": "2c86a9f3a0a5fef5990fc7adffc18be73310660f"
 }
