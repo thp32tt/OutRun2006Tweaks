@@ -117,6 +117,8 @@ def main() -> None:
             "DispGhostGap_ForceSpacingAndHud<0x000BE0A5u, false>",
             "DispGhostGap_ForceSpacingAndHud<0x000BE067u, false>",
             "VR R127 GHOST GAP FORCE HUD: shared producer-map handoff",
+            "DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u>",
+            "VR R128 TEMP HEART HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -178,6 +180,10 @@ def main() -> None:
         raise SystemExit(
             "F13 DispGhostGap force ownership regressed to spacing-only callbacks: "
             f"{stale_ghost_gap_force_hooks}"
+        )
+    if "DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BBA89, DispTempHeartNum_AdjustPosition);" in hooks_text:
+        raise SystemExit(
+            "F13 DispTempHeartNum ownership regressed to spacing-only callback"
         )
     require(
         "tools/analyze_outrun_exe.py",
