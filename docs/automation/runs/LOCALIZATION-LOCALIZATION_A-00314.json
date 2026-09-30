@@ -89,8 +89,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_SCHEMA16__UNCHANGED_A00313_FRONTIER__NO_LEGAL_COMPLETION_TIER__QA_PENDING_NOT_REPEATED__STICKY_SOURCE_NOT_REPROBED__B121_NOT_STOLEN__DUPLICATE_DISPATCH_SUPPRESSION_RECEIPT_PERSISTED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "3b83a503d54e0ab79f90cf0ca29233b4e1a4b2bb",
+  "authoritative_result_sha": "3b83a503d54e0ab79f90cf0ca29233b4e1a4b2bb",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): suppress unchanged A frontier redispatch [AUTO:LOCALIZATION-LOCALIZATION_A-00314]",
   "precommit_refresh": {
@@ -98,5 +98,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "B00310@index121 landed after A00313. It is B-owned and disjoint from the A frontier; contract/controller/queue/latest authoritative C inputs are unchanged. C00311 durable record is absent at precommit refresh."
   },
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable producer result commit is created. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result SHA bound after durable result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not own a Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T03:39:00+09:00",
+  "bookkeeping_base_head_sha": "3b83a503d54e0ab79f90cf0ca29233b4e1a4b2bb"
 }
