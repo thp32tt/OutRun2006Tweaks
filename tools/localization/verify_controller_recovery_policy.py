@@ -68,6 +68,16 @@ required = {
 
 expected_failures = {"failure","cancelled","timed_out","action_required","stale"}
 required["wait_actions.retry_terminal_failure_conclusions"] = expected_failures.issubset(set(wa.get("retry_terminal_failure_conclusions") or []))
+
+ga = cfg.get("github_access_validation") or {}
+required["github_access_validation.repository"] = ga.get("repository") == "thp32tt/OutRun2006Tweaks"
+required["github_access_validation.refresh_before_permission_block"] = ga.get("refresh_before_permission_block") is True
+required["github_access_validation.authoritative_write_capabilities"] = {"push","maintain","admin"}.issubset(set(ga.get("authoritative_write_capabilities") or []))
+permission_rule = str(ga.get("permission_denied_only_when") or "")
+required["github_access_validation.permission_denied_requires_fresh_evidence"] = ("fresh repository permission metadata" in permission_rule and "401/403" in permission_rule)
+non_permission = set(ga.get("do_not_classify_as_permission_denied") or [])
+required["github_access_validation.non_permission_failures"] = {"404_PATH_OR_REF_NOT_FOUND","UNSUPPORTED_CONNECTOR_OR_API_OPERATION","STALE_BLOB_SHA_CONFLICT","BRANCH_HEAD_RACE","VALIDATION_FAILURE","RATE_LIMIT","LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"}.issubset(non_permission)
+
 runtime_fields = {"queue_loop_heartbeat_at","last_scheduler_decision_at","last_scheduler_decision","blocked_reason"}
 required["runtime_observability.required_runtime_fields"] = runtime_fields.issubset(set(obs.get("required_runtime_fields") or []))
 
