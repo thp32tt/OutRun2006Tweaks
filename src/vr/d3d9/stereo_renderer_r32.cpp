@@ -9,6 +9,11 @@
 #include "../telemetry/performance_clock.hpp"
 #include "../render/effect_state_snapshot.hpp"
 #include "stereo_renderer_r31.cpp"
+#include "../render/stereo_base_policy.hpp"
+#include "../render/screen_space_api.hpp"
+#include "../render/cached_effect_state.hpp"
+#include "../lifecycle/mono_safety.hpp"
+#include "../lifecycle/frame_lifecycle.hpp"
 #include "../state/state_block_tracker.hpp"
 
 namespace OutRunVRStereo
@@ -146,30 +151,32 @@ namespace OutRunVRStereo
             else
                 frame.pointLinePrimitives += primitiveCount;
 
+            const auto effect = CachedEffectStateSnapshot();
+            const std::uint64_t drawSerial = TopLevelDrawSerial();
             const bool effectKnown =
-                R29Effect.valid &&
-                R29Effect.presentEpoch == PresentEpoch &&
-                R23GameDrawSerial >= R29Effect.drawSerial &&
-                R23GameDrawSerial - R29Effect.drawSerial < 64;
+                effect.valid &&
+                effect.presentEpoch == PresentEpoch &&
+                drawSerial >= effect.drawSerial &&
+                drawSerial - effect.drawSerial < 64;
             if (!effectKnown)
             {
                 ++frame.effectUnknownDraws;
                 return;
             }
 
-            if (R29Effect.alphaBlend != FALSE)
+            if (effect.alphaBlend != FALSE)
             {
                 ++frame.alphaBlendDraws;
                 frame.alphaBlendPrimitives += primitiveCount;
             }
-            if (R29Effect.alphaTest != FALSE)
+            if (effect.alphaTest != FALSE)
                 ++frame.alphaTestDraws;
 
             // Heuristic only: alpha-blended, non-Z-writing point/triangle work
             // is a useful proxy for sand/smoke/spray/flare-style effects, but is
             // deliberately not labelled as a proven game particle draw.
-            if (R29Effect.alphaBlend != FALSE &&
-                R29Effect.zWrite == FALSE &&
+            if (effect.alphaBlend != FALSE &&
+                effect.zWrite == FALSE &&
                 (triangleTopology || type == D3DPT_POINTLIST))
             {
                 ++frame.particleLikeDraws;
@@ -357,7 +364,7 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R32TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device))
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device))
             {
                 if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
                     NoteDispatchUnstable();
@@ -368,7 +375,7 @@ namespace OutRunVRStereo
             const bool stateBlocksReliable =
                 OutRunVR::State::StateBlockTracker::Reliable();
             const bool effectKnown = stateBlocksReliable
-                ? R29FragileEffectCached(device, fragile)
+                ? FragileEffectCached(device, fragile)
                 : R32EffectIsFragileLive(device, fragile);
             if (!effectKnown)
                 return {};
@@ -423,7 +430,7 @@ namespace OutRunVRStereo
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R32/fast-left-WVP-rollback");
                     NoteRestoreFailure("R32 fast left-eye c64 rollback");
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -446,7 +453,7 @@ namespace OutRunVRStereo
                     restored = R32SetWvpBatch(device, draw.originalConstants);
                 }
                 if (!restored) NoteRestoreFailure("R32 fast left draw c64");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
                 return result;
             }
 
@@ -484,7 +491,7 @@ namespace OutRunVRStereo
             FrameHadWorldStereo = true;
             ++DuplicatedDraws;
             ++WorldStereoDraws;
-            ++R29StableTwoEyeDraws;
+            NoteStableTwoEyeDraw();
             NoteDispatchFastWorld();
 
             if (FrameStereoPoseSequence == 0)
@@ -498,13 +505,13 @@ namespace OutRunVRStereo
                 FrameRightDrawFailed = true;
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             if (!restoreOk)
             {
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 NoteRestoreFailure("R32 fast right-eye draw");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             return result;
         }
@@ -513,10 +520,10 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R32TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            const R30ScreenSpaceKind screenKind =
-                R30ClassifyScreenSpacePass(device);
-            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device) ||
-                screenKind == R30ScreenSpaceKind::None)
+            const OutRunVR::Render::ScreenSpaceKind screenKind =
+                ClassifyScreenSpacePass(device);
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device) ||
+                screenKind == OutRunVR::Render::ScreenSpaceKind::None)
                 return {};
             if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
@@ -550,7 +557,7 @@ namespace OutRunVRStereo
             float eyeConstants[2][16]{};
             float eyeScale[2]{};
             float eyeOffset[2]{};
-            if (!R30BuildScreenSpaceEyeConstants(device, stereo, screenKind,
+            if (!BuildScreenSpaceEyeConstants(device, stereo, screenKind,
                     original, eyeConstants, eyeScale, eyeOffset))
                 return {};
 
@@ -575,7 +582,7 @@ namespace OutRunVRStereo
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R32/HUD-left-WVP-rollback");
                     NoteRestoreFailure("R32 HUD left-eye c64 rollback");
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -596,7 +603,7 @@ namespace OutRunVRStereo
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
                 if (!restored) NoteRestoreFailure("R32 HUD left draw c64");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
                 return result;
             }
 
@@ -633,8 +640,8 @@ namespace OutRunVRStereo
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
-            ++R29StableTwoEyeDraws;
-            ++R30ScreenSpaceFovDraws;
+            NoteStableTwoEyeDraw();
+            NoteScreenSpaceFovDraw();
             NoteDispatchHud();
 
             if (FAILED(rightHr))
@@ -642,13 +649,13 @@ namespace OutRunVRStereo
                 FrameRightDrawFailed = true;
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             if (!restoreOk)
             {
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 NoteRestoreFailure("R32 HUD right-eye draw");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             return result;
         }
@@ -688,7 +695,7 @@ namespace OutRunVRStereo
 
             if (!OutRunVR::State::StateBlockTracker::IsRecording())
             {
-                if (R30ClassifyScreenSpacePass(device) != R30ScreenSpaceKind::None)
+                if (ClassifyScreenSpacePass(device) != OutRunVR::Render::ScreenSpaceKind::None)
                 {
                     const auto hud = R32TryHud(device,
                         std::forward<ActualDraw>(actualDraw), site);
@@ -1120,7 +1127,7 @@ namespace OutRunVRStereo
 
         void R32InvalidateResetCaches() noexcept
         {
-            R29Effect = {};
+            ResetCachedEffectState();
             ResetDispatchSupportState();
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
@@ -1138,8 +1145,8 @@ namespace OutRunVRStereo
 
         void R32ResetAfterGameReset() noexcept
         {
-            R29MonoSafetyThroughEpoch = OutRunVR::R32::RearmMonoSafetyEpoch(
-                PresentEpoch);
+            SetMonoSafetyThroughEpoch(
+                OutRunVR::R32::RearmMonoSafetyEpoch(PresentEpoch));
             R32InvalidateResetCaches();
             ++R32ResetEpochRearms;
             if (!R32FirstResetRearmLogged)

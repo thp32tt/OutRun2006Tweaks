@@ -14,6 +14,7 @@
 // a third mono replay.
 
 #include "stereo_renderer_r26.cpp"
+#include "../render/cached_effect_state.hpp"
 #include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
 {
@@ -603,5 +604,27 @@ namespace OutRunVRStereo
     void NoteStableTwoEyeDraw() noexcept
     {
         ++R29StableTwoEyeDraws;
+    }
+
+    OutRunVR::Render::CachedEffectState CachedEffectStateSnapshot() noexcept
+    {
+        OutRunVR::Render::CachedEffectState snapshot{};
+        snapshot.alphaBlend = R29Effect.alphaBlend;
+        snapshot.alphaTest = R29Effect.alphaTest;
+        snapshot.zWrite = R29Effect.zWrite;
+        snapshot.valid = R29Effect.valid;
+        snapshot.presentEpoch = R29Effect.presentEpoch;
+        snapshot.drawSerial = R29Effect.drawSerial;
+        return snapshot;
+    }
+
+    void ResetCachedEffectState() noexcept
+    {
+        R29Effect = {};
+    }
+
+    void SetMonoSafetyThroughEpoch(std::uint64_t epoch) noexcept
+    {
+        R29MonoSafetyThroughEpoch = epoch;
     }
 }
