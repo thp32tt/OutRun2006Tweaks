@@ -1494,13 +1494,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "Index130 reuses unchanged authoritative C138 heavy QA. Index121 reuses current exact-fingerprint C85 REWORK evidence. Index51 reuses A_AUTO containment plus current A00014/C89 blocker and reviews its exact visual proof only for the source-style/v2 conflict. Index97 reuses A00004 structure/containment and independently reviews the exact current English-source comparison for source-style/v2 failure.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null,
-    "bookkeeping_note": "RESULT_SHA and authoritative Gate metadata are populated only after the immutable C AUTO result commit is created and its single Localization Automation Gate completes. Runtime remains UNTESTED."
+    "result_sha": "ada2cc3a0820ee65330a35272d84182dc45c51b8",
+    "authoritative_result_sha": "ada2cc3a0820ee65330a35272d84182dc45c51b8",
+    "validation_bearing_result_sha": "ada2cc3a0820ee65330a35272d84182dc45c51b8",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36706480875,
+      "head_sha": "ada2cc3a0820ee65330a35272d84182dc45c51b8",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-09-30T20:06:55+09:00"
+    },
+    "bookkeeping_note": "Q00059 authoritative Gate PASS is owned by validation-bearing result ada2cc3a0820ee65330a35272d84182dc45c51b8. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-09-30T20:07:00+09:00",
+    "bookkeeping_base_head_sha": "ada2cc3a0820ee65330a35272d84182dc45c51b8"
   }
 }
