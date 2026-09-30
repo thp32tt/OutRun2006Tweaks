@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T02:53:00+09:00",
+  "updatedKst": "2026-10-01T02:57:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "b8c1544cfd2b6d491345e180ec72a3a84586e4bd",
   "mode": "MANUAL_APPLY_1000_CYCLE_REVIEW_BRANCH",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 215,
+  "cycle": 220,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -48,9 +48,10 @@
     "VR-REFACTOR-GUARD-0002",
     "VR-REFACTOR-LIFECYCLE-0006",
     "VR-REFACTOR-LIFECYCLE-0007",
-    "VR-REFACTOR-LIFECYCLE-0008"
+    "VR-REFACTOR-LIFECYCLE-0008",
+    "VR-REFACTOR-LIFECYCLE-0009"
   ],
-  "next": "Cycles 216-220: isolate Reset replay health query from R34 compatibility namespace; no build.",
+  "next": "Cycles 221-225: isolate external safety-block mutation behind lifecycle recovery API; no build.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",

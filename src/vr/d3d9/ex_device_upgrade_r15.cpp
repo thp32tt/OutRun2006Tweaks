@@ -568,3 +568,16 @@ namespace OutRunVRD3D9ExUpgradeR13
         return R15ResetStateHealthy.load(std::memory_order_acquire);
     }
 }
+
+namespace OutRunVR::Lifecycle
+{
+    bool IsCompatResetDevice(IDirect3DDevice9* device) noexcept
+    {
+        return OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device);
+    }
+
+    bool ResetReplaySucceeded() noexcept
+    {
+        return OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
+    }
+}
