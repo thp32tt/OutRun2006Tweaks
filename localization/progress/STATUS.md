@@ -1486,3 +1486,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Index24/66743AA8 and index219/D263B3F1 **PASS only as PREFLIGHT_ONLY controls**. Heavy source/atlas/source-acquisition evidence is reused by unchanged fingerprint; no candidate/static/runtime approval is granted.
 - Supplied A00301@51fed90a is **SUPERSEDED** by current same-task result `fc703ce0...`; Q00065 does not approve the newer result. Current B00300@index163 candidate and B00306@index94 preflight remain out-of-batch **QA_PENDING**.
 - Controller v16 ordering after merge: **REWORK 121 -> C QA 159/163/198/201 -> unrelated preflight**. Q00065 adds no PRODUCTION_COMPLETE asset. C writes no candidate DDS. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 02:46 KST - C167 Q00065 AUTHORITATIVE GATE PASS
+- Validation-bearing result `2d1b9160b794ea2f4e9f0acaa7ed084462b41399`; Localization Automation Gate `36753724384` completed **success**.
+- Q00065 dispositions remain **A00297 PASS / B00295 REWORK_REQUIRED / A00299 PASS / supplied A00301@51fed90a SUPERSEDED**. Index24/219 approvals remain PREFLIGHT_ONLY only; index121 is not static-promoted until current-v2 review/prompt/signed-slant evidence is compliant.
+- Current candidate-first order remains **REWORK 121 -> C QA 159/163/198/201 -> unrelated preflight**. Q00065 adds no new PRODUCTION_COMPLETE asset and grants no runtime approval.
+- This bookkeeping checkpoint is separate from the Gate-owning result and does not replace `2d1b9160b794ea2f4e9f0acaa7ed084462b41399` as authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

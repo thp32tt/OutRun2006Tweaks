@@ -11,11 +11,11 @@
     "ONE_STAGE_TO_RENDER: none.",
     "REWORK_REQUIRED / RUNNABLE_PRODUCTION: index121/FD90AA9 B00295 exact candidate bytes are recoverable but current generation-v2 mandatory GitHub review set, generation prompt/hash provenance and signed-slant/style PASS evidence are absent. Re-emit/fix under a new immutable producer result, then fresh C QA.",
     "CANDIDATE_AWAITING_C: current B00300@index163 candidate plus existing indices159/198/201. Candidate-bearing QA stays ahead of unrelated preflight under controller v16.",
-    "PREFLIGHT_ONLY QA_PENDING: B00306@index94, current A00301@index111, A00303@index147 and B00304@index232 are out-of-batch and are not implicitly approved by Q00065.",
+    "PREFLIGHT_ONLY QA_PENDING: B00306@index94, current A00301@index111, A00303@index147 and B00304@index232 remain out-of-batch.",
     "SOURCE_BLOCKED PREFLIGHT: A00299@index219 source-reactivation guard is accepted by Q00065; unchanged source probes must not be repeated.",
     "SPECIAL_PIPELINE: A00297@index24 runtime-trace binding contract is accepted as PREFLIGHT_ONLY; runtime slot/UV/composition observations are still required.",
     "THROUGHPUT v16: Q00065 adds no new PRODUCTION_COMPLETE asset; candidate_awaiting_c=159/163/198/201; runnable_production=121; blocked_exception=none recorded; runtime_validated=none.",
-    "Q00065 validation-bearing result is pending Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00065 validation-bearing result 2d1b9160b794ea2f4e9f0acaa7ed084462b41399 passed Localization Automation Gate 36753724384. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2524,7 +2524,19 @@
       "blocked_exception": [],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
-    "runtime_validation": "UNTESTED"
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "authoritative_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "validation_bearing_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36753724384,
+      "head_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T02:46:16+09:00"
+    }
   }
 }

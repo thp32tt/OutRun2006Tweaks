@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T02:43:18+09:00",
+  "updated_at_kst": "2026-10-01T02:46:24+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C167/Q00065 VALIDATION-BEARING RESULT PENDING GATE: A00297@index24 PASS PREFLIGHT_ONLY; B00295@index121 REWORK_REQUIRED because current generation-v2 mandatory GitHub review/prompt/signed-slant provenance is absent despite exact Drive bytes/header/structure; A00299@index219 PASS PREFLIGHT_ONLY; supplied A00301@51fed90a SUPERSEDED by same-task fc703ce0. Candidate-first order: rework 121 -> C QA 159/163/198/201 -> unrelated preflight. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C167/Q00065 AUTHORITATIVE GATE PASS: validation-bearing result 2d1b9160b794ea2f4e9f0acaa7ed084462b41399 passed Localization Automation Gate 36753724384. Dispositions remain A00297 PASS / B00295 REWORK_REQUIRED / A00299 PASS / supplied A00301@51fed90a SUPERSEDED. Index121 requires current-v2 review/prompt/signed-slant evidence rework; current B00300@index163 and existing 159/198/201 remain candidate-awaiting-C. Q00065 adds no new PRODUCTION_COMPLETE asset. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1278,7 +1278,19 @@
       "PREFLIGHT_ONLY QA_PENDING: B00306@index94, A00301@index111, A00303@index147, B00304@index232.",
       "PREFLIGHT_ONLY ACCEPTED: A00299@index219 source-reactivation guard; SPECIAL: A00297@index24 runtime-trace guard."
     ],
-    "automation_validation": "PENDING",
-    "runtime_validation": "UNTESTED"
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "authoritative_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "validation_bearing_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36753724384,
+      "head_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T02:46:16+09:00"
+    }
   }
 }
