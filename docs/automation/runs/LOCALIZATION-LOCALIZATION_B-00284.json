@@ -28,7 +28,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null
+  "result_sha": "08ceedbbfd8bf1908271339f78277863a16b1790",
+  "authoritative_result_sha": "08ceedbbfd8bf1908271339f78277863a16b1790",
+  "validation_bearing_result_sha": null,
+  "durable_task_record_in_result_commit": true,
+  "bookkeeping_note": "Producer result commit 08ceedbbfd8bf1908271339f78277863a16b1790 contains both the B00284 lane-local material preflight report and the durable task record. This bookkeeping commit only records the producer result SHA; C_BATCH_GATE remains pending and runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T22:34:57+09:00"
 }
