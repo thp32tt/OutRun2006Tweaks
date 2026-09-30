@@ -20,6 +20,7 @@
 //    work so stage-specific 300 -> 3000+ draw explosions can be diagnosed.
 
 #include "stereo_renderer_r30.cpp"
+#include "../state/state_block_tracker.hpp"
 #include "../render/eye_tail_cache.hpp"
 #include "../telemetry/stereo_dispatch_counters.hpp"
 #include "../core/dispatch_result.hpp"
@@ -55,9 +56,6 @@ namespace OutRunVRStereo
         std::uint64_t R31StateBlockApplies = 0;
         std::uint64_t R31StateBlockRecordings = 0;
         std::uint64_t R31HudDraws = 0;
-        std::atomic<bool> R31StateBlockTrackingReliable{ false };
-        std::atomic<bool> R31StateBlockCoverageLost{ false };
-        thread_local bool R31StateBlockResyncPending = false;
         thread_local bool R31StateBlockRecording = false;
         bool R31FirstFastWorldLogged = false;
         bool R31FirstStateBlockLogged = false;
@@ -159,7 +157,7 @@ namespace OutRunVRStereo
 
         void R31DiscardUnreliableDrawCaches() noexcept
         {
-            if (R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (OutRunVR::State::StateBlockTracker::Reliable())
                 return;
             R29Effect.valid = false;
             R22ShadowState = {};
@@ -223,14 +221,14 @@ namespace OutRunVRStereo
                 currentShaderSerial != verifiedShaderSerial)
                 return false;
 
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire) &&
+            if (!OutRunVR::State::StateBlockTracker::Reliable() &&
                 !R31LiveShaderMatches(device, verifiedShader))
                 return false;
 
             ++R31FastWorldCandidates;
             float live[16]{};
             bool liveValidated = false;
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire) ||
+            if (!OutRunVR::State::StateBlockTracker::Reliable() ||
                 (R31FastWorldCandidates % LiveWvpValidationInterval) == 0)
             {
                 ++R31FastWorldLiveValidations;
@@ -460,7 +458,7 @@ namespace OutRunVRStereo
             if (R31StateBlockRecording || !R29StableStereoBase(device) ||
                 screenKind != R30ScreenSpaceKind::Hud2D)
                 return {};
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
                 const std::uintptr_t cachedShader =
                     CurrentVertexShaderIdentity.load(std::memory_order_acquire);
@@ -744,21 +742,18 @@ namespace OutRunVRStereo
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             R31EyeCache.valid = false;
-            R31StateBlockResyncPending = true;
+            OutRunVR::State::StateBlockTracker::RequireResync();
         }
 
         void R31FlushPendingStateBlockResync(IDirect3DDevice9* device) noexcept
         {
-            if (!R31StateBlockResyncPending || !device)
+            if (!device || !OutRunVR::State::StateBlockTracker::ConsumeResync())
                 return;
-            R31StateBlockResyncPending = false;
             R31ResynchronizeShaderEpoch(device);
             if (!R22PrimeShadowState(device))
             {
-                R31StateBlockTrackingReliable.store(false,
-                    std::memory_order_release);
-                R31StateBlockCoverageLost.store(true,
-                    std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
             }
         }
 
@@ -787,10 +782,8 @@ namespace OutRunVRStereo
             }
             else
             {
-                R31StateBlockCoverageLost.store(true,
-                    std::memory_order_release);
-                R31StateBlockTrackingReliable.store(false,
-                    std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
             }
             return hr;
         }
@@ -799,19 +792,15 @@ namespace OutRunVRStereo
         {
             if (!block)
             {
-                R31StateBlockCoverageLost.store(true,
-                    std::memory_order_release);
-                R31StateBlockTrackingReliable.store(false,
-                    std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 return false;
             }
             void** vtable = *reinterpret_cast<void***>(block);
             if (!vtable)
             {
-                R31StateBlockCoverageLost.store(true,
-                    std::memory_order_release);
-                R31StateBlockTrackingReliable.store(false,
-                    std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 return false;
             }
 
@@ -819,14 +808,13 @@ namespace OutRunVRStereo
             {
                 const bool reliable = R31CreateStateBlockHook &&
                     R31BeginStateBlockHook && R31EndStateBlockHook &&
-                    !R31StateBlockCoverageLost.load(std::memory_order_acquire) &&
+                    !OutRunVR::State::StateBlockTracker::CoverageLost() &&
                     R31StateBlockApplyTarget ==
                         vtable[StateBlockApplyVtableIndex];
                 if (!reliable && R31StateBlockApplyTarget !=
                         vtable[StateBlockApplyVtableIndex])
                 {
-                    R31StateBlockCoverageLost.store(true,
-                        std::memory_order_release);
+                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                     if (!R31FirstAlternateStateBlockLogged)
                     {
                         R31FirstAlternateStateBlockLogged = true;
@@ -834,8 +822,7 @@ namespace OutRunVRStereo
                             "VR R31 STATE: alternate StateBlock::Apply implementation observed; fast-path cache trust is disabled for the process");
                     }
                 }
-                R31StateBlockTrackingReliable.store(reliable,
-                    std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(reliable);
                 return reliable;
             }
             R31StateBlockApplyHook = safetyhook::create_inline(
@@ -846,10 +833,8 @@ namespace OutRunVRStereo
             {
                 R31StateBlockApplyHook = {};
                 R31StateBlockApplyTarget = nullptr;
-                R31StateBlockCoverageLost.store(true,
-                    std::memory_order_release);
-                R31StateBlockTrackingReliable.store(false,
-                    std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 spdlog::warn(
                     "VR R31 STATE: could not hook StateBlock::Apply; per-draw live WVP/shader/render-state validation remains active");
                 return false;
@@ -858,9 +843,8 @@ namespace OutRunVRStereo
                 vtable[StateBlockApplyVtableIndex];
             const bool reliable = R31CreateStateBlockHook &&
                 R31BeginStateBlockHook && R31EndStateBlockHook &&
-                !R31StateBlockCoverageLost.load(std::memory_order_acquire);
-            R31StateBlockTrackingReliable.store(reliable,
-                std::memory_order_release);
+                !OutRunVR::State::StateBlockTracker::CoverageLost();
+            OutRunVR::State::StateBlockTracker::SetR31Reliable(reliable);
             return reliable;
         }
 
@@ -899,10 +883,8 @@ namespace OutRunVRStereo
                 }
                 else if (R31StateBlockRecording)
                 {
-                    R31StateBlockCoverageLost.store(true,
-                        std::memory_order_release);
-                    R31StateBlockTrackingReliable.store(false,
-                        std::memory_order_release);
+                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                    OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 }
                 R31MarkStateBlockCachesDirty();
                 if (SUCCEEDED(hr) && block && *block)
@@ -979,10 +961,8 @@ namespace OutRunVRStereo
 
                     IDirect3DDevice9* const device =
                         StereoInstalledDevice.load(std::memory_order_acquire);
-                    R31StateBlockTrackingReliable.store(false,
-                        std::memory_order_release);
-                    R31StateBlockCoverageLost.store(false,
-                        std::memory_order_release);
+                    OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
+                    OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     if (device)
                     {
                         void** vtable = *reinterpret_cast<void***>(device);
@@ -1007,8 +987,7 @@ namespace OutRunVRStereo
                                 R31CreateStateBlockHook.enable().has_value();
                             if (!stateHooks)
                             {
-                                R31StateBlockCoverageLost.store(true,
-                                    std::memory_order_release);
+                                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                                 R31CreateStateBlockHook = {};
                                 R31BeginStateBlockHook = {};
                                 R31EndStateBlockHook = {};
@@ -1073,7 +1052,7 @@ namespace OutRunVRStereo
 
     bool IsStateBlockTrackingReliable() noexcept
     {
-        return R31StateBlockTrackingReliable.load(std::memory_order_acquire);
+        return OutRunVR::State::StateBlockTracker::Reliable();
     }
 
     void FlushPendingStateBlockResync(IDirect3DDevice9* device) noexcept

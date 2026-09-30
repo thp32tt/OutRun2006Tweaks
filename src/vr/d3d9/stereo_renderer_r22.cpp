@@ -12,6 +12,7 @@
 
 #include "stereo_renderer_r21.cpp"
 #include "../state/d3d9_raster_state.hpp"
+#include "../state/state_block_tracker.hpp"
 #include "../state/d3d9_raster_tracking.hpp"
 
 namespace OutRunVRStereo
@@ -34,7 +35,6 @@ namespace OutRunVRStereo
         SafetyHookInline R22EndStateBlockHook{};
         SafetyHookInline R22StateBlockApplyHook{};
         void* R22StateBlockApplyTarget = nullptr;
-        std::atomic<bool> R22StateBlockTrackingReliable{ false };
         SafetyHookInline R22ResetR13Hook{};
         SafetyHookInline R22ClearR20Hook{};
         SafetyHookInline R22DrawPrimitiveR9Hook{};
@@ -144,8 +144,7 @@ namespace OutRunVRStereo
             // Re-prime once at the Apply boundary instead of paying
             // GetViewport/GetScissorRect/GetRenderState on subsequent draws.
             if (!R22PrimeShadowState(device))
-                R22StateBlockTrackingReliable.store(
-                    false, std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
         }
 
         HRESULT __stdcall R22StateBlockApplyDest(IDirect3DStateBlock9* block)
@@ -161,8 +160,7 @@ namespace OutRunVRStereo
             }
             else
             {
-                R22StateBlockTrackingReliable.store(
-                    false, std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
             }
             return hr;
         }
@@ -180,8 +178,7 @@ namespace OutRunVRStereo
             {
                 const bool same = R22StateBlockApplyTarget == target;
                 if (!same)
-                    R22StateBlockTrackingReliable.store(
-                        false, std::memory_order_release);
+                    OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
                 return same;
             }
             R22StateBlockApplyHook = safetyhook::create_inline(
@@ -192,13 +189,11 @@ namespace OutRunVRStereo
             {
                 R22StateBlockApplyHook = {};
                 R22StateBlockApplyTarget = nullptr;
-                R22StateBlockTrackingReliable.store(
-                    false, std::memory_order_release);
+                OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
                 return false;
             }
             R22StateBlockApplyTarget = target;
-            R22StateBlockTrackingReliable.store(
-                true, std::memory_order_release);
+            OutRunVR::State::StateBlockTracker::SetR22Reliable(true);
             spdlog::info(
                 "VR R46 STATE: StateBlock::Apply interception proven; viewport/scissor/render-state caches invalidate at Apply boundary");
             return true;
@@ -679,7 +674,7 @@ namespace OutRunVRStereo
             R22EndStateBlockHook = {};
             R22StateBlockApplyHook = {};
             R22StateBlockApplyTarget = nullptr;
-            R22StateBlockTrackingReliable.store(false, std::memory_order_release);
+            OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
             R22ResetR13Hook = {};
             R22ClearR20Hook = {};
             R22DrawPrimitiveR9Hook = {};
@@ -806,8 +801,7 @@ namespace OutRunVRStereo
                         R22CreateStateBlockHook = {};
                         R22BeginStateBlockHook = {};
                         R22EndStateBlockHook = {};
-                        R22StateBlockTrackingReliable.store(
-                            false, std::memory_order_release);
+                        OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
                         spdlog::warn(
                             "VR R46 STATE: StateBlock creation hooks unavailable; periodic live raster validation retained");
                     }
@@ -880,7 +874,7 @@ namespace OutRunVRStereo
 
     bool IsTrackedStateBlockReliable() noexcept
     {
-        return R22StateBlockTrackingReliable.load(std::memory_order_acquire);
+        return OutRunVR::State::StateBlockTracker::R22Reliable();
     }
 
     void FailClosedStereoEligibility() noexcept
