@@ -309,6 +309,27 @@ def main() -> None:
             "F13 C2CSpeechBubbleGF ownership regressed to spacing-only callbacks: "
             f"{stale_gf_speech_hooks}"
         )
+    # R134/F13 negative guard: these five legacy GF hooks are intentionally
+    # NOT adopted into immediate next-draw SCREEN_HUD ownership yet. Their
+    # producer ranges are canonical HUD, but exact draw adjacency/effect is
+    # still unproven (0xFE8B1 is explicitly marked no-effect/uncertain and the
+    # four heart hooks have not been independently traced). Keep the current
+    # spacing-only bindings fail-closed until separate provenance exists.
+    unproven_gf_speech_hooks = [
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk7 = safetyhook::create_mid((void*)0x4FE8B1, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x4FD60C, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x4FD591, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x4FD5CD, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x4FD652, C2CSpeechBubble_AdjustPositionESP0);",
+    ]
+    missing_unproven_gf_speech_hooks = [
+        hook for hook in unproven_gf_speech_hooks if hook not in hooks_text
+    ]
+    if missing_unproven_gf_speech_hooks:
+        raise SystemExit(
+            "F13 unproven GF speech/heart hooks changed without exact producer evidence: "
+            f"{missing_unproven_gf_speech_hooks}"
+        )
     legacy_ctrl_icon_hooks = [
         "ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);",
         "ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid((void*)0x460FBC, ctrl_icon_work_AdjustPosition2);",
