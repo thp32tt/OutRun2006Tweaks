@@ -128,8 +128,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__Q00071_OBSERVED_NO_A_COMPLETION_TIER__NO_QA_PENDING_REPEAT__B_OWNED_133_61_232_NOT_STOLEN__NO_STICKY_SOURCE_REPROBE__INDEX102_SOURCE_CANDIDATE_BLOBS_UNCHANGED_FROM_A00239_C81_D83__CURRENT_WORKFLOW_MANIFEST_ADDED__HEAVY_QA_REUSED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
+  "authoritative_result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): standardize index102 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00338]",
   "durable_task_record_in_result_commit": true,
@@ -139,5 +139,9 @@
     "head_message": "localization(C): QA Q00071 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00337]",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "First ref update attempt correctly failed fast-forward after C00337 landed. Refreshed current HEAD, reviewed Q00071, confirmed no A-owned completion-tier change, and rebuilt only A00338 lane-local files on top of C00337 without overwriting shared/peer state."
-  }
+  },
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate, owns no Localization Automation Gate, and does not alter candidate/shared state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T05:54:26+09:00",
+  "bookkeeping_base_head_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
+  "bookkeeping_preserved_head_message": "localization(A): standardize index102 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00338]"
 }
