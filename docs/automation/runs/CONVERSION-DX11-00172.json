@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00172",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "25ee9d0e9056ef3a44d593b32b02d80e87e583f0",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R172_8BD20_BOUNDED_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DX11-00170 captured exact 0x8BD20 provenance from two independently aligned callers and explicitly left instruction boundaries, function-entry identity, semantics and ownership unresolved. Its durable resume cursor names complete-instruction decode as the next bounded F13 unit. DXVK-00171 independently validated the same exact public-EXE control-flow shape, which is reused only as proof design; DX11 must pass its own exact-result Actions.",
+  "summary": "Add a fail-closed DX11 exact-EXE proof for the bounded 0x8BD20 routine body: exact contiguous instructions through both RETs, both short branches targeting 0x8BD39, four-byte INT3 padding through 0x8BD40, and the next-code 8b 48 08 anchor. Keep function-entry identity, higher-level callee semantics and ScreenHud/world/render ownership unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00171",
+    "source_result_sha": "147b1a7e3a3c56aa5396fa49b633383fb5b2458d",
+    "source_proof_status": "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded instruction/control-flow proof design and the corrected terminal-row guard rows[-3]. DX11 retains independent predecessor provenance and exact-result validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00172.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00170 validation-bearing result 746461ff82ff29cb3ddaeae7206af7cc1837c324 established EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED from aligned callers 0x284D2 and 0x28390.",
+    "The exact R170 96-byte capture begins 8b 4c 24 04 85 c9 74 11 ... and contains the bounded instruction body through RET 0x8BD3B, followed by four INT3 bytes and next-code anchor 8b 48 08 at 0x8BD40.",
+    "DXVK-00171 exact result 147b1a7e3a3c56aa5396fa49b633383fb5b2458d independently passed the same bounded proof on the identical public EXE; DX11 validation remains independent.",
+    "Regression/history review found no runtime-source change: no protected DX9Ex/HUD/world invariant or runtime problem state is modified by this analyzer/verifier-only task.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the bounded proof passes, persist status EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN while keeping function_entry_status=UNRESOLVED, semantic_effect=BOUNDED_CONTROL_FLOW_ONLY and ownership_effect=NONE. A later independent task may establish the structural function-entry boundary or capture 0x182194 provenance."
+}

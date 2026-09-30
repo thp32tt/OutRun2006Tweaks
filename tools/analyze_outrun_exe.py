@@ -303,6 +303,36 @@ GF_TARGET_C_HELPER_1_NEXT_CODE_FUNCTION_END_RVA = 0x0002843E
 # only; function boundary and semantic effect remain unresolved.
 GF_TARGET_C_HELPER_1_SECOND_CALLEE_RVA = 0x0008BD20
 GF_TARGET_C_HELPER_1_SECOND_CALLEE_PROBE_LEN = 96
+
+# R172/F13: instruction-aligned bounded body recovered from the R170 96-byte
+# 0x8BD20 probe. This proves the local branch/return/padding shape only. The
+# bytes before 0x8BD20 are not part of this proof, so function-entry identity,
+# higher-level callee semantics, and render ownership remain unresolved.
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_BODY_END_RVA = 0x0008BD3C
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_PADDING_END_RVA = 0x0008BD40
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_RVA = 0x0008BD40
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_BRANCH_TARGET_RVA = 0x0008BD39
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_INSTRUCTIONS = (
+    (0x0008BD20, "8b 4c 24 04", "mov ecx, [esp+0x04]"),
+    (0x0008BD24, "85 c9", "test ecx, ecx"),
+    (0x0008BD26, "74 11", "je 0x8bd39"),
+    (0x0008BD28, "8b 01", "mov eax, [ecx]"),
+    (0x0008BD2A, "85 c0", "test eax, eax"),
+    (0x0008BD2C, "7e 0b", "jle 0x8bd39"),
+    (0x0008BD2E, "8b 49 04", "mov ecx, [ecx+0x04]"),
+    (0x0008BD31, "8d 04 c0", "lea eax, [eax+eax*8]"),
+    (0x0008BD34, "8d 44 81 dc", "lea eax, [ecx+eax*4-0x24]"),
+    (0x0008BD38, "c3", "ret"),
+    (0x0008BD39, "33 c0", "xor eax, eax"),
+    (0x0008BD3B, "c3", "ret"),
+)
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_PADDING_BYTES = bytes.fromhex(
+    "cc cc cc cc"
+)
+GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_ANCHOR = bytes.fromhex(
+    "8b 48 08"
+)
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -952,6 +982,116 @@ def collect_guarded_gf_target_c_helper_1_second_callee_provenance(pe: PE) -> dic
         ),
         "function_entry_status": "UNRESOLVED",
         "semantic_effect": "UNRESOLVED_CALLEE_BYTES_ONLY",
+        "ownership_effect": "NONE",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_second_callee_prefix_proof(pe: PE) -> dict:
+    """Prove the bounded instruction/control-flow shape at 0x8BD20.
+
+    The R170 provenance step established two independently aligned callers and
+    captured the exact 96-byte window. This step covers the complete first
+    bounded routine through both RETs, the following INT3 padding, and the next
+    code anchor. It intentionally does not infer a function start from bytes
+    before 0x8BD20 and does not assign any render/HUD semantic ownership.
+    """
+
+    provenance = collect_guarded_gf_target_c_helper_1_second_callee_provenance(pe)
+    expected_next = GF_TARGET_C_HELPER_1_SECOND_CALLEE_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_SECOND_CALLEE_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    def rel8_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 2)
+        if len(raw) != 2:
+            return None
+        rel = struct.unpack_from("<b", raw, 1)[0]
+        return (rva + 2 + rel) & 0xFFFFFFFF
+
+    null_branch_target = rel8_target(0x0008BD26)
+    nonpositive_branch_target = rel8_target(0x0008BD2C)
+    branch_targets_match = (
+        null_branch_target == GF_TARGET_C_HELPER_1_SECOND_CALLEE_BRANCH_TARGET_RVA
+        and nonpositive_branch_target
+        == GF_TARGET_C_HELPER_1_SECOND_CALLEE_BRANCH_TARGET_RVA
+    )
+    padding = pe.bytes_at_rva(
+        GF_TARGET_C_HELPER_1_SECOND_CALLEE_BODY_END_RVA,
+        GF_TARGET_C_HELPER_1_SECOND_CALLEE_PADDING_END_RVA
+        - GF_TARGET_C_HELPER_1_SECOND_CALLEE_BODY_END_RVA,
+    )
+    padding_matches = padding == GF_TARGET_C_HELPER_1_SECOND_CALLEE_PADDING_BYTES
+    next_anchor = pe.bytes_at_rva(
+        GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_RVA,
+        len(GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_ANCHOR),
+    )
+    next_anchor_matches = (
+        next_anchor == GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_ANCHOR
+    )
+    predecessor_exact = (
+        provenance["status"] == "EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED"
+        and provenance["helper_call_link"]
+        and provenance["routine_call_link"]
+        and provenance["target_section"] == ".text"
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    terminal_shape = (
+        expected_next == GF_TARGET_C_HELPER_1_SECOND_CALLEE_BODY_END_RVA
+        and rows[-3]["rva"] == 0x0008BD38
+        and rows[-3]["actual_bytes"] == "c3"
+        and rows[-1]["rva"] == 0x0008BD3B
+        and rows[-1]["actual_bytes"] == "c3"
+    )
+    proven = bool(
+        predecessor_exact
+        and contiguous
+        and all_bytes_match
+        and terminal_shape
+        and branch_targets_match
+        and padding_matches
+        and next_anchor_matches
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_SECOND_CALLEE_RVA,
+        "target_section": provenance["target_section"],
+        "predecessor_status": provenance["status"],
+        "predecessor_exact": predecessor_exact,
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "null_branch_target_rva": null_branch_target,
+        "nonpositive_branch_target_rva": nonpositive_branch_target,
+        "branch_targets_match": branch_targets_match,
+        "terminal_shape": terminal_shape,
+        "body_end_rva": GF_TARGET_C_HELPER_1_SECOND_CALLEE_BODY_END_RVA,
+        "padding_end_rva": GF_TARGET_C_HELPER_1_SECOND_CALLEE_PADDING_END_RVA,
+        "padding_bytes": padding.hex(" "),
+        "padding_matches": padding_matches,
+        "next_code_rva": GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_RVA,
+        "next_code_anchor": next_anchor.hex(" "),
+        "next_code_anchor_matches": next_anchor_matches,
+        "status": (
+            "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN"
+            if proven
+            else "CALLEE_8BD20_BOUNDED_ROUTINE_PROOF_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
         "ownership_effect": "NONE",
     }
 
@@ -2756,6 +2896,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_next_code_function_boundary_proof": collect_guarded_gf_target_c_helper_1_next_code_function_boundary_proof(pe),
         "guarded_gf_target_c_helper_1_second_callee_provenance": collect_guarded_gf_target_c_helper_1_second_callee_provenance(pe),
+        "guarded_gf_target_c_helper_1_second_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_second_callee_prefix_proof(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -3192,6 +3333,23 @@ def main() -> int:
         f"ownership_effect={helper_1_second_callee['ownership_effect']} "
         f"bytes={helper_1_second_callee['bytes']}"
     )
+    helper_1_second_callee_prefix = report[
+        "guarded_gf_target_c_helper_1_second_callee_prefix_proof"
+    ]
+    print(
+        f"gf_target_c_helper_1_second_callee_prefix=0x{helper_1_second_callee_prefix['target_rva']:08X} "
+        f"status={helper_1_second_callee_prefix['status']} "
+        f"predecessor={helper_1_second_callee_prefix['predecessor_status']} "
+        f"layout_contiguous={helper_1_second_callee_prefix['layout_contiguous']} "
+        f"bytes_match={helper_1_second_callee_prefix['all_instruction_bytes_match']} "
+        f"branches={helper_1_second_callee_prefix['branch_targets_match']} "
+        f"terminal_shape={helper_1_second_callee_prefix['terminal_shape']} "
+        f"padding={helper_1_second_callee_prefix['padding_matches']} "
+        f"next_anchor={helper_1_second_callee_prefix['next_code_anchor_matches']} "
+        f"function_entry={helper_1_second_callee_prefix['function_entry_status']} "
+        f"semantic_effect={helper_1_second_callee_prefix['semantic_effect']} "
+        f"ownership_effect={helper_1_second_callee_prefix['ownership_effect']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -3248,6 +3406,9 @@ def main() -> int:
     if helper_1_second_callee["status"] != "EXACT_EXE_8BD20_DUAL_CALL_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_second_callee_provenance=FAILED")
         return 18
+    if helper_1_second_callee_prefix["status"] != "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN":
+        print("guarded_gf_target_c_helper_1_second_callee_prefix_proof=FAILED")
+        return 19
     return 0
 
 
