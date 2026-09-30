@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00156",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "18643dd8cbc5f8669b10f7dbfeae83c46c3a8ae9",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R156_HELPER_28320_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00154 proved the prior 0x282B0 callee terminal/padding and only a three-byte next-code anchor at 0x28320, explicitly requiring independent provenance/instruction proof before assigning a function or render semantic. The smallest runnable HMD-free next unit is a fresh bounded exact-EXE provenance capture beginning at 0x28320. DXVK-00155 independently selected the same exact-EXE boundary, but DX11 binds this capture to its own 00154 predecessor and exact-result Actions.",
+  "summary": "Add an independent DX11 bounded exact-EXE provenance capture for code beginning at 0x28320. Verify continuity from the R154 terminal/padding proof, capture a fresh 96-byte .text window plus raw inbound/outbound rel32 candidates and a function-start guess, while leaving function-entry status and semantic effect unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00155",
+    "source_result_sha": "1c12478c7ac3681d09864cffca5f52edd5c8241a",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded provenance design only. DXVK hosted static analysis has independently captured the same 0x28320 window; DX11 must pass its own predecessor chain and exact-result Actions before the evidence is durable on this lane."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00156.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00154 validation-bearing result 21de28945d863a6e564b19261afd1a2260a1575d proved RET at 0x28318, seven INT3 bytes through 0x2831F, and only the three-byte next-code anchor 83 ec 0c at 0x28320.",
+    "This task captures fresh exact bytes at 0x28320 rather than promoting the prior anchor into a function-boundary or semantic claim.",
+    "DXVK-00155 hosted static analysis independently reported EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED on the same exact public EXE, but DX11 validation is independent.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If 0x28320 provenance capture passes, persist exact bytes/call census in separate bookkeeping while keeping function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_NEXT_CODE_BYTES_ONLY and ownership_effect=NONE. A later bounded task may decode only complete instructions from the fresh window."
+}

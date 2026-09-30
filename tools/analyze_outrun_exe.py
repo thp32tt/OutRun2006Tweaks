@@ -251,6 +251,12 @@ GF_TARGET_C_HELPER_1_FIRST_CALLEE_PADDING_BYTES = bytes.fromhex(
     "cc cc cc cc cc cc cc"
 )
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_ANCHOR = bytes.fromhex("83 ec 0c")
+
+# R156/F13: independent provenance window for the code beginning at the
+# R154 next-code anchor. This captures exact bytes and rel32 candidates only;
+# function-entry and render semantics remain unresolved.
+GF_TARGET_C_HELPER_1_NEXT_CODE_RVA = 0x00028320
+GF_TARGET_C_HELPER_1_NEXT_CODE_PROBE_LEN = 96
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_INSTRUCTIONS = (
     (0x000282B0, "8b 0c 85 58 65 95 00", "mov ecx, [eax*4+0x956558]"),
     (0x000282B7, "57", "push edi"),
@@ -1505,6 +1511,74 @@ def collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe:
 
 
 
+def collect_guarded_gf_target_c_helper_1_next_code_provenance(pe: PE) -> dict:
+    """Capture exact provenance for code beginning at the R154 0x28320 anchor.
+
+    The predecessor proof establishes only a terminal/padding/three-byte anchor.
+    This collector independently captures a fresh bounded .text byte window and
+    raw rel32 candidates without claiming a function entry or semantic effect.
+    """
+
+    predecessor = collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_NEXT_CODE_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(target_rva):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            target_rva - text_section.virtual_address,
+        )
+
+    probe = pe.bytes_at_rva(target_rva, GF_TARGET_C_HELPER_1_NEXT_CODE_PROBE_LEN)
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_NEXT_CODE_PROBE_LEN
+    )
+    predecessor_exact = (
+        predecessor["status"]
+        == "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN"
+        and predecessor["next_code_rva"] == target_rva
+        and predecessor["next_code_anchor_matches"]
+        and predecessor["target_section"] == ".text"
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_NEXT_CODE_PROBE_LEN
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "function_start_guess_rva": function_start_guess_rva,
+        "probe_len": GF_TARGET_C_HELPER_1_NEXT_CODE_PROBE_LEN,
+        "bytes": probe.hex(" "),
+        "predecessor_status": predecessor["status"],
+        "predecessor_next_code_rva": predecessor["next_code_rva"],
+        "predecessor_anchor_matches": predecessor["next_code_anchor_matches"],
+        "predecessor_exact": predecessor_exact,
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED"
+            if captured
+            else "NEXT_CODE_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "UNRESOLVED_NEXT_CODE_BYTES_ONLY",
+        "ownership_effect": "NONE",
+    }
+
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -1908,6 +1982,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_first_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_first_callee_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_first_callee_continuation_provenance": collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe),
         "guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof": collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe),
+        "guarded_gf_target_c_helper_1_next_code_provenance": collect_guarded_gf_target_c_helper_1_next_code_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -2146,6 +2221,30 @@ def main() -> int:
         f"next_code_semantics={first_callee_terminal['next_code_semantics']} "
         f"ownership_effect={first_callee_terminal['ownership_effect']}"
     )
+    helper_1_next_code = report["guarded_gf_target_c_helper_1_next_code_provenance"]
+    helper_1_next_code_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_next_code["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_next_code=0x{helper_1_next_code['target_rva']:08X} "
+        f"status={helper_1_next_code['status']} "
+        f"predecessor_status={helper_1_next_code['predecessor_status']} "
+        f"predecessor_next={hexrva(helper_1_next_code['predecessor_next_code_rva'])} "
+        f"predecessor_anchor={helper_1_next_code['predecessor_anchor_matches']} "
+        f"predecessor_exact={helper_1_next_code['predecessor_exact']} "
+        f"section={helper_1_next_code['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1_next_code['function_start_guess_rva'])} "
+        f"probe_len={helper_1_next_code['probe_len']} "
+        f"inbound_raw={len(helper_1_next_code['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_next_code['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_next_code_outbound} "
+        f"function_entry={helper_1_next_code['function_entry_status']} "
+        f"semantic_effect={helper_1_next_code['semantic_effect']} "
+        f"ownership_effect={helper_1_next_code['ownership_effect']} "
+        f"bytes={helper_1_next_code['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -2178,6 +2277,9 @@ def main() -> int:
     if first_callee_terminal["status"] != "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN":
         print("guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof=FAILED")
         return 10
+    if helper_1_next_code["status"] != "EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_next_code_provenance=FAILED")
+        return 11
     return 0
 
 
