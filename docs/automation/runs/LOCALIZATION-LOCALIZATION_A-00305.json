@@ -91,8 +91,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_FRESH_SCAN__ZERO_RUNNABLE_CANDIDATE_TIERS__QA_PENDING_159_198_201_NOT_REPEATED__A00301_INDEX111_NOT_REPEATED__A00303_INDEX147_NOT_REPEATED__STICKY_SOURCE_BLOCKERS_NOT_REPROBED__RUNTIME_SPECIALS_NOT_SUBSTITUTED__CROSS_LANE_163_NOT_STOLEN__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9caef1d8e1534a8b00fff0916f47778bfa1dfae5",
+  "authoritative_result_sha": "9caef1d8e1534a8b00fff0916f47778bfa1dfae5",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): record A-shard dependency frontier [AUTO:LOCALIZATION-LOCALIZATION_A-00305]",
   "precommit_refresh": {
@@ -100,5 +100,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest HEAD refreshed immediately before commit; only new lane-local A00305 report and task record are added."
   },
-  "bookkeeping_note": "Producer immutable result SHA may be recorded in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Producer immutable result SHA recorded in this separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T02:23:00+09:00",
+  "bookkeeping_base_head_sha": "9caef1d8e1534a8b00fff0916f47778bfa1dfae5"
 }
