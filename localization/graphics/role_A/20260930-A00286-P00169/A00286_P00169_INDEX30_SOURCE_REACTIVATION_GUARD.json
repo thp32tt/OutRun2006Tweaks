@@ -1,0 +1,124 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00286-p00169-index30-source-reactivation-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00286",
+  "wave_id": "P00169",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T22:37:00+09:00",
+  "base_head_sha": "bea37d6863e44afdde411e1085821d6ed42dade0",
+  "controller_schema_version": 15,
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "candidate_completion_scan": "A00285 exact scan remains current: zero runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework; queue/config/inventory/C-basis fingerprints unchanged at precommit refresh.",
+    "selected_priority": "FALLBACK_STEP_5_ASSET_SPECIFIC_REACTIVATION_TOOL_AFTER_ZERO_RUNNABLE_CANDIDATE_TIERS",
+    "selected_index": 30,
+    "selected_asset": "8215FD25",
+    "selected_action": "source_dependency_reactivation_guard",
+    "qa_pending_not_repeated": [
+      15,
+      18,
+      21,
+      24,
+      51,
+      54,
+      57,
+      60,
+      111,
+      159,
+      198,
+      201
+    ],
+    "sticky_source_probe_not_repeated": true,
+    "work_steal": false
+  },
+  "locked_dependency": {
+    "queue_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+    "canonical_inventory": {
+      "sha256": "0cd71138fd6811f5466a9c6674a243324d88ecc8dd82ad36df05234d759abc56",
+      "width": 1024,
+      "height": 512,
+      "mode": "RGBA"
+    },
+    "c_accepted_source_exhaustion": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00179",
+      "producer_result_sha": "7548b44b7364504c248341cce0771969f0793160",
+      "qa_run": "C136/Q00034",
+      "disposition": "PASS_SOURCE_ACQUISITION_EXHAUSTION_ONLY",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH"
+    },
+    "pinned_source": {
+      "tag": "v0.25.10a",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+    }
+  },
+  "current_checks": {
+    "queue_identity": "PASS",
+    "canonical_inventory_identity": "PASS_UNCHANGED",
+    "a00179_result_identity": "PASS_UNCHANGED",
+    "a00179_index30_source_exhaustion": "PASS_UNCHANGED",
+    "c136_accepts_exhaustion_only": "PASS_UNCHANGED",
+    "a00285_sticky_guard": "PASS_UNCHANGED",
+    "pinned_source_policy": "PASS_UNCHANGED"
+  },
+  "reactivation_contract": {
+    "current_result": "BLOCKED_UNCHANGED_DEPENDENCY_FINGERPRINT",
+    "source_reprobe_authorized": false,
+    "candidate_rebuild_authorized": false,
+    "fresh_rescan_required": false,
+    "triggers": [
+      "canonical inventory identity changes",
+      "C disposition/source-acquisition state changes",
+      "A00179 accepted result identity is superseded",
+      "pinned canonical source policy/tag/commit/bundle digest changes",
+      "A-shard candidate-completion scan no longer classifies index30 as sticky"
+    ],
+    "purpose": "Replace repeated full source-ladder retries with one deterministic asset-specific eligibility decision. Any trigger causes a fresh producer scan; unchanged evidence keeps index30 skipped."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00286-P00169/verify_index30_source_reactivation.py",
+    "localization/graphics/role_A/20260930-A00286-P00169/A00286_P00169_INDEX30_SOURCE_REACTIVATION_GUARD.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "8e099aefebb5911e46efa0d1e75a35d9bd8068ae",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "a00179_evidence_blob_sha": "e8b4aa7665e0c97a7db9cee25d55fd7892e29f5c",
+    "c136_report_blob_sha": "3a36cd7543550a904af3ad81e60b2928c22af87d",
+    "a00285_task_blob_sha": "eb8a05c0f82b88a39929489980797ad7cfaec796",
+    "a00285_report_blob_sha": "532fae7f3ee22059608ece2adc6db92e2757b58e"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX30_ASSET_SPECIFIC_SOURCE_DEPENDENCY_REACTIVATION_GUARD_AND_MACHINE_OUTPUT",
+    "executable": "localization/graphics/role_A/20260930-A00286-P00169/verify_index30_source_reactivation.py",
+    "machine_report": "localization/graphics/role_A/20260930-A00286-P00169/A00286_P00169_INDEX30_SOURCE_REACTIVATION_GUARD.json",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "new_executable_selection_input": true
+  },
+  "self_qa": "PASS_INDEX30_EXACT_CANONICAL_AND_C_ACCEPTED_EXHAUSTION_LOCK__NO_SOURCE_REPROBE__NO_QA_PENDING_REPEAT__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
