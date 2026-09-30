@@ -374,5 +374,25 @@
     "missing_object_behavior": "FALL_THROUGH_NEXT_TIER",
     "identity_gate": "CANONICAL_INVENTORY_SHA_DIMENSIONS_FORMAT",
     "producer_requirement": "A/B/E MUST attempt approved Drive exact-relative-path source acquisition before declaring canonical source unavailable or selecting source-reacquisition-only preflight."
+  },
+  "github_access_validation": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "refresh_before_permission_block": true,
+    "authoritative_write_capabilities": [
+      "push",
+      "maintain",
+      "admin"
+    ],
+    "permission_denied_only_when": "fresh repository permission metadata has no push/maintain/admin capability OR an actual write returns authorization-specific 401/403 after refresh",
+    "do_not_classify_as_permission_denied": [
+      "404_PATH_OR_REF_NOT_FOUND",
+      "UNSUPPORTED_CONNECTOR_OR_API_OPERATION",
+      "STALE_BLOB_SHA_CONFLICT",
+      "BRANCH_HEAD_RACE",
+      "VALIDATION_FAILURE",
+      "RATE_LIMIT",
+      "LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"
+    ],
+    "valid_permission_recovery": "refresh branch HEAD and continue incomplete lane work without alternate repo/branch/clone/worktree"
   }
 }
