@@ -605,9 +605,9 @@ namespace OutRunVRStereo
             return result;
         }
 
-        template <typename ActualDraw, typename R29Draw>
+        template <typename ActualDraw, typename LowerDraw>
         HRESULT R31Dispatch(IDirect3DDevice9* device, ActualDraw&& actualDraw,
-            R29Draw&& r29Draw, const char* site)
+            LowerDraw&& lowerDraw, const char* site)
         {
             R31ObserveDraw(device);
             R31DiscardUnreliableDrawCaches();
@@ -634,7 +634,7 @@ namespace OutRunVRStereo
             }
 
             ++R31Frame.fallback;
-            return r29Draw();
+            return lowerDraw();
         }
 
         HRESULT __stdcall DrawPrimitiveDestR31(IDirect3DDevice9* device,
