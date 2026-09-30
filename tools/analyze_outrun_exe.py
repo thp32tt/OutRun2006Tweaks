@@ -193,6 +193,32 @@ GF_TARGET_C_HELPER_1_PREFIX_INSTRUCTIONS = (
     (0x000284AF, "c3", "ret"),
 )
 
+# R145/F13: exact-byte continuation of helper 0x28460's first successful path.
+# This proves only the first two call-chain edges and the intervening -1 guard.
+GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_RVA = 0x000284BC
+GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_TARGET_RVA = 0x000282B0
+GF_TARGET_C_HELPER_1_SUCCESS_FAILURE_BRANCH_RVA = 0x000284CB
+GF_TARGET_C_HELPER_1_SUCCESS_FAILURE_TARGET_RVA = 0x00028587
+GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_RVA = 0x000284D2
+GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_TARGET_RVA = 0x0008BD20
+GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_END_RVA = 0x000284DF
+GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_INSTRUCTIONS = (
+    (0x000284B0, "55", "push ebp"),
+    (0x000284B1, "8b 6c 24 20", "mov ebp, [esp+0x20]"),
+    (0x000284B5, "8d 44 24 14", "lea eax, [esp+0x14]"),
+    (0x000284B9, "50", "push eax"),
+    (0x000284BA, "8b c5", "mov eax, ebp"),
+    (0x000284BC, "e8 ef fd ff ff", "call rel32"),
+    (0x000284C1, "83 c4 04", "add esp, 4"),
+    (0x000284C4, "83 f8 ff", "cmp eax, -1"),
+    (0x000284C7, "89 44 24 10", "mov [esp+0x10], eax"),
+    (0x000284CB, "0f 84 b6 00 00 00", "je 0x28587"),
+    (0x000284D1, "53", "push ebx"),
+    (0x000284D2, "e8 49 38 06 00", "call rel32"),
+    (0x000284D7, "db 44 24 2c", "fild dword [esp+0x2c]"),
+    (0x000284DB, "8b 4c 24 18", "mov ecx, [esp+0x18]"),
+)
+
 
 # Mirrors the canonical producer catalog in
 # src/vr/game/disasm_render_contract.hpp. Keep this Python representation
@@ -657,6 +683,150 @@ def collect_guarded_gf_target_c_helper_1_prefix_proof(pe: PE) -> dict:
             else "LOOKUP_PREFIX_PROOF_FAILED"
         ),
         "semantic_effect": "PARTIAL_LOOKUP_PREFIX_ONLY",
+        "full_helper_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe: PE) -> dict:
+    """Prove the first successful call-chain prefix after helper 0x28460 lookup.
+
+    The proof is deliberately bounded to 0x284B0..0x284DE. It establishes two
+    exact rel32 call targets plus the -1 error branch between them, while leaving
+    the callees' semantics and the remainder of helper 0x28460 unresolved.
+    """
+
+    lookup_proof = collect_guarded_gf_target_c_helper_1_prefix_proof(pe)
+    provenance = collect_guarded_gf_target_c_helper_1_provenance(pe)
+
+    expected_next = GF_TARGET_C_HELPER_1_SUCCESS_CONTINUATION_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    def rel32_call_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 5)
+        if len(raw) != 5 or raw[0] != 0xE8:
+            return None
+        rel = struct.unpack_from("<i", raw, 1)[0]
+        return (rva + 5 + rel) & 0xFFFFFFFF
+
+    def rel32cc_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 6)
+        if len(raw) != 6 or raw[0:2] != b"\x0f\x84":
+            return None
+        rel = struct.unpack_from("<i", raw, 2)[0]
+        return (rva + 6 + rel) & 0xFFFFFFFF
+
+    first_target = rel32_call_target(GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_RVA)
+    failure_target = rel32cc_target(
+        GF_TARGET_C_HELPER_1_SUCCESS_FAILURE_BRANCH_RVA
+    )
+    second_target = rel32_call_target(
+        GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_RVA
+    )
+
+    first_target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(first_target))
+        if first_target is not None
+        else iter(()),
+        "",
+    )
+    second_target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(second_target))
+        if second_target is not None
+        else iter(()),
+        "",
+    )
+    raw_outbound = {
+        (item["call_rva"], item["target_rva"])
+        for item in provenance["raw_outbound_rel32_candidates"]
+    }
+    outbound_candidates_match = (
+        (
+            GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_RVA,
+            GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_TARGET_RVA,
+        )
+        in raw_outbound
+        and (
+            GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_RVA,
+            GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_TARGET_RVA,
+        )
+        in raw_outbound
+    )
+    lookup_prefix_proven = (
+        lookup_proof["status"] == "EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN"
+        and lookup_proof["success_continuation_rva"]
+        == GF_TARGET_C_HELPER_1_SUCCESS_CONTINUATION_RVA
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    first_target_matches = (
+        first_target == GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_TARGET_RVA
+    )
+    failure_target_matches = (
+        failure_target == GF_TARGET_C_HELPER_1_SUCCESS_FAILURE_TARGET_RVA
+    )
+    second_target_matches = (
+        second_target == GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_TARGET_RVA
+    )
+    target_sections_match = (
+        first_target_section == ".text" and second_target_section == ".text"
+    )
+    prefix_end_matches = expected_next == GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_END_RVA
+
+    proven = bool(
+        lookup_prefix_proven
+        and contiguous
+        and all_bytes_match
+        and prefix_end_matches
+        and first_target_matches
+        and failure_target_matches
+        and second_target_matches
+        and target_sections_match
+        and outbound_candidates_match
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_RVA,
+        "lookup_prefix_status": lookup_proof["status"],
+        "success_start_rva": GF_TARGET_C_HELPER_1_SUCCESS_CONTINUATION_RVA,
+        "success_prefix_end_rva": GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_END_RVA,
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "first_call_rva": GF_TARGET_C_HELPER_1_SUCCESS_FIRST_CALL_RVA,
+        "first_call_target_rva": first_target,
+        "first_call_target_matches": first_target_matches,
+        "first_call_target_section": first_target_section,
+        "failure_branch_rva": GF_TARGET_C_HELPER_1_SUCCESS_FAILURE_BRANCH_RVA,
+        "failure_target_rva": failure_target,
+        "failure_target_matches": failure_target_matches,
+        "failure_condition": "EAX == -1 after first call",
+        "second_call_rva": GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_RVA,
+        "second_call_target_rva": second_target,
+        "second_call_target_matches": second_target_matches,
+        "second_call_target_section": second_target_section,
+        "outbound_candidates_match": outbound_candidates_match,
+        "status": (
+            "EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN"
+            if proven
+            else "SUCCESS_CALL_CHAIN_PREFIX_PROOF_FAILED"
+        ),
+        "semantic_effect": "PARTIAL_CALL_CHAIN_ONLY",
+        "callee_semantics": "UNRESOLVED",
         "full_helper_semantics": "UNRESOLVED",
         "ownership_effect": "NONE",
     }
@@ -1467,6 +1637,7 @@ def main() -> int:
         "guarded_gf_target_c_third_call_alignment_proof": collect_guarded_gf_target_c_third_call_alignment_proof(pe),
         "guarded_gf_target_c_helper_1_provenance": collect_guarded_gf_target_c_helper_1_provenance(pe),
         "guarded_gf_target_c_helper_1_prefix_proof": collect_guarded_gf_target_c_helper_1_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_success_prefix_proof": collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -1642,6 +1813,27 @@ def main() -> int:
         f"full_semantics={helper_1_proof['full_helper_semantics']} "
         f"ownership_effect={helper_1_proof['ownership_effect']}"
     )
+    helper_1_success = report["guarded_gf_target_c_helper_1_success_prefix_proof"]
+    print(
+        f"gf_target_c_helper_1_success=0x{helper_1_success['success_start_rva']:08X} "
+        f"status={helper_1_success['status']} "
+        f"lookup_status={helper_1_success['lookup_prefix_status']} "
+        f"layout_contiguous={helper_1_success['layout_contiguous']} "
+        f"bytes_match={helper_1_success['all_instruction_bytes_match']} "
+        f"first_call=0x{helper_1_success['first_call_rva']:08X}->"
+        f"{hexrva(helper_1_success['first_call_target_rva'])}:"
+        f"{helper_1_success['first_call_target_section'] or 'none'} "
+        f"failure_branch=0x{helper_1_success['failure_branch_rva']:08X}->"
+        f"{hexrva(helper_1_success['failure_target_rva'])} "
+        f"failure_condition={helper_1_success['failure_condition']} "
+        f"second_call=0x{helper_1_success['second_call_rva']:08X}->"
+        f"{hexrva(helper_1_success['second_call_target_rva'])}:"
+        f"{helper_1_success['second_call_target_section'] or 'none'} "
+        f"outbound_candidates={helper_1_success['outbound_candidates_match']} "
+        f"semantic_effect={helper_1_success['semantic_effect']} "
+        f"callee_semantics={helper_1_success['callee_semantics']} "
+        f"ownership_effect={helper_1_success['ownership_effect']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -1670,6 +1862,9 @@ def main() -> int:
     if helper_1_proof["status"] != "EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN":
         print("guarded_gf_target_c_helper_1_prefix_proof=FAILED")
         return 7
+    if helper_1_success["status"] != "EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN":
+        print("guarded_gf_target_c_helper_1_success_prefix_proof=FAILED")
+        return 8
     return 0
 
 
