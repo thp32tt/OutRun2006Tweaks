@@ -3,6 +3,7 @@
 #include "dispatch_semantics.hpp"
 #include "../d3d9/screen_space_policy.hpp"
 #include "../d3d9/vr_pass_policy.hpp"
+#include "../lifecycle/reset_replay_policy.hpp"
 
 namespace OutRunVR::Core::RefactorContract
 {
@@ -17,4 +18,8 @@ namespace OutRunVR::Core::RefactorContract
         PassPolicy::RenderSemantic::World3D));
     static_assert(!PassPolicy::AllowsWorldStereo(
         PassPolicy::RenderSemantic::Unknown));
+    static_assert(Lifecycle::ResetReplayHealthy(true, true));
+    static_assert(!Lifecycle::ResetReplayHealthy(true, false));
+    static_assert(!Lifecycle::ResetReplayHealthy(false, true));
+    static_assert(!Lifecycle::ResetReplayHealthy(false, false));
 }
