@@ -1,0 +1,142 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00276-index111-random-protected-art-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00276",
+  "wave_id": null,
+  "wave_id_status": "ROLLOVER_INPUT_OMITTED_AND_NO_PRIOR_DURABLE_A00276_RECORD_AT_BASE_HEAD",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T20:31:45+09:00",
+  "base_head_sha": "ae9cd8e3198c948373d9c8e4e8bca90dbe8a099c",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_RANDOM_PROTECTED_ART_GUARD_ADDED_CANDIDATE_UNCHANGED_RUNTIME_UNTESTED",
+  "summary": "Rollover 1 reconstructed A00276 from current GitHub SSOT. No prior A00276 run JSON or TASK commit existed at the refreshed base HEAD. Current schema 15 assigns A index%3==0; A-owned candidate-QA-pending indices 159/198/201 were not repeated, so the only actionable continuation remains index111/C075FB49. This pass consumes the latest A00271 protected-art handoff and runs a new exact-source fail-closed audit on RANDOM. The exact near-white source text fill is not separated from the unique light-blue panel/question-mark artwork by even a one-pixel square guard: a one-pixel dilation intersects 25 protected pixels, with larger guards intersecting 126/214/296/... pixels. Therefore a simple dilation-based removal mask is now explicitly rejected rather than risking protected-art damage. A deterministic lane-local audit script and exact machine output are committed. No DDS bytes or shared state are changed. Runtime remains UNTESTED.",
+  "selection": {
+    "controller_schema_version": 15,
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "FALLBACK_STEP_5_ASSET_SPECIFIC_FAIL_CLOSED_QA_TOOL_AFTER_ZERO_RUNNABLE_RENDER_READY_OR_ONE_STAGE_TO_RENDER_A_ASSETS",
+    "prior_handoff": "A00271 registered the tuned/normal shared protected-car template but left antialias/light-panel fringe verification and RANDOM protected-art reconstruction unresolved."
+  },
+  "fingerprint": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926",
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "current_candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "current_candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+    "current_candidate_git_blob_sha": "de1ad4cdcf2e26ddd5265e495b821e8b98f4199e",
+    "structure": "2048x2048 RGBA32 mip1 / raw mirror_y"
+  },
+  "source_acquisition": {
+    "github_state_ssot": true,
+    "uploaded_archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "uploaded_archive_size_bytes": 306223257,
+    "uploaded_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "canonical_member": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "canonical_member_size_bytes": 16777344,
+    "canonical_member_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "identity": "PASS_EXACT_PINNED_ARCHIVE_MEMBER_AND_GITHUB_SOURCE_BLOB"
+  },
+  "new_random_guard": {
+    "cell_half_open": [
+      1710,
+      1410,
+      2008,
+      1515
+    ],
+    "source_text_fill_rgba": [
+      245,
+      247,
+      247,
+      255
+    ],
+    "source_text_fill_pixels": 3027,
+    "source_text_fill_bbox_local_half_open": [
+      27,
+      43,
+      227,
+      80
+    ],
+    "protected_light_blue_rgba": [
+      103,
+      152,
+      220,
+      255
+    ],
+    "protected_light_blue_pixels": 1328,
+    "protected_light_blue_bbox_local_half_open": [
+      81,
+      50,
+      202,
+      105
+    ],
+    "dilation_metric": "square/Chebyshev neighborhood",
+    "protected_intersections_by_text_fill_dilation_radius_px": {
+      "1": 25,
+      "2": 126,
+      "3": 214,
+      "4": 296,
+      "5": 394,
+      "8": 536,
+      "12": 677
+    },
+    "disposition": "SOURCE_ONLY_SIMPLE_MASK_RECONSTRUCTION_REJECTED",
+    "required_next_method": "EXPLICIT_PROTECTED_ART_RECONSTRUCTION_MODEL_OR_VERIFIED_CURRENT_CANDIDATE_PRESERVING_MERGE"
+  },
+  "candidate_completion_attempt": {
+    "candidate_dds_modified": false,
+    "render_ready_reached": false,
+    "reason": "RANDOM still lacks a source-safe protected-art clean plate; this run proves the previously plausible simple dilation mask would violate the protected-art gate. Tuned/Normal fringe verification also remains open. A speculative DDS rewrite is forbidden.",
+    "current_candidate_materialized_to_compute_runtime": false,
+    "transport_note": "GitHub metadata proves the current b020... candidate blob at SSOT, but the available GitHub connector does not materialize oversized/non-UTF8 repository binaries into the compute runtime. N100/local clone/worktree fallback is prohibited by task instruction, so no binary rewrite was attempted."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00276/A00276_INDEX111_RANDOM_PROTECTED_ART_AUDIT.py",
+    "localization/graphics/role_A/20260930-A00276/A00276_INDEX111_RANDOM_PROTECTED_ART_AUDIT.json"
+  ],
+  "evidence_fingerprints": {
+    "audit_script_sha256": "9547b2616c8601735fb28b14e280766e118d07bb65386a48eefddde3c392d2ff",
+    "audit_output_sha256": "c1a1d403e668d28f3d07025f86a4db42b92fbbd1fbc14e40f355f718143043ee"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX111_C075FB49_RANDOM_PROTECTED_ART_FAIL_CLOSED_QA_TOOL_AND_EXACT_SOURCE_OUTPUT",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "new_qa_guard": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_SCHEMA15_SHARD__NO_QA_PENDING_REPEAT__EXACT_CANONICAL_SOURCE_ARCHIVE_AND_GITHUB_IDENTITY__RANDOM_1PX_SQUARE_DILATION_INTERSECTS_25_PROTECTED_PIXELS__SIMPLE_MASK_ROUTE_REJECTED_FAIL_CLOSED__LANE_LOCAL_TOOL_AND_OUTPUT_COMMITTED__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "PENDING_RESULT_COMMIT"
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "outrun-a00276-c075-random-protected-art-audit-v1",
+  "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+  "canvas": [
+    2048,
+    2048
+  ],
+  "readable_transform": "flip_y",
+  "random": {
+    "cell_half_open": [
+      1710,
+      1410,
+      2008,
+      1515
+    ],
+    "source_text_fill_rgba": [
+      245,
+      247,
+      247,
+      255
+    ],
+    "source_text_fill_pixels": 3027,
+    "source_text_fill_bbox_local_half_open": [
+      27,
+      43,
+      227,
+      80
+    ],
+    "protected_light_blue_rgba": [
+      103,
+      152,
+      220,
+      255
+    ],
+    "protected_light_blue_pixels": 1328,
+    "protected_light_blue_bbox_local_half_open": [
+      81,
+      50,
+      202,
+      105
+    ],
+    "dilation_metric": "square/Chebyshev neighborhood",
+    "text_fill_dilation_intersection_with_protected_pixels": {
+      "1": 25,
+      "2": 126,
+      "3": 214,
+      "4": 296,
+      "5": 394,
+      "8": 536,
+      "12": 677
+    },
+    "one_pixel_separation_safe": false,
+    "disposition": "SOURCE_ONLY_SIMPLE_MASK_RECONSTRUCTION_REJECTED"
+  },
+  "interpretation": "The exact RANDOM source text and unique panel artwork are not separated by a one-pixel guard. Any simple dilation-based English removal mask would consume protected artwork; use an explicit protected-art reconstruction/model or a verified current-candidate-preserving merge and fail closed otherwise."
+}
