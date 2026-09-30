@@ -67,10 +67,12 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "957481f2d475c88fa6872528de8a2c4fa6b8f087",
+  "authoritative_result_sha": "957481f2d475c88fa6872528de8a2c4fa6b8f087",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): republish index163 clean candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00300]",
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable material AUTO result commit. Producer validation remains PENDING for C_BATCH_GATE; runtime remains UNTESTED."
+  "bookkeeping_note": "Immutable producer material result is 957481f2d475c88fa6872528de8a2c4fa6b8f087. This bookkeeping commit does not own validation. automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T02:05:42+09:00",
+  "bookkeeping_base_head_sha": "957481f2d475c88fa6872528de8a2c4fa6b8f087"
 }
