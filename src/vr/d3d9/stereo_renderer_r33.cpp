@@ -306,7 +306,7 @@ namespace OutRunVRStereo
                 return {};
 
             DrawStereoState draw{};
-            if (!R31BuildFastWorldConstants(device, stereo, draw))
+            if (!BuildFastWorldConstants(device, stereo, draw))
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
@@ -441,10 +441,10 @@ namespace OutRunVRStereo
 
             if (!IsStateBlockTrackingReliable())
             {
-                R31DiscardUnreliableDrawCaches();
+                DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
                     CurrentVertexShaderIdentity.load(std::memory_order_acquire);
-                if (!R31LiveShaderMatches(device, cachedShader))
+                if (!LiveShaderMatches(device, cachedShader))
                     return {};
             }
 
@@ -626,7 +626,7 @@ namespace OutRunVRStereo
             // Preserve R31's fail-closed boundary when StateBlock tracking
             // is unreliable. Otherwise stale R29 effect/shadow caches can
             // reclassify a draw that R33 already rejected using live state.
-            R31DiscardUnreliableDrawCaches();
+            DiscardUnreliableDrawCaches();
             if (telemetry)
                 NoteTelemetryFallback();
             return R32LowerFailClosed(device,

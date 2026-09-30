@@ -1120,4 +1120,23 @@ namespace OutRunVRStereo
     {
         ++R31Frame.fallback;
     }
+
+    bool BuildFastWorldConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        DrawStereoState& draw) noexcept
+    {
+        return R31BuildFastWorldConstants(device, stereo, draw);
+    }
+
+    void DiscardUnreliableDrawCaches() noexcept
+    {
+        R31DiscardUnreliableDrawCaches();
+    }
+
+    bool LiveShaderMatches(
+        IDirect3DDevice9* device, std::uintptr_t expected) noexcept
+    {
+        return R31LiveShaderMatches(device, expected);
+    }
 }
