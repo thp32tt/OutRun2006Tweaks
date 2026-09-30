@@ -654,3 +654,17 @@ Effective 2026-09-30 by user visual-review direction.
 - Preserve source alignment, baseline, orientation, signed slant, outline/shadow/effect hierarchy, and spacing rules while normalizing nominal font size.
 - QA must record `title_family`, `family_target_font_size`, `actual_font_size`, and any fit-reduction reason. Unjustified per-title font-size variation is `REWORK_REQUIRED`.
 - Existing Korean candidates containing translated song titles, or visually inconsistent course/song title sizing under this rule, are rework candidates and must not be promoted until corrected. Runtime validation remains separate.
+
+
+## Conservative fit / micro-reduction rule
+
+Effective 2026-09-30 by user direction.
+
+- Do not force Korean lettering to touch or nearly touch the exact source bbox merely to maximize size.
+- Prefer a small native-render size reduction when it creates reliable containment. A **1-2 px visual safety margin per constrained edge** is explicitly acceptable and is not a style-fidelity failure by itself.
+- Fit order is: preserve the source-family target size when safely contained -> tighten source-faithful tracking/line break -> apply the minimum native font-size reduction needed for a 1-2 px safety margin -> use an approved shorter translation if still required.
+- The reduction must be performed by re-rendering the glyphs/effects natively at the smaller font size. Resampling, shrinking, trimming, or scaling a flattened rendered lettering raster remains forbidden.
+- C/producer QA must not reject a candidate solely because it is slightly smaller than the English source when the difference is the minimum needed for safe containment and remains visually source-faithful.
+- Material undersizing remains REWORK_REQUIRED. In particular, do not repeat the prior START/GOAL failure mode where lettering became conspicuously smaller than its source/display family.
+- When a fit reduction is used, machine-readable QA should record the original/family target size, actual size, and reason such as `MICRO_REDUCTION_FOR_1_2PX_SAFETY_MARGIN`.
+- The zero-pixel overflow rule is unchanged: no Korean glyph/effect pixel may escape the permitted source region.
