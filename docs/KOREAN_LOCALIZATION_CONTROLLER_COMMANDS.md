@@ -45,6 +45,8 @@ Each command means:
 Every controller-generated initial task, retry, and chat-rollover prompt MUST explicitly instruct the worker to perform a fresh authenticated GitHub repository metadata/permission check before claiming that GitHub access is unavailable.
 
 Required semantics:
+- Every initial/retry/rollover dispatch must refresh current `localization/controller_roles.json`; include current `CONTROLLER_SCHEMA_VERSION` and `CONTROLLER_CONFIG_BLOB_SHA` in the generated task. Never reuse a cached prompt after that blob changes.
+- Current producer shard is modulo-3 (A=0, B=1, E=2). Never inject historical A/B odd-even/two-producer rules.
 - GitHub access/permission preflight MUST use the authenticated GitHub connector/API first. Public web search is never authoritative for repository access.
 - A public web-search miss, or a search result that exposes only upstream `emoose/OutRun2006Tweaks`, MUST NOT be interpreted as evidence that `thp32tt/OutRun2006Tweaks` or `korean-localization-clean` is inaccessible.
 - Do not fall back to public web search to decide permission state when the authenticated GitHub connector is available; query repository metadata and branch HEAD directly.
