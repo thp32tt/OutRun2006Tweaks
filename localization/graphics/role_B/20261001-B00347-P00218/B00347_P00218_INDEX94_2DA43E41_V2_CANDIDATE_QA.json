@@ -1,0 +1,231 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00347-p00218-index94-2da43e41-v2-candidate-qa-v1",
+  "status": "PASS",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+  "wave_id": "P00218",
+  "lane": "LOCALIZATION_B",
+  "queue_index": 94,
+  "asset": "2DA43E41",
+  "source": {
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "member": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "bytes": 67108992,
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "FLIP_Y"
+  },
+  "accepted_lineage": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00329",
+    "c_corrected_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+    "c_disposition": "PASS_PREFLIGHT_ONLY",
+    "prior_producer_task": "LOCALIZATION-LOCALIZATION_B-00319",
+    "prior_producer_result_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae",
+    "regen_spec": "localization/graphics/role_B/20260930-B00273-P00158/B00273_P00158_INDEX94_V2_REGEN_SPEC.json"
+  },
+  "course_sp_resolution": {
+    "protected_prefix": "OutRun2: SP",
+    "protected_alpha_x_range": [
+      132,
+      801
+    ],
+    "transparent_separator_x_range": [
+      801,
+      827
+    ],
+    "transparent_separator_alpha_pixels": 0,
+    "first_line_removal_range": [
+      827,
+      488,
+      2078,
+      592
+    ],
+    "first_line_removal_alpha_pixels": 75892,
+    "transparent_row_gap_y_range": [
+      592,
+      617
+    ],
+    "transparent_row_gap_alpha_pixels": 0,
+    "second_line_removal_range": [
+      132,
+      617,
+      2078,
+      717
+    ],
+    "second_line_removal_alpha_pixels": 63718,
+    "deterministic_split": true,
+    "protected_prefix_modified": false
+  },
+  "removal_masks": {
+    "elements_total": 7,
+    "fully_resolved": 7,
+    "source_alpha_union_pixels": 433092,
+    "prior_c171_six_mask_counts_replayed_exact": true,
+    "counts": {
+      "course_sp": 139610,
+      "wait_now": 158449,
+      "acceleration": 6714,
+      "max_speed": 6970,
+      "view_change": 11725,
+      "expert": 49479,
+      "special_course": 60145
+    }
+  },
+  "candidate": {
+    "file_name": "2DA43E41_B00347_v2.dds",
+    "sha256": "93b4256599dcb131978f3685f80d25e99ce3eac3dfd12d8e4f4a923c3fafc054",
+    "bytes": 67108992,
+    "dds_header_128_identical": true,
+    "decoded_roundtrip_pixel_exact": true,
+    "physical_localized_occurrences": 9,
+    "canonical_semantic_groups": 7,
+    "changed_pixels_outside_allowed": 0,
+    "alpha_changed_pixels_outside_allowed": 0,
+    "protected_art_overlap_pixels": 0,
+    "one_pixel_overflow_count": 0
+  },
+  "placements": [
+    {
+      "element": "course_sp_line1",
+      "korean": "· 15코스 연속",
+      "bbox": [
+        827,
+        490,
+        1383,
+        590
+      ],
+      "font_px": 95,
+      "xscale": 1
+    },
+    {
+      "element": "course_sp_line2",
+      "korean": "선택되었습니다.",
+      "bbox": [
+        792,
+        619,
+        1418,
+        715
+      ],
+      "font_px": 91,
+      "xscale": 1
+    },
+    {
+      "element": "wait_now_line1",
+      "korean": "현재 다른 플레이어를 기다리는 중입니다.",
+      "bbox": [
+        2241,
+        484,
+        3763,
+        585
+      ],
+      "font_px": 96,
+      "xscale": 0.95
+    },
+    {
+      "element": "wait_now_line2",
+      "korean": "잠시 기다려 주세요.",
+      "bbox": [
+        2611,
+        609,
+        3392,
+        710
+      ],
+      "font_px": 96,
+      "xscale": 1
+    },
+    {
+      "element": "acceleration",
+      "korean": "가속:",
+      "bbox": [
+        3828,
+        249,
+        3941,
+        304
+      ],
+      "font_px": 58,
+      "xscale": 1
+    },
+    {
+      "element": "max_speed",
+      "korean": "최고 속도:",
+      "bbox": [
+        3831,
+        321,
+        4014,
+        376
+      ],
+      "font_px": 58,
+      "xscale": 0.81
+    },
+    {
+      "element": "view_change",
+      "korean": "시점 변경 버튼:",
+      "bbox": [
+        3470,
+        1032,
+        3762,
+        1089
+      ],
+      "font_px": 56,
+      "xscale": 0.88,
+      "slant_dx_per_dy": 0.09
+    },
+    {
+      "element": "expert",
+      "korean": "상급자용",
+      "bbox": [
+        2988,
+        1126,
+        3358,
+        1227
+      ],
+      "font_px": 72,
+      "xscale": 1.25,
+      "slant_dx_per_dy": 0.08
+    },
+    {
+      "element": "special_course",
+      "korean": "스페셜 코스",
+      "bbox": [
+        3208,
+        1281,
+        3807,
+        1401
+      ],
+      "font_px": 106,
+      "xscale": 1.08,
+      "slant_dx_per_dy": 0.08
+    }
+  ],
+  "generation": {
+    "contract": "outrun-first-pass-edit-v2",
+    "method": "EXACT_HD_SOURCE -> SOURCE_ALPHA_REMOVAL_MASK -> TRANSPARENT_CLEAN_PLATE -> DETERMINISTIC_VECTOR_KOREAN -> MEASURE_REFIT -> DDS -> DECODED_FINAL_QA",
+    "flattened_raster_resize_used": false,
+    "source_family_style_measured": true
+  },
+  "visual_review": {
+    "status": "PASS",
+    "source_clean_candidate": "index94_source_clean_candidate_comparison.png",
+    "candidate_elements": "index94_candidate_elements.png",
+    "notes": "Protected OutRun2: SP is intact; no visible source-language residue in translated regions, no cover boxes, clipped Hangul, neighboring-art overwrite, alpha seam, or 1px escape observed."
+  },
+  "drive_transport": {
+    "account": "ezflash557",
+    "current_pipeline_parent_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
+    "folder_id": "1A-_Uq5NxO4cyqnQxOJF4rXBEzxDkkOf0",
+    "package_file_id": "19UmVXn59iBoxwYwZTmZG9Ep7DuoETWDi",
+    "package_name": "LOCALIZATION-LOCALIZATION_B-00347_INDEX94_2DA43E41_V2.zip",
+    "package_bytes": 2973872,
+    "package_sha256": "148f4f781c8da24489debd2977ae7a1ec83be9dcc7c7ebcc59f03f6530ad9208",
+    "drive_readback_byte_identical": true,
+    "comparison_file_id": "185kSw70eMM5FiY4aur2oUGiaM_32E2rC",
+    "element_comparison_file_id": "1Fwc-zJZ6ha79peoFfwBFajEqCMdFGmuu"
+  },
+  "runtime_validation": "UNTESTED"
+}
