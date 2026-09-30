@@ -208,16 +208,18 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } elseif ($Backend -eq "dx11") {
-        # Explicitly exercise the x64 D3D11 OpenXR DirectGPU host. The game side
-        # remains D3D9Ex; DirectGPU-only prevents a desktop-duplication fallback
-        # from hiding ACK/run-identity failures.
+        # Exercise the x64 D3D11 OpenXR DirectGPU gameplay path without hiding
+        # ACK/run-identity failures behind classic SBS. Keep Desktop Duplication
+        # available for PresentationTheater/menu capture: DirectGpuOnly already
+        # rejects classic gameplay frames, while menus need a fresh mono source
+        # instead of falling through to a stale cached/emergency layer.
         $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
-        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } else {
         $value = switch ($Backend) {
             "dxvk" { "2" }

@@ -151,6 +151,28 @@ switch ([string]$target.RendererTarget) {
         if ([bool]$target.NativeDrawPathActive) {
             throw 'NativeDrawPathActive must remain false until the native D3D11 draw owner is actually connected.'
         }
+
+        # DX11 validation keeps gameplay DirectGPU-only, but menu/theater still
+        # requires Desktop Duplication until native menu rendering exists.
+        $dx11SelectorMatch = [regex]::Match(
+            $selector,
+            '(?s)elseif \(\$Backend -eq "dx11"\) \{(?<body>.*?)\r?\n    \} else \{')
+        if (!$dx11SelectorMatch.Success) {
+            throw 'DX11 selector policy block could not be isolated.'
+        }
+        $dx11SelectorBody = $dx11SelectorMatch.Groups['body'].Value
+        foreach ($requiredText in @(
+            '$text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"',
+            '$text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"'
+        )) {
+            if ($dx11SelectorBody -notmatch [regex]::Escape($requiredText)) {
+                throw "DX11 menu/direct transport policy missing: $requiredText"
+            }
+        }
+        if ($dx11SelectorBody -match [regex]::Escape(
+            '$text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"')) {
+            throw 'DX11 selector must not globally disable Desktop Duplication; menus still require mono capture.'
+        }
         foreach ($requiredText in @(
             'OUTRUN_VR_DX11_CENSUS',
             "RendererTarget -eq 'dx11-native'"
