@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 7:
-    raise SystemExit("controller_roles schema_version must be >= 7")
+if int(cfg.get("schema_version", 0)) < 14:
+    raise SystemExit("controller_roles schema_version must be >= 14")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -115,6 +115,18 @@ required["production_strategy.continue_to_next_ready_asset_after_fail_closed"] =
 required["production_strategy.qa_strictness_unchanged"] = strategy.get("qa_strictness_unchanged") is True
 required["production_strategy.readiness_tiers"] = strategy.get("readiness_tiers") == ["RENDER_READY", "ONE_STAGE_TO_RENDER", "PREFLIGHT_ONLY"]
 
+fresh = cfg.get("dispatch_freshness") or {}
+required["dispatch_freshness.refresh_all_entrypoints"] = {"INITIAL_DISPATCH","RETRY","CONVERSATION_ROLLOVER"}.issubset(set(fresh.get("refresh_config_before") or []))
+required["dispatch_freshness.required_prompt_tokens"] = {"CONTROLLER_SCHEMA_VERSION","CONTROLLER_CONFIG_BLOB_SHA"}.issubset(set(fresh.get("required_prompt_tokens") or []))
+required["dispatch_freshness.reject_cached_prompt"] = fresh.get("reject_cached_prompt_after_config_blob_change") is True
+required["dispatch_freshness.current_shard_rule"] = fresh.get("required_current_shard_rule") == "asset_queue.index % 3: A=0, B=1, E=2"
+required["startup_reconcile.reload_controller_config"] = sr.get("reload_controller_config") is True
+required["startup_reconcile.reject_stale_schema_prompt"] = sr.get("reject_stale_schema_prompt") is True
+single = (cfg.get("actions_batching") or {}).get("single_dds_packaging") or {}
+required["single_dds_packaging.optional_only"] = single.get("purpose") == "OPTIONAL_RUNTIME_TEST_ARTIFACT_ONLY"
+required["single_dds_packaging.no_producer_gate"] = single.get("gates_producer_progress") is False
+required["single_dds_packaging.no_c_gate"] = single.get("gates_c_batch_progress") is False
+required["single_dds_packaging.external_candidate_skip"] = single.get("external_candidate_mode") == "SKIP_WITH_TYPED_NOTICE_EXTERNAL_CANDIDATE_NOT_IN_GIT"
 bad = [name for name, ok in required.items() if not ok]
 if bad:
     raise SystemExit("controller recovery policy invalid: " + ", ".join(bad))
