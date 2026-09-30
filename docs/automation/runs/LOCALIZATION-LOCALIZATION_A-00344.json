@@ -50,7 +50,8 @@
     "exact_bytes_match": false,
     "new_executable_input": false,
     "materially_reduces_unresolved_work": true,
-    "sticky_dependency_blocker": true
+    "sticky_dependency_blocker": true,
+    "producing_result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d"
   },
   "evidence": [
     "localization/graphics/role_A/20261001-A00344-P00215/A00344_P00215_INDEX147_SOURCE_IDENTITY_MISMATCH.json",
@@ -88,8 +89,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__NO_RUNNABLE_COMPLETION_TIER__NO_QA_PENDING_REPEAT__INDEX147_DRIVE_EXACT_MISS__PINNED_DIRECT_404__PINNED_RELEASE_ARCHIVE_EXACT__RELEASE_MEMBER_SHA_MISMATCH_CANONICAL__SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_MASK_CLEANPLATE_CANDIDATE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+  "authoritative_result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): close index147 canonical source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00344]",
   "durable_task_record_in_result_commit": true,
@@ -100,5 +101,9 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Fresh HEAD fetched immediately before tree/commit creation. Only A00344 lane-local evidence/task-record paths are added; shared state and peer-lane files are untouched."
   },
-  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the result SHA without owning a Localization Automation Gate. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA is bound here. The result commit atomically contains the material source-terminal evidence and task record. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T06:52:30+09:00",
+  "bookkeeping_base_result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+  "bookkeeping_preserved_head_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+  "bookkeeping_preserved_head_message": "localization(A): close index147 canonical source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00344]"
 }
