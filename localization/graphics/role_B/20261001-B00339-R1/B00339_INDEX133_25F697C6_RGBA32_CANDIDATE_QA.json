@@ -1,0 +1,574 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00339-index133-25f697c6-producer-result-evidence-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+  "wave_id": null,
+  "lane": "LOCALIZATION_B",
+  "queue_index": 133,
+  "asset": "25F697C6",
+  "status": "PASS_PRODUCER_SELF_QA_PENDING_C_BATCH_GATE",
+  "result": "PASS_NEW_V2_KOREAN_RGBA32_CANDIDATE_DRIVE_PERSISTED",
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "source": {
+    "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089",
+    "decoded_readable_rgba_sha256": "a9dfec213db5d68034b025658055ac3141b864bbead63f33ce1d4a91d458114b",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "flip_y",
+    "source_effect_removal_pixels": 161688
+  },
+  "c_render_ready_authority": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00337",
+    "qa_batch_id": "Q00071",
+    "role_c": "C173",
+    "validation_bearing_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "gate_run_id": 36775721143,
+    "gate_conclusion": "success",
+    "index133_production_readiness": "RENDER_READY",
+    "safe_bbox_gate": "PASS_9_OF_9_2PX_INSET",
+    "semantic_binding": "PASS_9_OF_9_CURRENT_CANONICAL"
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "drive_account": "ezflash557",
+    "drive_folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "drive_file_id": "1_XTpHRuI02HsMHS1ZoALx_CuLdeEb0wu",
+    "file_name": "25F697C6_512x512.dds",
+    "bytes": 16777344,
+    "sha256": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
+    "header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089",
+    "decoded_raw_rgba_sha256": "add25355ab22e1e26033966eade0d0b1bc6753a303f77d663088ffc35925786d",
+    "decoded_readable_rgba_sha256": "2050c0c197dd1d2cdc27259646aaeea5528bc3fff8629c4b21205d3ed4c72d58",
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "flip_y",
+    "drive_readback_size_verified": 16777344,
+    "drive_readback_sha256_verified": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
+    "drive_readback_byte_identical_to_local_candidate": true
+  },
+  "render": {
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+    "render_method": "native_text_mask_direct_no_resample",
+    "baseline_vector": [
+      1,
+      0
+    ],
+    "source_slant_angle_deg": 0,
+    "candidate_slant_angle_deg": 0,
+    "signed_slant_gate": "PASS",
+    "effects": {
+      "outline": "none",
+      "shadow": "none",
+      "glow": "none"
+    },
+    "elements": [
+      {
+        "element": 1,
+        "source_text": "BLU MIRABEAU",
+        "korean": "블루 미라보",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          492,
+          904,
+          940,
+          956
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          494,
+          906,
+          938,
+          954
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          601,
+          906,
+          831,
+          953
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          101,
+          107,
+          109
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 2,
+        "source_text": "NERO",
+        "korean": "네로",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1728,
+          904,
+          1884,
+          956
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          1730,
+          906,
+          1882,
+          954
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          1764,
+          907,
+          1848,
+          953
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          98,
+          105,
+          107
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 3,
+        "source_text": "ARGENTO NURBURGRING",
+        "korean": "아르젠토 뉘르부르크링",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          216,
+          960,
+          932,
+          1024
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          218,
+          962,
+          930,
+          1022
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          351,
+          969,
+          797,
+          1015
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          101,
+          107,
+          109
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 4,
+        "source_text": "ROSSO SCUDERIA",
+        "korean": "로쏘 스쿠데리아",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1368,
+          972,
+          1884,
+          1024
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          1370,
+          974,
+          1882,
+          1022
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          1466,
+          975,
+          1785,
+          1021
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          101,
+          107,
+          109
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 5,
+        "source_text": "BIANCO AVUS",
+        "korean": "비앙코 아부스",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          544,
+          1040,
+          940,
+          1092
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          546,
+          1042,
+          938,
+          1090
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          606,
+          1043,
+          877,
+          1089
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          101,
+          107,
+          109
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 6,
+        "source_text": "GRIGIO ALLOY",
+        "korean": "그리지오 알로이",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1480,
+          1040,
+          1888,
+          1092
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          1482,
+          1042,
+          1886,
+          1090
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          1527,
+          1042,
+          1841,
+          1089
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          101,
+          107,
+          109
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 7,
+        "source_text": "ALPINE",
+        "korean": "알파인",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          664,
+          1103,
+          1067,
+          1192
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          666,
+          1105,
+          1065,
+          1190
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          749,
+          1106,
+          981,
+          1189
+        ],
+        "font_size_hd_px": 88,
+        "fill_rgb": [
+          46,
+          53,
+          57
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 8,
+        "source_text": "GIALLO MODENA",
+        "korean": "지알로 모데나",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1528,
+          1152,
+          2012,
+          1204
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          1530,
+          1154,
+          2010,
+          1202
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          1633,
+          1155,
+          1907,
+          1201
+        ],
+        "font_size_hd_px": 48,
+        "fill_rgb": [
+          101,
+          107,
+          109
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      },
+      {
+        "element": 9,
+        "source_text": "ANCIENT RUINS",
+        "korean": "고대 유적",
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          549,
+          1220,
+          1391,
+          1315
+        ],
+        "candidate_safe_bbox_readable_xyxy_exclusive": [
+          551,
+          1222,
+          1389,
+          1313
+        ],
+        "candidate_bbox_readable_xyxy_exclusive": [
+          804,
+          1226,
+          1136,
+          1309
+        ],
+        "font_size_hd_px": 88,
+        "fill_rgb": [
+          46,
+          53,
+          57
+        ],
+        "alignment": "center_on_source_effect_bbox",
+        "baseline_vector": [
+          1,
+          0
+        ],
+        "slant_angle_deg": 0,
+        "effects": {
+          "outline": "none",
+          "shadow": "none",
+          "glow": "none"
+        },
+        "containment": "PASS"
+      }
+    ]
+  },
+  "integrated_self_qa": {
+    "status": "PASS",
+    "changed_pixels_total": 194694,
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "source_style_residue_pixels": 0,
+    "one_pixel_overflow_count": 0,
+    "elements_containment_pass": 9,
+    "elements_total": 9,
+    "dds_header_128_identical": true,
+    "decoded_roundtrip_pixel_exact": true,
+    "protected_visible_source_pixels_preserved": 396575,
+    "visible_english_residue": "PASS_NONE_BY_ALPHA_COMPOSITED_SOURCE_CANDIDATE_VISUAL_REVIEW",
+    "broken_hangul_or_fallback_boxes": "PASS_NONE_VISIBLE",
+    "clipping": "PASS_NONE_VISIBLE",
+    "opaque_cover_box_or_patch": "PASS_NONE",
+    "wrong_artwork_or_neighbor_change": "PASS_NONE",
+    "material_resolution_or_scale": "PASS_NATIVE_HD_SCALE",
+    "readable_orientation_visual_review": "PASS",
+    "raw_orientation_contract": "PASS_FLIP_Y",
+    "signed_slant_gate": "PASS",
+    "english_source_side_by_side": "PASS",
+    "drive_readback": "PASS_BYTE_IDENTICAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "review_artifacts": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "files": {
+      "source_display": {
+        "file_id": "1UYsTqpGuJzZXHxVujRiPmLoXteBJPcnw",
+        "sha256": "a8b6dcdad8c04a3fc7cfab88dfa670c1f5fa8d594d0c7b1a1bb716b835f2d77e"
+      },
+      "clean_plate_display": {
+        "file_id": "1y9PXiJNpTgta2ygJG-mxR3PStjV9CseY",
+        "sha256": "80e2b8a6076d6bdbae1f182aeabc545ab5ad16c7074df6eb30417fa780b4c968"
+      },
+      "candidate_display": {
+        "file_id": "1WXECo9_jie-loDGCz8HfBrF1uC_bd1kd",
+        "sha256": "6cccb0e99e5ea7e9acea694949209e3247841f614a060c9c58b508ee16a4e153"
+      },
+      "comparison": {
+        "file_id": "18BUuLJ2cMtPZ6wWTj0S744Jcm9zz9ytN",
+        "sha256": "976f34ed7474cb30279824c95c4654154919a99d22e7791b9935800f6654e024"
+      },
+      "element_comparison": {
+        "file_id": "1Hu6F3SUu_gAIdvk5Hy0GRiOx_jl9Jb6J",
+        "sha256": "2f3ba8c371bbc6fb0ef32aee219b35231162cc824acea6621d65439af031031d"
+      },
+      "diff_display": {
+        "file_id": "1ZUw8-fIJB4CpwtPvQDQ6AiZQDYesHCOk",
+        "sha256": "b81554cb1fa6a8fe14e9c519ebfa56572aedaf701a6a26d69bc25e9f68b72d45"
+      },
+      "alpha_comparison": {
+        "file_id": "19M1lpohJE2c2V-hX2LoV-dYGrToDdQ44",
+        "sha256": "2e2f692a8573110b0bec8ecdb188e6095d50c018141815a1cdcbc81ee2c2ebf8"
+      },
+      "candidate_on_gray": {
+        "file_id": "1U7I_IIdpWX9FS7s9CW5uOSApBWGhURPR",
+        "sha256": "b2738ad0b08772942b5e94891afe6ee18beff43bea7eaf11352c59832c420431"
+      },
+      "source_on_gray": {
+        "file_id": "1LMwmNHzm-DJWefNydDGrTwz7Wql3iAk2",
+        "sha256": "01e8097b8aaa55dbd92f0a2a2ceb05112bb551466376f32046857386a62b5563"
+      },
+      "removal_mask_display": {
+        "file_id": "1ej9PWVHhGqOQRD7IKlJEul3aUTdit6d6",
+        "sha256": "861fe3779e98b5f0888ab53bc65e6e0df8aa2afee0f165262f0ae79e582fe2d0"
+      }
+    }
+  },
+  "producer_pregate": {
+    "script_blob_sha": "34cdd40a76136ed752b72234fd1878dc02b5c832",
+    "status": "PASS"
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "base_head_sha": "d709ae5bd047906df142ff22ee619b0aae8c1402",
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "queue_controller_contract_blob_sha": "5bdfa10cf4cfbbbc1f11fd31e86466c7beaddcb8",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "9e3bffc574a294d1d69946ae41d3630056ff58c8",
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "artwork_plan_blob_sha": "8d1ea4e64f681e61b31d8e3e72e09b6d44eaa0df",
+    "c_q00071_task_blob_sha": "5beb5b33fa57b191d8ffa21799674ca783fafae0",
+    "producer_pregate_script_blob_sha": "34cdd40a76136ed752b72234fd1878dc02b5c832"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "index": 133,
+    "asset": "25F697C6",
+    "index_mod_3": 1,
+    "owned_by_lane": true,
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00337",
+    "latest_c_gate": "PASS",
+    "production_readiness_at_selection": "RENDER_READY",
+    "selected_reason": "Q00071/C173 accepted exact source, nine masks, clean plate, safe boxes and 9/9 semantics; completion-first requires render/persist now."
+  },
+  "material_deliverable": {
+    "type": "INDEX133_25F697C6_NEW_V2_KOREAN_RGBA32_CANDIDATE",
+    "candidate_dds_modified": true,
+    "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "drive_folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "drive_file_id": "1_XTpHRuI02HsMHS1ZoALx_CuLdeEb0wu",
+    "candidate_file_name": "25F697C6_512x512.dds",
+    "candidate_bytes": 16777344,
+    "candidate_sha256": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
+    "drive_readback_byte_identical": true,
+    "physical_localized_occurrences": 9,
+    "canonical_semantic_strings": 9,
+    "changed_pixels_outside_allowed": 0,
+    "alpha_changed_pixels_outside_allowed": 0,
+    "one_pixel_overflow_count": 0,
+    "dds_header_128_identical": true,
+    "decoded_roundtrip_pixel_exact": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_MOD3_B_INDEX133__Q00071_RENDER_READY__EXACT_CANONICAL_SOURCE__C_ACCEPTED_9_REGION_MASK_CLEAN_PLATE_SAFE_BBOX__CURRENT_9_OF_9_SEMANTICS__NATIVE_V2_RENDER__ZERO_OUTSIDE_SOURCE__ZERO_PROTECTED__ZERO_ALPHA_OUTSIDE__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__DRIVE_READBACK_BYTE_IDENTICAL__PRODUCER_PREGATE_PASS__RUNTIME_UNTESTED",
+  "precommit_refresh": {
+    "head_sha": "d709ae5bd047906df142ff22ee619b0aae8c1402",
+    "head_message": "chore(localization): bind A00340 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00340] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Fresh HEAD fetched immediately before tree/commit creation; B00339 touches only unique B-lane JSON evidence/task record. Shared state and peer-lane files are untouched."
+  }
+}

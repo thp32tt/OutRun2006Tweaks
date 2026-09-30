@@ -1,0 +1,150 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00339-producer-index133-candidate-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+  "wave_id": null,
+  "wave_id_status": "NOT_PROVIDED_IN_ROLLOVER_PROMPT_AND_NO_PREEXISTING_DURABLE_B00339_RECORD_AT_BASE_HEAD",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "base_head_sha": "d709ae5bd047906df142ff22ee619b0aae8c1402",
+  "controller_schema_version": 16,
+  "controller_config_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX133_NEW_V2_KOREAN_RGBA32_CANDIDATE_DRIVE_PERSISTED_SELF_QA_RUNTIME_UNTESTED",
+  "summary": "Q00071/C173 makes B-owned index133/25F697C6 RENDER_READY. B00339 rendered all nine current Korean labels from the exact C-accepted source/mask/clean-plate/safe-box lineage, preserved 2048x2048 RGBA32 mip1 raw flip_y and the exact 128-byte header, decoded the final DDS for strict pixel/alpha QA, reviewed source/candidate in readable orientation, and persisted the 16,777,344-byte candidate plus review PNGs to the approved ezflash557 current-pipeline Drive area. Drive readback is byte-identical SHA-256 6e5ee22d...aa80fb. Producer pre-gate PASS. No real game test was performed.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "index": 133,
+    "asset": "25F697C6",
+    "index_mod_3": 1,
+    "owned_by_lane": true,
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00337",
+    "latest_c_gate": "PASS",
+    "production_readiness_at_selection": "RENDER_READY",
+    "selected_reason": "Q00071/C173 accepted exact source, nine masks, clean plate, safe boxes and 9/9 semantics; completion-first requires render/persist now."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "queue_controller_contract_blob_sha": "5bdfa10cf4cfbbbc1f11fd31e86466c7beaddcb8",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "9e3bffc574a294d1d69946ae41d3630056ff58c8",
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "artwork_plan_blob_sha": "8d1ea4e64f681e61b31d8e3e72e09b6d44eaa0df",
+    "c_q00071_task_blob_sha": "5beb5b33fa57b191d8ffa21799674ca783fafae0",
+    "producer_pregate_script_blob_sha": "34cdd40a76136ed752b72234fd1878dc02b5c832"
+  },
+  "material_deliverable": {
+    "type": "INDEX133_25F697C6_NEW_V2_KOREAN_RGBA32_CANDIDATE",
+    "candidate_dds_modified": true,
+    "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "drive_folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "drive_file_id": "1_XTpHRuI02HsMHS1ZoALx_CuLdeEb0wu",
+    "candidate_file_name": "25F697C6_512x512.dds",
+    "candidate_bytes": 16777344,
+    "candidate_sha256": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
+    "drive_readback_byte_identical": true,
+    "physical_localized_occurrences": 9,
+    "canonical_semantic_strings": 9,
+    "changed_pixels_outside_allowed": 0,
+    "alpha_changed_pixels_outside_allowed": 0,
+    "one_pixel_overflow_count": 0,
+    "dds_header_128_identical": true,
+    "decoded_roundtrip_pixel_exact": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00339-R1/B00339_INDEX133_25F697C6_RGBA32_CANDIDATE_QA.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/25F697C6/generation_prompt.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/25F697C6/qa_report.json",
+    "Google Drive current-pipeline folder 14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA with candidate and exact-hash review artifacts"
+  ],
+  "candidate_dds_modified": true,
+  "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "work_stolen_from_lane": null,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_MOD3_B_INDEX133__Q00071_RENDER_READY__EXACT_CANONICAL_SOURCE__C_ACCEPTED_9_REGION_MASK_CLEAN_PLATE_SAFE_BBOX__CURRENT_9_OF_9_SEMANTICS__NATIVE_V2_RENDER__ZERO_OUTSIDE_SOURCE__ZERO_PROTECTED__ZERO_ALPHA_OUTSIDE__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__DRIVE_READBACK_BYTE_IDENTICAL__PRODUCER_PREGATE_PASS__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(B): render index133 Korean DDS candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00339]",
+  "durable_task_record_in_result_commit": true,
+  "producing_role": "LOCALIZATION_B",
+  "drive_candidate": {
+    "folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "file_id": "1_XTpHRuI02HsMHS1ZoALx_CuLdeEb0wu",
+    "sha256": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
+    "bytes": 16777344,
+    "producing_result_sha": null,
+    "validation_state": "AUTOMATION_PENDING_C_BATCH_GATE_RUNTIME_UNTESTED"
+  },
+  "review_artifacts": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "files": {
+      "source_display": {
+        "file_id": "1UYsTqpGuJzZXHxVujRiPmLoXteBJPcnw",
+        "sha256": "a8b6dcdad8c04a3fc7cfab88dfa670c1f5fa8d594d0c7b1a1bb716b835f2d77e"
+      },
+      "clean_plate_display": {
+        "file_id": "1y9PXiJNpTgta2ygJG-mxR3PStjV9CseY",
+        "sha256": "80e2b8a6076d6bdbae1f182aeabc545ab5ad16c7074df6eb30417fa780b4c968"
+      },
+      "candidate_display": {
+        "file_id": "1WXECo9_jie-loDGCz8HfBrF1uC_bd1kd",
+        "sha256": "6cccb0e99e5ea7e9acea694949209e3247841f614a060c9c58b508ee16a4e153"
+      },
+      "comparison": {
+        "file_id": "18BUuLJ2cMtPZ6wWTj0S744Jcm9zz9ytN",
+        "sha256": "976f34ed7474cb30279824c95c4654154919a99d22e7791b9935800f6654e024"
+      },
+      "element_comparison": {
+        "file_id": "1Hu6F3SUu_gAIdvk5Hy0GRiOx_jl9Jb6J",
+        "sha256": "2f3ba8c371bbc6fb0ef32aee219b35231162cc824acea6621d65439af031031d"
+      },
+      "diff_display": {
+        "file_id": "1ZUw8-fIJB4CpwtPvQDQ6AiZQDYesHCOk",
+        "sha256": "b81554cb1fa6a8fe14e9c519ebfa56572aedaf701a6a26d69bc25e9f68b72d45"
+      },
+      "alpha_comparison": {
+        "file_id": "19M1lpohJE2c2V-hX2LoV-dYGrToDdQ44",
+        "sha256": "2e2f692a8573110b0bec8ecdb188e6095d50c018141815a1cdcbc81ee2c2ebf8"
+      },
+      "candidate_on_gray": {
+        "file_id": "1U7I_IIdpWX9FS7s9CW5uOSApBWGhURPR",
+        "sha256": "b2738ad0b08772942b5e94891afe6ee18beff43bea7eaf11352c59832c420431"
+      },
+      "source_on_gray": {
+        "file_id": "1LMwmNHzm-DJWefNydDGrTwz7Wql3iAk2",
+        "sha256": "01e8097b8aaa55dbd92f0a2a2ceb05112bb551466376f32046857386a62b5563"
+      },
+      "removal_mask_display": {
+        "file_id": "1ej9PWVHhGqOQRD7IKlJEul3aUTdit6d6",
+        "sha256": "861fe3779e98b5f0888ab53bc65e6e0df8aa2afee0f165262f0ae79e582fe2d0"
+      }
+    }
+  },
+  "precommit_refresh": {
+    "head_sha": "d709ae5bd047906df142ff22ee619b0aae8c1402",
+    "head_message": "chore(localization): bind A00340 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00340] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Fresh HEAD fetched immediately before tree/commit creation; B00339 touches only unique B-lane JSON evidence/task record. Shared state and peer-lane files are untouched."
+  },
+  "bookkeeping_note": "Initial result commit is bound by a separate bookkeeping commit because a commit cannot contain its own SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+}

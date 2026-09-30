@@ -1,0 +1,447 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "contract_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+  "wave_id": null,
+  "lane": "LOCALIZATION_B",
+  "queue_index": 133,
+  "asset_id": "25F697C6",
+  "source_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+  "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+  "source_dimensions": [
+    2048,
+    2048
+  ],
+  "source_format": "RGBA32",
+  "mip_count": 1,
+  "raw_orientation": "flip_y",
+  "display_transform": "flip_y_to_readable",
+  "generation_rule": "EDIT_DO_NOT_REDESIGN; use exact C173/Q00071 accepted source, 9-region removal mask, clean plate, safe boxes and 9/9 canonical semantics.",
+  "clean_plate": {
+    "method": "exact_source_effect_union_rgba_zero_only",
+    "removal_mask_u8_sha256": "48f3294697f1d806b99d4dc4efc5bac601632985b712bc99a0a32060524fe324",
+    "clean_plate_readable_rgba_sha256": "d0513c55193a73c4ffc2da5a802cd0baae5799944de569124e87460031e98ebc",
+    "source_effect_pixels": 161688,
+    "protected_visible_source_pixels": 396575
+  },
+  "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+  "render_method": "native_text_mask_direct_no_resample",
+  "style": {
+    "baseline_vector": [
+      1,
+      0
+    ],
+    "slant_dx_per_dy": 0,
+    "slant_angle_deg": 0,
+    "slant_direction": "none",
+    "outline": "none",
+    "shadow": "none",
+    "glow": "none",
+    "factory_color_rgb_default": [
+      101,
+      107,
+      109
+    ],
+    "nero_rgb": [
+      98,
+      105,
+      107
+    ],
+    "location_rgb": [
+      46,
+      53,
+      57
+    ],
+    "tracking": "native font tracking; no arbitrary expansion/compression"
+  },
+  "elements": [
+    {
+      "element": 1,
+      "source_text": "BLU MIRABEAU",
+      "korean": "블루 미라보",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        492,
+        904,
+        940,
+        956
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        494,
+        906,
+        938,
+        954
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        601,
+        906,
+        831,
+        953
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        101,
+        107,
+        109
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 2,
+      "source_text": "NERO",
+      "korean": "네로",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        1728,
+        904,
+        1884,
+        956
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        1730,
+        906,
+        1882,
+        954
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        1764,
+        907,
+        1848,
+        953
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        98,
+        105,
+        107
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 3,
+      "source_text": "ARGENTO NURBURGRING",
+      "korean": "아르젠토 뉘르부르크링",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        216,
+        960,
+        932,
+        1024
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        218,
+        962,
+        930,
+        1022
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        351,
+        969,
+        797,
+        1015
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        101,
+        107,
+        109
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 4,
+      "source_text": "ROSSO SCUDERIA",
+      "korean": "로쏘 스쿠데리아",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        1368,
+        972,
+        1884,
+        1024
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        1370,
+        974,
+        1882,
+        1022
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        1466,
+        975,
+        1785,
+        1021
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        101,
+        107,
+        109
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 5,
+      "source_text": "BIANCO AVUS",
+      "korean": "비앙코 아부스",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        544,
+        1040,
+        940,
+        1092
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        546,
+        1042,
+        938,
+        1090
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        606,
+        1043,
+        877,
+        1089
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        101,
+        107,
+        109
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 6,
+      "source_text": "GRIGIO ALLOY",
+      "korean": "그리지오 알로이",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        1480,
+        1040,
+        1888,
+        1092
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        1482,
+        1042,
+        1886,
+        1090
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        1527,
+        1042,
+        1841,
+        1089
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        101,
+        107,
+        109
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 7,
+      "source_text": "ALPINE",
+      "korean": "알파인",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        664,
+        1103,
+        1067,
+        1192
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        666,
+        1105,
+        1065,
+        1190
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        749,
+        1106,
+        981,
+        1189
+      ],
+      "font_size_hd_px": 88,
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 8,
+      "source_text": "GIALLO MODENA",
+      "korean": "지알로 모데나",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        1528,
+        1152,
+        2012,
+        1204
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        1530,
+        1154,
+        2010,
+        1202
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        1633,
+        1155,
+        1907,
+        1201
+      ],
+      "font_size_hd_px": 48,
+      "fill_rgb": [
+        101,
+        107,
+        109
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    },
+    {
+      "element": 9,
+      "source_text": "ANCIENT RUINS",
+      "korean": "고대 유적",
+      "source_effect_bbox_readable_xyxy_exclusive": [
+        549,
+        1220,
+        1391,
+        1315
+      ],
+      "candidate_safe_bbox_readable_xyxy_exclusive": [
+        551,
+        1222,
+        1389,
+        1313
+      ],
+      "candidate_bbox_readable_xyxy_exclusive": [
+        804,
+        1226,
+        1136,
+        1309
+      ],
+      "font_size_hd_px": 88,
+      "fill_rgb": [
+        46,
+        53,
+        57
+      ],
+      "alignment": "center_on_source_effect_bbox",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "containment": "PASS"
+    }
+  ],
+  "protected_regions": [
+    "396575 visible source-alpha pixels outside exact localizable mask",
+    "Ferrari/model-name strings and unrelated text/artwork",
+    "all pixels outside nine source-effect bboxes",
+    "DDS header bytes 0..127"
+  ],
+  "mandatory_negative_instructions": [
+    "no visible English/source glyph residue in nine targets",
+    "no cover rectangles or invented panels",
+    "no blur/smudge concealment",
+    "no change to Ferrari model names or neighboring atlas content",
+    "no crop/padding/canvas resize/aspect/orientation/mip change",
+    "no outline/shadow/glow absent from source",
+    "no missing-glyph boxes or mixed fallback fonts",
+    "no low-resolution reconstruction/upscaling",
+    "no flattened lettering resample or arbitrary stretch/squash",
+    "no alpha change outside approved source-effect geometry"
+  ],
+  "single_pass_self_check": "Require all nine target source labels absent from visible alpha result; protected content byte/pixel unchanged; Korean inside C-approved safe/source bboxes; slant sign/baseline unchanged; exact 2048x2048 RGBA32 mip1 header/raw flip_y preserved; fail closed otherwise."
+}
