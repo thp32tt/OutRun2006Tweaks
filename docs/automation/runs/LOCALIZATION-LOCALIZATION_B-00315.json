@@ -58,8 +58,8 @@
     "qa_batch_id": "Q00066",
     "result_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84"
   },
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "476ab48d3471ca907645069847be3de782516e4f",
+  "authoritative_result_sha": "476ab48d3471ca907645069847be3de782516e4f",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): reemit index163 current-v2 review lineage [AUTO:LOCALIZATION-LOCALIZATION_B-00315]",
@@ -73,5 +73,8 @@
     "Drive review bundle file 19D9Y8rjS2IL4Gg9vr0xcv5UQIR1VBK1s",
     "C Q00066 validation-bearing result fe6532b1f39325d664cb5aae2104a8ae6c64ac84"
   ],
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable producer material commit is created. Producer automation validation remains PENDING under C_BATCH_GATE; runtime remains UNTESTED."
+  "bookkeeping_note": "Immutable producer material result is 476ab48d3471ca907645069847be3de782516e4f. This bookkeeping commit binds the durable task record to that exact producer result and does not own validation. automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T03:59:00+09:00",
+  "bookkeeping_rollover": 2,
+  "bookkeeping_base_head_sha": "476ab48d3471ca907645069847be3de782516e4f"
 }
