@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00164",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "0c96cfa80e50b349d3a4bfd23cf9797354a1ca4d",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R164_HELPER_283DE_CONTINUATION_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00162 proved every instruction through 0x283DD and explicitly required fresh exact bytes beginning at 0x283DE before further decoding. This fresh bounded provenance capture is the smallest executable HMD-free next step.",
+  "summary": "Add an independent DX11 bounded exact-EXE continuation provenance capture beginning at 0x283DE, the exact exclusive end of the validated 0x2837E instruction window. Capture a fresh 96-byte .text window, function-start guess and raw inbound/outbound rel32 candidates, guarded by predecessor status/end and both prior aligned-call target checks. No continuation semantics or ownership are inferred.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00163",
+    "source_result_sha": "5493e9db678921067c97a686fc117f648cc5c9da",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded continuation-provenance design only. DX11 binds the capture to its own 00162 predecessor and must independently pass exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00164.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00162 validation-bearing result 60e983694a06318b3cf5093c3310c7283320287e proved every instruction through 0x283DD and both aligned calls, stopping at exclusive RVA 0x283DE.",
+    "This task captures fresh exact bytes at 0x283DE rather than extrapolating beyond the prior complete instruction window.",
+    "DXVK-00163 independently captured a fresh 96-byte 0x283DE window on the same exact public EXE; DX11 validation remains independent.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the 0x283DE continuation capture passes, persist exact bytes/call census in separate bookkeeping while keeping function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY and ownership_effect=NONE. A later bounded task may decode only complete instructions from the fresh window."
+}
