@@ -5,6 +5,7 @@
 // DirectGPU producer slot while a timed-out D3D9 EVENT query is still pending.
 
 #include "r32_policy.hpp"
+#include "../telemetry/performance_types.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -109,23 +110,7 @@ namespace OutRunVRStereo
                 static_cast<long double>(frequency));
         }
 
-        struct R32FrameWorkload
-        {
-            std::uint64_t draws = 0;
-            std::uint64_t primitives = 0;
-            std::uint64_t triangles = 0;
-            std::uint64_t pointLinePrimitives = 0;
-            std::uint64_t indexedDraws = 0;
-            std::uint64_t upDraws = 0;
-            std::uint64_t alphaBlendDraws = 0;
-            std::uint64_t alphaBlendPrimitives = 0;
-            std::uint64_t alphaTestDraws = 0;
-            std::uint64_t particleLikeDraws = 0;
-            std::uint64_t particleLikePrimitives = 0;
-            std::uint64_t effectUnknownDraws = 0;
-            std::uint64_t fenceWaitUs = 0;
-            std::uint64_t fencePolls = 0;
-        };
+        using R32FrameWorkload = OutRunVR::Telemetry::FrameWorkload;
         thread_local R32FrameWorkload R32FrameWorkloadCounters{};
 
         struct R32PerfWindow
