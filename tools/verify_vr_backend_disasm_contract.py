@@ -123,6 +123,10 @@ def main() -> None:
             "CtrlIcon_AdjustPositionAndHud<0x00060FBCu, true>",
             "CtrlIcon_AdjustPositionAndHud<0x00060A21u, true>",
             "VR R129 CTRL ICON HUD: shared producer-map handoff",
+            "C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC84Eu>",
+            "C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC882u>",
+            "C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC8B4u>",
+            "VR R130 SPEECH RANK HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -201,6 +205,19 @@ def main() -> None:
         raise SystemExit(
             "F13 ctrl_icon_work ownership regressed to legacy spacing-only callbacks: "
             f"{stale_ctrl_icon_hooks}"
+        )
+    legacy_speech_rank_hooks = [
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk8 = safetyhook::create_mid((void*)0x4FC84E, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk9 = safetyhook::create_mid((void*)0x4FC882, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk10 = safetyhook::create_mid((void*)0x4FC8B4, C2CSpeechBubble_AdjustPositionESP0);",
+    ]
+    stale_speech_rank_hooks = [
+        hook for hook in legacy_speech_rank_hooks if hook in hooks_text
+    ]
+    if stale_speech_rank_hooks:
+        raise SystemExit(
+            "F13 C2CSpeechBubbleGF rank ownership regressed to spacing-only callbacks: "
+            f"{stale_speech_rank_hooks}"
         )
     require(
         "tools/analyze_outrun_exe.py",

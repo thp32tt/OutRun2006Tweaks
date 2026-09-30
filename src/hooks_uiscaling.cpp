@@ -1286,6 +1286,26 @@ class UIScaling : public Hook
 		AddSpriteSpacing((float*)(ctx.esp), false);
 	}
 
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubbleRank_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF rank callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R130 SPEECH RANK HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
 	static void C2CSpeechBubble_AdjustPositionESP4(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((float*)(ctx.esp + 4), false);
@@ -1513,12 +1533,18 @@ public:
 		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x4FD5CD, C2CSpeechBubble_AdjustPositionESP0);
 		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x4FD652, C2CSpeechBubble_AdjustPositionESP0);
 
-		// ranking emoji position
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk8 = safetyhook::create_mid((void*)0x4FC84E, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk9 = safetyhook::create_mid((void*)0x4FC882, C2CSpeechBubble_AdjustPositionESP0);
-
-		// "rank: aaa" position
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk10 = safetyhook::create_mid((void*)0x4FC8B4, C2CSpeechBubble_AdjustPositionESP0);
+		// R130/F13: exact C2CSpeechBubbleGF rank emoji/text position edges are
+		// canonical SCREEN_HUD. Preserve the original ESP0 spacing correction
+		// and source only the immediate next-draw owner from the shared map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk8 = safetyhook::create_mid(
+			(void*)0x4FC84E,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC84Eu>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk9 = safetyhook::create_mid(
+			(void*)0x4FC882,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC882u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk10 = safetyhook::create_mid(
+			(void*)0x4FC8B4,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC8B4u>);
 
 		// speech bubble initial position
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid((void*)0x4FC9EB, C2CSpeechBubble_AdjustPositionESP0);
