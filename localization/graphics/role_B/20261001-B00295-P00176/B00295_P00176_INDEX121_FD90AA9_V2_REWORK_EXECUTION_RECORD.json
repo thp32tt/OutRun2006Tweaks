@@ -1,0 +1,523 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00295-p00176-index121-fd90aa9-v2-rework-execution-record-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00295",
+  "wave_id": "P00176",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-10-01T01:03:05+09:00",
+  "base_head_sha": "de62676e6d916e465898a9465e0900fd7e6fa513",
+  "target": {
+    "index": 121,
+    "asset": "FD90AA9",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "action": "localize_text"
+  },
+  "selection_basis": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "latest_c_disposition": "C161/Q00059 REWORK_REQUIRED",
+    "current_queue_status": "rework_required_zero_pixel_or_artifact",
+    "reason": "Exact current candidate 72cbf2cc... retains C85 19/29 exact-source bbox failures; source-faithful native v2 rebuild remains required."
+  },
+  "canonical_source": {
+    "github_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "github_git_blob_sha": "b57d20b7908d911d87b8178d88240f9202828594",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "raw_orientation": "mirror_y",
+    "approved_drive_transport": {
+      "account": "ezflash557",
+      "canonical_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "file_id": "1J5LBV_dkJQ280Y_oDOn6JZj-n22cI4eX",
+      "exact_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "bytes": 67108992,
+      "identity_crosscheck": "PASS_PATH_SIZE_AND_PINNED_SHA_FROM_GITHUB_INVENTORY"
+    }
+  },
+  "previous_candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "git_blob_sha": "066dd5b33e126d642560f8bc186dc1ae6f4a24a4",
+    "sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "reuse_as_artwork_input": false,
+    "note": "Generation-reset policy forbids reuse of old Korean candidate pixels as artwork input."
+  },
+  "current_policy": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "generation_reset": true,
+    "exact_source_only": true,
+    "zero_pixel_overflow": true,
+    "safe_inset_default_px": 2,
+    "no_flattened_raster_resample": true,
+    "runtime_separate": true
+  },
+  "c85_failure_reconstruction": {
+    "failed_elements": 19,
+    "passed_elements": 10,
+    "bbox_convention": "Readable coordinates copied from C85; extrema are recorded exactly as C85 original_bbox. candidate_safe_bbox here is a 2px inset on all four extrema.",
+    "failed": [
+      {
+        "key": "outsp_course",
+        "source": "OutRun2SP Course",
+        "korean": "아웃런2 SP 코스",
+        "source_effect_bbox_readable_inclusive": [
+          1126,
+          374,
+          1678,
+          449
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1128,
+          376,
+          1676,
+          447
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "top_yellow",
+        "prior_a87_font_size_reference": 70,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "out2_course",
+        "source": "OutRun2 Course",
+        "korean": "아웃런2 코스",
+        "source_effect_bbox_readable_inclusive": [
+          1776,
+          374,
+          2232,
+          449
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1778,
+          376,
+          2230,
+          447
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "top_blue",
+        "prior_a87_font_size_reference": 75,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "more_engine",
+        "source": "More Engine sound",
+        "korean": "엔진음 크게",
+        "source_effect_bbox_readable_inclusive": [
+          2772,
+          376,
+          3187,
+          448
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          2774,
+          378,
+          3185,
+          446
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "engine_tag",
+        "prior_a87_font_size_reference": 62,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "you",
+        "source": "You",
+        "korean": "나",
+        "source_effect_bbox_readable_inclusive": [
+          3169,
+          376,
+          3334,
+          445
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          3171,
+          378,
+          3332,
+          443
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "top_yellow_plain",
+        "prior_a87_font_size_reference": 73,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "gas_pedal",
+        "source": "Gas Pedal :",
+        "korean": "가속 페달:",
+        "source_effect_bbox_readable_inclusive": [
+          3490,
+          391,
+          3748,
+          440
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          3492,
+          393,
+          3746,
+          438
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "small_white",
+        "prior_a87_font_size_reference": 71,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "transmission2",
+        "source": "Transmission",
+        "korean": "변속기",
+        "source_effect_bbox_readable_inclusive": [
+          1221,
+          722,
+          1805,
+          843
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1223,
+          724,
+          1803,
+          841
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "hidden_black",
+        "prior_a87_font_size_reference": 106,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "select_game_mode",
+        "source": "Select Game Mode",
+        "korean": "게임 모드 선택",
+        "source_effect_bbox_readable_inclusive": [
+          166,
+          819,
+          1166,
+          973
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          168,
+          821,
+          1164,
+          971
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 125,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "select_car",
+        "source": "Select your car",
+        "korean": "차량 선택",
+        "source_effect_bbox_readable_inclusive": [
+          243,
+          947,
+          1156,
+          1111
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          245,
+          949,
+          1154,
+          1109
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 125,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "select_course",
+        "source": "Select Course",
+        "korean": "코스 선택",
+        "source_effect_bbox_readable_inclusive": [
+          302,
+          1062,
+          1085,
+          1213
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          304,
+          1064,
+          1083,
+          1211
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 125,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "select_music",
+        "source": "Select your music",
+        "korean": "음악 선택",
+        "source_effect_bbox_readable_inclusive": [
+          1549,
+          819,
+          2571,
+          990
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1551,
+          821,
+          2569,
+          988
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 125,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "select_transmission",
+        "source": "Select Transmission",
+        "korean": "변속 방식 선택",
+        "source_effect_bbox_readable_inclusive": [
+          1563,
+          947,
+          2589,
+          1092
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1565,
+          949,
+          2587,
+          1090
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 125,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "shortcut_features",
+        "source": "Shortcut Features",
+        "korean": "바로가기 기능",
+        "source_effect_bbox_readable_inclusive": [
+          1587,
+          1062,
+          2611,
+          1213
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1589,
+          1064,
+          2609,
+          1211
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 125,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "selected_sp",
+        "source": "Outrun2: SP Course has been selected.",
+        "korean": "아웃런2 SP 코스가 선택되었습니다.",
+        "source_effect_bbox_readable_inclusive": [
+          63,
+          1183,
+          2227,
+          1348
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          65,
+          1185,
+          2225,
+          1346
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "selected_yellow",
+        "prior_a87_font_size_reference": 128,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "select_car_setting",
+        "source": "Select car setting",
+        "korean": "차량 설정 선택",
+        "source_effect_bbox_readable_inclusive": [
+          2419,
+          1183,
+          3394,
+          1367
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          2421,
+          1185,
+          3392,
+          1365
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "large_white",
+        "prior_a87_font_size_reference": 135,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "gear_change",
+        "source": "Gear change",
+        "korean": "기어 변속",
+        "source_effect_bbox_readable_inclusive": [
+          3587,
+          1304,
+          4034,
+          1501
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          3589,
+          1306,
+          4032,
+          1499
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "gear_red",
+        "prior_a87_font_size_reference": 139,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "player_battle_desc",
+        "source": "A course designed for player battle.",
+        "korean": "플레이어 대전을 위해 / 설계된 코스입니다.",
+        "source_effect_bbox_readable_inclusive": [
+          3093,
+          1446,
+          3994,
+          1668
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          3095,
+          1448,
+          3992,
+          1666
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "desc_white",
+        "prior_a87_font_size_reference": 99,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "new_course_desc",
+        "source": "A brand new course designed for OutRun2: SP.",
+        "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+        "source_effect_bbox_readable_inclusive": [
+          3008,
+          1587,
+          3828,
+          1827
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          3010,
+          1589,
+          3826,
+          1825
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "desc_white",
+        "prior_a87_font_size_reference": 88,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "orig_course_desc",
+        "source": "The course from the original OutRun2.",
+        "korean": "오리지널 아웃런2의 / 코스입니다.",
+        "source_effect_bbox_readable_inclusive": [
+          3008,
+          1754,
+          3662,
+          1995
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          3010,
+          1756,
+          3660,
+          1993
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "desc_white",
+        "prior_a87_font_size_reference": 111,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      },
+      {
+        "key": "random_music",
+        "source": "Music will be Randomly Selected.",
+        "korean": "음악이 무작위로 / 선택됩니다.",
+        "source_effect_bbox_readable_inclusive": [
+          1741,
+          2360,
+          2720,
+          2573
+        ],
+        "candidate_safe_bbox_readable_inclusive": [
+          1743,
+          2362,
+          2718,
+          2571
+        ],
+        "safety_inset_px": 2,
+        "prior_a87_style_family": "random_white",
+        "prior_a87_font_size_reference": 135,
+        "production_rule": "NATIVE_RERENDER_AT_FINAL_SIZE_ONLY__REFIT_BY_FONT_PARAMETERS__NO_FLATTENED_RASTER_RESAMPLE"
+      }
+    ],
+    "previously_passing_keys": [
+      "run15",
+      "maximum_speed",
+      "enter_selection",
+      "same_conditions",
+      "experts_long",
+      "view_choices",
+      "for_experts",
+      "normal_difficult",
+      "selected_out2",
+      "versus_mode"
+    ],
+    "full_candidate_rule": "Because post-reset construction must start from exact English HD source, regenerate all 29 localized elements from source/clean-plate lineage; do not copy the 10 previously passing Korean raster regions from the old candidate. The 19 rows above are the mandatory exact-bbox refit focus."
+  },
+  "execution_attempt": {
+    "source_acquisition": "PASS",
+    "source_binary_materialized_path": "/mnt/data/FD90AA9_1024x1024.dds",
+    "binary_executor_status": "BLOCKED_TRANSIENT_RUNTIME_CLIENTERROR",
+    "attempted_backends": [
+      "container.exec",
+      "python.exec",
+      "python_user_visible.exec"
+    ],
+    "observed_error_class": "ClientError",
+    "candidate_dds_modified": false,
+    "candidate_persisted": false,
+    "clean_plate_generated": false,
+    "decoded_final_qa_performed": false,
+    "reason": "The session binary execution backends repeatedly returned ClientError even for local-file/stat and deterministic Python operations. Producing or claiming a DDS without executing native-resolution reconstruction/encode/round-trip QA would violate fail-closed v2 policy."
+  },
+  "next_required_execution": [
+    "Decode the exact Drive/GitHub-pinned source DDS and verify SHA-256 f7847db9...d4b3e before editing.",
+    "Build verified clean plates from exact source only; do not reuse prior Korean candidate pixels.",
+    "Re-render all 29 Korean elements natively; for the 19 C85 failures use the 2px candidate_safe_bbox values above and refit by font/effect parameters only.",
+    "Preserve raw mirror-Y storage orientation and all protected song titles, vehicle/model text, speed/player markers, route/map/icon artwork.",
+    "Encode exact 4096x4096 RGBA32 mip1 with source header policy, decode final DDS, and require zero out-of-region/protected/alpha changes.",
+    "Persist source/clean/candidate/comparison PNG review set plus generation_prompt.json and qa_report.json, then queue exact producer RESULT_SHA for C batch QA."
+  ],
+  "result": "BLOCKED_TRANSIENT_BINARY_EXECUTOR_UNAVAILABLE_AFTER_CANONICAL_SOURCE_ACQUISITION_AND_V2_REWORK_GEOMETRY_PIN",
+  "materially_reduces_unresolved_work": false,
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "NOT_RUN_BLOCKED_BEFORE_PRODUCER_CANDIDATE",
+  "validation_mode": "C_BATCH_GATE_AFTER_SUCCESSFUL_PRODUCER_RETRY",
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false
+}

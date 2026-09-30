@@ -1,0 +1,39 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00295-p00176-blocked-transient-binary-executor-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00295",
+  "wave_id": "P00176",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-10-01T01:03:05+09:00",
+  "base_head_sha": "de62676e6d916e465898a9465e0900fd7e6fa513",
+  "result": "BLOCKED_TRANSIENT_BINARY_EXECUTOR_UNAVAILABLE_AFTER_CANONICAL_SOURCE_ACQUISITION_AND_V2_REWORK_GEOMETRY_PIN",
+  "summary": "Resumed from current GitHub HEAD; selected C-returned index121/FD90AA9 existing-candidate rework. Verified the approved Google Drive canonical HD source path/file identity against GitHub-pinned path, size and SHA. Reconstructed the exact C85 19-failure bbox set into a v2 2px-safe native-rerender execution specification. Candidate production was not executed because all available binary execution backends in this session returned transient ClientError. Fail-closed: no DDS bytes were fabricated or promoted.",
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00295-P00176/B00295_P00176_INDEX121_FD90AA9_V2_REWORK_EXECUTION_RECORD.json"
+  ],
+  "target": {
+    "index": 121,
+    "asset": "FD90AA9"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "NOT_RUN_BLOCKED_BEFORE_PRODUCER_CANDIDATE",
+  "validation_mode": "C_BATCH_GATE_AFTER_SUCCESSFUL_PRODUCER_RETRY",
+  "retry_required": true,
+  "retry_reason": "TRANSIENT_BINARY_EXECUTOR_CLIENTERROR",
+  "retry_same_task_id": true,
+  "attempt_increment_policy": "This CHAT_ROLLOVER does not increment ATTEMPT; controller retry policy decides ATTEMPT after this durable blocked record.",
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "result_sha": null,
+  "authoritative_result_sha": null
+}
