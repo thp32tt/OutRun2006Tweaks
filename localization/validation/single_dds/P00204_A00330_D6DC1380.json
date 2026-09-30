@@ -1,0 +1,132 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00330-p00204-index12-standard-single-dds-isolation-v1",
+  "case_id": "P00204_A00330_D6DC1380",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
+  "wave_id": "P00204",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T05:09:39+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Materialize the previously C-created and C85-static-QA-backed D6DC1380 DDS_ONLY runtime-isolation input in the current localization/validation/single_dds manifest format. Current repository source/candidate blobs are unchanged; heavy pixel/visual QA is reused and runtime remains UNTESTED.",
+  "asset": {
+    "id": "D6DC1380",
+    "queue_index": 12,
+    "queue_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+    "raw_orientation": "normal",
+    "localized_semantic_bindings": 1,
+    "translations": [
+      {
+        "source": "Continue?",
+        "korean": "계속?",
+        "physical_occurrences": 1
+      }
+    ]
+  },
+  "source": {
+    "canonical_transport": "GITHUB_REPOSITORY_PINNED_HD_SOURCE",
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+    "git_blob_sha": "39ce635200bf4084b78dfd13a7d0e8bb8f67cedb",
+    "sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "bytes": 65664,
+    "dds": {
+      "width": 256,
+      "height": 64,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 1024,
+      "raw_orientation": "normal"
+    }
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+    "git_blob_sha": "6d8dc84ae10a5468a470d87b595e023fa3cc6fab",
+    "sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+    "bytes": 1048704,
+    "dds": {
+      "width": 1024,
+      "height": 256,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 4096,
+      "raw_orientation": "normal"
+    },
+    "dimension_policy": "CREATE_NEW_HD_DIMENSION_CHANGE",
+    "unchanged_fingerprint_proof": {
+      "legacy_isolation_task": "LOCALIZATION-LOCALIZATION_C-00019",
+      "legacy_isolation_result": "PASS_MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_READY_NO_NEW_APPROVALS",
+      "legacy_manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+      "c85_status": "PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "latest_static_pixel_visual_report": "localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json",
+    "latest_static_pixel_visual_report_blob_sha": "1d28abd16cce18f15f999d4e390ad3c04b440f8a",
+    "legacy_isolation_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00019.json",
+    "legacy_isolation_task_blob_sha": "c5f327990e7b3c13ce29dc5f9c0dc9a0e022e09d",
+    "legacy_isolation_manifest": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+    "legacy_isolation_manifest_blob_sha": "7c23445e26d1455dd18107c0d32e49e816ddd381",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "text_elements": 1,
+    "original_bbox": [
+      32,
+      40,
+      992,
+      176
+    ],
+    "localized_bbox": [
+      207,
+      41,
+      817,
+      175
+    ],
+    "delta_left": 175,
+    "delta_right": 175,
+    "delta_top": 1,
+    "delta_bottom": 1,
+    "containment": "PASS",
+    "outside_declared_cells_changed_nontransparent_pixels": 0,
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_input_location": "localization/validation/single_dds/W00005_C00019_D6DC1380.json",
+    "previous_input_schema_version": 1,
+    "current_schema_version": 16,
+    "current_aux_workflow_glob": "localization/validation/single_dds/*.json",
+    "new_current_workflow_consumable_manifest": true,
+    "candidate_repository_path_bound": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+    "relative_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+    "candidate_git_blob_sha": "6d8dc84ae10a5468a470d87b595e023fa3cc6fab",
+    "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the D6DC1380 replacement DDS and confirm the affected Continue prompt path renders without a crash.",
+    "Capture readable/game-orientation evidence for the Continue -> 계속? sprite.",
+    "Check runtime width/height and scaling ratio against the game's expected sprite geometry.",
+    "Check alpha/transparency, sprite position, clipping and zero-pixel overflow.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
