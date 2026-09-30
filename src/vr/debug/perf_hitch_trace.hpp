@@ -25,6 +25,7 @@ namespace OutRunVR::PerfHitch
         std::uint64_t bufferLockBytes = 0;
         std::uint64_t bufferDiscardLocks = 0;
         std::uint64_t bufferNoOverwriteLocks = 0;
+        std::uint64_t bufferWholeLocks = 0;
         std::uint64_t particleInterpCalls = 0;
         std::uint64_t particleInterpUs = 0;
         std::uint64_t particlePoolSlots = 0;
@@ -49,6 +50,7 @@ namespace OutRunVR::PerfHitch
     inline std::atomic<std::uint64_t> BufferLockBytes{ 0 };
     inline std::atomic<std::uint64_t> BufferDiscardLocks{ 0 };
     inline std::atomic<std::uint64_t> BufferNoOverwriteLocks{ 0 };
+    inline std::atomic<std::uint64_t> BufferWholeLocks{ 0 };
     inline std::atomic<std::uint64_t> ParticleInterpCalls{ 0 };
     inline std::atomic<std::uint64_t> ParticleInterpUs{ 0 };
     inline std::atomic<std::uint64_t> ParticlePoolSlots{ 0 };
@@ -103,10 +105,13 @@ namespace OutRunVR::PerfHitch
     }
 
     inline void NoteBufferLock(
-        std::uint64_t bytes, std::uint32_t flags) noexcept
+        std::uint64_t bytes, std::uint32_t flags,
+        bool wholeBuffer) noexcept
     {
         BufferLocks.fetch_add(1, std::memory_order_relaxed);
         BufferLockBytes.fetch_add(bytes, std::memory_order_relaxed);
+        if (wholeBuffer)
+            BufferWholeLocks.fetch_add(1, std::memory_order_relaxed);
         if ((flags & 0x00002000u) != 0) // D3DLOCK_DISCARD
             BufferDiscardLocks.fetch_add(1, std::memory_order_relaxed);
         if ((flags & 0x00001000u) != 0) // D3DLOCK_NOOVERWRITE
@@ -162,6 +167,8 @@ namespace OutRunVR::PerfHitch
             BufferDiscardLocks.exchange(0, std::memory_order_acq_rel);
         out.bufferNoOverwriteLocks =
             BufferNoOverwriteLocks.exchange(0, std::memory_order_acq_rel);
+        out.bufferWholeLocks =
+            BufferWholeLocks.exchange(0, std::memory_order_acq_rel);
         out.particleInterpCalls =
             ParticleInterpCalls.exchange(0, std::memory_order_acq_rel);
         out.particleInterpUs =
