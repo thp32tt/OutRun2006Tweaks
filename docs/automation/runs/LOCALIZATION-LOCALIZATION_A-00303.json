@@ -1,0 +1,172 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00303-p00182-index147-canonical-source-transport-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+  "wave_id": "P00182",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T02:17:08.671+09:00",
+  "base_head_sha": "0e4e952cb6eb86dad46a21548d9bfc18472493f9",
+  "controller_schema_version": 15,
+  "controller_config_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX147_SOURCE_GATE_TOOLING_RUNTIME_UNTESTED",
+  "summary": "Fresh Q00064/current-HEAD scan has no A-owned runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework. A-owned candidate results 159/198/201 remain C-QA pending and are not repeated; source-exhausted 30/36/48/132/135/219 are not reprobed; index111/A00301 is a newer producer preflight pending C and is not repeated. One new PREFLIGHT_ONLY batch is therefore expanded for index147/39BCA907. Approved Drive exact-relative-path lookup misses this asset; pinned upstream queue-style path is 404, while the immutable v0.25.10a tree resolves Release/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds at blob 959f27e1... (8,388,736 bytes). Current GitHub connector exposes the immutable object metadata but not its large binary body, so canonical inventory SHA c52f48b1... cannot be reverified from bytes in this invocation. A deterministic fail-closed source identity verifier is added so the exact source can be gated immediately when bytes are available. No Korean DDS is authorized or modified.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_c_gate": "C166/Q00064 624b504f9ddfeea77fe72f0fb7f155b3fce3832d Gate 36747306315 PASS",
+    "direct_rework_required_runnable": [],
+    "render_ready_runnable": [],
+    "one_stage_to_render_runnable": [],
+    "existing_candidate_material_rework_runnable": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219
+    ],
+    "newer_producer_preflight_pending_c_not_repeated": [
+      111
+    ],
+    "selected_index": 147,
+    "selected_asset": "39BCA907",
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_RUNNABLE_CANDIDATE_COMPLETION_TIERS",
+    "new_preflight_batches_this_invocation": 1
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "queue_controller_contract_blob_sha": "d0943eca15f7fbbe2fe2965c846bd47a505f73c2",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "d54e2df862741dba578c7e68cc10e4e32bc0d8c0",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "artwork_plan_blob_sha": "dc7b4b486cb47d5aa0b38ac05950a1b7e3a33323"
+  },
+  "canonical_inventory": {
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+    "sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "decoded_size": [
+      2048,
+      1024
+    ],
+    "mode": "RGBA"
+  },
+  "semantic_state": {
+    "translations": "PASS_REUSED_CURRENT_TRANSCRIPTIONS_AND_ARTWORK_PLAN",
+    "segment_count": 15,
+    "prior_c_accepted_stock_binding_task": "LOCALIZATION-LOCALIZATION_A-00123",
+    "prior_c_accepted_stock_binding_result_sha_prefix": "910cf76",
+    "prior_scope": "15/15 stock visible labels bound; stock effect bboxes only; canonical-HD geometry was not promoted"
+  },
+  "source_transport": {
+    "state_ssot": "github:korean-localization-clean",
+    "approved_drive": {
+      "account": "ezflash557",
+      "root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "resolved_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "exact_name_found": false,
+      "folder_listing": [
+        "9F060EC1_512x512.dds"
+      ],
+      "outcome": "SOURCE_TRANSPORT_MISS"
+    },
+    "pinned_upstream": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "queue_style_exact_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "queue_style_fetch": "SOURCE_TRANSPORT_MISS_404",
+      "release_path": "Release/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "release_git_blob_sha": "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+      "release_size_bytes": 8388736,
+      "release_tree_object_found": true,
+      "release_binary_body_chars_from_fetch_file": 0,
+      "outcome": "SOURCE_TRANSPORT_BLOCKED_BINARY_BODY_UNAVAILABLE"
+    },
+    "pinned_release_archive_attachment": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "expected_size_bytes": 306223257,
+      "expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "materialization_attempt": "FAILED_CURRENT_FILE_MATERIALIZATION_LIMIT_104857600_BYTES",
+      "used_for_pixel_analysis": false
+    },
+    "final_outcome": "SOURCE_BYTES_NOT_AVAILABLE_TO_CURRENT_EXECUTION_PATH__NOT_SOURCE_ACQUISITION_EXHAUSTED_BECAUSE_PINNED_RELEASE_OBJECT_EXISTS"
+  },
+  "readiness_before": "PREFLIGHT_ONLY_CANONICAL_HD_SOURCE_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_HOLD",
+  "readiness_after": "PREFLIGHT_ONLY_PINNED_RELEASE_OBJECT_RESOLVED__EXACT_CANONICAL_SOURCE_IDENTITY_VERIFIER_READY__BINARY_TRANSPORT_BLOCKS_PIXEL_STAGE",
+  "same_task_completion_gate": {
+    "render_ready_reached": false,
+    "one_stage_to_render_reached": false,
+    "reason": "Exact canonical source bytes were not available to the current execution path, so orientation/source-effect/removal-mask/CLEAN_PLATE stages cannot be truthfully promoted."
+  },
+  "new_tooling": {
+    "path": "localization/graphics/role_A/20261001-A00303-P00182/audit_index147_source_gate.py",
+    "purpose": "Fail-closed SHA-256 + DDS geometry/header gate for exact index147 canonical source bytes before any pixel measurement or reconstruction.",
+    "expected_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "expected_size": [
+      2048,
+      1024
+    ],
+    "side_effect_free": true
+  },
+  "next_executable_step": [
+    "Acquire the exact index147 bytes through the approved Drive subtree if the canonical file is restored there, or through a binary-capable pinned v0.25.10a Release transport.",
+    "Run audit_index147_source_gate.py and require PASS_EXACT_CANONICAL_SHA_AND_GEOMETRY.",
+    "Only then inspect exact canonical pixels for orientation, 15 source-effect/removal masks, protected non-text regions, CLEAN_PLATE and 2px candidate_safe_bboxes; if that reaches RENDER_READY, continue to Korean render in the same invocation."
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00303-P00182/audit_index147_source_gate.py",
+    "localization/graphics/role_A/20261001-A00303-P00182/A00303_P00182_INDEX147_SOURCE_TRANSPORT_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX147_CANONICAL_SOURCE_TRANSPORT_GATE_TOOLING_AND_MACHINE_PREFLIGHT",
+    "reviewed_indices": [
+      147
+    ],
+    "reviewed_assets": [
+      "39BCA907"
+    ],
+    "verifier": "localization/graphics/role_A/20261001-A00303-P00182/audit_index147_source_gate.py",
+    "report": "localization/graphics/role_A/20261001-A00303-P00182/A00303_P00182_INDEX147_SOURCE_TRANSPORT_PREFLIGHT.json",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "new_preflight_batches": 1
+  },
+  "current_disposition": "PREFLIGHT_ONLY_PINNED_RELEASE_OBJECT_RESOLVED_BINARY_TRANSPORT_BLOCKED",
+  "self_qa": "PASS_A_MOD3_INDEX147__ZERO_A_RUNNABLE_READY_REWORK_TIERS__QA_PENDING_159_198_201_NOT_REPEATED__INDEX111_A00301_NOT_REPEATED__SOURCE_BLOCKED_NOT_REPROBED__DRIVE_EXACT_MISS__PINNED_RELEASE_OBJECT_959F27E1_RESOLVED__CANONICAL_SHA_GATE_TOOL_ADDED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): gate index147 canonical source transport [AUTO:LOCALIZATION-LOCALIZATION_A-00303]",
+  "precommit_refresh": {
+    "head_sha": "0e4e952cb6eb86dad46a21548d9bfc18472493f9",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "HEAD advanced since task start through B00300 bookkeeping; producer B changes are preserved. No shared state is modified by A00303."
+  },
+  "bookkeeping_note": "Producer immutable result SHA will be recorded in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+}
