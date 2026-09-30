@@ -84,3 +84,15 @@ Do not resize a flattened Korean raster after rendering. If measured Korean effe
 - Stage/course proper names use **Korean transliteration consistently**, not semantic translation. Examples: `Coniferous Forest -> 코니퍼러스 포레스트`, `Ancient Ruins -> 에인션트 루인스`, `Desert -> 데저트`.
 - Generic UI words such as `Stage`, `Next Stage`, `Course Select`, mission instructions, and descriptive prose remain normal Korean localization; this rule applies to proper stage/course names only.
 - Producer and C QA must reject a candidate that translates/transliterates a protected song title or mixes semantic translation and transliteration for canonical stage/course proper names.
+
+## Typography family consistency v19
+
+Song-title and stage/course-name typography is family-locked.
+
+- Within the same visual UI family, every song title uses the same native font size/effect geometry. A long song title MUST NOT receive a smaller per-title font size.
+- Within the same visual UI family, every stage/course proper name uses the same native font size/effect geometry. A long stage name MUST NOT receive a smaller per-name font size.
+- "Same family" means labels occupying the same UI role/style system (same selector/list/ranking/card family), not every occurrence across unrelated screens. Different UI families may have different fixed sizes when the English source itself uses different typography roles.
+- Fit order for these families is: fixed family font size -> source-faithful alignment -> tracking adjustment within the source style -> canonical abbreviation only when that source family itself uses abbreviations. Do not shrink one label independently.
+- If a label still cannot satisfy the safe bbox at the locked family size, return `REWORK_REQUIRED` and redesign the family/layout. Never silently reduce only that label's font size or rescale a flattened raster.
+- Producer evidence must record a stable `typography_family_id` and native `font_size_px` for each affected element. C QA must compare all members available in that family and reject non-uniform font sizes.
+- This does not relax zero-pixel containment, source-faithful effects, or any DDS/alpha/orientation rule.

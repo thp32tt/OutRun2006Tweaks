@@ -1,5 +1,5 @@
 {
-  "schema_version": 18,
+  "schema_version": 19,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -542,5 +542,41 @@
     },
     "c_qa_must_check": true,
     "producer_must_apply": true
+  },
+  "typography_family_policy": {
+    "enabled": true,
+    "families": {
+      "song_title": {
+        "membership": "SONG_OR_MUSIC_TITLE_IN_SAME_VISUAL_UI_FAMILY",
+        "font_size": "FIXED_PER_VISUAL_FAMILY",
+        "per_string_font_size_override": false,
+        "source_title_preserved": true
+      },
+      "stage_course_name": {
+        "membership": "STAGE_OR_COURSE_PROPER_NAME_IN_SAME_VISUAL_UI_FAMILY",
+        "font_size": "FIXED_PER_VISUAL_FAMILY",
+        "per_string_font_size_override": false,
+        "naming_policy": "KOREAN_TRANSLITERATION_ONLY"
+      }
+    },
+    "fit_policy": {
+      "font_size_reduction_for_single_long_label": false,
+      "allowed_before_rework": [
+        "TRACKING_ADJUSTMENT_WITHIN_SOURCE_STYLE",
+        "SOURCE_FAITHFUL_ALIGNMENT",
+        "APPROVED_CANONICAL_ABBREVIATION_IF_SOURCE_FAMILY_USES_ABBREVIATION"
+      ],
+      "forbidden": [
+        "NONUNIFORM_FONT_SIZE_WITHIN_FAMILY",
+        "FLATTENED_RASTER_RESCALE",
+        "UNAPPROVED_SEMANTIC_SHORTENING"
+      ],
+      "on_no_fit": "REWORK_REQUIRED"
+    },
+    "evidence": {
+      "producer_records_family_id": true,
+      "producer_records_font_size_px": true,
+      "c_checks_uniform_family_font_size": true
+    }
   }
 }
