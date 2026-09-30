@@ -1,0 +1,71 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00348-index24-runtime-binder-regression-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00348",
+  "wave_id": "P00219",
+  "lane": "LOCALIZATION_A",
+  "queue_index": 24,
+  "asset": "66743AA8",
+  "purpose": "Asset-specific fallback-step-5 regression QA for the C167-accepted fail-closed runtime slot/UV/composition binder. No synthetic fixture is runtime evidence.",
+  "accepted_input_lineage": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00308",
+    "c_run": "C167",
+    "c_qa_batch": "Q00065",
+    "c_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "c_disposition": "PASS_PREFLIGHT_ONLY_RUNTIME_TRACE_CONTRACT_ACCEPTED",
+    "geometry_task_id": "LOCALIZATION-LOCALIZATION_A-00279",
+    "geometry_git_blob_sha": "9c8faffcc41b49410ff8135dd6ea3ab010702020",
+    "binder_task_id": "LOCALIZATION-LOCALIZATION_A-00297",
+    "binder_git_blob_sha": "3d261f3d83165de5b3c71c8e3f48702249786815",
+    "canonical_source_sha256": "7aa21de138af2d7f2aae54022a08f0aca79093a2a34a2bd74a87a442efaa60aa",
+    "source_structure": "4096x4096 DXT5 mip1 / raw mirror_y / readable flip_y",
+    "accepted_glyph_count": 48
+  },
+  "regression_cases": {
+    "positive_48_unique_plus_committed_hangul": {
+      "independent_replay": "PASS",
+      "exact_raw_bbox_unique_matches": 48,
+      "unique_visual_labels": 48,
+      "expected_complete_48_unique_mapping": true,
+      "expected_committed_hangul_result_observed": true,
+      "expected_readiness": "PREFLIGHT_ONLY_RUNTIME_MAPPING_EVIDENCE_READY_FOR_C_REVIEW"
+    },
+    "duplicate_visual_label_conflict": {
+      "independent_replay": "PASS",
+      "fixture": "slot 1 deliberately reuses exact raw bbox and visual label A from slot 0",
+      "expected_complete_48_unique_mapping": false,
+      "expected_conflicting_visual_label": "A",
+      "expected_conflicting_slots": [
+        0,
+        1
+      ]
+    },
+    "invalid_uv_space": {
+      "independent_replay": "PASS",
+      "fixture_space": "invalid_space",
+      "expected_parse_errors": 1,
+      "expected_complete_48_unique_mapping": false
+    },
+    "no_observations": {
+      "independent_replay": "PASS",
+      "expected_readiness": "PREFLIGHT_ONLY_RUNTIME_TRACE_REQUIRED"
+    }
+  },
+  "deterministic_harness": "localization/graphics/role_A/20261001-A00348-P00219/verify_index24_runtime_binder.py",
+  "synthetic_fixture_policy": {
+    "fixtures_are_runtime_evidence": false,
+    "fixtures_authorize_candidate": false,
+    "fixtures_authorize_runtime_pass": false,
+    "fixture_data_persisted_as_runtime_observations": false
+  },
+  "material_effect": {
+    "prior_gap": "C167 accepted binder semantics but no deterministic regression harness existed to prove positive and fail-closed conflict/error paths against exact A00279 geometry.",
+    "new_gap_closed": "Exact geometry/binder Git-blob lineage is pinned and four deterministic regression paths are executable. Future runtime observations can be processed without silently accepting duplicate-label or malformed-space evidence.",
+    "remaining_blocker": "Real game name-entry selection-index/UV observations and a committed Hangul composition result are still required.",
+    "materially_reduces_unresolved_work": true
+  },
+  "production_readiness": "PREFLIGHT_ONLY_RUNTIME_OBSERVATIONS_STILL_REQUIRED",
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED",
+  "self_qa": "PASS_EXACT_C167_BINDER_LINEAGE__48_OF_48_EXACT_RAW_BBOX_UNIQUE_MATCH_REPLAY__DUPLICATE_LABEL_FAIL_CLOSED__INVALID_SPACE_FAIL_CLOSED__EMPTY_TRACE_FAIL_CLOSED__SYNTHETIC_FIXTURES_NOT_RUNTIME_EVIDENCE__NO_DDS__RUNTIME_UNTESTED"
+}
