@@ -37,7 +37,8 @@
     "safe_bbox_pass": 2,
     "one_pixel_overflow_count": 0,
     "materially_reduces_unresolved_work": true,
-    "full_candidate_dds_written": false
+    "full_candidate_dds_written": false,
+    "producing_result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337"
   },
   "evidence": [
     "localization/graphics/role_B/20261001-B00342-P00214/B00342_C4A2937B_SEMANTIC_REWORK_PATCH_READY_REPORT.json",
@@ -67,8 +68,8 @@
   "retry_reason": "Exact current base candidate bytes unavailable through approved current runtime; apply package is ready and exact-hash guarded.",
   "production_readiness_after": "PATCH_READY_NEEDS_BASE_CANDIDATE_APPLY",
   "self_qa": "PASS_PATCH_SET__EXACT_CANONICAL_SOURCE__CURRENT_TWO_OF_TWO_SEMANTICS__V2_SAFE_BBOX__ZERO_PATCH_OVERFLOW__REVIEW_ARTIFACTS_GENERATED__ZIP_HASH_VERIFIED__FULL_DDS_NOT_WRITTEN_TRANSPORT_BLOCKED__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+  "authoritative_result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): stage index61 semantic rework patch [AUTO:LOCALIZATION-LOCALIZATION_B-00342]",
   "durable_task_record_in_result_commit": true,
@@ -77,7 +78,13 @@
     "head_sha": "908e27a334a6459e65e8c76fafd238d4edebbea5",
     "head_message": "chore(localization): bind A00346 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00346] [skip ci]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Fresh HEAD fetched immediately before tree creation; B00342 writes only its unique B-lane evidence and task record. Shared state and peer-lane files are untouched."
+    "concurrent_changes_reviewed": "Fresh HEAD fetched immediately before tree creation; B00342 writes only its unique B-lane evidence and task record. Shared state and peer-lane files are untouched.",
+    "bookkeeping_head_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+    "bookkeeping_concurrent_head_preserved": false
   },
-  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the immutable result SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA is bound here. The result commit atomically contains B00342 index61 semantic-rework patch evidence and task record. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T07:29:38+09:00",
+  "bookkeeping_base_result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+  "bookkeeping_preserved_head_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+  "bookkeeping_preserved_head_message": "localization(B): stage index61 semantic rework patch [AUTO:LOCALIZATION-LOCALIZATION_B-00342]"
 }
