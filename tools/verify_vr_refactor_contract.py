@@ -15,6 +15,7 @@ def read(rel: str) -> str:
 tracker = read("src/vr/state/state_block_tracker.hpp")
 r22 = read("src/vr/d3d9/stereo_renderer_r22.cpp")
 r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
+r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 
@@ -60,6 +61,7 @@ for legacy in (
     for rel, source in (
         ("src/vr/d3d9/stereo_renderer_r22.cpp", r22),
         ("src/vr/d3d9/stereo_renderer_r31.cpp", r31),
+        ("src/vr/d3d9/stereo_renderer_r32.cpp", r32),
         ("src/vr/d3d9/stereo_renderer_r33.cpp", r33),
     ):
         if legacy in source:
