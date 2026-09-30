@@ -91,10 +91,23 @@ namespace OutRunVR::GameSemantic
             return RenderScope::ScreenHud;
         case OutRunVR::DisasmContract::SpacePolicy::WorldBillboard:
             return RenderScope::WorldBillboard;
+        case OutRunVR::DisasmContract::SpacePolicy::ProjectedWorldMarker2D:
+            return RenderScope::ProjectedWorldMarker2D;
+        case OutRunVR::DisasmContract::SpacePolicy::ProjectedScreenEffect2D:
+            return RenderScope::ProjectedScreenEffect2D;
         default:
             return RenderScope::None;
         }
     }
+
+    static_assert(
+        ScopeFromDisasmPolicy(
+            OutRunVR::DisasmContract::SpacePolicy::ProjectedWorldMarker2D) ==
+        RenderScope::ProjectedWorldMarker2D);
+    static_assert(
+        ScopeFromDisasmPolicy(
+            OutRunVR::DisasmContract::SpacePolicy::ProjectedScreenEffect2D) ==
+        RenderScope::ProjectedScreenEffect2D);
 
     [[nodiscard]] constexpr RenderScope ClassifyCriticalProducer(
         std::uintptr_t callerRva) noexcept

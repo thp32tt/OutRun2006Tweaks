@@ -40,6 +40,12 @@ namespace OutRunVR::DisasmContract
         Unknown = 0,
         ScreenHud,
         WorldBillboard,
+        // F15: exact world anchor already projected to the game's 640x480
+        // sprite plane before its final queued 2D draw.
+        ProjectedWorldMarker2D,
+        // F15: exact world/light effect already projected into screen space.
+        // This remains distinct from finite-plane HUD ownership.
+        ProjectedScreenEffect2D,
     };
 
     struct ProducerRange

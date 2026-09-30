@@ -73,6 +73,8 @@ def main() -> None:
             "0x000BB0FBu",
             "0x000BB2D0u",
             "std::array<ProducerRange, 25>",
+            "ProjectedWorldMarker2D",
+            "ProjectedScreenEffect2D",
             "0x00060900u, 0x00061100u, SpacePolicy::ScreenHud",
             "0x00081A00u, 0x00081B00u, SpacePolicy::ScreenHud",
             "0x000BBA00u, 0x000BBC00u, SpacePolicy::ScreenHud",
@@ -106,6 +108,10 @@ def main() -> None:
             "0x42D762 begins one node",
             "0x42DCB4 is the common epilogue",
             "ScopeFromDisasmPolicy(",
+            "SpacePolicy::ProjectedWorldMarker2D",
+            "RenderScope::ProjectedWorldMarker2D",
+            "SpacePolicy::ProjectedScreenEffect2D",
+            "RenderScope::ProjectedScreenEffect2D",
             "ClassifyCriticalProducer(",
             "OutRunVR::DisasmContract::ClassifyCriticalProducer(callerRva)",
             "ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud",
@@ -206,6 +212,15 @@ def main() -> None:
             "F13 DispGhostGap force ownership regressed to spacing-only callbacks: "
             f"{stale_ghost_gap_force_hooks}"
         )
+    require(
+        "src/vr/hud_semantics.hpp",
+        [
+            "ProjectedWorldMarker2D",
+            "ProjectedScreenEffect2D",
+            "PROJECTED_WORLD_MARKER_2D",
+            "PROJECTED_SCREEN_EFFECT_2D",
+        ],
+    )
     require(
         "tools/analyze_outrun_exe.py",
         [
