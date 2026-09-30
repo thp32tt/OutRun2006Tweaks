@@ -237,6 +237,26 @@ GF_TARGET_C_HELPER_1_FIRST_CALLEE_SLOT_STRIDE = 0x7C
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_RING_SIZE = 0x40
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_RVA = 0x0002830A
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_PROBE_LEN = 96
+
+# R153/F13: exact terminal sequence and padding anchor recovered from the fresh
+# R151 continuation window. This proves bytes/control-flow only and does not
+# assign semantics to the code beginning at 0x28320.
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_END_RVA = 0x00028319
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_PADDING_END_RVA = 0x00028320
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_RVA = 0x00028320
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_INSTRUCTIONS = (
+    (0x0002830A, "ff 04 85 58 65 95 00", "inc dword [eax*4+0x956558]"),
+    (0x00028311, "c1 e0 06", "shl eax, 6"),
+    (0x00028314, "5e", "pop esi"),
+    (0x00028315, "03 c2", "add eax, edx"),
+    (0x00028317, "5f", "pop edi"),
+    (0x00028318, "c3", "ret"),
+)
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_PADDING_BYTES = bytes.fromhex(
+    "cc cc cc cc cc cc cc"
+)
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_ANCHOR = bytes.fromhex("83 ec 0c")
+
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_INSTRUCTIONS = (
     (0x000282B0, "8b 0c 85 58 65 95 00", "mov ecx, [eax*4+0x956558]"),
     (0x000282B7, "57", "push edi"),
@@ -1093,6 +1113,104 @@ def collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe
     }
 
 
+def collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe: PE) -> dict:
+    """Prove the exact terminal sequence, INT3 padding, and next-code anchor.
+
+    The fresh R151 continuation capture starts exactly at 0x2830A. This proof
+    decodes only complete terminal instructions through RET at 0x28318, verifies
+    seven INT3 bytes through 0x2831F, and pins the next three bytes at 0x28320
+    as an anchor. It does not claim a new function boundary or render semantic.
+    """
+
+    continuation = collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe)
+    expected_next = GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    terminal_end_matches = (
+        expected_next == GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_END_RVA
+    )
+    padding = pe.bytes_at_rva(
+        GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_END_RVA,
+        len(GF_TARGET_C_HELPER_1_FIRST_CALLEE_PADDING_BYTES),
+    )
+    padding_matches = padding == GF_TARGET_C_HELPER_1_FIRST_CALLEE_PADDING_BYTES
+    padding_end_rva = (
+        GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_END_RVA + len(padding)
+    )
+    padding_end_matches = (
+        padding_end_rva == GF_TARGET_C_HELPER_1_FIRST_CALLEE_PADDING_END_RVA
+        and padding_end_rva == GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_RVA
+    )
+    next_anchor = pe.bytes_at_rva(
+        GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_RVA,
+        len(GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_ANCHOR),
+    )
+    next_anchor_matches = (
+        next_anchor == GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_ANCHOR
+    )
+    predecessor_exact = (
+        continuation["status"]
+        == "EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED"
+        and continuation["target_rva"]
+        == GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_RVA
+        and continuation["target_section"] == ".text"
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    proven = bool(
+        predecessor_exact
+        and contiguous
+        and all_bytes_match
+        and terminal_end_matches
+        and padding_matches
+        and padding_end_matches
+        and next_anchor_matches
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_RVA,
+        "predecessor_status": continuation["status"],
+        "predecessor_exact": predecessor_exact,
+        "target_section": continuation["target_section"],
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "terminal_ret_rva": 0x00028318,
+        "terminal_end_rva": GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_END_RVA,
+        "terminal_end_matches": terminal_end_matches,
+        "padding_start_rva": GF_TARGET_C_HELPER_1_FIRST_CALLEE_TERMINAL_END_RVA,
+        "padding_end_rva": padding_end_rva,
+        "padding_bytes": padding.hex(" "),
+        "padding_matches": padding_matches,
+        "next_code_rva": GF_TARGET_C_HELPER_1_FIRST_CALLEE_NEXT_CODE_RVA,
+        "next_code_anchor": next_anchor.hex(" "),
+        "next_code_anchor_matches": next_anchor_matches,
+        "status": (
+            "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN"
+            if proven
+            else "FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROOF_FAILED"
+        ),
+        "semantic_effect": "PARTIAL_TERMINAL_DATAFLOW_ONLY",
+        "full_callee_semantics": "UNRESOLVED",
+        "next_code_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
 
@@ -1902,6 +2020,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_first_callee_provenance": collect_guarded_gf_target_c_helper_1_first_callee_provenance(pe),
         "guarded_gf_target_c_helper_1_first_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_first_callee_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_first_callee_continuation_provenance": collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe),
+        "guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof": collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -2169,6 +2288,29 @@ def main() -> int:
         f"ownership_effect={helper_1_callee_cont['ownership_effect']} "
         f"bytes={helper_1_callee_cont['bytes']}"
     )
+    helper_1_callee_terminal = report["guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof"]
+    print(
+        f"gf_target_c_helper_1_first_callee_terminal=0x{helper_1_callee_terminal['target_rva']:08X} "
+        f"status={helper_1_callee_terminal['status']} "
+        f"predecessor_status={helper_1_callee_terminal['predecessor_status']} "
+        f"predecessor_exact={helper_1_callee_terminal['predecessor_exact']} "
+        f"section={helper_1_callee_terminal['target_section'] or 'none'} "
+        f"layout_contiguous={helper_1_callee_terminal['layout_contiguous']} "
+        f"bytes_match={helper_1_callee_terminal['all_instruction_bytes_match']} "
+        f"ret=0x{helper_1_callee_terminal['terminal_ret_rva']:08X} "
+        f"terminal_end={hexrva(helper_1_callee_terminal['terminal_end_rva'])} "
+        f"padding=0x{helper_1_callee_terminal['padding_start_rva']:08X}-"
+        f"0x{helper_1_callee_terminal['padding_end_rva'] - 1:08X}:"
+        f"{helper_1_callee_terminal['padding_bytes']} "
+        f"padding_matches={helper_1_callee_terminal['padding_matches']} "
+        f"next_code={hexrva(helper_1_callee_terminal['next_code_rva'])} "
+        f"next_anchor={helper_1_callee_terminal['next_code_anchor']} "
+        f"next_anchor_matches={helper_1_callee_terminal['next_code_anchor_matches']} "
+        f"semantic_effect={helper_1_callee_terminal['semantic_effect']} "
+        f"full_semantics={helper_1_callee_terminal['full_callee_semantics']} "
+        f"next_code_semantics={helper_1_callee_terminal['next_code_semantics']} "
+        f"ownership_effect={helper_1_callee_terminal['ownership_effect']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -2209,6 +2351,9 @@ def main() -> int:
     if helper_1_callee_cont["status"] != "EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_first_callee_continuation_provenance=FAILED")
         return 11
+    if helper_1_callee_terminal["status"] != "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN":
+        print("guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof=FAILED")
+        return 12
     return 0
 
 

@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00153",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "08c9006d7220a37cfdb9a81a05ffeb68b53789d2",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R153_HELPER_282B0_TERMINAL_PADDING",
+  "selection_reason": "DXVK visual/performance promotion remains Quest 3/VDXR runtime-dependent. CONVERSION-DXVK-00151 captured fresh exact bytes at 0x2830A and explicitly required decoding only complete instructions plus separate terminal/padding/next-code-boundary proof. The smallest executable HMD-free unit is the terminal sequence through RET at 0x28318, the seven INT3 bytes through 0x2831F, and a three-byte next-code anchor at 0x28320.",
+  "summary": "Add a fail-closed exact-EXE proof for the 0x282B0 callee terminal sequence at 0x2830A..0x28318, seven INT3 padding bytes at 0x28319..0x2831F, and the next-code anchor 83 ec 0c at 0x28320. The proof does not claim 0x28320 is a new function and does not assign render ownership or full callee semantics.",
+  "evidence": [
+    "CONVERSION-DXVK-00151 validation-bearing result 64fc46a21384451d939f9c5fd45a717056080d74 captured a fresh 96-byte window beginning at 0x2830A with exact predecessor continuity.",
+    "The fresh bytes contain complete instructions through RET at 0x28318, followed by seven 0xCC bytes and then 83 ec 0c at 0x28320; this task pins only those exact boundaries.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00153.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the terminal/padding anchor proof passes, persist exact evidence while keeping full_callee_semantics=UNRESOLVED, next_code_semantics=UNRESOLVED and ownership_effect=NONE. A later bounded F13 task may analyze the 0x28320 code independently."
+}
