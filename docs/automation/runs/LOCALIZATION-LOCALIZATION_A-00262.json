@@ -60,7 +60,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "result_commit_message": "localization(A): measure index111 source style [AUTO:LOCALIZATION-LOCALIZATION_A-00262]"
+  "result_sha": "4bcac22ee9da124c9d737a5d54f99b9b4c3b2993",
+  "authoritative_result_sha": "4bcac22ee9da124c9d737a5d54f99b9b4c3b2993",
+  "result_commit_message": "localization(A): measure index111 source style [AUTO:LOCALIZATION-LOCALIZATION_A-00262]",
+  "bookkeeping_note": "Verified immutable producer result 4bcac22ee9da124c9d737a5d54f99b9b4c3b2993 contains exactly the A lane-local index111 source-style/signed-slant evidence plus the durable A00262 task record and required AUTO marker. This bookkeeping update records RESULT_SHA only; producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T18:49:43+09:00",
+  "bookkeeping_base_head_sha": "4bcac22ee9da124c9d737a5d54f99b9b4c3b2993"
 }
