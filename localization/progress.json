@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T05:48:00+09:00",
+  "updated_at_kst": "2026-10-01T05:54:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C173/Q00071 PRE-GATE: B00324@index133 PASS -> RENDER_READY; A00327@index63 PASS current-workflow DDS_ONLY isolation; B00328@index55/154 PASS fail-closed PREFLIGHT_ONLY with C-normalized SOURCE_IDENTITY_MISMATCH typed outcome; B00331@index61 REWORK_REQUIRED because unchanged candidate has two stale canonical translations. Concurrent B00332@index232 is a newer out-of-batch Korean candidate awaiting C and therefore replaces index232's older render-ready scheduling state. Runnable production=133; candidate QA backlog=159/198/201/232. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C173/Q00071 AUTHORITATIVE GATE PASS: validation-bearing result 9ecb54043789f4880380094c3010ed8bc542fe3e passed Localization Automation Gate 36775721143 attempt 1. B00324@index133 PASS RENDER_READY; A00327@index63 PASS current-workflow DDS_ONLY isolation; B00328@index55/154 PASS fail-closed PREFLIGHT_ONLY with SOURCE_IDENTITY_MISMATCH normalization; B00331@index61 REWORK_REQUIRED due two stale canonical translations. Concurrent B00332@index232 remains out-of-batch candidate QA pending. Runnable production=133; candidate QA backlog=159/198/201/232. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED. Concurrent A00338@index102 is preserved as out-of-batch QA_PENDING.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1267,6 +1267,12 @@
           "result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
           "status": "QA_PENDING_OUT_OF_BATCH",
           "scope": "index232 new v2 Korean candidate on approved current-pipeline Drive, candidate SHA-256 41334c7d..."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
+          "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index102 current-workflow single-DDS isolation manifest"
         }
       ]
     },
@@ -1473,6 +1479,12 @@
           "result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
           "status": "QA_PENDING_OUT_OF_BATCH",
           "scope": "index232 new v2 Korean candidate on approved current-pipeline Drive, candidate SHA-256 41334c7d..."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
+          "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index102 current-workflow single-DDS isolation manifest"
         }
       ],
       "candidate_completion_priority": [
@@ -1482,7 +1494,7 @@
         "CANDIDATE_AWAITING_C: indices159/198/201 plus newer out-of-batch index232/B00332 candidate SHA-256 41334c7d.... Do not overwrite index232 with older RENDER_READY state; its candidate must be independently consumed by a later C batch.",
         "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index54 remains sticky SOURCE_IDENTITY_MISMATCH; indices55/154 are normalized to sticky SOURCE_IDENTITY_MISMATCH because exact Release bytes exist but fail canonical identity; index94 retains Q00069 6/7-mask scope; index111 retains Q00067/A00309 authority until out-of-batch A00334 is C-consumed; index147 remains blocked.",
         "RUNTIME ISOLATION READY: index63 joins indices99/222/237 on unchanged static-QA candidates. Index61 is explicitly removed from current isolation-ready authority due semantic drift. No real-game validation is implied.",
-        "OUT-OF-BATCH C QA: A00330@index12, A00334@index111, A00335@index195, A00336@index51 and B00332@index232 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not implicitly promoted.",
+        "OUT-OF-BATCH C QA: A00330@index12, A00334@index111, A00335@index195, A00336@index51, B00332@index232 and A00338@index102 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not implicitly promoted.",
         "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=159/198/201/232; candidate_rework_required=61; runnable_production=133; blocked_exception=54/55/147/154; runtime_validated=none.",
         "Q00071 validation-bearing result commit will own the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
       ],
@@ -1563,17 +1575,29 @@
     "uploaded_archive_used": true,
     "heavy_qa_repeated": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
+    "result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "authoritative_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "validation_bearing_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
     "precommit_refresh": {
       "head_sha": "2245eda398885c8e556bf6396cc60742689ae3d9",
       "stale_state_overwrite": false,
-      "concurrent_changes_reviewed": "Latest branch refreshed immediately before Q00071 shared-state construction. A00330/A00334/A00335/A00336 and B00332 are preserved as out-of-batch QA_PENDING and are not implicitly dispositioned. B00332 materially advances index232 from Q00070 RENDER_READY to a newer candidate awaiting C, so Q00071 does not overwrite index232 back to render-ready."
+      "concurrent_changes_reviewed": "Latest branch refreshed immediately before Q00071 shared-state construction. A00330/A00334/A00335/A00336 and B00332 are preserved as out-of-batch QA_PENDING and are not implicitly dispositioned. B00332 materially advances index232 from Q00070 RENDER_READY to a newer candidate awaiting C, so Q00071 does not overwrite index232 back to render-ready.",
+      "bookkeeping_head_sha": "11052de50f1966dd4e18f9e3abf9b9a329080432",
+      "bookkeeping_concurrent_changes": "A00338@index102 completed after the Q00071 validation-bearing result and is preserved as out-of-batch QA_PENDING. It does not alter Q00071 dispositions or Gate ownership."
     },
-    "bookkeeping_note": "Validation-bearing RESULT_SHA will be bound only after this exact C result commit passes the single Localization Automation Gate. Runtime remains UNTESTED."
+    "bookkeeping_note": "Q00071 authoritative Gate PASS is owned by validation-bearing result 9ecb54043789f4880380094c3010ed8bc542fe3e (Localization Automation Gate run 36775721143, attempt 1). This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36775721143,
+      "head_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T05:53:33+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-10-01T05:54:00+09:00"
   }
 }

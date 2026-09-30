@@ -13,7 +13,7 @@
     "CANDIDATE_AWAITING_C: indices159/198/201 plus newer out-of-batch index232/B00332 candidate SHA-256 41334c7d.... Do not overwrite index232 with older RENDER_READY state; its candidate must be independently consumed by a later C batch.",
     "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index54 remains sticky SOURCE_IDENTITY_MISMATCH; indices55/154 are normalized to sticky SOURCE_IDENTITY_MISMATCH because exact Release bytes exist but fail canonical identity; index94 retains Q00069 6/7-mask scope; index111 retains Q00067/A00309 authority until out-of-batch A00334 is C-consumed; index147 remains blocked.",
     "RUNTIME ISOLATION READY: index63 joins indices99/222/237 on unchanged static-QA candidates. Index61 is explicitly removed from current isolation-ready authority due semantic drift. No real-game validation is implied.",
-    "OUT-OF-BATCH C QA: A00330@index12, A00334@index111, A00335@index195, A00336@index51 and B00332@index232 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not implicitly promoted.",
+    "OUT-OF-BATCH C QA: A00330@index12, A00334@index111, A00335@index195, A00336@index51, B00332@index232 and A00338@index102 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not implicitly promoted.",
     "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=159/198/201/232; candidate_rework_required=61; runnable_production=133; blocked_exception=54/55/147/154; runtime_validated=none.",
     "Q00071 validation-bearing result commit will own the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
@@ -2534,10 +2534,19 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "authoritative_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "validation_bearing_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36775721143,
+      "head_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T05:53:33+09:00"
+    }
   }
 }

@@ -1258,7 +1258,7 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 ## 2026-09-30 04:42 KST - C146 Q00044 INDEPENDENT QA BATCH
 - A00204 `e0649521...`: **PASS**, index198/9FC88069 -> **RENDER_READY** after independent exact-source CLEAN_PLATE replay (77,975 mask pixels; raw/display SHA `c210abb5...` / `d9d044a6...`; 0 outside/protected/alpha-outside changes; 2px safe bboxes accepted).
 - B00206 `d95e2968...`: **PASS** for the fail-closed semantic audit, index133/25F697C6 remains **PREFLIGHT_ONLY**. Exact source contains ANCIENT RUINS but not the other 8 currently assigned strings; re-bind those semantics before any mask/render work.
-- Shared next action order: **RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY index133/222/232**; candidate-QA 159/201 and direct rework 226 remain ahead of unrelated preflight. Runtime remains **UNTESTED**.
+- Shared next action order: **RENDER_READY index198 -> ONE_STAGE_TO_RENDER none -> PREFLIGHT_ONLY index133/222/232**; candidate-QA 159/201 and direct rework 226 remain ahead of unrelated preflight. Concurrent A00338@index102 remains out-of-batch QA_PENDING. Runtime remains **UNTESTED**.
 - Report: `localization/graphics/role_C/20260930-0442-C146/C146_Q00044_INDEPENDENT_QA_BATCH.json`.
 ## 2026-09-30 04:52 KST - C146 Q00044 AUTHORITATIVE GATE PASS
 - Validation-bearing result: `07952efd569649598034692745c745d71cc1c5fc`; Localization Automation Gate `36622258041` completed **success**.
@@ -1570,3 +1570,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Current order after latest-HEAD reconciliation: **RENDER_READY 133 -> ONE_STAGE none -> candidate rework 61 -> candidate QA 159/198/201/232 -> PREFLIGHT_ONLY**. B00332@index232 is a newer out-of-batch candidate and is not overwritten by Q00071. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 
 - Concurrent A00336@index51 and B00332@index232 remain out-of-batch QA_PENDING and are not dispositioned by Q00071.
+
+### Q00071 authoritative Gate PASS — 2026-10-01 05:54 KST
+- Validation-bearing result: `9ecb54043789f4880380094c3010ed8bc542fe3e`; Gate run: `36775721143` **success**.
+- Final dispositions: B00324 **PASS/RENDER_READY**, A00327 **PASS**, B00328 **PASS/PREFLIGHT_ONLY**, B00331 **REWORK_REQUIRED**.
+- Runnable production: **index133**. Index232 has a newer out-of-batch B00332 candidate awaiting C QA. Runtime remains **UNTESTED**.
