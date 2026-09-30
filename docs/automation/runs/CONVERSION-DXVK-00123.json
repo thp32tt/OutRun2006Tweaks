@@ -1,0 +1,75 @@
+{
+  "task_id": "CONVERSION-DXVK-00123",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "651e20f7e4c7718537056fa6206a7fa0e41d11c3",
+  "result_sha": "0b6b42c518c741c56498b9adedf1e7ce9a0e9359",
+  "validation_bearing_result_sha": "0b6b42c518c741c56498b9adedf1e7ce9a0e9359",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R133_C2CSPEECHBUBBLEGF_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for six exact C2CSpeechBubbleGF position-correction HUD edges 0xFCDC1, 0xFCDEA, 0xFCEB0, 0xFCED9, 0xFCF22 and 0xFCF4F. Existing ESP0 AddSpriteSpacing behavior is preserved for every edge. Immediate next-draw ScreenHud ownership now derives from GameSemantic::ClassifyCriticalProducer(CallerRva), with compile-time exact-RVA assertions and verifier guards. No producer range, uncertain/no-effect 0xFE8B1 hook, GF-heart hook, world/stereo path, transport path or protected DX9Ex branch was changed.",
+  "evidence": [
+    "All six exact callers lie inside the existing canonical C2CSpeechBubbleGF HUD_GF_SPEECH SCREEN_HUD range 0xFCD80-0xFD080.",
+    "The R133 helper preserves AddSpriteSpacing((float*)(ctx.esp), false) before semantic handoff for all six callsites.",
+    "render_semantics.hpp compile-time asserts all six exact RVAs classify as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires all six exact R133 template bindings and marker, and rejects restoration of every legacy spacing-only binding.",
+    "Validation-bearing source result 0b6b42c518c741c56498b9adedf1e7ce9a0e9359 contains [AUTO:CONVERSION-DXVK-00123] and no CI-skip directive.",
+    "Backend Conversion Gate 36709296920 PASS; artifact 11093916047 digest sha256:a26253bab9aef0809e57c321ee5e03769c1a555faa66b808a81f0b6ad0aea196.",
+    "Build 36709302706 PASS.",
+    "OpenXR VR architecture 36709302696 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36709302654 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36709296924 PASS and PR 36709302863 PASS.",
+    "VR PC Fast Test Build 36709296972 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "0b6b42c518c741c56498b9adedf1e7ce9a0e9359",
+      "message": "vr: route GF speech HUD through shared producer map [AUTO:CONVERSION-DXVK-00123]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36709296920,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11093916047,
+    "backend_conversion_gate_artifact_digest": "sha256:a26253bab9aef0809e57c321ee5e03769c1a555faa66b808a81f0b6ad0aea196",
+    "build_run_id": 36709302706,
+    "build_result": "PASS",
+    "openxr_run_id": 36709302696,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36709302654,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36709296924,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36709302863,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36709296972,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5910330963,
+    "validation_comment_id": 5910472093
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_C2CSPEECHBUBBLE_EXACT_EDGES",
+    "after": "PARTIAL_PLUS_C2CSPEECHBUBBLEGF_POSITION_EXACT_EDGES",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded C2CSpeechBubbleGF position-correction F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven producer sub-family. Keep the explicitly uncertain/no-effect 0xFE8B1 and GF-heart hooks unchanged until immediate draw ownership is separately established. Keep runtime validation distinct from hosted CI."
+}
