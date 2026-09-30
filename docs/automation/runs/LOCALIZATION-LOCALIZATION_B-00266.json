@@ -77,8 +77,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "073ca23777829bdb58edc6f3fe9c6c777ab46f18",
+  "authoritative_result_sha": "073ca23777829bdb58edc6f3fe9c6c777ab46f18",
   "result_commit_message": "localization(B): add index112 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00266]",
-  "bookkeeping_note": "RESULT_SHA will be populated only after the immutable AUTO result commit is created. This producer does not own final automation validation; C batch Gate does. Runtime remains UNTESTED."
+  "bookkeeping_note": "Verified immutable producer result 073ca23777829bdb58edc6f3fe9c6c777ab46f18 contains the exact AUTO marker, lane-local index112 DDS_ONLY isolation manifest, role_B evidence, and durable task record atomically. This bookkeeping update records RESULT_SHA only; producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T19:04:35.397+09:00",
+  "bookkeeping_base_head_sha": "073ca23777829bdb58edc6f3fe9c6c777ab46f18"
 }
