@@ -62,10 +62,19 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_MOD3_B_INDEX61__Q00071_SEMANTIC_REWORK__EXACT_C85_CANDIDATE_LINEAGE__EXACT_CANONICAL_SOURCE__TWO_CANONICAL_SEMANTICS_REPAIRED__V2_2PX_SAFE_BBOX__VECTOR_OUTLINE_RENDER__ZERO_OUTSIDE_ALLOWED__ZERO_ALPHA_OUTSIDE_ALLOWED__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+  "authoritative_result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): rework index61 C4A2937B semantics [AUTO:LOCALIZATION-LOCALIZATION_B-00342]",
   "durable_task_record_in_result_commit": true,
-  "producing_role": "LOCALIZATION_B"
+  "producing_role": "LOCALIZATION_B",
+  "producer_pre_gate": "PASS",
+  "result_commit_local_verification": {
+    "parallel_lane_commit": "PASS",
+    "strict_machine_readable_graphics_gate": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "bookkeeping_note": "Bound the immutable material result SHA after the task-specific producer completed. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not own the C batch validation gate and does not modify the candidate DDS or shared localization state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T07:41:00+09:00",
+  "bookkeeping_base_result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6"
 }
