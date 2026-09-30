@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00116",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T19:26:02+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "93d4e26d20e912409100780efa88953c3e0952f9",
+  "result_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5",
+  "validation_bearing_result_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R128_DISPTEMPHEARTNUM_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "The single exact DispTempHeartNum position-correction edge at 0xBBA89 now preserves its existing AddSpriteSpacing((int*)(ctx.esp), false) behavior while deriving immediate next-draw ScreenHud ownership from the shared backend-neutral producer map. A compile-time assertion requires 0xBBA89 to remain canonical ScreenHud and the backend disassembly verifier requires the exact templated binding while rejecting the legacy spacing-only callback. The existing canonical DispTempHeartNum range 0xBBA00-0xBBC00 is unchanged.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "provenance": "0xBBA89 lies inside the existing canonical DispTempHeartNum ScreenHud range 0xBBA00-0xBBC00 in disasm_render_contract.hpp, analyze_outrun_exe.py and hud_semantics.hpp.",
+    "behavior_preservation": "The existing negative-heart X AddSpriteSpacing operation remains unchanged and executes before semantic handoff.",
+    "scope_control": "Only the single exact 0xBBA89 edge changes; no Heart/Rival/C2C state-toggle family is converted and no producer range changes.",
+    "regression_safety": "src/hooks_uiscaling.cpp and src/vr/game/render_semantics.hpp remain protected risk paths for R50 world stereo and R51 white-HUD behavior; hosted CI is not HMD proof.",
+    "validation": "Compile-time exact-RVA classification plus backend verifier markers and legacy-binding rejection fail closed on semantic drift."
+  },
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "This is a bounded ownership-source substitution for one already-proven ScreenHud callsite. It preserves the existing position correction and does not widen producer semantics, enable native DX11 draw ownership, alter D3D9 render policy, or alter OpenXR transport. Hosted CI cannot prove Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36701738691,
+      "conclusion": "success",
+      "validated_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5",
+      "artifact_id": 11090626490,
+      "artifact_digest": "sha256:cff077fbe91e9c465371837160b72ffdcf1bd58764a3260f597d99657be847f4",
+      "evidence": "Mandatory conversion gate passed, including backend disassembly/source-graph checks, Win32 build path and DX11 semantic/object/linkage/constant-buffer/native-transport probes."
+    },
+    "build": {
+      "run_id": 36701744232,
+      "conclusion": "success",
+      "validated_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5",
+      "evidence": "Generic Win32 Release build completed successfully."
+    },
+    "hud_inspector": {
+      "run_id": 36701744188,
+      "conclusion": "success",
+      "validated_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5",
+      "evidence": "static-exe-analysis and build-hud-inspector both passed."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36701744164,
+      "conclusion": "success",
+      "validated_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5",
+      "evidence": "All six jobs passed: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify and game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36701738699,
+      "conclusion": "skipped",
+      "validated_sha": "c3e9686ae8b99b06037880f1aa308de535f6bbf5"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5909272779,
+    "validation_comment_id": 5909366335,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00116] and contains no CI-skip directive.",
+    "0xBBA89 is classified as ScreenHud by the shared producer classifier and is compile-time asserted in render_semantics.hpp.",
+    "The original AddSpriteSpacing((int*)(ctx.esp), false) correction remains on the exact edge.",
+    "The backend verifier requires DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u> and rejects restoration of the legacy spacing-only hook binding.",
+    "The existing canonical range 0xBBA00-0xBBC00 was not added, widened or reclassified.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R128 DispTempHeartNum shared producer-map adoption is automation-validated on the DX11 branch. Runtime visual behavior remains untested.",
+  "next_action": "Re-evaluate the remaining legacy exact HUD edges against the current shared producer map. Prefer a small independently proven family such as the NaviPub_Disp_Rival pair 0xBEB8E/0xBEBAF only if exact provenance and behavior preservation are reconfirmed; otherwise move to the next evidence-driven DX11 priority. Do not widen producer ranges or claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}
