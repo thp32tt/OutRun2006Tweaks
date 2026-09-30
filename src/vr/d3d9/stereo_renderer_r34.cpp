@@ -50,9 +50,8 @@ namespace OutRunVRStereo
             RightDepthSynchronized = false;
             RightStencilSynchronized = false;
 
-            if (!R34ResetReplay.firstReplayBlockLogged)
+            if (R34ResetReplay.MarkReplayBlockLogged())
             {
-                R34ResetReplay.firstReplayBlockLogged = true;
                 spdlog::error(
                     "VR R34 RESET: classic D3D9 state replay is unhealthy at {}; stereo remains fail-closed until a later clean ResetEx replay",
                     site ? site : "unknown");
@@ -181,18 +180,18 @@ namespace OutRunVRStereo
 
             if (!OutRunVR::Lifecycle::IsCompatResetDevice(device))
             {
-                R34ResetReplay.blocked.store(false, std::memory_order_release);
+                R34ResetReplay.SetBlocked(false);
                 OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
                 return hr;
             }
 
             const bool healthy = SUCCEEDED(hr) &&
                 OutRunVR::Lifecycle::ResetReplaySucceeded();
-            R34ResetReplay.blocked.store(!healthy, std::memory_order_release);
+            R34ResetReplay.SetBlocked(!healthy);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
             if (!healthy)
             {
-                ++R34ResetReplay.replayBlocks;
+                R34ResetReplay.NoteReplayBlock();
                 R34ForceResetReplayFailClosed(device, "Reset");
             }
             return hr;
@@ -208,14 +207,12 @@ namespace OutRunVRStereo
                 if (cooperative == D3DERR_DEVICELOST ||
                     cooperative == D3DERR_DEVICENOTRESET)
                 {
-                    ++R34ResetReplay.lostDeviceBypasses;
-                    R34ResetReplay.blocked.store(
-                        true, std::memory_order_release);
+                    R34ResetReplay.NoteLostDeviceBypass();
+                    R34ResetReplay.SetBlocked(true);
                     OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
                     ArmMonoSafety();
-                    if (!R34ResetReplay.firstLostDeviceBypassLogged)
+                    if (R34ResetReplay.MarkLostDeviceBypassLogged())
                     {
-                        R34ResetReplay.firstLostDeviceBypassLogged = true;
                         spdlog::warn(
                             "VR R34 DEVICE LOST: TestCooperativeLevel=0x{:08x}; skipping VR D3D work and forwarding raw Present until Reset restores the device",
                             static_cast<unsigned>(cooperative));
@@ -227,7 +224,7 @@ namespace OutRunVRStereo
             }
 
             const bool blocked = IsGameDevice(device) &&
-                R34ResetReplay.blocked.load(std::memory_order_acquire);
+                R34ResetReplay.IsBlocked();
             if (blocked)
                 R34ForceResetReplayFailClosed(device, "Present/pre");
 
@@ -325,8 +322,7 @@ namespace OutRunVRStereo
                     {
                         const bool healthy =
                             OutRunVR::Lifecycle::ResetReplaySucceeded();
-                        R34ResetReplay.blocked.store(!healthy,
-                            std::memory_order_release);
+                        R34ResetReplay.SetBlocked(!healthy);
                         OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(
                             !healthy);
                         if (!healthy)
