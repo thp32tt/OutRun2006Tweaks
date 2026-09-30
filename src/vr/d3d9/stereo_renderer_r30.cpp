@@ -3297,4 +3297,10 @@ namespace OutRunVRStereo
             device, type, minVertexIndex, numVertices, primitiveCount,
             indexData, indexFormat, vertexData, stride);
     }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    ScreenSpaceInstallState() noexcept
+    {
+        return R30InstallState.load(std::memory_order_acquire);
+    }
 }

@@ -3,6 +3,7 @@
 #include <d3d9.h>
 #include "screen_space_kind.hpp"
 #include "../renderer.hpp"
+#include "../runtime_eligibility.hpp"
 
 namespace OutRunVRStereo
 {
@@ -17,4 +18,6 @@ namespace OutRunVRStereo
         float eyeScale[2], float eyeOffset[2]) noexcept;
 
     void NoteScreenSpaceFovDraw() noexcept;
+    OutRunVR::RuntimeEligibility::InstallState
+    ScreenSpaceInstallState() noexcept;
 }

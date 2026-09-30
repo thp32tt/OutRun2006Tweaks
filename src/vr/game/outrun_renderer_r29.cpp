@@ -422,4 +422,10 @@ namespace OutRunVRRenderer
     {
         return R29RendererInstallState.load(std::memory_order_acquire);
     }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    RendererInstallState() noexcept
+    {
+        return R29RendererState();
+    }
 }

@@ -925,8 +925,8 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r30 = R30InstallState.load(std::memory_order_acquire);
-                const auto renderer = OutRunVRRenderer::R29RendererState();
+                const auto r30 = ScreenSpaceInstallState();
+                const auto renderer = OutRunVRRenderer::RendererInstallState();
                 if (r30 == State::Failed || renderer == State::Failed)
                 {
                     R31InstallState.store(State::Failed, std::memory_order_release);
