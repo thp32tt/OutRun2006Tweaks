@@ -2,9 +2,9 @@
   "task_id": "CONVERSION-DXVK-00141",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 2,
-  "controller_attempt": "2/3",
-  "chat_rollover": 2,
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 0,
   "base_sha": "a688f255661c8cfda81f86dab48878c1000b9ef7",
   "result_sha": "5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3",
   "validation_bearing_result_sha": "5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3",
@@ -132,7 +132,9 @@
     "prior_cancelled_sha": "6dbf927a958d9d9b7d666b8079e46de9fdbc7ca0",
     "prior_conclusion": "CANCELLED",
     "diagnosis": "The prior Backend Conversion Gate was superseded by later same-branch commits under cancel-in-progress while its Win32 Build step was running. All completed deterministic checks before cancellation had succeeded; this was not a reproduced source/test failure.",
-    "corrective_action": "Kept branch unchanged while validation-bearing result 5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3 completed all required hosted gates, avoiding another superseding commit until validation finished."
+    "corrective_action": "Kept branch unchanged while validation-bearing result 5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3 completed all required hosted gates, avoiding another superseding commit until validation finished.",
+    "controller_attempt_incremented": false,
+    "controller_note": "Superseded/cancelled probe validation is not a task failure or retry under QUEUE_CONTROLLER_CONTRACT; controller attempt remains 1/3."
   },
   "blocker": "Target-C raw outbound CALL instruction alignment is complete for 0x65997, 0x659AC, and 0x659C1, but helper semantic effects remain unresolved. Therefore guarded GF ScreenHud/renderer ownership must not be promoted from call alignment alone."
 }
