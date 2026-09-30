@@ -115,8 +115,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__Q00071_GATE_PASS_NO_A_COMPLETION_TIER__NO_QA_PENDING_REPEAT__B_OWNED_133_61_232_NOT_STOLEN__INDEX231_C156_STATIC_PASS_FINGERPRINT_REUSED__LEGACY_SCHEMA1_TO_CURRENT_SCHEMA16_ISOLATION_INPUT__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
+  "authoritative_result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): standardize index231 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00340]",
   "durable_task_record_in_result_commit": true,
@@ -125,6 +125,10 @@
     "head_sha": "6d647f5f23e4b95b72d5697071215686a2862414",
     "head_message": "chore(localization): record Q00071 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00337] [skip ci]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "No newer branch commit was present at the initial write-preparation refresh. Only A00340 lane-local report/manifest/task-record paths are planned."
-  }
+    "concurrent_changes_reviewed": "No newer branch commit was present at the initial write-preparation refresh. Only A00340 lane-local report/manifest/task-record paths were committed."
+  },
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate, owns no Localization Automation Gate, and does not alter candidate/shared state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T06:00:23+09:00",
+  "bookkeeping_base_head_sha": "4e3438375ede35e458e19303c5733710c71c608e",
+  "bookkeeping_preserved_head_message": "localization(A): standardize index231 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00340]"
 }
