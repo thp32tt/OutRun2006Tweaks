@@ -74,8 +74,8 @@ namespace OutRunVRStereo
             {
                 next.valid = true;
                 next.depthGeneration = R9MainDepthGeneration;
-                next.stateBlockRecordings = R31StateBlockRecordings;
-                next.stateBlockApplies = R31StateBlockApplies;
+                next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingCount();
+                next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyCount();
                 R33DepthStencilState = next;
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilSyncs;
@@ -121,8 +121,8 @@ namespace OutRunVRStereo
 
             next.valid = true;
             next.depthGeneration = R9MainDepthGeneration;
-            next.stateBlockRecordings = R31StateBlockRecordings;
-            next.stateBlockApplies = R31StateBlockApplies;
+            next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingCount();
+            next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyCount();
             R33DepthStencilState = next;
             if (R33TelemetryEnabled())
                 ++R33DepthStencilSyncs;
@@ -140,8 +140,8 @@ namespace OutRunVRStereo
             return R33DepthStencilState.valid &&
                 R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
                 R33DepthStencilState.stateBlockRecordings ==
-                    R31StateBlockRecordings &&
-                R33DepthStencilState.stateBlockApplies == R31StateBlockApplies;
+                    OutRunVR::State::StateBlockTracker::RecordingCount() &&
+                R33DepthStencilState.stateBlockApplies == OutRunVR::State::StateBlockTracker::ApplyCount();
         }
 
         bool R33GetWriteFlags(IDirect3DDevice9* device,
@@ -207,7 +207,7 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
-            if (R31StateBlockRecording)
+            if (OutRunVR::State::StateBlockTracker::IsRecording())
             {
                 R33InvalidateDepthStencilCache();
                 return hr;
@@ -264,7 +264,7 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R33TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (R31StateBlockRecording || !R29StableStereoBase(device))
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device))
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
@@ -438,7 +438,7 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
 
@@ -599,13 +599,13 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
             const char* site) noexcept
         {
-            if (!R31StateBlockRecording)
+            if (!OutRunVR::State::StateBlockTracker::IsRecording())
                 R31FlushPendingStateBlockResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
                 R31ObserveDraw(device);
 
-            if (R31StateBlockRecording)
+            if (OutRunVR::State::StateBlockTracker::IsRecording())
             {
                 if (telemetry)
                     ++R31Frame.fallback;

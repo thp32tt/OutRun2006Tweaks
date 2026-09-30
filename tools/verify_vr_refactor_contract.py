@@ -29,6 +29,12 @@ for marker in (
     "CoverageLost",
     "RequireResync",
     "ConsumeResync",
+    "BeginRecording",
+    "EndRecording",
+    "IsRecording",
+    "NoteApply",
+    "RecordingCount",
+    "ApplyCount",
 ):
     if marker not in tracker:
         errors.append(f"StateBlockTracker API missing marker: {marker}")
@@ -46,6 +52,9 @@ for legacy in (
     "R31StateBlockTrackingReliable",
     "R31StateBlockCoverageLost",
     "R31StateBlockResyncPending",
+    "R31StateBlockRecordings",
+    "R31StateBlockApplies",
+    "R31StateBlockRecording",
 ):
     for rel, source in (
         ("src/vr/d3d9/stereo_renderer_r22.cpp", r22),

@@ -53,10 +53,7 @@ namespace OutRunVRStereo
         std::uint64_t R31FastWorldDraws = 0;
         std::uint64_t R31FastWorldLiveValidations = 0;
         std::uint64_t R31FastWorldValidationRejects = 0;
-        std::uint64_t R31StateBlockApplies = 0;
-        std::uint64_t R31StateBlockRecordings = 0;
         std::uint64_t R31HudDraws = 0;
-        thread_local bool R31StateBlockRecording = false;
         bool R31FirstFastWorldLogged = false;
         bool R31FirstStateBlockLogged = false;
         bool R31FirstAlternateStateBlockLogged = false;
@@ -102,7 +99,7 @@ namespace OutRunVRStereo
                     R31Window.fastWorld, R31Window.hud, R31Window.fragile,
                     R31Window.unstable, R31Window.fallback,
                     R31FastWorldLiveValidations, R31FastWorldValidationRejects,
-                    R31StateBlockRecordings, R31StateBlockApplies);
+                    OutRunVR::State::StateBlockTracker::RecordingCount(), OutRunVR::State::StateBlockTracker::ApplyCount());
                 R31Window = {};
                 R31Window.lastLogMs = now;
             }
@@ -290,7 +287,7 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R31TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (R31StateBlockRecording || !R29StableStereoBase(device))
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device))
             {
                 if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
                     ++R31Frame.unstable;
@@ -455,7 +452,7 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
+            if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device) ||
                 screenKind != R30ScreenSpaceKind::Hud2D)
                 return {};
             if (!OutRunVR::State::StateBlockTracker::Reliable())
@@ -607,7 +604,7 @@ namespace OutRunVRStereo
             R31ObserveDraw(device);
             R31DiscardUnreliableDrawCaches();
 
-            if (R31StateBlockRecording)
+            if (OutRunVR::State::StateBlockTracker::IsRecording())
             {
                 ++R31Frame.fallback;
                 return actualDraw();
@@ -768,7 +765,7 @@ namespace OutRunVRStereo
                 const bool game = IsGameDevice(device);
                 if (game)
                 {
-                    ++R31StateBlockApplies;
+                    OutRunVR::State::StateBlockTracker::NoteApply();
                     R31MarkStateBlockCachesDirty();
                     if (!R31FirstStateBlockLogged)
                     {
@@ -863,8 +860,7 @@ namespace OutRunVRStereo
             const HRESULT hr = R31BeginStateBlockHook.stdcall<HRESULT>(device);
             if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
             {
-                R31StateBlockRecording = true;
-                ++R31StateBlockRecordings;
+                OutRunVR::State::StateBlockTracker::BeginRecording();
                 R31MarkStateBlockCachesDirty();
             }
             return hr;
@@ -875,13 +871,13 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R31EndStateBlockHook.stdcall<HRESULT>(device, block);
             if (IsGameDevice(device) &&
-                (!InternalStereoPass || R31StateBlockRecording))
+                (!InternalStereoPass || OutRunVR::State::StateBlockTracker::IsRecording()))
             {
                 if (SUCCEEDED(hr))
                 {
-                    R31StateBlockRecording = false;
+                    OutRunVR::State::StateBlockTracker::EndRecording();
                 }
-                else if (R31StateBlockRecording)
+                else if (OutRunVR::State::StateBlockTracker::IsRecording())
                 {
                     OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                     OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
@@ -1047,7 +1043,7 @@ namespace OutRunVRStereo
 
     bool IsGameStateBlockRecording() noexcept
     {
-        return R31StateBlockRecording;
+        return OutRunVR::State::StateBlockTracker::IsRecording();
     }
 
     bool IsStateBlockTrackingReliable() noexcept
