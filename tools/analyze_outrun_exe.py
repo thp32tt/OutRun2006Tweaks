@@ -97,13 +97,15 @@ GF_TARGET_B_HELPER_RVA = 0x000285A0
 GF_TARGET_B_HELPER_WINDOW = 128
 GF_TARGET_B_HELPER_FINGERPRINT_BYTES = 96
 
-# R141/F13: exact-byte instruction-boundary anchor for guarded-GF target C.
-# This proves only that the first raw outbound candidate at 0x65997 is an
-# instruction-aligned CALL from the reviewed 0x65970 prefix to 0x28460.
-# Helper semantics and draw ownership remain unresolved.
+# R142/F13: extend the exact-byte instruction-boundary anchor for guarded-GF
+# target C through the second raw outbound candidate. This proves only that
+# 0x65997 and 0x659AC are instruction-aligned CALLs from the reviewed 0x65970
+# prefix. Helper semantics and draw ownership remain unresolved.
 GF_TARGET_C_ENTRY_RVA = 0x00065970
 GF_TARGET_C_ALIGNED_CALL_RVA = 0x00065997
 GF_TARGET_C_ALIGNED_CALL_TARGET_RVA = 0x00028460
+GF_TARGET_C_SECOND_ALIGNED_CALL_RVA = 0x000659AC
+GF_TARGET_C_SECOND_ALIGNED_CALL_TARGET_RVA = 0x00028320
 GF_TARGET_C_PREFIX_INSTRUCTIONS = (
     (0x00065970, "56", "push esi"),
     (0x00065971, "8b f1", "mov esi, ecx"),
@@ -126,6 +128,14 @@ GF_TARGET_C_PREFIX_INSTRUCTIONS = (
     (0x00065996, "52", "push edx"),
     (0x00065997, "e8 c4 2a fc ff", "call rel32"),
     (0x0006599C, "83 c4 14", "add esp, 0x14"),
+    (0x0006599F, "eb 13", "jmp +0x13"),
+    (0x000659A1, "8b 46 18", "mov eax, [esi+0x18]"),
+    (0x000659A4, "8b 4e 14", "mov ecx, [esi+0x14]"),
+    (0x000659A7, "8b 16", "mov edx, [esi]"),
+    (0x000659A9, "50", "push eax"),
+    (0x000659AA, "51", "push ecx"),
+    (0x000659AB, "52", "push edx"),
+    (0x000659AC, "e8 6f 29 fc ff", "call rel32"),
 )
 
 
@@ -628,7 +638,7 @@ def collect_guarded_gf_target_b_helper_provenance(pe: PE) -> dict:
 
 
 def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
-    """Verify exact instruction alignment for 0x65997 -> 0x28460.
+    """Verify exact alignment for the first two CALLs from target C.
 
     The prefix is manually reviewed from the exact public EXE. This is an
     instruction-boundary/call-target proof only and cannot assign HUD ownership.
@@ -653,13 +663,20 @@ def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
         )
         expected_next = rva + len(expected)
 
-    call_bytes = pe.bytes_at_rva(GF_TARGET_C_ALIGNED_CALL_RVA, 5)
-    decoded_target_rva = None
-    if len(call_bytes) == 5 and call_bytes[0] == 0xE8:
-        rel = struct.unpack_from("<i", call_bytes, 1)[0]
-        decoded_target_rva = (
-            GF_TARGET_C_ALIGNED_CALL_RVA + 5 + rel
-        ) & 0xFFFFFFFF
+    def decode_call_target(call_rva: int):
+        call_bytes = pe.bytes_at_rva(call_rva, 5)
+        decoded_target_rva = None
+        if len(call_bytes) == 5 and call_bytes[0] == 0xE8:
+            rel = struct.unpack_from("<i", call_bytes, 1)[0]
+            decoded_target_rva = (call_rva + 5 + rel) & 0xFFFFFFFF
+        return call_bytes, decoded_target_rva
+
+    call_bytes, decoded_target_rva = decode_call_target(
+        GF_TARGET_C_ALIGNED_CALL_RVA
+    )
+    second_call_bytes, second_decoded_target_rva = decode_call_target(
+        GF_TARGET_C_SECOND_ALIGNED_CALL_RVA
+    )
 
     text_section = pe.section(".text")
     function_start_guess_rva = None
@@ -674,19 +691,36 @@ def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
             GF_TARGET_C_ENTRY_RVA - text_section.virtual_address,
         )
 
-    target_section = next(
-        (
-            section.name
-            for section in pe.sections
-            if section.contains_rva(GF_TARGET_C_ALIGNED_CALL_TARGET_RVA)
-        ),
-        "",
+    def section_name(rva: int) -> str:
+        return next(
+            (
+                section.name
+                for section in pe.sections
+                if section.contains_rva(rva)
+            ),
+            "",
+        )
+
+    target_section = section_name(GF_TARGET_C_ALIGNED_CALL_TARGET_RVA)
+    second_target_section = section_name(
+        GF_TARGET_C_SECOND_ALIGNED_CALL_TARGET_RVA
     )
     all_bytes_match = all(row["bytes_match"] for row in rows)
     entry_guess_matches = function_start_guess_rva == GF_TARGET_C_ENTRY_RVA
     call_target_matches = decoded_target_rva == GF_TARGET_C_ALIGNED_CALL_TARGET_RVA
+    second_call_target_matches = (
+        second_decoded_target_rva == GF_TARGET_C_SECOND_ALIGNED_CALL_TARGET_RVA
+    )
     call_row = next(
         (row for row in rows if row["rva"] == GF_TARGET_C_ALIGNED_CALL_RVA),
+        None,
+    )
+    second_call_row = next(
+        (
+            row
+            for row in rows
+            if row["rva"] == GF_TARGET_C_SECOND_ALIGNED_CALL_RVA
+        ),
         None,
     )
     call_is_layout_boundary = bool(
@@ -695,6 +729,17 @@ def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
         and call_bytes
         and call_bytes[0] == 0xE8
     )
+    second_call_is_layout_boundary = bool(
+        second_call_row
+        and second_call_row["bytes_match"]
+        and second_call_bytes
+        and second_call_bytes[0] == 0xE8
+    )
+    second_call_alignment_proven = bool(
+        second_call_is_layout_boundary
+        and second_call_target_matches
+        and second_target_section
+    )
     proven = bool(
         contiguous
         and all_bytes_match
@@ -702,6 +747,7 @@ def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
         and call_is_layout_boundary
         and call_target_matches
         and target_section
+        and second_call_alignment_proven
     )
     return {
         "entry_rva": GF_TARGET_C_ENTRY_RVA,
@@ -716,6 +762,15 @@ def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
         "expected_call_target_rva": GF_TARGET_C_ALIGNED_CALL_TARGET_RVA,
         "call_target_matches": call_target_matches,
         "call_target_section": target_section,
+        "second_aligned_call_rva": GF_TARGET_C_SECOND_ALIGNED_CALL_RVA,
+        "second_call_is_layout_boundary": second_call_is_layout_boundary,
+        "second_decoded_call_target_rva": second_decoded_target_rva,
+        "second_expected_call_target_rva": (
+            GF_TARGET_C_SECOND_ALIGNED_CALL_TARGET_RVA
+        ),
+        "second_call_target_matches": second_call_target_matches,
+        "second_call_target_section": second_target_section,
+        "second_call_alignment_proven": second_call_alignment_proven,
         "status": (
             "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN"
             if proven
@@ -724,7 +779,6 @@ def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
         "semantic_effect": "UNRESOLVED",
         "ownership_effect": "NONE",
     }
-
 
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
@@ -977,20 +1031,25 @@ def render_markdown(report: dict) -> str:
     )
     lines += [
         "",
-        "## Guarded GF target C first CALL instruction-boundary proof",
+        "## Guarded GF target C first/second CALL instruction-boundary proof",
         "",
-        "R141 exact-byte/manual-decode proof only. This establishes 0x65997 as "
-        "an aligned CALL from the reviewed 0x65970 prefix to 0x28460. It does "
-        "not establish helper semantics or ScreenHud ownership.",
+        "R142 exact-byte/manual-decode proof only. This extends the reviewed "
+        "0x65970 prefix through 0x659AC and establishes aligned CALLs to "
+        "0x28460 and 0x28320. It does not establish helper semantics or "
+        "ScreenHud ownership.",
         "",
         f"- Status: {target_c['status']}",
         f"- Entry anchor: {hexrva(target_c['entry_rva'])}",
         f"- Function-start guess: {hexrva(target_c['function_start_guess_rva'])}",
         f"- Layout contiguous: {target_c['layout_contiguous']}",
         f"- All instruction bytes match: {target_c['all_instruction_bytes_match']}",
-        f"- Aligned CALL: {hexrva(target_c['aligned_call_rva'])} -> "
+        f"- First aligned CALL: {hexrva(target_c['aligned_call_rva'])} -> "
         f"{hexrva(target_c['decoded_call_target_rva'])} "
         f"({target_c['call_target_section'] or '-'})",
+        f"- Second aligned CALL: {hexrva(target_c['second_aligned_call_rva'])} -> "
+        f"{hexrva(target_c['second_decoded_call_target_rva'])} "
+        f"({target_c['second_call_target_section'] or '-'})",
+        f"- Second CALL proof: {target_c['second_call_alignment_proven']}",
         f"- Semantic effect: {target_c['semantic_effect']}",
         f"- Ownership effect: {target_c['ownership_effect']}",
         f"- Reviewed prefix: {target_c_rows}",
@@ -1185,6 +1244,10 @@ def main() -> int:
         f"call=0x{target_c['aligned_call_rva']:08X} "
         f"target={hexrva(target_c['decoded_call_target_rva'])} "
         f"target_section={target_c['call_target_section'] or 'none'} "
+        f"second_call=0x{target_c['second_aligned_call_rva']:08X} "
+        f"second_target={hexrva(target_c['second_decoded_call_target_rva'])} "
+        f"second_target_section={target_c['second_call_target_section'] or 'none'} "
+        f"second_call_proven={target_c['second_call_alignment_proven']} "
         f"semantic_effect={target_c['semantic_effect']} "
         f"ownership_effect={target_c['ownership_effect']}"
     )
