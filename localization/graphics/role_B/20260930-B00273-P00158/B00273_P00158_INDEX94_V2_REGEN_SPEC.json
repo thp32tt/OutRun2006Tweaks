@@ -1,0 +1,525 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00273-p00158-index94-v2-regeneration-constraints-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00273",
+  "wave_id": "P00158",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T19:42:12.451+09:00",
+  "base_head_sha": "019b17c0f0d0d3489d4a6a537d2217c65af003bc",
+  "asset": {
+    "index": 94,
+    "id": "2DA43E41",
+    "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "canvas": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "source_text_transform": "flip_y",
+    "source_git_blob_sha": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+    "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "candidate_git_blob_sha": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+    "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563"
+  },
+  "rationale": "Current HEAD has no B-owned RENDER_READY or ONE_STAGE_TO_RENDER asset and all B runtime-isolation fallbacks are already present. Index94 remains REWORK_REQUIRED, but its historical B93 repair used flattened-raster LANCZOS scaling that is forbidden by the current v2 safe-fit contract. This record converts the unpersisted C85/B93 geometry into a current-policy regeneration spec instead of retrying the retired method.",
+  "source_evidence_fingerprints": {
+    "a84_report_blob_sha": "1ee9bacca48ddaddfef44f042b8e164f412e700d",
+    "b91_actions_blob_sha": "04ccefa9c798ed71176f4cd8905255246efb9199",
+    "c85_report_blob_sha": "1d28abd16cce18f15f999d4e390ad3c04b440f8a",
+    "b93_task_blob_sha": "a57c001cf1ae6dfb8b698ef28cc756634a7ddc8c",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "current_controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580"
+  },
+  "regeneration_scope": {
+    "c85_failed_elements": 7,
+    "keys": [
+      "course_sp",
+      "wait_now",
+      "acceleration",
+      "max_speed",
+      "view_change",
+      "expert",
+      "special_course"
+    ],
+    "preserve_unchanged_elements": [
+      "course_or2",
+      "wait_other",
+      "handling",
+      "single_play"
+    ],
+    "preserve_original_artwork": [
+      "OutRun2",
+      "OutRun2: SP",
+      "Keep Your Heart -1989-",
+      "4P",
+      "3P",
+      "2P",
+      "1P",
+      "6",
+      "5",
+      "4",
+      "987",
+      "course-map artwork",
+      "character artwork",
+      "player indicators"
+    ],
+    "elements": [
+      {
+        "key": "course_sp",
+        "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+        "korean": "OutRun2: SP · 15코스 연속 / 선택되었습니다.",
+        "cell": [
+          102,
+          461,
+          2125,
+          717
+        ],
+        "source_bbox": [
+          132,
+          488,
+          2078,
+          717
+        ],
+        "current_bbox": [
+          494,
+          477,
+          1733,
+          697
+        ],
+        "a84": {
+          "style": "select_two",
+          "lines": [
+            {
+              "line": 1,
+              "font_size": 96,
+              "xscale": 1,
+              "outer_stroke": 6
+            },
+            {
+              "line": 2,
+              "font_size": 96,
+              "xscale": 1,
+              "outer_stroke": 6
+            }
+          ]
+        },
+        "b91": [
+          494,
+          489,
+          1733,
+          709
+        ],
+        "b91_scale": 1,
+        "candidate_safe_bbox_display": [
+          134,
+          490,
+          2076,
+          715
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          134,
+          3380,
+          2076,
+          3605
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          360,
+          343,
+          -1,
+          6
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      },
+      {
+        "key": "wait_now",
+        "source": "Now waiting for other players. Please stand by.",
+        "korean": "현재 다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+        "cell": [
+          2189,
+          461,
+          3776,
+          717
+        ],
+        "source_bbox": [
+          2228,
+          461,
+          3776,
+          717
+        ],
+        "current_bbox": [
+          2204,
+          476,
+          3763,
+          697
+        ],
+        "a84": {
+          "style": "wait_two",
+          "lines": [
+            {
+              "line": 1,
+              "font_size": 96,
+              "xscale": 0.946,
+              "outer_stroke": 6
+            },
+            {
+              "line": 2,
+              "font_size": 96,
+              "xscale": 1,
+              "outer_stroke": 6
+            }
+          ]
+        },
+        "b91": [
+          2229,
+          477,
+          3775,
+          696
+        ],
+        "b91_scale": 0.991661,
+        "candidate_safe_bbox_display": [
+          2230,
+          463,
+          3774,
+          715
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          2230,
+          3380,
+          3774,
+          3632
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          -1,
+          -1,
+          14,
+          19
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      },
+      {
+        "key": "acceleration",
+        "source": "加速度:",
+        "korean": "가속:",
+        "cell": [
+          3789,
+          230,
+          4045,
+          320
+        ],
+        "source_bbox": [
+          3826,
+          247,
+          4016,
+          320
+        ],
+        "current_bbox": [
+          3816,
+          244,
+          4018,
+          307
+        ],
+        "a84": {
+          "font_size": 66,
+          "outer_stroke": 1,
+          "inner_stroke": 0,
+          "xscale": 1,
+          "style": "plain_white",
+          "shear": 0
+        },
+        "b91": [
+          3827,
+          248,
+          4015,
+          306
+        ],
+        "b91_scale": 0.930693,
+        "candidate_safe_bbox_display": [
+          3828,
+          249,
+          4014,
+          318
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          3828,
+          3777,
+          4014,
+          3846
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          -1,
+          -1,
+          -1,
+          12
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      },
+      {
+        "key": "max_speed",
+        "source": "最高速:",
+        "korean": "최고 속도:",
+        "cell": [
+          3789,
+          312,
+          4045,
+          410
+        ],
+        "source_bbox": [
+          3827,
+          319,
+          4018,
+          410
+        ],
+        "current_bbox": [
+          3797,
+          327,
+          4037,
+          395
+        ],
+        "a84": {
+          "font_size": 72,
+          "outer_stroke": 1,
+          "inner_stroke": 0,
+          "xscale": 0.8108,
+          "style": "plain_white",
+          "shear": 0
+        },
+        "b91": [
+          3828,
+          334,
+          4017,
+          387
+        ],
+        "b91_scale": 0.7875,
+        "candidate_safe_bbox_display": [
+          3829,
+          321,
+          4016,
+          408
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          3829,
+          3687,
+          4016,
+          3774
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          -1,
+          -1,
+          13,
+          21
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      },
+      {
+        "key": "view_change",
+        "source": "View Change Button :",
+        "korean": "시점 변경 버튼:",
+        "cell": [
+          3430,
+          998,
+          3955,
+          1114
+        ],
+        "source_bbox": [
+          3430,
+          998,
+          3896,
+          1102
+        ],
+        "current_bbox": [
+          3443,
+          1009,
+          3933,
+          1103
+        ],
+        "a84": {
+          "font_size": 90,
+          "outer_stroke": 5,
+          "inner_stroke": 3,
+          "xscale": 0.8832,
+          "style": "view_change",
+          "shear": 0.09
+        },
+        "b91": [
+          3431,
+          1012,
+          3895,
+          1101
+        ],
+        "b91_scale": 0.946939,
+        "candidate_safe_bbox_display": [
+          3432,
+          1000,
+          3894,
+          1100
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          3432,
+          2995,
+          3894,
+          3095
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          -1,
+          -1,
+          12,
+          -1
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      },
+      {
+        "key": "expert",
+        "source": "For Expert Drivers",
+        "korean": "상급자용",
+        "cell": [
+          2842,
+          1088,
+          3482,
+          1229
+        ],
+        "source_bbox": [
+          2842,
+          1124,
+          3479,
+          1229
+        ],
+        "current_bbox": [
+          2953,
+          1099,
+          3355,
+          1218
+        ],
+        "a84": {
+          "font_size": 109,
+          "outer_stroke": 8,
+          "inner_stroke": 3,
+          "xscale": 1,
+          "style": "expert_red",
+          "shear": 0.08
+        },
+        "b91": [
+          2980,
+          1125,
+          3327,
+          1228
+        ],
+        "b91_scale": 0.865546,
+        "candidate_safe_bbox_display": [
+          2844,
+          1126,
+          3477,
+          1227
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          2844,
+          2868,
+          3477,
+          2969
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          136,
+          150,
+          -1,
+          -1
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      },
+      {
+        "key": "special_course",
+        "source": "Special Course",
+        "korean": "스페셜 코스",
+        "cell": [
+          3098,
+          1254,
+          3930,
+          1421
+        ],
+        "source_bbox": [
+          3137,
+          1279,
+          3879,
+          1403
+        ],
+        "current_bbox": [
+          3183,
+          1265,
+          3830,
+          1409
+        ],
+        "a84": {
+          "font_size": 133,
+          "outer_stroke": 10,
+          "inner_stroke": 4,
+          "xscale": 1,
+          "style": "special_yellow",
+          "shear": 0.08
+        },
+        "b91": [
+          3232,
+          1280,
+          3780,
+          1402
+        ],
+        "b91_scale": 0.847222,
+        "candidate_safe_bbox_display": [
+          3139,
+          1281,
+          3877,
+          1401
+        ],
+        "candidate_safe_bbox_raw_flip_y": [
+          3139,
+          2694,
+          3877,
+          2814
+        ],
+        "b91_target_margins_vs_v2_safe_lrtb": [
+          93,
+          97,
+          -1,
+          -1
+        ],
+        "b91_target_meets_v2_2px_safe": false,
+        "historical_render_params_status": "STYLE_SEED_ONLY_NOT_CURRENT_V2_APPROVAL"
+      }
+    ]
+  },
+  "cross_check": {
+    "all_historical_b91_targets_fail_current_2px_safe_inset": true,
+    "note": "B91 targets were valid historical containment targets but every one touches or crosses the current mandatory 2px v2 safe inset on at least one side. They are geometry history only, not current render targets."
+  },
+  "deterministic_next_stage": [
+    "Build a source-effect removal mask for each of the seven elements from the exact canonical source; detection rectangles are hints only.",
+    "Generate and independently validate a clean plate per element with zero changed pixels outside the removal mask, zero protected-mask changes, and zero alpha changes outside the mask.",
+    "Measure readable-space baseline, signed slant, weight, fill/outline/shadow hierarchy from the exact English source for each style family.",
+    "Rerender Korean glyph/effect geometry from the approved text and style seed; do not resize a flattened candidate raster.",
+    "Require the final effect-inclusive Korean bbox to remain inside candidate_safe_bbox_display and the mapped raw flip_y bbox with at least 2px margin.",
+    "Encode exact RGBA32 4096x4096 mip1 DDS with source header behavior, decode again, and run containment/protected/alpha/residue checks.",
+    "Persist mandatory KOREAN_PNG_REVIEW source/clean/candidate/comparison + prompt + machine-readable QA and perform exact ENGLISH SOURCE comparison."
+  ],
+  "fail_closed_missing_prerequisites": [
+    "independently validated v2 clean_plate for the seven-element removal masks",
+    "current-policy font/source-letterform provenance sufficient to regenerate glyphs without flattened-raster scaling",
+    "per-element source-style/signed-slant measurements under current orientation policy"
+  ],
+  "readiness_before": "REWORK_REQUIRED__B93_THREE_ATTEMPT_BLOCKER__HISTORICAL_RASTER_RESIZE_METHOD",
+  "readiness_after": "PREFLIGHT_ONLY_V2_REGEN_CONSTRAINTS_READY__CLEAN_PLATE_AND_SOURCE_STYLE_PROVENANCE_REQUIRED",
+  "render_attempted": false,
+  "render_not_attempted_reason": "The new evidence intentionally retires the only historical automatic repair method. Current HEAD lacks an independently validated v2 clean plate and source-letterform/font provenance for a safe native glyph rerender; therefore the asset is not RENDER_READY/ONE_STAGE_TO_RENDER after this evidence.",
+  "candidate_dds_modified": false,
+  "material_deliverable": true,
+  "materially_reduces_unresolved_work": true,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
