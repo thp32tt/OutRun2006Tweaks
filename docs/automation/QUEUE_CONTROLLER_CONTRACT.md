@@ -25,6 +25,14 @@ Each task must update or add a durable record under `docs/automation/runs/` cont
 - Runtime-untested work may continue when the next task is independent.
 - Runtime-dependent follow-up work must be marked BLOCKED_RUNTIME and skipped in favor of another runnable task.
 
+## GitHub access and permission classification
+- Repository access MUST be determined from the authenticated GitHub repository metadata, not inferred from a failed file lookup, missing run record, unsupported endpoint, or an unavailable local/N100 workspace.
+- For `thp32tt/OutRun2006Tweaks`, a fresh repository permission response with `permissions.push=true` (or `maintain=true` / `admin=true`) is authoritative evidence that direct branch writes are available to the worker.
+- HTTP 404 for an expected path means PATH_OR_REF_NOT_FOUND unless a fresh repository permission check independently proves access loss. It MUST NOT be reported as `GITHUB_PERMISSION_DENIED`.
+- Unsupported connector/API operations, stale blob SHA conflicts, branch-HEAD races, validation failures, and rate limits MUST retain their specific failure class and MUST NOT be collapsed into a permission error.
+- Before stopping a localization lane for alleged GitHub write denial, refresh repository permissions and branch HEAD. Stop for permission denial only when the authenticated permission check shows no push/maintain/admin capability or an actual write returns an authorization-specific 401/403 after refresh.
+- When permissions are valid, recover the lane from current GitHub HEAD and continue incomplete work; do not create an alternate repository, branch, clone, or worktree.
+
 ## Controller runtime recovery and WAIT_ACTIONS liveness
 - `WAIT_ACTIONS` is a transient controller state, never a terminal state and never a reason to stop queue progression indefinitely.
 - Once a lane has a concrete `gate_run.id`, the controller MUST poll that exact GitHub Actions run by run ID. Cached workflow-run discovery/list responses are non-authoritative after a run ID is bound.
