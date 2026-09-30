@@ -227,6 +227,11 @@ GF_TARGET_C_HELPER_1_FIRST_CALLEE_POOL_BASE = 0x0095E028
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_POOL_STRIDE = 0x1F00
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_SLOT_STRIDE = 0x7C
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_RING_SIZE = 0x40
+# R152/F13: fresh exact-EXE continuation capture after the proven 0x282B0
+# slot-scan prefix. This is provenance only; no continuation semantics or
+# render/ScreenHud ownership are inferred from raw bytes/call candidates.
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_RVA = 0x0002830A
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_PROBE_LEN = 96
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_INSTRUCTIONS = (
     (0x000282B0, "8b 0c 85 58 65 95 00", "mov ecx, [eax*4+0x956558]"),
     (0x000282B7, "57", "push edi"),
@@ -563,6 +568,58 @@ def collect_guarded_gf_target_provenance(pe: PE) -> list[dict]:
             }
         )
     return out
+
+
+def collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe: PE) -> dict:
+    """Capture a fresh exact-EXE window beginning at the proven 0x2830A boundary.
+
+    R150 proves complete instructions through 0x28309. This collector starts at
+    the exclusive end boundary and captures a new bounded byte/call window for
+    later instruction review. It does not decode or promote callee semantics.
+    """
+
+    prefix = collect_guarded_gf_target_c_helper_1_first_callee_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_PROBE_LEN
+    )
+    predecessor_exact = (
+        prefix["status"] == "EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN"
+        and prefix["prefix_end_rva"] == target_rva
+        and prefix["target_section"] == ".text"
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_PROBE_LEN
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "probe_len": GF_TARGET_C_HELPER_1_FIRST_CALLEE_CONTINUATION_PROBE_LEN,
+        "bytes": probe.hex(" "),
+        "predecessor_status": prefix["status"],
+        "predecessor_end_rva": prefix["prefix_end_rva"],
+        "predecessor_exact": predecessor_exact,
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED"
+            if captured
+            else "FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "full_callee_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
 
 
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
@@ -1731,6 +1788,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_prefix_proof": collect_guarded_gf_target_c_helper_1_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_success_prefix_proof": collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_first_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_first_callee_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_first_callee_continuation_provenance": collect_guarded_gf_target_c_helper_1_first_callee_continuation_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -1924,6 +1982,28 @@ def main() -> int:
         f"full_semantics={first_callee_prefix['full_callee_semantics']} "
         f"ownership_effect={first_callee_prefix['ownership_effect']}"
     )
+    first_callee_cont = report["guarded_gf_target_c_helper_1_first_callee_continuation_provenance"]
+    first_callee_cont_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in first_callee_cont["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_first_callee_continuation=0x{first_callee_cont['target_rva']:08X} "
+        f"status={first_callee_cont['status']} "
+        f"predecessor_status={first_callee_cont['predecessor_status']} "
+        f"predecessor_end={hexrva(first_callee_cont['predecessor_end_rva'])} "
+        f"predecessor_exact={first_callee_cont['predecessor_exact']} "
+        f"section={first_callee_cont['target_section'] or 'none'} "
+        f"probe_len={first_callee_cont['probe_len']} "
+        f"inbound_raw={len(first_callee_cont['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(first_callee_cont['raw_outbound_rel32_candidates'])} "
+        f"outbound={first_callee_cont_outbound} "
+        f"semantic_effect={first_callee_cont['semantic_effect']} "
+        f"full_semantics={first_callee_cont['full_callee_semantics']} "
+        f"ownership_effect={first_callee_cont['ownership_effect']} "
+        f"bytes={first_callee_cont['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -1950,6 +2030,9 @@ def main() -> int:
     if first_callee_prefix["status"] != "EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN":
         print("guarded_gf_target_c_helper_1_first_callee_prefix_proof=FAILED")
         return 8
+    if first_callee_cont["status"] != "EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_first_callee_continuation_provenance=FAILED")
+        return 9
     return 0
 
 
