@@ -1,0 +1,145 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00328-p00203-producer-result-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00328",
+  "wave_id": "P00203",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T05:04:42+09:00",
+  "base_head_sha": "c6acbcdf4e1d590f254b12ea8f9973351f181347",
+  "controller_schema_version": 16,
+  "controller_config_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+  "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+  "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+  "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+  "latest_c_accepted": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00321",
+    "qa_batch_id": "Q00068",
+    "result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "automation_validation": "PASS",
+    "validation_mode": "C_BATCH_GATE",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "runnable_production": [],
+    "candidate_qa_pending_indices": [
+      159,
+      163,
+      198,
+      201
+    ],
+    "preflight_only_accepted_indices": [
+      133,
+      147,
+      232
+    ],
+    "preflight_only_out_of_batch_qa_pending_indices": [
+      94,
+      111
+    ]
+  },
+  "current_head_concurrency": {
+    "refreshed_head_before_material": "c6acbcdf4e1d590f254b12ea8f9973351f181347",
+    "preserved_peer_change": "A00327 timestamp/bookkeeping plus prior A00327 material",
+    "stale_state_overwrite": false
+  },
+  "targets": [
+    {
+      "index": 55,
+      "asset": "2EA557B4",
+      "path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "index_mod_3": 1,
+      "owned_by_lane": true
+    },
+    {
+      "index": 154,
+      "asset": "4D38BBB0",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "index_mod_3": 1,
+      "owned_by_lane": true
+    }
+  ],
+  "result": "PASS_MATERIAL_B_SINGLE_PREFLIGHT_BATCH_INDICES55_154_APPROVED_SOURCE_TIERS_EXHAUSTED_STICKY_NO_CANDIDATE_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD/schema16 scan against latest accepted C00321/Q00068 found no B-owned runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework. Newer B results for indices163/94/232/133 remain C-QA-pending and were not repeated. One permitted PREFLIGHT_ONLY batch advanced indices55 and154 by exhausting all currently approved canonical-source tiers. For index55, Drive exact path is absent, immutable v0.25.10a direct-file returns 404, and the verified pinned Release member b2d5b03a... is 2048x256 DXT5 rather than canonical 512x64 RGBA SHA 8a39e88b.... For index154, Drive exact path is absent, immutable direct-file returns 404, and verified Release member 15a10e6b... is 4096x1024 RGBA but still byte-identical mismatch versus canonical SHA 666511c5.... No alias/newer-source substitution or pixel geometry was fabricated. Both assets are now sticky SOURCE_ACQUISITION_EXHAUSTED until a canonical-source dependency fingerprint or policy change. Runtime remains UNTESTED.",
+  "readiness_scan": {
+    "direct_rework_required_runnable_indices": [],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "existing_candidate_rework_runnable_indices": [],
+    "qa_pending_not_repeated": [
+      94,
+      133,
+      163,
+      232
+    ],
+    "selected_priority": "ONE_PREFLIGHT_BATCH_SOURCE_ACQUISITION_FINALIZATION_INDICES55_154",
+    "max_new_preflight_batches_used": 1
+  },
+  "readiness_after": {
+    "55": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_STICKY",
+    "154": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_STICKY"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "TWO_B_SHARD_CANONICAL_SOURCE_ACQUISITION_EXHAUSTION_MANIFESTS",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "material_report_commit_sha": "8eb2fb5957d4884eac0756e6cd8fab4f13527d39",
+    "material_report_blob_sha": "d0fdf69e44c64da951f0c5034c507858580a1861",
+    "material_payload_visible_at_result_sha": true,
+    "exact_remaining_blocker": "Canonical bytes matching inventory SHA-256 for index55 and index154 must become available through an approved source tier or project policy/inventory must explicitly change."
+  },
+  "source_transport": {
+    "approved_drive_account": "ezflash557",
+    "google_drive_used": true,
+    "index55": {
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH_B2D5B03A_VS_CANONICAL_8A39E88B",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    },
+    "index154": {
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_TRANSPORT_MISS_404",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH_15A10E6B_VS_CANONICAL_666511C5",
+      "final": "SOURCE_ACQUISITION_EXHAUSTED"
+    }
+  },
+  "self_qa": "PASS_B_SHARD_55_154__LATEST_C_READY_ZERO__QA_PENDING_94_133_163_232_SKIPPED__ONE_PREFLIGHT_BATCH__PINNED_ZIP_SHA_EXACT__DRIVE_EXACT_PATH_MISS_2_OF_2__DIRECT_404_2_OF_2__RELEASE_MEMBER_IDENTITY_MISMATCH_2_OF_2__NO_ALIAS_SUBSTITUTION__NO_PIXEL_GEOMETRY_FABRICATION__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "report": "localization/graphics/role_B/20261001-B00328-P00203/B00328_P00203_INDEX55_INDEX154_SOURCE_ACQUISITION_EXHAUSTION.json",
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00328-P00203/B00328_P00203_INDEX55_INDEX154_SOURCE_ACQUISITION_EXHAUSTION.json",
+    "C00321/Q00068 latest accepted readiness reconciliation",
+    "A00131/C122 current index55 canonical identity and retired Release geometry",
+    "B00138/C122 current index154 canonical identity and six semantics",
+    "verified pinned OR2-HD-GUI-v0.25.10a.zip SHA-256 76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(B): finalize source exhaustion for indices55 154 [AUTO:LOCALIZATION-LOCALIZATION_B-00328]",
+  "precommit_refresh": {
+    "head_sha": "8eb2fb5957d4884eac0756e6cd8fab4f13527d39",
+    "head_message": "localization(B): close source tiers for indices55 154 [AUTO:LOCALIZATION-LOCALIZATION_B-00328] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Latest peer A00327 changes were already present before the lane-local material commit. Only B00328 lane-local evidence/task files are added."
+  },
+  "bookkeeping_note": "Result SHA will be bound by a separate bookkeeping commit after the durable producer task commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "durable_task_record_in_result_commit": true
+}
