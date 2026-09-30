@@ -19,6 +19,7 @@
 #include "../lifecycle/raw_present.hpp"
 #include "../lifecycle/reset_replay_health.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
+#include "../lifecycle/reset_replay_policy.hpp"
 
 namespace OutRunVRStereo
 {
@@ -184,8 +185,8 @@ namespace OutRunVRStereo
                 return hr;
             }
 
-            const bool healthy = SUCCEEDED(hr) &&
-                OutRunVR::Lifecycle::ResetReplaySucceeded();
+            const bool healthy = OutRunVR::Lifecycle::ResetReplayHealthy(
+                SUCCEEDED(hr), OutRunVR::Lifecycle::ResetReplaySucceeded());
             R34ResetReplay.SetBlocked(!healthy);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
             if (!healthy)
@@ -203,8 +204,7 @@ namespace OutRunVRStereo
             if (device && IsGameDevice(device))
             {
                 const HRESULT cooperative = device->TestCooperativeLevel();
-                if (cooperative == D3DERR_DEVICELOST ||
-                    cooperative == D3DERR_DEVICENOTRESET)
+                if (OutRunVR::Lifecycle::DeviceNeedsResetBypass(cooperative))
                 {
                     R34ResetReplay.NoteLostDeviceBypass();
                     R34ResetReplay.SetBlocked(true);
