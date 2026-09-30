@@ -1540,3 +1540,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00319@index94: **PASS PREFLIGHT_ONLY**, 6/7 removal masks resolved; course_sp protected-prefix split/CLEAN_PLATE remain.
 - A00320@index111: **PASS PREFLIGHT_ONLY**, 3,960 proposal-resolved / 8,221 unresolved; RANDOM protected-art work remains.
 - Candidate QA backlog: **159/198/201**. Authoritative **RENDER_READY none / ONE_STAGE_TO_RENDER none**; out-of-batch producer handoffs remain QA_PENDING. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### Q00069 Gate correction — 2026-10-01 05:19 KST
+- Prior result `77881b51...` Gate `36771464265` failed only the exact-producer-SHA step; earlier state/v2/domain/payload/lane checks passed.
+- **A00320@index111: REWORK_REQUIRED** — numeric replay passes, but immutable result SHA lacks a same-commit durable task-record/material change. Do not promote the 8,221-unresolved scope; retain Q00067/A00309 authority and re-emit under one valid SHA.
+- B00315@index163, A00318@index99, B00319@index94 remain PASS. Replacement C result: `AUTOMATION_VALIDATION=PENDING`; runtime UNTESTED.

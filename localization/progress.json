@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T05:15:00+09:00",
+  "updated_at_kst": "2026-10-01T05:19:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C171/Q00069 PRE-GATE: B00315@index163 PASS STATIC_QA -> PRODUCTION_COMPLETE; A00318@index99 PASS current-workflow DDS_ONLY isolation on unchanged C139 candidate; B00319@index94 PASS PREFLIGHT_ONLY with 6/7 masks resolved; A00320@index111 PASS PREFLIGHT_ONLY with 8,221 unresolved. Candidate QA backlog 159/198/201. Newer producer outputs outside Q00069 remain QA_PENDING. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C171/Q00069 CORRECTION PRE-GATE: B00315@index163 PASS STATIC_QA -> PRODUCTION_COMPLETE; A00318@index99 PASS DDS_ONLY isolation; B00319@index94 PASS PREFLIGHT_ONLY; A00320@index111 REWORK_REQUIRED because immutable 9f45de59 result does not change its durable task record/material payload, despite numeric replay PASS. Retain Q00067/A00309 index111 authority. Candidate QA backlog 159/198/201. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1156,8 +1156,8 @@
     "base_head_sha": "bc638b6d041f9dd77ed4467661f7c9c0a7714845",
     "base_sha": "bc638b6d041f9dd77ed4467661f7c9c0a7714845",
     "commit_mode": "VALIDATION_BEARING_RESULT",
-    "result": "PASS_Q00069_INDEX163_STATIC_QA_INDEX99_ISOLATION_INDEX94_INDEX111_PREFLIGHT_RUNTIME_UNTESTED",
-    "summary": "Q00069 consumes immutable B00315/A00318/B00319/A00320 once. B00315@index163 closes the Q00066 review-lineage-only blocker and passes independent static QA on exact current candidate fcb75cef..., making index163 PRODUCTION_COMPLETE while runtime remains UNTESTED. A00318@index99 passes only as a current-workflow DDS_ONLY isolation input on the unchanged C139 static-QA candidate. B00319@index94 exact-source mask segmentation independently reproduces 357,200 source-effect pixels but leaves the protected course_sp first-line split unresolved, so it remains PREFLIGHT_ONLY. A00320@index111 independently reproduces 3,960 proposed source-only resolutions / 1,718 actual source changes with 8,221 pixels still unresolved and remains PREFLIGHT_ONLY. No candidate DDS is rewritten by C and no runtime test is performed.",
+    "result": "PASS_Q00069_INDEX163_STATIC_QA_INDEX99_ISOLATION_INDEX94_PREFLIGHT_A00320_REWORK_RESULT_COMMIT_RUNTIME_UNTESTED",
+    "summary": "Q00069 consumes immutable B00315/A00318/B00319/A00320 once. B00315@index163 passes independent static QA on exact current candidate fcb75cef... and becomes PRODUCTION_COMPLETE. A00318@index99 passes only as a current-workflow DDS_ONLY isolation input on the unchanged C139 static-QA candidate. B00319@index94 exact-source segmentation independently reproduces 357,200 source-effect pixels and passes PREFLIGHT_ONLY with the protected course_sp first-line split still unresolved. A00320@index111 numerically replays its source-only proposal, but its immutable RESULT_SHA changes only the analyzer and fails exact-producer automation-commit structure because the durable task record/material payload is not changed in that same SHA; this input alone is REWORK_REQUIRED and its newer 8,221-unresolved scope is not promoted. Runtime remains UNTESTED.",
     "qa_batch_inputs": [
       {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00315",
@@ -1225,9 +1225,9 @@
       {
         "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
         "result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
-        "status": "PASS",
+        "status": "REWORK_REQUIRED",
         "production_readiness": "PREFLIGHT_ONLY",
-        "reason": "Index111/C075FB49 source-only Tuned/Normal proposal independently replays on exact canonical target a8942f07... and donor411 bad9701a... (2048x2048 RGBA32 mip1). C reproduces unresolved 3,689/3,300, proposal-resolved 1,719/2,241 (3,960 total), 1,718 actual source-pixel changes, 8,221 aggregate unresolved pixels, and zero outside-mask, alpha or protected-guard changes. RANDOM remains fail-closed; a full independently approved CLEAN_PLATE and candidate are not yet available, so readiness remains PREFLIGHT_ONLY."
+        "reason": "Index111/C075FB49 source-only Tuned/Normal proposal is numerically reproducible on exact canonical target/donor, but immutable producer RESULT_SHA 9f45de59... changes only analyze_index111_tuned_normal_core_reconstruction.py and does not carry the durable task record/material payload in that same result commit. The C batch exact-producer Gate therefore cannot validate it as PASS. Return only this producer input as REWORK_REQUIRED: re-emit the already-reproduced material plus durable task record under one valid result SHA. Do not merge the 8,221-unresolved improvement; retain the prior Q00067/A00309 PREFLIGHT_ONLY authority. Runtime remains UNTESTED."
       }
     ],
     "input_fingerprint": {
@@ -1427,7 +1427,10 @@
         "protected_guard_overlap_pixels": 0,
         "random_state": "UNCHANGED_FAIL_CLOSED_PROTECTED_QUESTION_MARK",
         "production_readiness": "PREFLIGHT_ONLY",
-        "runtime_validation": "UNTESTED"
+        "runtime_validation": "UNTESTED",
+        "numeric_replay": "PASS_EXACT",
+        "producer_commit_gate": "REWORK_REQUIRED_DURABLE_TASK_RECORD_NOT_CHANGED_IN_IMMUTABLE_RESULT_SHA",
+        "promotion_authorized": false
       }
     },
     "readiness_reconciliation": {
@@ -1508,22 +1511,32 @@
         99
       ],
       "candidate_completion_priority": [
-        "RENDER_READY: none authoritative after Q00069.",
-        "ONE_STAGE_TO_RENDER: none authoritative after Q00069. B00322@index232 and B00324@index133 producer handoffs claim one-stage-to-render readiness but remain out-of-batch C-QA pending and are not implicitly accepted.",
-        "CANDIDATE_AWAITING_C: indices159/198/201. Keep these candidate results ahead of unrelated PREFLIGHT_ONLY expansion.",
-        "PREFLIGHT_ONLY ACCEPTED: index94 B00319 exact-source segmentation is accepted with 6/7 masks resolved; finish course_sp protected-prefix split, CLEAN_PLATE and final safe geometry before render. Index111 A00320 Tuned/Normal core proposal is accepted with 8,221 pixels still unresolved including RANDOM; complete protected-art CLEAN_PLATE work before render.",
+        "RENDER_READY: none authoritative after corrected Q00069.",
+        "ONE_STAGE_TO_RENDER: none authoritative after corrected Q00069. B00322@index232 and B00324@index133 producer handoffs remain out-of-batch C-QA pending.",
+        "CANDIDATE_AWAITING_C: indices159/198/201. Keep candidate results ahead of unrelated PREFLIGHT_ONLY expansion.",
+        "PREFLIGHT_ONLY REWORK_REQUIRED: index111 A00320 numeric source-only replay is valid, but immutable RESULT_SHA 9f45de59... fails exact-producer commit structure because the durable task record/material payload is not changed in that same SHA. Re-emit material+task record under one SHA; retain Q00067/A00309 authority (12,181 unresolved) until then.",
+        "PREFLIGHT_ONLY ACCEPTED: index94 B00319 exact-source segmentation is accepted with 6/7 removal masks resolved; finish course_sp protected-prefix split, CLEAN_PLATE and final safe geometry before render.",
         "STATIC_QA PRODUCTION_COMPLETE: index163/59A79158 candidate fcb75cef... newly passes Q00069 independent static QA; runtime remains UNTESTED.",
         "RUNTIME ISOLATION READY: index99/4F68708E A00318 current-workflow DDS_ONLY manifest is accepted on unchanged C139 static-QA candidate 4d19c5f1...; real-game validation remains UNTESTED.",
         "OUT-OF-BATCH C QA: producer results not listed in Q00069 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not promoted by this batch.",
-        "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from Q00069-authoritative evidence; runtime_validated=none.",
-        "Q00069 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
-      ]
+        "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from corrected Q00069 authority; runtime_validated=none.",
+        "Corrected Q00069 validation-bearing result commit owns the retry Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+      ],
+      "rework_required_inputs": [
+        {
+          "index": 111,
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
+          "result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
+          "reason": "REEMIT_MATERIAL_AND_DURABLE_TASK_RECORD_UNDER_ONE_VALID_RESULT_SHA"
+        }
+      ],
+      "index111_authoritative_scope": "Retain Q00067/A00309 PREFLIGHT_ONLY with 12,181 unresolved source-only pixels; A00320 8,221-unresolved improvement is not promoted."
     },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_WITH_INDEX163_STATIC_PROMOTION_INDEX99_ISOLATION_AND_TWO_PREFLIGHT_ACCEPTANCES",
+      "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_WITH_INDEX163_STATIC_PROMOTION_INDEX99_ISOLATION_INDEX94_PREFLIGHT_AND_A00320_RESULT_COMMIT_REWORK",
       "reviewed_inputs": 4,
-      "producer_inputs_pass": 4,
-      "producer_inputs_rework_required": 0,
+      "producer_inputs_pass": 3,
+      "producer_inputs_rework_required": 1,
       "producer_inputs_hold": 0,
       "producer_inputs_superseded": 0,
       "new_static_artwork_passes": 1,
@@ -1588,10 +1601,21 @@
     "authoritative_result_sha": null,
     "validation_bearing_result_sha": null,
     "precommit_refresh": {
-      "head_sha": "bc638b6d041f9dd77ed4467661f7c9c0a7714845",
+      "head_sha": "48416f7c2186d0c1b6f59a6b99dc429625e5d65c",
       "stale_state_overwrite": false,
-      "concurrent_changes_reviewed": "Latest branch refreshed immediately before shared-state construction; newer producer outputs are preserved and not dispositioned unless listed in Q00069."
+      "concurrent_changes_reviewed": "Correction built from latest failed C result HEAD; no producer state overwritten."
     },
-    "bookkeeping_note": "Validation-bearing RESULT_SHA will be bound only after this exact C result commit passes the single Localization Automation Gate. Runtime remains UNTESTED."
+    "bookkeeping_note": "Prior C result 77881b51 failed the exact-producer Gate because A00320 was incorrectly dispositioned PASS despite its immutable result SHA lacking a changed durable task record. Corrected disposition is REWORK_REQUIRED; replacement validation-bearing result commit remains PENDING. Runtime remains UNTESTED.",
+    "corrected_at_kst": "2026-10-01T05:19:00+09:00",
+    "prior_failed_gate": {
+      "result_sha": "77881b5106198fabdae6fb4ffcc43a9a6266425a",
+      "workflow": "Localization Automation Gate",
+      "run_id": 36771464265,
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_step": "Verify exact producer SHAs in C batch",
+      "diagnosis": "A00320@9f45de59 immutable result changes only analyzer script; durable task record/material payload is not in the same result commit, so PASS disposition cannot satisfy exact-producer verify_automation_commit."
+    }
   }
 }

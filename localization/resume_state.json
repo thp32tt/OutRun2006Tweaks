@@ -7,15 +7,16 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: none authoritative after Q00069.",
-    "ONE_STAGE_TO_RENDER: none authoritative after Q00069. B00322@index232 and B00324@index133 producer handoffs claim one-stage-to-render readiness but remain out-of-batch C-QA pending and are not implicitly accepted.",
-    "CANDIDATE_AWAITING_C: indices159/198/201. Keep these candidate results ahead of unrelated PREFLIGHT_ONLY expansion.",
-    "PREFLIGHT_ONLY ACCEPTED: index94 B00319 exact-source segmentation is accepted with 6/7 masks resolved; finish course_sp protected-prefix split, CLEAN_PLATE and final safe geometry before render. Index111 A00320 Tuned/Normal core proposal is accepted with 8,221 pixels still unresolved including RANDOM; complete protected-art CLEAN_PLATE work before render.",
+    "RENDER_READY: none authoritative after corrected Q00069.",
+    "ONE_STAGE_TO_RENDER: none authoritative after corrected Q00069. B00322@index232 and B00324@index133 producer handoffs remain out-of-batch C-QA pending.",
+    "CANDIDATE_AWAITING_C: indices159/198/201. Keep candidate results ahead of unrelated PREFLIGHT_ONLY expansion.",
+    "PREFLIGHT_ONLY REWORK_REQUIRED: index111 A00320 numeric source-only replay is valid, but immutable RESULT_SHA 9f45de59... fails exact-producer commit structure because the durable task record/material payload is not changed in that same SHA. Re-emit material+task record under one SHA; retain Q00067/A00309 authority (12,181 unresolved) until then.",
+    "PREFLIGHT_ONLY ACCEPTED: index94 B00319 exact-source segmentation is accepted with 6/7 removal masks resolved; finish course_sp protected-prefix split, CLEAN_PLATE and final safe geometry before render.",
     "STATIC_QA PRODUCTION_COMPLETE: index163/59A79158 candidate fcb75cef... newly passes Q00069 independent static QA; runtime remains UNTESTED.",
     "RUNTIME ISOLATION READY: index99/4F68708E A00318 current-workflow DDS_ONLY manifest is accepted on unchanged C139 static-QA candidate 4d19c5f1...; real-game validation remains UNTESTED.",
     "OUT-OF-BATCH C QA: producer results not listed in Q00069 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not promoted by this batch.",
-    "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from Q00069-authoritative evidence; runtime_validated=none.",
-    "Q00069 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from corrected Q00069 authority; runtime_validated=none.",
+    "Corrected Q00069 validation-bearing result commit owns the retry Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2470,7 +2471,8 @@
     "wave_id": "Q00069",
     "run": "C171",
     "recorded_at_kst": "2026-10-01T05:15:00+09:00",
-    "result": "PASS_Q00069_INDEX163_STATIC_QA_INDEX99_ISOLATION_INDEX94_INDEX111_PREFLIGHT_RUNTIME_UNTESTED",
+    "corrected_at_kst": "2026-10-01T05:19:00+09:00",
+    "result": "PASS_Q00069_INDEX163_STATIC_QA_INDEX99_ISOLATION_INDEX94_PREFLIGHT_A00320_REWORK_RESULT_COMMIT_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
         "task_id": "LOCALIZATION-LOCALIZATION_B-00315",
@@ -2490,7 +2492,7 @@
       {
         "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
         "result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
-        "status": "PASS"
+        "status": "REWORK_REQUIRED"
       }
     ],
     "throughput_kpis": {
@@ -2529,6 +2531,16 @@
     "runtime_validation": "UNTESTED",
     "result_sha": null,
     "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "validation_bearing_result_sha": null,
+    "prior_failed_gate": {
+      "result_sha": "77881b5106198fabdae6fb4ffcc43a9a6266425a",
+      "workflow": "Localization Automation Gate",
+      "run_id": 36771464265,
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_step": "Verify exact producer SHAs in C batch",
+      "diagnosis": "A00320@9f45de59 immutable result changes only analyzer script; durable task record/material payload is not in the same result commit, so PASS disposition cannot satisfy exact-producer verify_automation_commit."
+    }
   }
 }
