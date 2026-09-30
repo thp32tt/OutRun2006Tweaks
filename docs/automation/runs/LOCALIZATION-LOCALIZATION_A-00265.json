@@ -98,8 +98,25 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "4f306e210eabb3900192ca7bd413c06e065ae744",
+  "authoritative_result_sha": "4f306e210eabb3900192ca7bd413c06e065ae744",
   "result_commit_message": "localization(A): add index51 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00265]",
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created. Producer automation validation remains PENDING under C_BATCH_GATE. The current static rework blocker remains authoritative and runtime remains UNTESTED."
+  "bookkeeping_note": "Verified immutable producer result 4f306e210eabb3900192ca7bd413c06e065ae744 contains the exact AUTO marker, lane-local index51 DDS_ONLY isolation manifest, role_A evidence, and durable task record atomically. The dedicated single-DDS isolation workflow run 36702521095 completed successfully. This bookkeeping update records RESULT_SHA/CI only; producer automation_validation remains PENDING under C_BATCH_GATE, the current static rework blocker remains authoritative, and runtime_validation remains UNTESTED.",
+  "result_ci": {
+    "single_dds_isolation": {
+      "workflow": "Korean single-DDS isolation payload",
+      "run_id": 36702521095,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "localization_automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36702521111,
+      "status": "completed",
+      "conclusion": "skipped",
+      "interpretation": "Expected producer-side skip under schema15 C_BATCH_GATE; automation_validation remains PENDING until C batch gate consumes the result."
+    }
+  },
+  "bookkeeping_recorded_at_kst": "2026-09-30T19:28:14+09:00",
+  "bookkeeping_base_head_sha": "4f306e210eabb3900192ca7bd413c06e065ae744"
 }
