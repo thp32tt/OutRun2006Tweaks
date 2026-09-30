@@ -393,6 +393,26 @@
       "RATE_LIMIT",
       "LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"
     ],
-    "valid_permission_recovery": "refresh branch HEAD and continue incomplete lane work without alternate repo/branch/clone/worktree"
+    "valid_permission_recovery": "refresh branch HEAD and continue incomplete lane work without alternate repo/branch/clone/worktree",
+    "authenticated_github_connector_first": true,
+    "public_web_search_is_authoritative": false,
+    "public_web_search_failure_never_implies_permission_denied": true,
+    "required_preflight_order": [
+      "AUTHENTICATED_GITHUB_REPOSITORY_METADATA",
+      "REFRESH_KOREAN_LOCALIZATION_CLEAN_HEAD",
+      "RESOLVE_REQUESTED_PATHS_FROM_CURRENT_HEAD"
+    ],
+    "forbid_permission_inference_from": [
+      "PUBLIC_WEB_SEARCH_MISS",
+      "PUBLIC_SEARCH_ONLY_UPSTREAM_RESULT",
+      "404_PATH_OR_REF_NOT_FOUND",
+      "UNSUPPORTED_CONNECTOR_OR_API_OPERATION",
+      "STALE_BLOB_SHA_CONFLICT",
+      "BRANCH_HEAD_RACE",
+      "VALIDATION_FAILURE",
+      "RATE_LIMIT",
+      "LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"
+    ],
+    "generated_prompt_directive": "GitHub 접근/권한 판정에는 공개 웹 검색을 사용하지 마. authenticated GitHub connector/API로 thp32tt/OutRun2006Tweaks repository metadata와 korean-localization-clean HEAD를 먼저 직접 확인해. 공개 검색 miss 또는 upstream만 노출되는 결과는 권한 부족의 근거가 아니다. push/maintain/admin 중 하나가 true이면 즉시 현재 HEAD에서 작업을 계속해. fresh permission denial 또는 refresh 후 실제 write 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해."
   }
 }
