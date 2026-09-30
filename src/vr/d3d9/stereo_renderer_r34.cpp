@@ -20,6 +20,7 @@
 #include "../lifecycle/reset_replay_health.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
 #include "../lifecycle/reset_replay_policy.hpp"
+#include "../lifecycle/recovery_gate.hpp"
 
 namespace OutRunVRStereo
 {
@@ -42,7 +43,7 @@ namespace OutRunVRStereo
             if (!device || !IsGameDevice(device))
                 return;
 
-            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+            OutRunVR::Lifecycle::SetRecoverySafetyBlock(true);
             FailClosedStereoEligibility();
             ResetStereoBaselineTracking();
             InvalidateTrackedRasterShadow();
@@ -181,14 +182,14 @@ namespace OutRunVRStereo
             if (!OutRunVR::Lifecycle::IsCompatResetDevice(device))
             {
                 R34ResetReplay.SetBlocked(false);
-                OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
+                OutRunVR::Lifecycle::SetRecoverySafetyBlock(false);
                 return hr;
             }
 
             const bool healthy = OutRunVR::Lifecycle::ResetReplayHealthy(
                 SUCCEEDED(hr), OutRunVR::Lifecycle::ResetReplaySucceeded());
             R34ResetReplay.SetBlocked(!healthy);
-            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
+            OutRunVR::Lifecycle::SetRecoverySafetyBlock(!healthy);
             if (!healthy)
             {
                 R34ResetReplay.NoteReplayBlock();
@@ -208,7 +209,7 @@ namespace OutRunVRStereo
                 {
                     R34ResetReplay.NoteLostDeviceBypass();
                     R34ResetReplay.SetBlocked(true);
-                    OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+                    OutRunVR::Lifecycle::SetRecoverySafetyBlock(true);
                     ArmMonoSafety();
                     if (R34ResetReplay.MarkLostDeviceBypassLogged())
                     {
@@ -322,7 +323,7 @@ namespace OutRunVRStereo
                         const bool healthy =
                             OutRunVR::Lifecycle::ResetReplaySucceeded();
                         R34ResetReplay.SetBlocked(!healthy);
-                        OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(
+                        OutRunVR::Lifecycle::SetRecoverySafetyBlock(
                             !healthy);
                         if (!healthy)
                             R34ForceResetReplayFailClosed(
