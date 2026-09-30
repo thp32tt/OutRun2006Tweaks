@@ -1,0 +1,255 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00328-p00203-index55-index154-source-acquisition-exhaustion-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00328",
+  "wave_id": "P00203",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T05:03:12+09:00",
+  "base_head_sha": "c6acbcdf4e1d590f254b12ea8f9973351f181347",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "latest_c_accepted": "LOCALIZATION-LOCALIZATION_C-00321/Q00068@09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "latest_c_render_ready_indices": [],
+    "latest_c_one_stage_to_render_indices": [],
+    "latest_c_runnable_production": [],
+    "qa_pending_not_repeated": [
+      "index163 candidate B00315",
+      "index94 preflight B00319",
+      "index232 preflight B00322",
+      "index133 preflight B00324"
+    ],
+    "selected_batch": [
+      {
+        "index": 55,
+        "asset": "2EA557B4",
+        "path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+        "index_mod_3": 1
+      },
+      {
+        "index": 154,
+        "asset": "4D38BBB0",
+        "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+        "index_mod_3": 1
+      }
+    ],
+    "reason": "No B-owned runnable DIRECT_REWORK_REQUIRED, C-accepted RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework exists at fresh HEAD. This is one legal PREFLIGHT_ONLY batch. Index55 had canonical identity pinned but no approved-tier exhaustion record; index154 likewise had canonical identity/semantics but no final approved-tier exhaustion record."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "pinned_release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "approved_source_transport": {
+    "drive_account": "ezflash557",
+    "drive_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "allowed_subtree": "OutRun2006_Korean_Artifacts/90_ARCHIVE/LOCALIZATION_SNAPSHOT_20260927_0302/03_ORIGINAL_REFERENCE/hd_source/OR2-HD-GUI-v0.25.10a/textures/load",
+    "pinned_upstream_repo": "envido32/OR2006Sprites",
+    "pinned_tag": "v0.25.10a",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+    "pinned_release_asset_id": 306630789,
+    "observed_release_zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "release_zip_identity_match": true
+  },
+  "assets": [
+    {
+      "index": 55,
+      "asset": "2EA557B4",
+      "path": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+      "canonical": {
+        "sha256": "8a39e88bf0d60654b4460c06b18f3c3639c3790375ae0557a337fa75a9b3de6a",
+        "dimensions": [
+          512,
+          64
+        ],
+        "mode": "RGBA",
+        "semantic_binding": [
+          [
+            "NEXT ROUND",
+            "다음 라운드"
+          ]
+        ]
+      },
+      "prior_authoritative_evidence": {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00131",
+        "result_sha": "23af3e8b8e14744ab9dca06c208bc521bb2a8c1c",
+        "disposition": "C122/Q00020 PASS PREFLIGHT_ONLY",
+        "meaning": "Current canonical 512x64 RGBA identity and semantic are authoritative; legacy 2048x256 Release-derived mask/CLEAN_PLATE/safe-bbox geometry is retired."
+      },
+      "acquisition": {
+        "drive": {
+          "parent_folder_id": "1lcRfuzfY-tDtaiQuXhjdGbOjxENeDB4L",
+          "exact_filename": "2EA557B4_512x64.dds",
+          "observed_children": [
+            "C4A2937B_1024x1024.dds",
+            "A064FDFC_1024x512.dds",
+            "39229D64_1024x1024.dds"
+          ],
+          "outcome": "SOURCE_TRANSPORT_MISS"
+        },
+        "pinned_direct": {
+          "probe": "envido32/OR2006Sprites@v0.25.10a:textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS_404"
+        },
+        "pinned_release": {
+          "member": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+          "member_bytes": 524416,
+          "member_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+          "dds_dimensions": [
+            2048,
+            256
+          ],
+          "dds_format": "DXT5",
+          "mip_count": 1,
+          "identity_match": false,
+          "outcome": "SOURCE_IDENTITY_MISMATCH"
+        },
+        "final_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+        "retry_policy": "STICKY_UNTIL_CANONICAL_SOURCE_DEPENDENCY_FINGERPRINT_OR_POLICY_CHANGES"
+      },
+      "pixel_work": {
+        "performed": false,
+        "reason": "No approved-tier source bytes match canonical inventory. Retired Release geometry is forbidden as construction input."
+      }
+    },
+    {
+      "index": 154,
+      "asset": "4D38BBB0",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "canonical": {
+        "sha256": "666511c591d3b15f400934c43c089ff4636942918d6fc9554171675d0d6cea00",
+        "dimensions": [
+          4096,
+          1024
+        ],
+        "mode": "RGBA",
+        "semantic_binding": [
+          [
+            "MULTIPLAYER",
+            "멀티플레이"
+          ],
+          [
+            "SINGLE PLAYER",
+            "싱글 플레이"
+          ],
+          [
+            "DEFAULT LICENSE",
+            "기본 라이선스"
+          ],
+          [
+            "CREATE NEW LICENSE",
+            "새 라이선스 만들기"
+          ],
+          [
+            "SELECT LICENSE",
+            "라이선스 선택"
+          ],
+          [
+            "SHOWROOM",
+            "쇼룸"
+          ]
+        ]
+      },
+      "prior_authoritative_evidence": {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00138",
+        "result_sha": "0f03eaa4d10707024414ee2da349c5f0d34c17d4",
+        "disposition": "C122/Q00020 PASS PREFLIGHT_ONLY",
+        "meaning": "Canonical 4096x1024 RGBA identity and all six semantics are current; style/geometry reuse remains withheld pending exact asset-specific canonical bytes."
+      },
+      "acquisition": {
+        "drive": {
+          "parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+          "exact_filename": "4D38BBB0_1024x256.dds",
+          "observed_children": [
+            "9F060EC1_512x512.dds"
+          ],
+          "outcome": "SOURCE_TRANSPORT_MISS"
+        },
+        "pinned_direct": {
+          "probe": "envido32/OR2006Sprites@v0.25.10a:textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS_404"
+        },
+        "pinned_release": {
+          "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+          "member_bytes": 16777344,
+          "member_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+          "dds_header_128_sha256": "361af3a53b61fab028fd24678aa02b87401e3a8ec3bea17399f32e280e93ddcf",
+          "dds_dimensions": [
+            4096,
+            1024
+          ],
+          "dds_format": "RGBA32",
+          "mip_count": 1,
+          "identity_match": false,
+          "mismatch_note": "Canvas/mode match canonical inventory but full-file SHA-256 does not. Same-size substitution is forbidden.",
+          "outcome": "SOURCE_IDENTITY_MISMATCH"
+        },
+        "final_outcome": "SOURCE_ACQUISITION_EXHAUSTED",
+        "retry_policy": "STICKY_UNTIL_CANONICAL_SOURCE_DEPENDENCY_FINGERPRINT_OR_POLICY_CHANGES"
+      },
+      "pixel_work": {
+        "performed": false,
+        "reason": "Pinned Release bytes fail canonical inventory identity; source-effect/removal-mask/CLEAN_PLATE/safe-bbox must not be derived from mismatched bytes."
+      }
+    }
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "TWO_B_SHARD_CANONICAL_SOURCE_ACQUISITION_EXHAUSTION_MANIFESTS",
+    "preflight_only_batch_count": 1,
+    "assets_advanced": 2,
+    "source_tiers_closed_per_asset": 3,
+    "sticky_source_exhausted_indices": [
+      55,
+      154
+    ],
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "reduction": "Prevents future A/B/E producer slots from repeating unchanged Drive/direct/Release probes for indices55/154 and explicitly separates canonical inventory from mismatched legacy Release bytes."
+  },
+  "readiness": {
+    "before": {
+      "55": "PREFLIGHT_ONLY_CANONICAL_IDENTITY_KNOWN_SOURCE_AVAILABILITY_NOT_FINALIZED",
+      "154": "PREFLIGHT_ONLY_CANONICAL_IDENTITY_SEMANTICS_KNOWN_SOURCE_AVAILABILITY_NOT_FINALIZED"
+    },
+    "after": {
+      "55": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_STICKY",
+      "154": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED_STICKY"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "exact_remaining_dependency": "A future canonical-source transport/inventory-policy change that yields bytes matching each current inventory SHA-256."
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_55_MOD3_EQ_1__154_MOD3_EQ_1",
+    "candidate_completion_scan": "PASS_NO_RUNNABLE_B_COMPLETION_TIER_AT_FRESH_C00321_AND_CURRENT_HEAD",
+    "qa_pending_skip": "PASS_94_133_163_232_NOT_REPEATED",
+    "preflight_batch_limit": "PASS_EXACTLY_ONE_BATCH",
+    "index55_source_identity": "PASS_CANONICAL_METADATA__ALL_APPROVED_TIERS_EXHAUSTED__NO_PIXEL_FABRICATION",
+    "index154_source_identity": "PASS_CANONICAL_METADATA__ALL_APPROVED_TIERS_EXHAUSTED__RELEASE_SHA_MISMATCH_FAIL_CLOSED",
+    "source_policy": "PASS_NO_ALIAS_OR_NEWER_UPSTREAM_SUBSTITUTION",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
