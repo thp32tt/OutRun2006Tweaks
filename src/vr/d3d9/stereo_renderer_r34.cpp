@@ -232,7 +232,7 @@ namespace OutRunVRStereo
 
             if (!OutRunVR::Lifecycle::IsCompatResetDevice(device))
             {
-                R34ResetReplay.blocked.store(false, std::memory_order_release);
+                R34ResetReplay.SetBlocked(false);
                 OutRunVR::Lifecycle::SetRecoverySafetyBlock(false);
                 return hr;
             }
@@ -241,7 +241,7 @@ namespace OutRunVRStereo
                 OutRunVR::Lifecycle::ResetReplayHealthy(
                     SUCCEEDED(hr),
                     OutRunVR::Lifecycle::ResetReplaySucceeded());
-            R34ResetReplay.blocked.store(!healthy, std::memory_order_release);
+            R34ResetReplay.SetBlocked(!healthy);
             OutRunVR::Lifecycle::SetRecoverySafetyBlock(!healthy);
             if (!healthy)
             {
@@ -261,8 +261,7 @@ namespace OutRunVRStereo
                 if (OutRunVR::Lifecycle::DeviceNeedsResetBypass(cooperative))
                 {
                     ++R34ResetReplay.lostDeviceBypasses;
-                    R34ResetReplay.blocked.store(
-                        true, std::memory_order_release);
+                    R34ResetReplay.SetBlocked(true);
                     OutRunVR::Lifecycle::SetRecoverySafetyBlock(true);
                     ArmMonoSafety();
                     if (!R34ResetReplay.firstLostDeviceBypassLogged)
@@ -279,7 +278,7 @@ namespace OutRunVRStereo
             }
 
             const bool blocked = IsGameDevice(device) &&
-                R34ResetReplay.blocked.load(std::memory_order_acquire);
+                R34ResetReplay.IsBlocked();
             if (blocked)
                 R34ForceResetReplayFailClosed(device, "Present/pre");
 
@@ -382,8 +381,7 @@ namespace OutRunVRStereo
                     {
                         const bool healthy =
                             OutRunVR::Lifecycle::ResetReplaySucceeded();
-                        R34ResetReplay.blocked.store(!healthy,
-                            std::memory_order_release);
+                        R34ResetReplay.SetBlocked(!healthy);
                         OutRunVR::Lifecycle::SetRecoverySafetyBlock(
                             !healthy);
                         if (!healthy)
