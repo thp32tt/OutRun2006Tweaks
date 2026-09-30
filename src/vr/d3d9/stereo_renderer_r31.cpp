@@ -21,6 +21,7 @@
 
 #include "stereo_renderer_r30.cpp"
 #include "../telemetry/performance_counters.hpp"
+#include "../render/eye_tail_cache.hpp"
 
 namespace OutRunVRStereo
 {
@@ -62,15 +63,7 @@ namespace OutRunVRStereo
         bool R31FirstAlternateStateBlockLogged = false;
         bool R31FirstHudLogged = false;
 
-        struct R31EyeTailCache
-        {
-            bool valid = false;
-            std::uint32_t poseSequence = 0;
-            float worldScale = 0.0f;
-            D3DMATRIX projection{};
-            D3DMATRIX inverseProjection{};
-            D3DMATRIX eyeTail[2]{};
-        };
+        using R31EyeTailCache = OutRunVR::Render::EyeTailCache;
         R31EyeTailCache R31EyeCache{};
 
         using R31FramePerf = OutRunVR::Telemetry::FrameCounters;
