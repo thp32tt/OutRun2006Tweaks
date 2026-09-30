@@ -70,12 +70,14 @@ namespace OutRunVRStereo
                 return false;
 
             R33DepthStencilWriteState next{};
+            const auto stateBlock =
+                OutRunVR::State::StateBlockTracker::Snapshot();
             if (!TrackedDepthStencil)
             {
                 next.valid = true;
                 next.depthGeneration = R9MainDepthGeneration;
-                next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingCount();
-                next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyCount();
+                next.stateBlockRecordings = stateBlock.recordings;
+                next.stateBlockApplies = stateBlock.applies;
                 R33DepthStencilState = next;
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilSyncs;
@@ -121,8 +123,8 @@ namespace OutRunVRStereo
 
             next.valid = true;
             next.depthGeneration = R9MainDepthGeneration;
-            next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingCount();
-            next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyCount();
+            next.stateBlockRecordings = stateBlock.recordings;
+            next.stateBlockApplies = stateBlock.applies;
             R33DepthStencilState = next;
             if (R33TelemetryEnabled())
                 ++R33DepthStencilSyncs;
@@ -137,11 +139,13 @@ namespace OutRunVRStereo
 
         bool R33DepthStencilCacheCurrent() noexcept
         {
+            const auto stateBlock =
+                OutRunVR::State::StateBlockTracker::Snapshot();
             return R33DepthStencilState.valid &&
                 R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
                 R33DepthStencilState.stateBlockRecordings ==
-                    OutRunVR::State::StateBlockTracker::RecordingCount() &&
-                R33DepthStencilState.stateBlockApplies == OutRunVR::State::StateBlockTracker::ApplyCount();
+                    stateBlock.recordings &&
+                R33DepthStencilState.stateBlockApplies == stateBlock.applies;
         }
 
         bool R33GetWriteFlags(IDirect3DDevice9* device,

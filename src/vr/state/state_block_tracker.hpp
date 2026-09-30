@@ -5,6 +5,14 @@
 
 namespace OutRunVR::State
 {
+    struct StateBlockSnapshot
+    {
+        bool reliable = false;
+        bool recording = false;
+        std::uint64_t recordings = 0;
+        std::uint64_t applies = 0;
+    };
+
     class StateBlockTracker final
     {
     public:
@@ -92,6 +100,16 @@ namespace OutRunVR::State
         static std::uint64_t ApplyCount() noexcept
         {
             return ApplyGeneration();
+        }
+
+        static StateBlockSnapshot Snapshot() noexcept
+        {
+            StateBlockSnapshot snapshot{};
+            snapshot.reliable = Reliable();
+            snapshot.recording = IsRecording();
+            snapshot.recordings = RecordingCount();
+            snapshot.applies = ApplyCount();
+            return snapshot;
         }
 
     private:
