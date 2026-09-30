@@ -30,10 +30,11 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "2edaf8eea143eda57b8a77994c8e900fd71632e8",
+  "authoritative_result_sha": "2edaf8eea143eda57b8a77994c8e900fd71632e8",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): blueprint index94 v2 rebuild execution [AUTO:LOCALIZATION-LOCALIZATION_B-00306]",
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO material result commit is created. Producer automation validation remains PENDING under C_BATCH_GATE; runtime remains UNTESTED."
+  "bookkeeping_note": "Producer material result commit 2edaf8eea143eda57b8a77994c8e900fd71632e8 contains the lane-local index94 execution blueprint and durable task record. This bookkeeping update records the immutable RESULT_SHA only; producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE and RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T02:38:46+09:00"
 }
