@@ -56,6 +56,17 @@ GF_HOOK_PROVENANCE_RVAS = {
 }
 
 
+# R137/F13: recurring exact-EXE rel32 targets discovered by the guarded-hook
+# raw census. These labels are deliberately neutral: target identity/effect and
+# instruction alignment still require independent evidence.
+GF_RAW_REL32_TARGET_RVAS = {
+    0x000653C0: "guarded GF raw rel32 target A",
+    0x00065860: "guarded GF raw rel32 target B",
+    0x00065970: "guarded GF raw rel32 target C",
+}
+GF_RAW_REL32_TARGET_WINDOW = 96
+
+
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
 # rather than D3D primitive-count heuristics.
@@ -278,6 +289,93 @@ def collect_raw_rel32_call_candidates(
     return out
 
 
+def collect_raw_inbound_rel32_candidates(pe: PE, target_rva: int) -> list[dict]:
+    """Find raw .text E8 rel32 byte candidates that decode to target_rva.
+
+    This scans bytes, not decoded instructions. Results are provenance leads,
+    not proof that an E8 byte is an instruction-aligned CALL.
+    """
+
+    text_section = pe.section(".text")
+    if not text_section:
+        return []
+
+    text = pe.data[
+        text_section.raw_pointer :
+        text_section.raw_pointer + text_section.raw_size
+    ]
+    out: list[dict] = []
+    for i in range(0, max(0, len(text) - 5)):
+        if text[i] != 0xE8:
+            continue
+        rel = struct.unpack_from("<i", text, i + 1)[0]
+        call_rva = text_section.virtual_address + i
+        decoded_target_rva = (call_rva + 5 + rel) & 0xFFFFFFFF
+        if decoded_target_rva != target_rva:
+            continue
+        area, semantic, space_policy = classify_semantic(call_rva)
+        out.append(
+            {
+                "call_rva": call_rva,
+                "function_start_guess_rva": guess_function_start(
+                    text, text_section.virtual_address, i
+                ),
+                "known_call_site": KNOWN_CALL_SITES.get(call_rva, ""),
+                "known_area": area,
+                "semantic": semantic,
+                "space_policy": space_policy,
+            }
+        )
+    return out
+
+
+def collect_guarded_gf_target_provenance(pe: PE) -> list[dict]:
+    """Fingerprint recurring guarded-GF rel32 targets from the exact EXE.
+
+    Captures target bytes, a backward prologue guess, raw inbound E8 candidates,
+    and raw outbound rel32 candidates in a bounded target window. All call data
+    remains byte-level until instruction alignment/effect is separately proven.
+    """
+
+    text_section = pe.section(".text")
+    text = b""
+    if text_section:
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+
+    out: list[dict] = []
+    for target_rva, label in sorted(GF_RAW_REL32_TARGET_RVAS.items()):
+        target_section = next(
+            (section.name for section in pe.sections if section.contains_rva(target_rva)),
+            "",
+        )
+        function_start_guess_rva = None
+        if text_section and text_section.contains_rva(target_rva):
+            function_start_guess_rva = guess_function_start(
+                text,
+                text_section.virtual_address,
+                target_rva - text_section.virtual_address,
+            )
+        out.append(
+            {
+                "target_rva": target_rva,
+                "label": label,
+                "target_section": target_section,
+                "bytes64": pe.bytes_at_rva(target_rva, 64).hex(" "),
+                "function_start_guess_rva": function_start_guess_rva,
+                "raw_inbound_rel32_candidates": collect_raw_inbound_rel32_candidates(
+                    pe, target_rva
+                ),
+                "raw_outbound_rel32_candidates": collect_raw_rel32_call_candidates(
+                    pe, target_rva, GF_RAW_REL32_TARGET_WINDOW
+                ),
+            }
+        )
+    return out
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -426,6 +524,41 @@ def render_markdown(report: dict) -> str:
 
     lines += [
         "",
+        "## Guarded GF rel32 target function fingerprints",
+        "",
+        "Diagnostic-only exact-EXE target evidence. Raw inbound/outbound E8 rows "
+        "are byte-scan candidates and do not establish instruction boundaries or "
+        "semantic effect.",
+        "",
+        "| Target RVA | Label | Section | Function-start guess | First 64 bytes | Raw inbound E8 candidates | Raw outbound E8 candidates (96B) |",
+        "|---:|---|---|---:|---|---|---|",
+    ]
+    for item in report["guarded_gf_target_provenance"]:
+        inbound = item["raw_inbound_rel32_candidates"]
+        outbound = item["raw_outbound_rel32_candidates"]
+        inbound_text = "<br>".join(
+            f"{hexrva(call['call_rva'])} "
+            f"[{call['semantic']}/{call['space_policy']}]"
+            for call in inbound[:12]
+        ) or "-"
+        if len(inbound) > 12:
+            inbound_text += f"<br>... +{len(inbound) - 12} more"
+        outbound_text = "<br>".join(
+            f"{hexrva(call['call_rva'])}->{hexrva(call['target_rva'])} "
+            f"[{call['known_target'] or 'unknown'}] {call['target_section']}"
+            for call in outbound[:12]
+        ) or "-"
+        if len(outbound) > 12:
+            outbound_text += f"<br>... +{len(outbound) - 12} more"
+        lines.append(
+            f"| {hexrva(item['target_rva'])} | {item['label']} | "
+            f"{item['target_section'] or '-'} | "
+            f"{hexrva(item['function_start_guess_rva'])} | "
+            f"{item['bytes64']} | {inbound_text} | {outbound_text} |"
+        )
+
+    lines += [
+        "",
         "## Direct CALL references into HUD/sprite anchors",
         "",
         "| Call RVA | Function start guess | Target | Known site | Semantic | Space |",
@@ -498,6 +631,7 @@ def main() -> int:
         "symbols": symbol_fingerprints(pe),
         "calls": calls,
         "guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls),
+        "guarded_gf_target_provenance": collect_guarded_gf_target_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -543,6 +677,27 @@ def main() -> int:
         ) or "none"
         print(
             f"gf_hook_rel32=0x{item['hook_rva']:08X} candidates={raw_text}"
+        )
+    target_provenance = report["guarded_gf_target_provenance"]
+    print(
+        f"guarded_gf_targets={len(target_provenance)}/"
+        f"{len(GF_RAW_REL32_TARGET_RVAS)}"
+    )
+    for item in target_provenance:
+        inbound = item["raw_inbound_rel32_candidates"]
+        outbound = item["raw_outbound_rel32_candidates"]
+        outbound_known = ",".join(
+            f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+            f"{call['known_target'] or 'unknown'}"
+            for call in outbound
+        ) or "none"
+        print(
+            f"gf_target_provenance=0x{item['target_rva']:08X} "
+            f"section={item['target_section'] or 'none'} "
+            f"start_guess={hexrva(item['function_start_guess_rva'])} "
+            f"inbound_raw={len(inbound)} outbound_raw={len(outbound)} "
+            f"outbound={outbound_known} "
+            f"bytes64={item['bytes64']}"
         )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
