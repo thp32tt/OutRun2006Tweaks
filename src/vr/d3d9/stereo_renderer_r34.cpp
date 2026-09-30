@@ -15,6 +15,7 @@
 #include "../state/d3d9_raster_tracking.hpp"
 #include "../state/depth_stencil_tracking.hpp"
 #include "../state/stateblock_tracking.hpp"
+#include "../core/final_dispatch_state.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -276,7 +277,7 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r33 = R33InstallState.load(std::memory_order_acquire);
+                const auto r33 = FinalDispatchInstallState();
                 if (r33 == State::Failed)
                 {
                     R34InstallState.store(State::Failed,
