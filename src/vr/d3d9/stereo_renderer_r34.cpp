@@ -17,11 +17,7 @@
 #include "../state/stateblock_tracking.hpp"
 #include "../core/final_dispatch_state.hpp"
 #include "../lifecycle/raw_present.hpp"
-
-namespace OutRunVRD3D9ExUpgradeR13
-{
-    bool LastResetStateReplaySucceeded() noexcept;
-}
+#include "../lifecycle/reset_replay_health.hpp"
 
 namespace OutRunVRStereo
 {
@@ -183,7 +179,7 @@ namespace OutRunVRStereo
             if (!gameDevice)
                 return hr;
 
-            if (!OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device))
+            if (!OutRunVR::Lifecycle::IsCompatResetDevice(device))
             {
                 R34ResetReplay.blocked.store(false, std::memory_order_release);
                 OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
@@ -191,7 +187,7 @@ namespace OutRunVRStereo
             }
 
             const bool healthy = SUCCEEDED(hr) &&
-                OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
+                OutRunVR::Lifecycle::ResetReplaySucceeded();
             R34ResetReplay.blocked.store(!healthy, std::memory_order_release);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
             if (!healthy)
@@ -325,10 +321,10 @@ namespace OutRunVRStereo
                     IDirect3DDevice9* const installedDevice =
                         StereoInstalledDevice.load(std::memory_order_acquire);
                     if (installedDevice &&
-                        OutRunVRD3D9ExUpgradeR13::IsCompatDevice(installedDevice))
+                        OutRunVR::Lifecycle::IsCompatResetDevice(installedDevice))
                     {
                         const bool healthy =
-                            OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
+                            OutRunVR::Lifecycle::ResetReplaySucceeded();
                         R34ResetReplay.blocked.store(!healthy,
                             std::memory_order_release);
                         OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(

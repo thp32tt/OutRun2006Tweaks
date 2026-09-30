@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 140,
+  "cycle": 145,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -38,10 +38,11 @@
     "R84-REF-LIFECYCLE-0006",
     "R84-REF-STATE-0008",
     "R84-REF-DISPATCH-0003",
-    "R84-REF-LIFECYCLE-0007"
+    "R84-REF-LIFECYCLE-0007",
+    "R84-REF-LIFECYCLE-0008"
   ],
-  "next": "Cycles 141-145: isolate ResetEx compatibility/replay health behind lifecycle API.",
-  "updatedKst": "2026-10-01T07:25:00+09:00",
+  "next": "Cycles 146-150: encapsulate ResetReplayState access.",
+  "updatedKst": "2026-10-01T07:30:00+09:00",
   "batchStatus": "R84_CORRECT_BASELINE_CYCLE_100_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
