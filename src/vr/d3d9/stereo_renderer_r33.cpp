@@ -25,6 +25,15 @@ namespace OutRunVRStereo
         SafetyHookInline R33DrawIndexedPrimitiveR32Hook{};
         SafetyHookInline R33DrawPrimitiveUPR32Hook{};
         SafetyHookInline R33DrawIndexedPrimitiveUPR32Hook{};
+        SafetyHookInline* R33HookTransaction[]{
+            &R33ResetR32Hook,
+            &R33PresentR32Hook,
+            &R33SetRenderStateR29Hook,
+            &R33DrawPrimitiveR32Hook,
+            &R33DrawIndexedPrimitiveR32Hook,
+            &R33DrawPrimitiveUPR32Hook,
+            &R33DrawIndexedPrimitiveUPR32Hook
+        };
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R33InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -800,27 +809,13 @@ namespace OutRunVRStereo
 
         void R33RollbackHooks() noexcept
         {
-            R33DrawIndexedPrimitiveUPR32Hook = {};
-            R33DrawPrimitiveUPR32Hook = {};
-            R33DrawIndexedPrimitiveR32Hook = {};
-            R33DrawPrimitiveR32Hook = {};
-            R33SetRenderStateR29Hook = {};
-            R33PresentR32Hook = {};
-            R33ResetR32Hook = {};
+            for (auto* hook : R33HookTransaction)
+                *hook = {};
         }
 
         bool R33EnableHooks() noexcept
         {
-            SafetyHookInline* hooks[]{
-                &R33ResetR32Hook,
-                &R33PresentR32Hook,
-                &R33SetRenderStateR29Hook,
-                &R33DrawPrimitiveR32Hook,
-                &R33DrawIndexedPrimitiveR32Hook,
-                &R33DrawPrimitiveUPR32Hook,
-                &R33DrawIndexedPrimitiveUPR32Hook
-            };
-            for (auto* hook : hooks)
+            for (auto* hook : R33HookTransaction)
                 if (!*hook || !hook->enable().has_value())
                     return false;
             return true;
