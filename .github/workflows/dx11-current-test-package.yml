@@ -62,3 +62,5 @@ jobs:
             out/DX11_TEST_BUILD_STATUS.txt
           if-no-files-found: error
           retention-days: 7
+
+# trigger: current DX11 test package 2026-09-30 21:00 KST
