@@ -14,6 +14,7 @@
 #include "../state/state_block_tracker.hpp"
 #include "../core/dispatch_support.hpp"
 #include "../render/stereo_base_policy.hpp"
+#include "../render/screen_space_api.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
@@ -442,10 +443,10 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R33TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            const R30ScreenSpaceKind screenKind =
-                R30ClassifyScreenSpacePass(device);
+            const OutRunVR::Render::ScreenSpaceKind screenKind =
+                ClassifyScreenSpacePass(device);
             if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device) ||
-                screenKind == R30ScreenSpaceKind::None)
+                screenKind == OutRunVR::Render::ScreenSpaceKind::None)
                 return {};
 
             if (!OutRunVR::State::StateBlockTracker::Reliable())
@@ -481,7 +482,7 @@ namespace OutRunVRStereo
             float eyeConstants[2][16]{};
             float eyeScale[2]{};
             float eyeOffset[2]{};
-            if (!R30BuildScreenSpaceEyeConstants(device, stereo, screenKind,
+            if (!BuildScreenSpaceEyeConstants(device, stereo, screenKind,
                     original, eyeConstants, eyeScale, eyeOffset))
                 return {};
 
@@ -575,7 +576,7 @@ namespace OutRunVRStereo
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
             NoteStableTwoEyeDraw();
-            ++R30ScreenSpaceFovDraws;
+            NoteScreenSpaceFovDraw();
             if (R33TelemetryEnabled())
             {
                 NoteDispatchHud();
@@ -617,7 +618,7 @@ namespace OutRunVRStereo
                 return actualDraw();
             }
 
-            if (R30ClassifyScreenSpacePass(device) != R30ScreenSpaceKind::None)
+            if (ClassifyScreenSpacePass(device) != OutRunVR::Render::ScreenSpaceKind::None)
             {
                 const auto hud = R33TryHud(device,
                     std::forward<ActualDraw>(actualDraw), site);

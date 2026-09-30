@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r29.cpp"
+#include "../render/screen_space_kind.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -1261,12 +1262,8 @@ namespace OutRunVRStereo
                 transformed.bottom > transformed.top;
         }
 
-        enum class R30ScreenSpaceKind : std::uint8_t
-        {
-            None,
-            Hud2D,
-            FlatPerspectiveEffect
-        };
+        using R30ScreenSpaceKind =
+            OutRunVR::Render::ScreenSpaceKind;
 
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
@@ -3202,5 +3199,28 @@ namespace OutRunVRStereo
         };
 
         VRStereoR30HudHook VRStereoR30HudHook::instance;
+    }
+
+    OutRunVR::Render::ScreenSpaceKind
+    ClassifyScreenSpacePass(IDirect3DDevice9* device) noexcept
+    {
+        return R30ClassifyScreenSpacePass(device);
+    }
+
+    bool BuildScreenSpaceEyeConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        OutRunVR::Render::ScreenSpaceKind kind,
+        float original[16], float eyeConstants[2][16],
+        float eyeScale[2], float eyeOffset[2]) noexcept
+    {
+        return R30BuildScreenSpaceEyeConstants(
+            device, stereo, kind, original,
+            eyeConstants, eyeScale, eyeOffset);
+    }
+
+    void NoteScreenSpaceFovDraw() noexcept
+    {
+        ++R30ScreenSpaceFovDraws;
     }
 }
