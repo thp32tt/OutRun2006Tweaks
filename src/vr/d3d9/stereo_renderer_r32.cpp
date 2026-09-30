@@ -14,6 +14,7 @@
 #include "../render/cached_effect_state.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../lifecycle/frame_lifecycle.hpp"
+#include "../game/renderer_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
 
 namespace OutRunVRStereo
@@ -1129,9 +1130,8 @@ namespace OutRunVRStereo
         {
             ResetCachedEffectState();
             ResetDispatchSupportState();
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
-            OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
+            ResetRasterSampleHistory();
+            OutRunVRRenderer::InvalidateRendererStateAfterExternalRestore();
             R32ForgetDirectIdentity();
             R32ClearPendingProducerFences();
             R32DirectCopyPathRejected = false;

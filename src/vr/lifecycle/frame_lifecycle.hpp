@@ -8,4 +8,5 @@ namespace OutRunVRStereo
 {
     void NotifyTopLevelDraw(IDirect3DDevice9* device) noexcept;
     std::uint64_t TopLevelDrawSerial() noexcept;
+    void ResetRasterSampleHistory() noexcept;
 }

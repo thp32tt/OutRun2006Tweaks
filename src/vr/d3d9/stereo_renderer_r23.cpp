@@ -873,4 +873,10 @@ namespace OutRunVRStereo
     {
         return TopLevelDrawSerial();
     }
+
+    void ResetRasterSampleHistory() noexcept
+    {
+        R23LastStateSampleDrawSerial = 0;
+        R23LastStateSampleEpoch = 0;
+    }
 }
