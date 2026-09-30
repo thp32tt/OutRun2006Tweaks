@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T00:12:51+09:00",
+  "updated_at_kst": "2026-10-01T00:14:43.403+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1522,7 +1522,7 @@
       "validated_at_kst": "2026-10-01T00:12:51+09:00"
     },
     "bookkeeping_note": "Q00062 authoritative Gate PASS is owned by validation-bearing result b47185be7eb14acfbdfb99407d8ffbeb474a8fe9. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
-    "bookkeeping_recorded_at_kst": "2026-10-01T00:12:51+09:00",
-    "bookkeeping_base_head_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9"
+    "bookkeeping_recorded_at_kst": "2026-10-01T00:14:43.403+09:00",
+    "bookkeeping_base_head_sha": "76bd6219fb0fc51258f97f2f66d197482b12e156"
   }
 }
