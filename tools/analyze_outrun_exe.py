@@ -123,6 +123,8 @@ GF_TARGET_C_PREFIX_INSTRUCTIONS = (
 GF_TARGET_C_SECOND_CALL_ANCHOR_RVA = 0x0006599F
 GF_TARGET_C_SECOND_ALIGNED_CALL_RVA = 0x000659AC
 GF_TARGET_C_SECOND_ALIGNED_CALL_TARGET_RVA = 0x00028320
+GF_TARGET_C_TAIL_PROBE_RVA = 0x000659B1
+GF_TARGET_C_TAIL_PROBE_LEN = 32
 GF_TARGET_C_SECOND_CALL_INSTRUCTIONS = (
     (0x0006599F, "eb 13", "jmp +0x13"),
     (0x000659A1, "8b 46 18", "mov eax, [esi+0x18]"),
@@ -1099,6 +1101,11 @@ def main() -> int:
         "guarded_gf_target_b_alignment_proof": collect_guarded_gf_target_b_alignment_proof(pe),
         "guarded_gf_target_c_alignment_proof": collect_guarded_gf_target_c_alignment_proof(pe),
         "guarded_gf_target_c_second_call_alignment_proof": collect_guarded_gf_target_c_second_call_alignment_proof(pe),
+        "guarded_gf_target_c_tail_probe": {
+            "rva": GF_TARGET_C_TAIL_PROBE_RVA,
+            "length": GF_TARGET_C_TAIL_PROBE_LEN,
+            "bytes": pe.bytes_at_rva(GF_TARGET_C_TAIL_PROBE_RVA, GF_TARGET_C_TAIL_PROBE_LEN).hex(" "),
+        },
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -1207,6 +1214,11 @@ def main() -> int:
         f"target_section={alignment_c2['call_target_section'] or 'none'} "
         f"semantic_effect={alignment_c2['semantic_effect']} "
         f"remaining_raw_calls={','.join(hexrva(rva) for rva in alignment_c2['remaining_raw_call_rvas'])}"
+    )
+    tail_probe = report["guarded_gf_target_c_tail_probe"]
+    print(
+        f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
+        f"len={tail_probe['length']} bytes={tail_probe['bytes']}"
     )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
