@@ -952,4 +952,10 @@ namespace OutRunVRStereo
 			device, sourceRect, destRect,
 			destWindowOverride, dirtyRegion);
 	}
+
+	void InvalidateRightDepthStencilSync() noexcept
+	{
+		RightDepthSynchronized = false;
+		RightStencilSynchronized = false;
+	}
 }

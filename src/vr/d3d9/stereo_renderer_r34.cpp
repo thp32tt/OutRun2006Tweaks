@@ -14,6 +14,7 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/d3d9_raster_tracking.hpp"
 #include "../state/depth_stencil_tracking.hpp"
+#include "../state/depth_stencil_sync.hpp"
 #include "../state/stateblock_tracking.hpp"
 #include "../core/final_dispatch_state.hpp"
 #include "../lifecycle/raw_present.hpp"
@@ -100,8 +101,7 @@ namespace OutRunVRStereo
             InvalidateTrackedRasterShadow();
             InvalidateDepthStencilStateCache();
             ArmMonoSafety();
-            RightDepthSynchronized = false;
-            RightStencilSynchronized = false;
+            InvalidateRightDepthStencilSync();
 
             if (R34ResetReplay.MarkReplayBlockLogged())
             {
