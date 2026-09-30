@@ -48,7 +48,7 @@
     "new_executable_analysis_input": true,
     "materially_reduces_unresolved_work": true,
     "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
-    "producing_result_sha": null
+    "producing_result_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf"
   },
   "evidence": [
     "localization/graphics/role_A/20261001-A00350-P00220/verify_index225_source_reactivation.py",
@@ -88,8 +88,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__C175_ZERO_A_COMPLETION_TIER__QA_PENDING_NOT_REPEATED__INDEX225_C142_SOURCE_EXHAUSTION_REUSED__NO_SOURCE_REPROBE__NONCANONICAL_RELEASE_SUBSTITUTION_FORBIDDEN__NEW_EXECUTABLE_REACTIVATION_GUARD__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf",
+  "authoritative_result_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): guard index225 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00350]",
   "durable_task_record_in_result_commit": true,
@@ -98,6 +98,13 @@
     "head_sha": "d638d51598dae457007d2778ea74eeb8006d990b",
     "head_message": "chore(localization): bind B00347 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00347] [skip ci]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Fresh branch HEAD fetched before result tree creation; only A00350 lane-local index225 guard/report and its unique task record are added. Shared state and peer-lane files are untouched."
-  }
+    "concurrent_changes_reviewed": "Fresh branch HEAD fetched before result tree creation; only A00350 lane-local index225 guard/report and its unique task record are added. Shared state and peer-lane files are untouched.",
+    "bookkeeping_head_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf",
+    "bookkeeping_concurrent_head_preserved": false
+  },
+  "bookkeeping_note": "Durable producer result SHA is bound here. Result 033ef6c483983bd60b72bb089431a9c3ae25eddf atomically contains the index225 executable source-reactivation guard, machine report, and durable A00350 task record. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T08:06:00+09:00",
+  "bookkeeping_base_result_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf",
+  "bookkeeping_preserved_head_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf",
+  "bookkeeping_preserved_head_message": "localization(A): guard index225 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00350]"
 }
