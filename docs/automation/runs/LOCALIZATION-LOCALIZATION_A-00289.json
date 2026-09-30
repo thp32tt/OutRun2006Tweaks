@@ -54,9 +54,11 @@
   "self_qa": "PASS_EXACT_CANONICAL_SOURCE__C00288_HANDOFF_CONSUMED__3027_TEXT_FILL__3372_HARD_PROTECTED_VISIBLE__30_RADIUS1_VISIBLE_CONFLICT_25_BLUE_5_WHITE__31_TEXT_FILL_PIXELS_IN_PROTECTED_ENVELOPE__SIMPLE_DILATION_REJECTED__NO_FALSE_CLEAN_PLATE_PROMOTION__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "b5e6f9c9baa98ed4a9242a209022f264abc268a7",
+  "authoritative_result_sha": "b5e6f9c9baa98ed4a9242a209022f264abc268a7",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): model index111 RANDOM protected art [AUTO:LOCALIZATION-LOCALIZATION_A-00289]",
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable producer result commit exists. Producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result b5e6f9c9baa98ed4a9242a209022f264abc268a7 contains only the A lane-local index111 protected-art model/tool plus the durable task record and exact AUTO marker. This bookkeeping commit only records the result SHA. Producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T23:24:00+09:00",
+  "bookkeeping_base_head_sha": "b5e6f9c9baa98ed4a9242a209022f264abc268a7"
 }
