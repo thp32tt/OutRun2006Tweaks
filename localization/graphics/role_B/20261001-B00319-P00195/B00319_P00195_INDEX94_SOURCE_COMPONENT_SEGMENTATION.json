@@ -1,0 +1,191 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00319-p00195-index94-source-component-segmentation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00319",
+  "wave_id": "P00195",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "target": {
+    "index": 94,
+    "asset": "2DA43E41",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds"
+  },
+  "source_transport": {
+    "route": "PINNED_RELEASE_ARCHIVE_EXACT_MEMBER",
+    "bundle_name": "OR2-HD-GUI-v0.25.10a.zip",
+    "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "bundle_size_bytes": 306223257,
+    "member": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "member_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "member_size_bytes": 67108992,
+    "canonical_identity_match": true
+  },
+  "dds": {
+    "width": 4096,
+    "height": 4096,
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "FLIP_Y",
+    "readable_transform": "flip_y"
+  },
+  "method": {
+    "coordinate_space": "readable_display",
+    "pixel_rule": "Within a visually isolated source-text subregion, source effect support is alpha>0. Contamination separated by exact transparent row/column gaps is excluded.",
+    "candidate_construction_input_used": false,
+    "historical_candidate_used_as_input": false,
+    "source_only": true
+  },
+  "elements": [
+    {
+      "key": "course_sp",
+      "source_bbox_display_ltrb": [132, 488, 2078, 717],
+      "confident_text_region_display_ltrb": [132, 617, 2078, 717],
+      "confident_effect_mask_nonzero_pixels": 63718,
+      "confident_effect_mask_bbox_display_ltrb": [611, 617, 1593, 717],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [
+        {"rgb": [0, 10, 57], "count": 34663},
+        {"rgb": [255, 255, 255], "count": 21856},
+        {"rgb": [16, 25, 69], "count": 228},
+        {"rgb": [112, 118, 144], "count": 203},
+        {"rgb": [240, 241, 243], "count": 171},
+        {"rgb": [224, 225, 231], "count": 131},
+        {"rgb": [144, 148, 169], "count": 91},
+        {"rgb": [32, 41, 82], "count": 78}
+      ],
+      "reason": "Second line is isolated by a 25px transparent row gap; first line contains protected inline OutRun2: SP and remains unresolved as one connected effect run.",
+      "remaining_ambiguity": "protected_inline_prefix_first_line"
+    },
+    {
+      "key": "wait_now",
+      "source_bbox_display_ltrb": [2228, 461, 3776, 717],
+      "confident_text_region_display_ltrb": [2228, 478, 3776, 717],
+      "confident_effect_mask_nonzero_pixels": 158449,
+      "confident_effect_mask_bbox_display_ltrb": [2228, 478, 3776, 717],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [
+        {"rgb": [0, 10, 57], "count": 86098},
+        {"rgb": [247, 186, 24], "count": 35151},
+        {"rgb": [255, 255, 255], "count": 19564},
+        {"rgb": [15, 21, 55], "count": 677},
+        {"rgb": [232, 176, 26], "count": 364},
+        {"rgb": [108, 87, 43], "count": 327},
+        {"rgb": [16, 25, 69], "count": 307},
+        {"rgb": [124, 98, 40], "count": 270}
+      ],
+      "reason": "Rows 0-4 contain unrelated neighboring art; rows 5-16 are transparent; rows 17-255 are the two text lines.",
+      "remaining_ambiguity": null
+    },
+    {
+      "key": "acceleration",
+      "source_bbox_display_ltrb": [3826, 247, 4016, 320],
+      "confident_text_region_display_ltrb": [3826, 247, 4016, 307],
+      "confident_effect_mask_nonzero_pixels": 6714,
+      "confident_effect_mask_bbox_display_ltrb": [3826, 247, 4016, 307],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [{"rgb": [255, 255, 255], "count": 6165}],
+      "reason": "Rows 0-59 are the label; rows 60-71 transparent; row 72 contains neighboring art.",
+      "remaining_ambiguity": null
+    },
+    {
+      "key": "max_speed",
+      "source_bbox_display_ltrb": [3827, 319, 4018, 410],
+      "confident_text_region_display_ltrb": [3827, 319, 4018, 378],
+      "confident_effect_mask_nonzero_pixels": 6970,
+      "confident_effect_mask_bbox_display_ltrb": [3827, 319, 4016, 378],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [{"rgb": [255, 255, 255], "count": 6377}],
+      "reason": "Rows 0-58 are the label; rows 59-76 transparent; rows 77-90 are neighboring numeric/art content.",
+      "remaining_ambiguity": null
+    },
+    {
+      "key": "view_change",
+      "source_bbox_display_ltrb": [3430, 998, 3896, 1102],
+      "confident_text_region_display_ltrb": [3430, 1030, 3896, 1091],
+      "confident_effect_mask_nonzero_pixels": 11725,
+      "confident_effect_mask_bbox_display_ltrb": [3468, 1030, 3896, 1091],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [
+        {"rgb": [255, 255, 255], "count": 5944},
+        {"rgb": [0, 17, 24], "count": 2261},
+        {"rgb": [119, 128, 132], "count": 128},
+        {"rgb": [17, 33, 39], "count": 120},
+        {"rgb": [187, 192, 193], "count": 99},
+        {"rgb": [238, 245, 249], "count": 99},
+        {"rgb": [102, 112, 116], "count": 98},
+        {"rgb": [0, 42, 60], "count": 96}
+      ],
+      "reason": "Rows 0-21 and 98-103 contain neighboring UI art; rows 22-31 and 93-97 are transparent separators; rows 32-92 isolate the label.",
+      "remaining_ambiguity": null
+    },
+    {
+      "key": "expert",
+      "source_bbox_display_ltrb": [2842, 1124, 3479, 1229],
+      "confident_text_region_display_ltrb": [2868, 1124, 3479, 1229],
+      "confident_effect_mask_nonzero_pixels": 49479,
+      "confident_effect_mask_bbox_display_ltrb": [2868, 1124, 3479, 1229],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [
+        {"rgb": [0, 10, 57], "count": 14512},
+        {"rgb": [199, 50, 50], "count": 12185},
+        {"rgb": [255, 255, 255], "count": 10512},
+        {"rgb": [93, 29, 54], "count": 358},
+        {"rgb": [186, 47, 50], "count": 221},
+        {"rgb": [53, 21, 55], "count": 219},
+        {"rgb": [146, 39, 52], "count": 212},
+        {"rgb": [13, 13, 57], "count": 202}
+      ],
+      "reason": "Columns 0-13 contain unrelated neighboring art; columns 14-25 are transparent; columns 26-636 isolate the label.",
+      "remaining_ambiguity": null
+    },
+    {
+      "key": "special_course",
+      "source_bbox_display_ltrb": [3137, 1279, 3879, 1403],
+      "confident_text_region_display_ltrb": [3137, 1279, 3879, 1403],
+      "confident_effect_mask_nonzero_pixels": 60145,
+      "confident_effect_mask_bbox_display_ltrb": [3137, 1279, 3879, 1403],
+      "mask_definition": "alpha>0 inside confident_text_region_display_ltrb",
+      "dominant_opaque_rgb": [
+        {"rgb": [0, 10, 57], "count": 19378},
+        {"rgb": [255, 255, 255], "count": 11558},
+        {"rgb": [255, 244, 214], "count": 1338},
+        {"rgb": [255, 244, 215], "count": 989},
+        {"rgb": [191, 156, 13], "count": 522},
+        {"rgb": [255, 203, 67], "count": 442},
+        {"rgb": [254, 244, 214], "count": 332},
+        {"rgb": [255, 210, 95], "count": 305}
+      ],
+      "reason": "The entire bbox is one isolated text/effect region with no internal contamination band observed.",
+      "remaining_ambiguity": null
+    }
+  ],
+  "aggregate": {
+    "elements_total": 7,
+    "elements_with_confident_effect_support": 7,
+    "elements_fully_resolved_for_removal_mask": 6,
+    "elements_partially_resolved": 1,
+    "partial_element": "course_sp",
+    "partial_reason": "Protected inline OutRun2: SP remains in the first line; this task deliberately does not guess the split inside that connected effect run.",
+    "confident_effect_mask_pixels": 357200,
+    "mask_raw_sha256": "d3a3f6a80e8bc087e328dd99236a6c7979056d8eb93afdf8a9915e59740eeaef"
+  },
+  "self_qa": {
+    "exact_source_hash_match": "PASS",
+    "mask_outside_declared_confident_regions_px": 0,
+    "protected_inline_prefix_modified": false,
+    "candidate_dds_modified": false,
+    "clean_plate_generated": false,
+    "source_style_measurement_completed": false,
+    "readiness_before": "PREFLIGHT_ONLY",
+    "readiness_after": "PREFLIGHT_ONLY__6_OF_7_REMOVAL_MASKS_PIXEL_RESOLVED__COURSE_SP_PROTECTED_PREFIX_SPLIT_REMAINS",
+    "runtime_validation": "UNTESTED",
+    "locally_rendered_review_inspected": "PASS",
+    "local_review_note": "Overlay inspection confirmed excluded neighboring-art bands for wait_now, acceleration, max_speed, view_change, expert, and full isolation for special_course; course_sp first-line protected-prefix split remains intentionally unresolved."
+  },
+  "artifacts": {
+    "mask_persistence": "DETERMINISTIC_RULE_IN_JSON",
+    "mask_rebuild": "For each element, take exact canonical readable-display RGBA source, crop confident_text_region_display_ltrb, select alpha>0, then map selected pixels back to full atlas.",
+    "binary_mask_committed": false,
+    "visual_review_png_committed": false
+  }
+}
