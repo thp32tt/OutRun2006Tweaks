@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 405,
+  "cycle": 410,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -53,14 +53,16 @@
     "R84-REF-GUARD-0003",
     "R84-REF-MATRIX-0001-0020",
     "R84-REF-MATRIX-0021-0040",
-    "VR-REFACTOR-STATE-0002A-FIX00-R84"
+    "VR-REFACTOR-STATE-0002A-FIX00-R84",
+    "VR-REFACTOR-STATE-0002A-FIX01-R84"
   ],
-  "next": "Cycles 406-410: migrate R33 dangling StateBlock reliability queries to neutral StateBlockTracker and add source verifier.",
-  "updatedKst": "2026-10-01T08:02:00+09:00",
+  "next": "Cycles 411-415: migrate R31/R33 StateBlock recording state and recording/apply generations to StateBlockTracker; keep physical hooks unchanged.",
+  "updatedKst": "2026-10-01T08:05:00+09:00",
   "batchStatus": "R84_MATRIX_CYCLE_400_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
-    "Ported STATE-0002A FIX00 onto recovered R84 lineage: StateBlockTracker now owns R22/R31 reliability, coverage-loss and lazy-resync authority. Physical StateBlock hooks remain unchanged."
+    "Ported STATE-0002A FIX00 onto recovered R84 lineage: StateBlockTracker now owns R22/R31 reliability, coverage-loss and lazy-resync authority. Physical StateBlock hooks remain unchanged.",
+    "Ported FIX01 onto recovered R84 lineage: R33 no longer references removed R31 reliability storage; source-only verifier now requires tracker file/API and rejects legacy authority symbols."
   ]
 }
