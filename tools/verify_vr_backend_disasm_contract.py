@@ -112,6 +112,11 @@ def main() -> None:
             "VR R125 GHOST GAP INFO HUD: shared producer-map handoff",
             "PutGhostGapInfo_sub_AdjustPositionAndHud<0x000BDAE8u>",
             "VR R126 GHOST GAP SUB HUD: shared producer-map handoff",
+            "DispGhostGap_ForceSpacingAndHud<0x000BE045u, true>",
+            "DispGhostGap_ForceSpacingAndHud<0x000BE083u, true>",
+            "DispGhostGap_ForceSpacingAndHud<0x000BE0A5u, false>",
+            "DispGhostGap_ForceSpacingAndHud<0x000BE067u, false>",
+            "VR R127 GHOST GAP FORCE HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -159,6 +164,20 @@ def main() -> None:
     if "PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDAE8, PutGhostGapInfo_sub_AdjustPosition);" in hooks_text:
         raise SystemExit(
             "F13 PutGhostGapInfo_sub ownership regressed to spacing-only callback"
+        )
+    legacy_ghost_gap_force_hooks = [
+        "DispGhostGap_ForceLeft_hk = safetyhook::create_mid((void*)0x4BE045, SpriteSpacingForceLeft);",
+        "DispGhostGap_ForceLeft2_hk = safetyhook::create_mid((void*)0x4BE083, SpriteSpacingForceLeft);",
+        "DispGhostGap_ForceRight_hk = safetyhook::create_mid((void*)0x4BE0A5, SpriteSpacingForceRight);",
+        "DispGhostGap_ForceRight2_hk = safetyhook::create_mid((void*)0x4BE067, SpriteSpacingForceRight);",
+    ]
+    stale_ghost_gap_force_hooks = [
+        hook for hook in legacy_ghost_gap_force_hooks if hook in hooks_text
+    ]
+    if stale_ghost_gap_force_hooks:
+        raise SystemExit(
+            "F13 DispGhostGap force ownership regressed to spacing-only callbacks: "
+            f"{stale_ghost_gap_force_hooks}"
         )
     require(
         "tools/analyze_outrun_exe.py",
