@@ -31,6 +31,18 @@ jobs:
           if ($actual -ne '46fa5383bbf1144e58446028a452f74065fa44c8') { throw "Pinned DX11 source mismatch: $actual" }
           Write-Host "DX11_TEST_SOURCE_SHA=$actual"
 
+      - name: Adapt stale package guard to current R121 marker
+        shell: pwsh
+        run: |
+          $path = 'tools/Build-OutRunPCFast.ps1'
+          $text = Get-Content $path -Raw
+          $old = "'VR R66 GOAL TIME HUD:'"
+          $new = "'VR R121 GOAL TIME HUD: shared producer-map'"
+          if (-not $text.Contains($old)) { throw "Expected stale DX11 package guard not found" }
+          $text = $text.Replace($old, $new)
+          Set-Content $path $text
+          Write-Host 'Package guard adapted: R66 GOAL TIME HUD -> R121 shared producer-map'
+
       - name: Build packaged runtime test ZIP
         shell: pwsh
         env:
