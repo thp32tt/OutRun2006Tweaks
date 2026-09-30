@@ -1,0 +1,66 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00262-p00148-index111-source-style-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00262",
+  "wave_id": "P00148",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-09-30T18:48:04+09:00",
+  "base_head_sha": "4bed01cb4c287a966b1ba719c7b071894952c1dc",
+  "base_sha": "4bed01cb4c287a966b1ba719c7b071894952c1dc",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX111_SOURCE_STYLE_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_SIX_SOURCE_STYLE_SLANT_MEASUREMENTS_THREE_PANEL_CLEAN_PLATES_STILL_BLOCKED_RUNTIME_UNTESTED",
+  "summary": "Rollover 3 resumes unfinished A00262 from current GitHub SSOT; no prior durable A00262 result exists. Current schema 15 assigns A index%3==0. Exact index111 C075FB49 source/candidate Git blobs remain unchanged from A00254/C157 lineage. The approved Drive exact-relative-path canonical source object was resolved, and the pinned v0.25.10a archive/member identity was independently verified before pixel measurement. This pass removes the source-letterform/signed-slant blocker for all six remaining index111 rework elements by recording readable-space fill geometry, source palettes, line geometry and signed vertical-stem measurements from the exact English HD source. keep_passing and drift are upright; maximum_speed, tuned_setting, normal_setting and random are right-slanted about 19-21 degrees. A00254 clean-plate evidence for keep_passing/drift/maximum_speed remains reusable. tuned_setting/normal_setting/random remain blocked on protected-artwork/background clean plates because their text is alpha-connected to car/question-mark panel artwork. No DDS bytes or shared state are changed; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00262-P00148/A00262_P00148_INDEX111_SOURCE_STYLE_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_C075FB49_SIX_ELEMENT_SOURCE_STYLE_SIGNED_SLANT_RECONSTRUCTION_INPUT",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "source_style_measurements_added": 6,
+    "signed_slant_measurements_added": 6,
+    "candidate_dds_modified": false,
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_indices": [
+      111
+    ],
+    "readiness_before": "PREFLIGHT_ONLY__3_OF_6_SOURCE_MASK_CLEAN_PLATE_READY__3_PANEL_ARTWORK_RECONSTRUCTION_REQUIRED",
+    "readiness_after": "PREFLIGHT_ONLY__SIX_SOURCE_STYLE_SLANT_MEASURED__3_OF_6_CLEAN_PLATE_READY__3_PANEL_PROTECTED_ARTWORK_CLEAN_PLATE_RECONSTRUCTION_REQUIRED",
+    "unresolved_panel_clean_plates": [
+      "tuned_setting",
+      "normal_setting",
+      "random"
+    ]
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_SCHEMA15_SHARD__EXACT_CANONICAL_SOURCE_IDENTITY__SOURCE_AND_CANDIDATE_GIT_BLOBS_UNCHANGED__SIX_SOURCE_STYLE_AND_SIGNED_SLANT_INPUTS_RECORDED__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(A): measure index111 source style [AUTO:LOCALIZATION-LOCALIZATION_A-00262]"
+}

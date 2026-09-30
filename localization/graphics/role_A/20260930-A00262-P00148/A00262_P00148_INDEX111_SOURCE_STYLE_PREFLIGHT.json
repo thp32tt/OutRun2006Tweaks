@@ -1,0 +1,438 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00262-p00148-index111-source-style-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00262",
+  "wave_id": "P00148",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-09-30T18:48:04+09:00",
+  "base_head_sha": "4bed01cb4c287a966b1ba719c7b071894952c1dc",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_SIX_SOURCE_STYLE_SLANT_MEASUREMENTS_THREE_PANEL_CLEAN_PLATES_STILL_BLOCKED_RUNTIME_UNTESTED",
+  "summary": "Rollover 3 resumes unfinished A00262 from current GitHub SSOT; no prior durable A00262 result exists. Current schema 15 assigns A index%3==0. Exact index111 C075FB49 source/candidate Git blobs remain unchanged from A00254/C157 lineage. The approved Drive exact-relative-path canonical source object was resolved, and the pinned v0.25.10a archive/member identity was independently verified before pixel measurement. This pass removes the source-letterform/signed-slant blocker for all six remaining index111 rework elements by recording readable-space fill geometry, source palettes, line geometry and signed vertical-stem measurements from the exact English HD source. keep_passing and drift are upright; maximum_speed, tuned_setting, normal_setting and random are right-slanted about 19-21 degrees. A00254 clean-plate evidence for keep_passing/drift/maximum_speed remains reusable. tuned_setting/normal_setting/random remain blocked on protected-artwork/background clean plates because their text is alpha-connected to car/question-mark panel artwork. No DDS bytes or shared state are changed; runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "FALLBACK_STEP_4_SOURCE_STYLE_INPUT_CONTINUATION_AFTER_ZERO_RUNNABLE_READY_TIERS",
+    "prior_material": "A00254 resolved exact source-effect masks + transparent clean plates for keep_passing/drift/maximum_speed and proved three panel-artwork blockers.",
+    "qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ]
+  },
+  "fingerprint": {
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+    "candidate_git_blob_sha": "de1ad4cdcf2e26ddd5265e495b821e8b98f4199e",
+    "structure": "2048x2048 RGBA32 mip1 / raw mirror_y",
+    "controller_schema_version": 15,
+    "controller_config_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926"
+  },
+  "source_acquisition": {
+    "github_state_ssot": true,
+    "drive_provider": "google_drive",
+    "drive_account": "ezflash557",
+    "drive_file_id": "1pIGMl0fCgtlkEo0vwfIr8nTGjpe1BTLB",
+    "drive_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "drive_reported_size_bytes": 16777344,
+    "drive_write_performed": false,
+    "uploaded_archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "uploaded_archive_size_bytes": 306223257,
+    "uploaded_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "canonical_member": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "canonical_member_size_bytes": 16777344,
+    "canonical_member_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "identity": "PASS_EXACT_PINNED_ARCHIVE_AND_MEMBER"
+  },
+  "measurement_method": {
+    "source_only": true,
+    "coordinate_space": "readable/display coordinates after exact raw mirror_y -> flip_y normalization",
+    "source_text_transform_storage": "raw mirror_y",
+    "source_fill_segmentation": "dominant exact-source palette inside locked sprite-cell/element ROI; protected panel/icon colors excluded from text-fill geometry",
+    "slant_measurement": "Canny/Hough stable near-vertical source-fill stems; robust median dx/dy in readable coordinates",
+    "slant_sign_convention": "positive slant_dx_per_dy means glyph top displaced right of bottom; angle=atan(slant_dx_per_dy)",
+    "candidate_pixels_used": false,
+    "note": "These are generation inputs, not final candidate approval or editable-mask authority."
+  },
+  "measured_elements": [
+    {
+      "key": "keep_passing",
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!",
+      "sprite_cell": [
+        0,
+        120,
+        520,
+        245
+      ],
+      "candidate_safe_bbox": [
+        3,
+        145,
+        518,
+        234
+      ],
+      "source_fill_bbox_display": [
+        16,
+        158,
+        490,
+        221
+      ],
+      "source_fill_rgb": [
+        246,
+        205,
+        12
+      ],
+      "source_effect_palette": {
+        "inner_outline_rgb": [
+          0,
+          10,
+          57
+        ],
+        "outer_outline_rgb": [
+          255,
+          255,
+          255
+        ]
+      },
+      "line_count": 1,
+      "baseline_direction": "+x",
+      "slant_dx_per_dy": 0,
+      "slant_angle_deg": 0,
+      "slant_direction": "none",
+      "letterform_traits": "bold condensed upright arcade lettering; yellow fill with dark navy inner outline and white outer outline",
+      "clean_plate_status": "A00254_SOURCE_EFFECT_MASK_AND_TRANSPARENT_CLEAN_PLATE_READY",
+      "style_status": "SOURCE_STYLE_READY"
+    },
+    {
+      "key": "drift",
+      "source": "Drift!",
+      "korean": "드리프트!",
+      "sprite_cell": [
+        500,
+        120,
+        720,
+        245
+      ],
+      "candidate_safe_bbox": [
+        502,
+        122,
+        718,
+        226
+      ],
+      "source_fill_bbox_display": [
+        530,
+        161,
+        677,
+        214
+      ],
+      "source_fill_rgb": [
+        246,
+        205,
+        12
+      ],
+      "source_effect_palette": {
+        "inner_outline_rgb": [
+          0,
+          10,
+          57
+        ],
+        "outer_outline_rgb": [
+          255,
+          255,
+          255
+        ]
+      },
+      "line_count": 1,
+      "baseline_direction": "+x",
+      "slant_dx_per_dy": 0,
+      "slant_angle_deg": 0,
+      "slant_direction": "none",
+      "letterform_traits": "bold condensed upright arcade lettering; yellow fill with dark navy inner outline and white outer outline",
+      "clean_plate_status": "A00254_SOURCE_EFFECT_MASK_AND_TRANSPARENT_CLEAN_PLATE_READY",
+      "style_status": "SOURCE_STYLE_READY"
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "sprite_cell": [
+        680,
+        120,
+        1160,
+        245
+      ],
+      "candidate_safe_bbox": [
+        682,
+        122,
+        1135,
+        225
+      ],
+      "source_fill_bbox_display": [
+        707,
+        162,
+        1137,
+        225
+      ],
+      "source_fill_rgb": [
+        255,
+        255,
+        255
+      ],
+      "line_count": 1,
+      "baseline_direction": "+x",
+      "slant_dx_per_dy": 0.361413,
+      "slant_angle_deg": 19.8705,
+      "slant_direction": "right",
+      "letterform_traits": "condensed right-italic white lettering; no separate outline observed inside the selected source-text mask",
+      "clean_plate_status": "A00254_SOURCE_EFFECT_MASK_AND_TRANSPARENT_CLEAN_PLATE_READY",
+      "style_status": "SOURCE_STYLE_READY"
+    },
+    {
+      "key": "tuned_setting",
+      "source": "Tuned Setting",
+      "korean": "튜닝 / 설정",
+      "sprite_cell": [
+        40,
+        1170,
+        245,
+        1305
+      ],
+      "candidate_safe_bbox": [
+        42,
+        1197,
+        243,
+        1303
+      ],
+      "source_fill_bbox_display": [
+        50,
+        1213,
+        214,
+        1304
+      ],
+      "source_line_fill_bboxes_display": [
+        [
+          71,
+          1213,
+          215,
+          1250
+        ],
+        [
+          49,
+          1257,
+          215,
+          1304
+        ]
+      ],
+      "source_fill_rgb": [
+        255,
+        150,
+        0
+      ],
+      "source_effect_palette": {
+        "panel_rgb": [
+          196,
+          0,
+          0
+        ],
+        "dark_effect_rgb": [
+          29,
+          0,
+          0
+        ],
+        "light_panel_effect_rgb": [
+          228,
+          136,
+          136
+        ]
+      },
+      "line_count": 2,
+      "baseline_direction": "+x",
+      "slant_dx_per_dy": 0.375,
+      "slant_angle_deg": 20.556,
+      "slant_direction": "right",
+      "letterform_traits": "two-line condensed right-italic orange lettering with dark red effect over red selector panel",
+      "clean_plate_status": "BLOCKED_PROTECTED_CAR_ICON_AND_PANEL_ALPHA_CONNECTED",
+      "style_status": "SOURCE_STYLE_READY_CLEAN_PLATE_BLOCKED"
+    },
+    {
+      "key": "normal_setting",
+      "source": "Normal Setting",
+      "korean": "일반 / 설정",
+      "sprite_cell": [
+        375,
+        1170,
+        600,
+        1305
+      ],
+      "candidate_safe_bbox": [
+        383,
+        1197,
+        598,
+        1303
+      ],
+      "source_fill_bbox_display": [
+        410,
+        1213,
+        596,
+        1304
+      ],
+      "source_line_fill_bboxes_display": [
+        [
+          425,
+          1213,
+          596,
+          1251
+        ],
+        [
+          410,
+          1258,
+          575,
+          1304
+        ]
+      ],
+      "source_fill_rgb": [
+        255,
+        243,
+        112
+      ],
+      "source_effect_palette": {
+        "panel_rgb": [
+          0,
+          150,
+          0
+        ],
+        "dark_effect_rgb": [
+          0,
+          22,
+          0
+        ],
+        "light_panel_effect_rgb": [
+          136,
+          206,
+          136
+        ]
+      },
+      "line_count": 2,
+      "baseline_direction": "+x",
+      "slant_dx_per_dy": 0.345342,
+      "slant_angle_deg": 19.0519,
+      "slant_direction": "right",
+      "letterform_traits": "two-line condensed right-italic pale-yellow lettering with dark green effect over green selector panel",
+      "clean_plate_status": "BLOCKED_PROTECTED_CAR_ICON_AND_PANEL_ALPHA_CONNECTED",
+      "style_status": "SOURCE_STYLE_READY_CLEAN_PLATE_BLOCKED"
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "sprite_cell": [
+        1710,
+        1410,
+        2008,
+        1515
+      ],
+      "candidate_safe_bbox": [
+        1712,
+        1437,
+        2006,
+        1513
+      ],
+      "source_fill_bbox_display": [
+        1737,
+        1453,
+        1937,
+        1490
+      ],
+      "source_fill_rgb": [
+        245,
+        247,
+        247
+      ],
+      "source_effect_palette": {
+        "panel_rgb": [
+          0,
+          79,
+          159
+        ],
+        "dark_effect_rgb": [
+          [
+            0,
+            20,
+            40
+          ],
+          [
+            0,
+            12,
+            24
+          ]
+        ],
+        "light_panel_effect_rgb": [
+          136,
+          173,
+          211
+        ]
+      },
+      "line_count": 1,
+      "baseline_direction": "+x",
+      "slant_dx_per_dy": 0.387097,
+      "slant_angle_deg": 21.1613,
+      "slant_direction": "right",
+      "letterform_traits": "condensed right-italic near-white lettering with dark blue shadow/effect over blue random-selector panel",
+      "clean_plate_status": "BLOCKED_PROTECTED_QUESTION_MARK_AND_PANEL_ALPHA_CONNECTED",
+      "style_status": "SOURCE_STYLE_READY_CLEAN_PLATE_BLOCKED"
+    }
+  ],
+  "readiness_before": "PREFLIGHT_ONLY__3_OF_6_SOURCE_MASK_CLEAN_PLATE_READY__3_PANEL_ARTWORK_RECONSTRUCTION_REQUIRED",
+  "readiness_after": "PREFLIGHT_ONLY__SIX_SOURCE_STYLE_SLANT_MEASURED__3_OF_6_CLEAN_PLATE_READY__3_PANEL_PROTECTED_ARTWORK_CLEAN_PLATE_RECONSTRUCTION_REQUIRED",
+  "blockers_after": [
+    "tuned_setting requires a source-faithful protected-car/panel reconstruction mask and independent CLEAN_PLATE.",
+    "normal_setting requires a source-faithful protected-car/panel reconstruction mask and independent CLEAN_PLATE.",
+    "random requires a source-faithful protected-question-mark/panel reconstruction mask and independent CLEAN_PLATE.",
+    "Only after those clean plates pass may a changed index111 DDS proceed through native Korean render, v2 measure/refit, exact DDS encode, decoded-final self-QA and mandatory source-vs-candidate review artifacts."
+  ],
+  "same_task_completion_gate": {
+    "render_ready_reached": false,
+    "reason": "Three panel-connected elements still lack independent protected-artwork clean plates. A production rewrite would violate the clean-plate/protected-artwork gate."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_C075FB49_SIX_ELEMENT_SOURCE_STYLE_SIGNED_SLANT_RECONSTRUCTION_INPUT",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "source_style_measurements_added": 6,
+    "signed_slant_measurements_added": 6,
+    "candidate_dds_modified": false,
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_SCHEMA15_SHARD__EXACT_CANONICAL_SOURCE_IDENTITY__SOURCE_AND_CANDIDATE_GIT_BLOBS_UNCHANGED__SIX_SOURCE_STYLE_AND_SIGNED_SLANT_INPUTS_RECORDED__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
