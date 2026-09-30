@@ -98,16 +98,18 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "8c8df542c8df1baa87d5c1cf6db621e023adff37",
+  "authoritative_result_sha": "8c8df542c8df1baa87d5c1cf6db621e023adff37",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): complete index232 full clean-plate preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00322]",
   "precommit_refresh": {
     "head_sha": "c5ff31e065e5905e887c366fe663f6b85e989d73",
     "head_message": "chore(localization): record Q00068 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00321] [skip ci]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "C170/Q00068 Gate bookkeeping is preserved. Only new B00322 lane-local report and unique task record will be added."
+    "concurrent_changes_reviewed": "C170/Q00068 Gate bookkeeping is preserved. Only new B00322 lane-local report and unique task record were added."
   },
-  "bookkeeping_note": "Result SHA will be bound by a separate bookkeeping commit after the durable producer result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
-  "durable_task_record_in_result_commit": true
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "durable_task_record_in_result_commit": true,
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:29:00+09:00",
+  "bookkeeping_base_head_sha": "8c8df542c8df1baa87d5c1cf6db621e023adff37"
 }
