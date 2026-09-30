@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00166",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "9069ce44501516acfa93cc7f954b53cef9a08cae",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R166_HELPER_283DE_INSTRUCTION_TERMINAL",
+  "selection_reason": "CONVERSION-DX11-00164 captured exact 0x283DE continuation bytes and explicitly named complete-instruction decoding as the next bounded F13 task. The 96-byte window ends exactly at RET 0x2843D, so the full capture can be proven without another byte fetch.",
+  "summary": "Add an independent DX11 fail-closed exact-EXE proof for every complete instruction in 0x283DE..0x2843D. Pin terminal RET 0x2843D and prove that the previously validated failure edge to 0x28433 lands on the shared epilogue entry. Data-structure meaning, function-entry status and render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00165",
+    "source_result_sha": "abcc7a90cc29d147ed4e6f541c38dba046592363",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded terminal-proof design only. DX11 binds the proof to its own 00164 provenance predecessor and must independently pass exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00166.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00164 validation-bearing result e5fe3137aea436706e2f613212a32fa0c0cb008c captured a fresh exact 96-byte 0x283DE window with zero raw rel32 candidates.",
+    "The 96-byte window ends exactly after RET at exclusive RVA 0x2843E, allowing every captured byte to be covered by complete instructions.",
+    "The earlier R162 proof pinned the failure edge to 0x28433; this task verifies 0x28433 is the instruction-aligned shared epilogue entry inside the terminal window.",
+    "DXVK-00165 independently selected and hosted-validated the same bounded terminal proof on the same exact public EXE; DX11 validation remains independent.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If green, persist exact 0x283DE..0x2843D instruction/epilogue evidence in separate bookkeeping while keeping function_entry_status=UNRESOLVED, data_structure_semantics=UNRESOLVED and ownership_effect=NONE."
+}

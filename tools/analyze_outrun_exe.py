@@ -285,6 +285,45 @@ GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_2_TARGET_RVA = 0x00182194
 # of the R162 complete instruction window. Capture bytes/call candidates only.
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA = 0x000283DE
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN = 96
+
+# R166/F13: complete instruction proof for the fresh R164 continuation window.
+# The exact 96-byte capture ends at RET 0x2843D (exclusive end 0x2843E).
+GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_END_RVA = 0x0002843E
+GF_TARGET_C_HELPER_1_NEXT_CODE_SHARED_EPILOGUE_RVA = 0x00028433
+GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
+    (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
+    (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
+    (0x000283E6, "89 48 20", "mov [eax+0x20], ecx"),
+    (0x000283E9, "89 68 70", "mov [eax+0x70], ebp"),
+    (0x000283EC, "89 58 74", "mov [eax+0x74], ebx"),
+    (0x000283EF, "81 c7 88 6d 95 00", "add edi, 0x956d88"),
+    (0x000283F5, "89 78 28", "mov [eax+0x28], edi"),
+    (0x000283F8, "c7 40 2c ff ff ff ff", "mov dword [eax+0x2c], -1"),
+    (0x000283FF, "89 50 78", "mov [eax+0x78], edx"),
+    (0x00028402, "89 70 68", "mov [eax+0x68], esi"),
+    (0x00028405, "89 70 64", "mov [eax+0x64], esi"),
+    (0x00028408, "89 70 60", "mov [eax+0x60], esi"),
+    (0x0002840B, "89 70 5c", "mov [eax+0x5c], esi"),
+    (0x0002840E, "89 70 54", "mov [eax+0x54], esi"),
+    (0x00028411, "89 70 50", "mov [eax+0x50], esi"),
+    (0x00028414, "89 70 4c", "mov [eax+0x4c], esi"),
+    (0x00028417, "89 70 48", "mov [eax+0x48], esi"),
+    (0x0002841A, "89 70 40", "mov [eax+0x40], esi"),
+    (0x0002841D, "89 70 3c", "mov [eax+0x3c], esi"),
+    (0x00028420, "89 70 38", "mov [eax+0x38], esi"),
+    (0x00028423, "89 70 34", "mov [eax+0x34], esi"),
+    (0x00028426, "89 48 6c", "mov [eax+0x6c], ecx"),
+    (0x00028429, "89 48 58", "mov [eax+0x58], ecx"),
+    (0x0002842C, "89 48 44", "mov [eax+0x44], ecx"),
+    (0x0002842F, "89 48 30", "mov [eax+0x30], ecx"),
+    (0x00028432, "5b", "pop ebx"),
+    (0x00028433, "8b 44 24 0c", "mov eax, [esp+0x0c]"),
+    (0x00028437, "5f", "pop edi"),
+    (0x00028438, "5e", "pop esi"),
+    (0x00028439, "5d", "pop ebp"),
+    (0x0002843A, "83 c4 0c", "add esp, 0x0c"),
+    (0x0002843D, "c3", "ret"),
+)
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_INSTRUCTIONS = (
     (0x0002837E, "83 c4 04", "add esp, 4"),
     (0x00028381, "83 f8 ff", "cmp eax, -1"),
@@ -2044,6 +2083,90 @@ def collect_guarded_gf_target_c_helper_1_next_code_continuation_2_provenance(pe:
 
 
 
+def collect_guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof(pe: PE) -> dict:
+    """Prove the complete 0x283DE..0x2843D terminal/data-write window."""
+
+    provenance = collect_guarded_gf_target_c_helper_1_next_code_continuation_2_provenance(pe)
+    previous = collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe)
+    expected_next = GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    predecessor_exact = (
+        provenance["status"]
+        == "EXACT_EXE_NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURED"
+        and provenance["predecessor_exact"]
+        and provenance["target_section"] == ".text"
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    end_matches = (
+        expected_next == GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_END_RVA
+    )
+    ret_matches = (
+        pe.bytes_at_rva(GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_END_RVA - 1, 1)
+        == b"\xc3"
+    )
+    shared_epilogue_link = (
+        previous["status"] == "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN"
+        and previous["fail_target_matches"]
+        and previous["fail_target_rva"]
+        == GF_TARGET_C_HELPER_1_NEXT_CODE_SHARED_EPILOGUE_RVA
+        and any(
+            row["rva"] == GF_TARGET_C_HELPER_1_NEXT_CODE_SHARED_EPILOGUE_RVA
+            and row["bytes_match"]
+            for row in rows
+        )
+    )
+    proven = bool(
+        predecessor_exact
+        and contiguous
+        and all_bytes_match
+        and end_matches
+        and ret_matches
+        and shared_epilogue_link
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA,
+        "end_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_END_RVA,
+        "predecessor_status": provenance["status"],
+        "predecessor_exact": predecessor_exact,
+        "target_section": provenance["target_section"],
+        "function_start_guess_rva": provenance["function_start_guess_rva"],
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "shared_epilogue_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_SHARED_EPILOGUE_RVA,
+        "shared_epilogue_link": shared_epilogue_link,
+        "terminal_ret_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_END_RVA - 1,
+        "terminal_ret_matches": ret_matches,
+        "status": (
+            "EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN"
+            if proven
+            else "NEXT_CODE_CONTINUATION_2_TERMINAL_PROOF_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "PARTIAL_BOUNDED_DATA_WRITES_AND_EPILOGUE_ONLY",
+        "data_structure_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -2452,6 +2575,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_next_code_continuation_provenance": collect_guarded_gf_target_c_helper_1_next_code_continuation_provenance(pe),
         "guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_next_code_continuation_2_provenance": collect_guarded_gf_target_c_helper_1_next_code_continuation_2_provenance(pe),
+        "guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -2817,6 +2941,26 @@ def main() -> int:
         f"ownership_effect={helper_1_next_cont2['ownership_effect']} "
         f"bytes={helper_1_next_cont2['bytes']}"
     )
+    helper_1_next_cont2_prefix = report["guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof"]
+    print(
+        f"gf_target_c_helper_1_next_code_continuation_2_prefix=0x{helper_1_next_cont2_prefix['target_rva']:08X} "
+        f"status={helper_1_next_cont2_prefix['status']} "
+        f"predecessor_status={helper_1_next_cont2_prefix['predecessor_status']} "
+        f"predecessor_exact={helper_1_next_cont2_prefix['predecessor_exact']} "
+        f"section={helper_1_next_cont2_prefix['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1_next_cont2_prefix['function_start_guess_rva'])} "
+        f"end={hexrva(helper_1_next_cont2_prefix['end_rva'])} "
+        f"layout_contiguous={helper_1_next_cont2_prefix['layout_contiguous']} "
+        f"bytes_match={helper_1_next_cont2_prefix['all_instruction_bytes_match']} "
+        f"shared_epilogue={hexrva(helper_1_next_cont2_prefix['shared_epilogue_rva'])} "
+        f"shared_epilogue_link={helper_1_next_cont2_prefix['shared_epilogue_link']} "
+        f"ret=0x{helper_1_next_cont2_prefix['terminal_ret_rva']:08X} "
+        f"ret_match={helper_1_next_cont2_prefix['terminal_ret_matches']} "
+        f"function_entry={helper_1_next_cont2_prefix['function_entry_status']} "
+        f"semantic_effect={helper_1_next_cont2_prefix['semantic_effect']} "
+        f"data_semantics={helper_1_next_cont2_prefix['data_structure_semantics']} "
+        f"ownership_effect={helper_1_next_cont2_prefix['ownership_effect']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -2864,6 +3008,9 @@ def main() -> int:
     if helper_1_next_cont2["status"] != "EXACT_EXE_NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_next_code_continuation_2_provenance=FAILED")
         return 15
+    if helper_1_next_cont2_prefix["status"] != "EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN":
+        print("guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof=FAILED")
+        return 16
     return 0
 
 
