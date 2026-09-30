@@ -963,7 +963,12 @@ namespace OutRunVRStereo
         bool R73OutRunHudStageSeen = false;
         int R73OutRunHudLastStage = -1;
         bool R73FirstTransientHudLogged = false;
-        constexpr bool R73BypassStereoSkyGlow = true;
+        constexpr bool R73BypassStereoSkyGlow = false;
+        // R76: SkyGlow visual/runtime path restored to the exact DX9Ex common
+        // baseline shared by the DX11 and DXVK development branches:
+        // b6c208bbc9a411b9c035be26f9e1e9c014028738.
+        constexpr const char* R76SkyGlowBaselineSha =
+            "b6c208bbc9a411b9c035be26f9e1e9c014028738";
 
         void R67GuardStageTransitionPresent() noexcept
         {
@@ -1395,7 +1400,8 @@ namespace OutRunVRStereo
                 !width || !height)
                 return false;
 
-            if (FAILED(device->SetRenderTarget(0, target)))
+            if (FAILED(device->SetRenderTarget(0, target)) ||
+                FAILED(device->SetDepthStencilSurface(nullptr)))
                 return false;
 
             D3DVIEWPORT9 viewport{};
@@ -1417,11 +1423,21 @@ namespace OutRunVRStereo
                     0.0f, 1.0f, 1.0f, 1.0f }
             };
 
-            if (FAILED(device->SetPixelShader(shader)) ||
-                FAILED(device->SetTexture(0, source)) ||
-                FAILED(device->SetRenderState(
-                    D3DRS_ALPHABLENDENABLE, additive ? TRUE : FALSE)))
-                return false;
+            device->SetVertexShader(nullptr);
+            device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+            device->SetPixelShader(shader);
+            device->SetTexture(0, source);
+            device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+            device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+            device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+            device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+            device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+            device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+            device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+            device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+            device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+            device->SetRenderState(D3DRS_ALPHABLENDENABLE,
+                additive ? TRUE : FALSE);
             if (additive)
             {
                 device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -1440,18 +1456,16 @@ namespace OutRunVRStereo
                     D3DCOLORWRITEENABLE_BLUE |
                     D3DCOLORWRITEENABLE_ALPHA);
             }
-            if (FAILED(device->SetPixelShaderConstantF(
-                    0, constant, 1)))
-                return false;
-            return SUCCEEDED(device->DrawPrimitiveUP(
-                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex)));
+            device->SetPixelShaderConstantF(0, constant, 1);
+            const HRESULT hr = device->DrawPrimitiveUP(
+                D3DPT_TRIANGLESTRIP, 2, v, sizeof(R30GlowVertex));
+            device->SetTexture(0, nullptr);
+            return SUCCEEDED(hr);
         }
 
         bool R30CaptureSkyGlowSceneBeforeHud(
             IDirect3DDevice9* device)
         {
-            if (R73BypassStereoSkyGlow)
-                return false;
             if (!device || Settings::SkyGlowFactor <= 0 ||
                 !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
                 FrameRightDrawFailed || FrameStereoIncomplete ||
@@ -1469,10 +1483,17 @@ namespace OutRunVRStereo
             bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
+                IDirect3DSurface9* reduced = nullptr;
+                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &reduced)) || !reduced)
+                {
+                    ok = false;
+                    break;
+                }
                 ok = SUCCEEDED(device->StretchRect(
-                    eyeSurface[eye], nullptr,
-                    R30SkyGlow.reducedSurface[eye], nullptr,
+                    eyeSurface[eye], nullptr, reduced, nullptr,
                     D3DTEXF_LINEAR));
+                reduced->Release();
             }
             if (ok)
                 R30SkyGlowSceneCaptureEpoch = PresentEpoch;
@@ -1481,8 +1502,6 @@ namespace OutRunVRStereo
 
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
-            if (R73BypassStereoSkyGlow)
-                return true;
             if (!device || Settings::SkyGlowFactor <= 0 ||
                 !StereoWanted() || !FrameHadWorldStereo ||
                 !FrameHadDuplicatedDraw || FrameRightDrawFailed ||
@@ -1493,20 +1512,50 @@ namespace OutRunVRStereo
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
-            R30SkyGlowSavedState savedState{};
-            if (!R30CaptureSkyGlowState(device, savedState))
+            IDirect3DStateBlock9* stateBlock = nullptr;
+            IDirect3DSurface9* savedRt = nullptr;
+            IDirect3DSurface9* savedDepth = nullptr;
+            D3DVIEWPORT9 savedViewport{};
+            if (FAILED(device->CreateStateBlock(
+                    D3DSBT_ALL, &stateBlock)) ||
+                !stateBlock ||
+                FAILED(device->GetRenderTarget(0, &savedRt)) ||
+                !savedRt ||
+                FAILED(device->GetViewport(&savedViewport)))
+            {
+                if (savedRt) savedRt->Release();
+                if (stateBlock) stateBlock->Release();
                 return false;
+            }
+            const HRESULT depthHr =
+                device->GetDepthStencilSurface(&savedDepth);
+            const bool depthOk =
+                SUCCEEDED(depthHr) || depthHr == D3DERR_NOTFOUND;
+            if (!depthOk)
+            {
+                savedRt->Release();
+                stateBlock->Release();
+                return false;
+            }
 
-            bool ok = R30PrepareSkyGlowPipeline(device);
+            bool ok = true;
             IDirect3DSurface9* eyeSurface[2]{
                 BackBuffer, RightEyeSurface
             };
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced =
-                    R30SkyGlow.reducedSurface[eye];
-                IDirect3DSurface9* temp =
-                    R30SkyGlow.tempSurface[eye];
+                IDirect3DSurface9* reduced = nullptr;
+                IDirect3DSurface9* temp = nullptr;
+                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &reduced)) || !reduced ||
+                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
+                        0, &temp)) || !temp)
+                {
+                    if (temp) temp->Release();
+                    if (reduced) reduced->Release();
+                    ok = false;
+                    break;
+                }
 
                 if (R30SkyGlowSceneCaptureEpoch != PresentEpoch)
                 {
@@ -1528,12 +1577,6 @@ namespace OutRunVRStereo
                         R30SkyGlow.bright, zero, false);
                 }
 
-                // R71: the R70 HMD run proved the old "dead work"
-                // optimization was visually wrong: factor=1 composited the
-                // unblurred bright-pass TEMP texture, washing out sky/cloud
-                // detail. Always consume the horizontal blur result. When the
-                // optional second pass is active it writes reduced -> temp, so
-                // TEMP becomes the final composite source.
                 const float horizontal[4]{
                     1.0f /
                         static_cast<float>(R30SkyGlow.glowWidth),
@@ -1547,11 +1590,15 @@ namespace OutRunVRStereo
                         R30SkyGlow.temp[eye],
                         R30SkyGlow.blur, horizontal, false);
 
+                // TwoStep exists to reduce aliasing after a downsample.
+                // At factor=1 there is no downsample, so a second full-resolution
+                // blur only doubles bandwidth. Also make sure the vertical pass,
+                // when requested for factor>1, is actually the composite source.
                 const bool effectiveTwoStep =
                     Settings::SkyGlowTwoStep.get() &&
                     R30SkyGlow.factor > 1;
                 IDirect3DTexture9* compositeSource =
-                    R30SkyGlow.reduced[eye];
+                    R30SkyGlow.temp[eye];
                 if (effectiveTwoStep)
                 {
                     const float vertical[4]{
@@ -1568,13 +1615,10 @@ namespace OutRunVRStereo
                             R30SkyGlow.reduced[eye],
                             R30SkyGlow.blur, vertical, false);
                     if (ok)
-                        compositeSource = R30SkyGlow.temp[eye];
+                        compositeSource = R30SkyGlow.reduced[eye];
                 }
 
-                // R72 HMD correction: current full-res factor=1 run is still
-                // visibly overexposed. Preserve the pre-HUD stereo ordering but
-                // halve only the additive bloom energy.
-                const float composite[4]{ 0.20f, 0, 0, 0 };
+                const float composite[4]{ 0.38f, 0, 0, 0 };
                 if (ok)
                     ok = R30DrawSkyGlowPass(
                         device, eyeSurface[eye],
@@ -1583,25 +1627,39 @@ namespace OutRunVRStereo
                         compositeSource,
                         R30SkyGlow.composite, composite, true);
 
+                temp->Release();
+                reduced->Release();
             }
 
-            // Experimental performance path: restore exactly the state touched
-            // by the stereo SkyGlow pass instead of creating/applying a full
-            // D3DSBT_ALL state block every Present. DrawPrimitiveUP clears
-            // stream 0, so the original stream binding is part of the explicit
-            // snapshot as well.
-            const bool restoreOk =
-                R30RestoreSkyGlowState(device, savedState);
+            // Apply the captured pipeline state first, then explicitly restore
+            // RT/depth/viewport last. This guarantees the game bindings win even
+            // if a driver/state-block implementation restores more state than
+            // the code path historically relied on.
+            bool restoreOk = SUCCEEDED(stateBlock->Apply());
+            restoreOk =
+                SUCCEEDED(device->SetRenderTarget(0, savedRt)) &&
+                restoreOk;
+            const HRESULT restoreDepth =
+                device->SetDepthStencilSurface(savedDepth);
+            restoreOk =
+                (SUCCEEDED(restoreDepth) ||
+                 (!savedDepth && restoreDepth == D3D_OK)) &&
+                restoreOk;
+            restoreOk =
+                SUCCEEDED(device->SetViewport(&savedViewport)) &&
+                restoreOk;
+            savedRt->Release();
+            if (savedDepth) savedDepth->Release();
+            stateBlock->Release();
 
             if (ok && restoreOk)
             {
-                R30SkyGlowAppliedEpoch = PresentEpoch;
                 ++R30SkyGlowFrames;
                 if (!R30FirstSkyGlowLogged)
                 {
                     R30FirstSkyGlowLogged = true;
                     spdlog::info(
-                        "VR SKY GLOW EXP STATEBLOCK V2: explicit touched-state restore + FVF/cull/scissor hardening ACTIVE; D3DSBT_ALL removed factor={} requestedBlur={} effectiveBlur={} buffer={}x{}",
+                        "VR R76 SKY GLOW BASELINE RESTORE: b6c208bb independent L/R extract + stereo blur + additive composite ACTIVE factor={} requestedTwoStep={} effectiveTwoStep={} buffer={}x{}",
                         R30SkyGlow.factor,
                         Settings::SkyGlowTwoStep.get() ? 1 : 0,
                         (Settings::SkyGlowTwoStep.get() && R30SkyGlow.factor > 1) ? 1 : 0,
@@ -1702,42 +1760,12 @@ namespace OutRunVRStereo
             R67GuardStageTransitionPresent();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
-                R30SkyGlowAppliedEpoch != PresentEpoch &&
-                R30SkyGlowPreHudAttemptEpoch != PresentEpoch &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
             {
-                static const LARGE_INTEGER perfFrequency = []() noexcept {
-                    LARGE_INTEGER value{};
-                    QueryPerformanceFrequency(&value);
-                    return value;
-                }();
-                LARGE_INTEGER perfStart{}, perfEnd{};
-                const bool measureSkyGlow =
-                    Settings::VRTelemetry &&
-                    perfFrequency.QuadPart > 0 &&
-                    QueryPerformanceCounter(&perfStart);
-                {
-                    InternalPassScope guard;
-                    R30ApplyStereoSkyGlow(device);
-                }
-                if (measureSkyGlow &&
-                    QueryPerformanceCounter(&perfEnd) &&
-                    perfEnd.QuadPart >= perfStart.QuadPart)
-                {
-                    const auto elapsedUs =
-                        static_cast<std::uint64_t>(
-                            (static_cast<long double>(
-                                perfEnd.QuadPart - perfStart.QuadPart) *
-                                1000000.0L) /
-                            static_cast<long double>(
-                                perfFrequency.QuadPart));
-                    ++R30SkyGlowPerfSamples;
-                    R30SkyGlowPerfTotalUs += elapsedUs;
-                    R30SkyGlowPerfMaxUs =
-                        std::max(R30SkyGlowPerfMaxUs, elapsedUs);
-                }
+                InternalPassScope guard;
+                R30ApplyStereoSkyGlow(device);
             }
             return R30PresentR26Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
@@ -3329,7 +3357,7 @@ namespace OutRunVRStereo
             const char* site)
         {
             if (!state.worldEffect)
-                R30CompositeSkyGlowBeforeHud(device);
+                R30CaptureSkyGlowSceneBeforeHud(device);
 
             ++R9DrawCalls;
             R9MonoBackupGap = true;
@@ -4373,7 +4401,7 @@ namespace OutRunVRStereo
             // Composite the completed world glow before the first recognized
             // HUD draw. The scene snapshot excludes HUD pixels and, critically,
             // the additive glow no longer washes over HUD/menu pixels at Present.
-            R30CompositeSkyGlowBeforeHud(device);
+            R30CaptureSkyGlowSceneBeforeHud(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
