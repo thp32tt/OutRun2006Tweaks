@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00148",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "492771516f68e5ddd9b4dc0142103ee824ed191a",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R148_HELPER_28460_SUCCESS_CALL_CHAIN_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00146 proved the bounded helper 0x28460 packed-selector lookup prefix through success continuation 0x284B0 and explicitly named the 0x284B0 success path as the next independent static unit. DXVK-00145 independently validated the same exact-EXE bytes and call targets, so this task reuses only those reviewed bytes/targets while applying an independent fail-closed DX11 proof.",
+  "summary": "Add a fail-closed exact-byte proof for helper 0x28460 success path 0x284B0..0x284DE. The proof validates call 0x284BC->0x282B0, the EAX==-1 failure branch 0x284CB->0x28587, and call 0x284D2->0x8BD20. Callee semantics, later helper behavior, and render/ScreenHud ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00145",
+    "source_result_sha": "f1fad531f8dee31909a4550743188e9282e742d3",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE; reuse reviewed instruction bytes and decoded branch/call targets only, with independent DX11 analyzer/verifier and Actions validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00148.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "DX11-00146 validation-bearing result 68555337cf75b87a135ef72eb32a5986a775b604 proved EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN and success continuation 0x284B0.",
+    "DXVK-00145 validation-bearing result f1fad531f8dee31909a4550743188e9282e742d3 independently proved the same exact-EXE 0x284B0..0x284DE call-chain bytes.",
+    "This result must be independently validated by GitHub Actions on vr-dx11-native-r71 before AUTOMATION_VALIDATION may become PASS.",
+    "No HMD/game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "next_action": "Consume exact-result-sha GitHub Actions. If green, record PASS in a separate bookkeeping checkpoint. Keep guarded GF ownership unchanged; a later task may analyze callees 0x282B0/0x8BD20 or continue helper 0x28460 from 0x284DF."
+}
