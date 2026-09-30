@@ -1,0 +1,64 @@
+{
+  "schema_version": 16,
+  "task_family": "A00316_INDEX147_PINNED_RELEASE_EXACT_MEMBER_IDENTITY",
+  "queue_index": 147,
+  "asset": "39BCA907",
+  "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+  "recorded_at_kst": "2026-10-01T03:52:45+09:00",
+  "source_context": {
+    "latest_c_task": "LOCALIZATION-LOCALIZATION_C-00311",
+    "latest_c_result_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84",
+    "c_disposition": "PASS_PREFLIGHT_ONLY_SOURCE_TRANSPORT_GATE_ACCEPTED",
+    "prior_a_task": "LOCALIZATION-LOCALIZATION_A-00303",
+    "prior_release_git_blob_sha1": "959f27e1063f249fb8d04b7ad63d8b670bdae06e"
+  },
+  "archive": {
+    "name": "OR2-HD-GUI-v0.25.10a.zip",
+    "size": 306223257,
+    "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_identity_pass": true
+  },
+  "expected": {
+    "canonical_inventory_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "release_git_blob_sha1": "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+    "width": 2048,
+    "height": 1024,
+    "mode": "RGBA32",
+    "mip_count": 1
+  },
+  "observed": {
+    "member_bytes": 8388736,
+    "sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+    "git_blob_sha1": "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+    "dds_header": {
+      "header_size": 124,
+      "height": 1024,
+      "width": 2048,
+      "pitch_or_linear_size": 8192,
+      "mip_count_header": 1,
+      "pixel_format_size": 32,
+      "pixel_format_flags": 65,
+      "fourcc_u32": 0,
+      "rgb_bit_count": 32,
+      "r_mask": 255,
+      "g_mask": 65280,
+      "b_mask": 16711680,
+      "a_mask": 4278190080
+    }
+  },
+  "checks": {
+    "pinned_archive_identity": "PASS",
+    "exact_member_exists": "PASS",
+    "release_git_blob_lineage": "PASS",
+    "dds_geometry_format": "PASS",
+    "canonical_inventory_sha256": "FAIL"
+  },
+  "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+  "source_outcome_reason": "Pinned v0.25.10a exact member is proven byte-for-byte identical to upstream Release Git blob 959f27e1..., but its SHA-256 b913c967... does not equal current canonical inventory c52f48b1.... Contract forbids substituting this noncanonical source for pixel reconstruction.",
+  "retry_policy": "STICKY_UNTIL_CANONICAL_INVENTORY_OR_SOURCE_POLICY_OR_EXACT_CANONICAL_TRANSPORT_CHANGES",
+  "candidate_authorized": false,
+  "clean_plate_authorized": false,
+  "render_ready": false,
+  "one_stage_to_render": false,
+  "runtime_validation": "UNTESTED"
+}
