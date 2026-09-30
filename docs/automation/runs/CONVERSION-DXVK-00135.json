@@ -1,0 +1,39 @@
+{
+  "task_id": "CONVERSION-DXVK-00135",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "4abae0c1a1a995fc3d22ed39525e7f3b9c400c2f",
+  "result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R139_TARGET_65970_FIRST_CALL_ALIGNMENT",
+  "summary": "Bounded F13 continuation for guarded-GF target C. Add a fail-closed exact-byte/manual-decode proof only for the first outbound CALL at 0x65997 -> 0x28460, anchored at 0x65970. The later raw candidates 0x659AC and 0x659C1 remain unresolved and no semantic ownership is promoted.",
+  "evidence": [
+    "CONVERSION-DXVK-00133 proved target B first-CALL alignment and explicitly named target C 0x65970 as the next bounded F13 work.",
+    "CONVERSION-DXVK-00131 exact-EXE census reported target C start_guess=0x65970 with raw outbound candidates 0x65997->0x28460, 0x659AC->0x28320 and 0x659C1->0x28800.",
+    "This task uses only the already observed exact bytes through the first outbound CALL and cleanup; it does not infer the later CALL boundaries or helper semantics."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00135.json"
+  ],
+  "review_lenses": {
+    "architecture": "Keep the proof in exact-EXE analyzer/verifier tooling; no backend activation or transport change.",
+    "ownership": "All guarded GF hooks remain spacing-only; semantic_effect stays UNRESOLVED and ownership_effect NONE.",
+    "stereo_correctness": "No WVP/projection/HUD/world classification changes.",
+    "performance": "CI-only exact-byte validation; no runtime hot-path work or telemetry.",
+    "adversarial": "Fail closed on byte drift, non-contiguous instruction layout, entry-start mismatch, E8 position/opcode drift, decoded target drift or non-.text target."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_TARGET_65860_EXACT_CALL_ALIGNMENT",
+    "after": "PENDING_TARGET_65970_FIRST_CALL_ALIGNMENT",
+    "runtime_claim": false
+  },
+  "next_action": "Run exact-SHA GitHub Actions. If 0x65997 is proven aligned, record only first-CALL provenance. Keep 0x659AC and 0x659C1 for separate bounded alignment work and do not infer helper semantics or ScreenHud ownership."
+}
