@@ -97,6 +97,37 @@ GF_TARGET_B_HELPER_RVA = 0x000285A0
 GF_TARGET_B_HELPER_WINDOW = 128
 GF_TARGET_B_HELPER_FINGERPRINT_BYTES = 96
 
+# R141/F13: exact-byte instruction-boundary anchor for guarded-GF target C.
+# This proves only that the first raw outbound candidate at 0x65997 is an
+# instruction-aligned CALL from the reviewed 0x65970 prefix to 0x28460.
+# Helper semantics and draw ownership remain unresolved.
+GF_TARGET_C_ENTRY_RVA = 0x00065970
+GF_TARGET_C_ALIGNED_CALL_RVA = 0x00065997
+GF_TARGET_C_ALIGNED_CALL_TARGET_RVA = 0x00028460
+GF_TARGET_C_PREFIX_INSTRUCTIONS = (
+    (0x00065970, "56", "push esi"),
+    (0x00065971, "8b f1", "mov esi, ecx"),
+    (0x00065973, "8b 46 24", "mov eax, [esi+0x24]"),
+    (0x00065976, "85 c0", "test eax, eax"),
+    (0x00065978, "75 57", "jne +0x57"),
+    (0x0006597A, "8b 4e 0c", "mov ecx, [esi+0x0c]"),
+    (0x0006597D, "83 f9 ff", "cmp ecx, -1"),
+    (0x00065980, "74 1f", "je +0x1f"),
+    (0x00065982, "8b 46 10", "mov eax, [esi+0x10]"),
+    (0x00065985, "83 f8 ff", "cmp eax, -1"),
+    (0x00065988, "74 17", "je +0x17"),
+    (0x0006598A, "8b 16", "mov edx, [esi]"),
+    (0x0006598C, "50", "push eax"),
+    (0x0006598D, "8b 46 18", "mov eax, [esi+0x18]"),
+    (0x00065990, "51", "push ecx"),
+    (0x00065991, "8b 4e 14", "mov ecx, [esi+0x14]"),
+    (0x00065994, "50", "push eax"),
+    (0x00065995, "51", "push ecx"),
+    (0x00065996, "52", "push edx"),
+    (0x00065997, "e8 c4 2a fc ff", "call rel32"),
+    (0x0006599C, "83 c4 14", "add esp, 0x14"),
+)
+
 
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
@@ -596,6 +627,105 @@ def collect_guarded_gf_target_b_helper_provenance(pe: PE) -> dict:
     }
 
 
+def collect_guarded_gf_target_c_alignment_proof(pe: PE) -> dict:
+    """Verify exact instruction alignment for 0x65997 -> 0x28460.
+
+    The prefix is manually reviewed from the exact public EXE. This is an
+    instruction-boundary/call-target proof only and cannot assign HUD ownership.
+    """
+
+    expected_next = GF_TARGET_C_ENTRY_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_PREFIX_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    call_bytes = pe.bytes_at_rva(GF_TARGET_C_ALIGNED_CALL_RVA, 5)
+    decoded_target_rva = None
+    if len(call_bytes) == 5 and call_bytes[0] == 0xE8:
+        rel = struct.unpack_from("<i", call_bytes, 1)[0]
+        decoded_target_rva = (
+            GF_TARGET_C_ALIGNED_CALL_RVA + 5 + rel
+        ) & 0xFFFFFFFF
+
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(GF_TARGET_C_ENTRY_RVA):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            GF_TARGET_C_ENTRY_RVA - text_section.virtual_address,
+        )
+
+    target_section = next(
+        (
+            section.name
+            for section in pe.sections
+            if section.contains_rva(GF_TARGET_C_ALIGNED_CALL_TARGET_RVA)
+        ),
+        "",
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    entry_guess_matches = function_start_guess_rva == GF_TARGET_C_ENTRY_RVA
+    call_target_matches = decoded_target_rva == GF_TARGET_C_ALIGNED_CALL_TARGET_RVA
+    call_row = next(
+        (row for row in rows if row["rva"] == GF_TARGET_C_ALIGNED_CALL_RVA),
+        None,
+    )
+    call_is_layout_boundary = bool(
+        call_row
+        and call_row["bytes_match"]
+        and call_bytes
+        and call_bytes[0] == 0xE8
+    )
+    proven = bool(
+        contiguous
+        and all_bytes_match
+        and entry_guess_matches
+        and call_is_layout_boundary
+        and call_target_matches
+        and target_section
+    )
+    return {
+        "entry_rva": GF_TARGET_C_ENTRY_RVA,
+        "function_start_guess_rva": function_start_guess_rva,
+        "entry_guess_matches": entry_guess_matches,
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "aligned_call_rva": GF_TARGET_C_ALIGNED_CALL_RVA,
+        "call_is_layout_boundary": call_is_layout_boundary,
+        "decoded_call_target_rva": decoded_target_rva,
+        "expected_call_target_rva": GF_TARGET_C_ALIGNED_CALL_TARGET_RVA,
+        "call_target_matches": call_target_matches,
+        "call_target_section": target_section,
+        "status": (
+            "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN"
+            if proven
+            else "ALIGNMENT_PROOF_FAILED"
+        ),
+        "semantic_effect": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -839,6 +969,33 @@ def render_markdown(report: dict) -> str:
         f"- Ownership effect: {helper['ownership_effect']}",
     ]
 
+    target_c = report["guarded_gf_target_c_alignment_proof"]
+    target_c_rows = "<br>".join(
+        f"{hexrva(row['rva'])} {row['actual_bytes']} {row['asm']} "
+        f"[{'match' if row['bytes_match'] else 'MISMATCH'}]"
+        for row in target_c["instructions"]
+    )
+    lines += [
+        "",
+        "## Guarded GF target C first CALL instruction-boundary proof",
+        "",
+        "R141 exact-byte/manual-decode proof only. This establishes 0x65997 as "
+        "an aligned CALL from the reviewed 0x65970 prefix to 0x28460. It does "
+        "not establish helper semantics or ScreenHud ownership.",
+        "",
+        f"- Status: {target_c['status']}",
+        f"- Entry anchor: {hexrva(target_c['entry_rva'])}",
+        f"- Function-start guess: {hexrva(target_c['function_start_guess_rva'])}",
+        f"- Layout contiguous: {target_c['layout_contiguous']}",
+        f"- All instruction bytes match: {target_c['all_instruction_bytes_match']}",
+        f"- Aligned CALL: {hexrva(target_c['aligned_call_rva'])} -> "
+        f"{hexrva(target_c['decoded_call_target_rva'])} "
+        f"({target_c['call_target_section'] or '-'})",
+        f"- Semantic effect: {target_c['semantic_effect']}",
+        f"- Ownership effect: {target_c['ownership_effect']}",
+        f"- Reviewed prefix: {target_c_rows}",
+    ]
+
     lines += [
         "",
         "## Direct CALL references into HUD/sprite anchors",
@@ -916,6 +1073,7 @@ def main() -> int:
         "guarded_gf_target_provenance": collect_guarded_gf_target_provenance(pe),
         "guarded_gf_target_b_alignment_proof": collect_guarded_gf_target_b_alignment_proof(pe),
         "guarded_gf_target_b_helper_provenance": collect_guarded_gf_target_b_helper_provenance(pe),
+        "guarded_gf_target_c_alignment_proof": collect_guarded_gf_target_c_alignment_proof(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -1017,6 +1175,19 @@ def main() -> int:
         f"semantic_effect={helper['semantic_effect']} "
         f"ownership_effect={helper['ownership_effect']}"
     )
+    target_c = report["guarded_gf_target_c_alignment_proof"]
+    print(
+        f"gf_target_c_alignment=0x{target_c['entry_rva']:08X} "
+        f"status={target_c['status']} "
+        f"start_guess={hexrva(target_c['function_start_guess_rva'])} "
+        f"layout_contiguous={target_c['layout_contiguous']} "
+        f"bytes_match={target_c['all_instruction_bytes_match']} "
+        f"call=0x{target_c['aligned_call_rva']:08X} "
+        f"target={hexrva(target_c['decoded_call_target_rva'])} "
+        f"target_section={target_c['call_target_section'] or 'none'} "
+        f"semantic_effect={target_c['semantic_effect']} "
+        f"ownership_effect={target_c['ownership_effect']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -1031,6 +1202,9 @@ def main() -> int:
     if helper["status"] != "EXACT_HELPER_PROVENANCE_CAPTURED":
         print("guarded_gf_target_b_helper_provenance=FAILED")
         return 4
+    if target_c["status"] != "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN":
+        print("guarded_gf_target_c_alignment_proof=FAILED")
+        return 5
     return 0
 
 
