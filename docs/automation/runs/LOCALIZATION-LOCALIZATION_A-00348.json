@@ -79,7 +79,8 @@
     "candidate_dds_modified": false,
     "new_executable_analysis_input": true,
     "materially_reduces_unresolved_work": true,
-    "production_readiness": "PREFLIGHT_ONLY_RUNTIME_OBSERVATIONS_STILL_REQUIRED"
+    "production_readiness": "PREFLIGHT_ONLY_RUNTIME_OBSERVATIONS_STILL_REQUIRED",
+    "producing_result_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933"
   },
   "evidence": [
     "localization/graphics/role_A/20261001-A00348-P00219/verify_index24_runtime_binder.py",
@@ -118,8 +119,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__C174_NO_A_COMPLETION_TIER__A00346_AND_OTHER_QA_PENDING_NOT_REPEATED__INDEX24_C167_BINDER_ACCEPTED__GEOMETRY_AND_BINDER_BLOBS_PINNED__48_OF_48_EXACT_RAW_BBOX_MATCH_POSITIVE__DUPLICATE_LABEL_CONFLICT_REJECTED__INVALID_SPACE_REJECTED__EMPTY_TRACE_FAIL_CLOSED__SYNTHETIC_FIXTURES_NOT_RUNTIME_EVIDENCE__NO_DDS__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933",
+  "authoritative_result_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): harden index24 runtime binder QA [AUTO:LOCALIZATION-LOCALIZATION_A-00348]",
   "durable_task_record_in_result_commit": true,
@@ -128,7 +129,13 @@
     "head_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
     "head_message": "localization(B): rework index61 C4A2937B semantics [AUTO:LOCALIZATION-LOCALIZATION_B-00342]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Fresh HEAD includes B00342 workflow/result changes. A00348 adds only lane-local index24 QA harness/report and its durable task record; shared state and peer-lane files are untouched."
+    "concurrent_changes_reviewed": "Fresh HEAD includes B00342 workflow/result changes. A00348 adds only lane-local index24 QA harness/report and its durable task record; shared state and peer-lane files are untouched.",
+    "bookkeeping_head_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933",
+    "bookkeeping_concurrent_head_preserved": false
   },
-  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA is bound here. The result commit atomically contains the index24 regression harness, its machine report, and the durable A00348 task record. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T07:43:00+09:00",
+  "bookkeeping_base_result_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933",
+  "bookkeeping_preserved_head_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933",
+  "bookkeeping_preserved_head_message": "localization(A): harden index24 runtime binder QA [AUTO:LOCALIZATION-LOCALIZATION_A-00348]"
 }
