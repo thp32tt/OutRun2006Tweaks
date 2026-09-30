@@ -1550,3 +1550,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Validation-bearing result: `6362a807dc00765ae9be3f6d74c005ac956cd322`; Gate run: `36771923100` **success**.
 - Final dispositions: B00315 **PASS**, A00318 **PASS**, B00319 **PASS**, A00320 **REWORK_REQUIRED**.
 - New production completion: index163/59A79158. Runtime remains **UNTESTED**.
+
+## C172 Q00070 — 2026-10-01 05:28 KST
+- B00322@index232: **PASS / RENDER_READY** after independent exact source + six-region mask + all-zero CLEAN_PLATE + 2px safe-bbox replay.
+- A00323@index54: **PASS / PREFLIGHT_ONLY SOURCE_IDENTITY_MISMATCH**; historical candidate reuse forbidden.
+- A00325@index237 and A00326@index222: **PASS current-workflow DDS_ONLY isolation inputs** on unchanged production-complete candidates; runtime UNTESTED.
+- Current order: **RENDER_READY 232 -> ONE_STAGE none -> candidate QA 159/198/201 -> unrelated PREFLIGHT_ONLY**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

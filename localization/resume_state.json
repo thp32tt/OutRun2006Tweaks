@@ -7,16 +7,14 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: none authoritative after corrected Q00069.",
-    "ONE_STAGE_TO_RENDER: none authoritative after corrected Q00069. B00322@index232 and B00324@index133 producer handoffs remain out-of-batch C-QA pending.",
-    "CANDIDATE_AWAITING_C: indices159/198/201. Keep candidate results ahead of unrelated PREFLIGHT_ONLY expansion.",
-    "PREFLIGHT_ONLY REWORK_REQUIRED: index111 A00320 numeric source-only replay is valid, but immutable RESULT_SHA 9f45de59... fails exact-producer commit structure because the durable task record/material payload is not changed in that same SHA. Re-emit material+task record under one SHA; retain Q00067/A00309 authority (12,181 unresolved) until then.",
-    "PREFLIGHT_ONLY ACCEPTED: index94 B00319 exact-source segmentation is accepted with 6/7 removal masks resolved; finish course_sp protected-prefix split, CLEAN_PLATE and final safe geometry before render.",
-    "STATIC_QA PRODUCTION_COMPLETE: index163/59A79158 candidate fcb75cef... newly passes Q00069 independent static QA; runtime remains UNTESTED.",
-    "RUNTIME ISOLATION READY: index99/4F68708E A00318 current-workflow DDS_ONLY manifest is accepted on unchanged C139 static-QA candidate 4d19c5f1...; real-game validation remains UNTESTED.",
-    "OUT-OF-BATCH C QA: producer results not listed in Q00069 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not promoted by this batch.",
-    "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from corrected Q00069 authority; runtime_validated=none.",
-    "Q00069 corrected validation-bearing result 6362a807dc00765ae9be3f6d74c005ac956cd322 passed Localization Automation Gate 36771923100 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
+    "RENDER_READY: index232/EBFC709F. Q00070 independently accepted exact source, full six-region removal mask, all-zero CLEAN_PLATE, six 2px safe bboxes and resolved 4-string/6-region semantics. Producer should measure/refine source typography as needed and render/persist the Korean DDS in the same invocation.",
+    "ONE_STAGE_TO_RENDER: none authoritative. B00324@index133 claims a one-stage handoff but remains out-of-batch C-QA pending and is not implicitly promoted.",
+    "CANDIDATE_AWAITING_C: indices159/198/201. Existing candidate QA remains ahead of unrelated PREFLIGHT_ONLY expansion.",
+    "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index54/FA7BBB13 is sticky SOURCE_IDENTITY_MISMATCH (inventory f7695f10... vs exact Release/Drive 61c82072...); do not reuse the old B95 candidate. Index94 retains Q00069 6/7-mask scope; index111 retains Q00067/A00309 authority until valid A00320 re-emission; index133/147 retain prior accepted scopes.",
+    "RUNTIME ISOLATION READY: indices99/222/237 have current-workflow or accepted DDS_ONLY inputs on unchanged production-complete static-QA candidates. No real-game validation is implied.",
+    "OUT-OF-BATCH C QA: B00324, A00327, B00328, A00330 and B00331 remain QA_PENDING by exact TASK_ID@RESULT_SHA.",
+    "THROUGHPUT v16: production_complete new=0; retained production_complete includes 222/237; candidate_awaiting_c=159/198/201; runnable_production=232; blocked_exception=54/147; runtime_validated=none.",
+    "Q00070 validation-bearing result commit will own the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2467,37 +2465,36 @@
   },
   "latest_qa_batch": {
     "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00329",
-    "wave_id": "Q00069",
-    "run": "C171",
-    "recorded_at_kst": "2026-10-01T05:15:00+09:00",
-    "corrected_at_kst": "2026-10-01T05:19:00+09:00",
-    "result": "PASS_Q00069_INDEX163_STATIC_QA_INDEX99_ISOLATION_INDEX94_PREFLIGHT_A00320_REWORK_RESULT_COMMIT_RUNTIME_UNTESTED",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00333",
+    "wave_id": "Q00070",
+    "run": "C172",
+    "recorded_at_kst": "2026-10-01T05:28:00+09:00",
+    "result": "PASS_Q00070_INDEX232_RENDER_READY_INDEX54_SOURCE_MISMATCH_INDEX237_INDEX222_ISOLATION_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00315",
-        "result_sha": "476ab48d3471ca907645069847be3de782516e4f",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00322",
+        "result_sha": "8c8df542c8df1baa87d5c1cf6db621e023adff37",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00318",
-        "result_sha": "95d6cb420ce814802fad3d71b172d3020e81086e",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00323",
+        "result_sha": "d40716564a256cf6425b62dcf01038550769269f",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00319",
-        "result_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00325",
+        "result_sha": "cab3cdb45af325cb45374c3392da3b03f9945b8f",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
-        "result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
-        "status": "REWORK_REQUIRED"
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00326",
+        "result_sha": "cb076cd58f416256178bcaaefb610288d8d8f336",
+        "status": "PASS"
       }
     ],
     "throughput_kpis": {
       "production_complete": {
-        "new_this_batch": 1,
+        "new_this_batch": 0,
         "retained_authoritative_static_qa_indices": [
           51,
           97,
@@ -2521,35 +2518,19 @@
         198,
         201
       ],
-      "runnable_production": [],
+      "runnable_production": [
+        232
+      ],
       "blocked_exception": [
+        54,
         147
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
-    "authoritative_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
-    "validation_bearing_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36771923100,
-      "head_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T05:20:49+09:00"
-    },
-    "prior_failed_gate": {
-      "result_sha": "77881b5106198fabdae6fb4ffcc43a9a6266425a",
-      "workflow": "Localization Automation Gate",
-      "run_id": 36771464265,
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "failure",
-      "failed_step": "Verify exact producer SHAs in C batch",
-      "diagnosis": "A00320@9f45de59 immutable result changes only analyzer script; durable task record/material payload is not in the same result commit, so PASS disposition cannot satisfy exact-producer verify_automation_commit."
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null
   }
 }
