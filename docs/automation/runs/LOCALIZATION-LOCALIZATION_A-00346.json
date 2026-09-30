@@ -1,0 +1,114 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00346-p00217-index111-panel-interior-reconstruction-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00346",
+  "wave_id": "P00217",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T07:08:00+09:00",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_PANEL_INTERIOR_RECONSTRUCTION_ADVANCED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD/C174 selection finds no A-owned runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework. A candidate results at indices159/198/201 and out-of-batch A00338@index102, A00340@index231, A00344@index147 plus A00345 font-family evidence are not repeated; B-owned 61/133/232 work is not stolen. The single allowed fallback/preflight batch advances A-owned index111 from the C174-accepted A00320 8,221-pixel unresolved state. Exact pinned source/donor identities are reused from the verified v0.25.10a archive. A deterministic external-contour panel-interior rule proposes 2,487 additional source-only reconstruction pixels (2,223 actual changes), reducing unresolved scope to 5,734 while retaining zero outside-mask changes, zero alpha changes and zero protected-guard overlap. RANDOM remains fail-closed around protected question-mark artwork. No CLEAN_PLATE or Korean DDS candidate is authorized; runtime remains UNTESTED.",
+  "selection": {
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00343",
+    "latest_automation_validated_c_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "latest_c_gate_run_id": 36782428617,
+    "latest_c_gate_conclusion": "success",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_qa_pending_not_repeated": [
+      102,
+      231,
+      147,
+      15,
+      18,
+      21
+    ],
+    "cross_lane_not_stolen": [
+      61,
+      133,
+      232
+    ],
+    "selected_indices": [
+      111
+    ],
+    "selected_action": "fallback_step_4_source_only_panel_interior_reconstruction",
+    "new_preflight_batches_started": 1
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_SOURCE_ONLY_PANEL_INTERIOR_RECONSTRUCTION_ADVANCE",
+    "evidence": "localization/graphics/role_A/20261001-A00346-P00217/A00346_P00217_INDEX111_PANEL_INTERIOR_RECONSTRUCTION.json",
+    "analyzer": "localization/graphics/role_A/20261001-A00346-P00217/analyze_index111_panel_interior_reconstruction.py",
+    "reviewed_indices": [
+      111
+    ],
+    "prior_unresolved_pixels": 8221,
+    "new_proposal_resolved_pixels": 2487,
+    "new_actual_changed_pixels": 2223,
+    "remaining_unresolved_pixels": 5734,
+    "candidate_dds_modified": false,
+    "clean_plate_emitted": false,
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00346-P00217/A00346_P00217_INDEX111_PANEL_INTERIOR_RECONSTRUCTION.json",
+    "localization/graphics/role_A/20261001-A00346-P00217/analyze_index111_panel_interior_reconstruction.py",
+    "localization/graphics/role_A/20261001-A00320-P00196/A00320_P00196_INDEX111_TUNED_NORMAL_CORE_RECONSTRUCTION.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00343.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "2df474c33e70dd092fc0ef2d6f1203391e2eb232",
+    "latest_c_record_blob_sha": "ea26fb36d6db3f90cd53c8ce8b7adc87675de60f",
+    "a00320_material_blob_sha": "9e7d346eec36fcc528198e9523084467cdefc29e",
+    "target_source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified_against_contract": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA16__C174_GATE_PASS_NO_A_COMPLETION_TIER__QA_PENDING_159_198_201_NOT_REPEATED__B61_133_232_NOT_STOLEN__INDEX111_C174_A00320_8221_REMAINDER_REUSED__PANEL_INTERIOR_STAGE2_2487_PROPOSAL_2223_ACTUAL__5734_REMAINING__ZERO_OUTSIDE_MASK__ZERO_ALPHA__ZERO_PROTECTED_GUARD_OVERLAP__RANDOM_FAIL_CLOSED__NO_CLEANPLATE_DDS__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): advance index111 panel reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00346]",
+  "durable_task_record_in_result_commit": true,
+  "base_head_sha": "6501a3ebceb293f6b8b194df5dc57e062d393edd",
+  "precommit_refresh": {
+    "head_sha": "6501a3ebceb293f6b8b194df5dc57e062d393edd",
+    "head_message": "chore(localization): bind A00345 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00345] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Current branch HEAD was refreshed immediately before blob/tree preparation. Only A00346 lane-local evidence/analyzer and durable task-record paths are added; shared state and peer-lane files are untouched."
+  },
+  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the immutable result SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+}

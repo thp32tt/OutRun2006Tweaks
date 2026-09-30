@@ -1,0 +1,138 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00346-index111-panel-interior-source-only-reconstruction-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00346",
+  "wave_id": "P00217",
+  "lane": "LOCALIZATION_A",
+  "queue_index": 111,
+  "asset": "C075FB49",
+  "coordinate_space": "readable/display after raw mirror_y -> flip_y",
+  "source_identity": {
+    "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "canvas": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1
+  },
+  "accepted_prior_evidence": {
+    "c174_q00072": "Index111 A00334 atomic re-emission PASS/PREFLIGHT_ONLY; C exact replay accepts 3960 proposal-resolved / 1718 actual changed / 8221 remaining, with zero outside-mask, alpha, and protected overlap.",
+    "a00320_material": "localization/graphics/role_A/20261001-A00320-P00196/A00320_P00196_INDEX111_TUNED_NORMAL_CORE_RECONSTRUCTION.json",
+    "prior_unresolved_pixels": {
+      "tuned_setting": 1970,
+      "normal_setting": 1059,
+      "random": 5192,
+      "aggregate": 8221
+    }
+  },
+  "method": {
+    "scope": "TUNED_NORMAL_REMAINDER_ONLY_RANDOM_UNTOUCHED",
+    "purpose": "Advance source-only reconstruction only where target panel interior is proven by the external contour of the largest exact base-color component; never infer through protected artwork.",
+    "tuned_panel_color_rgba": [
+      196,
+      0,
+      0,
+      255
+    ],
+    "normal_panel_color_rgba": [
+      0,
+      150,
+      0,
+      255
+    ],
+    "tuned_analysis_roi": [
+      20,
+      1190,
+      340,
+      1370
+    ],
+    "normal_analysis_roi": [
+      380,
+      1190,
+      700,
+      1370
+    ],
+    "panel_interior_rule": "Within each conservative ROI, find the largest connected component of the exact panel base color and fill only its RETR_EXTERNAL contour. Intersect that proven panel interior with the C-accepted A00320 remaining-unresolved mask and exclude the unchanged A00320 protected-art guard.",
+    "protected_guard": "Reuse A00320/A00271 exact sibling-registered near-white protected-car core plus exact per-panel light palette with 4px dilation.",
+    "candidate_pixels_used": false,
+    "random_state": "UNCHANGED_FAIL_CLOSED_PROTECTED_QUESTION_MARK",
+    "clean_plate_status": "NOT_APPROVED_PREFLIGHT_ONLY"
+  },
+  "elements": {
+    "tuned_setting": {
+      "prior_unresolved_pixels": 1970,
+      "new_panel_interior_proposal_pixels": 1507,
+      "new_actual_changed_pixels": 1344,
+      "new_proposal_bbox": [
+        100,
+        1218,
+        217,
+        1256
+      ],
+      "remaining_unresolved_pixels": 463,
+      "remaining_bbox": [
+        100,
+        1221,
+        213,
+        1258
+      ],
+      "protected_guard_overlap_pixels": 0
+    },
+    "normal_setting": {
+      "prior_unresolved_pixels": 1059,
+      "new_panel_interior_proposal_pixels": 980,
+      "new_actual_changed_pixels": 879,
+      "new_proposal_bbox": [
+        450,
+        1219,
+        552,
+        1255
+      ],
+      "remaining_unresolved_pixels": 79,
+      "remaining_bbox": [
+        529,
+        1240,
+        548,
+        1256
+      ],
+      "protected_guard_overlap_pixels": 0
+    },
+    "random": {
+      "prior_unresolved_pixels": 5192,
+      "new_panel_interior_proposal_pixels": 0,
+      "new_actual_changed_pixels": 0,
+      "remaining_unresolved_pixels": 5192,
+      "disposition": "UNCHANGED_FAIL_CLOSED_PROTECTED_QUESTION_MARK"
+    }
+  },
+  "aggregate": {
+    "prior_c_accepted_proposal_resolved_pixels": 3960,
+    "prior_c_accepted_actual_changed_pixels": 1718,
+    "new_panel_interior_proposal_pixels": 2487,
+    "new_panel_interior_actual_changed_pixels": 2223,
+    "combined_proposal_resolved_pixels": 6447,
+    "combined_actual_changed_pixels": 3941,
+    "remaining_unresolved_pixels": 5734,
+    "unresolved_reduction_pixels": 2487,
+    "unresolved_reduction_ratio": 0.3025179418562219,
+    "outside_accepted_mask_changed_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "protected_guard_overlap_pixels": 0
+  },
+  "self_qa": {
+    "exact_source_identity": "PASS",
+    "deterministic_replay_fingerprint": "PASS_EXPECTED_COUNTS_ASSERTED_BY_ANALYZER",
+    "proposal_subset_of_prior_unresolved": "PASS",
+    "outside_accepted_mask_changes": 0,
+    "alpha_changes": 0,
+    "protected_guard_overlap": 0,
+    "candidate_or_clean_plate_emitted": false
+  },
+  "readiness_after": "PREFLIGHT_ONLY__TUNED_NORMAL_PANEL_INTERIOR_RECONSTRUCTION_ADVANCED__5734_UNRESOLVED__RANDOM_AND_PROTECTED_FRINGE_HOLD",
+  "candidate_dds_authorized": false,
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED"
+}
