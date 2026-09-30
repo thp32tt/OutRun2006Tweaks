@@ -43,7 +43,13 @@ function Invoke-AnalyzerCase {
         [int64]$ExpectedDrawFingerprintDropped=0,
         [string]$ExpectedFirstDrawFingerprintScope='',
         [bool]$ExpectedRankProjectedMarkerDrawEvidence=$false,
-        [int]$ExpectedRankProjectedMarkerDrawFingerprintCount=0
+        [int]$ExpectedRankProjectedMarkerDrawFingerprintCount=0,
+        [Nullable[int]]$ExpectedMenuCadenceWindows=$null,
+        [Nullable[int]]$ExpectedGameplayCadenceWindows=$null,
+        [Nullable[int]]$ExpectedMixedCadenceWindows=$null,
+        [Nullable[double]]$ExpectedMenuCadenceHz=$null,
+        [Nullable[double]]$ExpectedGameplayCadenceHz=$null,
+        [Nullable[bool]]$ExpectedGameplayCadenceDegraded=$null
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -194,6 +200,34 @@ function Invoke-AnalyzerCase {
     }
     if([int]$summary.RankProjectedMarkerDrawFingerprintCount -ne $ExpectedRankProjectedMarkerDrawFingerprintCount){
         throw "${Name}: RankProjectedMarkerDrawFingerprintCount=$($summary.RankProjectedMarkerDrawFingerprintCount), expected $ExpectedRankProjectedMarkerDrawFingerprintCount"
+    }
+    if($null -ne $ExpectedMenuCadenceWindows -and
+       [int]$summary.PresentationCadence.Menu.WindowCount -ne [int]$ExpectedMenuCadenceWindows){
+        throw "${Name}: Menu cadence windows=$($summary.PresentationCadence.Menu.WindowCount), expected $ExpectedMenuCadenceWindows"
+    }
+    if($null -ne $ExpectedGameplayCadenceWindows -and
+       [int]$summary.PresentationCadence.Gameplay.WindowCount -ne [int]$ExpectedGameplayCadenceWindows){
+        throw "${Name}: Gameplay cadence windows=$($summary.PresentationCadence.Gameplay.WindowCount), expected $ExpectedGameplayCadenceWindows"
+    }
+    if($null -ne $ExpectedMixedCadenceWindows -and
+       [int]$summary.PresentationCadence.MixedOrUnknown.WindowCount -ne [int]$ExpectedMixedCadenceWindows){
+        throw "${Name}: Mixed cadence windows=$($summary.PresentationCadence.MixedOrUnknown.WindowCount), expected $ExpectedMixedCadenceWindows"
+    }
+    if($null -ne $ExpectedMenuCadenceHz){
+        if($null -eq $summary.PresentationCadence.Menu.ApproxHz -or
+           [math]::Abs([double]$summary.PresentationCadence.Menu.ApproxHz-[double]$ExpectedMenuCadenceHz) -gt 0.05){
+            throw "${Name}: Menu cadence Hz=$($summary.PresentationCadence.Menu.ApproxHz), expected $ExpectedMenuCadenceHz"
+        }
+    }
+    if($null -ne $ExpectedGameplayCadenceHz){
+        if($null -eq $summary.PresentationCadence.Gameplay.ApproxHz -or
+           [math]::Abs([double]$summary.PresentationCadence.Gameplay.ApproxHz-[double]$ExpectedGameplayCadenceHz) -gt 0.05){
+            throw "${Name}: Gameplay cadence Hz=$($summary.PresentationCadence.Gameplay.ApproxHz), expected $ExpectedGameplayCadenceHz"
+        }
+    }
+    if($null -ne $ExpectedGameplayCadenceDegraded -and
+       [bool]$summary.DxvkGameplayCadenceDegraded -ne [bool]$ExpectedGameplayCadenceDegraded){
+        throw "${Name}: DxvkGameplayCadenceDegraded=$($summary.DxvkGameplayCadenceDegraded), expected $ExpectedGameplayCadenceDegraded"
     }
     $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
     foreach($blocker in $ExpectedDirectEvidenceBlockers){
@@ -404,6 +438,28 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedHostPipelineWindows 2 -ExpectedProducerPerfWindows 2 `
         -ExpectedProducerFenceOk 18 -ExpectedProducerBudgetFallback 3 `
         -ExpectedCaptureMaxMs 5.0 -ExpectedEndFrameP95MaxMs 9.0
+
+    # 2026-09-30 HMD evidence showed that one aggregate XR-Hz value can hide
+    # healthy ~90 Hz menu windows and degraded ~30-33 Hz gameplay windows.
+    # Pure phase windows must be kept separate; a transition window is excluded
+    # from both phase averages instead of contaminating either side.
+    Invoke-AnalyzerCase -Name 'dxvk-menu-gameplay-cadence-split' `
+        -GameLog "direct[frames=2359,fallbacks=0,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog @"
+[R23 pipeline] requestedLayer=menu-local-fixed-projection-cached actualFinal=menu-local-fixed-projection-cached captureMs=0.1 commitCopyMs=0.0 renderMs=0.1 xrWaitFrameMs=9.0 xrFrameIntervalMs=11.1 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=1.0 xrEndFrameMs=1.0 displayPeriodMs=11.1 intervalFrames=450 actualSubmits={menu-local-fixed-projection-cached:450} rejectCounts={none} captureAvgMaxP95=0.1/0.2/0.2 commitAvgMaxP95=0.0/0.0/0.0 renderAvgMaxP95=0.1/0.2/0.2 endAvgMaxP95=1.0/1.5/1.2
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.0 xrFrameIntervalMs=30.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=29.0 xrEndFrameMs=20.0 displayPeriodMs=11.1 intervalFrames=166 actualSubmits={projection-direct-r32-fast:166} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=20.0/24.0/22.0
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.2 xrFrameIntervalMs=31.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=30.0 xrEndFrameMs=22.0 displayPeriodMs=11.1 intervalFrames=161 actualSubmits={projection-direct-r32-fast:161} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=22.0/26.0/24.0
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-cached captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.1 xrFrameIntervalMs=20.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=15.0 xrEndFrameMs=10.0 displayPeriodMs=11.1 intervalFrames=250 actualSubmits={menu-local-fixed-projection-cached:100,projection-cached:150} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=10.0/12.0/11.0
+"@ `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 2359 -ExpectedFallbacks 0 `
+        -ExpectedHostPipelineWindows 4 `
+        -ExpectedMenuCadenceWindows 1 -ExpectedGameplayCadenceWindows 2 `
+        -ExpectedMixedCadenceWindows 1 `
+        -ExpectedMenuCadenceHz (1000.0/11.1) `
+        -ExpectedGameplayCadenceHz (1000.0/30.5) `
+        -ExpectedGameplayCadenceDegraded $true
 
     $queuePath = Join-Path $PSScriptRoot '..\docs\VR_WORK_QUEUE.json'
     $workQueue = Get-Content $queuePath -Raw | ConvertFrom-Json

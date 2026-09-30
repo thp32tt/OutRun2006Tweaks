@@ -1,0 +1,27 @@
+{
+  "task_id": "CONVERSION-DXVK-00137",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "c213dbac63d6255c24add7dccad6d596118f4307",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "ISSUE_81_DXVK_P0_MENU_GAMEPLAY_CADENCE_SPLIT",
+  "summary": "Bounded analyzer-only P0 follow-up to the 2026-09-30 DXVK HMD performance failure. Split R23 pipeline cadence into pure MENU, pure GAMEPLAY, and MIXED_OR_UNKNOWN windows; keep the legacy all-window average for compatibility but explicitly mark it unsuitable for phase-health decisions. Emit a DXVK gameplay cadence degraded flag when at least two pure gameplay windows average >=1.5x the observed runtime display period. No render, transport, cadence-control, copy, or OpenXR runtime policy is changed.",
+  "evidence": [
+    "GitHub Issue #81 records source d7017310 DXVK gameplay at ~29.57-31.52 ms XR intervals while menu windows remain near 90 Hz; the aggregate ~43 Hz value masked the gameplay failure.",
+    "docs/automation/runs/RUNTIME-DXVK-20260930-HMD-d7017310.json requires menu/gameplay cadence separation before copy/render optimization.",
+    "tools/Analyze-OutRunVRSession.ps1 already parses R23 pipeline xrFrameIntervalMs but averages all windows together; R23 telemetry exposes actualSubmits/requestedLayer and displayPeriodMs, sufficient for a fail-closed phase split without runtime instrumentation changes."
+  ],
+  "changed_paths": [
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-AnalyzeOutRunVRSession.ps1",
+    "docs/automation/runs/CONVERSION-DXVK-00137.json"
+  ],
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "next_action": "Run exact-result GitHub Actions. Require Test-AnalyzeOutRunVRSession.ps1 PASS with the mixed menu/gameplay regression fixture, then finalize this record with exact result SHA and gate IDs. RUNTIME_VALIDATION remains UNTESTED because no new HMD/game run is performed."
+}
