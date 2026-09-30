@@ -1,0 +1,1177 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00310-fd90aa9-v2-style-slant-rework-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
+  "wave_id": "P00188",
+  "lane": "LOCALIZATION_B",
+  "asset_id": "FD90AA9",
+  "queue_index": 121,
+  "recorded_at_kst": "2026-10-01T03:30:29+09:00",
+  "status": "PASS",
+  "result": "PASS_SELF_QA_CURRENT_V2_SLANT_STYLE_REWORK_PENDING_C_BATCH_GATE",
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "prompt_sha256": "abffc780856fbeabca21220f611ba7fa7d0075191acf1b3568546a4d753377b9",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "previous_candidate_sha256": "9e93c7ef550a057d23015466604ff527380cfc0323b883b5f8ebfe92efb5fd78",
+  "candidate_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+  "candidate_bundle_sha256": "5a99823875512d79977cda7be02f1af5f11ee99d625cb4153172a7a2bcd990e5",
+  "candidate_bundle_drive_file_id": "1d7iviLACITHKqIksf-IvV2SNuuVrpSoX",
+  "candidate_bundle_drive_folder_id": "1J7pnOXo8Koe4zYZfJVeYuCMIvlP5O3VC",
+  "candidate_bundle_member": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "candidate_bundle_readback_verified": true,
+  "candidate_bundle_member_readback_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y",
+    "source_bytes": 67108992,
+    "candidate_bytes": 67108992,
+    "header_128_exact": true,
+    "header_128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+    "decoded_final_matches_preencode_pixels": true
+  },
+  "construction": {
+    "method": "native-resolution integer-row affine slant correction of isolated Korean lettering/effect pixels with no interpolation or scale refit",
+    "background_authority": "exact canonical source plus source-derived clean plate",
+    "opaque_panel_reconstruction": "More Engine sound yellow panel background reconstructed as a local two-dimensional color plane inside the approved text-effect envelope; panel geometry outside the approved envelope remains exact",
+    "raster_resampling_used": false,
+    "font_size_scale_change_used": false,
+    "source_semantics_changed": false
+  },
+  "machine_qa": {
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "changed_pixels_outside_safe_bboxes": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "source_style_residue_pixels": 0,
+    "clean_plate_changed_pixels_outside_edit_mask": 0,
+    "clean_plate_alpha_changed_outside_edit_mask": 0,
+    "minimum_candidate_margin_px": 2,
+    "semantic_rows": "29/29",
+    "containment_rows": "29/29",
+    "signed_slant_rows": "29/29"
+  },
+  "signed_slant_gate": "PASS",
+  "signed_slant_tolerance_abs_dx_per_dy": 0.05,
+  "rows": [
+    {
+      "key": "outsp_course",
+      "style_family": "top_yellow",
+      "source": "OutRun2SP Course",
+      "korean": "아웃런2 SP 코스",
+      "font_size_seed": 62,
+      "source_effect_bbox_display_ltrb": [
+        1126,
+        374,
+        1677,
+        448
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1182,
+        376,
+        1620,
+        446
+      ],
+      "safety_margins_px_ltrb": [
+        56,
+        2,
+        57,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.0,
+      "candidate_slant_dx_per_dy": 0.0,
+      "source_slant_angle_deg": 0.0,
+      "candidate_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_slant_direction": "none",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "paired_upright_family",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "out2_course",
+      "style_family": "top_blue",
+      "source": "OutRun2 Course",
+      "korean": "아웃런2 코스",
+      "font_size_seed": 62,
+      "source_effect_bbox_display_ltrb": [
+        1776,
+        374,
+        2231,
+        448
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1831,
+        376,
+        2175,
+        446
+      ],
+      "safety_margins_px_ltrb": [
+        55,
+        2,
+        56,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.0,
+      "candidate_slant_dx_per_dy": 0.0,
+      "source_slant_angle_deg": 0.0,
+      "candidate_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_slant_direction": "none",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_upright",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "more_engine",
+      "style_family": "engine_tag",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "font_size_seed": 54,
+      "source_effect_bbox_display_ltrb": [
+        2790,
+        385,
+        3171,
+        440
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        2851,
+        387,
+        3114,
+        438
+      ],
+      "safety_margins_px_ltrb": [
+        61,
+        2,
+        57,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3611,
+      "candidate_slant_dx_per_dy": 0.3571,
+      "source_slant_angle_deg": 19.855,
+      "candidate_slant_angle_deg": 19.652,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.004,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "you",
+      "style_family": "top_yellow_plain",
+      "source": "You",
+      "korean": "나",
+      "font_size_seed": 56,
+      "source_effect_bbox_display_ltrb": [
+        3200,
+        379,
+        3333,
+        444
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3234,
+        381,
+        3298,
+        442
+      ],
+      "safety_margins_px_ltrb": [
+        34,
+        2,
+        35,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3684,
+      "candidate_slant_dx_per_dy": 0.36,
+      "source_slant_angle_deg": 20.224,
+      "candidate_slant_angle_deg": 19.799,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0084,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "gas_pedal",
+      "style_family": "small_white",
+      "source": "Gas Pedal :",
+      "korean": "가속 페달:",
+      "font_size_seed": 42,
+      "source_effect_bbox_display_ltrb": [
+        3490,
+        391,
+        3747,
+        439
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3526,
+        393,
+        3710,
+        437
+      ],
+      "safety_margins_px_ltrb": [
+        36,
+        2,
+        37,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3333,
+      "candidate_slant_dx_per_dy": 0.3333,
+      "source_slant_angle_deg": 18.433,
+      "candidate_slant_angle_deg": 18.433,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "run15",
+      "style_family": "small_white_blue",
+      "source": "You will run 15 courses continuously.",
+      "korean": "15코스를 연속으로 달립니다.",
+      "font_size_seed": 53,
+      "source_effect_bbox_display_ltrb": [
+        15,
+        558,
+        919,
+        620
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        142,
+        560,
+        786,
+        618
+      ],
+      "safety_margins_px_ltrb": [
+        127,
+        2,
+        133,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.32,
+      "candidate_slant_dx_per_dy": 0.32,
+      "source_slant_angle_deg": 17.745,
+      "candidate_slant_angle_deg": 17.745,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "maximum_speed",
+      "style_family": "hidden_black",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "font_size_seed": 58,
+      "source_effect_bbox_display_ltrb": [
+        940,
+        562,
+        1369,
+        620
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1040,
+        564,
+        1271,
+        618
+      ],
+      "safety_margins_px_ltrb": [
+        100,
+        2,
+        98,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3696,
+      "candidate_slant_dx_per_dy": 0.3636,
+      "source_slant_angle_deg": 20.284,
+      "candidate_slant_angle_deg": 19.981,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.006,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "enter_selection",
+      "style_family": "small_white",
+      "source": "Enter Selection",
+      "korean": "선택 확정",
+      "font_size_seed": 37,
+      "source_effect_bbox_display_ltrb": [
+        3525,
+        583,
+        3869,
+        627
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3622,
+        585,
+        3775,
+        625
+      ],
+      "safety_margins_px_ltrb": [
+        97,
+        2,
+        94,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.32,
+      "candidate_slant_dx_per_dy": 0.3636,
+      "source_slant_angle_deg": 17.745,
+      "candidate_slant_angle_deg": 19.981,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0436,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "same_conditions",
+      "style_family": "small_white_blue",
+      "source": "Do you want to set up under the same conditions as your former race?",
+      "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?",
+      "font_size_seed": 60,
+      "source_effect_bbox_display_ltrb": [
+        14,
+        660,
+        1848,
+        730
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        333,
+        662,
+        1530,
+        727
+      ],
+      "safety_margins_px_ltrb": [
+        319,
+        2,
+        318,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3,
+      "candidate_slant_dx_per_dy": 0.3333,
+      "source_slant_angle_deg": 16.699,
+      "candidate_slant_angle_deg": 18.433,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0333,
+      "slant_measurement_provenance": "direct_hough_loose_family_confirmed",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "transmission2",
+      "style_family": "hidden_black",
+      "source": "Transmission",
+      "korean": "변속기",
+      "font_size_seed": 63,
+      "source_effect_bbox_display_ltrb": [
+        1254,
+        780,
+        1805,
+        843
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1443,
+        782,
+        1620,
+        841
+      ],
+      "safety_margins_px_ltrb": [
+        189,
+        2,
+        185,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.36,
+      "candidate_slant_dx_per_dy": 0.3509,
+      "source_slant_angle_deg": 19.799,
+      "candidate_slant_angle_deg": 19.336,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0091,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "experts_long",
+      "style_family": "expert_red_mixed",
+      "source": "For Experts & Long distance to the goal",
+      "korean": "상급자용 · 골까지 장거리",
+      "font_size_seed": 112,
+      "source_effect_bbox_display_ltrb": [
+        1907,
+        652,
+        3378,
+        781
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        2050,
+        654,
+        3249,
+        779
+      ],
+      "safety_margins_px_ltrb": [
+        143,
+        2,
+        129,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3607,
+      "candidate_slant_dx_per_dy": 0.3611,
+      "source_slant_angle_deg": 19.834,
+      "candidate_slant_angle_deg": 19.855,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0004,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "view_choices",
+      "style_family": "small_white",
+      "source": "View Choices",
+      "korean": "선택 보기",
+      "font_size_seed": 38,
+      "source_effect_bbox_display_ltrb": [
+        3586,
+        686,
+        3881,
+        730
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3658,
+        688,
+        3811,
+        728
+      ],
+      "safety_margins_px_ltrb": [
+        72,
+        2,
+        70,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.32,
+      "candidate_slant_dx_per_dy": 0.3333,
+      "source_slant_angle_deg": 17.745,
+      "candidate_slant_angle_deg": 18.433,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0133,
+      "slant_measurement_provenance": "small_white_family_template_source_outlier",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "for_experts",
+      "style_family": "expert_red",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "font_size_seed": 85,
+      "source_effect_bbox_display_ltrb": [
+        1766,
+        790,
+        2218,
+        890
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1830,
+        792,
+        2157,
+        887
+      ],
+      "safety_margins_px_ltrb": [
+        64,
+        2,
+        61,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3611,
+      "candidate_slant_dx_per_dy": 0.3529,
+      "source_slant_angle_deg": 19.855,
+      "candidate_slant_angle_deg": 19.438,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0082,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "normal_difficult",
+      "style_family": "normal_green",
+      "source": "Normal difficult",
+      "korean": "보통 난이도",
+      "font_size_seed": 61,
+      "source_effect_bbox_display_ltrb": [
+        2614,
+        790,
+        3284,
+        863
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        2790,
+        792,
+        3106,
+        861
+      ],
+      "safety_margins_px_ltrb": [
+        176,
+        2,
+        178,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3651,
+      "candidate_slant_dx_per_dy": 0.3684,
+      "source_slant_angle_deg": 20.057,
+      "candidate_slant_angle_deg": 20.224,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0033,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "select_game_mode",
+      "style_family": "large_white",
+      "source": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "font_size_seed": 81,
+      "source_effect_bbox_display_ltrb": [
+        213,
+        887,
+        1165,
+        972
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        443,
+        889,
+        939,
+        969
+      ],
+      "safety_margins_px_ltrb": [
+        230,
+        2,
+        226,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3519,
+      "candidate_slant_dx_per_dy": 0.3438,
+      "source_slant_angle_deg": 19.387,
+      "candidate_slant_angle_deg": 18.973,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0081,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "select_car",
+      "style_family": "large_white",
+      "source": "Select your car",
+      "korean": "차량 선택",
+      "font_size_seed": 99,
+      "source_effect_bbox_display_ltrb": [
+        302,
+        1007,
+        1085,
+        1110
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        494,
+        1009,
+        898,
+        1107
+      ],
+      "safety_margins_px_ltrb": [
+        192,
+        2,
+        187,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3529,
+      "candidate_slant_dx_per_dy": 0.3438,
+      "source_slant_angle_deg": 19.438,
+      "candidate_slant_angle_deg": 18.973,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0091,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "select_course",
+      "style_family": "large_white",
+      "source": "Select Course",
+      "korean": "코스 선택",
+      "font_size_seed": 82,
+      "source_effect_bbox_display_ltrb": [
+        370,
+        1127,
+        1084,
+        1212
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        558,
+        1129,
+        897,
+        1210
+      ],
+      "safety_margins_px_ltrb": [
+        188,
+        2,
+        187,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3636,
+      "candidate_slant_dx_per_dy": 0.3944,
+      "source_slant_angle_deg": 19.981,
+      "candidate_slant_angle_deg": 21.524,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0308,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "select_music",
+      "style_family": "large_white",
+      "source": "Select your music",
+      "korean": "음악 선택",
+      "font_size_seed": 86,
+      "source_effect_bbox_display_ltrb": [
+        1613,
+        900,
+        2533,
+        989
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1899,
+        902,
+        2248,
+        987
+      ],
+      "safety_margins_px_ltrb": [
+        286,
+        2,
+        285,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3462,
+      "candidate_slant_dx_per_dy": 0.325,
+      "source_slant_angle_deg": 19.096,
+      "candidate_slant_angle_deg": 18.004,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0212,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "select_transmission",
+      "style_family": "large_white",
+      "source": "Select Transmission",
+      "korean": "변속 방식 선택",
+      "font_size_seed": 72,
+      "source_effect_bbox_display_ltrb": [
+        1563,
+        1015,
+        2588,
+        1091
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1858,
+        1017,
+        2296,
+        1089
+      ],
+      "safety_margins_px_ltrb": [
+        295,
+        2,
+        292,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3673,
+      "candidate_slant_dx_per_dy": 0.3636,
+      "source_slant_angle_deg": 20.168,
+      "candidate_slant_angle_deg": 19.981,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0037,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "shortcut_features",
+      "style_family": "large_white",
+      "source": "Shortcut Features",
+      "korean": "바로가기 기능",
+      "font_size_seed": 81,
+      "source_effect_bbox_display_ltrb": [
+        1680,
+        1127,
+        2610,
+        1212
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1909,
+        1129,
+        2378,
+        1209
+      ],
+      "safety_margins_px_ltrb": [
+        229,
+        2,
+        232,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3649,
+      "candidate_slant_dx_per_dy": 0.3649,
+      "source_slant_angle_deg": 20.047,
+      "candidate_slant_angle_deg": 20.047,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "selected_sp",
+      "style_family": "selected_yellow",
+      "source": "Outrun2: SP Course has been selected.",
+      "korean": "아웃런2 SP 코스가 선택되었습니다.",
+      "font_size_seed": 92,
+      "source_effect_bbox_display_ltrb": [
+        63,
+        1244,
+        2144,
+        1347
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        419,
+        1246,
+        1787,
+        1344
+      ],
+      "safety_margins_px_ltrb": [
+        356,
+        2,
+        357,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.0,
+      "candidate_slant_dx_per_dy": 0.0,
+      "source_slant_angle_deg": 0.0,
+      "candidate_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_slant_direction": "none",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_upright",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "selected_out2",
+      "style_family": "selected_yellow",
+      "source": "Outrun2 Course has been selected.",
+      "korean": "아웃런2 코스가 선택되었습니다.",
+      "font_size_seed": 92,
+      "source_effect_bbox_display_ltrb": [
+        162,
+        1380,
+        2046,
+        1483
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        490,
+        1382,
+        1718,
+        1480
+      ],
+      "safety_margins_px_ltrb": [
+        328,
+        2,
+        328,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.0,
+      "candidate_slant_dx_per_dy": 0.0,
+      "source_slant_angle_deg": 0.0,
+      "candidate_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_slant_direction": "none",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_upright",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "select_car_setting",
+      "style_family": "large_white",
+      "source": "Select car setting",
+      "korean": "차량 설정 선택",
+      "font_size_seed": 99,
+      "source_effect_bbox_display_ltrb": [
+        2489,
+        1263,
+        3393,
+        1366
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        2639,
+        1265,
+        3248,
+        1363
+      ],
+      "safety_margins_px_ltrb": [
+        150,
+        2,
+        145,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3784,
+      "candidate_slant_dx_per_dy": 0.3721,
+      "source_slant_angle_deg": 20.727,
+      "candidate_slant_angle_deg": 20.41,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0063,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "versus_mode",
+      "style_family": "selected_yellow",
+      "source": "Versus Mode.",
+      "korean": "대전 모드",
+      "font_size_seed": 90,
+      "source_effect_bbox_display_ltrb": [
+        2226,
+        1385,
+        2945,
+        1485
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        2408,
+        1387,
+        2763,
+        1483
+      ],
+      "safety_margins_px_ltrb": [
+        182,
+        2,
+        182,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.0,
+      "candidate_slant_dx_per_dy": 0.0,
+      "source_slant_angle_deg": 0.0,
+      "candidate_slant_angle_deg": 0.0,
+      "source_slant_direction": "none",
+      "candidate_slant_direction": "none",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_upright",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "gear_change",
+      "style_family": "gear_red",
+      "source": "Gear change",
+      "korean": "기어 변속",
+      "font_size_seed": 94,
+      "source_effect_bbox_display_ltrb": [
+        3587,
+        1392,
+        4033,
+        1500
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3615,
+        1394,
+        4002,
+        1498
+      ],
+      "safety_margins_px_ltrb": [
+        28,
+        2,
+        31,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3462,
+      "candidate_slant_dx_per_dy": 0.3647,
+      "source_slant_angle_deg": 19.096,
+      "candidate_slant_angle_deg": 20.037,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0185,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "player_battle_desc",
+      "style_family": "desc_white",
+      "source": "A course designed for player battle.",
+      "korean": "플레이어 대전을 위해 / 설계된 코스입니다.",
+      "font_size_seed": 53,
+      "source_effect_bbox_display_ltrb": [
+        3180,
+        1534,
+        3827,
+        1667
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3265,
+        1536,
+        3744,
+        1665
+      ],
+      "safety_margins_px_ltrb": [
+        85,
+        2,
+        83,
+        2
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.36,
+      "candidate_slant_dx_per_dy": 0.3704,
+      "source_slant_angle_deg": 19.799,
+      "candidate_slant_angle_deg": 20.325,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0104,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "new_course_desc",
+      "style_family": "desc_white",
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+      "font_size_seed": 46,
+      "source_effect_bbox_display_ltrb": [
+        3008,
+        1709,
+        3661,
+        1826
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3087,
+        1712,
+        3585,
+        1823
+      ],
+      "safety_margins_px_ltrb": [
+        79,
+        3,
+        76,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3333,
+      "candidate_slant_dx_per_dy": 0.3333,
+      "source_slant_angle_deg": 18.433,
+      "candidate_slant_angle_deg": 18.433,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "orig_course_desc",
+      "style_family": "desc_white",
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 / 코스입니다.",
+      "font_size_seed": 46,
+      "source_effect_bbox_display_ltrb": [
+        3034,
+        1877,
+        3564,
+        1994
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        3104,
+        1880,
+        3495,
+        1991
+      ],
+      "safety_margins_px_ltrb": [
+        70,
+        3,
+        69,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3488,
+      "candidate_slant_dx_per_dy": 0.3404,
+      "source_slant_angle_deg": 19.229,
+      "candidate_slant_angle_deg": 18.799,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0084,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    },
+    {
+      "key": "random_music",
+      "style_family": "random_white",
+      "source": "Music will be Randomly Selected.",
+      "korean": "음악이 무작위로 / 선택됩니다.",
+      "font_size_seed": 86,
+      "source_effect_bbox_display_ltrb": [
+        1741,
+        2360,
+        2719,
+        2572
+      ],
+      "candidate_effect_bbox_display_ltrb": [
+        1935,
+        2363,
+        2527,
+        2569
+      ],
+      "safety_margins_px_ltrb": [
+        194,
+        3,
+        192,
+        3
+      ],
+      "one_pixel_overflow": 0,
+      "source_text_transform": "flip_y",
+      "source_slant_dx_per_dy": 0.3636,
+      "candidate_slant_dx_per_dy": 0.3647,
+      "source_slant_angle_deg": 19.981,
+      "candidate_slant_angle_deg": 20.037,
+      "source_slant_direction": "right",
+      "candidate_slant_direction": "right",
+      "slant_abs_delta": 0.0011,
+      "slant_measurement_provenance": "direct_hough",
+      "signed_slant_row_gate": "PASS"
+    }
+  ],
+  "review_artifacts": {
+    "github_directory": "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9",
+    "source_display.png": {
+      "sha256": "5da281f52bda17229ff8b5edfe0233c3da53d97d138a9c1b84f8a46298c82327",
+      "pixel_sha256": "d8c8c407c758c77c8877c26ac9821c752fcb9e9da0e099090cce903bcf4d65c7",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "mode": "exact full readable source; lossless PNG recompression only",
+      "drive_file_id": "1WexVO5yF9rcQ3pbQRvaQ-ap83IfZqVKU"
+    },
+    "clean_plate_display.png": {
+      "sha256": "6dfb7c1ae6c437b55c609d906d2f8739216a918a3777a5dc9f6e69e1c8a8b0f6",
+      "pixel_sha256": "cdabb7d579bf98c7d64eb44cfe1e3ff94fb018698f8c261cc4616037de9a09b1",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "mode": "exact full readable clean plate",
+      "drive_file_id": "1W1LVLY4_QLtqyctLbnRK2z9Ss52ngl3y"
+    },
+    "candidate_display.png": {
+      "sha256": "3ac30f6355c16b3065cbe1beb08f25a2320a771c581659f16bb65c7181b97480",
+      "pixel_sha256": "6e9003fe46508e73a484a07c3ee5d902134add0e37ae633d34081ab6edbe569c",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "mode": "exact full readable candidate; lossless PNG recompression only",
+      "drive_file_id": "18SIt_VaCNskoMRy-DKtu_fMsUPkI8e-z"
+    },
+    "comparison.png": {
+      "sha256": "12e70138b33afd618cef6e2f3c12c171d517267df2811e30f83f5875dc4de0bb",
+      "dimensions": [
+        6258,
+        3129
+      ],
+      "mode": "all 29 source-effect regions at native pixel scale, labeled SOURCE | CLEAN | CANDIDATE; no crop resampling",
+      "drive_file_id": "1Rw73WtO48T0uDYS164wT0jz0P7CLDtfY"
+    },
+    "generation_prompt.json": {
+      "sha256": "abffc780856fbeabca21220f611ba7fa7d0075191acf1b3568546a4d753377b9"
+    }
+  },
+  "independent_visual_self_review": {
+    "status": "PASS",
+    "checked": "full readable source/clean/candidate plus all-29 native comparison montage",
+    "english_source_residue": "NONE_OBSERVED",
+    "broken_hangul": "NONE_OBSERVED",
+    "clipping": "NONE_OBSERVED",
+    "cover_box_or_invented_panel": "NONE_OBSERVED",
+    "wrong_image_or_canvas": "NONE_OBSERVED",
+    "source_style_result": "PASS_RIGHT_SLANT_FAMILIES_CORRECTED_TO_SOURCE_SIGN_AND_TOLERANCE; UPRIGHT_FAMILIES_PRESERVED"
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "source_c_disposition": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00308",
+    "run": "C167",
+    "qa_batch_id": "Q00065",
+    "validation_bearing_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "automation_validation": "PASS",
+    "disposition": "REWORK_REQUIRED_CURRENT_V2_REVIEW_PROMPT_SLANT_PROVENANCE"
+  },
+  "producer_pregate": "PASS"
+}

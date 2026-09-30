@@ -1,0 +1,119 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00310-p00188-index121-current-v2-style-slant-rework-result-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
+  "wave_id": "P00188",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T03:30:29+09:00",
+  "base_head_sha": "3030678fa10317780aa0759dd850df18c56bd6b9",
+  "controller_schema_version": 16,
+  "controller_config_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+  "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX121_CURRENT_V2_STYLE_SLANT_REWORK_CANDIDATE_SELF_QA_PENDING_C_RUNTIME_UNTESTED",
+  "summary": "C167/Q00065 returned B00295 index121/FD90AA9 for current-v2 review/prompt/signed-slant provenance and unproven source-style right slant, while independently passing exact source/candidate transport and DDS structure and explicitly not asserting pixel overflow. B00310 reuses the accepted canonical source and B00295 semantic/containment lineage, measures readable-space signed slant by source style family, corrects only the Korean lettering/effect slant at native resolution using integer-row affine translation with no scale/refit interpolation, preserves upright source families, rebuilds the source-derived clean plate where needed, writes an exact-header 4096x4096 RGBA32 mip1 flip_y candidate, performs decoded-final zero-pixel/alpha/29-row containment and signed-slant QA, persists the candidate bundle to approved Drive with readback hash verification, and adds the mandatory GitHub KOREAN_PNG_REVIEW set plus prompt/QA provenance. Runtime remains UNTESTED.",
+  "target": {
+    "index": 121,
+    "asset": "FD90AA9",
+    "shard_mod_3": 1
+  },
+  "selection": {
+    "priority": "DIRECT_C_REWORK_REQUIRED_RUNNABLE",
+    "source_c_task": "LOCALIZATION-LOCALIZATION_C-00308",
+    "source_c_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "source_c_disposition": "REWORK_REQUIRED_CURRENT_V2_REVIEW_PROMPT_SLANT_PROVENANCE",
+    "skipped_qa_pending_not_repeated": [
+      163,
+      232,
+      94
+    ]
+  },
+  "source": {
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "drive_file_id": "1J5LBV_dkJQ280Y_oDOn6JZj-n22cI4eX",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y"
+  },
+  "previous_candidate": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00295",
+    "result_sha": "b3c130cc89f30176df42f6ebe68f39d57c2ff5ae",
+    "sha256": "9e93c7ef550a057d23015466604ff527380cfc0323b883b5f8ebfe92efb5fd78"
+  },
+  "candidate": {
+    "sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+    "bytes": 67108992,
+    "drive_folder_id": "1J7pnOXo8Koe4zYZfJVeYuCMIvlP5O3VC",
+    "drive_bundle_file_id": "1d7iviLACITHKqIksf-IvV2SNuuVrpSoX",
+    "drive_bundle_sha256": "5a99823875512d79977cda7be02f1af5f11ee99d625cb4153172a7a2bcd990e5",
+    "bundle_member": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "bundle_member_readback_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+    "external_transport": "GOOGLE_DRIVE_APPROVED_CURRENT_PIPELINE",
+    "git_candidate_binary_modified": false
+  },
+  "self_qa": {
+    "producer_pregate": "PASS",
+    "prompt_contract": "outrun-first-pass-edit-v2",
+    "prompt_sha256": "abffc780856fbeabca21220f611ba7fa7d0075191acf1b3568546a4d753377b9",
+    "qa_report_sha256": "741bf316c28db0ecbfbef520fa3ff8c2427abb6b3ca77e9b56f6a27448842ba0",
+    "signed_slant_gate": "PASS_29_OF_29",
+    "containment": "PASS_29_OF_29_MIN_2PX_MARGIN",
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "source_style_residue_pixels": 0,
+    "header_128_exact": true,
+    "decoded_final_matches_preencode_pixels": true,
+    "visual_self_review": "PASS_NO_VISIBLE_ENGLISH_RESIDUE_BROKEN_HANGUL_CLIPPING_COVER_BOX_OR_WRONG_CANVAS"
+  },
+  "review_set": {
+    "directory": "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9",
+    "required_files": [
+      "source_display.png",
+      "clean_plate_display.png",
+      "candidate_display.png",
+      "comparison.png",
+      "generation_prompt.json",
+      "qa_report.json"
+    ],
+    "all_present_in_result_tree": true
+  },
+  "material_deliverable": {
+    "type": "INDEX121_CURRENT_V2_STYLE_SLANT_REWORKED_KOREAN_DDS_CANDIDATE_PLUS_MANDATORY_GITHUB_REVIEW_SET",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "mandatory_review_set_added": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "candidate_dds_modified": true,
+  "candidate_binary_persisted": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00310-P00188/B00310_P00188_FD90AA9_V2_STYLE_REWORK_REPORT.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9/generation_prompt.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9/qa_report.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9/source_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9/clean_plate_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9/candidate_display.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9/comparison.png"
+  ]
+}

@@ -1,0 +1,465 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00310-fd90aa9-current-v2-style-correction-prompt-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
+  "wave_id": "P00188",
+  "lane": "LOCALIZATION_B",
+  "asset_id": "FD90AA9",
+  "queue_index": 121,
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "recorded_at_kst": "2026-10-01T03:30:29+09:00",
+  "source": {
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y",
+    "header_128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+    "canonical_drive_file_id": "1J5LBV_dkJQ280Y_oDOn6JZj-n22cI4eX"
+  },
+  "base_candidate": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00295",
+    "result_sha": "b3c130cc89f30176df42f6ebe68f39d57c2ff5ae",
+    "sha256": "9e93c7ef550a057d23015466604ff527380cfc0323b883b5f8ebfe92efb5fd78",
+    "reason_for_rework": "C167/Q00065 rejected current-v2 promotion for missing mandatory GitHub review/prompt/signed-slant provenance and unproven right-slant fidelity; no pixel overflow was asserted."
+  },
+  "task": "Materially rework only the Korean lettering/effect geometry needed to match source signed slant while preserving the exact canonical source-derived background, exact edit regions, DDS header, canvas, alpha behavior, and semantic translations.",
+  "construction_rules": [
+    "EDIT, DO NOT REDESIGN. The exact supplied canonical HD source is authoritative for canvas, art, edit envelopes and orientation.",
+    "Operate only within the 29 approved source-effect envelopes; every pixel outside their union is protected and must remain bit-identical to source.",
+    "Preserve all source artwork, icons, panels and unrelated atlas content. For the yellow More Engine sound panel, reconstruct only the English lettering footprint/background continuation and preserve panel geometry.",
+    "Use the already approved Korean semantics from B00295; do not add, omit, transliterate, or invent text.",
+    "Normalize source and candidate to readable display coordinates, measure signed right-slant by style family, and apply only the minimum native-resolution affine slant correction needed to match source sign/magnitude.",
+    "Slant correction uses integer row translation of isolated Korean lettering/effect pixels at native resolution with no interpolation, no resizing, and no glyph-scale change.",
+    "Upright source families remain upright; pronounced right-slant families must keep positive readable-coordinate slant and remain within absolute slant delta 0.05.",
+    "Final effect-inclusive Korean pixels must retain at least 2 px safety margin inside each exact source-effect envelope.",
+    "Encode as exact 4096x4096 RGBA32 mip1 DDS with the original 128-byte header and raw flip_y orientation; decode final DDS and rerun all geometry/alpha/style checks."
+  ],
+  "mandatory_negative_rules": [
+    "No Korean over visible English.",
+    "No black/white/gray/colored/semitransparent cover rectangles.",
+    "No new panels, labels, plaques, ribbons, boxes or invented backing shapes.",
+    "No blur/smudge patch used to conceal source text.",
+    "No visible English glyph fragments, shadows, outlines, glow or antialias residue.",
+    "No modification outside approved edit envelopes.",
+    "No crop, pad, resize, aspect-ratio change, mipmap change or DDS header change.",
+    "No arbitrary font fallback or mixed fallback glyphs.",
+    "No extra outline/shadow/glow absent from the source family.",
+    "No low-resolution render followed by upscale.",
+    "No raster scale-down/refit operation on existing Korean lettering.",
+    "No alpha change outside the approved edit envelopes."
+  ],
+  "style_slant_targets": [
+    {
+      "key": "outsp_course",
+      "style_family": "top_yellow",
+      "source_slant_dx_per_dy": 0.0,
+      "target_direction": "none",
+      "measurement_provenance": "paired_upright_family",
+      "source_effect_bbox_display_ltrb": [
+        1126,
+        374,
+        1677,
+        448
+      ],
+      "approved_korean": "아웃런2 SP 코스"
+    },
+    {
+      "key": "out2_course",
+      "style_family": "top_blue",
+      "source_slant_dx_per_dy": 0.0,
+      "target_direction": "none",
+      "measurement_provenance": "direct_upright",
+      "source_effect_bbox_display_ltrb": [
+        1776,
+        374,
+        2231,
+        448
+      ],
+      "approved_korean": "아웃런2 코스"
+    },
+    {
+      "key": "more_engine",
+      "style_family": "engine_tag",
+      "source_slant_dx_per_dy": 0.3611,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        2790,
+        385,
+        3171,
+        440
+      ],
+      "approved_korean": "엔진음 크게"
+    },
+    {
+      "key": "you",
+      "style_family": "top_yellow_plain",
+      "source_slant_dx_per_dy": 0.3684,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3200,
+        379,
+        3333,
+        444
+      ],
+      "approved_korean": "나"
+    },
+    {
+      "key": "gas_pedal",
+      "style_family": "small_white",
+      "source_slant_dx_per_dy": 0.3333,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3490,
+        391,
+        3747,
+        439
+      ],
+      "approved_korean": "가속 페달:"
+    },
+    {
+      "key": "run15",
+      "style_family": "small_white_blue",
+      "source_slant_dx_per_dy": 0.32,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        15,
+        558,
+        919,
+        620
+      ],
+      "approved_korean": "15코스를 연속으로 달립니다."
+    },
+    {
+      "key": "maximum_speed",
+      "style_family": "hidden_black",
+      "source_slant_dx_per_dy": 0.3696,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        940,
+        562,
+        1369,
+        620
+      ],
+      "approved_korean": "최고 속도"
+    },
+    {
+      "key": "enter_selection",
+      "style_family": "small_white",
+      "source_slant_dx_per_dy": 0.32,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3525,
+        583,
+        3869,
+        627
+      ],
+      "approved_korean": "선택 확정"
+    },
+    {
+      "key": "same_conditions",
+      "style_family": "small_white_blue",
+      "source_slant_dx_per_dy": 0.3,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough_loose_family_confirmed",
+      "source_effect_bbox_display_ltrb": [
+        14,
+        660,
+        1848,
+        730
+      ],
+      "approved_korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?"
+    },
+    {
+      "key": "transmission2",
+      "style_family": "hidden_black",
+      "source_slant_dx_per_dy": 0.36,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1254,
+        780,
+        1805,
+        843
+      ],
+      "approved_korean": "변속기"
+    },
+    {
+      "key": "experts_long",
+      "style_family": "expert_red_mixed",
+      "source_slant_dx_per_dy": 0.3607,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1907,
+        652,
+        3378,
+        781
+      ],
+      "approved_korean": "상급자용 · 골까지 장거리"
+    },
+    {
+      "key": "view_choices",
+      "style_family": "small_white",
+      "source_slant_dx_per_dy": 0.32,
+      "target_direction": "right",
+      "measurement_provenance": "small_white_family_template_source_outlier",
+      "source_effect_bbox_display_ltrb": [
+        3586,
+        686,
+        3881,
+        730
+      ],
+      "approved_korean": "선택 보기"
+    },
+    {
+      "key": "for_experts",
+      "style_family": "expert_red",
+      "source_slant_dx_per_dy": 0.3611,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1766,
+        790,
+        2218,
+        890
+      ],
+      "approved_korean": "상급자용"
+    },
+    {
+      "key": "normal_difficult",
+      "style_family": "normal_green",
+      "source_slant_dx_per_dy": 0.3651,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        2614,
+        790,
+        3284,
+        863
+      ],
+      "approved_korean": "보통 난이도"
+    },
+    {
+      "key": "select_game_mode",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3519,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        213,
+        887,
+        1165,
+        972
+      ],
+      "approved_korean": "게임 모드 선택"
+    },
+    {
+      "key": "select_car",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3529,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        302,
+        1007,
+        1085,
+        1110
+      ],
+      "approved_korean": "차량 선택"
+    },
+    {
+      "key": "select_course",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3636,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        370,
+        1127,
+        1084,
+        1212
+      ],
+      "approved_korean": "코스 선택"
+    },
+    {
+      "key": "select_music",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3462,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1613,
+        900,
+        2533,
+        989
+      ],
+      "approved_korean": "음악 선택"
+    },
+    {
+      "key": "select_transmission",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3673,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1563,
+        1015,
+        2588,
+        1091
+      ],
+      "approved_korean": "변속 방식 선택"
+    },
+    {
+      "key": "shortcut_features",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3649,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1680,
+        1127,
+        2610,
+        1212
+      ],
+      "approved_korean": "바로가기 기능"
+    },
+    {
+      "key": "selected_sp",
+      "style_family": "selected_yellow",
+      "source_slant_dx_per_dy": 0.0,
+      "target_direction": "none",
+      "measurement_provenance": "direct_upright",
+      "source_effect_bbox_display_ltrb": [
+        63,
+        1244,
+        2144,
+        1347
+      ],
+      "approved_korean": "아웃런2 SP 코스가 선택되었습니다."
+    },
+    {
+      "key": "selected_out2",
+      "style_family": "selected_yellow",
+      "source_slant_dx_per_dy": 0.0,
+      "target_direction": "none",
+      "measurement_provenance": "direct_upright",
+      "source_effect_bbox_display_ltrb": [
+        162,
+        1380,
+        2046,
+        1483
+      ],
+      "approved_korean": "아웃런2 코스가 선택되었습니다."
+    },
+    {
+      "key": "select_car_setting",
+      "style_family": "large_white",
+      "source_slant_dx_per_dy": 0.3784,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        2489,
+        1263,
+        3393,
+        1366
+      ],
+      "approved_korean": "차량 설정 선택"
+    },
+    {
+      "key": "versus_mode",
+      "style_family": "selected_yellow",
+      "source_slant_dx_per_dy": 0.0,
+      "target_direction": "none",
+      "measurement_provenance": "direct_upright",
+      "source_effect_bbox_display_ltrb": [
+        2226,
+        1385,
+        2945,
+        1485
+      ],
+      "approved_korean": "대전 모드"
+    },
+    {
+      "key": "gear_change",
+      "style_family": "gear_red",
+      "source_slant_dx_per_dy": 0.3462,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3587,
+        1392,
+        4033,
+        1500
+      ],
+      "approved_korean": "기어 변속"
+    },
+    {
+      "key": "player_battle_desc",
+      "style_family": "desc_white",
+      "source_slant_dx_per_dy": 0.36,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3180,
+        1534,
+        3827,
+        1667
+      ],
+      "approved_korean": "플레이어 대전을 위해 / 설계된 코스입니다."
+    },
+    {
+      "key": "new_course_desc",
+      "style_family": "desc_white",
+      "source_slant_dx_per_dy": 0.3333,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3008,
+        1709,
+        3661,
+        1826
+      ],
+      "approved_korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다."
+    },
+    {
+      "key": "orig_course_desc",
+      "style_family": "desc_white",
+      "source_slant_dx_per_dy": 0.3488,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        3034,
+        1877,
+        3564,
+        1994
+      ],
+      "approved_korean": "오리지널 아웃런2의 / 코스입니다."
+    },
+    {
+      "key": "random_music",
+      "style_family": "random_white",
+      "source_slant_dx_per_dy": 0.3636,
+      "target_direction": "right",
+      "measurement_provenance": "direct_hough",
+      "source_effect_bbox_display_ltrb": [
+        1741,
+        2360,
+        2719,
+        2572
+      ],
+      "approved_korean": "음악이 무작위로 / 선택됩니다."
+    }
+  ],
+  "self_check": "Before producing the candidate, verify that no source-language text or effect remains; no cover box, patch, seam or invented panel exists; all protected artwork is unchanged; Korean text is fully inside the permitted region and unclipped; canvas, orientation and transparency are unchanged. If any condition cannot be satisfied, do not produce a production candidate."
+}
