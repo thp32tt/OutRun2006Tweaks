@@ -9,6 +9,7 @@
 
 #include "stereo_renderer_r33.cpp"
 #include "vr/game/render_semantics.hpp"
+#include "../lifecycle/reset_replay_state.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -27,10 +28,8 @@ namespace OutRunVRStereo
         SafetyHookInline R34DrawIndexedPrimitiveUPR33Hook{};
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R34InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
-        std::atomic<bool> R34ResetReplayBlocked{false};
-        std::uint64_t R34ReplayBlocks = 0;
+        OutRunVR::Lifecycle::ResetReplayState R34ResetReplay{};
         std::uint64_t R34RasterGuardDraws = 0;
-        std::uint64_t R34LostDeviceBypasses = 0;
         bool R34FirstReplayBlockLogged = false;
         bool R34FirstLostDeviceBypassLogged = false;
         bool R34FirstRasterGuardLogged = false;
@@ -181,18 +180,18 @@ namespace OutRunVRStereo
 
             if (!OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device))
             {
-                R34ResetReplayBlocked.store(false, std::memory_order_release);
+                R34ResetReplay.blocked.store(false, std::memory_order_release);
                 OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
                 return hr;
             }
 
             const bool healthy = SUCCEEDED(hr) &&
                 OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
-            R34ResetReplayBlocked.store(!healthy, std::memory_order_release);
+            R34ResetReplay.blocked.store(!healthy, std::memory_order_release);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
             if (!healthy)
             {
-                ++R34ReplayBlocks;
+                ++R34ResetReplay.replayBlocks;
                 R34ForceResetReplayFailClosed(device, "Reset");
             }
             return hr;
@@ -208,8 +207,8 @@ namespace OutRunVRStereo
                 if (cooperative == D3DERR_DEVICELOST ||
                     cooperative == D3DERR_DEVICENOTRESET)
                 {
-                    ++R34LostDeviceBypasses;
-                    R34ResetReplayBlocked.store(
+                    ++R34ResetReplay.lostDeviceBypasses;
+                    R34ResetReplay.blocked.store(
                         true, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
                     ArmMonoSafety();
@@ -227,7 +226,7 @@ namespace OutRunVRStereo
             }
 
             const bool blocked = IsGameDevice(device) &&
-                R34ResetReplayBlocked.load(std::memory_order_acquire);
+                R34ResetReplay.blocked.load(std::memory_order_acquire);
             if (blocked)
                 R34ForceResetReplayFailClosed(device, "Present/pre");
 
@@ -325,7 +324,7 @@ namespace OutRunVRStereo
                     {
                         const bool healthy =
                             OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
-                        R34ResetReplayBlocked.store(!healthy,
+                        R34ResetReplay.blocked.store(!healthy,
                             std::memory_order_release);
                         OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(
                             !healthy);
