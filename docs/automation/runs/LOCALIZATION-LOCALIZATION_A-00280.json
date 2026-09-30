@@ -90,9 +90,12 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "42248567499c9127571d43254507559eff308b13",
+  "authoritative_result_sha": "42248567499c9127571d43254507559eff308b13",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): audit A-owned font pipeline [AUTO:LOCALIZATION-LOCALIZATION_A-00280]",
-  "precommit_refresh_head_sha": "4923fd7fc7a92d7266bb3a2dfe4f7ad6a9bf241c"
+  "precommit_refresh_head_sha": "4923fd7fc7a92d7266bb3a2dfe4f7ad6a9bf241c",
+  "bookkeeping_note": "Immutable producer result 42248567499c9127571d43254507559eff308b13 contains only A lane-local font-pipeline crosswalk evidence, its deterministic audit tool, and the durable A00280 task record. Producer automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T21:33:00+09:00",
+  "bookkeeping_base_head_sha": "42248567499c9127571d43254507559eff308b13"
 }
