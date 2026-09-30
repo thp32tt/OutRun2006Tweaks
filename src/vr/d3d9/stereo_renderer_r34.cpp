@@ -8,7 +8,7 @@
 // stale ResetEx state. A later clean Reset clears the block.
 
 #include "stereo_renderer_r33.cpp"
-#include "vr/game/render_semantics.hpp"
+#include "../render/draw_semantic_scope.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
 
@@ -61,10 +61,9 @@ namespace OutRunVRStereo
             DrawCall&& drawCall, const char* site) noexcept
         {
             const auto drawSemanticValue =
-                (device && IsGameDevice(device) && !InternalStereoPass)
-                ? OutRunVR::GameSemantic::ConsumeForDraw()
-                : OutRunVR::GameSemantic::CurrentScope;
-            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                OutRunVR::Render::AcquireDrawSemantic(
+                    device && IsGameDevice(device) && !InternalStereoPass);
+            OutRunVR::Render::ScopedDrawSemantic drawSemantic(
                 drawSemanticValue);
 
             if (!device || !IsGameDevice(device) || InternalStereoPass ||
