@@ -1,0 +1,112 @@
+{
+  "schema_version": 16,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00313",
+  "wave_id": "P00190",
+  "lane": "LOCALIZATION_A",
+  "purpose": "A_LANE_DISPATCH_SUPPRESSION_FINGERPRINT",
+  "recorded_at_kst": "2026-10-01T03:29:37+09:00",
+  "base_head_sha": "aec5c357cc8a3f262e41fc524351515ae9ef94f1",
+  "frontier_fingerprint_sha256": "3f3a98086587c63cd4e79822fbdba46c5c29ae395f3e149397f2d14fd36e2466",
+  "fingerprint_inputs": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "asset_queue_blob_sha": "e18ae69c216b93facaf54bc0f3fe2ebcdb628727",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00308",
+    "latest_authoritative_c_record_blob_sha": "67ee4a0cff043ce5fdde592ef6b703e8087b558f",
+    "latest_authoritative_c_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "previous_a_task": "LOCALIZATION-LOCALIZATION_A-00312",
+    "previous_a_record_blob_sha": "8b79f91a066f37dafd0b053d6806a110fbbaf66a",
+    "pinned_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_bundle_size": 306223257
+  },
+  "fresh_a_shard_scan": {
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "qa_pending_not_repeated": [
+      {
+        "index": 111,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00309",
+        "result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd"
+      },
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+        "result_sha": "0d638bf038becb211d39414f024aab699a6369b2"
+      },
+      {
+        "index": 159,
+        "state": "CANDIDATE_QA_PENDING"
+      },
+      {
+        "index": 198,
+        "state": "CANDIDATE_QA_PENDING"
+      },
+      {
+        "index": 201,
+        "state": "CANDIDATE_QA_PENDING"
+      }
+    ],
+    "sticky_source_exhausted_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "legacy_pending_c_not_repeated": [
+      54,
+      57,
+      60
+    ],
+    "static_or_runtime_only_not_reworked": [
+      12,
+      51,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "cross_lane_rework_not_stolen": [
+      121
+    ]
+  },
+  "suppression_contract": {
+    "suppress_same_lane_redispatch_while_fingerprint_unchanged": true,
+    "invalidate_on": [
+      "automation_contract_blob_sha_change",
+      "controller_roles_blob_sha_change",
+      "asset_queue_blob_sha_change",
+      "new_authoritative_C_disposition_for_A_owned_input",
+      "canonical_source_or_candidate_fingerprint_change",
+      "new_runtime_or_user_visual_evidence",
+      "explicit_user_instruction_that_changes_dependency"
+    ],
+    "next_legal_A_action": "Recompute the A shard only after one invalidation trigger. Do not repeat sticky source probes or QA-pending candidates under this fingerprint."
+  },
+  "canonical_bundle_crosscheck": {
+    "uploaded_bundle_path": "/mnt/data/OR2-HD-GUI-v0.25.10a.zip",
+    "verified_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "verified_size": 306223257,
+    "matches_contract_pin": true,
+    "authoritative_state_source": "GitHub korean-localization-clean",
+    "effect_on_sticky_source_decisions": "NONE; existing C-accepted source-exhaustion fingerprints remain authoritative and were not reactivated."
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "runtime_validation": "UNTESTED"
+}
