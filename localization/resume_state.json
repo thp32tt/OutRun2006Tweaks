@@ -16,7 +16,7 @@
     "SOURCE_BLOCKED_PREFLIGHT: Q00064 accepts fail-closed guards for indices132/135. Existing Q00063 guards 30/36/48 remain accepted. Do not repeat source probes until a guard dependency changes; A00299@index219 is a newer out-of-batch guard QA_PENDING.",
     "SPECIAL_PIPELINE: font15/18/21 remain runtime-handle blocked; A00297@index24 runtime-trace binding remains out-of-batch QA_PENDING.",
     "OUT_OF_BATCH_QA_PENDING: B00295@index121, A00297@index24 and A00299@index219 remain outside Q00064 and are not implicitly approved.",
-    "Q00064 validation-bearing result is awaiting Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00064 validation-bearing result 624b504f9ddfeea77fe72f0fb7f155b3fce3832d passed Localization Automation Gate 36747306315. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -104,7 +104,7 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-01T01:48:37+09:00",
+      "updated_at_kst": "2026-10-01T01:52:33+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
       "report": "localization/graphics/role_C/20261001-0148-C166/C166_Q00064_INDEPENDENT_QA_BATCH.json",
       "direct_queue_scope": 126,
@@ -138,7 +138,7 @@
       "promotion_hold_reason": "Q00010 accepted immutable A00091/B00092/A00094/B00095 pre-generation extraction/work-order evidence across 15 assets. Geometry/canonical checks pass, but no Korean candidate DDS or CLEAN_PLATE was produced; index175 semantic binding, B92 exact binary-header/orientation decode, and all candidate-only zero-pixel/DDS/style/source-vs-candidate gates remain HOLD_STRICT_RECHECK.",
       "user_approved_locked": 0,
       "zoom_review_resolved_preserve_original": 31,
-      "queue_reconciled_at_kst": "2026-10-01T01:48:37+09:00",
+      "queue_reconciled_at_kst": "2026-10-01T01:52:33+09:00",
       "partial_pixel_visual_pass_assets": [
         "C05E67EF"
       ],
@@ -479,8 +479,9 @@
       "q00064_runtime_isolation_accepted_indices": [
         51
       ],
-      "q00064_automation_validation": "PENDING",
-      "q00064_validation_bearing_result_sha": null
+      "q00064_automation_validation": "PASS",
+      "q00064_validation_bearing_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+      "q00064_automation_gate_run_id": 36747306315
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -2785,12 +2786,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "Reused unchanged accepted source/candidate fingerprints for A00292/A00294/A00296. Performed fresh readback/hash/decoded visual comparison only for B00287 because it introduced a new candidate pointer; exact pointer content no longer matches producer hashes.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "bookkeeping_note": "RESULT_SHA and Gate metadata are populated only after this validation-bearing result commit exists and its Localization Automation Gate completes. Runtime remains UNTESTED."
+    "result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "authoritative_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "validation_bearing_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "bookkeeping_note": "Q00064 authoritative Gate PASS is owned by validation-bearing result 624b504f9ddfeea77fe72f0fb7f155b3fce3832d. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36747306315,
+      "head_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T01:52:33+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-10-01T01:52:33+09:00",
+    "bookkeeping_base_head_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T01:48:37+09:00",
+  "updated_at_kst": "2026-10-01T01:52:33+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C166/Q00064 RESULT PENDING GATE: A00292@index132 PASS PREFLIGHT_ONLY source guard; B00287@index163 REWORK_REQUIRED because recorded Drive bundle/DDS hashes no longer match current exact file-ID bytes and current two rows visibly retain English residue; A00294@index135 PASS PREFLIGHT_ONLY source guard; A00296@index51 PASS DDS_ONLY isolation input on unchanged C163 static candidate. Order RENDER_READY none -> ONE_STAGE none -> rework 163 -> candidate QA 121/159/198/201 -> runtime isolation 51 accepted -> unrelated preflight. Pending production 65; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C166/Q00064 AUTHORITATIVE GATE PASS: validation-bearing result 624b504f9ddfeea77fe72f0fb7f155b3fce3832d passed Localization Automation Gate 36747306315. A00292@index132 PASS PREFLIGHT_ONLY source guard; B00287@index163 REWORK_REQUIRED because recorded Drive bundle/DDS hashes do not match current exact file-ID bytes and current two-row DDS retains English residue; A00294@index135 PASS PREFLIGHT_ONLY source guard; A00296@index51 PASS DDS_ONLY isolation input on unchanged C163 static candidate. Order RENDER_READY none -> ONE_STAGE none -> rework 163 -> candidate QA 121/159/198/201 -> runtime isolation 51 accepted -> unrelated preflight. Pending production 65; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1033,8 +1033,10 @@
       },
       "pending_production_localize_text": 65,
       "actionable_localize_text": 93,
-      "automation_validation": "PENDING",
-      "runtime_validation": "UNTESTED"
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+      "automation_gate_run_id": 36747306315
     }
   },
   "data_build": {
@@ -1488,12 +1490,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "Reused unchanged accepted source/candidate fingerprints for A00292/A00294/A00296. Performed fresh readback/hash/decoded visual comparison only for B00287 because it introduced a new candidate pointer; exact pointer content no longer matches producer hashes.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "bookkeeping_note": "RESULT_SHA and Gate metadata are populated only after this validation-bearing result commit exists and its Localization Automation Gate completes. Runtime remains UNTESTED."
+    "result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "authoritative_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "validation_bearing_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "bookkeeping_note": "Q00064 authoritative Gate PASS is owned by validation-bearing result 624b504f9ddfeea77fe72f0fb7f155b3fce3832d. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36747306315,
+      "head_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T01:52:33+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-10-01T01:52:33+09:00",
+    "bookkeeping_base_head_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d"
   }
 }

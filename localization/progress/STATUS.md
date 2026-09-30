@@ -1474,3 +1474,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Current order: **RENDER_READY none -> ONE_STAGE none -> REWORK_REQUIRED 163 -> candidate QA 121/159/198/201 -> runtime-isolation 51 accepted -> unrelated preflight**. A00299@index219 remains out-of-batch QA_PENDING.
 - C writes no candidate DDS. No real-game test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. One validation-bearing result commit owns Q00064 Gate. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
 
+## 2026-10-01 01:52 KST - C166 Q00064 AUTHORITATIVE GATE PASS
+- Validation-bearing result `624b504f9ddfeea77fe72f0fb7f155b3fce3832d`; Localization Automation Gate `36747306315` completed **success**.
+- Q00064 dispositions remain **A00292 PASS / B00287 REWORK_REQUIRED / A00294 PASS / A00296 PASS**. Index132/135 approvals are pre-generation source guards only; index51 accepts a DDS_ONLY isolation input on the unchanged C163 static-QA candidate; index163 remains **REWORK_REQUIRED** because its recorded Drive artifact identity no longer matches current bytes and the current transported DDS visibly retains English residue under Korean.
+- Candidate-first order remains **RENDER_READY none -> ONE_STAGE none -> rework 163 -> candidate QA 121/159/198/201 -> runtime-isolation 51 accepted -> unrelated preflight**. No runtime approval was granted.
+- This bookkeeping checkpoint is separate from the Gate-owning result and does not replace `624b504f9ddfeea77fe72f0fb7f155b3fce3832d` as authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
