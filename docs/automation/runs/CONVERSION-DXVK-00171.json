@@ -1,0 +1,82 @@
+{
+  "task_id": "CONVERSION-DXVK-00171",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "6625f65c23d01103490e14d7f002734d92150cba",
+  "result_sha": "PENDING_VALIDATION_RESULT",
+  "validation_bearing_result_sha": "PENDING_VALIDATION_RESULT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R171_8BD20_BOUNDED_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DXVK-00169 captured exact 0x8BD20 provenance from two independently aligned callers and explicitly left instruction boundaries, function-entry identity, semantics and ownership unresolved. Its durable next_action names a fresh 0x8BD20 decode as the next independent F13 unit.",
+  "summary": "Add a fail-closed instruction-aligned proof for the first bounded routine in the already captured 0x8BD20 window. The proof pins both short branches to 0x8BD39, both RETs, the four-byte INT3 padding through 0x8BD40, and the next-code anchor. It deliberately leaves function-entry identity, higher-level callee semantics and render/HUD ownership unresolved.",
+  "evidence": [
+    "Base branch HEAD before work: 6625f65c23d01103490e14d7f002734d92150cba.",
+    "CONVERSION-DXVK-00169 exact bytes at 0x8BD20 begin 8b 4c 24 04 85 c9 74 11 ... and contain two RET paths ending at 0x8BD3B followed by four INT3 bytes and next code at 0x8BD40.",
+    "Analyzer implementation commit 04c4434a8ecfe4973aaedba5ce9fd38b18852127 added the bounded proof; follow-up 85c2e85309c89364ad0e6731b28338d95a622c1a corrected the terminal-row guard discovered during immediate review.",
+    "Static contract commit 4e07c94e5a4dc210aee7682f1f4e008f7cf1fd7e requires the new constants, proof collector, report key, PASS marker and fail-closed exit marker.",
+    "No Quest 3 / VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00171.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "04c4434a8ecfe4973aaedba5ce9fd38b18852127",
+      "message": "vr: prove bounded 0x8BD20 control-flow window [AUTO:CONVERSION-DXVK-00171]",
+      "role": "implementation_initial",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "85c2e85309c89364ad0e6731b28338d95a622c1a",
+      "message": "vr: correct 0x8BD20 terminal row guard [AUTO:CONVERSION-DXVK-00171]",
+      "role": "implementation_repair",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "4e07c94e5a4dc210aee7682f1f4e008f7cf1fd7e",
+      "message": "test: gate 0x8BD20 bounded routine proof [AUTO:CONVERSION-DXVK-00171]",
+      "role": "static_contract",
+      "validation_bearing": false,
+      "ci_skip": false
+    }
+  ],
+  "proof_contract": {
+    "target_rva": "0x0008BD20",
+    "body_end_rva": "0x0008BD3C",
+    "branch_target_rva": "0x0008BD39",
+    "padding_end_rva": "0x0008BD40",
+    "next_code_rva": "0x0008BD40",
+    "expected_status": "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. No renderer, DXVK provider, selector, package policy, transport or backend activation behavior changed.",
+    "ownership": "The proof is bounded to exact instruction/control-flow shape; ScreenHud/world/render ownership is not inferred.",
+    "stereo_correctness": "No WVP, projection, eye submission, HUD/world classification, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed unless predecessor dual-call provenance is exact, instruction bytes are contiguous and exact, both short branches land at 0x8BD39, both RETs are present, four INT3 padding bytes match, and the next-code anchor begins at 0x8BD40."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_CALLEE_8BD20_EXACT_PROVENANCE",
+    "after": "PENDING_8BD20_BOUNDED_CONTROL_FLOW_VALIDATION",
+    "runtime_claim": false
+  },
+  "blocker": "Function-entry identity still requires evidence before 0x8BD20 or equivalent structural proof. Higher-level callee semantics and all render/HUD ownership remain unresolved. The separate 0x182194 callee is untouched.",
+  "next_action": "Run exact-source GitHub validation on the result commit. If mandatory workflows pass, set AUTOMATION_VALIDATION=PASS while keeping RUNTIME_VALIDATION=UNTESTED; then the next independent F13 unit can address function-entry identity or 0x182194 provenance without inferring render semantics."
+}
