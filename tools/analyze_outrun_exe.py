@@ -158,6 +158,40 @@ GF_TARGET_C_THIRD_CALL_INSTRUCTIONS = (
 # inferred until exact instruction/control-flow review is performed separately.
 GF_TARGET_C_HELPER_1_RVA = 0x00028460
 GF_TARGET_C_HELPER_PROBE_LEN = 128
+GF_TARGET_C_HELPER_1_RANGE_FALLBACK_RVA = 0x00028588
+GF_TARGET_C_HELPER_1_MISS_CLEANUP_RVA = 0x000284A6
+GF_TARGET_C_HELPER_1_SUCCESS_CONTINUATION_RVA = 0x000284B0
+GF_TARGET_C_HELPER_1_TABLE_BASE = 0x009568B8
+GF_TARGET_C_HELPER_1_PREFIX_INSTRUCTIONS = (
+    (0x00028460, "83 ec 08", "sub esp, 8"),
+    (0x00028463, "8b 44 24 0c", "mov eax, [esp+0x0c]"),
+    (0x00028467, "53", "push ebx"),
+    (0x00028468, "56", "push esi"),
+    (0x00028469, "8b f0", "mov esi, eax"),
+    (0x0002846B, "c1 ee 10", "shr esi, 0x10"),
+    (0x0002846E, "83 fe 20", "cmp esi, 0x20"),
+    (0x00028471, "57", "push edi"),
+    (0x00028472, "c7 44 24 0c ff ff ff ff", "mov [esp+0x0c], -1"),
+    (0x0002847A, "0f 8c 08 01 00 00", "jl 0x28588"),
+    (0x00028480, "83 fe 4b", "cmp esi, 0x4b"),
+    (0x00028483, "0f 8d ff 00 00 00", "jge 0x28588"),
+    (0x00028489, "33 ff", "xor edi, edi"),
+    (0x0002848B, "25 ff ff 00 00", "and eax, 0xffff"),
+    (0x00028490, "3b f7", "cmp esi, edi"),
+    (0x00028492, "7c 12", "jl 0x284a6"),
+    (0x00028494, "8b 0c b5 b8 68 95 00", "mov ecx, [esi*4+0x9568b8]"),
+    (0x0002849B, "3b cf", "cmp ecx, edi"),
+    (0x0002849D, "74 07", "je 0x284a6"),
+    (0x0002849F, "8b 1c 81", "mov ebx, [ecx+eax*4]"),
+    (0x000284A2, "3b df", "cmp ebx, edi"),
+    (0x000284A4, "75 0a", "jne 0x284b0"),
+    (0x000284A6, "5f", "pop edi"),
+    (0x000284A7, "5e", "pop esi"),
+    (0x000284A8, "83 c8 ff", "or eax, -1"),
+    (0x000284AB, "5b", "pop ebx"),
+    (0x000284AC, "83 c4 08", "add esp, 8"),
+    (0x000284AF, "c3", "ret"),
+)
 
 
 # Mirrors the canonical producer catalog in
@@ -508,6 +542,122 @@ def collect_guarded_gf_target_c_helper_1_provenance(pe: PE) -> dict:
             pe, target_rva, GF_TARGET_C_HELPER_PROBE_LEN
         ),
         "semantic_effect": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_prefix_proof(pe: PE) -> dict:
+    """Prove the bounded packed-selector lookup prefix at helper 0x28460.
+
+    This proof stops at the first successful continuation (0x284B0). It proves
+    selector splitting, range guards, table lookup, and the local miss return,
+    but does not infer the helper's full semantic effect or render ownership.
+    """
+
+    provenance = collect_guarded_gf_target_c_helper_1_provenance(pe)
+    caller_proof = collect_guarded_gf_target_c_alignment_proof(pe)
+
+    expected_next = GF_TARGET_C_HELPER_1_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_PREFIX_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    def rel8_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 2)
+        if len(raw) != 2:
+            return None
+        rel = struct.unpack_from("<b", raw, 1)[0]
+        return (rva + 2 + rel) & 0xFFFFFFFF
+
+    def rel32cc_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 6)
+        if len(raw) != 6 or raw[0] != 0x0F:
+            return None
+        rel = struct.unpack_from("<i", raw, 2)[0]
+        return (rva + 6 + rel) & 0xFFFFFFFF
+
+    range_low_target = rel32cc_target(0x0002847A)
+    range_high_target = rel32cc_target(0x00028483)
+    legacy_negative_target = rel8_target(0x00028492)
+    null_table_target = rel8_target(0x0002849D)
+    success_target = rel8_target(0x000284A4)
+
+    caller_link_present = any(
+        item["call_rva"] == GF_TARGET_C_ALIGNED_CALL_RVA
+        for item in provenance["raw_inbound_rel32_candidates"]
+    )
+    caller_exact = (
+        caller_proof["status"] == "EXACT_FIRST_CALL_ALIGNMENT_PROVEN"
+        and caller_proof["decoded_call_target_rva"] == GF_TARGET_C_HELPER_1_RVA
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    range_targets_match = (
+        range_low_target == GF_TARGET_C_HELPER_1_RANGE_FALLBACK_RVA
+        and range_high_target == GF_TARGET_C_HELPER_1_RANGE_FALLBACK_RVA
+    )
+    miss_targets_match = (
+        legacy_negative_target == GF_TARGET_C_HELPER_1_MISS_CLEANUP_RVA
+        and null_table_target == GF_TARGET_C_HELPER_1_MISS_CLEANUP_RVA
+    )
+    success_target_matches = (
+        success_target == GF_TARGET_C_HELPER_1_SUCCESS_CONTINUATION_RVA
+    )
+    target_section_matches = provenance["target_section"] == ".text"
+
+    proven = bool(
+        caller_exact
+        and caller_link_present
+        and contiguous
+        and all_bytes_match
+        and range_targets_match
+        and miss_targets_match
+        and success_target_matches
+        and target_section_matches
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_RVA,
+        "target_section": provenance["target_section"],
+        "caller_rva": GF_TARGET_C_ALIGNED_CALL_RVA,
+        "caller_status": caller_proof["status"],
+        "caller_link_present": caller_link_present,
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "selector_high_word_range_min_inclusive": 0x20,
+        "selector_high_word_range_max_exclusive": 0x4B,
+        "selector_low_word_mask": 0xFFFF,
+        "table_base": GF_TARGET_C_HELPER_1_TABLE_BASE,
+        "range_low_target": range_low_target,
+        "range_high_target": range_high_target,
+        "range_targets_match": range_targets_match,
+        "legacy_negative_target": legacy_negative_target,
+        "null_table_target": null_table_target,
+        "miss_cleanup_rva": GF_TARGET_C_HELPER_1_MISS_CLEANUP_RVA,
+        "miss_targets_match": miss_targets_match,
+        "miss_return_value": -1,
+        "success_continuation_rva": success_target,
+        "success_target_matches": success_target_matches,
+        "status": (
+            "EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN"
+            if proven
+            else "LOOKUP_PREFIX_PROOF_FAILED"
+        ),
+        "semantic_effect": "PARTIAL_LOOKUP_PREFIX_ONLY",
+        "full_helper_semantics": "UNRESOLVED",
         "ownership_effect": "NONE",
     }
 
@@ -1316,6 +1466,7 @@ def main() -> int:
         "guarded_gf_target_c_second_call_alignment_proof": collect_guarded_gf_target_c_second_call_alignment_proof(pe),
         "guarded_gf_target_c_third_call_alignment_proof": collect_guarded_gf_target_c_third_call_alignment_proof(pe),
         "guarded_gf_target_c_helper_1_provenance": collect_guarded_gf_target_c_helper_1_provenance(pe),
+        "guarded_gf_target_c_helper_1_prefix_proof": collect_guarded_gf_target_c_helper_1_prefix_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -1469,6 +1620,28 @@ def main() -> int:
         f"semantic_effect={helper_1['semantic_effect']} "
         f"bytes={helper_1['bytes']}"
     )
+    helper_1_proof = report["guarded_gf_target_c_helper_1_prefix_proof"]
+    print(
+        f"gf_target_c_helper_1_prefix=0x{helper_1_proof['target_rva']:08X} "
+        f"status={helper_1_proof['status']} "
+        f"caller=0x{helper_1_proof['caller_rva']:08X} "
+        f"caller_status={helper_1_proof['caller_status']} "
+        f"caller_link={helper_1_proof['caller_link_present']} "
+        f"layout_contiguous={helper_1_proof['layout_contiguous']} "
+        f"bytes_match={helper_1_proof['all_instruction_bytes_match']} "
+        f"high_range=0x{helper_1_proof['selector_high_word_range_min_inclusive']:X}-"
+        f"0x{helper_1_proof['selector_high_word_range_max_exclusive']:X} "
+        f"low_mask=0x{helper_1_proof['selector_low_word_mask']:X} "
+        f"table_base=0x{helper_1_proof['table_base']:08X} "
+        f"range_fallback={hexrva(helper_1_proof['range_low_target'])}/"
+        f"{hexrva(helper_1_proof['range_high_target'])} "
+        f"miss_cleanup={hexrva(helper_1_proof['miss_cleanup_rva'])} "
+        f"miss_return={helper_1_proof['miss_return_value']} "
+        f"success_continuation={hexrva(helper_1_proof['success_continuation_rva'])} "
+        f"semantic_effect={helper_1_proof['semantic_effect']} "
+        f"full_semantics={helper_1_proof['full_helper_semantics']} "
+        f"ownership_effect={helper_1_proof['ownership_effect']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -1494,6 +1667,9 @@ def main() -> int:
     if alignment_c3["status"] != "EXACT_THIRD_CALL_ALIGNMENT_PROVEN":
         print("guarded_gf_target_c_third_call_alignment_proof=FAILED")
         return 6
+    if helper_1_proof["status"] != "EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN":
+        print("guarded_gf_target_c_helper_1_prefix_proof=FAILED")
+        return 7
     return 0
 
 
