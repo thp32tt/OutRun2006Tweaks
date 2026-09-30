@@ -40,6 +40,20 @@ Each command means:
 - Work scope comes from `localization/graphics/asset_queue.csv`, never from the count of DDS binaries currently committed.
 - Rules must be changed in Git, not duplicated into Docker prompts.
 
+## Mandatory GitHub access preflight for every generated task and rollover
+
+Every controller-generated initial task, retry, and chat-rollover prompt MUST explicitly instruct the worker to perform a fresh authenticated GitHub repository metadata/permission check before claiming that GitHub access is unavailable.
+
+Required semantics:
+- Start by calling the authenticated GitHub connector against `thp32tt/OutRun2006Tweaks` and refresh `korean-localization-clean` HEAD.
+- If repository metadata shows `push=true`, `maintain=true`, or `admin=true`, GitHub write access is available and the worker MUST continue from current HEAD.
+- A missing file/404, unsupported connector operation, stale SHA conflict, branch race, validation failure, rate limit, or unavailable N100/local workspace MUST NOT be called a GitHub permission failure.
+- If a read/path operation fails while repository permissions are valid, re-resolve the path/ref from current HEAD and continue or report the specific non-permission blocker; do not park the lane waiting for permission.
+- Only a fresh permission response lacking push/maintain/admin, or an actual write returning authorization-specific 401/403 after refresh, may produce `GITHUB_PERMISSION_DENIED`.
+- A rollover MUST repeat this preflight itself. It MUST NOT inherit an earlier chat's claim that GitHub permission was unavailable.
+
+The generated prompt should include the compact directive: `GitHub 권한을 추정하지 마. 먼저 authenticated repository permission metadata와 korean-localization-clean HEAD를 새로 확인해. push/maintain/admin 중 하나가 true이면 접근 가능으로 판정하고 즉시 계속해. 404/path miss/unsupported operation/stale SHA/rate limit/N100 unavailable은 permission denied가 아니다. 실제 fresh permission denial 또는 refresh 후 write 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해.`
+
 ## WAIT_ACTIONS recovery mapping
 
 - After a task commit is found, bind the exact `Localization Automation Gate` run ID for that commit and poll that run ID directly.
