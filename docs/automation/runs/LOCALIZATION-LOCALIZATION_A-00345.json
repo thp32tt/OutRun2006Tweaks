@@ -60,7 +60,8 @@
     ],
     "prior_drive_tier_reused_without_probe": true,
     "materially_reduces_unresolved_work": true,
-    "sticky_dependency_blocker": true
+    "sticky_dependency_blocker": true,
+    "producing_result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7"
   },
   "evidence": [
     "localization/graphics/role_A/20261001-A00345-P00216/A00345_P00216_FONT_FAMILY_SOURCE_IDENTITY_MISMATCH.json",
@@ -103,8 +104,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__C174_GATE_PASS_NO_A_COMPLETION_TIER__NO_QA_PENDING_REPEAT__FONT15_18_21_C163_DRIVE_MISS_REUSED__PINNED_DIRECT_3_OF_3_404__PINNED_RELEASE_ARCHIVE_EXACT__RELEASE_MEMBERS_3_OF_3_CANONICAL_SHA_MISMATCH__SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_DDS_MASK_CLEANPLATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+  "authoritative_result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): close font-family source mismatches [AUTO:LOCALIZATION-LOCALIZATION_A-00345]",
   "durable_task_record_in_result_commit": true,
@@ -113,7 +114,13 @@
     "head_sha": "c52c5d845e913d6b9ea328509ffa48d6c9ba1b4b",
     "head_message": "chore(localization): record Q00072 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00343] [skip ci]",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Fresh HEAD fetched after Q00072 Gate bookkeeping and immediately before tree/commit creation. Only A00345 lane-local evidence/task-record paths are added; shared state and peer-lane files are untouched."
+    "concurrent_changes_reviewed": "Fresh HEAD fetched after Q00072 Gate bookkeeping and immediately before tree/commit creation. Only A00345 lane-local evidence/task-record paths are added; shared state and peer-lane files are untouched.",
+    "bookkeeping_head_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+    "bookkeeping_concurrent_head_preserved": false
   },
-  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the result SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA is bound here. The result commit atomically contains the font-family source-terminal evidence and durable task record. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T07:02:00+09:00",
+  "bookkeeping_base_result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+  "bookkeeping_preserved_head_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+  "bookkeeping_preserved_head_message": "localization(A): close font-family source mismatches [AUTO:LOCALIZATION-LOCALIZATION_A-00345]"
 }
