@@ -1,0 +1,217 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00280-p00164-a-owned-font-pipeline-static-crosswalk-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00280",
+  "wave_id": "P00164",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T21:24:00+09:00",
+  "base_head_sha": "4923fd7fc7a92d7266bb3a2dfe4f7ad6a9bf241c",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "candidate_completion_scan": "ZERO_LEGAL_RUNNABLE_LOCALIZE_TEXT_AFTER_A00278_CANDIDATE_AND_A00279_PREFLIGHT_ENTERED_QA_PENDING",
+    "selected_priority": "OTHER_ROLE_SPECIFIC_PENDING_FONT_PIPELINE_AFTER_ZERO_RUNNABLE_READY_REWORK_AND_RUNTIME_ISOLATION_GAPS",
+    "selected_indices": [
+      15,
+      18,
+      21
+    ],
+    "selected_assets": [
+      "20389D70",
+      "7B65A191",
+      "D7CE8BC3"
+    ],
+    "selected_action": "font_pipeline",
+    "qa_pending_not_repeated": [
+      24,
+      51,
+      111,
+      159,
+      198,
+      201
+    ],
+    "sticky_source_acquisition_not_repeated": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ]
+  },
+  "source_transport": {
+    "provider": "google_drive",
+    "account": "ezflash557",
+    "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "traversed_folder_ids": {
+      "textures": "1xWHh1nrbRWPp_rVl_xRzfRFFO8Y2DnBS",
+      "load": "1M_zaCiIOP1S7khgRynMLxc_iLCAMKfib",
+      "spr_font_xst": "1ShehW83ZpvX1N6Y65VMCRM9DWV-465_W"
+    },
+    "exact_parent_listing": [
+      "6B8ED9DA_256x128.dds"
+    ],
+    "exact_target_outcomes": {
+      "20389D70_512x256.dds": "SOURCE_TRANSPORT_MISS",
+      "7B65A191_256x128.dds": "SOURCE_TRANSPORT_MISS",
+      "D7CE8BC3_512x256.dds": "SOURCE_TRANSPORT_MISS"
+    },
+    "interpretation": "Drive exact-relative-path fast path was attempted first. These misses are transport misses only, not source identity mismatches. No Release/source-byte fallback is needed for this static descriptor crosswalk because runtime handle-usage evidence is the blocking prerequisite before any DDS mutation."
+  },
+  "manifest": {
+    "glyph_count": 505,
+    "page_count": 2,
+    "page_capacity": 256,
+    "grid": {
+      "columns": 16,
+      "rows": 16
+    }
+  },
+  "targets": [
+    {
+      "index": 15,
+      "path": "textures/load/spr_font_xst/20389D70_512x256.dds",
+      "asset_hash": "20389D70",
+      "canonical_inventory": {
+        "sha256": "0b687a1d416f579bc71521ad4ec8278b84a3362b1c687ead3d80aaec7de31d25",
+        "width": 2048,
+        "height": 1024,
+        "mode": "RGBA",
+        "category": "font"
+      },
+      "stock_runtime_descriptor": {
+        "descriptor_index": 9,
+        "resource_handle": 9,
+        "cell": [
+          17,
+          17
+        ],
+        "base_code": 32,
+        "letter_spacing": 2,
+        "stock_dds_size": [
+          512,
+          256
+        ],
+        "stock_dds_format": "DXT5"
+      },
+      "inventory_to_stock_dimension_ratio": [
+        4,
+        4
+      ],
+      "static_crosswalk": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    },
+    {
+      "index": 18,
+      "path": "textures/load/spr_font_xst/7B65A191_256x128.dds",
+      "asset_hash": "7B65A191",
+      "canonical_inventory": {
+        "sha256": "c1f47db9ab463fcc46bc23fa1154046b5c0eb6fd126559351e2e80042334e100",
+        "width": 256,
+        "height": 128,
+        "mode": "RGBA",
+        "category": "font"
+      },
+      "stock_runtime_descriptor": {
+        "descriptor_index": 0,
+        "resource_handle": 0,
+        "cell": [
+          12,
+          12
+        ],
+        "base_code": 0,
+        "letter_spacing": 0,
+        "stock_dds_size": [
+          256,
+          128
+        ],
+        "stock_dds_format": "DXT3"
+      },
+      "inventory_to_stock_dimension_ratio": [
+        1,
+        1
+      ],
+      "static_crosswalk": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    },
+    {
+      "index": 21,
+      "path": "textures/load/spr_font_xst/D7CE8BC3_512x256.dds",
+      "asset_hash": "D7CE8BC3",
+      "canonical_inventory": {
+        "sha256": "2a8f9e8c906a6ae5583550c735d999fc3f5650c4f21a4e9d0c7a915ec063f4b7",
+        "width": 512,
+        "height": 256,
+        "mode": "RGBA",
+        "category": "font"
+      },
+      "stock_runtime_descriptor": {
+        "descriptor_index": 7,
+        "resource_handle": 2,
+        "cell": [
+          22,
+          26
+        ],
+        "base_code": 32,
+        "letter_spacing": 0,
+        "stock_dds_size": [
+          512,
+          256
+        ],
+        "stock_dds_format": "DXT3"
+      },
+      "inventory_to_stock_dimension_ratio": [
+        1,
+        1
+      ],
+      "static_crosswalk": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    }
+  ],
+  "conclusion": {
+    "static_identity_complete": true,
+    "safe_repurpose_inferred_from_static_data": false,
+    "candidate_dds_modified": false,
+    "required_next": "Collect KoreanK3Trace font-state usage and bind actual target-screen resource-handle activity before choosing any Korean atlas/page-switch target. Preserve stock ASCII resources and restore full font state after Korean segments.",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "A_OWNED_FONT_PIPELINE_STATIC_DESCRIPTOR_CROSSWALK_AUDIT_TOOL_AND_MACHINE_OUTPUT",
+    "reviewed_indices": [
+      15,
+      18,
+      21
+    ],
+    "reviewed_assets": [
+      "20389D70",
+      "7B65A191",
+      "D7CE8BC3"
+    ],
+    "new_static_runtime_crosswalk": true,
+    "new_drift_detection_tool": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_FONT_PIPELINE__QUEUE_INVENTORY_STOCK_DESCRIPTOR_CROSSWALK_3_OF_3__HD_DIMENSION_RATIO_RECORDED__DRIVE_FAST_PATH_MISS_TYPED_NOT_IDENTITY_FAIL__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

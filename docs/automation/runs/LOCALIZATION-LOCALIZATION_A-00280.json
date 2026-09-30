@@ -1,0 +1,98 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00280-p00164-a-owned-font-pipeline-static-crosswalk-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00280",
+  "wave_id": "P00164",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T21:24:00+09:00",
+  "base_head_sha": "4923fd7fc7a92d7266bb3a2dfe4f7ad6a9bf241c",
+  "result": "PASS_MATERIAL_A_MOD3_FONT_PIPELINE_STATIC_DESCRIPTOR_CROSSWALK_RUNTIME_USAGE_BLOCKED_RUNTIME_UNTESTED",
+  "summary": "Fresh schema15 A-shard scan found no legal localize_text candidate-completion work: A00278@index51 has a new native-v2 candidate awaiting C, A00279@index24 is now QA-pending, index111 producer evidence remains QA-pending, indices159/198/201 remain candidate-QA pending, and the remaining A localize_text preflights are sticky source-acquisition blocked. The single allowed material fallback therefore advances the three A-owned font_pipeline rows (15/20389D70, 18/7B65A191, 21/D7CE8BC3) in one batch. A deterministic audit now binds each queue row and canonical graphics-inventory identity to the stock executable font descriptor/resource handle and records the exact HD-to-stock dimension ratio. The approved Drive font folder was traversed directly first; all three exact names are SOURCE_TRANSPORT_MISS, not identity failures. No DDS is generated because static data cannot prove a safe Korean atlas/page-switch slot: KoreanK3Trace runtime font-state evidence is the remaining prerequisite. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "candidate_completion_scan": "ZERO_LEGAL_RUNNABLE_LOCALIZE_TEXT_AFTER_A00278_CANDIDATE_AND_A00279_PREFLIGHT_ENTERED_QA_PENDING",
+    "selected_priority": "OTHER_ROLE_SPECIFIC_PENDING_FONT_PIPELINE_AFTER_ZERO_RUNNABLE_READY_REWORK_AND_RUNTIME_ISOLATION_GAPS",
+    "selected_indices": [
+      15,
+      18,
+      21
+    ],
+    "selected_assets": [
+      "20389D70",
+      "7B65A191",
+      "D7CE8BC3"
+    ],
+    "selected_action": "font_pipeline",
+    "qa_pending_not_repeated": [
+      24,
+      51,
+      111,
+      159,
+      198,
+      201
+    ],
+    "sticky_source_acquisition_not_repeated": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ]
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00280-P00164/A00280_P00164_A_OWNED_FONT_PIPELINE_CROSSWALK.json",
+    "localization/graphics/role_A/20260930-A00280-P00164/audit_a_owned_font_pipeline.py"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "A_OWNED_FONT_PIPELINE_STATIC_DESCRIPTOR_CROSSWALK_AUDIT_TOOL_AND_MACHINE_OUTPUT",
+    "reviewed_indices": [
+      15,
+      18,
+      21
+    ],
+    "reviewed_assets": [
+      "20389D70",
+      "7B65A191",
+      "D7CE8BC3"
+    ],
+    "new_static_runtime_crosswalk": true,
+    "new_drift_detection_tool": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "production_readiness": {
+    "15": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+    "18": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+    "21": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+  },
+  "self_qa": "PASS_A_MOD3_FONT_PIPELINE__QUEUE_INVENTORY_STOCK_DESCRIPTOR_CROSSWALK_3_OF_3__HD_DIMENSION_RATIO_RECORDED__DRIVE_FAST_PATH_MISS_TYPED_NOT_IDENTITY_FAIL__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): audit A-owned font pipeline [AUTO:LOCALIZATION-LOCALIZATION_A-00280]",
+  "precommit_refresh_head_sha": "4923fd7fc7a92d7266bb3a2dfe4f7ad6a9bf241c"
+}
