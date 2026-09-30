@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 14:
-    raise SystemExit("controller_roles schema_version must be >= 14")
+if int(cfg.get("schema_version", 0)) < 15:
+    raise SystemExit("controller_roles schema_version must be >= 15")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -127,6 +127,20 @@ required["single_dds_packaging.optional_only"] = single.get("purpose") == "OPTIO
 required["single_dds_packaging.no_producer_gate"] = single.get("gates_producer_progress") is False
 required["single_dds_packaging.no_c_gate"] = single.get("gates_c_batch_progress") is False
 required["single_dds_packaging.external_candidate_skip"] = single.get("external_candidate_mode") == "SKIP_WITH_TYPED_NOTICE_EXTERNAL_CANDIDATE_NOT_IN_GIT"
+required["execution.c_rework_owner_includes_e"] = (cfg.get("lanes") or {}).get("C", {}).get("candidate_write_policy") == "RETURN_REWORK_TO_OWNING_A_B_OR_E"
+forbidden_fragments = set((cfg.get("dispatch_freshness") or {}).get("forbidden_prompt_fragments") or [])
+required["dispatch_freshness.forbids_stale_two_producer_phrases"] = {"A: odd-index","B: even-index","A+B production wave","odd/even queue shards"}.issubset(forbidden_fragments)
+
+commands_text = (root / "docs" / "KOREAN_LOCALIZATION_CONTROLLER_COMMANDS.md").read_text(encoding="utf-8")
+for stale in ["A: odd-index", "B: even-index", "A+B production wave", "odd/even queue shards"]:
+    required["controller_commands.no_stale_" + stale.replace(" ", "_")] = stale not in commands_text
+required["controller_commands.has_e_command"] = "OutRun 한글화 E 실행" in commands_text
+required["controller_commands.modulo3"] = "index % 3 == 0" in commands_text and "index % 3 == 1" in commands_text and "index % 3 == 2" in commands_text
+
+workflow_text = (root / ".github" / "workflows" / "localization-automation-gate.yml").read_text(encoding="utf-8")
+required["automation_gate.skips_a"] = "[AUTO:LOCALIZATION-LOCALIZATION_A-" in workflow_text
+required["automation_gate.skips_b"] = "[AUTO:LOCALIZATION-LOCALIZATION_B-" in workflow_text
+required["automation_gate.skips_e"] = "[AUTO:LOCALIZATION-LOCALIZATION_E-" in workflow_text
 bad = [name for name, ok in required.items() if not ok]
 if bad:
     raise SystemExit("controller recovery policy invalid: " + ", ".join(bad))
