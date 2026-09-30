@@ -275,7 +275,7 @@ namespace OutRunVRStereo
                 IsStateBlockTrackingReliable();
             const bool effectKnown = stateBlocksReliable
                 ? FragileEffectCached(device, fragile)
-                : R32EffectIsFragileLive(device, fragile);
+                : EffectIsFragileLive(device, fragile);
             if (!effectKnown)
                 return {};
             if (fragile)
@@ -310,7 +310,7 @@ namespace OutRunVRStereo
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
-            if (!R32GetSavedViewport(device, savedViewport))
+            if (!GetSavedViewportForStereo(device, savedViewport))
                 return {};
 
             bool mayWriteDepth = false;
@@ -321,14 +321,14 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
-                leftWvpOk = R32SetWvpBatch(device, draw.eyeConstants[0]);
+                leftWvpOk = SetStereoWvpBatch(device, draw.eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
                     InternalPassScope guard;
-                    rolledBack = R32SetWvpBatch(device, draw.originalConstants);
+                    rolledBack = SetStereoWvpBatch(device, draw.originalConstants);
                 }
                 if (!rolledBack)
                 {
@@ -355,7 +355,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     InternalPassScope guard;
-                    restored = R32SetWvpBatch(device, draw.originalConstants);
+                    restored = SetStereoWvpBatch(device, draw.originalConstants);
                 }
                 if (!restored)
                     NoteRestoreFailure("R33 fast left draw c64");
@@ -379,7 +379,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
-                    !R32SetWvpBatch(device, draw.eyeConstants[1]))
+                    !SetStereoWvpBatch(device, draw.eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -390,7 +390,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R32RestoreRightPassState(
+                restoreOk = RestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport,
                     draw.originalConstants, true);
             }
@@ -477,7 +477,7 @@ namespace OutRunVRStereo
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
-            if (!R32GetSavedViewport(device, savedViewport))
+            if (!GetSavedViewportForStereo(device, savedViewport))
                 return {};
 
             bool mayWriteDepth = false;
@@ -488,14 +488,14 @@ namespace OutRunVRStereo
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
-                leftWvpOk = R32SetWvpBatch(device, eyeConstants[0]);
+                leftWvpOk = SetStereoWvpBatch(device, eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
                     InternalPassScope guard;
-                    rolledBack = R32SetWvpBatch(device, original);
+                    rolledBack = SetStereoWvpBatch(device, original);
                 }
                 if (!rolledBack)
                 {
@@ -521,7 +521,7 @@ namespace OutRunVRStereo
                 bool restored = false;
                 {
                     InternalPassScope guard;
-                    restored = R32SetWvpBatch(device, original);
+                    restored = SetStereoWvpBatch(device, original);
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, result.hr);
@@ -547,7 +547,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
-                    !R32SetWvpBatch(device, eyeConstants[1]))
+                    !SetStereoWvpBatch(device, eyeConstants[1]))
                 {
                     rightFailure =
                         OutRunVR::StereoFailureRightWvpUploadFailed;
@@ -558,7 +558,7 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R32RestoreRightPassState(
+                restoreOk = RestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport, original, true);
             }
 

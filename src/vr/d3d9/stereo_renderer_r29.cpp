@@ -606,4 +606,4 @@ namespace OutRunVRStereo
     {
         ++R29StableTwoEyeDraws;
     }
-}}
+}

@@ -1473,6 +1473,38 @@ namespace OutRunVRStereo
             static VRStereoR32ReviewHook instance;
         };
 
+
         VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;
+    }
+
+    bool EffectIsFragileLive(
+        IDirect3DDevice9* device, bool& fragile) noexcept
+    {
+        return R32EffectIsFragileLive(device, fragile);
+    }
+
+    bool GetSavedViewportForStereo(
+        IDirect3DDevice9* device, D3DVIEWPORT9& viewport) noexcept
+    {
+        return R32GetSavedViewport(device, viewport);
+    }
+
+    bool SetStereoWvpBatch(
+        IDirect3DDevice9* device, const float* constants) noexcept
+    {
+        return R32SetWvpBatch(device, constants);
+    }
+
+    bool RestoreRightPassState(
+        IDirect3DDevice9* device,
+        IDirect3DSurface9* savedRt,
+        IDirect3DSurface9* savedDepth,
+        const D3DVIEWPORT9& savedViewport,
+        const float* originalConstants,
+        bool restoreWvp) noexcept
+    {
+        return R32RestoreRightPassState(
+            device, savedRt, savedDepth, savedViewport,
+            originalConstants, restoreWvp);
     }
 }
