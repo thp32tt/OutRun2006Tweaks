@@ -1,0 +1,142 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00335-p00208-index195-standard-single-dds-isolation-v1",
+  "case_id": "P00208_A00335_9CE4E175",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
+  "wave_id": "P00208",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T05:32:00+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Standardize the already C130-accepted 9CE4E175 DDS_ONLY runtime-isolation input into the current schema16 localization/validation/single_dds format. Current repository candidate blob remains byte-identical to the C99 static-QA candidate; heavy DDS/pixel/visual QA is reused and runtime remains UNTESTED.",
+  "asset": {
+    "id": "9CE4E175",
+    "queue_index": 195,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "raw_orientation": "flip_y",
+    "localized_semantic_bindings": 1,
+    "translations": [
+      {
+        "source": "NOT AVAILABLE",
+        "korean": "이용 불가",
+        "physical_occurrences": 1
+      }
+    ]
+  },
+  "source": {
+    "authority": "RETAINED_C99_C130_STATIC_QA_LINEAGE_REFERENCE_ONLY",
+    "accepted_reference_repository": "Sonic-TV/OR2006Sprites",
+    "accepted_reference_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+    "accepted_reference_path": "Release/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "git_blob_sha": "b70d3aa184d8d00a561ab72133cd3f830943fb41",
+    "sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+    "bytes": 524416,
+    "dds": {
+      "width": 1024,
+      "height": 128,
+      "format": "BGRA32_ARGB_MASKS",
+      "mipmaps": 1,
+      "pitch": 4096,
+      "raw_orientation": "flip_y"
+    },
+    "note": "No new source acquisition is performed in A00335. Q00070 retains index195 as production-complete; this manifest only packages the unchanged repository-backed candidate for isolated runtime testing."
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+    "sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+    "bytes": 524416,
+    "dds": {
+      "width": 1024,
+      "height": 128,
+      "format": "BGRA32_ARGB_MASKS",
+      "mipmaps": 1,
+      "pitch": 4096,
+      "raw_orientation": "flip_y"
+    },
+    "dimension_policy": "SOURCE_DIMENSIONS_IDENTICAL",
+    "unchanged_fingerprint_proof": {
+      "legacy_isolation_task": "LOCALIZATION-LOCALIZATION_A-00163",
+      "legacy_isolation_result_sha": "52a71e466a4074db1e96d4e4e6e4fcf605fc40d6",
+      "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00165",
+      "c_batch": "Q00028",
+      "c_run": "C130",
+      "c_status": "PASS_RUNTIME_ISOLATION_INPUT_ONLY",
+      "c99_static_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_static_report": "localization/graphics/role_A/20260929-0635-A00044/A00044_9CE4E175_SELF_QA.json",
+    "producer_static_report_blob_sha": "7f18f4af881a5a85d9c819e9bf508cb8a5ff93dc",
+    "independent_static_report": "localization/graphics/role_C/20260929-0651-C99/C99_W00014_SYNC_FINAL_QA.json",
+    "independent_static_report_blob_sha": "f2635e537c6cceeeec50f78f08c12b54210b713c",
+    "legacy_isolation_report": "localization/graphics/role_A/20260929-2318-A00163-P00079/A00163_P00079_9CE4E175_SINGLE_DDS_ISOLATION_INPUT.json",
+    "legacy_isolation_report_blob_sha": "2afe20fa32d096e44ef13be12188291719836f75",
+    "independent_isolation_report": "localization/graphics/role_C/20260929-2350-C130/C130_Q00028_INDEPENDENT_QA_BATCH.json",
+    "independent_isolation_report_blob_sha": "f86f16604dc9cab55b4a74d15b01f12759de346d",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "original_bbox": [
+      95,
+      7,
+      489,
+      46
+    ],
+    "localized_bbox": [
+      215,
+      8,
+      369,
+      45
+    ],
+    "delta_left": 120,
+    "delta_right": -120,
+    "delta_top": 1,
+    "delta_bottom": -1,
+    "containment": "PASS",
+    "changed_pixels": 8776,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_pixels": 0,
+    "header_128_byte_identical": true,
+    "english_source_comparison": "PASS_REUSED_C99_EXACT_READABLE_ORIENTATION_PROOF",
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_input_location": "localization/graphics/role_A/20260929-2318-A00163-P00079/A00163_P00079_9CE4E175_SINGLE_DDS_ISOLATION_INPUT.json",
+    "previous_input_consumable_by_current_aux_workflow": false,
+    "current_aux_workflow_glob": "localization/validation/single_dds/*.json",
+    "new_current_workflow_consumable_manifest": true,
+    "candidate_repository_path_bound": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
+    "candidate_git_blob_sha": "e40af638fe836185d25f2b500531f15729d663f2",
+    "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 9CE4E175 replacement DDS and open the UI state containing NOT AVAILABLE -> 이용 불가.",
+    "Capture readable/game-orientation evidence and verify flip-Y storage is interpreted correctly.",
+    "Check native runtime size/scaling, alpha/transparency, sprite position, clipping, background preservation and zero-pixel overflow.",
+    "Do not promote runtime approval without isolated real-game evidence."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
