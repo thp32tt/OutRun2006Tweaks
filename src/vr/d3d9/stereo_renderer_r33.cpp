@@ -38,6 +38,18 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R33InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
 
+        void SetFinalDispatchState(
+            OutRunVR::RuntimeEligibility::InstallState state) noexcept
+        {
+            R33InstallState.store(state, std::memory_order_release);
+        }
+
+        OutRunVR::RuntimeEligibility::InstallState
+        ReadFinalDispatchState() noexcept
+        {
+            return R33InstallState.load(std::memory_order_acquire);
+        }
+
         using R33DepthStencilWriteState =
             OutRunVR::State::DepthStencilWriteState;
         thread_local R33DepthStencilWriteState R33DepthStencilState{};
@@ -850,13 +862,13 @@ namespace OutRunVRStereo
         DWORD WINAPI R33InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R33InstallState.store(State::Pending, std::memory_order_release);
+            SetFinalDispatchState(State::Pending);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r32 = DispatchSupportInstallState();
                 if (r32 == State::Failed)
                 {
-                    R33InstallState.store(State::Failed, std::memory_order_release);
+                    SetFinalDispatchState(State::Failed);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR33Dispatch", false);
                     return 0;
@@ -868,8 +880,7 @@ namespace OutRunVRStereo
                     if (!R33EnableHooks())
                     {
                         R33RollbackHooks();
-                        R33InstallState.store(State::Failed,
-                            std::memory_order_release);
+                        SetFinalDispatchState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR33Dispatch", false);
                         spdlog::error(
@@ -877,7 +888,7 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    R33InstallState.store(State::Ready, std::memory_order_release);
+                    SetFinalDispatchState(State::Ready);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR33Dispatch", true);
                     spdlog::info(
@@ -887,7 +898,7 @@ namespace OutRunVRStereo
                 Sleep(25);
             }
 
-            R33InstallState.store(State::Failed, std::memory_order_release);
+            SetFinalDispatchState(State::Failed);
             HookManager::ReportAsyncResult("OpenXRVRStereoR33Dispatch", false);
             return 0;
         }
@@ -906,9 +917,7 @@ namespace OutRunVRStereo
                     nullptr, 0, R33InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R33InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
+                    SetFinalDispatchState(OutRunVR::RuntimeEligibility::InstallState::Failed);
                     return false;
                 }
                 CloseHandle(thread);
@@ -927,6 +936,6 @@ namespace OutRunVRStereo
     OutRunVR::RuntimeEligibility::InstallState
     FinalDispatchInstallState() noexcept
     {
-        return R33InstallState.load(std::memory_order_acquire);
+        return ReadFinalDispatchState();
     }
 }
