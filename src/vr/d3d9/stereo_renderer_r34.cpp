@@ -136,8 +136,8 @@ namespace OutRunVRStereo
             // the final draw boundary. Flush a pending StateBlock resync first
             // so the scope never snapshots stale shadow state.
             FlushPendingStateBlockResync(device);
-            R22ReplayScope replay(device);
-            if (!replay.stateValid)
+            RasterReplayScope replay(device);
+            if (!replay.Valid())
             {
                 FailClosedRasterReplayState(device, site);
                 return drawCall();

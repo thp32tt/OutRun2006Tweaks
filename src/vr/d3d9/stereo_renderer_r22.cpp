@@ -872,6 +872,23 @@ namespace OutRunVRStereo
         R22ShadowState = {};
     }
 
+    class RasterReplayScope final
+    {
+    public:
+        explicit RasterReplayScope(IDirect3DDevice9* device) noexcept
+            : scope_(device)
+        {
+        }
+
+        bool Valid() const noexcept
+        {
+            return scope_.stateValid;
+        }
+
+    private:
+        R22ReplayScope scope_;
+    };
+
     bool IsTrackedStateBlockReliable() noexcept
     {
         return OutRunVR::State::StateBlockTracker::R22Reliable();
