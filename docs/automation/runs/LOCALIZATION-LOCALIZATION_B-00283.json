@@ -99,8 +99,11 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "f231efacf0bb71f2221de947d79e25d344a53245",
+  "authoritative_result_sha": "f231efacf0bb71f2221de947d79e25d344a53245",
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(B): rebuild index97 natively [AUTO:LOCALIZATION-LOCALIZATION_B-00283]"
+  "result_commit_message": "localization(B): rebuild index97 natively [AUTO:LOCALIZATION-LOCALIZATION_B-00283]",
+  "bookkeeping_note": "Verified immutable producer result f231efacf0bb71f2221de947d79e25d344a53245 contains only B lane-local evidence plus the durable task record and exact AUTO marker. Candidate/review binaries remain registered under approved Drive CURRENT_PIPELINE. Producer automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T22:08:00+09:00",
+  "bookkeeping_base_head_sha": "f231efacf0bb71f2221de947d79e25d344a53245"
 }
