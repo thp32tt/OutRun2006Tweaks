@@ -34,6 +34,10 @@
   "google_drive_write_performed": false,
   "gpt_library_used_as_source_or_ssot": false,
   "vr_ffb_dx_changes": false,
-  "result_sha": null,
-  "authoritative_result_sha": null
+  "result_sha": "43f695c89aeb84ef2f85ea5306ea91571928f7bc",
+  "authoritative_result_sha": "43f695c89aeb84ef2f85ea5306ea91571928f7bc",
+  "result_commit_message": "localization(B): record index121 v2 rework execution block [AUTO:LOCALIZATION-LOCALIZATION_B-00295]",
+  "bookkeeping_note": "Durable blocked result records the exact canonical-source acquisition and v2 rework geometry pin. It is not a successful producer candidate and MUST NOT be enqueued as a PASS candidate for C QA. Retry the same TASK_ID under controller retry policy when binary execution is available. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T01:03:05+09:00",
+  "bookkeeping_base_head_sha": "43f695c89aeb84ef2f85ea5306ea91571928f7bc"
 }
