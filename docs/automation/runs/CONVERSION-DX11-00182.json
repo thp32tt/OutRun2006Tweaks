@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00182",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "50fc23429fbffb2237354dc036d44d8f8c4211ae",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R182_182251_CONTINUATION_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00180 completed the bounded 0x1821F3 control-flow proof and explicitly left the incomplete 83 e0 instruction at 0x182251 plus forward targets 0x182254/0x182258/0x1822BF as the next independent F13 evidence boundary. A fresh exact-EXE 128-byte capture from 0x182251 is the smallest runnable step that advances provenance without HMD/runtime claims. DXVK-00181 independently passed the same public-EXE capture design; DX11 exact-result validation remains separate.",
+  "summary": "Add a fail-closed DX11 exact-EXE 128-byte continuation provenance capture from 0x182251. Require the R180 exact control-flow predecessor, exact .text placement, overlap bytes 83 e0, exact probe arithmetic through exclusive end 0x1822D1, and inclusion of forward targets 0x182254/0x182258/0x1822BF. Record raw inbound/outbound rel32 candidates only and do not instruction-decode the new window or promote function identity, semantics or render/HUD ownership.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00181",
+    "source_result_sha": "a07a90725ec0a6b7f13590f952156c348553f189",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_status": "EXACT_EXE_182251_CONTINUATION_PROVENANCE_CAPTURED",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded provenance-capture design; DX11 depends on its own R180 predecessor and independent exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00182.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00180 result 9092b4a77a6463a2b72bad984055cd1ed07e1f21 established EXACT_1821F3_CONTINUATION_CONTROL_FLOW_PROVEN through 0x182250 and incomplete bytes 83 e0 at 0x182251.",
+    "R180 encoded forward targets 0x182254, 0x182258 and 0x1822BF lie within a 128-byte evidence window beginning at 0x182251 and ending exclusively at 0x1822D1.",
+    "DXVK-00181 result a07a90725ec0a6b7f13590f952156c348553f189 independently passed the same public-EXE capture shape and observed one raw outbound rel32 candidate at 0x18229B->0x1882CC; DX11 must establish this independently.",
+    "Regression/history review found no runtime-source change: no protected DX9Ex/HUD/world invariant or runtime problem state is modified by this analyzer/verifier-only task.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the provenance capture passes, persist EXACT_EXE_182251_CONTINUATION_PROVENANCE_CAPTURED with function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY, ownership_effect=NONE and continuation_scope=RAW_BYTES_AND_REL32_CENSUS_ONLY. A later bounded task may instruction-decode this exact 128-byte window and investigate raw call targets without semantic promotion."
+}
