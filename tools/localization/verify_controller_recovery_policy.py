@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 15:
-    raise SystemExit("controller_roles schema_version must be >= 15")
+if int(cfg.get("schema_version", 0)) < 16:
+    raise SystemExit("controller_roles schema_version must be >= 16")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -57,8 +57,8 @@ required = {
     "runtime_tuning.parallel_distinct_slot_send_gap_seconds": int(rt.get("parallel_distinct_slot_send_gap_seconds", 9999)) <= 60,
     "runtime_tuning.localization_qa_batch_size": int(rt.get("localization_qa_batch_size", 0)) == 4,
     "runtime_tuning.localization_qa_coalesce_seconds": int(rt.get("localization_qa_coalesce_seconds", 9999)) <= 60,
-    "runtime_tuning.localization_same_slot_send_gap_seconds": int(rt.get("localization_same_slot_send_gap_seconds", 9999)) <= 90,
-    "runtime_tuning.localization_slot_dedup_seconds": int(rt.get("localization_slot_dedup_seconds", 9999)) <= 90,
+    "runtime_tuning.localization_same_slot_send_gap_seconds": int(rt.get("localization_same_slot_send_gap_seconds", 9999)) <= 30,
+    "runtime_tuning.localization_slot_dedup_seconds": int(rt.get("localization_slot_dedup_seconds", 9999)) <= 30,
     "runtime_observability.queue_loop_heartbeat_seconds": int(obs.get("queue_loop_heartbeat_seconds", 9999)) <= 15,
     "runtime_observability.heartbeat_stale_after_seconds": int(obs.get("heartbeat_stale_after_seconds", 9999)) <= 45,
     "runtime_observability.active_state_source_of_truth": obs.get("active_state_source_of_truth") == "active_by_lane",
@@ -102,6 +102,8 @@ required["execution.qa_coalesce_seconds"] = int(execution.get("qa_coalesce_secon
 required["execution.max_parallel_production"] = int(execution.get("max_parallel_production", 0)) == 3
 required["execution.concurrent_group"] = execution.get("concurrent_group") == ["A", "B", "E"]
 required["execution.e_backlog_throttle"] = (execution.get("extra_producer_backlog_throttle") or {}).get("lane") == "E"
+qprio = execution.get("qa_priority_policy") or {}
+required["execution.candidate_bearing_qa_first"] = qprio.get("primary") == "CANDIDATE_BEARING_RESULTS_FIRST" and qprio.get("preflight_must_not_delay_candidate_batch") is True
 required["qa_deduplication.identity"] = qa.get("identity") == "TASK_ID@RESULT_SHA"
 required["qa_deduplication.reuse_unchanged_pass_evidence"] = qa.get("reuse_unchanged_pass_evidence") is True
 required["qa_deduplication.shared_state_merge_frequency"] = qa.get("shared_state_merge_frequency") == "once_per_c_batch"
@@ -110,7 +112,22 @@ strategy = cfg.get("production_strategy") or {}
 required["production_strategy.mode"] = strategy.get("mode") == "candidate_completion_first"
 required["production_strategy.forbid_new_preflight_while_ready_exists"] = strategy.get("forbid_new_preflight_while_ready_exists") is True
 required["production_strategy.max_new_preflight_only_batches_when_no_ready_assets"] = int(strategy.get("max_new_preflight_only_batches_when_no_ready_assets", 99)) <= 1
-required["production_strategy.candidate_target_per_invocation_when_ready_exists"] = int(strategy.get("candidate_target_per_invocation_when_ready_exists", 0)) >= 1
+required["production_strategy.candidate_target_per_invocation_when_ready_exists"] = int(strategy.get("candidate_target_per_invocation_when_ready_exists", 0)) >= 2
+batch_policy = strategy.get("candidate_batch_policy") or {}
+required["production_strategy.candidate_batch_default"] = int(batch_policy.get("default_target", 0)) >= 2
+required["production_strategy.candidate_batch_max"] = int(batch_policy.get("max_target", 0)) == 4
+required["production_strategy.family_fast_path_target"] = int(batch_policy.get("family_fast_path_target", 0)) == 4
+preflight = strategy.get("preflight_suppression") or {}
+required["production_strategy.preflight_forbidden_with_completion_work"] = preflight.get("forbid_when_any_runnable_completion_tier_exists") is True
+required["production_strategy.preflight_not_throughput"] = preflight.get("preflight_result_never_counts_as_candidate_throughput") is True
+exception = strategy.get("exception_queue") or {}
+required["production_strategy.exception_after_three"] = int(exception.get("max_repair_attempts_same_dependency_fingerprint", 0)) == 3 and exception.get("route_after_limit") == "EXCEPTION_QUEUE"
+required["production_strategy.exception_nonblocking"] = exception.get("blocks_independent_assets") is False
+completion = strategy.get("completion_semantics") or {}
+required["production_strategy.production_complete_static_c"] = completion.get("production_complete") == "C_STATIC_QA_PASS_ON_CURRENT_V2_CANDIDATE"
+required["production_strategy.runtime_separate"] = completion.get("production_complete_requires_runtime") is False and completion.get("runtime_state_separate") is True
+cprio = strategy.get("candidate_qa_priority") or {}
+required["production_strategy.c_candidate_first"] = cprio.get("candidate_bearing_first") is True and cprio.get("preflight_only_secondary") is True
 required["production_strategy.continue_to_next_ready_asset_after_fail_closed"] = strategy.get("continue_to_next_ready_asset_after_fail_closed") is True
 required["production_strategy.qa_strictness_unchanged"] = strategy.get("qa_strictness_unchanged") is True
 required["production_strategy.readiness_tiers"] = strategy.get("readiness_tiers") == ["RENDER_READY", "ONE_STAGE_TO_RENDER", "PREFLIGHT_ONLY"]

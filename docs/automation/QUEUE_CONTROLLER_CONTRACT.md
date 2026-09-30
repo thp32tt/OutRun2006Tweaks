@@ -116,3 +116,22 @@ The current-schema values in `localization/controller_roles.json` are mandatory 
 - The C Gate validates the current C reconciliation plus the exact historical producer commits with PASS dispositions.
 - Producer task records remain `automation_validation=PENDING` until covered by a passing C batch; C's batch record + Gate is the durable validation authority.
 - A failed C Gate retries/repairs the C batch and may return only the implicated producer inputs as REWORK_REQUIRED; unrelated producers continue.
+
+## Throughput correction v16 — DDS completion first
+
+Effective immediately, throughput is measured in deployable Korean DDS candidates and C static-QA production completions, not task count, preflight count, guard count, or bookkeeping commits.
+
+- A/B/E target **2 candidate DDS outputs per invocation by default** when runnable completion-tier work exists. They may batch **up to 4** compatible family/template assets; a genuinely complex atlas may use a target of 1.
+- After one candidate succeeds, continue to the next ready asset in the same invocation while the lane budget and safe runnable work remain. Do not terminate merely because one DDS was produced.
+- `DIRECT_REWORK_REQUIRED`, explicit render-next handoffs, `RENDER_READY`, `ONE_STAGE_TO_RENDER`, and existing-candidate rework are completion tiers. If any completion-tier item is runnable in the owning shard, unrelated preflight/source-guard/dependency research MUST NOT be selected.
+- Preflight-only work is a fallback only after a fresh full-shard scan proves no completion-tier item is runnable. A preflight result never counts toward DDS throughput.
+- The same dependency/input fingerprint may receive at most 3 repair attempts. After the third failure, route it to `EXCEPTION_QUEUE`, record the blocker/fingerprint, and continue independent assets. Retry only after the dependency fingerprint changes or explicit user instruction.
+- C prioritizes producer results that contain a new or materially reworked DDS candidate. Preflight/research-only producer results are secondary and MUST NOT delay a candidate-bearing C batch.
+- Heavy C QA remains fingerprint-deduplicated. Reuse unchanged PASS evidence; never rerun expensive checks solely because bookkeeping or task identity changed.
+- A current-generation v2 candidate that passes independent C static QA is `PRODUCTION_COMPLETE` even while `RUNTIME_VALIDATION=UNTESTED`. Runtime/in-game validation remains a separate user integrated-test state and is not a production/static-QA completion gate.
+- Progress reporting MUST expose at least: `production_complete`, `candidate_awaiting_c`, `runnable_production`, `blocked_exception`, and `runtime_validated`. Do not present runtime-untested production-complete assets as if no graphics production was completed.
+- Zero-pixel containment, exact HD-source identity, English-residue rejection, DDS/header/format/mip/alpha/orientation preservation, source-faithful style, and all existing strict visual gates remain unchanged.
+
+The scheduler should optimize the conversion path:
+`REWORK/READY -> DDS CANDIDATE -> C STATIC PASS (PRODUCTION_COMPLETE)`
+and keep runtime validation as a later independent gate.

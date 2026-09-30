@@ -1,5 +1,5 @@
 {
-  "schema_version": 15,
+  "schema_version": 16,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -28,8 +28,14 @@
     "batch_gate_is_only_runner_validation": true,
     "extra_producer_backlog_throttle": {
       "lane": "E",
-      "pause_when_qa_pending_at_least": 8,
-      "resume_when_qa_pending_below": 6
+      "pause_when_qa_pending_at_least": 16,
+      "resume_when_qa_pending_below": 12
+    },
+    "qa_priority_policy": {
+      "primary": "CANDIDATE_BEARING_RESULTS_FIRST",
+      "candidate_signal": "candidate_dds_modified=true OR materially_reworked_candidate=true",
+      "secondary": "PREFLIGHT_OR_RESEARCH_RESULTS",
+      "preflight_must_not_delay_candidate_batch": true
     }
   },
   "lanes": {
@@ -182,10 +188,10 @@
     "github_task_commit_cache_seconds": 60,
     "github_actions_discovery_cache_seconds": 60,
     "bound_run_nonterminal_cache_ttl_seconds": 0,
-    "queue_next_task_delay_seconds": 30,
-    "parallel_lane_stagger_seconds": 45,
+    "queue_next_task_delay_seconds": 15,
+    "parallel_lane_stagger_seconds": 15,
     "min_send_gap_seconds": 60,
-    "parallel_distinct_slot_send_gap_seconds": 60,
+    "parallel_distinct_slot_send_gap_seconds": 15,
     "slot_dedup_seconds": 120,
     "retry_button_cooldown_seconds": 45,
     "rate_limit_backoff_seconds": [
@@ -196,10 +202,10 @@
     ],
     "localization_qa_batch_size": 4,
     "localization_qa_coalesce_seconds": 60,
-    "localization_same_slot_send_gap_seconds": 90,
-    "localization_slot_dedup_seconds": 90,
-    "localization_extra_producer_qa_pause_threshold": 8,
-    "localization_extra_producer_qa_resume_threshold": 6
+    "localization_same_slot_send_gap_seconds": 30,
+    "localization_slot_dedup_seconds": 30,
+    "localization_extra_producer_qa_pause_threshold": 16,
+    "localization_extra_producer_qa_resume_threshold": 12
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -295,7 +301,7 @@
     "one_stage_to_render_definition": "one deterministic reconstruction/style stage remains and can be completed before rendering",
     "forbid_new_preflight_while_ready_exists": true,
     "max_new_preflight_only_batches_when_no_ready_assets": 1,
-    "candidate_target_per_invocation_when_ready_exists": 1,
+    "candidate_target_per_invocation_when_ready_exists": 2,
     "continue_to_next_ready_asset_after_fail_closed": true,
     "primary_throughput_metric": "NEW_OR_MATERIALLY_REWORKED_V2_KOREAN_DDS_CANDIDATES_TO_C_QA",
     "qa_strictness_unchanged": true,
@@ -366,6 +372,52 @@
     "source_exhaustion_reselection": {
       "skip_unchanged_source_acquisition_exhausted": true,
       "retry_only_on_dependency_fingerprint_change": true
+    },
+    "candidate_batch_policy": {
+      "default_target": 2,
+      "max_target": 4,
+      "family_fast_path_target": 4,
+      "complex_atlas_target": 1,
+      "continue_after_success_while_budget_and_ready_work_remain": true,
+      "success_count_unit": "DDS_CANDIDATE"
+    },
+    "preflight_suppression": {
+      "forbid_when_any_runnable_completion_tier_exists": true,
+      "completion_tiers": [
+        "DIRECT_REWORK_REQUIRED_RUNNABLE",
+        "EXPLICIT_RENDER_NEXT_FROM_LATEST_PRODUCER_OR_C",
+        "RENDER_READY",
+        "ONE_STAGE_TO_RENDER",
+        "EXISTING_CANDIDATE_REWORK"
+      ],
+      "source_guard_retry_requires_dependency_fingerprint_change": true,
+      "preflight_result_never_counts_as_candidate_throughput": true
+    },
+    "exception_queue": {
+      "max_repair_attempts_same_dependency_fingerprint": 3,
+      "route_after_limit": "EXCEPTION_QUEUE",
+      "blocks_independent_assets": false,
+      "retry_requires_dependency_fingerprint_change_or_explicit_user_instruction": true
+    },
+    "completion_semantics": {
+      "production_complete": "C_STATIC_QA_PASS_ON_CURRENT_V2_CANDIDATE",
+      "production_complete_requires_runtime": false,
+      "runtime_state_separate": true,
+      "runtime_default": "UNTESTED",
+      "final_runtime_approved": "USER_INTEGRATED_GAME_VALIDATION_PASS",
+      "progress_kpis": [
+        "production_complete",
+        "candidate_awaiting_c",
+        "runnable_production",
+        "blocked_exception",
+        "runtime_validated"
+      ]
+    },
+    "candidate_qa_priority": {
+      "candidate_bearing_first": true,
+      "preflight_only_secondary": true,
+      "reuse_unchanged_heavy_qa_fingerprint": true,
+      "c_pass_promotes_production_complete": true
     }
   },
   "source_transport": {
