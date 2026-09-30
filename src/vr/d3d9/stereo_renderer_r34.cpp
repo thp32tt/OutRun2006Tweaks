@@ -9,6 +9,7 @@
 
 #include "stereo_renderer_r33.cpp"
 #include "../render/draw_semantic_scope.hpp"
+#include "../core/raster_guard_policy.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
 
@@ -66,9 +67,12 @@ namespace OutRunVRStereo
             OutRunVR::Render::ScopedDrawSemantic drawSemantic(
                 drawSemanticValue);
 
-            if (!device || !IsGameDevice(device) || InternalStereoPass ||
-                IsGameStateBlockRecording() || !StereoWanted() ||
-                !TargetIsBackBuffer())
+            if (!OutRunVR::Core::ShouldGuardStereoRaster(
+                    device != nullptr && IsGameDevice(device),
+                    InternalStereoPass,
+                    IsGameStateBlockRecording(),
+                    StereoWanted(),
+                    TargetIsBackBuffer()))
             {
                 return drawCall();
             }
