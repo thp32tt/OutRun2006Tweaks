@@ -41,6 +41,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_vr_backend_disasm_contract.py
 
+      - name: Test VR session auto-analysis regressions
+        shell: pwsh
+        run: ./tools/Test-Analyze-OutRunVRSession.ps1
+
       - name: Verify DX11 native transport lifetime contract
         shell: pwsh
         run: python tools/verify_dx11_native_transport_contract.py
