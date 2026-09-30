@@ -7,7 +7,9 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "TYPOGRAPHY/NAMING v19 REAUDIT: index222/DDF0392A prior PRODUCTION_COMPLETE is REWORK_REQUIRED because three song titles were translated. Restore exact source song titles, rerender with one locked song-title family font size, then fresh C QA. Audit every prior static-QA/production-complete asset containing song or stage/course name families; do not reuse pre-v19 PASS without v19 family evidence.",
+    "V19 RETROSPECTIVE REWORK: index163/59A79158 prior PRODUCTION_COMPLETE/static PASS withdrawn; 24 stage/course rows historically used nine font sizes 36-57px. Rerender one locked stage/course typography-family size, then fresh C QA.",
+    "V19 RETROSPECTIVE REWORK: index222/DDF0392A prior PRODUCTION_COMPLETE withdrawn; restore exact-source song titles and rerender one locked song-title family font size, then fresh C QA.",
+    "V19 RETROSPECTIVE HOLD: index51/FF2462BB old static PASS cannot be reused until all stage/course rows are measured and prove one family font size; mismatch => REWORK_REQUIRED.",
     "RENDER_READY: none authoritative after Q00073 consumed the index133 and index232 Korean candidates.",
     "ONE_STAGE_TO_RENDER: none authoritative.",
     "CANDIDATE_AWAITING_C: index61/C4A2937B fresh B00342 semantic-rework candidate (SHA-256 e31487c2...) is the highest completion-tier pending C input; then indices159/198/201. Do not expand unrelated preflight ahead of candidate completion.",
@@ -2551,7 +2553,7 @@
   "typography_v19_reaudit": {
     "policy_version": 19,
     "scope": "ALL_EXISTING_STATIC_QA_PASS_OR_PRODUCTION_COMPLETE_GRAPHICS_WITH_SONG_TITLE_OR_STAGE_COURSE_NAME_FAMILIES",
-    "status": "REQUIRED",
+    "status": "ACTIVE",
     "rules": [
       "SONG_TITLES_PRESERVE_EXACT_SOURCE",
       "STAGE_COURSE_PROPER_NAMES_KOREAN_TRANSLITERATION_ONLY",
@@ -2560,20 +2562,52 @@
     ],
     "confirmed_rework_required": [
       {
+        "index": 163,
+        "asset": "59A79158",
+        "reason": "EXPLICIT_HISTORICAL_NONUNIFORM_STAGE_COURSE_FONT_SIZES_36_TO_57PX_NINE_SIZES",
+        "required_fix": "RERENDER_24_STAGE_COURSE_ROWS_WITH_ONE_LOCKED_TYPOGRAPHY_FAMILY_SIZE_THEN_FRESH_C_QA",
+        "prior_completion_must_not_be_reused": true,
+        "runtime_validation": "UNTESTED"
+      },
+      {
         "index": 222,
         "asset": "DDF0392A",
-        "reason": "PRIOR_PRODUCTION_COMPLETE_CONTAINS_TRANSLATED_SONG_TITLES",
-        "invalid_strings": [
-          "Rush A Difficulty -> 난이도에 도전",
-          "Shake The Street -> 거리를 뒤흔들어라",
-          "Who Are You? -> 당신은 누구?"
-        ],
-        "required_fix": "RESTORE_EXACT_SOURCE_SONG_TITLES_AND_RERENDER_WITH_LOCKED_SONG_TITLE_TYPOGRAPHY_FAMILY_THEN_FRESH_C_QA",
+        "reason": "PRIOR_PRODUCTION_COMPLETE_CONTAINS_TRANSLATED_SONG_TITLES_AND_PRE_V19_FAMILY_EVIDENCE",
+        "required_fix": "RESTORE_EXACT_SOURCE_SONG_TITLES_AND_RERENDER_WITH_ONE_LOCKED_SONG_TITLE_FAMILY_SIZE_THEN_FRESH_C_QA",
         "prior_completion_must_not_be_reused": true,
         "runtime_validation": "UNTESTED"
       }
     ],
     "existing_completion_policy": "NO_PRE_V19_COMPLETION_WITH_AFFECTED_TITLE_FAMILY_MAY_REUSE_STATIC_PASS_UNLESS_V19_NAMING_AND_TYPOGRAPHY_FAMILY_EVIDENCE_IS_PRESENT",
-    "c_action": "AUDIT_AFFECTED_EXISTING_COMPLETIONS_BEFORE_REUSE_OR_RUNTIME_ISOLATION"
+    "c_action": "AUDIT_AFFECTED_EXISTING_COMPLETIONS_BEFORE_REUSE_OR_RUNTIME_ISOLATION",
+    "affected_inventory_indices": [
+      46,
+      51,
+      86,
+      128,
+      143,
+      163,
+      222
+    ],
+    "completed_or_static_pass_affected": [
+      51,
+      163,
+      222
+    ],
+    "hold_strict_recheck": [
+      {
+        "index": 51,
+        "asset": "FF2462BB",
+        "reason": "PRE_V19_STATIC_PASS_HAS_STAGE_COURSE_FAMILY_WITHOUT_UNIFORM_FONT_SIZE_EVIDENCE",
+        "required_check": "MEASURE_ALL_STAGE_COURSE_ROWS_NATIVE_FONT_SIZE_AND_ASSIGN_TYPOGRAPHY_FAMILY_ID_BEFORE_PASS_REUSE"
+      }
+    ],
+    "pending_not_completed_apply_on_production": [
+      46,
+      86,
+      128,
+      143
+    ],
+    "audit_summary": "7 affected assets; 3 prior completed/static-pass affected; 2 confirmed REWORK_REQUIRED; 1 HOLD_STRICT_RECHECK; 4 pending production under v19"
   }
 }

@@ -2213,3 +2213,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Confirmed regression: **index222 / DDF0392A** had previously reached PRODUCTION_COMPLETE/static PASS, but canonical transcription/artwork data contained translated song titles `Rush A Difficulty -> 난이도에 도전`, `Shake The Street -> 거리를 뒤흔들어라`, and `Who Are You? -> 당신은 누구?`. Those canonical fields are now restored to exact source titles; the existing rendered candidate is therefore **REWORK_REQUIRED** and its prior static PASS must not be reused.
 - Required index222 repair: rerender exact-source song titles using one locked song-title typography family/font size, preserve all other protected artwork, run current v2 containment/DDS checks, then obtain fresh C QA. Runtime remains UNTESTED.
 - Any other pre-v19 PASS containing song/stage/course title families is **audit-required** unless it already has explicit v19-equivalent family ID + uniform native font-size evidence. Missing family evidence is not an automatic pixel failure, but it blocks reuse/promotion until checked.
+
+## 2026-10-01 - v20 retrospective title-family audit inventory
+- Full canonical transcription scan found 7 graphics assets containing protected song-title or stage/course-name families: indices **46, 51, 86, 128, 143, 163, 222**.
+- Prior completed/static-pass affected set: **51, 163, 222**.
+- **index163 / 59A79158: REWORK_REQUIRED.** Historical QA explicitly records 24 course-name rows using nine nominal font sizes from 36-57px. This directly violates v19 fixed-size-per-visual-family policy; later pre-v19 static PASS cannot override the new retrospective rule. Rerender the complete course-name family at one locked size and fresh C QA.
+- **index222 / DDF0392A: REWORK_REQUIRED.** Prior production-complete candidate used translated song titles; canonical fields are restored to exact source. Rerender the song-title family with exact source titles and one locked family size, then fresh C QA.
+- **index51 / FF2462BB: HOLD_STRICT_RECHECK.** It has prior static PASS plus a stage/course-name family, but no v19-equivalent family ID/uniform native font-size evidence. Measure every family member before reusing PASS; any mismatch promotes it to REWORK_REQUIRED.
+- Indices **46, 86, 128, 143** are not prior completed candidates; enforce v18/v19 naming/typography during their future production rather than fabricating a retrospective failure.
+- Runtime remains UNTESTED for all of the above.
