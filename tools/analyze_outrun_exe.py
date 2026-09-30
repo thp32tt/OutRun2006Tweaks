@@ -296,6 +296,14 @@ GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN = 96
 # complete instruction. This proves bounded data writes/epilogue shape only.
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_END_RVA = 0x0002843E
 GF_TARGET_C_HELPER_1_NEXT_CODE_SHARED_EPILOGUE_RVA = 0x00028433
+
+# R167/F13: structural function-entry boundary for the fully bounded 0x28320
+# routine. This combines the aligned external CALL target, exact preceding INT3
+# padding boundary, contiguous instruction windows, and terminal RET. It does not
+# assign higher-level data/render semantics.
+GF_TARGET_C_HELPER_1_NEXT_CODE_FUNCTION_ENTRY_RVA = 0x00028320
+GF_TARGET_C_HELPER_1_NEXT_CODE_FUNCTION_END_RVA = 0x0002843E
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -1876,6 +1884,101 @@ def collect_guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof(p
     }
 
 
+def collect_guarded_gf_target_c_helper_1_next_code_function_boundary_proof(pe: PE) -> dict:
+    """Prove 0x28320 as an exact structural function-entry boundary.
+
+    This combines four already independent proofs: an instruction-aligned external
+    CALL resolving to 0x28320, exact INT3 padding immediately before 0x28320,
+    contiguous exact instruction coverage from 0x28320 through 0x2843D, and the
+    terminal RET/shared epilogue. Only boundary identity is promoted.
+    """
+
+    caller = collect_guarded_gf_target_c_second_call_alignment_proof(pe)
+    padding = collect_guarded_gf_target_c_helper_1_first_callee_terminal_padding_proof(pe)
+    prefix = collect_guarded_gf_target_c_helper_1_next_code_prefix_proof(pe)
+    continuation = collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe)
+    terminal = collect_guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof(pe)
+
+    entry_rva = GF_TARGET_C_HELPER_1_NEXT_CODE_FUNCTION_ENTRY_RVA
+    end_rva = GF_TARGET_C_HELPER_1_NEXT_CODE_FUNCTION_END_RVA
+
+    external_call_link = bool(
+        caller["status"] == "EXACT_SECOND_CALL_ALIGNMENT_PROVEN"
+        and caller["call_is_layout_boundary"]
+        and caller["call_target_matches"]
+        and caller["call_target_section_matches"]
+        and caller["decoded_call_target_rva"] == entry_rva
+    )
+    padding_boundary = bool(
+        padding["status"] == "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN"
+        and padding["padding_matches"]
+        and padding["padding_end_rva"] == entry_rva
+        and padding["next_code_rva"] == entry_rva
+        and padding["next_code_anchor_matches"]
+    )
+    body_chain = bool(
+        prefix["status"] == "EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN"
+        and prefix["target_rva"] == entry_rva
+        and prefix["prefix_end_rva"]
+        == GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_RVA
+        and continuation["status"] == "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN"
+        and continuation["target_rva"]
+        == GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_RVA
+        and continuation["end_rva"]
+        == GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA
+        and terminal["status"] == "EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN"
+        and terminal["target_rva"]
+        == GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA
+        and terminal["end_rva"] == end_rva
+        and terminal["terminal_ret_rva"] == end_rva - 1
+        and terminal["terminal_ret_matches"]
+    )
+    text_boundary = bool(
+        caller["call_target_section"] == ".text"
+        and prefix["target_section"] == ".text"
+        and continuation["target_section"] == ".text"
+        and terminal["target_section"] == ".text"
+    )
+    proven = bool(
+        external_call_link
+        and padding_boundary
+        and body_chain
+        and text_boundary
+    )
+    return {
+        "entry_rva": entry_rva,
+        "end_rva": end_rva,
+        "external_call_rva": caller["aligned_call_rva"],
+        "external_call_target_rva": caller["decoded_call_target_rva"],
+        "external_call_link": external_call_link,
+        "padding_start_rva": padding["padding_start_rva"],
+        "padding_end_rva": padding["padding_end_rva"],
+        "padding_boundary": padding_boundary,
+        "prefix_status": prefix["status"],
+        "continuation_status": continuation["status"],
+        "terminal_status": terminal["status"],
+        "body_chain": body_chain,
+        "target_section": prefix["target_section"],
+        "text_boundary": text_boundary,
+        "terminal_ret_rva": terminal["terminal_ret_rva"],
+        "shared_epilogue_rva": terminal["shared_epilogue_rva"],
+        "status": (
+            "EXACT_28320_FUNCTION_ENTRY_BOUNDARY_PROVEN"
+            if proven
+            else "FUNCTION_ENTRY_BOUNDARY_PROOF_FAILED"
+        ),
+        "function_entry_status": (
+            "EXACT_CALL_TARGET_PADDING_BOUNDARY_PROVEN"
+            if proven
+            else "UNRESOLVED"
+        ),
+        "semantic_effect": "BOUNDARY_IDENTITY_ONLY",
+        "data_structure_semantics": "UNRESOLVED",
+        "callee_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
 
@@ -2692,6 +2795,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_next_code_continuation_2_provenance": collect_guarded_gf_target_c_helper_1_next_code_continuation_2_provenance(pe),
         "guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_next_code_function_boundary_proof": collect_guarded_gf_target_c_helper_1_next_code_function_boundary_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -3129,6 +3233,31 @@ def main() -> int:
         f"data_semantics={helper_1_next_cont2_prefix['data_structure_semantics']} "
         f"ownership_effect={helper_1_next_cont2_prefix['ownership_effect']}"
     )
+    helper_1_next_boundary = report["guarded_gf_target_c_helper_1_next_code_function_boundary_proof"]
+    print(
+        f"gf_target_c_helper_1_next_code_function_boundary=0x{helper_1_next_boundary['entry_rva']:08X} "
+        f"status={helper_1_next_boundary['status']} "
+        f"end={hexrva(helper_1_next_boundary['end_rva'])} "
+        f"external_call=0x{helper_1_next_boundary['external_call_rva']:08X}->"
+        f"{hexrva(helper_1_next_boundary['external_call_target_rva'])} "
+        f"external_call_link={helper_1_next_boundary['external_call_link']} "
+        f"padding=0x{helper_1_next_boundary['padding_start_rva']:08X}-"
+        f"0x{helper_1_next_boundary['padding_end_rva'] - 1:08X} "
+        f"padding_boundary={helper_1_next_boundary['padding_boundary']} "
+        f"prefix_status={helper_1_next_boundary['prefix_status']} "
+        f"continuation_status={helper_1_next_boundary['continuation_status']} "
+        f"terminal_status={helper_1_next_boundary['terminal_status']} "
+        f"body_chain={helper_1_next_boundary['body_chain']} "
+        f"section={helper_1_next_boundary['target_section'] or 'none'} "
+        f"text_boundary={helper_1_next_boundary['text_boundary']} "
+        f"ret=0x{helper_1_next_boundary['terminal_ret_rva']:08X} "
+        f"shared_epilogue=0x{helper_1_next_boundary['shared_epilogue_rva']:08X} "
+        f"function_entry={helper_1_next_boundary['function_entry_status']} "
+        f"semantic_effect={helper_1_next_boundary['semantic_effect']} "
+        f"data_semantics={helper_1_next_boundary['data_structure_semantics']} "
+        f"callee_semantics={helper_1_next_boundary['callee_semantics']} "
+        f"ownership_effect={helper_1_next_boundary['ownership_effect']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -3190,6 +3319,9 @@ def main() -> int:
     if helper_1_next_cont2_prefix["status"] != "EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN":
         print("guarded_gf_target_c_helper_1_next_code_continuation_2_prefix_proof=FAILED")
         return 18
+    if helper_1_next_boundary["status"] != "EXACT_28320_FUNCTION_ENTRY_BOUNDARY_PROVEN":
+        print("guarded_gf_target_c_helper_1_next_code_function_boundary_proof=FAILED")
+        return 19
     return 0
 
 
