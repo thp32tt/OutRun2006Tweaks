@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00180",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "d112a7fc15d13414d6cb9a260542dc4fc5a41952",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R180_1821F3_CONTINUATION_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DX11-00178 completed exact 0x1821F3 continuation provenance and explicitly named instruction-boundary decode as the next runnable F13 unit. The exact 96-byte window contains the predecessor common target 0x182207, a raw rel32 call 0x182240->0x186906, complete instructions through 0x182250, and only incomplete bytes 83 e0 at 0x182251..0x182252. This bounded structural proof requires no HMD/runtime evidence. DXVK-00179 provides same-EXE proof design only; its validation was PENDING when selected, so DX11 exact-result validation remains independent.",
+  "summary": "Add a fail-closed DX11 exact-byte/manual-decode proof for the R178 0x1821F3 continuation. Pin complete instructions through 0x182250, prove the predecessor common target 0x182207 is leave followed by ret at 0x182208, validate all visible branch targets and raw call 0x182240->0x186906, and stop at incomplete bytes 83 e0 at 0x182251. Do not promote 0x182194 function-entry identity, call semantics, higher-level semantics or render/HUD ownership.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00179",
+    "source_result_sha": "a776dd87e9852f9ee8ca06a88b245e9512dd5203",
+    "source_validation_state_at_selection": "PENDING",
+    "source_expected_status": "EXACT_1821F3_CONTINUATION_CONTROL_FLOW_PROVEN",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded manual-decode proof design; DX11 relies on its own R178 exact provenance and independent exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00180.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00178 result 29af823a938a016e8ea54ec64b72a5441d195b34 established EXACT_EXE_1821F3_CONTINUATION_PROVENANCE_CAPTURED for exact bytes 0x1821F3..0x182252.",
+    "R178 exact bytes contain complete decode candidates through 0x182250 and only bytes 83 e0 at 0x182251..0x182252, so R180 stops fail-closed at that first incomplete instruction.",
+    "R176 predecessor proof had two jumps to common target 0x182207; R180 structurally checks c9 c3 at 0x182207..0x182208 without promoting 0x182194 function-entry identity.",
+    "R178 raw rel32 census contains 0x182240->0x186906; R180 verifies the encoded call target and raw-census membership while keeping call_semantics=UNRESOLVED and ownership_effect=NONE.",
+    "Regression/history review found no runtime-source change: no protected DX9Ex/HUD/world invariant or runtime problem state is modified by this analyzer/verifier-only task.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the structural proof passes, persist EXACT_1821F3_CONTINUATION_CONTROL_FLOW_PROVEN with terminal_status=EXACT_COMMON_TARGET_LEAVE_RET_PROVEN, call_semantics=UNRESOLVED and ownership_effect=NONE. A later bounded task may capture an overlapping continuation from 0x182251 to finish the incomplete instruction and cover forward targets 0x182254/0x182258/0x1822BF."
+}
