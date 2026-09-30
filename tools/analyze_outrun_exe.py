@@ -225,6 +225,44 @@ GF_TARGET_C_HELPER_1_SUCCESS_PREFIX_INSTRUCTIONS = (
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_RVA = 0x000282B0
 GF_TARGET_C_HELPER_1_FIRST_CALLEE_PROBE_LEN = 96
 
+# R149/F13: instruction-aligned prefix recovered from the R147 96-byte probe.
+# Stop before 0x2830A because the prior bounded probe ended inside the next
+# instruction. This proves local control-flow/data-address behavior only.
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_END_RVA = 0x0002830A
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_COUNT_TABLE = 0x00956558
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_CURSOR_TABLE = 0x00956500
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_POOL_BASE = 0x0095E028
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_POOL_STRIDE = 0x1F00
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_SLOT_STRIDE = 0x7C
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_RING_SIZE = 0x40
+GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_INSTRUCTIONS = (
+    (0x000282B0, "8b 0c 85 58 65 95 00", "mov ecx, [eax*4+0x956558]"),
+    (0x000282B7, "57", "push edi"),
+    (0x000282B8, "8b f8", "mov edi, eax"),
+    (0x000282BA, "69 ff 00 1f 00 00", "imul edi, edi, 0x1f00"),
+    (0x000282C0, "81 c7 28 e0 95 00", "add edi, 0x95e028"),
+    (0x000282C6, "83 f9 40", "cmp ecx, 0x40"),
+    (0x000282C9, "7c 05", "jl 0x282d0"),
+    (0x000282CB, "83 c8 ff", "or eax, -1"),
+    (0x000282CE, "5f", "pop edi"),
+    (0x000282CF, "c3", "ret"),
+    (0x000282D0, "56", "push esi"),
+    (0x000282D1, "8b 14 85 00 65 95 00", "mov edx, [eax*4+0x956500]"),
+    (0x000282D8, "8b ca", "mov ecx, edx"),
+    (0x000282DA, "6b c9 7c", "imul ecx, ecx, 0x7c"),
+    (0x000282DD, "8d 72 01", "lea esi, [edx+1]"),
+    (0x000282E0, "03 cf", "add ecx, edi"),
+    (0x000282E2, "83 fe 40", "cmp esi, 0x40"),
+    (0x000282E5, "89 34 85 00 65 95 00", "mov [eax*4+0x956500], esi"),
+    (0x000282EC, "75 0b", "jne 0x282f9"),
+    (0x000282EE, "c7 04 85 00 65 95 00 00 00 00 00", "mov dword [eax*4+0x956500], 0"),
+    (0x000282F9, "83 39 00", "cmp dword [ecx], 0"),
+    (0x000282FC, "75 d3", "jne 0x282d1"),
+    (0x000282FE, "8b 74 24 0c", "mov esi, [esp+0x0c]"),
+    (0x00028302, "c7 01 01 00 00 00", "mov dword [ecx], 1"),
+    (0x00028308, "89 0e", "mov [esi], ecx"),
+)
+
 
 # Mirrors the canonical producer catalog in
 # src/vr/game/disasm_render_contract.hpp. Keep this Python representation
@@ -904,6 +942,99 @@ def collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe: PE) -> dict:
         "semantic_effect": "PARTIAL_CALL_CHAIN_ONLY",
         "callee_semantics": "UNRESOLVED",
         "full_helper_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_first_callee_prefix_proof(pe: PE) -> dict:
+    """Prove the instruction-aligned 0x282B0..0x28309 callee prefix.
+
+    The bounded proof establishes the exact table/base/stride immediates, the
+    >=64 failure return, the 64-entry cursor wrap, the occupied-slot retry edge,
+    and the first slot mark/output-pointer store. It deliberately stops before
+    the next instruction and does not infer HUD/render ownership.
+    """
+
+    provenance = collect_guarded_gf_target_c_helper_1_first_callee_provenance(pe)
+    expected_next = GF_TARGET_C_HELPER_1_FIRST_CALLEE_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    def rel8_target(rva: int) -> int | None:
+        raw = pe.bytes_at_rva(rva, 2)
+        if len(raw) != 2:
+            return None
+        rel = struct.unpack_from("<b", raw, 1)[0]
+        return (rva + 2 + rel) & 0xFFFFFFFF
+
+    count_ok_target = rel8_target(0x000282C9)
+    cursor_nonwrap_target = rel8_target(0x000282EC)
+    occupied_retry_target = rel8_target(0x000282FC)
+    branch_targets_match = (
+        count_ok_target == 0x000282D0
+        and cursor_nonwrap_target == 0x000282F9
+        and occupied_retry_target == 0x000282D1
+    )
+    prefix_end_matches = (
+        expected_next == GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_END_RVA
+    )
+    predecessor_proven = (
+        provenance["status"] == "EXACT_EXE_FIRST_CALLEE_PROVENANCE_CAPTURED"
+        and provenance["caller_link_present"]
+        and provenance["target_section"] == ".text"
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    proven = bool(
+        predecessor_proven
+        and contiguous
+        and all_bytes_match
+        and prefix_end_matches
+        and branch_targets_match
+    )
+    return {
+        "target_rva": GF_TARGET_C_HELPER_1_FIRST_CALLEE_RVA,
+        "prefix_end_rva": GF_TARGET_C_HELPER_1_FIRST_CALLEE_PREFIX_END_RVA,
+        "predecessor_status": provenance["status"],
+        "caller_rva": provenance["caller_rva"],
+        "caller_link_present": provenance["caller_link_present"],
+        "target_section": provenance["target_section"],
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "count_table": GF_TARGET_C_HELPER_1_FIRST_CALLEE_COUNT_TABLE,
+        "cursor_table": GF_TARGET_C_HELPER_1_FIRST_CALLEE_CURSOR_TABLE,
+        "pool_base": GF_TARGET_C_HELPER_1_FIRST_CALLEE_POOL_BASE,
+        "pool_stride": GF_TARGET_C_HELPER_1_FIRST_CALLEE_POOL_STRIDE,
+        "slot_stride": GF_TARGET_C_HELPER_1_FIRST_CALLEE_SLOT_STRIDE,
+        "ring_size": GF_TARGET_C_HELPER_1_FIRST_CALLEE_RING_SIZE,
+        "count_ok_target_rva": count_ok_target,
+        "cursor_nonwrap_target_rva": cursor_nonwrap_target,
+        "occupied_retry_target_rva": occupied_retry_target,
+        "branch_targets_match": branch_targets_match,
+        "failure_return_value": -1,
+        "slot_mark_value": 1,
+        "status": (
+            "EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN"
+            if proven
+            else "FIRST_CALLEE_SLOT_SCAN_PREFIX_PROOF_FAILED"
+        ),
+        "semantic_effect": "PARTIAL_BOUNDED_SLOT_SCAN_ONLY",
+        "full_callee_semantics": "UNRESOLVED",
         "ownership_effect": "NONE",
     }
 
@@ -1715,6 +1846,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_prefix_proof": collect_guarded_gf_target_c_helper_1_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_success_prefix_proof": collect_guarded_gf_target_c_helper_1_success_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_first_callee_provenance": collect_guarded_gf_target_c_helper_1_first_callee_provenance(pe),
+        "guarded_gf_target_c_helper_1_first_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_first_callee_prefix_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -1933,6 +2065,33 @@ def main() -> int:
         f"ownership_effect={helper_1_callee['ownership_effect']} "
         f"bytes={helper_1_callee['bytes']}"
     )
+    helper_1_callee_prefix = report["guarded_gf_target_c_helper_1_first_callee_prefix_proof"]
+    print(
+        f"gf_target_c_helper_1_first_callee_prefix=0x{helper_1_callee_prefix['target_rva']:08X} "
+        f"status={helper_1_callee_prefix['status']} "
+        f"predecessor_status={helper_1_callee_prefix['predecessor_status']} "
+        f"caller=0x{helper_1_callee_prefix['caller_rva']:08X} "
+        f"caller_link={helper_1_callee_prefix['caller_link_present']} "
+        f"section={helper_1_callee_prefix['target_section'] or 'none'} "
+        f"end={hexrva(helper_1_callee_prefix['prefix_end_rva'])} "
+        f"layout_contiguous={helper_1_callee_prefix['layout_contiguous']} "
+        f"bytes_match={helper_1_callee_prefix['all_instruction_bytes_match']} "
+        f"count_table=0x{helper_1_callee_prefix['count_table']:08X} "
+        f"cursor_table=0x{helper_1_callee_prefix['cursor_table']:08X} "
+        f"pool_base=0x{helper_1_callee_prefix['pool_base']:08X} "
+        f"pool_stride=0x{helper_1_callee_prefix['pool_stride']:X} "
+        f"slot_stride=0x{helper_1_callee_prefix['slot_stride']:X} "
+        f"ring_size=0x{helper_1_callee_prefix['ring_size']:X} "
+        f"count_ok={hexrva(helper_1_callee_prefix['count_ok_target_rva'])} "
+        f"cursor_nonwrap={hexrva(helper_1_callee_prefix['cursor_nonwrap_target_rva'])} "
+        f"occupied_retry={hexrva(helper_1_callee_prefix['occupied_retry_target_rva'])} "
+        f"branch_targets={helper_1_callee_prefix['branch_targets_match']} "
+        f"failure_return={helper_1_callee_prefix['failure_return_value']} "
+        f"slot_mark={helper_1_callee_prefix['slot_mark_value']} "
+        f"semantic_effect={helper_1_callee_prefix['semantic_effect']} "
+        f"full_semantics={helper_1_callee_prefix['full_callee_semantics']} "
+        f"ownership_effect={helper_1_callee_prefix['ownership_effect']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -1967,6 +2126,9 @@ def main() -> int:
     if helper_1_callee["status"] != "EXACT_EXE_FIRST_CALLEE_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_first_callee_provenance=FAILED")
         return 9
+    if helper_1_callee_prefix["status"] != "EXACT_FIRST_CALLEE_SLOT_SCAN_PREFIX_PROVEN":
+        print("guarded_gf_target_c_helper_1_first_callee_prefix_proof=FAILED")
+        return 10
     return 0
 
 

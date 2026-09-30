@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00149",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "16bb70fb6ee7d6e386280a8437f5031b8342bf4d",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R149_HELPER_282B0_INSTRUCTION_PREFIX",
+  "selection_reason": "DXVK visual/performance promotion gates remain Quest 3/VDXR runtime-dependent. CONVERSION-DXVK-00147 captured exact 0x282B0 provenance and explicitly named an instruction-aligned prefix proof as the next independent executable F13 task. This task proves only the complete instructions ending at 0x2830A, before the prior 96-byte probe truncates the next instruction.",
+  "summary": "Add a fail-closed exact-EXE instruction/control-flow proof for callee 0x282B0 through 0x28309. The bounded prefix pins table/base/stride immediates, the >=64 -1 failure return, 64-entry cursor wrap, occupied-slot retry edge, slot mark=1, and output-pointer store. Full callee semantics and all ScreenHud/world/render ownership remain unresolved.",
+  "evidence": [
+    "CONVERSION-DXVK-00147 result 24abf31cddc442eb98560603d36fb19301e54e5a captured the exact 96-byte 0x282B0 window with caller 0x284BC linked, target in .text, inbound_raw=2 and outbound_raw=0.",
+    "The R147 probe ends inside the instruction beginning at 0x2830A, so this task deliberately stops at exclusive RVA 0x2830A and proves only complete instructions.",
+    "No Quest 3 / VDXR or in-game execution is performed by this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00149.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the 0x282B0 instruction-prefix proof passes, persist its branch targets and structural effect while keeping full_callee_semantics=UNRESOLVED and ownership_effect=NONE. A later bounded task may continue from 0x2830A with a fresh exact byte window."
+}
