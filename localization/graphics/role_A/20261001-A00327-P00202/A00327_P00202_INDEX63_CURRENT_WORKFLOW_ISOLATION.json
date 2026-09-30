@@ -5,7 +5,7 @@
   "wave_id": "P00202",
   "lane": "LOCALIZATION_A",
   "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
-  "recorded_at_kst": "2026-10-01T05:08:00+09:00",
+  "recorded_at_kst": "2026-10-01T05:01:00+09:00",
   "base_head_sha": "468e97f247debbdb717bf97183473cb6924d613b",
   "target": {
     "index": 63,
@@ -96,5 +96,9 @@
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE"
+  "validation_mode": "C_BATCH_GATE",
+  "timestamp_correction": {
+    "corrected_at_kst": "2026-10-01T05:02:24+09:00",
+    "reason": "Corrected future-skewed record timestamp only; material/QA fields unchanged."
+  }
 }

@@ -7,7 +7,7 @@
   "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": "2026-10-01T05:08:00+09:00",
+  "recorded_at_kst": "2026-10-01T05:01:00+09:00",
   "base_head_sha": "468e97f247debbdb717bf97183473cb6924d613b",
   "controller_schema_version": 16,
   "result": "PASS_MATERIAL_A_MOD3_ZERO_RUNNABLE_COMPLETION_TIER_INDEX63_CURRENT_WORKFLOW_SINGLE_DDS_MANIFEST_RUNTIME_UNTESTED",
@@ -117,7 +117,11 @@
   },
   "durable_task_record_in_result_commit": true,
   "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate, owns no Localization Automation Gate, and does not alter candidate/shared state.",
-  "bookkeeping_recorded_at_kst": "2026-10-01T05:10:00+09:00",
+  "bookkeeping_recorded_at_kst": "2026-10-01T05:02:00+09:00",
   "bookkeeping_base_head_sha": "bdd1ea8f82172fa3f78e3508cb7101ee8c3e8f3c",
-  "bookkeeping_preserved_head_message": "localization(A): standardize index63 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00327]"
+  "bookkeeping_preserved_head_message": "localization(A): standardize index63 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00327]",
+  "timestamp_correction": {
+    "corrected_at_kst": "2026-10-01T05:02:24+09:00",
+    "reason": "Corrected future-skewed bookkeeping timestamps against authoritative current KST clock; no candidate/source/QA/material fields changed."
+  }
 }
