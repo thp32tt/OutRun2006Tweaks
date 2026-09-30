@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00174",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "0d5373c196a0b3c541b3f853c68ac510bcc3f098",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R174_182194_CALL_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00172 completed the bounded 0x8BD20 control-flow proof and explicitly left the separate 0x182194 callee untouched. The already-proven aligned rel32 CALL at 0x2839D resolves to 0x182194, making bounded exact-byte provenance capture the smallest highest-priority independent F13 unit that does not require HMD/runtime evidence. DXVK-00173 independently validated the same public-EXE capture design; DX11 must pass separate exact-result Actions.",
+  "summary": "Add a fail-closed DX11 exact-EXE provenance collector for the separate 0x182194 callee reached by the proven aligned 0x2839D rel32 CALL. Require the prior exact continuation proof, exact target linkage, matching raw inbound candidate, .text residency and a full 96-byte capture. Keep function-entry identity, higher-level callee semantics and ScreenHud/world/render ownership unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00173",
+    "source_result_sha": "b3db9c2a94311d2e9ff02cb0ea437cbf2ed4cf13",
+    "source_proof_status": "EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded provenance proof design. DX11 relies on its own proven 0x2839D call edge and independent exact-result validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00174.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00172 result f8c3564d902d8843d9ac8e7cfd9d589e40ae4153 closed the independent 0x8BD20 bounded control-flow proof while leaving 0x182194 untouched.",
+    "Existing EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN proof independently resolves aligned CALL 0x2839D to 0x182194 in .text.",
+    "DXVK-00173 result b3db9c2a94311d2e9ff02cb0ea437cbf2ed4cf13 independently captured the same public-EXE target with status EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED; DX11 validation remains separate.",
+    "Regression/history review found no runtime-source change: no protected DX9Ex/HUD/world invariant or runtime problem state is modified by this analyzer/verifier-only task.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the bounded provenance capture passes, persist status EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED while keeping function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CALLEE_BYTES_ONLY and ownership_effect=NONE. A later independent task may decode the 96-byte prefix to complete instruction boundaries or gather structural pre-target evidence."
+}

@@ -333,6 +333,13 @@ GF_TARGET_C_HELPER_1_SECOND_CALLEE_NEXT_CODE_ANCHOR = bytes.fromhex(
     "8b 48 08"
 )
 
+# R174/F13: bounded provenance for the separate callee reached by the exact
+# instruction-aligned 0x2839D CALL in the proven 0x28320 routine. Capture only
+# exact .text bytes and raw rel32 candidates. Function-entry identity, higher-
+# level semantics and render/HUD ownership remain unresolved.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_RVA = 0x00182194
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_PROBE_LEN = 96
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -1092,6 +1099,77 @@ def collect_guarded_gf_target_c_helper_1_second_callee_prefix_proof(pe: PE) -> d
         ),
         "function_entry_status": "UNRESOLVED",
         "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+        "ownership_effect": "NONE",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_third_callee_provenance(pe: PE) -> dict:
+    """Capture exact provenance for the separate 0x182194 callee.
+
+    The complete 0x2837E..0x283DD instruction proof resolves the aligned
+    0x2839D rel32 CALL to 0x182194. This collector requires that exact
+    predecessor proof and the matching raw inbound call candidate, then captures
+    a bounded .text byte window and raw rel32 census only. Function boundaries,
+    callee semantics and render/HUD ownership remain unresolved.
+    """
+
+    routine_cont = collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(target_rva):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            target_rva - text_section.virtual_address,
+        )
+
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_PROBE_LEN
+    )
+    inbound_call_rvas = {item["call_rva"] for item in inbound}
+    routine_call_link = (
+        routine_cont["status"] == "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN"
+        and routine_cont["aligned_call_2_target_matches"]
+        and routine_cont["aligned_call_2_target_rva"] == target_rva
+        and GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_2_RVA
+        in inbound_call_rvas
+    )
+    captured = bool(
+        routine_call_link
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_PROBE_LEN
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "function_start_guess_rva": function_start_guess_rva,
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_PROBE_LEN,
+        "bytes": probe.hex(" "),
+        "routine_predecessor_status": routine_cont["status"],
+        "routine_call_rva": GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_2_RVA,
+        "routine_call_link": routine_call_link,
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_182194_CALL_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "UNRESOLVED_CALLEE_BYTES_ONLY",
         "ownership_effect": "NONE",
     }
 
@@ -2897,6 +2975,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_next_code_function_boundary_proof": collect_guarded_gf_target_c_helper_1_next_code_function_boundary_proof(pe),
         "guarded_gf_target_c_helper_1_second_callee_provenance": collect_guarded_gf_target_c_helper_1_second_callee_provenance(pe),
         "guarded_gf_target_c_helper_1_second_callee_prefix_proof": collect_guarded_gf_target_c_helper_1_second_callee_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_provenance": collect_guarded_gf_target_c_helper_1_third_callee_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -3350,6 +3429,31 @@ def main() -> int:
         f"semantic_effect={helper_1_second_callee_prefix['semantic_effect']} "
         f"ownership_effect={helper_1_second_callee_prefix['ownership_effect']}"
     )
+    helper_1_third_callee = report[
+        "guarded_gf_target_c_helper_1_third_callee_provenance"
+    ]
+    helper_1_third_callee_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_third_callee["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_third_callee=0x{helper_1_third_callee['target_rva']:08X} "
+        f"status={helper_1_third_callee['status']} "
+        f"routine_predecessor={helper_1_third_callee['routine_predecessor_status']} "
+        f"routine_call=0x{helper_1_third_callee['routine_call_rva']:08X} "
+        f"routine_link={helper_1_third_callee['routine_call_link']} "
+        f"section={helper_1_third_callee['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1_third_callee['function_start_guess_rva'])} "
+        f"probe_len={helper_1_third_callee['probe_len']} "
+        f"inbound_raw={len(helper_1_third_callee['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_third_callee['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_third_callee_outbound} "
+        f"function_entry={helper_1_third_callee['function_entry_status']} "
+        f"semantic_effect={helper_1_third_callee['semantic_effect']} "
+        f"ownership_effect={helper_1_third_callee['ownership_effect']} "
+        f"bytes={helper_1_third_callee['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -3409,6 +3513,9 @@ def main() -> int:
     if helper_1_second_callee_prefix["status"] != "EXACT_8BD20_BOUNDED_ROUTINE_PADDING_PROVEN":
         print("guarded_gf_target_c_helper_1_second_callee_prefix_proof=FAILED")
         return 19
+    if helper_1_third_callee["status"] != "EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_provenance=FAILED")
+        return 20
     return 0
 
 
