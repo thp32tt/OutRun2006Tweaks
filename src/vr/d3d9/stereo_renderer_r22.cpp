@@ -11,6 +11,7 @@
 //     complete callback transaction is enabled.
 
 #include "stereo_renderer_r21.cpp"
+#include "../state/d3d9_raster_state.hpp"
 
 namespace OutRunVRStereo
 {
@@ -42,20 +43,7 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R22InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
 
-        struct R22ScissorSnapshot
-        {
-            RECT rect{};
-            DWORD enabled = FALSE;
-            D3DVIEWPORT9 viewport{};
-            bool viewportValid = false;
-            bool rectValid = false;
-            bool enableValid = false;
-
-            bool Valid() const noexcept
-            {
-                return viewportValid && rectValid && enableValid;
-            }
-        };
+        using R22ScissorSnapshot = OutRunVR::State::D3D9RasterSnapshot;
 
         thread_local R22ScissorSnapshot R22GameScissor{};
         thread_local R22ScissorSnapshot R22ShadowState{};
