@@ -37,6 +37,43 @@ namespace OutRunVRStereo
         OutRunVR::Lifecycle::ResetReplayState R34ResetReplay{};
         OutRunVR::Telemetry::RasterGuardMetrics R34RasterGuard{};
 
+        HRESULT CallFinalDrawPrimitive(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            UINT startVertex, UINT primitiveCount)
+        {
+            return R34DrawPrimitiveR33Hook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        }
+
+        HRESULT CallFinalDrawIndexedPrimitive(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+            UINT startIndex, UINT primitiveCount)
+        {
+            return R34DrawIndexedPrimitiveR33Hook.stdcall<HRESULT>(
+                device, type, baseVertexIndex, minVertexIndex,
+                numVertices, startIndex, primitiveCount);
+        }
+
+        HRESULT CallFinalDrawPrimitiveUP(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            UINT primitiveCount, const void* data, UINT stride)
+        {
+            return R34DrawPrimitiveUPR33Hook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        }
+
+        HRESULT CallFinalDrawIndexedPrimitiveUP(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+            const void* indexData, D3DFORMAT indexFormat,
+            const void* vertexData, UINT stride)
+        {
+            return R34DrawIndexedPrimitiveUPR33Hook.stdcall<HRESULT>(
+                device, type, minVertexIndex, numVertices, primitiveCount,
+                indexData, indexFormat, vertexData, stride);
+        }
+
         void R34ForceResetReplayFailClosed(IDirect3DDevice9* device,
             const char* site) noexcept
         {
@@ -108,7 +145,7 @@ namespace OutRunVRStereo
                     device, type, startVertex, primitiveCount);
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
-                return R34DrawPrimitiveR33Hook.stdcall<HRESULT>(
+                return CallFinalDrawPrimitive(
                     device, type, startVertex, primitiveCount);
             };
             return R34GuardStereoRasterState(
@@ -126,7 +163,7 @@ namespace OutRunVRStereo
                     numVertices, startIndex, primitiveCount);
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
-                return R34DrawIndexedPrimitiveR33Hook.stdcall<HRESULT>(
+                return CallFinalDrawIndexedPrimitive(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
             };
@@ -143,7 +180,7 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride);
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
-                return R34DrawPrimitiveUPR33Hook.stdcall<HRESULT>(
+                return CallFinalDrawPrimitiveUP(
                     device, type, primitiveCount, data, stride);
             };
             return R34GuardStereoRasterState(
@@ -162,7 +199,7 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride);
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
-                return R34DrawIndexedPrimitiveUPR33Hook.stdcall<HRESULT>(
+                return CallFinalDrawIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
