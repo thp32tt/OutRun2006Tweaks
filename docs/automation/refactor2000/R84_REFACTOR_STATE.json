@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 55,
+  "cycle": 60,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -21,10 +21,11 @@
     "R84-REF-PERF-0002",
     "R84-REF-PERF-0003",
     "R84-REF-PERF-0004",
-    "R84-REF-LIFECYCLE-0003"
+    "R84-REF-LIFECYCLE-0003",
+    "R84-REF-STATE-0004"
   ],
-  "next": "Cycles 56-60: make R22 raster tracking accessors an explicit header boundary.",
-  "updatedKst": "2026-10-01T02:46:00+09:00",
+  "next": "Cycles 61-65: extract R32 effect snapshot data shape into neutral render state.",
+  "updatedKst": "2026-10-01T02:49:00+09:00",
   "batchStatus": "R84_CORRECT_BASELINE_CYCLE_50_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability."

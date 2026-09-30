@@ -14,6 +14,7 @@
 
 #include "stereo_renderer_r22.cpp"
 #include "../lifecycle/frame_lifecycle.hpp"
+#include "../state/d3d9_raster_tracking.hpp"
 
 namespace OutRunVRStereo
 {
