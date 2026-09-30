@@ -994,4 +994,17 @@ namespace OutRunVRStereo
 	{
 		++R9MainDepthContentSerial;
 	}
+
+	void NoteStereoLeftDraw() noexcept
+	{
+		++R9DrawCalls;
+		R9MonoBackupGap = true;
+	}
+
+	void ReportStereoFailure(
+		OutRunVR::StereoFailureReason reason,
+		const char* site, HRESULT hr) noexcept
+	{
+		R9Poison(reason, site, hr);
+	}
 }

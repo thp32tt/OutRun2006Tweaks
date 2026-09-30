@@ -19,6 +19,7 @@
 #include "../render/lower_draw_api.hpp"
 #include "../state/right_depth_stencil_sync.hpp"
 #include "../state/depth_target_state.hpp"
+#include "../lifecycle/frame_accounting.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
@@ -395,7 +396,7 @@ namespace OutRunVRStereo
                 }
                 if (!rolledBack)
                 {
-                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                    ReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R33/fast-left-WVP-rollback");
                     NoteRestoreFailure("R33 fast left-eye c64 rollback");
                     ArmMonoSafety();
@@ -404,8 +405,7 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            NoteStereoLeftDraw();
             if (mayWriteDepth || mayWriteStencil)
                 NoteMainDepthContentWrite();
 
@@ -414,7 +414,7 @@ namespace OutRunVRStereo
             {
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
-                R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
+                ReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
                 bool restored = false;
                 {
                     InternalPassScope guard;
@@ -479,7 +479,7 @@ namespace OutRunVRStereo
                 FrameRightDrawFailed = true;
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
-                R9Poison(rightFailure, site, rightHr);
+                ReportStereoFailure(rightFailure, site, rightHr);
                 ArmMonoSafety();
             }
             if (!restoreOk)
@@ -562,7 +562,7 @@ namespace OutRunVRStereo
                 }
                 if (!rolledBack)
                 {
-                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                    ReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R33/HUD-left-WVP-rollback");
                     NoteRestoreFailure("R33 HUD left-eye c64 rollback");
                     ArmMonoSafety();
@@ -571,8 +571,7 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            NoteStereoLeftDraw();
             if (mayWriteDepth || mayWriteStencil)
                 NoteMainDepthContentWrite();
 
@@ -586,7 +585,7 @@ namespace OutRunVRStereo
                     InternalPassScope guard;
                     restored = SetWvpBatch(device, original);
                 }
-                R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
+                ReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, result.hr);
                 if (!restored)
                     NoteRestoreFailure("R33 HUD left draw c64");
@@ -640,7 +639,7 @@ namespace OutRunVRStereo
                 FrameRightDrawFailed = true;
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
-                R9Poison(rightFailure, site, rightHr);
+                ReportStereoFailure(rightFailure, site, rightHr);
                 ArmMonoSafety();
             }
             if (!restoreOk)
