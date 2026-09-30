@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00267-p00153-index130-single-dds-isolation-v1",
+  "case_id": "P00153_B00267_1762489B",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00267",
+  "wave_id": "P00153",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T19:07:22+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "5cc84b9f2e1c5ebc2cc17c215d7f002787729b77",
+  "active": true,
+  "purpose": "Provide an exact DDS_ONLY runtime-isolation input for the unchanged C138/Q00036 STATIC_QA_PASS_RUNTIME_UNTESTED 1762489B candidate without rerendering or repeating heavy QA. Runtime remains UNTESTED until a real-game test.",
+  "asset": {
+    "id": "1762489B",
+    "queue_index": 130,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "raw_orientation": "flip_y",
+    "localized_regions": 5,
+    "preserve_original": "sprite_1085 numeric marker and all non-localized structural artwork"
+  },
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "git_blob_sha": "ce5158f8f3e78dc328227e4e76c7c71789b53060",
+    "sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+    "bytes": 4194432,
+    "canonical_inventory_match": true,
+    "source_acquisition": "PINNED_DIRECT_EXACT_CANONICAL_SOURCE",
+    "release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "dds": {
+      "width": 2048,
+      "height": 512,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "git_blob_sha": "905f0d05db3f094aeb93448548df1091238109cf",
+    "sha256": "823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8",
+    "bytes": 4194432,
+    "dds": {
+      "width": 2048,
+      "height": 512,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00185",
+      "producer_result_sha": "01c58ad3af8545b5c0f48dd914cdb1ca38a80f30",
+      "c_static_qa_task": "LOCALIZATION-LOCALIZATION_C-00189",
+      "c_static_qa_result_sha": "0128225e60b537b325aa047fafbc58e53c604b07",
+      "c_gate_run_id": 36607542193,
+      "candidate_blob_at_c138": "905f0d05db3f094aeb93448548df1091238109cf",
+      "current_candidate_blob": "905f0d05db3f094aeb93448548df1091238109cf",
+      "current_head_checked": "5cc84b9f2e1c5ebc2cc17c215d7f002787729b77",
+      "no_existing_1762489b_single_dds_manifest_at_selection": true,
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00189",
+    "authoritative_c_result_sha": "0128225e60b537b325aa047fafbc58e53c604b07",
+    "authoritative_c_gate_run_id": 36607542193,
+    "c138_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "current_shared_state_retains_static_pass": true,
+    "heavy_candidate_qa_rerun": false,
+    "source_candidate_fingerprint_unchanged": true,
+    "structure": "RGBA32 2048x512 mip1 / header exact / flip_y",
+    "localized_regions": "PASS_5_OF_5_CONTAINMENT",
+    "source_removal_mask_pixels": 120338,
+    "hidden_rgb_alpha0_pixels": 3726,
+    "clean_changed_outside_mask": 0,
+    "changed_pixels_outside_allowed_region": 0,
+    "alpha_changed_pixels_outside_allowed": 0,
+    "protected_numeric_marker_exact": true,
+    "source_language_residue": "NONE_VISIBLE",
+    "clipping": "NONE_VISIBLE",
+    "final_approved": false,
+    "note": "Current contract/controller topology is newer than C138, but current Git shared state has not returned index130 for rework or withdrawn its static PASS. This producer adds runtime-isolation input only; current-contract acceptance belongs to C_BATCH_GATE."
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+    "candidate_git_blob_sha": "905f0d05db3f094aeb93448548df1091238109cf",
+    "candidate_sha256": "823c7691ba5524cfd10340af3c92a3a3f388afda847cf2214b21b5d1240112e8",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 1762489B replacement DDS and confirm the affected menu/rank screen renders without a crash.",
+    "Capture readable/game-orientation evidence for all five localized regions.",
+    "Confirm flip-Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring artwork and any 1-pixel overflow.",
+    "Confirm the protected numeric marker and all non-localized artwork remain unchanged.",
+    "Do not promote runtime approval without isolated real-game evidence."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
