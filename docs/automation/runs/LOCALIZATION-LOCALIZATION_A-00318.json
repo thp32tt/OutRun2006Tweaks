@@ -117,8 +117,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_SCHEMA16__C169_RUNNABLE_PRODUCTION_EMPTY__NO_RUNNABLE_COMPLETION_TIER__C_ACCEPTED_INDEX111_PREFLIGHT_NOT_REPEATED__A00316_INDEX147_QA_PENDING_NOT_REPROBED__159_198_201_CANDIDATE_QA_PENDING_NOT_REPEATED__INDEX99_C139_STATIC_QA_FINGERPRINT_REUSED__NEW_REPOSITORY_BACKED_DDS_ONLY_ISOLATION_INPUT__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "95d6cb420ce814802fad3d71b172d3020e81086e",
+  "authoritative_result_sha": "95d6cb420ce814802fad3d71b172d3020e81086e",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): add index99 single-DDS isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00318]",
   "precommit_refresh": {
@@ -126,5 +126,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "C00317/Q00067 landed during A00318 preparation and is incorporated. It reports runnable_production=[] and accepts index111 only as PREFLIGHT_ONLY. B00315 remains C-QA pending. Only new A00318 disjoint paths will be written."
   },
-  "bookkeeping_note": "RESULT_SHA will be bound after the immutable producer result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result SHA bound after durable result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:04:28+09:00",
+  "bookkeeping_base_head_sha": "95d6cb420ce814802fad3d71b172d3020e81086e"
 }
