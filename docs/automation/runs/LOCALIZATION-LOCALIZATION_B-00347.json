@@ -48,10 +48,12 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "df58c036ffbf2ccca531ccb5b483bc83abc738c5",
+  "authoritative_result_sha": "df58c036ffbf2ccca531ccb5b483bc83abc738c5",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): bind index94 accepted masks to raw DDS coordinates [AUTO:LOCALIZATION-LOCALIZATION_B-00347]",
   "durable_task_record_in_result_commit": true,
-  "self_qa": "PASS_MOD3_B_INDEX94__CURRENT_DRIVE_EXACT_PATH_SIZE_REBOUND__C171_ACCEPTED_MASKS_TO_RAW_FLIP_Y_COORDS__CANVAS_BOUNDS_PASS__COURSE_SP_FIRST_LINE_FAIL_CLOSED__NO_CANDIDATE__NO_SHARED_STATE__RUNTIME_UNTESTED"
+  "self_qa": "PASS_MOD3_B_INDEX94__CURRENT_DRIVE_EXACT_PATH_SIZE_REBOUND__C171_ACCEPTED_MASKS_TO_RAW_FLIP_Y_COORDS__CANVAS_BOUNDS_PASS__COURSE_SP_FIRST_LINE_FAIL_CLOSED__NO_CANDIDATE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "bookkeeping_note": "Immutable producer result SHA bound after the durable material result commit. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not modify the material report, candidate DDS, or shared localization state.",
+  "bookkeeping_base_result_sha": "df58c036ffbf2ccca531ccb5b483bc83abc738c5"
 }
