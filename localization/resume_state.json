@@ -16,7 +16,7 @@
     "RUNTIME_ISOLATION: accepted inputs remain 99/102/112/130/193/237; 226/231 remain QA_PENDING.",
     "OUT_OF_BATCH_QA_PENDING: A00286@index30, A00291@index48 and A00292@index132 source-reactivation guards are newer disjoint inputs and are not implicitly approved by Q00062.",
     "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; unchanged source-exhaustion rows must not be reprobed.",
-    "Q00062 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+    "Q00062 validation-bearing result b47185be7eb14acfbdfb99407d8ffbeb474a8fe9 passed Localization Automation Gate 36734942838. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -104,7 +104,7 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-01T00:01:31+09:00",
+      "updated_at_kst": "2026-10-01T00:12:51+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
       "report": "localization/graphics/role_C/202610010001-C164/C164_Q00062_INDEPENDENT_QA_BATCH.json",
       "direct_queue_scope": 126,
@@ -138,7 +138,7 @@
       "promotion_hold_reason": "Q00010 accepted immutable A00091/B00092/A00094/B00095 pre-generation extraction/work-order evidence across 15 assets. Geometry/canonical checks pass, but no Korean candidate DDS or CLEAN_PLATE was produced; index175 semantic binding, B92 exact binary-header/orientation decode, and all candidate-only zero-pixel/DDS/style/source-vs-candidate gates remain HOLD_STRICT_RECHECK.",
       "user_approved_locked": 0,
       "zoom_review_resolved_preserve_original": 31,
-      "queue_reconciled_at_kst": "2026-10-01T00:01:31+09:00",
+      "queue_reconciled_at_kst": "2026-10-01T00:12:51+09:00",
       "partial_pixel_visual_pass_assets": [
         "C05E67EF"
       ],
@@ -454,9 +454,9 @@
       "q00062_static_pass_candidate_sha256": {
         "97": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80"
       },
-      "q00062_automation_validation": "PENDING",
-      "q00062_validation_bearing_result_sha": null,
-      "q00062_automation_gate_run_id": null
+      "q00062_automation_validation": "PASS",
+      "q00062_validation_bearing_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+      "q00062_automation_gate_run_id": 36734942838
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -2762,7 +2762,7 @@
         "RUNTIME_ISOLATION: accepted inputs remain 99/102/112/130/193/237; 226/231 remain QA_PENDING.",
         "OUT_OF_BATCH_QA_PENDING: A00286@index30, A00291@index48 and A00292@index132 source-reactivation guards are newer disjoint inputs and are not implicitly approved by Q00062.",
         "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; unchanged source-exhaustion rows must not be reprobed.",
-        "Q00062 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+        "Q00062 validation-bearing result b47185be7eb14acfbdfb99407d8ffbeb474a8fe9 passed Localization Automation Gate 36734942838. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
       ]
     },
     "material_deliverable": {
@@ -2802,12 +2802,23 @@
     "heavy_qa_repeated": false,
     "heavy_qa_note": "Fresh heavy decoded QA once for B00283@index97; reuse Q00061 font crosswalk and Q00060 index163 exact source/mask/CLEAN_PLATE/semantic fingerprints; validate only new binder/guard/rework-spec scope.",
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null
+    "result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+    "authoritative_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+    "validation_bearing_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36734942838,
+      "head_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T00:12:51+09:00"
+    },
+    "bookkeeping_note": "Q00062 authoritative Gate PASS is owned by validation-bearing result b47185be7eb14acfbdfb99407d8ffbeb474a8fe9. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-10-01T00:12:51+09:00",
+    "bookkeeping_base_head_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9"
   }
 }
