@@ -22,5 +22,31 @@ namespace OutRunVR::Lifecycle
         {
             return blocked.load(std::memory_order_acquire);
         }
+
+        void NoteReplayBlock() noexcept
+        {
+            ++replayBlocks;
+        }
+
+        void NoteLostDeviceBypass() noexcept
+        {
+            ++lostDeviceBypasses;
+        }
+
+        bool MarkReplayBlockLogged() noexcept
+        {
+            if (firstReplayBlockLogged)
+                return false;
+            firstReplayBlockLogged = true;
+            return true;
+        }
+
+        bool MarkLostDeviceBypassLogged() noexcept
+        {
+            if (firstLostDeviceBypassLogged)
+                return false;
+            firstLostDeviceBypassLogged = true;
+            return true;
+        }
     };
 }
