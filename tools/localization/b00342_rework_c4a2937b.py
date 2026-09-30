@@ -19,8 +19,8 @@ EXPECTED_SOURCE_GIT_BLOB="aa0e87be65349bca1ddad278f8f336f9511c95f5"
 EXPECTED_CANDIDATE_GIT_BLOB="0b5f45ec475af6edcc982ce5aafa35dd05e9a66d"
 FONT_FAMILY="Noto Sans CJK KR"
 TARGETS=[
- {"element_id":"cut_line","source_text":"Cut the line!","old_korean":"라인을 끊으세요!","approved_korean":"하트선을 통과하세요!","display_lines":["하트선을 통과하세요!"],"sprite_cell":[2573,998,3059,1106],"source_bbox":[2596,998,3028,1106],"old_candidate_bbox":[2597,1008,3027,1096],"candidate_safe_bbox":[2598,1000,3026,1104],"font_size":70,"min_font_size":58,"xscale":0.66,"slant_dx_per_dy":0.02,"outer_stroke":8.0,"inner_stroke":3.0,"fill_rgb":[12,204,245],"inner_rgb":[255,255,255],"outer_rgb":[57,10,0],"style_class":"instr_cyan_white_dark_outline"},
- {"element_id":"stage_bonus","source_text":"STAGE BONUS","old_korean":"스테이지 / 보너스","approved_korean":"스테이지 보너스","display_lines":["스테이지","보너스"],"sprite_cell":[3814,1741,4096,1894],"source_bbox":[3814,1799,4075,1894],"old_candidate_bbox":[3872,1800,4028,1893],"candidate_safe_bbox":[3816,1801,4073,1892],"font_size":39,"min_font_size":31,"xscale":0.92,"slant_dx_per_dy":0.06,"outer_stroke":5.0,"inner_stroke":3.0,"fill_rgb":[255,255,255],"inner_rgb":[255,255,255],"outer_rgb":[57,10,0],"style_class":"stage_bonus_white_dark_outline"}]
+ {"element_id":"cut_line","source_text":"Cut the line!","old_korean":"라인을 끊으세요!","approved_korean":"하트선을 통과하세요!","display_lines":["하트선을 통과하세요!"],"sprite_cell":[2573,998,3059,1106],"source_bbox":[2596,998,3028,1106],"old_candidate_bbox":[2597,1008,3027,1096],"candidate_safe_bbox":[2598,1000,3026,1104],"font_size":70,"min_font_size":58,"xscale":0.66,"slant_dx_per_dy":0.02,"font_weight":"bold","outer_stroke":8.0,"inner_stroke":3.0,"fill_rgb":[245,204,12],"inner_rgb":[255,255,255],"outer_rgb":[0,10,57],"style_class":"instr_yellow_white_navy_outline"},
+ {"element_id":"stage_bonus","source_text":"STAGE BONUS","old_korean":"스테이지 / 보너스","approved_korean":"스테이지 보너스","display_lines":["스테이지","보너스"],"sprite_cell":[3814,1741,4096,1894],"source_bbox":[3814,1799,4075,1894],"old_candidate_bbox":[3872,1800,4028,1893],"candidate_safe_bbox":[3816,1801,4073,1892],"font_size":41,"min_font_size":31,"xscale":0.95,"slant_dx_per_dy":0.12,"font_weight":"normal","outer_stroke":5.0,"inner_stroke":2.0,"fill_rgb":[255,255,255],"inner_rgb":[255,255,255],"outer_rgb":[0,10,57],"style_class":"stage_bonus_white_navy_outline"}]
 
 def shab(data): return hashlib.sha256(data).hexdigest()
 def shaf(path): return shab(path.read_bytes())
@@ -28,15 +28,15 @@ def dds_info(data):
  if len(data)<128 or data[:4]!=b"DDS ": raise SystemExit("invalid DDS")
  return {"width":struct.unpack_from("<I",data,16)[0],"height":struct.unpack_from("<I",data,12)[0],"pitch":struct.unpack_from("<I",data,20)[0],"mips":struct.unpack_from("<I",data,28)[0] or 1,"fourcc":data[84:88],"rgb_bits":struct.unpack_from("<I",data,88)[0],"masks":struct.unpack_from("<IIII",data,92),"header_sha256":shab(data[:128])}
 def decode_dds(data):
- i=dds_info(data); masks=(0x00FF0000,0x0000FF00,0x000000FF,0xFF000000)
+ i=dds_info(data); masks=(0x000000FF,0x0000FF00,0x00FF0000,0xFF000000)
  if i["fourcc"]!=b"\0\0\0\0" or i["rgb_bits"]!=32 or i["masks"]!=masks or i["mips"]!=1 or i["pitch"]!=i["width"]*4: raise SystemExit("unexpected DDS structure")
  p=data[128:]
  if len(p)!=i["width"]*i["height"]*4: raise SystemExit("unexpected DDS payload")
  a=np.frombuffer(p,dtype=np.uint8).reshape(i["height"],i["width"],4)
- return Image.fromarray(a[:,:,[2,1,0,3]].copy(),"RGBA")
+ return Image.fromarray(a.copy(),"RGBA")
 def encode_dds(header_source,img):
  a=np.asarray(img.convert("RGBA"),dtype=np.uint8)
- return header_source[:128]+a[:,:,[2,1,0,3]].copy().tobytes()
+ return header_source[:128]+a.copy().tobytes()
 def cairo_to_pil(s):
  s.flush(); w,h,stride=s.get_width(),s.get_height(),s.get_stride()
  raw=np.frombuffer(s.get_data(),dtype=np.uint8).reshape(h,stride)[:,:w*4].reshape(h,w,4).copy()
@@ -44,9 +44,9 @@ def cairo_to_pil(s):
  out=np.zeros_like(raw); nz=a>0; scale=np.zeros_like(a); scale[nz]=255.0/a[nz]
  out[:,:,0]=np.clip(r*scale,0,255).astype(np.uint8); out[:,:,1]=np.clip(g*scale,0,255).astype(np.uint8); out[:,:,2]=np.clip(b*scale,0,255).astype(np.uint8); out[:,:,3]=a.astype(np.uint8)
  return Image.fromarray(out,"RGBA")
-def render_line(text,size,xscale,slant,outer,inner,fill,inner_rgb,outer_rgb):
+def render_line(text,size,xscale,slant,font_weight,outer,inner,fill,inner_rgb,outer_rgb):
  s=cairo.ImageSurface(cairo.FORMAT_ARGB32,1200,300); c=cairo.Context(s)
- c.select_font_face(FONT_FAMILY,cairo.FONT_SLANT_NORMAL,cairo.FONT_WEIGHT_BOLD); c.set_font_size(size)
+ c.select_font_face(FONT_FAMILY,cairo.FONT_SLANT_NORMAL,cairo.FONT_WEIGHT_BOLD if font_weight=="bold" else cairo.FONT_WEIGHT_NORMAL); c.set_font_size(size)
  c.save(); c.transform(cairo.Matrix(xx=xscale,yx=0.0,xy=-slant,yy=1.0,x0=80.0,y0=180.0)); c.move_to(0,0); c.text_path(text); c.restore()
  c.set_line_join(cairo.LINE_JOIN_ROUND); c.set_line_cap(cairo.LINE_CAP_ROUND)
  c.set_source_rgba(*(x/255 for x in outer_rgb),1); c.set_line_width(outer); c.stroke_preserve()
@@ -58,7 +58,7 @@ def render_line(text,size,xscale,slant,outer,inner,fill,inner_rgb,outer_rgb):
 def render_target(t):
  safe=t["candidate_safe_bbox"]; mw,mh=safe[2]-safe[0],safe[3]-safe[1]
  for size in range(t["font_size"],t["min_font_size"]-1,-1):
-  lines=[render_line(x,size,t["xscale"],t["slant_dx_per_dy"],t["outer_stroke"],t["inner_stroke"],t["fill_rgb"],t["inner_rgb"],t["outer_rgb"]) for x in t["display_lines"]]
+  lines=[render_line(x,size,t["xscale"],t["slant_dx_per_dy"],t["font_weight"],t["outer_stroke"],t["inner_stroke"],t["fill_rgb"],t["inner_rgb"],t["outer_rgb"]) for x in t["display_lines"]]
   if len(lines)==1: combined=lines[0]
   else:
    w=max(x.width for x in lines); h=sum(x.height for x in lines); combined=Image.new("RGBA",(w,h),(0,0,0,0)); y=0
@@ -109,7 +109,7 @@ def main():
   layer,size=render_target(t); safe=t["candidate_safe_bbox"]; x=safe[0]+(safe[2]-safe[0]-layer.width)//2; y=safe[1]+(safe[3]-safe[1]-layer.height)//2; bb=[x,y,x+layer.width,y+layer.height]
   if not contained(bb,safe): raise SystemExit("FAIL 2px safe bbox")
   ar.alpha_composite(layer,(x,y))
-  rendered.append({"element_id":t["element_id"],"source_text":t["source_text"],"old_korean":t["old_korean"],"approved_korean":t["approved_korean"],"display_lines":t["display_lines"],"source_effect_bbox_readable_xyxy":t["source_bbox"],"candidate_safe_bbox_readable_xyxy":safe,"old_candidate_bbox_readable_xyxy":t["old_candidate_bbox"],"candidate_effect_bbox_readable_xyxy":bb,"font_size_px":size,"xscale":t["xscale"],"slant_dx_per_dy":t["slant_dx_per_dy"],"slant_angle_deg":round(math.degrees(math.atan(t["slant_dx_per_dy"])),4),"slant_direction":"right","safe_margins_ltrb_px":[bb[0]-safe[0],bb[1]-safe[1],safe[2]-bb[2],safe[3]-bb[3]],"containment":"PASS","style_class":t["style_class"]})
+  rendered.append({"element_id":t["element_id"],"source_text":t["source_text"],"old_korean":t["old_korean"],"approved_korean":t["approved_korean"],"display_lines":t["display_lines"],"source_effect_bbox_readable_xyxy":t["source_bbox"],"candidate_safe_bbox_readable_xyxy":safe,"old_candidate_bbox_readable_xyxy":t["old_candidate_bbox"],"candidate_effect_bbox_readable_xyxy":bb,"font_size_px":size,"font_weight":t["font_weight"],"xscale":t["xscale"],"slant_dx_per_dy":t["slant_dx_per_dy"],"slant_angle_deg":round(math.degrees(math.atan(t["slant_dx_per_dy"])),4),"slant_direction":"right","safe_margins_ltrb_px":[bb[0]-safe[0],bb[1]-safe[1],safe[2]-bb[2],safe[3]-bb[3]],"containment":"PASS","style_class":t["style_class"]})
  allowed=rect_mask(ar.size,[t["old_candidate_bbox"] for t in TARGETS]+[t["candidate_safe_bbox"] for t in TARGETS]); cells=rect_mask(ar.size,[t["sprite_cell"] for t in TARGETS])
  ch=diff_mask(br,ar); ao=nz(ImageChops.multiply(ch,ImageChops.invert(allowed))); co=nz(ImageChops.multiply(ch,ImageChops.invert(cells)))
  ach=diff_mask(br.getchannel("A").convert("RGBA"),ar.getchannel("A").convert("RGBA")); aao=nz(ImageChops.multiply(ach,ImageChops.invert(allowed)))
@@ -124,7 +124,7 @@ def main():
  ah={}
  for name,im in artifacts.items(): p=REVIEW/name; im.save(p,optimize=True); ah[name]={"sha256":shaf(p)}
  preview=artifacts["comparison.png"].copy(); preview.thumbnail((720,360),Image.Resampling.BILINEAR); bio=io.BytesIO(); preview.save(bio,"JPEG",quality=55,optimize=True); (ROLE/"comparison_preview.b64.txt").write_text(base64.b64encode(bio.getvalue()).decode("ascii")+"\n",encoding="ascii")
- prompt={"contract":"outrun-first-pass-edit-v2","contract_version":2,"task_id":TASK_ID,"wave_id":WAVE_ID,"queue_index":INDEX,"asset_id":ASSET,"source_path":"textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds","source_sha256":EXPECTED_SOURCE_SHA256,"source_dimensions":[4096,4096],"raw_orientation":"mirror_y","display_transform":"flip_y_to_readable","background_class":"transparent Heart Attack instruction/result sprite atlas","font_identifier":"Noto Sans CJK KR Bold (system font; font bytes not distributed)","source_style":{"cut_line":"cyan fill + white inner outline + dark-brown outer outline, bold condensed right-slanted sans","stage_bonus":"white fill + dark-brown outer outline, bold condensed two-line right-slanted sans"},"alpha_behavior":"reuse C85 current candidate as clean lineage; remove only two stale Korean glyph footprints and introduce fresh vector lettering only inside 2px safe bboxes","elements":[],"stage_order":["CLEAN_PLATE","KOREAN_LETTERING","MEASURE_REFIT","FINAL_VALIDATE"],"priority":["CONTAINMENT BEFORE STYLE","source-faithful spacing and effect family","fresh vector rerender if refit is needed"],"protected_regions":["all pixels outside the two stale-glyph removal footprints and two 2px-safe lettering boxes","the other 19 C85-localized regions","DDS header bytes 0..127"],"forbidden":["visible English/source residue","cover rectangles","changes outside target cells","cropping/padding/resizing DDS canvas","1px overflow beyond source-effect bbox"],"single_pass_self_check":"preserve C85 candidate outside targets; encode exact RGBA32 header; decode exact roundtrip; zero outside/alpha delta"}
+ prompt={"contract":"outrun-first-pass-edit-v2","contract_version":2,"task_id":TASK_ID,"wave_id":WAVE_ID,"queue_index":INDEX,"asset_id":ASSET,"source_path":"textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds","source_sha256":EXPECTED_SOURCE_SHA256,"source_dimensions":[4096,4096],"raw_orientation":"mirror_y","display_transform":"flip_y_to_readable","background_class":"transparent Heart Attack instruction/result sprite atlas","font_identifier":"Noto Sans CJK KR Bold (system font; font bytes not distributed)","source_style":{"cut_line":"yellow fill + white inner outline + navy outer outline, bold condensed right-slanted sans","stage_bonus":"white fill + navy outer outline, regular condensed two-line right-slanted sans"},"alpha_behavior":"reuse C85 current candidate as clean lineage; remove only two stale Korean glyph footprints and introduce fresh vector lettering only inside 2px safe bboxes","elements":[],"stage_order":["CLEAN_PLATE","KOREAN_LETTERING","MEASURE_REFIT","FINAL_VALIDATE"],"priority":["CONTAINMENT BEFORE STYLE","source-faithful spacing and effect family","fresh vector rerender if refit is needed"],"protected_regions":["all pixels outside the two stale-glyph removal footprints and two 2px-safe lettering boxes","the other 19 C85-localized regions","DDS header bytes 0..127"],"forbidden":["visible English/source residue","cover rectangles","changes outside target cells","cropping/padding/resizing DDS canvas","1px overflow beyond source-effect bbox"],"single_pass_self_check":"preserve C85 candidate outside targets; encode exact RGBA32 header; decode exact roundtrip; zero outside/alpha delta"}
  for r in rendered:
   prompt["elements"].append({"element_id":r["element_id"],"source_text":r["source_text"],"approved_korean":r["approved_korean"],"display_lines":r["display_lines"],"source_bbox":r["source_effect_bbox_readable_xyxy"],"permitted_region":r["source_effect_bbox_readable_xyxy"],"candidate_safe_bbox":r["candidate_safe_bbox_readable_xyxy"],"candidate_bbox":r["candidate_effect_bbox_readable_xyxy"],"safety_inset_px":2,"alignment":"center","baseline_vector":[1,0],"source_text_transform":"flip_y raw / normal readable","display_transform":"flip_y_to_readable","style_traits":{"weight":"bold","width":"condensed","outline":"source-family measured"},"slant_dx_per_dy":r["slant_dx_per_dy"],"slant_angle_deg":r["slant_angle_deg"],"slant_direction":"right","font_size_used_hd_px":r["font_size_px"],"lettering_method":"DETERMINISTIC_VECTOR_OUTLINE","refit_policy":{"max_iterations":8,"fresh_vector_rerender_each_iteration":True},"style_class":r["style_class"]})
  ph=jsha(prompt); prompt["prompt_sha256"]=ph; pp=REVIEW/"generation_prompt.json"; pp.write_text(json.dumps(prompt,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"); pjh=shaf(pp)
