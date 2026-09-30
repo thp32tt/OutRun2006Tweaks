@@ -16,6 +16,7 @@
 #include "../state/depth_stencil_tracking.hpp"
 #include "../state/stateblock_tracking.hpp"
 #include "../core/final_dispatch_state.hpp"
+#include "../lifecycle/raw_present.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -223,7 +224,7 @@ namespace OutRunVRStereo
                             "VR R34 DEVICE LOST: TestCooperativeLevel=0x{:08x}; skipping VR D3D work and forwarding raw Present until Reset restores the device",
                             static_cast<unsigned>(cooperative));
                     }
-                    return PresentHook.stdcall<HRESULT>(
+                    return CallRawPresent(
                         device, sourceRect, destRect,
                         destWindowOverride, dirtyRegion);
                 }

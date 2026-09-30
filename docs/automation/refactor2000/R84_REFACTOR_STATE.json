@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 135,
+  "cycle": 140,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -37,9 +37,10 @@
     "R84-REF-STATE-0007",
     "R84-REF-LIFECYCLE-0006",
     "R84-REF-STATE-0008",
-    "R84-REF-DISPATCH-0003"
+    "R84-REF-DISPATCH-0003",
+    "R84-REF-LIFECYCLE-0007"
   ],
-  "next": "Cycles 136-140: isolate raw Present trampoline behind neutral lifecycle API.",
+  "next": "Cycles 141-145: isolate ResetEx compatibility/replay health behind lifecycle API.",
   "updatedKst": "2026-10-01T07:25:00+09:00",
   "batchStatus": "R84_CORRECT_BASELINE_CYCLE_100_CHECKPOINT",
   "notes": [

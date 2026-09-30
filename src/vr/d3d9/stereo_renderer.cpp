@@ -942,4 +942,14 @@ namespace OutRunVRStereo
 
 		VRFinalTestR9Hook VRFinalTestR9Hook::instance;
 	}
+
+	HRESULT CallRawPresent(
+		IDirect3DDevice9* device,
+		const RECT* sourceRect, const RECT* destRect,
+		HWND destWindowOverride, const RGNDATA* dirtyRegion)
+	{
+		return PresentHook.stdcall<HRESULT>(
+			device, sourceRect, destRect,
+			destWindowOverride, dirtyRegion);
+	}
 }
