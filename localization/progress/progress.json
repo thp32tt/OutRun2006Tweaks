@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T05:54:00+09:00",
+  "updated_at_kst": "2026-10-01T06:53:00+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C173/Q00071 AUTHORITATIVE GATE PASS: validation-bearing result 9ecb54043789f4880380094c3010ed8bc542fe3e passed Localization Automation Gate 36775721143 attempt 1. B00324@index133 PASS RENDER_READY; A00327@index63 PASS current-workflow DDS_ONLY isolation; B00328@index55/154 PASS fail-closed PREFLIGHT_ONLY with SOURCE_IDENTITY_MISMATCH normalization; B00331@index61 REWORK_REQUIRED due two stale canonical translations. Concurrent B00332@index232 remains out-of-batch candidate QA pending. Runnable production=133; candidate QA backlog=159/198/201/232. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED. Concurrent A00338@index102 is preserved as out-of-batch QA_PENDING.",
+  "next_checkpoint": "C174/Q00072 PRE-GATE: A00330@index12 PASS isolation; A00334@index111 PASS atomic re-emission -> authoritative 8,221-unresolved PREFLIGHT_ONLY; A00335@index195 PASS isolation; A00336@index51 PASS isolation. Out-of-batch candidate QA=133/159/198/201/232; runnable production=index61 rework. A00344@index147 remains out-of-batch pending. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1143,270 +1143,195 @@
   },
   "latest_c_batch_qa": {
     "schema_version": 16,
-    "schema": "outrun-c173-q00071-four-input-independent-batch-qa-v16",
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00337",
-    "wave_id": "Q00071",
-    "qa_batch_id": "Q00071",
-    "run": "C173",
+    "schema": "outrun-c174-q00072-four-input-independent-batch-qa-v16",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00343",
+    "wave_id": "Q00072",
+    "qa_batch_id": "Q00072",
+    "run": "C174",
     "lane": "LOCALIZATION_C",
     "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
     "target_branch": "korean-localization-clean",
     "attempt": "1/3",
-    "recorded_at_kst": "2026-10-01T05:48:00+09:00",
-    "base_head_sha": "2245eda398885c8e556bf6396cc60742689ae3d9",
-    "base_sha": "2245eda398885c8e556bf6396cc60742689ae3d9",
+    "recorded_at_kst": "2026-10-01T06:53:00+09:00",
+    "base_head_sha": "c85411e771fc4110de90a1afd134cabcedca5b99",
+    "base_sha": "c85411e771fc4110de90a1afd134cabcedca5b99",
     "commit_mode": "VALIDATION_BEARING_RESULT",
-    "result": "PASS_Q00071_INDEX133_RENDER_READY_INDEX63_ISOLATION_INDEX55_154_SOURCE_MISMATCH_INDEX61_REWORK_SEMANTIC_STALE_RUNTIME_UNTESTED",
-    "summary": "Q00071 consumes immutable B00324/A00327/B00328/B00331 once. B00324@index133 passes independent exact-source/mask/CLEAN_PLATE/safe-bbox replay and is promoted to RENDER_READY. A00327@index63 passes as a current-workflow DDS_ONLY isolation input on the unchanged C85/C128 candidate with current semantics still exact. B00328@index55/154 safely proves current approved transports do not yield canonical bytes; C accepts the fail-closed evidence but normalizes the terminal typed state to SOURCE_IDENTITY_MISMATCH because mismatched Release bytes were actually obtained. B00331@index61 is REWORK_REQUIRED because the unchanged C85 candidate carries two translations that no longer match current canonical transcriptions. Concurrent out-of-batch B00332 materially advances prior RENDER_READY index232 to a newer Korean candidate awaiting C, so shared state preserves that newer candidate and does not regress index232. No candidate DDS is rewritten by C; runtime remains UNTESTED.",
+    "result": "PASS_Q00072_INDEX12_195_51_ISOLATION_INDEX111_ATOMIC_REEMISSION_PREFLIGHT_RUNTIME_UNTESTED",
+    "summary": "Q00072 consumes immutable A00330/A00334/A00335/A00336 once; all four PASS. Indices12/195/51 gain current-schema DDS_ONLY isolation inputs on unchanged prior-QA candidates. Index111 fixes the Q00069 exact-producer structural defect; the already C-replayed 3,960-pixel improvement becomes authoritative with 8,221 unresolved, but remains PREFLIGHT_ONLY. Concurrent B00339@index133 and B00332@index232 candidates plus A00338@index102, A00340@index231 and A00344@index147 evidence remain out-of-batch QA_PENDING. C rewrites no candidate DDS; runtime remains UNTESTED.",
     "qa_batch_inputs": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00324",
-        "lane": "LOCALIZATION_B",
-        "result_sha": "fabe52f2b943665933b7da0e75972676c6dfa3fc",
-        "result_message": "localization(B): advance index133 clean-plate preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00324]",
-        "completed_at": "2026-10-01T04:58:53.042194+09:00",
-        "producer_id": "P00199",
-        "automation_validation": "PENDING",
-        "validation_mode": "C_BATCH_GATE"
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00327",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
         "lane": "LOCALIZATION_A",
-        "result_sha": "bdd1ea8f82172fa3f78e3508cb7101ee8c3e8f3c",
-        "result_message": "localization(A): standardize index63 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00327]",
-        "completed_at": "2026-10-01T05:04:12.397266+09:00",
-        "producer_id": "P00202",
+        "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
+        "result_message": "localization(A): standardize index12 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00330]",
+        "completed_at": "2026-10-01T05:09:39+09:00",
+        "producer_id": "P00204",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00328",
-        "lane": "LOCALIZATION_B",
-        "result_sha": "2f972a6b8f37f777e97c527c9485aa3e2501bcf2",
-        "result_message": "localization(B): finalize source exhaustion for indices55 154 [AUTO:LOCALIZATION-LOCALIZATION_B-00328]",
-        "completed_at": "2026-10-01T05:11:47.861080+09:00",
-        "producer_id": "P00203",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
+        "result_message": "localization(A): atomically reemit index111 A00320 material [AUTO:LOCALIZATION-LOCALIZATION_A-00334]",
+        "completed_at": "2026-10-01T05:30:29+09:00",
+        "producer_id": "P00207",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00331",
-        "lane": "LOCALIZATION_B",
-        "result_sha": "fcbe82fc77e78cd8093374ed48fe4f317b4b95f8",
-        "result_message": "localization(B): standardize index61 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_B-00331]",
-        "completed_at": "2026-10-01T05:19:27.427035+09:00",
-        "producer_id": "P00205",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "868a0c8a6432a599d258783b6ca1ab8c8fbc24bf",
+        "result_message": "localization(A): standardize index195 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00335]",
+        "completed_at": "2026-10-01T05:32:00+09:00",
+        "producer_id": "P00208",
+        "automation_validation": "PENDING",
+        "validation_mode": "C_BATCH_GATE"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
+        "lane": "LOCALIZATION_A",
+        "result_sha": "d61db69e66a3ebf266e43470c189b2691a079b4b",
+        "result_message": "localization(A): standardize index51 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_A-00336]",
+        "completed_at": "2026-10-01T05:47:47+09:00",
+        "producer_id": "P00209",
         "automation_validation": "PENDING",
         "validation_mode": "C_BATCH_GATE"
       }
     ],
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00324",
-        "result_sha": "fabe52f2b943665933b7da0e75972676c6dfa3fc",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
+        "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
         "status": "PASS",
-        "production_readiness": "RENDER_READY",
-        "reason": "Index133/25F697C6 exact pre-generation handoff passes independent C replay. The verified pinned v0.25.10a archive is 306,223,257 bytes / SHA-256 76f85ed2..., and the exact member is 16,777,344 bytes / SHA-256 8b59df1e..., matching current inventory at 2048x2048 RGBA32 mip1 flip_y. C independently reproduces all nine alpha-footprint source-effect counts/bboxes, 161,688 localizable pixels total, 396,575 protected visible source pixels, zero mask overlap, mask hashes 48f32946.../5d7c481f..., and CLEAN_PLATE raw/readable hashes 0841df98.../d0513c55... with zero localizable alpha residue and zero outside/protected changes. Current 9/9 semantics match; all nine final safe bboxes are 2px insets. Visual review of the independently reconstructed readable CLEAN_PLATE confirms the nine localizable labels are removed while protected artwork/text remains. Exact source, removal mask, independent CLEAN_PLATE, safe geometry and semantic binding are therefore complete: RENDER_READY. Runtime remains UNTESTED."
+        "production_readiness": "LEGACY_STATIC_QA_RETAINED_RUNTIME_ISOLATION_READY",
+        "reason": "Index12/D6DC1380 current schema16 DDS_ONLY isolation manifest is accepted on unchanged source/candidate fingerprints (source 42aa10e0..., candidate 53eba1bb...). Existing C85/C90 heavy QA is reused; no candidate/static/runtime promotion."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00327",
-        "result_sha": "bdd1ea8f82172fa3f78e3508cb7101ee8c3e8f3c",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
+        "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
         "status": "PASS",
-        "production_readiness": "STATIC_QA_RETAINED_RUNTIME_ISOLATION_READY",
-        "reason": "Index63/48DEBE77 current-workflow DDS_ONLY isolation manifest is valid for the unchanged candidate Git blob 9c571113... / SHA-256 fa0f6e27.... Current HEAD retains the exact source blob 3eb59ab4... and candidate blob 9c571113.... Current canonical semantics START→출발 and GOAL→골 exactly match the C85 candidate's three physical rows (two START, one GOAL), with zero semantic drift. Existing C85/C128 heavy QA remains reusable: CREATE_NEW_HD dimension policy, mirror_y orientation, 3/3 containment, zero outside declared-cell nontransparent changes, and prior DDS_ONLY isolation acceptance. No candidate bytes changed; runtime remains UNTESTED."
+        "production_readiness": "PREFLIGHT_ONLY_PARTIAL_RECONSTRUCTION",
+        "reason": "Index111/C075FB49 now carries the durable record and unchanged source-only material atomically in RESULT_SHA 9fb736dc..., resolving the sole Q00069 structural rejection. Reuse C171 exact replay: 3,960 proposal-resolved, 1,718 actual changes, 8,221 unresolved, 0 outside-mask/alpha/protected overlap. The improved scope is authoritative PREFLIGHT_ONLY; RANDOM/fringe still block CLEAN_PLATE/render/candidate."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00328",
-        "result_sha": "2f972a6b8f37f777e97c527c9485aa3e2501bcf2",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
+        "result_sha": "868a0c8a6432a599d258783b6ca1ab8c8fbc24bf",
         "status": "PASS",
-        "production_readiness": "PREFLIGHT_ONLY",
-        "reason": "Indices55/2EA557B4 and154/4D38BBB0 correctly remain fail-closed with no candidate construction. C verifies the pinned archive once and reuses it: index55 exact Release member SHA-256 b2d5b03a... is 2048x256 DXT5, conflicting with canonical inventory SHA-256 8a39e88b... at 512x64 RGBA; index154 exact Release member SHA-256 15a10e6b... is 4096x1024 RGBA32 but conflicts byte-for-byte with canonical SHA-256 666511c5.... Current semantics remain 1/1 and 6/6 respectively. Per the current source-outcome contract, because Release bytes were actually obtained and failed identity, C normalizes the terminal typed state to SOURCE_IDENTITY_MISMATCH (not SOURCE_ACQUISITION_EXHAUSTED); the producer's safe no-substitution/no-pixel-work behavior is accepted and probes remain sticky until the source/inventory/policy fingerprint changes. Both remain PREFLIGHT_ONLY; runtime UNTESTED."
+        "production_readiness": "STATIC_QA_PASS_RUNTIME_ISOLATION_READY",
+        "reason": "Index195/9CE4E175 current schema16 DDS_ONLY manifest is accepted on unchanged C99/C130 source/candidate fingerprints (candidate 8ba7d964...). Heavy QA is reused; runtime remains UNTESTED."
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00331",
-        "result_sha": "fcbe82fc77e78cd8093374ed48fe4f317b4b95f8",
-        "status": "REWORK_REQUIRED",
-        "production_readiness": "CANDIDATE_REWORK_REQUIRED",
-        "reason": "Index61/C4A2937B current-workflow isolation manifest binds the unchanged C85 candidate Git blob 0b5f45ec... / SHA-256 28f4c6bd..., but that candidate is semantically stale against current canonical transcriptions. C85 candidate evidence renders Cut the line! as '라인을 끊으세요!' while current canonical text is '하트선을 통과하세요!', and renders STAGE BONUS as '스테이지 / 보너스' while current canonical text is '스테이지 보너스'. Therefore the old C85 pixel/containment geometry may be reused as rework evidence, but the unchanged candidate cannot be promoted as a current runtime-isolation input. Re-render at least those two stale elements on the exact current source/candidate lineage, preserve the remaining current semantics, then provide fresh candidate-bound English-source comparison and C QA. Runtime remains UNTESTED."
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
+        "result_sha": "d61db69e66a3ebf266e43470c189b2691a079b4b",
+        "status": "PASS",
+        "production_readiness": "PRODUCTION_COMPLETE_STATIC_QA_RUNTIME_ISOLATION_READY",
+        "reason": "Index51/FF2462BB current schema16 DDS_ONLY manifest is accepted on unchanged C163/C166 exact candidate 907350cd... and source 5b029de7.... Prior exact header/orientation, 21/21 containment and zero outside/alpha/overflow checks are reused; runtime remains UNTESTED."
       }
     ],
     "input_fingerprint": {
       "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+      "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
       "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
-      "asset_queue_blob_sha": "6524a4c279cbfdc6bdbfe864088391fe726adab0",
-      "canonical_progress_blob_sha": "4ad0c38da3a76edaf672a6314ba9be18d07cd52d",
-      "resume_state_blob_sha": "8fb42ac7f7dfbf75b37ebdca26ec3ff97bd549eb",
-      "merge_head_sha": "2245eda398885c8e556bf6396cc60742689ae3d9",
+      "asset_queue_blob_sha": "9e3bffc574a294d1d69946ae41d3630056ff58c8",
+      "canonical_progress_blob_sha": "85879b8d0dcab7b821deb3964951a6e0aaec4fe2",
+      "resume_state_blob_sha": "0d945b259498d7c83141ccdd981254357ecec2f5",
+      "merge_head_sha": "c85411e771fc4110de90a1afd134cabcedca5b99",
       "out_of_batch_seen": [
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
-          "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index12 current-workflow isolation manifest"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
-          "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index111 atomic re-emission of prior C-returned rework"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
-          "result_sha": "868a0c8a6432a599d258783b6ca1ab8c8fbc24bf",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index195 current-workflow isolation manifest"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
-          "result_sha": "d61db69e66a3ebf266e43470c189b2691a079b4b",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index51 current schema16 single-DDS isolation manifest"
-        },
         {
           "task_id": "LOCALIZATION-LOCALIZATION_B-00332",
           "result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
           "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index232 new v2 Korean candidate on approved current-pipeline Drive, candidate SHA-256 41334c7d..."
+          "scope": "index232 v2 Korean candidate SHA-256 41334c7d..."
         },
         {
           "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
           "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
           "status": "QA_PENDING_OUT_OF_BATCH",
           "scope": "index102 current-workflow single-DDS isolation manifest"
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
+          "result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index231 current schema16 single-DDS isolation manifest"
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+          "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index133 v2 Korean candidate SHA-256 6e5ee22d..."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+          "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index147 SOURCE_IDENTITY_MISMATCH terminal fingerprint guard"
         }
-      ]
+      ],
+      "unlisted_newer_producers_preserved_by_head_refresh": true
     },
     "de_duplication": {
-      "pinned_release_archive_identity_verified_once_and_reused_for_indices133_55_154": true,
-      "pinned_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-      "index63_c85_c128_heavy_qa_reused": true,
-      "index61_c85_heavy_geometry_reused_but_semantic_gate_rerun": true,
-      "repeated_identical_candidate_heavy_checks": false
+      "index12_c85_c90_heavy_qa_reused": true,
+      "index111_q00069_exact_numeric_replay_reused": true,
+      "index111_material_fingerprint_changed": false,
+      "index195_c99_c130_heavy_qa_reused": true,
+      "index51_c163_c166_heavy_qa_reused": true,
+      "repeated_identical_heavy_checks": false
     },
     "independent_replay": {
-      "index133": {
-        "asset": "25F697C6",
-        "source_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
-        "bytes": 16777344,
-        "header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089",
-        "structure": "2048x2048 RGBA32 mip1 / raw flip_y",
-        "decoded_source_rgba_raw_sha256": "8dbf7b408b1d35b9dbd23daf69056fa9ae1aaef6a76136558169822f48306991",
-        "decoded_source_rgba_readable_sha256": "a9dfec213db5d68034b025658055ac3141b864bbead63f33ce1d4a91d458114b",
-        "semantic_pairs": "PASS_9_OF_9_CURRENT_CANONICAL",
-        "source_effect_pixels_by_element": [
-          14176,
-          5584,
-          24224,
-          16752,
-          12544,
-          11968,
-          19619,
-          15008,
-          41813
-        ],
-        "source_effect_pixels_total": 161688,
-        "source_alpha_nonzero_pixels_total": 558263,
-        "protected_source_alpha_pixels_total": 396575,
-        "pairwise_mask_overlap_pixels": 0,
-        "removal_mask_u8_01_sha256": "48f3294697f1d806b99d4dc4efc5bac601632985b712bc99a0a32060524fe324",
-        "removal_mask_packbits_little_sha256": "5d7c481f9efcdc54afd7a18b8dddc760a253c55c79c251232165fabc913d90a5",
-        "clean_plate_readable_sha256": "d0513c55193a73c4ffc2da5a802cd0baae5799944de569124e87460031e98ebc",
-        "clean_plate_raw_sha256": "0841df984c69114962a341dd891bd0019db96fc6269599a53866a8e6b44e116c",
-        "changed_pixels_outside_removal_mask": 0,
-        "changed_pixels_in_protected_mask": 0,
-        "localizable_alpha_residue_pixels": 0,
-        "protected_alpha_pixels_preserved": 396575,
-        "safe_bboxes": "PASS_9_OF_9_2PX_INSET",
-        "visual_clean_plate_review": "PASS_LOCALIZABLE_LABELS_REMOVED_PROTECTED_ART_AND_TEXT_RETAINED",
-        "production_readiness": "RENDER_READY",
+      "index12": {
+        "asset": "D6DC1380",
+        "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+        "candidate_sha256": "53eba1bbc976d7f746b5af24bb5e5fa0dcd2e4a6618ca35d56ae496d82db0e00",
+        "isolation_input": "PASS_CURRENT_SCHEMA16_DDS_ONLY",
         "runtime_validation": "UNTESTED"
       },
-      "index63": {
-        "asset": "48DEBE77",
-        "source_git_blob_sha": "3eb59ab402a87a4a38787d37eaaff6e263f1ffe0",
-        "source_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
-        "candidate_git_blob_sha": "9c5711130c1fd37d218bc404f9abaac6f1c182c0",
-        "candidate_sha256": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0",
-        "current_head_source_candidate_blobs_unchanged": true,
-        "current_semantic_mismatches_vs_c85_candidate": 0,
-        "structure": "source 512x512 RGBA32 mip1 -> CREATE_NEW_HD candidate 2048x2048 RGBA32 mip1 / mirror_y",
-        "c85_geometry": "PASS_3_OF_3_ZERO_OUTSIDE_DECLARED_CELL_CHANGES",
-        "c128_isolation": "PASS_DDS_ONLY_INPUT_RUNTIME_UNTESTED",
-        "heavy_qa_reused": true,
-        "isolation_input": "PASS_CURRENT_WORKFLOW_DDS_ONLY",
+      "index111": {
+        "asset": "C075FB49",
+        "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+        "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+        "proposal_resolved_pixels": 3960,
+        "proposal_actual_changed_pixels": 1718,
+        "aggregate_remaining_unresolved_pixels": 8221,
+        "outside_accepted_mask_changed_pixels": 0,
+        "alpha_changed_pixels": 0,
+        "protected_guard_overlap_pixels": 0,
+        "random_state": "UNCHANGED_FAIL_CLOSED_PROTECTED_QUESTION_MARK",
+        "q00069_numeric_replay": "PASS_EXACT_REUSED",
+        "producer_commit_gate": "PASS_ATOMIC_MATERIAL_AND_DURABLE_TASK_RECORD",
+        "production_readiness": "PREFLIGHT_ONLY",
+        "candidate_dds_authorized": false,
         "runtime_validation": "UNTESTED"
       },
-      "indices55_154": {
-        "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-        "index55": {
-          "asset": "2EA557B4",
-          "canonical_sha256": "8a39e88bf0d60654b4460c06b18f3c3639c3790375ae0557a337fa75a9b3de6a",
-          "canonical_structure": "512x64 RGBA",
-          "release_member_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
-          "release_structure": "2048x256 DXT5 mip1",
-          "typed_outcome": "SOURCE_IDENTITY_MISMATCH",
-          "production_readiness": "PREFLIGHT_ONLY"
-        },
-        "index154": {
-          "asset": "4D38BBB0",
-          "canonical_sha256": "666511c591d3b15f400934c43c089ff4636942918d6fc9554171675d0d6cea00",
-          "canonical_structure": "4096x1024 RGBA",
-          "release_member_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
-          "release_header_128_sha256": "361af3a53b61fab028fd24678aa02b87401e3a8ec3bea17399f32e280e93ddcf",
-          "release_structure": "4096x1024 RGBA32 mip1",
-          "typed_outcome": "SOURCE_IDENTITY_MISMATCH",
-          "production_readiness": "PREFLIGHT_ONLY"
-        },
-        "producer_terminal_label_normalized_by_c": "SOURCE_ACQUISITION_EXHAUSTED -> SOURCE_IDENTITY_MISMATCH because bytes were obtained and failed identity",
-        "candidate_construction_authorized": false,
+      "index195": {
+        "asset": "9CE4E175",
+        "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+        "candidate_sha256": "8ba7d9640d1911a244719d759645e42e45580076f2433ba49e5fc39168ff4c01",
+        "isolation_input": "PASS_CURRENT_SCHEMA16_DDS_ONLY",
         "runtime_validation": "UNTESTED"
       },
-      "index61": {
-        "asset": "C4A2937B",
-        "source_git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
-        "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
-        "candidate_git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
-        "candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
-        "current_head_source_candidate_blobs_unchanged": true,
-        "c85_geometry_reusable": {
-          "text_elements": 21,
-          "containment_pass": "21/21",
-          "collateral_count": 0,
-          "outside_declared_cells_changed_nontransparent_pixels": 0,
-          "visual_source_style": "PASS"
-        },
-        "semantic_replay": {
-          "current_semantic_count": 20,
-          "c85_physical_rows": 21,
-          "mismatches": [
-            {
-              "key": "cut_line",
-              "source": "Cut the line!",
-              "candidate_korean": "라인을 끊으세요!",
-              "current_canonical_korean": "하트선을 통과하세요!"
-            },
-            {
-              "key": "stage_bonus",
-              "source": "STAGE BONUS",
-              "candidate_korean": "스테이지 / 보너스",
-              "current_canonical_korean": "스테이지 보너스"
-            }
-          ]
-        },
-        "isolation_input": "REJECT_CURRENT_WORKFLOW_UNCHANGED_STALE_SEMANTIC_CANDIDATE",
-        "rework_required": true,
+      "index51": {
+        "asset": "FF2462BB",
+        "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+        "candidate_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+        "final_render_bbox_containment": "PASS_21_OF_21_INSIDE_2PX_SAFE_BBOX",
+        "changed_pixels_outside_declared_source_regions": 0,
+        "alpha_changed_pixels_outside_declared_source_regions": 0,
+        "one_pixel_overflow": 0,
+        "isolation_input": "PASS_CURRENT_SCHEMA16_DDS_ONLY_EXTERNAL_CURRENT_PIPELINE",
         "runtime_validation": "UNTESTED"
       }
     },
     "readiness_reconciliation": {
-      "render_ready_indices": [
-        133
-      ],
+      "render_ready_indices": [],
       "one_stage_to_render_indices": [],
       "candidate_rework_required_indices": [
         61
       ],
       "candidate_qa_pending_indices": [
+        133,
         159,
         198,
         201,
@@ -1438,8 +1363,11 @@
         237
       ],
       "runtime_isolation_ready_indices": [
+        12,
+        51,
         63,
         99,
+        195,
         222,
         237
       ],
@@ -1451,76 +1379,67 @@
       ],
       "out_of_batch_qa_pending": [
         {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
-          "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index12 current-workflow isolation manifest"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
-          "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index111 atomic re-emission of prior C-returned rework"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
-          "result_sha": "868a0c8a6432a599d258783b6ca1ab8c8fbc24bf",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index195 current-workflow isolation manifest"
-        },
-        {
-          "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
-          "result_sha": "d61db69e66a3ebf266e43470c189b2691a079b4b",
-          "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index51 current schema16 single-DDS isolation manifest"
-        },
-        {
           "task_id": "LOCALIZATION-LOCALIZATION_B-00332",
           "result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
           "status": "QA_PENDING_OUT_OF_BATCH",
-          "scope": "index232 new v2 Korean candidate on approved current-pipeline Drive, candidate SHA-256 41334c7d..."
+          "scope": "index232 v2 Korean candidate SHA-256 41334c7d..."
         },
         {
           "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
           "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
           "status": "QA_PENDING_OUT_OF_BATCH",
           "scope": "index102 current-workflow single-DDS isolation manifest"
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
+          "result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index231 current schema16 single-DDS isolation manifest"
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+          "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index133 v2 Korean candidate SHA-256 6e5ee22d..."
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+          "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+          "status": "QA_PENDING_OUT_OF_BATCH",
+          "scope": "index147 SOURCE_IDENTITY_MISMATCH terminal fingerprint guard"
         }
       ],
       "candidate_completion_priority": [
-        "RENDER_READY: index133/25F697C6. Q00071 independently accepts exact source, nine removal masks, CLEAN_PLATE, final safe geometry and 9/9 semantics; render/persist its Korean DDS candidate before unrelated preflight expansion.",
-        "ONE_STAGE_TO_RENDER: none authoritative after Q00071.",
-        "CANDIDATE_REWORK_REQUIRED: index61/C4A2937B. Re-render current canonical Cut the line!→하트선을 통과하세요! and STAGE BONUS→스테이지 보너스 on the unchanged C85 lineage, then fresh candidate-bound English-source comparison/C QA. Reuse valid 21/21 geometry where unchanged.",
-        "CANDIDATE_AWAITING_C: indices159/198/201 plus newer out-of-batch index232/B00332 candidate SHA-256 41334c7d.... Do not overwrite index232 with older RENDER_READY state; its candidate must be independently consumed by a later C batch.",
-        "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index54 remains sticky SOURCE_IDENTITY_MISMATCH; indices55/154 are normalized to sticky SOURCE_IDENTITY_MISMATCH because exact Release bytes exist but fail canonical identity; index94 retains Q00069 6/7-mask scope; index111 retains Q00067/A00309 authority until out-of-batch A00334 is C-consumed; index147 remains blocked.",
-        "RUNTIME ISOLATION READY: index63 joins indices99/222/237 on unchanged static-QA candidates. Index61 is explicitly removed from current isolation-ready authority due semantic drift. No real-game validation is implied.",
-        "OUT-OF-BATCH C QA: A00330@index12, A00334@index111, A00335@index195, A00336@index51, B00332@index232 and A00338@index102 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not implicitly promoted.",
-        "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=159/198/201/232; candidate_rework_required=61; runnable_production=133; blocked_exception=54/55/147/154; runtime_validated=none.",
-        "Q00071 validation-bearing result commit will own the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+        "RENDER_READY: none at merge HEAD because prior index133 and index232 RENDER_READY states have newer out-of-batch Korean candidates awaiting C.",
+        "CANDIDATE_REWORK_REQUIRED: index61 remains next runnable completion-tier work.",
+        "CANDIDATE_AWAITING_C: 133/159/198/201/232.",
+        "PREFLIGHT_ONLY: index111 accepts A00334 atomic re-emission and advances to 8,221 unresolved; no CLEAN_PLATE/render. Index147 newer A00344 source guard remains out-of-batch.",
+        "RUNTIME ISOLATION READY: Q00072 adds current-schema acceptance for 12/195/51; no real-game validation.",
+        "OUT-OF-BATCH: B00332/A00338/A00340/B00339/A00344 remain QA_PENDING.",
+        "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=133/159/198/201/232; candidate_rework_required=61; runnable_production=61; blocked_exception=54/55/147/154; runtime_validated=none.",
+        "Q00072 result owns the sole Gate. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
       ],
-      "index111_authoritative_scope": "Retain Q00067/A00309 PREFLIGHT_ONLY until out-of-batch A00334@9fb736dc is independently consumed by a later C batch."
+      "index111_authoritative_scope": "A00334@9fb736dc fixes Q00069 producer-commit structure; reused C171 exact replay makes 8,221-unresolved PREFLIGHT_ONLY scope authoritative, without CLEAN_PLATE/render/candidate promotion."
     },
     "material_deliverable": {
-      "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_PROMOTING_INDEX133_RENDER_READY_ACCEPTING_INDEX63_ISOLATION_NORMALIZING_55_154_SOURCE_TYPES_AND_RETURNING_INDEX61_SEMANTIC_REWORK",
+      "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_THREE_SCHEMA16_ISOLATION_ACCEPTANCES_PLUS_INDEX111_ATOMIC_PREFLIGHT_REEMISSION",
       "reviewed_inputs": 4,
-      "producer_inputs_pass": 3,
-      "producer_inputs_rework_required": 1,
+      "producer_inputs_pass": 4,
+      "producer_inputs_rework_required": 0,
       "producer_inputs_hold": 0,
       "producer_inputs_superseded": 0,
-      "new_render_ready_indices": [
-        133
-      ],
       "new_static_artwork_passes": 0,
       "new_production_complete_indices": [],
       "new_runtime_isolation_ready_indices": [
-        63
+        12,
+        195,
+        51
       ],
       "new_runtime_approvals": 0,
-      "metadata_segments_changed": 0,
       "canonical_segments_after_merge": 757,
       "candidate_dds_modified_by_c": false,
-      "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00337.json",
-      "role_c_report": "localization/graphics/role_C/20261001-0548-C173/C173_Q00071_INDEPENDENT_QA_BATCH.json"
+      "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00343.json",
+      "role_c_report": "localization/graphics/role_C/20261001-0653-C174/C174_Q00072_INDEPENDENT_QA_BATCH.json"
     },
     "throughput_kpis": {
       "production_complete": {
@@ -1544,6 +1463,7 @@
         ]
       },
       "candidate_awaiting_c": [
+        133,
         159,
         198,
         201,
@@ -1553,7 +1473,7 @@
         61
       ],
       "runnable_production": [
-        133
+        61
       ],
       "blocked_exception": [
         54,
@@ -1572,32 +1492,21 @@
     "local_clone_used": false,
     "gpt_library_used": false,
     "google_drive_used": false,
-    "uploaded_archive_used": true,
+    "uploaded_archive_used": false,
     "heavy_qa_repeated": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-    "authoritative_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-    "validation_bearing_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null,
     "precommit_refresh": {
-      "head_sha": "2245eda398885c8e556bf6396cc60742689ae3d9",
+      "head_sha": "c85411e771fc4110de90a1afd134cabcedca5b99",
       "stale_state_overwrite": false,
-      "concurrent_changes_reviewed": "Latest branch refreshed immediately before Q00071 shared-state construction. A00330/A00334/A00335/A00336 and B00332 are preserved as out-of-batch QA_PENDING and are not implicitly dispositioned. B00332 materially advances index232 from Q00070 RENDER_READY to a newer candidate awaiting C, so Q00071 does not overwrite index232 back to render-ready.",
-      "bookkeeping_head_sha": "11052de50f1966dd4e18f9e3abf9b9a329080432",
-      "bookkeeping_concurrent_changes": "A00338@index102 completed after the Q00071 validation-bearing result and is preserved as out-of-batch QA_PENDING. It does not alter Q00071 dispositions or Gate ownership."
+      "concurrent_changes_reviewed": "Refreshed latest HEAD after a real branch race. Fixed Q00072 inputs are consumed once; concurrent A00344 plus prior B00332/A00338/A00340/B00339 are preserved as out-of-batch QA_PENDING."
     },
-    "bookkeeping_note": "Q00071 authoritative Gate PASS is owned by validation-bearing result 9ecb54043789f4880380094c3010ed8bc542fe3e (Localization Automation Gate run 36775721143, attempt 1). This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36775721143,
-      "head_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T05:53:33+09:00"
-    },
-    "bookkeeping_recorded_at_kst": "2026-10-01T05:54:00+09:00"
+    "result_commit_message": "localization(C): QA Q00072 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00343]",
+    "bookkeeping_note": "Bind RESULT_SHA only after this exact C result commit passes Localization Automation Gate. Runtime remains UNTESTED."
   }
 }

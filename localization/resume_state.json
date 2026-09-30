@@ -2466,31 +2466,31 @@
   },
   "latest_qa_batch": {
     "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00337",
-    "wave_id": "Q00071",
-    "run": "C173",
-    "recorded_at_kst": "2026-10-01T05:48:00+09:00",
-    "result": "PASS_Q00071_INDEX133_RENDER_READY_INDEX63_ISOLATION_INDEX55_154_SOURCE_MISMATCH_INDEX61_REWORK_SEMANTIC_STALE_RUNTIME_UNTESTED",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00343",
+    "wave_id": "Q00072",
+    "run": "C174",
+    "recorded_at_kst": "2026-10-01T06:53:00+09:00",
+    "result": "PASS_Q00072_INDEX12_195_51_ISOLATION_INDEX111_ATOMIC_REEMISSION_PREFLIGHT_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00324",
-        "result_sha": "fabe52f2b943665933b7da0e75972676c6dfa3fc",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00330",
+        "result_sha": "2b5fac85b10d7fc9ff9209149e935a219aca3232",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00327",
-        "result_sha": "bdd1ea8f82172fa3f78e3508cb7101ee8c3e8f3c",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
+        "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00328",
-        "result_sha": "2f972a6b8f37f777e97c527c9485aa3e2501bcf2",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00335",
+        "result_sha": "868a0c8a6432a599d258783b6ca1ab8c8fbc24bf",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00331",
-        "result_sha": "fcbe82fc77e78cd8093374ed48fe4f317b4b95f8",
-        "status": "REWORK_REQUIRED"
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
+        "result_sha": "d61db69e66a3ebf266e43470c189b2691a079b4b",
+        "status": "PASS"
       }
     ],
     "throughput_kpis": {
@@ -2515,6 +2515,7 @@
         ]
       },
       "candidate_awaiting_c": [
+        133,
         159,
         198,
         201,
@@ -2524,7 +2525,7 @@
         61
       ],
       "runnable_production": [
-        133
+        61
       ],
       "blocked_exception": [
         54,
@@ -2534,19 +2535,10 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-    "authoritative_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-    "validation_bearing_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36775721143,
-      "head_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T05:53:33+09:00"
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null
   }
 }
