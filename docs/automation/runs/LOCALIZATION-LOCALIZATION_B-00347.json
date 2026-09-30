@@ -95,8 +95,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_B_MOD3_INDEX94__FRESH_C175_NO_RUNNABLE_COMPLETION_TIER__COURSE_SP_EXACT_TRANSPARENT_GAP_SPLIT__7_OF_7_SOURCE_MASKS__PROTECTED_OUTRUN2_SP_INTACT__CLEAN_PLATE__SOURCE_STYLE_VECTOR_RENDER__9_PHYSICAL_OCCURRENCES__ZERO_OUTSIDE_ALLOWED__ZERO_ALPHA_OUTSIDE__ZERO_PROTECTED_OVERLAP__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__ENGLISH_SOURCE_VISUAL_PASS__DRIVE_READBACK_BYTE_IDENTICAL__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "7ca5adbc51941aff245f1f5e1646528c6003e32d",
+  "authoritative_result_sha": "7ca5adbc51941aff245f1f5e1646528c6003e32d",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): complete index94 Korean DDS candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00347]",
   "durable_task_record_in_result_commit": true,
@@ -106,5 +106,9 @@
     "head_message": "chore(localization): dedupe Q00073 rollover bookkeeping [AUTO:LOCALIZATION-LOCALIZATION_C-00349] [skip ci]",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Fresh C175/Q00073 was read immediately before result preparation; B00342 index61 is suppressed as QA_PENDING and B00339/index133 plus B00332/index232 are already static-QA PASS. Only B00347 lane-local evidence/task record will be committed."
-  }
+  },
+  "bookkeeping_note": "Durable producer result 7ca5adbc51941aff245f1f5e1646528c6003e32d atomically contains B00347 index94 lane-local QA/prompt/task record. Candidate DDS and immutable package remain in approved current-pipeline Drive. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not own a Localization Automation Gate and does not modify candidate bytes or shared localization state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T08:02:15+09:00",
+  "bookkeeping_base_result_sha": "7ca5adbc51941aff245f1f5e1646528c6003e32d",
+  "bookkeeping_head_before_update": "7ca5adbc51941aff245f1f5e1646528c6003e32d"
 }
