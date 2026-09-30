@@ -1,0 +1,141 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00270-p00156-index94-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+  "wave_id": "P00156",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T19:32:26.111+09:00",
+  "base_head_sha": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "current_controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "latest_shared_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "direct_rework_runnable_indices": [],
+    "direct_rework_dependency_blocked": [
+      {
+        "index": 94,
+        "asset": "2DA43E41",
+        "reason": "B93 safe-repair attempts exhausted; unchanged exact-bbox/source-diff dependency"
+      },
+      {
+        "index": 121,
+        "asset": "FD90AA9",
+        "reason": "source-faithful exact-bbox/collateral rebuild blocker unchanged; DDS_ONLY input already added by B00269"
+      }
+    ],
+    "candidate_qa_backlog_outside_b_shard": [
+      159,
+      198,
+      201
+    ],
+    "existing_b_isolation_not_repeated": [
+      61,
+      97,
+      112,
+      121,
+      130,
+      163,
+      193,
+      226
+    ],
+    "pregen_pending_c_not_repeated": [
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213"
+      },
+      {
+        "index": 220,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00214"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211"
+      }
+    ],
+    "source_exhausted_or_identity_blocked_not_reprobed": [
+      28,
+      34,
+      43,
+      46,
+      49,
+      52,
+      55,
+      100,
+      103,
+      106,
+      139,
+      154,
+      172,
+      175,
+      205,
+      214,
+      217,
+      241
+    ],
+    "unresolved_zoom_review_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "selected_index": 94,
+    "selected_asset": "2DA43E41",
+    "reason": "No B candidate-completion tier is runnable. Index94's three-attempt B93 rework blocker is unchanged and therefore not repeated, but the existing repository-backed C80 candidate still lacks DDS_ONLY real-game evidence and has no single-DDS manifest. Runtime isolation can materially advance that separate backlog without claiming the blocker is resolved."
+  },
+  "fingerprint_reuse": {
+    "source_git_blob_sha": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+    "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "candidate_git_blob_sha": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+    "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+    "c80_report_blob_sha": "4ea3e5025097f3ddcd8963078b1e069341a4b53c",
+    "c80_metrics_blob_sha": "1b336fd697f43bde61c84d6725a4979315d7a850",
+    "b93_task_blob_sha": "a57c001cf1ae6dfb8b698ef28cc756634a7ddc8c",
+    "current_candidate_blob_verified_at_head": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+    "current_source_blob_verified_at_head": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+    "source_candidate_changed": false,
+    "heavy_qa_repeated": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX94_2DA43E41_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      94
+    ],
+    "reviewed_assets": [
+      "2DA43E41"
+    ],
+    "candidate_dds_modified": false,
+    "static_rework_blocker_resolved": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX94__ZERO_RUNNABLE_READY_TIERS__B93_THREE_ATTEMPT_BLOCKER_UNCHANGED_NOT_REEXECUTED__UNCHANGED_C80_SOURCE_CANDIDATE_BLOBS__NEW_DDS_ONLY_INPUT__NO_STATIC_PROMOTION__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "CURRENT_SHARED_REWORK_REQUIRED_RETAINED__HISTORICAL_C80_EVIDENCE_REUSED_FOR_ISOLATION_ONLY__B93_STRICT_BLOCKER_RETAINED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00156_B00270_2DA43E41.json",
+    "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+    "localization/graphics/role_C/20260927-1826-C80/C80_2DA43E41_rework_metrics.json",
+    "docs/automation/runs/B93-20260928-1304.json",
+    "localization/graphics/role_B/20260929-0030-B98/B98_W00004_RUNTIME_ISOLATION_GATE.json",
+    "localization/graphics/role_B/20260929-0119-B99/B99_W00005_RUNTIME_SOURCE_GATE.json"
+  ]
+}

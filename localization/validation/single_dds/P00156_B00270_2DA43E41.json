@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00270-p00156-index94-single-dds-isolation-v1",
+  "case_id": "P00156_B00270_2DA43E41",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+  "wave_id": "P00156",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T19:32:26.111+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+  "active": true,
+  "purpose": "Provide a concrete repository-backed DDS_ONLY runtime-isolation input for index94/2DA43E41 without rerendering or repeating B93's exhausted repair attempts. This does not clear the current REWORK_REQUIRED exact-bbox blocker; it only enables the still-missing isolated real-game evidence. Runtime remains UNTESTED.",
+  "asset": {
+    "id": "2DA43E41",
+    "queue_index": 94,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "raw_orientation": "mirror_y",
+    "localized_regions": 11,
+    "semantic_entries": 11,
+    "current_queue_status": "rework_required_zero_pixel_or_artifact",
+    "current_queue_blocker": "B93 safe automatic repair attempts exhausted; unchanged exact-bbox/source-diff containment dependency for wait_now/view_change/expert",
+    "protected_original": [
+      "OutRun2",
+      "OutRun2: SP",
+      "Keep Your Heart -1989-",
+      "4P",
+      "3P",
+      "2P",
+      "1P",
+      "6",
+      "5",
+      "4",
+      "987",
+      "course-map artwork",
+      "character artwork",
+      "player indicators"
+    ]
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "git_blob_sha": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+    "sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "git_blob_sha": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+    "sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "c80_result_commit": "699e1d854c7d6be3f13e6b06aaa56886f5b38a82",
+      "candidate_blob_at_c80": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+      "current_candidate_blob": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+      "source_blob_at_c80": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+      "current_source_blob": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+      "current_head_checked": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+      "no_existing_2da43e41_single_dds_manifest_at_selection": true,
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "a84_report": "localization/graphics/role_A/20260927-1630-A84/A84_2DA43E41_PRODUCTION_REPORT.json",
+    "b85_report": "localization/graphics/role_B/20260927-1710-B85/B85_C4A2937B_2DA43E41_REWORK_FIRST_QA_REPORT.json",
+    "c80_report": "localization/graphics/role_C/20260927-1826-C80/C80_STRICT_QA_REWORK_REPORT.json",
+    "c80_metrics": "localization/graphics/role_C/20260927-1826-C80/C80_2DA43E41_rework_metrics.json",
+    "b93_task_record": "docs/automation/runs/B93-20260928-1304.json",
+    "b98_gate": "localization/graphics/role_B/20260929-0030-B98/B98_W00004_RUNTIME_ISOLATION_GATE.json",
+    "b99_gate": "localization/graphics/role_B/20260929-0119-B99/B99_W00005_RUNTIME_SOURCE_GATE.json",
+    "c80_historical_status": "C80_REWORK_STATIC_PASS_PENDING_D_REVALIDATION_INGAME",
+    "c80_structure": "RGBA32 4096x4096 mip1 / header exact / mirror_y",
+    "c80_localized_regions": "11_OF_11",
+    "c80_outside_cells_changed_pixels": 0,
+    "c80_introduced_alpha_outside_cells": 0,
+    "c80_visual_qa": "PASS_AFTER_REWORK_READABLE_RAW_WHITE_BACKGROUND",
+    "later_strict_blocker": {
+      "source": "B93-20260928-1304",
+      "automatic_repair_attempts_exhausted": 3,
+      "affected_elements": [
+        "wait_now",
+        "view_change",
+        "expert"
+      ],
+      "candidate_written_by_b93": false,
+      "blocker": "overlapping-cell/source-diff exact containment failures remained under stricter pre-commit QA"
+    },
+    "heavy_candidate_qa_rerun": false,
+    "source_candidate_fingerprint_unchanged": true,
+    "final_static_approval": false,
+    "final_approved": false,
+    "note": "C80 evidence is reused only for the identical source/candidate fingerprint. B93's later stricter exact-bbox blocker remains authoritative, so this isolation input must not be interpreted as clearing static QA or approving the candidate."
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "candidate_git_blob_sha": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+    "candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 2DA43E41 replacement DDS and confirm the selector/course flow renders without a crash.",
+    "Capture readable/game-orientation evidence across states that exercise all 11 localized regions.",
+    "Confirm mirror-Y raw storage is interpreted correctly in game.",
+    "Check clipping, overlap, 1-pixel overflow, position, scaling, alpha/transparency and collateral artwork.",
+    "Specifically inspect wait_now, view_change and expert, which remain blocked by the stricter B93 exact-bbox/source-diff findings.",
+    "Confirm OutRun2 / OutRun2: SP branding, Keep Your Heart -1989-, player markers, course-map and character artwork remain unchanged.",
+    "Do not promote static/final/runtime approval from this manifest alone; the current REWORK_REQUIRED blocker remains authoritative until C/shared state changes."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

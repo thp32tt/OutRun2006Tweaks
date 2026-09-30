@@ -1,0 +1,90 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00270-p00156-index94-single-dds-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+  "wave_id": "P00156",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-09-30T19:32:26.111+09:00",
+  "base_head_sha": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+  "base_sha": "0d8372519b6d30736ee78d19ba8e05b8316d16b4",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX94_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX94_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_REWORK_BLOCKER_RETAINED_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD schema15 scan finds no B-owned RENDER_READY, ONE_STAGE_TO_RENDER, runnable direct rework, unresolved zoom_review, or existing-candidate material rewrite. Direct rework indices94/121 have unchanged dependency blockers and must not be speculatively repeated. Existing B isolation inputs 61/97/112/121/130/163/193/226 and C-pending pre-generation results 133/220/232 are not duplicated; sticky source blockers are not reprobed. Index94/2DA43E41 is an existing repository-backed C80 candidate with no single-DDS manifest and still lacks isolated real-game evidence. Its source/candidate Git blobs are byte-identical between C80 result commit and current HEAD; historical C80 records 11/11 cell containment, zero outside-cell changes/alpha introduction and clean visual QA, while later B93 stricter exact-bbox repair attempts exhausted safely without writing a replacement candidate. Because the current shared queue retains REWORK_REQUIRED, this task does not promote static approval. Fallback step 3 adds only the deterministic DDS_ONLY runtime-isolation input needed to collect the missing in-game evidence.",
+  "evidence": [
+    "localization/graphics/role_B/20260930-B00270-P00156/B00270_P00156_INDEX94_SINGLE_DDS_ISOLATION_INPUT.json",
+    "localization/validation/single_dds/P00156_B00270_2DA43E41.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX94_2DA43E41_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      94
+    ],
+    "reviewed_assets": [
+      "2DA43E41"
+    ],
+    "candidate_dds_modified": false,
+    "static_rework_blocker_resolved": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "direct_rework_runnable_indices": [],
+    "unresolved_zoom_review_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "selected_indices": [
+      94
+    ],
+    "existing_isolation_not_repeated": [
+      61,
+      97,
+      112,
+      121,
+      130,
+      163,
+      193,
+      226
+    ],
+    "pregen_pending_c_not_repeated": [
+      133,
+      220,
+      232
+    ],
+    "readiness_before": {
+      "94": "REWORK_REQUIRED_UNCHANGED_B93_BLOCKER__EXISTING_CANDIDATE_NO_SINGLE_DDS_ISOLATION"
+    },
+    "readiness_after": {
+      "94": "REWORK_REQUIRED_UNCHANGED_B93_BLOCKER__SINGLE_DDS_ISOLATION_INPUT_READY__RUNTIME_UNTESTED"
+    }
+  },
+  "self_qa": "PASS_B_MOD3_INDEX94__C157_ZERO_RUNNABLE_READY_TIERS__UNCHANGED_B93_REWORK_BLOCKER_NOT_REPEATED__UNCHANGED_C80_SOURCE_CANDIDATE_FINGERPRINT__NEW_DDS_ONLY_INPUT__NO_STATIC_PROMOTION__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "CURRENT_SHARED_REWORK_REQUIRED_RETAINED__NO_STATIC_PROMOTION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(B): add index94 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00270]",
+  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created. Producer automation validation remains PENDING under C_BATCH_GATE. The current static rework blocker is retained; runtime remains UNTESTED."
+}
