@@ -1596,3 +1596,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - B00339@index133: **PASS / STATIC_QA PASS**, candidate SHA-256 `6e5ee22d...`; Q00071 source/mask/CLEAN_PLATE/safe geometry reused; 9/9 current semantics, zero outside/protected/alpha/1px overflow; runtime UNTESTED.
 - Latest-HEAD reconciliation: B00342@index61 fresh candidate is out-of-batch QA_PENDING; A00344/A00345/A00346/A00348 remain out-of-batch. Current order: **RENDER_READY none -> ONE_STAGE none -> candidate QA 61/159/198/201 -> PREFLIGHT_ONLY**.
 - `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### Q00073 authoritative Gate PASS — 2026-10-01 07:53 KST
+- Validation-bearing result: `0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa`; Gate run: `36788089100` **success**.
+- Final dispositions: B00332 **PASS/STATIC_QA**, A00338 **PASS**, A00340 **PASS**, B00339 **PASS/STATIC_QA**.
+- Production-complete static-QA adds **133/232**; current-schema isolation-ready adds **102/231**. Candidate QA backlog is **61/159/198/201** after Q00073 reconciliation. Post-Gate B00347@index94 remains separate out-of-batch QA_PENDING. Runtime remains **UNTESTED**.
