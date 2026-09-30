@@ -1,0 +1,39 @@
+{
+  "task_id": "CONVERSION-DXVK-00131",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "569112a2bf0714a01aef95e42172af57a3616664",
+  "result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R137_GUARDED_GF_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+  "summary": "Extend the exact-EXE F13 analyzer around the three recurring guarded-GF raw rel32 targets (0x653C0, 0x65860, 0x65970). Record each target's first 64 bytes, backward function-start guess, raw inbound E8 candidates, and bounded 96-byte raw outbound rel32 candidates. This is diagnostics-only provenance and does not change runtime ownership or claim instruction alignment/effect.",
+  "evidence": [
+    "CONVERSION-DXVK-00129 reduced the five guarded GF hook windows to three recurring unknown .text rel32 targets: 0x653C0, 0x65860 and 0x65970.",
+    "The highest-priority DXVK items requiring Quest3/VDXR remain runtime-blocked; this F13 provenance step is independently runnable in hosted CI.",
+    "Changed paths are analyzer/verifier/task record only; no game/host runtime source, protected DX9Ex branch, transport policy or ScreenHud ownership is changed."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00131.json"
+  ],
+  "review_lenses": {
+    "architecture": "Keep F13 evidence in the exact-EXE analyzer and verifier; do not change renderer/backend activation.",
+    "ownership": "No ArmNextDraw or semantic producer ownership change; all five guarded hooks stay spacing-only.",
+    "stereo_correctness": "No WVP/projection/HUD/world policy is changed.",
+    "performance": "CI-only byte scanning; no game/host hot-path work or runtime logging is added.",
+    "adversarial": "Inbound/outbound E8 rows are explicitly raw byte candidates, not instruction-boundary or effect proof."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GUARDED_GF_RAW_REL32_TARGET_CENSUS",
+    "after": "PENDING_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+    "runtime_claim": false
+  },
+  "next_action": "Run exact-SHA GitHub Actions, inspect gf_target_provenance rows for target bytes/prologue guesses/inbound and outbound candidates, then record only the evidence actually established. Keep guarded hooks spacing-only."
+}
