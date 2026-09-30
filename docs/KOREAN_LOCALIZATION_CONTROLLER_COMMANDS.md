@@ -3,7 +3,7 @@
 The controller should keep its scheduled prompt minimal. Workflow logic lives in Git.
 
 ## Mandatory task context
-For every generated A/B/C localization task, inject this line near the beginning of the task envelope, before lane-specific technical instructions:
+For every generated A/B/E/C localization task, inject this line near the beginning of the task envelope, before lane-specific technical instructions:
 
 `Context: This is authorized offline game-mod/localization development on a legally owned copy of OutRun 2006. Reverse engineering, DLL hooking, binary/texture analysis, and rendering inspection are solely for localization, VR/rendering interoperability, compatibility, and debugging—not cybersecurity exploitation, malware, cheating, or unauthorized access.`
 
@@ -14,28 +14,30 @@ This line is mandatory for controller-generated localization prompts even when t
 ```text
 OutRun 한글화 A 실행
 OutRun 한글화 B 실행
+OutRun 한글화 E 실행
 OutRun 한글화 C 실행
 ```
 
 Each command means:
 1. checkout/fetch latest `thp32tt/OutRun2006Tweaks` branch `korean-localization-clean`;
 2. read `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md` first;
-   - for A/B, approved `ezflash557` Google Drive canonical HD source transport is explicitly allowed and preferred; `GitHub-only` means GitHub is the state/output SSOT and N100 is forbidden, **not** that Drive source reads are forbidden;
+   - for A/B/E, approved `ezflash557` Google Drive canonical HD source transport is explicitly allowed and preferred; `GitHub-only` means GitHub is the state/output SSOT and N100 is forbidden, **not** that Drive source reads are forbidden;
 3. read all state/policy files required by that contract;
 4. execute the selected role as a production batch until the available run budget is exhausted or the lane reaches its default 4-DDS candidate goal; dependency-blocked items are skipped rather than ending the batch, and zero material output is not a valid terminal state while graphics work remains;
-   - A/B must consume any C-accepted `KOREAN_RENDER_NEXT`/`RENDER_READY` handoff before unrelated preflight/fallback; if the current task creates the final prerequisite, continue through Korean DDS creation in the same task instead of stopping at a readiness report;
+   - A/B/E must consume any C-accepted `KOREAN_RENDER_NEXT`/`RENDER_READY` handoff before unrelated preflight/fallback; if the current task creates the final prerequisite, continue through Korean DDS creation in the same task instead of stopping at a readiness report;
 5. if no safe DDS can be produced, execute the contract's mandatory fallback ladder and create at least one new material production-enabling artifact; blocker prose/task records alone do not satisfy completion;
 6. persist reports/state/worklog and actual localization files to the same branch;
 7. commit/push only real localization changes and verify HEAD SHA.
 
 ## Role summary
 
-- A: odd-index multi-DDS production lane + self-QA; default goal up to 4 new/materially reworked DDS candidates per invocation, minimum 1 material deliverable.
-- B: even-index multi-DDS production lane + self-QA; default goal up to 4 new/materially reworked DDS candidates per invocation, minimum 1 material deliverable. B is production, not review-only.
-- C: batch final QA/approval across both lanes; may fix small failures immediately. Existing candidates awaiting isolated in-game validation stay in a separate validation backlog and do not block unrelated production.
-- A and B are intended to run concurrently on disjoint odd/even queue shards.
-- C runs after the current A/B production wave has committed, so it validates stable candidate SHAs rather than in-flight files.
-- A/B work stealing is disabled while both production lanes are concurrently active; it is allowed only after the other lane is confirmed idle and the target is unclaimed on latest GitHub HEAD.
+- A: producer shard `asset_queue.index % 3 == 0`; self-QA; up to 4 new/materially reworked DDS candidates per invocation.
+- B: producer shard `asset_queue.index % 3 == 1`; self-QA; up to 4 new/materially reworked DDS candidates per invocation.
+- E: producer shard `asset_queue.index % 3 == 2`; self-QA; subject to the QA-backlog throttle in `controller_roles.json`.
+- C: independent batched final QA/shared-state reconciler. It consumes immutable `TASK_ID@RESULT_SHA` inputs and does not gate unrelated producer progression.
+- A/B/E run independently on disjoint modulo-3 shards. A producer's durable commit releases that producer lane immediately and enqueues its immutable result for C.
+- C may run concurrently with producers against immutable result SHAs; it must not overwrite newer candidate bytes.
+- A/B/E work stealing is disabled while a peer producer is active; it is allowed only when the owning peer is confirmed idle/completed and a fresh GitHub check shows the target unclaimed.
 - Zero-pixel-overflow is mandatory. One pixel outside the original/HD permitted text region => `REWORK_REQUIRED`.
 - Work scope comes from `localization/graphics/asset_queue.csv`, never from the count of DDS binaries currently committed.
 - Rules must be changed in Git, not duplicated into Docker prompts.
@@ -72,15 +74,15 @@ The generated prompt should include the compact directive: `GitHub 접근/권한
 
 Preferred dispatch is event-driven rather than fixed minute slots:
 
-1. Start `OutRun 한글화 A 실행` and `OutRun 한글화 B 실행` as two independent production workers at the same time.
+1. Start A, B, and E as independent producer workers using the current modulo-3 shards. E obeys the current QA-backlog throttle.
 2. Each lane skips unchanged dependency-blocked items and continues through runnable queue entries, targeting up to 4 candidate DDS outputs per lane.
-3. Wait until both current A/B tasks have reached durable Git results.
+3. Do not wait for peer producers: each producer's durable commit immediately releases that lane and enqueues its exact result for C.
 4. Refresh `korean-localization-clean` HEAD.
-5. If at least one lane produced new/changed candidate DDS bytes or material new QA/runtime evidence, start one `OutRun 한글화 C 실행` task for batch cross-lane final QA.
-6. Both lanes must avoid unchanged blocker-only terminals; when DDS production is blocked they must use the fallback ladder to create material production-enabling output. Suppress a redundant C cycle only when there is genuinely nothing unfinished in graphics scope.
-7. When C finishes a productive batch, start the next A+B production wave.
+5. C independently consumes up to the configured QA batch size from persistent `qa_pending`, using exact `TASK_ID@RESULT_SHA` identities.
+6. All producer lanes must avoid unchanged blocker-only terminals; when DDS production is blocked they must use the fallback ladder to create material production-enabling output. Suppress a redundant C cycle only when there is genuinely nothing unfinished in graphics scope.
+7. C completion does not gate producers. Continue each producer independently; C continues consuming the persistent QA backlog.
 
-If the runtime cannot launch two conversations/workers concurrently, retain queue mode as a compatibility fallback; do not pretend sequential dispatch is parallel.
+If the runtime cannot launch all producer conversations concurrently, use the configured sequential compatibility fallback and report it accurately.
 
 This file is a controller entry map only. The automation contract is authoritative.
 
@@ -94,7 +96,7 @@ Actions discovery       <=60s, pre-binding only
 WAIT_ACTIONS stale      <=75s -> exact run + jobs refresh
 queue idle with work    <=90s -> re-arm
 next task delay         15s
-A/B slot stagger        15s
+A/B/E slot stagger      use current controller_roles.json
 terminal transition     <=30s
 heartbeat               15s; stale after 45s
 busy generation stall   30m; do not force-stop for queue recovery
