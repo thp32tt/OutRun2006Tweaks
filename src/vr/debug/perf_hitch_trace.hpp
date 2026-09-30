@@ -25,6 +25,10 @@ namespace OutRunVR::PerfHitch
         std::uint64_t bufferLockBytes = 0;
         std::uint64_t bufferDiscardLocks = 0;
         std::uint64_t bufferNoOverwriteLocks = 0;
+        std::uint64_t particleInterpCalls = 0;
+        std::uint64_t particleInterpUs = 0;
+        std::uint64_t particlePoolSlots = 0;
+        std::uint64_t particleMoved = 0;
     };
 
     inline std::atomic<std::uint64_t> ManagedTextureCreates{ 0 };
@@ -45,6 +49,10 @@ namespace OutRunVR::PerfHitch
     inline std::atomic<std::uint64_t> BufferLockBytes{ 0 };
     inline std::atomic<std::uint64_t> BufferDiscardLocks{ 0 };
     inline std::atomic<std::uint64_t> BufferNoOverwriteLocks{ 0 };
+    inline std::atomic<std::uint64_t> ParticleInterpCalls{ 0 };
+    inline std::atomic<std::uint64_t> ParticleInterpUs{ 0 };
+    inline std::atomic<std::uint64_t> ParticlePoolSlots{ 0 };
+    inline std::atomic<std::uint64_t> ParticleMoved{ 0 };
 
     inline void NoteManagedTextureCreate(std::uint64_t bytes) noexcept
     {
@@ -105,6 +113,16 @@ namespace OutRunVR::PerfHitch
             BufferNoOverwriteLocks.fetch_add(1, std::memory_order_relaxed);
     }
 
+    inline void NoteParticleInterpolation(
+        std::uint64_t elapsedUs, std::uint64_t poolSlots,
+        std::uint64_t moved) noexcept
+    {
+        ParticleInterpCalls.fetch_add(1, std::memory_order_relaxed);
+        ParticleInterpUs.fetch_add(elapsedUs, std::memory_order_relaxed);
+        ParticlePoolSlots.fetch_add(poolSlots, std::memory_order_relaxed);
+        ParticleMoved.fetch_add(moved, std::memory_order_relaxed);
+    }
+
     inline ResourceSnapshot Consume() noexcept
     {
         ResourceSnapshot out{};
@@ -144,6 +162,14 @@ namespace OutRunVR::PerfHitch
             BufferDiscardLocks.exchange(0, std::memory_order_acq_rel);
         out.bufferNoOverwriteLocks =
             BufferNoOverwriteLocks.exchange(0, std::memory_order_acq_rel);
+        out.particleInterpCalls =
+            ParticleInterpCalls.exchange(0, std::memory_order_acq_rel);
+        out.particleInterpUs =
+            ParticleInterpUs.exchange(0, std::memory_order_acq_rel);
+        out.particlePoolSlots =
+            ParticlePoolSlots.exchange(0, std::memory_order_acq_rel);
+        out.particleMoved =
+            ParticleMoved.exchange(0, std::memory_order_acq_rel);
         return out;
     }
 }
