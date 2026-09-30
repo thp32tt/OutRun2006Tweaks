@@ -1,0 +1,491 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-c163-q00061-four-input-independent-batch-qa-current-policy-reconciliation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00288",
+  "wave_id": "Q00061",
+  "qa_batch_id": "Q00061",
+  "run": "C163",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T23:00:00+09:00",
+  "base_head_sha": "3a43f795d0bef652674892696664cc4a04ecde80",
+  "base_sha": "3a43f795d0bef652674892696664cc4a04ecde80",
+  "commit_mode": "VALIDATION_BEARING_RESULT",
+  "result": "PASS_Q00061_BATCH_ALL_FOUR_INPUTS_PASS_INDEX51_STATIC_QA_RUNTIME_UNTESTED",
+  "summary": "Q00061 consumes four immutable A-lane producer results in one independent batch. A00276@index111 PASSes an exact-source fail-closed RANDOM protected-art guard as PREFLIGHT_ONLY. A00278@index51 receives fresh binary/source/current-policy/visual replay and PASSes STATIC_QA on candidate 907350cd..., removing the Q00059 source-style/flattened-raster blocker while runtime remains UNTESTED. A00279@index24 PASSes exact canonical name-entry atlas geometry as PREFLIGHT_ONLY with runtime mapping still blocked. A00280 font indices15/18/21 PASS the static descriptor crosswalk as PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED; later A00281 remains out-of-batch QA_PENDING. Shared state is reconciled once; C writes no candidate DDS.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00276",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "bb19063245160837c4e0cfa5777f3a5e9c11e750",
+      "result_message": "localization(A): guard index111 RANDOM protected art [AUTO:LOCALIZATION-LOCALIZATION_A-00276]",
+      "completed_at": "2026-09-30T20:34:12.697732+09:00",
+      "producer_id": "P00160",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00278",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "e32e1c27a2045d1eaef318bbc56379102b0572c2",
+      "result_message": "localization(A): rerender index51 natively [AUTO:LOCALIZATION-LOCALIZATION_A-00278]",
+      "completed_at": "2026-09-30T21:01:43.985990+09:00",
+      "producer_id": "P00162",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00279",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "51b606da094b0a27fa161834cf7edefea18d88ca",
+      "result_message": "localization(A): preflight index24 name-entry atlas [AUTO:LOCALIZATION-LOCALIZATION_A-00279]",
+      "completed_at": "2026-09-30T21:22:02.708902+09:00",
+      "producer_id": "P00163",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00280",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "42248567499c9127571d43254507559eff308b13",
+      "result_message": "localization(A): audit A-owned font pipeline [AUTO:LOCALIZATION-LOCALIZATION_A-00280]",
+      "completed_at": "2026-09-30T21:32:55.640752+09:00",
+      "producer_id": "P00164",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00276",
+      "result_sha": "bb19063245160837c4e0cfa5777f3a5e9c11e750",
+      "status": "PASS",
+      "reason": "Index111/C075FB49 RANDOM protected-art fail-closed audit PASS for its claimed pre-generation scope. C independently replayed the exact canonical source SHA-256 a8942f07... and reproduced the producer metrics exactly: source text-fill 3027 px / local bbox [27,43,227,80], protected light-blue artwork 1328 px / [81,50,202,105], and square-dilation intersections 25/126/214/296/394/536/677 px at radii 1/2/3/4/5/8/12. A one-pixel guard is therefore unsafe, so simple dilation reconstruction is correctly rejected. production_readiness=PREFLIGHT_ONLY; CLEAN_PLATE/candidate/runtime approval is not granted."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00278",
+      "result_sha": "e32e1c27a2045d1eaef318bbc56379102b0572c2",
+      "status": "PASS",
+      "reason": "Index51/FF2462BB materially reworked native-v2 candidate PASS / STATIC_QA_PASS_RUNTIME_UNTESTED. C independently verified pinned source archive SHA-256 76f85ed2..., exact source DDS 5b029de7..., Drive bundle 4d956170..., candidate DDS 907350cd..., 4096x2048 RGBA32 mip1 and source/candidate 128-byte header SHA-256 8879e51b... identical. The prior f3210736 candidate was recovered from GitHub Actions artifact 11090772221; exact byte replay finds 96,064 changed pixels and 0 changes / 0 alpha changes outside the 21 declared source regions. All 21 final render bboxes are inside their 2px candidate_safe_bbox. Current conservative-fit policy was applied: minimum candidate/source-effect height ratio is 0.875 and START/GOAL are about 0.918, with no prior conspicuous-undersizing regression. Actual decoded source/candidate full-atlas and 21-element comparison shows no clipping, broken Hangul, source residue, cover box, wrong art, orientation loss or material undersizing in the reworked scope. Runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00279",
+      "result_sha": "51b606da094b0a27fa161834cf7edefea18d88ca",
+      "status": "PASS",
+      "reason": "Index24/66743AA8 name-entry atlas geometry preflight PASS for its claimed scope. C independently verified pinned archive 76f85ed2..., exact member SHA-256 7aa21de1..., 4096x4096 DXT5 mip1, raw mirror-Y/readable flip-Y, and decoded alpha geometry. The five readable alpha bands reproduce exactly [6,364), [386,756), [771,1129), [1155,1513), [1541,1903) with 10/10/10/10/8 glyph columns = 48 visual glyphs, and alpha is clear below y=1903. Static capacity does not prove runtime selection-index/UV/composition behavior, so production_readiness=PREFLIGHT_ONLY; no DDS/runtime approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00280",
+      "result_sha": "42248567499c9127571d43254507559eff308b13",
+      "status": "PASS",
+      "reason": "A-owned font-pipeline static crosswalk PASS for its claimed scope. C independently cross-checked the exact stock_font_map blob cf028d50..., graphics inventory blob 5a3d3b09... and Hangul manifest 102defd4.... Index15/20389D70 binds descriptor 9 / handle 9 / 17x17 / DXT5 with canonical 2048x1024 inventory and 4x4 ratio; index18/7B65A191 binds descriptor 0 / handle 0 / 12x12 / DXT3 at 1x1; index21/D7CE8BC3 binds descriptor 7 / handle 2 / 22x26 / DXT3 at 1x1. The evidence correctly refuses to infer safe repurposing from static data. production_readiness=PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED; A00281 runtime-binding harness remains a separate QA-pending producer result and runtime remains UNTESTED."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "a00276_audit_blob_sha": "895f55e081dab4efcdcd06e520a8a8c390ba93d6",
+    "a00278_production_blob_sha": "2b71f51e11cfb740d6bcd639e45c6efc9d824a5a",
+    "a00278_qa_report_blob_sha": "d548d244b6debabf002aba41d13eaecd396dbf4d",
+    "a00278_generation_prompt_blob_sha": "71dce7354166191083c0c249809871cea552e388",
+    "a00279_preflight_blob_sha": "9c8faffcc41b49410ff8135dd6ea3ab010702020",
+    "a00280_crosswalk_blob_sha": "c668c16395e4e9f71cf70be1094ddbbf4d40025f",
+    "stock_font_map_blob_sha": "cf028d506c360fa912b178077f11aced032ebf5d",
+    "graphics_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "hangul_manifest_blob_sha": "102defd4139490c7b620acd3de9d3acf64318d91",
+    "canonical_source_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "index111_source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "index51_source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "index51_previous_candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+    "index51_candidate_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+    "index51_candidate_bundle_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d",
+    "index24_source_sha256": "7aa21de138af2d7f2aae54022a08f0aca79093a2a34a2bd74a87a442efaa60aa"
+  },
+  "policy_delta_review": {
+    "current_orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "applies_conservative_micro_reduction": true,
+    "index51_current_policy_result": "PASS_NO_MATERIAL_UNDERSIZING",
+    "index51_min_source_effect_height_ratio": 0.875,
+    "index51_start_goal_height_ratio": 0.918,
+    "unaffected_pre_generation_inputs": [
+      "A00276@index111",
+      "A00279@index24",
+      "A00280@font15_18_21"
+    ]
+  },
+  "independent_replay": {
+    "index111": {
+      "asset": "C075FB49",
+      "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "exact_source_replayed": true,
+      "text_fill_pixels": 3027,
+      "text_fill_bbox_local_half_open": [
+        27,
+        43,
+        227,
+        80
+      ],
+      "protected_light_blue_pixels": 1328,
+      "protected_light_blue_bbox_local_half_open": [
+        81,
+        50,
+        202,
+        105
+      ],
+      "dilation_intersections": {
+        "1": 25,
+        "2": 126,
+        "3": 214,
+        "4": 296,
+        "5": 394,
+        "8": 536,
+        "12": 677
+      },
+      "simple_mask_reconstruction_safe": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED"
+    },
+    "index51": {
+      "asset": "FF2462BB",
+      "new_candidate_fingerprint": true,
+      "drive_candidate_readback": true,
+      "candidate_bundle_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d",
+      "candidate_bundle_bytes": 1206168,
+      "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "previous_candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+      "candidate_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+      "source_candidate_dds_bytes": 33554560,
+      "structure": "4096x2048 RGBA32 mip1 / raw flip_y",
+      "dds_header_sha256_source": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57",
+      "dds_header_sha256_candidate": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57",
+      "dds_header_identical": true,
+      "previous_candidate_artifact_id": 11090772221,
+      "previous_to_new_changed_pixels": 96064,
+      "previous_to_new_changed_pixels_outside_declared_source_regions": 0,
+      "previous_to_new_alpha_changed_pixels_outside_declared_source_regions": 0,
+      "final_render_bbox_containment": "PASS_21_OF_21_INSIDE_2PX_SAFE_BBOX",
+      "min_candidate_to_source_effect_height_ratio": 0.875,
+      "start_goal_candidate_to_source_effect_height_ratio": 0.918,
+      "current_policy_material_undersizing": false,
+      "independent_source_candidate_visual_review": "PASS_FULL_ATLAS_PLUS_21_REWORKED_ELEMENTS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    "index24": {
+      "asset": "66743AA8",
+      "source_sha256": "7aa21de138af2d7f2aae54022a08f0aca79093a2a34a2bd74a87a442efaa60aa",
+      "exact_source_replayed": true,
+      "structure": "4096x4096 DXT5 mip1 / raw mirror_y",
+      "readable_transform": "flip_y",
+      "alpha_bands_readable_half_open": [
+        [
+          6,
+          364
+        ],
+        [
+          386,
+          756
+        ],
+        [
+          771,
+          1129
+        ],
+        [
+          1155,
+          1513
+        ],
+        [
+          1541,
+          1903
+        ]
+      ],
+      "row_glyph_counts": [
+        10,
+        10,
+        10,
+        10,
+        8
+      ],
+      "glyph_count": 48,
+      "alpha_clear_below_readable_y": 1903,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "blocker": "RUNTIME_NAME_ENTRY_SELECTION_INDEX_UV_COMPOSITION_MAPPING",
+      "runtime_validation": "UNTESTED"
+    },
+    "font_pipeline": {
+      "indices": [
+        15,
+        18,
+        21
+      ],
+      "assets": [
+        "20389D70",
+        "7B65A191",
+        "D7CE8BC3"
+      ],
+      "static_crosswalk_replayed": true,
+      "targets": [
+        {
+          "index": 15,
+          "asset": "20389D70",
+          "descriptor_index": 9,
+          "resource_handle": 9,
+          "cell": [
+            17,
+            17
+          ],
+          "stock_format": "DXT5",
+          "inventory_to_stock_ratio": [
+            4,
+            4
+          ]
+        },
+        {
+          "index": 18,
+          "asset": "7B65A191",
+          "descriptor_index": 0,
+          "resource_handle": 0,
+          "cell": [
+            12,
+            12
+          ],
+          "stock_format": "DXT3",
+          "inventory_to_stock_ratio": [
+            1,
+            1
+          ]
+        },
+        {
+          "index": 21,
+          "asset": "D7CE8BC3",
+          "descriptor_index": 7,
+          "resource_handle": 2,
+          "cell": [
+            22,
+            26
+          ],
+          "stock_format": "DXT3",
+          "inventory_to_stock_ratio": [
+            1,
+            1
+          ]
+        }
+      ],
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "safe_repurpose_inferred": false,
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "reviewed_assets": [
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "disposition": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Use an explicit protected-art reconstruction/model for RANDOM and complete independent CLEAN_PLATE QA; simple dilation is forbidden by reproduced source evidence."
+    },
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "disposition": "PASS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Do not rerender unchanged candidate. Keep exact Drive candidate 907350cd... and create/accept an isolated runtime input only when runtime validation is scheduled."
+    },
+    {
+      "index": 24,
+      "asset": "66743AA8",
+      "disposition": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Collect/prove runtime name-entry selection-index/UV/composition behavior before generating a Hangul name-entry atlas candidate."
+    },
+    {
+      "indices": [
+        15,
+        18,
+        21
+      ],
+      "assets": [
+        "20389D70",
+        "7B65A191",
+        "D7CE8BC3"
+      ],
+      "disposition": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Consume separately QA-pending A00281 only after its own C disposition; real KoreanK3Trace/LocalizationTrace evidence is still required before choosing any font resource for Korean atlas/page switching."
+    }
+  ],
+  "concurrent_head_reconciliation": {
+    "observed_head": "3a43f795d0bef652674892696664cc4a04ecde80",
+    "index51_superseded": false,
+    "index111_superseded": false,
+    "index24_superseded": false,
+    "font_crosswalk_superseded": false,
+    "note": "Latest HEAD was refreshed immediately before the single shared-state merge. Newer producer records are disjoint or explicit continuations without replacing these immutable candidate/evidence fingerprints.",
+    "out_of_batch_newer_inputs": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+        "indices": [
+          15,
+          18,
+          21
+        ],
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00061"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00283",
+        "index": 97,
+        "asset": "411827E",
+        "status": "QA_PENDING_NEW_CANDIDATE_NOT_DISPOSITIONED_BY_Q00061"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00284",
+        "index": 163,
+        "asset": "59A79158",
+        "status": "QA_PENDING_PREFLIGHT_NOT_DISPOSITIONED_BY_Q00061"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00285",
+        "status": "QA_PENDING_GUARD_NOT_DISPOSITIONED_BY_Q00061"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00286",
+        "index": 30,
+        "asset": "8215FD25",
+        "status": "QA_PENDING_GUARD_NOT_DISPOSITIONED_BY_Q00061"
+      }
+    ]
+  },
+  "readiness_reconciliation": {
+    "production_readiness": {
+      "15": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "18": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "21": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "24": "PREFLIGHT_ONLY_RUNTIME_NAME_ENTRY_MAPPING_BLOCKED",
+      "51": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "94": "PREFLIGHT_ONLY_V2_REGEN_CONSTRAINTS_READY",
+      "97": "QA_PENDING_OUT_OF_BATCH_B00283_V2_CANDIDATE",
+      "111": "PREFLIGHT_ONLY_RANDOM_SIMPLE_MASK_REJECTED",
+      "121": "REWORK_REQUIRED_ZERO_PIXEL_OR_ARTIFACT",
+      "163": "REWORK_REQUIRED_CURRENT_POLICY_MATERIAL_UNDERSIZING__B00284_PREFLIGHT_QA_PENDING"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_rework_indices": [
+      121,
+      163
+    ],
+    "candidate_qa_pending_indices": [
+      97,
+      159,
+      198,
+      201
+    ],
+    "preflight_only_actionable_indices": [
+      94,
+      111,
+      133,
+      232
+    ],
+    "special_pipeline_preflight_only_indices": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "preflight_only_dependency_blocked_indices": [
+      175,
+      217,
+      135
+    ],
+    "static_qa_pass_runtime_untested_indices": [
+      51,
+      99,
+      102,
+      112,
+      130,
+      152,
+      193,
+      195,
+      222,
+      226,
+      231,
+      237
+    ],
+    "runtime_isolation_ready_indices": [
+      99,
+      102,
+      112,
+      130,
+      193,
+      237
+    ],
+    "runtime_isolation_qa_pending_indices": [
+      226,
+      231
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: none.",
+      "ONE_STAGE_TO_RENDER: none.",
+      "CANDIDATE_REWORK: indices121/FD90AA9 and 163/59A79158 remain ahead of unrelated preflight. Index163 retains Q00060 material-undersizing rework; newer B00284 conservative-fit spec is out-of-batch QA_PENDING and is not implicitly approved here.",
+      "QA_BACKLOG: candidate-bearing index97/411827E from out-of-batch B00283 plus indices159/198/201 remain ahead of unrelated preflight. Index51/FF2462BB leaves this backlog after Q00061 STATIC_QA PASS.",
+      "PREFLIGHT_ONLY: index94/2DA43E41, index111/C075FB49, indices133/232 remain localize-text preflight work. Q00061 additionally accepts special-pipeline preflight for index24 name-entry and font indices15/18/21, but all four remain runtime-mapping blocked and must stay behind candidate completion.",
+      "STATIC_QA: index51/FF2462BB joins unchanged accepted static fingerprints 99/102/112/130/152/193/195/222/226/231/237. Runtime remains UNTESTED.",
+      "RUNTIME_ISOLATION: accepted inputs remain 99/102/112/130/193/237. Index51 has no accepted isolation input yet; indices226/231 remain QA_PENDING isolation inputs.",
+      "OUT_OF_BATCH_QA_PENDING: A00281 font runtime-binding harness, A00285/A00286 guards, B00283 index97 candidate and B00284 index163 rework spec are preserved without implicit approval.",
+      "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; unchanged source-exhaustion rows must not be reprobed.",
+      "Q00061 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_CURRENT_POLICY_RECONCILIATION_AND_SINGLE_SHARED_STATE_MERGE",
+    "reviewed_inputs": 4,
+    "reviewed_assets": 6,
+    "producer_inputs_pass": 4,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "new_static_artwork_passes": 1,
+    "new_pre_generation_passes": 3,
+    "new_runtime_isolation_inputs_accepted": 0,
+    "new_runtime_approvals": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 755,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 66,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00288.json",
+    "role_c_report": "localization/graphics/role_C/202609302300-C163/C163_Q00061_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "github_actions_artifact_used": true,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "uploaded_archive_purpose": "Read-only exact pinned v0.25.10a source replay for index111/index51/index24; GitHub remains state/QA SSOT.",
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "All four inputs add distinct scope/fingerprints. A00278 new candidate receives fresh source/candidate/previous-byte/current-policy visual QA. A00276 and A00279 are independently replayed against exact source bytes. A00280 is replayed against exact static stock-map/inventory/manifest blobs. No unchanged PASS candidate QA is recomputed.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "report_kind": "C163_Q00061_INDEPENDENT_QA_BATCH",
+  "task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00288.json"
+}
