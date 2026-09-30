@@ -131,21 +131,27 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__INDEX111_C_ACCEPTED_PREFLIGHT_CONTINUATION__EXACT_DRIVE_TARGET_AND_DONOR_FINGERPRINTS__3960_PRIOR_UNRESOLVED_PIXELS_PROPOSED_RESOLVED__1718_ACTUAL_SOURCE_PIXELS_CHANGED_IN_PROPOSAL__ZERO_OUTSIDE_MASK__ZERO_ALPHA_CHANGE__ZERO_4PX_PROTECTED_GUARD_OVERLAP__RANDOM_UNTOUCHED_FAIL_CLOSED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
+  "authoritative_result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(A): advance index111 clean-plate core proposal [AUTO:LOCALIZATION-LOCALIZATION_A-00320]",
+  "result_commit_message": "localization(A): finalize index111 replay fix [AUTO:LOCALIZATION-LOCALIZATION_A-00320]",
   "precommit_refresh": {
     "head_sha": "b421cffd08f94db0afb7b90161a2d6bc86a1e52b",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Refreshed latest branch before A00320 correction. Only the A00320 lane-local analyzer/task record are changed; existing peer-lane commits and shared state are preserved."
   },
-  "bookkeeping_note": "This corrected immutable producer result supersedes intermediate b421cffd08f94db0afb7b90161a2d6bc86a1e52b. RESULT_SHA will be bound in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
-  "superseded_intermediate_result_sha": "b421cffd08f94db0afb7b90161a2d6bc86a1e52b",
+  "bookkeeping_note": "Authoritative producer result is 9f45de594a6035636398668820d344b4c31bd2c1. Intermediate b421cffd... and 25d978c7... are superseded and must not be queued independently. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
   "correction": {
-    "reason": "Committed replay source serialized tuned protected-mask '& gt' expressions as '&gt' / Python '>' comparisons. Machine output was generated from the correct producer computation, but the durable analyzer was not replay-safe.",
-    "action": "Replace only the affected tuned protected-overlap expressions with explicit np.logical_and calls; machine output and source inputs remain unchanged.",
+    "reason": "Initial durable analyzer serialized tuned protected-mask '& gt' expressions as '&gt' / Python '>' comparisons. An intermediate correction fixed element metrics but left the aggregate occurrence.",
+    "final_action": "Final result 9f45de59 uses explicit np.logical_and for all tuned protected-guard intersections; committed machine output/source fingerprints are unchanged.",
     "machine_output_changed": false,
-    "candidate_dds_modified": false
-  }
+    "candidate_dds_modified": false,
+    "replay_expression_residue": "NONE"
+  },
+  "superseded_intermediate_result_shas": [
+    "b421cffd08f94db0afb7b90161a2d6bc86a1e52b",
+    "25d978c775e0444f72a5a342bc6b53acf3dfa017"
+  ],
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:24:30+09:00",
+  "bookkeeping_base_head_sha": "9f45de594a6035636398668820d344b4c31bd2c1"
 }
