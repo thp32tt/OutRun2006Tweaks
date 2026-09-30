@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00150",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "3fd92157b1b8cd391c0d775a5f6ca86056b191f5",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R150_HELPER_282B0_INSTRUCTION_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00148 proved the exact 0x284BC->0x282B0 call and left callee semantics unresolved. DXVK-00149 independently proved the same exact-EXE 0x282B0..0x28309 complete-instruction prefix, making this the smallest runnable DX11 F13 follow-up that does not require HMD evidence.",
+  "summary": "Add an independent DX11 fail-closed exact-EXE proof for callee 0x282B0 complete instructions through 0x28309. Pin the count/cursor tables, pool base and strides, >=64 failure return -1, 64-entry cursor wrap, occupied-slot retry edge, slot mark=1, and output-pointer store. Stop before 0x2830A because the reviewed exact window truncates the next instruction. Full callee semantics and render/ScreenHud ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00149",
+    "source_result_sha": "b367c5f178ec872cefeb6513cbdb3bdbc036c293",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE; reuse reviewed instruction bytes and decoded local branch targets only. DX11 keeps an independent predecessor check, analyzer/verifier proof, and exact-result Actions gate."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00150.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "DX11-00148 validation-bearing result afff66edff678cb6c5b99591efc2e481563a5689 proved EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN including 0x284BC->0x282B0 in .text.",
+    "DXVK-00149 validation-bearing result b367c5f178ec872cefeb6513cbdb3bdbc036c293 independently proved exact bytes and local branch targets for the same public EXE through 0x28309.",
+    "This result requires independent exact-result GitHub Actions validation before AUTOMATION_VALIDATION may become PASS.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "next_action": "Consume exact-result-sha GitHub Actions. If green, record PASS in a separate bookkeeping checkpoint. Keep guarded GF ownership unchanged; later work may obtain a fresh exact byte window from 0x2830A or analyze the second callee 0x8BD20."
+}
