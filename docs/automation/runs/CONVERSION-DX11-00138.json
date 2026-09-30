@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00138",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T23:58:25+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "019f119e32e0426c8039cedc10788b929d854fc9",
+  "result_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086",
+  "validation_bearing_result_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R140_HELPER_285A0_EXACT_PROVENANCE",
+  "summary": "Extended the exact-EXE guarded-GF provenance chain from the R138-proven aligned CALL 0x65874->0x285A0 into a bounded helper fingerprint. The analyzer now records the helper's mapped section, first 96 bytes, backward function-start guess, exact parent-call linkage, raw inbound/outbound E8 candidates and known-target outbound subset, and fails closed if the exact helper provenance cannot be captured. The exact public EXE reports helper 0x285A0 in .text with exact parent linkage, 200 raw inbound candidates, zero raw outbound E8 candidates within 128 bytes and zero known outbound targets. Semantic effect remains UNRESOLVED and ownership effect remains NONE; no ScreenHud/native-draw routing was promoted.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "architecture": "Exact-EXE analyzer/verifier only; no game renderer, D3D11 runtime backend, host or transport source changed.",
+    "ownership": "The helper is not promoted to ScreenHud or any runtime owner. All guarded GF hooks remain spacing-only.",
+    "stereo_correctness": "No WVP, HUD/world classification, projection, SkyGlow, rank-marker or recenter behavior changed.",
+    "performance": "CI/static analysis only; no runtime hot-path telemetry or cost was added.",
+    "adversarial": "The analyzer requires the exact prior parent CALL bytes/target plus a mapped 96-byte helper fingerprint. Raw helper E8 scanning is explicitly non-semantic and cannot automatically promote ownership."
+  },
+  "exact_helper_provenance": {
+    "helper_rva": "0x000285A0",
+    "helper_section": ".text",
+    "parent_call_rva": "0x00065874",
+    "parent_call_target_rva": "0x000285A0",
+    "exact_parent_link": true,
+    "function_start_guess_rva": null,
+    "raw_inbound_count": 200,
+    "raw_outbound_count_128b": 0,
+    "known_outbound_count_128b": 0,
+    "bytes96": "8b 44 24 04 85 c0 7c 48 8b c8 81 e1 3f 00 00 80 79 05 49 83 c9 c0 41 2b c1 99 83 e2 3f 03 c2 c1 f8 06 8b d0 c1 e2 06 03 d1 6b d2 7c c7 82 28 e0 95 00 00 00 00 00 8b 14 85 58 65 95 00 85 d2 7e 08 4a 89 14 85 58 65 95 00 89 0c 85 00 65 95 00 c3 cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc",
+    "status": "EXACT_HELPER_PROVENANCE_CAPTURED",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "interpretation": "The helper is broadly referenced and the reviewed 128-byte window contains no raw outbound E8 candidate, including no known HUD/sprite target call. This narrows F13 provenance but does not establish the helper's full semantic purpose or justify draw ownership."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "R138 proved only call alignment. This task extends static provenance without modifying any R50/R51 runtime-risk paths, and preserves the rule that unknown/broadly reused helpers cannot become HUD owners without exact semantic evidence."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36732345462,
+      "conclusion": "success",
+      "validated_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086",
+      "artifact_id": 11105274202,
+      "artifact_digest": "sha256:e9ea3372660a389a1be28c870e23564c641a2a077d25aeb47a859cdccca42ae4",
+      "evidence": "Queue/baseline/one-click/disassembly/analyzer/source-graph checks, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and artifact upload passed."
+    },
+    "build": {
+      "run_id": 36732356146,
+      "conclusion": "success",
+      "validated_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086"
+    },
+    "hud_inspector": {
+      "run_id": 36732355638,
+      "conclusion": "success",
+      "validated_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086",
+      "analysis_artifact_id": 11105702701,
+      "analysis_artifact_digest": "sha256:3102462b4a84a3c4b5bfaa293adacc1faf626b1c7fdbf9e6b1d0ff7089673c1b",
+      "game_artifact_id": 11105513550,
+      "game_artifact_digest": "sha256:55ef153c48448de67417e4c302a096f4134f6e0f323a525fff092affb2a0abe3",
+      "evidence": "Exact EXE static analysis emitted gf_target_helper=0x000285A0 status=EXACT_HELPER_PROVENANCE_CAPTURED parent_exact=True inbound_raw=200 outbound_raw=0 known_outbound=0 semantic_effect=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36732355542,
+      "conclusion": "success",
+      "validated_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086",
+      "evidence": "All six OpenXR architecture jobs passed."
+    },
+    "pc_fast": {
+      "run_id": 36732345355,
+      "conclusion": "skipped",
+      "validated_sha": "bded82b634849f6e5c9e6ea013c0fd501200f086"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5913759484,
+    "validation_comment_id": 5913878441,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Validation-bearing result commit contains exact marker [AUTO:CONVERSION-DX11-00138] and no CI-skip directive.",
+    "R138 parent CALL bytes e8 27 2d fc ff still decode exactly from 0x65874 to 0x285A0.",
+    "Exact public EXE maps helper 0x285A0 to .text and returns a complete 96-byte fingerprint.",
+    "Helper provenance reports 200 raw inbound E8 candidates, zero raw outbound E8 candidates within 128 bytes, and zero known outbound targets.",
+    "Semantic effect remains UNRESOLVED and ownership effect remains NONE; no guarded GF hook is promoted.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all OpenXR architecture jobs passed on the exact result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R140 exact helper provenance for 0x285A0 is automation-validated. The helper is exact-parent-linked and broadly reused, with no raw outbound E8 in the bounded 128-byte window; its semantic purpose remains unresolved and all guarded hooks remain spacing-only.",
+  "next_action": "Keep all five guarded GF hooks spacing-only. Continue F13 with one separate bounded instruction/effect proof for helper 0x285A0 or another guarded target such as 0x65970; require exact semantic evidence before any ScreenHud ownership change."
+}
