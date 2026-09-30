@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "TYPOGRAPHY/NAMING v19 REAUDIT: index222/DDF0392A prior PRODUCTION_COMPLETE is REWORK_REQUIRED because three song titles were translated. Restore exact source song titles, rerender with one locked song-title family font size, then fresh C QA. Audit every prior static-QA/production-complete asset containing song or stage/course name families; do not reuse pre-v19 PASS without v19 family evidence.",
     "RENDER_READY: none authoritative after Q00073 consumed the index133 and index232 Korean candidates.",
     "ONE_STAGE_TO_RENDER: none authoritative.",
     "CANDIDATE_AWAITING_C: index61/C4A2937B fresh B00342 semantic-rework candidate (SHA-256 e31487c2...) is the highest completion-tier pending C input; then indices159/198/201. Do not expand unrelated preflight ahead of candidate completion.",
@@ -2546,5 +2547,33 @@
       "conclusion": "success",
       "validated_at_kst": "2026-10-01T07:53:28+09:00"
     }
+  },
+  "typography_v19_reaudit": {
+    "policy_version": 19,
+    "scope": "ALL_EXISTING_STATIC_QA_PASS_OR_PRODUCTION_COMPLETE_GRAPHICS_WITH_SONG_TITLE_OR_STAGE_COURSE_NAME_FAMILIES",
+    "status": "REQUIRED",
+    "rules": [
+      "SONG_TITLES_PRESERVE_EXACT_SOURCE",
+      "STAGE_COURSE_PROPER_NAMES_KOREAN_TRANSLITERATION_ONLY",
+      "SAME_VISUAL_FAMILY_FIXED_FONT_SIZE",
+      "NO_PER_STRING_FONT_SIZE_REDUCTION"
+    ],
+    "confirmed_rework_required": [
+      {
+        "index": 222,
+        "asset": "DDF0392A",
+        "reason": "PRIOR_PRODUCTION_COMPLETE_CONTAINS_TRANSLATED_SONG_TITLES",
+        "invalid_strings": [
+          "Rush A Difficulty -> 난이도에 도전",
+          "Shake The Street -> 거리를 뒤흔들어라",
+          "Who Are You? -> 당신은 누구?"
+        ],
+        "required_fix": "RESTORE_EXACT_SOURCE_SONG_TITLES_AND_RERENDER_WITH_LOCKED_SONG_TITLE_TYPOGRAPHY_FAMILY_THEN_FRESH_C_QA",
+        "prior_completion_must_not_be_reused": true,
+        "runtime_validation": "UNTESTED"
+      }
+    ],
+    "existing_completion_policy": "NO_PRE_V19_COMPLETION_WITH_AFFECTED_TITLE_FAMILY_MAY_REUSE_STATIC_PASS_UNLESS_V19_NAMING_AND_TYPOGRAPHY_FAMILY_EVIDENCE_IS_PRESENT",
+    "c_action": "AUDIT_AFFECTED_EXISTING_COMPLETIONS_BEFORE_REUSE_OR_RUNTIME_ISOLATION"
   }
 }

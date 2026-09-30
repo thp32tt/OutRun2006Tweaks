@@ -1,5 +1,5 @@
 {
-  "schema_version": 19,
+  "schema_version": 20,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -577,6 +577,20 @@
       "producer_records_family_id": true,
       "producer_records_font_size_px": true,
       "c_checks_uniform_family_font_size": true
+    },
+    "retrospective_audit": {
+      "applies_to_existing_static_pass": true,
+      "applies_to_existing_production_complete": true,
+      "affected_roles": [
+        "SONG_TITLE",
+        "STAGE_COURSE_PROPER_NAME"
+      ],
+      "prior_pass_reuse_requires_v19_equivalent_evidence": true,
+      "missing_evidence_disposition": "HOLD_STRICT_RECHECK",
+      "known_rework_required_indices": [
+        222
+      ],
+      "c_must_audit_before_runtime_isolation_reuse": true
     }
   }
 }
