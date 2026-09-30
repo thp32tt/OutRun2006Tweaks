@@ -1,0 +1,67 @@
+{
+  "task_id": "CONVERSION-DXVK-00141",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 1,
+  "base_sha": "a688f255661c8cfda81f86dab48878c1000b9ef7",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R141_TARGET_65970_THIRD_CALL_ALIGNMENT",
+  "selection_reason": "CONVERSION-DXVK-00139 proved the second target-C outbound CALL at 0x659AC->0x28320 and explicitly left 0x659C1->0x28800 as the remaining bounded provenance task. Runtime-dependent DXVK gameplay pacing remains active under Issue #81, so this independent exact-EXE proof is runnable without HMD evidence.",
+  "summary": "Stage a bounded exact-EXE instruction-boundary proof for guarded-GF target C's third outbound CALL at 0x659C1. The proof is anchored to the already-proven second CALL end at 0x659B1, verifies the exact contiguous instruction bytes through the E8, decodes the target as 0x28800 in .text, and keeps helper semantics/ScreenHud ownership unresolved. No renderer, transport, cadence, HUD ownership, or OpenXR runtime behavior changes.",
+  "evidence": [
+    "CONVERSION-DXVK-00139 exact result e9468bf1 proved 0x659AC->0x28320 and left 0x659C1->0x28800 as the only remaining raw target-C outbound CALL.",
+    "Discovery commit 97644a48 exposed the target-C 96-byte exact-EXE window; OutRun EXE HUD Inspector CI run 36737623809 static job 109963367524 PASS showed 0x659B1 bytes through 0x659C1 and raw candidate 0x659C1->0x28800.",
+    "Tail-probe commit 6dbf927a recorded an explicit 32-byte probe from 0x659B1; OutRun EXE HUD Inspector CI run 36737848932 static job 109964534876 PASS reported: 83 c4 0c 83 f8 ff 89 46 08 74 24 8b 4e 3c 51 50 e8 3a 2e fc ff ...",
+    "The exact rel32 for 0x659C1->0x28800 is 0xFFFC2E3A, encoded little-endian as 3a 2e fc ff.",
+    "Issue #81 P0 DXVK gameplay pacing remains ACTIVE and runtime-dependent; this independent provenance task does not change or clear it.",
+    "No Quest 3 / VDXR or in-game execution has been performed for this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00141.json"
+  ],
+  "source_commits": [
+    {
+      "sha": "97644a48cf176373fdd2437f9506f522c817a3a3",
+      "message": "vr: expose target C 96-byte provenance for third-call proof [AUTO:CONVERSION-DXVK-00141]",
+      "role": "evidence_probe",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "6dbf927a958d9d9b7d666b8079e46de9fdbc7ca0",
+      "message": "vr: expose target C third-call tail bytes [AUTO:CONVERSION-DXVK-00141]",
+      "role": "evidence_probe",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "467afe0e84e40fa9f3d6e1e7a3bd3927e3516f4d",
+      "message": "vr: stage target C third-call alignment proof [AUTO:CONVERSION-DXVK-00141] [skip ci]",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "ci_skip": true
+    }
+  ],
+  "target_c_third_call_expected": {
+    "entry_rva": "0x00065970",
+    "continuation_anchor_rva": "0x000659B1",
+    "third_call_rva": "0x000659C1",
+    "expected_target_rva": "0x00028800",
+    "expected_target_section": ".text",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "remaining_raw_calls": []
+  },
+  "runtime_claim": "NONE",
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Add verifier fail-closed markers in a no-CI-skip validation-bearing result commit, run exact-result GitHub Actions, then finalize this record in a separate CI-skipped bookkeeping commit. RUNTIME_VALIDATION remains UNTESTED."
+}
