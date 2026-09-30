@@ -1,0 +1,127 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00325-p00200-producer-material-fallback-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00325",
+  "wave_id": "P00200",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:48:00+09:00",
+  "base_head_sha": "c17fe2db0c84758c90822e7ec240566b74c5fabd",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_A_MOD3_NO_RUNNABLE_COMPLETION_TIER_INDEX237_SINGLE_DDS_ISOLATION_INPUT_RUNTIME_UNTESTED",
+  "summary": "Fresh schema16/current-HEAD scan after C170/Q00068, A00323 and B00324 finds no legal A-owned DIRECT_REWORK_REQUIRED, C-accepted RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework. A-owned candidates159/198/201 and older candidate57/60 lineages are already C-QA/pending and are not repeated; A00320@index111 and A00323@index54 are producer preflights awaiting C; index147 and source-exhausted A-shard assets remain fail-closed on unchanged fingerprints. With no runnable candidate-completion tier and no unresolved zoom-review, this task uses the contract-approved material fallback on production-complete index237/FF514CEB: an exact repository-backed DDS_ONLY runtime-isolation manifest for the unchanged C138/Q00036 static-QA-passed candidate. Heavy source/pixel/visual QA is reused, no DDS/shared state is modified, and runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00321",
+    "latest_authoritative_c_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      57,
+      60,
+      159,
+      198,
+      201
+    ],
+    "producer_preflight_qa_pending_not_repeated": [
+      54,
+      111
+    ],
+    "static_pass_or_runtime_state_not_reworked": [
+      12,
+      51,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "selected_index": 237,
+    "selected_asset": "FF514CEB",
+    "selected_priority": "MATERIAL_FALLBACK_SINGLE_DDS_ISOLATION_AFTER_ZERO_RUNNABLE_COMPLETION_TIER",
+    "new_preflight_batches_started": 0
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "candidate_git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+    "candidate_sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+    "source_git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30",
+    "source_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "producer_task_blob_sha": "019966fef13d9a75ac889d649e103b0491d1fc51",
+    "producer_qa_blob_sha": "58bbcb1a60c30ebafaa784f488cae3e179c6309e",
+    "c_task_blob_sha": "2f6f70e7e83b043a40abf26a6d1e7a7444b56247"
+  },
+  "evidence": [
+    "localization/validation/single_dds/P00200_A00325_FF514CEB.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00182.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00189.json",
+    "localization/graphics/role_A/20260930-A00182-P00092/A00182_P00092_INDEX237_FF514CEB_RGBA32_CANDIDATE_QA.json",
+    "localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json"
+  ],
+  "material_deliverable": {
+    "type": "INDEX237_REPOSITORY_BACKED_DDS_ONLY_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      237
+    ],
+    "reviewed_assets": [
+      "FF514CEB"
+    ],
+    "candidate_reuse_authorized": true,
+    "candidate_dds_modified": false,
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "runtime_isolation_manifest": "localization/validation/single_dds/P00200_A00325_FF514CEB.json",
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true,
+    "durable_task_record_in_result_commit": true
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__NO_C_QA_PENDING_CANDIDATE_REPEATED__INDEX237_CURRENT_REPOSITORY_CANDIDATE_BLOB_A7F2670C__C138_STATIC_QA_REUSED__NEW_DDS_ONLY_ISOLATION_INPUT__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): add index237 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00325]",
+  "precommit_refresh": {
+    "head_sha": "c17fe2db0c84758c90822e7ec240566b74c5fabd",
+    "head_message": "chore(localization): bind B00324 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00324] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "A00323 material/bookkeeping and B00324 material/bookkeeping are already present at refreshed base c17fe2db and are preserved. Only new A00325 lane-local isolation manifest and task record are added."
+  },
+  "bookkeeping_note": "Result SHA will be bound by a separate bookkeeping commit after the durable producer result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "durable_task_record_in_result_commit": true
+}

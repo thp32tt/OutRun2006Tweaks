@@ -1,0 +1,119 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00325-p00200-index237-single-dds-isolation-v1",
+  "case_id": "P00200_A00325_FF514CEB",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00325",
+  "wave_id": "P00200",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T04:48:00+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Provide an exact repository-backed single-DDS runtime-isolation input for the unchanged C138/Q00036 static-QA-passed FF514CEB candidate. Reuse immutable heavy QA; do not rerender or re-review the candidate. Runtime remains UNTESTED until a real game test.",
+  "asset": {
+    "id": "FF514CEB",
+    "queue_index": 237,
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "raw_orientation": "flip_y",
+    "localized_semantic_bindings": 6,
+    "localized_physical_occurrences": 9
+  },
+  "source": {
+    "canonical_transport": "PINNED_UPSTREAM_DIRECT_FILE_EXACT_CANONICAL",
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "git_blob_sha": "6e9d40d155956eb13647217bcc14680066084c30",
+    "sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 8192,
+      "raw_orientation": "flip_y"
+    },
+    "acquisition_note": "A00182 recorded approved Drive exact-path miss and pinned queue-path direct 404 before the immutable pinned object/direct fallback produced the exact canonical source. This task reuses the already accepted immutable source fingerprint and does not repeat source acquisition."
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+    "sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "header_128_exact": true,
+      "raw_orientation": "flip_y"
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00182",
+      "producer_result_sha": "e78b9160064c3b60f55f0a336be7448482836da0",
+      "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00189",
+      "independent_c_result_sha": "0128225e60b537b325aa047fafbc58e53c604b07",
+      "c_batch": "Q00036",
+      "c_run": "C138",
+      "c_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00182.json",
+    "producer_task_blob_sha": "019966fef13d9a75ac889d649e103b0491d1fc51",
+    "producer_qa_report": "localization/graphics/role_A/20260930-A00182-P00092/A00182_P00092_INDEX237_FF514CEB_RGBA32_CANDIDATE_QA.json",
+    "producer_qa_report_blob_sha": "58bbcb1a60c30ebafaa784f488cae3e179c6309e",
+    "independent_c_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00189.json",
+    "independent_c_task_blob_sha": "2f6f70e7e83b043a40abf26a6d1e7a7444b56247",
+    "independent_c_report": "localization/graphics/role_C/20260930-0234-C138/C138_Q00036_INDEPENDENT_QA_BATCH.json",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "source_effect_removal_pixels": 637151,
+    "changed_pixels": 641321,
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_pixels_outside_edit_mask": 0,
+    "containment": "PASS_ALL_NINE_PHYSICAL_OCCURRENCES_POSITIVE_MARGIN",
+    "one_pixel_overflow": 0,
+    "source_language_residue": "NONE_OBSERVED_BY_C138",
+    "broken_hangul": "NONE_OBSERVED_BY_C138",
+    "clipping_overlap_box_escape": "NONE_OBSERVED_BY_C138",
+    "signed_slant_gate": "PASS",
+    "protected_k1_exact": true,
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "repository_candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds",
+    "candidate_git_blob_sha": "a7f2670c7f5d6997d718ef0dc4e281fabd6bbaac",
+    "candidate_sha256": "4a2a3a31152f2d56aa61dc1e2efa387a49946d11cd984f8253730a42517c6e5a",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the FF514CEB replacement DDS and confirm the Create Game / Custom Game / Quick Game UI family renders without a crash.",
+    "Capture readable/game-orientation evidence for all nine localized physical occurrences.",
+    "Confirm flip_y raw storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, and any 1-pixel overflow.",
+    "Verify protected K1/unrelated artwork remains visually unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
