@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00163",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "48c2f54168a88fe036d15dd1f6be0a733680ba65",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R163_HELPER_283DE_CONTINUATION_PROVENANCE",
+  "selection_reason": "DXVK runtime promotion remains Quest 3/VDXR-dependent. CONVERSION-DXVK-00161 proved every instruction through 0x283DD and explicitly required fresh exact bytes beginning at 0x283DE before further decoding. This provenance capture is the smallest independent HMD-free next step.",
+  "summary": "Add a bounded exact-EXE continuation provenance capture beginning at 0x283DE, the exact exclusive end of the validated 0x2837E instruction window. Capture a fresh 96-byte .text window, function-start guess and raw inbound/outbound rel32 candidates, guarded by predecessor status/end and both prior aligned-call target checks. No continuation semantics or ownership are inferred.",
+  "evidence": [
+    "CONVERSION-DXVK-00161 validation-bearing result 57e30439e8adea89f8f2dba750efe8021da3a8ce proved complete instructions through 0x283DD and both aligned calls, stopping at exclusive RVA 0x283DE.",
+    "This task captures fresh exact bytes at 0x283DE rather than extrapolating beyond the prior complete instruction window.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00163.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the 0x283DE continuation capture passes, persist exact bytes/call census while keeping function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY and ownership_effect=NONE. A later bounded task may decode only complete instructions from that fresh window."
+}

@@ -285,6 +285,12 @@ GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_1_RVA = 0x00028390
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_1_TARGET_RVA = 0x0008BD20
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_2_RVA = 0x0002839D
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_2_TARGET_RVA = 0x00182194
+
+# R163/F13: fresh continuation provenance beginning at the exact exclusive end
+# of the R161 complete instruction window. Capture bytes/call candidates only.
+GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA = 0x000283DE
+GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN = 96
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_INSTRUCTIONS = (
     (0x0002837E, "83 c4 04", "add esp, 4"),
     (0x00028381, "83 f8 ff", "cmp eax, -1"),
@@ -1671,6 +1677,76 @@ def collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe:
     }
 
 
+def collect_guarded_gf_target_c_helper_1_next_code_continuation_2_provenance(pe: PE) -> dict:
+    """Capture a fresh exact-EXE window beginning at the proven 0x283DE boundary.
+
+    R161 proves every instruction through 0x283DD. This collector starts exactly
+    at the exclusive end boundary and captures a bounded .text window plus raw
+    rel32 candidates for later review. It deliberately does not decode semantics.
+    """
+
+    prefix = collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(target_rva):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            target_rva - text_section.virtual_address,
+        )
+
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN
+    )
+    predecessor_exact = (
+        prefix["status"] == "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN"
+        and prefix["end_rva"] == target_rva
+        and prefix["target_section"] == ".text"
+        and prefix["aligned_call_1_target_matches"]
+        and prefix["aligned_call_2_target_matches"]
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "function_start_guess_rva": function_start_guess_rva,
+        "probe_len": GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_PROBE_LEN,
+        "bytes": probe.hex(" "),
+        "predecessor_status": prefix["status"],
+        "predecessor_end_rva": prefix["end_rva"],
+        "predecessor_call_1_target_matches": prefix["aligned_call_1_target_matches"],
+        "predecessor_call_2_target_matches": prefix["aligned_call_2_target_matches"],
+        "predecessor_exact": predecessor_exact,
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURED"
+            if captured
+            else "NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
 
@@ -2485,6 +2561,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_next_code_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_next_code_continuation_provenance": collect_guarded_gf_target_c_helper_1_next_code_continuation_provenance(pe),
         "guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof": collect_guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_next_code_continuation_2_provenance": collect_guarded_gf_target_c_helper_1_next_code_continuation_2_provenance(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -2877,6 +2954,31 @@ def main() -> int:
         f"call2_semantics={helper_1_next_cont_prefix['call_2_semantics']} "
         f"ownership_effect={helper_1_next_cont_prefix['ownership_effect']}"
     )
+    helper_1_next_cont2 = report["guarded_gf_target_c_helper_1_next_code_continuation_2_provenance"]
+    helper_1_next_cont2_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_next_cont2["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_next_code_continuation_2=0x{helper_1_next_cont2['target_rva']:08X} "
+        f"status={helper_1_next_cont2['status']} "
+        f"predecessor_status={helper_1_next_cont2['predecessor_status']} "
+        f"predecessor_end={hexrva(helper_1_next_cont2['predecessor_end_rva'])} "
+        f"predecessor_call1={helper_1_next_cont2['predecessor_call_1_target_matches']} "
+        f"predecessor_call2={helper_1_next_cont2['predecessor_call_2_target_matches']} "
+        f"predecessor_exact={helper_1_next_cont2['predecessor_exact']} "
+        f"section={helper_1_next_cont2['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1_next_cont2['function_start_guess_rva'])} "
+        f"probe_len={helper_1_next_cont2['probe_len']} "
+        f"inbound_raw={len(helper_1_next_cont2['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_next_cont2['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_next_cont2_outbound} "
+        f"function_entry={helper_1_next_cont2['function_entry_status']} "
+        f"semantic_effect={helper_1_next_cont2['semantic_effect']} "
+        f"ownership_effect={helper_1_next_cont2['ownership_effect']} "
+        f"bytes={helper_1_next_cont2['bytes']}"
+    )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
         f"gf_target_c_tail_probe=0x{tail_probe['rva']:08X} "
@@ -2932,6 +3034,9 @@ def main() -> int:
     if helper_1_next_cont_prefix["status"] != "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN":
         print("guarded_gf_target_c_helper_1_next_code_continuation_prefix_proof=FAILED")
         return 16
+    if helper_1_next_cont2["status"] != "EXACT_EXE_NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_next_code_continuation_2_provenance=FAILED")
+        return 17
     return 0
 
 
