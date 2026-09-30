@@ -1,0 +1,180 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00304-p00183-index232-canonical-translation-proposal-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00304",
+  "wave_id": "P00183",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T02:12:00+09:00",
+  "base_head_sha": "8447a9201a9b4ac3e4f882f06e6aab3999027aea",
+  "concurrent_head_reconciliation": {
+    "originally_observed_head": "0e4e952cb6eb86dad46a21548d9bfc18472493f9",
+    "final_commit_base_head": "8447a9201a9b4ac3e4f882f06e6aab3999027aea",
+    "final_commit_base_message": "chore(localization): record A00301 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00301] [skip ci]",
+    "action": "LATEST_GITHUB_TREE_PRESERVED; ONLY B00304 LANE_LOCAL FILES ADDED"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "latest_c_gate": "C166/Q00064@624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "latest_completed_b_result": "B00300@957481f2d475c88fa6872528de8a2c4fa6b8f087",
+    "direct_rework_scan": "index163 already reworked by B00300 and C-QA pending; do not repeat",
+    "qa_pending_skipped": [
+      "index121/FD90AA9 B00295",
+      "index163/59A79158 B00300"
+    ],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_FRESH_ZERO_RUNNABLE_READY_SCAN",
+    "selected_index": 232,
+    "selected_asset": "EBFC709F",
+    "selection_reason": "No runnable B-owned ready tier remains after skipping fresh candidate QA inputs. One preflight-only expansion is permitted; index232 has an explicit deterministic semantic blocker."
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "d54e2df862741dba578c7e68cc10e4e32bc0d8c0",
+    "transcriptions_blob_sha": "43acac9e923aefb03b3f32a06d235b4f6d6f5569",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "c_q00064_task_blob_sha": "06ccaf30c6d2a12cd5036842193729cc2f33619a",
+    "b00202_task_blob_sha": "c31ee2e8cc0e110b1780fffd6ee173f7cab5e829",
+    "c145_q00043_report_blob_sha": "7c0170c3424accf54d2d1719e13cf528a6847960"
+  },
+  "target": {
+    "index": 232,
+    "asset": "EBFC709F",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+    "action": "localize_text",
+    "artwork_status": "pending_artwork",
+    "transcription_status": "transcribed_reviewed"
+  },
+  "canonical_source": {
+    "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "canvas": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_to_readable": "flip_y",
+    "source_identity_heavy_qa": "REUSE_C142_B00197_B00202_UNCHANGED_EXACT_CANONICAL_SOURCE",
+    "heavy_source_qa_repeated": false,
+    "drive_exact_probe": {
+      "approved_account": "ezflash557",
+      "approved_source_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_family_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_filename": "EBFC709F_512x256.dds",
+      "result": "SOURCE_TRANSPORT_MISS",
+      "historical_localized_output_search": false
+    }
+  },
+  "prior_c_blocker": {
+    "source": "C145/Q00043",
+    "production_readiness": "PREFLIGHT_ONLY",
+    "required_next": "Resolve both index232 canonical Korean description bindings in shared transcription, then complete full removal mask/CLEAN_PLATE/safe-bbox independent QA before render."
+  },
+  "canonical_translation_proposal": [
+    {
+      "source": "Join your friends in a game of OutRun!",
+      "korean": "친구들과 함께 아웃런 게임에 참가하세요!",
+      "status": "PROPOSED_FOR_C_SHARED_TRANSCRIPTION_MERGE",
+      "basis": [
+        "Reviewed index231 uses 아웃런 for OutRun in online/LAN descriptive copy.",
+        "Reviewed index231 uses 게임에 참가 for Join ... game semantics.",
+        "Reviewed corpus uses 친구/친구들 terminology consistently."
+      ],
+      "exact_duplicate_reuse": false
+    },
+    {
+      "source": "Create a game and invite your friends!",
+      "korean": "게임을 만들고 친구를 초대하세요!",
+      "status": "EXACT_REVIEWED_DUPLICATE_REUSE_PROPOSED_FOR_C_SHARED_TRANSCRIPTION_MERGE",
+      "basis": [
+        "Exact source string is reviewed at index237/FF514CEB with this Korean translation."
+      ],
+      "exact_duplicate_reuse": true,
+      "reuse_from_index": 237,
+      "reuse_from_asset": "FF514CEB"
+    }
+  ],
+  "geometry_carry_forward": {
+    "rule": "B00202 exact-source geometry is preflight context only. C must accept semantics and full six-region removal/CLEAN_PLATE before render readiness.",
+    "elements": [
+      {
+        "sprite": "sprite_757",
+        "source": "Join your friends in a game of OutRun!",
+        "proposed_korean": "친구들과 함께 아웃런 게임에 참가하세요!",
+        "source_effect_bbox_readable_xyxy": [
+          4,
+          527,
+          1138,
+          597
+        ],
+        "proposed_candidate_safe_bbox_2px_readable_xyxy": [
+          6,
+          529,
+          1136,
+          595
+        ]
+      },
+      {
+        "sprite": "sprite_758",
+        "source": "Create a game and invite your friends!",
+        "proposed_korean": "게임을 만들고 친구를 초대하세요!",
+        "source_effect_bbox_readable_xyxy": [
+          7,
+          367,
+          1120,
+          437
+        ],
+        "proposed_candidate_safe_bbox_2px_readable_xyxy": [
+          9,
+          369,
+          1118,
+          435
+        ]
+      }
+    ],
+    "prior_four_join_create_removal_mask_pixels": 192602,
+    "full_six_region_removal_mask_status": "HOLD_NOT_RECOMPUTED",
+    "full_clean_plate_status": "HOLD_STRICT_RECHECK",
+    "independently_qa_passed_clean_plate": false
+  },
+  "readiness_after": {
+    "classification": "PREFLIGHT_ONLY",
+    "state": "SIX_OF_SIX_SEMANTIC_BINDINGS_PROPOSED_LANE_LOCAL_PENDING_C_SHARED_MERGE__FULL_SIX_REGION_REMOVAL_MASK_CLEAN_PLATE_INDEPENDENT_QA_REQUIRED__NO_RENDER",
+    "candidate_dds_modified": false,
+    "render_ready": false,
+    "one_stage_to_render": false,
+    "next_required": "C review/merge translations, then full six-region removal mask/CLEAN_PLATE/safe-bbox QA before Korean render."
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_232_MOD3_EQ_1",
+    "duplicate_candidate_avoidance": "PASS_121_AND_163_QA_PENDING_SKIPPED",
+    "shared_state_isolation": "PASS",
+    "source_transport_policy": "PASS_TYPED_DRIVE_MISS_NO_HISTORICAL_OUTPUT_SEARCH",
+    "source_identity": "PASS_REUSED_UNCHANGED_AD7A1C21",
+    "translation_duplicate_reuse": "PASS_INDEX237_EXACT_SOURCE_DUPLICATE",
+    "translation_context_consistency": "PASS_CURRENT_REVIEWED_TERMINOLOGY",
+    "candidate_generation": "NONE_FAIL_CLOSED",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
