@@ -581,8 +581,11 @@ namespace OutRunVRStereo
                 return true;
             }
             static VRStereoR29Hook instance;
-        };
+        };        VRStereoR29Hook VRStereoR29Hook::instance;
+    }
 
-        VRStereoR29Hook VRStereoR29Hook::instance;
+    void ArmMonoSafety(std::uint64_t extraPresents) noexcept
+    {
+        R29ArmMonoSafety(extraPresents);
     }
 }

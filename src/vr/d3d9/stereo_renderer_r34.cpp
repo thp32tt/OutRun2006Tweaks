@@ -11,6 +11,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../lifecycle/recovery_api.hpp"
+#include "../lifecycle/mono_safety.hpp"
 #include "../state/d3d9_raster_tracking.hpp"
 #include "../state/depth_stencil_tracking.hpp"
 
@@ -46,7 +47,7 @@ namespace OutRunVRStereo
             ResetStereoBaselineTracking();
             InvalidateTrackedRasterShadow();
             InvalidateDepthStencilStateCache();
-            R29ArmMonoSafety();
+            ArmMonoSafety();
             RightDepthSynchronized = false;
             RightStencilSynchronized = false;
 
@@ -212,7 +213,7 @@ namespace OutRunVRStereo
                     R34ResetReplay.blocked.store(
                         true, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     if (!R34ResetReplay.firstLostDeviceBypassLogged)
                     {
                         R34ResetReplay.firstLostDeviceBypassLogged = true;
