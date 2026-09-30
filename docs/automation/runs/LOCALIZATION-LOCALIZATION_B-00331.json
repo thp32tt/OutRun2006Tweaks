@@ -105,8 +105,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_B_MOD3_SCHEMA16__ZERO_AUTOMATION_VALIDATED_RUNNABLE_COMPLETION_TIER__PENDING_C_Q00069_NOT_USED_AS_AUTHORITY__QA_PENDING_NOT_REPEATED__STICKY_SOURCE_NOT_REPROBED__NO_UNRESOLVED_ZOOM_REVIEW__INDEX61_UNCHANGED_C85_21_OF_21_PIXEL_VISUAL_PASS__C00022_W00006_LEGACY_ISOLATION_READY__CURRENT_WORKFLOW_MANIFEST_ADDED__CURRENT_GIT_SOURCE_CANDIDATE_BLOBS_BOUND__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "fcbe82fc77e78cd8093374ed48fe4f317b4b95f8",
+  "authoritative_result_sha": "fcbe82fc77e78cd8093374ed48fe4f317b4b95f8",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): standardize index61 isolation manifest [AUTO:LOCALIZATION-LOCALIZATION_B-00331]",
   "durable_task_record_in_result_commit": true,
@@ -116,5 +116,8 @@
     "head_message": "localization(C): QA Q00069 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00329]",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Concurrent C00329/Q00069 shared-state commit is preserved. Its AUTOMATION_VALIDATION=PENDING state is explicitly not used as accepted selection authority. Only B00331 lane-local report, current single-DDS manifest and durable task record are added."
-  }
+  },
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate, owns no Localization Automation Gate, and does not alter candidate/shared state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T05:19:17+09:00",
+  "bookkeeping_base_head_sha": "fcbe82fc77e78cd8093374ed48fe4f317b4b95f8"
 }
