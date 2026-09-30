@@ -1,0 +1,116 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00312-p00189-a-shard-post-a00309-zero-candidate-frontier-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00312",
+  "wave_id": "P00189",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "observed_head_sha": "84600ed4fdf27e0c64c46234e9efa3ade246753f",
+  "latest_authoritative_c": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00308",
+    "result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
+    "qa_batch_id": "Q00065",
+    "automation_validation": "PASS",
+    "gate_run_id": 36753724384
+  },
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "completion_tier_scan": {
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_a": [],
+    "one_stage_to_render_a": [],
+    "existing_candidate_material_rework_a": [],
+    "qa_pending_not_repeated": [
+      {
+        "index": 111,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00309",
+        "result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd",
+        "state": "PREFLIGHT_MATERIAL_QA_PENDING"
+      },
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+        "result_sha": "0d638bf038becb211d39414f024aab699a6369b2",
+        "state": "PREFLIGHT_QA_PENDING"
+      },
+      {
+        "index": 159,
+        "state": "CANDIDATE_QA_PENDING"
+      },
+      {
+        "index": 198,
+        "state": "CANDIDATE_QA_PENDING"
+      },
+      {
+        "index": 201,
+        "state": "CANDIDATE_QA_PENDING"
+      }
+    ],
+    "sticky_source_exhausted_or_fail_closed_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "cross_lane_work_not_stolen": [
+      {
+        "index": 121,
+        "owner": "B",
+        "state": "REWORK_REQUIRED_CURRENT_V2_REVIEW_PROMPT_SLANT_PROVENANCE"
+      }
+    ],
+    "new_preflight_batches_started": 0,
+    "candidate_dds_modified": false
+  },
+  "dependency_delta": {
+    "vs_a00307": "CHANGED",
+    "changes": [
+      "controller/automation contract advanced to schema16 before A00309",
+      "A00309 produced new index111 source-only multisource reconstruction coverage and is now a durable C-QA-pending producer result"
+    ],
+    "legal_new_a_target_created": false,
+    "rationale": "The changed dependency state has already been consumed by A00309. Re-entering index111 before C disposition would duplicate a QA-pending producer result; index147 and candidate indices159/198/201 are also QA-pending. Sticky source blockers have no new source/candidate/QA-contract dependency trigger."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "queue_controller_contract_blob_sha": "5bdfa10cf4cfbbbc1f11fd31e86466c7beaddcb8",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "e18ae69c216b93facaf54bc0f3fe2ebcdb628727",
+    "canonical_progress_blob_sha": "77a5eae89d218ca715f2de64e43eb169b98080b6",
+    "compatibility_progress_blob_sha": "77a5eae89d218ca715f2de64e43eb169b98080b6",
+    "resume_state_blob_sha": "810202dd4bc37a1c24489d7e8c912693f55ff00b",
+    "controller_schema_version": 16
+  },
+  "source_transport": {
+    "google_drive_used": false,
+    "reason": "No legal A-owned source-acquisition or preflight target exists after the fresh completion-tier scan; retrying sticky source misses or QA-pending targets is forbidden by current contract."
+  },
+  "material_deliverable": {
+    "type": "A_SHARD_POST_A00309_ZERO_CANDIDATE_BLOCKER_FRONTIER_REVIEW",
+    "material_blocker_recorded": true,
+    "prevents_duplicate_qa_pending_or_sticky_source_work": true,
+    "candidate_dds_modified": false
+  },
+  "self_qa": "PASS_A_MOD3_SCHEMA16_POST_A00309_FRESH_SCAN__ZERO_RUNNABLE_COMPLETION_TIERS__INDEX111_A00309_QA_PENDING_NOT_REPEATED__INDEX147_QA_PENDING_NOT_REPEATED__159_198_201_CANDIDATE_QA_PENDING_NOT_REPEATED__STICKY_SOURCE_BLOCKERS_NOT_REPROBED__B121_NOT_STOLEN__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false
+}
