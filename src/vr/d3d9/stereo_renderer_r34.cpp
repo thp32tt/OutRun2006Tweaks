@@ -31,8 +31,6 @@ namespace OutRunVRStereo
             OutRunVR::RuntimeEligibility::InstallState::Pending };
         OutRunVR::Lifecycle::ResetReplayState R34ResetReplay{};
         OutRunVR::Telemetry::RasterGuardMetrics R34RasterGuardMetrics{};
-        bool R34FirstReplayBlockLogged = false;
-        bool R34FirstLostDeviceBypassLogged = false;
 
         void R34ForceResetReplayFailClosed(IDirect3DDevice9* device,
             const char* site) noexcept
@@ -49,9 +47,9 @@ namespace OutRunVRStereo
             RightDepthSynchronized = false;
             RightStencilSynchronized = false;
 
-            if (!R34FirstReplayBlockLogged)
+            if (!R34ResetReplay.firstReplayBlockLogged)
             {
-                R34FirstReplayBlockLogged = true;
+                R34ResetReplay.firstReplayBlockLogged = true;
                 spdlog::error(
                     "VR R34 RESET: classic D3D9 state replay is unhealthy at {}; stereo remains fail-closed until a later clean ResetEx replay",
                     site ? site : "unknown");
@@ -212,9 +210,9 @@ namespace OutRunVRStereo
                         true, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
                     ArmMonoSafety();
-                    if (!R34FirstLostDeviceBypassLogged)
+                    if (!R34ResetReplay.firstLostDeviceBypassLogged)
                     {
-                        R34FirstLostDeviceBypassLogged = true;
+                        R34ResetReplay.firstLostDeviceBypassLogged = true;
                         spdlog::warn(
                             "VR R34 DEVICE LOST: TestCooperativeLevel=0x{:08x}; skipping VR D3D work and forwarding raw Present until Reset restores the device",
                             static_cast<unsigned>(cooperative));

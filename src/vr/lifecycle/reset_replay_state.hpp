@@ -10,5 +10,7 @@ namespace OutRunVR::Lifecycle
         std::atomic<bool> blocked{ false };
         std::uint64_t replayBlocks = 0;
         std::uint64_t lostDeviceBypasses = 0;
+        bool firstReplayBlockLogged = false;
+        bool firstLostDeviceBypassLogged = false;
     };
 }
