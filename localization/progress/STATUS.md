@@ -1492,3 +1492,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Q00065 dispositions remain **A00297 PASS / B00295 REWORK_REQUIRED / A00299 PASS / supplied A00301@51fed90a SUPERSEDED**. Index24/219 approvals remain PREFLIGHT_ONLY only; index121 is not static-promoted until current-v2 review/prompt/signed-slant evidence is compliant.
 - Current candidate-first order remains **REWORK 121 -> C QA 159/163/198/201 -> unrelated preflight**. Q00065 adds no new PRODUCTION_COMPLETE asset and grants no runtime approval.
 - This bookkeeping checkpoint is separate from the Gate-owning result and does not replace `2d1b9160b794ea2f4e9f0acaa7ed084462b41399` as authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 03:39 KST - C168 Q00066 independent batch QA
+- Inputs: B00300 `957481f2...` index163, A00303 `0d638bf0...` index147, B00304 `52f0172e...` index232, A00305 `9caef1d8...` frontier. Dispositions: **REWORK_REQUIRED / PASS / PASS / PASS**.
+- Index163 transport integrity PASSes exact current readback (candidate bundle `0928c5af...`, review bundle `3a4fbf24...`), but promotion is **REWORK_REQUIRED** because mandatory GitHub `KOREAN_PNG_REVIEW/59A79158` qa_report/prompt still bind predecessor `a9d5aacc...` / B00274 rather than current `fcb75cef...`. Re-emit exact current-v2 lineage; no pixel-overflow failure asserted.
+- Index147 **PASS PREFLIGHT_ONLY** fail-closed source gate. Index232 **PASS PREFLIGHT_ONLY** and two reviewed description translations are merged, raising shared canonical segments **755 -> 757**; full six-region CLEAN_PLATE/safe-bbox QA remains before render.
+- A00305 **PASS historical frontier scope only**; current A00313 controls dispatch/frontier state.
+- Order: **REWORK 121/163 -> C QA 159/198/201 -> preflight**. No new PRODUCTION_COMPLETE asset; C writes no candidate DDS. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

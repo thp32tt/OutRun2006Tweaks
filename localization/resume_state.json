@@ -9,13 +9,12 @@
   "next_actions": [
     "RENDER_READY: none.",
     "ONE_STAGE_TO_RENDER: none.",
-    "REWORK_REQUIRED / RUNNABLE_PRODUCTION: index121/FD90AA9 B00295 exact candidate bytes are recoverable but current generation-v2 mandatory GitHub review set, generation prompt/hash provenance and signed-slant/style PASS evidence are absent. Re-emit/fix under a new immutable producer result, then fresh C QA.",
-    "CANDIDATE_AWAITING_C: current B00300@index163 candidate plus existing indices159/198/201. Candidate-bearing QA stays ahead of unrelated preflight under controller v16.",
-    "PREFLIGHT_ONLY QA_PENDING: B00306@index94, current A00301@index111, A00303@index147 and B00304@index232 remain out-of-batch.",
-    "SOURCE_BLOCKED PREFLIGHT: A00299@index219 source-reactivation guard is accepted by Q00065; unchanged source probes must not be repeated.",
-    "SPECIAL_PIPELINE: A00297@index24 runtime-trace binding contract is accepted as PREFLIGHT_ONLY; runtime slot/UV/composition observations are still required.",
-    "THROUGHPUT v16: Q00065 adds no new PRODUCTION_COMPLETE asset; candidate_awaiting_c=159/163/198/201; runnable_production=121; blocked_exception=none recorded; runtime_validated=none.",
-    "Q00065 validation-bearing result 2d1b9160b794ea2f4e9f0acaa7ed084462b41399 passed Localization Automation Gate 36753724384. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
+    "REWORK_REQUIRED / RUNNABLE_PRODUCTION: indices121 and163. Index163 exact fcb75cef Drive candidate is intact, but mandatory GitHub review/prompt/QA lineage still targets predecessor a9d5aacc/B00274; re-emit exact lineage then fresh C QA.",
+    "CANDIDATE_AWAITING_C: indices159/198/201.",
+    "PREFLIGHT_ONLY: index232 canonical semantics complete; next full six-region removal-mask/CLEAN_PLATE/safe-bbox QA. Index147 source bytes must pass exact canonical verifier before pixel work.",
+    "A-LANE FRONTIER: A00305 accepted only historical scope; current dispatch/frontier is A00313@2ed25784.",
+    "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=159/198/201; runnable_production=121/163; runtime_validated=none.",
+    "Q00066 validation-bearing result pending Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2466,31 +2465,31 @@
   },
   "latest_qa_batch": {
     "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00308",
-    "wave_id": "Q00065",
-    "run": "C167",
-    "recorded_at_kst": "2026-10-01T02:43:18+09:00",
-    "result": "REWORK_Q00065_INDEX121_V2_REVIEW_PROMPT_SLANT_PROVENANCE_FAIL_A00297_A00299_PASS_A00301_SUPERSEDED_RUNTIME_UNTESTED",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00311",
+    "wave_id": "Q00066",
+    "run": "C168",
+    "recorded_at_kst": "2026-10-01T03:39:27+09:00",
+    "result": "REWORK_Q00066_INDEX163_V2_GITHUB_REVIEW_LINEAGE_MISMATCH_A00303_B00304_A00305_PASS_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00297",
-        "result_sha": "8c513939cb7a32fc155754444ae5471690100ecc",
-        "status": "PASS"
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00295",
-        "result_sha": "b3c130cc89f30176df42f6ebe68f39d57c2ff5ae",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00300",
+        "result_sha": "957481f2d475c88fa6872528de8a2c4fa6b8f087",
         "status": "REWORK_REQUIRED"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00299",
-        "result_sha": "4f35616dea8a3d15afc83f8fd0296e7e8d30ad4b",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+        "result_sha": "0d638bf038becb211d39414f024aab699a6369b2",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
-        "result_sha": "51fed90a4af3ba713dd99b0815e468f845e93196",
-        "status": "SUPERSEDED"
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00304",
+        "result_sha": "52f0172ecd1eeda2bfb2208b3a62579f747e2a61",
+        "status": "PASS"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00305",
+        "result_sha": "9caef1d8e1534a8b00fff0916f47778bfa1dfae5",
+        "status": "PASS"
       }
     ],
     "throughput_kpis": {
@@ -2514,29 +2513,21 @@
       },
       "candidate_awaiting_c": [
         159,
-        163,
         198,
         201
       ],
       "runnable_production": [
-        121
+        121,
+        163
       ],
       "blocked_exception": [],
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
-    "authoritative_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
-    "validation_bearing_result_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36753724384,
-      "head_sha": "2d1b9160b794ea2f4e9f0acaa7ed084462b41399",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T02:46:16+09:00"
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null,
+    "automation_gate": null
   }
 }
