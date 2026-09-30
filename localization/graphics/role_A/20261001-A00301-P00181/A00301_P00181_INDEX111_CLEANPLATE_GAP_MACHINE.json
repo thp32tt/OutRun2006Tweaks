@@ -1,0 +1,82 @@
+{
+  "schema_version": 15,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
+  "wave_id": "P00181",
+  "queue_index": 111,
+  "asset": "C075FB49",
+  "source": {
+    "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "decoded_size": [
+      2048,
+      2048
+    ],
+    "readable_transform": "flip_y"
+  },
+  "tuned_normal": {
+    "registration": [
+      25,
+      0
+    ],
+    "core": [
+      1517,
+      1392,
+      1378,
+      1531
+    ],
+    "jaccard": 0.9000653167864141,
+    "shared_english": 2971,
+    "shared_english_in_protected_r1": 27,
+    "r1_bbox": [
+      106,
+      75,
+      171,
+      111
+    ],
+    "shared_english_in_protected_r2": 132,
+    "r2_bbox": [
+      88,
+      75,
+      174,
+      124
+    ]
+  },
+  "random": {
+    "text": 3027,
+    "light_blue": 1328,
+    "question_white": 453,
+    "border_white": 1591,
+    "hard_protected": 3372,
+    "envelope_r1": 5169,
+    "visible_conflict": 30,
+    "palette": [
+      {
+        "rgba": [
+          103,
+          152,
+          220,
+          255
+        ],
+        "pixels": 25
+      },
+      {
+        "rgba": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "pixels": 5
+      }
+    ],
+    "text_in_envelope": 31,
+    "corridor_bbox": [
+      104,
+      52,
+      197,
+      80
+    ]
+  },
+  "clean_plate": "HOLD_EXACT_UNOBSERVABLE_PROTECTED_CORRIDOR",
+  "candidate_dds_authorized": false,
+  "runtime_validation": "UNTESTED"
+}
