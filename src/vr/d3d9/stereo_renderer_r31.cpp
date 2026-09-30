@@ -20,6 +20,7 @@
 //    work so stage-specific 300 -> 3000+ draw explosions can be diagnosed.
 
 #include "stereo_renderer_r30.cpp"
+#include "../telemetry/performance_counters.hpp"
 
 namespace OutRunVRStereo
 {
@@ -72,36 +73,9 @@ namespace OutRunVRStereo
         };
         R31EyeTailCache R31EyeCache{};
 
-        struct R31FramePerf
-        {
-            std::uint64_t epoch = 0;
-            std::uint64_t draws = 0;
-            std::uint64_t main = 0;
-            std::uint64_t offscreen = 0;
-            std::uint64_t aux = 0;
-            std::uint64_t fastWorld = 0;
-            std::uint64_t hud = 0;
-            std::uint64_t fragile = 0;
-            std::uint64_t unstable = 0;
-            std::uint64_t fallback = 0;
-        };
+        using R31FramePerf = OutRunVR::Telemetry::FrameCounters;
+        using R31WindowPerf = OutRunVR::Telemetry::WindowCounters;
         R31FramePerf R31Frame{};
-
-        struct R31WindowPerf
-        {
-            std::uint64_t presents = 0;
-            std::uint64_t draws = 0;
-            std::uint64_t main = 0;
-            std::uint64_t offscreen = 0;
-            std::uint64_t aux = 0;
-            std::uint64_t fastWorld = 0;
-            std::uint64_t hud = 0;
-            std::uint64_t fragile = 0;
-            std::uint64_t unstable = 0;
-            std::uint64_t fallback = 0;
-            std::uint64_t maxDraws = 0;
-            ULONGLONG lastLogMs = 0;
-        };
         R31WindowPerf R31Window{};
 
         void R31FinalizePerfFrame() noexcept
