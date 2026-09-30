@@ -1,0 +1,113 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00318-p00194-index99-single-dds-isolation-v1",
+  "case_id": "P00194_A00318_4F68708E",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00318",
+  "wave_id": "P00194",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T04:01:39+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Provide an exact repository-backed single-DDS runtime-isolation input for the unchanged C139/Q00037 static-QA-passed 4F68708E candidate. No candidate rerender or heavy QA repetition; runtime remains UNTESTED until a real game test.",
+  "asset": {
+    "id": "4F68708E",
+    "queue_index": 99,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "raw_orientation": "mirror-Y",
+    "localized_semantic_bindings": 1,
+    "localized_render_lines": 2
+  },
+  "source": {
+    "canonical_transport": "PINNED_UPSTREAM_DIRECT_FILE_EXACT_CANONICAL",
+    "repository": "envido32/OR2006Sprites",
+    "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "git_blob_sha": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5_BC3",
+      "mipmaps": 1,
+      "raw_orientation": "mirror-Y"
+    }
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+    "sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+    "decoded_rgba_sha256": "fbdd0050b882d9e20f95834b2f56a57dc4b19ac316560f8f0b4ec627636aa23b",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5_BC3",
+      "mipmaps": 1,
+      "header_128_exact": true,
+      "raw_orientation": "mirror-Y"
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00187",
+      "producer_result_sha": "047972fbd8fbb494f0046a0c829d670a0fd02753",
+      "c_static_qa_task": "LOCALIZATION-LOCALIZATION_C-00192",
+      "c_static_qa_result_sha": "63cd2ed9068e542d257fca12885ee9a0784ca86b",
+      "c_gate_run_id": 36609117374,
+      "candidate_sha256_at_c139": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+      "current_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "current_isolation_state": "NEW_A00318_INPUT",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_qa_report": "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00187/qa_report.json",
+    "producer_qa_report_blob_sha": "5ed1d44d726df4f9ac8cc07775f2d3935dd087b6",
+    "independent_c_task": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00192.json",
+    "independent_c_task_blob_sha": "faebf74c4ad619a52c8777aa2bffccf6cf018663",
+    "independent_c_report": "localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json",
+    "c139_status": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "containment": "PASS_2_OF_2_POSITIVE_MARGIN",
+    "one_pixel_overflow": 0,
+    "source_language_residue": "NONE_OBSERVED_BY_C139",
+    "broken_hangul": "NONE_OBSERVED_BY_C139",
+    "clipping_overlap_box_escape": "NONE_OBSERVED_BY_C139",
+    "final_approved": false
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "repository_candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "candidate_git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+    "candidate_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 4F68708E replacement DDS and confirm the affected Ghost Car/course-record selector text renders without a crash.",
+    "Capture readable/game-orientation evidence for both localized lines.",
+    "Confirm mirror-Y raw storage is interpreted correctly in game.",
+    "Check clipping, position, DXT5 alpha/transparency, scaling, and any 1-pixel overflow.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

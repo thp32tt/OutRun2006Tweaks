@@ -1,0 +1,123 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00318-p00194-a-mod3-fallback-index99-runtime-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00318",
+  "wave_id": "P00194",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:01:39+09:00",
+  "base_head_sha": "3232859cd65353d34e486f0555f80273c2392266",
+  "result": "PASS_MATERIAL_A_MOD3_NO_RUNNABLE_COMPLETION_TIER_INDEX99_SINGLE_DDS_ISOLATION_INPUT_RUNTIME_UNTESTED",
+  "summary": "Fresh schema16/current-HEAD scan after C169/Q00067 finds no legal A-owned candidate-completion tier. C169 reports runnable_production=[]; index111 is C-accepted PREFLIGHT_ONLY with 12,181 unresolved protected-art reconstruction pixels; index147 A00316 exact-member SOURCE_IDENTITY_MISMATCH is out-of-batch C-QA pending; candidate indices159/198/201 remain C-QA pending; unchanged source-exhausted/fail-closed rows are not reprobed. Per fallback ladder step 3, index99/4F68708E is A-owned, already independently STATIC_QA PASS at C139/Q00037, and had no single-DDS isolation manifest. A00318 persists an exact repository-backed DDS_ONLY isolation input bound to candidate Git blob a170fc1e... / SHA-256 4d19c5f1... and canonical source d97206d8.... No candidate bytes or shared state are modified; heavy static QA is reused; runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_gate_pass_c_task": "LOCALIZATION-LOCALIZATION_C-00311",
+    "latest_authoritative_gate_pass_c_result_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84",
+    "latest_c_readiness_task": "LOCALIZATION-LOCALIZATION_C-00317",
+    "latest_c_readiness_result_commit_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "latest_c_readiness_automation_validation": "PENDING",
+    "latest_c_runnable_production": [],
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "preflight_only_not_repeated": [
+      {
+        "index": 111,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00309",
+        "c_disposition": "PASS_PREFLIGHT_ONLY",
+        "blocker": "12181 unresolved protected-art reconstruction pixels; CLEAN_PLATE not ready"
+      }
+    ],
+    "producer_or_candidate_qa_pending_not_repeated": [
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00316",
+        "result_sha": "eed179b15c215cee541678829fc1f91a2abbd498",
+        "state": "C_QA_PENDING_SOURCE_IDENTITY_MISMATCH_EVIDENCE"
+      },
+      {
+        "index": 159,
+        "state": "CANDIDATE_QA_PENDING"
+      },
+      {
+        "index": 198,
+        "state": "CANDIDATE_QA_PENDING"
+      },
+      {
+        "index": 201,
+        "state": "CANDIDATE_QA_PENDING"
+      }
+    ],
+    "sticky_source_exhausted_or_fail_closed_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "cross_lane_candidate_qa_pending_not_stolen": [
+      121,
+      163
+    ],
+    "selected_index": 99,
+    "selected_asset": "4F68708E",
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_C_STATIC_PASS_CANDIDATE_RUNTIME_ISOLATION_INPUT",
+    "new_preflight_batches_started": 0
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "asset_queue_blob_sha": "7869ac36726ae2ed5880b0e7ab6333611ed18a0a",
+    "latest_c_record_blob_sha": "678183e5ebce2e81aba9ebe3598bfbf89ab59775",
+    "previous_a_record_blob_sha": "e01a914f4220447de3d4eaf6263b7923ef0191c8",
+    "candidate_git_blob_sha": "a170fc1e8378e66415cde138b07ab3deb2ca4a2d",
+    "candidate_sha256": "4d19c5f11daef8186cadb5ce9e1f84a2d7d6b2fa747ca46fc891fda343611c28",
+    "canonical_source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "c139_result_sha": "63cd2ed9068e542d257fca12885ee9a0784ca86b"
+  },
+  "evidence": [
+    "localization/validation/single_dds/P00194_A00318_4F68708E.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/4F68708E/A00187/qa_report.json",
+    "localization/graphics/role_C/20260930-0257-C139/C139_Q00037_INDEPENDENT_QA_BATCH.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00317.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX99_REPOSITORY_BACKED_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false,
+    "manifest": "localization/validation/single_dds/P00194_A00318_4F68708E.json"
+  },
+  "candidate_dds_modified": false,
+  "heavy_qa_reused": true,
+  "heavy_qa_rerun": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "self_qa": "PASS_A_MOD3_SCHEMA16__C169_RUNNABLE_PRODUCTION_EMPTY__NO_RUNNABLE_COMPLETION_TIER__C_ACCEPTED_INDEX111_PREFLIGHT_NOT_REPEATED__A00316_INDEX147_QA_PENDING_NOT_REPROBED__159_198_201_CANDIDATE_QA_PENDING_NOT_REPEATED__INDEX99_C139_STATIC_QA_FINGERPRINT_REUSED__NEW_REPOSITORY_BACKED_DDS_ONLY_ISOLATION_INPUT__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED"
+}
