@@ -866,6 +866,12 @@ namespace OutRunVRStereo
         return R23GameDrawSerial;
     }
 
+    void ResetTopLevelStateSample() noexcept
+    {
+        R23LastStateSampleDrawSerial = 0;
+        R23LastStateSampleEpoch = 0;
+    }
+
     std::uint64_t GetTopLevelDrawSerial() noexcept
     {
         return TopLevelDrawSerial();

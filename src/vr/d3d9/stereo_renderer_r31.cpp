@@ -160,9 +160,10 @@ namespace OutRunVRStereo
         bool R31GetSavedViewport(IDirect3DDevice9* device,
             D3DVIEWPORT9& viewport) noexcept
         {
-            if (R22ShadowState.Valid())
+            const auto shadow = GetTrackedRasterShadow();
+            if (shadow.Valid())
             {
-                viewport = R22ShadowState.viewport;
+                viewport = shadow.viewport;
                 return true;
             }
             return device && SUCCEEDED(device->GetViewport(&viewport));
@@ -193,9 +194,8 @@ namespace OutRunVRStereo
             if (R31StateBlockTrackingReliable.load(std::memory_order_acquire))
                 return;
             R29Effect.valid = false;
-            R22ShadowState = {};
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
+            InvalidateTrackedRasterShadow();
+            ResetTopLevelStateSample();
         }
 
         bool R31PrepareEyeTailCache(
@@ -777,9 +777,8 @@ namespace OutRunVRStereo
             R31BlockCurrentVerifiedGeneration();
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
             R29Effect = {};
-            R22ShadowState = {};
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
+            InvalidateTrackedRasterShadow();
+            ResetTopLevelStateSample();
             R31EyeCache.valid = false;
             R31StateBlockResyncPending = true;
         }
