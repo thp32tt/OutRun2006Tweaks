@@ -156,7 +156,7 @@ namespace OutRunVRStereo
             // R23 normally owns this top-level boundary. Because this one draw
             // intentionally bypasses the R23->R22->R13->R9 replay chain, keep
             // its draw serial/live-state accounting explicitly in sync.
-            R23BeforeTopLevelDraw(device);
+            NotifyTopLevelDraw(device);
 
             ++R26TrackedOcclusionSingleExec;
             ++OcclusionStereoRejects;
@@ -341,14 +341,14 @@ namespace OutRunVRStereo
             // viewport/scissor at least once per Present and periodically during
             // effect-heavy passes, without restoring the old per-draw query cost.
             if (R27EffectStateSyncEpoch != PresentEpoch ||
-                GetTopLevelDrawSerial() - R27LastEffectStateSyncDrawSerial >= 256)
+                TopLevelDrawSerial() - R27LastEffectStateSyncDrawSerial >= 256)
             {
                 R22ScissorSnapshot actual{};
                 if (!R23CaptureActualGameState(
                         device, actual, "R28EffectDraw", true))
                     return false;
                 R27EffectStateSyncEpoch = PresentEpoch;
-                R27LastEffectStateSyncDrawSerial = GetTopLevelDrawSerial();
+                R27LastEffectStateSyncDrawSerial = TopLevelDrawSerial();
                 ++R27EffectStateResyncs;
             }
             return true;
@@ -577,7 +577,7 @@ namespace OutRunVRStereo
                     const std::uint64_t sampleDelta =
                         R27PresentSamples - R27PerfLastPresentSamples;
                     const std::uint64_t drawDelta =
-                        GetTopLevelDrawSerial() - R27PerfLastDrawSerial;
+                        TopLevelDrawSerial() - R27PerfLastDrawSerial;
                     const double avg = R27PresentSamples ?
                         R27PresentTotalMs / static_cast<double>(R27PresentSamples) : 0.0;
                     const double drawsPerPresent = sampleDelta ?
@@ -591,7 +591,7 @@ namespace OutRunVRStereo
                         R28RebindPoseReject, R27EffectStateResyncs,
                         R26TrackedOcclusionSingleExec, R26OcclusionWriteRejects);
                     R27PerfLastLogMs = now;
-                    R27PerfLastDrawSerial = GetTopLevelDrawSerial();
+                    R27PerfLastDrawSerial = TopLevelDrawSerial();
                     R27PresentTotalMs = 0.0;
                     R27PresentMaxMs = 0.0;
                     R27PresentSamples = 0;
