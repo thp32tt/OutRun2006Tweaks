@@ -14,7 +14,8 @@
     "PREFLIGHT_ONLY OUT-OF-BATCH QA_PENDING: A00316@index147 proves pinned Release exact member b913c967... mismatches canonical c52f48b1...; no source substitution or pixel work before its own C disposition. Index232 canonical semantics remain complete; index133 follows candidate completion.",
     "A-LANE FRONTIER: A00307/A00312 accepted historical scope only; A00313 suppression fingerprint and A00314 duplicate-dispatch receipt govern current duplicate suppression.",
     "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=121/159/163/198/201; runnable_production=none; runtime_validated=none.",
-    "Q00067 validation-bearing result is pending its single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "OUT-OF-BATCH QA_PENDING: A00318@index99 single-DDS isolation input was produced after the Q00067 validation-bearing result and is not implicitly approved by this batch.",
+    "Q00067 validation-bearing result 3232859cd65353d34e486f0555f80273c2392266 passed Localization Automation Gate 36762899251 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2522,11 +2523,19 @@
       "blocked_exception": [],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null
+    "result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "authoritative_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "validation_bearing_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36762899251,
+      "head_sha": "3232859cd65353d34e486f0555f80273c2392266",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T04:04:33+09:00"
+    }
   }
 }

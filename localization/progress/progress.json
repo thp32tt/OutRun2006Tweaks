@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T04:00:39+09:00",
+  "updated_at_kst": "2026-10-01T04:04:33+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C169/Q00067 independent batch QA committed pending Localization Automation Gate: A00307 PASS historical frontier scope; B00306@index94 PASS PREFLIGHT_ONLY; A00309@index111 PASS PREFLIGHT_ONLY with 12,181 unresolved source-only reconstruction pixels; A00312 PASS historical frontier scope. Fresh out-of-batch B00310@index121, B00315@index163 and A00316@index147 remain C-QA-pending. Order: RENDER_READY none -> ONE_STAGE none -> candidate QA 121/159/163/198/201 -> preflight 94/111/133/147/232. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C169/Q00067 AUTHORITATIVE GATE PASS: validation-bearing result 3232859cd65353d34e486f0555f80273c2392266 passed Localization Automation Gate 36762899251 attempt 1. A00307/A00312 remain PASS historical frontier scope; B00306@index94 and A00309@index111 remain PASS PREFLIGHT_ONLY. Candidate QA backlog remains 121/159/163/198/201; A00316@index147 and post-result A00318@index99 isolation input remain out-of-batch QA_PENDING. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -768,12 +768,23 @@
       "candidate_dds_modified": false,
       "shared_state_modified": true,
       "runtime_test_performed": false,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "validation_mode": "C_BATCH_GATE",
       "runtime_validation": "UNTESTED",
-      "result_sha": null,
-      "authoritative_result_sha": null,
-      "validation_bearing_result_sha": null
+      "result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+      "authoritative_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+      "validation_bearing_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+      "automation_gate": {
+        "workflow": "Localization Automation Gate",
+        "run_id": 36762899251,
+        "head_sha": "3232859cd65353d34e486f0555f80273c2392266",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "validated_at_kst": "2026-10-01T04:04:33+09:00"
+      },
+      "bookkeeping_note": "Q00067 authoritative Gate PASS is owned by validation-bearing result 3232859cd65353d34e486f0555f80273c2392266. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+      "bookkeeping_recorded_at_kst": "2026-10-01T04:04:33+09:00"
     },
     "generation_contract": {
       "version": "outrun-first-pass-edit-v2",
@@ -805,10 +816,10 @@
       "pending_production_localize_text": 65,
       "actionable_localize_text": 93,
       "canonical_segments": 757,
-      "automation_validation": "PENDING",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "validation_bearing_result_sha": null,
-      "automation_gate_run_id": null
+      "validation_bearing_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+      "automation_gate_run_id": 36762899251
     },
     "throughput_kpis": {
       "production_complete": {
@@ -1096,11 +1107,22 @@
     "candidate_dds_modified": false,
     "shared_state_modified": true,
     "runtime_test_performed": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "authoritative_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "validation_bearing_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36762899251,
+      "head_sha": "3232859cd65353d34e486f0555f80273c2392266",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T04:04:33+09:00"
+    },
+    "bookkeeping_note": "Q00067 authoritative Gate PASS is owned by validation-bearing result 3232859cd65353d34e486f0555f80273c2392266. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "bookkeeping_recorded_at_kst": "2026-10-01T04:04:33+09:00"
   }
 }
