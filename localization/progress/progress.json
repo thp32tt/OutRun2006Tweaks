@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T01:32:00+09:00",
+  "updated_at_kst": "2026-10-01T01:33:49+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C164/Q00062 AUTHORITATIVE GATE PASS: validation-bearing result b47185be7eb14acfbdfb99407d8ffbeb474a8fe9 passed Localization Automation Gate 36734942838. B00283@index97 PASS STATIC_QA_PASS_RUNTIME_UNTESTED on candidate 85a50bb9...; A00281 PASS PREFLIGHT_ONLY trace binder; A00285 PASS fail-closed guard; B00284@index163 PASS RENDER_READY two-row native rerender. Order RENDER_READY 163 -> ONE_STAGE none -> rework 121 -> candidate QA 159/198/201 -> unrelated preflight. Pending production 65; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C165/Q00063 AUTHORITATIVE GATE PASS: validation-bearing result a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76 passed Localization Automation Gate 36744707866. A00286@index30, A00290@index36, A00291@index48 PASS fail-closed source-reactivation guards only; A00289@index111 PASS PREFLIGHT_ONLY protected-art model with CLEAN_PLATE/candidate still HOLD. Fresh out-of-batch B00295@index121 and B00287@index163 candidates plus existing 159/198/201 remain C QA backlog; A00296@index51 runtime-isolation input is QA_PENDING. Indices30/36/48/111 remain PREFLIGHT_ONLY. Pending production 65; actionable 93; canonical segments 755. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
