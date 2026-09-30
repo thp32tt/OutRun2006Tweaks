@@ -11,6 +11,7 @@
 // draw path pays only for correctness checks required by stereo rendering.
 
 #include "stereo_renderer_r32.cpp"
+#include "../state/depth_stencil_write_state.hpp"
 
 namespace OutRunVRStereo
 {
@@ -27,25 +28,8 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R33InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
 
-        struct R33DepthStencilWriteState
-        {
-            DWORD zEnable = D3DZB_TRUE;
-            DWORD zWrite = TRUE;
-            DWORD stencilEnable = FALSE;
-            DWORD stencilWriteMask = 0xFFFFFFFFu;
-            DWORD stencilFail = D3DSTENCILOP_KEEP;
-            DWORD stencilZFail = D3DSTENCILOP_KEEP;
-            DWORD stencilPass = D3DSTENCILOP_KEEP;
-            DWORD twoSided = FALSE;
-            DWORD ccwStencilFail = D3DSTENCILOP_KEEP;
-            DWORD ccwStencilZFail = D3DSTENCILOP_KEEP;
-            DWORD ccwStencilPass = D3DSTENCILOP_KEEP;
-            std::uint64_t depthGeneration = 0;
-            std::uint64_t stateBlockRecordings = 0;
-            std::uint64_t stateBlockApplies = 0;
-            bool valid = false;
-        };
-
+        using R33DepthStencilWriteState =
+            OutRunVR::State::DepthStencilWriteState;
         thread_local R33DepthStencilWriteState R33DepthStencilState{};
         std::uint64_t R33DepthStencilSyncs = 0;
         std::uint64_t R33DepthStencilCacheHits = 0;
