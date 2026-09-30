@@ -1,0 +1,344 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00306-p00185-index94-v2-execution-blueprint-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00306",
+  "wave_id": "P00185",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T02:38:46+09:00",
+  "base_head_sha": "461d6c9c79b6484b6035e36c71c44cb8bddf2640",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX94_V2_EXECUTION_BLUEPRINT__PIXEL_RUNTIME_UNAVAILABLE__PREFLIGHT_ONLY",
+  "summary": "Fresh schema-v16 candidate-completion scan found no runnable B-owned DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate rework after QA-pending suppression: index163 is already republished by B00300, index121 has B00295 candidate pending C, and index232 has B00304 producer evidence pending C. The single allowed preflight fallback advances index94/2DA43E41 with an exact canonical Drive object binding and a deterministic seven-element v2 execution blueprint. It does not claim CLEAN_PLATE, style measurement, candidate DDS, or static QA because the active Python/container pixel runtime returns ClientError. Runtime remains UNTESTED.",
+  "selected_index": 94,
+  "selected_asset": "2DA43E41",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "shard_check": {
+    "rule": "asset_queue.index % 3 == 1",
+    "index_mod_3": 1,
+    "owned_by_lane": true
+  },
+  "current_policy_fingerprint": {
+    "controller_schema_version": 16,
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "d54e2df862741dba578c7e68cc10e4e32bc0d8c0"
+  },
+  "readiness_scan": {
+    "direct_rework_required_runnable_indices": [],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "existing_candidate_rework_runnable_indices": [],
+    "qa_pending_not_repeated": [
+      {
+        "index": 121,
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00295",
+        "reason": "fresh v2 candidate awaiting C"
+      },
+      {
+        "index": 163,
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00300",
+        "reason": "clean candidate republished after Q00064 rework and awaiting C"
+      },
+      {
+        "index": 232,
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00304",
+        "reason": "semantic proposal/evidence awaiting C"
+      }
+    ],
+    "selected_priority": "PREFLIGHT_ONLY_FALLBACK_STEP_4_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+    "max_new_preflight_batches_used": 1
+  },
+  "authoritative_prior_evidence": {
+    "c_batch_task": "LOCALIZATION-LOCALIZATION_C-00282",
+    "c_batch_id": "Q00060",
+    "c_disposition_for_b00273": "PASS_PREFLIGHT_ONLY",
+    "b00273_task": "LOCALIZATION-LOCALIZATION_B-00273",
+    "source_git_blob_sha": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+    "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "candidate_git_blob_sha": "1d53055205e2a98bf097e74bc738e76d01f052b3",
+    "stale_candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+    "structure": "4096x4096 RGBA32 mip1",
+    "readable_transform": "flip_y",
+    "note": "Heavy source/candidate/header evidence is reused. This task adds execution input only and does not repeat unchanged heavy QA."
+  },
+  "canonical_source_transport": {
+    "provider": "GOOGLE_DRIVE_APPROVED_EXACT_RELATIVE_PATH",
+    "account": "ezflash557",
+    "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "resolved_folder_chain": [
+      {
+        "name": "textures",
+        "id": "1xWHh1nrbRWPp_rVl_xRzfRFFO8Y2DnBS"
+      },
+      {
+        "name": "load",
+        "id": "1M_zaCiIOP1S7khgRynMLxc_iLCAMKfib"
+      },
+      {
+        "name": "spr_sprani_selector_cvt_Exst",
+        "id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l"
+      }
+    ],
+    "file_name": "2DA43E41_1024x1024.dds",
+    "file_id": "1C8zRAuBRhKrklwE2cDCvsZclKLjWMm25",
+    "provider_size_bytes": 67108992,
+    "expected_canonical_size_bytes": 67108992,
+    "exact_path_binding": true,
+    "source_sha256_rehash_performed_this_task": false,
+    "sha_identity_source": "reused current C/Git canonical fingerprint; no new hash claim because binary execution runtime was unavailable",
+    "transport_result": "PASS_EXACT_PATH_ID_SIZE_BINDING__PIXEL_HASH_REUSE_ONLY"
+  },
+  "v2_execution_blueprint": {
+    "construction_input_rule": "Exact canonical English source only. Historical Korean candidates are forbidden as construction input; historical render values are style seeds only.",
+    "raw_orientation": "flip_y",
+    "safe_inset_px": 2,
+    "removal_mask_rule": [
+      "Operate only inside the exact source-effect bbox for each element.",
+      "Derive the effect support from exact source pixels, including antialias/outline/shadow/glow; do not clear the whole rectangle.",
+      "Intersect every proposed mask against protected source artwork before reconstruction.",
+      "Any source-effect/artwork ambiguity is fail-closed and must not be solved by dilation into protected art.",
+      "For transparent/semitransparent sprites reconstruct RGB+alpha together; no black/white/gray cover box, blur, smudge, invented panel, crop or resize."
+    ],
+    "style_measurement_rule": [
+      "Normalize exact source to readable display coordinates before lettering.",
+      "Measure baseline vector, source effect height, fill/effect colors, stroke hierarchy and signed slant from source pixels.",
+      "Record slant_dx_per_dy, signed slant_angle_deg and slant_direction; historical A84 shear values are hints only.",
+      "Build Korean lettering natively at source-family scale; flattened-raster resize/Lanczos shrink is forbidden.",
+      "Keep final effect-inclusive Korean pixels inside candidate_safe_bbox with the required interior margin, then map to raw flip_y."
+    ],
+    "same_task_completion_trigger": "Once exact removal/protected masks, independently passing CLEAN_PLATE and source-style measurements are available, the next producer invocation must continue through Korean render -> measure/refit -> exact RGBA32 DDS encode -> decoded-final self-QA -> English-source comparison -> candidate persistence without another preflight-only stop.",
+    "elements": [
+      {
+        "key": "course_sp",
+        "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+        "korean": "OutRun2: SP · 15코스 연속 / 선택되었습니다.",
+        "source_bbox_display_ltrb": [
+          132,
+          488,
+          2078,
+          717
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          134,
+          490,
+          2076,
+          715
+        ],
+        "protected_inline_token": "OutRun2: SP",
+        "reconstruction_class": "TEXT_WITH_PROTECTED_INLINE_BRAND_TOKEN",
+        "historical_style_seed": {
+          "style": "select_two",
+          "line_count": 2,
+          "font_size": 96,
+          "xscale": 1,
+          "outer_stroke": 6
+        },
+        "next_pixel_stage": "measure protected-prefix/source-effect separation; create exact removal/protected mask and CLEAN_PLATE; then measure current source style"
+      },
+      {
+        "key": "wait_now",
+        "source": "Now waiting for other players. Please stand by.",
+        "korean": "현재 다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+        "source_bbox_display_ltrb": [
+          2228,
+          461,
+          3776,
+          717
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          2230,
+          463,
+          3774,
+          715
+        ],
+        "reconstruction_class": "TWO_LINE_TEXT_ONLY_EFFECT",
+        "historical_style_seed": {
+          "style": "wait_two",
+          "line_count": 2,
+          "font_size": 96,
+          "line1_xscale": 0.946,
+          "line2_xscale": 1,
+          "outer_stroke": 6
+        },
+        "next_pixel_stage": "derive exact source-effect mask/CLEAN_PLATE and measure current baseline/slant/effects"
+      },
+      {
+        "key": "acceleration",
+        "source": "加速度:",
+        "korean": "가속:",
+        "source_bbox_display_ltrb": [
+          3826,
+          247,
+          4016,
+          320
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3828,
+          249,
+          4014,
+          318
+        ],
+        "reconstruction_class": "SMALL_STAT_LABEL",
+        "historical_style_seed": {
+          "style": "plain_white",
+          "font_size": 66,
+          "xscale": 1,
+          "outer_stroke": 1,
+          "inner_stroke": 0,
+          "shear_hint": 0
+        },
+        "next_pixel_stage": "derive exact source-effect mask/CLEAN_PLATE and measure current baseline/weight"
+      },
+      {
+        "key": "max_speed",
+        "source": "最高速:",
+        "korean": "최고 속도:",
+        "source_bbox_display_ltrb": [
+          3827,
+          319,
+          4018,
+          410
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3829,
+          321,
+          4016,
+          408
+        ],
+        "reconstruction_class": "SMALL_STAT_LABEL",
+        "historical_style_seed": {
+          "style": "plain_white",
+          "font_size": 72,
+          "xscale": 0.8108,
+          "outer_stroke": 1,
+          "inner_stroke": 0,
+          "shear_hint": 0
+        },
+        "next_pixel_stage": "derive exact source-effect mask/CLEAN_PLATE and measure current baseline/weight"
+      },
+      {
+        "key": "view_change",
+        "source": "View Change Button :",
+        "korean": "시점 변경 버튼:",
+        "source_bbox_display_ltrb": [
+          3430,
+          998,
+          3896,
+          1102
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3432,
+          1000,
+          3894,
+          1100
+        ],
+        "reconstruction_class": "STYLED_UI_LABEL",
+        "historical_style_seed": {
+          "style": "view_change",
+          "font_size": 90,
+          "xscale": 0.8832,
+          "outer_stroke": 5,
+          "inner_stroke": 3,
+          "shear_hint": 0.09
+        },
+        "next_pixel_stage": "derive exact source-effect mask/CLEAN_PLATE; replace shear hint with measured signed slant"
+      },
+      {
+        "key": "expert",
+        "source": "For Expert Drivers",
+        "korean": "상급자용",
+        "source_bbox_display_ltrb": [
+          2842,
+          1124,
+          3479,
+          1229
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          2844,
+          1126,
+          3477,
+          1227
+        ],
+        "reconstruction_class": "STYLED_UI_LABEL",
+        "historical_style_seed": {
+          "style": "expert_red",
+          "font_size": 109,
+          "xscale": 1,
+          "outer_stroke": 8,
+          "inner_stroke": 3,
+          "shear_hint": 0.08
+        },
+        "next_pixel_stage": "derive exact source-effect mask/CLEAN_PLATE; replace shear hint with measured signed slant"
+      },
+      {
+        "key": "special_course",
+        "source": "Special Course",
+        "korean": "스페셜 코스",
+        "source_bbox_display_ltrb": [
+          3137,
+          1279,
+          3879,
+          1403
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3139,
+          1281,
+          3877,
+          1401
+        ],
+        "reconstruction_class": "STYLED_UI_LABEL",
+        "historical_style_seed": {
+          "style": "special_yellow",
+          "font_size": 133,
+          "xscale": 1,
+          "outer_stroke": 10,
+          "inner_stroke": 4,
+          "shear_hint": 0.08
+        },
+        "next_pixel_stage": "derive exact source-effect mask/CLEAN_PLATE; replace shear hint with measured signed slant"
+      }
+    ]
+  },
+  "fail_closed_execution_state": {
+    "binary_pixel_runtime_available": false,
+    "observed_failures": [
+      "container.exec returned ClientError before command execution",
+      "python.exec returned ClientError before code execution",
+      "python_user_visible.exec returned ClientError before code execution"
+    ],
+    "source_file_materialized_path": "/mnt/data/2DA43E41_1024x1024.dds",
+    "source_file_materialized_size_bytes": 67108992,
+    "source_pixel_hash_or_decode_recomputed": false,
+    "clean_plate_generated": false,
+    "source_style_measured_current_policy": false,
+    "candidate_render_attempted": false,
+    "candidate_dds_modified": false,
+    "stale_candidate_promoted": false
+  },
+  "readiness_before": "PREFLIGHT_ONLY_V2_REGEN_CONSTRAINTS_READY__CLEAN_PLATE_AND_SOURCE_STYLE_PROVENANCE_REQUIRED",
+  "readiness_after": "PREFLIGHT_ONLY_V2_EXECUTION_BLUEPRINT_READY__PIXEL_MASK_CLEAN_PLATE_STYLE_MEASUREMENT_REMAINS",
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX94_DETERMINISTIC_V2_RECONSTRUCTION_EXECUTION_BLUEPRINT_AND_EXACT_DRIVE_SOURCE_BINDING",
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true,
+    "reason_zero_candidate": "Fresh schema-v16 scan found no runnable completion-tier B asset after QA-pending suppression, and current binary pixel runtime failed closed before source mask/CLEAN_PLATE/style construction."
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
