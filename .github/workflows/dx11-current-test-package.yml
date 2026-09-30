@@ -1,0 +1,64 @@
+name: DX11 Current Test Package
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - test-dx11-20260930-2059
+
+concurrency:
+  group: dx11-current-test-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - name: Checkout exact DX11 source
+        uses: actions/checkout@v4
+        with:
+          ref: 46fa5383bbf1144e58446028a452f74065fa44c8
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Verify pinned source
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          if ($actual -ne '46fa5383bbf1144e58446028a452f74065fa44c8') { throw "Pinned DX11 source mismatch: $actual" }
+          Write-Host "DX11_TEST_SOURCE_SHA=$actual"
+
+      - name: Build packaged runtime test ZIP
+        shell: pwsh
+        env:
+          OUTRUN_TEST_DROP_ROOT: ${{ github.workspace }}\out\hosted-drop
+        run: |
+          ./tools/Build-OutRunPCFast.ps1
+          $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
+          if (-not (Test-Path $zip -PathType Leaf)) { throw "Test ZIP missing: $zip" }
+          "OUTRUN_TEST_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "DX11 hosted test ZIP: $zip"
+          Get-FileHash $zip -Algorithm SHA256
+
+      - name: Write validation marker
+        shell: pwsh
+        run: |
+          @(
+            'LANE=DX11'
+            'SOURCE_SHA=46fa5383bbf1144e58446028a452f74065fa44c8'
+            'AUTOMATION_VALIDATION=BUILD_ONLY'
+            'RUNTIME_VALIDATION=UNTESTED'
+          ) | Set-Content out/DX11_TEST_BUILD_STATUS.txt -Encoding ascii
+
+      - name: Upload DX11 runtime test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX11-TEST-46fa5383bbf1
+          path: |
+            ${{ env.OUTRUN_TEST_ZIP }}
+            out/DX11_TEST_BUILD_STATUS.txt
+          if-no-files-found: error
+          retention-days: 7
