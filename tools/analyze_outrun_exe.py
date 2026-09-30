@@ -2021,24 +2021,19 @@ def collect_guarded_gf_target_c_helper_1_second_callee_provenance(pe: PE) -> dic
     outbound = collect_raw_rel32_call_candidates(
         pe, target_rva, GF_TARGET_C_HELPER_1_SECOND_CALLEE_PROBE_LEN
     )
-    inbound_pairs = {(item["call_rva"], item["target_rva"]) for item in inbound}
+    inbound_call_rvas = {item["call_rva"] for item in inbound}
     helper_call_link = (
         helper_success["status"] == "EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN"
         and helper_success["second_call_target_matches"]
         and helper_success["second_call_target_rva"] == target_rva
-        and (
-            GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_RVA,
-            target_rva,
-        ) in inbound_pairs
+        and GF_TARGET_C_HELPER_1_SUCCESS_SECOND_CALL_RVA in inbound_call_rvas
     )
     routine_call_link = (
         routine_cont["status"] == "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN"
         and routine_cont["aligned_call_1_target_matches"]
         and routine_cont["aligned_call_1_target_rva"] == target_rva
-        and (
-            GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_1_RVA,
-            target_rva,
-        ) in inbound_pairs
+        and GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_CALL_1_RVA
+        in inbound_call_rvas
     )
     captured = bool(
         helper_call_link
