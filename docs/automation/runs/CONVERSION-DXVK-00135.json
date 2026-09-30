@@ -4,36 +4,118 @@
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": 1,
   "controller_attempt": "1/3",
+  "chat_rollover": 1,
   "base_sha": "4abae0c1a1a995fc3d22ed39525e7f3b9c400c2f",
-  "result_sha": "PENDING_COMMIT",
-  "validation_bearing_result_sha": "PENDING_COMMIT",
-  "automation_validation": "PENDING",
+  "result_sha": "28bb8d3e745fa0759bb97f08dcd2d13c177fc78e",
+  "validation_bearing_result_sha": "28bb8d3e745fa0759bb97f08dcd2d13c177fc78e",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_required": false,
   "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R139_TARGET_65970_FIRST_CALL_ALIGNMENT",
-  "summary": "Bounded F13 continuation for guarded-GF target C. Add a fail-closed exact-byte/manual-decode proof only for the first outbound CALL at 0x65997 -> 0x28460, anchored at 0x65970. The later raw candidates 0x659AC and 0x659C1 remain unresolved and no semantic ownership is promoted.",
+  "summary": "Completed the bounded exact-EXE instruction-alignment proof for guarded-GF target C's first outbound CALL. CI verifies a contiguous manually reviewed prefix anchored at 0x65970, exact byte identity, function-start guess 0x65970, and an instruction-aligned CALL at 0x65997 resolving to 0x28460 in .text. The later raw candidates 0x659AC and 0x659C1 remain unresolved; helper semantics and ScreenHud ownership are not promoted.",
   "evidence": [
     "CONVERSION-DXVK-00133 proved target B first-CALL alignment and explicitly named target C 0x65970 as the next bounded F13 work.",
     "CONVERSION-DXVK-00131 exact-EXE census reported target C start_guess=0x65970 with raw outbound candidates 0x65997->0x28460, 0x659AC->0x28320 and 0x659C1->0x28800.",
-    "This task uses only the already observed exact bytes through the first outbound CALL and cleanup; it does not infer the later CALL boundaries or helper semantics."
+    "Result commit 28bb8d3e745fa0759bb97f08dcd2d13c177fc78e carries the validation-bearing verifier update and has no CI-skip directive.",
+    "OutRun EXE HUD Inspector CI 36725622562 PASS. static-exe-analysis printed known_call_sites=9/9 and guarded_gf_targets=3/3.",
+    "Exact analyzer output: gf_target_alignment=0x00065970 status=EXACT_FIRST_CALL_ALIGNMENT_PROVEN start_guess=0x00065970 layout_contiguous=True bytes_match=True call=0x00065997 target=0x00028460 target_section=.text semantic_effect=UNRESOLVED remaining_raw_calls=0x000659AC,0x000659C1.",
+    "HUD analysis artifact 11102199243 digest sha256:93b65d3017a7c3148a37868515328825b3390b89cc85e8f4225cb1bc05a9a730.",
+    "HUD inspector game artifact 11102589793 digest sha256:aa5d04dd86f2bfabb7d38aafc75c26845acd4fe471f07e62c3accddc090e8651.",
+    "Backend Conversion Gate 36725611673 PASS; artifact 11102950861 digest sha256:78e4f87449151825141698108a25c63f8dac5af319e415844512eca9e40e73ef.",
+    "Build 36725621994 PASS; main artifact 11103250841 digest sha256:9166ba47b4f332199fccf3888e3a5b9c581e80183aa0f6d1101c28d9b29d093d.",
+    "OpenXR VR architecture 36725622234 PASS across all six jobs.",
+    "VR Hosted Test Package push 36725611441 PASS; artifact 11103700539 digest sha256:950d2ada3819d4c4bfae0ff4bd7e1dd2f37cb45ce7d277f3a3a1f43b77d240a6.",
+    "VR Hosted Test Package PR 36725622013 PASS; artifact 11103580620 digest sha256:71b4377a48264a29e7d741dd3ed9210f524911a3d654b6973e87ca7b4c2fc6e3.",
+    "VR PC Fast Test Build 36725611613 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed against result commit 28bb8d3e745fa0759bb97f08dcd2d13c177fc78e; RUNTIME_VALIDATION remains UNTESTED."
   ],
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
     "tools/verify_vr_backend_disasm_contract.py",
     "docs/automation/runs/CONVERSION-DXVK-00135.json"
   ],
+  "source_commits": [
+    {
+      "sha": "03c32bf44bc5098b430a67ef594df1a442d8b99e",
+      "message": "vr: stage target C first-call alignment proof [AUTO:CONVERSION-DXVK-00135] [skip ci]",
+      "role": "staged_analyzer_change",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "86032bffbaed3fef6873b85551c878320de8248d",
+      "message": "docs: stage CONVERSION-DXVK-00135 record [AUTO:CONVERSION-DXVK-00135] [skip ci]",
+      "role": "staged_run_record",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "28bb8d3e745fa0759bb97f08dcd2d13c177fc78e",
+      "message": "vr: prove guarded GF target C first call alignment [AUTO:CONVERSION-DXVK-00135]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "target_c_alignment_proof": {
+    "entry_rva": "0x00065970",
+    "status": "EXACT_FIRST_CALL_ALIGNMENT_PROVEN",
+    "function_start_guess_rva": "0x00065970",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "aligned_call_rva": "0x00065997",
+    "decoded_call_target_rva": "0x00028460",
+    "call_target_section": ".text",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "remaining_raw_call_rvas": [
+      "0x000659AC",
+      "0x000659C1"
+    ]
+  },
+  "validation": {
+    "backend_conversion_gate_run_id": 36725611673,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11102950861,
+    "backend_conversion_gate_artifact_digest": "sha256:78e4f87449151825141698108a25c63f8dac5af319e415844512eca9e40e73ef",
+    "build_run_id": 36725621994,
+    "build_result": "PASS",
+    "build_artifact_id": 11103250841,
+    "build_artifact_digest": "sha256:9166ba47b4f332199fccf3888e3a5b9c581e80183aa0f6d1101c28d9b29d093d",
+    "openxr_run_id": 36725622234,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36725622562,
+    "hud_result": "PASS",
+    "hud_analysis_artifact_id": 11102199243,
+    "hud_analysis_artifact_digest": "sha256:93b65d3017a7c3148a37868515328825b3390b89cc85e8f4225cb1bc05a9a730",
+    "hud_game_artifact_id": 11102589793,
+    "hud_game_artifact_digest": "sha256:aa5d04dd86f2bfabb7d38aafc75c26845acd4fe471f07e62c3accddc090e8651",
+    "hosted_package_push_run_id": 36725611441,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_push_artifact_id": 11103700539,
+    "hosted_package_push_artifact_digest": "sha256:950d2ada3819d4c4bfae0ff4bd7e1dd2f37cb45ce7d277f3a3a1f43b77d240a6",
+    "hosted_package_pr_run_id": 36725622013,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_pr_artifact_id": 11103580620,
+    "hosted_package_pr_artifact_digest": "sha256:71b4377a48264a29e7d741dd3ed9210f524911a3d654b6973e87ca7b4c2fc6e3",
+    "pc_fast_run_id": 36725611613,
+    "pc_fast_result": "SKIPPED"
+  },
   "review_lenses": {
-    "architecture": "Keep the proof in exact-EXE analyzer/verifier tooling; no backend activation or transport change.",
-    "ownership": "All guarded GF hooks remain spacing-only; semantic_effect stays UNRESOLVED and ownership_effect NONE.",
-    "stereo_correctness": "No WVP/projection/HUD/world classification changes.",
-    "performance": "CI-only exact-byte validation; no runtime hot-path work or telemetry.",
-    "adversarial": "Fail closed on byte drift, non-contiguous instruction layout, entry-start mismatch, E8 position/opcode drift, decoded target drift or non-.text target."
+    "architecture": "Exact-EXE first-CALL proof stays isolated in analyzer/verifier tooling; backend activation and transport are unchanged.",
+    "ownership": "All guarded GF hooks remain spacing-only; semantic_effect is UNRESOLVED and ownership_effect is NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification or stereo render policy changed.",
+    "performance": "No game/host runtime hot path or telemetry was added.",
+    "adversarial": "The proof fails closed on reviewed byte drift, non-contiguous layout, entry-guess mismatch, E8 position/opcode drift, decoded target drift or unmapped target section."
   },
   "finding_status": {
     "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
     "before": "PARTIAL_PLUS_TARGET_65860_EXACT_CALL_ALIGNMENT",
-    "after": "PENDING_TARGET_65970_FIRST_CALL_ALIGNMENT",
+    "after": "PARTIAL_PLUS_TARGET_65970_FIRST_CALL_ALIGNMENT",
     "runtime_claim": false
   },
-  "next_action": "Run exact-SHA GitHub Actions. If 0x65997 is proven aligned, record only first-CALL provenance. Keep 0x659AC and 0x659C1 for separate bounded alignment work and do not infer helper semantics or ScreenHud ownership."
+  "blocker": "Instruction alignment for 0x65997->0x28460 is now proven, but helper semantics remain unresolved and this does not establish immediate next-draw or ScreenHud ownership. The later raw target-C candidates 0x659AC->0x28320 and 0x659C1->0x28800 still require separate instruction-boundary proof; the true entry/context around 0x653C0 also remains unresolved.",
+  "next_action": "Keep all guarded GF hooks spacing-only. Continue a later bounded F13 task with exact instruction-alignment proof for target C's second CALL at 0x659AC->0x28320, then 0x659C1->0x28800, and independently resolve the true entry/context around 0x653C0. Keep runtime validation separate from hosted CI."
 }
