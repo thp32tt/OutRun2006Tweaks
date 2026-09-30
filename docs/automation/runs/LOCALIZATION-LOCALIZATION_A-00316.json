@@ -91,8 +91,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_INDEX147__PINNED_ARCHIVE_76F85E_VERIFIED__EXACT_RELEASE_GIT_BLOB_959F27E1_VERIFIED__DDS_2048X1024_RGBA32_MIP1__CANONICAL_SHA_MISMATCH_C52F48B1_VS_B913C967__SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_RENDER__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "eed179b15c215cee541678829fc1f91a2abbd498",
+  "authoritative_result_sha": "eed179b15c215cee541678829fc1f91a2abbd498",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): prove index147 Release source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00316]",
   "precommit_refresh": {
@@ -100,5 +100,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Q00066 Gate bookkeeping is current HEAD. No newer A00315/A00316 record exists. Only A lane-local evidence/task paths will be written."
   },
-  "bookkeeping_note": "RESULT_SHA is populated after immutable producer result commit. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result SHA bound after durable result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T03:53:30+09:00",
+  "bookkeeping_base_head_sha": "eed179b15c215cee541678829fc1f91a2abbd498"
 }
