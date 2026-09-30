@@ -98,10 +98,8 @@
     },
     "build": {
       "run_id": 36727445603,
-      "conclusion": "in_progress_at_record_time",
-      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
-      "blocking": false,
-      "reason": "Mandatory Backend Conversion Gate already completed the Win32 build and uploaded the exact-SHA artifact."
+      "conclusion": "success",
+      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825"
     },
     "pc_fast": {
       "run_id": 36727435161,
@@ -126,9 +124,11 @@
     "The exact-SHA Backend Conversion Gate passed and uploaded dinput8.dll.",
     "The new synthetic sustained cached-image case is classified as DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED while the direct-gpu control remains OK.",
     "HUD Inspector and OpenXR architecture also passed on the exact result SHA.",
-    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used for this automation task."
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used for this automation task.",
+    "Generic Build passed on the exact result SHA."
   ],
   "blocker": "DX11 runtime visual blocker remains active in Issue #81; this task only fixes diagnostic detection.",
   "resume_cursor": "R139 sustained cached-image fallback detection is automation-validated on the DX11 branch. The analyzer false negative is closed, but the actual menu cached-image fallback/native-draw-dormant problem remains unresolved.",
-  "next_action": "Keep Issue #81 active. Continue runtime-path development that can provide a valid menu-local/direct frame or eliminate the bad cached-image fallback, then rebuild and re-test on Quest 3/VDXR. Do not claim native DX11 visual parity until that HMD result passes."
+  "next_action": "Keep Issue #81 active. Continue runtime-path development that can provide a valid menu-local/direct frame or eliminate the bad cached-image fallback, then rebuild and re-test on Quest 3/VDXR. Do not claim native DX11 visual parity until that HMD result passes.",
+  "validation_finalized_kst": "2026-09-30T23:21:22+09:00"
 }
