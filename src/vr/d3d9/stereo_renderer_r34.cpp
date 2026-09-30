@@ -42,6 +42,12 @@ namespace OutRunVRStereo
         };
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R34InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
+
+        void SetResetGuardInstallState(
+            OutRunVR::RuntimeEligibility::InstallState state) noexcept
+        {
+            R34InstallState.store(state, std::memory_order_release);
+        }
         OutRunVR::Lifecycle::ResetReplayState R34ResetReplay{};
         OutRunVR::Telemetry::RasterGuardMetrics R34RasterGuard{};
 
@@ -300,15 +306,14 @@ namespace OutRunVRStereo
         DWORD WINAPI R34InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R34InstallState.store(State::Pending, std::memory_order_release);
+            SetResetGuardInstallState(State::Pending);
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r33 = FinalDispatchInstallState();
                 if (r33 == State::Failed)
                 {
-                    R34InstallState.store(State::Failed,
-                        std::memory_order_release);
+                    SetResetGuardInstallState(State::Failed);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR34ResetGuard", false);
                     return 0;
@@ -339,8 +344,7 @@ namespace OutRunVRStereo
                     if (!R34EnableHooks())
                     {
                         R34RollbackHooks();
-                        R34InstallState.store(State::Failed,
-                            std::memory_order_release);
+                        SetResetGuardInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR34ResetGuard", false);
                         spdlog::error(
@@ -363,8 +367,7 @@ namespace OutRunVRStereo
                                 installedDevice, "Install/state-sync");
                     }
 
-                    R34InstallState.store(State::Ready,
-                        std::memory_order_release);
+                    SetResetGuardInstallState(State::Ready);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR34ResetGuard", true);
                     spdlog::info(
@@ -374,7 +377,7 @@ namespace OutRunVRStereo
                 Sleep(25);
             }
 
-            R34InstallState.store(State::Failed, std::memory_order_release);
+            SetResetGuardInstallState(State::Failed);
             HookManager::ReportAsyncResult(
                 "OpenXRVRStereoR34ResetGuard", false);
             return 0;
@@ -394,9 +397,7 @@ namespace OutRunVRStereo
                     nullptr, 0, R34InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R34InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
+                    SetResetGuardInstallState(OutRunVR::RuntimeEligibility::InstallState::Failed);
                     return false;
                 }
                 CloseHandle(thread);
