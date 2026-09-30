@@ -1,0 +1,113 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00296-p00177-index51-single-dds-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00296",
+  "wave_id": "P00177",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T00:35:00+09:00",
+  "base_head_sha": "d30d75d8efadf0e114c2c63b5d31e285b28e088d",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "direct_rework_required_runnable": [],
+    "render_ready_runnable": [],
+    "one_stage_to_render_runnable": [],
+    "existing_candidate_material_rework_runnable": [],
+    "c164_cross_lane_render_ready_not_stolen": [
+      163
+    ],
+    "c164_cross_lane_rework_not_stolen": [
+      121
+    ],
+    "qa_pending_not_repeated": [
+      111,
+      159,
+      198,
+      201
+    ],
+    "previous_a00294_index135_guard_not_repeated": true,
+    "selected_index": 51,
+    "selected_asset": "FF2462BB",
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_STATIC_QA_CANDIDATE_AWAITING_RUNTIME_ISOLATION"
+  },
+  "current_state": {
+    "c163_static_qa": "PASS_STATIC_QA_PASS_RUNTIME_UNTESTED",
+    "c163_result_sha": "7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a",
+    "c163_gate_run_id": 36726224927,
+    "c164_retains_static_qa": true,
+    "c164_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+    "c164_gate_run_id": 36734942838,
+    "c164_runtime_isolation_ready_indices": [
+      99,
+      102,
+      112,
+      130,
+      193,
+      237
+    ],
+    "c164_runtime_isolation_qa_pending_indices": [
+      226,
+      231
+    ],
+    "index51_isolation_missing": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "af75e38f1e3c206db694292876fc5589b4a47f8d",
+    "a00278_task_blob_sha": "b3b12b9468c0b1c46e0a57ca5a2aea8fa93b9ca9",
+    "a00278_production_blob_sha": "2b71f51e11cfb740d6bcd639e45c6efc9d824a5a",
+    "a00278_qa_report_blob_sha": "d548d244b6debabf002aba41d13eaecd396dbf4d",
+    "c163_report_blob_sha": "9027c326a4d9bf01c7352f126128746a99b6c101",
+    "c164_task_blob_sha": "30443575141ddd40cb9029088725f1ee70950995",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "candidate_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+    "candidate_bundle_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d"
+  },
+  "reused_heavy_qa": {
+    "repeated": false,
+    "reason": "C163 already independently replayed exact source/candidate/header/orientation/21-region containment/current-policy visual QA on the same immutable fingerprints. A00296 adds only the missing isolation input.",
+    "c163_header_exact": true,
+    "c163_zero_changed_outside_regions": true,
+    "c163_zero_alpha_outside_regions": true,
+    "c163_21_of_21_safe_fit": true,
+    "c163_visual_review_pass": true
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX51_FF2462BB_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "isolation_manifest": "localization/validation/single_dds/P00177_A00296_FF2462BB.json",
+    "reviewed_indices": [
+      51
+    ],
+    "reviewed_assets": [
+      "FF2462BB"
+    ],
+    "candidate_dds_modified": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX51__C164_ZERO_A_READY_OR_REWORK_TIERS__A_QA_PENDING_NOT_REPEATED__C163_STATIC_QA_FINGERPRINT_REUSED__EXACT_DRIVE_BUNDLE_MEMBER_PINNED__NEW_DDS_ONLY_ISOLATION_INPUT__NO_HEAVY_QA_REPEAT__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "drive_material_referenced_from_git_metadata": true,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
