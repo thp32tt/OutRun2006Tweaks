@@ -106,8 +106,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA16__DIRECT_Q00069_REWORK_SELECTED_FIRST__A00320_C_REPRODUCED_NUMERIC_MATERIAL_REEMITTED_UNCHANGED__3960_PROPOSED_RESOLVED__8221_REMAINING__ZERO_OUTSIDE_MASK__ZERO_ALPHA_CHANGE__ZERO_PROTECTED_GUARD_OVERLAP__REPORT_AND_DURABLE_TASK_RECORD_ATOMIC__NO_HEAVY_QA_REPEAT__NO_DDS__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
+  "authoritative_result_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): atomically reemit index111 A00320 material [AUTO:LOCALIZATION-LOCALIZATION_A-00334]",
   "material_payload_in_result_commit": true,
@@ -117,5 +117,9 @@
     "head_message": "chore(localization): record Q00070 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00333] [skip ci]",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Refreshed current branch immediately before object creation. Only new A00334 lane-local material evidence and task record are added; Q00070 shared state and all peer-lane files are preserved."
-  }
+  },
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate, owns no Localization Automation Gate, and does not alter material/candidate/shared state.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T05:31:39+09:00",
+  "bookkeeping_base_head_sha": "9fb736dce6936dcc02f77bdb2b7b82b9e16213d1",
+  "bookkeeping_preserved_head_message": "localization(A): atomically reemit index111 A00320 material [AUTO:LOCALIZATION-LOCALIZATION_A-00334]"
 }
