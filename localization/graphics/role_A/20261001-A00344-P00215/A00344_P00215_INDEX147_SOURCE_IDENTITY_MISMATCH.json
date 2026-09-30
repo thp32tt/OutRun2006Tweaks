@@ -1,0 +1,180 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00344-p00215-index147-source-terminal-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+  "wave_id": "P00215",
+  "lane": "LOCALIZATION_A",
+  "asset_index": 147,
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+  "shard_check": {
+    "index_mod_3": 0,
+    "owner": "LOCALIZATION_A",
+    "work_steal": false
+  },
+  "recorded_at_kst": "2026-10-01T06:49:50+09:00",
+  "production_strategy": {
+    "candidate_completion_first": true,
+    "latest_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00337",
+    "latest_validated_c_result_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+    "prior_a_selection_task": "LOCALIZATION-LOCALIZATION_A-00340",
+    "prior_a_selection_result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
+    "runnable_completion_tier_found": false,
+    "qa_pending_candidates_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "qa_pending_a_material_not_repeated": [
+      12,
+      51,
+      102,
+      111,
+      195
+    ],
+    "new_preflight_batches_started": 1
+  },
+  "canonical_inventory": {
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "expected_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "expected_width": 2048,
+    "expected_height": 1024,
+    "expected_format": "RGBA32",
+    "expected_mip_count": 1
+  },
+  "current_semantics": {
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "reviewed_unique_strings": 15,
+    "status": "transcribed_reviewed",
+    "pairs": [
+      [
+        "ALPINE",
+        "알파인"
+      ],
+      [
+        "CAPE WAY",
+        "케이프 웨이"
+      ],
+      [
+        "CLOUDY HIGHLAND",
+        "클라우디 하이랜드"
+      ],
+      [
+        "DEEP LAKE",
+        "딥 레이크"
+      ],
+      [
+        "GHOST FOREST",
+        "고스트 포레스트"
+      ],
+      [
+        "INDUSTRIAL COMPLEX",
+        "인더스트리얼 컴플렉스"
+      ],
+      [
+        "PALM BEACH",
+        "팜 비치"
+      ],
+      [
+        "TULIP GARDEN",
+        "튤립 가든"
+      ],
+      [
+        "ANCIENT RUINS",
+        "고대 유적"
+      ],
+      [
+        "CASTLE WALL",
+        "캐슬 월"
+      ],
+      [
+        "CONIFEROUS FOREST",
+        "침엽수림"
+      ],
+      [
+        "DESERT",
+        "사막"
+      ],
+      [
+        "IMPERIAL AVENUE",
+        "임페리얼 애비뉴"
+      ],
+      [
+        "METROPOLIS",
+        "메트로폴리스"
+      ],
+      [
+        "SNOW MOUNTAIN",
+        "스노 마운틴"
+      ]
+    ]
+  },
+  "acquisition": [
+    {
+      "tier": 1,
+      "transport": "GOOGLE_DRIVE_APPROVED_CANONICAL_HD_SOURCE",
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "resolved_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "lookup": "exact name + exact parent",
+      "outcome": "SOURCE_TRANSPORT_MISS"
+    },
+    {
+      "tier": 2,
+      "transport": "PINNED_TAG_DIRECT_FILE",
+      "repository": "envido32/OR2006Sprites",
+      "immutable_ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "exact_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "outcome": "SOURCE_TRANSPORT_MISS",
+      "http_semantics": "404_NOT_FOUND"
+    },
+    {
+      "tier": 3,
+      "transport": "PINNED_RELEASE_FALLBACK",
+      "release_tag": "v0.25.10a",
+      "release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_size": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_identity": "PASS_CONTRACT_EXACT",
+      "exact_member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256.dds",
+      "member_size": 8388736,
+      "member_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "member_git_blob_sha1": "959f27e1063f249fb8d04b7ad63d8b670bdae06e",
+      "dds": {
+        "width": 2048,
+        "height": 1024,
+        "format": "RGBA32",
+        "mip_count": 1,
+        "pitch": 8192,
+        "alpha_mask": "0xff000000"
+      },
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    }
+  ],
+  "identity_comparison": {
+    "expected_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+    "obtained_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+    "dimensions_match": true,
+    "format_match": true,
+    "bytes_match": false,
+    "terminal_typed_outcome": "SOURCE_IDENTITY_MISMATCH",
+    "sticky_until_dependency_change": true,
+    "retry_triggers": [
+      "canonical inventory identity change",
+      "source transport policy change",
+      "new exact canonical source availability",
+      "explicit user instruction"
+    ]
+  },
+  "production_readiness": "PREFLIGHT_ONLY",
+  "candidate_authorized": false,
+  "candidate_dds_created": false,
+  "source_masks_created": false,
+  "clean_plate_created": false,
+  "no_noncanonical_substitution": true,
+  "no_pixel_work_performed": true,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "material_advance": "Closes all currently approved source-acquisition tiers for index147 under the current fingerprint and prevents repeated unsafe/noncanonical source probing or candidate construction."
+}
