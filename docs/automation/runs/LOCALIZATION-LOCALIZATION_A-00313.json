@@ -92,8 +92,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "self_qa": "PASS_A_MOD3_SCHEMA16__NO_LEGAL_COMPLETION_TIER__QA_PENDING_NOT_REPEATED__STICKY_SOURCE_NOT_REPROBED__RUNTIME_SPECIAL_NOT_SELECTED__B121_NOT_STOLEN__DETERMINISTIC_SUPPRESSION_FINGERPRINT_PERSISTED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "2ed2578462866e042f60cb694f3ad6a2062dc4c7",
+  "authoritative_result_sha": "2ed2578462866e042f60cb694f3ad6a2062dc4c7",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): persist A-lane suppression fingerprint [AUTO:LOCALIZATION-LOCALIZATION_A-00313]",
   "precommit_refresh": {
@@ -101,5 +101,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "No B00310/C00311 durable task record was present at precommit refresh; branch remained at A00312 bookkeeping HEAD."
   },
-  "bookkeeping_note": "Producer result SHA will be bound in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result SHA bound after durable result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T03:30:57+09:00",
+  "bookkeeping_base_head_sha": "2ed2578462866e042f60cb694f3ad6a2062dc4c7"
 }
