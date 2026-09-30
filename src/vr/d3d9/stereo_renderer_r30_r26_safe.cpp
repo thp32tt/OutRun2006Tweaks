@@ -19,6 +19,7 @@
 #include "vr/d3d9/screen_space_policy.hpp"
 #include "vr/d3d9/safety_policy.hpp"
 #include "vr/core/dispatch_semantics.hpp"
+#include "vr/core/refactor_contract.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
