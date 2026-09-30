@@ -74,6 +74,13 @@ for banned in (
     "R30TryXyzrhw",
     "OutRunVR::GameSemantic::ConsumeForDraw",
     "OutRunVR::GameSemantic::CurrentScope",
+    "OutRunVRD3D9ExUpgradeR13::",
+    "PresentHook.stdcall",
+    "R34ResetReplay.blocked.",
+    "R34ResetReplay.replayBlocks",
+    "R34ResetReplay.lostDeviceBypasses",
+    "R34ResetReplay.firstReplayBlockLogged",
+    "R34ResetReplay.firstLostDeviceBypassLogged",
 ):
     if banned in r34:
         errors.append(f"R34 regained direct lower-layer dependency: {banned}")
@@ -123,6 +130,9 @@ for rel in (
     "src/vr/render/draw_semantic_scope.hpp",
     "src/vr/state/depth_stencil_write_state.hpp",
     "src/vr/lifecycle/reset_replay_state.hpp",
+    "src/vr/lifecycle/reset_replay_health.hpp",
+    "src/vr/lifecycle/reset_replay_policy.hpp",
+    "src/vr/lifecycle/recovery_gate.hpp",
     "src/vr/telemetry/performance_counters.hpp",
     "src/vr/telemetry/depth_stencil_metrics.hpp",
     "src/vr/telemetry/raster_guard_metrics.hpp",

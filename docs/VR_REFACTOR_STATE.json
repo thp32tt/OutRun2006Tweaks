@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T03:15:00+09:00",
+  "updatedKst": "2026-10-01T03:18:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "b8c1544cfd2b6d491345e180ec72a3a84586e4bd",
   "mode": "MANUAL_APPLY_1000_CYCLE_REVIEW_BRANCH",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 245,
+  "cycle": 250,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -54,9 +54,10 @@
     "VR-REFACTOR-LIFECYCLE-0011",
     "VR-REFACTOR-LIFECYCLE-0012",
     "VR-REFACTOR-LIFECYCLE-0013",
-    "VR-REFACTOR-LIFECYCLE-0014"
+    "VR-REFACTOR-LIFECYCLE-0014",
+    "VR-REFACTOR-GUARD-0003"
   ],
-  "next": "Cycles 246-250: strengthen lifecycle/refactor verifier and close 250-cycle checkpoint; no build.",
+  "next": "Cycles 251-255: flatten R33 hook storage and lower-call boundaries next; no build.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -64,5 +65,5 @@
     "Cycles 91-95 caught and repaired malformed IsGameStateBlockRecording()s caused by substring replacement; verifier now rejects this token.",
     "Cycles 126-130 repaired one extra R29 namespace close caught by post-commit text review."
   ],
-  "batchStatus": "SOURCE_APPLY_EVERY_5_NO_BUILD_CYCLE_200_CHECKPOINT"
+  "batchStatus": "SOURCE_APPLY_EVERY_5_NO_BUILD_CYCLE_250_CHECKPOINT"
 }
