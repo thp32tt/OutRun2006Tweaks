@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00151",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "d13b71ca5f6b4f45c2492864618f77935fb875a6",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R151_HELPER_282B0_CONTINUATION_PROVENANCE",
+  "selection_reason": "DXVK visual/performance promotion remains Quest 3/VDXR runtime-dependent. CONVERSION-DXVK-00149 proved complete 0x282B0 instructions only through 0x28309 and explicitly required a fresh exact byte window beginning at 0x2830A before any further callee proof. This is the smallest independent HMD-free next step.",
+  "summary": "Add a bounded exact-EXE continuation provenance capture beginning at 0x2830A, the exact exclusive end of the validated 0x282B0 slot-scan prefix. Capture a new 96-byte .text window plus raw inbound/outbound rel32 candidates, guarded by predecessor status/end boundary. No continuation instruction semantics or render ownership are inferred.",
+  "evidence": [
+    "CONVERSION-DXVK-00149 validation-bearing result b367c5f178ec872cefeb6513cbdb3bdbc036c293 proved the complete instruction prefix through 0x28309 and stopped before 0x2830A because the previous probe truncated the next instruction.",
+    "This task captures fresh exact bytes at 0x2830A rather than extrapolating from the truncated prior window.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00151.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the fresh 0x2830A provenance capture passes, persist its exact bytes/call census while keeping full_callee_semantics=UNRESOLVED and ownership_effect=NONE. A later bounded task may decode only complete instructions from that captured window."
+}
