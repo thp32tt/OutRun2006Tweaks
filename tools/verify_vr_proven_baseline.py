@@ -261,8 +261,11 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'VR R76 SKY GLOW BASELINE RESTORE:',
 ], "P8_R76_SKYGLOW_COMMON_BASELINE")
 require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
-    'VR R81 FRAME HITCH:',
-    'dumping 4 pre + hit + 4 post frames',
+    'VR R82 FRAME HITCH:',
+    'captured 4 pre + hit + 4 post before log flush',
+    'R82PendingHitch',
+    'R82CaptureHistory',
+    'R82FlushPendingHitch',
     'R81ReadParticleLoad',
     'NLPartSourceCount',
     'liveParticles',
@@ -271,9 +274,12 @@ require_all("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp", [
     'fileLoadMaxUs',
     'vertexBufferCreates',
     'bufferDiscardLocks',
+    'bufferWholeLocks',
+    'particleInterpUs',
+    'particlePoolSlots',
     'skyGlowUs',
     'presentUs',
-], "P8_R81_FRAME_HITCH_TRACE")
+], "P8_R82_FRAME_HITCH_TRACE")
 require_all("src/vr/debug/perf_hitch_trace.hpp", [
     'struct ResourceSnapshot',
     'NoteManagedTextureCreate',
@@ -282,8 +288,12 @@ require_all("src/vr/debug/perf_hitch_trace.hpp", [
     'NoteVertexBufferCreate',
     'NoteIndexBufferCreate',
     'NoteBufferLock',
+    'NoteParticleInterpolation',
+    'BufferWholeLocks',
+    'ParticleInterpUs',
+    'ParticlePoolSlots',
     'ResourceSnapshot Consume()',
-], "P8_R81_FRAME_HITCH_RESOURCE_COUNTERS")
+], "P8_R82_FRAME_HITCH_RESOURCE_COUNTERS")
 require_all("src/vr/d3d9/ex_device_upgrade_r14.cpp", [
     'OutRunVR::PerfHitch::NoteManagedTextureCreate',
     'OutRunVR::PerfHitch::NoteTextureLock',
@@ -489,3 +499,8 @@ if errors:
     raise SystemExit(2)
 
 print(f"VR proven baseline verification passed: {len(unique_passes)} guards.")
+require_all("src/interpolation.cpp", [
+    'OutRunVR::PerfHitch::NoteParticleInterpolation',
+    'poolSlots += count',
+    'std::chrono::steady_clock::now()',
+], "P8_R82_PARTICLE_INTERPOLATION_TIMING")
