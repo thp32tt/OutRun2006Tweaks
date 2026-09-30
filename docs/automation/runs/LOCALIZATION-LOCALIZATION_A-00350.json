@@ -1,0 +1,103 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00350-p00220-index225-source-reactivation-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00350",
+  "wave_id": "P00220",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T08:03:30+09:00",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_FALLBACK5_INDEX225_SOURCE_REACTIVATION_GUARD_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD after authoritative C175/Q00073 Gate PASS has no A-owned runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework. Existing candidates159/198/201 and out-of-batch A00344@index147, A00345@index15/18/21, A00346@index111 and A00348@index24 are not repeated; cross-lane index61 is not stolen. The single allowed preflight fallback advances older C142/Q00040 index225/E3C455FA SOURCE_ACQUISITION_EXHAUSTED state without repeating Drive/direct/Release probes: it adds a deterministic fail-closed reactivation guard pinned to current inventory/source-policy/C-disposition fingerprints. Verified Release member a0c8c67f... matches the 2048x1024 canvas but not canonical SHA 03d29bba..., so substitution and candidate rebuild remain forbidden until an authoritative dependency changes. No DDS/shared state/runtime/build/N100/local clone/Drive/Library/VR/FFB/DX changes.",
+  "selection": {
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00349",
+    "latest_automation_validated_c_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
+    "latest_c_gate_run_id": 36788089100,
+    "latest_c_gate_conclusion": "success",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      61,
+      159,
+      198,
+      201
+    ],
+    "current_a_task_qa_pending_not_repeated": [
+      "A00344@index147",
+      "A00345@index15/18/21",
+      "A00346@index111",
+      "A00348@index24"
+    ],
+    "selected_indices": [
+      225
+    ],
+    "selected_action": "fallback_step_5_index225_source_reactivation_guard",
+    "new_preflight_batches_started": 1,
+    "source_probe_repeated": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX225_SOURCE_DEPENDENCY_REACTIVATION_GUARD_AND_MACHINE_OUTPUT",
+    "tool": "localization/graphics/role_A/20261001-A00350-P00220/verify_index225_source_reactivation.py",
+    "machine_report": "localization/graphics/role_A/20261001-A00350-P00220/A00350_P00220_INDEX225_SOURCE_REACTIVATION_GUARD.json",
+    "candidate_dds_modified": false,
+    "new_executable_analysis_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+    "producing_result_sha": null
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00350-P00220/verify_index225_source_reactivation.py",
+    "localization/graphics/role_A/20261001-A00350-P00220/A00350_P00220_INDEX225_SOURCE_REACTIVATION_GUARD.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00201.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00349.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "e028c585df953aa0874023c1cba00e2cc7c6b070",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "resume_state_blob_sha": "573ae61ee49bd797f8660928ad77c6ba0d1e45ac",
+    "c142_task_blob_sha": "5e60e6acecbcee5adec44fe3b0d92b7bba5959ae",
+    "c142_report_blob_sha": "fab0dccd1064861818d82dabeb9c6a0d14173c04",
+    "a00196_source_manifest_blob_sha": "c76efd0621802c832193f8fec7b6149994b15d52",
+    "c175_task_blob_sha": "92285a364dee3ad11d83c7e7f74e90e40adb54bf",
+    "canonical_source_sha256": "03d29bbabcffa88887dd538b30a35348b28d3a556026c2c63cbb824d70dabc36",
+    "pinned_release_member_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA16__C175_ZERO_A_COMPLETION_TIER__QA_PENDING_NOT_REPEATED__INDEX225_C142_SOURCE_EXHAUSTION_REUSED__NO_SOURCE_REPROBE__NONCANONICAL_RELEASE_SUBSTITUTION_FORBIDDEN__NEW_EXECUTABLE_REACTIVATION_GUARD__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): guard index225 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00350]",
+  "durable_task_record_in_result_commit": true,
+  "base_head_sha": "d638d51598dae457007d2778ea74eeb8006d990b",
+  "precommit_refresh": {
+    "head_sha": "d638d51598dae457007d2778ea74eeb8006d990b",
+    "head_message": "chore(localization): bind B00347 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00347] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Fresh branch HEAD fetched before result tree creation; only A00350 lane-local index225 guard/report and its unique task record are added. Shared state and peer-lane files are untouched."
+  }
+}
