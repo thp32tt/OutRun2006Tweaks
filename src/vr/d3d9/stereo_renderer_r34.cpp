@@ -351,7 +351,7 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r33 = R33InstallState.load(std::memory_order_acquire);
+                const auto r33 = FinalDispatchInstallState();
                 if (r33 == State::Failed)
                 {
                     R34InstallState.store(State::Failed,

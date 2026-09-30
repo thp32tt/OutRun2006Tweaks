@@ -899,4 +899,9 @@ namespace OutRunVRStereo
     {
         R33InvalidateDepthStencilCache();
     }
+    OutRunVR::RuntimeEligibility::InstallState
+    FinalDispatchInstallState() noexcept
+    {
+        return R33InstallState.load(std::memory_order_acquire);
+    }
 }

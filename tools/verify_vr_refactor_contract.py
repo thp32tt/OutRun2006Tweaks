@@ -63,6 +63,7 @@ for banned in (
         errors.append(f"R33 regained revision-layer dependency: {banned}")
 
 for banned in (
+    "R33InstallState",
     "R22ShadowState",
     "R22FailClosedEligibility",
     "R22ResetBaselineTracking",
