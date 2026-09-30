@@ -21,6 +21,7 @@
 
 #include "stereo_renderer_r30.cpp"
 #include "../render/eye_tail_cache.hpp"
+#include "../telemetry/stereo_dispatch_counters.hpp"
 
 namespace OutRunVRStereo
 {
@@ -65,19 +66,7 @@ namespace OutRunVRStereo
         using R31EyeTailCache = OutRunVR::Render::EyeTailCache;
         R31EyeTailCache R31EyeCache{};
 
-        struct R31FramePerf
-        {
-            std::uint64_t epoch = 0;
-            std::uint64_t draws = 0;
-            std::uint64_t main = 0;
-            std::uint64_t offscreen = 0;
-            std::uint64_t aux = 0;
-            std::uint64_t fastWorld = 0;
-            std::uint64_t hud = 0;
-            std::uint64_t fragile = 0;
-            std::uint64_t unstable = 0;
-            std::uint64_t fallback = 0;
-        };
+        using R31FramePerf = OutRunVR::Telemetry::StereoFrameCounters;
         R31FramePerf R31Frame{};
 
         struct R31WindowPerf
