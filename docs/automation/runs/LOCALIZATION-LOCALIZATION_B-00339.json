@@ -80,8 +80,8 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_MOD3_B_INDEX133__Q00071_RENDER_READY__EXACT_CANONICAL_SOURCE__C_ACCEPTED_9_REGION_MASK_CLEAN_PLATE_SAFE_BBOX__CURRENT_9_OF_9_SEMANTICS__NATIVE_V2_RENDER__ZERO_OUTSIDE_SOURCE__ZERO_PROTECTED__ZERO_ALPHA_OUTSIDE__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__DRIVE_READBACK_BYTE_IDENTICAL__PRODUCER_PREGATE_PASS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
+  "authoritative_result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): render index133 Korean DDS candidate [AUTO:LOCALIZATION-LOCALIZATION_B-00339]",
   "durable_task_record_in_result_commit": true,
@@ -91,7 +91,7 @@
     "file_id": "1_XTpHRuI02HsMHS1ZoALx_CuLdeEb0wu",
     "sha256": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
     "bytes": 16777344,
-    "producing_result_sha": null,
+    "producing_result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
     "validation_state": "AUTOMATION_PENDING_C_BATCH_GATE_RUNTIME_UNTESTED"
   },
   "review_artifacts": {
@@ -146,5 +146,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Fresh HEAD fetched immediately before tree/commit creation; B00339 touches only unique B-lane JSON evidence/task record. Shared state and peer-lane files are untouched."
   },
-  "bookkeeping_note": "Initial result commit is bound by a separate bookkeeping commit because a commit cannot contain its own SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Durable producer result SHA is bound here. Candidate DDS and exact-hash review artifacts remain in approved current-pipeline Drive. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T06:22:59+09:00",
+  "bookkeeping_base_result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae"
 }
