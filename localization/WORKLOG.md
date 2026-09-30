@@ -2082,3 +2082,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate-first order remains **RENDER_READY none -> ONE_STAGE none -> rework 163 -> candidate QA 121/159/198/201 -> runtime-isolation 51 accepted -> unrelated preflight**. No runtime approval was granted.
 - This bookkeeping checkpoint is separate from the Gate-owning result and does not replace `624b504f9ddfeea77fe72f0fb7f155b3fce3832d` as authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
 
+## 2026-10-01 02:43 KST - C167 Q00065 independent batch QA
+- Immutable inputs: A00297 `8c513939...` index24, B00295 `b3c130cc...` index121, A00299 `4f35616d...` index219, A00301 `51fed90a...` index111. Dispositions: **PASS / REWORK_REQUIRED / PASS / SUPERSEDED**.
+- Index121/FD90AA9 receives candidate-first fresh artifact review. Exact Drive source `f7847db9...`, candidate `9e93c7ef...`, comparison `086c8c49...`, 4096x4096 RGBA32 mip1 and exact header `1423e78c...` are independently recovered. Promotion is **REWORK_REQUIRED** because the current generation-v2 mandatory GitHub review set, generation prompt/hash provenance and signed-slant/style PASS evidence are absent. Q00065 does not assert a pixel-overflow failure.
+- Index24/66743AA8 and index219/D263B3F1 **PASS only as PREFLIGHT_ONLY controls**. Heavy source/atlas/source-acquisition evidence is reused by unchanged fingerprint; no candidate/static/runtime approval is granted.
+- Supplied A00301@51fed90a is **SUPERSEDED** by current same-task result `fc703ce0...`; Q00065 does not approve the newer result. Current B00300@index163 candidate and B00306@index94 preflight remain out-of-batch **QA_PENDING**.
+- Controller v16 ordering after merge: **REWORK 121 -> C QA 159/163/198/201 -> unrelated preflight**. Q00065 adds no PRODUCTION_COMPLETE asset. C writes no candidate DDS. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
