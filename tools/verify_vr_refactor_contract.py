@@ -17,8 +17,11 @@ def text(rel: str) -> str:
 r22 = text("src/vr/d3d9/stereo_renderer_r22.cpp")
 r23 = text("src/vr/d3d9/stereo_renderer_r23.cpp")
 r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
+r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
+r33 = text("src/vr/d3d9/stereo_renderer_r33.cpp")
 draw_class = text("src/vr/render/draw_class.hpp")
 raster = text("src/vr/state/d3d9_raster_state.hpp")
+state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
 text("tools/verify_vr_hook_graph.py")
 
 for banned in ("R22ShadowState", "R22StateBlockTrackingReliable"):
@@ -52,6 +55,39 @@ for marker in (
 
 if "SameRasterSnapshot" not in raster:
     errors.append("neutral raster snapshot comparison missing")
+
+for marker in (
+    "class StateBlockTracker",
+    "SetR22Reliable(",
+    "R22Reliable()",
+    "SetR31Reliable(",
+    "R31Reliable()",
+    "Reliable()",
+    "MarkCoverageLost()",
+    "ResetCoverageLoss()",
+    "CoverageLost()",
+    "RequireResync()",
+    "ConsumeResync()",
+):
+    if marker not in state_block_tracker:
+        errors.append(f"StateBlockTracker missing API marker: {marker}")
+
+for rel, source in (
+    ("R22", r22),
+    ("R31", r31),
+    ("R33", r33),
+):
+    if '../state/state_block_tracker.hpp' not in source:
+        errors.append(f"{rel} missing neutral StateBlockTracker include")
+
+if "R31StateBlockTrackingReliable" in r33:
+    errors.append(
+        "R33 regained removed R31 StateBlock reliability dependency")
+
+misplaced_tracker = ROOT / "src/vr/d3d9/state/state_block_tracker.hpp"
+if misplaced_tracker.exists():
+    errors.append(
+        "misplaced legacy StateBlockTracker copy still exists under src/vr/d3d9/state")
 
 for p in (ROOT / "src/vr/d3d9").glob("stereo_renderer_r*.cpp"):
     m = re.fullmatch(r"stereo_renderer_r(\d+)\.cpp", p.name)

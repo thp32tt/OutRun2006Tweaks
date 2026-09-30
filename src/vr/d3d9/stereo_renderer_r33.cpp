@@ -11,6 +11,7 @@
 // draw path pays only for correctness checks required by stereo rendering.
 
 #include "stereo_renderer_r32.cpp"
+#include "../state/state_block_tracker.hpp"
 
 namespace OutRunVRStereo
 {
@@ -174,7 +175,7 @@ namespace OutRunVRStereo
             if (!TrackedDepthStencil)
                 return true;
 
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilLiveFallbacks;
@@ -296,7 +297,7 @@ namespace OutRunVRStereo
 
             bool fragile = true;
             const bool stateBlocksReliable =
-                R31StateBlockTrackingReliable.load(std::memory_order_acquire);
+                OutRunVR::State::StateBlockTracker::Reliable();
             const bool effectKnown = stateBlocksReliable
                 ? R29FragileEffectCached(device, fragile)
                 : R32EffectIsFragileLive(device, fragile);
@@ -464,7 +465,7 @@ namespace OutRunVRStereo
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
 
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
                 R31DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =

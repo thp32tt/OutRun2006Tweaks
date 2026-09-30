@@ -22,10 +22,14 @@ namespace OutRunVR::State
         {
             return R22ReliableFlag().load(std::memory_order_acquire);
         }
+        static bool R31Reliable() noexcept
+        {
+            return R31ReliableFlag().load(std::memory_order_acquire);
+        }
         static bool Reliable() noexcept
         {
             return R22Reliable() &&
-                R31ReliableFlag().load(std::memory_order_acquire) &&
+                R31Reliable() &&
                 !CoverageLost();
         }
         static void MarkCoverageLost() noexcept
