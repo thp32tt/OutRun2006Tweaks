@@ -627,4 +627,10 @@ namespace OutRunVRStereo
     {
         R29MonoSafetyThroughEpoch = epoch;
     }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    StereoBaseInstallState() noexcept
+    {
+        return R29StereoInstallState.load(std::memory_order_acquire);
+    }
 }

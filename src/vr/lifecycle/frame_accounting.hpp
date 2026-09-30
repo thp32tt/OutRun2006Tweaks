@@ -6,6 +6,7 @@
 namespace OutRunVRStereo
 {
     void NoteStereoLeftDraw() noexcept;
+    void UndoStereoLeftDraw() noexcept;
     bool IsStereoSeeded() noexcept;
 
     void ReportStereoFailure(

@@ -1001,6 +1001,12 @@ namespace OutRunVRStereo
 		R9MonoBackupGap = true;
 	}
 
+	void UndoStereoLeftDraw() noexcept
+	{
+		if (R9DrawCalls)
+			--R9DrawCalls;
+	}
+
 	void ReportStereoFailure(
 		OutRunVR::StereoFailureReason reason,
 		const char* site, HRESULT hr) noexcept
