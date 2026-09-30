@@ -1075,4 +1075,9 @@ namespace OutRunVRStereo
     {
         return R31StateBlockTrackingReliable.load(std::memory_order_acquire);
     }
+
+    void FlushPendingStateBlockResync(IDirect3DDevice9* device) noexcept
+    {
+        R31FlushPendingStateBlockResync(device);
+    }
 }

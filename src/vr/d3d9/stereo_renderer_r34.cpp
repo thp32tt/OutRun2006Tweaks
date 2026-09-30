@@ -14,6 +14,7 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/d3d9_raster_tracking.hpp"
 #include "../state/depth_stencil_tracking.hpp"
+#include "../state/stateblock_tracking.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -72,7 +73,7 @@ namespace OutRunVRStereo
                 drawSemanticValue);
 
             if (!device || !IsGameDevice(device) || InternalStereoPass ||
-                R31StateBlockRecording || !StereoWanted() ||
+                IsGameStateBlockRecording() || !StereoWanted() ||
                 !TargetIsBackBuffer())
             {
                 return drawCall();
@@ -83,7 +84,7 @@ namespace OutRunVRStereo
             // wrapper, so establish the already-validated R22 replay scope at
             // the final draw boundary. Flush a pending StateBlock resync first
             // so the scope never snapshots stale shadow state.
-            R31FlushPendingStateBlockResync(device);
+            FlushPendingStateBlockResync(device);
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {
