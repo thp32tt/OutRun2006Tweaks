@@ -1,0 +1,161 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00284-p00167-index163-conservative-fit-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00284",
+  "wave_id": "P00167",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_REWORK_PREFLIGHT",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T22:34:57+09:00",
+  "selected_index": 163,
+  "selected_asset": "59A79158",
+  "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "result": "PASS_PREFLIGHT_ONLY_CONSERVATIVE_FIT_TRANSLATION_GEOMETRY_SPEC__BINARY_RASTER_EXECUTION_BLOCKED",
+  "summary": "Resume B00284 at the already-selected index163/59A79158. Consume C Q00060 without repeating B00274 structural work. The existing B00274 candidate remains REWORK_REQUIRED solely for material undersizing in Ice Scape and Skyscrapers. Preserve the C-reverified source/header/alpha/zero-overflow/CLEAN_PLATE evidence. Replace only those two Korean course-name strings with shorter source-faithful labels and rerender natively with at most a 1 px family micro-reduction, leaving interior safety margin instead of fitting to the edge. No candidate bytes are claimed in this run because the current binary raster execution runtime was unavailable; fail closed and do not promote the stale candidate.",
+  "c_authoritative_input": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00282",
+    "qa_batch_id": "Q00060",
+    "validation_bearing_result_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "disposition": "REWORK_REQUIRED",
+    "retained_evidence": [
+      "canonical source SHA-256 7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "stale candidate SHA-256 a9d5aacc840b158ef0335301c512387f423fffda2640e612aceb29a6bc8efbf0",
+      "DDS 1024x2048 RGBA32 mip1",
+      "exact 128-byte source header",
+      "FLIP_Y orientation",
+      "transparent CLEAN_PLATE/removal-mask evidence",
+      "24/24 semantics",
+      "zero outside-edit/protected/alpha/source-region violations"
+    ],
+    "rejected_only": [
+      "Ice Scape: 57 -> 37 px; candidate alpha height 35 vs 59 px source-effect height",
+      "Skyscrapers: 57 -> 41 px; candidate alpha height 38 vs 59 px source-effect height"
+    ]
+  },
+  "rework_rows": [
+    {
+      "physical_row": 10,
+      "source": "Ice Scape",
+      "prior_korean": "아이스 스케이프",
+      "approved_short_korean": "빙원",
+      "translation_rationale": "Concise Korean course-title rendering of an icy expanse; preserves the scene meaning while avoiding conspicuous family undersizing.",
+      "source_effect_bbox_ltrb": [
+        5,
+        922,
+        250,
+        980
+      ],
+      "candidate_safe_bbox_ltrb": [
+        7,
+        924,
+        248,
+        978
+      ],
+      "prior_font_size": 37,
+      "family_target_font_size": 57,
+      "preferred_native_font_size": 56,
+      "allowed_search_font_sizes_desc": [
+        57,
+        56
+      ],
+      "prior_baseline_y_readable": 962,
+      "preferred_baseline_y_readable": 969,
+      "preferred_left_x": 8,
+      "placement_rule": "Measure native NanumSquare Bold glyph alpha at integer size. Keep at least 1 px inside candidate_safe_bbox on all sides; prefer size 56 as the conservative micro-reduction requested by current policy/user fit guidance. If 56 unexpectedly fails, 57 may be tried only if it still preserves the interior margin; do not go below 56 in this rework without returning to C.",
+      "style": {
+        "font": "NanumSquare Bold",
+        "fill_rgb": [
+          46,
+          54,
+          57
+        ],
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none",
+        "slant": "none",
+        "alignment": "left"
+      }
+    },
+    {
+      "physical_row": 20,
+      "source": "Skyscrapers",
+      "prior_korean": "스카이스크레이퍼",
+      "approved_short_korean": "마천루",
+      "translation_rationale": "Standard concise Korean noun for skyscrapers; source-faithful and substantially shorter than the transliteration.",
+      "source_effect_bbox_ltrb": [
+        4,
+        1682,
+        305,
+        1740
+      ],
+      "candidate_safe_bbox_ltrb": [
+        6,
+        1684,
+        303,
+        1738
+      ],
+      "prior_font_size": 41,
+      "family_target_font_size": 57,
+      "preferred_native_font_size": 56,
+      "allowed_search_font_sizes_desc": [
+        57,
+        56
+      ],
+      "prior_baseline_y_readable": 1723,
+      "preferred_baseline_y_readable": 1729,
+      "preferred_left_x": 7,
+      "placement_rule": "Measure native NanumSquare Bold glyph alpha at integer size. Keep at least 1 px inside candidate_safe_bbox on all sides; prefer size 56 as the conservative micro-reduction requested by current policy/user fit guidance. If 56 unexpectedly fails, 57 may be tried only if it still preserves the interior margin; do not go below 56 in this rework without returning to C.",
+      "style": {
+        "font": "NanumSquare Bold",
+        "fill_rgb": [
+          46,
+          54,
+          57
+        ],
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none",
+        "slant": "none",
+        "alignment": "left"
+      }
+    }
+  ],
+  "generation_constraints": [
+    "Generation reset applies: exact English source plus approved CLEAN_PLATE/source masks only; no old Korean candidate pixels as construction input.",
+    "Reuse B00274 exact source-removal mask and transparent CLEAN_PLATE; do not alter the other 22 accepted Korean course rows.",
+    "Native text render only; no flattened-raster resize, Lanczos shrink, blur, smudge, crop, pad or invented panel.",
+    "Preserve exact DDS header, RGBA32, 1024x2048, mip1 and FLIP_Y raw storage.",
+    "Zero changed pixels outside the two row edit masks; zero protected-mask changes; zero alpha escape.",
+    "Effect-inclusive Korean bbox must remain inside exact source-permitted region and additionally leave a small interior safety margin rather than touching the gate.",
+    "Fresh decoded-final English-source comparison and C batch QA are required before promotion."
+  ],
+  "execution_blocker": {
+    "type": "BINARY_RASTER_EXECUTION_RUNTIME_UNAVAILABLE",
+    "observed_behavior": "The active local binary execution runtime rejected container/Python access, including the mounted exact DDS, so a source-faithful DDS could not be regenerated or byte-validated safely in this run.",
+    "fail_closed": true,
+    "stale_candidate_promoted": false,
+    "candidate_dds_modified": false,
+    "drive_write_performed": false,
+    "required_next": "Execute the two-row native rerender from the retained exact source/CLEAN_PLATE with this spec, produce fresh DDS and comparison proof, then submit the exact candidate fingerprint to C batch QA."
+  },
+  "production_readiness_before": "REWORK_REQUIRED_MATERIAL_UNDERSIZING",
+  "production_readiness_after": "PREFLIGHT_ONLY__TWO_ROW_NATIVE_RERENDER_SPEC_READY__CANDIDATE_NOT_YET_REBUILT",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used_for_index163": false,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "base_head_sha": "5a46d5b7dc6d051d963d5765fc0d2193f2033e14"
+}
