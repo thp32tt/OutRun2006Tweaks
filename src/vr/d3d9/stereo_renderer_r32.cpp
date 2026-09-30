@@ -6,6 +6,7 @@
 
 #include "r32_policy.hpp"
 #include "../telemetry/performance_types.hpp"
+#include "../telemetry/performance_clock.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -90,26 +91,6 @@ namespace OutRunVRStereo
         };
         R32CounterSnapshot R32Counters{};
 
-        LONGLONG R32QpcFrequency() noexcept
-        {
-            static const LONGLONG frequency = []() noexcept {
-                LARGE_INTEGER value{};
-                return QueryPerformanceFrequency(&value) != FALSE
-                    ? value.QuadPart : 0;
-            }();
-            return frequency;
-        }
-
-        std::uint64_t R32QpcTicksToUs(std::uint64_t ticks) noexcept
-        {
-            const LONGLONG frequency = R32QpcFrequency();
-            if (frequency <= 0)
-                return 0;
-            return static_cast<std::uint64_t>(
-                (static_cast<long double>(ticks) * 1000000.0L) /
-                static_cast<long double>(frequency));
-        }
-
         using R32FrameWorkload = OutRunVR::Telemetry::FrameWorkload;
         thread_local R32FrameWorkload R32FrameWorkloadCounters{};
 
@@ -121,27 +102,6 @@ namespace OutRunVRStereo
 
         using R32StereoWorkloadSnapshot =
             OutRunVR::Telemetry::StereoWorkloadSnapshot;
-
-        LONGLONG R32PerfQpcFrequency() noexcept
-        {
-            static const LONGLONG frequency = []() noexcept {
-                LARGE_INTEGER value{};
-                return QueryPerformanceFrequency(&value) != FALSE
-                    ? value.QuadPart : 0;
-            }();
-            return frequency;
-        }
-
-        std::uint64_t R32ElapsedUs(
-            LONGLONG begin,
-            LONGLONG end) noexcept
-        {
-            const LONGLONG frequency = R32PerfQpcFrequency();
-            if (frequency <= 0 || begin <= 0 || end < begin)
-                return 0;
-            return static_cast<std::uint64_t>(
-                ((end - begin) * 1000000LL) / frequency);
-        }
 
         R32StereoWorkloadSnapshot R32CaptureStereoWorkload() noexcept
         {
@@ -230,9 +190,9 @@ namespace OutRunVRStereo
             R32FrameWorkloadCounters = {};
 
             const std::uint64_t presentUs =
-                R32ElapsedUs(presentStartQpc, presentEndQpc);
+                OutRunVR::Telemetry::ElapsedUs(presentStartQpc, presentEndQpc);
             const std::uint64_t frameUs =
-                R32ElapsedUs(R32LastPresentEndQpc, presentEndQpc);
+                OutRunVR::Telemetry::ElapsedUs(R32LastPresentEndQpc, presentEndQpc);
             R32LastPresentEndQpc = presentEndQpc;
 
             if (frameUs == 0)
@@ -1087,7 +1047,7 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 LARGE_INTEGER copyStart{};
                 const bool measureCopy = Settings::VRTelemetry &&
-                    R32QpcFrequency() > 0 &&
+                    OutRunVR::Telemetry::QpcFrequency() > 0 &&
                     QueryPerformanceCounter(&copyStart) != FALSE;
 
                 const HRESULT leftCopy = device->StretchRect(BackBuffer, nullptr,
@@ -1281,7 +1241,7 @@ namespace OutRunVRStereo
             const std::uint64_t copyPairs =
                 R32DirectCopyPairs - R32Counters.directCopyPairs;
             const std::uint64_t copyAvgUs = copyPairs
-                ? R32QpcTicksToUs(
+                ? OutRunVR::Telemetry::QpcTicksToUs(
                     R32DirectCopyQpcTicks - R32Counters.directCopyQpcTicks) /
                     copyPairs
                 : 0;
@@ -1324,7 +1284,7 @@ namespace OutRunVRStereo
                 R32PendingFenceErrors - R32Counters.pendingError,
                 copyPairs,
                 copyAvgUs,
-                R32QpcTicksToUs(R32DirectCopyMaxQpcTicksSinceLog),
+                OutRunVR::Telemetry::QpcTicksToUs(R32DirectCopyMaxQpcTicksSinceLog),
                 (R32DirectCopyPixels - R32Counters.directCopyPixels) / 1000000ull,
                 DirectTransportWidth,
                 DirectTransportHeight,

@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 45,
+  "cycle": 50,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD",
@@ -19,8 +19,10 @@
     "R84-REF-DISPATCH-0001",
     "R84-REF-PERF-0001",
     "R84-REF-PERF-0002",
-    "R84-REF-PERF-0003"
+    "R84-REF-PERF-0003",
+    "R84-REF-PERF-0004"
   ],
-  "next": "Cycles 46-50: move QPC timing helpers into neutral telemetry clock module.",
-  "updatedKst": "2026-10-01T02:41:00+09:00"
+  "next": "Cycles 51-55: protect the R84 R26+HUD production owner and new refactor boundaries with a no-build static source verifier.",
+  "updatedKst": "2026-10-01T02:43:00+09:00",
+  "batchStatus": "R84_CORRECT_BASELINE_CYCLE_50_CHECKPOINT"
 }
