@@ -1,0 +1,121 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00334-p00207-producer-direct-c-rework-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00334",
+  "wave_id": "P00207",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T05:30:29+09:00",
+  "base_head_sha": "6ce4942432ddb3b542fb5ce388bc7b1bf1dd7c20",
+  "controller_schema_version": 16,
+  "commit_mode": "ATOMIC_C_REWORK_EQUIVALENT_MATERIAL_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_DIRECT_REWORK_INDEX111_A00320_ATOMIC_REEMISSION_RUNTIME_UNTESTED",
+  "summary": "Latest automation-validated Q00069/C171 returned A00320@index111 as REWORK_REQUIRED solely because immutable producer RESULT_SHA 9f45de59 changed only the analyzer and omitted the durable task record/material payload from that same commit. The Tuned/Normal proposal itself was numerically reproduced by C. A00334 therefore selects this direct C-returned rework before any new preflight, re-emits the unchanged 3,960-pixel proposal / 8,221-pixel remaining evidence together with its durable task record in one result commit, and repeats no heavy source/pixel QA. Newer pre-Gate Q00070 leaves index111 on the same re-emission requirement. No DDS/shared state/build/runtime validation is performed.",
+  "selection": {
+    "selected_priority": "DIRECT_REWORK_REQUIRED_RUNNABLE",
+    "authoritative_rework_source": {
+      "c_task_id": "LOCALIZATION-LOCALIZATION_C-00329",
+      "qa_batch_id": "Q00069",
+      "validation_bearing_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+      "automation_validation": "PASS",
+      "rejected_input": "LOCALIZATION-LOCALIZATION_A-00320@9f45de594a6035636398668820d344b4c31bd2c1",
+      "reason": "REEMIT_MATERIAL_AND_DURABLE_TASK_RECORD_UNDER_ONE_VALID_RESULT_SHA"
+    },
+    "observed_newer_c_head": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00333",
+      "qa_batch_id": "Q00070",
+      "head_sha": "6ce4942432ddb3b542fb5ce388bc7b1bf1dd7c20",
+      "automation_validation": "PENDING",
+      "index111_scope": "UNCHANGED_RETAINS_Q00067_A00309_UNTIL_VALID_A00320_REEMISSION"
+    },
+    "a_owned_render_ready": [],
+    "a_owned_one_stage_to_render": [],
+    "a_owned_existing_candidate_rework": [],
+    "cross_lane_render_ready_not_stolen": [
+      232
+    ],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "source_blocked_not_reprobed": [
+      54,
+      147
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "c_rework_resolution": {
+    "defect": "IMMUTABLE_A00320_RESULT_SHA_CHANGED_ANALYZER_ONLY_AND_DID_NOT_CARRY_DURABLE_TASK_RECORD_PLUS_MATERIAL_PAYLOAD",
+    "resolution": "REEMIT_THE_ALREADY_C_NUMERICALLY_REPRODUCED_A00320_MATERIAL_AND_THIS_DURABLE_TASK_RECORD_ATOMICALLY",
+    "prior_task_id": "LOCALIZATION-LOCALIZATION_A-00320",
+    "prior_result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
+    "prior_task_record_blob_sha": "72f8a2e5bd128daadcaa76b19a0c1a7fff5977fa",
+    "prior_material_path": "localization/graphics/role_A/20261001-A00320-P00196/A00320_P00196_INDEX111_TUNED_NORMAL_CORE_RECONSTRUCTION.json",
+    "prior_material_blob_sha": "9e7d346eec36fcc528198e9523084467cdefc29e",
+    "c_replay_report": "localization/graphics/role_C/20261001-0515-C171/C171_Q00069_INDEPENDENT_QA_BATCH.json",
+    "c_replay_report_blob_sha": "4ad99879d42a1843ede884b8721f048767dfab3a",
+    "content_qa_repeated": false,
+    "accepted_numeric_material_changed": false
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00334-P00207/A00334_P00207_INDEX111_A00320_ATOMIC_REEMISSION.json",
+    "localization/graphics/role_A/20261001-A00320-P00196/A00320_P00196_INDEX111_TUNED_NORMAL_CORE_RECONSTRUCTION.json",
+    "localization/graphics/role_C/20261001-0515-C171/C171_Q00069_INDEPENDENT_QA_BATCH.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00329.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00333.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": "DIRECT_C_RETURNED_REWORK",
+    "type": "INDEX111_A00320_EQUIVALENT_SOURCE_ONLY_RECONSTRUCTION_MATERIAL_ATOMIC_REEMISSION",
+    "materially_resolves_c_rework_blocker": true,
+    "equivalent_material_evidence_reemitted": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "candidate_dds_modified": false,
+    "proposal_resolved_pixels": 3960,
+    "remaining_unresolved_pixels": 8221
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "current_asset_queue_blob_sha": "6524a4c279cbfdc6bdbfe864088391fe726adab0",
+    "q00069_c_report_blob_sha": "4ad99879d42a1843ede884b8721f048767dfab3a",
+    "q00070_c_task_blob_sha": "31b4e1aa37076dc0de1e815c9e48c86c6b7c4f2c",
+    "prior_a00320_material_blob_sha": "9e7d346eec36fcc528198e9523084467cdefc29e",
+    "prior_a00320_task_blob_sha": "72f8a2e5bd128daadcaa76b19a0c1a7fff5977fa"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA16__DIRECT_Q00069_REWORK_SELECTED_FIRST__A00320_C_REPRODUCED_NUMERIC_MATERIAL_REEMITTED_UNCHANGED__3960_PROPOSED_RESOLVED__8221_REMAINING__ZERO_OUTSIDE_MASK__ZERO_ALPHA_CHANGE__ZERO_PROTECTED_GUARD_OVERLAP__REPORT_AND_DURABLE_TASK_RECORD_ATOMIC__NO_HEAVY_QA_REPEAT__NO_DDS__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): atomically reemit index111 A00320 material [AUTO:LOCALIZATION-LOCALIZATION_A-00334]",
+  "material_payload_in_result_commit": true,
+  "durable_task_record_in_result_commit": true,
+  "precommit_refresh": {
+    "head_sha": "6ce4942432ddb3b542fb5ce388bc7b1bf1dd7c20",
+    "head_message": "chore(localization): record Q00070 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00333] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Refreshed current branch immediately before object creation. Only new A00334 lane-local material evidence and task record are added; Q00070 shared state and all peer-lane files are preserved."
+  }
+}
