@@ -1,0 +1,119 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00345-p00216-producer-font-source-terminal-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+  "wave_id": "P00216",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T06:59:30+09:00",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_A_MOD3_FONT_FAMILY_15_18_21_SOURCE_IDENTITY_MISMATCH_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD after authoritative C174/Q00072 Gate PASS finds no A-owned runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework. A candidates159/198/201 and out-of-batch A00338@index102, A00340@index231, A00344@index147 are not repeated; B-owned index61/133/232 work is not stolen. The single allowed preflight batch advances the A-owned font family 15/18/21. C163-accepted Drive exact-name misses and A00280 static crosswalk are reused without reinspection. Immutable pinned direct paths are 3/3 404; the exact contract-pinned Release archive is verified, but all three exact members mismatch current canonical inventory identities. Fail closed as SOURCE_IDENTITY_MISMATCH in addition to the existing runtime font-handle usage blocker; no DDS/mask/CLEAN_PLATE/candidate is generated. Runtime remains UNTESTED.",
+  "selection": {
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00343",
+    "latest_automation_validated_c_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "latest_c_gate_run_id": 36782428617,
+    "latest_c_gate_conclusion": "success",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_qa_pending_not_repeated": [
+      102,
+      231,
+      147
+    ],
+    "selected_indices": [
+      15,
+      18,
+      21
+    ],
+    "selected_action": "font_pipeline_source_identity_terminal_guard",
+    "new_preflight_batches_started": 1,
+    "cross_lane_not_stolen": [
+      61,
+      133,
+      232
+    ]
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "A_OWNED_FONT_FAMILY_CANONICAL_SOURCE_TERMINAL_FINGERPRINT_GUARD",
+    "evidence": "localization/graphics/role_A/20261001-A00345-P00216/A00345_P00216_FONT_FAMILY_SOURCE_IDENTITY_MISMATCH.json",
+    "reviewed_indices": [
+      15,
+      18,
+      21
+    ],
+    "typed_source_outcome": "SOURCE_IDENTITY_MISMATCH",
+    "candidate_dds_modified": false,
+    "new_source_tiers_resolved": [
+      "PINNED_TAG_DIRECT_FILE",
+      "PINNED_RELEASE_FALLBACK"
+    ],
+    "prior_drive_tier_reused_without_probe": true,
+    "materially_reduces_unresolved_work": true,
+    "sticky_dependency_blocker": true
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00345-P00216/A00345_P00216_FONT_FAMILY_SOURCE_IDENTITY_MISMATCH.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00280.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00343.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "2df474c33e70dd092fc0ef2d6f1203391e2eb232",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "latest_c_record_blob_sha": "ea26fb36d6db3f90cd53c8ce8b7adc87675de60f",
+    "a00280_task_blob_sha": "4789223c75aa80d915051d120905b03a542f70d7",
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "index15_expected_sha256": "0b687a1d416f579bc71521ad4ec8278b84a3362b1c687ead3d80aaec7de31d25",
+    "index15_release_sha256": "25ee2fd3cca7ac65acc5629ef96270d78706179bc0e723838ed7a992821735aa",
+    "index18_expected_sha256": "c1f47db9ab463fcc46bc23fa1154046b5c0eb6fd126559351e2e80042334e100",
+    "index18_release_sha256": "09f27e1c4e3997aa49fa120838626271855c504463be2383f7e9330509801484",
+    "index21_expected_sha256": "2a8f9e8c906a6ae5583550c735d999fc3f5650c4f21a4e9d0c7a915ec063f4b7",
+    "index21_release_sha256": "3185f71400fa697aa6104a5cceac49bbad458d5f02667526efa21fc98f47e8fe"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_prior_evidence_reused": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified_against_contract": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA16__C174_GATE_PASS_NO_A_COMPLETION_TIER__NO_QA_PENDING_REPEAT__FONT15_18_21_C163_DRIVE_MISS_REUSED__PINNED_DIRECT_3_OF_3_404__PINNED_RELEASE_ARCHIVE_EXACT__RELEASE_MEMBERS_3_OF_3_CANONICAL_SHA_MISMATCH__SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_DDS_MASK_CLEANPLATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): close font-family source mismatches [AUTO:LOCALIZATION-LOCALIZATION_A-00345]",
+  "durable_task_record_in_result_commit": true,
+  "base_head_sha": "c52c5d845e913d6b9ea328509ffa48d6c9ba1b4b",
+  "precommit_refresh": {
+    "head_sha": "c52c5d845e913d6b9ea328509ffa48d6c9ba1b4b",
+    "head_message": "chore(localization): record Q00072 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00343] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Fresh HEAD fetched after Q00072 Gate bookkeeping and immediately before tree/commit creation. Only A00345 lane-local evidence/task-record paths are added; shared state and peer-lane files are untouched."
+  },
+  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the result SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+}

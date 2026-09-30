@@ -1,0 +1,191 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00345-p00216-font-family-source-terminal-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+  "wave_id": "P00216",
+  "lane": "LOCALIZATION_A",
+  "recorded_at_kst": "2026-10-01T06:59:30+09:00",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "reviewed_indices": [
+    15,
+    18,
+    21
+  ],
+  "reviewed_assets": [
+    "20389D70",
+    "7B65A191",
+    "D7CE8BC3"
+  ],
+  "current_authority": {
+    "head_sha": "c52c5d845e913d6b9ea328509ffa48d6c9ba1b4b",
+    "latest_c_task": "LOCALIZATION-LOCALIZATION_C-00343",
+    "latest_c_run": "C174",
+    "latest_c_wave": "Q00072",
+    "latest_c_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "latest_c_gate_run_id": 36782428617,
+    "latest_c_gate_conclusion": "success"
+  },
+  "candidate_completion_scan": {
+    "a_owned_direct_rework_required": [],
+    "a_owned_render_ready": [],
+    "a_owned_one_stage_to_render": [],
+    "a_owned_existing_candidate_rework": [],
+    "a_owned_candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "a_owned_out_of_batch_material_not_repeated": [
+      "LOCALIZATION-LOCALIZATION_A-00338@index102",
+      "LOCALIZATION-LOCALIZATION_A-00340@index231",
+      "LOCALIZATION-LOCALIZATION_A-00344@index147"
+    ],
+    "cross_lane_not_stolen": [
+      "index61 B candidate rework",
+      "index133 B candidate awaiting C",
+      "index232 B candidate awaiting C"
+    ],
+    "preflight_batches_started": 1
+  },
+  "prior_accepted_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_A-00280",
+    "producer_result_sha": "42248567499c9127571d43254507559eff308b13",
+    "c_acceptance": "Q00061/C163 PASS PREFLIGHT_ONLY static font crosswalk",
+    "drive_exact_name_fast_path": "3_OF_3_SOURCE_TRANSPORT_MISS_REUSED_UNCHANGED_FINGERPRINT",
+    "runtime_blocker": "REAL_KOREANK3TRACE_PLUS_KOREANLOCALIZATIONTRACE_FONT_HANDLE_USAGE_STILL_REQUIRED",
+    "no_repeat_of_drive_probe": true,
+    "no_repeat_of_static_crosswalk": true
+  },
+  "acquisition": {
+    "tier1": {
+      "transport": "GOOGLE_DRIVE_APPROVED_CANONICAL_HD_SOURCE",
+      "outcome": "REUSED_ACCEPTED_3_OF_3_SOURCE_TRANSPORT_MISS",
+      "reprobed": false
+    },
+    "tier2": {
+      "transport": "PINNED_TAG_DIRECT_FILE",
+      "repository": "envido32/OR2006Sprites",
+      "immutable_ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "outcomes": [
+        {
+          "index": 15,
+          "path": "textures/load/spr_font_xst/20389D70_512x256.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "http_semantics": "404_NOT_FOUND"
+        },
+        {
+          "index": 18,
+          "path": "textures/load/spr_font_xst/7B65A191_256x128.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "http_semantics": "404_NOT_FOUND"
+        },
+        {
+          "index": 21,
+          "path": "textures/load/spr_font_xst/D7CE8BC3_512x256.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "http_semantics": "404_NOT_FOUND"
+        }
+      ]
+    },
+    "tier3": {
+      "transport": "PINNED_RELEASE_FALLBACK",
+      "release_tag": "v0.25.10a",
+      "release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_size": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_identity": "PASS_CONTRACT_EXACT",
+      "members": [
+        {
+          "index": 15,
+          "path": "textures/load/spr_font_xst/20389D70_512x256.dds",
+          "canonical": {
+            "sha256": "0b687a1d416f579bc71521ad4ec8278b84a3362b1c687ead3d80aaec7de31d25",
+            "width": 2048,
+            "height": 1024,
+            "format": "RGBA"
+          },
+          "release": {
+            "bytes": 8388736,
+            "sha256": "25ee2fd3cca7ac65acc5629ef96270d78706179bc0e723838ed7a992821735aa",
+            "git_blob_sha1": "9311d3e5fe521aca5a867fc5dc222fcb40be6018",
+            "header128_sha256": "2195f6a7c276e34259dcfa3a2af6b7424780c19478a08dc6ad597ba2753b3456",
+            "width": 2048,
+            "height": 1024,
+            "format": "RGBA32",
+            "mip_count": 1,
+            "pitch_or_linear": 8192
+          },
+          "sha256_match": false,
+          "geometry_match": true,
+          "format_match": true,
+          "outcome": "SOURCE_IDENTITY_MISMATCH"
+        },
+        {
+          "index": 18,
+          "path": "textures/load/spr_font_xst/7B65A191_256x128.dds",
+          "canonical": {
+            "sha256": "c1f47db9ab463fcc46bc23fa1154046b5c0eb6fd126559351e2e80042334e100",
+            "width": 256,
+            "height": 128,
+            "format": "RGBA"
+          },
+          "release": {
+            "bytes": 524416,
+            "sha256": "09f27e1c4e3997aa49fa120838626271855c504463be2383f7e9330509801484",
+            "git_blob_sha1": "fa507ac1239430e4a89eeab17d8dad85adf6cd66",
+            "header128_sha256": "e17b6b3c790aa2f55e42de212fe06282762ce2b81edcc90ecb47780505cc96a8",
+            "width": 1024,
+            "height": 512,
+            "format": "DXT5",
+            "mip_count": 1,
+            "pitch_or_linear": 524288
+          },
+          "sha256_match": false,
+          "geometry_match": false,
+          "format_match": false,
+          "outcome": "SOURCE_IDENTITY_MISMATCH"
+        },
+        {
+          "index": 21,
+          "path": "textures/load/spr_font_xst/D7CE8BC3_512x256.dds",
+          "canonical": {
+            "sha256": "2a8f9e8c906a6ae5583550c735d999fc3f5650c4f21a4e9d0c7a915ec063f4b7",
+            "width": 512,
+            "height": 256,
+            "format": "RGBA"
+          },
+          "release": {
+            "bytes": 2097280,
+            "sha256": "3185f71400fa697aa6104a5cceac49bbad458d5f02667526efa21fc98f47e8fe",
+            "git_blob_sha1": "7640f50a6f3a4417ef06216a535974db1922fa21",
+            "header128_sha256": "cc9086ff5a7f0292352ff32bd46005a7a032a665036b35af7aede28fa21bb892",
+            "width": 2048,
+            "height": 1024,
+            "format": "DXT5",
+            "mip_count": 1,
+            "pitch_or_linear": 2097152
+          },
+          "sha256_match": false,
+          "geometry_match": false,
+          "format_match": false,
+          "outcome": "SOURCE_IDENTITY_MISMATCH"
+        }
+      ]
+    }
+  },
+  "terminal_state": {
+    "15": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_AND_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+    "18": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_AND_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+    "21": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_AND_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+  },
+  "retry_policy": "STICKY_SOURCE_IDENTITY_MISMATCH_UNTIL_CANONICAL_INVENTORY_SOURCE_POLICY_EXACT_CANONICAL_TRANSPORT_OR_EXPLICIT_USER_INSTRUCTION_CHANGES",
+  "candidate_authorized": false,
+  "candidate_dds_created": false,
+  "masks_created": false,
+  "clean_plate_created": false,
+  "noncanonical_release_substitution": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "material_advance": "Completes all remaining approved source-acquisition tiers for the A-owned font family without repeating the accepted Drive miss or static crosswalk; all three exact Release members fail current canonical identity, so unsafe source substitution and repeated acquisition are now fail-closed."
+}
