@@ -12,6 +12,7 @@
 #include "../core/raster_guard_policy.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../lifecycle/reset_replay_health.hpp"
+#include "../lifecycle/recovery_gate.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
 
 namespace OutRunVRStereo
@@ -89,7 +90,7 @@ namespace OutRunVRStereo
             if (!device || !IsGameDevice(device))
                 return;
 
-            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+            OutRunVR::Lifecycle::SetRecoverySafetyBlock(true);
             FailClosedStereoEligibility();
             ResetStereoBaselineTracking();
             InvalidateTrackedRasterShadow();
@@ -231,14 +232,14 @@ namespace OutRunVRStereo
             if (!OutRunVR::Lifecycle::IsCompatResetDevice(device))
             {
                 R34ResetReplay.blocked.store(false, std::memory_order_release);
-                OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
+                OutRunVR::Lifecycle::SetRecoverySafetyBlock(false);
                 return hr;
             }
 
             const bool healthy = SUCCEEDED(hr) &&
                 OutRunVR::Lifecycle::ResetReplaySucceeded();
             R34ResetReplay.blocked.store(!healthy, std::memory_order_release);
-            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
+            OutRunVR::Lifecycle::SetRecoverySafetyBlock(!healthy);
             if (!healthy)
             {
                 ++R34ResetReplay.replayBlocks;
@@ -260,7 +261,7 @@ namespace OutRunVRStereo
                     ++R34ResetReplay.lostDeviceBypasses;
                     R34ResetReplay.blocked.store(
                         true, std::memory_order_release);
-                    OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+                    OutRunVR::Lifecycle::SetRecoverySafetyBlock(true);
                     ArmMonoSafety();
                     if (!R34ResetReplay.firstLostDeviceBypassLogged)
                     {
@@ -381,7 +382,7 @@ namespace OutRunVRStereo
                             OutRunVR::Lifecycle::ResetReplaySucceeded();
                         R34ResetReplay.blocked.store(!healthy,
                             std::memory_order_release);
-                        OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(
+                        OutRunVR::Lifecycle::SetRecoverySafetyBlock(
                             !healthy);
                         if (!healthy)
                             R34ForceResetReplayFailClosed(
