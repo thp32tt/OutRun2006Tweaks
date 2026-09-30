@@ -1518,3 +1518,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Dispositions remain **PASS / PASS / PASS / PASS** for A00307/B00306/A00309/A00312. Index94/index111 approvals are still **PREFLIGHT_ONLY**; no runtime approval.
 - Candidate QA backlog remains **121/159/163/198/201**. A00318@index99 was produced after Q00067 and remains out-of-batch QA_PENDING.
 - `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+## 2026-10-01 04:19 KST - C170 Q00068 independent batch QA
+- A00313/B00310/A00314/A00316 dispositions: **PASS / PASS / PASS / PASS**.
+- Index121/FD90AA9 is newly **STATIC_QA_PASS_RUNTIME_UNTESTED** on candidate `5bb3a83b...`; exact Drive source/candidate identities, 4096x4096 RGBA32 mip1 header, zero outside-source-bbox decoded changes, 29/29 containment/slant evidence and independent visual review pass.
+- Index147/39BCA907 is **PASS PREFLIGHT_ONLY** for a fail-closed SOURCE_IDENTITY_MISMATCH: pinned Release exact member `b913c967...` does not match canonical inventory `c52f48b1...`; render remains forbidden.
+- A00313/A00314 are historical suppression-scope PASS only. Candidate QA backlog becomes **159/163/198/201**; B00319@index94, A00320@index111 and A00318@index99 are out-of-batch QA_PENDING.
+- Order: **RENDER_READY none -> ONE_STAGE none -> candidate QA 159/163/198/201 -> PREFLIGHT**. Canonical segments remain **757**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

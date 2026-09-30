@@ -9,13 +9,14 @@
   "next_actions": [
     "RENDER_READY: none.",
     "ONE_STAGE_TO_RENDER: none.",
-    "CANDIDATE_AWAITING_C: B00310@index121, B00315@index163, plus indices159/198/201. These candidate-completion items remain ahead of unrelated preflight.",
-    "PREFLIGHT_ONLY ACCEPTED: index94 B00306 seven-element v2 blueprint; removal/source-effect masks, independently QA-passed CLEAN_PLATE and current source-style measurement remain. Index111 A00309 source-only coverage; 12,181 Tuned/Normal/Random pixels remain unresolved and protected-art CLEAN_PLATE QA is required.",
-    "PREFLIGHT_ONLY OUT-OF-BATCH QA_PENDING: A00316@index147 proves pinned Release exact member b913c967... mismatches canonical c52f48b1...; no source substitution or pixel work before its own C disposition. Index232 canonical semantics remain complete; index133 follows candidate completion.",
-    "A-LANE FRONTIER: A00307/A00312 accepted historical scope only; A00313 suppression fingerprint and A00314 duplicate-dispatch receipt govern current duplicate suppression.",
-    "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=121/159/163/198/201; runnable_production=none; runtime_validated=none.",
-    "OUT-OF-BATCH QA_PENDING: A00318@index99 single-DDS isolation input was produced after the Q00067 validation-bearing result and is not implicitly approved by this batch.",
-    "Q00067 validation-bearing result 3232859cd65353d34e486f0555f80273c2392266 passed Localization Automation Gate 36762899251 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
+    "CANDIDATE_AWAITING_C: indices159/163/198/201. B00315@index163 is the newest exact-current review-lineage result and remains ahead of unrelated preflight.",
+    "PREFLIGHT_ONLY QA_PENDING: B00319@index94 exact-source segmentation and A00320@index111 Tuned/Normal source-only CLEAN_PLATE core proposal are newer than their last C-accepted scopes and are not implicitly approved by Q00068.",
+    "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index147 A00316 exact pinned Release member is proven noncanonical (b913c967... != c52f48b1...); keep SOURCE_IDENTITY_MISMATCH fail-closed until source/inventory/policy fingerprint changes. Indices133/232 retain prior accepted scopes.",
+    "STATIC_QA PASS: index121/FD90AA9 candidate 5bb3a83b... passed Q00068 C independent binary/pixel/visual QA; runtime remains UNTESTED.",
+    "RUNTIME ISOLATION QA_PENDING: A00318@index99 remains out-of-batch and is not implicitly approved.",
+    "A-LANE FRONTIER: A00313/A00314 are accepted only as historical suppression evidence; later Q00066/Q00067 and A00316/A00318/A00320 invalidate them as current frontier authority.",
+    "THROUGHPUT v16: production_complete new=1 (index121); candidate_awaiting_c=159/163/198/201; runnable_production=none; runtime_validated=none.",
+    "Q00068 validation-bearing result is pending its single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2466,42 +2467,43 @@
   },
   "latest_qa_batch": {
     "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00317",
-    "wave_id": "Q00067",
-    "run": "C169",
-    "recorded_at_kst": "2026-10-01T04:00:39+09:00",
-    "result": "PASS_Q00067_A00307_B00306_A00309_A00312_SCOPED_QA_RUNTIME_UNTESTED",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00321",
+    "wave_id": "Q00068",
+    "run": "C170",
+    "recorded_at_kst": "2026-10-01T04:23:51+09:00",
+    "result": "PASS_Q00068_INDEX121_STATIC_QA_A00313_A00314_FRONTIER_A00316_SOURCE_MISMATCH_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00307",
-        "result_sha": "0f58ce74120445c951286c6e2e317ee2d86e06c7",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00313",
+        "result_sha": "2ed2578462866e042f60cb694f3ad6a2062dc4c7",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00306",
-        "result_sha": "2edaf8eea143eda57b8a77994c8e900fd71632e8",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
+        "result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00309",
-        "result_sha": "8c5a59da9fa57d572da0939c0bb8eec9d4c3c6bd",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00314",
+        "result_sha": "3b83a503d54e0ab79f90cf0ca29233b4e1a4b2bb",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00312",
-        "result_sha": "4156f601c2456790d070da7e9c07d549bc391601",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00316",
+        "result_sha": "eed179b15c215cee541678829fc1f91a2abbd498",
         "status": "PASS"
       }
     ],
     "throughput_kpis": {
       "production_complete": {
-        "new_this_batch": 0,
+        "new_this_batch": 1,
         "retained_authoritative_static_qa_indices": [
           51,
           97,
           99,
           102,
           112,
+          121,
           130,
           152,
           193,
@@ -2513,29 +2515,22 @@
         ]
       },
       "candidate_awaiting_c": [
-        121,
         159,
         163,
         198,
         201
       ],
       "runnable_production": [],
-      "blocked_exception": [],
+      "blocked_exception": [
+        147
+      ],
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "3232859cd65353d34e486f0555f80273c2392266",
-    "authoritative_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
-    "validation_bearing_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36762899251,
-      "head_sha": "3232859cd65353d34e486f0555f80273c2392266",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T04:04:33+09:00"
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null,
+    "automation_gate": null
   }
 }
