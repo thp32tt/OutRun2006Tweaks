@@ -7,16 +7,15 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "RENDER_READY: none.",
-    "ONE_STAGE_TO_RENDER: none.",
-    "CANDIDATE_AWAITING_C: indices159/163/198/201. B00315@index163 is the newest exact-current review-lineage result and remains ahead of unrelated preflight.",
-    "PREFLIGHT_ONLY QA_PENDING: B00319@index94 exact-source segmentation and A00320@index111 Tuned/Normal source-only CLEAN_PLATE core proposal are newer than their last C-accepted scopes and are not implicitly approved by Q00068.",
-    "PREFLIGHT_ONLY ACCEPTED/BLOCKED: index147 A00316 exact pinned Release member is proven noncanonical (b913c967... != c52f48b1...); keep SOURCE_IDENTITY_MISMATCH fail-closed until source/inventory/policy fingerprint changes. Indices133/232 retain prior accepted scopes.",
-    "STATIC_QA PASS: index121/FD90AA9 candidate 5bb3a83b... passed Q00068 C independent binary/pixel/visual QA; runtime remains UNTESTED.",
-    "RUNTIME ISOLATION QA_PENDING: A00318@index99 remains out-of-batch and is not implicitly approved.",
-    "A-LANE FRONTIER: A00313/A00314 are accepted only as historical suppression evidence; later Q00066/Q00067 and A00316/A00318/A00320 invalidate them as current frontier authority.",
-    "THROUGHPUT v16: production_complete new=1 (index121); candidate_awaiting_c=159/163/198/201; runnable_production=none; runtime_validated=none.",
-    "Q00068 validation-bearing result 09f720371ac36e02098b6cf10b5c6c545cd75b7e passed Localization Automation Gate 36765645929 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
+    "RENDER_READY: none authoritative after Q00069.",
+    "ONE_STAGE_TO_RENDER: none authoritative after Q00069. B00322@index232 and B00324@index133 producer handoffs claim one-stage-to-render readiness but remain out-of-batch C-QA pending and are not implicitly accepted.",
+    "CANDIDATE_AWAITING_C: indices159/198/201. Keep these candidate results ahead of unrelated PREFLIGHT_ONLY expansion.",
+    "PREFLIGHT_ONLY ACCEPTED: index94 B00319 exact-source segmentation is accepted with 6/7 masks resolved; finish course_sp protected-prefix split, CLEAN_PLATE and final safe geometry before render. Index111 A00320 Tuned/Normal core proposal is accepted with 8,221 pixels still unresolved including RANDOM; complete protected-art CLEAN_PLATE work before render.",
+    "STATIC_QA PRODUCTION_COMPLETE: index163/59A79158 candidate fcb75cef... newly passes Q00069 independent static QA; runtime remains UNTESTED.",
+    "RUNTIME ISOLATION READY: index99/4F68708E A00318 current-workflow DDS_ONLY manifest is accepted on unchanged C139 static-QA candidate 4d19c5f1...; real-game validation remains UNTESTED.",
+    "OUT-OF-BATCH C QA: producer results not listed in Q00069 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not promoted by this batch.",
+    "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from Q00069-authoritative evidence; runtime_validated=none.",
+    "Q00069 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2467,30 +2466,30 @@
   },
   "latest_qa_batch": {
     "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00321",
-    "wave_id": "Q00068",
-    "run": "C170",
-    "recorded_at_kst": "2026-10-01T04:23:51+09:00",
-    "result": "PASS_Q00068_INDEX121_STATIC_QA_A00313_A00314_FRONTIER_A00316_SOURCE_MISMATCH_RUNTIME_UNTESTED",
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00329",
+    "wave_id": "Q00069",
+    "run": "C171",
+    "recorded_at_kst": "2026-10-01T05:15:00+09:00",
+    "result": "PASS_Q00069_INDEX163_STATIC_QA_INDEX99_ISOLATION_INDEX94_INDEX111_PREFLIGHT_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00313",
-        "result_sha": "2ed2578462866e042f60cb694f3ad6a2062dc4c7",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00315",
+        "result_sha": "476ab48d3471ca907645069847be3de782516e4f",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00310",
-        "result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00318",
+        "result_sha": "95d6cb420ce814802fad3d71b172d3020e81086e",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00314",
-        "result_sha": "3b83a503d54e0ab79f90cf0ca29233b4e1a4b2bb",
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00319",
+        "result_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00316",
-        "result_sha": "eed179b15c215cee541678829fc1f91a2abbd498",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
+        "result_sha": "9f45de594a6035636398668820d344b4c31bd2c1",
         "status": "PASS"
       }
     ],
@@ -2506,6 +2505,7 @@
           121,
           130,
           152,
+          163,
           193,
           195,
           222,
@@ -2516,7 +2516,6 @@
       },
       "candidate_awaiting_c": [
         159,
-        163,
         198,
         201
       ],
@@ -2526,19 +2525,10 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
-    "authoritative_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
-    "validation_bearing_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36765645929,
-      "head_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T04:26:51+09:00"
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null
   }
 }
