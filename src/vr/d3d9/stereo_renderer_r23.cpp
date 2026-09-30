@@ -857,6 +857,11 @@ namespace OutRunVRStereo
         VRRecoveryBaselineR23Hook VRRecoveryBaselineR23Hook::instance;
     }
 
+    void NotifyTopLevelDraw(IDirect3DDevice9* device) noexcept
+    {
+        R23BeforeTopLevelDraw(device);
+    }
+
     std::uint64_t TopLevelDrawSerial() noexcept
     {
         return R23GameDrawSerial;

@@ -231,7 +231,7 @@ namespace OutRunVRStereo
             // R23 normally owns this top-level boundary. Because this one draw
             // intentionally bypasses the R23->R22->R13->R9 replay chain, keep
             // its draw serial/live-state accounting explicitly in sync.
-            R23BeforeTopLevelDraw(device);
+            NotifyTopLevelDraw(device);
 
             ++R26TrackedOcclusionSingleExec;
             ++OcclusionStereoRejects;
