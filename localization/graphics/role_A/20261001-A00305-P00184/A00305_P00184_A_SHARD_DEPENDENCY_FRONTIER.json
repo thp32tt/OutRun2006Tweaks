@@ -1,0 +1,142 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00305-p00184-a-shard-zero-candidate-dependency-frontier-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00305",
+  "wave_id": "P00184",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "base_head_sha": "95d413b3149d1bc10997b21aa0b539924e302915",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "queue_controller_contract_blob_sha": "d0943eca15f7fbbe2fe2965c846bd47a505f73c2",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "d54e2df862741dba578c7e68cc10e4e32bc0d8c0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00302",
+    "latest_authoritative_c_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "latest_authoritative_c_gate_run_id": 36747306315,
+    "a00301_result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281",
+    "a00303_result_sha": "0d638bf038becb211d39414f024aab699a6369b2"
+  },
+  "scan_scope": {
+    "a_owned_localize_text_indices": [
+      12,
+      30,
+      36,
+      48,
+      51,
+      54,
+      57,
+      60,
+      63,
+      99,
+      102,
+      111,
+      132,
+      135,
+      147,
+      159,
+      195,
+      198,
+      201,
+      219,
+      222,
+      225,
+      228,
+      231,
+      237
+    ],
+    "a_owned_localize_text_count": 25,
+    "a_owned_zoom_review_indices": [
+      27,
+      33,
+      45,
+      144,
+      150,
+      153,
+      165,
+      171,
+      174,
+      177,
+      180,
+      189,
+      210
+    ],
+    "a_owned_zoom_review_count": 13
+  },
+  "candidate_completion_scan": {
+    "direct_rework_required_runnable": [],
+    "render_ready_runnable": [],
+    "one_stage_to_render_runnable": [],
+    "existing_candidate_material_rework_runnable": [],
+    "cross_lane_rework_not_stolen": [
+      163
+    ],
+    "c_candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_preflight_qa_pending_not_repeated": [
+      {
+        "index": 111,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
+        "result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281"
+      },
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+        "result_sha": "0d638bf038becb211d39414f024aab699a6369b2"
+      }
+    ],
+    "sticky_source_exhausted_or_fail_closed_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "source_transport_note": {
+    "pinned_release_attachment_present_in_current_conversation": true,
+    "consumed_in_this_task": false,
+    "reason": "Index147 is already represented by durable A00303 and is QA_PENDING; producer contract forbids repeating QA-pending work absent C REWORK_REQUIRED or a material source/candidate/QA-contract fingerprint change. Sticky source-exhausted assets are not reselected without dependency fingerprint change."
+  },
+  "conclusion": "ZERO_CANDIDATE_EXCEPTION_VALID_AFTER_FRESH_POST_EVIDENCE_SCAN",
+  "next_dependency_hinges": [
+    "C batch disposition for A00301@index111.",
+    "C batch disposition for A00303@index147.",
+    "C batch disposition for candidate results at indices159/198/201.",
+    "A material canonical-source dependency fingerprint change for sticky source-exhausted A-owned assets.",
+    "Real KoreanK3Trace/KoreanLocalizationTrace evidence for runtime-blocked font/name-entry special pipeline."
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false,
+  "material_deliverable": {
+    "type": "A_SHARD_FRESH_DEPENDENCY_FRONTIER_AND_ZERO_CANDIDATE_EXCEPTION_EVIDENCE",
+    "materially_reduces_duplicate_or_invalid_work": true,
+    "candidate_dds_modified": false,
+    "report": "localization/graphics/role_A/20261001-A00305-P00184/A00305_P00184_A_SHARD_DEPENDENCY_FRONTIER.json"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00305-p00184-a-shard-zero-candidate-dependency-frontier-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00305",
+  "wave_id": "P00184",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "base_head_sha": "95d413b3149d1bc10997b21aa0b539924e302915",
+  "result": "PASS_MATERIAL_A_MOD3_ZERO_CANDIDATE_EXCEPTION_DEPENDENCY_FRONTIER_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD/C166 scan finds no A-owned DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework. Candidate indices159/198/201 remain C-QA pending; index111/A00301 and index147/A00303 are durable producer preflights pending C and are not repeated. Sticky source-exhausted/fail-closed A assets are not reprobed, runtime-blocked font/name-entry work is not substituted for graphics production, and B-owned index163 rework is not stolen. With no valid new candidate/preflight target left after the fresh scan, this task records the exact dependency frontier rather than creating duplicate or speculative work.",
+  "selection": {
+    "direct_rework_required_runnable": [],
+    "render_ready_runnable": [],
+    "one_stage_to_render_runnable": [],
+    "existing_candidate_material_rework_runnable": [],
+    "cross_lane_rework_not_stolen": [
+      163
+    ],
+    "c_candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_preflight_qa_pending_not_repeated": [
+      {
+        "index": 111,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
+        "result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281"
+      },
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+        "result_sha": "0d638bf038becb211d39414f024aab699a6369b2"
+      }
+    ],
+    "sticky_source_exhausted_or_fail_closed_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "queue_controller_contract_blob_sha": "d0943eca15f7fbbe2fe2965c846bd47a505f73c2",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "d54e2df862741dba578c7e68cc10e4e32bc0d8c0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00302",
+    "latest_authoritative_c_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "latest_authoritative_c_gate_run_id": 36747306315,
+    "a00301_result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281",
+    "a00303_result_sha": "0d638bf038becb211d39414f024aab699a6369b2"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00305-P00184/A00305_P00184_A_SHARD_DEPENDENCY_FRONTIER.json"
+  ],
+  "material_deliverable": {
+    "type": "A_SHARD_FRESH_DEPENDENCY_FRONTIER_AND_ZERO_CANDIDATE_EXCEPTION_EVIDENCE",
+    "materially_reduces_duplicate_or_invalid_work": true,
+    "candidate_dds_modified": false,
+    "report": "localization/graphics/role_A/20261001-A00305-P00184/A00305_P00184_A_SHARD_DEPENDENCY_FRONTIER.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "self_qa": "PASS_A_MOD3_FRESH_SCAN__ZERO_RUNNABLE_CANDIDATE_TIERS__QA_PENDING_159_198_201_NOT_REPEATED__A00301_INDEX111_NOT_REPEATED__A00303_INDEX147_NOT_REPEATED__STICKY_SOURCE_BLOCKERS_NOT_REPROBED__RUNTIME_SPECIALS_NOT_SUBSTITUTED__CROSS_LANE_163_NOT_STOLEN__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): record A-shard dependency frontier [AUTO:LOCALIZATION-LOCALIZATION_A-00305]",
+  "precommit_refresh": {
+    "head_sha": "95d413b3149d1bc10997b21aa0b539924e302915",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Latest HEAD refreshed immediately before commit; only new lane-local A00305 report and task record are added."
+  },
+  "bookkeeping_note": "Producer immutable result SHA may be recorded in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+}
