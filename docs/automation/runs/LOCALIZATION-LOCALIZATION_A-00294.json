@@ -69,8 +69,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "ef3d9190eb11f24e5c54ba9e3a97d513fdb8e294",
+  "authoritative_result_sha": "ef3d9190eb11f24e5c54ba9e3a97d513fdb8e294",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): guard index135 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00294]",
   "precommit_refresh": {
@@ -78,5 +78,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest branch HEAD and C164/Q00062 shared state were refreshed before atomic tree construction; no shared state paths are modified."
   },
-  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00294 result SHA. Runtime remains UNTESTED."
+  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00294 result SHA. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T00:16:00+09:00",
+  "bookkeeping_base_head_sha": "ef3d9190eb11f24e5c54ba9e3a97d513fdb8e294"
 }
