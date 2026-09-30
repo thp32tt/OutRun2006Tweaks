@@ -1055,4 +1055,37 @@ namespace OutRunVRStereo
     {
         R31FlushPendingStateBlockResync(device);
     }
+
+    void DiscardUnreliableDrawCaches() noexcept
+    {
+        R31DiscardUnreliableDrawCaches();
+    }
+
+    bool LiveShaderMatches(
+        IDirect3DDevice9* device, std::uintptr_t shader) noexcept
+    {
+        return R31LiveShaderMatches(device, shader);
+    }
+
+    void ObserveDispatchDraw(IDirect3DDevice9* device) noexcept
+    {
+        R31ObserveDraw(device);
+    }
+
+    void NoteDispatchUnstable() noexcept { ++R31Frame.unstable; }
+    void NoteDispatchFragile() noexcept { ++R31Frame.fragile; }
+
+    void NoteDispatchFastWorld() noexcept
+    {
+        ++R31FastWorldDraws;
+        ++R31Frame.fastWorld;
+    }
+
+    void NoteDispatchHud() noexcept
+    {
+        ++R31HudDraws;
+        ++R31Frame.hud;
+    }
+
+    void NoteDispatchFallback() noexcept { ++R31Frame.fallback; }
 }

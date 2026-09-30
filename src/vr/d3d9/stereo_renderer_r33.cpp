@@ -12,6 +12,7 @@
 
 #include "stereo_renderer_r32.cpp"
 #include "../state/state_block_tracker.hpp"
+#include "../core/dispatch_support.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
 
@@ -272,7 +273,7 @@ namespace OutRunVRStereo
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
-                    ++R31Frame.unstable;
+                    NoteDispatchUnstable();
                 return {};
             }
 
@@ -287,7 +288,7 @@ namespace OutRunVRStereo
             if (fragile)
             {
                 if (R33TelemetryEnabled())
-                    ++R31Frame.fragile;
+                    NoteDispatchFragile();
                 return {};
             }
 
@@ -408,8 +409,7 @@ namespace OutRunVRStereo
             ++R29StableTwoEyeDraws;
             if (R33TelemetryEnabled())
             {
-                ++R31FastWorldDraws;
-                ++R31Frame.fastWorld;
+                NoteDispatchFastWorld();
             }
 
             if (FrameStereoPoseSequence == 0)
@@ -448,10 +448,10 @@ namespace OutRunVRStereo
 
             if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
-                R31DiscardUnreliableDrawCaches();
+                DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
                     CurrentVertexShaderIdentity.load(std::memory_order_acquire);
-                if (!R31LiveShaderMatches(device, cachedShader))
+                if (!LiveShaderMatches(device, cachedShader))
                     return {};
             }
 
@@ -576,8 +576,7 @@ namespace OutRunVRStereo
             ++R30ScreenSpaceFovDraws;
             if (R33TelemetryEnabled())
             {
-                ++R31HudDraws;
-                ++R31Frame.hud;
+                NoteDispatchHud();
             }
 
             if (FAILED(rightHr))
@@ -604,15 +603,15 @@ namespace OutRunVRStereo
             const char* site) noexcept
         {
             if (!OutRunVR::State::StateBlockTracker::IsRecording())
-                R31FlushPendingStateBlockResync(device);
+                FlushPendingStateBlockResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
-                R31ObserveDraw(device);
+                ObserveDispatchDraw(device);
 
             if (OutRunVR::State::StateBlockTracker::IsRecording())
             {
                 if (telemetry)
-                    ++R31Frame.fallback;
+                    NoteDispatchFallback();
                 return actualDraw();
             }
 
@@ -634,9 +633,9 @@ namespace OutRunVRStereo
             // Preserve R31's fail-closed boundary when StateBlock tracking
             // is unreliable. Otherwise stale R29 effect/shadow caches can
             // reclassify a draw that R33 already rejected using live state.
-            R31DiscardUnreliableDrawCaches();
+            DiscardUnreliableDrawCaches();
             if (telemetry)
-                ++R31Frame.fallback;
+                NoteDispatchFallback();
             return R32LowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
