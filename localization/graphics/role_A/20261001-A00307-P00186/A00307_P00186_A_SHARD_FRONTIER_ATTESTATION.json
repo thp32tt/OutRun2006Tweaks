@@ -1,0 +1,104 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00307-p00186-a-shard-unchanged-frontier-attestation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00307",
+  "wave_id": "P00186",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "base_head_sha": "c24ead0e10fe6a9f8dc6064cbfcfc9c85bfb3d31",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "governing_fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "queue_controller_contract_blob_sha": "d0943eca15f7fbbe2fe2965c846bd47a505f73c2",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "d54e2df862741dba578c7e68cc10e4e32bc0d8c0",
+    "canonical_progress_blob_sha": "37170eb087c6db0ce987c56703b213094f05e677",
+    "resume_state_blob_sha": "e43ed117f10a75cad9aed2d1c3eebf53f51c0ba3",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00302",
+    "latest_authoritative_c_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "latest_authoritative_c_gate_run_id": 36747306315,
+    "previous_a_frontier_task": "LOCALIZATION-LOCALIZATION_A-00305",
+    "previous_a_frontier_result_sha": "9caef1d8e1534a8b00fff0916f47778bfa1dfae5"
+  },
+  "dependency_delta_vs_a00305": {
+    "changed": false,
+    "rationale": "Current HEAD is the A00305 bookkeeping child and all candidate-selection fingerprints plus the latest authoritative C result are unchanged. No new C disposition, source identity, candidate fingerprint, or QA-contract fingerprint creates a legal A-owned rerun target."
+  },
+  "candidate_completion_scan": {
+    "direct_rework_required_runnable": [],
+    "render_ready_runnable": [],
+    "one_stage_to_render_runnable": [],
+    "existing_candidate_material_rework_runnable": [],
+    "cross_lane_rework_not_stolen": [
+      163
+    ],
+    "c_candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_preflight_qa_pending_not_repeated": [
+      {
+        "index": 111,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
+        "result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281"
+      },
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00303",
+        "result_sha": "0d638bf038becb211d39414f024aab699a6369b2"
+      }
+    ],
+    "sticky_source_exhausted_or_fail_closed_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_pipeline_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "new_preflight_target": null,
+    "new_preflight_batches_started": 0
+  },
+  "source_transport": {
+    "google_drive_approved_by_contract": true,
+    "google_drive_used": false,
+    "uploaded_pinned_release_archive_present_in_conversation": true,
+    "uploaded_archive_used": false,
+    "reason_not_used": "No A-owned source-acquisition target is legally selectable while unchanged producer/C QA-pending or fail-closed dependency fingerprints remain in force."
+  },
+  "conclusion": "ZERO_CANDIDATE_EXCEPTION_RECONFIRMED_BY_UNCHANGED_SSOT_FINGERPRINTS",
+  "next_dependency_hinges": [
+    "C batch disposition for A00301@index111.",
+    "C batch disposition for A00303@index147.",
+    "C batch disposition for candidate results at indices159/198/201.",
+    "A material source/candidate/QA-contract fingerprint change for fail-closed A-owned assets.",
+    "Real KoreanK3Trace/KoreanLocalizationTrace evidence for runtime-blocked special-pipeline assets."
+  ],
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "material_deliverable": {
+    "type": "A_SHARD_UNCHANGED_FRONTIER_FINGERPRINT_ATTESTATION_AND_DUPLICATE_SUPPRESSION_REVIEW",
+    "materially_reduces_duplicate_or_invalid_work": true,
+    "candidate_dds_modified": false,
+    "report": "localization/graphics/role_A/20261001-A00307-P00186/A00307_P00186_A_SHARD_FRONTIER_ATTESTATION.json"
+  }
+}
