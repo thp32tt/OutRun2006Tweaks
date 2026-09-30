@@ -82,8 +82,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "4f35616dea8a3d15afc83f8fd0296e7e8d30ad4b",
+  "authoritative_result_sha": "4f35616dea8a3d15afc83f8fd0296e7e8d30ad4b",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): guard index219 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00299]",
   "precommit_refresh": {
@@ -91,5 +91,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest HEAD includes disjoint B00295 index121 candidate/bookkeeping after A00297; no shared-state or index219 lane-local payload is overwritten."
   },
-  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00299 result SHA. RUNTIME_VALIDATION=UNTESTED."
+  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes immutable A00299 result 4f35616dea8a3d15afc83f8fd0296e7e8d30ad4b. This bookkeeping commit is separate, does not own the runner-backed Gate, and RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T01:30:00+09:00",
+  "bookkeeping_base_head_sha": "4f35616dea8a3d15afc83f8fd0296e7e8d30ad4b"
 }
