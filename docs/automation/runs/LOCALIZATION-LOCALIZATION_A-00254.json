@@ -70,7 +70,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "result_commit_message": "localization(A): resolve index111 source masks [AUTO:LOCALIZATION-LOCALIZATION_A-00254]"
+  "result_sha": "f73c48fcca2a17bc4bf50b2fedaa13f387635458",
+  "authoritative_result_sha": "f73c48fcca2a17bc4bf50b2fedaa13f387635458",
+  "result_commit_message": "localization(A): resolve index111 source masks [AUTO:LOCALIZATION-LOCALIZATION_A-00254]",
+  "bookkeeping_note": "Verified immutable producer result f73c48fcca2a17bc4bf50b2fedaa13f387635458 contains only A lane-local index111 source-effect-mask/reconstruction evidence plus the durable task record. This bookkeeping commit only fills the self-referential result SHA; automation_validation remains PENDING/C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T13:48:38+09:00",
+  "bookkeeping_base_head_sha": "f73c48fcca2a17bc4bf50b2fedaa13f387635458"
 }
