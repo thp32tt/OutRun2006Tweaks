@@ -451,18 +451,18 @@
   "uploaded_archive_used": true,
   "heavy_qa_repeated": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+  "authoritative_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+  "validation_bearing_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
   "precommit_refresh": {
     "head_sha": "48416f7c2186d0c1b6f59a6b99dc429625e5d65c",
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Correction built from latest failed C result HEAD; no producer state overwritten."
   },
-  "bookkeeping_note": "Prior C result 77881b51 failed the exact-producer Gate because A00320 was incorrectly dispositioned PASS despite its immutable result SHA lacking a changed durable task record. Corrected disposition is REWORK_REQUIRED; replacement validation-bearing result commit remains PENDING. Runtime remains UNTESTED.",
+  "bookkeeping_note": "Q00069 authoritative Gate PASS is owned by corrected validation-bearing result 6362a807dc00765ae9be3f6d74c005ac956cd322 (run 36771923100). Earlier result 77881b51... failed exact-producer verification and is diagnostic history only. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
   "corrected_at_kst": "2026-10-01T05:19:00+09:00",
   "prior_failed_gate": {
     "result_sha": "77881b5106198fabdae6fb4ffcc43a9a6266425a",
@@ -473,5 +473,15 @@
     "conclusion": "failure",
     "failed_step": "Verify exact producer SHAs in C batch",
     "diagnosis": "A00320@9f45de59 immutable result changes only analyzer script; durable task record/material payload is not in the same result commit, so PASS disposition cannot satisfy exact-producer verify_automation_commit."
-  }
+  },
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36771923100,
+    "head_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-10-01T05:20:49+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-10-01T05:21:00+09:00"
 }

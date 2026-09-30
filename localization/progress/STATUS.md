@@ -1545,3 +1545,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Prior result `77881b51...` Gate `36771464265` failed only the exact-producer-SHA step; earlier state/v2/domain/payload/lane checks passed.
 - **A00320@index111: REWORK_REQUIRED** — numeric replay passes, but immutable result SHA lacks a same-commit durable task-record/material change. Do not promote the 8,221-unresolved scope; retain Q00067/A00309 authority and re-emit under one valid SHA.
 - B00315@index163, A00318@index99, B00319@index94 remain PASS. Replacement C result: `AUTOMATION_VALIDATION=PENDING`; runtime UNTESTED.
+
+### Q00069 authoritative Gate PASS — 2026-10-01 05:21 KST
+- Validation-bearing result: `6362a807dc00765ae9be3f6d74c005ac956cd322`; Gate run: `36771923100` **success**.
+- Final dispositions: B00315 **PASS**, A00318 **PASS**, B00319 **PASS**, A00320 **REWORK_REQUIRED**.
+- New production completion: index163/59A79158. Runtime remains **UNTESTED**.

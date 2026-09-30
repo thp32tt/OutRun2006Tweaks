@@ -16,7 +16,7 @@
     "RUNTIME ISOLATION READY: index99/4F68708E A00318 current-workflow DDS_ONLY manifest is accepted on unchanged C139 static-QA candidate 4d19c5f1...; real-game validation remains UNTESTED.",
     "OUT-OF-BATCH C QA: producer results not listed in Q00069 remain QA_PENDING by exact TASK_ID@RESULT_SHA and are not promoted by this batch.",
     "THROUGHPUT v16: production_complete new=1 (index163); candidate_awaiting_c=159/198/201; runnable_production=none from corrected Q00069 authority; runtime_validated=none.",
-    "Corrected Q00069 validation-bearing result commit owns the retry Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00069 corrected validation-bearing result 6362a807dc00765ae9be3f6d74c005ac956cd322 passed Localization Automation Gate 36771923100 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2527,11 +2527,20 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
+    "result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+    "authoritative_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+    "validation_bearing_result_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36771923100,
+      "head_sha": "6362a807dc00765ae9be3f6d74c005ac956cd322",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T05:20:49+09:00"
+    },
     "prior_failed_gate": {
       "result_sha": "77881b5106198fabdae6fb4ffcc43a9a6266425a",
       "workflow": "Localization Automation Gate",
