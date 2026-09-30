@@ -1,87 +1,24 @@
 {
   "schema_version": 15,
-  "schema": "outrun-b00295-p00176-index121-fd90aa9-v2-source-only-success-v2",
+  "schema": "outrun-b00295-p00176-fd90aa9-final-static-qa-v1",
   "task_id": "LOCALIZATION-LOCALIZATION_B-00295",
   "wave_id": "P00176",
-  "lane": "LOCALIZATION_B",
-  "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
-  "chat_rollover": 3,
-  "current_rollover_message": 1,
+  "asset": "FD90AA9",
+  "index": 121,
   "recorded_at_kst": "2026-10-01T01:23:14+09:00",
-  "base_head_sha": "90befd9f4d615e73c7e456d4116bb27ff696f8ff",
-  "supersedes_blocked_result_sha": "43f695c89aeb84ef2f85ea5306ea91571928f7bc",
-  "target": {
-    "index": 121,
-    "asset": "FD90AA9",
-    "path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
-    "action": "localize_text",
-    "shard_check": "121 % 3 == 1 => B"
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "9e93c7ef550a057d23015466604ff527380cfc0323b883b5f8ebfe92efb5fd78",
+  "comparison_sha256": "086c8c49a14192f53e69006bde13d7fcb3e4d24c68b868dc4d5bdf92a25fdb0c",
+  "structure": {
+    "width": 4096,
+    "height": 4096,
+    "format": "RGBA32",
+    "pitch": 16384,
+    "mipmaps": 1,
+    "header_128_exact_source": true,
+    "raw_orientation": "mirror_y"
   },
-  "source": {
-    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
-    "git_blob_sha": "b57d20b7908d911d87b8178d88240f9202828594",
-    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
-    "bytes": 67108992,
-    "dds": {
-      "width": 4096,
-      "height": 4096,
-      "format": "RGBA32",
-      "pitch": 16384,
-      "mipmaps": 1,
-      "raw_orientation": "mirror_y"
-    },
-    "drive": {
-      "account": "ezflash557",
-      "canonical_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
-      "file_id": "1J5LBV_dkJQ280Y_oDOn6JZj-n22cI4eX",
-      "exact_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
-      "readback_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
-      "identity": "PASS"
-    }
-  },
-  "generation_reset": {
-    "exact_english_source_only": true,
-    "old_korean_candidate_pixels_used": false,
-    "old_korean_candidate_used_as_artwork_input": false,
-    "old_candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
-    "clean_plate_method": "exact-source target-glyph footprint removal; transparent families clear only target source pixels; engine_tag preserves panel and reconstructs English glyph footprint from exact source panel",
-    "render_method": "fresh Korean glyph render at final atlas resolution with source-family sampled fill/outline/shadow/slant; no flattened old-Korean raster resampling",
-    "protected_artwork_policy": "retain exact-source pixels outside target effect footprints; overlapping neighboring atlas artwork/text remains source-derived",
-    "font_file_persisted": false
-  },
-  "candidate": {
-    "sha256": "9e93c7ef550a057d23015466604ff527380cfc0323b883b5f8ebfe92efb5fd78",
-    "bytes": 67108992,
-    "dds": {
-      "width": 4096,
-      "height": 4096,
-      "format": "RGBA32",
-      "pitch": 16384,
-      "mipmaps": 1,
-      "header_128_exact_source": true,
-      "raw_orientation": "mirror_y"
-    },
-    "drive": {
-      "current_pipeline_folder_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
-      "task_folder_id": "1K6aT-zJmTfTGqfOSm3Zjj0eTv1X9NoFh",
-      "file_id": "1-0MD6jL8lyWbUDADnWxh5C3ixCCJTnp9",
-      "file_name": "FD90AA9_1024x1024.dds",
-      "readback_bytes": 67108992,
-      "readback_sha256": "9e93c7ef550a057d23015466604ff527380cfc0323b883b5f8ebfe92efb5fd78",
-      "readback_equal": true
-    }
-  },
-  "comparison_proof": {
-    "file_id": "1S3ybMSOsijtLfE5ty_GvobPWI1m3a21Q",
-    "file_name": "B00295_FD90AA9_SOURCE_CANDIDATE_COMPARE.png",
-    "sha256": "086c8c49a14192f53e69006bde13d7fcb3e4d24c68b868dc4d5bdf92a25fdb0c",
-    "bytes": 1859359,
-    "readback_equal": true,
-    "construction": "same readable orientation/crop scale; English source left, Korean candidate right",
-    "visual_review": "PASS_TARGET_ENGLISH_REMOVED_NO_CLIPPING_NO_NEW_NEIGHBOR_OVERLAP; source-derived neighboring atlas overlaps preserved"
-  },
-  "qa": {
+  "summary": {
     "elements": 29,
     "containment_pass": 29,
     "containment_fail": 0,
@@ -1704,23 +1641,1608 @@
       }
     ]
   },
-  "result": "PASS_MATERIAL_B_MOD3_INDEX121_SOURCE_ONLY_FD90AA9_V2_CANDIDATE_SELF_QA_RUNTIME_UNTESTED_PENDING_C_BATCH",
-  "materially_reduces_unresolved_work": true,
-  "candidate_dds_modified": true,
-  "candidate_binary_persisted": true,
-  "shared_state_modified": false,
-  "peer_lane_files_modified": false,
-  "runtime_test_performed": false,
+  "rows": [
+    {
+      "key": "outsp_course",
+      "source": "OutRun2SP Course",
+      "korean": "아웃런2 SP 코스",
+      "style": "top_yellow",
+      "font_size": 62,
+      "original_bbox": [
+        1126,
+        374,
+        1678,
+        449
+      ],
+      "source_effect_bbox": [
+        1126,
+        374,
+        1677,
+        448
+      ],
+      "localized_bbox": [
+        1182,
+        376,
+        1620,
+        446
+      ],
+      "delta_left": 56,
+      "delta_right": 58,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 56,
+      "source_effect_delta_right": 57,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1126,
+        3647,
+        1678,
+        3722
+      ],
+      "raw_source_effect_bbox": [
+        1126,
+        3648,
+        1677,
+        3722
+      ],
+      "raw_localized_bbox": [
+        1182,
+        3650,
+        1620,
+        3720
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "out2_course",
+      "source": "OutRun2 Course",
+      "korean": "아웃런2 코스",
+      "style": "top_blue",
+      "font_size": 62,
+      "original_bbox": [
+        1776,
+        374,
+        2232,
+        449
+      ],
+      "source_effect_bbox": [
+        1776,
+        374,
+        2231,
+        448
+      ],
+      "localized_bbox": [
+        1831,
+        376,
+        2175,
+        446
+      ],
+      "delta_left": 55,
+      "delta_right": 57,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 55,
+      "source_effect_delta_right": 56,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1776,
+        3647,
+        2232,
+        3722
+      ],
+      "raw_source_effect_bbox": [
+        1776,
+        3648,
+        2231,
+        3722
+      ],
+      "raw_localized_bbox": [
+        1831,
+        3650,
+        2175,
+        3720
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "more_engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "style": "engine_tag",
+      "font_size": 54,
+      "original_bbox": [
+        2772,
+        376,
+        3187,
+        448
+      ],
+      "source_effect_bbox": [
+        2790,
+        385,
+        3171,
+        440
+      ],
+      "localized_bbox": [
+        2851,
+        387,
+        3110,
+        438
+      ],
+      "delta_left": 79,
+      "delta_right": 77,
+      "delta_top": 11,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "source_effect_delta_left": 61,
+      "source_effect_delta_right": 61,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        2772,
+        3648,
+        3187,
+        3720
+      ],
+      "raw_source_effect_bbox": [
+        2790,
+        3656,
+        3171,
+        3711
+      ],
+      "raw_localized_bbox": [
+        2851,
+        3658,
+        3110,
+        3709
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "you",
+      "source": "You",
+      "korean": "나",
+      "style": "top_yellow_plain",
+      "font_size": 56,
+      "original_bbox": [
+        3169,
+        376,
+        3334,
+        445
+      ],
+      "source_effect_bbox": [
+        3200,
+        379,
+        3333,
+        444
+      ],
+      "localized_bbox": [
+        3237,
+        381,
+        3296,
+        442
+      ],
+      "delta_left": 68,
+      "delta_right": 38,
+      "delta_top": 5,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 37,
+      "source_effect_delta_right": 37,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3169,
+        3651,
+        3334,
+        3720
+      ],
+      "raw_source_effect_bbox": [
+        3200,
+        3652,
+        3333,
+        3717
+      ],
+      "raw_localized_bbox": [
+        3237,
+        3654,
+        3296,
+        3715
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "gas_pedal",
+      "source": "Gas Pedal :",
+      "korean": "가속 페달:",
+      "style": "small_white",
+      "font_size": 42,
+      "original_bbox": [
+        3490,
+        391,
+        3748,
+        440
+      ],
+      "source_effect_bbox": [
+        3490,
+        391,
+        3747,
+        439
+      ],
+      "localized_bbox": [
+        3528,
+        393,
+        3709,
+        437
+      ],
+      "delta_left": 38,
+      "delta_right": 39,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 38,
+      "source_effect_delta_right": 38,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3490,
+        3656,
+        3748,
+        3705
+      ],
+      "raw_source_effect_bbox": [
+        3490,
+        3657,
+        3747,
+        3705
+      ],
+      "raw_localized_bbox": [
+        3528,
+        3659,
+        3709,
+        3703
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "run15",
+      "source": "You will run 15 courses continuously.",
+      "korean": "15코스를 연속으로 달립니다.",
+      "style": "small_white_blue",
+      "font_size": 53,
+      "original_bbox": [
+        0,
+        517,
+        934,
+        620
+      ],
+      "source_effect_bbox": [
+        15,
+        558,
+        919,
+        620
+      ],
+      "localized_bbox": [
+        146,
+        560,
+        788,
+        618
+      ],
+      "delta_left": 146,
+      "delta_right": 146,
+      "delta_top": 43,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "source_effect_delta_left": 131,
+      "source_effect_delta_right": 131,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        0,
+        3476,
+        934,
+        3579
+      ],
+      "raw_source_effect_bbox": [
+        15,
+        3476,
+        919,
+        3538
+      ],
+      "raw_localized_bbox": [
+        146,
+        3478,
+        788,
+        3536
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "style": "hidden_black",
+      "font_size": 58,
+      "original_bbox": [
+        922,
+        499,
+        1408,
+        620
+      ],
+      "source_effect_bbox": [
+        940,
+        562,
+        1369,
+        620
+      ],
+      "localized_bbox": [
+        1043,
+        564,
+        1266,
+        618
+      ],
+      "delta_left": 121,
+      "delta_right": 142,
+      "delta_top": 65,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "source_effect_delta_left": 103,
+      "source_effect_delta_right": 103,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        922,
+        3476,
+        1408,
+        3597
+      ],
+      "raw_source_effect_bbox": [
+        940,
+        3476,
+        1369,
+        3534
+      ],
+      "raw_localized_bbox": [
+        1043,
+        3478,
+        1266,
+        3532
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "enter_selection",
+      "source": "Enter Selection",
+      "korean": "선택 확정",
+      "style": "small_white",
+      "font_size": 37,
+      "original_bbox": [
+        3456,
+        517,
+        3893,
+        627
+      ],
+      "source_effect_bbox": [
+        3525,
+        583,
+        3869,
+        627
+      ],
+      "localized_bbox": [
+        3622,
+        585,
+        3771,
+        625
+      ],
+      "delta_left": 166,
+      "delta_right": 122,
+      "delta_top": 68,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "source_effect_delta_left": 97,
+      "source_effect_delta_right": 98,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3456,
+        3469,
+        3893,
+        3579
+      ],
+      "raw_source_effect_bbox": [
+        3525,
+        3469,
+        3869,
+        3513
+      ],
+      "raw_localized_bbox": [
+        3622,
+        3471,
+        3771,
+        3511
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "same_conditions",
+      "source": "Do you want to set up under the same conditions as your former race?",
+      "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?",
+      "style": "small_white_blue",
+      "font_size": 60,
+      "original_bbox": [
+        14,
+        614,
+        1894,
+        730
+      ],
+      "source_effect_bbox": [
+        14,
+        660,
+        1848,
+        730
+      ],
+      "localized_bbox": [
+        334,
+        662,
+        1527,
+        727
+      ],
+      "delta_left": 320,
+      "delta_right": 367,
+      "delta_top": 48,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 320,
+      "source_effect_delta_right": 321,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        14,
+        3366,
+        1894,
+        3482
+      ],
+      "raw_source_effect_bbox": [
+        14,
+        3366,
+        1848,
+        3436
+      ],
+      "raw_localized_bbox": [
+        334,
+        3369,
+        1527,
+        3434
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "transmission2",
+      "source": "Transmission",
+      "korean": "변속기",
+      "style": "hidden_black",
+      "font_size": 63,
+      "original_bbox": [
+        1221,
+        722,
+        1805,
+        843
+      ],
+      "source_effect_bbox": [
+        1254,
+        780,
+        1805,
+        843
+      ],
+      "localized_bbox": [
+        1445,
+        782,
+        1614,
+        841
+      ],
+      "delta_left": 224,
+      "delta_right": 191,
+      "delta_top": 60,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "source_effect_delta_left": 191,
+      "source_effect_delta_right": 191,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1221,
+        3253,
+        1805,
+        3374
+      ],
+      "raw_source_effect_bbox": [
+        1254,
+        3253,
+        1805,
+        3316
+      ],
+      "raw_localized_bbox": [
+        1445,
+        3255,
+        1614,
+        3314
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "experts_long",
+      "source": "For Experts & Long distance to the goal",
+      "korean": "상급자용 · 골까지 장거리",
+      "style": "expert_red_mixed",
+      "font_size": 112,
+      "original_bbox": [
+        1907,
+        602,
+        3406,
+        781
+      ],
+      "source_effect_bbox": [
+        1907,
+        652,
+        3378,
+        781
+      ],
+      "localized_bbox": [
+        2050,
+        654,
+        3235,
+        779
+      ],
+      "delta_left": 143,
+      "delta_right": 171,
+      "delta_top": 52,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "source_effect_delta_left": 143,
+      "source_effect_delta_right": 143,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1907,
+        3315,
+        3406,
+        3494
+      ],
+      "raw_source_effect_bbox": [
+        1907,
+        3315,
+        3378,
+        3444
+      ],
+      "raw_localized_bbox": [
+        2050,
+        3317,
+        3235,
+        3442
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "view_choices",
+      "source": "View Choices",
+      "korean": "선택 보기",
+      "style": "small_white",
+      "font_size": 38,
+      "original_bbox": [
+        3525,
+        614,
+        3882,
+        730
+      ],
+      "source_effect_bbox": [
+        3586,
+        686,
+        3881,
+        730
+      ],
+      "localized_bbox": [
+        3658,
+        688,
+        3808,
+        728
+      ],
+      "delta_left": 133,
+      "delta_right": 74,
+      "delta_top": 74,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "source_effect_delta_left": 72,
+      "source_effect_delta_right": 73,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3525,
+        3366,
+        3882,
+        3482
+      ],
+      "raw_source_effect_bbox": [
+        3586,
+        3366,
+        3881,
+        3410
+      ],
+      "raw_localized_bbox": [
+        3658,
+        3368,
+        3808,
+        3408
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "for_experts",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "style": "expert_red",
+      "font_size": 85,
+      "original_bbox": [
+        1766,
+        704,
+        2304,
+        896
+      ],
+      "source_effect_bbox": [
+        1766,
+        790,
+        2218,
+        890
+      ],
+      "localized_bbox": [
+        1830,
+        792,
+        2154,
+        887
+      ],
+      "delta_left": 64,
+      "delta_right": 150,
+      "delta_top": 88,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "source_effect_delta_left": 64,
+      "source_effect_delta_right": 64,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1766,
+        3200,
+        2304,
+        3392
+      ],
+      "raw_source_effect_bbox": [
+        1766,
+        3206,
+        2218,
+        3306
+      ],
+      "raw_localized_bbox": [
+        1830,
+        3209,
+        2154,
+        3304
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "normal_difficult",
+      "source": "Normal difficult",
+      "korean": "보통 난이도",
+      "style": "normal_green",
+      "font_size": 61,
+      "original_bbox": [
+        2547,
+        704,
+        3354,
+        896
+      ],
+      "source_effect_bbox": [
+        2614,
+        790,
+        3284,
+        863
+      ],
+      "localized_bbox": [
+        2797,
+        792,
+        3100,
+        861
+      ],
+      "delta_left": 250,
+      "delta_right": 254,
+      "delta_top": 88,
+      "delta_bottom": 35,
+      "containment": "PASS",
+      "source_effect_delta_left": 183,
+      "source_effect_delta_right": 184,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        2547,
+        3200,
+        3354,
+        3392
+      ],
+      "raw_source_effect_bbox": [
+        2614,
+        3233,
+        3284,
+        3306
+      ],
+      "raw_localized_bbox": [
+        2797,
+        3235,
+        3100,
+        3304
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "select_game_mode",
+      "source": "Select Game Mode",
+      "korean": "게임 모드 선택",
+      "style": "large_white",
+      "font_size": 81,
+      "original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "source_effect_bbox": [
+        213,
+        887,
+        1165,
+        972
+      ],
+      "localized_bbox": [
+        445,
+        889,
+        933,
+        969
+      ],
+      "delta_left": 279,
+      "delta_right": 233,
+      "delta_top": 70,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 232,
+      "source_effect_delta_right": 232,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        166,
+        3123,
+        1166,
+        3277
+      ],
+      "raw_source_effect_bbox": [
+        213,
+        3124,
+        1165,
+        3209
+      ],
+      "raw_localized_bbox": [
+        445,
+        3127,
+        933,
+        3207
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "select_car",
+      "source": "Select your car",
+      "korean": "차량 선택",
+      "style": "large_white",
+      "font_size": 99,
+      "original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "source_effect_bbox": [
+        302,
+        1007,
+        1085,
+        1110
+      ],
+      "localized_bbox": [
+        497,
+        1009,
+        890,
+        1107
+      ],
+      "delta_left": 254,
+      "delta_right": 266,
+      "delta_top": 62,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 195,
+      "source_effect_delta_right": 195,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        243,
+        2985,
+        1156,
+        3149
+      ],
+      "raw_source_effect_bbox": [
+        302,
+        2986,
+        1085,
+        3089
+      ],
+      "raw_localized_bbox": [
+        497,
+        2989,
+        890,
+        3087
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "select_course",
+      "source": "Select Course",
+      "korean": "코스 선택",
+      "style": "large_white",
+      "font_size": 82,
+      "original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "source_effect_bbox": [
+        370,
+        1127,
+        1084,
+        1212
+      ],
+      "localized_bbox": [
+        563,
+        1129,
+        890,
+        1210
+      ],
+      "delta_left": 261,
+      "delta_right": 195,
+      "delta_top": 67,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 193,
+      "source_effect_delta_right": 194,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        302,
+        2883,
+        1085,
+        3034
+      ],
+      "raw_source_effect_bbox": [
+        370,
+        2884,
+        1084,
+        2969
+      ],
+      "raw_localized_bbox": [
+        563,
+        2886,
+        890,
+        2967
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "select_music",
+      "source": "Select your music",
+      "korean": "음악 선택",
+      "style": "large_white",
+      "font_size": 86,
+      "original_bbox": [
+        1549,
+        819,
+        2571,
+        990
+      ],
+      "source_effect_bbox": [
+        1613,
+        900,
+        2533,
+        989
+      ],
+      "localized_bbox": [
+        1903,
+        902,
+        2242,
+        987
+      ],
+      "delta_left": 354,
+      "delta_right": 329,
+      "delta_top": 83,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 290,
+      "source_effect_delta_right": 291,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1549,
+        3106,
+        2571,
+        3277
+      ],
+      "raw_source_effect_bbox": [
+        1613,
+        3107,
+        2533,
+        3196
+      ],
+      "raw_localized_bbox": [
+        1903,
+        3109,
+        2242,
+        3194
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "select_transmission",
+      "source": "Select Transmission",
+      "korean": "변속 방식 선택",
+      "style": "large_white",
+      "font_size": 72,
+      "original_bbox": [
+        1563,
+        947,
+        2589,
+        1092
+      ],
+      "source_effect_bbox": [
+        1563,
+        1015,
+        2588,
+        1091
+      ],
+      "localized_bbox": [
+        1860,
+        1017,
+        2290,
+        1089
+      ],
+      "delta_left": 297,
+      "delta_right": 299,
+      "delta_top": 70,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 297,
+      "source_effect_delta_right": 298,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1563,
+        3004,
+        2589,
+        3149
+      ],
+      "raw_source_effect_bbox": [
+        1563,
+        3005,
+        2588,
+        3081
+      ],
+      "raw_localized_bbox": [
+        1860,
+        3007,
+        2290,
+        3079
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "shortcut_features",
+      "source": "Shortcut Features",
+      "korean": "바로가기 기능",
+      "style": "large_white",
+      "font_size": 81,
+      "original_bbox": [
+        1587,
+        1062,
+        2611,
+        1213
+      ],
+      "source_effect_bbox": [
+        1680,
+        1127,
+        2610,
+        1212
+      ],
+      "localized_bbox": [
+        1912,
+        1129,
+        2378,
+        1209
+      ],
+      "delta_left": 325,
+      "delta_right": 233,
+      "delta_top": 67,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 232,
+      "source_effect_delta_right": 232,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1587,
+        2883,
+        2611,
+        3034
+      ],
+      "raw_source_effect_bbox": [
+        1680,
+        2884,
+        2610,
+        2969
+      ],
+      "raw_localized_bbox": [
+        1912,
+        2887,
+        2378,
+        2967
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "selected_sp",
+      "source": "Outrun2: SP Course has been selected.",
+      "korean": "아웃런2 SP 코스가 선택되었습니다.",
+      "style": "selected_yellow",
+      "font_size": 92,
+      "original_bbox": [
+        63,
+        1183,
+        2227,
+        1348
+      ],
+      "source_effect_bbox": [
+        63,
+        1244,
+        2144,
+        1347
+      ],
+      "localized_bbox": [
+        419,
+        1246,
+        1787,
+        1344
+      ],
+      "delta_left": 356,
+      "delta_right": 440,
+      "delta_top": 63,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 356,
+      "source_effect_delta_right": 357,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        63,
+        2748,
+        2227,
+        2913
+      ],
+      "raw_source_effect_bbox": [
+        63,
+        2749,
+        2144,
+        2852
+      ],
+      "raw_localized_bbox": [
+        419,
+        2752,
+        1787,
+        2850
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "selected_out2",
+      "source": "Outrun2 Course has been selected.",
+      "korean": "아웃런2 코스가 선택되었습니다.",
+      "style": "selected_yellow",
+      "font_size": 92,
+      "original_bbox": [
+        90,
+        1306,
+        2125,
+        1484
+      ],
+      "source_effect_bbox": [
+        162,
+        1380,
+        2046,
+        1483
+      ],
+      "localized_bbox": [
+        490,
+        1382,
+        1718,
+        1480
+      ],
+      "delta_left": 400,
+      "delta_right": 407,
+      "delta_top": 76,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 328,
+      "source_effect_delta_right": 328,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        90,
+        2612,
+        2125,
+        2790
+      ],
+      "raw_source_effect_bbox": [
+        162,
+        2613,
+        2046,
+        2716
+      ],
+      "raw_localized_bbox": [
+        490,
+        2616,
+        1718,
+        2714
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "select_car_setting",
+      "source": "Select car setting",
+      "korean": "차량 설정 선택",
+      "style": "large_white",
+      "font_size": 99,
+      "original_bbox": [
+        2419,
+        1183,
+        3394,
+        1367
+      ],
+      "source_effect_bbox": [
+        2489,
+        1263,
+        3393,
+        1366
+      ],
+      "localized_bbox": [
+        2642,
+        1265,
+        3239,
+        1363
+      ],
+      "delta_left": 223,
+      "delta_right": 155,
+      "delta_top": 82,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 153,
+      "source_effect_delta_right": 154,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        2419,
+        2729,
+        3394,
+        2913
+      ],
+      "raw_source_effect_bbox": [
+        2489,
+        2730,
+        3393,
+        2833
+      ],
+      "raw_localized_bbox": [
+        2642,
+        2733,
+        3239,
+        2831
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "versus_mode",
+      "source": "Versus Mode.",
+      "korean": "대전 모드",
+      "style": "selected_yellow",
+      "font_size": 90,
+      "original_bbox": [
+        2226,
+        1306,
+        2995,
+        1486
+      ],
+      "source_effect_bbox": [
+        2226,
+        1385,
+        2945,
+        1485
+      ],
+      "localized_bbox": [
+        2408,
+        1387,
+        2763,
+        1483
+      ],
+      "delta_left": 182,
+      "delta_right": 232,
+      "delta_top": 81,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 182,
+      "source_effect_delta_right": 182,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        2226,
+        2610,
+        2995,
+        2790
+      ],
+      "raw_source_effect_bbox": [
+        2226,
+        2611,
+        2945,
+        2711
+      ],
+      "raw_localized_bbox": [
+        2408,
+        2613,
+        2763,
+        2709
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "gear_change",
+      "source": "Gear change",
+      "korean": "기어 변속",
+      "style": "gear_red",
+      "font_size": 94,
+      "original_bbox": [
+        3587,
+        1304,
+        4034,
+        1501
+      ],
+      "source_effect_bbox": [
+        3587,
+        1392,
+        4033,
+        1500
+      ],
+      "localized_bbox": [
+        3621,
+        1394,
+        3999,
+        1498
+      ],
+      "delta_left": 34,
+      "delta_right": 35,
+      "delta_top": 90,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 34,
+      "source_effect_delta_right": 34,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3587,
+        2595,
+        4034,
+        2792
+      ],
+      "raw_source_effect_bbox": [
+        3587,
+        2596,
+        4033,
+        2704
+      ],
+      "raw_localized_bbox": [
+        3621,
+        2598,
+        3999,
+        2702
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "player_battle_desc",
+      "source": "A course designed for player battle.",
+      "korean": "플레이어 대전을 위해 / 설계된 코스입니다.",
+      "style": "desc_white",
+      "font_size": 53,
+      "original_bbox": [
+        3093,
+        1446,
+        3994,
+        1668
+      ],
+      "source_effect_bbox": [
+        3180,
+        1534,
+        3827,
+        1667
+      ],
+      "localized_bbox": [
+        3269,
+        1536,
+        3738,
+        1665
+      ],
+      "delta_left": 176,
+      "delta_right": 256,
+      "delta_top": 90,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "source_effect_delta_left": 89,
+      "source_effect_delta_right": 89,
+      "source_effect_delta_top": 2,
+      "source_effect_delta_bottom": 2,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3093,
+        2428,
+        3994,
+        2650
+      ],
+      "raw_source_effect_bbox": [
+        3180,
+        2429,
+        3827,
+        2562
+      ],
+      "raw_localized_bbox": [
+        3269,
+        2431,
+        3738,
+        2560
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "new_course_desc",
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+      "style": "desc_white",
+      "font_size": 46,
+      "original_bbox": [
+        3008,
+        1587,
+        3828,
+        1827
+      ],
+      "source_effect_bbox": [
+        3008,
+        1709,
+        3661,
+        1826
+      ],
+      "localized_bbox": [
+        3088,
+        1712,
+        3581,
+        1823
+      ],
+      "delta_left": 80,
+      "delta_right": 247,
+      "delta_top": 125,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 80,
+      "source_effect_delta_right": 80,
+      "source_effect_delta_top": 3,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3008,
+        2269,
+        3828,
+        2509
+      ],
+      "raw_source_effect_bbox": [
+        3008,
+        2270,
+        3661,
+        2387
+      ],
+      "raw_localized_bbox": [
+        3088,
+        2273,
+        3581,
+        2384
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "orig_course_desc",
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 / 코스입니다.",
+      "style": "desc_white",
+      "font_size": 46,
+      "original_bbox": [
+        3008,
+        1754,
+        3662,
+        1995
+      ],
+      "source_effect_bbox": [
+        3034,
+        1877,
+        3564,
+        1994
+      ],
+      "localized_bbox": [
+        3108,
+        1880,
+        3490,
+        1991
+      ],
+      "delta_left": 100,
+      "delta_right": 172,
+      "delta_top": 126,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 74,
+      "source_effect_delta_right": 74,
+      "source_effect_delta_top": 3,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        3008,
+        2101,
+        3662,
+        2342
+      ],
+      "raw_source_effect_bbox": [
+        3034,
+        2102,
+        3564,
+        2219
+      ],
+      "raw_localized_bbox": [
+        3108,
+        2105,
+        3490,
+        2216
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    },
+    {
+      "key": "random_music",
+      "source": "Music will be Randomly Selected.",
+      "korean": "음악이 무작위로 / 선택됩니다.",
+      "style": "random_white",
+      "font_size": 86,
+      "original_bbox": [
+        1741,
+        2360,
+        2720,
+        2573
+      ],
+      "source_effect_bbox": [
+        1741,
+        2360,
+        2719,
+        2572
+      ],
+      "localized_bbox": [
+        1941,
+        2363,
+        2519,
+        2569
+      ],
+      "delta_left": 200,
+      "delta_right": 201,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "source_effect_delta_left": 200,
+      "source_effect_delta_right": 200,
+      "source_effect_delta_top": 3,
+      "source_effect_delta_bottom": 3,
+      "source_effect_containment": "PASS",
+      "raw_original_bbox": [
+        1741,
+        1523,
+        2720,
+        1736
+      ],
+      "raw_source_effect_bbox": [
+        1741,
+        1524,
+        2719,
+        1736
+      ],
+      "raw_localized_bbox": [
+        1941,
+        1527,
+        2519,
+        1733
+      ],
+      "rework_required": false,
+      "rework_status": "PASS_SELF_QA_PENDING_C"
+    }
+  ],
+  "disposition": "PASS_SELF_QA_PENDING_C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE",
-  "n100_used": false,
-  "local_clone_used": false,
-  "google_drive_used": true,
-  "google_drive_write_performed": true,
-  "gpt_library_used_as_source_or_ssot": false,
-  "temporary_file_service_bridge_used_for_drive_upload": true,
-  "temporary_bridge_files_cleaned": true,
-  "vr_ffb_dx_changes": false,
-  "next_action": "C independent batch QA must consume this producer RESULT_SHA plus exact Drive candidate/proof identities; producer self-QA is not final approval."
+  "notes": [
+    "All per-element readable and raw-orientation bboxes remain inside the exact English source gates.",
+    "Zero changed pixels and zero introduced-alpha pixels occur outside the union of measured exact-source effect footprints.",
+    "The complete source-vs-candidate comparison proof is stored in the current-pipeline Drive task folder and byte-readback verified."
+  ]
 }
