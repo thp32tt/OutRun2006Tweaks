@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T01:29:00+09:00",
+  "updatedKst": "2026-10-01T01:32:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "b8c1544cfd2b6d491345e180ec72a3a84586e4bd",
   "mode": "MANUAL_APPLY_1000_CYCLE_REVIEW_BRANCH",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 95,
+  "cycle": 100,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -24,14 +24,15 @@
     "VR-REFACTOR-PERF-0001",
     "VR-REFACTOR-RENDER-CACHE-0001",
     "VR-REFACTOR-STATE-0004",
-    "VR-REFACTOR-STATE-0005"
+    "VR-REFACTOR-STATE-0005",
+    "VR-REFACTOR-DISPATCH-0002"
   ],
-  "next": "Cycles 96-100: extract dispatch result type from R31 naming and update R33 consumers; no build.",
+  "next": "Cycles 101-105: extract R33 depth/stencil metrics snapshot into neutral telemetry type; no build.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
     "Future refactor commits may reduce legacy hook counts but must not increase them without explicit review.",
     "Cycles 91-95 caught and repaired malformed IsGameStateBlockRecording()s caused by substring replacement; verifier now rejects this token."
   ],
-  "batchStatus": "SOURCE_APPLY_EVERY_5_NO_BUILD"
+  "batchStatus": "SOURCE_APPLY_EVERY_5_NO_BUILD_CYCLE_100_CHECKPOINT"
 }

@@ -267,7 +267,7 @@ namespace OutRunVRStereo
         }
 
         template <typename ActualDraw>
-        R31OwnedResult R33TryFastWorld(IDirect3DDevice9* device,
+        OutRunVR::Core::DispatchResult R33TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
             if (IsGameStateBlockRecording() || !R29StableStereoBase(device))
@@ -354,7 +354,7 @@ namespace OutRunVRStereo
             if (mayWriteDepth || mayWriteStencil)
                 ++R9MainDepthContentSerial;
 
-            R31OwnedResult result{ true, actualDraw() };
+            OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
             {
                 R33InvalidateRightForLeftWrite(
@@ -439,7 +439,7 @@ namespace OutRunVRStereo
         }
 
         template <typename ActualDraw>
-        R31OwnedResult R33TryHud(IDirect3DDevice9* device,
+        OutRunVR::Core::DispatchResult R33TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
             const R30ScreenSpaceKind screenKind =
@@ -522,7 +522,7 @@ namespace OutRunVRStereo
             if (mayWriteDepth || mayWriteStencil)
                 ++R9MainDepthContentSerial;
 
-            R31OwnedResult result{ true, actualDraw() };
+            OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
             {
                 R33InvalidateRightForLeftWrite(

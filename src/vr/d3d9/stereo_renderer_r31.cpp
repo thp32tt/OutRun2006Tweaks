@@ -22,6 +22,7 @@
 #include "stereo_renderer_r30.cpp"
 #include "../telemetry/performance_counters.hpp"
 #include "../render/eye_tail_cache.hpp"
+#include "../core/dispatch_result.hpp"
 
 namespace OutRunVRStereo
 {
@@ -286,14 +287,8 @@ namespace OutRunVRStereo
             return true;
         }
 
-        struct R31OwnedResult
-        {
-            bool handled = false;
-            HRESULT hr = D3D_OK;
-        };
-
         template <typename ActualDraw>
-        R31OwnedResult R31TryFastWorld(IDirect3DDevice9* device,
+        OutRunVR::Core::DispatchResult R31TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
             if (R31StateBlockRecording || !R29StableStereoBase(device))
@@ -370,7 +365,7 @@ namespace OutRunVRStereo
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
                 ++R9MainDepthContentSerial;
 
-            R31OwnedResult result{ true, D3D_OK };
+            OutRunVR::Core::DispatchResult result{ true, D3D_OK };
             result.hr = actualDraw();
             if (FAILED(result.hr))
             {
@@ -456,7 +451,7 @@ namespace OutRunVRStereo
         }
 
         template <typename ActualDraw>
-        R31OwnedResult R31TryHud(IDirect3DDevice9* device,
+        OutRunVR::Core::DispatchResult R31TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
             const R30ScreenSpaceKind screenKind =
@@ -531,7 +526,7 @@ namespace OutRunVRStereo
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
                 ++R9MainDepthContentSerial;
 
-            R31OwnedResult result{ true, actualDraw() };
+            OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
             {
                 bool restored = false;
