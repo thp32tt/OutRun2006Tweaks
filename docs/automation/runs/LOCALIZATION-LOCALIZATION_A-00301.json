@@ -70,8 +70,16 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "PENDING_SELF_REFERENCE",
-  "authoritative_result_sha": "PENDING_SELF_REFERENCE",
+  "result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281",
+  "authoritative_result_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281",
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(A): register index111 RANDOM cross-asset template [AUTO:LOCALIZATION-LOCALIZATION_A-00301]"
+  "result_commit_message": "localization(A): register index111 RANDOM cross-asset template [AUTO:LOCALIZATION-LOCALIZATION_A-00301]",
+  "precommit_refresh": {
+    "head_sha": "f6e5352e1d356b7d3020b2bf2fe13e10f0c02ad9",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "A00303@index147 result + bookkeeping landed while A00301 was reconstructing. It is disjoint from index111 and is preserved by rebasing A00301 result onto f6e5352e...; no shared state is modified."
+  },
+  "bookkeeping_note": "Immutable producer material result is fc703ce0c4616d26807a1fd408bd9ee21a50a281. This bookkeeping commit only records the self-referential result SHA and does not own validation. automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T02:20:00+09:00",
+  "bookkeeping_base_head_sha": "fc703ce0c4616d26807a1fd408bd9ee21a50a281"
 }
