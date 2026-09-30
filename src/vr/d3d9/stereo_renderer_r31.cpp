@@ -69,21 +69,7 @@ namespace OutRunVRStereo
         using R31FramePerf = OutRunVR::Telemetry::StereoFrameCounters;
         R31FramePerf R31Frame{};
 
-        struct R31WindowPerf
-        {
-            std::uint64_t presents = 0;
-            std::uint64_t draws = 0;
-            std::uint64_t main = 0;
-            std::uint64_t offscreen = 0;
-            std::uint64_t aux = 0;
-            std::uint64_t fastWorld = 0;
-            std::uint64_t hud = 0;
-            std::uint64_t fragile = 0;
-            std::uint64_t unstable = 0;
-            std::uint64_t fallback = 0;
-            std::uint64_t maxDraws = 0;
-            ULONGLONG lastLogMs = 0;
-        };
+        using R31WindowPerf = OutRunVR::Telemetry::StereoWindowCounters;
         R31WindowPerf R31Window{};
 
         void R31FinalizePerfFrame() noexcept
