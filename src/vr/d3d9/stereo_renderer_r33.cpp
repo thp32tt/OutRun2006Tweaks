@@ -16,6 +16,7 @@
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../render/fast_path_support.hpp"
+#include "../render/lower_draw_api.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
@@ -652,7 +653,7 @@ namespace OutRunVRStereo
                     device, type, startVertex, primitiveCount);
             };
             auto lower = [&]() {
-                return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+                return LowerDrawPrimitive(
                     device, type, startVertex, primitiveCount);
             };
             return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
@@ -669,7 +670,7 @@ namespace OutRunVRStereo
                     primitiveCount);
             };
             auto lower = [&]() {
-                return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device,
+                return LowerDrawIndexedPrimitive(device,
                     type, baseVertexIndex, minVertexIndex, numVertices,
                     startIndex, primitiveCount);
             };
@@ -686,7 +687,7 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride);
             };
             auto lower = [&]() {
-                return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+                return LowerDrawPrimitiveUP(
                     device, type, primitiveCount, data, stride);
             };
             return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
@@ -704,7 +705,7 @@ namespace OutRunVRStereo
                     indexFormat, vertexData, stride);
             };
             auto lower = [&]() {
-                return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
+                return LowerDrawIndexedPrimitiveUP(device,
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
