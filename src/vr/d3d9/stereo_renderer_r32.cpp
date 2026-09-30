@@ -31,6 +31,10 @@ namespace OutRunVRStereo
         std::uint64_t R32DirectProbeCacheHits = 0;
         std::uint64_t R32DirectFenceSuccess = 0;
         std::uint64_t R32DirectFenceBudgetFallbacks = 0;
+        std::uint64_t R32DirectFenceWaitSamples = 0;
+        std::uint64_t R32DirectFencePolls = 0;
+        std::uint64_t R32DirectFenceWaitUsTotal = 0;
+        std::uint64_t R32DirectFenceWaitUsMax = 0;
         std::uint64_t R32DirectIdentityInvalidations = 0;
         std::uint64_t R32PendingFenceDrains = 0;
         std::uint64_t R32PendingFenceBlocks = 0;
@@ -70,6 +74,9 @@ namespace OutRunVRStereo
             std::uint64_t directCache = 0;
             std::uint64_t directFenceOk = 0;
             std::uint64_t directFenceFallback = 0;
+            std::uint64_t directFenceWaitSamples = 0;
+            std::uint64_t directFencePolls = 0;
+            std::uint64_t directFenceWaitUs = 0;
             std::uint64_t directBackpressure = 0;
             std::uint64_t pendingDrain = 0;
             std::uint64_t pendingBlock = 0;
@@ -100,6 +107,231 @@ namespace OutRunVRStereo
             return static_cast<std::uint64_t>(
                 (static_cast<long double>(ticks) * 1000000.0L) /
                 static_cast<long double>(frequency));
+        }
+
+        struct R32FrameWorkload
+        {
+            std::uint64_t draws = 0;
+            std::uint64_t primitives = 0;
+            std::uint64_t triangles = 0;
+            std::uint64_t pointLinePrimitives = 0;
+            std::uint64_t indexedDraws = 0;
+            std::uint64_t upDraws = 0;
+            std::uint64_t alphaBlendDraws = 0;
+            std::uint64_t alphaBlendPrimitives = 0;
+            std::uint64_t alphaTestDraws = 0;
+            std::uint64_t particleLikeDraws = 0;
+            std::uint64_t particleLikePrimitives = 0;
+            std::uint64_t effectUnknownDraws = 0;
+            std::uint64_t fenceWaitUs = 0;
+            std::uint64_t fencePolls = 0;
+        };
+        thread_local R32FrameWorkload R32FrameWorkloadCounters{};
+
+        struct R32PerfWindow
+        {
+            std::uint64_t frames = 0;
+            std::uint64_t spikes = 0;
+            std::uint64_t frameUsTotal = 0;
+            std::uint64_t maxFrameUs = 0;
+            std::uint64_t presentUsTotal = 0;
+            std::uint64_t maxPresentUs = 0;
+            std::uint64_t drawsTotal = 0;
+            std::uint64_t maxDraws = 0;
+            std::uint64_t primitivesTotal = 0;
+            std::uint64_t maxPrimitives = 0;
+            std::uint64_t maxTriangles = 0;
+            std::uint64_t maxUpDraws = 0;
+            std::uint64_t maxAlphaBlendDraws = 0;
+            std::uint64_t maxParticleLikeDraws = 0;
+            std::uint64_t maxParticleLikePrimitives = 0;
+        };
+        thread_local R32PerfWindow R32PerfWindowCounters{};
+        thread_local std::uint64_t R32PerfBaselineUs = 0;
+        thread_local LONGLONG R32LastPresentEndQpc = 0;
+        thread_local ULONGLONG R32LastSpikeLogMs = 0;
+
+        struct R32StereoWorkloadSnapshot
+        {
+            std::uint64_t main = 0;
+            std::uint64_t offscreen = 0;
+            std::uint64_t aux = 0;
+            std::uint64_t fastWorld = 0;
+            std::uint64_t hud = 0;
+            std::uint64_t fallback = 0;
+            std::uint64_t fragile = 0;
+            std::uint64_t unstable = 0;
+        };
+
+        LONGLONG R32PerfQpcFrequency() noexcept
+        {
+            static const LONGLONG frequency = []() noexcept {
+                LARGE_INTEGER value{};
+                return QueryPerformanceFrequency(&value) != FALSE
+                    ? value.QuadPart : 0;
+            }();
+            return frequency;
+        }
+
+        std::uint64_t R32ElapsedUs(
+            LONGLONG begin,
+            LONGLONG end) noexcept
+        {
+            const LONGLONG frequency = R32PerfQpcFrequency();
+            if (frequency <= 0 || begin <= 0 || end < begin)
+                return 0;
+            return static_cast<std::uint64_t>(
+                ((end - begin) * 1000000LL) / frequency);
+        }
+
+        R32StereoWorkloadSnapshot R32CaptureStereoWorkload() noexcept
+        {
+            return {
+                R31Frame.main,
+                R31Frame.offscreen,
+                R31Frame.aux,
+                R31Frame.fastWorld,
+                R31Frame.hud,
+                R31Frame.fallback,
+                R31Frame.fragile,
+                R31Frame.unstable
+            };
+        }
+
+        void R32ObserveFrameWorkload(
+            IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE type,
+            UINT primitiveCount,
+            bool indexed,
+            bool up) noexcept
+        {
+            if (!Settings::VRTelemetry || !IsGameDevice(device) ||
+                InternalStereoPass)
+                return;
+
+            auto& frame = R32FrameWorkloadCounters;
+            ++frame.draws;
+            frame.primitives += primitiveCount;
+            if (indexed) ++frame.indexedDraws;
+            if (up) ++frame.upDraws;
+
+            const bool triangleTopology =
+                type == D3DPT_TRIANGLELIST ||
+                type == D3DPT_TRIANGLESTRIP ||
+                type == D3DPT_TRIANGLEFAN;
+            if (triangleTopology)
+                frame.triangles += primitiveCount;
+            else
+                frame.pointLinePrimitives += primitiveCount;
+
+            const bool effectKnown =
+                R29Effect.valid &&
+                R29Effect.presentEpoch == PresentEpoch &&
+                R23GameDrawSerial >= R29Effect.drawSerial &&
+                R23GameDrawSerial - R29Effect.drawSerial < 64;
+            if (!effectKnown)
+            {
+                ++frame.effectUnknownDraws;
+                return;
+            }
+
+            if (R29Effect.alphaBlend != FALSE)
+            {
+                ++frame.alphaBlendDraws;
+                frame.alphaBlendPrimitives += primitiveCount;
+            }
+            if (R29Effect.alphaTest != FALSE)
+                ++frame.alphaTestDraws;
+
+            // Heuristic only: alpha-blended, non-Z-writing point/triangle work
+            // is a useful proxy for sand/smoke/spray/flare-style effects, but is
+            // deliberately not labelled as a proven game particle draw.
+            if (R29Effect.alphaBlend != FALSE &&
+                R29Effect.zWrite == FALSE &&
+                (triangleTopology || type == D3DPT_POINTLIST))
+            {
+                ++frame.particleLikeDraws;
+                frame.particleLikePrimitives += primitiveCount;
+            }
+        }
+
+        void R32FinalizeFramePerf(
+            LONGLONG presentStartQpc,
+            LONGLONG presentEndQpc,
+            const R32StereoWorkloadSnapshot& stereo) noexcept
+        {
+            if (!Settings::VRTelemetry)
+            {
+                R32FrameWorkloadCounters = {};
+                R32LastPresentEndQpc = presentEndQpc;
+                return;
+            }
+
+            auto frame = R32FrameWorkloadCounters;
+            R32FrameWorkloadCounters = {};
+
+            const std::uint64_t presentUs =
+                R32ElapsedUs(presentStartQpc, presentEndQpc);
+            const std::uint64_t frameUs =
+                R32ElapsedUs(R32LastPresentEndQpc, presentEndQpc);
+            R32LastPresentEndQpc = presentEndQpc;
+
+            if (frameUs == 0)
+                return;
+
+            const std::uint64_t baselineBefore = R32PerfBaselineUs;
+            const bool spike =
+                OutRunVR::R32::IsPerfFrameSpike(frameUs, baselineBefore);
+            R32PerfBaselineUs = OutRunVR::R32::UpdatePerfBaselineUs(
+                R32PerfBaselineUs, frameUs, spike);
+
+            auto& window = R32PerfWindowCounters;
+            ++window.frames;
+            if (spike) ++window.spikes;
+            window.frameUsTotal += frameUs;
+            window.presentUsTotal += presentUs;
+            window.drawsTotal += frame.draws;
+            window.primitivesTotal += frame.primitives;
+            window.maxFrameUs = (std::max)(window.maxFrameUs, frameUs);
+            window.maxPresentUs = (std::max)(window.maxPresentUs, presentUs);
+            window.maxDraws = (std::max)(window.maxDraws, frame.draws);
+            window.maxPrimitives =
+                (std::max)(window.maxPrimitives, frame.primitives);
+            window.maxTriangles =
+                (std::max)(window.maxTriangles, frame.triangles);
+            window.maxUpDraws =
+                (std::max)(window.maxUpDraws, frame.upDraws);
+            window.maxAlphaBlendDraws =
+                (std::max)(window.maxAlphaBlendDraws, frame.alphaBlendDraws);
+            window.maxParticleLikeDraws =
+                (std::max)(window.maxParticleLikeDraws, frame.particleLikeDraws);
+            window.maxParticleLikePrimitives = (std::max)(
+                window.maxParticleLikePrimitives,
+                frame.particleLikePrimitives);
+
+            if (!spike)
+                return;
+
+            const ULONGLONG nowMs = GetTickCount64();
+            const bool hardSpike = frameUs >= OutRunVR::R32::PerfSpikeHardUs;
+            if (!hardSpike && R32LastSpikeLogMs != 0 &&
+                nowMs - R32LastSpikeLogMs <
+                    OutRunVR::R32::PerfSpikeLogCooldownMs)
+                return;
+            R32LastSpikeLogMs = nowMs;
+
+            spdlog::warn(
+                "VR R32 FRAME SPIKE: frameUs={} baselineUs={} presentUs={} workload[draws={},primitives={},triangles={},indexed={},up={},alphaBlend={},alphaBlendPrimitives={},alphaTest={},particleLikeDraws={},particleLikePrimitives={},effectUnknown={}] stereo[main={},offscreen={},aux={},fastWorld={},hud={},fallback={},fragile={},unstable={}] direct[fenceWaitUs={},fencePolls={}]",
+                frameUs, baselineBefore, presentUs,
+                frame.draws, frame.primitives, frame.triangles,
+                frame.indexedDraws, frame.upDraws,
+                frame.alphaBlendDraws, frame.alphaBlendPrimitives,
+                frame.alphaTestDraws, frame.particleLikeDraws,
+                frame.particleLikePrimitives, frame.effectUnknownDraws,
+                stereo.main, stereo.offscreen, stereo.aux,
+                stereo.fastWorld, stereo.hud, stereo.fallback,
+                stereo.fragile, stereo.unstable,
+                frame.fenceWaitUs, frame.fencePolls);
         }
 
         struct R32EffectSnapshot
@@ -567,6 +799,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR32(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto actual = [&]() {
                 return DrawPrimitiveHook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
@@ -583,6 +816,7 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto actual = [&]() {
                 return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
@@ -601,6 +835,7 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
             UINT stride)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto actual = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
@@ -618,6 +853,7 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto actual = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
                     minVertexIndex, numVertices, primitiveCount, indexData,
@@ -714,8 +950,40 @@ namespace OutRunVRStereo
             LARGE_INTEGER start{};
             const bool highResolutionClock = qpcFrequency > 0 &&
                 QueryPerformanceCounter(&start) != FALSE;
+            const ULONGLONG fallbackStartMs = highResolutionClock ? 0 :
+                GetTickCount64();
             const ULONGLONG fallbackDeadline = highResolutionClock ? 0 :
-                GetTickCount64() + OutRunVR::R32::ProducerFenceBudgetMs;
+                fallbackStartMs + OutRunVR::R32::ProducerFenceBudgetMs;
+            std::uint64_t pollCount = 0;
+            auto recordFenceWait = [&]() noexcept {
+                if (!Settings::VRTelemetry)
+                    return;
+                std::uint64_t elapsedUs = 0;
+                if (highResolutionClock)
+                {
+                    LARGE_INTEGER now{};
+                    if (QueryPerformanceCounter(&now) != FALSE &&
+                        now.QuadPart >= start.QuadPart)
+                    {
+                        elapsedUs = static_cast<std::uint64_t>(
+                            ((now.QuadPart - start.QuadPart) * 1000000LL) /
+                            qpcFrequency);
+                    }
+                }
+                else
+                {
+                    const ULONGLONG nowMs = GetTickCount64();
+                    elapsedUs = nowMs >= fallbackStartMs
+                        ? (nowMs - fallbackStartMs) * 1000ULL : 0ULL;
+                }
+                ++R32DirectFenceWaitSamples;
+                R32DirectFencePolls += pollCount;
+                R32DirectFenceWaitUsTotal += elapsedUs;
+                R32DirectFenceWaitUsMax =
+                    (std::max)(R32DirectFenceWaitUsMax, elapsedUs);
+                R32FrameWorkloadCounters.fenceWaitUs += elapsedUs;
+                R32FrameWorkloadCounters.fencePolls += pollCount;
+            };
             const LONGLONG budgetTicks = highResolutionClock
                 ? (qpcFrequency *
                     static_cast<LONGLONG>(OutRunVR::R32::ProducerFenceBudgetMs) +
@@ -728,17 +996,23 @@ namespace OutRunVRStereo
             if (ready == S_OK)
             {
                 if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
+                recordFenceWait();
                 return true;
             }
             if (ready != S_FALSE)
+            {
+                recordFenceWait();
                 return false;
+            }
 
             for (;;)
             {
+                ++pollCount;
                 ready = query->GetData(nullptr, 0, 0);
                 if (ready == S_OK)
                 {
                     if (Settings::VRTelemetry) ++R32DirectFenceSuccess;
+                    recordFenceWait();
                     return true;
                 }
 
@@ -765,6 +1039,7 @@ namespace OutRunVRStereo
                             "VR R32 D3D9Ex: producer copy fence exceeded {}ms; falling back to SBS instead of stalling up to 12ms",
                             OutRunVR::R32::ProducerFenceBudgetMs);
                     }
+                    recordFenceWait();
                     return false;
                 }
                 SwitchToThread();
@@ -945,6 +1220,11 @@ namespace OutRunVRStereo
             R32ClearPendingProducerFences();
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
+            R32FrameWorkloadCounters = {};
+            R32PerfWindowCounters = {};
+            R32PerfBaselineUs = 0;
+            R32LastPresentEndQpc = 0;
+            R32LastSpikeLogMs = 0;
         }
 
         void R32ResetAfterGameReset() noexcept
@@ -1001,6 +1281,9 @@ namespace OutRunVRStereo
                 R32Counters.directCache = R32DirectProbeCacheHits;
                 R32Counters.directFenceOk = R32DirectFenceSuccess;
                 R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
+                R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
+                R32Counters.directFencePolls = R32DirectFencePolls;
+                R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
                 R32Counters.directBackpressure = DirectTransportRingBackpressure;
                 R32Counters.pendingDrain = R32PendingFenceDrains;
                 R32Counters.pendingBlock = R32PendingFenceBlocks;
@@ -1016,8 +1299,51 @@ namespace OutRunVRStereo
             if (now - R32Counters.lastLogMs < 5000)
                 return;
 
+            const std::uint64_t fenceSamples =
+                R32DirectFenceWaitSamples - R32Counters.directFenceWaitSamples;
+            const std::uint64_t fencePolls =
+                R32DirectFencePolls - R32Counters.directFencePolls;
+            const std::uint64_t fenceWaitUs =
+                R32DirectFenceWaitUsTotal - R32Counters.directFenceWaitUs;
+            const std::uint64_t fenceAvgUs =
+                fenceSamples ? fenceWaitUs / fenceSamples : 0;
+            const std::uint64_t frameAvgUs = R32PerfWindowCounters.frames
+                ? R32PerfWindowCounters.frameUsTotal /
+                    R32PerfWindowCounters.frames : 0;
+            const std::uint64_t presentAvgUs = R32PerfWindowCounters.frames
+                ? R32PerfWindowCounters.presentUsTotal /
+                    R32PerfWindowCounters.frames : 0;
+            const std::uint64_t drawAvg = R32PerfWindowCounters.frames
+                ? R32PerfWindowCounters.drawsTotal /
+                    R32PerfWindowCounters.frames : 0;
+            const std::uint64_t primitiveAvg = R32PerfWindowCounters.frames
+                ? R32PerfWindowCounters.primitivesTotal /
+                    R32PerfWindowCounters.frames : 0;
+            const std::uint64_t copyPairs =
+                R32DirectCopyPairs - R32Counters.directCopyPairs;
+            const std::uint64_t copyAvgUs = copyPairs
+                ? R32QpcTicksToUs(
+                    R32DirectCopyQpcTicks - R32Counters.directCopyQpcTicks) /
+                    copyPairs
+                : 0;
+
             spdlog::info(
-                "VR R32 PERF 5s: liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},backpressure={},pendingDrain={},pendingBlock={},pendingError={},copyPairs={},copyAvgUs={},copyMaxUs={},copyMPix={},copy={}x{} fmt={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: frame[frames={},spikes={},avgUs={},maxUs={},presentAvgUs={},presentMaxUs={}] workload[drawAvg={},drawMax={},primitiveAvg={},primitiveMax={},triangleMax={},upMax={},alphaBlendMax={},particleLikeDrawMax={},particleLikePrimitiveMax={}] liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},producerFenceOk={},producerBudgetFallback={},fenceSamples={},fencePolls={},fenceAvgUs={},fenceMaxUs={},backpressure={},pendingDrain={},pendingBlock={},pendingError={},copyPairs={},copyAvgUs={},copyMaxUs={},copyMPix={},copy={}x{} fmt={}] reset[rearm={},fail={}]",
+                R32PerfWindowCounters.frames,
+                R32PerfWindowCounters.spikes,
+                frameAvgUs,
+                R32PerfWindowCounters.maxFrameUs,
+                presentAvgUs,
+                R32PerfWindowCounters.maxPresentUs,
+                drawAvg,
+                R32PerfWindowCounters.maxDraws,
+                primitiveAvg,
+                R32PerfWindowCounters.maxPrimitives,
+                R32PerfWindowCounters.maxTriangles,
+                R32PerfWindowCounters.maxUpDraws,
+                R32PerfWindowCounters.maxAlphaBlendDraws,
+                R32PerfWindowCounters.maxParticleLikeDraws,
+                R32PerfWindowCounters.maxParticleLikePrimitives,
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
                 R31StateBlockRecordings - R32Counters.stateRecord,
@@ -1029,16 +1355,16 @@ namespace OutRunVRStereo
                 R32DirectProbeCacheHits - R32Counters.directCache,
                 R32DirectFenceSuccess - R32Counters.directFenceOk,
                 R32DirectFenceBudgetFallbacks - R32Counters.directFenceFallback,
+                fenceSamples,
+                fencePolls,
+                fenceAvgUs,
+                R32DirectFenceWaitUsMax,
                 DirectTransportRingBackpressure - R32Counters.directBackpressure,
                 R32PendingFenceDrains - R32Counters.pendingDrain,
                 R32PendingFenceBlocks - R32Counters.pendingBlock,
                 R32PendingFenceErrors - R32Counters.pendingError,
-                R32DirectCopyPairs - R32Counters.directCopyPairs,
-                (R32DirectCopyPairs - R32Counters.directCopyPairs) != 0
-                    ? R32QpcTicksToUs(
-                        R32DirectCopyQpcTicks - R32Counters.directCopyQpcTicks) /
-                        (R32DirectCopyPairs - R32Counters.directCopyPairs)
-                    : 0,
+                copyPairs,
+                copyAvgUs,
                 R32QpcTicksToUs(R32DirectCopyMaxQpcTicksSinceLog),
                 (R32DirectCopyPixels - R32Counters.directCopyPixels) / 1000000ull,
                 DirectTransportWidth,
@@ -1059,6 +1385,9 @@ namespace OutRunVRStereo
             R32Counters.directCache = R32DirectProbeCacheHits;
             R32Counters.directFenceOk = R32DirectFenceSuccess;
             R32Counters.directFenceFallback = R32DirectFenceBudgetFallbacks;
+            R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
+            R32Counters.directFencePolls = R32DirectFencePolls;
+            R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
             R32Counters.directBackpressure = DirectTransportRingBackpressure;
             R32Counters.pendingDrain = R32PendingFenceDrains;
             R32Counters.pendingBlock = R32PendingFenceBlocks;
@@ -1066,19 +1395,37 @@ namespace OutRunVRStereo
             R32Counters.directCopyPairs = R32DirectCopyPairs;
             R32Counters.directCopyQpcTicks = R32DirectCopyQpcTicks;
             R32Counters.directCopyPixels = R32DirectCopyPixels;
-            R32DirectCopyMaxQpcTicksSinceLog = 0;
             R32Counters.resetRearm = R32ResetEpochRearms;
             R32Counters.resetFail = R32ResetFailures;
+            R32DirectFenceWaitUsMax = 0;
+            R32DirectCopyMaxQpcTicksSinceLog = 0;
+            R32PerfWindowCounters = {};
         }
 
         HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
+            const bool gameDevice = IsGameDevice(device);
+            const R32StereoWorkloadSnapshot stereo =
+                gameDevice ? R32CaptureStereoWorkload()
+                           : R32StereoWorkloadSnapshot{};
+            LARGE_INTEGER presentStart{};
+            if (gameDevice && Settings::VRTelemetry)
+                QueryPerformanceCounter(&presentStart);
+
             const HRESULT hr = R32PresentR13Hook.stdcall<HRESULT>(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
-            if (IsGameDevice(device))
+
+            if (gameDevice)
+            {
+                LARGE_INTEGER presentEnd{};
+                if (Settings::VRTelemetry)
+                    QueryPerformanceCounter(&presentEnd);
+                R32FinalizeFramePerf(
+                    presentStart.QuadPart, presentEnd.QuadPart, stereo);
                 R32LogPerfWindow();
+            }
             return hr;
         }
 

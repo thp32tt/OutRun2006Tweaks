@@ -82,6 +82,45 @@ if($frameIntervals.Count -gt 0){
     if($avgFrameMs -gt 0){$approxHz=1000.0/$avgFrameMs}
 }
 
+$perfSpikeRows=@()
+$perfSpikePattern='VR R32 FRAME SPIKE: frameUs=(\d+) baselineUs=(\d+) presentUs=(\d+).*?draws=(\d+),primitives=(\d+),triangles=(\d+),indexed=(\d+),up=(\d+),alphaBlend=(\d+),alphaBlendPrimitives=(\d+),alphaTest=(\d+),particleLikeDraws=(\d+),particleLikePrimitives=(\d+),effectUnknown=(\d+).*?fenceWaitUs=(\d+),fencePolls=(\d+)'
+foreach($spike in [regex]::Matches($gameLog,$perfSpikePattern)){
+    $perfSpikeRows += [pscustomobject]@{
+        FrameUs=[int64]$spike.Groups[1].Value
+        BaselineUs=[int64]$spike.Groups[2].Value
+        PresentUs=[int64]$spike.Groups[3].Value
+        Draws=[int64]$spike.Groups[4].Value
+        Primitives=[int64]$spike.Groups[5].Value
+        Triangles=[int64]$spike.Groups[6].Value
+        IndexedDraws=[int64]$spike.Groups[7].Value
+        UpDraws=[int64]$spike.Groups[8].Value
+        AlphaBlendDraws=[int64]$spike.Groups[9].Value
+        AlphaBlendPrimitives=[int64]$spike.Groups[10].Value
+        AlphaTestDraws=[int64]$spike.Groups[11].Value
+        ParticleLikeDraws=[int64]$spike.Groups[12].Value
+        ParticleLikePrimitives=[int64]$spike.Groups[13].Value
+        EffectUnknownDraws=[int64]$spike.Groups[14].Value
+        FenceWaitUs=[int64]$spike.Groups[15].Value
+        FencePolls=[int64]$spike.Groups[16].Value
+    }
+}
+$perfSpikeCount=$perfSpikeRows.Count
+$perfSpikeMaxFrameUs=0
+$perfSpikeMaxDraws=0
+$perfSpikeMaxPrimitives=0
+$perfSpikeMaxParticleLikeDraws=0
+$perfSpikeMaxParticleLikePrimitives=0
+$perfSpikeMaxFenceWaitUs=0
+if($perfSpikeCount -gt 0){
+    $perfSpikeMaxFrameUs=($perfSpikeRows|Measure-Object FrameUs -Maximum).Maximum
+    $perfSpikeMaxDraws=($perfSpikeRows|Measure-Object Draws -Maximum).Maximum
+    $perfSpikeMaxPrimitives=($perfSpikeRows|Measure-Object Primitives -Maximum).Maximum
+    $perfSpikeMaxParticleLikeDraws=($perfSpikeRows|Measure-Object ParticleLikeDraws -Maximum).Maximum
+    $perfSpikeMaxParticleLikePrimitives=($perfSpikeRows|Measure-Object ParticleLikePrimitives -Maximum).Maximum
+    $perfSpikeMaxFenceWaitUs=($perfSpikeRows|Measure-Object FenceWaitUs -Maximum).Maximum
+    $perfSpikeRows|Export-Csv (Join-Path $SessionDir 'PERFORMANCE_SPIKES.csv') -NoTypeInformation -Encoding UTF8
+}
+
 $flags=@()
 if($sbsFallback){$flags+='SBS_DESKTOP_DUP_FALLBACK'}
 if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
@@ -90,6 +129,7 @@ if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
 if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
 if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
 if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
+if($perfSpikeCount -gt 0){$flags+='DX9EX_FRAME_SPIKES_PRESENT'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
 $variant=if($session.VariantId){[string]$session.VariantId}else{'UNKNOWN'}
@@ -126,6 +166,13 @@ $result=[ordered]@{
     RecenterHostApplied=$recenterHostApplied
     ApproxAverageXrFrameMs=$avgFrameMs
     ApproxAverageXrHz=$approxHz
+    PerfSpikeCount=$perfSpikeCount
+    PerfSpikeMaxFrameUs=$perfSpikeMaxFrameUs
+    PerfSpikeMaxDraws=$perfSpikeMaxDraws
+    PerfSpikeMaxPrimitives=$perfSpikeMaxPrimitives
+    PerfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws
+    PerfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives
+    PerfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs
     Flags=$flags
 }
 $result|ConvertTo-Json -Depth 4|Set-Content (Join-Path $SessionDir 'AUTO_ANALYSIS_SUMMARY.json') -Encoding UTF8
@@ -154,6 +201,13 @@ $lines=@(
     "recenterHostApplied=$recenterHostApplied"
     ("approxAverageXrFrameMs="+$(if($null -ne $avgFrameMs){'{0:F3}' -f $avgFrameMs}else{'n/a'}))
     ("approxAverageXrHz="+$(if($null -ne $approxHz){'{0:F1}' -f $approxHz}else{'n/a'}))
+    "perfSpikeCount=$perfSpikeCount"
+    "perfSpikeMaxFrameUs=$perfSpikeMaxFrameUs"
+    "perfSpikeMaxDraws=$perfSpikeMaxDraws"
+    "perfSpikeMaxPrimitives=$perfSpikeMaxPrimitives"
+    "perfSpikeMaxParticleLikeDraws=$perfSpikeMaxParticleLikeDraws"
+    "perfSpikeMaxParticleLikePrimitives=$perfSpikeMaxParticleLikePrimitives"
+    "perfSpikeMaxFenceWaitUs=$perfSpikeMaxFenceWaitUs"
     "flags=$($flags -join ',')"
 )
 if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
