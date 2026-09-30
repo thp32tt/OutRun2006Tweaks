@@ -1,0 +1,94 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00336-p00209-index51-current-workflow-isolation-material-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00336",
+  "wave_id": "P00209",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-10-01T05:47:47+09:00",
+  "target": {
+    "index": 51,
+    "asset": "FF2462BB",
+    "index_mod_3": 0,
+    "owned_by_lane": true
+  },
+  "readiness_scan": {
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00333",
+    "latest_authoritative_c_result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      57,
+      60,
+      159,
+      198,
+      201
+    ],
+    "producer_qa_pending_not_repeated": [
+      111,
+      195
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      54,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "cross_lane_render_ready_not_stolen": [
+      232
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "selection_reason": "No A-owned completion-tier item is runnable on the refreshed schema16 frontier. A00334@index111 and A00335@index195 are immutable producer QA-pending work and are not repeated; candidate-bearing 57/60/159/198/201 are not revalidated; sticky source blockers are not reprobed; B-owned index232 is not stolen. Fallback step 3 therefore advances production-complete index51 by re-emitting its C163/C166-accepted DDS_ONLY isolation evidence as a current schema16 producer manifest while reusing the unchanged heavy-QA fingerprint.",
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX51_CURRENT_SCHEMA16_SINGLE_DDS_ISOLATION_MANIFEST",
+    "manifest": "localization/validation/single_dds/P00209_A00336_FF2462BB.json",
+    "candidate_dds_modified": false,
+    "candidate_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+    "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "prior_static_qa": "C163/Q00061 PASS",
+    "prior_legacy_isolation": "A00296/C166 Q00064 PASS",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "current_schema16_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "6524a4c279cbfdc6bdbfe864088391fe726adab0",
+    "latest_c_record_blob_sha": "bde8d951736a57ab8edbe7fcc3d8f46ba7061627",
+    "c163_task_blob_sha": "a1582c7d64f3546e539d55c72b980fd1e0d243d2",
+    "c166_task_blob_sha": "06ccaf30c6d2a12cd5036842193729cc2f33619a",
+    "legacy_manifest_blob_sha": "17cb052401cb4d44126e3b9dd3eeb4e621095680",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "candidate_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0"
+  },
+  "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__QA_PENDING_NOT_REPEATED__STICKY_SOURCE_BLOCKERS_NOT_REPROBED__INDEX51_C163_STATIC_PASS_C166_LEGACY_ISOLATION_PASS_REUSED__CURRENT_SCHEMA16_MANIFEST_ADDED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "drive_material_referenced_from_git_metadata": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
