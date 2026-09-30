@@ -13,6 +13,8 @@
 #include "../render/screen_space_api.hpp"
 #include "../render/cached_effect_state.hpp"
 #include "../lifecycle/mono_safety.hpp"
+#include "../lifecycle/frame_accounting.hpp"
+#include "../state/depth_target_state.hpp"
 #include "../lifecycle/frame_lifecycle.hpp"
 #include "../game/renderer_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
@@ -428,7 +430,7 @@ namespace OutRunVRStereo
                 }
                 if (!rolledBack)
                 {
-                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                    ReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R32/fast-left-WVP-rollback");
                     NoteRestoreFailure("R32 fast left-eye c64 rollback");
                     ArmMonoSafety();
@@ -437,17 +439,16 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            NoteStereoLeftDraw();
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
-                ++R9MainDepthContentSerial;
+                NoteMainDepthContentWrite();
 
             OutRunVR::Core::DispatchResult result{ true, D3D_OK };
             result.hr = actualDraw();
             if (FAILED(result.hr))
             {
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
+                ReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
                 bool restored = false;
                 {
                     InternalPassScope guard;
@@ -505,7 +506,7 @@ namespace OutRunVRStereo
             {
                 FrameRightDrawFailed = true;
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(rightFailure, site, rightHr);
+                ReportStereoFailure(rightFailure, site, rightHr);
                 ArmMonoSafety();
             }
             if (!restoreOk)
@@ -580,7 +581,7 @@ namespace OutRunVRStereo
                 }
                 if (!rolledBack)
                 {
-                    R9Poison(OutRunVR::StereoFailureRestoreFailed,
+                    ReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R32/HUD-left-WVP-rollback");
                     NoteRestoreFailure("R32 HUD left-eye c64 rollback");
                     ArmMonoSafety();
@@ -589,10 +590,9 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            ++R9DrawCalls;
-            R9MonoBackupGap = true;
+            NoteStereoLeftDraw();
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
-                ++R9MainDepthContentSerial;
+                NoteMainDepthContentWrite();
 
             OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
@@ -602,7 +602,7 @@ namespace OutRunVRStereo
                     InternalPassScope guard;
                     restored = R32SetWvpBatch(device, original);
                 }
-                R9Poison(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
+                ReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
                 if (!restored) NoteRestoreFailure("R32 HUD left draw c64");
                 ArmMonoSafety();
                 return result;
@@ -649,7 +649,7 @@ namespace OutRunVRStereo
             {
                 FrameRightDrawFailed = true;
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
-                R9Poison(rightFailure, site, rightHr);
+                ReportStereoFailure(rightFailure, site, rightHr);
                 ArmMonoSafety();
             }
             if (!restoreOk)
@@ -666,7 +666,7 @@ namespace OutRunVRStereo
             LowerDraw&& lowerDraw) noexcept
         {
             if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
+                !TargetIsBackBuffer() || !StereoWanted() || !IsStereoSeeded())
                 return lowerDraw();
 
             R32EffectSnapshot snapshot{};

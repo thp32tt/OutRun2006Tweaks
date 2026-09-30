@@ -1007,4 +1007,9 @@ namespace OutRunVRStereo
 	{
 		R9Poison(reason, site, hr);
 	}
+
+	bool IsStereoSeeded() noexcept
+	{
+		return R9StereoSeeded;
+	}
 }
