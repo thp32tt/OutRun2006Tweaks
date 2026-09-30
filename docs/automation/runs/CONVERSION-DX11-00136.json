@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00136",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T23:20:24+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "01cff75f7b2ebf9ea7ab668d6cd7e8626d4405f9",
+  "superseded_initial_sha": "dac73da4c50db854eb5bdad2b3ef40e8074730ad",
+  "result_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+  "validation_bearing_result_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_RUNTIME_ANALYSIS_R139_SUSTAINED_CACHED_IMAGE_FALLBACK_DETECTION",
+  "summary": "Closed the DX11 session auto-analyzer false-negative gap exposed by the 2026-09-30 Quest 3/VDXR run. The analyzer now counts fallback-cached-image submission windows and per-frame final markers and emits DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED for backend=dx11 when one summarized fallback window reaches 300 frames or when 120 final fallback markers are observed. Added a synthetic 2x450-frame failure case plus direct-gpu control and wired the regression test into Backend Conversion Gate. This does not change the renderer/runtime path and does not fix the brown menu rectangle itself.",
+  "changed_paths": [
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/Analyze-OutRunVRSession.ps1",
+    "tools/Test-Analyze-OutRunVRSession.ps1"
+  ],
+  "repair_history": {
+    "initial_sha": "dac73da4c50db854eb5bdad2b3ef40e8074730ad",
+    "initial_status": "SUPERSEDED_BEFORE_VALIDATION",
+    "defect": "Remote source composition malformed the sustainedCachedImageFallback expression and duplicated the analyzer tail.",
+    "repaired_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+    "repaired_status": "VALIDATION_BEARING_RESULT",
+    "evidence": "Repair restored a literal-safe boolean expression and removed the duplicate analyzer body; the regression test then passed in the exact-SHA Backend Conversion Gate."
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/test/workflow only; no renderer or backend activation path changed.",
+    "ownership": "NativeDrawPathActivationAllowed remains false; no ScreenHud/world/native draw ownership change.",
+    "stereo_correctness": "No WVP, projection, HUD, SkyGlow or world stereo behavior changed.",
+    "performance": "Post-session log parsing only; no game or host hot-path cost was added.",
+    "adversarial": "A healthy direct-frame aggregate can no longer suppress a sustained cached-image visual failure; a direct-gpu control test prevents the new rule from treating healthy direct submission as a failure."
+  },
+  "detection_contract": {
+    "applies_when_backend_regex": "^dx11$",
+    "fallback_window_regex": "actualSubmits={...fallback-cached-image:N...}",
+    "per_frame_final_regex": "actualFinal=fallback-cached-image",
+    "sustained_if_max_window_frames_gte": 300,
+    "sustained_if_final_markers_gte": 120,
+    "failure_status": "DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED",
+    "failure_flag": "DX11_SUSTAINED_CACHED_IMAGE_FALLBACK",
+    "synthetic_failure_case": "two 450-frame cached fallback windows",
+    "synthetic_control_case": "450 direct-gpu submissions",
+    "interpretation": "Diagnostic guard only. It proves sustained cached-image fallback was observed in analyzed logs; it does not prove the cause or a renderer fix."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_allowed_changed": false,
+    "native_game_draw_routing_changed": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "producer_range_changed": false,
+    "semantic_ownership_promoted": false
+  },
+  "runtime_blocker": {
+    "issue": 81,
+    "status": "ACTIVE",
+    "prior_hmd_record": "docs/automation/runs/RUNTIME-DX11-20260930-HMD-46fa5383.json",
+    "prior_tested_source_sha": "46fa5383bbf1144e58446028a452f74065fa44c8",
+    "user_observation": [
+      "Menu still shows the brown rectangle.",
+      "Gameplay looks the same as the DX9Ex path."
+    ],
+    "carry_forward_reason": "This task changes only post-session diagnostics. No runtime render path was changed, so the HMD failure remains authoritative.",
+    "clear_condition": "A later runtime-path change must be tested on Quest 3/VDXR and must no longer show the cached-image menu failure."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36727435215,
+      "conclusion": "success",
+      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+      "artifact_id": 11102938537,
+      "artifact_digest": "sha256:1e343dcc966dce2db547fd66c8cac36499e58d9256dfb141e3722c137e3bc621",
+      "evidence": "New Test VR session auto-analysis regressions step passed; Win32 DLL build and artifact upload also passed."
+    },
+    "hud_inspector": {
+      "run_id": 36727445587,
+      "conclusion": "success",
+      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+      "analysis_artifact_id": 11103557110,
+      "analysis_artifact_digest": "sha256:805bf9cca22e529c19f5adbb98388f8f207a938f56024d5fee22b5e17adfc6a3",
+      "game_artifact_id": 11102878733,
+      "game_artifact_digest": "sha256:ed1089a35107c76d96ba074fd2dfad2d3d19e40650eb39b804426298c70d2d69"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36727445666,
+      "conclusion": "success",
+      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825"
+    },
+    "build": {
+      "run_id": 36727445603,
+      "conclusion": "in_progress_at_record_time",
+      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+      "blocking": false,
+      "reason": "Mandatory Backend Conversion Gate already completed the Win32 build and uploaded the exact-SHA artifact."
+    },
+    "pc_fast": {
+      "run_id": 36727435161,
+      "conclusion": "skipped",
+      "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5913053030,
+    "validation_comment_id": 5913198428,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "runtime_issue_ledger": {
+    "issue": 81,
+    "carry_forward_comment_id": 5913199119,
+    "status": "BLOCKER_REMAINS_ACTIVE"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00136] and no CI-skip directive.",
+    "Compare 01cff75f..391eda75 changes only the analyzer, its regression test, and Backend Conversion Gate workflow.",
+    "The exact-SHA Backend Conversion Gate passed and uploaded dinput8.dll.",
+    "The new synthetic sustained cached-image case is classified as DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED while the direct-gpu control remains OK.",
+    "HUD Inspector and OpenXR architecture also passed on the exact result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used for this automation task."
+  ],
+  "blocker": "DX11 runtime visual blocker remains active in Issue #81; this task only fixes diagnostic detection.",
+  "resume_cursor": "R139 sustained cached-image fallback detection is automation-validated on the DX11 branch. The analyzer false negative is closed, but the actual menu cached-image fallback/native-draw-dormant problem remains unresolved.",
+  "next_action": "Keep Issue #81 active. Continue runtime-path development that can provide a valid menu-local/direct frame or eliminate the bad cached-image fallback, then rebuild and re-test on Quest 3/VDXR. Do not claim native DX11 visual parity until that HMD result passes."
+}
