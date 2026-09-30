@@ -1,0 +1,602 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00324-p00199-index133-source-mask-clean-plate-safe-bbox-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00324",
+  "wave_id": "P00199",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:43:04+09:00",
+  "base_head_sha": "13a082648e8b22cca6cfb1a064f268010e963db9",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "index": 133,
+    "asset": "25F697C6",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+    "index_mod_3": 1,
+    "owned_by_lane": true,
+    "latest_c_accepted": "LOCALIZATION-LOCALIZATION_C-00321/Q00068@09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "latest_c_render_ready_indices": [],
+    "latest_c_one_stage_to_render_indices": [],
+    "skipped_current_qa_pending": [
+      "index163 candidate B00315",
+      "index94 preflight B00319",
+      "index232 preflight advancement B00322"
+    ],
+    "reason": "Fresh C00321 scan has no runnable DIRECT_REWORK/RENDER_READY/ONE_STAGE_TO_RENDER. Index133 is B-owned, C-accepted PREFLIGHT_ONLY with exact current translations but canonical source bytes previously absent, so the one permitted fallback advances it using approved source transport."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "reused_work_order": "A00128/C119 accepted index133 source-gated 9-segment work order"
+  },
+  "source_transport": {
+    "canonical_inventory_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "canonical_canvas": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y",
+    "approved_drive_account": "ezflash557",
+    "approved_drive_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "drive_exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+    "drive_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "drive_fast_path_outcome": "SOURCE_TRANSPORT_MISS",
+    "pinned_direct_probe": "envido32/OR2006Sprites@v0.25.10a:textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+    "pinned_direct_outcome": "SOURCE_TRANSPORT_MISS_404",
+    "pinned_release_bundle": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "observed_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "identity_match": true,
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+      "member_bytes": 16777344,
+      "member_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "canonical_identity_match": true
+    },
+    "dds_header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089",
+    "decoded_source_rgba_raw_sha256": "8dbf7b408b1d35b9dbd23daf69056fa9ae1aaef6a76136558169822f48306991",
+    "decoded_source_rgba_readable_sha256": "a9dfec213db5d68034b025658055ac3141b864bbead63f33ce1d4a91d458114b"
+  },
+  "semantic_binding": {
+    "status": "PASS_REUSED_C_ACCEPTED_CURRENT_9_OF_9",
+    "elements": [
+      {
+        "source": "BLU MIRABEAU",
+        "korean": "블루 미라보"
+      },
+      {
+        "source": "NERO",
+        "korean": "네로"
+      },
+      {
+        "source": "ARGENTO NURBURGRING",
+        "korean": "아르젠토 뉘르부르크링"
+      },
+      {
+        "source": "ROSSO SCUDERIA",
+        "korean": "로쏘 스쿠데리아"
+      },
+      {
+        "source": "BIANCO AVUS",
+        "korean": "비앙코 아부스"
+      },
+      {
+        "source": "GRIGIO ALLOY",
+        "korean": "그리지오 알로이"
+      },
+      {
+        "source": "ALPINE",
+        "korean": "알파인"
+      },
+      {
+        "source": "GIALLO MODENA",
+        "korean": "지알로 모데나"
+      },
+      {
+        "source": "ANCIENT RUINS",
+        "korean": "고대 유적"
+      }
+    ],
+    "protected_text": "Ferrari/model-name strings not in the 9 translation segments remain preserve-original."
+  },
+  "source_effect_geometry": {
+    "coordinate_convention": "xyxy exclusive; readable display is vertical flip of raw DDS",
+    "mask_method": "Within each semantically isolated localizable-label cell, use every decoded source pixel with alpha > 0. This captures fill/antialias/effect coverage and never erases the full detector rectangle. Cells were chosen at native resolution to exclude preserve-original Ferrari/model-name text.",
+    "elements": [
+      {
+        "source": "BLU MIRABEAU",
+        "korean": "블루 미라보",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          430,
+          890,
+          1050,
+          960
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          492,
+          904,
+          940,
+          956
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          492,
+          1092,
+          940,
+          1144
+        ],
+        "source_effect_pixels_alpha_gt_0": 14176,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          494,
+          906,
+          938,
+          954
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          494,
+          1094,
+          938,
+          1142
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          492,
+          904,
+          940,
+          956
+        ]
+      },
+      {
+        "source": "NERO",
+        "korean": "네로",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          1650,
+          890,
+          1950,
+          960
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1728,
+          904,
+          1884,
+          956
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          1728,
+          1092,
+          1884,
+          1144
+        ],
+        "source_effect_pixels_alpha_gt_0": 5584,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          1730,
+          906,
+          1882,
+          954
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          1730,
+          1094,
+          1882,
+          1142
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          1728,
+          904,
+          1884,
+          956
+        ]
+      },
+      {
+        "source": "ARGENTO NURBURGRING",
+        "korean": "아르젠토 뉘르부르크링",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          150,
+          960,
+          1050,
+          1030
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          216,
+          960,
+          932,
+          1024
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          216,
+          1024,
+          932,
+          1088
+        ],
+        "source_effect_pixels_alpha_gt_0": 24224,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          218,
+          962,
+          930,
+          1022
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          218,
+          1026,
+          930,
+          1086
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          216,
+          960,
+          932,
+          1024
+        ]
+      },
+      {
+        "source": "ROSSO SCUDERIA",
+        "korean": "로쏘 스쿠데리아",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          1280,
+          960,
+          1960,
+          1030
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1368,
+          972,
+          1884,
+          1024
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          1368,
+          1024,
+          1884,
+          1076
+        ],
+        "source_effect_pixels_alpha_gt_0": 16752,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          1370,
+          974,
+          1882,
+          1022
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          1370,
+          1026,
+          1882,
+          1074
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          1368,
+          972,
+          1884,
+          1024
+        ]
+      },
+      {
+        "source": "BIANCO AVUS",
+        "korean": "비앙코 아부스",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          470,
+          1030,
+          1100,
+          1100
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          544,
+          1040,
+          940,
+          1092
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          544,
+          956,
+          940,
+          1008
+        ],
+        "source_effect_pixels_alpha_gt_0": 12544,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          546,
+          1042,
+          938,
+          1090
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          546,
+          958,
+          938,
+          1006
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          544,
+          1040,
+          940,
+          1092
+        ]
+      },
+      {
+        "source": "GRIGIO ALLOY",
+        "korean": "그리지오 알로이",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          1420,
+          1030,
+          1960,
+          1100
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1480,
+          1040,
+          1888,
+          1092
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          1480,
+          956,
+          1888,
+          1008
+        ],
+        "source_effect_pixels_alpha_gt_0": 11968,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          1482,
+          1042,
+          1886,
+          1090
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          1482,
+          958,
+          1886,
+          1006
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          1480,
+          1040,
+          1888,
+          1092
+        ]
+      },
+      {
+        "source": "ALPINE",
+        "korean": "알파인",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          600,
+          1100,
+          1150,
+          1210
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          664,
+          1103,
+          1067,
+          1192
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          664,
+          856,
+          1067,
+          945
+        ],
+        "source_effect_pixels_alpha_gt_0": 19619,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          666,
+          1105,
+          1065,
+          1190
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          666,
+          858,
+          1065,
+          943
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          664,
+          1103,
+          1067,
+          1192
+        ]
+      },
+      {
+        "source": "GIALLO MODENA",
+        "korean": "지알로 모데나",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          1440,
+          1100,
+          2048,
+          1210
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          1528,
+          1152,
+          2012,
+          1204
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          1528,
+          844,
+          2012,
+          896
+        ],
+        "source_effect_pixels_alpha_gt_0": 15008,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          1530,
+          1154,
+          2010,
+          1202
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          1530,
+          846,
+          2010,
+          894
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          1528,
+          1152,
+          2012,
+          1204
+        ]
+      },
+      {
+        "source": "ANCIENT RUINS",
+        "korean": "고대 유적",
+        "semantic_isolation_cell_readable_xyxy_exclusive": [
+          500,
+          1210,
+          1450,
+          1325
+        ],
+        "source_effect_bbox_readable_xyxy_exclusive": [
+          549,
+          1220,
+          1391,
+          1315
+        ],
+        "source_effect_bbox_raw_xyxy_exclusive": [
+          549,
+          733,
+          1391,
+          828
+        ],
+        "source_effect_pixels_alpha_gt_0": 41813,
+        "candidate_safe_bbox_2px_readable_xyxy_exclusive": [
+          551,
+          1222,
+          1389,
+          1313
+        ],
+        "candidate_safe_bbox_2px_raw_xyxy_exclusive": [
+          551,
+          735,
+          1389,
+          826
+        ],
+        "permitted_region_readable_xyxy_exclusive": [
+          549,
+          1220,
+          1391,
+          1315
+        ]
+      }
+    ],
+    "source_alpha_nonzero_pixels_total": 558263,
+    "localizable_source_effect_pixels_total": 161688,
+    "protected_source_alpha_pixels_total": 396575,
+    "pairwise_localizable_mask_overlap_pixels": 0,
+    "removal_mask_u8_01_sha256": "48f3294697f1d806b99d4dc4efc5bac601632985b712bc99a0a32060524fe324",
+    "removal_mask_packbits_little_sha256": "5d7c481f9efcdc54afd7a18b8dddc760a253c55c79c251232165fabc913d90a5"
+  },
+  "clean_plate_self_qa": {
+    "reconstruction_class": "TRANSPARENT_TEXT_ONLY_DETERMINISTIC_REMOVAL",
+    "method": "Set RGBA to zero only at the exact 161,688-pixel source-effect union; preserve every pixel outside that union byte-for-byte.",
+    "changed_pixels_total": 161688,
+    "changed_pixels_outside_removal_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "output_alpha_nonzero_pixels": 396575,
+    "localizable_alpha_residue_pixels": 0,
+    "protected_alpha_pixels_preserved": 396575,
+    "clean_plate_rgba_readable_sha256": "d0513c55193a73c4ffc2da5a802cd0baae5799944de569124e87460031e98ebc",
+    "clean_plate_rgba_raw_sha256": "0841df984c69114962a341dd891bd0019db96fc6269599a53866a8e6b44e116c",
+    "deterministic_review_artifact_hashes": {
+      "removal_mask_png_sha256": "21e8539d20b9488a83ee343e25e3a1f9fd08fa09d17730146bcb2795ef35bf11",
+      "clean_plate_readable_png_sha256": "503bae115dbf11109036acea1be5acd3b151007a4c6686b4380a5f54e8e3dec0",
+      "source_readable_png_sha256": "d6a3d0c2dc82a27d6ea87ec003e5ccd303a7ffd74e5e5611d5db8c7ac0708b80",
+      "source_clean_comparison_png_sha256": "3601d2878a0194dfa4b69dfdf831bcf95fa20b26dc0b781a3a203dd0abb5f531"
+    },
+    "status": "PASS_PRODUCER_SELF_QA_PENDING_INDEPENDENT_C_REPLAY"
+  },
+  "source_style_measurement": {
+    "readable_baseline_vector": [
+      1,
+      0
+    ],
+    "slant_angle_deg": 0,
+    "effects": {
+      "outline": "none_observed",
+      "shadow": "none_observed",
+      "glow": "none_observed",
+      "antialias": "alpha_coverage"
+    },
+    "classes": {
+      "small_factory_color_labels": {
+        "elements": [
+          "BLU MIRABEAU",
+          "NERO",
+          "ARGENTO NURBURGRING",
+          "ROSSO SCUDERIA",
+          "BIANCO AVUS",
+          "GRIGIO ALLOY",
+          "GIALLO MODENA"
+        ],
+        "dominant_rgb_reference": [
+          101,
+          107,
+          109
+        ],
+        "nero_dominant_rgb": [
+          98,
+          105,
+          107
+        ],
+        "source_effect_height_px_range": [
+          52,
+          64
+        ]
+      },
+      "large_location_labels": {
+        "elements": [
+          "ALPINE",
+          "ANCIENT RUINS"
+        ],
+        "dominant_rgb_reference": [
+          46,
+          53,
+          57
+        ],
+        "source_effect_height_px_range": [
+          89,
+          95
+        ]
+      }
+    },
+    "status": "MEASURED_SOURCE_ONLY_RENDER_STILL_FAIL_CLOSED"
+  },
+  "readiness": {
+    "before": "PREFLIGHT_ONLY_C_ACCEPTED_EXACT_SOURCE_BYTES_PREVIOUSLY_ABSENT",
+    "after": "ONE_STAGE_TO_RENDER_PENDING_C_INDEPENDENT_9_REGION_MASK_CLEAN_PLATE_SAFE_BBOX_REPLAY",
+    "render_authorized_now": false,
+    "exact_remaining_blocker": "Independent C replay/acceptance of unchanged exact-source 9-region removal mask, deterministic transparent CLEAN_PLATE and all nine 2px safe bboxes.",
+    "after_c_pass": "RENDER_READY__DETERMINISTIC_KOREAN_RENDER_MEASURE_REFIT_DDS_ENCODE_DECODED_FINAL_SELF_QA",
+    "candidate_dds_modified": false
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_133_MOD3_EQ_1",
+    "duplicate_candidate_avoidance": "PASS_163_94_232_QA_PENDING_NOT_REPEATED",
+    "source_identity": "PASS_EXACT_CANONICAL_RELEASE_MEMBER",
+    "semantic_binding": "PASS_9_OF_9_CURRENT_C_ACCEPTED",
+    "source_effect_mask": "PASS_9_OF_9_NATIVE_ALPHA_FOOTPRINTS_NO_RECTANGLE_ERASE",
+    "protected_artwork": "PASS_396575_VISIBLE_SOURCE_ALPHA_PIXELS_OUTSIDE_MASK_PRESERVED",
+    "clean_plate": "PASS_0_OUTSIDE_CHANGES_0_PROTECTED_CHANGES_0_LOCALIZABLE_ALPHA_RESIDUE",
+    "safe_bbox": "PASS_9_OF_9_2PX_INSET",
+    "style_measurement": "PASS_SOURCE_ONLY_BASELINE_SLANT_COLOR",
+    "candidate_generation": "NONE_FAIL_CLOSED_PENDING_C_INDEPENDENT_CLEAN_PLATE_REPLAY",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
