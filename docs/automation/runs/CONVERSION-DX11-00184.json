@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00184",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "b538f01080d7732918a75d7136fd0fa8e2238572",
+  "staged_source_commits": [
+    "233fc7e3ccb88a7492d6326c58ff4abd59d620d4",
+    "c57a7d7c6ab93c1f276e4abd652051c51d259150"
+  ],
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R184_182251_CONTINUATION_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DX11-00182 captured exact 128-byte provenance from 0x182251 and explicitly left instruction-boundary decode as the next independent F13 unit. The window contains all three predecessor forward targets and one raw rel32 call, so a bounded exact-byte/control-flow proof is the highest-priority runnable DX11 follow-up that does not require Quest 3/VDXR evidence. DXVK-00183 independently passed the same public-EXE proof shape; DX11 validation remains separate.",
+  "summary": "PENDING automatic validation. Adds a fail-closed exact-byte/manual-decode proof for all 128 bytes in the R182 0x182251 continuation window. It validates all 51 contiguous instructions, predecessor forward targets as exact instruction boundaries, nine local rel8 branch targets, and raw call 0x18229B->0x1882CC. The window ends with complete leave at 0x1822D0; byte 0x1822D1 is outside captured evidence, so no ret/function-boundary, callee-semantic, or render/HUD ownership claim is made.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00184.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Base b538f01080d7732918a75d7136fd0fa8e2238572 is the completed CONVERSION-DX11-00182 bookkeeping descendant; validation-bearing ancestor 9b8c68bf captured exact 128-byte 0x182251 provenance.",
+    "The R182 bytes decode contiguously from 0x182251 through 0x1822D0 into 51 complete instructions, exactly consuming the 128-byte probe and leaving 0x1822D1 outside the captured evidence.",
+    "Previously encoded forward targets 0x182254, 0x182258 and 0x1822BF are required to land on instruction starts; nine local rel8 branch targets are checked likewise.",
+    "The existing raw outbound census identified 0x18229B->0x1882CC; R184 validates the exact encoded call target while leaving callee semantics UNRESOLVED and ownership NONE.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00183",
+    "source_validation_bearing_result_sha": "be8238f7ac01ce49fb1cf4c910d2436290245b8a",
+    "source_validation_state": "PASS",
+    "source_proof_status": "EXACT_182251_CONTINUATION_CONTROL_FLOW_PROVEN",
+    "reason": "Reuse only the bounded exact-byte/control-flow proof design on the shared canonical EXE. DX11 depends on its own R182 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_EXE_182251_CONTINUATION_PROVENANCE_CAPTURED",
+    "target_rva": "0x00182251",
+    "prefix_end_rva": "0x001822D1",
+    "probe_end_rva": "0x001822D1",
+    "instruction_count": 51,
+    "predecessor_forward_target_rvas": [
+      "0x00182254",
+      "0x00182258",
+      "0x001822BF"
+    ],
+    "local_branch_count": 9,
+    "call_rva": "0x0018229B",
+    "call_target_rva": "0x001882CC",
+    "leave_rva": "0x001822D0",
+    "expected_status": "EXACT_182251_CONTINUATION_CONTROL_FLOW_PROVEN",
+    "function_entry_status": "UNRESOLVED",
+    "terminal_status": "LEAVE_PROVEN_RET_NOT_CAPTURED",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "continuation_status": "NEXT_BYTE_AFTER_LEAVE_NOT_CAPTURED"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Instruction/control-flow proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless all 128 exact bytes decode contiguously, predecessor forward targets and all local branches land on instruction boundaries, rel32 call resolves exactly to 0x1882CC and exists in raw census, and final captured byte remains complete leave at 0x1822D0. It explicitly refuses to infer uncaptured 0x1822D1."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182251_CONTINUATION_PROVENANCE_CAPTURED",
+    "after": "PENDING_182251_CONTINUATION_CONTROL_FLOW",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x182251 control-flow layout can be proven only through captured leave at 0x1822D0. Byte 0x1822D1 is outside R182 evidence, so terminal ret/function-boundary identity remains unresolved. The 0x1882CC callee semantics, 0x182194 function-entry identity and all render/HUD ownership remain unresolved.",
+  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until the result Gate completes because Backend Conversion Gate uses cancel-in-progress."
+}
