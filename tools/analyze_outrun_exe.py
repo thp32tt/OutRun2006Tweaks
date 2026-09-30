@@ -432,6 +432,7 @@ def collect_guarded_gf_target_provenance(pe: PE) -> list[dict]:
                 "label": label,
                 "target_section": target_section,
                 "bytes64": pe.bytes_at_rva(target_rva, 64).hex(" "),
+                "bytes96": pe.bytes_at_rva(target_rva, GF_RAW_REL32_TARGET_WINDOW).hex(" "),
                 "function_start_guess_rva": function_start_guess_rva,
                 "raw_inbound_rel32_candidates": collect_raw_inbound_rel32_candidates(
                     pe, target_rva
@@ -1163,7 +1164,8 @@ def main() -> int:
             f"start_guess={hexrva(item['function_start_guess_rva'])} "
             f"inbound_raw={len(inbound)} outbound_raw={len(outbound)} "
             f"outbound={outbound_known} "
-            f"bytes64={item['bytes64']}"
+            f"bytes64={item['bytes64']} "
+            f"bytes96={item['bytes96']}"
         )
     alignment = report["guarded_gf_target_b_alignment_proof"]
     print(
