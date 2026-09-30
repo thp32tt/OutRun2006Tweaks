@@ -166,4 +166,5 @@ namespace OutRunVR::Core::RefactorContract
     static_assert(CheckMatrixCase(36));
     static_assert(CheckMatrixCase(37));
     static_assert(CheckMatrixCase(38));
+    static_assert(CheckMatrixCase(39));
 }
