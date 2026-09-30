@@ -1,0 +1,115 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00323-index54-current-canonical-source-reactivation-gate-v16",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00323",
+  "wave_id": "P00198",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-10-01T04:37:48+09:00",
+  "branch": "korean-localization-clean",
+  "base_head_sha": "60a826a7db5665ebf28f22071a48f28e63dc3b81",
+  "queue_index": 54,
+  "asset": "FA7BBB13",
+  "queue_path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "selection_reason": "No A-owned DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework is runnable at latest authoritative C170/Q00068; A candidate indices159/198/201 and A00320@index111 are already C-QA pending and are not repeated. This is the single allowed new PREFLIGHT_ONLY expansion.",
+  "current_c_readiness": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00321",
+    "c_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "c_automation_validation": "PASS",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_rework_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      163,
+      198,
+      201
+    ],
+    "runnable_production": []
+  },
+  "canonical_inventory": {
+    "expected_sha256": "f7695f10b8761ab00ff988c443fd864340d5569a7047cc7342c3e1e3e96db7b6",
+    "width": 4096,
+    "height": 2048,
+    "format": "RGBA32",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df"
+  },
+  "acquisition_tiers": [
+    {
+      "tier": 1,
+      "transport": "GOOGLE_DRIVE_APPROVED_CANONICAL_HD_SOURCE_FAST_PATH",
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_relative_path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "drive_file_id": "1G8a2LxAqy57fC4LhtEXPv35GimxoH6xr",
+      "bytes": 33554560,
+      "sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "dds": {
+        "width": 4096,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "pitch": 16384,
+        "header_128_sha256": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57"
+      },
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    },
+    {
+      "tier": 2,
+      "transport": "PINNED_TAG_DIRECT_FILE_FAST_PATH",
+      "repository": "envido32/OR2006Sprites",
+      "immutable_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "exact_path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "probe": "GitHub contents API at immutable commit",
+      "http_status": 404,
+      "outcome": "SOURCE_TRANSPORT_MISS"
+    },
+    {
+      "tier": 3,
+      "transport": "PINNED_RELEASE_FALLBACK",
+      "release_tag": "v0.25.10a",
+      "release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_size": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "exact_member": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "member_bytes": 33554560,
+      "member_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "member_git_blob_sha1": "b32fdd46f0d60840977dd913f4631afe0ba6499d",
+      "header_128_sha256": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57",
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    }
+  ],
+  "lineage_reconciliation": {
+    "historical_b95_source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+    "historical_b95_candidate_sha256": "d0dae8165f8a6c7231b398be9fc7bc5fdf7f66f97253eb8ba03c54f6136615da",
+    "current_candidate_git_blob_sha": "d309cc265a50d61d29745b7e00f419f78fda080e",
+    "source_lineage_matches_current_inventory": false,
+    "existing_candidate_reuse_authorized": false,
+    "reason": "B95 candidate is derived from the same 61c82072 source returned by the approved Drive and pinned Release paths, while current canonical inventory requires f7695f10. Candidate bytes are not re-reviewed or re-rendered under this mismatched source identity."
+  },
+  "final_source_outcome": "SOURCE_IDENTITY_MISMATCH",
+  "production_readiness": "PREFLIGHT_ONLY",
+  "blocker_fingerprint": {
+    "canonical_inventory_sha256": "f7695f10b8761ab00ff988c443fd864340d5569a7047cc7342c3e1e3e96db7b6",
+    "acquired_exact_path_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+    "source_policy_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df"
+  },
+  "retry_policy": "STICKY_UNTIL_CANONICAL_INVENTORY_OR_SOURCE_POLICY_OR_EXACT_CANONICAL_TRANSPORT_CHANGES",
+  "candidate_dds_modified": false,
+  "heavy_candidate_qa_repeated": false,
+  "clean_plate_created": false,
+  "korean_render_created": false,
+  "runtime_validation": "UNTESTED",
+  "self_qa": "PASS_FAIL_CLOSED__EXACT_QUEUE_PATH__DRIVE_FAST_PATH_BYTES_HASHED__PINNED_DIRECT_404_CLASSIFIED_TRANSPORT_MISS__PINNED_RELEASE_DIGEST_AND_EXACT_MEMBER_HASHED__CURRENT_INVENTORY_MISMATCH_PROVEN__STALE_B95_SOURCE_LINEAGE_RETIRED__NO_CANDIDATE_WRITE",
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "latest_c_record_blob_sha": "27e80e09d3cc332e4ab03605cb7bf0b738b67d2d",
+    "historical_b95_report_blob_sha": "24af1deb57364b0be681e2ee3697899cc27e6b10",
+    "current_candidate_git_blob_sha": "d309cc265a50d61d29745b7e00f419f78fda080e"
+  }
+}

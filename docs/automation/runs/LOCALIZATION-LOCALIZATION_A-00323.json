@@ -1,0 +1,105 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00323-p00198-producer-result-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00323",
+  "wave_id": "P00198",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:37:48+09:00",
+  "base_head_sha": "60a826a7db5665ebf28f22071a48f28e63dc3b81",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_A_MOD3_NO_RUNNABLE_COMPLETION_TIER_INDEX54_SOURCE_IDENTITY_MISMATCH_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Latest authoritative C170/Q00068 reports A runnable_production=[] with no RENDER_READY/ONE_STAGE_TO_RENDER/candidate-rework tier; indices159/198/201 are already candidate-QA pending and A00320@index111 is preflight-QA pending, so none are repeated. A expands exactly one new PREFLIGHT_ONLY item: index54/FA7BBB13. Current canonical inventory requires source SHA-256 f7695f10..., but the approved Drive exact path returns 61c82072..., immutable pinned-tag exact path is a 404 SOURCE_TRANSPORT_MISS, and the verified v0.25.10a Release exact member also returns 61c82072.... Historical B95 used that same 61c82072 source for candidate d0dae816..., so the old candidate lineage is fail-closed as noncanonical under current inventory. No DDS candidate or shared state is modified. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00321",
+    "latest_authoritative_c_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "latest_c_runnable_production": [],
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_or_preflight_qa_pending_not_repeated": [
+      111,
+      159,
+      198,
+      201
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "runtime_blocked_special_not_selected": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "selected_index": 54,
+    "selected_asset": "FA7BBB13",
+    "selected_priority": "FALLBACK_STEP_4_SINGLE_NEW_PREFLIGHT_BATCH__CURRENT_CANONICAL_SOURCE_REACTIVATION_GATE",
+    "new_preflight_batches_started": 1
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "latest_c_record_blob_sha": "27e80e09d3cc332e4ab03605cb7bf0b738b67d2d",
+    "historical_b95_report_blob_sha": "24af1deb57364b0be681e2ee3697899cc27e6b10",
+    "current_candidate_git_blob_sha": "d309cc265a50d61d29745b7e00f419f78fda080e"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00323-P00198/A00323_P00198_INDEX54_SOURCE_REACTIVATION_GATE.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX54_CURRENT_CANONICAL_SOURCE_REACTIVATION_GATE_AND_STALE_LINEAGE_RETIREMENT",
+    "reviewed_indices": [
+      54
+    ],
+    "reviewed_assets": [
+      "FA7BBB13"
+    ],
+    "current_inventory_sha256": "f7695f10b8761ab00ff988c443fd864340d5569a7047cc7342c3e1e3e96db7b6",
+    "acquired_drive_release_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+    "final_source_outcome": "SOURCE_IDENTITY_MISMATCH",
+    "candidate_reuse_authorized": false,
+    "candidate_dds_modified": false,
+    "new_machine_readable_source_gate": true,
+    "materially_reduces_unresolved_work": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "self_qa": "PASS_A_MOD3_SCHEMA16__C170_RUNNABLE_PRODUCTION_EMPTY__NO_COMPLETION_TIER_REPEATED__ONE_NEW_PREFLIGHT_ONLY_BATCH__INDEX54_CURRENT_INVENTORY_F769_VS_APPROVED_TRANSPORT_61C_SOURCE_IDENTITY_MISMATCH__HISTORICAL_B95_LINEAGE_RETIRED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): gate index54 current source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00323]"
+}
