@@ -1,0 +1,401 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-c162-q00060-four-input-independent-batch-qa-current-policy-reconciliation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00282",
+  "wave_id": "Q00060",
+  "qa_batch_id": "Q00060",
+  "run": "C162",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T21:55:00+09:00",
+  "base_head_sha": "b82544acd2444616982e26f050e2443d8343912a",
+  "base_sha": "b82544acd2444616982e26f050e2443d8343912a",
+  "commit_mode": "VALIDATION_BEARING_RESULT",
+  "result": "PASS_Q00060_BATCH_WITH_B00273_A00271_PASS_B00270_B00274_REWORK_REQUIRED_RUNTIME_UNTESTED",
+  "summary": "Q00060 consumes four immutable producer results in one independent batch. B00270@index94 is REWORK_REQUIRED because its DDS_ONLY manifest points to the unchanged strict-blocked C80 candidate. B00273@index94 PASSes its current-v2 regeneration constraints as PREFLIGHT_ONLY while reusing that exact fingerprint. A00271@index111 PASSes its source-only Tuned/Normal protected-car registration as PREFLIGHT_ONLY. B00274@index163 is REWORK_REQUIRED under the newer conservative-fit policy: binary/header/zero-overflow checks pass, but Ice Scape and Skyscrapers are materially undersized rather than micro-reduced. No candidate DDS is rewritten by C; shared state is reconciled once; runtime remains UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "4d8b1a35e597dc1d5c54105b2fc190e52bd609f4",
+      "result_message": "localization(B): add index94 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_B-00270]",
+      "completed_at": "2026-09-30T19:33:49.287217+09:00",
+      "producer_id": "P00156",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00273",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "61514792079dbfc15c8a8afa9102f8291fdca750",
+      "result_message": "localization(B): persist index94 v2 regeneration constraints [AUTO:LOCALIZATION-LOCALIZATION_B-00273]",
+      "completed_at": "2026-09-30T19:45:17.375764+09:00",
+      "producer_id": "P00158",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00271",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "28d4552d321311b2ae08d224259451b911e54fd1",
+      "result_message": "localization(A): register index111 protected-art template [AUTO:LOCALIZATION-LOCALIZATION_A-00271]",
+      "completed_at": "2026-09-30T19:56:32.602717+09:00",
+      "producer_id": "P00157",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00274",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "7dbecfb5ba666091dc62ab23c56faf8a08c07690",
+      "result_message": "localization(B): normalize index163 course-title family [AUTO:LOCALIZATION-LOCALIZATION_B-00274]",
+      "completed_at": "2026-09-30T20:03:12.061477+09:00",
+      "producer_id": "P00159",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+      "result_sha": "4d8b1a35e597dc1d5c54105b2fc190e52bd609f4",
+      "status": "REWORK_REQUIRED",
+      "reason": "Index94/2DA43E41 DDS_ONLY manifest points to unchanged candidate 02da4680... / Git blob 1d530552... while the B93/C85 exact-source-bbox/source-faithful blocker remains current. B93 exhausted safe-repair attempts without writing a replacement and B00270 explicitly made no static promotion. Do not accept this stale candidate for runtime promotion; runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00273",
+      "result_sha": "61514792079dbfc15c8a8afa9102f8291fdca750",
+      "status": "PASS",
+      "reason": "Index94/2DA43E41 regeneration constraints PASS for their claimed pre-generation scope. The unchanged source/candidate fingerprint is de-duplicated with B00270. C accepts the B93 failure geometry, retirement of flattened-raster LANCZOS repair, and seven current-v2 2px candidate-safe bboxes as deterministic rebuild input. CLEAN_PLATE/source-style provenance is still missing, so production_readiness=PREFLIGHT_ONLY; no candidate/static/runtime approval is granted."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00271",
+      "result_sha": "28d4552d321311b2ae08d224259451b911e54fd1",
+      "status": "PASS",
+      "reason": "Index111/C075FB49 source-only protected-art registration PASS for its claimed scope. Exact source/candidate identity remains unchanged from C160. Tuned Setting and Normal Setting protected-car cores register at readable dx=+25,dy=0 with Jaccard 0.9000653168 using source pixels only. Tuned/Normal fringe CLEAN_PLATE work and RANDOM protected-question-mark reconstruction remain, so production_readiness=PREFLIGHT_ONLY; runtime remains UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00274",
+      "result_sha": "7dbecfb5ba666091dc62ab23c56faf8a08c07690",
+      "status": "REWORK_REQUIRED",
+      "reason": "Index163/59A79158 passes binary/header/alpha/zero-overflow mechanics but fails the current policy added after B00274. C independently reverified Drive bundle a827d4cd..., candidate a9d5aacc..., canonical source 7cf4f4c6..., identical 128-byte DDS header 68d8452d..., 1024x2048 RGBA32 mip1, and clean structural machine evidence. Current ORIENTATION_POLICY 791e5309... permits only small native micro-reduction and explicitly makes material undersizing REWORK_REQUIRED. Ice Scape is 57->37 px with Korean alpha height 35 vs 59 source-effect px (~59%); Skyscrapers is 57->41 px with 38 vs 59 (~64%). These are conspicuously smaller than the display family. Preserve reusable clean structural evidence, but rerender the materially undersized rows with source-faithful tighter tracking/condensed treatment or an approved shorter translation before fresh decoded-final C QA. Runtime remains UNTESTED."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "b00270_isolation_blob_sha": "1bac3bd576aa342bcb979439dd1cffea4ca1d1ea",
+    "b00273_regen_spec_blob_sha": "dd977b356c726439b509ad64dfd3f37fd8f64a35",
+    "a00271_protected_art_blob_sha": "7d8479ba7c1c40d076f1a29bf52388030e02a815",
+    "b00274_qa_report_blob_sha": "238239f313abc6f9ae59ea9e532d014374df8a2d",
+    "b00274_generation_prompt_blob_sha": "8296ef858e53bf7ec5f3455e10280a695a10b37e",
+    "index94_source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "index94_candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+    "index111_source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "index111_candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+    "index163_source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "index163_candidate_sha256": "a9d5aacc840b158ef0335301c512387f423fffda2640e612aceb29a6bc8efbf0",
+    "index163_candidate_bundle_sha256": "a827d4cd693e0721bfa000cba45959cdb52ec224c1561b3a9138f0f89d9a0f16",
+    "canonical_source_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "policy_delta_review": {
+    "producer_b00274_orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926",
+    "current_orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "policy_changed_since_b00274": true,
+    "new_rule": "Conservative fit / micro-reduction: only small native reductions for reliable 1-2 px safety margins are acceptable; material undersizing remains REWORK_REQUIRED.",
+    "affected_batch_assets": [
+      "59A79158"
+    ],
+    "unaffected_batch_assets": [
+      "2DA43E41",
+      "C075FB49"
+    ]
+  },
+  "independent_replay": {
+    "index94": {
+      "asset": "2DA43E41",
+      "shared_source_candidate_fingerprint_across_inputs": true,
+      "source_candidate_unchanged": true,
+      "heavy_candidate_qa_repeated": false,
+      "b00270_runtime_isolation_manifest_accepted": false,
+      "b00270_current_result": "REWORK_REQUIRED_UNCHANGED_STRICT_BLOCKER",
+      "b00273_pregen_result": "PASS_CURRENT_V2_REGEN_CONSTRAINTS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "candidate_safe_bbox_count": 7,
+      "flattened_raster_historical_method_retired": true,
+      "runtime_validation": "UNTESTED"
+    },
+    "index111": {
+      "asset": "C075FB49",
+      "source_candidate_unchanged": true,
+      "reused_c160_source_style_fingerprint": true,
+      "heavy_candidate_qa_repeated": false,
+      "new_scope_review": "PASS_SOURCE_ONLY_TUNED_NORMAL_PROTECTED_CAR_REGISTRATION",
+      "protected_car_registration_readable_dx_dy": [
+        25,
+        0
+      ],
+      "protected_car_jaccard": 0.9000653167864141,
+      "clean_plate_ready_for_new_three_panels": false,
+      "random_protected_question_mark_reconstruction_ready": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED"
+    },
+    "index163": {
+      "asset": "59A79158",
+      "new_candidate_fingerprint": true,
+      "drive_candidate_readback": true,
+      "candidate_bundle_size_bytes": 79173,
+      "candidate_bundle_sha256": "a827d4cd693e0721bfa000cba45959cdb52ec224c1561b3a9138f0f89d9a0f16",
+      "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "candidate_sha256": "a9d5aacc840b158ef0335301c512387f423fffda2640e612aceb29a6bc8efbf0",
+      "source_candidate_dds_bytes": 8388736,
+      "dds_header_sha256_source": "68d8452d40fe2ba3922dd50187ef03aab9dafbc1a3dc98245283ea94c3284ab6",
+      "dds_header_sha256_candidate": "68d8452d40fe2ba3922dd50187ef03aab9dafbc1a3dc98245283ea94c3284ab6",
+      "dds_header_identical": true,
+      "structure": "1024x2048 RGBA32 mip1 / raw flip_y",
+      "machine_qa_replayed": {
+        "semantic_rows": "24/24",
+        "one_pixel_overflow_total": 0,
+        "changed_pixels_outside_edit_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "source_comparison_gate": "PASS_24_OF_24_ENGLISH_SOURCE_TO_KOREAN_CANDIDATE",
+        "raster_resampling": "NOT_USED"
+      },
+      "independent_readable_source_candidate_review": true,
+      "current_policy_result": "REWORK_REQUIRED_MATERIAL_UNDERSIZING",
+      "material_undersizing_rows": [
+        {
+          "source": "Ice Scape",
+          "korean": "아이스 스케이프",
+          "family_target_font_size": 57,
+          "actual_font_size": 37,
+          "source_effect_height_px": 59,
+          "candidate_alpha_height_px": 35,
+          "height_ratio": 0.593
+        },
+        {
+          "source": "Skyscrapers",
+          "korean": "스카이스크레이퍼",
+          "family_target_font_size": 57,
+          "actual_font_size": 41,
+          "source_effect_height_px": 59,
+          "candidate_alpha_height_px": 38,
+          "height_ratio": 0.644
+        }
+      ],
+      "reusable_after_rework": [
+        "exact canonical source identity",
+        "DDS header/format/mipmap/orientation",
+        "semantic binding",
+        "transparent CLEAN_PLATE lineage",
+        "protected-mask/zero-outside-change framework"
+      ],
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "reviewed_assets": [
+    {
+      "index": 94,
+      "asset": "2DA43E41",
+      "producer_dispositions": [
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00270",
+          "status": "REWORK_REQUIRED"
+        },
+        {
+          "task_id": "LOCALIZATION-LOCALIZATION_B-00273",
+          "status": "PASS"
+        }
+      ],
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Use accepted v2 regeneration constraints to complete source-effect removal/protected masks, CLEAN_PLATE and source-style provenance, then natively rerender; do not runtime-promote the unchanged C80 candidate."
+    },
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "disposition": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Complete protected-art CLEAN_PLATE reconstruction for Tuned Setting/Normal Setting/RANDOM; newer A00276 RANDOM guard is out-of-batch QA_PENDING."
+    },
+    {
+      "index": 163,
+      "asset": "59A79158",
+      "disposition": "REWORK_REQUIRED",
+      "production_readiness": "REWORK_REQUIRED_CURRENT_POLICY_MATERIAL_UNDERSIZING",
+      "runtime_validation": "UNTESTED",
+      "required_next": "Retain exact source/header/clean-plate/containment evidence, but natively rerender materially undersized course-name rows with tighter source-faithful tracking/condensed treatment or approved shorter translation, then fresh decoded-final C QA."
+    }
+  ],
+  "concurrent_head_reconciliation": {
+    "observed_head": "b82544acd2444616982e26f050e2443d8343912a",
+    "index94_superseded": false,
+    "index111_superseded": false,
+    "index163_superseded": false,
+    "note": "Refreshed GitHub HEAD before the single shared-state merge. Later producer work is preserved as out-of-batch and does not overwrite immutable dispositions unless it changes the relevant candidate fingerprint.",
+    "out_of_batch_newer_inputs": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00276",
+        "index": 111,
+        "asset": "C075FB49",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00060"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00278",
+        "index": 51,
+        "asset": "FF2462BB",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00060"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00279",
+        "index": 24,
+        "asset": "66743AA8",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00060"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00280",
+        "indices": [
+          15,
+          18,
+          21
+        ],
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00060"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+        "indices": [
+          15,
+          18,
+          21
+        ],
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00060"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00277",
+        "index": 97,
+        "asset": "411827E",
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00060"
+      }
+    ]
+  },
+  "readiness_reconciliation": {
+    "production_readiness": {
+      "51": "QA_PENDING_OUT_OF_BATCH_A00278_NATIVE_V2_CANDIDATE",
+      "94": "PREFLIGHT_ONLY_V2_REGEN_CONSTRAINTS_READY__UNCHANGED_CANDIDATE_REWORK_REQUIRED",
+      "97": "REWORK_REQUIRED_CURRENT_POLICY_SOURCE_STYLE__B00277_PREFLIGHT_QA_PENDING",
+      "111": "PREFLIGHT_ONLY_PROTECTED_ART_TEMPLATE_ACCEPTED__A00276_QA_PENDING",
+      "121": "REWORK_REQUIRED_ZERO_PIXEL_OR_ARTIFACT",
+      "130": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "163": "REWORK_REQUIRED_CURRENT_POLICY_MATERIAL_UNDERSIZING"
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_rework_indices": [
+      97,
+      121,
+      163
+    ],
+    "candidate_qa_pending_indices": [
+      51,
+      159,
+      198,
+      201
+    ],
+    "preflight_only_actionable_indices": [
+      94,
+      111,
+      133,
+      232
+    ],
+    "preflight_only_dependency_blocked_indices": [
+      175,
+      217,
+      135
+    ],
+    "static_qa_pass_runtime_untested_indices": [
+      99,
+      102,
+      112,
+      130,
+      152,
+      193,
+      195,
+      222,
+      226,
+      231,
+      237
+    ],
+    "runtime_isolation_ready_indices": [
+      99,
+      102,
+      112,
+      130,
+      193,
+      237
+    ],
+    "runtime_isolation_qa_pending_indices": [
+      226,
+      231
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: none.",
+      "ONE_STAGE_TO_RENDER: none.",
+      "CANDIDATE_REWORK: indices97/411827E, 121/FD90AA9 and 163/59A79158 remain ahead of unrelated preflight. Index163 must fix current-policy material undersizing without zero-pixel overflow or flattened-raster scaling; index97 retains source-style/slant rework and has newer out-of-batch B00277 rebuild-spec evidence awaiting C.",
+      "QA_BACKLOG: newer candidate-bearing index51/FF2462BB from A00278 plus indices159/198/201 remain ahead of unrelated preflight; Q00060 does not implicitly approve those out-of-batch candidates.",
+      "PREFLIGHT_ONLY: index94/2DA43E41 B00273 v2 regeneration constraints and index111/C075FB49 A00271 protected-art registration are accepted for their claimed scopes. Index111 has newer out-of-batch A00276 RANDOM guard evidence awaiting C; indices133/232 follow candidate completion.",
+      "STATIC_QA: accepted unchanged static fingerprints remain indices99/102/112/130/152/193/195/222/226/231/237. Q00060 adds no new STATIC_QA_PASS asset.",
+      "RUNTIME_ISOLATION: accepted indices99/102/112/130/193/237 remain ready. Index94 B00270 isolation is REWORK_REQUIRED and is not accepted for runtime promotion; indices226/231 remain QA_PENDING isolation inputs.",
+      "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; do not reprobe until dependency/fingerprint changes.",
+      "Q00060 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_CURRENT_POLICY_RECONCILIATION_AND_SINGLE_SHARED_STATE_MERGE",
+    "reviewed_inputs": 4,
+    "reviewed_assets": 3,
+    "producer_inputs_pass": 2,
+    "producer_inputs_rework_required": 2,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "new_static_artwork_passes": 0,
+    "new_pre_generation_passes": 2,
+    "new_runtime_isolation_inputs_accepted": 0,
+    "new_runtime_approvals": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 755,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 67,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00282.json",
+    "role_c_report": "localization/graphics/role_C/202609302155-C162/C162_Q00060_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Read-only exact pinned v0.25.10a source-byte replay after SHA-256 identity verification; GitHub remains state/QA SSOT.",
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "Index94 B00270/B00273 share one unchanged source/candidate fingerprint, so strict blocker work is reviewed once and pre-generation delta once. Index111 reuses unchanged C160 source/candidate/style identity and reviews only new protected-art registration. Index163 is a new candidate fingerprint and receives fresh Drive binary/header/current-policy/readable comparison review.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "report_kind": "C162_Q00060_INDEPENDENT_QA_BATCH",
+  "task_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00282.json"
+}
