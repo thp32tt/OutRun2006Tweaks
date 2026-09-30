@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-a00265-p00151-index51-single-dds-isolation-v1",
+  "case_id": "P00151_A00265_FF2462BB",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00265",
+  "wave_id": "P00151",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-09-30T19:26:30+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+  "active": true,
+  "purpose": "Provide a concrete repository-backed DDS_ONLY runtime-isolation input for index51/FF2462BB without rerendering or repeating heavy QA. This does not clear the current shared source-faithful/artifact rework blocker and does not grant static approval; it only enables the still-missing isolated real-game evidence. Runtime remains UNTESTED.",
+  "asset": {
+    "id": "FF2462BB",
+    "queue_index": 51,
+    "queue_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "raw_orientation": "mirror_y",
+    "semantic_entries": 59,
+    "localized_regions": 68,
+    "current_queue_status": "rework_required_zero_pixel_or_artifact",
+    "current_queue_blocker": "source-faithful rerender/artifact blocker unchanged; per-DDS runtime isolation required"
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "git_blob_sha": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+    "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "bytes": 33554560,
+    "dds": {
+      "width": 4096,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "pitch": 16384
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "git_blob_sha": "f3a1b7851e9e81e2b861764f574c166beffbc0d5",
+    "sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+    "bytes": 33554560,
+    "dds": {
+      "width": 4096,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "a_auto_current_candidate_commit": "e7ea6bd25efb554ad63c4d76de92572cd6d75ca7",
+      "candidate_blob_at_a_auto": "f3a1b7851e9e81e2b861764f574c166beffbc0d5",
+      "current_candidate_blob": "f3a1b7851e9e81e2b861764f574c166beffbc0d5",
+      "source_blob_at_a_auto": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+      "current_source_blob": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+      "current_head_checked": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+      "no_existing_ff2462bb_single_dds_manifest_at_selection": true,
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "current_candidate_report": "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
+    "current_candidate_producer_self_qa": "21 reworked elements / 0 failed / 0 collateral pixels / 0 changes outside declared cells / 0 introduced alpha outside declared cells",
+    "historical_c75_report": "localization/graphics/role_C/20260927-1220-C75/C75_FF2462BB_STRICT_QA.json",
+    "historical_d74_report": "localization/graphics/role_D/20260927-1220-D74/D74_FF2462BB_FINAL_STATIC_GATE.json",
+    "historical_candidate_status": "SUPERSEDED_FOR_CURRENT_BINARY_BY_A_AUTO_00001",
+    "current_shared_rework_blocker_retained": true,
+    "heavy_candidate_qa_rerun": false,
+    "source_candidate_fingerprint_unchanged_since_a_auto_00001": true,
+    "final_static_approval": false,
+    "final_approved": false,
+    "note": "The current candidate has only producer self-QA after A_AUTO_00001. Historical C75/D74 evidence is kept as background lineage only and is not reused as independent approval for the changed current SHA."
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "candidate_git_blob_sha": "f3a1b7851e9e81e2b861764f574c166beffbc0d5",
+    "candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the FF2462BB replacement DDS and confirm the affected UI flows render without a crash.",
+    "Capture readable/game-orientation evidence for representative states covering the localized atlas, including account/login and START/GOAL-related regions.",
+    "Confirm mirror-Y raw storage is interpreted correctly in game.",
+    "Check clipping, overlap, 1-pixel overflow, position, scaling, alpha/transparency, visible seams/boxes and collateral artwork.",
+    "Specifically inspect regions implicated by the current source-faithful/artifact rework blocker rather than treating isolation success as static-QA clearance.",
+    "Do not promote static/final/runtime approval from this manifest alone; independent C disposition and real-game evidence remain required."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

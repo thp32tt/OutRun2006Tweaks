@@ -1,0 +1,105 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00265-p00151-index51-single-dds-isolation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00265",
+  "wave_id": "P00151",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T19:26:30+09:00",
+  "base_head_sha": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+  "base_sha": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX51_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX51_SINGLE_DDS_RUNTIME_ISOLATION_INPUT_REWORK_BLOCKER_RETAINED_RUNTIME_UNTESTED",
+  "summary": "Rollover 2 resumes A00265 from current GitHub SSOT. The previous rollover's index111/C075FB49 direction is not repeated because A00262@4bcac22e already produced the style/slant input and remains QA-pending under C_BATCH_GATE. Fresh schema15 A-shard scan has no runnable C-accepted RENDER_READY or ONE_STAGE_TO_RENDER item. Index51/FF2462BB has an unchanged source-faithful/artifact rework blocker, so no speculative rerender is attempted, but its current repository-backed A_AUTO candidate still lacks a deterministic single-DDS isolation manifest and W00004/C89 explicitly retains per-DDS runtime evidence as missing. The exact current source/candidate Git blobs are unchanged since A_AUTO; the source blob also matches the verified pinned v0.25.10a archive member. Fallback step 3 therefore adds only a DDS_ONLY runtime-isolation input. No candidate/shared state is changed, no static approval is promoted, and runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00265-P00151/A00265_P00151_INDEX51_SINGLE_DDS_ISOLATION_INPUT.json",
+    "localization/validation/single_dds/P00151_A00265_FF2462BB.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX51_FF2462BB_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      51
+    ],
+    "reviewed_assets": [
+      "FF2462BB"
+    ],
+    "candidate_dds_modified": false,
+    "static_rework_blocker_resolved": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "prior_rollover_index111": "SKIP_QA_PENDING_A00262_C_BATCH_GATE",
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "selected_indices": [
+      51
+    ],
+    "existing_isolation_not_repeated": [
+      12,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "qa_pending_not_repeated": [
+      54,
+      57,
+      60,
+      111,
+      159,
+      198,
+      201
+    ],
+    "dependency_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "readiness_before": {
+      "51": "REWORK_REQUIRED_UNCHANGED_BLOCKER__EXISTING_CURRENT_CANDIDATE_NO_SINGLE_DDS_ISOLATION"
+    },
+    "readiness_after": {
+      "51": "REWORK_REQUIRED_UNCHANGED_BLOCKER__SINGLE_DDS_ISOLATION_INPUT_READY__RUNTIME_UNTESTED"
+    }
+  },
+  "self_qa": "PASS_A_MOD3_INDEX51__LATEST_SCHEMA15__A00262_INDEX111_QA_PENDING_NOT_REPEATED__UNCHANGED_A_AUTO_SOURCE_CANDIDATE_FINGERPRINT__NEW_DDS_ONLY_INPUT__NO_STATIC_PROMOTION__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "CURRENT_SHARED_REWORK_REQUIRED_RETAINED__CURRENT_CANDIDATE_PENDING_INDEPENDENT_C_STATIC_DISPOSITION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(A): add index51 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00265]",
+  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created. Producer automation validation remains PENDING under C_BATCH_GATE. The current static rework blocker remains authoritative and runtime remains UNTESTED."
+}

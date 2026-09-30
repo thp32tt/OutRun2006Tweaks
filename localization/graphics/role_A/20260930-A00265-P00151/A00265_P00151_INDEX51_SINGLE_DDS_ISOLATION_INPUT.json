@@ -1,0 +1,123 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00265-p00151-index51-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00265",
+  "wave_id": "P00151",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T19:26:30+09:00",
+  "base_head_sha": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "current_controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "current_asset_queue_blob_sha": "a0112b8f732b06c7c0818803ec8781ea216483db",
+    "latest_shared_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "rollover_prior_target": {
+      "index": 111,
+      "asset": "C075FB49",
+      "disposition": "SKIP_QA_PENDING",
+      "reason": "A00262@4bcac22ee9da124c9d737a5d54f99b9b4c3b2993 already produced six source-style/slant measurements and remains PENDING under C_BATCH_GATE. Current producer policy forbids repeating QA-pending work."
+    },
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_backlog_not_repeated": [
+      54,
+      57,
+      60,
+      111,
+      159,
+      198,
+      201
+    ],
+    "existing_a_isolation_not_repeated": [
+      12,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "source_exhausted_not_reprobed": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "selected_index": 51,
+    "selected_asset": "FF2462BB",
+    "reason": "Index51 is A-owned and current shared state still requires source-faithful/collateral rework, but the repository-backed candidate has no single-DDS isolation manifest. W00004/C89 explicitly retains per-DDS runtime isolation as missing evidence. The static blocker is not rerun or cleared; this result only supplies a deterministic DDS_ONLY runtime input."
+  },
+  "fingerprint_reuse": {
+    "source_git_blob_sha": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+    "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "candidate_git_blob_sha": "f3a1b7851e9e81e2b861764f574c166beffbc0d5",
+    "candidate_sha256": "f3210736300592f87472c19c930031649c18bd3de01dba032849e3a5974d1ebb",
+    "current_candidate_blob_verified_at_head": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+    "current_source_blob_verified_at_head": "56896e6306da0e6d520c8dd04add85c38bb828a8",
+    "current_candidate_matches_a_auto_00001_commit": "e7ea6bd25efb554ad63c4d76de92572cd6d75ca7",
+    "current_source_matches_pinned_release_member": true,
+    "pinned_release_bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_release_member_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "pinned_release_member_git_blob_sha": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+    "source_candidate_changed_since_a_auto_00001": false,
+    "heavy_qa_repeated": false
+  },
+  "current_blocker": {
+    "queue_status": "rework_required_zero_pixel_or_artifact",
+    "queue_evidence": "W00004/C89: source-faithful rerender/artifact blocker unchanged; per-DDS runtime isolation still required. W00005/C90 retained the source-faithful artifact blocker.",
+    "historical_static_evidence": "C75/D74 applies to the superseded pre-A_AUTO candidate only and is not promoted to the current candidate.",
+    "current_candidate_producer_self_qa": "A_AUTO_00001 reworked 21 elements with 0 failed elements, 0 collateral pixels, 0 changed pixels outside declared cells and 0 introduced alpha outside declared cells.",
+    "independent_c_qa_for_current_candidate": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX51_FF2462BB_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      51
+    ],
+    "reviewed_assets": [
+      "FF2462BB"
+    ],
+    "candidate_dds_modified": false,
+    "static_rework_blocker_resolved": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX51__LATEST_SCHEMA15__A00262_INDEX111_QA_PENDING_NOT_REPEATED__UNCHANGED_A_AUTO_SOURCE_CANDIDATE_BLOBS__PINNED_RELEASE_SOURCE_IDENTITY_REVERIFIED__NO_EXISTING_FF2462BB_SINGLE_DDS_MANIFEST__NEW_DDS_ONLY_INPUT__NO_STATIC_PROMOTION__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "CURRENT_SHARED_REWORK_REQUIRED_RETAINED__CURRENT_CANDIDATE_PENDING_INDEPENDENT_C_STATIC_DISPOSITION",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00151_A00265_FF2462BB.json",
+    "localization/graphics/role_A/20260928-AUTO-A00001-FF2462BB/A_AUTO_00001_FF2462BB_REPORT.json",
+    "localization/graphics/role_C/20260927-1220-C75/C75_FF2462BB_STRICT_QA.json",
+    "localization/graphics/role_D/20260927-1220-D74/D74_FF2462BB_FINAL_STATIC_GATE.json"
+  ]
+}
