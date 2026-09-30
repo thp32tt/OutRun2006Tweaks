@@ -37,6 +37,9 @@ on:
       - 'tools/verify_vr_r51_runtime_contract.py'
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_nearplane_active_gate.py'
+      - 'tools/verify_vr_hook_graph.py'
+      - 'tools/verify_vr_refactor_contract.py'
+      - 'docs/VR_REFACTOR_STATE.json'
       - 'tools/Test-VRRegressionKnowledge.ps1'
       - 'tools/Select-OutRunVRBackend.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
@@ -76,6 +79,8 @@ jobs:
           python tools/verify_vr_architecture.py
           python tools/verify_vr_r51_runtime_contract.py
           python tools/verify_vr_r32_review.py
+          python tools/verify_vr_hook_graph.py
+          python tools/verify_vr_refactor_contract.py
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
         run: python tools/verify_vr_nearplane_active_gate.py
