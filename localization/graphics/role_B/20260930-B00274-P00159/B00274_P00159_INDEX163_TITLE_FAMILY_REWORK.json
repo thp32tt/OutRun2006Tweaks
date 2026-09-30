@@ -1,0 +1,123 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00274-p00159-index163-title-family-normalized-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00274",
+  "wave_id": "P00159",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_utc": "2026-09-30T11:01:54.077Z",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX163_TITLE_FAMILY_NORMALIZED_V2_CANDIDATE_SELF_QA_RUNTIME_UNTESTED",
+  "summary": "C160/Q00058 returned index163/59A79158 REWORK_REQUIRED solely because the current title-family normalization rule was not represented in the stale candidate. Reused C157-accepted exact source, transparent CLEAN_PLATE, semantics, orientation and style/baseline evidence. Family target is 57 px, the largest prior accepted nominal size in this course-name family; every row starts at 57 and is reduced only when the preserved baseline plus exact 2 px safe bbox requires it. Seven rows increase by 1 px versus the stale candidate; no flattened-raster scaling is used. The new RGBA32 candidate is exact-header encoded, decoded-final self-QA passes 24/24 containment with zero outside-edit/protected/alpha/source-region violations, and full-atlas plus 24-row English-source comparison is visually clean. Candidate is persisted in the approved current-pipeline Drive area; GitHub retains the current review set and machine QA. Runtime remains UNTESTED.",
+  "c_rework_source": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00272",
+    "queue_id": "Q00058",
+    "validation_result_sha": "019b17c0f0d0d3489d4a6a537d2217c65af003bc",
+    "gate_run_id": 36703945263,
+    "disposition": "REWORK_REQUIRED_INDEX163_TITLE_FAMILY_SIZE_NORMALIZATION"
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "DIRECT_REWORK_REQUIRED_RUNNABLE",
+    "selected_index": 163,
+    "selected_asset": "59A79158",
+    "readiness_before": "REWORK_REQUIRED_TITLE_FAMILY_SIZE_NORMALIZATION",
+    "readiness_after": "KOREAN_V2_CANDIDATE_SELF_QA_PASS_PENDING_C_BATCH",
+    "candidate_attempted": true,
+    "candidate_dds_modified": true
+  },
+  "source": {
+    "drive_exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "google_drive_exact_result": "SOURCE_TRANSPORT_MISS__APPROVED_FOLDER_CONTAINED_ONLY_9F060EC1",
+    "pinned_tag_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_tag_direct_result": "SOURCE_TRANSPORT_MISS__404",
+    "pinned_release_asset": "OR2-HD-GUI-v0.25.10a.zip",
+    "pinned_release_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_release_bytes": 306223257,
+    "exact_member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "exact_member_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "result": "PASS_PINNED_RELEASE_FALLBACK_EXACT_CANONICAL_IDENTITY"
+  },
+  "generation": {
+    "prompt_path": "localization/graphics/KOREAN_PNG_REVIEW/59A79158/generation_prompt.json",
+    "prompt_sha256": "4b6082ff12be29200ad5f0559be092b0360b7accdb010bb2d8ce34a0642af8f2",
+    "prompt_git_blob_sha1": "8296ef858e53bf7ec5f3455e10280a695a10b37e",
+    "title_family": "course_name_sumo_fe_dark_gray",
+    "family_target_font_size": 57,
+    "font_identifier": "NanumSquare Bold (system font; bytes not redistributed)",
+    "native_resolution_render": true,
+    "flattened_raster_resize": false
+  },
+  "candidate": {
+    "mode": "GOOGLE_DRIVE_LARGE_BINARY_BUNDLE",
+    "account": "ezflash557",
+    "current_pipeline_folder_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
+    "task_folder_id": "10_I7vZoi1sBz1AH4zr0UV35pz1o2jWaY",
+    "drive_file_id": "1VO-UCwS-z67IveMXgVtHtfmJctz2FFeG",
+    "drive_url": "https://drive.google.com/file/d/1VO-UCwS-z67IveMXgVtHtfmJctz2FFeG/view?usp=drivesdk",
+    "bundle_name": "B00274_59A79158_Korean_candidate.zip",
+    "bundle_sha256": "a827d4cd693e0721bfa000cba45959cdb52ec224c1561b3a9138f0f89d9a0f16",
+    "bundle_bytes": 79173,
+    "inner_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "candidate_sha256": "a9d5aacc840b158ef0335301c512387f423fffda2640e612aceb29a6bc8efbf0",
+    "candidate_bytes": 8388736,
+    "upload_readback_sha256": "a827d4cd693e0721bfa000cba45959cdb52ec224c1561b3a9138f0f89d9a0f16",
+    "upload_readback_bytes": 79173
+  },
+  "self_qa": {
+    "status": "PASS",
+    "qa_report": "localization/graphics/KOREAN_PNG_REVIEW/59A79158/qa_report.json",
+    "candidate_sha256": "a9d5aacc840b158ef0335301c512387f423fffda2640e612aceb29a6bc8efbf0",
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "one_pixel_overflow_total": 0,
+    "signed_slant_gate": "PASS",
+    "hangul_clipping": "PASS_NONE",
+    "english_residue": "PASS_NONE",
+    "source_comparison_gate": "PASS_24_OF_24_ENGLISH_SOURCE_TO_KOREAN_CANDIDATE",
+    "title_family_policy": "PASS"
+  },
+  "review_set": {
+    "base": "localization/graphics/KOREAN_PNG_REVIEW/59A79158",
+    "mandatory": [
+      "source_display.png",
+      "clean_plate_display.png",
+      "candidate_display.png",
+      "comparison.png",
+      "generation_prompt.json",
+      "qa_report.json"
+    ],
+    "additional": [
+      "element_comparison.png",
+      "source_text_mask_display.png",
+      "protected_mask_display.png"
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEX163_MATERIALLY_REWORKED_V2_KOREAN_DDS_PLUS_CURRENT_POLICY_REVIEW_SET",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null
+}
