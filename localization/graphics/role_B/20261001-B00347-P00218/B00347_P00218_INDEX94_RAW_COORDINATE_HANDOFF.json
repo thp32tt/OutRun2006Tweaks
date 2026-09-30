@@ -1,0 +1,423 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00347-p00218-index94-raw-coordinate-execution-handoff-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+  "wave_id": "P00218",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "base_head_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
+  "controller_schema_version": 16,
+  "controller_config_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+  "target": {
+    "index": 94,
+    "asset": "2DA43E41",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "index_mod_3": 1,
+    "owned_by_lane": true
+  },
+  "freshness_reconciliation": {
+    "index61_newer_producer_result": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+      "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+      "candidate_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
+      "disposition_for_this_task": "DO_NOT_REPEAT__AWAIT_C"
+    },
+    "b_owned_candidate_qa_pending_not_repeated": [
+      61,
+      133,
+      232
+    ],
+    "authoritative_index94_c_scope": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00329",
+      "qa_batch_id": "Q00069",
+      "status": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "fully_resolved_removal_masks": 6,
+      "partial_element": "course_sp"
+    },
+    "runnable_completion_tier_after_suppression": [],
+    "selected_priority": "PREFLIGHT_ONLY_FALLBACK__RAW_COORDINATE_EXECUTION_HANDOFF"
+  },
+  "canonical_source_transport": {
+    "provider": "GOOGLE_DRIVE_APPROVED_EXACT_RELATIVE_PATH",
+    "account": "ezflash557",
+    "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "resolved_folder_chain": [
+      {
+        "name": "textures",
+        "id": "1xWHh1nrbRWPp_rVl_xRzfRFFO8Y2DnBS"
+      },
+      {
+        "name": "load",
+        "id": "1M_zaCiIOP1S7khgRynMLxc_iLCAMKfib"
+      },
+      {
+        "name": "spr_sprani_selector_cvt_Exst",
+        "id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l"
+      }
+    ],
+    "file_name": "2DA43E41_1024x1024.dds",
+    "file_id": "1C8zRAuBRhKrklwE2cDCvsZclKLjWMm25",
+    "provider_size_bytes": 67108992,
+    "expected_canonical_size_bytes": 67108992,
+    "exact_path_binding": true,
+    "expected_sha256_from_c_accepted_lineage": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "source_sha256_rehash_performed_this_task": false,
+    "note": "Exact Drive object/path/size was revalidated and streamed. No new SHA claim is made because binary execution runtime failed before hashing/decode."
+  },
+  "dds": {
+    "width": 4096,
+    "height": 4096,
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "FLIP_Y",
+    "display_to_raw_bbox_formula": "[l, H-b, r, H-t] with H=4096"
+  },
+  "accepted_c171_mask_binding": {
+    "source": "LOCALIZATION-LOCALIZATION_B-00319 accepted by Q00069/C171",
+    "elements_total": 7,
+    "fully_resolved_removal_mask_elements": 6,
+    "partially_resolved_elements": 1,
+    "partial_element": "course_sp",
+    "accepted_confident_effect_mask_pixels_total": 357200,
+    "elements": [
+      {
+        "key": "course_sp",
+        "source_bbox_display_ltrb": [
+          132,
+          488,
+          2078,
+          717
+        ],
+        "source_bbox_raw_ltrb": [
+          132,
+          3379,
+          2078,
+          3608
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          132,
+          617,
+          2078,
+          717
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          132,
+          3379,
+          2078,
+          3479
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          134,
+          490,
+          2076,
+          715
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          134,
+          3381,
+          2076,
+          3606
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 63718,
+        "remaining_ambiguity": "protected_inline_prefix_first_line"
+      },
+      {
+        "key": "wait_now",
+        "source_bbox_display_ltrb": [
+          2228,
+          461,
+          3776,
+          717
+        ],
+        "source_bbox_raw_ltrb": [
+          2228,
+          3379,
+          3776,
+          3635
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          2228,
+          478,
+          3776,
+          717
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          2228,
+          3379,
+          3776,
+          3618
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          2230,
+          463,
+          3774,
+          715
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          2230,
+          3381,
+          3774,
+          3633
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 158449,
+        "remaining_ambiguity": null
+      },
+      {
+        "key": "acceleration",
+        "source_bbox_display_ltrb": [
+          3826,
+          247,
+          4016,
+          320
+        ],
+        "source_bbox_raw_ltrb": [
+          3826,
+          3776,
+          4016,
+          3849
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          3826,
+          247,
+          4016,
+          307
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          3826,
+          3789,
+          4016,
+          3849
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3828,
+          249,
+          4014,
+          318
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          3828,
+          3778,
+          4014,
+          3847
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 6714,
+        "remaining_ambiguity": null
+      },
+      {
+        "key": "max_speed",
+        "source_bbox_display_ltrb": [
+          3827,
+          319,
+          4018,
+          410
+        ],
+        "source_bbox_raw_ltrb": [
+          3827,
+          3686,
+          4018,
+          3777
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          3827,
+          319,
+          4018,
+          378
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          3827,
+          3718,
+          4018,
+          3777
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3829,
+          321,
+          4016,
+          408
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          3829,
+          3688,
+          4016,
+          3775
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 6970,
+        "remaining_ambiguity": null
+      },
+      {
+        "key": "view_change",
+        "source_bbox_display_ltrb": [
+          3430,
+          998,
+          3896,
+          1102
+        ],
+        "source_bbox_raw_ltrb": [
+          3430,
+          2994,
+          3896,
+          3098
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          3430,
+          1030,
+          3896,
+          1091
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          3430,
+          3005,
+          3896,
+          3066
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3432,
+          1000,
+          3894,
+          1100
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          3432,
+          2996,
+          3894,
+          3096
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 11725,
+        "remaining_ambiguity": null
+      },
+      {
+        "key": "expert",
+        "source_bbox_display_ltrb": [
+          2842,
+          1124,
+          3479,
+          1229
+        ],
+        "source_bbox_raw_ltrb": [
+          2842,
+          2867,
+          3479,
+          2972
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          2868,
+          1124,
+          3479,
+          1229
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          2868,
+          2867,
+          3479,
+          2972
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          2844,
+          1126,
+          3477,
+          1227
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          2844,
+          2869,
+          3477,
+          2970
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 49479,
+        "remaining_ambiguity": null
+      },
+      {
+        "key": "special_course",
+        "source_bbox_display_ltrb": [
+          3137,
+          1279,
+          3879,
+          1403
+        ],
+        "source_bbox_raw_ltrb": [
+          3137,
+          2693,
+          3879,
+          2817
+        ],
+        "accepted_confident_text_region_display_ltrb": [
+          3137,
+          1279,
+          3879,
+          1403
+        ],
+        "accepted_confident_text_region_raw_ltrb": [
+          3137,
+          2693,
+          3879,
+          2817
+        ],
+        "candidate_safe_bbox_display_ltrb": [
+          3139,
+          1281,
+          3877,
+          1401
+        ],
+        "candidate_safe_bbox_raw_ltrb": [
+          3139,
+          2695,
+          3877,
+          2815
+        ],
+        "accepted_confident_effect_mask_nonzero_pixels": 60145,
+        "remaining_ambiguity": null
+      }
+    ]
+  },
+  "course_sp_fail_closed_handoff": {
+    "protected_inline_token": "OutRun2: SP",
+    "translated_suffix_and_second_line": "15 Continuous Course has been selected. -> 15코스 연속 / 선택되었습니다.",
+    "currently_authorized_removal_support": "Only the C171-accepted second-line alpha>0 support inside display [132,617,2078,717] / raw [132,3379,2078,3479].",
+    "first_line_status": "UNRESOLVED_CONNECTED_EFFECT_RUN",
+    "rule": "Do not erase, dilate across, reconstruct, or redraw any first-line pixel until exact source-only separation of protected OutRun2: SP from the translatable suffix is measured. Preserve all first-line source pixels fail-closed.",
+    "next_success_condition": "Resolve the first-line source-only split, then generate and independently verify CLEAN_PLATE plus current source-style metrics; if those pass, continue in the same producer invocation through native Korean render and decoded-final candidate QA."
+  },
+  "pixel_runtime": {
+    "source_stream_materialized_path": "/mnt/data/2DA43E41_1024x1024.dds",
+    "python_private": "CLIENT_ERROR_BEFORE_EXECUTION",
+    "container_exec": "CLIENT_ERROR_BEFORE_EXECUTION",
+    "python_user_visible": "TOO_MANY_ACTIVE_SESSIONS",
+    "source_pixel_decode_performed": false,
+    "candidate_render_attempted": false,
+    "candidate_dds_modified": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX94_C171_ACCEPTED_MASKS_BOUND_TO_EXACT_RAW_FLIP_Y_COORDINATES_AND_CURRENT_CANONICAL_DRIVE_OBJECT",
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true,
+    "reason_zero_candidate": "Fresh B-shard reconciliation suppresses newer index61/index133/index232 candidates awaiting C and leaves no runnable completion-tier candidate. Exact pixel execution is unavailable, so this task records a new per-element raw-coordinate execution handoff without inventing first-line pixels."
+  },
+  "self_qa": {
+    "all_display_boxes_within_canvas": true,
+    "all_raw_boxes_within_canvas": true,
+    "raw_roundtrip_formula_verified": true,
+    "no_candidate_write": true,
+    "no_shared_state_write": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
