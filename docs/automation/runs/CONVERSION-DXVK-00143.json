@@ -1,0 +1,29 @@
+{
+  "task_id": "CONVERSION-DXVK-00143",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "ef0531aa700548abc755e87ab185eb8488aadd31",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R143_TARGET_C_HELPER_28460_PROVENANCE",
+  "selection_reason": "Current priority-13/12 DXVK runtime/cadence/visual items require Quest3/VDXR evidence. CONVERSION-DXVK-00141 completed exact alignment for all three target-C outbound CALLs and explicitly left helper semantics 0x28460/0x28320/0x28800 unresolved. This task selects only the first helper 0x28460 for bounded exact-EXE provenance/effect evidence without changing runtime ownership.",
+  "summary": "Collect bounded exact-EXE provenance for guarded-GF target C helper 0x28460: exact bytes, .text membership, function-start guess, raw inbound rel32 census, and bounded raw outbound rel32 candidates. This probe does not itself infer semantic effect or ScreenHud ownership.",
+  "evidence": [
+    "CONVERSION-DXVK-00141 validated 0x65997->0x28460 as an exact instruction-aligned CALL and left helper semantics UNRESOLVED.",
+    "Repository search found no existing exact provenance record for helper 0x28460.",
+    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "docs/automation/runs/CONVERSION-DXVK-00143.json"
+  ],
+  "runtime_claim": "NONE",
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-source HUD Inspector/GitHub Actions, inspect the 0x28460 helper byte/control-flow evidence, then add only evidence-supported fail-closed proof/verifier logic in the validation-bearing result commit. Do not promote ScreenHud ownership from raw provenance alone."
+}

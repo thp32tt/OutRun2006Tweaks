@@ -153,6 +153,12 @@ GF_TARGET_C_THIRD_CALL_INSTRUCTIONS = (
     (0x000659C1, "e8 3a 2e fc ff", "call rel32"),
 )
 
+# R143/F13: bounded exact-EXE provenance probe for the first helper called by
+# guarded-GF target C. This remains raw evidence; helper effect/ownership is not
+# inferred until exact instruction/control-flow review is performed separately.
+GF_TARGET_C_HELPER_1_RVA = 0x00028460
+GF_TARGET_C_HELPER_PROBE_LEN = 128
+
 
 # Mirrors the canonical producer catalog in
 # src/vr/game/disasm_render_contract.hpp. Keep this Python representation
@@ -462,6 +468,48 @@ def collect_guarded_gf_target_provenance(pe: PE) -> list[dict]:
             }
         )
     return out
+
+
+def collect_guarded_gf_target_c_helper_1_provenance(pe: PE) -> dict:
+    """Collect bounded raw provenance for target-C helper 0x28460.
+
+    The byte window and rel32 candidate census are evidence only. They do not
+    prove instruction alignment, semantic effect, or render ownership.
+    """
+
+    target_rva = GF_TARGET_C_HELPER_1_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(target_rva):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            target_rva - text_section.virtual_address,
+        )
+
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "function_start_guess_rva": function_start_guess_rva,
+        "probe_len": GF_TARGET_C_HELPER_PROBE_LEN,
+        "bytes": pe.bytes_at_rva(target_rva, GF_TARGET_C_HELPER_PROBE_LEN).hex(" "),
+        "raw_inbound_rel32_candidates": collect_raw_inbound_rel32_candidates(
+            pe, target_rva
+        ),
+        "raw_outbound_rel32_candidates": collect_raw_rel32_call_candidates(
+            pe, target_rva, GF_TARGET_C_HELPER_PROBE_LEN
+        ),
+        "semantic_effect": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
 
 
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
@@ -1267,6 +1315,7 @@ def main() -> int:
         "guarded_gf_target_c_alignment_proof": collect_guarded_gf_target_c_alignment_proof(pe),
         "guarded_gf_target_c_second_call_alignment_proof": collect_guarded_gf_target_c_second_call_alignment_proof(pe),
         "guarded_gf_target_c_third_call_alignment_proof": collect_guarded_gf_target_c_third_call_alignment_proof(pe),
+        "guarded_gf_target_c_helper_1_provenance": collect_guarded_gf_target_c_helper_1_provenance(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -1397,6 +1446,28 @@ def main() -> int:
         f"target_section={alignment_c3['call_target_section'] or 'none'} "
         f"semantic_effect={alignment_c3['semantic_effect']} "
         f"remaining_raw_calls={','.join(hexrva(rva) for rva in alignment_c3['remaining_raw_call_rvas']) or 'none'}"
+    )
+    helper_1 = report["guarded_gf_target_c_helper_1_provenance"]
+    helper_1_inbound = ",".join(
+        f"0x{call['call_rva']:08X}:{call['semantic']}/{call['space_policy']}"
+        for call in helper_1["raw_inbound_rel32_candidates"]
+    ) or "none"
+    helper_1_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1=0x{helper_1['target_rva']:08X} "
+        f"section={helper_1['target_section'] or 'none'} "
+        f"start_guess={hexrva(helper_1['function_start_guess_rva'])} "
+        f"probe_len={helper_1['probe_len']} "
+        f"inbound_raw={len(helper_1['raw_inbound_rel32_candidates'])} "
+        f"inbound={helper_1_inbound} "
+        f"outbound_raw={len(helper_1['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_outbound} "
+        f"semantic_effect={helper_1['semantic_effect']} "
+        f"bytes={helper_1['bytes']}"
     )
     tail_probe = report["guarded_gf_target_c_tail_probe"]
     print(
