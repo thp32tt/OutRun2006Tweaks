@@ -1,0 +1,144 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00320-p00196-index111-tuned-normal-solid-core-reconstruction-proposal-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
+  "wave_id": "P00196",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:19:03+09:00",
+  "base_head_sha": "7b21fa39dd73650503e457c111817b888871cb6d",
+  "controller_schema_version": 16,
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_TUNED_NORMAL_SOURCE_ONLY_CORE_RECONSTRUCTION_PROPOSAL_ADVANCED_RUNTIME_UNTESTED",
+  "summary": "Fresh schema16/current-HEAD scan after A00318 and concurrent B00319 finds no legal A-owned DIRECT_REWORK_REQUIRED, explicit RENDER_NEXT, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework. A-owned candidates159/198/201 remain C-QA pending; index147 A00316 source-identity-mismatch evidence remains out-of-batch C-QA pending; B-owned candidate121/163 and B00319@index94 are not stolen. C169/Q00067 accepted A00309@index111 only as PREFLIGHT_ONLY with 12,181 unresolved source-only reconstruction pixels, so the single permitted new preflight batch continues that same accepted asset rather than opening an unrelated target. Exact canonical Drive target C075FB49 and donor411 bytes were read via the approved ezflash557 transport and match their accepted SHA-256 fingerprints. A deterministic source-only proposal resolves 3,960 of the previously unresolved Tuned/Normal pixels by requiring exact panel-color enclosure on both axes, then excluding a 4px guard around the A00271 sibling-registered protected-car/light-panel geometry. The proposal changes 1,718 source pixels, changes 0 pixels outside its accepted mask, changes 0 alpha pixels, and overlaps the protected guard by 0 pixels. RANDOM remains untouched/fail-closed because the protected question-mark corridor is still unresolved. This is a CLEAN_PLATE proposal for independent C QA only; no Korean DDS is rendered or promoted and runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00317",
+    "latest_authoritative_c_result_sha": "3232859cd65353d34e486f0555f80273c2392266",
+    "latest_authoritative_c_gate_bookkeeping_head": "c2e83f3cf182f458f938fb1f63df451202c1df50",
+    "latest_authoritative_c_gate_run_id": 36762899251,
+    "latest_authoritative_c_automation_validation": "PASS",
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "producer_qa_pending_not_repeated": [
+      {
+        "index": 147,
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00316",
+        "result_sha": "eed179b15c215cee541678829fc1f91a2abbd498"
+      }
+    ],
+    "cross_lane_candidate_qa_pending_not_stolen": [
+      121,
+      163
+    ],
+    "concurrent_b00319_index94_not_stolen": true,
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_CONTINUATION_AFTER_ZERO_RUNNABLE_COMPLETION_TIER",
+    "new_preflight_batches_this_invocation": 1
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "queue_controller_contract_blob_sha": "5bdfa10cf4cfbbbc1f11fd31e86466c7beaddcb8",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "7869ac36726ae2ed5880b0e7ab6333611ed18a0a",
+    "latest_c_record_blob_sha": "943bedfeaf2968abadfa271513c8776af90b9588",
+    "previous_a_record_blob_sha": "a5caec9e026d047c1a69a795492cef69836f1807",
+    "concurrent_b_record_blob_sha": "bc2997ad96f508bedd8bef28c6433b64699b5d5f",
+    "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364"
+  },
+  "source_transport": {
+    "state_ssot": "github:korean-localization-clean",
+    "google_drive_account": "ezflash557",
+    "google_drive_used": true,
+    "google_drive_write_performed": false,
+    "target": {
+      "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "drive_file_id": "1pIGMl0fCgtlkEo0vwfIr8nTGjpe1BTLB",
+      "drive_reported_size_bytes": 16777344,
+      "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "identity": "PASS_EXACT_CANONICAL_ACCEPTED_FINGERPRINT"
+    },
+    "donor411": {
+      "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "drive_file_id": "1H3T8RKgbV164FhIRtjBnkYqeSmSRNWvU",
+      "drive_reported_size_bytes": 16777344,
+      "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "identity": "PASS_EXACT_CANONICAL_ACCEPTED_FINGERPRINT"
+    }
+  },
+  "accepted_prior_evidence": {
+    "A00271": "Tuned/Normal protected-car source-only sibling registration accepted; local normal relative to tuned dx=+25,dy=0.",
+    "A00276": "RANDOM simple dilation rejected because one-pixel text expansion intersects protected question-mark artwork.",
+    "A00301": "RANDOM cross-asset light-blue geometry strong but white question mark remains approximate; no clean-plate authority.",
+    "A00309": "Q00067 C-accepted source-only coverage: 25,111/37,292 covered and 12,181 unresolved across Tuned/Normal/Random."
+  },
+  "new_reconstruction_input": {
+    "analyzer": "localization/graphics/role_A/20261001-A00320-P00196/analyze_index111_tuned_normal_core_reconstruction.py",
+    "machine_output": "localization/graphics/role_A/20261001-A00320-P00196/A00320_P00196_INDEX111_TUNED_NORMAL_CORE_RECONSTRUCTION.json",
+    "proposal_scope": "TUNED_NORMAL_ONLY_RANDOM_UNTOUCHED",
+    "protected_guard_dilation_px": 4,
+    "prior_unresolved_pixels": 12181,
+    "proposal_resolved_pixels": 3960,
+    "proposal_actual_changed_pixels": 1718,
+    "remaining_unresolved_pixels": 8221,
+    "outside_accepted_mask_changed_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "protected_guard_overlap_pixels": 0,
+    "readiness_after": "PREFLIGHT_ONLY_TUNED_NORMAL_SOLID_CORE_RECONSTRUCTION_PROPOSAL_READY_FOR_INDEPENDENT_C_CLEANPLATE_QA__RANDOM_AND_TUNED_NORMAL_FRINGE_REMAINDERS_STILL_HOLD"
+  },
+  "same_task_completion_gate": {
+    "render_ready_reached": false,
+    "one_stage_to_render_reached": false,
+    "reason": "Independent C CLEAN_PLATE PASS is still mandatory. Tuned/Normal have only a producer proposal and 3,029 combined unresolved pixels remain; RANDOM retains 5,192 unresolved protected-question-mark pixels. Korean render is therefore not authorized."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00320-P00196/analyze_index111_tuned_normal_core_reconstruction.py",
+    "localization/graphics/role_A/20261001-A00320-P00196/A00320_P00196_INDEX111_TUNED_NORMAL_CORE_RECONSTRUCTION.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_TUNED_NORMAL_SOURCE_ONLY_SOLID_CORE_CLEANPLATE_PROPOSAL_AND_MACHINE_REPLAY",
+    "materially_reduces_unresolved_work": true,
+    "new_reconstruction_input": true,
+    "candidate_dds_modified": false,
+    "proposal_resolved_pixels": 3960,
+    "remaining_unresolved_pixels": 8221
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "self_qa": "PASS_A_MOD3_SCHEMA16__ZERO_RUNNABLE_COMPLETION_TIER__INDEX111_C_ACCEPTED_PREFLIGHT_CONTINUATION__EXACT_DRIVE_TARGET_AND_DONOR_FINGERPRINTS__3960_PRIOR_UNRESOLVED_PIXELS_PROPOSED_RESOLVED__1718_ACTUAL_SOURCE_PIXELS_CHANGED_IN_PROPOSAL__ZERO_OUTSIDE_MASK__ZERO_ALPHA_CHANGE__ZERO_4PX_PROTECTED_GUARD_OVERLAP__RANDOM_UNTOUCHED_FAIL_CLOSED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(A): advance index111 clean-plate core proposal [AUTO:LOCALIZATION-LOCALIZATION_A-00320]",
+  "precommit_refresh": {
+    "head_sha": "7b21fa39dd73650503e457c111817b888871cb6d",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "A00318 bookkeeping and B00319 result/bookkeeping are current HEAD. B00319 touches B-owned index94 only. A00320 commits only new lane-local index111 evidence and its durable task record; no shared state is modified."
+  },
+  "bookkeeping_note": "RESULT_SHA will be bound in a separate bookkeeping checkpoint after the immutable producer result commit. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+}

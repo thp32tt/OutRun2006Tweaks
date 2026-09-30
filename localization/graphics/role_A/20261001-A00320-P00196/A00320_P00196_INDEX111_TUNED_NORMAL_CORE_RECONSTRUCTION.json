@@ -1,0 +1,115 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00320-index111-tuned-normal-solid-core-reconstruction-proposal-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00320",
+  "wave_id": "P00196",
+  "asset": "C075FB49",
+  "queue_index": 111,
+  "coordinate_space": "readable/display after raw mirror_y -> flip_y",
+  "source_identity": {
+    "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "canvas": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1
+  },
+  "accepted_prior_evidence": {
+    "a00271_protected_registration": "normal_relative_to_tuned local dx=+25,dy=0; protected car source-only template",
+    "a00309_unresolved_counts": {
+      "tuned_setting": 3689,
+      "normal_setting": 3300,
+      "random": 5192,
+      "aggregate": 12181
+    },
+    "q00067_disposition": "A00309 PASS/PREFLIGHT_ONLY; 12181 unresolved pixels remain; CLEAN_PLATE not approved"
+  },
+  "method": {
+    "scope": "TUNED_NORMAL_ONLY_RANDOM_UNTOUCHED",
+    "bounded_background_rule": "candidate pixel must be inside accepted A00309 unresolved mask and enclosed by exact panel base color on both horizontal and vertical axes; every intervening non-base pixel must also belong to that unresolved mask",
+    "max_axis_gap_px": 64,
+    "protected_guard": "A00271 near-white sibling registered protected-car core plus exact per-panel light-panel palette, dilated before accepting proposal pixels",
+    "protected_guard_dilation_px": 4,
+    "candidate_pixels_used": false,
+    "clean_plate_status": "PROPOSAL_ONLY_REQUIRES_INDEPENDENT_C_QA"
+  },
+  "elements": {
+    "tuned_setting": {
+      "panel_color_rgba": [
+        196,
+        0,
+        0,
+        255
+      ],
+      "prior_unresolved_pixels": 3689,
+      "bounded_biaxial_pixels_before_guard": 1790,
+      "excluded_by_protected_guard": 71,
+      "proposal_resolved_pixels": 1719,
+      "proposal_actual_changed_pixels": 570,
+      "proposal_noop_already_panel_pixels": 1149,
+      "proposal_bbox": [
+        102,
+        1218,
+        220,
+        1258
+      ],
+      "actual_changed_bbox": [
+        105,
+        1223,
+        200,
+        1255
+      ],
+      "remaining_unresolved_pixels": 1970,
+      "proposal_overlap_protected_guard_pixels": 0
+    },
+    "normal_setting": {
+      "panel_color_rgba": [
+        0,
+        150,
+        0,
+        255
+      ],
+      "prior_unresolved_pixels": 3300,
+      "bounded_biaxial_pixels_before_guard": 2257,
+      "excluded_by_protected_guard": 16,
+      "proposal_resolved_pixels": 2241,
+      "proposal_actual_changed_pixels": 1148,
+      "proposal_noop_already_panel_pixels": 1093,
+      "proposal_bbox": [
+        450,
+        1218,
+        555,
+        1258
+      ],
+      "actual_changed_bbox": [
+        461,
+        1223,
+        543,
+        1255
+      ],
+      "remaining_unresolved_pixels": 1059,
+      "proposal_overlap_protected_guard_pixels": 0
+    },
+    "random": {
+      "prior_unresolved_pixels": 5192,
+      "proposal_resolved_pixels": 0,
+      "remaining_unresolved_pixels": 5192,
+      "disposition": "UNCHANGED_FAIL_CLOSED_PROTECTED_QUESTION_MARK"
+    }
+  },
+  "aggregate": {
+    "prior_unresolved_pixels": 12181,
+    "proposal_resolved_pixels": 3960,
+    "proposal_actual_changed_pixels": 1718,
+    "remaining_unresolved_pixels": 8221,
+    "outside_accepted_mask_changed_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "protected_guard_overlap_pixels": 0
+  },
+  "readiness_after": "PREFLIGHT_ONLY_TUNED_NORMAL_SOLID_CORE_RECONSTRUCTION_PROPOSAL_READY_FOR_INDEPENDENT_C_CLEANPLATE_QA__RANDOM_AND_TUNED_NORMAL_FRINGE_REMAINDERS_STILL_HOLD",
+  "candidate_dds_authorized": false,
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED"
+}
