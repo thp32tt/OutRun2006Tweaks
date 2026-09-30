@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00112",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T10:57:49+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "289e3dc2c10f7033f07ac39d5f8442e08235ad0d",
+  "result_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883",
+  "validation_bearing_result_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F16 semantic-tag table overflow safety closure on the DX11 branch.",
+  "summary": "F16 replaces destructive semantic-tag saturation with a non-evicting fail-safe policy. When the fixed 0x230 table is full, already-published exact HUD/world ownership remains intact and only the new registration is rejected; if that node is later consumed it follows the existing ScreenOverlay2D fallback. SpriteNodeSemanticOverflowRejected exposes abnormal saturation, and the backend disassembly verifier rejects reintroduction of oldest-live-tag eviction or overflow being misreported as stale cleanup. Capacity, producer ranges, native DX11 activation, D3D9 policy and OpenXR transport are unchanged.",
+  "changed_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_table_capacity_changed": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F16",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Semantic ownership is runtime-visible under abnormal table pressure. The new policy preserves older live exact ownership instead of silently corrupting it, but a newly rejected saturated tag still falls back to generic ScreenOverlay2D. Hosted CI proves source/build/contract integrity only; no Quest3/VDXR visual run was performed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36657077133,
+      "conclusion": "success",
+      "validated_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883",
+      "artifact_id": 11072433122,
+      "artifact_digest": "sha256:c01e9b5efaadb491547f16a97079d80302aa1c4cdc1cd78c6f64d109ab0610c6",
+      "evidence": "Queue/baseline/one-click checks PASS; F16 backend disassembly contract PASS; DX11 transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes and object/shader/linkage/constant-buffer/native-transport probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36657081241,
+      "conclusion": "success",
+      "validated_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883",
+      "evidence": "Generic Win32 Release build, built wheel/VR payload verification and artifact uploads PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36657081218,
+      "conclusion": "success",
+      "validated_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36657081307,
+      "conclusion": "success",
+      "validated_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36657077132,
+      "conclusion": "skipped",
+      "validated_sha": "5d05a184c7239fd9996eb0424516fb1c284ca883"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5902495761,
+    "validation_comment_id": 5902562755,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00112] and contains no CI-skip directive.",
+    "RegisterSpriteNodeScope no longer selects or overwrites the oldest live semantic tag when SpriteNodeSemanticCapacity is exhausted.",
+    "SpriteNodeSemanticOverflowRejected records rejected saturated registrations without incrementing the stale-cleanup counter.",
+    "The rejected new node retains the existing fail-safe ScreenOverlay2D fallback if no exact tag can be consumed.",
+    "The backend disassembly verifier rejects restoration of oldest-live-tag eviction and rejects overflow being counted as stale cleanup.",
+    "No producer range, semantic table capacity, native draw activation, D3D9 render policy or OpenXR transport behavior was changed.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs pass for the validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F16 semantic-tag overflow safety is automation-validated on the DX11 branch. Table capacity remains 0x230; saturation now preserves existing exact ownership and rejects only the incoming tag. Runtime visual behavior remains untested.",
+  "next_action": "Return to the next independently proven DX11 review-index item, including bounded Set04/F13 producer-map adoption where exact disassembly provenance exists. Do not widen producer ranges or claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}
