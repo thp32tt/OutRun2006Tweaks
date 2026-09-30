@@ -280,11 +280,21 @@
   "uploaded_archive_used": true,
   "heavy_qa_repeated": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "bookkeeping_note": "C170/Q00068 validation-bearing result commit must be the only Localization Automation Gate owner for this batch. AUTOMATION_VALIDATION remains PENDING in this commit; runtime remains UNTESTED."
+  "result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+  "authoritative_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+  "validation_bearing_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+  "bookkeeping_note": "Q00068 authoritative Gate PASS is owned by validation-bearing result 09f720371ac36e02098b6cf10b5c6c545cd75b7e. This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36765645929,
+    "head_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-10-01T04:26:51+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:26:51+09:00"
 }

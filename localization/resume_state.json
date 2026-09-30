@@ -16,7 +16,7 @@
     "RUNTIME ISOLATION QA_PENDING: A00318@index99 remains out-of-batch and is not implicitly approved.",
     "A-LANE FRONTIER: A00313/A00314 are accepted only as historical suppression evidence; later Q00066/Q00067 and A00316/A00318/A00320 invalidate them as current frontier authority.",
     "THROUGHPUT v16: production_complete new=1 (index121); candidate_awaiting_c=159/163/198/201; runnable_production=none; runtime_validated=none.",
-    "Q00068 validation-bearing result is pending its single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00068 validation-bearing result 09f720371ac36e02098b6cf10b5c6c545cd75b7e passed Localization Automation Gate 36765645929 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2526,11 +2526,19 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null
+    "result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "authoritative_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "validation_bearing_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36765645929,
+      "head_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T04:26:51+09:00"
+    }
   }
 }
