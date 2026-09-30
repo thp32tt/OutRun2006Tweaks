@@ -1,0 +1,161 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00281-p00165-a-owned-font-runtime-trace-binding-handoff-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+  "wave_id": "P00165",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T21:40:00+09:00",
+  "base_head_sha": "a29d448a64014c1020a025509878a5ad5dba56c9",
+  "result": "PASS_MATERIAL_A_MOD3_FONT_RUNTIME_TRACE_BINDING_HARNESS_RUNTIME_UNTESTED",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "candidate_completion_scan": "ZERO_LEGAL_RUNNABLE_A_CANDIDATE_COMPLETION: index51 A00278 native-v2 candidate awaits C; indices111/159/198/201 have newer producer inputs awaiting C; source-blocked A localize_text rows retain unchanged sticky acquisition blockers; existing static runtime-isolation items are already covered",
+    "selected_priority": "FALLBACK_LADDER_STEP_5_RUNTIME_EVIDENCE_BINDING_TOOL_AFTER_ZERO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK",
+    "selected_indices": [
+      15,
+      18,
+      21
+    ],
+    "selected_assets": [
+      "20389D70",
+      "7B65A191",
+      "D7CE8BC3"
+    ],
+    "selected_action": "font_pipeline_runtime_trace_binding_handoff",
+    "duplicate_avoidance": {
+      "a00278_index51": "QA_PENDING_NOT_TOUCHED",
+      "a00279_index24": "QA_PENDING_NOT_TOUCHED",
+      "a00280_crosswalk": "INPUT_REFERENCE_ONLY_NOT_REINSPECTED_OR_REWRITTEN",
+      "candidate_qa_pending_indices": [
+        51,
+        111,
+        159,
+        198,
+        201
+      ],
+      "sticky_source_acquisition_not_repeated": [
+        30,
+        36,
+        48,
+        132,
+        135,
+        147,
+        219,
+        225,
+        228
+      ]
+    }
+  },
+  "dependency_fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "222a229b17d323fd7558b68bcb9a24611e7bc4c8",
+    "stock_font_map_blob_sha": "cf028d506c360fa912b178077f11aced032ebf5d",
+    "trace_analyzer_blob_sha": "32e53adf01c0b86d03ab78aa05fee17841664aea",
+    "hooks_localization_blob_sha": "f32afc3f14831e9afe8918c9087da6974535cbc6",
+    "a00280_crosswalk_blob_sha": "c668c16395e4e9f71cf70be1094ddbbf4d40025f",
+    "a00280_result_sha": "42248567499c9127571d43254507559eff308b13",
+    "a00280_validation_state": "PENDING_C_BATCH_GATE"
+  },
+  "runtime_trace_semantics": {
+    "source": "src/hooks_localization.cpp KoreanK3TraceHook",
+    "font_state_logging": "first observation per resource handle only (SeenFontHandles)",
+    "width_text_logging": "first observation per unique preview only (SeenStrings)",
+    "binding_rule": "A font_state may be bound to an immediate following unique width_text event in the same trace stream; if no adjacent width event exists, classify UNBOUND rather than guessing.",
+    "resolver_crosswalk": "When adjacent width_text exactly matches a KoreanLocalizationTrace original/returned string, attach the observed text_id set.",
+    "fail_closed_rules": [
+      "No observed handle is not proof of unused resource.",
+      "Descriptor mismatch blocks reuse.",
+      "Unbound handle observation does not identify a target screen.",
+      "No static or parsed trace result authorizes DDS replacement or runtime PASS."
+    ]
+  },
+  "targets": [
+    {
+      "index": 15,
+      "asset_hash": "20389D70",
+      "resource_handle": 9,
+      "descriptor_index": 9,
+      "stock_size": [
+        512,
+        256
+      ],
+      "cell": [
+        17,
+        17
+      ],
+      "base_code": 32,
+      "letter_spacing": 2,
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    },
+    {
+      "index": 18,
+      "asset_hash": "7B65A191",
+      "resource_handle": 0,
+      "descriptor_index": 0,
+      "stock_size": [
+        256,
+        128
+      ],
+      "cell": [
+        12,
+        12
+      ],
+      "base_code": 0,
+      "letter_spacing": 0,
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    },
+    {
+      "index": 21,
+      "asset_hash": "D7CE8BC3",
+      "resource_handle": 2,
+      "descriptor_index": 7,
+      "stock_size": [
+        512,
+        256
+      ],
+      "cell": [
+        22,
+        26
+      ],
+      "base_code": 32,
+      "letter_spacing": 0,
+      "production_readiness": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    }
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "A_OWNED_FONT_RUNTIME_TRACE_BINDING_HARNESS_AND_FAIL_CLOSED_CAPTURE_CONTRACT",
+    "tool": "localization/graphics/role_A/20260930-A00281-P00165/bind_a_owned_font_trace.py",
+    "machine_report": "localization/graphics/role_A/20260930-A00281-P00165/A00281_P00165_A_OWNED_FONT_RUNTIME_TRACE_BINDING.json",
+    "new_executable_analysis_input": true,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "required_next": [
+    "Collect a real KoreanK3Trace + KoreanLocalizationTrace log on the target screens.",
+    "Run bind_a_owned_font_trace.py on that log.",
+    "Require descriptor matches and explicit text/screen binding before choosing any Korean atlas/page-switch target.",
+    "Keep RUNTIME_VALIDATION=UNTESTED until real game evidence is reviewed."
+  ],
+  "self_qa": "PASS_LANE_LOCAL_TOOL_AND_FAIL_CLOSED_RUNTIME_BINDING_CONTRACT__NO_SHARED_STATE__NO_DDS_WRITE__NO_PENDING_CANDIDATE_RECHECK__RUNTIME_UNTESTED",
+  "tool_execution_against_real_runtime_log": false,
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
