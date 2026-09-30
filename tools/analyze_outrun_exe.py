@@ -1569,7 +1569,7 @@ def main() -> int:
         f"full_semantics={target_c_helper_1['full_helper_semantics']} "
         f"ownership_effect={target_c_helper_1['ownership_effect']}"
     )
-        print(f"hud_strings={len(report['hud_strings'])}")
+    print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
             print(
