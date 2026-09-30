@@ -45,6 +45,9 @@ Each command means:
 Every controller-generated initial task, retry, and chat-rollover prompt MUST explicitly instruct the worker to perform a fresh authenticated GitHub repository metadata/permission check before claiming that GitHub access is unavailable.
 
 Required semantics:
+- GitHub access/permission preflight MUST use the authenticated GitHub connector/API first. Public web search is never authoritative for repository access.
+- A public web-search miss, or a search result that exposes only upstream `emoose/OutRun2006Tweaks`, MUST NOT be interpreted as evidence that `thp32tt/OutRun2006Tweaks` or `korean-localization-clean` is inaccessible.
+- Do not fall back to public web search to decide permission state when the authenticated GitHub connector is available; query repository metadata and branch HEAD directly.
 - Start by calling the authenticated GitHub connector against `thp32tt/OutRun2006Tweaks` and refresh `korean-localization-clean` HEAD.
 - If repository metadata shows `push=true`, `maintain=true`, or `admin=true`, GitHub write access is available and the worker MUST continue from current HEAD.
 - A missing file/404, unsupported connector operation, stale SHA conflict, branch race, validation failure, rate limit, or unavailable N100/local workspace MUST NOT be called a GitHub permission failure.
@@ -52,7 +55,7 @@ Required semantics:
 - Only a fresh permission response lacking push/maintain/admin, or an actual write returning authorization-specific 401/403 after refresh, may produce `GITHUB_PERMISSION_DENIED`.
 - A rollover MUST repeat this preflight itself. It MUST NOT inherit an earlier chat's claim that GitHub permission was unavailable.
 
-The generated prompt should include the compact directive: `GitHub 권한을 추정하지 마. 먼저 authenticated repository permission metadata와 korean-localization-clean HEAD를 새로 확인해. push/maintain/admin 중 하나가 true이면 접근 가능으로 판정하고 즉시 계속해. 404/path miss/unsupported operation/stale SHA/rate limit/N100 unavailable은 permission denied가 아니다. 실제 fresh permission denial 또는 refresh 후 write 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해.`
+The generated prompt should include the compact directive: `GitHub 접근/권한 판정에는 공개 웹 검색을 사용하지 마. authenticated GitHub connector/API로 thp32tt/OutRun2006Tweaks와 korean-localization-clean HEAD를 먼저 직접 확인해. 공개 검색 miss 또는 upstream만 노출되는 결과는 권한 부족의 근거가 아니다. GitHub 권한을 추정하지 마. 먼저 authenticated repository permission metadata와 korean-localization-clean HEAD를 새로 확인해. push/maintain/admin 중 하나가 true이면 접근 가능으로 판정하고 즉시 계속해. 404/path miss/unsupported operation/stale SHA/rate limit/N100 unavailable은 permission denied가 아니다. 실제 fresh permission denial 또는 refresh 후 write 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해.`
 
 ## WAIT_ACTIONS recovery mapping
 
