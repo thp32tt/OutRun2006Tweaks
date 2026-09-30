@@ -274,7 +274,7 @@ namespace OutRunVRStereo
                             "VR R34 DEVICE LOST: TestCooperativeLevel=0x{:08x}; skipping VR D3D work and forwarding raw Present until Reset restores the device",
                             static_cast<unsigned>(cooperative));
                     }
-                    return PresentHook.stdcall<HRESULT>(
+                    return CallRawPresent(
                         device, sourceRect, destRect,
                         destWindowOverride, dirtyRegion);
                 }
