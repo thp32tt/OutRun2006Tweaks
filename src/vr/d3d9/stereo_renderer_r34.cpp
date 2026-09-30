@@ -104,7 +104,7 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
             auto call = [&]() {
-                const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
+                const HRESULT xyzrhw = TryXyzrhwPrimitive(
                     device, type, startVertex, primitiveCount);
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
@@ -121,7 +121,7 @@ namespace OutRunVRStereo
             UINT startIndex, UINT primitiveCount)
         {
             auto call = [&]() {
-                const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
+                const HRESULT xyzrhw = TryXyzrhwIndexedPrimitive(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
                 if (xyzrhw != E_NOTIMPL)
@@ -139,7 +139,7 @@ namespace OutRunVRStereo
             UINT stride)
         {
             auto call = [&]() {
-                const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
+                const HRESULT xyzrhw = TryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride);
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
@@ -157,7 +157,7 @@ namespace OutRunVRStereo
             const void* vertexData, UINT stride)
         {
             auto call = [&]() {
-                const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
+                const HRESULT xyzrhw = TryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
                 if (xyzrhw != E_NOTIMPL)

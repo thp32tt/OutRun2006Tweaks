@@ -3255,4 +3255,41 @@ namespace OutRunVRStereo
             device, type, minVertexIndex, numVertices, primitiveCount,
             indexData, indexFormat, vertexData, stride);
     }
+
+    HRESULT TryXyzrhwPrimitive(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT startVertex, UINT primitiveCount)
+    {
+        return R30TryXyzrhwPrimitiveVB(
+            device, type, startVertex, primitiveCount);
+    }
+
+    HRESULT TryXyzrhwIndexedPrimitive(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount)
+    {
+        return R30TryXyzrhwIndexedPrimitiveVB(
+            device, type, baseVertexIndex, minVertexIndex,
+            numVertices, startIndex, primitiveCount);
+    }
+
+    HRESULT TryXyzrhwPrimitiveUP(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT primitiveCount, const void* data, UINT stride)
+    {
+        return R30TryXyzrhwPrimitiveUP(
+            device, type, primitiveCount, data, stride);
+    }
+
+    HRESULT TryXyzrhwIndexedPrimitiveUP(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride)
+    {
+        return R30TryXyzrhwIndexedPrimitiveUP(
+            device, type, minVertexIndex, numVertices, primitiveCount,
+            indexData, indexFormat, vertexData, stride);
+    }
 }
