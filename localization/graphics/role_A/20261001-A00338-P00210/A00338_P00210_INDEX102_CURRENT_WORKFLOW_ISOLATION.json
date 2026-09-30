@@ -1,0 +1,124 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00338-p00210-index102-current-workflow-isolation-material-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
+  "wave_id": "P00210",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "recorded_at_kst": "2026-10-01T05:51:21+09:00",
+  "target": {
+    "index": 102,
+    "asset": "571E78F3",
+    "index_mod_3": 0,
+    "owned_by_lane": true
+  },
+  "readiness_scan": {
+    "latest_automation_validated_c_task": "LOCALIZATION-LOCALIZATION_C-00333",
+    "latest_automation_validated_c_result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+    "observed_newer_c_head": {
+      "task_id": "LOCALIZATION-LOCALIZATION_C-00337",
+      "qa_batch_id": "Q00071",
+      "head_sha": "9ecb54043789f4880380094c3010ed8bc542fe3e",
+      "automation_validation": "PENDING",
+      "a_shard_completion_tier_change": "NONE"
+    },
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      57,
+      60,
+      159,
+      198,
+      201
+    ],
+    "producer_qa_pending_not_repeated": [
+      111,
+      195,
+      51
+    ],
+    "sticky_source_blocked_not_reprobed": [
+      30,
+      36,
+      48,
+      54,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "production_complete_not_rerendered": [
+      12,
+      51,
+      63,
+      99,
+      102,
+      121,
+      163,
+      195,
+      222,
+      231,
+      237
+    ],
+    "cross_lane_render_ready_not_stolen": [
+      133
+    ],
+    "cross_lane_rework_not_stolen": [
+      61
+    ],
+    "cross_lane_candidate_qa_not_stolen": [
+      232
+    ],
+    "new_preflight_batches_started": 0
+  },
+  "selection_reason": "The latest automation-validated C authority remains Q00070/C172, and the newer current-HEAD Q00071/C173 result is observed pre-Gate. Neither exposes any A-owned DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework. Q00071 adds only B-owned index133 RENDER_READY and index61 rework, while A00330/A00334/A00335/A00336 and A candidate-bearing assets remain QA_PENDING. No unrelated preflight is opened. Fallback step 3 standardizes production-complete index102/571E78F3's already accepted P00129 DDS_ONLY isolation input into the current schema16 auxiliary manifest format without touching DDS bytes or repeating heavy QA.",
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX102_CURRENT_WORKFLOW_CONSUMABLE_SINGLE_DDS_MANIFEST",
+    "manifest": "localization/validation/single_dds/P00210_A00338_571E78F3.json",
+    "candidate_dds_modified": false,
+    "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "candidate_git_blob_sha": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+    "prior_static_qa": "C81 STATIC_STRICT_QA PASS / D83 FINAL STATIC QA PASS PENDING INGAME REAPPROVAL",
+    "prior_legacy_isolation": "A00239 P00129 accepted producer input; C157/Q00055 isolation input PASS",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "new_executable_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "6524a4c279cbfdc6bdbfe864088391fe726adab0",
+    "latest_validated_c_record_blob_sha": "bde8d951736a57ab8edbe7fcc3d8f46ba7061627",
+    "observed_newer_c_record_blob_sha": "d53019e347bccae9fc14f3fe7c17b81539af95e2",
+    "legacy_isolation_manifest_blob_sha": "8bc3af7b8c5ac5d2be5dd15ad75829fb899b00e8",
+    "source_git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+    "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "candidate_git_blob_sha": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+    "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "c81_report_blob_sha": "6c1bfd8317a7a19ae85b3fa81d51622fff13fdb3",
+    "d83_report_blob_sha": "27c869fe0fa3ea10da8f5a2d3dc1052f5a98d597"
+  },
+  "self_qa": "PASS_A_MOD3_SCHEMA16__Q00071_OBSERVED_NO_A_COMPLETION_TIER__NO_QA_PENDING_REPEAT__B_OWNED_133_61_232_NOT_STOLEN__NO_STICKY_SOURCE_REPROBE__INDEX102_SOURCE_CANDIDATE_BLOBS_UNCHANGED_FROM_A00239_C81_D83__CURRENT_WORKFLOW_MANIFEST_ADDED__HEAVY_QA_REUSED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

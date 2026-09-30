@@ -1,0 +1,130 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00338-p00210-index102-standard-single-dds-isolation-v1",
+  "case_id": "P00210_A00338_571E78F3",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
+  "wave_id": "P00210",
+  "lane": "LOCALIZATION_A",
+  "created_at_kst": "2026-10-01T05:51:21+09:00",
+  "branch": "korean-localization-clean",
+  "active": true,
+  "purpose": "Standardize the already accepted 571E78F3 DDS_ONLY runtime-isolation input into the current schema16 localization/validation/single_dds format. The repository source/candidate blobs are unchanged from A00239 and the C81/D83 static-QA lineage; heavy DDS/pixel/visual QA is reused and runtime remains UNTESTED.",
+  "asset": {
+    "id": "571E78F3",
+    "queue_index": 102,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "raw_orientation": "mirror_y",
+    "localized_semantic_bindings": 2,
+    "translations": [
+      {
+        "source": "Time Attack Mode",
+        "korean": "타임 어택 모드",
+        "physical_occurrences": 1
+      },
+      {
+        "source": "15 continuous course",
+        "korean": "15코스 연속",
+        "physical_occurrences": 1
+      }
+    ]
+  },
+  "source": {
+    "canonical_transport": "GITHUB_REPOSITORY_PINNED_HD_SOURCE",
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+    "sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y"
+    },
+    "note": "No new source acquisition or reconstruction is performed in A00338. Q00070 retains index102 as production-complete; this manifest only binds the unchanged repository-backed candidate for isolated runtime testing."
+  },
+  "candidate": {
+    "storage": "GITHUB_REPOSITORY",
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "git_blob_sha": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+    "sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "bytes": 524416,
+    "dds": {
+      "width": 2048,
+      "height": 256,
+      "format": "DXT5",
+      "mipmaps": 1,
+      "raw_orientation": "mirror_y"
+    },
+    "dimension_policy": "SOURCE_DIMENSIONS_IDENTICAL",
+    "unchanged_fingerprint_proof": {
+      "legacy_isolation_task": "LOCALIZATION-LOCALIZATION_A-00239",
+      "legacy_isolation_result_sha": "eb621c769fd430cc737c73adda3468b92d9c139d",
+      "legacy_manifest": "localization/validation/single_dds/P00129_A00239_571E78F3.json",
+      "independent_static_c": "C81",
+      "final_static_reconcile": "D83",
+      "current_authoritative_c_batch": "Q00070",
+      "current_authoritative_c_result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_report": "localization/graphics/role_B/20260927-1900-B87/B87_P0_HD_REBUILD_FIRST_QA_REPORT.json",
+    "producer_report_blob_sha": "0ea9837eef11e4de41edf9853b395538d051bd87",
+    "independent_c_report": "localization/graphics/role_C/20260927-2000-C81/C81_P0_HD_TRIO_STRICT_QA_REPORT.json",
+    "independent_c_report_blob_sha": "6c1bfd8317a7a19ae85b3fa81d51622fff13fdb3",
+    "final_static_reconcile_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
+    "final_static_reconcile_report_blob_sha": "27c869fe0fa3ea10da8f5a2d3dc1052f5a98d597",
+    "legacy_isolation_manifest": "localization/validation/single_dds/P00129_A00239_571E78F3.json",
+    "legacy_isolation_manifest_blob_sha": "8bc3af7b8c5ac5d2be5dd15ad75829fb899b00e8",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "structure": "2048x256 DXT5 / mip1 / mirror_y",
+    "localized_regions": 2,
+    "outside_declared_cells_decoded_pixels_changed": 0,
+    "outside_declared_cells_dxt5_blocks_changed": 0,
+    "introduced_alpha_outside_declared_cells": 0,
+    "source_language_residue": "NONE_OBSERVED_REUSED_C81_D83",
+    "broken_hangul": "NONE_OBSERVED_REUSED_C81_D83",
+    "clipping_overlap_box_escape": "NONE_OBSERVED_REUSED_C81_D83",
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_input_location": "localization/validation/single_dds/P00129_A00239_571E78F3.json",
+    "previous_input_schema_version": 1,
+    "current_schema_version": 16,
+    "current_aux_workflow_glob": "localization/validation/single_dds/*.json",
+    "new_current_workflow_consumable_manifest": true,
+    "candidate_repository_path_bound": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "candidate_git_blob_sha": "3ca211b40fbf8f0335681f1d553faf7c735043ff",
+    "candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the 571E78F3 replacement DDS and confirm the affected selector screen renders without a crash.",
+    "Capture readable/game-orientation evidence for both localized regions.",
+    "Check mirror-Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling and zero-pixel overflow.",
+    "Do not promote runtime approval without isolated real-game evidence."
+  ],
+  "candidate_dds_modified": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
