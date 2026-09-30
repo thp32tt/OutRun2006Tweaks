@@ -1,0 +1,397 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00322-p00197-index232-full-clean-plate-safe-bbox-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00322",
+  "wave_id": "P00197",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:28:00+09:00",
+  "base_head_sha": "c5ff31e065e5905e887c366fe663f6b85e989d73",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "index": 232,
+    "asset": "EBFC709F",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+    "index_mod_3": 1,
+    "owned_by_lane": true,
+    "latest_c_accepted": "C170/Q00068@09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "latest_c_gate": "PASS",
+    "c170_render_ready_indices": [],
+    "c170_one_stage_to_render_indices": [],
+    "c170_candidate_qa_pending_indices": [
+      159,
+      163,
+      198,
+      201
+    ],
+    "c170_preflight_only_accepted_indices": [
+      133,
+      147,
+      232
+    ],
+    "c170_preflight_only_out_of_batch_qa_pending_indices": [
+      94,
+      111
+    ],
+    "qa_pending_not_repeated": [
+      163
+    ],
+    "reason": "C170 has no runnable B completion-tier asset. B00315@index163 is still C-QA-pending and B00319@index94 is preflight QA-pending, so the single permitted preflight fallback advances C-accepted index232."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+    "controller_roles_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "c170_report_blob_sha": "27e80e09d3cc332e4ab03605cb7bf0b738b67d2d",
+    "c168_semantic_merge_report_blob_sha": "23b5ec851015c86ec767ba21fa48a870d23951a3",
+    "b00202_source_geometry_blob_sha": "c87eda238d559af213373b0fde813953134a4561",
+    "b00211_semantic_binding_blob_sha": "c98705558f77b9f74952f45a23484cfc0cc87415"
+  },
+  "source_transport": {
+    "canonical_inventory_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "canonical_canvas": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_to_readable": "flip_y",
+    "approved_drive_account": "ezflash557",
+    "approved_drive_family_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "drive_fast_path_outcome": "SOURCE_TRANSPORT_MISS",
+    "drive_observed_children": [
+      "9F060EC1_512x512.dds"
+    ],
+    "pinned_direct_outcome": "REUSED_C142_ACCEPTED_IMMUTABLE_404_NO_REPEAT",
+    "pinned_release_bundle": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "size_bytes": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "verified_this_invocation": true,
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+      "member_size_bytes": 8388736,
+      "member_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "canonical_identity_match": true
+    },
+    "dds_header_128_sha256": "532576d0ccd0d1eb3392c6754f1d13cf0afb4d34d02dd4fd9e1c14c2c4ea0a0f",
+    "source_rgba_raw_sha256": "f97138f759e9436fb68ab000ec49fa5d62af68666b9b5712c5b7e9b9ccac5c97",
+    "source_rgba_readable_sha256": "9ad6f8bdef307e97c274128b321324181651c9c755a1b1245f471547505579b8"
+  },
+  "semantic_binding": {
+    "status": "PASS_C168_CANONICAL_4_UNIQUE_STRINGS_6_PHYSICAL_REGIONS",
+    "canonical_strings": [
+      {
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "physical_occurrences": 2
+      },
+      {
+        "source": "Join your friends in a game of OutRun!",
+        "korean": "친구들과 함께 아웃런 게임에 참가하세요!",
+        "physical_occurrences": 1
+      },
+      {
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "physical_occurrences": 1
+      }
+    ],
+    "shared_state_modified_by_b": false
+  },
+  "full_six_region_geometry": {
+    "coordinate_space": "raw DDS cells; readable display is vertical flip",
+    "mask_method": "Within each exact bound text cell, select every pixel whose RGBA tuple is nonzero; union all six supports. No rectangular whole-cell erase.",
+    "elements": [
+      {
+        "sprite": "sprite_755",
+        "element_id": "big_join",
+        "raw_cell": [
+          0,
+          0,
+          1760,
+          172
+        ],
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "source_effect_pixels": 70756,
+        "source_effect_bbox_raw_xyxy": [
+          9,
+          5,
+          979,
+          150
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          9,
+          874,
+          979,
+          1019
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          11,
+          876,
+          977,
+          1017
+        ],
+        "style_class": "red_heading"
+      },
+      {
+        "sprite": "sprite_756",
+        "element_id": "big_create",
+        "raw_cell": [
+          0,
+          172,
+          1760,
+          344
+        ],
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "source_effect_pixels": 90495,
+        "source_effect_bbox_raw_xyxy": [
+          24,
+          184,
+          1245,
+          329
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          24,
+          695,
+          1245,
+          840
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          26,
+          697,
+          1243,
+          838
+        ],
+        "style_class": "red_heading"
+      },
+      {
+        "sprite": "sprite_757",
+        "element_id": "desc_join",
+        "raw_cell": [
+          0,
+          344,
+          1800,
+          504
+        ],
+        "source": "Join your friends in a game of OutRun!",
+        "korean": "친구들과 함께 아웃런 게임에 참가하세요!",
+        "source_effect_pixels": 26671,
+        "source_effect_bbox_raw_xyxy": [
+          4,
+          427,
+          1138,
+          497
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          4,
+          527,
+          1138,
+          597
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          6,
+          529,
+          1136,
+          595
+        ],
+        "style_class": "gray_description"
+      },
+      {
+        "sprite": "sprite_758",
+        "element_id": "desc_create",
+        "raw_cell": [
+          0,
+          504,
+          1800,
+          664
+        ],
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "source_effect_pixels": 26222,
+        "source_effect_bbox_raw_xyxy": [
+          7,
+          587,
+          1120,
+          657
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          7,
+          367,
+          1120,
+          437
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          9,
+          369,
+          1118,
+          435
+        ],
+        "style_class": "gray_description"
+      },
+      {
+        "sprite": "sprite_759",
+        "element_id": "small_join",
+        "raw_cell": [
+          0,
+          664,
+          880,
+          752
+        ],
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "source_effect_pixels": 13855,
+        "source_effect_bbox_raw_xyxy": [
+          14,
+          674,
+          418,
+          737
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          14,
+          287,
+          418,
+          350
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          16,
+          289,
+          416,
+          348
+        ],
+        "style_class": "gray_label"
+      },
+      {
+        "sprite": "sprite_760",
+        "element_id": "small_create",
+        "raw_cell": [
+          880,
+          664,
+          1648,
+          752
+        ],
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "source_effect_pixels": 17841,
+        "source_effect_bbox_raw_xyxy": [
+          898,
+          670,
+          1420,
+          733
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          898,
+          291,
+          1420,
+          354
+        ],
+        "candidate_safe_bbox_2px_readable_xyxy": [
+          900,
+          293,
+          1418,
+          352
+        ],
+        "style_class": "gray_label"
+      }
+    ],
+    "source_nonzero_rgba_pixels_total": 245840,
+    "removal_mask_pixels": 245840,
+    "source_nonzero_rgba_pixels_outside_six_cells": 0,
+    "changed_pixels_outside_source_effect_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "full_mask_packbits_little_endian_sha256": "0fa69ab441f8bbc85dcac858aa60820fa25b6e70b6f602706457eebc096a7391",
+    "full_mask_u8_sha256": "be314e0605bffafa028797bfc9221ef94d4c152f1cf2b1ed05c91b59e0d553c2"
+  },
+  "clean_plate_self_qa": {
+    "method": "Zero RGBA only at exact full six-region source-effect-mask pixels.",
+    "output_nonzero_rgba_pixels": 0,
+    "output_alpha_nonzero_pixels": 0,
+    "raw_rgba_sha256": "2daeb1f36095b44b318410b3f4e8b5d989dcc7bb023d1426c492dab0a3053e74",
+    "deterministic_png_sha256_reproduced": "d7088744990d7e93d5d00f4d11687ae0b891423a3ecb5ecca5204b88417a3a72",
+    "english_residue_pixels": 0,
+    "status": "PASS_PRODUCER_SELF_QA_PENDING_INDEPENDENT_C_REPLAY"
+  },
+  "safe_bbox_self_qa": {
+    "rule": "2px inset on all four sides of each exact source-effect bbox in readable orientation",
+    "elements_total": 6,
+    "valid_positive_safe_bboxes": 6,
+    "zero_margin_targets": 0,
+    "candidate_pixels_generated": false,
+    "status": "PASS_GEOMETRY_ONLY_NO_CANDIDATE"
+  },
+  "source_style_measurement": {
+    "same_family_current_v2_reference": "index237/FF514CEB production-complete current-v2 review set",
+    "reference_generation_prompt": "localization/graphics/KOREAN_PNG_REVIEW/FF514CEB/generation_prompt.json",
+    "reference_font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+    "raw_orientation": "flip_y",
+    "baseline_vector": [
+      1,
+      0
+    ],
+    "slant_angle_deg": 0,
+    "effects": {
+      "outline": "none",
+      "shadow": "none",
+      "glow": "none"
+    },
+    "measured_source_colors": {
+      "red_heading_dominant_rgb": [
+        186,
+        0,
+        0
+      ],
+      "gray_text_dominant_rgb": [
+        63,
+        71,
+        74
+      ]
+    },
+    "note": "Style lineage is recorded to avoid duplicate family measurement after C clean-plate replay. No Korean raster is rendered in this task."
+  },
+  "readiness": {
+    "before": "PREFLIGHT_ONLY_CANONICAL_SEMANTICS_MERGED__FULL_SIX_REGION_CLEAN_PLATE_SAFE_BBOX_QA_REQUIRED",
+    "after": "ONE_STAGE_TO_RENDER_PENDING_C_INDEPENDENT_FULL_SIX_REGION_REPLAY",
+    "render_authorized_now": false,
+    "exact_remaining_stage": "C independently replay and accept the full six-region removal mask, all-zero CLEAN_PLATE and all six 2px safe bboxes at this unchanged source/transcription fingerprint.",
+    "after_c_pass": "RENDER_READY__NATIVE_RENDER_MEASURE_REFIT_DDS_DECODED_FINAL_SELF_QA",
+    "candidate_dds_modified": false
+  },
+  "integrated_self_qa": {
+    "shard_ownership": "PASS_232_MOD3_EQ_1",
+    "duplicate_candidate_avoidance": "PASS_INDEX163_C_QA_PENDING_AND_INDEX94_PREFLIGHT_QA_PENDING_NOT_REPEATED",
+    "source_identity": "PASS_EXACT_CANONICAL",
+    "semantic_binding": "PASS_C168_MERGED",
+    "full_mask_replay": "PASS_245840_OF_245840_SOURCE_NONZERO_PIXELS",
+    "protected_artwork": "PASS_NO_NONZERO_SOURCE_PIXELS_OUTSIDE_BOUND_TEXT_CELLS",
+    "clean_plate": "PASS_ALL_ZERO_RGBA",
+    "safe_bbox": "PASS_6_OF_6_2PX_INSET",
+    "candidate_generation": "NONE_FAIL_CLOSED_PENDING_C_INDEPENDENT_REPLAY",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

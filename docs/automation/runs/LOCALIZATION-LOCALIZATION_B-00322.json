@@ -1,0 +1,113 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00322-p00197-producer-result-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00322",
+  "wave_id": "P00197",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T04:28:00+09:00",
+  "base_head_sha": "c5ff31e065e5905e887c366fe663f6b85e989d73",
+  "controller_schema_version": 16,
+  "controller_config_blob_sha": "8572d3f81f50f0ae9724b7c005f95278843e053a",
+  "automation_contract_blob_sha": "2af7d8388b524db9b923cc9f9fe2e2067a1f8ba6",
+  "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+  "asset_queue_blob_sha": "ddd038ff8266c2eceff1eaf9e65a8b72fe606ebd",
+  "latest_c_accepted": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00321",
+    "qa_batch_id": "Q00068",
+    "result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "automation_validation": "PASS",
+    "validation_mode": "C_BATCH_GATE",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "candidate_qa_pending_indices": [
+      159,
+      163,
+      198,
+      201
+    ],
+    "preflight_only_accepted_indices": [
+      133,
+      147,
+      232
+    ],
+    "preflight_only_out_of_batch_qa_pending_indices": [
+      94,
+      111
+    ]
+  },
+  "target": {
+    "index": 232,
+    "asset": "EBFC709F",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+    "index_mod_3": 1,
+    "owned_by_lane": true
+  },
+  "result": "PASS_MATERIAL_B_INDEX232_FULL_SIX_REGION_CLEAN_PLATE_SAFE_BBOX_SELF_QA_ONE_STAGE_TO_RENDER_PENDING_C_RUNTIME_UNTESTED",
+  "summary": "C170/Q00068 has no runnable B-shard RENDER_READY/ONE_STAGE_TO_RENDER/direct candidate rework. B00315@index163 remains C-QA-pending and B00319@index94 remains preflight QA-pending, so this task uses the one permitted preflight fallback on accepted index232. Exact pinned source identity and C168 canonical semantics are current. All 245,840 nonzero source pixels are contained in the six bound text cells; the exact removal mask removes those 245,840 pixels, leaves zero protected-source changes, and produces an all-zero RGBA CLEAN_PLATE. Six 2px safe bboxes and current-v2 same-family style lineage are recorded. Rendering stays fail-closed until independent C replay accepts this full six-region fingerprint. Runtime remains UNTESTED.",
+  "readiness_scan": {
+    "direct_rework_required_runnable_indices": [],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "existing_candidate_rework_runnable_indices": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      163,
+      198,
+      201
+    ],
+    "preflight_qa_pending_not_repeated": [
+      94,
+      111
+    ],
+    "selected_priority": "PREFLIGHT_ONLY_FALLBACK_CANDIDATE_COMPLETION_INDEX232",
+    "max_new_preflight_batches_used": 1
+  },
+  "readiness_before": "PREFLIGHT_ONLY_CANONICAL_SEMANTICS_MERGED__FULL_SIX_REGION_CLEAN_PLATE_SAFE_BBOX_QA_REQUIRED",
+  "readiness_after": "ONE_STAGE_TO_RENDER_PENDING_C_INDEPENDENT_FULL_SIX_REGION_REPLAY",
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX232_FULL_SIX_REGION_SOURCE_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_AND_STYLE_HANDOFF",
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true,
+    "exact_remaining_blocker": "Independent C replay/acceptance of unchanged full six-region mask/CLEAN_PLATE/safe-bbox fingerprint before render."
+  },
+  "self_qa": "PASS_EXACT_SOURCE__6_OF_6_BINDINGS__245840_MASK_PIXELS__0_OUTSIDE__ALL_ZERO_CLEAN_PLATE__6_OF_6_2PX_SAFE_BBOX__STYLE_HANDOFF__NO_CANDIDATE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "report": "localization/graphics/role_B/20261001-B00322-P00197/B00322_P00197_INDEX232_FULL_CLEAN_PLATE_SAFE_BBOX.json",
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00322-P00197/B00322_P00197_INDEX232_FULL_CLEAN_PLATE_SAFE_BBOX.json",
+    "C168/Q00066 canonical semantic merge",
+    "C170/Q00068 latest accepted readiness reconciliation",
+    "index237/FF514CEB current-v2 generation prompt style lineage"
+  ],
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(B): complete index232 full clean-plate preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00322]",
+  "precommit_refresh": {
+    "head_sha": "c5ff31e065e5905e887c366fe663f6b85e989d73",
+    "head_message": "chore(localization): record Q00068 Gate PASS [AUTO:LOCALIZATION-LOCALIZATION_C-00321] [skip ci]",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "C170/Q00068 Gate bookkeeping is preserved. Only new B00322 lane-local report and unique task record will be added."
+  },
+  "bookkeeping_note": "Result SHA will be bound by a separate bookkeeping commit after the durable producer result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "durable_task_record_in_result_commit": true
+}
