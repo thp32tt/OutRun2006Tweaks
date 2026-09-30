@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "wave_id": "P00214",
+  "lane": "LOCALIZATION_B",
+  "recorded_at_kst": "2026-10-01T07:26:47+09:00",
+  "base_head_sha": "908e27a334a6459e65e8c76fafd238d4edebbea5",
+  "asset": {
+    "index": 61,
+    "id": "C4A2937B",
+    "index_mod_3": 1
+  },
+  "selection": {
+    "reason": "C173/Q00071 returned index61 REWORK_REQUIRED for two stale semantic strings; candidate-completion-first priority applies.",
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00337",
+    "c_disposition": "REWORK_REQUIRED"
+  },
+  "source_acquisition": {
+    "transport": "pinned_v0.25.10a_project_archive",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "relative_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "identity": "PASS"
+  },
+  "base_candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "bytes": 67108992,
+    "status": "C_RETURNED_REWORK_REQUIRED"
+  },
+  "semantic_repairs": {
+    "cut_line": {
+      "from": "라인을 끊으세요!",
+      "to": "하트선을 통과하세요!",
+      "safe_bbox": [
+        2598,
+        1000,
+        3026,
+        1104
+      ],
+      "new_effect_bbox": [
+        2598,
+        1018,
+        3025,
+        1085
+      ],
+      "patch_sha256": "3545bd13532f69ea139c2369adf9ef94ecd6f2d048c485d4d14b0108d0608bf6"
+    },
+    "stage_bonus": {
+      "from": "스테이지 / 보너스",
+      "to": "스테이지 보너스",
+      "display_lines": [
+        "스테이지",
+        "보너스"
+      ],
+      "safe_bbox": [
+        3816,
+        1801,
+        4073,
+        1892
+      ],
+      "new_effect_bbox": [
+        3855,
+        1801,
+        4034,
+        1892
+      ],
+      "patch_sha256": "0b2b09be8f1a7c7756f5e781e59f7bbd10df96ffe7d8c281b30214520bd5e981"
+    }
+  },
+  "self_qa": {
+    "source_identity": "PASS",
+    "channel_masks": "PASS_RGBA",
+    "safe_bbox_containment": "PASS_2_OF_2",
+    "zero_pixel_overflow": "PASS_PATCH_REGIONS",
+    "review_pngs": "GENERATED_AND_VISUALLY_REVIEWED",
+    "zip_integrity": "PASS",
+    "apply_script_syntax": "PASS",
+    "final_candidate_apply": "BLOCKED_BASE_BINARY_TRANSPORT",
+    "final_candidate_decode_qa": "NOT_RUN",
+    "runtime_validation": "UNTESTED"
+  },
+  "blocker": {
+    "type": "BASE_CANDIDATE_BINARY_TRANSPORT",
+    "detail": "Authenticated GitHub connector exposes the 67,108,992-byte current candidate only as a binary Git blob that the available fetch path attempts to UTF-8 decode; Contents API returns no >1MB content. N100/local clone/worktree workaround is forbidden. The exact-hash apply package is therefore persisted without claiming a final DDS.",
+    "retry_condition": "Make exact base candidate SHA-256 28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593 available as bytes in an approved runtime/transport, then run the committed apply script and decoded-final QA."
+  },
+  "drive_artifact": {
+    "account": "ezflash557",
+    "current_pipeline_folder_id": "1eqN9YXpvwwN3NT9HJKo6OzU4xUMH5Ak8",
+    "zip_file_id": "1X-pak-JTWdizfDrwWhiBjzQ5L5isdfug",
+    "zip_sha256": "1fa33068c9815fa875ed30fc60a6c98dfb625a4bf70f83b616bc1d85db9101a1",
+    "zip_bytes": 360058,
+    "zip_members": 18
+  },
+  "candidate_dds_modified": false,
+  "materially_reduces_unresolved_work": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "status": "PATCH_READY_NEEDS_BASE_CANDIDATE_APPLY"
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_id": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "asset": "C4A2937B",
+  "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "base_candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+  "edits": {
+    "cut_line": {
+      "source_text": "Cut the line!",
+      "stale_korean": "라인을 끊으세요!",
+      "canonical_korean": "하트선을 통과하세요!",
+      "source_bbox": [
+        2596,
+        998,
+        3028,
+        1106
+      ],
+      "current_stale_bbox": [
+        2597,
+        1008,
+        3027,
+        1096
+      ],
+      "candidate_safe_bbox": [
+        2598,
+        1000,
+        3026,
+        1104
+      ],
+      "new_effect_bbox": [
+        2598,
+        1018,
+        3025,
+        1085
+      ],
+      "render": {
+        "font_size": 55,
+        "tracking_px": -8,
+        "space_tracking_px": 2,
+        "outer_stroke": 7,
+        "inner_stroke": 3,
+        "shear": 0.02,
+        "style": "instr_yellow"
+      },
+      "patch_sha256": "3545bd13532f69ea139c2369adf9ef94ecd6f2d048c485d4d14b0108d0608bf6"
+    },
+    "stage_bonus": {
+      "source_text": "STAGE BONUS",
+      "stale_korean": "스테이지 / 보너스",
+      "canonical_korean": "스테이지 보너스",
+      "source_bbox": [
+        3814,
+        1799,
+        4075,
+        1894
+      ],
+      "current_stale_bbox": [
+        3872,
+        1800,
+        4028,
+        1893
+      ],
+      "candidate_safe_bbox": [
+        3816,
+        1801,
+        4073,
+        1892
+      ],
+      "new_effect_bbox": [
+        3855,
+        1801,
+        4034,
+        1892
+      ],
+      "render": {
+        "font_size": 40,
+        "tracking_px_by_line": [
+          8,
+          18
+        ],
+        "outer_stroke": 5,
+        "shear": 0.06,
+        "display_lines": [
+          "스테이지",
+          "보너스"
+        ],
+        "style": "stage_bonus"
+      },
+      "patch_sha256": "0b2b09be8f1a7c7756f5e781e59f7bbd10df96ffe7d8c281b30214520bd5e981"
+    }
+  },
+  "invariants": [
+    "apply only to the exact base candidate SHA-256",
+    "preserve exact 128-byte DDS header",
+    "preserve 4096x4096 RGBA32 mip1",
+    "change only the two declared stale regions",
+    "keep the other 19 localized elements byte-identical to base candidate",
+    "zero changed pixels outside allowed clear/new rectangles",
+    "RUNTIME_VALIDATION=UNTESTED until a real game test is supplied"
+  ]
+}

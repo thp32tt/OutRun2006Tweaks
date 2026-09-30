@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "wave_id": "P00214",
+  "lane": "LOCALIZATION_B",
+  "asset": "C4A2937B",
+  "index": 61,
+  "source": {
+    "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "width": 4096,
+    "height": 4096,
+    "dds_header_masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "orientation": "raw_mirror_y_readable_review"
+  },
+  "base_candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+    "git_blob_sha": "0b5f45ec475af6edcc982ce5aafa35dd05e9a66d",
+    "bytes": 67108992,
+    "status": "C_RETURNED_REWORK_REQUIRED"
+  },
+  "generation_prompt": "outrun-first-pass-edit-v2",
+  "scope": "two stale semantic elements only; other 19 elements must remain byte-identical to the exact base candidate when the patch is applied",
+  "elements": {
+    "cut_line": {
+      "source_text": "Cut the line!",
+      "stale_korean": "라인을 끊으세요!",
+      "canonical_korean": "하트선을 통과하세요!",
+      "source_bbox": [
+        2596,
+        998,
+        3028,
+        1106
+      ],
+      "current_stale_bbox": [
+        2597,
+        1008,
+        3027,
+        1096
+      ],
+      "candidate_safe_bbox": [
+        2598,
+        1000,
+        3026,
+        1104
+      ],
+      "new_effect_bbox": [
+        2598,
+        1018,
+        3025,
+        1085
+      ],
+      "render": {
+        "font_size": 55,
+        "tracking_px": -8,
+        "space_tracking_px": 2,
+        "outer_stroke": 7,
+        "inner_stroke": 3,
+        "shear": 0.02,
+        "style": "instr_yellow"
+      },
+      "patch_sha256": "3545bd13532f69ea139c2369adf9ef94ecd6f2d048c485d4d14b0108d0608bf6"
+    },
+    "stage_bonus": {
+      "source_text": "STAGE BONUS",
+      "stale_korean": "스테이지 / 보너스",
+      "canonical_korean": "스테이지 보너스",
+      "source_bbox": [
+        3814,
+        1799,
+        4075,
+        1894
+      ],
+      "current_stale_bbox": [
+        3872,
+        1800,
+        4028,
+        1893
+      ],
+      "candidate_safe_bbox": [
+        3816,
+        1801,
+        4073,
+        1892
+      ],
+      "new_effect_bbox": [
+        3855,
+        1801,
+        4034,
+        1892
+      ],
+      "render": {
+        "font_size": 40,
+        "tracking_px_by_line": [
+          8,
+          18
+        ],
+        "outer_stroke": 5,
+        "shear": 0.06,
+        "display_lines": [
+          "스테이지",
+          "보너스"
+        ],
+        "style": "stage_bonus"
+      },
+      "patch_sha256": "0b2b09be8f1a7c7756f5e781e59f7bbd10df96ffe7d8c281b30214520bd5e981"
+    }
+  },
+  "static_validation": {
+    "canonical_source_archive_sha256_match": true,
+    "source_sha_match": true,
+    "dds_dimensions_match": true,
+    "dds_channel_masks_verified": true,
+    "safe_bbox_containment": "PASS",
+    "target_region_review_generated": true,
+    "patch_zip_testzip": "PASS",
+    "apply_script_syntax": "PASS",
+    "full_candidate_dds_written": false,
+    "final_candidate_decode_qa": "NOT_RUN_NO_BASE_BYTES",
+    "reason_full_candidate_not_written": "GitHub connector cannot retrieve the 67,108,992-byte current binary candidate as bytes: UTF-8 blob fetch fails and Contents API omits >1MB content. No N100/local clone workaround was used and no false candidate completion is claimed."
+  },
+  "drive_transport": {
+    "account": "ezflash557",
+    "folder_id": "1eqN9YXpvwwN3NT9HJKo6OzU4xUMH5Ak8",
+    "zip_file_id": "1X-pak-JTWdizfDrwWhiBjzQ5L5isdfug",
+    "zip_file_name": "LOCALIZATION-LOCALIZATION_B-00342_INDEX61_C4A2937B_PATCH_READY.zip",
+    "zip_sha256": "1fa33068c9815fa875ed30fc60a6c98dfb625a4bf70f83b616bc1d85db9101a1",
+    "zip_bytes": 360058,
+    "zip_members": 18
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "production_readiness": "PATCH_READY_NEEDS_BASE_CANDIDATE_APPLY"
+}

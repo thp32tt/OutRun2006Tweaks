@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "wave_id": "P00214",
+  "asset": "C4A2937B",
+  "index": 61,
+  "base_candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+  "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "runtime_validation": "UNTESTED",
+  "package": {
+    "drive_folder_id": "1eqN9YXpvwwN3NT9HJKo6OzU4xUMH5Ak8",
+    "drive_zip_file_id": "1X-pak-JTWdizfDrwWhiBjzQ5L5isdfug",
+    "zip_sha256": "1fa33068c9815fa875ed30fc60a6c98dfb625a4bf70f83b616bc1d85db9101a1",
+    "zip_bytes": 360058,
+    "zip_members": 18
+  },
+  "key_files": {
+    "apply_patch_to_current_candidate.py": "67dfaf5c8dedc2d7c145bbfe216006e9c0371d7fc027795f736681414076fe19",
+    "cut_line_patch.png": "3545bd13532f69ea139c2369adf9ef94ecd6f2d048c485d4d14b0108d0608bf6",
+    "stage_bonus_patch.png": "0b2b09be8f1a7c7756f5e781e59f7bbd10df96ffe7d8c281b30214520bd5e981",
+    "comparison.png": "73bae9066c1fa1525529f0a6751902a75e1171e366c3bf07db688af96e8d6912",
+    "generation_prompt.json": "06851b23f1b94cfbc1055399364cd8da01032fc160838cf3dda6ae5bccdf35a8",
+    "qa_report.json": "ee9eb378df227fff53f8cbbdd6d903141d66759b6bca1cfde68aadf512795bcb"
+  }
+}
