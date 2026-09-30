@@ -49,6 +49,31 @@ namespace OutRunVRStereo
             return Settings::VRTelemetry;
         }
 
+        HRESULT CallLowerDispatchSetRenderState(
+            IDirect3DDevice9* device,
+            D3DRENDERSTATETYPE state, DWORD value)
+        {
+            return R33SetRenderStateR29Hook.stdcall<HRESULT>(
+                device, state, value);
+        }
+
+        HRESULT CallLowerDispatchReset(
+            IDirect3DDevice9* device,
+            D3DPRESENT_PARAMETERS* params)
+        {
+            return R33ResetR32Hook.stdcall<HRESULT>(device, params);
+        }
+
+        HRESULT CallLowerDispatchPresent(
+            IDirect3DDevice9* device,
+            const RECT* sourceRect, const RECT* destRect,
+            HWND destWindowOverride, const RGNDATA* dirtyRegion)
+        {
+            return R33PresentR32Hook.stdcall<HRESULT>(
+                device, sourceRect, destRect,
+                destWindowOverride, dirtyRegion);
+        }
+
         void R33InvalidateDepthStencilCache() noexcept
         {
             R33DepthStencilState.valid = false;
@@ -200,7 +225,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall SetRenderStateDestR33(IDirect3DDevice9* device,
             D3DRENDERSTATETYPE state, DWORD value)
         {
-            const HRESULT hr = R33SetRenderStateR29Hook.stdcall<HRESULT>(
+            const HRESULT hr = CallLowerDispatchSetRenderState(
                 device, state, value);
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
@@ -705,7 +730,7 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = IsGameDevice(device);
-            const HRESULT hr = R33ResetR32Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr = CallLowerDispatchReset(device, params);
 
             if (gameDevice)
             {
@@ -766,7 +791,7 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
-            const HRESULT hr = R33PresentR32Hook.stdcall<HRESULT>(device,
+            const HRESULT hr = CallLowerDispatchPresent(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
             if (IsGameDevice(device))
                 R33LogPerfWindow();
