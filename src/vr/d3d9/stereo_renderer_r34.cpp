@@ -12,6 +12,7 @@
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../lifecycle/recovery_api.hpp"
 #include "../state/d3d9_raster_tracking.hpp"
+#include "../state/depth_stencil_tracking.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -44,7 +45,7 @@ namespace OutRunVRStereo
             FailClosedStereoEligibility();
             ResetStereoBaselineTracking();
             InvalidateTrackedRasterShadow();
-            R33InvalidateDepthStencilCache();
+            InvalidateDepthStencilStateCache();
             R29ArmMonoSafety();
             RightDepthSynchronized = false;
             RightStencilSynchronized = false;

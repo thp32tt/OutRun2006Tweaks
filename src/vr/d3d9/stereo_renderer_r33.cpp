@@ -897,4 +897,9 @@ namespace OutRunVRStereo
 
         VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;
     }
+
+    void InvalidateDepthStencilStateCache() noexcept
+    {
+        R33InvalidateDepthStencilCache();
+    }
 }
