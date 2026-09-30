@@ -1201,18 +1201,47 @@ class UIScaling : public Hook
 	static inline SafetyHookMid NaviPub_Disp_RivalOnlineEnableScaling_hk{};
 
 	static inline SafetyHookMid ctrl_icon_work_AdjustPosition_hk{};
-	static void ctrl_icon_work_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void ctrl_icon_work_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	static inline SafetyHookMid ctrl_icon_work_AdjustPosition2_hk{};
 	static inline SafetyHookMid set_icon_work_AdjustPosition_hk{};
-	static void ctrl_icon_work_AdjustPosition2(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void ctrl_icon_work_AdjustPosition2AndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
-
 		*(float*)(ctx.esp) = ctx.xmm0.f32[0];
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work stack-write callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	static inline SafetyHookMid DispTempHeartNum_AdjustPosition_hk{};
@@ -1443,9 +1472,19 @@ public:
 			GoalTime_Help150, Memory::HookType::Call);
 
 		// adjusts the girlfriend request speech bubble
-		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);
-		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid((void*)0x460FBC, ctrl_icon_work_AdjustPosition2);
-		set_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460A21, ctrl_icon_work_AdjustPosition2); // set_icon_work can use same logic as ctrl_icon_work_AdjustPosition2
+		// R129/F13: all three existing ctrl/set icon position-correction edges
+		// are inside the canonical ctrl_icon_work SCREEN_HUD producer range.
+		// Preserve spacing/stack-write behavior and source only the immediate
+		// next-draw owner from the shared disassembly producer map.
+		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460D40,
+			ctrl_icon_work_AdjustPositionAndHud<0x00060D40u>);
+		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid(
+			(void*)0x460FBC,
+			ctrl_icon_work_AdjustPosition2AndHud<0x00060FBCu>);
+		set_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460A21,
+			ctrl_icon_work_AdjustPosition2AndHud<0x00060A21u>); // set_icon_work keeps the same stack-write correction
 
 		// "-" text when negative heart score
 		DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BBA89, DispTempHeartNum_AdjustPosition);

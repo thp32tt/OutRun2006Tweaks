@@ -114,6 +114,9 @@ def main() -> None:
             "RenderScope::ProjectedScreenEffect2D",
             "ClassifyCriticalProducer(",
             "OutRunVR::DisasmContract::ClassifyCriticalProducer(callerRva)",
+            "ClassifyCriticalProducer(0x00060A21u) == RenderScope::ScreenHud",
+            "ClassifyCriticalProducer(0x00060D40u) == RenderScope::ScreenHud",
+            "ClassifyCriticalProducer(0x00060FBCu) == RenderScope::ScreenHud",
             "ClassifyCriticalProducer(0x000BE5CDu) == RenderScope::ScreenHud",
         ],
     )
@@ -152,6 +155,10 @@ def main() -> None:
             "DispGhostGap_ForceSpacingAndHud<0x000BE0A5u, false>",
             "DispGhostGap_ForceSpacingAndHud<0x000BE067u, false>",
             "VR R127 GHOST GAP FORCE HUD: shared producer-map handoff",
+            "ctrl_icon_work_AdjustPositionAndHud<0x00060D40u>",
+            "ctrl_icon_work_AdjustPosition2AndHud<0x00060FBCu>",
+            "ctrl_icon_work_AdjustPosition2AndHud<0x00060A21u>",
+            "VR R129 CTRL ICON HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -211,6 +218,19 @@ def main() -> None:
         raise SystemExit(
             "F13 DispGhostGap force ownership regressed to spacing-only callbacks: "
             f"{stale_ghost_gap_force_hooks}"
+        )
+    legacy_ctrl_icon_hooks = [
+        "ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);",
+        "ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid((void*)0x460FBC, ctrl_icon_work_AdjustPosition2);",
+        "set_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460A21, ctrl_icon_work_AdjustPosition2);",
+    ]
+    stale_ctrl_icon_hooks = [
+        hook for hook in legacy_ctrl_icon_hooks if hook in hooks_text
+    ]
+    if stale_ctrl_icon_hooks:
+        raise SystemExit(
+            "F13 ctrl_icon_work ownership regressed to spacing-only callbacks: "
+            f"{stale_ctrl_icon_hooks}"
         )
     semantic_text = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     register_block = re.search(
