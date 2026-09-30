@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T07:54:25+09:00",
+  "updated_at_kst": "2026-10-01T07:54:20+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -976,19 +976,7 @@
       "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
       "validation_bearing_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-      "automation_gate_run_id": 36788089100,
-      "result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-      "authoritative_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-      "automation_gate": {
-        "workflow": "Localization Automation Gate",
-        "run_id": 36788089100,
-        "head_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-        "run_attempt": 1,
-        "status": "completed",
-        "conclusion": "success",
-        "validated_at_kst": "2026-10-01T07:53:28+09:00"
-      },
-      "bookkeeping_recorded_at_kst": "2026-10-01T07:54:25+09:00"
+      "automation_gate_run_id": 36788089100
     },
     "throughput_kpis": {
       "production_complete": {
@@ -1547,11 +1535,11 @@
       "head_sha": "d1dfbf2640b238abfffee58d4cdd74a1c762da05",
       "stale_state_overwrite": false,
       "concurrent_changes_reviewed": "Fresh HEAD includes A00345/A00346/B00342/A00348 after Q00072. Fixed Q00073 inputs are consumed once; those newer producer outputs are preserved as out-of-batch QA_PENDING and shared completion ordering is reconciled without dispositioning them.",
-      "bookkeeping_head_sha": "55cfcc16a70b0bfe71520c9b47eff325f7f103ea",
-      "bookkeeping_concurrent_changes": "Bookkeeping refreshed on newer branch HEAD 55cfcc16a70b0bfe71520c9b47eff325f7f103ea; post-result B00347 changes are preserved and are not dispositioned by Q00073."
+      "bookkeeping_head_sha": "4ebcc3e0e1ad3e26bf28022d6dc64383fd89e82b",
+      "bookkeeping_concurrent_changes": "Concurrent producer commits after the validated Q00073 result are preserved without disposition: localization(B): bind index94 accepted masks to raw DDS coordinates [AUTO:LOCALIZATION-LOCALIZATION_B-00347] | chore(localization): bind B00347 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00347] [skip ci]."
     },
     "result_commit_message": "localization(C): QA Q00073 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00349]",
-    "bookkeeping_note": "Q00073 authoritative Gate PASS is owned by validation-bearing result 0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa (Localization Automation Gate run 36788089100, attempt 1). This bookkeeping checkpoint is separate and does not replace validation ownership. Post-result B00347 changes remain preserved. Runtime remains UNTESTED.",
+    "bookkeeping_note": "Q00073 authoritative Gate PASS is owned by validation-bearing result 0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa (Localization Automation Gate run 36788089100, attempt 1). This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
     "automation_gate": {
       "workflow": "Localization Automation Gate",
       "run_id": 36788089100,
@@ -1561,6 +1549,6 @@
       "conclusion": "success",
       "validated_at_kst": "2026-10-01T07:53:28+09:00"
     },
-    "bookkeeping_recorded_at_kst": "2026-10-01T07:54:25+09:00"
+    "bookkeeping_recorded_at_kst": "2026-10-01T07:54:20+09:00"
   }
 }

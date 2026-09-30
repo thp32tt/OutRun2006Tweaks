@@ -2545,7 +2545,6 @@
       "status": "completed",
       "conclusion": "success",
       "validated_at_kst": "2026-10-01T07:53:28+09:00"
-    },
-    "bookkeeping_recorded_at_kst": "2026-10-01T07:54:25+09:00"
+    }
   }
 }

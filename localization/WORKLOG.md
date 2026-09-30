@@ -2207,9 +2207,3 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Validation-bearing result `0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa` passed **Localization Automation Gate** run `36788089100` attempt 1.
 - Final dispositions: B00332@index232 **PASS / STATIC_QA**, A00338@index102 **PASS current-schema isolation**, A00340@index231 **PASS current-schema isolation**, B00339@index133 **PASS / STATIC_QA**.
 - New production-complete static-QA indices: **133, 232**. Current-schema runtime-isolation-ready additions: **102, 231**. Fresh B00342@index61 remains out-of-batch QA_PENDING; post-Gate B00347@index94 is also preserved out-of-batch and is not dispositioned by Q00073. No runtime approval was granted. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
-
-
-### Q00073 authoritative Gate PASS — 2026-10-01 07:54 KST
-- Validation-bearing result `0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa` passed **Localization Automation Gate** run `36788089100` attempt 1. This bookkeeping checkpoint is separate from the Gate-owning result.
-- Final Q00073 dispositions remain **B00332 PASS / A00338 PASS / A00340 PASS / B00339 PASS**. Index232/EBFC709F and index133/25F697C6 are **STATIC_QA_PASS_RUNTIME_UNTESTED**; indices102/571E78F3 and231/EBE401C8 current-schema DDS_ONLY isolation inputs are accepted on unchanged prior-QA candidates.
-- Post-result B00347 changes on newer branch HEAD are preserved and are not implicitly dispositioned by Q00073. Candidate QA backlog remains **61/159/198/201**. No runtime approval was granted. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
