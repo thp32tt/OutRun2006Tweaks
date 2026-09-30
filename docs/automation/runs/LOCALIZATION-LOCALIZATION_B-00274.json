@@ -54,8 +54,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "7dbecfb5ba666091dc62ab23c56faf8a08c07690",
+  "authoritative_result_sha": "7dbecfb5ba666091dc62ab23c56faf8a08c07690",
   "result_commit_message": "localization(B): normalize index163 course-title family [AUTO:LOCALIZATION-LOCALIZATION_B-00274]",
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created. Producer validation remains PENDING until the later C batch gate; runtime remains UNTESTED."
+  "bookkeeping_note": "Immutable AUTO result commit recorded. Producer automation validation remains PENDING under C_BATCH_GATE; runtime remains UNTESTED. This bookkeeping commit does not own validation."
 }
