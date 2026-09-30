@@ -13,6 +13,7 @@
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../lifecycle/reset_replay_health.hpp"
 #include "../lifecycle/recovery_gate.hpp"
+#include "../lifecycle/reset_replay_policy.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
 
 namespace OutRunVRStereo
@@ -236,8 +237,10 @@ namespace OutRunVRStereo
                 return hr;
             }
 
-            const bool healthy = SUCCEEDED(hr) &&
-                OutRunVR::Lifecycle::ResetReplaySucceeded();
+            const bool healthy =
+                OutRunVR::Lifecycle::ResetReplayHealthy(
+                    SUCCEEDED(hr),
+                    OutRunVR::Lifecycle::ResetReplaySucceeded());
             R34ResetReplay.blocked.store(!healthy, std::memory_order_release);
             OutRunVR::Lifecycle::SetRecoverySafetyBlock(!healthy);
             if (!healthy)
