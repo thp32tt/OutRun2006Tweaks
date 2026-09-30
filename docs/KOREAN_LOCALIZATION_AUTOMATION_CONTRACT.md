@@ -306,3 +306,16 @@ Effective immediately, throughput is measured in deployable Korean DDS candidate
 The scheduler should optimize the conversion path:
 `REWORK/READY -> DDS CANDIDATE -> C STATIC PASS (PRODUCTION_COMPLETE)`
 and keep runtime validation as a later independent gate.
+
+## Throughput enforcement v17 — producer batch is a hard invariant
+
+Effective immediately, the v16 candidate target is executable completion policy, not advisory guidance.
+
+- A/B/E normal producer success requires **at least 2 new or materially reworked Korean DDS candidates in the same invocation** whenever a fresh owning-shard scan exposes at least two runnable completion-tier assets.
+- Producing one candidate MUST NOT release the lane or terminate the invocation when a second runnable completion-tier asset exists. After every candidate, refresh the owning shard and continue until the target is met or runnable completion work is exhausted.
+- A one-candidate result is permitted only as typed `PARTIAL_BATCH` when a fresh owning-shard scan proves fewer than two runnable completion-tier assets remain. The task record must preserve that exhaustion evidence; it is not normal batch success.
+- Preflight, source guard, bookkeeping, runtime isolation, or research cannot fill a missing candidate slot and never count toward the batch target.
+- Compatible family/template work may continue to 4 candidates. Complex-atlas handling may still use one candidate only when the fresh shard scan proves no second safe runnable completion-tier asset for that invocation.
+- C continues candidate-first QA and may consume up to four producer results per batch. Strict static QA thresholds are unchanged.
+
+The enforced producer loop is: `fresh shard scan -> candidate -> rescan -> candidate -> durable result`; only proven shard exhaustion may shorten it.

@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 16:
-    raise SystemExit("controller_roles schema_version must be >= 16")
+if int(cfg.get("schema_version", 0)) < 17:
+    raise SystemExit("controller_roles schema_version must be >= 17")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -104,6 +104,9 @@ required["execution.concurrent_group"] = execution.get("concurrent_group") == ["
 required["execution.e_backlog_throttle"] = (execution.get("extra_producer_backlog_throttle") or {}).get("lane") == "E"
 qprio = execution.get("qa_priority_policy") or {}
 required["execution.candidate_bearing_qa_first"] = qprio.get("primary") == "CANDIDATE_BEARING_RESULTS_FIRST" and qprio.get("preflight_must_not_delay_candidate_batch") is True
+pb = execution.get("producer_batch_completion") or {}
+required["execution.producer_batch_hard_min"] = int(pb.get("normal_success_min_candidate_dds", 0)) >= 2 and pb.get("first_candidate_must_not_release_lane_when_second_runnable_exists") is True
+required["execution.partial_requires_exhaustion"] = pb.get("partial_batch_requires_fresh_shard_exhaustion") is True
 required["qa_deduplication.identity"] = qa.get("identity") == "TASK_ID@RESULT_SHA"
 required["qa_deduplication.reuse_unchanged_pass_evidence"] = qa.get("reuse_unchanged_pass_evidence") is True
 required["qa_deduplication.shared_state_merge_frequency"] = qa.get("shared_state_merge_frequency") == "once_per_c_batch"
@@ -116,6 +119,10 @@ required["production_strategy.candidate_target_per_invocation_when_ready_exists"
 batch_policy = strategy.get("candidate_batch_policy") or {}
 required["production_strategy.candidate_batch_default"] = int(batch_policy.get("default_target", 0)) >= 2
 required["production_strategy.candidate_batch_max"] = int(batch_policy.get("max_target", 0)) == 4
+required["production_strategy.candidate_batch_min_success"] = int(batch_policy.get("minimum_success_before_normal_terminal", 0)) >= 2
+required["production_strategy.single_candidate_normal_terminal_forbidden"] = batch_policy.get("single_candidate_normal_terminal_forbidden") is True
+required["production_strategy.partial_batch_typed"] = batch_policy.get("partial_batch_status") == "PARTIAL_BATCH" and batch_policy.get("partial_batch_requires_evidence") is True
+required["production_strategy.rescan_after_each_candidate"] = batch_policy.get("rescan_after_each_candidate") is True and batch_policy.get("continue_same_invocation_until_target_or_exhaustion") is True
 required["production_strategy.family_fast_path_target"] = int(batch_policy.get("family_fast_path_target", 0)) == 4
 preflight = strategy.get("preflight_suppression") or {}
 required["production_strategy.preflight_forbidden_with_completion_work"] = preflight.get("forbid_when_any_runnable_completion_tier_exists") is True

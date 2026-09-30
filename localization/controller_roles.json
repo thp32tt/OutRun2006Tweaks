@@ -1,5 +1,5 @@
 {
-  "schema_version": 16,
+  "schema_version": 17,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -36,6 +36,13 @@
       "candidate_signal": "candidate_dds_modified=true OR materially_reworked_candidate=true",
       "secondary": "PREFLIGHT_OR_RESEARCH_RESULTS",
       "preflight_must_not_delay_candidate_batch": true
+    },
+    "producer_batch_completion": {
+      "target_candidate_dds": 2,
+      "max_candidate_dds": 4,
+      "normal_success_min_candidate_dds": 2,
+      "partial_batch_requires_fresh_shard_exhaustion": true,
+      "first_candidate_must_not_release_lane_when_second_runnable_exists": true
     }
   },
   "lanes": {
@@ -355,7 +362,9 @@
       ],
       "primary_success_field": "candidate_dds_modified",
       "zero_candidate_requires_post_evidence_rescan": true,
-      "fallback_cannot_replace_newly_runnable_render": true
+      "fallback_cannot_replace_newly_runnable_render": true,
+      "invocation_success_requires_batch_target": true,
+      "one_candidate_does_not_satisfy_invocation_success": true
     },
     "render_handoff": {
       "consume_latest_readiness_after": true,
@@ -379,7 +388,14 @@
       "family_fast_path_target": 4,
       "complex_atlas_target": 1,
       "continue_after_success_while_budget_and_ready_work_remain": true,
-      "success_count_unit": "DDS_CANDIDATE"
+      "success_count_unit": "DDS_CANDIDATE",
+      "minimum_success_before_normal_terminal": 2,
+      "single_candidate_normal_terminal_forbidden": true,
+      "partial_batch_status": "PARTIAL_BATCH",
+      "partial_batch_allowed_only_when": "FRESH_OWNING_SHARD_SCAN_PROVES_FEWER_THAN_2_RUNNABLE_COMPLETION_TIER_ASSETS",
+      "partial_batch_requires_evidence": true,
+      "rescan_after_each_candidate": true,
+      "continue_same_invocation_until_target_or_exhaustion": true
     },
     "preflight_suppression": {
       "forbid_when_any_runnable_completion_tier_exists": true,
