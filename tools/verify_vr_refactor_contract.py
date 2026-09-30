@@ -84,6 +84,22 @@ for required in (
     read(required)
 
 for legacy in (
+    "R9",
+    "R13",
+    "R20",
+    "R21",
+    "R22",
+    "R23",
+    "R26",
+    "R29",
+    "R30",
+    "R31",
+):
+    import re
+    if re.search(rf"\\b{legacy}[A-Za-z0-9_]+", r32):
+        errors.append(f"R32 regained lower-layer implementation dependency: {legacy}*")
+
+for legacy in (
     "R29StableStereoBase",
     "R29FragileEffectCached",
     "R29ArmMonoSafety",

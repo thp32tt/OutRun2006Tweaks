@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 530,
+  "cycle": 535,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -78,10 +78,11 @@
     "R84-REF-RENDER-0005",
     "R84-REF-LIFECYCLE-0018",
     "R84-REF-LIFECYCLE-0019",
-    "R84-REF-TRANSPORT-0001"
+    "R84-REF-TRANSPORT-0001",
+    "R84-REF-GUARD-0005"
   ],
-  "next": "Cycles 531-535: isolate R32 lower hook target symbols (R22 Reset, R13 direct transport) behind neutral hook-target facade.",
-  "updatedKst": "2026-10-01T08:31:00+09:00",
+  "next": "Cycles 536-540: migrate R31 R9/R29/R30 direct accounting and policy calls onto neutral APIs.",
+  "updatedKst": "2026-10-01T08:34:00+09:00",
   "batchStatus": "R84_FLATTEN_CYCLE_500_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
