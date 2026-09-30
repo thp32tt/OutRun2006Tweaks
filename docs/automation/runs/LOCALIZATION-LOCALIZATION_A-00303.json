@@ -159,8 +159,8 @@
   },
   "current_disposition": "PREFLIGHT_ONLY_PINNED_RELEASE_OBJECT_RESOLVED_BINARY_TRANSPORT_BLOCKED",
   "self_qa": "PASS_A_MOD3_INDEX147__ZERO_A_RUNNABLE_READY_REWORK_TIERS__QA_PENDING_159_198_201_NOT_REPEATED__INDEX111_A00301_NOT_REPEATED__SOURCE_BLOCKED_NOT_REPROBED__DRIVE_EXACT_MISS__PINNED_RELEASE_OBJECT_959F27E1_RESOLVED__CANONICAL_SHA_GATE_TOOL_ADDED__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "0d638bf038becb211d39414f024aab699a6369b2",
+  "authoritative_result_sha": "0d638bf038becb211d39414f024aab699a6369b2",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): gate index147 canonical source transport [AUTO:LOCALIZATION-LOCALIZATION_A-00303]",
   "precommit_refresh": {
@@ -168,5 +168,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "HEAD advanced since task start through B00300 bookkeeping; producer B changes are preserved. No shared state is modified by A00303."
   },
-  "bookkeeping_note": "Producer immutable result SHA will be recorded in a separate bookkeeping checkpoint. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Producer immutable result SHA recorded after durable material commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T02:18:38.871+09:00",
+  "bookkeeping_base_head_sha": "0d638bf038becb211d39414f024aab699a6369b2"
 }
