@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00283",
+  "wave_id": "P00166",
+  "lane": "LOCALIZATION_B",
+  "asset": "411827E",
+  "index": 97,
+  "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "raw_orientation": "flip_y readable normalization; restore exact raw storage orientation on DDS encode",
+  "instructions": [
+    "Restart from the exact pinned English HD source; previous Korean candidate pixels are not construction input.",
+    "Remove all English glyph/effect pixels, reconstruct the source background, then render Korean.",
+    "Use native Korean font rendering at final size, source-matched fill/outline/effect hierarchy, and measured signed right slant.",
+    "Keep final fill/outline/antialias inside the 2px-inset candidate-safe bbox.",
+    "If fit needs adjustment, rerender natively at a smaller font size; do not scale completed lettering.",
+    "Preserve Ferrari model names, player labels, vehicle/control artwork and every pixel outside the seven localization regions.",
+    "Preserve RGBA32 2048x2048 mip1 structure, exact 128-byte header and raw orientation."
+  ],
+  "elements": [
+    {
+      "key": "automatic",
+      "source": "Automatic",
+      "korean": "자동",
+      "original_bbox": [
+        6,
+        178,
+        543,
+        288
+      ],
+      "candidate_safe_bbox": [
+        8,
+        180,
+        541,
+        286
+      ],
+      "localized_bbox": [
+        173,
+        180,
+        376,
+        286
+      ],
+      "source_slant_deg": 19.799,
+      "candidate_slant_deg": 19.432,
+      "font_size": 100,
+      "containment": "PASS"
+    },
+    {
+      "key": "seconds",
+      "source": "seconds",
+      "korean": "초",
+      "original_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "candidate_safe_bbox": [
+        1239,
+        64,
+        1582,
+        142
+      ],
+      "localized_bbox": [
+        1362,
+        64,
+        1459,
+        142
+      ],
+      "source_slant_deg": 20.105,
+      "candidate_slant_deg": 19.044,
+      "font_size": 84,
+      "containment": "PASS"
+    },
+    {
+      "key": "engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "original_bbox": [
+        1492,
+        336,
+        1915,
+        408
+      ],
+      "candidate_safe_bbox": [
+        1494,
+        338,
+        1913,
+        406
+      ],
+      "localized_bbox": [
+        1558,
+        346,
+        1848,
+        398
+      ],
+      "source_slant_deg": 19.524,
+      "candidate_slant_deg": 19.853,
+      "font_size": 58,
+      "containment": "PASS"
+    },
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "original_bbox": [
+        843,
+        851,
+        1154,
+        965
+      ],
+      "candidate_safe_bbox": [
+        845,
+        853,
+        1152,
+        963
+      ],
+      "localized_bbox": [
+        895,
+        860,
+        1101,
+        955
+      ],
+      "source_slant_deg": 19.827,
+      "candidate_slant_deg": 20.283,
+      "font_size": 96,
+      "containment": "PASS"
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "original_bbox": [
+        1235,
+        851,
+        1546,
+        965
+      ],
+      "candidate_safe_bbox": [
+        1237,
+        853,
+        1544,
+        963
+      ],
+      "localized_bbox": [
+        1283,
+        861,
+        1498,
+        955
+      ],
+      "source_slant_deg": 20.376,
+      "candidate_slant_deg": 19.29,
+      "font_size": 96,
+      "containment": "PASS"
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "original_bbox": [
+        1627,
+        856,
+        1901,
+        965
+      ],
+      "candidate_safe_bbox": [
+        1629,
+        858,
+        1899,
+        963
+      ],
+      "localized_bbox": [
+        1629,
+        868,
+        1898,
+        952
+      ],
+      "source_slant_deg": 20.556,
+      "candidate_slant_deg": 20.225,
+      "font_size": 85,
+      "containment": "PASS_HIGH_RISK_SAFE_EDGE_TOUCH"
+    },
+    {
+      "key": "recommendation",
+      "source": "Recommendation",
+      "korean": "추천",
+      "original_bbox": [
+        1565,
+        1710,
+        2012,
+        2030
+      ],
+      "candidate_safe_bbox": [
+        1567,
+        1712,
+        2010,
+        2028
+      ],
+      "localized_bbox": [
+        1663,
+        1765,
+        1914,
+        1974
+      ],
+      "source_baseline_deg": -29.808,
+      "candidate_baseline_deg": -28.118,
+      "font_size": 142,
+      "containment": "PASS"
+    }
+  ]
+}

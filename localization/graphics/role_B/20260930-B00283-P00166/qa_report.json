@@ -1,0 +1,274 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00283-p00166-index97-v2-native-rerender-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00283",
+  "wave_id": "P00166",
+  "lane": "LOCALIZATION_B",
+  "asset": "411827E",
+  "index": 97,
+  "prompt_contract": "outrun-first-pass-edit-v2",
+  "contract": "outrun-first-pass-edit-v2",
+  "status": "PASS_PRODUCER_SELF_QA_PENDING_INDEPENDENT_C",
+  "result": "PASS",
+  "source": {
+    "transport": "GOOGLE_DRIVE_APPROVED_CANONICAL_HD_SOURCE",
+    "drive_file_id": "1H3T8RKgbV164FhIRtjBnkYqeSmSRNWvU",
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1
+  },
+  "candidate": {
+    "sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80",
+    "bytes": 16777344,
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_byte_exact": true,
+    "roundtrip_decode_exact_to_render": true,
+    "raw_orientation": "flip_y"
+  },
+  "generation_v2": {
+    "clean_plate_independent_gate": "PASS",
+    "source_removal_mask_separate_from_korean_lettering_regions": true,
+    "native_resolution_render": true,
+    "native_refit_only": true,
+    "signed_slant_gate": "PASS",
+    "orientation_gate": "PASS",
+    "english_source_visual_comparison": "PASS",
+    "whole_atlas_visual_review": "PASS"
+  },
+  "signed_slant_gate": "PASS",
+  "elements": [
+    {
+      "key": "automatic",
+      "source": "Automatic",
+      "korean": "자동",
+      "original_bbox": [
+        6,
+        178,
+        543,
+        288
+      ],
+      "candidate_safe_bbox": [
+        8,
+        180,
+        541,
+        286
+      ],
+      "localized_bbox": [
+        173,
+        180,
+        376,
+        286
+      ],
+      "source_slant_deg": 19.799,
+      "candidate_slant_deg": 19.432,
+      "font_size": 100,
+      "containment": "PASS"
+    },
+    {
+      "key": "seconds",
+      "source": "seconds",
+      "korean": "초",
+      "original_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "candidate_safe_bbox": [
+        1239,
+        64,
+        1582,
+        142
+      ],
+      "localized_bbox": [
+        1362,
+        64,
+        1459,
+        142
+      ],
+      "source_slant_deg": 20.105,
+      "candidate_slant_deg": 19.044,
+      "font_size": 84,
+      "containment": "PASS"
+    },
+    {
+      "key": "engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "original_bbox": [
+        1492,
+        336,
+        1915,
+        408
+      ],
+      "candidate_safe_bbox": [
+        1494,
+        338,
+        1913,
+        406
+      ],
+      "localized_bbox": [
+        1558,
+        346,
+        1848,
+        398
+      ],
+      "source_slant_deg": 19.524,
+      "candidate_slant_deg": 19.853,
+      "font_size": 58,
+      "containment": "PASS"
+    },
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "original_bbox": [
+        843,
+        851,
+        1154,
+        965
+      ],
+      "candidate_safe_bbox": [
+        845,
+        853,
+        1152,
+        963
+      ],
+      "localized_bbox": [
+        895,
+        860,
+        1101,
+        955
+      ],
+      "source_slant_deg": 19.827,
+      "candidate_slant_deg": 20.283,
+      "font_size": 96,
+      "containment": "PASS"
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "original_bbox": [
+        1235,
+        851,
+        1546,
+        965
+      ],
+      "candidate_safe_bbox": [
+        1237,
+        853,
+        1544,
+        963
+      ],
+      "localized_bbox": [
+        1283,
+        861,
+        1498,
+        955
+      ],
+      "source_slant_deg": 20.376,
+      "candidate_slant_deg": 19.29,
+      "font_size": 96,
+      "containment": "PASS"
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "original_bbox": [
+        1627,
+        856,
+        1901,
+        965
+      ],
+      "candidate_safe_bbox": [
+        1629,
+        858,
+        1899,
+        963
+      ],
+      "localized_bbox": [
+        1629,
+        868,
+        1898,
+        952
+      ],
+      "source_slant_deg": 20.556,
+      "candidate_slant_deg": 20.225,
+      "font_size": 85,
+      "containment": "PASS_HIGH_RISK_SAFE_EDGE_TOUCH"
+    },
+    {
+      "key": "recommendation",
+      "source": "Recommendation",
+      "korean": "추천",
+      "original_bbox": [
+        1565,
+        1710,
+        2012,
+        2030
+      ],
+      "candidate_safe_bbox": [
+        1567,
+        1712,
+        2010,
+        2028
+      ],
+      "localized_bbox": [
+        1663,
+        1765,
+        1914,
+        1974
+      ],
+      "source_baseline_deg": -29.808,
+      "candidate_baseline_deg": -28.118,
+      "font_size": 142,
+      "containment": "PASS"
+    }
+  ],
+  "metrics": {
+    "clean_plate_changed_pixels": 138596,
+    "candidate_lettering_pixels": 79073,
+    "source_candidate_changed_pixels": 162648,
+    "changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "changed_pixels_outside_source_region": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "changed_pixels_outside_safe_bboxes": 0,
+    "introduced_alpha_outside_source_region": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "source_style_residue_pixels": 0,
+    "one_pixel_overflow": 0
+  },
+  "changed_pixels_outside_edit_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "changed_pixels_outside_source_region": 0,
+  "changed_pixels_outside_exact_source_bboxes": 0,
+  "changed_pixels_outside_safe_bboxes": 0,
+  "introduced_alpha_outside_source_region": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "source_style_residue_pixels": 0,
+  "visual_findings": {
+    "untranslated_english_residue_in_localized_regions": "NONE_OBSERVED",
+    "clipped_korean": "NONE_OBSERVED",
+    "wrong_image": "NONE_OBSERVED",
+    "resolution_loss": "NONE_OBSERVED",
+    "new_background_box_or_seam": "NONE_OBSERVED",
+    "preserved_art_damage": "NONE_OBSERVED",
+    "source_style_slant_mismatch": "NONE_OBSERVED"
+  },
+  "producer_pregate": "PASS",
+  "candidate_static_qa": "PASS_PRODUCER_MACHINE_AND_VISUAL_PENDING_INDEPENDENT_C",
+  "runtime_validation": "UNTESTED"
+}
