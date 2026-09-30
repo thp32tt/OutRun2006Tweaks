@@ -1,0 +1,20 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00342-p00214-dispatch-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+  "wave_id": "P00214",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "dispatched_at_kst": "2026-10-01T07:34:30+09:00",
+  "base_head_sha": "c227563e9274816c2976db76966716ed45680263",
+  "action": "RUN_INDEX61_C4A2937B_SEMANTIC_REWORK",
+  "expected_source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+  "expected_candidate_sha256": "28f4c6bde58bcabd2e7bf8b0c1ce200858201928dfa77abd44152522e52ba593",
+  "required_semantics": {
+    "Cut the line!": "하트선을 통과하세요!",
+    "STAGE BONUS": "스테이지 보너스"
+  },
+  "runtime_validation": "UNTESTED"
+}
