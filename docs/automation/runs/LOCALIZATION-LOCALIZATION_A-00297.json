@@ -76,8 +76,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "8c513939cb7a32fc155754444ae5471690100ecc",
+  "authoritative_result_sha": "8c513939cb7a32fc155754444ae5471690100ecc",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): bind index24 name-entry runtime trace [AUTO:LOCALIZATION-LOCALIZATION_A-00297]",
   "precommit_refresh": {
@@ -85,5 +85,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Current HEAD includes disjoint B00295 index121 blocked execution evidence after A00296; no shared-state or index24 payload is overwritten."
   },
-  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00297 result SHA. RUNTIME_VALIDATION=UNTESTED."
+  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00297 result SHA. RUNTIME_VALIDATION=UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T01:13:00+09:00",
+  "bookkeeping_base_head_sha": "8c513939cb7a32fc155754444ae5471690100ecc"
 }
