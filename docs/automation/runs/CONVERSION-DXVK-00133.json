@@ -1,0 +1,39 @@
+{
+  "task_id": "CONVERSION-DXVK-00133",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "fa0fc50548ba520c01057061a6989df91e2184a0",
+  "result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R138_TARGET_65860_EXACT_CALL_ALIGNMENT",
+  "summary": "Add an exact-byte, manually reviewed instruction-layout guard for guarded-GF target 0x65860 through its first outbound E8 at 0x65874. The analyzer verifies contiguous instruction boundaries, exact bytes, the existing function-start heuristic at 0x65860, and rel32 decoding to 0x285A0. This proves only that this E8 is aligned in the reviewed prefix; helper identity/semantic effect and ScreenHud ownership remain unresolved.",
+  "evidence": [
+    "CONVERSION-DXVK-00131 established 0x65860 as a recurring .text target with function-start guess 0x65860, 251 raw inbound E8 candidates and one bounded raw outbound candidate 0x65874->0x285A0.",
+    "Runtime-dependent DXVK transport/pacing work remains HMD-gated, so bounded F13 exact-disassembly provenance is the highest-priority independently runnable lane work.",
+    "No runtime renderer, producer catalog, semantic ownership, D3D9 policy, OpenXR transport, protected vr-d3d9ex-focus content or HMD package behavior is changed."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00133.json"
+  ],
+  "review_lenses": {
+    "architecture": "Keep the proof in exact-EXE analyzer/verifier tooling; do not activate or reroute a backend.",
+    "ownership": "All five guarded GF hooks remain spacing-only; semantic_effect stays UNRESOLVED and ownership_effect NONE.",
+    "stereo_correctness": "No WVP/projection/HUD/world classification changes.",
+    "performance": "CI-only exact-byte checks; no runtime hot-path work or telemetry added.",
+    "adversarial": "Fail closed if any reviewed instruction byte, layout contiguity, entry-start heuristic, E8 opcode/position, decoded target or mapped target section drifts."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_GUARDED_GF_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+    "after": "PENDING_TARGET_65860_EXACT_CALL_ALIGNMENT",
+    "runtime_claim": false
+  },
+  "next_action": "Run exact-SHA GitHub Actions and inspect gf_target_alignment. If the exact public EXE matches, record only CALL-boundary provenance for 0x65874->0x285A0; do not infer semantic effect or promote ScreenHud ownership. Leave 0x65970 and 0x653C0 for separate bounded tasks."
+}

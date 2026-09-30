@@ -65,6 +65,28 @@ GF_RAW_REL32_TARGET_RVAS = {
 }
 GF_RAW_REL32_TARGET_WINDOW = 96
 
+# R138/F13: exact-byte instruction-boundary anchor for guarded-GF target B.
+# This deliberately proves only that the first outbound E8 at 0x65874 is on a
+# manually reviewed, contiguous x86 instruction boundary beginning at the
+# prologue-like 0x65860 anchor. Function identity/effect remains unresolved.
+GF_TARGET_B_ENTRY_RVA = 0x00065860
+GF_TARGET_B_ALIGNED_CALL_RVA = 0x00065874
+GF_TARGET_B_ALIGNED_CALL_TARGET_RVA = 0x000285A0
+GF_TARGET_B_PREFIX_INSTRUCTIONS = (
+    (0x00065860, "56", "push esi"),
+    (0x00065861, "8b f1", "mov esi, ecx"),
+    (0x00065863, "8b 46 08", "mov eax, [esi+0x08]"),
+    (0x00065866, "57", "push edi"),
+    (0x00065867, "33 ff", "xor edi, edi"),
+    (0x00065869, "83 f8 ff", "cmp eax, -1"),
+    (0x0006586C, "74 1b", "je +0x1b"),
+    (0x0006586E, "39 7e 24", "cmp [esi+0x24], edi"),
+    (0x00065871, "75 09", "jne +0x09"),
+    (0x00065873, "50", "push eax"),
+    (0x00065874, "e8 27 2d fc ff", "call rel32"),
+    (0x00065879, "83 c4 04", "add esp, 4"),
+)
+
 
 # Mirrors the canonical producer catalog in
 # src/vr/game/disasm_render_contract.hpp. Keep this Python representation
@@ -375,6 +397,105 @@ def collect_guarded_gf_target_provenance(pe: PE) -> list[dict]:
     return out
 
 
+def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
+    """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
+
+    The instruction layout is a manually reviewed exact-byte map. This does not
+    infer the helper's semantic effect or promote any guarded GF hook ownership.
+    """
+
+    expected_next = GF_TARGET_B_ENTRY_RVA
+    contiguous = True
+    rows: list[dict] = []
+    for rva, hex_bytes, asm in GF_TARGET_B_PREFIX_INSTRUCTIONS:
+        expected = bytes.fromhex(hex_bytes)
+        if rva != expected_next:
+            contiguous = False
+        actual = pe.bytes_at_rva(rva, len(expected))
+        rows.append(
+            {
+                "rva": rva,
+                "asm": asm,
+                "expected_bytes": expected.hex(" "),
+                "actual_bytes": actual.hex(" "),
+                "bytes_match": actual == expected,
+            }
+        )
+        expected_next = rva + len(expected)
+
+    call_bytes = pe.bytes_at_rva(GF_TARGET_B_ALIGNED_CALL_RVA, 5)
+    decoded_target_rva = None
+    if len(call_bytes) == 5 and call_bytes[0] == 0xE8:
+        rel = struct.unpack_from("<i", call_bytes, 1)[0]
+        decoded_target_rva = (
+            GF_TARGET_B_ALIGNED_CALL_RVA + 5 + rel
+        ) & 0xFFFFFFFF
+
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(GF_TARGET_B_ENTRY_RVA):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            GF_TARGET_B_ENTRY_RVA - text_section.virtual_address,
+        )
+
+    target_section = next(
+        (
+            section.name
+            for section in pe.sections
+            if section.contains_rva(GF_TARGET_B_ALIGNED_CALL_TARGET_RVA)
+        ),
+        "",
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    entry_guess_matches = function_start_guess_rva == GF_TARGET_B_ENTRY_RVA
+    call_target_matches = decoded_target_rva == GF_TARGET_B_ALIGNED_CALL_TARGET_RVA
+    call_row = next(
+        (row for row in rows if row["rva"] == GF_TARGET_B_ALIGNED_CALL_RVA),
+        None,
+    )
+    call_is_layout_boundary = bool(
+        call_row
+        and call_row["bytes_match"]
+        and call_bytes
+        and call_bytes[0] == 0xE8
+    )
+    proven = bool(
+        contiguous
+        and all_bytes_match
+        and entry_guess_matches
+        and call_is_layout_boundary
+        and call_target_matches
+        and target_section
+    )
+    return {
+        "entry_rva": GF_TARGET_B_ENTRY_RVA,
+        "function_start_guess_rva": function_start_guess_rva,
+        "entry_guess_matches": entry_guess_matches,
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "aligned_call_rva": GF_TARGET_B_ALIGNED_CALL_RVA,
+        "call_is_layout_boundary": call_is_layout_boundary,
+        "decoded_call_target_rva": decoded_target_rva,
+        "expected_call_target_rva": GF_TARGET_B_ALIGNED_CALL_TARGET_RVA,
+        "call_target_matches": call_target_matches,
+        "call_target_section": target_section,
+        "status": (
+            "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN"
+            if proven
+            else "ALIGNMENT_PROOF_FAILED"
+        ),
+        "semantic_effect": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -555,6 +676,32 @@ def render_markdown(report: dict) -> str:
             f"{item['bytes64']} | {inbound_text} | {outbound_text} |"
         )
 
+    proof = report["guarded_gf_target_b_alignment_proof"]
+    proof_rows = "<br>".join(
+        f"{hexrva(row['rva'])} {row['actual_bytes']} {row['asm']} "
+        f"[{'match' if row['bytes_match'] else 'MISMATCH'}]"
+        for row in proof["instructions"]
+    )
+    lines += [
+        "",
+        "## Guarded GF target B exact instruction-boundary proof",
+        "",
+        "Exact-byte/manual-decode proof only. This establishes the 0x65874 E8 as "
+        "an instruction boundary in the reviewed prefix anchored at 0x65860; it "
+        "does not establish the helper's semantic effect or ScreenHud ownership.",
+        "",
+        f"- Status: {proof['status']}",
+        f"- Entry anchor: {hexrva(proof['entry_rva'])}",
+        f"- Function-start guess: {hexrva(proof['function_start_guess_rva'])}",
+        f"- Layout contiguous: {proof['layout_contiguous']}",
+        f"- All instruction bytes match: {proof['all_instruction_bytes_match']}",
+        f"- Aligned CALL: {hexrva(proof['aligned_call_rva'])} -> "
+        f"{hexrva(proof['decoded_call_target_rva'])} "
+        f"({proof['call_target_section'] or '-'})",
+        f"- Semantic effect: {proof['semantic_effect']}",
+        f"- Reviewed prefix: {proof_rows}",
+    ]
+
     lines += [
         "",
         "## Direct CALL references into HUD/sprite anchors",
@@ -630,6 +777,7 @@ def main() -> int:
         "calls": calls,
         "guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls),
         "guarded_gf_target_provenance": collect_guarded_gf_target_provenance(pe),
+        "guarded_gf_target_b_alignment_proof": collect_guarded_gf_target_b_alignment_proof(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -697,6 +845,18 @@ def main() -> int:
             f"outbound={outbound_known} "
             f"bytes64={item['bytes64']}"
         )
+    alignment = report["guarded_gf_target_b_alignment_proof"]
+    print(
+        f"gf_target_alignment=0x{alignment['entry_rva']:08X} "
+        f"status={alignment['status']} "
+        f"start_guess={hexrva(alignment['function_start_guess_rva'])} "
+        f"layout_contiguous={alignment['layout_contiguous']} "
+        f"bytes_match={alignment['all_instruction_bytes_match']} "
+        f"call=0x{alignment['aligned_call_rva']:08X} "
+        f"target={hexrva(alignment['decoded_call_target_rva'])} "
+        f"target_section={alignment['call_target_section'] or 'none'} "
+        f"semantic_effect={alignment['semantic_effect']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -705,6 +865,9 @@ def main() -> int:
                 f"{item['label']}"
             )
         return 2
+    if alignment["status"] != "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN":
+        print("guarded_gf_target_b_alignment_proof=FAILED")
+        return 3
     return 0
 
 
