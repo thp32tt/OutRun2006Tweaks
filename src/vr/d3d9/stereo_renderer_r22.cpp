@@ -860,4 +860,25 @@ namespace OutRunVRStereo
 
         VRR22SafetyOverlayHook VRR22SafetyOverlayHook::instance;
     }
+
+    OutRunVR::State::D3D9RasterSnapshot GetTrackedRasterShadow() noexcept
+    {
+        return R22ShadowState;
+    }
+
+    void SetTrackedRasterShadow(
+        const OutRunVR::State::D3D9RasterSnapshot& snapshot) noexcept
+    {
+        R22ShadowState = snapshot;
+    }
+
+    void InvalidateTrackedRasterShadow() noexcept
+    {
+        R22ShadowState = {};
+    }
+
+    bool IsTrackedStateBlockReliable() noexcept
+    {
+        return R22StateBlockTrackingReliable.load(std::memory_order_acquire);
+    }
 }

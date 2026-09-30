@@ -69,21 +69,22 @@ namespace OutRunVRStereo
             // forced live reads for SetRenderTarget implicit viewport changes.
             const bool effectForce =
                 force && site && std::strcmp(site, "R28EffectDraw") == 0;
-            if (R22ShadowState.Valid() &&
-                R22StateBlockTrackingReliable.load(std::memory_order_acquire) &&
+            const auto shadow = GetTrackedRasterShadow();
+            if (shadow.Valid() &&
+                IsTrackedStateBlockReliable() &&
                 (!force || effectForce))
             {
-                out = R22ShadowState;
+                out = shadow;
                 return true;
             }
 
             // If Apply tracking is unavailable, retain the conservative
             // historical live-validation window.
             if (!force && R23LastStateSampleEpoch == PresentEpoch &&
-                R22ShadowState.Valid() && !R22ShadowState.enabled &&
+                shadow.Valid() && !shadow.enabled &&
                 R23GameDrawSerial - R23LastStateSampleDrawSerial < 16)
             {
-                out = R22ShadowState;
+                out = shadow;
                 return true;
             }
 
@@ -94,7 +95,7 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            if (R22ShadowState.Valid() && !OutRunVR::State::SameRasterSnapshot(actual, R22ShadowState))
+            if (shadow.Valid() && !OutRunVR::State::SameRasterSnapshot(actual, shadow))
             {
                 const bool implicitRenderTargetViewport =
                     site && std::strcmp(site, "SetRenderTarget") == 0;
@@ -123,19 +124,19 @@ namespace OutRunVRStereo
                             actual.enabled ? 1 : 0,
                             actual.rect.left, actual.rect.top,
                             actual.rect.right, actual.rect.bottom,
-                            R22ShadowState.viewport.X, R22ShadowState.viewport.Y,
-                            R22ShadowState.viewport.Width,
-                            R22ShadowState.viewport.Height,
-                            R22ShadowState.enabled ? 1 : 0,
-                            R22ShadowState.rect.left, R22ShadowState.rect.top,
-                            R22ShadowState.rect.right, R22ShadowState.rect.bottom);
+                            shadow.viewport.X, shadow.viewport.Y,
+                            shadow.viewport.Width,
+                            shadow.viewport.Height,
+                            shadow.enabled ? 1 : 0,
+                            shadow.rect.left, shadow.rect.top,
+                            shadow.rect.right, shadow.rect.bottom);
                     }
                 }
             }
 
             // LIVE device state is authoritative. This also repairs changes made
             // by SetRenderTarget and StateBlock::Apply that bypass tracked setters.
-            R22ShadowState = actual;
+            SetTrackedRasterShadow(actual);
             R23LastStateSampleDrawSerial = R23GameDrawSerial;
             R23LastStateSampleEpoch = PresentEpoch;
             out = actual;
@@ -560,7 +561,7 @@ namespace OutRunVRStereo
                 if (!R23CaptureActualGameState(device, actual,
                         "SetRenderTarget", true))
                 {
-                    R22ShadowState = {};
+                    InvalidateTrackedRasterShadow();
                     R23LastStateSampleDrawSerial = 0;
                     R23LastStateSampleEpoch = 0;
                     R22FailClosedReplayState(
