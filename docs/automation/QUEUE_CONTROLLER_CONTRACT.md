@@ -93,6 +93,14 @@ The current-schema values in `localization/controller_roles.json` are mandatory 
 - Startup/restart must refresh branch HEAD, clear discovery cache, and reconcile every nonterminal lane from exact GitHub state before dispatch.
 
 
+
+## Producer pre-gate / rework-loop reduction
+- A/B/E MUST run `python tools/localization/verify_producer_pregate.py <changed machine-readable QA JSON...>` after candidate self-QA and before publishing a candidate result when the current task creates or materially reworks Korean graphics.
+- This pre-gate is local/read-only and MUST NOT modify shared state, queue state, candidate DDS bytes, peer-lane files, or wait for GitHub Actions. A failure returns only that producer candidate to immediate in-lane repair; it MUST NOT pause peer producers or C.
+- The pre-gate mirrors the recurring strict-C rejection classes that are deterministically knowable before submission: zero-pixel containment/protected/alpha metrics, generation-v2 evidence, signed-slant PASS evidence, and forbidden flattened-raster shrink/trim/Lanczos-style repair markers.
+- Passing this producer pre-gate is not C approval and not runtime validation. C remains the independent authority for batch disposition, and `RUNTIME_VALIDATION=UNTESTED` remains mandatory until a real game test occurs.
+- Existing immutable producer results already queued for C are not retroactively blocked by this rule; apply it to new/materially reworked producer results after this contract revision.
+
 ## Independent C QA / one-pass optimization
 - Queue state persists `qa_pending`, `qa_completed`, and `qa_blocked`; the de-dup identity is exact `TASK_ID@RESULT_SHA`.
 - C receives explicit `QA_BATCH_INPUTS` and validates those exact commits even if branch HEAD has advanced.
