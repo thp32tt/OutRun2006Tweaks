@@ -104,6 +104,10 @@ def main() -> None:
             "C2CDontLoseGF_AdjustPositionAndHud<0x000BD414u>",
             "C2CDontLoseGF_AdjustPositionAndHud<0x000BD472u>",
             "VR R123 GF WARNING HUD: shared producer-map handoff",
+            "DispGearPosition_AdjustPositionAndHud<0x000B9096u>",
+            "DispGearPosition_AdjustPositionAndHud<0x000B90B3u>",
+            "DispGearPosition_AdjustPositionAndHud<0x000B90F6u>",
+            "VR R124 GEAR REV HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -139,6 +143,10 @@ def main() -> None:
     if "put_scroll_AdjustPositionRight" in hooks_text:
         raise SystemExit(
             "F13 C2CDontLoseGF ownership regressed to legacy spacing-only callback"
+        )
+    if "put_scroll_AdjustPositionLeft" in hooks_text:
+        raise SystemExit(
+            "F13 DispGearPosition ownership regressed to legacy spacing-only callback"
         )
     require(
         "tools/analyze_outrun_exe.py",
