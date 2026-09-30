@@ -1,0 +1,33 @@
+{
+  "task_id": "CONVERSION-DXVK-00165",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "a2c5ef59135189a1284bbc3b1b2e3040ae9aed85",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R165_HELPER_283DE_INSTRUCTION_TERMINAL",
+  "selection_reason": "DXVK runtime promotion remains Quest 3/VDXR-dependent. CONVERSION-DXVK-00163 captured exact 0x283DE continuation bytes and explicitly named complete-instruction decoding as the next bounded F13 task. The 96-byte window ends exactly at RET 0x2843D, so the entire capture can be proven without another byte fetch.",
+  "summary": "Add a fail-closed exact-EXE proof for every complete instruction in 0x283DE..0x2843D. Pin the terminal RET at 0x2843D and prove that the previously validated failure edge to 0x28433 lands on the shared epilogue entry. Data-structure meaning, function-entry status and render ownership remain unresolved.",
+  "evidence": [
+    "CONVERSION-DXVK-00163 validation-bearing result 5493e9db678921067c97a686fc117f648cc5c9da captured a fresh exact 96-byte window beginning at 0x283DE with zero raw rel32 candidates.",
+    "The 96-byte window ends exactly after RET at exclusive RVA 0x2843E, allowing every captured byte to be covered by complete instructions.",
+    "The earlier R161 proof already pinned the failure edge to 0x28433; this task verifies 0x28433 is the instruction-aligned epilogue entry inside the terminal window.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00165.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the terminal proof passes, persist the exact 0x283DE..0x2843D instruction/epilogue evidence while keeping function_entry_status=UNRESOLVED, data_structure_semantics=UNRESOLVED and ownership_effect=NONE. A later task may independently assess whether the now-bounded 0x28320..0x2843D routine has sufficient evidence for a higher-level semantic label."
+}
