@@ -18,6 +18,7 @@
 #include "../lifecycle/frame_accounting.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_target_state.hpp"
+#include "../render/stereo_draw_trampoline.hpp"
 #include "../render/cached_effect_state.hpp"
 #include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
@@ -357,7 +358,7 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
             auto stereo = [&]() {
-                return R9DrawPrimitiveCallbackHook.stdcall<HRESULT>(
+                return CallStereoDrawPrimitive(
                     device, type, startVertex, primitiveCount);
             };
             auto legacy = [&]() {
@@ -374,9 +375,9 @@ namespace OutRunVRStereo
             UINT startIndex, UINT primitiveCount)
         {
             auto stereo = [&]() {
-                return R9DrawIndexedPrimitiveCallbackHook.stdcall<HRESULT>(
-                    device, type, baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
+                return CallStereoDrawIndexedPrimitive(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
             };
             auto legacy = [&]() {
                 return R27DrawIndexedPrimitiveR13Hook.stdcall<HRESULT>(
@@ -392,7 +393,7 @@ namespace OutRunVRStereo
             UINT primitiveCount, const void* data, UINT stride)
         {
             auto stereo = [&]() {
-                return R9DrawPrimitiveUPCallbackHook.stdcall<HRESULT>(
+                return CallStereoDrawPrimitiveUP(
                     device, type, primitiveCount, data, stride);
             };
             auto legacy = [&]() {
@@ -410,9 +411,10 @@ namespace OutRunVRStereo
             const void* vertexData, UINT stride)
         {
             auto stereo = [&]() {
-                return R9DrawIndexedPrimitiveUPCallbackHook.stdcall<HRESULT>(
-                    device, type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
+                return CallStereoDrawIndexedPrimitiveUP(
+                    device, type, minVertexIndex, numVertices,
+                    primitiveCount, indexData, indexFormat,
+                    vertexData, stride);
             };
             auto legacy = [&]() {
                 return R27DrawIndexedPrimitiveUPR13Hook.stdcall<HRESULT>(
