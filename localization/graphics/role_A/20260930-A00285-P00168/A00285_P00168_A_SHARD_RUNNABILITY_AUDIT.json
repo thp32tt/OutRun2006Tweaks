@@ -1,0 +1,180 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00285-p00168-a-shard-runnability-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00285",
+  "wave_id": "P00168",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-09-30T22:18:00+09:00",
+  "base_head_sha": "58246706654c76cdede4a419cacc674b5ba3e42c",
+  "controller_schema_version": 15,
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "c_basis": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00282",
+    "qa_batch_id": "Q00060",
+    "validation_bearing_result_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "task_blob_sha": "304e5fcb7418fcb62e58517cb0a500487700f817"
+  },
+  "candidate_completion_scan": {
+    "direct_rework_required_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "existing_candidate_material_rework_runnable": [],
+    "conclusion": "ZERO_LEGAL_A_CANDIDATE_COMPLETION_AT_CURRENT_FINGERPRINTS"
+  },
+  "qa_pending_exact": [
+    {
+      "index": 51,
+      "asset": "FF2462BB",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00278",
+      "result_sha": "e32e1c27a2045d1eaef318bbc56379102b0572c2",
+      "state": "NEW_NATIVE_V2_CANDIDATE_PENDING_C"
+    },
+    {
+      "index": 111,
+      "asset": "C075FB49",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00276",
+      "result_sha": "bb19063245160837c4e0cfa5777f3a5e9c11e750",
+      "state": "NEW_PROTECTED_ART_GUARD_PENDING_C"
+    },
+    {
+      "index": 159,
+      "asset": "4EDA9DE3",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00196",
+      "result_sha": "1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+      "state": "KOREAN_CANDIDATE_PENDING_C"
+    },
+    {
+      "index": 198,
+      "asset": "9FC88069",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00208",
+      "result_sha": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+      "state": "KOREAN_CANDIDATE_PENDING_C"
+    },
+    {
+      "index": 201,
+      "asset": "A9ABD877",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00196",
+      "result_sha": "1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+      "state": "KOREAN_CANDIDATE_PENDING_C"
+    },
+    {
+      "index": 24,
+      "asset": "66743AA8",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00279",
+      "result_sha": "51b606da094b0a27fa161834cf7edefea18d88ca",
+      "state": "NAME_ENTRY_PREFLIGHT_PENDING_C"
+    },
+    {
+      "index": 15,
+      "asset": "20389D70",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+      "result_sha": "54d9119ac94f050549c3cc612cc99b5ba7798a65",
+      "state": "FONT_RUNTIME_BINDING_HANDOFF_PENDING_C"
+    },
+    {
+      "index": 18,
+      "asset": "7B65A191",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+      "result_sha": "54d9119ac94f050549c3cc612cc99b5ba7798a65",
+      "state": "FONT_RUNTIME_BINDING_HANDOFF_PENDING_C"
+    },
+    {
+      "index": 21,
+      "asset": "D7CE8BC3",
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+      "result_sha": "54d9119ac94f050549c3cc612cc99b5ba7798a65",
+      "state": "FONT_RUNTIME_BINDING_HANDOFF_PENDING_C"
+    }
+  ],
+  "legacy_queue_qa_pending_indices": [
+    {
+      "index": 54,
+      "asset": "FA7BBB13",
+      "artwork_status": "b95_self_qa_pass_pending_c"
+    },
+    {
+      "index": 57,
+      "asset": "39229D64",
+      "artwork_status": "a_auto_self_qa_pass_pending_c"
+    },
+    {
+      "index": 60,
+      "asset": "A064FDFC",
+      "artwork_status": "b94_self_qa_pass_pending_c"
+    }
+  ],
+  "sticky_source_acquisition_blockers": {
+    "indices": [
+      30,
+      36,
+      48,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "source": "latest A00279/A00280/A00281 producer scans plus current queue history",
+    "reselect_rule": "DO_NOT_REPROBE_UNTIL_SOURCE_INVENTORY_POLICY_OR_OTHER_DEPENDENCY_FINGERPRINT_CHANGES"
+  },
+  "static_or_runtime_isolation_already_covered": {
+    "indices": [
+      12,
+      63,
+      99,
+      102,
+      195,
+      222,
+      231,
+      237
+    ],
+    "rule": "Do not create duplicate isolation or repeat unchanged heavy QA; runtime remains a separate backlog."
+  },
+  "latest_c_cross_lane_rework_not_owned_by_a": [
+    {
+      "index": 97,
+      "asset": "411827E",
+      "owner_modulo": 1
+    },
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "owner_modulo": 1
+    },
+    {
+      "index": 163,
+      "asset": "59A79158",
+      "owner_modulo": 1
+    }
+  ],
+  "guard_contract": {
+    "purpose": "Fail closed on A producer reselection while immutable QA-pending or sticky dependency fingerprints are unchanged, and force a fresh scan as soon as any tracked result/source/policy fingerprint changes.",
+    "executable": "localization/graphics/role_A/20260930-A00285-P00168/verify_a_shard_runnability.py",
+    "candidate_rebuild_authorized": false,
+    "unrelated_preflight_authorized": false,
+    "work_steal_authorized": false,
+    "c_disposition_or_dependency_change_reactivates_scan": true
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "8e099aefebb5911e46efa0d1e75a35d9bd8068ae",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "a00276_task_blob_sha": "08ee9d300156655df3d3a8179cd184f1182ea5c0",
+    "a00278_task_blob_sha": "b3b12b9468c0b1c46e0a57ca5a2aea8fa93b9ca9",
+    "a00196_task_blob_sha": "440ebc4c7bee1ef81d6cdd2815f094276f029286",
+    "a00208_task_blob_sha": "5fb40a7d0c19754e87ecea650852175cb6dd0fe2",
+    "a00279_task_blob_sha": "f1b4cd35512847ea1accf3e9920fa2209462d44c",
+    "a00280_task_blob_sha": "4789223c75aa80d915051d120905b03a542f70d7",
+    "a00281_task_blob_sha": "475cfe6240025d541f70d91a191a4994f26437d5"
+  },
+  "result": "PASS_MATERIAL_FALLBACK5_A_SHARD_RUNNABILITY_GUARD_RUNTIME_UNTESTED",
+  "self_qa": "PASS_CURRENT_HEAD_EXACT_TASK_IDENTITIES__ZERO_RUNNABLE_A_CANDIDATE_TIERS__QA_PENDING_NOT_REVIEWED__STICKY_SOURCE_BLOCKERS_NOT_REPROBED__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED"
+}
