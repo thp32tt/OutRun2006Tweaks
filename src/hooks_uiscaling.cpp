@@ -1324,6 +1324,26 @@ class UIScaling : public Hook
 				CallerRva, hit);
 	}
 
+	template<std::uintptr_t CallerRva, int StackOffset>
+	static void C2CSpeechBubbleGFInitial_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp + StackOffset), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF initial-position callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R131 GF SPEECH INITIAL HUD: shared producer-map handoff rva=0x{:x} stackOffset={} hits={}",
+				CallerRva, StackOffset, hit);
+	}
+
 	static void C2CSpeechBubble_AdjustPositionESP4(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((float*)(ctx.esp + 4), false);
@@ -1566,11 +1586,22 @@ public:
 			(void*)0x4FC8B4,
 			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC8B4u>);
 
-		// speech bubble initial position
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid((void*)0x4FC9EB, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk12 = safetyhook::create_mid((void*)0x4FCA1E, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid((void*)0x4FCA51, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid((void*)0x4FCB20, C2CSpeechBubble_AdjustPositionESP4);
+		// R131/F13: exact C2CSpeechBubbleGF initial-position edges are canonical
+		// SCREEN_HUD. Preserve the original three ESP0 and one ESP4 spacing
+		// corrections while sourcing only immediate next-draw ownership from the
+		// shared backend-neutral producer map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid(
+			(void*)0x4FC9EB,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FC9EBu, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk12 = safetyhook::create_mid(
+			(void*)0x4FCA1E,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA1Eu, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid(
+			(void*)0x4FCA51,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA51u, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid(
+			(void*)0x4FCB20,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCB20u, 4>);
 
 		// R123/F13: the three exact C2CDontLoseGF producer edges are all
 		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
