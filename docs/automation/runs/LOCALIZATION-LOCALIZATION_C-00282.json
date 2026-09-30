@@ -390,10 +390,22 @@
   "heavy_qa_repeated": false,
   "heavy_qa_note": "Index94 B00270/B00273 share one unchanged source/candidate fingerprint, so strict blocker work is reviewed once and pre-generation delta once. Index111 reuses unchanged C160 source/candidate/style identity and reviews only new protected-art registration. Index163 is a new candidate fingerprint and receives fresh Drive binary/header/current-policy/readable comparison review.",
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null
+  "result_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+  "authoritative_result_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+  "validation_bearing_result_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36718375768,
+    "head_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-09-30T21:59:20+09:00"
+  },
+  "bookkeeping_note": "Q00060 authoritative Gate PASS is owned by validation-bearing result 8cffecbfe06f7ac72d2d0133ff596cdb827ae16c. This bookkeeping commit is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T22:00:00+09:00",
+  "bookkeeping_base_head_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c"
 }
