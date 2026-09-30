@@ -266,7 +266,7 @@ namespace OutRunVRStereo
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
-                    ++R31Frame.unstable;
+                    NoteTelemetryUnstable();
                 return {};
             }
 
@@ -281,7 +281,7 @@ namespace OutRunVRStereo
             if (fragile)
             {
                 if (R33TelemetryEnabled())
-                    ++R31Frame.fragile;
+                    NoteTelemetryFragile();
                 return {};
             }
 
@@ -402,8 +402,7 @@ namespace OutRunVRStereo
             ++R29StableTwoEyeDraws;
             if (R33TelemetryEnabled())
             {
-                ++R31FastWorldDraws;
-                ++R31Frame.fastWorld;
+                NoteTelemetryFastWorld();
             }
 
             if (FrameStereoPoseSequence == 0)
@@ -570,8 +569,7 @@ namespace OutRunVRStereo
             ++R30ScreenSpaceFovDraws;
             if (R33TelemetryEnabled())
             {
-                ++R31HudDraws;
-                ++R31Frame.hud;
+                NoteTelemetryHud();
             }
 
             if (FAILED(rightHr))
@@ -601,12 +599,12 @@ namespace OutRunVRStereo
                 FlushPendingStateBlockResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
-                R31ObserveDraw(device);
+                ObserveDrawTelemetry(device);
 
             if (IsGameStateBlockRecording())
             {
                 if (telemetry)
-                    ++R31Frame.fallback;
+                    NoteTelemetryFallback();
                 return actualDraw();
             }
 
@@ -630,7 +628,7 @@ namespace OutRunVRStereo
             // reclassify a draw that R33 already rejected using live state.
             R31DiscardUnreliableDrawCaches();
             if (telemetry)
-                ++R31Frame.fallback;
+                NoteTelemetryFallback();
             return R32LowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }

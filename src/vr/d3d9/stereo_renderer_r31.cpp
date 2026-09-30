@@ -1088,4 +1088,36 @@ namespace OutRunVRStereo
     {
         return R31StateBlockApplies;
     }
+
+    void ObserveDrawTelemetry(IDirect3DDevice9* device) noexcept
+    {
+        R31ObserveDraw(device);
+    }
+
+    void NoteTelemetryUnstable() noexcept
+    {
+        ++R31Frame.unstable;
+    }
+
+    void NoteTelemetryFragile() noexcept
+    {
+        ++R31Frame.fragile;
+    }
+
+    void NoteTelemetryFastWorld() noexcept
+    {
+        ++R31FastWorldDraws;
+        ++R31Frame.fastWorld;
+    }
+
+    void NoteTelemetryHud() noexcept
+    {
+        ++R31HudDraws;
+        ++R31Frame.hud;
+    }
+
+    void NoteTelemetryFallback() noexcept
+    {
+        ++R31Frame.fallback;
+    }
 }
