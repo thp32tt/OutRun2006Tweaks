@@ -18,6 +18,7 @@
 #include "vr/d3d9/render_policy.hpp"
 #include "vr/d3d9/screen_space_policy.hpp"
 #include "vr/d3d9/safety_policy.hpp"
+#include "vr/core/dispatch_semantics.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -2195,17 +2196,17 @@ namespace OutRunVRStereo
             const auto semanticScope =
                 OutRunVR::GameSemantic::EffectiveScope();
             const auto semanticRoute =
-                OutRunVR::RenderPolicy::RouteFor(semanticScope);
+                OutRunVR::Core::SemanticRouteFor(semanticScope);
             const auto directScreenKind =
                 OutRunVR::ScreenSpacePolicy::DirectKind(semanticRoute);
             const bool transientOutRunHud =
                 directScreenKind == R30ScreenSpaceKind::ScreenOverlay2D &&
                 R73OutRunTransientHudActive();
             const bool semanticHud =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::ScreenHud ||
+                semanticRoute == OutRunVR::Core::SemanticRoute::ScreenHud ||
                 transientOutRunHud;
             const bool semanticWorld =
-                semanticRoute == OutRunVR::RenderPolicy::SemanticRoute::World;
+                semanticRoute == OutRunVR::Core::SemanticRoute::World;
 
             // Exact producer-owned routes still win. R72 only withholds the
             // generic ScreenOverlay2D direct return during the bounded OutRun
