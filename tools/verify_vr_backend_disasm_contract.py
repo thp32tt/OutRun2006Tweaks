@@ -320,7 +320,7 @@ def main() -> None:
             '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
             '"## Guarded GF hook provenance census"',
             'print(f"guarded_gf_provenance={len(provenance)}/{len(GF_HOOK_PROVENANCE_RVAS)}")',
-            "'0x049940: \"Calc3D2D\"',",
+            '0x049940: "Calc3D2D"',
             '0x0BAD20: "RankMarker_sub_4BAD20"',
             '0x0BB0FB: "RankMarker sprani #1"',
             '0x0BB2D0: "RankMarker clip #5"',
