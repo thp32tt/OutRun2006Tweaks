@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00269-p00155-index121-single-dds-isolation-v1",
+  "case_id": "P00155_B00269_FD90AA9",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00269",
+  "wave_id": "P00155",
+  "lane": "LOCALIZATION_B",
+  "created_at_kst": "2026-09-30T19:21:58+09:00",
+  "branch": "korean-localization-clean",
+  "base_head": "a9e64f0086355845ee1b948321769f90a47f7f8e",
+  "active": true,
+  "purpose": "Provide a concrete repository-backed DDS_ONLY runtime-isolation input for index121/FD90AA9 without rerendering or repeating heavy QA. This does not clear the current shared rework blocker; it only enables the still-missing isolated real-game evidence. Runtime remains UNTESTED.",
+  "asset": {
+    "id": "FD90AA9",
+    "queue_index": 121,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "raw_orientation": "mirror_y",
+    "localized_regions": 29,
+    "semantic_entries": 29,
+    "current_queue_status": "rework_required_zero_pixel_or_artifact",
+    "current_queue_blocker": "source-faithful exact-bbox/collateral rebuild blocker unchanged",
+    "protected_original": [
+      "Risky Ride",
+      "PASSING BREEZE",
+      "Night Flight",
+      "MAGICAL SOUND SHOWER",
+      "Life Was a Bore",
+      "Shiny World",
+      "RANDOM",
+      "SPLASH WAVE",
+      "250GTO",
+      "512BB",
+      "300km/h",
+      "293km/h",
+      "4P",
+      "3P",
+      "5 AT/MT",
+      "6 AT/MT",
+      "route/map artwork",
+      "speech bubble",
+      "equalizer artwork",
+      "road/vehicle icons"
+    ]
+  },
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "git_blob_sha": "b57d20b7908d911d87b8178d88240f9202828594",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "git_blob_sha": "066dd5b33e126d642560f8bc186dc1ae6f4a24a4",
+    "sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "unchanged_fingerprint_proof": {
+      "c82_base_head": "294bb92bafcfa94b05bba1e1dfde8d1d67da3427",
+      "candidate_blob_at_c82": "066dd5b33e126d642560f8bc186dc1ae6f4a24a4",
+      "current_candidate_blob": "066dd5b33e126d642560f8bc186dc1ae6f4a24a4",
+      "source_blob_at_c82": "b57d20b7908d911d87b8178d88240f9202828594",
+      "current_source_blob": "b57d20b7908d911d87b8178d88240f9202828594",
+      "current_head_checked": "a9e64f0086355845ee1b948321769f90a47f7f8e",
+      "no_existing_fd90aa9_single_dds_manifest_at_selection": true,
+      "unchanged": true
+    }
+  },
+  "qa_evidence": {
+    "a87_report": "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+    "b88_report": "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+    "c82_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+    "d83_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json",
+    "c82_status": "C82_STATIC_STRICT_QA_PASS_D83_SAME_SHA_PENDING_D_RECONCILE_INGAME",
+    "d83_preflight_status": "D83_PREFLIGHT_PASS_PENDING_C_INGAME",
+    "current_shared_rework_blocker_retained": true,
+    "heavy_candidate_qa_rerun": false,
+    "source_candidate_fingerprint_unchanged": true,
+    "structure": "RGBA32 4096x4096 mip1 / header exact / mirror_y",
+    "c82_localized_regions": "29_OF_29",
+    "c82_min_bbox_margin_px": 13,
+    "c82_outside_cells_changed_pixels": 0,
+    "c82_introduced_alpha_outside_cells": 0,
+    "c82_visual_qa": "PASS_READABLE_RAW_WHITE_GRAY_NO_RESIDUE_CLIP_ESCAPE_DEGRADATION_SEAM_BOX_HALO_NONART_DAMAGE",
+    "final_static_approval": false,
+    "final_approved": false,
+    "note": "Historical C82 strict QA is reusable only for the identical source/candidate fingerprint. The newer shared queue still marks index121 REWORK_REQUIRED, so this isolation input must not be interpreted as clearing static QA or approving the candidate."
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "candidate_git_blob_sha": "066dd5b33e126d642560f8bc186dc1ae6f4a24a4",
+    "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the FD90AA9 replacement DDS and confirm the affected selector/options flow renders without a crash.",
+    "Capture readable/game-orientation evidence across the screen states that exercise the 29 localized regions.",
+    "Confirm mirror-Y raw storage is interpreted correctly in game.",
+    "Check clipping, overlap, 1-pixel overflow, position, scaling, alpha/transparency and collateral artwork.",
+    "Specifically inspect the areas implicated by the current source-faithful exact-bbox/collateral rebuild blocker.",
+    "Confirm protected song titles, vehicle/model text, speed markers, player markers and route/map/icon artwork remain unchanged.",
+    "Do not promote static/final/runtime approval from this manifest alone; the current rework blocker remains authoritative until C/shared state changes."
+  ],
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}

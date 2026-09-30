@@ -1,0 +1,136 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-b00269-p00155-index121-single-dds-isolation-producer-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00269",
+  "wave_id": "P00155",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T19:21:58+09:00",
+  "base_head_sha": "a9e64f0086355845ee1b948321769f90a47f7f8e",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "current_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "current_controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "latest_shared_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Gate 36647301188 success",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "direct_rework_runnable_indices": [],
+    "direct_rework_dependency_blocked": [
+      {
+        "index": 94,
+        "asset": "2DA43E41",
+        "reason": "safe-repair attempts exhausted; unchanged dependency"
+      },
+      {
+        "index": 121,
+        "asset": "FD90AA9",
+        "reason": "source-faithful exact-bbox/collateral rebuild blocker unchanged"
+      }
+    ],
+    "candidate_qa_backlog_outside_b_shard": [
+      159,
+      198,
+      201
+    ],
+    "existing_b_isolation_not_repeated": [
+      61,
+      97,
+      112,
+      130,
+      163,
+      193,
+      226
+    ],
+    "pregen_pending_c_not_repeated": [
+      {
+        "index": 133,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00213"
+      },
+      {
+        "index": 220,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00214"
+      },
+      {
+        "index": 232,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00211"
+      }
+    ],
+    "source_exhausted_or_identity_blocked_not_reprobed": [
+      28,
+      34,
+      43,
+      46,
+      49,
+      52,
+      55,
+      100,
+      103,
+      106,
+      139,
+      154,
+      172,
+      175,
+      205,
+      214,
+      217,
+      241
+    ],
+    "unresolved_zoom_review_indices": [],
+    "selected_priority": "FALLBACK_STEP_3_EXISTING_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "selected_index": 121,
+    "selected_asset": "FD90AA9",
+    "reason": "No B candidate-completion tier is runnable. Index121's rework blocker is unchanged and therefore not repeated, but the existing repository-backed candidate still lacks DDS_ONLY in-game evidence and has no single-DDS manifest. Runtime isolation can materially advance that separate backlog without claiming the blocker is resolved."
+  },
+  "fingerprint_reuse": {
+    "source_git_blob_sha": "b57d20b7908d911d87b8178d88240f9202828594",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "candidate_git_blob_sha": "066dd5b33e126d642560f8bc186dc1ae6f4a24a4",
+    "candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "c82_report_blob_sha": "faa87da296f30131e8151d2966fd5dffd11a9873",
+    "current_candidate_blob_verified_at_head": "a9e64f0086355845ee1b948321769f90a47f7f8e",
+    "current_source_blob_verified_at_head": "a9e64f0086355845ee1b948321769f90a47f7f8e",
+    "source_candidate_changed": false,
+    "heavy_qa_repeated": false
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 3,
+    "type": "INDEX121_FD90AA9_SINGLE_DDS_RUNTIME_ISOLATION_INPUT",
+    "reviewed_indices": [
+      121
+    ],
+    "reviewed_assets": [
+      "FD90AA9"
+    ],
+    "candidate_dds_modified": false,
+    "static_rework_blocker_resolved": false,
+    "new_isolation_input": true,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_INDEX121__ZERO_RUNNABLE_READY_TIERS__REWORK_BLOCKER_UNCHANGED_NOT_REEXECUTED__UNCHANGED_C82_SOURCE_CANDIDATE_BLOBS__29_OF_29_C82_STRICT_QA_REUSED_ONLY_AS_FINGERPRINT_EVIDENCE__NO_EXISTING_FD90AA9_ISOLATION_MANIFEST__NEW_DDS_ONLY_INPUT__NO_STATIC_PROMOTION__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_static_qa": "CURRENT_SHARED_REWORK_REQUIRED_RETAINED__HISTORICAL_C82_STRICT_QA_FINGERPRINT_REUSED_FOR_ISOLATION_ONLY",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "evidence": [
+    "localization/validation/single_dds/P00155_B00269_FD90AA9.json",
+    "localization/graphics/role_A/20260927-1930-A87/A87_FD90AA9_PRODUCTION_REPORT.json",
+    "localization/graphics/role_B/20260927-2000-B88/B88_C075FB49_REWORK_FD90AA9_FIRST_QA_REPORT.json",
+    "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+    "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
+  ]
+}
