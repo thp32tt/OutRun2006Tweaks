@@ -89,6 +89,15 @@ GF_TARGET_B_PREFIX_INSTRUCTIONS = (
 )
 
 
+# R140/F13: bounded exact-EXE provenance for the helper reached by the proven
+# 0x65874 CALL. This captures helper identity/call topology only. Raw E8 scans
+# inside the helper are still not instruction-boundary proof, and no semantic
+# ownership is promoted from this evidence alone.
+GF_TARGET_B_HELPER_RVA = 0x000285A0
+GF_TARGET_B_HELPER_WINDOW = 128
+GF_TARGET_B_HELPER_FINGERPRINT_BYTES = 96
+
+
 # Mirrors src/vr/hud_semantics.hpp. These ranges come from the shipped
 # hooks_uiscaling.cpp reverse engineering and are intentionally semantic,
 # rather than D3D primitive-count heuristics.
@@ -497,6 +506,96 @@ def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     }
 
 
+def collect_guarded_gf_target_b_helper_provenance(pe: PE) -> dict:
+    """Capture exact-EXE provenance for helper 0x285A0.
+
+    R138 already proves that 0x65874 is an aligned CALL to this helper. R140
+    binds that proven caller to the mapped helper bytes, a backward prologue
+    guess, and bounded raw inbound/outbound E8 candidates. The raw helper call
+    candidates remain diagnostic until independently instruction-decoded.
+    """
+
+    helper_section = next(
+        (
+            section.name
+            for section in pe.sections
+            if section.contains_rva(GF_TARGET_B_HELPER_RVA)
+        ),
+        "",
+    )
+
+    text_section = pe.section(".text")
+    function_start_guess_rva = None
+    if text_section and text_section.contains_rva(GF_TARGET_B_HELPER_RVA):
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        function_start_guess_rva = guess_function_start(
+            text,
+            text_section.virtual_address,
+            GF_TARGET_B_HELPER_RVA - text_section.virtual_address,
+        )
+
+    parent_call_bytes = pe.bytes_at_rva(GF_TARGET_B_ALIGNED_CALL_RVA, 5)
+    parent_decoded_target_rva = None
+    if len(parent_call_bytes) == 5 and parent_call_bytes[0] == 0xE8:
+        rel = struct.unpack_from("<i", parent_call_bytes, 1)[0]
+        parent_decoded_target_rva = (
+            GF_TARGET_B_ALIGNED_CALL_RVA + 5 + rel
+        ) & 0xFFFFFFFF
+
+    inbound = collect_raw_inbound_rel32_candidates(pe, GF_TARGET_B_HELPER_RVA)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, GF_TARGET_B_HELPER_RVA, GF_TARGET_B_HELPER_WINDOW
+    )
+    aligned_parent_present = any(
+        call["call_rva"] == GF_TARGET_B_ALIGNED_CALL_RVA
+        for call in inbound
+    )
+    exact_parent_link = bool(
+        parent_call_bytes == bytes.fromhex("e8 27 2d fc ff")
+        and parent_decoded_target_rva == GF_TARGET_B_HELPER_RVA
+        and aligned_parent_present
+    )
+    known_outbound = [
+        call for call in outbound if call["known_target"]
+    ]
+    captured = bool(
+        helper_section
+        and exact_parent_link
+        and len(pe.bytes_at_rva(
+            GF_TARGET_B_HELPER_RVA,
+            GF_TARGET_B_HELPER_FINGERPRINT_BYTES,
+        )) == GF_TARGET_B_HELPER_FINGERPRINT_BYTES
+    )
+
+    return {
+        "helper_rva": GF_TARGET_B_HELPER_RVA,
+        "helper_section": helper_section,
+        "function_start_guess_rva": function_start_guess_rva,
+        "bytes96": pe.bytes_at_rva(
+            GF_TARGET_B_HELPER_RVA,
+            GF_TARGET_B_HELPER_FINGERPRINT_BYTES,
+        ).hex(" "),
+        "parent_call_rva": GF_TARGET_B_ALIGNED_CALL_RVA,
+        "parent_call_bytes": parent_call_bytes.hex(" "),
+        "parent_decoded_target_rva": parent_decoded_target_rva,
+        "aligned_parent_present_in_raw_inbound": aligned_parent_present,
+        "exact_parent_link": exact_parent_link,
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "known_outbound_rel32_candidates": known_outbound,
+        "status": (
+            "EXACT_HELPER_PROVENANCE_CAPTURED"
+            if captured
+            else "HELPER_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "semantic_effect": "UNRESOLVED",
+        "ownership_effect": "NONE",
+    }
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -704,6 +803,42 @@ def render_markdown(report: dict) -> str:
         f"- Reviewed prefix: {proof_rows}",
     ]
 
+    helper = report["guarded_gf_target_b_helper_provenance"]
+    helper_outbound = "<br>".join(
+        f"{hexrva(call['call_rva'])}->{hexrva(call['target_rva'])} "
+        f"[{call['known_target'] or 'unknown'}] {call['target_section']}"
+        for call in helper["raw_outbound_rel32_candidates"][:16]
+    ) or "-"
+    if len(helper["raw_outbound_rel32_candidates"]) > 16:
+        helper_outbound += (
+            f"<br>... +{len(helper['raw_outbound_rel32_candidates']) - 16} more"
+        )
+    lines += [
+        "",
+        "## Guarded GF target B helper provenance",
+        "",
+        "R140 bounded exact-EXE helper identity evidence. The parent CALL at "
+        "0x65874 is already instruction-aligned by R138; helper-internal E8 rows "
+        "remain raw byte-scan candidates and cannot justify ScreenHud ownership.",
+        "",
+        f"- Status: {helper['status']}",
+        f"- Helper RVA: {hexrva(helper['helper_rva'])} "
+        f"({helper['helper_section'] or '-'})",
+        f"- Function-start guess: {hexrva(helper['function_start_guess_rva'])}",
+        f"- Exact parent link: {helper['exact_parent_link']} "
+        f"({hexrva(helper['parent_call_rva'])} -> "
+        f"{hexrva(helper['parent_decoded_target_rva'])})",
+        f"- Raw inbound candidates: {len(helper['raw_inbound_rel32_candidates'])}",
+        f"- Raw outbound candidates ({GF_TARGET_B_HELPER_WINDOW}B): "
+        f"{helper_outbound}",
+        f"- Known outbound target candidates: "
+        f"{len(helper['known_outbound_rel32_candidates'])}",
+        f"- First {GF_TARGET_B_HELPER_FINGERPRINT_BYTES} bytes: "
+        f"{helper['bytes96']}",
+        f"- Semantic effect: {helper['semantic_effect']}",
+        f"- Ownership effect: {helper['ownership_effect']}",
+    ]
+
     lines += [
         "",
         "## Direct CALL references into HUD/sprite anchors",
@@ -780,6 +915,7 @@ def main() -> int:
         "guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls),
         "guarded_gf_target_provenance": collect_guarded_gf_target_provenance(pe),
         "guarded_gf_target_b_alignment_proof": collect_guarded_gf_target_b_alignment_proof(pe),
+        "guarded_gf_target_b_helper_provenance": collect_guarded_gf_target_b_helper_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -859,6 +995,28 @@ def main() -> int:
         f"target_section={alignment['call_target_section'] or 'none'} "
         f"semantic_effect={alignment['semantic_effect']}"
     )
+    helper = report["guarded_gf_target_b_helper_provenance"]
+    helper_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_helper=0x{helper['helper_rva']:08X} "
+        f"status={helper['status']} "
+        f"section={helper['helper_section'] or 'none'} "
+        f"start_guess={hexrva(helper['function_start_guess_rva'])} "
+        f"parent=0x{helper['parent_call_rva']:08X}->"
+        f"{hexrva(helper['parent_decoded_target_rva'])} "
+        f"parent_exact={helper['exact_parent_link']} "
+        f"inbound_raw={len(helper['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper['raw_outbound_rel32_candidates'])} "
+        f"known_outbound={len(helper['known_outbound_rel32_candidates'])} "
+        f"outbound={helper_outbound} "
+        f"bytes96={helper['bytes96']} "
+        f"semantic_effect={helper['semantic_effect']} "
+        f"ownership_effect={helper['ownership_effect']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -870,6 +1028,9 @@ def main() -> int:
     if alignment["status"] != "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN":
         print("guarded_gf_target_b_alignment_proof=FAILED")
         return 3
+    if helper["status"] != "EXACT_HELPER_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_b_helper_provenance=FAILED")
+        return 4
     return 0
 
 
