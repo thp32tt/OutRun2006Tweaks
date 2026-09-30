@@ -39,6 +39,8 @@ on:
       - 'tools/verify_vr_nearplane_active_gate.py'
       - 'tools/Test-VRRegressionKnowledge.ps1'
       - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/OutRunVR-Slot-Selector.ps1'
       - 'tools/Test-VRDXVKBackendContract.ps1'
       - '.github/workflows/vr-dx9ex-active.yml'
 
@@ -235,6 +237,18 @@ jobs:
           foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt')) {
             if (-not (Test-Path (Join-Path 'verify/backends/d3d9' $file))) { throw "backend payload missing $file" }
           }
+
+          # Regression: extracting a new package over an older R71 test folder
+          # must not fail just because the old launcher passes R71_HUD_FLARE.
+          Copy-Item verify verify-legacy -Recurse
+          & ./verify-legacy/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile HUD_WORLD -VariantId R71_HUD_FLARE
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'legacy VariantId migration failed' }
+          $legacyState = Get-Content verify-legacy/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($legacyState.VariantId -ne 'C_FLARE') { throw "legacy VariantId mapped incorrectly: $($legacyState.VariantId)" }
+          if ($legacyState.Backend -ne 'd3d9') { throw "legacy VariantId changed backend unexpectedly: $($legacyState.Backend)" }
+          $runnerText = Get-Content (Join-Path verify 'Run-OutRunVRTest.ps1') -Raw
+          if ($runnerText -match '-VariantId\s+\$variant\s+-VariantId') { throw 'runner still passes VariantId twice' }
+
           $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
           if ($bad) { throw 'active package contains forbidden backend payload' }
       - uses: actions/upload-artifact@v4

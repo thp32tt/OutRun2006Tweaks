@@ -33,6 +33,12 @@ $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 
+# Packages are commonly extracted over an older test directory. Treat session
+# metadata from a different build matrix as stale and let the current selector
+# migrate its legacy VariantId instead of failing parameter validation.
+$packageMatrixFile=Join-Path $root 'BUILD_MATRIX_ID.txt'
+$packageMatrix=if(Test-Path $packageMatrixFile){(Get-Content $packageMatrixFile -Raw).Trim()}else{''}
+
 $patterns=@(
     'OutRun2006Tweaks*.log',
     'OutRun2006Tweaks-hudtrace*.csv',
@@ -58,15 +64,18 @@ foreach($pattern in $patterns){
         break
     }
 }
-if($stale){
-    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant -VariantId $variant
-    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to seal stale logs before launch.'}
+$state=$null
+try{$state=Get-Content $current -Raw|ConvertFrom-Json}catch{$state=$null}
+$matrixMismatch=$false
+if($packageMatrix){
+    $matrixMismatch=(-not $state) -or (-not $state.BuildMatrixId) -or ([string]$state.BuildMatrixId -ne $packageMatrix)
 }
+$profileMismatch=(-not $state) -or (-not $state.TestProfile) -or ([string]$state.TestProfile -ne $TestProfile)
+$backendMismatch=(-not $state) -or (-not $state.Backend) -or ([string]$state.Backend -ne $backend)
 
-$state=Get-Content $current -Raw|ConvertFrom-Json
-if($state.TestProfile -and $state.TestProfile -ne $TestProfile){
-    & $selector -Backend $backend -TestProfile $TestProfile
-    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare requested test profile.'}
+if($stale -or $matrixMismatch -or $profileMismatch -or $backendMismatch){
+    & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
+    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare current test session.'}
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
 

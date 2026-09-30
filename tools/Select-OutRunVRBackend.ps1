@@ -4,7 +4,6 @@ param(
     [string]$Backend,
     [ValidateSet("CONTROL","CORRECTNESS","HUD_SCREEN","HUD_MENU","HUD_WORLD","PERFORMANCE","STAGE_DIAGNOSTIC","A_BASELINE","B_CULLING","C_CULLING_NO_SSAA","D_CULLING_NO_SSAA_R512")]
     [string]$TestProfile = "CORRECTNESS",
-    [ValidateSet("AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF","E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT")]
     [string]$VariantId = "AUTO"
 )
 
@@ -15,12 +14,32 @@ $payloadBackend = if ($Backend -eq "2d" -or $Backend -eq "dxvk-safe") { "d3d9" }
 
 $defaultVariant = switch ($Backend) {
     "2d"        { "CONTROL_2D" }
-    "d3d9"      { "A_CONTROL" }
+    "d3d9"      { "CURRENT_FOCUS" }
     "dxvk-safe" { "E_DXVK_SAFE" }
     "dxvk"      { "E_DXVK_MULTIVIEW" }
     "dx12"      { "F_DX12_STRICT" }
 }
-$variant = if ($VariantId -eq "AUTO") { $defaultVariant } else { $VariantId }
+
+# Variant IDs are session metadata, but old R70/R71 launchers can survive when a
+# new package is extracted over an existing game directory. Never let stale
+# metadata prevent a current build from launching.
+$canonicalVariants = @(
+    "AUTO","CONTROL_2D","CURRENT_FOCUS","A_CONTROL","B_HUD","C_FLARE","D_PERF",
+    "E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT"
+)
+$legacyVariantAliases = @{
+    "R71_HUD_FLARE" = "C_FLARE"
+}
+$requestedVariant = [string]$VariantId
+if ($legacyVariantAliases.ContainsKey($requestedVariant)) {
+    $mapped = [string]$legacyVariantAliases[$requestedVariant]
+    Write-Warning "Legacy VariantId '$requestedVariant' mapped to '$mapped'."
+    $requestedVariant = $mapped
+} elseif ($canonicalVariants -notcontains $requestedVariant) {
+    Write-Warning "Unknown/stale VariantId '$requestedVariant'; using current backend default '$defaultVariant'."
+    $requestedVariant = "AUTO"
+}
+$variant = if ($requestedVariant -eq "AUTO") { $defaultVariant } else { $requestedVariant }
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
 $backendPayload = Join-Path $backendRoot $payloadBackend
