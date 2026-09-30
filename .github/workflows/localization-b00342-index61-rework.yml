@@ -1,0 +1,70 @@
+name: Localization B00342 C4A2937B Semantic Rework
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00342.dispatch.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-b00342-c4a2937b-semantic-rework
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Refresh branch before production
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --ff-only origin korean-localization-clean
+
+      - name: Install deterministic image dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig fonts-noto-cjk-extra libcairo2-dev pkg-config
+          python -m pip install --disable-pip-version-check pillow numpy pycairo
+          fc-match "Noto Sans CJK KR"
+
+      - name: Syntax-check B00342 producer
+        run: python -m py_compile tools/localization/b00342_rework_c4a2937b.py
+
+      - name: Rework index61 semantic drift
+        run: python tools/localization/b00342_rework_c4a2937b.py
+
+      - name: Producer pre-gate
+        run: |
+          python tools/localization/verify_producer_pregate.py \
+            localization/graphics/role_B/20261001-B00342-P00214/B00342_P00214_INDEX61_C4A2937B_SEMANTIC_REWORK_QA.json
+
+      - name: Commit and locally verify immutable B result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+thp32tt@users.noreply.github.com"
+          git add \
+            docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00342.json \
+            localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds \
+            localization/graphics/role_B/20261001-B00342-P00214 \
+            localization/graphics/KOREAN_PNG_REVIEW/C4A2937B
+          git commit -m "localization(B): rework index61 C4A2937B semantics [AUTO:LOCALIZATION-LOCALIZATION_B-00342]"
+          result_sha="$(git rev-parse HEAD)"
+          VERIFY_BEFORE="${result_sha}^" VERIFY_HEAD="${result_sha}" python tools/localization/verify_parallel_lane_commit.py
+          VERIFY_BEFORE="${result_sha}^" VERIFY_HEAD="${result_sha}" python tools/localization/verify_automation_commit.py
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
