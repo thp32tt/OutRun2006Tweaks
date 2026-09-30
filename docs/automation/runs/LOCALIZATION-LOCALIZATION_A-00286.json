@@ -57,9 +57,11 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "1eabccbc904731c6b18f34e2fa0f213ca4401e27",
+  "authoritative_result_sha": "1eabccbc904731c6b18f34e2fa0f213ca4401e27",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): guard index30 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00286]",
-  "bookkeeping_note": "RESULT_SHA is populated only after the immutable producer result commit exists. Producer automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result 1eabccbc904731c6b18f34e2fa0f213ca4401e27 contains only A lane-local index30 reactivation tooling/output plus the durable task record and exact AUTO marker. Producer automation_validation remains PENDING under C_BATCH_GATE; runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T22:39:00+09:00",
+  "bookkeeping_base_head_sha": "1eabccbc904731c6b18f34e2fa0f213ca4401e27"
 }
