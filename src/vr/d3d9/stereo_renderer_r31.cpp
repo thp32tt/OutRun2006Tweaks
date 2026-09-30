@@ -1096,4 +1096,41 @@ namespace OutRunVRStereo
     {
         return R31BuildFastWorldConstants(device, stereo, draw);
     }
+
+    bool GetTrackedViewport(
+        IDirect3DDevice9* device, D3DVIEWPORT9& viewport) noexcept
+    {
+        return R31GetSavedViewport(device, viewport);
+    }
+
+    OutRunVR::Telemetry::StereoFrameCounters
+    DispatchFrameCounters() noexcept
+    {
+        return R31Frame;
+    }
+
+    std::uint64_t FastWorldLiveValidationCount() noexcept
+    {
+        return R31FastWorldLiveValidations;
+    }
+
+    std::uint64_t FastWorldValidationRejectCount() noexcept
+    {
+        return R31FastWorldValidationRejects;
+    }
+
+    void ResetDispatchSupportState() noexcept
+    {
+        R31BlockedVerifiedGeneration = 0;
+        R31FastWorldCandidates = 0;
+        R31EyeCache = {};
+        R31Frame = {};
+        R31Window = {};
+    }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    DispatchSupportInstallState() noexcept
+    {
+        return R31InstallState.load(std::memory_order_acquire);
+    }
 }

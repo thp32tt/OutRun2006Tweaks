@@ -107,15 +107,16 @@ namespace OutRunVRStereo
 
         R32StereoWorkloadSnapshot R32CaptureStereoWorkload() noexcept
         {
+            const auto frame = DispatchFrameCounters();
             return {
-                R31Frame.main,
-                R31Frame.offscreen,
-                R31Frame.aux,
-                R31Frame.fastWorld,
-                R31Frame.hud,
-                R31Frame.fallback,
-                R31Frame.fragile,
-                R31Frame.unstable
+                frame.main,
+                frame.offscreen,
+                frame.aux,
+                frame.fastWorld,
+                frame.hud,
+                frame.fallback,
+                frame.fragile,
+                frame.unstable
             };
         }
 
@@ -330,7 +331,7 @@ namespace OutRunVRStereo
             if (!device)
                 return false;
             if (OutRunVR::State::StateBlockTracker::Reliable())
-                return R31GetSavedViewport(device, viewport);
+                return GetTrackedViewport(device, viewport);
             return SUCCEEDED(device->GetViewport(&viewport));
         }
 
@@ -353,13 +354,13 @@ namespace OutRunVRStereo
         }
 
         template <typename ActualDraw>
-        R31OwnedResult R32TryFastWorld(IDirect3DDevice9* device,
+        OutRunVR::Core::DispatchResult R32TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
             if (OutRunVR::State::StateBlockTracker::IsRecording() || !R29StableStereoBase(device))
             {
                 if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
-                    ++R31Frame.unstable;
+                    NoteDispatchUnstable();
                 return {};
             }
 
@@ -373,7 +374,7 @@ namespace OutRunVRStereo
                 return {};
             if (fragile)
             {
-                ++R31Frame.fragile;
+                NoteDispatchFragile();
                 return {};
             }
 
@@ -398,7 +399,7 @@ namespace OutRunVRStereo
                 return {};
 
             DrawStereoState draw{};
-            if (!R31BuildFastWorldConstants(device, stereo, draw))
+            if (!BuildFastWorldConstants(device, stereo, draw))
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
@@ -433,7 +434,7 @@ namespace OutRunVRStereo
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
                 ++R9MainDepthContentSerial;
 
-            R31OwnedResult result{ true, D3D_OK };
+            OutRunVR::Core::DispatchResult result{ true, D3D_OK };
             result.hr = actualDraw();
             if (FAILED(result.hr))
             {
@@ -484,8 +485,7 @@ namespace OutRunVRStereo
             ++DuplicatedDraws;
             ++WorldStereoDraws;
             ++R29StableTwoEyeDraws;
-            ++R31FastWorldDraws;
-            ++R31Frame.fastWorld;
+            NoteDispatchFastWorld();
 
             if (FrameStereoPoseSequence == 0)
             {
@@ -510,7 +510,7 @@ namespace OutRunVRStereo
         }
 
         template <typename ActualDraw>
-        R31OwnedResult R32TryHud(IDirect3DDevice9* device,
+        OutRunVR::Core::DispatchResult R32TryHud(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
             const R30ScreenSpaceKind screenKind =
@@ -520,10 +520,10 @@ namespace OutRunVRStereo
                 return {};
             if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
-                R31DiscardUnreliableDrawCaches();
+                DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
                     CurrentVertexShaderIdentity.load(std::memory_order_acquire);
-                if (!R31LiveShaderMatches(device, cachedShader))
+                if (!LiveShaderMatches(device, cachedShader))
                     return {};
             }
             if (!EnsureStereoResources(device))
@@ -586,7 +586,7 @@ namespace OutRunVRStereo
             if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
                 ++R9MainDepthContentSerial;
 
-            R31OwnedResult result{ true, actualDraw() };
+            OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
             {
                 bool restored = false;
@@ -635,8 +635,7 @@ namespace OutRunVRStereo
             ++NonWorldDuplicatedDraws;
             ++R29StableTwoEyeDraws;
             ++R30ScreenSpaceFovDraws;
-            ++R31HudDraws;
-            ++R31Frame.hud;
+            NoteDispatchHud();
 
             if (FAILED(rightHr))
             {
@@ -685,7 +684,7 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, LowerDraw&& lowerDraw,
             const char* site) noexcept
         {
-            R31ObserveDraw(device);
+            ObserveDispatchDraw(device);
 
             if (!OutRunVR::State::StateBlockTracker::IsRecording())
             {
@@ -705,7 +704,7 @@ namespace OutRunVRStereo
                 }
             }
 
-            ++R31Frame.fallback;
+            NoteDispatchFallback();
             return R32LowerFailClosed(device,
                 std::forward<LowerDraw>(lowerDraw));
         }
@@ -1122,11 +1121,7 @@ namespace OutRunVRStereo
         void R32InvalidateResetCaches() noexcept
         {
             R29Effect = {};
-            R31BlockedVerifiedGeneration = 0;
-            R31FastWorldCandidates = 0;
-            R31EyeCache = {};
-            R31Frame = {};
-            R31Window = {};
+            ResetDispatchSupportState();
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
@@ -1184,9 +1179,9 @@ namespace OutRunVRStereo
             if (R32Counters.lastLogMs == 0)
             {
                 R32Counters.lastLogMs = now;
-                R32Counters.liveWvp = R31FastWorldLiveValidations;
-                R32Counters.liveReject = R31FastWorldValidationRejects;
-                R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::IsRecording()s;
+                R32Counters.liveWvp = FastWorldLiveValidationCount();
+                R32Counters.liveReject = FastWorldValidationRejectCount();
+                R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingCount();
                 R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyCount();
                 R32Counters.batch = R32BatchWvpUploads;
                 R32Counters.batchFail = R32BatchWvpFailures;
@@ -1258,9 +1253,9 @@ namespace OutRunVRStereo
                 R32PerfWindowCounters.maxAlphaBlendDraws,
                 R32PerfWindowCounters.maxParticleLikeDraws,
                 R32PerfWindowCounters.maxParticleLikePrimitives,
-                R31FastWorldLiveValidations - R32Counters.liveWvp,
-                R31FastWorldValidationRejects - R32Counters.liveReject,
-                OutRunVR::State::StateBlockTracker::IsRecording()s - R32Counters.stateRecord,
+                FastWorldLiveValidationCount() - R32Counters.liveWvp,
+                FastWorldValidationRejectCount() - R32Counters.liveReject,
+                OutRunVR::State::StateBlockTracker::RecordingCount() - R32Counters.stateRecord,
                 OutRunVR::State::StateBlockTracker::ApplyCount() - R32Counters.stateApply,
                 R32BatchWvpUploads - R32Counters.batch,
                 R32BatchWvpFailures - R32Counters.batchFail,
@@ -1288,9 +1283,9 @@ namespace OutRunVRStereo
                 R32ResetFailures - R32Counters.resetFail);
 
             R32Counters.lastLogMs = now;
-            R32Counters.liveWvp = R31FastWorldLiveValidations;
-            R32Counters.liveReject = R31FastWorldValidationRejects;
-            R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::IsRecording()s;
+            R32Counters.liveWvp = FastWorldLiveValidationCount();
+            R32Counters.liveReject = FastWorldValidationRejectCount();
+            R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingCount();
             R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyCount();
             R32Counters.batch = R32BatchWvpUploads;
             R32Counters.batchFail = R32BatchWvpFailures;
@@ -1377,7 +1372,7 @@ namespace OutRunVRStereo
             R32InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r31 = R31InstallState.load(std::memory_order_acquire);
+                const auto r31 = DispatchSupportInstallState();
                 const auto r22 = R22InstallState.load(std::memory_order_acquire);
                 const auto r13 = R13InstallState.load(std::memory_order_acquire);
                 if (r31 == State::Failed || r22 == State::Failed ||

@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 505,
+  "cycle": 510,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -73,10 +73,11 @@
     "R84-REF-LIFECYCLE-0016",
     "R84-REF-LIFECYCLE-0017",
     "R84-REF-GUARD-0004",
-    "R84-REF-STATE-0013"
+    "R84-REF-STATE-0013",
+    "R84-REF-DISPATCH-0009"
   ],
-  "next": "Cycles 506-510: remove R32 direct R31 helper/counter dependencies using neutral dispatch support APIs.",
-  "updatedKst": "2026-10-01T09:06:00+09:00",
+  "next": "Cycles 511-515: remove R32 direct R29/R30 policy, counters and screen-space implementation dependencies.",
+  "updatedKst": "2026-10-01T09:10:00+09:00",
   "batchStatus": "R84_FLATTEN_CYCLE_500_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
@@ -84,6 +85,7 @@
     "Ported STATE-0002A FIX00 onto recovered R84 lineage: StateBlockTracker now owns R22/R31 reliability, coverage-loss and lazy-resync authority. Physical StateBlock hooks remain unchanged.",
     "Ported FIX01 onto recovered R84 lineage: R33 no longer references removed R31 reliability storage; source-only verifier now requires tracker file/API and rejects legacy authority symbols.",
     "STATE-0003 ported to recovered R84 lineage: recording state plus recording/apply generations now live behind StateBlockTracker; R33 depth/stencil cache key no longer reads R31 storage directly.",
-    "Physical StateBlock hook ownership merge (0002B) remains blocked because builds are disabled by user request; only source/static contract validation is performed."
+    "Physical StateBlock hook ownership merge (0002B) remains blocked because builds are disabled by user request; only source/static contract validation is performed.",
+    "Cycle 506 fixed malformed IsRecording()s introduced by the prior broad legacy-symbol replacement before any build was run."
   ]
 }
