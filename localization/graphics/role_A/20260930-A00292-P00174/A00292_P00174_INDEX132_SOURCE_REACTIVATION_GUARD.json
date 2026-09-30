@@ -1,0 +1,143 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00292-p00174-index132-canonical-source-reactivation-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00292",
+  "wave_id": "P00174",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T23:49:00+09:00",
+  "base_head_sha": "7125bc32b1d19af8e4b41530ea6a1053d169fcce",
+  "controller_schema_version": 15,
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "direct_rework_required_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "existing_candidate_material_rework_runnable": [],
+    "qa_pending_not_repeated": [
+      111,
+      159,
+      198,
+      201
+    ],
+    "prior_source_guards_not_repeated": [
+      30,
+      36,
+      48
+    ],
+    "selected_index": 132,
+    "selected_asset": "1F5FE6E9",
+    "selected_priority": "FALLBACK_STEP_5_CANONICAL_SOURCE_REACTIVATION_GUARD_AFTER_ZERO_RUNNABLE_A_CANDIDATE_TIERS",
+    "new_preflight_batches_this_invocation": 1,
+    "source_probe_repeated": false
+  },
+  "locked_dependency": {
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+    "canonical_inventory": {
+      "sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+      "width": 1024,
+      "height": 512,
+      "mode": "RGBA"
+    },
+    "accepted_source_exhaustion": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00179",
+      "producer_result_sha": "7548b44b7364504c248341cce0771969f0793160",
+      "qa_run": "C136/Q00034",
+      "disposition": "PASS_SOURCE_ACQUISITION_EXHAUSTION_ONLY",
+      "production_readiness": "PREFLIGHT_ONLY",
+      "drive": "SOURCE_TRANSPORT_MISS",
+      "pinned_direct": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_direct_blob_sha": "a89e403c92d335f83c808e5f10dcc9e584d4ff7c",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_release_sha256": "2a02471fe95e0c4253cf72ec58423cb9d16ae074e3012418716e88e75e2a2a80",
+      "pinned_release_width": 4096,
+      "pinned_release_height": 2048,
+      "alias_or_scale_substitution_allowed": false
+    },
+    "pinned_source": {
+      "tag": "v0.25.10a",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "approved_drive_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr"
+    }
+  },
+  "current_checks": {
+    "canonical_inventory_identity": "PASS_UNCHANGED",
+    "accepted_a00179_result": "PASS_UNCHANGED",
+    "c136_source_exhaustion": "PASS_UNCHANGED",
+    "c163_render_ready": "NONE",
+    "c163_one_stage_to_render": "NONE",
+    "c163_candidate_rework": "CROSS_LANE_ONLY_121_163_NOT_STOLEN",
+    "drive_exact_name_transport": "SOURCE_TRANSPORT_MISS_UNCHANGED",
+    "pinned_direct_identity": "MISMATCH_UNCHANGED",
+    "pinned_release_identity": "MISMATCH_UNCHANGED",
+    "noncanonical_4096x2048_source_substitution": "FORBIDDEN",
+    "a00289_index111": "QA_PENDING_NOT_REPEATED",
+    "a00196_candidates_159_201": "QA_PENDING_NOT_REPEATED",
+    "a00204_index198": "QA_PENDING_NOT_REPEATED",
+    "prior_source_guards_30_36_48": "PASS_DISJOINT_NOT_REPEATED",
+    "pinned_source_policy": "PASS_UNCHANGED"
+  },
+  "reactivation_contract": {
+    "current_result": "BLOCKED_UNCHANGED_CANONICAL_SOURCE_IDENTITY_FINGERPRINT",
+    "source_reprobe_authorized": false,
+    "alias_or_scale_substitution_authorized": false,
+    "candidate_rebuild_authorized": false,
+    "fresh_rescan_required": false,
+    "triggers": [
+      "canonical inventory identity for index132 changes",
+      "C disposition/source-acquisition state for index132 changes",
+      "accepted A00179 result identity is superseded",
+      "pinned source tag/commit/bundle or approved Drive transport policy changes",
+      "an exact canonical 1024x512 1F5FE6E9 source transport is newly recorded by authoritative evidence"
+    ],
+    "purpose": "Prevent repeat Drive/direct/release acquisition work and prevent use of the noncanonical 4096x2048 pinned object as a scaled or aliased substitute for the current 1024x512 canonical inventory object."
+  },
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00292-P00174/verify_index132_source_reactivation.py",
+    "localization/graphics/role_A/20260930-A00292-P00174/A00292_P00174_INDEX132_SOURCE_REACTIVATION_GUARD.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "asset_queue_blob_sha": "6616452bcc12e85ce88a7c0be2f395518f579557",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "c163_task_blob_sha": "a1582c7d64f3546e539d55c72b980fd1e0d243d2",
+    "a00179_task_blob_sha": "48a5d3e3b1e2ee2cf21440bd4455305cf0f7cb5a",
+    "a00179_evidence_blob_sha": "e8b4aa7665e0c97a7db9cee25d55fd7892e29f5c",
+    "c136_report_blob_sha": "3a36cd7543550a904af3ad81e60b2928c22af87d",
+    "a00285_task_blob_sha": "eb8a05c0f82b88a39929489980797ad7cfaec796",
+    "a00286_task_blob_sha": "e114f57dbc5fa0f7abbfd4855084ecd789b21b57",
+    "a00290_task_blob_sha": "c5e3b44724a0ac40486db17760c25ce522e77d33",
+    "a00291_task_blob_sha": "a63a0fbc6572704fe13675346df29c1a4e515952",
+    "a00291_guard_blob_sha": "0c467aef294f363f8412446c7b523cb5ee1afd8d"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX132_CANONICAL_SOURCE_DEPENDENCY_REACTIVATION_AND_NONCANONICAL_SUBSTITUTION_GUARD",
+    "executable": "localization/graphics/role_A/20260930-A00292-P00174/verify_index132_source_reactivation.py",
+    "machine_report": "localization/graphics/role_A/20260930-A00292-P00174/A00292_P00174_INDEX132_SOURCE_REACTIVATION_GUARD.json",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "new_executable_selection_input": true
+  },
+  "self_qa": "PASS_INDEX132_CANONICAL_IDENTITY_LOCK__C136_ACCEPTED_EXHAUSTION__C163_ZERO_A_READY_TIERS__DRIVE_MISS__PINNED_DIRECT_RELEASE_MISMATCH_REUSED__NONCANONICAL_4096_SUBSTITUTION_FORBIDDEN__NO_SOURCE_REPROBE__QA_PENDING_CANDIDATES_NOT_REPEATED__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
