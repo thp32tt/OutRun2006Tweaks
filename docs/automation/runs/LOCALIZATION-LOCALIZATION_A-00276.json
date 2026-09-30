@@ -138,5 +138,10 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "PENDING_RESULT_COMMIT"
+  "result_sha": "bb19063245160837c4e0cfa5777f3a5e9c11e750",
+  "authoritative_result_sha": "bb19063245160837c4e0cfa5777f3a5e9c11e750",
+  "result_commit_message": "localization(A): guard index111 RANDOM protected art [AUTO:LOCALIZATION-LOCALIZATION_A-00276]",
+  "bookkeeping_note": "Verified immutable producer result bb19063245160837c4e0cfa5777f3a5e9c11e750 contains only A lane-local index111 RANDOM fail-closed audit tooling/output plus the durable task record. This bookkeeping commit only fills the self-referential result SHA; automation_validation remains PENDING/C_BATCH_GATE and runtime_validation remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T20:33:51+09:00",
+  "bookkeeping_base_head_sha": "bb19063245160837c4e0cfa5777f3a5e9c11e750"
 }
