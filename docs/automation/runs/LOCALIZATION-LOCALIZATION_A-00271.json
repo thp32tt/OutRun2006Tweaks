@@ -1,0 +1,71 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00271-p00157-index111-protected-art-template-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00271",
+  "wave_id": "P00157",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T19:53:25+09:00",
+  "base_head_sha": "71ef038f0abcdde801a57233a3816dcc8b7c3bc2",
+  "base_sha": "71ef038f0abcdde801a57233a3816dcc8b7c3bc2",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX111_PROTECTED_ART_TEMPLATE_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_TUNED_NORMAL_SHARED_PROTECTED_CAR_REGISTRATION_RANDOM_REMAINS_BLOCKED_RUNTIME_UNTESTED",
+  "summary": "Rollover 2 resumes unfinished A00271 from current GitHub SSOT. Current schema 15 assigns A index%3==0. No durable A00271 record existed at the refreshed base HEAD. The prior rollover's index219/D263B3F1 source-acquisition path remains sticky-exhausted and was not reprobed. After C160/Q00058 accepted A00262@index111 source-style/slant evidence, this pass advances the only A-owned actionable preflight asset C075FB49 by deriving a source-only protected-art registration between Tuned Setting and Normal Setting. The two selector cells share the same near-white protected car artwork at exact readable-space offset dx=+25,dy=0; source-only overlap is 1378 pixels with Jaccard 0.9000653168. This creates a deterministic sibling-cell reconstruction template for the protected car geometry without using old Korean candidate pixels. It does not yet approve a CLEAN_PLATE: antialias/light-panel fringe reconstruction must still be verified, and RANDOM has unique question-mark artwork with no source counterpart template. No DDS bytes or shared state are changed; runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00271-P00157/A00271_P00157_INDEX111_PROTECTED_ART_TEMPLATE_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_SOURCE_ONLY_PROTECTED_ART_SIBLING_REGISTRATION_AND_RANDOM_BLOCKER_NARROWING",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "new_protected_art_registration": true,
+    "source_only_registration_pairs": 1,
+    "candidate_dds_modified": false,
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "source_exhausted_not_reprobed": [
+      219
+    ],
+    "selected_indices": [
+      111
+    ],
+    "readiness_before": "PREFLIGHT_ONLY__SIX_STYLE_SLANT_ACCEPTED__3_OF_6_CLEAN_PLATES_READY__TUNED_NORMAL_RANDOM_PROTECTED_ART_RECONSTRUCTION_REQUIRED",
+    "readiness_after": "PREFLIGHT_ONLY__3_OF_6_CLEAN_PLATES_READY__TUNED_NORMAL_SHARED_PROTECTED_CAR_TEMPLATE_REGISTERED__FRINGE_VERIFICATION_AND_RANDOM_QUESTION_MARK_RECONSTRUCTION_REQUIRED"
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_SCHEMA15_SHARD__C160_HANDOFF_CONSUMED__QA_PENDING_159_198_201_SKIPPED__INDEX219_SOURCE_EXHAUSTION_NOT_REPROBED__EXACT_CANONICAL_SOURCE_IDENTITY_REUSED__TUNED_NORMAL_SOURCE_ONLY_CAR_REGISTRATION_DX25_DY0_JACCARD_0_9000653168__NO_CANDIDATE_PIXELS_USED__RANDOM_FAIL_CLOSED__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(A): register index111 protected-art template [AUTO:LOCALIZATION-LOCALIZATION_A-00271]",
+  "bookkeeping_note": "RESULT_SHA is populated only after the immutable AUTO result commit is created. Producer automation validation remains PENDING under C_BATCH_GATE; runtime remains UNTESTED."
+}

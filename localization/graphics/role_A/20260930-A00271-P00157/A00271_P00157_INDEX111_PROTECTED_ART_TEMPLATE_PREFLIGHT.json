@@ -1,0 +1,209 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00271-p00157-index111-protected-art-template-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00271",
+  "wave_id": "P00157",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_at_kst": "2026-09-30T19:53:25+09:00",
+  "base_head_sha": "71ef038f0abcdde801a57233a3816dcc8b7c3bc2",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_TUNED_NORMAL_SHARED_PROTECTED_CAR_REGISTRATION_RANDOM_REMAINS_BLOCKED_RUNTIME_UNTESTED",
+  "summary": "Rollover 2 resumes unfinished A00271 from current GitHub SSOT. Current schema 15 assigns A index%3==0. No durable A00271 record existed at the refreshed base HEAD. The prior rollover's index219/D263B3F1 source-acquisition path remains sticky-exhausted and was not reprobed. After C160/Q00058 accepted A00262@index111 source-style/slant evidence, this pass advances the only A-owned actionable preflight asset C075FB49 by deriving a source-only protected-art registration between Tuned Setting and Normal Setting. The two selector cells share the same near-white protected car artwork at exact readable-space offset dx=+25,dy=0; source-only overlap is 1378 pixels with Jaccard 0.9000653168. This creates a deterministic sibling-cell reconstruction template for the protected car geometry without using old Korean candidate pixels. It does not yet approve a CLEAN_PLATE: antialias/light-panel fringe reconstruction must still be verified, and RANDOM has unique question-mark artwork with no source counterpart template. No DDS bytes or shared state are changed; runtime remains UNTESTED.",
+  "selection": {
+    "controller_schema_version": 15,
+    "controller_config_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "refreshed_base_head": "71ef038f0abcdde801a57233a3816dcc8b7c3bc2",
+    "qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "stale_rollover_target_not_reprobed": {
+      "index": 219,
+      "asset": "D263B3F1",
+      "reason": "Not A modulo-3 ownership under current schema and Q00040/C142 SOURCE_ACQUISITION_EXHAUSTED remains unchanged; repeated Drive/direct/Release probes are forbidden."
+    },
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_ACTIONABLE_AFTER_ZERO_A_OWNED_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_TIERS",
+    "c_handoff": "C160/Q00058 accepted A00262 six-element source-style/slant scope; protected-art CLEAN_PLATE reconstruction remains required for tuned_setting/normal_setting/random."
+  },
+  "fingerprint": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926",
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+    "candidate_git_blob_sha": "de1ad4cdcf2e26ddd5265e495b821e8b98f4199e",
+    "structure": "2048x2048 RGBA32 mip1 / raw mirror_y",
+    "canonical_source_member": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "canonical_source_member_size_bytes": 16777344,
+    "source_identity_basis": "C160-accepted A00262 canonical identity reused; exact pinned source member SHA-256 rechecked in this rollover."
+  },
+  "method": {
+    "source_only": true,
+    "candidate_pixels_used": false,
+    "coordinate_space": "readable/display after raw mirror_y -> flip_y normalization",
+    "protected_core_mask": "alpha>=200 AND min(R,G,B)>=240; local y<60 excluded from sibling registration to suppress upper border/text contamination",
+    "registration_search": "integer translation maximizing Jaccard overlap of source-only near-white protected-core masks",
+    "reconstruction_policy": "Use sibling source cells only to establish protected-car geometry registration/template. Do not copy sibling panel colors, do not use prior Korean candidates, and do not mark CLEAN_PLATE PASS until source-specific antialias/light-panel/text-effect fringe reconstruction independently passes zero-change/protected-art gates."
+  },
+  "panel_source_metrics": {
+    "tuned_setting": {
+      "source": "Tuned Setting",
+      "korean": "튜닝 / 설정",
+      "sprite_cell": [
+        40,
+        1170,
+        245,
+        1305
+      ],
+      "candidate_safe_bbox": [
+        42,
+        1197,
+        243,
+        1303
+      ],
+      "rgba_sha256": "a73b10412dcf7e40539308c5182cbe503f31978b169c9ac16f1925a95aa73667",
+      "alpha_positive_pixels": 21933,
+      "exact_palette_counts": {
+        "panel_red_196_0_0_255": 8069,
+        "text_fill_255_150_0_255": 4008,
+        "protected_white_255_255_255_255": 2419,
+        "light_panel_228_136_136_255": 1553,
+        "dark_effect_29_0_0_255": 1454
+      },
+      "source_style_slant_deg": 20.556,
+      "prior_clean_plate_status": "BLOCKED_PROTECTED_CAR_ICON_AND_PANEL_ALPHA_CONNECTED"
+    },
+    "normal_setting": {
+      "source": "Normal Setting",
+      "korean": "일반 / 설정",
+      "sprite_cell": [
+        375,
+        1170,
+        600,
+        1305
+      ],
+      "candidate_safe_bbox": [
+        383,
+        1197,
+        598,
+        1303
+      ],
+      "rgba_sha256": "84cc1566e49b7e2351f5787e74b082cda489c8d62a8b1d99c1fb95a50c080de4",
+      "alpha_positive_pixels": 21868,
+      "exact_palette_counts": {
+        "panel_green_0_150_0_255": 7199,
+        "text_fill_255_243_112_255": 4444,
+        "protected_white_255_255_255_255": 2334,
+        "light_panel_136_206_136_255": 1556,
+        "dark_effect_0_22_0_255": 1453
+      },
+      "source_style_slant_deg": 19.0519,
+      "prior_clean_plate_status": "BLOCKED_PROTECTED_CAR_ICON_AND_PANEL_ALPHA_CONNECTED"
+    },
+    "random": {
+      "source": "RANDOM",
+      "korean": "무작위",
+      "sprite_cell": [
+        1710,
+        1410,
+        2008,
+        1515
+      ],
+      "candidate_safe_bbox": [
+        1712,
+        1437,
+        2006,
+        1513
+      ],
+      "rgba_sha256": "a24cbd469da19f4162040bfd5ecf46ea8445a34829b1ed8ad7f9b3a616860c98",
+      "alpha_positive_pixels": 22749,
+      "exact_palette_counts": {
+        "panel_blue_0_79_159_255": 7221,
+        "text_fill_245_247_247_255": 3027,
+        "light_panel_136_173_211_255": 2067,
+        "protected_white_255_255_255_255": 2044,
+        "question_mark_light_blue_103_152_220_255": 1328,
+        "dark_effect_0_20_40_255": 712
+      },
+      "source_style_slant_deg": 21.1613,
+      "prior_clean_plate_status": "BLOCKED_PROTECTED_QUESTION_MARK_AND_PANEL_ALPHA_CONNECTED"
+    }
+  },
+  "new_reconstruction_input": {
+    "tuned_normal_shared_protected_car_registration": {
+      "normal_relative_to_tuned_readable": [
+        25,
+        0
+      ],
+      "jaccard": 0.9000653167864141,
+      "intersection_pixels": 1378,
+      "union_pixels": 1531,
+      "tuned_core_pixels_in_common_overlap": 1517,
+      "normal_core_pixels_in_common_overlap": 1392,
+      "tuned_unique_pixels": 139,
+      "normal_unique_pixels": 14,
+      "disposition": "PROTECTED_CAR_GEOMETRY_TEMPLATE_REGISTERED_SOURCE_ONLY",
+      "next_executable_step": "Build union/complement source-only protected-car guard at the registered offset, reconstruct each panel with its own source palette/edge samples, then independently verify antialias/light-panel fringe and source-language removal before CLEAN_PLATE can pass."
+    },
+    "random_unique_question_mark": {
+      "exact_light_blue_103_152_220_255_pixels": 1328,
+      "source_only_light_blue_cluster_bbox_local": [
+        81,
+        50,
+        202,
+        105
+      ],
+      "disposition": "UNIQUE_PROTECTED_ART_NO_SIBLING_TEMPLATE",
+      "blocker": "RANDOM question-mark protected artwork remains alpha-connected to text/panel and has no matching sibling source cell from which protected geometry can be recovered deterministically in this pass.",
+      "next_executable_step": "Derive a source-constrained protected-question-mark mask/background reconstruction from the exact RANDOM source cell; fail closed rather than erase the single connected component."
+    }
+  },
+  "readiness_before": "PREFLIGHT_ONLY__SIX_STYLE_SLANT_ACCEPTED__3_OF_6_CLEAN_PLATES_READY__TUNED_NORMAL_RANDOM_PROTECTED_ART_RECONSTRUCTION_REQUIRED",
+  "readiness_after": "PREFLIGHT_ONLY__3_OF_6_CLEAN_PLATES_READY__TUNED_NORMAL_SHARED_PROTECTED_CAR_TEMPLATE_REGISTERED__FRINGE_VERIFICATION_AND_RANDOM_QUESTION_MARK_RECONSTRUCTION_REQUIRED",
+  "same_task_completion_gate": {
+    "render_ready_reached": false,
+    "reason": "Tuned/Normal now have a deterministic protected-car geometry registration, but neither has an independently verified source-faithful CLEAN_PLATE yet; RANDOM still lacks a protected-question-mark reconstruction. Rendering now would violate clean-plate/protected-artwork gates."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_SOURCE_ONLY_PROTECTED_ART_SIBLING_REGISTRATION_AND_RANDOM_BLOCKER_NARROWING",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "new_protected_art_registration": true,
+    "source_only_registration_pairs": 1,
+    "candidate_dds_modified": false,
+    "new_reconstruction_input": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_SCHEMA15_SHARD__C160_HANDOFF_CONSUMED__QA_PENDING_159_198_201_SKIPPED__INDEX219_SOURCE_EXHAUSTION_NOT_REPROBED__EXACT_CANONICAL_SOURCE_IDENTITY_REUSED__TUNED_NORMAL_SOURCE_ONLY_CAR_REGISTRATION_DX25_DY0_JACCARD_0_9000653168__NO_CANDIDATE_PIXELS_USED__RANDOM_FAIL_CLOSED__NO_SHARED_STATE__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Read-only exact pinned v0.25.10a English source member verification; GitHub remains progress/QA SSOT.",
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
