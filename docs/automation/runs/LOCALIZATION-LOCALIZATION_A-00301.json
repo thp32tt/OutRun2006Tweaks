@@ -108,8 +108,8 @@
   "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_C166_Q00064__ZERO_A_RUNNABLE_READY_REWORK_TIERS__CROSS_LANE_163_NOT_STOLEN__QA_PENDING_159_198_201_NOT_REPEATED__EXACT_DRIVE_SOURCE__TUNED_NORMAL_JACCARD_0_9000653168__2971_SHARED_ENGLISH__27_SHARED_ENGLISH_IN_1PX_PROTECTED_ENVELOPE__RANDOM_C165_31_REPRODUCED__CLEAN_PLATE_HOLD__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "51fed90a4af3ba713dd99b0815e468f845e93196",
+  "authoritative_result_sha": "51fed90a4af3ba713dd99b0815e468f845e93196",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): narrow index111 CLEAN_PLATE gap [AUTO:LOCALIZATION-LOCALIZATION_A-00301]",
   "precommit_refresh": {
@@ -117,5 +117,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "HEAD advanced during task from e48ef843... to C166/Q00064 bookkeeping bb31454b...; C166 was re-read. Index111 remained A-owned PREFLIGHT_ONLY; B-owned index163 REWORK was not stolen; shared state is untouched."
   },
-  "bookkeeping_note": "Producer validation remains PENDING until independent C batch consumes immutable A00301 result SHA. RUNTIME_VALIDATION=UNTESTED."
+  "bookkeeping_note": "Producer immutable result SHA recorded after durable material commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T01:58:00+09:00",
+  "bookkeeping_base_head_sha": "51fed90a4af3ba713dd99b0815e468f845e93196"
 }
