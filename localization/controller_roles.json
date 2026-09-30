@@ -1,5 +1,5 @@
 {
-  "schema_version": 17,
+  "schema_version": 18,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -524,5 +524,23 @@
       "localization/controller_roles.json",
       "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md"
     ]
+  },
+  "naming_policy": {
+    "song_titles": {
+      "mode": "PRESERVE_EXACT_SOURCE",
+      "translate": false,
+      "transliterate": false,
+      "qa_failure": "REWORK_REQUIRED"
+    },
+    "stage_course_proper_names": {
+      "mode": "KOREAN_TRANSLITERATION_ONLY",
+      "semantic_translation": false,
+      "qa_failure": "REWORK_REQUIRED"
+    },
+    "generic_stage_course_ui": {
+      "mode": "NORMAL_KOREAN_LOCALIZATION"
+    },
+    "c_qa_must_check": true,
+    "producer_must_apply": true
   }
 }
