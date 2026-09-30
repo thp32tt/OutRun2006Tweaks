@@ -178,6 +178,13 @@ def main() -> None:
             "C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C10u>",
             "C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C6Au>",
             "VR R132 C2C SPEECH HUD: shared producer-map handoff",
+            "C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCDC1u>",
+            "C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCDEAu>",
+            "C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCEB0u>",
+            "C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCED9u>",
+            "C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCF22u>",
+            "C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCF4Fu>",
+            "VR R133 GF SPEECH HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -285,6 +292,22 @@ def main() -> None:
         raise SystemExit(
             "F13 C2CSpeechBubble ownership regressed to spacing-only callbacks: "
             f"{stale_c2c_speech_hooks}"
+        )
+    legacy_gf_speech_hooks = [
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x4FCDC1, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x4FCDEA, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x4FCEB0, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x4FCED9, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk5 = safetyhook::create_mid((void*)0x4FCF22, C2CSpeechBubble_AdjustPositionESP0);",
+        "C2CSpeechBubbleGF_AdjustPositionESP0_hk6 = safetyhook::create_mid((void*)0x4FCF4F, C2CSpeechBubble_AdjustPositionESP0);",
+    ]
+    stale_gf_speech_hooks = [
+        hook for hook in legacy_gf_speech_hooks if hook in hooks_text
+    ]
+    if stale_gf_speech_hooks:
+        raise SystemExit(
+            "F13 C2CSpeechBubbleGF ownership regressed to spacing-only callbacks: "
+            f"{stale_gf_speech_hooks}"
         )
     legacy_ctrl_icon_hooks = [
         "ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);",
