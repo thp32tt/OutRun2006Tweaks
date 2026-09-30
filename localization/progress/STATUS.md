@@ -1465,3 +1465,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Candidate-first shared order remains **RENDER_READY none -> ONE_STAGE none -> candidate QA 121/159/163/198/201 -> unrelated preflight**. B00295@index121 and B00287@index163 remain out-of-batch QA_PENDING and are not implicitly approved.
 - Canonical and legacy progress remain byte-for-byte synchronized. No candidate bytes or runtime state changed in bookkeeping.
 - This bookkeeping checkpoint is separate from the Gate-owning result commit and does not replace `a8ca8146b3cac03e578a9fa5128f9b5ec3ca0b76` as authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 01:48 KST - C166 Q00064 independent batch QA
+- Consumed immutable A00292 `0c99b6fd...`, B00287 `3f0d77f0...`, A00294 `ef3d9190...`, A00296 `b5f6e71b...` once; dispositions **PASS / REWORK_REQUIRED / PASS / PASS**.
+- Index132/1F5FE6E9 and index135/2B0863D6 PASS only fail-closed source-reactivation guards; both remain **PREFLIGHT_ONLY** with no source reprobe/candidate/static/runtime approval.
+- Index163/59A79158 **REWORK_REQUIRED**: B00287 records candidate ZIP `f1e2e526...` / DDS `fcb75cef...`, but the exact recorded Drive file ID currently reads ZIP `32d883d1...` / DDS `7f22fce1...`. The unchanged review bundle still targets `fcb75cef...`; current DDS display differs by 4,820 pixels within the two rerender rows and visibly leaves English Ice Scape/Skyscrapers strokes underneath Korean. Exact header/structure remains intact, proving this is not a ZIP-container-only change. Republish/regenerate under a new immutable producer result.
+- Index51/FF2462BB A00296 **PASS** DDS_ONLY isolation input. Exact Drive readback reproduces bundle `4d956170...`, candidate `907350cd...`, header `8879e51b...`; C163 heavy static QA is reused, not repeated. This accepts isolation input only; runtime remains **UNTESTED**.
+- Current order: **RENDER_READY none -> ONE_STAGE none -> REWORK_REQUIRED 163 -> candidate QA 121/159/198/201 -> runtime-isolation 51 accepted -> unrelated preflight**. A00299@index219 remains out-of-batch QA_PENDING.
+- C writes no candidate DDS. No real-game test/build/N100/local clone/worktree/GPT Library/Drive write/VR/FFB/DX changes. One validation-bearing result commit owns Q00064 Gate. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
