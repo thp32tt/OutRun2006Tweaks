@@ -73,8 +73,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "b5f6e71bd1e83cfcacbcfff487ea3119a72e84d7",
+  "authoritative_result_sha": "b5f6e71bd1e83cfcacbcfff487ea3119a72e84d7",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): add index51 DDS-only isolation input [AUTO:LOCALIZATION-LOCALIZATION_A-00296]",
   "precommit_refresh": {
@@ -82,5 +82,7 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest HEAD includes disjoint B00287 index163 work only; no shared-state or index51 payload is overwritten."
   },
-  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00296 result SHA. RUNTIME_VALIDATION=UNTESTED."
+  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes the immutable A00296 result SHA. RUNTIME_VALIDATION=UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T00:35:00+09:00",
+  "bookkeeping_base_head_sha": "b5f6e71bd1e83cfcacbcfff487ea3119a72e84d7"
 }
