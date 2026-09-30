@@ -2535,10 +2535,19 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "authoritative_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "validation_bearing_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36782428617,
+      "head_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T06:55:15+09:00"
+    }
   }
 }

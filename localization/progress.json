@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-01T06:53:00+09:00",
+  "updated_at_kst": "2026-10-01T06:55:30+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "C174/Q00072 PRE-GATE: A00330@index12 PASS isolation; A00334@index111 PASS atomic re-emission -> authoritative 8,221-unresolved PREFLIGHT_ONLY; A00335@index195 PASS isolation; A00336@index51 PASS isolation. Out-of-batch candidate QA=133/159/198/201/232; runnable production=index61 rework. A00344@index147 remains out-of-batch pending. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C174/Q00072 AUTHORITATIVE GATE PASS: validation-bearing result be82dc96e9cfc48f434b1e013248cdca20e6cd78 passed Localization Automation Gate 36782428617 attempt 1. A00330@index12, A00335@index195 and A00336@index51 current-schema isolation inputs PASS; A00334@index111 atomic re-emission PASS with authoritative 8,221-unresolved PREFLIGHT_ONLY scope. Candidate QA backlog=133/159/198/201/232; runnable production=index61 rework. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -1495,18 +1495,30 @@
     "uploaded_archive_used": false,
     "heavy_qa_repeated": false,
     "vr_ffb_dx_changes": false,
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
+    "result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "authoritative_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+    "validation_bearing_result_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
     "precommit_refresh": {
       "head_sha": "c85411e771fc4110de90a1afd134cabcedca5b99",
       "stale_state_overwrite": false,
-      "concurrent_changes_reviewed": "Refreshed latest HEAD after a real branch race. Fixed Q00072 inputs are consumed once; concurrent A00344 plus prior B00332/A00338/A00340/B00339 are preserved as out-of-batch QA_PENDING."
+      "concurrent_changes_reviewed": "Refreshed latest HEAD after a real branch race. Fixed Q00072 inputs are consumed once; concurrent A00344 plus prior B00332/A00338/A00340/B00339 are preserved as out-of-batch QA_PENDING.",
+      "bookkeeping_head_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+      "bookkeeping_concurrent_changes": "No newer branch commit existed before bookkeeping; no concurrent producer state needed reconciliation at this checkpoint."
     },
     "result_commit_message": "localization(C): QA Q00072 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00343]",
-    "bookkeeping_note": "Bind RESULT_SHA only after this exact C result commit passes Localization Automation Gate. Runtime remains UNTESTED."
+    "bookkeeping_note": "Q00072 authoritative Gate PASS is owned by validation-bearing result be82dc96e9cfc48f434b1e013248cdca20e6cd78 (Localization Automation Gate run 36782428617, attempt 1). This bookkeeping checkpoint is separate and does not replace validation ownership. Runtime remains UNTESTED.",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36782428617,
+      "head_sha": "be82dc96e9cfc48f434b1e013248cdca20e6cd78",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T06:55:15+09:00"
+    },
+    "bookkeeping_recorded_at_kst": "2026-10-01T06:55:30+09:00"
   }
 }
