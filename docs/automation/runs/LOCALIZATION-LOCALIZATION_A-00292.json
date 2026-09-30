@@ -77,7 +77,8 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest HEAD refreshed immediately before atomic tree construction; A00291 bookkeeping is preserved and no shared state paths are touched."
   },
-  "bookkeeping_note": "Immutable producer result 0c99b6fd08ba50d40a5531933dccc1a0e4e26967 contains only A lane-local index132 canonical-source reactivation tooling/output plus the durable task record and required AUTO marker. This bookkeeping commit only records the producer result SHA; automation_validation remains PENDING under C_BATCH_GATE and runtime_validation remains UNTESTED.",
-  "bookkeeping_recorded_at_kst": "2026-09-30T23:54:00+09:00",
-  "bookkeeping_base_head_sha": "0c99b6fd08ba50d40a5531933dccc1a0e4e26967"
+  "bookkeeping_note": "Producer validation remains PENDING until an independent C batch consumes exact LOCALIZATION-LOCALIZATION_A-00292@0c99b6fd08ba50d40a5531933dccc1a0e4e26967. This bookkeeping commit only pins the immutable producer result SHA and does not replace result identity. RUNTIME_VALIDATION=UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T23:54:43+09:00",
+  "bookkeeping_base_head_sha": "0c99b6fd08ba50d40a5531933dccc1a0e4e26967",
+  "bookkeeping_parent_head_sha": "ec35e6b5a10c748f4315b97e362b0678f41d4f2c"
 }
