@@ -79,9 +79,11 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "00663841ced4e362860b0fa5004a94458634365d",
+  "authoritative_result_sha": "00663841ced4e362860b0fa5004a94458634365d",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(A): guard blocked A shard [AUTO:LOCALIZATION-LOCALIZATION_A-00285]",
-  "bookkeeping_note": "RESULT_SHA will be populated only after the immutable producer result commit exists. Producer automatic validation remains PENDING for the later C batch Gate. Runtime remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result 00663841ced4e362860b0fa5004a94458634365d recorded. This producer result does not own the runner-backed Localization Automation Gate; automation_validation remains PENDING with validation_mode=C_BATCH_GATE until a later C batch validates the exact producer SHA. Runtime remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-09-30T22:20:00+09:00",
+  "bookkeeping_base_head_sha": "00663841ced4e362860b0fa5004a94458634365d"
 }
