@@ -14,7 +14,7 @@
     "RUNTIME ISOLATION READY: indices99/222/237 have current-workflow or accepted DDS_ONLY inputs on unchanged production-complete static-QA candidates. No real-game validation is implied.",
     "OUT-OF-BATCH C QA: B00324, A00327, B00328, A00330 and B00331 remain QA_PENDING by exact TASK_ID@RESULT_SHA.",
     "THROUGHPUT v16: production_complete new=0; retained production_complete includes 222/237; candidate_awaiting_c=159/198/201; runnable_production=232; blocked_exception=54/147; runtime_validated=none.",
-    "Q00070 validation-bearing result commit will own the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00070 validation-bearing result b0388771ec0f8835898c4300c061b16a0fca8af7 passed Localization Automation Gate 36772955277 attempt 1. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2527,10 +2527,19 @@
       ],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null
+    "result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+    "authoritative_result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+    "validation_bearing_result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36772955277,
+      "head_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T05:29:35+09:00"
+    }
   }
 }
