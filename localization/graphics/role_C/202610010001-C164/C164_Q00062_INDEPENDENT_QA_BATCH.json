@@ -1,0 +1,371 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-c164-q00062-four-input-independent-batch-qa-current-policy-reconciliation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00293",
+  "wave_id": "Q00062",
+  "qa_batch_id": "Q00062",
+  "run": "C164",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T00:01:31+09:00",
+  "base_head_sha": "21b2edfb3c3052c26ed3627a505249725399817b",
+  "base_sha": "21b2edfb3c3052c26ed3627a505249725399817b",
+  "commit_mode": "VALIDATION_BEARING_RESULT",
+  "result": "PASS_Q00062_BATCH_ALL_FOUR_INPUTS_PASS_INDEX97_STATIC_QA_INDEX163_RENDER_READY_RUNTIME_UNTESTED",
+  "summary": "Q00062 consumes four immutable producer results once. B00283@index97 PASSes fresh independent exact source/candidate hash/header/decoded-pixel plus visual QA as STATIC_QA. A00281 PASSes only the fail-closed font binder PREFLIGHT_ONLY scope. A00285 PASSes only as a drift-detecting guard; its stale snapshot is not reasserted. B00284@index163 PASSes its pre-generation conservative-fit spec and is RENDER_READY because Q00060 already independently established exact source, masks, CLEAN_PLATE, semantics and safe geometry. Shared state is merged once; C writes no candidate DDS.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00283",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "f231efacf0bb71f2221de947d79e25d344a53245",
+      "result_message": "localization(B): rebuild index97 natively [AUTO:LOCALIZATION-LOCALIZATION_B-00283]",
+      "completed_at": "2026-09-30T22:14:27.252524+09:00",
+      "producer_id": "P00166",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "54d9119ac94f050549c3cc612cc99b5ba7798a65",
+      "result_message": "localization(A): add font trace binding harness [AUTO:LOCALIZATION-LOCALIZATION_A-00281]",
+      "completed_at": "2026-09-30T22:22:19.118872+09:00",
+      "producer_id": "P00165",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00285",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "00663841ced4e362860b0fa5004a94458634365d",
+      "result_message": "localization(A): guard blocked A shard [AUTO:LOCALIZATION-LOCALIZATION_A-00285]",
+      "completed_at": "2026-09-30T22:34:16.651739+09:00",
+      "producer_id": "P00168",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00284",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "08ceedbbfd8bf1908271339f78277863a16b1790",
+      "result_message": "localization(B): specify index163 conservative-fit rework [AUTO:LOCALIZATION-LOCALIZATION_B-00284]",
+      "completed_at": "2026-09-30T22:43:42.287437+09:00",
+      "producer_id": "P00167",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00283",
+      "result_sha": "f231efacf0bb71f2221de947d79e25d344a53245",
+      "status": "PASS",
+      "reason": "Index97/411827E native-v2 candidate PASS / STATIC_QA_PASS_RUNTIME_UNTESTED. C independently rehashed canonical v0.25.10a archive 76f85ed2... (306223257 bytes), exact source bad9701a..., Drive candidate bundle 9c305268... and DDS 85a50bb9.... Source/candidate 128-byte headers are byte-identical (5f6f54e0...), 2048x2048 RGBA32 mip1. Decoded replay changes 162648 pixels; with declared inclusive-LTRB seven source regions, RGBA outside=0 and alpha outside=0. 7/7 Korean bboxes fit candidate-safe bboxes; high-zoom source/clean/candidate review shows no clipping, English residue, cover box, wrong art or protected-art damage. Runtime UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00281",
+      "result_sha": "54d9119ac94f050549c3cc612cc99b5ba7798a65",
+      "status": "PASS",
+      "reason": "Font15/18/21 trace-binding harness PASS for fail-closed PREFLIGHT_ONLY scope. Q00061 static descriptor crosswalk fingerprint is reused rather than repeated. C checked hooks_localization emission order against the parser: first-seen font_state precedes first-seen width_text under the same lock; unobserved, mismatched or unbound handles never authorize reuse. safe_repurpose_inferred=false, candidate_dds_authorized=false, runtime_validation=UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00285",
+      "result_sha": "00663841ced4e362860b0fa5004a94458634365d",
+      "status": "PASS",
+      "reason": "A-shard runnability guard PASS only for its fail-closed control scope, not as a current zero-runnable assertion. Its pinned queue blob 8e099aef... differs from current pre-merge queue 6616452b..., so the guard must return RESCAN_REQUIRED and cannot reuse the stale snapshot. No DDS/rebuild/work-steal is authorized. production_readiness=PREFLIGHT_ONLY; runtime UNTESTED."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00284",
+      "result_sha": "08ceedbbfd8bf1908271339f78277863a16b1790",
+      "status": "PASS",
+      "reason": "Index163/59A79158 conservative-fit rework spec PASS and production_readiness=RENDER_READY. Q00060 exact source 7cf4f4c6..., 1024x2048 RGBA32 mip1 FLIP_Y, source-effect/removal masks, independently QAed transparent CLEAN_PLATE, 24/24 semantic binding, zero outside/protected/alpha/source-region violations and final safe geometry are reused once. B00284 resolves the only rejection with Ice Scape→빙원 and Skyscrapers→마천루, native preferred 56px (57/56 only). No stale candidate is promoted; fresh DDS/C QA required."
+    }
+  ],
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha_before_merge": "6616452bcc12e85ce88a7c0be2f395518f579557",
+    "previous_c_batch_task_blob_sha": "a1582c7d64f3546e539d55c72b980fd1e0d243d2",
+    "b00283_production_blob_sha": "2a4b7ec12d9a6ba743bf5703dbac7cf465d3a818",
+    "b00283_qa_blob_sha": "89a2a74ca0e869b71b2a1727a7fac83d572710ae",
+    "b00283_generation_prompt_blob_sha": "d07cc8fa0c3b46f721c07cfe1e2087ae89e55a11",
+    "a00281_report_blob_sha": "4c3704ba19cab16711e0ee01e91fdb9d4cf6e41a",
+    "a00281_tool_blob_sha": "74ef404cdc32ed8d73cff36ee87e74fc5b18f235",
+    "a00285_report_blob_sha": "532fae7f3ee22059608ece2adc6db92e2757b58e",
+    "a00285_tool_blob_sha": "1e46475291de17f5d1e1dc0399c940a120b925e8",
+    "b00284_spec_blob_sha": "7cfdb56067fa9301c8f89ba0f3ce81d7a0e11e66",
+    "canonical_source_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "index97_source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "index97_candidate_sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80",
+    "index97_candidate_bundle_sha256": "9c305268775a002c3bfd372196b5bcfd7178c87b10f6e0ca83c3d63803265691",
+    "index163_source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d"
+  },
+  "independent_replay": {
+    "index97": {
+      "asset": "411827E",
+      "candidate_zip_file_id": "1weJ8A0rrjB0KRHWbTprWjvzgzRV5uBJO",
+      "comparison_file_id": "1aeRU6XjwyrAcyjTM_yAbXBaEZK53nEiM",
+      "element_comparison_file_id": "1EowrqOWwxfgYSb-k7RZc9z5PFgN1C_IB",
+      "canonical_archive_bytes": 306223257,
+      "canonical_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "candidate_bundle_sha256": "9c305268775a002c3bfd372196b5bcfd7178c87b10f6e0ca83c3d63803265691",
+      "candidate_sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80",
+      "source_candidate_dds_bytes": 16777344,
+      "structure": "2048x2048 RGBA32 mip1 / raw flip_y",
+      "dds_header_sha256_source": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f",
+      "dds_header_sha256_candidate": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f",
+      "dds_header_identical": true,
+      "source_candidate_changed_pixels": 162648,
+      "bbox_coordinate_convention": "inclusive_LTRB",
+      "changed_pixels_outside_declared_source_regions": 0,
+      "alpha_changed_pixels_outside_declared_source_regions": 0,
+      "final_render_bbox_containment": "PASS_7_OF_7_INSIDE_CANDIDATE_SAFE_BBOX",
+      "high_risk_edge_touch": "RANDOM left edge equals safe-box left; visual PASS",
+      "independent_source_candidate_visual_review": "PASS_FULL_ATLAS_PLUS_7_ELEMENTS",
+      "production_readiness": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    "font_trace_binding": {
+      "indices": [
+        15,
+        18,
+        21
+      ],
+      "assets": [
+        "20389D70",
+        "7B65A191",
+        "D7CE8BC3"
+      ],
+      "prior_static_crosswalk_reused_from_q00061": true,
+      "hooks_localization_blob_sha": "f32afc3f14831e9afe8918c9087da6974535cbc6",
+      "parser_blob_sha": "74ef404cdc32ed8d73cff36ee87e74fc5b18f235",
+      "emission_order_checked": "font_state first-seen precedes width_text first-seen inside StringWidthDest/TraceMutex",
+      "safe_repurpose_inferred": false,
+      "candidate_dds_authorized": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED"
+    },
+    "a_shard_guard": {
+      "producer_pinned_queue_blob_sha": "8e099aefebb5911e46efa0d1e75a35d9bd8068ae",
+      "current_premerge_queue_blob_sha": "6616452bcc12e85ce88a7c0be2f395518f579557",
+      "fingerprint_drift_present": true,
+      "expected_current_behavior": "RESCAN_REQUIRED",
+      "current_zero_runnable_assertion_reused": false,
+      "candidate_rebuild_authorized": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "runtime_validation": "UNTESTED"
+    },
+    "index163": {
+      "asset": "59A79158",
+      "q00060_validation_bearing_result_sha": "8cffecbfe06f7ac72d2d0133ff596cdb827ae16c",
+      "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "retained_heavy_qa": "Q00060 exact source/header/FLIP_Y + masks + transparent CLEAN_PLATE + 24/24 semantics + zero outside/protected/alpha/source-region violations",
+      "rerender_rows": [
+        {
+          "source": "Ice Scape",
+          "korean": "빙원",
+          "source_effect_bbox_ltrb": [
+            5,
+            922,
+            250,
+            980
+          ],
+          "candidate_safe_bbox_ltrb": [
+            7,
+            924,
+            248,
+            978
+          ],
+          "preferred_native_font_size": 56,
+          "allowed_sizes": [
+            57,
+            56
+          ]
+        },
+        {
+          "source": "Skyscrapers",
+          "korean": "마천루",
+          "source_effect_bbox_ltrb": [
+            4,
+            1682,
+            305,
+            1740
+          ],
+          "candidate_safe_bbox_ltrb": [
+            6,
+            1684,
+            303,
+            1738
+          ],
+          "preferred_native_font_size": 56,
+          "allowed_sizes": [
+            57,
+            56
+          ]
+        }
+      ],
+      "style": "NanumSquare Bold; RGB 46,54,57; no outline/shadow/glow/slant; left",
+      "stale_candidate_promoted": false,
+      "production_readiness": "RENDER_READY",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "concurrent_head_reconciliation": {
+    "observed_head": "21b2edfb3c3052c26ed3627a505249725399817b",
+    "index97_superseded": false,
+    "index163_superseded": false,
+    "a00281_superseded": false,
+    "a00285_superseded": false,
+    "note": "HEAD refreshed before merge; A00286/A00291/A00292 are disjoint and do not replace batch fingerprints.",
+    "out_of_batch_newer_inputs": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00286",
+        "result_sha": "1eabccbc904731c6b18f34e2fa0f213ca4401e27",
+        "index": 30,
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00062"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00291",
+        "result_sha": "0d21bd282f48fd57f38bb0d6bdfb246c361b56eb",
+        "index": 48,
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00062"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00292",
+        "result_sha": "0c99b6fd08ba50d40a5531933dccc1a0e4e26967",
+        "index": 132,
+        "status": "QA_PENDING_NOT_DISPOSITIONED_BY_Q00062"
+      }
+    ]
+  },
+  "readiness_reconciliation": {
+    "production_readiness": {
+      "15": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "18": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "21": "PREFLIGHT_ONLY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED",
+      "24": "PREFLIGHT_ONLY_RUNTIME_NAME_ENTRY_MAPPING_BLOCKED",
+      "51": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "94": "PREFLIGHT_ONLY_V2_REGEN_CONSTRAINTS_READY",
+      "97": "STATIC_QA_PASS_RUNTIME_UNTESTED",
+      "111": "PREFLIGHT_ONLY_RANDOM_SIMPLE_MASK_REJECTED",
+      "121": "REWORK_REQUIRED_ZERO_PIXEL_OR_ARTIFACT",
+      "163": "RENDER_READY_B00284_TWO_ROW_NATIVE_CONSERVATIVE_FIT"
+    },
+    "render_ready_indices": [
+      163
+    ],
+    "one_stage_to_render_indices": [],
+    "candidate_rework_indices": [
+      121
+    ],
+    "candidate_qa_pending_indices": [
+      159,
+      198,
+      201
+    ],
+    "preflight_only_actionable_indices": [
+      94,
+      111,
+      133,
+      232
+    ],
+    "special_pipeline_preflight_only_indices": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "preflight_only_dependency_blocked_indices": [
+      175,
+      217,
+      135
+    ],
+    "static_qa_pass_runtime_untested_indices": [
+      51,
+      97,
+      99,
+      102,
+      112,
+      130,
+      152,
+      193,
+      195,
+      222,
+      226,
+      231,
+      237
+    ],
+    "runtime_isolation_ready_indices": [
+      99,
+      102,
+      112,
+      130,
+      193,
+      237
+    ],
+    "runtime_isolation_qa_pending_indices": [
+      226,
+      231
+    ],
+    "candidate_completion_priority": [
+      "RENDER_READY: index163/59A79158. Q00062 accepts B00284 exact-source/Q00060-mask/CLEAN_PLATE/semantic/safe-bbox two-row spec; render Ice Scape -> 빙원 and Skyscrapers -> 마천루 natively at preferred 56px (57/56 only), preserve all other 22 rows and exact DDS structure, then submit fresh candidate to C.",
+      "ONE_STAGE_TO_RENDER: none.",
+      "CANDIDATE_REWORK: index121/FD90AA9 remains REWORK_REQUIRED and stays ahead of unrelated preflight.",
+      "QA_BACKLOG: indices159/198/201 remain pending C. Index97/411827E leaves the backlog after Q00062 STATIC_QA PASS.",
+      "PREFLIGHT_ONLY: index94/2DA43E41, index111/C075FB49 and indices133/232 remain localize-text preflight. Font15/18/21 and name-entry24 remain runtime-mapping blocked special preflight.",
+      "STATIC_QA: index97/411827E candidate 85a50bb9... joins accepted static fingerprints 51/99/102/112/130/152/193/195/222/226/231/237. Runtime remains UNTESTED.",
+      "RUNTIME_ISOLATION: accepted inputs remain 99/102/112/130/193/237; 226/231 remain QA_PENDING.",
+      "OUT_OF_BATCH_QA_PENDING: A00286@index30, A00291@index48 and A00292@index132 source-reactivation guards are newer disjoint inputs and are not implicitly approved by Q00062.",
+      "Dependency-blocked: indices175/217 remain SOURCE_IDENTITY_MISMATCH and index135 SOURCE_ACQUISITION_EXHAUSTED; unchanged source-exhaustion rows must not be reprobed.",
+      "Q00062 validation-bearing result owns the single Localization Automation Gate. AUTOMATION_VALIDATION=PENDING until that exact commit Gate completes; RUNTIME_VALIDATION=UNTESTED."
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_CURRENT_POLICY_RECONCILIATION_AND_SINGLE_SHARED_STATE_MERGE",
+    "reviewed_inputs": 4,
+    "reviewed_assets": 5,
+    "producer_inputs_pass": 4,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold_strict_recheck": 0,
+    "producer_inputs_superseded": 0,
+    "new_static_artwork_passes": 1,
+    "new_pre_generation_passes": 3,
+    "new_render_ready": 1,
+    "new_runtime_isolation_inputs_accepted": 0,
+    "new_runtime_approvals": 0,
+    "metadata_segments_changed": 0,
+    "canonical_segments_after_merge": 755,
+    "actionable_localize_text_after": 93,
+    "pending_production_localize_text_after": 65,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00293.json",
+    "role_c_report": "localization/graphics/role_C/202610010001-C164/C164_Q00062_INDEPENDENT_QA_BATCH.json"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "github_actions_artifact_used": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified": true,
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "Fresh heavy decoded QA once for B00283@index97; reuse Q00061 font crosswalk and Q00060 index163 exact source/mask/CLEAN_PLATE/semantic fingerprints; validate only new binder/guard/rework-spec scope.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_gate": null,
+  "report_kind": "ROLE_C_INDEPENDENT_QA_BATCH_REPORT"
+}

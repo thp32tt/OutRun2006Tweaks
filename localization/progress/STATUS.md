@@ -1438,3 +1438,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Q00061 dispositions remain **A00276 PASS / A00278 PASS / A00279 PASS / A00280 PASS**. Index51/FF2462BB is authoritative **STATIC_QA_PASS_RUNTIME_UNTESTED** on candidate `907350cd...`; index111/index24/font15/18/21 remain accepted only for their PREFLIGHT_ONLY scopes.
 - Order remains **RENDER_READY none -> ONE_STAGE none -> rework 121/163 -> candidate QA 97/159/198/201 -> PREFLIGHT_ONLY 94/111/133/232 -> runtime-blocked special preflight 15/18/21/24**. Pending production **66**, actionable **93**, canonical segments **755**.
 - Canonical and legacy progress files remain byte-for-byte identical. This bookkeeping checkpoint is separate from the Gate-owning result commit. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+### C164 Q00062 — 2026-10-01 00:01 KST
+- Inputs B00283 `f231efac...`, A00281 `54d9119a...`, A00285 `00663841...`, B00284 `08ceedbb...`: **PASS / PASS / PASS / PASS**, none superseded at merge HEAD `21b2edfb`.
+- Index97: exact source/candidate hash+header+decoded diff+visual QA PASS -> **STATIC_QA_PASS_RUNTIME_UNTESTED** on `85a50bb9...`.
+- Font15/18/21 binder: **PASS / PREFLIGHT_ONLY**; A00285 guard: **PASS** fail-closed control scope only.
+- Index163: **PASS / RENDER_READY** two-row native rerender from Q00060-verified source/masks/CLEAN_PLATE/semantics/safe geometry.
+- Order **RENDER_READY 163 -> ONE_STAGE none -> rework 121 -> candidate QA 159/198/201 -> unrelated preflight**. Pending production **65**, actionable **93**, canonical segments **755**. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

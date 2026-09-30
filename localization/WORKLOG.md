@@ -2041,3 +2041,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Dispositions remain **PASS / PASS / PASS / PASS** for A00276, A00278, A00279 and A00280. Index51 candidate `907350cd...` remains **STATIC_QA_PASS_RUNTIME_UNTESTED**; the other accepted inputs remain pre-generation/static-crosswalk evidence only.
 - Shared next-actions keep candidate completion ahead of unrelated runtime/name-entry/font preflight. Canonical progress mirror remains synchronized; no candidate bytes or runtime status change in bookkeeping.
 - This commit does not own the Gate and does not replace `7bd5d0d7eab6ecfa9e506c94899c4be3edd1a82a` as the authoritative result. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+## 2026-10-01 00:01 KST - C164 Q00062 independent batch QA
+- Consumed immutable B00283 `f231efac...`, A00281 `54d9119a...`, A00285 `00663841...`, B00284 `08ceedbb...` once; dispositions **PASS / PASS / PASS / PASS**.
+- Index97/411827E fresh binary+visual QA: archive `76f85ed2...`, source `bad9701a...`, bundle `9c305268...`, candidate `85a50bb9...`; 2048x2048 RGBA32 mip1 headers byte-identical. 162,648 decoded changed pixels; **0** RGBA/**0** alpha changes outside seven inclusive source regions; 7/7 safe fit and source/clean/candidate visual PASS -> **STATIC_QA_PASS_RUNTIME_UNTESTED**.
+- A00281 font15/18/21 binder **PASS / PREFLIGHT_ONLY** only; A00285 guard **PASS** only as drift detector and current drift forces rescan.
+- Index163 B00284 **PASS / RENDER_READY** using Q00060 exact source/masks/CLEAN_PLATE/24 semantics/safe geometry; rerender only Ice Scape→빙원 and Skyscrapers→마천루 at native 57/56px. Stale undersized DDS remains rejected.
+- Order: **RENDER_READY 163 -> ONE_STAGE none -> rework 121 -> candidate QA 159/198/201 -> unrelated preflight**. Pending production **65**, actionable **93**, canonical segments **755**. A00286/A00291/A00292 remain out-of-batch QA_PENDING. No runtime/build/N100/local clone/Drive write/VR/FFB/DX. `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
